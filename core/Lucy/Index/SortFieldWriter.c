@@ -76,7 +76,7 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
                      OutStream *temp_ord_out, OutStream *temp_ix_out,
                      OutStream *temp_dat_out) {
     // Init.
-    SortEx_init((SortExternal*)self, sizeof(SFWriterElem));
+    SortEx_init((SortExternal*)self, sizeof(SFWriterElem*));
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
     ivars->null_ord        = -1;
     ivars->count           = 0;
@@ -139,6 +139,11 @@ SortFieldWriter_Clear_Cache_IMP(SortFieldWriter *self) {
     SortFieldWriter_Clear_Cache_t super_clear_cache
         = SUPER_METHOD_PTR(SORTFIELDWRITER, LUCY_SortFieldWriter_Clear_Cache);
     super_clear_cache(self);
+    // Note that we have not called MemPool_Release_All() on our memory pool.
+    // This is because the pool is shared amongst multiple SortFieldWriters
+    // which belong to a parent SortWriter; it is the responsibility of the
+    // parent SortWriter to release the memory pool once **all** of its child
+    // SortFieldWriters have cleared their caches.
 }
 
 void
@@ -191,9 +196,10 @@ SortFieldWriter_Add_IMP(SortFieldWriter *self, int32_t doc_id, Obj *value) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
 
     // Uniq-ify the value, and record it for this document.
-    SFWriterElem elem;
-    elem.value = S_find_unique_value(ivars->uniq_vals, value);
-    elem.doc_id = doc_id;
+    SFWriterElem *elem
+        = (SFWriterElem*)MemPool_Grab(ivars->mem_pool, sizeof(SFWriterElem));
+    elem->value = S_find_unique_value(ivars->uniq_vals, value);
+    elem->doc_id = doc_id;
     SortFieldWriter_Feed(self, &elem);
     ivars->count++;
 }
@@ -336,8 +342,8 @@ S_write_val(Obj *val, int8_t prim_id, OutStream *ix_out, OutStream *dat_out,
 int
 SortFieldWriter_Compare_IMP(SortFieldWriter *self, void *va, void *vb) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
-    SFWriterElem *a = (SFWriterElem*)va;
-    SFWriterElem *b = (SFWriterElem*)vb;
+    SFWriterElem *a = *(SFWriterElem**)va;
+    SFWriterElem *b = *(SFWriterElem**)vb;
     int32_t comparison
         = FType_null_back_compare_values(ivars->type, a->value, b->value);
     if (comparison == 0) { comparison = b->doc_id - a->doc_id; }
@@ -553,7 +559,8 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
 
     // Grab the first item and record its ord.  Add a dummy ord for invalid
     // doc id 0.
-    SFWriterElem *elem = (SFWriterElem*)SortFieldWriter_Fetch(self);
+    SFWriterElem **elem_ptr = (SFWriterElem**)SortFieldWriter_Fetch(self);
+    SFWriterElem *elem = *elem_ptr;
     ords[elem->doc_id] = ord;
     ords[0] = 0;
 
@@ -561,7 +568,8 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
     ivars->last_val = INCREF(elem->value);
     Obj *last_val_address = elem->value;
     S_write_val(elem->value, prim_id, ix_out, dat_out, dat_start);
-    while (NULL != (elem = (SFWriterElem*)SortFieldWriter_Fetch(self))) {
+    while (NULL != (elem_ptr = (SFWriterElem**)SortFieldWriter_Fetch(self))) {
+        elem = *elem_ptr;
         if (elem->value != last_val_address) {
             int32_t comparison
                 = FType_Compare_Values(ivars->type, elem->value, ivars->last_val);
