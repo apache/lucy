@@ -2282,7 +2282,7 @@ chaz_OS_init(void) {
     if (chaz_Util_can_open_file("/dev/null")) {
         strcpy(chaz_OS.dev_null, "/dev/null");
         strcpy(chaz_OS.exe_ext, "");
-        strcpy(chaz_OS.obj_ext, "");
+        strcpy(chaz_OS.obj_ext, ".o");
         strcpy(chaz_OS.local_command_start, "./");
         chaz_OS.shell_type = CHAZ_OS_POSIX;
     }
