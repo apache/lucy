@@ -15,6 +15,7 @@
  */
 
 #define C_LUCY_SORTFIELDWRITER
+#define C_LUCY_SFWRITERELEM
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
@@ -49,11 +50,11 @@ static int32_t
 S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
               OutStream *dat_out);
 
-typedef struct lucy_SFWriterElem {
-    Obj *value;
-    int32_t doc_id;
-} lucy_SFWriterElem;
-#define SFWriterElem lucy_SFWriterElem
+// Create an element for the sort pool.  Both the `value` and the object
+// allocation itself will come from the MemoryPool, so the the element will be
+// deallocated via MemPool_Release_All().
+static SFWriterElem*
+S_SFWriterElem_create(MemoryPool *mem_pool, Obj *value, int32_t doc_id);
 
 SortFieldWriter*
 SortFieldWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
@@ -196,10 +197,8 @@ SortFieldWriter_Add_IMP(SortFieldWriter *self, int32_t doc_id, Obj *value) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
 
     // Uniq-ify the value, and record it for this document.
-    SFWriterElem *elem
-        = (SFWriterElem*)MemPool_Grab(ivars->mem_pool, sizeof(SFWriterElem));
-    elem->value = S_find_unique_value(ivars->uniq_vals, value);
-    elem->doc_id = doc_id;
+    Obj *copy = S_find_unique_value(ivars->uniq_vals, value);
+    SFWriterElem *elem = S_SFWriterElem_create(ivars->mem_pool, copy, doc_id);
     SortFieldWriter_Feed(self, &elem);
     ivars->count++;
 }
@@ -342,8 +341,8 @@ S_write_val(Obj *val, int8_t prim_id, OutStream *ix_out, OutStream *dat_out,
 int
 SortFieldWriter_Compare_IMP(SortFieldWriter *self, void *va, void *vb) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
-    SFWriterElem *a = *(SFWriterElem**)va;
-    SFWriterElem *b = *(SFWriterElem**)vb;
+    SFWriterElemIVARS *a = SFWriterElem_IVARS(*(SFWriterElem**)va);
+    SFWriterElemIVARS *b = SFWriterElem_IVARS(*(SFWriterElem**)vb);
     int32_t comparison
         = FType_null_back_compare_values(ivars->type, a->value, b->value);
     if (comparison == 0) { comparison = b->doc_id - a->doc_id; }
@@ -561,27 +560,31 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
     // doc id 0.
     SFWriterElem **elem_ptr = (SFWriterElem**)SortFieldWriter_Fetch(self);
     SFWriterElem *elem = *elem_ptr;
-    ords[elem->doc_id] = ord;
+    SFWriterElemIVARS *elem_ivars = SFWriterElem_IVARS(elem);
+    ords[elem_ivars->doc_id] = ord;
     ords[0] = 0;
 
     // Build array of ords, write non-NULL sorted values.
-    ivars->last_val = INCREF(elem->value);
-    Obj *last_val_address = elem->value;
-    S_write_val(elem->value, prim_id, ix_out, dat_out, dat_start);
+    ivars->last_val = INCREF(elem_ivars->value);
+    Obj *last_val_address = elem_ivars->value;
+    S_write_val(elem_ivars->value, prim_id, ix_out, dat_out, dat_start);
     while (NULL != (elem_ptr = (SFWriterElem**)SortFieldWriter_Fetch(self))) {
         elem = *elem_ptr;
-        if (elem->value != last_val_address) {
+        elem_ivars = SFWriterElem_IVARS(elem);
+        if (elem_ivars->value != last_val_address) {
             int32_t comparison
-                = FType_Compare_Values(ivars->type, elem->value, ivars->last_val);
+                = FType_Compare_Values(ivars->type, elem_ivars->value,
+                                       ivars->last_val);
             if (comparison != 0) {
                 ord++;
-                S_write_val(elem->value, prim_id, ix_out, dat_out, dat_start);
+                S_write_val(elem_ivars->value, prim_id, ix_out, dat_out,
+                            dat_start);
                 DECREF(ivars->last_val);
-                ivars->last_val = INCREF(elem->value);
+                ivars->last_val = INCREF(elem_ivars->value);
             }
-            last_val_address = elem->value;
+            last_val_address = elem_ivars->value;
         }
-        ords[elem->doc_id] = ord;
+        ords[elem_ivars->doc_id] = ord;
     }
     DECREF(ivars->last_val);
     ivars->last_val = NULL;
@@ -750,4 +753,39 @@ S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in,
     DECREF(dat_in_dupe);
 }
 
+/***************************************************************************/
+
+static SFWriterElem*
+S_SFWriterElem_create(MemoryPool *mem_pool, Obj *value, int32_t doc_id) {
+    size_t size = VTable_Get_Obj_Alloc_Size(SFWRITERELEM);
+    SFWriterElem *self = (SFWriterElem*)MemPool_Grab(mem_pool, size);
+    VTable_Init_Obj(SFWRITERELEM, (Obj*)self);
+    SFWriterElemIVARS *ivars = SFWriterElem_IVARS(self);
+    ivars->value  = value;
+    ivars->doc_id = doc_id;
+    return self;
+}
+
+void
+SFWriterElem_Destroy_IMP(SFWriterElem *self) {
+    UNUSED_VAR(self);
+    THROW(ERR, "Illegal attempt to destroy SFWriterElem object");
+}
+
+uint32_t
+SFWriterElem_Get_RefCount_IMP(SFWriterElem* self) {
+    UNUSED_VAR(self);
+    return 1;
+}
+
+SFWriterElem*
+SFWriterElem_Inc_RefCount_IMP(SFWriterElem* self) {
+    return self;
+}
+
+uint32_t
+SFWriterElem_Dec_RefCount_IMP(SFWriterElem* self) {
+    UNUSED_VAR(self);
+    return 1;
+}
 
