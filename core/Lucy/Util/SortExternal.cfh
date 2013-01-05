@@ -92,13 +92,13 @@ abstract class Lucy::Util::SortExternal nickname SortEx
     /** Fetch the next sorted item from the sort pool.  Invalid prior to
      * calling Flip(). Returns NULL when all elements have been exhausted.
      */
-    nullable void*
+    incremented nullable Obj*
     Fetch(SortExternal *self);
 
     /** Preview the next item that Fetch will return, but don't pop it.
      * Invalid prior to calling Flip().
      */
-    nullable void*
+    nullable Obj*
     Peek(SortExternal *self);
 
     /** Add a run to the sortex's collection.

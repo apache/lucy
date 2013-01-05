@@ -94,29 +94,30 @@ SortEx_Feed_IMP(SortExternal *self, Obj *item) {
     ivars->cache_max++;
 }
 
-static CFISH_INLINE void*
+static CFISH_INLINE Obj*
 SI_peek(SortExternal *self, SortExternalIVARS *ivars) {
     if (ivars->cache_tick >= ivars->cache_max) {
         S_refill_cache(self, ivars);
     }
 
     if (ivars->cache_max > 0) {
-        return ivars->cache + ivars->cache_tick * sizeof(Obj*);
+        Obj **elems = (Obj**)ivars->cache;
+        return elems[ivars->cache_tick];
     }
     else {
         return NULL;
     }
 }
 
-void*
+Obj*
 SortEx_Fetch_IMP(SortExternal *self) {
     SortExternalIVARS *const ivars = SortEx_IVARS(self);
-    void *address = SI_peek(self, ivars);
+    Obj *item = SI_peek(self, ivars);
     ivars->cache_tick++;
-    return address;
+    return item;
 }
 
-void*
+Obj*
 SortEx_Peek_IMP(SortExternal *self) {
     SortExternalIVARS *const ivars = SortEx_IVARS(self);
     return SI_peek(self, ivars);
