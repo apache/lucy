@@ -425,6 +425,14 @@ chaz_MakeFile_add_rule(chaz_MakeFile *makefile, const char *target,
 void
 chaz_MakeFile_add_to_cleanup(chaz_MakeFile *makefile, const char *target);
 
+/** Add a directory to the 'clean' target.
+ *
+ * @param makefile The makefile.
+ * @param dir The directory.
+ */
+void
+chaz_MakeFile_add_dir_to_cleanup(chaz_MakeFile *makefile, const char *dir);
+
 /** Add a rule to link an executable. The executable will also be added to the
  * list of files to clean.
  *
@@ -432,9 +440,9 @@ chaz_MakeFile_add_to_cleanup(chaz_MakeFile *makefile, const char *target);
  * @param exe The name of the executable.
  * @param objects The list of object files.
  */
-void
+chaz_MakeRule*
 chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
-                      const char *objects);
+                      const char *objects, const char *extra_link_flags);
 
 /** Add a rule to link a shared object. The shared object will also be added to
  * the list of files to clean.
@@ -443,9 +451,10 @@ chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
  * @param shared_obj The name of the shared object.
  * @param objects The list of object files.
  */
-void
+chaz_MakeRule*
 chaz_MakeFile_add_shared_obj(chaz_MakeFile *makefile, const char *shared_obj,
-                             const char *objects);
+                             const char *objects,
+                             const char *extra_link_flags);
 
 /** Write the makefile to a file named 'Makefile' in the current directory.
  *
@@ -2858,8 +2867,10 @@ struct chaz_MakeFile {
     size_t          num_vars;
     chaz_MakeRule **rules;
     size_t          num_rules;
-    char          **cleanups;
-    size_t          num_cleanups;
+    char          **cleanup_files;
+    size_t          num_cleanup_files;
+    char          **cleanup_dirs;
+    size_t          num_cleanup_dirs;
 };
 
 /* Static vars. */
@@ -2978,9 +2989,13 @@ chaz_MakeFile_new() {
     makefile->rules[0] = NULL;
     makefile->num_rules = 0;
 
-    makefile->cleanups = (char**)malloc(sizeof(char*));
-    makefile->cleanups[0] = NULL;
-    makefile->num_cleanups = 0;
+    makefile->cleanup_files = (char**)malloc(sizeof(char*));
+    makefile->cleanup_files[0] = NULL;
+    makefile->num_cleanup_files = 0;
+
+    makefile->cleanup_dirs = (char**)malloc(sizeof(char*));
+    makefile->cleanup_dirs[0] = NULL;
+    makefile->num_cleanup_dirs = 0;
 
     return makefile;
 }
@@ -3034,21 +3049,32 @@ chaz_MakeFile_add_rule(chaz_MakeFile *makefile, const char *target,
 
 void
 chaz_MakeFile_add_to_cleanup(chaz_MakeFile *makefile, const char *target) {
-    char    *cleanup      = chaz_Util_strdup(target);
-    char   **cleanups     = makefile->cleanups;
-    size_t   num_cleanups = makefile->num_cleanups + 1;
+    char   **files     = makefile->cleanup_files;
+    size_t   num_files = makefile->num_cleanup_files + 1;
 
-    cleanups = (char**)realloc(cleanups, (num_cleanups + 1) * sizeof(char*));
-    cleanups[num_cleanups-1] = cleanup;
-    cleanups[num_cleanups]   = NULL;
-    makefile->cleanups = cleanups;
-    makefile->num_cleanups = num_cleanups;
+    files = (char**)realloc(files, (num_files + 1) * sizeof(char*));
+    files[num_files-1] = chaz_Util_strdup(target);
+    files[num_files]   = NULL;
+    makefile->cleanup_files     = files;
+    makefile->num_cleanup_files = num_files;
 }
 
 void
+chaz_MakeFile_add_dir_to_cleanup(chaz_MakeFile *makefile, const char *dir) {
+    char   **dirs     = makefile->cleanup_dirs;
+    size_t   num_dirs = makefile->num_cleanup_dirs + 1;
+
+    dirs = (char**)realloc(dirs, (num_dirs + 1) * sizeof(char*));
+    dirs[num_dirs-1] = chaz_Util_strdup(dir);
+    dirs[num_dirs]   = NULL;
+    makefile->cleanup_dirs     = dirs;
+    makefile->num_cleanup_dirs = num_dirs;
+}
+
+chaz_MakeRule*
 chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
-                      const char *objects) {
-    const char    *pattern     = "%s %s %s %s%s";
+                      const char *objects, const char *extra_link_flags) {
+    const char    *pattern     = "%s %s %s %s %s%s";
     const char    *link        = chaz_CC_link_command();
     const char    *link_flags  = chaz_CC_link_flags();
     const char    *output_flag = chaz_CC_link_output_flag();
@@ -3061,21 +3087,26 @@ chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
     size = strlen(pattern)
            + strlen(link)
            + strlen(link_flags)
+           + strlen(extra_link_flags)
            + strlen(objects)
            + strlen(output_flag)
            + strlen(exe)
            + 50;
     command = (char*)malloc(size);
-    sprintf(command, pattern, link, link_flags, objects, output_flag, exe);
+    sprintf(command, pattern, link, link_flags, extra_link_flags, objects,
+            output_flag, exe);
     chaz_MakeRule_add_command(rule, command);
 
     chaz_MakeFile_add_to_cleanup(makefile, exe);
+
+    return rule;
 }
 
-void
+chaz_MakeRule*
 chaz_MakeFile_add_shared_obj(chaz_MakeFile *makefile, const char *shared_obj,
-                             const char *objects) {
-    const char    *pattern     = "%s %s %s %s %s%s";
+                             const char *objects,
+                             const char *extra_link_flags) {
+    const char    *pattern     = "%s %s %s %s %s %s%s";
     const char    *link        = chaz_CC_link_command();
     const char    *shobj_flags = chaz_CC_link_shared_obj_flag();
     const char    *link_flags  = chaz_CC_link_flags();
@@ -3090,77 +3121,96 @@ chaz_MakeFile_add_shared_obj(chaz_MakeFile *makefile, const char *shared_obj,
            + strlen(link)
            + strlen(shobj_flags)
            + strlen(link_flags)
+           + strlen(extra_link_flags)
            + strlen(objects)
            + strlen(output_flag)
            + strlen(shared_obj)
            + 50;
     command = (char*)malloc(size);
-    sprintf(command, pattern, link, shobj_flags, link_flags, objects,
-            output_flag, shared_obj);
+    sprintf(command, pattern, link, shobj_flags, link_flags, extra_link_flags,
+            objects, output_flag, shared_obj);
     chaz_MakeRule_add_command(rule, command);
 
     chaz_MakeFile_add_to_cleanup(makefile, shared_obj);
+
+    return rule;
 }
 
 void
 chaz_MakeFile_write(chaz_MakeFile *makefile) {
     int     shell_type = chaz_OS_shell_type();
-    FILE   *file;
+    FILE   *out;
     size_t  i;
 
-    file = fopen("Makefile", "w");
-    if (!file) {
+    out = fopen("Makefile", "w");
+    if (!out) {
         chaz_Util_die("Can't open Makefile\n");
     }
 
     for (i = 0; makefile->vars[i]; i++) {
         chaz_MakeVar *var = makefile->vars[i];
-        fprintf(file, "%s = %s\n", var->name, var->value);
+        fprintf(out, "%s = %s\n", var->name, var->value);
     }
-    fprintf(file, "\n");
+    fprintf(out, "\n");
 
     for (i = 0; makefile->rules[i]; i++) {
         chaz_MakeRule *rule = makefile->rules[i];
-        fprintf(file, "%s :", rule->targets);
+        fprintf(out, "%s :", rule->targets);
         if (rule->prereqs) {
-            fprintf(file, " %s", rule->prereqs);
+            fprintf(out, " %s", rule->prereqs);
         }
-        fprintf(file, "\n");
+        fprintf(out, "\n");
         if (rule->commands) {
-            fprintf(file, "%s", rule->commands);
+            fprintf(out, "%s", rule->commands);
         }
-        fprintf(file, "\n");
+        fprintf(out, "\n");
     }
 
-    if (makefile->cleanups[0]) {
+    if (makefile->cleanup_files[0] || makefile->cleanup_dirs[0]) {
+        fprintf(out, "clean :\n");
         if (shell_type == CHAZ_OS_POSIX) {
-            fprintf(file, "clean :\n\trm -f");
-            for (i = 0; makefile->cleanups[i]; i++) {
-                const char *cleanup = makefile->cleanups[i];
-                fprintf(file, " \\\n\t    %s", cleanup);
+            if (makefile->cleanup_files[0]) {
+                fprintf(out, "\trm -f");
+                for (i = 0; makefile->cleanup_files[i]; i++) {
+                    const char *file = makefile->cleanup_files[i];
+                    fprintf(out, " \\\n\t    %s", file);
+                }
+                fprintf(out, "\n");
             }
-            fprintf(file, "\n\n");
+            if (makefile->cleanup_dirs[0]) {
+                fprintf(out, "\trm -rf");
+                for (i = 0; makefile->cleanup_dirs[i]; i++) {
+                    const char *dir = makefile->cleanup_dirs[i];
+                    fprintf(out, " \\\n\t    %s", dir);
+                }
+                fprintf(out, "\n");
+            }
         }
         else if (shell_type == CHAZ_OS_CMD_EXE) {
-            fprintf(file, "clean :\n");
-            for (i = 0; makefile->cleanups[i]; i++) {
-                const char *cleanup = makefile->cleanups[i];
-                fprintf(file, "\tfor %%i in (%s) do @if exist %%i del /f %%i\n",
-                        cleanup);
+            for (i = 0; makefile->cleanup_files[i]; i++) {
+                const char *file = makefile->cleanup_files[i];
+                fprintf(out, "\tfor %%i in (%s) do @if exist %%i del /f %%i\n",
+                        file);
             }
-            fprintf(file, "\n");
+            for (i = 0; makefile->cleanup_dirs[i]; i++) {
+                const char *dir = makefile->cleanup_dirs[i];
+                fprintf(out,
+                        "\tfor %%i in (%s) do @if exist %%i rmdir /s /q %%i\n",
+                        dir);
+            }
         }
         else {
             chaz_Util_die("Unsupported shell type: %d", shell_type);
         }
+        fprintf(out, "\n");
     }
 
-    fprintf(file, "distclean : clean\n");
+    fprintf(out, "distclean : clean\n");
     if (shell_type == CHAZ_OS_POSIX) {
-        fprintf(file, "\trm -f charmonizer$(EXE_EXT) charmony.h Makefile\n\n");
+        fprintf(out, "\trm -f charmonizer$(EXE_EXT) charmony.h Makefile\n\n");
     }
     else if (shell_type == CHAZ_OS_CMD_EXE) {
-        fprintf(file,
+        fprintf(out,
             "\tfor %%i in (charmonizer$(EXE_EXT) charmonizer$(OBJ_EXT)"
             " charmony.h Makefile) do @if exist %%i del /f %%i\n\n");
     }
@@ -3170,16 +3220,16 @@ chaz_MakeFile_write(chaz_MakeFile *makefile) {
 
     if (chaz_Make.is_nmake) {
         /* Inference rule for .c files. */
-        fprintf(file, ".c.obj :\n");
+        fprintf(out, ".c.obj :\n");
         if (chaz_CC_msvc_version_num()) {
-            fprintf(file, "\t$(CC) $(CFLAGS) /c $< /Fo$@\n\n");
+            fprintf(out, "\t$(CC) $(CFLAGS) /c $< /Fo$@\n\n");
         }
         else {
-            fprintf(file, "\t$(CC) $(CFLAGS) -c $< -o $@\n\n");
+            fprintf(out, "\t$(CC) $(CFLAGS) -c $< -o $@\n\n");
         }
     }
 
-    fclose(file);
+    fclose(out);
 }
 
 void
@@ -5771,6 +5821,13 @@ chaz_VariadicMacros_run(void) {
 /* #include "Charmonizer/Core/ConfWriterPerl.h" */
 /* #include "Charmonizer/Core/ConfWriterRuby.h" */
 
+#define DIR_SEP "/"
+
+typedef struct SourceFileContext {
+    chaz_MakeVar *var;
+    const char *dir;
+} SourceFileContext;
+
 static void
 S_add_compiler_flags(struct chaz_CLIArgs *args) {
     if (chaz_Probe_gcc_version_num()) {
@@ -5815,6 +5872,199 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
             chaz_CC_add_extra_cflags("/DHAS_BOOL");
         }
     }
+}
+
+static void
+S_source_file_callback(char *file, void *context) {
+    SourceFileContext *sfc = (SourceFileContext*)context;
+    const char *json_parser_c = "Lucy" DIR_SEP "Util" DIR_SEP "Json" DIR_SEP
+                                "JsonParser.c";
+    size_t file_len = strlen(file);
+    size_t obj_file_size;
+    const char *pattern;
+    char *obj_file;
+
+    if (strcmp(file, json_parser_c) == 0) { return; }
+
+    /* Strip extension */
+    if (file_len <= 2 || memcmp(file + file_len - 2, ".c", 2) != 0) {
+        chaz_Util_warn("Unexpected source file name: %s", file);
+        return;
+    }
+    file[file_len-2] = '\0';
+
+    pattern = "%s" DIR_SEP "%s$(OBJ_EXT)";
+    obj_file_size = strlen(pattern) + file_len + 10;
+    obj_file = (char*)malloc(obj_file_size);
+    sprintf(obj_file, pattern, sfc->dir, file);
+    chaz_MakeVar_append(sfc->var, obj_file);
+    free(obj_file);
+}
+
+static void
+S_write_makefile() {
+    SourceFileContext sfc;
+
+    const char *base_dir  = "..";
+    const char *exe_ext   = chaz_OS_exe_ext();
+    const char *obj_ext   = chaz_OS_obj_ext();
+    const char *shobj_ext = chaz_OS_shared_obj_ext();
+
+    const char *json_parser_y = "$(CORE_DIR)" DIR_SEP "Lucy" DIR_SEP "Util"
+                                DIR_SEP "Json" DIR_SEP "JsonParser.y";
+    const char *json_parser_h = "$(CORE_DIR)" DIR_SEP "Lucy" DIR_SEP "Util"
+                                DIR_SEP "Json" DIR_SEP "JsonParser.h";
+    const char *json_parser_c = "$(CORE_DIR)" DIR_SEP "Lucy" DIR_SEP "Util"
+                                DIR_SEP "Json" DIR_SEP "JsonParser.c";
+
+    char *scratch;
+
+    chaz_MakeFile *makefile;
+    chaz_MakeVar  *var;
+    chaz_MakeRule *rule;
+
+    printf("Creating Makefile...\n");
+
+    makefile = chaz_MakeFile_new();
+
+    /* Directories */
+
+    chaz_MakeFile_add_var(makefile, "SRC_DIR", "src");
+    chaz_MakeFile_add_var(makefile, "AUTOGEN_DIR", "autogen");
+    chaz_MakeFile_add_var(makefile, "BASE_DIR", base_dir);
+    chaz_MakeFile_add_var(makefile, "CORE_DIR",
+                          "$(BASE_DIR)" DIR_SEP "core");
+    chaz_MakeFile_add_var(makefile, "MODULES_DIR",
+                          "$(BASE_DIR)" DIR_SEP "modules");
+    chaz_MakeFile_add_var(makefile, "LEMON_DIR",
+                          "$(BASE_DIR)" DIR_SEP "lemon");
+    chaz_MakeFile_add_var(makefile, "CFC_DIR",
+                          "$(BASE_DIR)" DIR_SEP "clownfish" DIR_SEP "compiler"
+                          DIR_SEP "c");
+    chaz_MakeFile_add_var(makefile, "SNOWSTEM_DIR",
+                          "$(MODULES_DIR)" DIR_SEP "analysis" DIR_SEP
+                          "snowstem" DIR_SEP "source");
+    chaz_MakeFile_add_var(makefile, "SNOWSTOP_DIR",
+                          "$(MODULES_DIR)" DIR_SEP "analysis" DIR_SEP
+                          "snowstop" DIR_SEP "source");
+    chaz_MakeFile_add_var(makefile, "UTF8PROC_DIR",
+                          "$(MODULES_DIR)" DIR_SEP "unicode" DIR_SEP
+                          "utf8proc");
+
+    /* File extensions */
+
+    chaz_MakeFile_add_var(makefile, "EXE_EXT", exe_ext);
+    chaz_MakeFile_add_var(makefile, "OBJ_EXT", obj_ext);
+    chaz_MakeFile_add_var(makefile, "SHOBJ_EXT", shobj_ext);
+
+    /* C compiler */
+
+    chaz_MakeFile_add_var(makefile, "CC", chaz_CC_get_cc());
+
+    if (chaz_CC_msvc_version_num()) {
+        chaz_CC_add_extra_cflags("/nologo");
+    }
+    chaz_CC_set_optimization_level("2");
+    chaz_CC_add_include_dir(".");
+    chaz_CC_add_include_dir("$(SRC_DIR)");
+    chaz_CC_add_include_dir("$(CORE_DIR)");
+    chaz_CC_add_include_dir("$(AUTOGEN_DIR)" DIR_SEP "include");
+    chaz_CC_add_include_dir("$(SNOWSTEM_DIR)" DIR_SEP "include");
+    chaz_CC_add_include_dir("$(MODULES_DIR)" DIR_SEP "unicode" DIR_SEP "ucd");
+    chaz_CC_add_include_dir("$(UTF8PROC_DIR)");
+
+    var = chaz_MakeFile_add_var(makefile, "CFLAGS", NULL);
+    chaz_MakeVar_append(var, chaz_CC_get_cflags());
+    chaz_MakeVar_append(var, chaz_CC_get_extra_cflags());
+
+    /* Object files */
+
+    chaz_MakeFile_add_var(makefile, "LEMON_OBJS",
+                          "$(LEMON_DIR)" DIR_SEP "lemon$(OBJ_EXT)");
+
+    var = chaz_MakeFile_add_var(makefile, "LUCY_OBJS", NULL);
+    sfc.var = var;
+
+    sfc.dir = "$(SRC_DIR)";
+    chaz_Make_list_files("src", "c", S_source_file_callback, &sfc);
+
+    scratch = (char*)malloc(strlen(base_dir) + 20);
+    sprintf(scratch, "%s" DIR_SEP "core", base_dir);
+    sfc.dir = "$(CORE_DIR)";
+    chaz_Make_list_files(scratch, "c", S_source_file_callback, &sfc);
+    free(scratch);
+    chaz_MakeVar_append(var, "$(CORE_DIR)" DIR_SEP "Lucy" DIR_SEP "Util"
+                        DIR_SEP "Json" DIR_SEP "JsonParser$(OBJ_EXT)");
+
+    scratch = (char*)malloc(strlen(base_dir) + 80);
+    sprintf(scratch, "%s" DIR_SEP "modules" DIR_SEP "analysis" DIR_SEP
+            "snowstem" DIR_SEP "source", base_dir);
+    sfc.dir = "$(SNOWSTEM_DIR)";
+    chaz_Make_list_files(scratch, "c", S_source_file_callback, &sfc);
+    free(scratch);
+
+    scratch = (char*)malloc(strlen(base_dir) + 80);
+    sprintf(scratch, "%s" DIR_SEP "modules" DIR_SEP "analysis" DIR_SEP
+            "snowstop" DIR_SEP "source", base_dir);
+    sfc.dir = "$(SNOWSTOP_DIR)";
+    chaz_Make_list_files(scratch, "c", S_source_file_callback, &sfc);
+    free(scratch);
+
+    scratch = (char*)malloc(strlen(base_dir) + 80);
+    sprintf(scratch, "%s" DIR_SEP "modules" DIR_SEP "unicode" DIR_SEP
+            "utf8proc", base_dir);
+    sfc.dir = "$(UTF8PROC_DIR)";
+    chaz_Make_list_files(scratch, "c", S_source_file_callback, &sfc);
+    free(scratch);
+
+    chaz_MakeVar_append(var, "$(AUTOGEN_DIR)" DIR_SEP "source" DIR_SEP
+                        "parcel$(OBJ_EXT)");
+
+    /* Executables */
+
+    chaz_MakeFile_add_var(makefile, "LEMON_EXE",
+                          "$(LEMON_DIR)" DIR_SEP "lemon$(EXE_EXT)");
+    chaz_MakeFile_add_var(makefile, "CFC_EXE",
+                          "$(CFC_DIR)" DIR_SEP "cfc$(EXE_EXT)");
+
+    /* Shared library */
+
+    chaz_MakeFile_add_var(makefile, "LUCY_SHOBJ", "liblucy$(SHOBJ_EXT)");
+
+    /* Rules */
+
+    chaz_MakeFile_add_rule(makefile, "all", "$(LUCY_SHOBJ)");
+
+    chaz_MakeFile_add_exe(makefile, "$(LEMON_EXE)", "$(LEMON_OBJS)", "");
+
+    rule = chaz_MakeFile_add_rule(makefile, "$(CFC_EXE)", NULL);
+    chaz_MakeRule_add_command_make(rule, "$(CFC_DIR)", NULL);
+
+    rule = chaz_MakeFile_add_rule(makefile, "$(AUTOGEN_DIR)", "$(CFC_EXE)");
+    chaz_MakeRule_add_command(rule, "$(CFC_EXE) --source=$(CORE_DIR) "
+                              "--dest=$(AUTOGEN_DIR) --header=cfc_header");
+
+    rule = chaz_MakeFile_add_rule(makefile, json_parser_c, NULL);
+    chaz_MakeRule_add_prereq(rule, "$(LEMON_EXE)");
+    chaz_MakeRule_add_prereq(rule, json_parser_y);
+    scratch = (char*)malloc(strlen(json_parser_y) + 20);
+    sprintf(scratch, "$(LEMON_EXE) -q %s", json_parser_y);
+    chaz_MakeRule_add_command(rule, scratch);
+    free(scratch);
+
+    rule = chaz_MakeFile_add_rule(makefile, "$(LUCY_OBJS)", NULL);
+    chaz_MakeRule_add_prereq(rule, json_parser_c);
+    chaz_MakeRule_add_prereq(rule, "$(AUTOGEN_DIR)");
+
+    chaz_MakeFile_add_shared_obj(makefile, "$(LUCY_SHOBJ)", "$(LUCY_OBJS)",
+                                 "");
+
+    chaz_MakeFile_add_to_cleanup(makefile, "$(LUCY_OBJS)");
+    chaz_MakeFile_add_to_cleanup(makefile, json_parser_h);
+    chaz_MakeFile_add_to_cleanup(makefile, json_parser_c);
+    chaz_MakeFile_add_dir_to_cleanup(makefile, "$(AUTOGEN_DIR)");
+
+    chaz_MakeFile_write(makefile);
 }
 
 int main(int argc, const char **argv) {
@@ -5884,6 +6134,16 @@ int main(int argc, const char **argv) {
         "  #endif\n"
         "#endif\n\n"
     );
+
+    {
+        int i;
+        for (i = 0; i < argc; i++) {
+            if (strncmp(argv[i], "--enable-makefile", 17) == 0) {
+                S_write_makefile();
+                break;
+            }
+        }
+    }
 
     /* Clean up. */
     chaz_Probe_clean_up();
