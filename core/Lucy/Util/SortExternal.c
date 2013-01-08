@@ -136,8 +136,8 @@ SortEx_Sort_Cache_IMP(SortExternal *self) {
         if (ivars->scratch_cap < ivars->cache_cap) {
             ivars->scratch_cap = ivars->cache_cap;
             ivars->scratch
-                = (uint8_t*)REALLOCATE(ivars->scratch,
-                                       ivars->scratch_cap * sizeof(Obj*));
+                = (Obj**)REALLOCATE(ivars->scratch,
+                                    ivars->scratch_cap * sizeof(Obj*));
         }
         Sort_mergesort(ivars->cache, ivars->scratch, ivars->cache_max,
                        sizeof(Obj*), compare, self);
@@ -159,8 +159,8 @@ SortEx_Add_Run_IMP(SortExternal *self, SortExternal *run) {
         = (uint32_t*)REALLOCATE(ivars->slice_sizes,
                                 num_runs * sizeof(uint32_t));
     ivars->slice_starts
-        = (uint8_t**)REALLOCATE(ivars->slice_starts,
-                                num_runs * sizeof(uint8_t*));
+        = (Obj**)REALLOCATE(ivars->slice_starts,
+                                num_runs * sizeof(Obj*));
 }
 
 static void
@@ -223,7 +223,7 @@ static void
 S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
                 uint8_t *endpost) {
     uint32_t    num_runs     = VA_Get_Size(ivars->runs);
-    uint8_t   **slice_starts = ivars->slice_starts;
+    Obj       **slice_starts = ivars->slice_starts;
     uint32_t   *slice_sizes  = ivars->slice_sizes;
     VTable     *vtable       = SortEx_Get_VTable(self);
     CFISH_Sort_Compare_t compare
@@ -258,7 +258,7 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
     // Transform slice starts from ticks to pointers.
     uint32_t total = 0;
     for (uint32_t i = 0; i < ivars->num_slices; i++) {
-        slice_starts[i] = ivars->cache + total * sizeof(Obj*);
+        slice_starts[i] = (Obj*)(ivars->cache + total * sizeof(Obj*));
         total += slice_sizes[i];
     }
 
@@ -266,7 +266,7 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
     // but exploit the fact that each slice is already sorted.
     if (ivars->scratch_cap < ivars->cache_cap) {
         ivars->scratch_cap = ivars->cache_cap;
-        ivars->scratch = (uint8_t*)REALLOCATE(
+        ivars->scratch = (Obj**)REALLOCATE(
                             ivars->scratch, ivars->scratch_cap * sizeof(Obj*));
     }
 
