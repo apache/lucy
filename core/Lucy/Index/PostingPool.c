@@ -260,36 +260,6 @@ PostPool_Add_Segment_IMP(PostingPool *self, SegReader *reader,
 }
 
 void
-PostPool_Shrink_IMP(PostingPool *self) {
-    PostingPoolIVARS *const ivars = PostPool_IVARS(self);
-    if (ivars->cache_max - ivars->cache_tick > 0) {
-        size_t cache_count = PostPool_Cache_Count(self);
-        size_t size        = cache_count * sizeof(Obj*);
-        if (ivars->cache_tick > 0) {
-            Obj **start = ivars->cache + ivars->cache_tick;
-            memmove(ivars->cache, start, size);
-        }
-        ivars->cache      = (Obj**)REALLOCATE(ivars->cache, size);
-        ivars->cache_tick = 0;
-        ivars->cache_max  = cache_count;
-        ivars->cache_cap  = cache_count;
-    }
-    else {
-        FREEMEM(ivars->cache);
-        ivars->cache      = NULL;
-        ivars->cache_tick = 0;
-        ivars->cache_max  = 0;
-        ivars->cache_cap  = 0;
-    }
-    ivars->scratch_cap = 0;
-    FREEMEM(ivars->scratch);
-    ivars->scratch = NULL;
-
-    // It's not necessary to iterate over the runs, because they don't have
-    // any cache costs until Refill() gets called.
-}
-
-void
 PostPool_Flush_IMP(PostingPool *self) {
     PostingPoolIVARS *const ivars = PostPool_IVARS(self);
 

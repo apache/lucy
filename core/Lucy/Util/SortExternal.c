@@ -165,6 +165,38 @@ SortEx_Add_Run_IMP(SortExternal *self, SortExternal *run) {
         = (Obj***)REALLOCATE(ivars->slice_starts, num_runs * sizeof(Obj**));
 }
 
+void
+SortEx_Shrink_IMP(SortExternal *self) {
+    SortExternalIVARS *const ivars = SortEx_IVARS(self);
+    if (ivars->cache_max - ivars->cache_tick > 0) {
+        size_t cache_count = SortEx_Cache_Count(self);
+        size_t size        = cache_count * sizeof(Obj*);
+        if (ivars->cache_tick > 0) {
+            Obj **start = ivars->cache + ivars->cache_tick;
+            memmove(ivars->cache, start, size);
+        }
+        ivars->cache      = (Obj**)REALLOCATE(ivars->cache, size);
+        ivars->cache_tick = 0;
+        ivars->cache_max  = cache_count;
+        ivars->cache_cap  = cache_count;
+    }
+    else {
+        FREEMEM(ivars->cache);
+        ivars->cache      = NULL;
+        ivars->cache_tick = 0;
+        ivars->cache_max  = 0;
+        ivars->cache_cap  = 0;
+    }
+    ivars->scratch_cap = 0;
+    FREEMEM(ivars->scratch);
+    ivars->scratch = NULL;
+
+    for (uint32_t i = 0, max = VA_Get_Size(ivars->runs); i < max; i++) {
+        SortExternal *run = (SortExternal*)VA_Fetch(ivars->runs, i);
+        SortEx_Shrink(run);
+    }
+}
+
 static void
 S_refill_cache(SortExternal *self, SortExternalIVARS *ivars) {
     // Reset cache vars.
