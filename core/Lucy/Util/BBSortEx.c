@@ -52,10 +52,6 @@ BBSortEx_Destroy_IMP(BBSortEx *self) {
 void
 BBSortEx_Clear_Cache_IMP(BBSortEx *self) {
     BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
-    Obj **const cache = ivars->cache;
-    for (uint32_t i = ivars->cache_tick, max = ivars->cache_max; i < max; i++) {
-        DECREF(cache[i]);
-    }
     ivars->mem_consumed = 0;
     BBSortEx_Clear_Cache_t super_clear_cache
         = SUPER_METHOD_PTR(BBSORTEX, LUCY_BBSortEx_Clear_Cache);

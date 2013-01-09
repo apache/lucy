@@ -78,6 +78,11 @@ SortEx_Destroy_IMP(SortExternal *self) {
 void
 SortEx_Clear_Cache_IMP(SortExternal *self) {
     SortExternalIVARS *const ivars = SortEx_IVARS(self);
+    Obj **const cache = ivars->cache;
+    const uint32_t max = ivars->cache_max;
+    for (uint32_t i = ivars->cache_tick; i < max; i++) {
+        DECREF(cache[i]);
+    }
     ivars->cache_max    = 0;
     ivars->cache_tick   = 0;
 }
