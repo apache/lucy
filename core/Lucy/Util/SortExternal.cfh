@@ -38,10 +38,10 @@ parcel Lucy;
 abstract class Lucy::Util::SortExternal nickname SortEx
     inherits Clownfish::Obj {
 
-    Obj          **cache;
-    uint32_t       cache_cap;
-    uint32_t       cache_max;
-    uint32_t       cache_tick;
+    Obj          **buffer;
+    uint32_t       buf_cap;
+    uint32_t       buf_max;
+    uint32_t       buf_tick;
     Obj          **scratch;
     uint32_t       scratch_cap;
     VArray        *runs;
@@ -127,7 +127,7 @@ abstract class Lucy::Util::SortExternal nickname SortEx
     /** Allocate more memory to the cache.
      */
     void
-    Grow_Cache(SortExternal *self, uint32_t new_cache_cap);
+    Grow_Cache(SortExternal *self, uint32_t cap);
 
     void
     Set_Mem_Thresh(SortExternal *self, uint32_t mem_thresh);

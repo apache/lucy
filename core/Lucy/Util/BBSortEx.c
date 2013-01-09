@@ -76,24 +76,24 @@ BBSortEx_Feed_IMP(BBSortEx *self, Obj *item) {
 void
 BBSortEx_Flush_IMP(BBSortEx *self) {
     BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
-    uint32_t     cache_count = ivars->cache_max - ivars->cache_tick;
-    Obj        **cache = ivars->cache;
+    uint32_t     buf_count = ivars->buf_max - ivars->buf_tick;
+    Obj        **buffer = ivars->buffer;
     VArray      *elems;
 
-    if (!cache_count) { return; }
-    else              { elems = VA_new(cache_count); }
+    if (!buf_count) { return; }
+    else            { elems = VA_new(buf_count); }
 
     // Sort, then create a new run.
     BBSortEx_Sort_Cache(self);
-    for (uint32_t i = ivars->cache_tick; i < ivars->cache_max; i++) {
-        VA_Push(elems, cache[i]);
+    for (uint32_t i = ivars->buf_tick; i < ivars->buf_max; i++) {
+        VA_Push(elems, buffer[i]);
     }
     BBSortEx *run = BBSortEx_new(0, elems);
     DECREF(elems);
     BBSortEx_Add_Run(self, (SortExternal*)run);
 
     // Blank the cache vars.
-    ivars->cache_tick += cache_count;
+    ivars->buf_tick += buf_count;
     BBSortEx_Clear_Cache(self);
 }
 
@@ -102,12 +102,12 @@ BBSortEx_Refill_IMP(BBSortEx *self) {
     BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
 
     // Make sure cache is empty, then set cache tick vars.
-    if (ivars->cache_max - ivars->cache_tick > 0) {
+    if (ivars->buf_max - ivars->buf_tick > 0) {
         THROW(ERR, "Refill called but cache contains %u32 items",
-              ivars->cache_max - ivars->cache_tick);
+              ivars->buf_max - ivars->buf_tick);
     }
-    ivars->cache_tick = 0;
-    ivars->cache_max  = 0;
+    ivars->buf_tick = 0;
+    ivars->buf_max  = 0;
 
     // Read in elements.
     while (1) {
@@ -127,15 +127,15 @@ BBSortEx_Refill_IMP(BBSortEx *self) {
             ivars->mem_consumed += BB_Get_Size(elem);
         }
 
-        if (ivars->cache_max == ivars->cache_cap) {
+        if (ivars->buf_max == ivars->buf_cap) {
             BBSortEx_Grow_Cache(self,
-                                Memory_oversize(ivars->cache_max + 1,
+                                Memory_oversize(ivars->buf_max + 1,
                                                 sizeof(Obj*)));
         }
-        ivars->cache[ivars->cache_max++] = INCREF(elem);
+        ivars->buffer[ivars->buf_max++] = INCREF(elem);
     }
 
-    return ivars->cache_max;
+    return ivars->buf_max;
 }
 
 void

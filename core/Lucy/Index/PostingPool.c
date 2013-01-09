@@ -191,7 +191,7 @@ PostPool_Flip_IMP(PostingPool *self) {
     }
 
     PostPool_Sort_Cache(self);
-    if (num_runs && (ivars->cache_max - ivars->cache_tick) > 0) {
+    if (num_runs && (ivars->buf_max - ivars->buf_tick) > 0) {
         uint32_t num_items = PostPool_Cache_Count(self);
         // Cheap imitation of flush. FIXME.
         PostingPool *run
@@ -202,12 +202,12 @@ PostPool_Flip_IMP(PostingPool *self) {
         PostPool_Grow_Cache(run, num_items);
         PostingPoolIVARS *const run_ivars = PostPool_IVARS(run);
 
-        memcpy(run_ivars->cache, (ivars->cache) + ivars->cache_tick,
+        memcpy(run_ivars->buffer, (ivars->buffer) + ivars->buf_tick,
                num_items * sizeof(Obj*));
-        run_ivars->cache_max = num_items;
+        run_ivars->buf_max = num_items;
         PostPool_Add_Run(self, (SortExternal*)run);
-        ivars->cache_tick = 0;
-        ivars->cache_max = 0;
+        ivars->buf_tick = 0;
+        ivars->buf_max = 0;
     }
 
     // Assign.
@@ -278,10 +278,10 @@ PostPool_Flush_IMP(PostingPool *self) {
                                             ivars->post_temp_out);
 
     // Borrow the cache.
-    run_ivars->cache      = ivars->cache;
-    run_ivars->cache_tick = ivars->cache_tick;
-    run_ivars->cache_max  = ivars->cache_max;
-    run_ivars->cache_cap  = ivars->cache_cap;
+    run_ivars->buffer   = ivars->buffer;
+    run_ivars->buf_tick = ivars->buf_tick;
+    run_ivars->buf_max  = ivars->buf_max;
+    run_ivars->buf_cap  = ivars->buf_cap;
 
     // Write to temp files.
     LexWriter_Enter_Temp_Mode(ivars->lex_writer, ivars->field,
@@ -296,10 +296,10 @@ PostPool_Flush_IMP(PostingPool *self) {
     LexWriter_Leave_Temp_Mode(ivars->lex_writer);
 
     // Return the cache and empty it.
-    run_ivars->cache      = NULL;
-    run_ivars->cache_tick = 0;
-    run_ivars->cache_max  = 0;
-    run_ivars->cache_cap  = 0;
+    run_ivars->buffer   = NULL;
+    run_ivars->buf_tick = 0;
+    run_ivars->buf_max  = 0;
+    run_ivars->buf_cap  = 0;
     PostPool_Clear_Cache(self);
 
     // Add the run to the array.
@@ -459,12 +459,12 @@ PostPool_Refill_IMP(PostingPool *self) {
     else { term_text = (String*)Lex_Get_Term(lexicon); }
 
     // Make sure cache is empty.
-    if (ivars->cache_max - ivars->cache_tick > 0) {
+    if (ivars->buf_max - ivars->buf_tick > 0) {
         THROW(ERR, "Refill called but cache contains %u32 items",
-              ivars->cache_max - ivars->cache_tick);
+              ivars->buf_max - ivars->buf_tick);
     }
-    ivars->cache_max  = 0;
-    ivars->cache_tick = 0;
+    ivars->buf_max  = 0;
+    ivars->buf_tick = 0;
 
     // Ditch old MemoryPool and get another.
     DECREF(ivars->mem_pool);
@@ -515,17 +515,17 @@ PostPool_Refill_IMP(PostingPool *self) {
         }
 
         // Add to the run's cache.
-        if (num_elems >= ivars->cache_cap) {
+        if (num_elems >= ivars->buf_cap) {
             size_t new_cap = Memory_oversize(num_elems + 1, sizeof(Obj*));
             PostPool_Grow_Cache(self, new_cap);
         }
-        ivars->cache[num_elems] = (Obj*)rawpost;
+        ivars->buffer[num_elems] = (Obj*)rawpost;
         num_elems++;
     }
 
     // Reset the cache array position and length; remember file pos.
-    ivars->cache_max   = num_elems;
-    ivars->cache_tick  = 0;
+    ivars->buf_max   = num_elems;
+    ivars->buf_tick  = 0;
 
     return num_elems;
 }

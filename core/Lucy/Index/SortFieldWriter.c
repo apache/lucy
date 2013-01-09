@@ -399,10 +399,10 @@ SortFieldWriter_Flush_IMP(SortFieldWriter *self) {
     run_ivars->dat_start = OutStream_Align(temp_dat_out, sizeof(int64_t));
 
     // Have the run borrow the array of elems.
-    run_ivars->cache      = ivars->cache;
-    run_ivars->cache_max  = ivars->cache_max;
-    run_ivars->cache_tick = ivars->cache_tick;
-    run_ivars->cache_cap  = ivars->cache_cap;
+    run_ivars->buffer   = ivars->buffer;
+    run_ivars->buf_max  = ivars->buf_max;
+    run_ivars->buf_tick = ivars->buf_tick;
+    run_ivars->buf_cap  = ivars->buf_cap;
 
     // Write files, record stats.
     run_ivars->run_max = (int32_t)Seg_Get_Count(ivars->segment);
@@ -410,11 +410,11 @@ SortFieldWriter_Flush_IMP(SortFieldWriter *self) {
                                                temp_dat_out);
 
     // Reclaim the buffer from the run and empty it.
-    run_ivars->cache       = NULL;
-    run_ivars->cache_max   = 0;
-    run_ivars->cache_tick  = 0;
-    run_ivars->cache_cap   = 0;
-    ivars->cache_tick = ivars->cache_max;
+    run_ivars->buffer    = NULL;
+    run_ivars->buf_max   = 0;
+    run_ivars->buf_tick  = 0;
+    run_ivars->buf_cap   = 0;
+    ivars->buf_tick = ivars->buf_max;
     SortFieldWriter_Clear_Cache(self);
 
     // Record stream ends.
@@ -434,10 +434,10 @@ SortFieldWriter_Refill_IMP(SortFieldWriter *self) {
     if (!ivars->sort_cache) { return 0; }
 
     // Sanity check, then reset the cache and prepare to start loading items.
-    uint32_t cache_count = SortFieldWriter_Cache_Count(self);
-    if (cache_count) {
+    uint32_t buf_count = SortFieldWriter_Cache_Count(self);
+    if (buf_count) {
         THROW(ERR, "Refill called but cache contains %u32 items",
-              cache_count);
+              buf_count);
     }
     SortFieldWriter_Clear_Cache(self);
     MemPool_Release_All(ivars->mem_pool);
