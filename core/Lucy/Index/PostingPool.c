@@ -202,7 +202,7 @@ PostPool_Flip_IMP(PostingPool *self) {
         PostPool_Grow_Cache(run, num_items);
         PostingPoolIVARS *const run_ivars = PostPool_IVARS(run);
 
-        memcpy(run_ivars->cache, ((Obj**)ivars->cache) + ivars->cache_tick,
+        memcpy(run_ivars->cache, (ivars->cache) + ivars->cache_tick,
                num_items * sizeof(Obj*));
         run_ivars->cache_max = num_items;
         PostPool_Add_Run(self, (SortExternal*)run);
@@ -266,10 +266,10 @@ PostPool_Shrink_IMP(PostingPool *self) {
         size_t cache_count = PostPool_Cache_Count(self);
         size_t size        = cache_count * sizeof(Obj*);
         if (ivars->cache_tick > 0) {
-            Obj **start = ((Obj**)ivars->cache) + ivars->cache_tick;
+            Obj **start = ivars->cache + ivars->cache_tick;
             memmove(ivars->cache, start, size);
         }
-        ivars->cache      = (uint8_t*)REALLOCATE(ivars->cache, size);
+        ivars->cache      = (Obj**)REALLOCATE(ivars->cache, size);
         ivars->cache_tick = 0;
         ivars->cache_max  = cache_count;
         ivars->cache_cap  = cache_count;
@@ -549,8 +549,7 @@ PostPool_Refill_IMP(PostingPool *self) {
             size_t new_cap = Memory_oversize(num_elems + 1, sizeof(Obj*));
             PostPool_Grow_Cache(self, new_cap);
         }
-        Obj **cache = (Obj**)ivars->cache;
-        cache[num_elems] = (Obj*)rawpost;
+        ivars->cache[num_elems] = (Obj*)rawpost;
         num_elems++;
     }
 

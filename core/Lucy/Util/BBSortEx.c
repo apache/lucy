@@ -52,7 +52,7 @@ BBSortEx_Destroy_IMP(BBSortEx *self) {
 void
 BBSortEx_Clear_Cache_IMP(BBSortEx *self) {
     BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
-    Obj **const cache = (Obj**)ivars->cache;
+    Obj **const cache = ivars->cache;
     for (uint32_t i = ivars->cache_tick, max = ivars->cache_max; i < max; i++) {
         DECREF(cache[i]);
     }
@@ -81,7 +81,7 @@ void
 BBSortEx_Flush_IMP(BBSortEx *self) {
     BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
     uint32_t     cache_count = ivars->cache_max - ivars->cache_tick;
-    Obj        **cache = (Obj**)ivars->cache;
+    Obj        **cache = ivars->cache;
     VArray      *elems;
 
     if (!cache_count) { return; }
@@ -136,8 +136,7 @@ BBSortEx_Refill_IMP(BBSortEx *self) {
                                 Memory_oversize(ivars->cache_max + 1,
                                                 sizeof(Obj*)));
         }
-        Obj **cache = (Obj**)ivars->cache;
-        cache[ivars->cache_max++] = INCREF(elem);
+        ivars->cache[ivars->cache_max++] = INCREF(elem);
     }
 
     return ivars->cache_max;
