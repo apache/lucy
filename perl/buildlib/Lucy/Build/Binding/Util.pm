@@ -179,22 +179,10 @@ END_XS_CODE
 }
 
 sub bind_sortexternal {
-    my $xs_code = <<'END_XS_CODE';
-MODULE = Lucy    PACKAGE = Lucy::Util::SortExternal
-
-IV
-_DEFAULT_MEM_THRESHOLD()
-CODE:
-    RETVAL = LUCY_SORTEX_DEFAULT_MEM_THRESHOLD;
-OUTPUT: RETVAL
-END_XS_CODE
-
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Util::SortExternal",
     );
-    $binding->append_xs($xs_code);
-
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

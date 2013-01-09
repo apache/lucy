@@ -16,17 +16,6 @@
 
 parcel Lucy;
 
-__C__
-#include <stddef.h>
-#include "Clownfish/Obj.h"
-#include "Clownfish/Util/SortUtils.h"
-
-#define LUCY_SORTEX_DEFAULT_MEM_THRESHOLD 0x1000000
-#ifdef LUCY_USE_SHORT_NAMES
-  #define SORTEX_DEFAULT_MEM_THRESHOLD LUCY_SORTEX_DEFAULT_MEM_THRESHOLD
-#endif
-__END_C__
-
 /** Abstract external sorter.
  *
  * SortExternal objects are sort pools which allow you to sort large amounts
