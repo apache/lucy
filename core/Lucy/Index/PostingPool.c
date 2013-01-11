@@ -190,16 +190,16 @@ PostPool_Flip_IMP(PostingPool *self) {
         DECREF(post_temp_path);
     }
 
-    PostPool_Sort_Cache(self);
+    PostPool_Sort_Buffer(self);
     if (num_runs && (ivars->buf_max - ivars->buf_tick) > 0) {
-        uint32_t num_items = PostPool_Cache_Count(self);
+        uint32_t num_items = PostPool_Buffer_Count(self);
         // Cheap imitation of flush. FIXME.
         PostingPool *run
             = PostPool_new(ivars->schema, ivars->snapshot, ivars->segment,
                            ivars->polyreader, ivars->field, ivars->lex_writer,
                            ivars->mem_pool, ivars->lex_temp_out,
                            ivars->post_temp_out, ivars->skip_out);
-        PostPool_Grow_Cache(run, num_items);
+        PostPool_Grow_Buffer(run, num_items);
         PostingPoolIVARS *const run_ivars = PostPool_IVARS(run);
 
         memcpy(run_ivars->buffer, (ivars->buffer) + ivars->buf_tick,
@@ -264,7 +264,7 @@ PostPool_Flush_IMP(PostingPool *self) {
     PostingPoolIVARS *const ivars = PostPool_IVARS(self);
 
     // Don't add a run unless we have data to put in it.
-    if (PostPool_Cache_Count(self) == 0) { return; }
+    if (PostPool_Buffer_Count(self) == 0) { return; }
 
     PostingPool *run
         = PostPool_new(ivars->schema, ivars->snapshot, ivars->segment,
@@ -288,7 +288,7 @@ PostPool_Flush_IMP(PostingPool *self) {
                               ivars->lex_temp_out);
     run_ivars->lex_start  = OutStream_Tell(ivars->lex_temp_out);
     run_ivars->post_start = OutStream_Tell(ivars->post_temp_out);
-    PostPool_Sort_Cache(self);
+    PostPool_Sort_Buffer(self);
     S_write_terms_and_postings(run, post_writer, NULL);
 
     run_ivars->lex_end  = OutStream_Tell(ivars->lex_temp_out);
@@ -300,7 +300,7 @@ PostPool_Flush_IMP(PostingPool *self) {
     run_ivars->buf_tick = 0;
     run_ivars->buf_max  = 0;
     run_ivars->buf_cap  = 0;
-    PostPool_Clear_Cache(self);
+    PostPool_Clear_Buffer(self);
 
     // Add the run to the array.
     PostPool_Add_Run(self, (SortExternal*)run);
@@ -517,7 +517,7 @@ PostPool_Refill_IMP(PostingPool *self) {
         // Add to the run's cache.
         if (num_elems >= ivars->buf_cap) {
             size_t new_cap = Memory_oversize(num_elems + 1, sizeof(Obj*));
-            PostPool_Grow_Cache(self, new_cap);
+            PostPool_Grow_Buffer(self, new_cap);
         }
         ivars->buffer[num_elems] = (Obj*)rawpost;
         num_elems++;
@@ -547,7 +547,7 @@ S_fresh_flip(PostingPool *self, InStream *lex_temp_in,
     ivars->flipped = true;
 
     // Sort RawPostings in cache, if any.
-    PostPool_Sort_Cache(self);
+    PostPool_Sort_Buffer(self);
 
     // Bail if never flushed.
     if (ivars->lex_end == 0) { return; }

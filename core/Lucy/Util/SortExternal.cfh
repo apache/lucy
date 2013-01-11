@@ -109,7 +109,7 @@ abstract class Lucy::Util::SortExternal nickname SortEx
     /** Sort all items currently in the main cache.
      */
     void
-    Sort_Cache(SortExternal *self);
+    Sort_Buffer(SortExternal *self);
 
     /** Reset cache variables so that cache gives the appearance of having
      * been initialized.
@@ -117,17 +117,17 @@ abstract class Lucy::Util::SortExternal nickname SortEx
      * Subclasses may take steps to release items held in cache, if any.
      */
     void
-    Clear_Cache(SortExternal *self);
+    Clear_Buffer(SortExternal *self);
 
     /** Return the number of items presently in the cache.
      */
     uint32_t
-    Cache_Count(SortExternal *self);
+    Buffer_Count(SortExternal *self);
 
     /** Allocate more memory to the cache.
      */
     void
-    Grow_Cache(SortExternal *self, uint32_t cap);
+    Grow_Buffer(SortExternal *self, uint32_t cap);
 
     void
     Set_Mem_Thresh(SortExternal *self, uint32_t mem_thresh);

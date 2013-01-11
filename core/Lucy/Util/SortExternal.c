@@ -21,7 +21,7 @@
 
 // Refill the main cache, drawing from the caches of all runs.
 static void
-S_refill_cache(SortExternal *self, SortExternalIVARS *ivars);
+S_refill_buffer(SortExternal *self, SortExternalIVARS *ivars);
 
 // Absorb all the items which are "in-range" from all the Runs into the main
 // cache.
@@ -68,7 +68,7 @@ SortEx_Destroy_IMP(SortExternal *self) {
     FREEMEM(ivars->slice_sizes);
     FREEMEM(ivars->slice_starts);
     if (ivars->buffer) {
-        SortEx_Clear_Cache(self);
+        SortEx_Clear_Buffer(self);
         FREEMEM(ivars->buffer);
     }
     DECREF(ivars->runs);
@@ -76,7 +76,7 @@ SortEx_Destroy_IMP(SortExternal *self) {
 }
 
 void
-SortEx_Clear_Cache_IMP(SortExternal *self) {
+SortEx_Clear_Buffer_IMP(SortExternal *self) {
     SortExternalIVARS *const ivars = SortEx_IVARS(self);
     Obj **const buffer = ivars->buffer;
     const uint32_t max = ivars->buf_max;
@@ -92,7 +92,7 @@ SortEx_Feed_IMP(SortExternal *self, Obj *item) {
     SortExternalIVARS *const ivars = SortEx_IVARS(self);
     if (ivars->buf_max == ivars->buf_cap) {
         size_t amount = Memory_oversize(ivars->buf_max + 1, sizeof(Obj*));
-        SortEx_Grow_Cache(self, amount);
+        SortEx_Grow_Buffer(self, amount);
     }
     ivars->buffer[ivars->buf_max] = item;
     ivars->buf_max++;
@@ -101,7 +101,7 @@ SortEx_Feed_IMP(SortExternal *self, Obj *item) {
 static CFISH_INLINE Obj*
 SI_peek(SortExternal *self, SortExternalIVARS *ivars) {
     if (ivars->buf_tick >= ivars->buf_max) {
-        S_refill_cache(self, ivars);
+        S_refill_buffer(self, ivars);
     }
 
     if (ivars->buf_max > 0) {
@@ -127,10 +127,10 @@ SortEx_Peek_IMP(SortExternal *self) {
 }
 
 void
-SortEx_Sort_Cache_IMP(SortExternal *self) {
+SortEx_Sort_Buffer_IMP(SortExternal *self) {
     SortExternalIVARS *const ivars = SortEx_IVARS(self);
     if (ivars->buf_tick != 0) {
-        THROW(ERR, "Cant Sort_Cache() after fetching %u32 items", ivars->buf_tick);
+        THROW(ERR, "Cant Sort_Buffer() after fetching %u32 items", ivars->buf_tick);
     }
     if (ivars->buf_max != 0) {
         VTable *vtable = SortEx_Get_VTable(self);
@@ -169,7 +169,7 @@ void
 SortEx_Shrink_IMP(SortExternal *self) {
     SortExternalIVARS *const ivars = SortEx_IVARS(self);
     if (ivars->buf_max - ivars->buf_tick > 0) {
-        size_t buf_count = SortEx_Cache_Count(self);
+        size_t buf_count = SortEx_Buffer_Count(self);
         size_t size        = buf_count * sizeof(Obj*);
         if (ivars->buf_tick > 0) {
             Obj **start = ivars->buffer + ivars->buf_tick;
@@ -198,15 +198,15 @@ SortEx_Shrink_IMP(SortExternal *self) {
 }
 
 static void
-S_refill_cache(SortExternal *self, SortExternalIVARS *ivars) {
+S_refill_buffer(SortExternal *self, SortExternalIVARS *ivars) {
     // Reset cache vars.
-    SortEx_Clear_Cache(self);
+    SortEx_Clear_Buffer(self);
 
     // Make sure all runs have at least one item in the cache.
     uint32_t i = 0;
     while (i < VA_Get_Size(ivars->runs)) {
         SortExternal *const run = (SortExternal*)VA_Fetch(ivars->runs, i);
-        if (SortEx_Cache_Count(run) > 0 || SortEx_Refill(run) > 0) {
+        if (SortEx_Buffer_Count(run) > 0 || SortEx_Refill(run) > 0) {
             i++; // Run has some elements, so keep.
         }
         else {
@@ -276,7 +276,7 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
             if (ivars->buf_max + slice_size > ivars->buf_cap) {
                 size_t cap = Memory_oversize(ivars->buf_max + slice_size,
                                              sizeof(Obj*));
-                SortEx_Grow_Cache(self, cap);
+                SortEx_Grow_Buffer(self, cap);
             }
             memcpy(ivars->buffer + ivars->buf_max,
                    run_ivars->buffer + run_ivars->buf_tick,
@@ -338,7 +338,7 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
 }
 
 void
-SortEx_Grow_Cache_IMP(SortExternal *self, uint32_t cap) {
+SortEx_Grow_Buffer_IMP(SortExternal *self, uint32_t cap) {
     SortExternalIVARS *const ivars = SortEx_IVARS(self);
     if (cap > ivars->buf_cap) {
         ivars->buffer = (Obj**)REALLOCATE(ivars->buffer, cap * sizeof(Obj*));
@@ -375,7 +375,7 @@ SortEx_Set_Mem_Thresh_IMP(SortExternal *self, uint32_t mem_thresh) {
 }
 
 uint32_t
-SortEx_Cache_Count_IMP(SortExternal *self) {
+SortEx_Buffer_Count_IMP(SortExternal *self) {
     SortExternalIVARS *const ivars = SortEx_IVARS(self);
     return ivars->buf_max - ivars->buf_tick;
 }

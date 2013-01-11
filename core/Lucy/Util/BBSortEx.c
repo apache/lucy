@@ -50,12 +50,12 @@ BBSortEx_Destroy_IMP(BBSortEx *self) {
 }
 
 void
-BBSortEx_Clear_Cache_IMP(BBSortEx *self) {
+BBSortEx_Clear_Buffer_IMP(BBSortEx *self) {
     BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
     ivars->mem_consumed = 0;
-    BBSortEx_Clear_Cache_t super_clear_cache
-        = SUPER_METHOD_PTR(BBSORTEX, LUCY_BBSortEx_Clear_Cache);
-    super_clear_cache(self);
+    BBSortEx_Clear_Buffer_t super_clear_buffer
+        = SUPER_METHOD_PTR(BBSORTEX, LUCY_BBSortEx_Clear_Buffer);
+    super_clear_buffer(self);
 }
 
 void
@@ -84,7 +84,7 @@ BBSortEx_Flush_IMP(BBSortEx *self) {
     else            { elems = VA_new(buf_count); }
 
     // Sort, then create a new run.
-    BBSortEx_Sort_Cache(self);
+    BBSortEx_Sort_Buffer(self);
     for (uint32_t i = ivars->buf_tick; i < ivars->buf_max; i++) {
         VA_Push(elems, buffer[i]);
     }
@@ -94,7 +94,7 @@ BBSortEx_Flush_IMP(BBSortEx *self) {
 
     // Blank the cache vars.
     ivars->buf_tick += buf_count;
-    BBSortEx_Clear_Cache(self);
+    BBSortEx_Clear_Buffer(self);
 }
 
 uint32_t
@@ -128,9 +128,9 @@ BBSortEx_Refill_IMP(BBSortEx *self) {
         }
 
         if (ivars->buf_max == ivars->buf_cap) {
-            BBSortEx_Grow_Cache(self,
-                                Memory_oversize(ivars->buf_max + 1,
-                                                sizeof(Obj*)));
+            BBSortEx_Grow_Buffer(self,
+                                 Memory_oversize(ivars->buf_max + 1,
+                                                 sizeof(Obj*)));
         }
         ivars->buffer[ivars->buf_max++] = INCREF(elem);
     }

@@ -43,7 +43,7 @@ class Lucy::Util::BBSortEx
     Refill(BBSortEx *self);
 
     void
-    Clear_Cache(BBSortEx *self);
+    Clear_Buffer(BBSortEx *self);
 
     void
     Flip(BBSortEx *self);

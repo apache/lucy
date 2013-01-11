@@ -21,24 +21,24 @@ use List::Util qw( shuffle );
 use Lucy::Test;
 use bytes qw();
 
-my ( $sortex, $cache, @orig, @sort_output );
+my ( $sortex, $buffer, @orig, @sort_output );
 
 $sortex = Lucy::Util::BBSortEx->new( mem_thresh => 4 );
 $sortex->feed( new_bytebuf('c') );
-is( $sortex->cache_count, 1, "feed elem into cache" );
+is( $sortex->buffer_count, 1, "feed elem into buffer" );
 
 $sortex->feed( new_bytebuf('b') );
 $sortex->feed( new_bytebuf('d') );
-$sortex->sort_cache;
+$sortex->sort_buffer;
 SKIP: {
     skip( "Restore when porting test to C", 1 );
-    $cache = $sortex->_peek_cache;
-    is_deeply( $cache, [qw( b c d )], "sort cache" );
+    $buffer = $sortex->_peek_buffer;
+    is_deeply( $buffer, [qw( b c d )], "sort buffer" );
 }
 
 $sortex->feed( new_bytebuf('a') );
-is( $sortex->cache_count, 0,
-    "cache flushed automatically when mem_thresh crossed" );
+is( $sortex->buffer_count, 0,
+    "buffer flushed automatically when mem_thresh crossed" );
 #is( $sortex->get_num_runs, 1, "run added" );
 
 my @bytebufs = map { new_bytebuf($_) } qw( x y z );
@@ -55,8 +55,8 @@ is_deeply( \@sort_output, \@orig, "Add_Run" );
 
 $sortex = Lucy::Util::BBSortEx->new( mem_thresh => 4 );
 $sortex->feed( new_bytebuf('c') );
-$sortex->clear_cache;
-is( $sortex->cache_count, 0, "Clear_Cache" );
+$sortex->clear_buffer;
+is( $sortex->buffer_count, 0, "Clear_Buffer" );
 $sortex->feed( new_bytebuf('b') );
 $sortex->feed( new_bytebuf('a') );
 $sortex->flush;
@@ -68,7 +68,7 @@ while ( defined( my $result = $sortex->fetch ) ) {
     push @sort_output, $result;
 }
 is_deeply( \@sort_output, \@orig,
-    "elements cleared via Clear_Cache truly cleared" );
+    "elements cleared via Clear_Buffer truly cleared" );
 @orig        = ();
 @sort_output = ();
 

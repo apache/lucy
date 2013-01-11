@@ -127,7 +127,7 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
 }
 
 void
-SortFieldWriter_Clear_Cache_IMP(SortFieldWriter *self) {
+SortFieldWriter_Clear_Buffer_IMP(SortFieldWriter *self) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
     if (ivars->uniq_vals) {
         if (ivars->last_val) {
@@ -137,9 +137,9 @@ SortFieldWriter_Clear_Cache_IMP(SortFieldWriter *self) {
         }
         Hash_Clear(ivars->uniq_vals);
     }
-    SortFieldWriter_Clear_Cache_t super_clear_cache
-        = SUPER_METHOD_PTR(SORTFIELDWRITER, LUCY_SortFieldWriter_Clear_Cache);
-    super_clear_cache(self);
+    SortFieldWriter_Clear_Buffer_t super_clear_buffer
+        = SUPER_METHOD_PTR(SORTFIELDWRITER, LUCY_SortFieldWriter_Clear_Buffer);
+    super_clear_buffer(self);
     // Note that we have not called MemPool_Release_All() on our memory pool.
     // This is because the pool is shared amongst multiple SortFieldWriters
     // which belong to a parent SortWriter; it is the responsibility of the
@@ -378,13 +378,13 @@ SortFieldWriter_Flush_IMP(SortFieldWriter *self) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
 
     // Don't add a run unless we have data to put in it.
-    if (SortFieldWriter_Cache_Count(self) == 0) { return; }
+    if (SortFieldWriter_Buffer_Count(self) == 0) { return; }
 
     OutStream *const temp_ord_out = ivars->temp_ord_out;
     OutStream *const temp_ix_out  = ivars->temp_ix_out;
     OutStream *const temp_dat_out = ivars->temp_dat_out;
 
-    SortFieldWriter_Sort_Cache(self);
+    SortFieldWriter_Sort_Buffer(self);
     SortFieldWriter *run
         = SortFieldWriter_new(ivars->schema, ivars->snapshot, ivars->segment,
                               ivars->polyreader, ivars->field, ivars->mem_pool,
@@ -415,7 +415,7 @@ SortFieldWriter_Flush_IMP(SortFieldWriter *self) {
     run_ivars->buf_tick  = 0;
     run_ivars->buf_cap   = 0;
     ivars->buf_tick = ivars->buf_max;
-    SortFieldWriter_Clear_Cache(self);
+    SortFieldWriter_Clear_Buffer(self);
 
     // Record stream ends.
     run_ivars->ord_end = OutStream_Tell(temp_ord_out);
@@ -434,12 +434,12 @@ SortFieldWriter_Refill_IMP(SortFieldWriter *self) {
     if (!ivars->sort_cache) { return 0; }
 
     // Sanity check, then reset the cache and prepare to start loading items.
-    uint32_t buf_count = SortFieldWriter_Cache_Count(self);
+    uint32_t buf_count = SortFieldWriter_Buffer_Count(self);
     if (buf_count) {
         THROW(ERR, "Refill called but cache contains %u32 items",
               buf_count);
     }
-    SortFieldWriter_Clear_Cache(self);
+    SortFieldWriter_Clear_Buffer(self);
     MemPool_Release_All(ivars->mem_pool);
     S_lazy_init_sorted_ids(self);
 
@@ -480,7 +480,7 @@ SortFieldWriter_Refill_IMP(SortFieldWriter *self) {
         ivars->run_tick++;
     }
     ivars->run_ord++;
-    SortFieldWriter_Sort_Cache(self);
+    SortFieldWriter_Sort_Buffer(self);
 
     if (ivars->run_ord >= ivars->run_cardinality) {
         DECREF(ivars->sort_cache);
@@ -493,7 +493,7 @@ SortFieldWriter_Refill_IMP(SortFieldWriter *self) {
 void
 SortFieldWriter_Flip_IMP(SortFieldWriter *self) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
-    uint32_t num_items = SortFieldWriter_Cache_Count(self);
+    uint32_t num_items = SortFieldWriter_Buffer_Count(self);
     uint32_t num_runs = VA_Get_Size(ivars->runs);
 
     if (ivars->flipped) { THROW(ERR, "Can't call Flip() twice"); }
@@ -506,7 +506,7 @@ SortFieldWriter_Flip_IMP(SortFieldWriter *self) {
     }
 
     if (num_items) {
-        SortFieldWriter_Sort_Cache(self);
+        SortFieldWriter_Sort_Buffer(self);
     }
     else if (num_runs) {
         Folder  *folder = PolyReader_Get_Folder(ivars->polyreader);
