@@ -26,7 +26,7 @@ parcel Lucy;
  * It's expected that the total memory footprint of the sortable objects will
  * eventually exceed a specified threshold; at that point, the SortExternal
  * object will call the abstract method Flush().  It's expected that Flush()
- * implementations will empty out the current sort cache, write a sorted "run"
+ * implementations will empty out the current sort buffer, write a sorted "run"
  * to external storage, and add a new child SortExternal object to the top
  * level object's "runs" array to represent the flushed content.
  *
@@ -59,7 +59,7 @@ abstract class Lucy::Util::SortExternal nickname SortEx
     abstract int
     Compare(SortExternal *self, void *va, void *vb);
 
-    /** Flush all elements currently in the cache.
+    /** Flush all elements currently in the buffer.
      *
      * Presumably this entails sorting everything, writing the sorted elements
      * to disk, spawning a child object to represent those elements, and
@@ -100,31 +100,31 @@ abstract class Lucy::Util::SortExternal nickname SortEx
     void
     Shrink(SortExternal *self);
 
-    /** Refill the cache of a run.  Will only be called on child objects, not
+    /** Refill the buffer of a run.  Will only be called on child objects, not
      * the main object.
      */
     abstract uint32_t
     Refill(SortExternal *self);
 
-    /** Sort all items currently in the main cache.
+    /** Sort all items currently in the main buffer.
      */
     void
     Sort_Buffer(SortExternal *self);
 
-    /** Reset cache variables so that cache gives the appearance of having
+    /** Reset buffer variables so that buffer gives the appearance of having
      * been initialized.
      *
-     * Subclasses may take steps to release items held in cache, if any.
+     * Subclasses may take steps to release items held in buffer, if any.
      */
     void
     Clear_Buffer(SortExternal *self);
 
-    /** Return the number of items presently in the cache.
+    /** Return the number of items presently in the buffer.
      */
     uint32_t
     Buffer_Count(SortExternal *self);
 
-    /** Allocate more memory to the cache.
+    /** Allocate more memory to the buffer.
      */
     void
     Grow_Buffer(SortExternal *self, uint32_t cap);

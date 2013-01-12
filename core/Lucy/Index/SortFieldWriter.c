@@ -144,7 +144,7 @@ SortFieldWriter_Clear_Buffer_IMP(SortFieldWriter *self) {
     // This is because the pool is shared amongst multiple SortFieldWriters
     // which belong to a parent SortWriter; it is the responsibility of the
     // parent SortWriter to release the memory pool once **all** of its child
-    // SortFieldWriters have cleared their caches.
+    // SortFieldWriters have cleared their buffers.
 }
 
 void
@@ -433,10 +433,10 @@ SortFieldWriter_Refill_IMP(SortFieldWriter *self) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
     if (!ivars->sort_cache) { return 0; }
 
-    // Sanity check, then reset the cache and prepare to start loading items.
+    // Sanity check, then reset the buffer and prepare to start loading items.
     uint32_t buf_count = SortFieldWriter_Buffer_Count(self);
     if (buf_count) {
-        THROW(ERR, "Refill called but cache contains %u32 items",
+        THROW(ERR, "Refill called but buffer contains %u32 items",
               buf_count);
     }
     SortFieldWriter_Clear_Buffer(self);

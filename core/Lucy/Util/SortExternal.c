@@ -19,19 +19,19 @@
 
 #include "Lucy/Util/SortExternal.h"
 
-// Refill the main cache, drawing from the caches of all runs.
+// Refill the main buffer, drawing from the buffers of all runs.
 static void
 S_refill_buffer(SortExternal *self, SortExternalIVARS *ivars);
 
 // Absorb all the items which are "in-range" from all the Runs into the main
-// cache.
+// buffer.
 static void
 S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
                 Obj **endpost);
 
-// Return the address for the item in one of the runs' caches which is the
+// Return the address for the item in one of the runs' buffers which is the
 // highest in sort order, but which we can guarantee is lower in sort order
-// than any item which has yet to enter a run cache.
+// than any item which has yet to enter a run buffer.
 static Obj**
 S_find_endpost(SortExternal *self, SortExternalIVARS *ivars);
 
@@ -199,10 +199,10 @@ SortEx_Shrink_IMP(SortExternal *self) {
 
 static void
 S_refill_buffer(SortExternal *self, SortExternalIVARS *ivars) {
-    // Reset cache vars.
+    // Reset buffer vars.
     SortEx_Clear_Buffer(self);
 
-    // Make sure all runs have at least one item in the cache.
+    // Make sure all runs have at least one item in the buffer.
     uint32_t i = 0;
     while (i < VA_Get_Size(ivars->runs)) {
         SortExternal *const run = (SortExternal*)VA_Fetch(ivars->runs, i);
@@ -214,7 +214,7 @@ S_refill_buffer(SortExternal *self, SortExternalIVARS *ivars) {
         }
     }
 
-    // Absorb as many elems as possible from all runs into main cache.
+    // Absorb as many elems as possible from all runs into main buffer.
     if (VA_Get_Size(ivars->runs)) {
         Obj **endpost = S_find_endpost(self, ivars);
         S_absorb_slices(self, ivars, endpost);
@@ -226,12 +226,12 @@ S_find_endpost(SortExternal *self, SortExternalIVARS *ivars) {
     Obj **endpost = NULL;
 
     for (uint32_t i = 0, max = VA_Get_Size(ivars->runs); i < max; i++) {
-        // Get a run and retrieve the last item in its cache.
+        // Get a run and retrieve the last item in its buffer.
         SortExternal *const run = (SortExternal*)VA_Fetch(ivars->runs, i);
         SortExternalIVARS *const run_ivars = SortEx_IVARS(run);
         const uint32_t tick = run_ivars->buf_max - 1;
         if (tick >= run_ivars->buf_cap || run_ivars->buf_max < 1) {
-            THROW(ERR, "Invalid SortExternal cache access: %u32 %u32 %u32", tick,
+            THROW(ERR, "Invalid SortExternal buffer access: %u32 %u32 %u32", tick,
                   run_ivars->buf_max, run_ivars->buf_cap);
         }
         else {
@@ -265,14 +265,14 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
 
     if (ivars->buf_max != 0) { THROW(ERR, "Can't refill unless empty"); }
 
-    // Move all the elements in range into the main cache as slices.
+    // Move all the elements in range into the main buffer as slices.
     for (uint32_t i = 0; i < num_runs; i++) {
         SortExternal *const run = (SortExternal*)VA_Fetch(ivars->runs, i);
         SortExternalIVARS *const run_ivars = SortEx_IVARS(run);
         uint32_t slice_size = S_find_slice_size(run, run_ivars, endpost);
 
         if (slice_size) {
-            // Move slice content from run cache to main cache.
+            // Move slice content from run buffer to main buffer.
             if (ivars->buf_max + slice_size > ivars->buf_cap) {
                 size_t cap = Memory_oversize(ivars->buf_max + slice_size,
                                              sizeof(Obj*));
@@ -296,7 +296,7 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
         total += slice_sizes[i];
     }
 
-    // The main cache now consists of several slices.  Sort the main cache,
+    // The main buffer now consists of several slices.  Sort the main buffer,
     // but exploit the fact that each slice is already sorted.
     if (ivars->scratch_cap < ivars->buf_cap) {
         ivars->scratch_cap = ivars->buf_cap;
@@ -304,7 +304,7 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
                             ivars->scratch, ivars->scratch_cap * sizeof(Obj*));
     }
 
-    // Exploit previous sorting, rather than sort cache naively.
+    // Exploit previous sorting, rather than sort buffer naively.
     // Leave the first slice intact if the number of slices is odd. */
     while (ivars->num_slices > 1) {
         uint32_t i = 0;

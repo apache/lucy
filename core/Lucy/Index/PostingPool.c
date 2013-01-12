@@ -277,7 +277,7 @@ PostPool_Flush_IMP(PostingPool *self) {
                                             ivars->segment, ivars->polyreader,
                                             ivars->post_temp_out);
 
-    // Borrow the cache.
+    // Borrow the buffer.
     run_ivars->buffer   = ivars->buffer;
     run_ivars->buf_tick = ivars->buf_tick;
     run_ivars->buf_max  = ivars->buf_max;
@@ -295,7 +295,7 @@ PostPool_Flush_IMP(PostingPool *self) {
     run_ivars->post_end = OutStream_Tell(ivars->post_temp_out);
     LexWriter_Leave_Temp_Mode(ivars->lex_writer);
 
-    // Return the cache and empty it.
+    // Return the buffer and empty it.
     run_ivars->buffer   = NULL;
     run_ivars->buf_tick = 0;
     run_ivars->buf_max  = 0;
@@ -458,9 +458,9 @@ PostPool_Refill_IMP(PostingPool *self) {
     if (ivars->lexicon == NULL) { return 0; }
     else { term_text = (String*)Lex_Get_Term(lexicon); }
 
-    // Make sure cache is empty.
+    // Make sure buffer is empty.
     if (ivars->buf_max - ivars->buf_tick > 0) {
-        THROW(ERR, "Refill called but cache contains %u32 items",
+        THROW(ERR, "Refill called but buffer contains %u32 items",
               ivars->buf_max - ivars->buf_tick);
     }
     ivars->buf_max  = 0;
@@ -492,7 +492,7 @@ PostPool_Refill_IMP(PostingPool *self) {
             }
         }
 
-        // Bail if we've hit the ceiling for this run's cache.
+        // Bail if we've hit the ceiling for this run's buffer.
         if (mem_pool_ivars->consumed >= mem_thresh && num_elems > 0) {
             break;
         }
@@ -514,7 +514,7 @@ PostPool_Refill_IMP(PostingPool *self) {
             rawpost_ivars->doc_id = remapped;
         }
 
-        // Add to the run's cache.
+        // Add to the run's buffer.
         if (num_elems >= ivars->buf_cap) {
             size_t new_cap = Memory_oversize(num_elems + 1, sizeof(Obj*));
             PostPool_Grow_Buffer(self, new_cap);
@@ -523,7 +523,7 @@ PostPool_Refill_IMP(PostingPool *self) {
         num_elems++;
     }
 
-    // Reset the cache array position and length; remember file pos.
+    // Reset the buffer array position and length; remember file pos.
     ivars->buf_max   = num_elems;
     ivars->buf_tick  = 0;
 
@@ -546,7 +546,7 @@ S_fresh_flip(PostingPool *self, InStream *lex_temp_in,
     if (ivars->flipped) { THROW(ERR, "Can't Flip twice"); }
     ivars->flipped = true;
 
-    // Sort RawPostings in cache, if any.
+    // Sort RawPostings in buffer, if any.
     PostPool_Sort_Buffer(self);
 
     // Bail if never flushed.
