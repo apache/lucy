@@ -112,6 +112,13 @@ public class Lucy::Index::Indexer inherits Clownfish::Obj {
     public void
     Delete_By_Query(Indexer *self, Query *query);
 
+    /** Mark the document identified by the supplied document ID as deleted.
+     *
+     * @param doc_id A L<document id|Lucy::Docs::DocIDs>.
+     */
+    public void
+    Delete_By_Doc_ID(Indexer *self, int32_t doc_id);
+
     /** Optimize the index for search-time performance.  This may take a
      * while, as it can involve rewriting large amounts of data.
      *

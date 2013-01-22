@@ -444,6 +444,7 @@ sub bind_indexer {
         Prepare_Commit
         Delete_By_Term
         Delete_By_Query
+        Delete_By_Doc_ID
         Get_Schema
     );
     my @hand_rolled = qw( Add_Doc );

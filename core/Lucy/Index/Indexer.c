@@ -304,6 +304,11 @@ Indexer_delete_by_query(Indexer *self, Query *query) {
 }
 
 void
+Indexer_delete_by_doc_id(Indexer *self, int32_t doc_id) {
+    DelWriter_Delete_By_Doc_ID(self->del_writer, doc_id);
+}
+
+void
 Indexer_add_index(Indexer *self, Obj *index) {
     Folder *other_folder = NULL;
     IndexReader *reader  = NULL;
