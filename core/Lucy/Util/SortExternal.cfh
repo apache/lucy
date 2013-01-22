@@ -18,22 +18,22 @@ parcel Lucy;
 
 /** Abstract external sorter.
  *
- * SortExternal objects are sort pools which allow you to sort large amounts
- * of data.  To achieve this, you Feed() all values into the SortExternal
- * object, Flip() the object from write mode to read mode, then Fetch() the
- * values one at a time in sorted order.
+ * SortExternal objects are sort pools which allow you to sort huge
+ * collections of elements.  To achieve this, you Feed() all items into the
+ * SortExternal object, Flip() it from write mode to read mode, then Fetch()
+ * the elements one at a time in sorted order.
  *
- * It's expected that the total memory footprint of the sortable objects will
- * eventually exceed a specified threshold; at that point, the SortExternal
- * object will call the abstract method Flush().  It's expected that Flush()
- * implementations will empty out the current sort buffer, write a sorted "run"
- * to external storage, and add a new child SortExternal object to the top
- * level object's "runs" array to represent the flushed content.
+ * It's expected that the total memory footprint of the buffered sortable
+ * items will eventually exceed a specified threshold; at that point, the
+ * SortExternal object will call the abstract method Flush().  It's expected
+ * that Flush() implementations will empty out the current buffer, write a
+ * sorted "run" to external storage, and add a new child SortExternal object
+ * to the top level object's "runs" array to represent the flushed content.
  *
- * During the read phase, the child objects retrieve values from external
- * storage by calling the abstract method Refill().  The top-level
+ * During the read phase, the child sortex objects retrieve elements from
+ * external storage by calling the abstract method Refill().  The top-level
  * SortExternal object then interleaves multiple sorted streams to produce a
- * single unified stream of sorted values.
+ * single unified stream of sorted items.
  */
 abstract class Lucy::Util::SortExternal nickname SortEx
     inherits Clownfish::Obj {
@@ -63,7 +63,7 @@ abstract class Lucy::Util::SortExternal nickname SortEx
      *
      * Presumably this entails sorting everything, writing the sorted elements
      * to disk, spawning a child object to represent those elements, and
-     * adding that child to the top level object via Add_Run().
+     * adding that child to the top-level object via Add_Run().
      */
     abstract void
     Flush(SortExternal *self);
@@ -100,8 +100,8 @@ abstract class Lucy::Util::SortExternal nickname SortEx
     void
     Shrink(SortExternal *self);
 
-    /** Refill the buffer of a run.  Will only be called on child objects, not
-     * the main object.
+    /** Refill the buffer of a run.  Will only be called on child sortex
+     * objects, not the main object.
      */
     abstract uint32_t
     Refill(SortExternal *self);
