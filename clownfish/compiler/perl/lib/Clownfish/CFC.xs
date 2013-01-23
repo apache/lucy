@@ -2389,3 +2389,23 @@ CODE:
     RETVAL = S_cfcbase_to_perlref((CFCBase*)parcel);
 OUTPUT: RETVAL
 
+
+MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Test
+
+SV*
+_new(formatter_name)
+    const char *formatter_name;
+CODE:
+    CFCTest *self = CFCTest_new(formatter_name);
+    RETVAL = S_cfcbase_to_perlref(self);
+    CFCBase_decref((CFCBase*)self);
+OUTPUT: RETVAL
+
+int
+run_batch(self, klass)
+    CFCTest *self;
+    const char *klass;
+CODE:
+    RETVAL = CFCTest_run_batch(self, klass);
+OUTPUT: RETVAL
+

@@ -29,6 +29,7 @@
 #include "CFCParcel.h"
 #include "CFCParser.h"
 #include "CFCSymbol.h"
+#include "CFCTest.h"
 #include "CFCType.h"
 #include "CFCUtil.h"
 #include "CFCVariable.h"

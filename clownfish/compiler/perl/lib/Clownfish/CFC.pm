@@ -849,6 +849,25 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
     }
 }
 
+{
+    package Clownfish::CFC::Test;
+    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
+    use Clownfish::CFC::Util qw( verify_args );
+    use Carp;
+
+    my %new_PARAMS = (
+        formatter_name => 'tap',
+    );
+
+    sub new {
+        my ( $either, %args ) = @_;
+        verify_args( \%new_PARAMS, %args ) or confess $@;
+        confess "no subclassing allowed" unless $either eq __PACKAGE__;
+        $args{formatter_name} = 'tap' unless defined $args{formatter_name};
+        return _new( @args{qw( formatter_name )} );
+    }
+}
+
 1;
 
 =head1 NAME
