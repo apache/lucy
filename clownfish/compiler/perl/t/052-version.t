@@ -16,10 +16,11 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 11;
 use Clownfish::CFC;
 
 my $v3_2_1   = Clownfish::CFC::Model::Version->new( vstring => 'v3.2.1' );
+my $v3_2     = Clownfish::CFC::Model::Version->new( vstring => 'v3.2' );
 my $v3_3     = Clownfish::CFC::Model::Version->new( vstring => 'v3.3' );
 my $v3_2_0   = Clownfish::CFC::Model::Version->new( vstring => 'v3.2.0' );
 my $v3_2_1_0 = Clownfish::CFC::Model::Version->new( vstring => 'v3.2.1.0' );
@@ -33,6 +34,8 @@ is( $v3_2_1->compare_to($v3_2_1_0), 0,  "ignore zeroes in compare_to" );
 is( $v3_2_1_0->compare_to($v3_2_1), 0,  "ignore zeroes in compare_to" );
 is( $v3_2_1->compare_to($v3_3),     -1, "compare_to A < B_fewer_digits" );
 is( $v3_3->compare_to($v3_2_1),     1,  "compare_to A_fewer_digits > B" );
+is( $v3_2_1->compare_to($v3_2),     1,  "compare_to A < B_fewer_digits" );
+is( $v3_2->compare_to($v3_2_1),     -1, "compare_to A_fewer_digits > B" );
 is( $v3_2_1->compare_to($v3_2_0),   1,  "compare_to A > B" );
 is( $v3_2_0->compare_to($v3_2_1),   -1, "compare_to A < B" );
 

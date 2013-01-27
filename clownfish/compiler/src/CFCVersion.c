@@ -59,7 +59,10 @@ CFCVersion_init(CFCVersion *self, const char *vstring) {
     self->num_numbers = 0;
     self->numbers = (uint32_t*)CALLOCATE(1, sizeof(uint32_t));
     while (1) {
-        if (!isdigit(*vstring)) {
+        if (isdigit(*vstring)) {
+            num = num * 10 + *vstring - '0';
+        }
+        else {
             if (*vstring != 0 && *vstring != '.') {
                 CFCBase_decref((CFCBase*)self);
                 CFCUtil_die("Bad version string: '%s'", self->vstring);
@@ -72,7 +75,6 @@ CFCVersion_init(CFCVersion *self, const char *vstring) {
             }
             num = 0;
         }
-        num = num * 10 + *vstring - '0';
         vstring++;
     }
 
@@ -89,15 +91,15 @@ CFCVersion_destroy(CFCVersion *self) {
 int
 CFCVersion_compare_to(CFCVersion *self, CFCVersion *other) {
     for (size_t i = 0;
-         i < self->num_numbers && i < other->num_numbers;
+         i < self->num_numbers || i < other->num_numbers;
          i++
         ) {
-        int32_t my_number = i >= self->num_numbers
-                            ? 0
-                            : self->numbers[i];
-        int32_t other_number = i >= other->num_numbers
-                               ? 0
-                               : other->numbers[i];
+        uint32_t my_number = i >= self->num_numbers
+                             ? 0
+                             : self->numbers[i];
+        uint32_t other_number = i >= other->num_numbers
+                                ? 0
+                                : other->numbers[i];
         if (my_number > other_number) {
             return 1;
         }
