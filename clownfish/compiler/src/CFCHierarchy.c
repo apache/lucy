@@ -389,7 +389,7 @@ S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified) {
     const char *source_dir = CFCFile_get_source_dir(file);
     CFCUTIL_NULL_CHECK(source_dir);
     char *source_path = CFCFile_cfh_path(file, source_dir);
-    char *h_path      = CFCFile_h_path(file, self->dest);
+    char *h_path      = CFCFile_h_path(file, self->inc_dest);
 
     if (!CFCUtil_current(source_path, h_path)) {
         modified = true;

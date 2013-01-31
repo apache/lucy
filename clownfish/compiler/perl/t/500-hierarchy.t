@@ -78,7 +78,7 @@ for my $class (@$classes) {
 # Generate fake C files, with times set to one second ago.
 my $one_second_ago = time() - 1;
 for my $file (@files) {
-    my $h_path = $file->h_path( $args{dest} );
+    my $h_path = $file->h_path( $inc_dest );
     my ( undef, $dir, undef ) = splitpath($h_path);
     mkpath($dir);
     sysopen( my $fh, $h_path, O_CREAT | O_EXCL | O_WRONLY )
