@@ -22,7 +22,7 @@ use Clownfish::CFC::Model::Hierarchy;
 use Clownfish::CFC::Util qw( a_isa_b );
 use File::Spec::Functions qw( catfile splitpath );
 use Fcntl;
-use File::Path qw( rmtree mkpath );
+use File::Path qw( rmtree );
 
 my $source = 't/cfsource';
 my $ext    = 't/cfext';
@@ -151,4 +151,7 @@ my $file_clash  = 't/cfclash/file';
 
     Clownfish::CFC::Model::Class->_clear_registry();
 }
+
+# Clean up.
+rmtree($dest);
 
