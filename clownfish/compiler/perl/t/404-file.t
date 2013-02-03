@@ -17,6 +17,7 @@ use strict;
 use warnings;
 
 use Test::More tests => 19;
+use File::Spec::Functions qw( catdir );
 
 use Clownfish::CFC::Model::File;
 use Clownfish::CFC::Parser;
@@ -32,16 +33,17 @@ my $class_content      = qq|
 |;
 my $c_block = "__C__\nint foo;\n__END_C__\n";
 
+my $path_part = catdir(qw( Stuff Thing ));
 my $file_spec = Clownfish::CFC::Model::FileSpec->new(
     source_dir  => '.',
-    path_part   => 'Stuff/Thing',
+    path_part   => $path_part,
 );
 my $file
     = $parser->_parse_file( "$parcel_declaration\n$class_content\n$c_block",
     $file_spec );
 
 is( $file->get_source_dir, ".", "get_source_dir" );
-is( $file->get_path_part, "Stuff/Thing", "get_path_part" );
+is( $file->get_path_part, $path_part, "get_path_part" );
 ok( !$file->included, "included" );
 
 my $guard_name = $file->guard_name;

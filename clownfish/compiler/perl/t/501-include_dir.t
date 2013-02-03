@@ -20,16 +20,16 @@ use Test::More tests => 25;
 
 use Clownfish::CFC::Model::Hierarchy;
 use Clownfish::CFC::Util qw( a_isa_b );
-use File::Spec::Functions qw( catfile splitpath );
+use File::Spec::Functions qw( catdir catfile splitpath );
 use Fcntl;
 use File::Path qw( rmtree );
 
-my $source = 't/cfsource';
-my $ext    = 't/cfext';
-my $dest   = 't/cfdest';
+my $source = catdir(qw( t cfsource ));
+my $ext    = catdir(qw( t cfext ));
+my $dest   = catdir(qw( t cfdest ));
 
-my $class_clash = 't/cfclash/class';
-my $file_clash  = 't/cfclash/file';
+my $class_clash = catdir(qw( t cfclash class ));
+my $file_clash  = catdir(qw( t cfclash file ));
 
 # One source, one include
 
@@ -120,7 +120,8 @@ my $file_clash  = 't/cfclash/file';
 
     eval { $hierarchy->build; };
 
-    like( $@, qr/File Animal\/Dog.cfh already registered/, "source/source filename clash" );
+    my $filename = catfile(qw( Animal Dog.cfh ));
+    like( $@, qr/File \Q$filename\E already registered/, "source/source filename clash" );
 
     Clownfish::CFC::Model::Class->_clear_registry();
 }

@@ -20,13 +20,13 @@ use Test::More tests => 20;
 
 use Clownfish::CFC::Model::Hierarchy;
 use Clownfish::CFC::Util qw( a_isa_b );
-use File::Spec::Functions qw( catfile splitpath );
+use File::Spec::Functions qw( catdir catfile splitpath );
 use Fcntl;
 use File::Path qw( rmtree mkpath );
 
-my $source = 't/cfsource';
+my $source = catdir(qw( t cfsource ));
 my %args = (
-    dest   => 't/cfdest',
+    dest => catdir(qw( t cfdest )),
 );
 
 # Clean up.
