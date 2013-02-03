@@ -4665,11 +4665,15 @@ chaz_Strings_probe_c99_snprintf(void) {
 
     /* Test for _scprintf and _snprintf found in the MSVCRT.
      */
-    if (chaz_CC_test_compile(detect__scprintf_code)) {
+    output = chaz_CC_capture_output(detect__scprintf_code, &output_len);
+    if (output != NULL) {
         chaz_ConfWriter_add_def("HAS__SCPRINTF", NULL);
+        free(output);
     }
-    if (chaz_CC_test_compile(detect__snprintf_code)) {
+    output = chaz_CC_capture_output(detect__snprintf_code, &output_len);
+    if (output != NULL) {
         chaz_ConfWriter_add_def("HAS__SNPRINTF", NULL);
+        free(output);
     }
 }
 
