@@ -219,6 +219,7 @@ CFCClass_destroy(CFCClass *self) {
         FREEMEM(attribute->value);
         FREEMEM(attribute);
     }
+    CFCBase_decref((CFCBase*)self->file_spec);
     FREEMEM(self->children);
     FREEMEM(self->functions);
     FREEMEM(self->methods);

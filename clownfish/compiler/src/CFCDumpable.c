@@ -165,10 +165,10 @@ S_add_dump_method(CFCClass *klass) {
     const size_t BUF_SIZE = 400;
     char buf[BUF_SIZE];
 
-    char *full_typedef = CFCMethod_full_typedef(method, klass);
-    char *full_meth    = CFCMethod_full_method_sym(method, klass);
-
     if (parent && CFCClass_has_attribute(parent, "dumpable")) {
+        char *full_typedef = CFCMethod_full_typedef(method, klass);
+        char *full_meth    = CFCMethod_full_method_sym(method, klass);
+
         const char pattern[] =
             "cfish_Obj*\n"
             "%s(%s *self)\n"
@@ -221,10 +221,10 @@ S_add_load_method(CFCClass *klass) {
     const size_t BUF_SIZE = 400;
     char buf[BUF_SIZE];
 
-    char *full_typedef = CFCMethod_full_typedef(method, klass);
-    char *full_meth    = CFCMethod_full_method_sym(method, klass);
-
     if (parent && CFCClass_has_attribute(parent, "dumpable")) {
+        char *full_typedef = CFCMethod_full_typedef(method, klass);
+        char *full_meth    = CFCMethod_full_method_sym(method, klass);
+
         const char pattern[] =
             "cfish_Obj*\n"
             "%s(%s *self, cfish_Obj *dump)\n"
