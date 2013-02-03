@@ -252,7 +252,6 @@ CFCPerlMethod**
 CFCPerlClass_method_bindings(CFCPerlClass *self) {
     CFCClass       *client     = self->client;
     CFCClass       *parent     = CFCClass_get_parent(client);
-    const char     *class_name = self->class_name;
     size_t          num_bound  = 0;
     CFCMethod     **fresh_methods = CFCClass_fresh_methods(client);
     CFCClass      **descendants   = CFCClass_tree_to_ladder(client);

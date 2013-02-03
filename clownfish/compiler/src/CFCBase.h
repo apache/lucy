@@ -37,7 +37,7 @@ struct CFCBase {
 };
 #endif
 struct CFCMeta {
-    char *cfc_class;
+    const char *cfc_class;
     size_t obj_alloc_size;
     CFCBase_destroy_t destroy;
 };

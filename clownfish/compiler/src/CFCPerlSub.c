@@ -111,8 +111,8 @@ CFCPerlSub_params_hash_def(CFCPerlSub *self) {
 }
 
 struct allot_macro_map {
-    char *prim_type;
-    char *allot_macro;
+    const char *prim_type;
+    const char *allot_macro;
 };
 
 struct allot_macro_map prim_type_to_allot_macro[] = {

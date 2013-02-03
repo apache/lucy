@@ -49,10 +49,6 @@ S_to_c_header_dynamic(CFCBindClass *self);
 static char*
 S_struct_definition(CFCBindClass *self);
 
-// Return C code defining the class's VTable.
-static char*
-S_vtable_definition(CFCBindClass *self);
-
 // Declare typedefs for fresh methods, to ease casting.
 static char*
 S_method_typedefs(CFCBindClass *self);
@@ -108,14 +104,6 @@ CFCBindClass_destroy(CFCBindClass *self) {
     FREEMEM(self->short_names_macro);
     CFCBase_decref((CFCBase*)self->client);
     CFCBase_destroy((CFCBase*)self);
-}
-
-static int
-S_method_is_fresh(CFCMethod *method, CFCMethod **fresh_methods) {
-    for (int i = 0; fresh_methods[i] != NULL; i++) {
-        if (method == fresh_methods[i]) { return 1; }
-    }
-    return 0;
 }
 
 char*

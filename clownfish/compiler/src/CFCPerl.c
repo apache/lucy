@@ -429,7 +429,6 @@ CFCPerl_write_bindings(CFCPerl *self) {
 
     // Hand-rolled XS.
     for (size_t i = 0; registry[i] != NULL; i++) {
-        CFCPerlClass *class_binding = registry[i];
         const char *xs = CFCPerlClass_get_xs_code(registry[i]);
         hand_rolled_xs = CFCUtil_cat(hand_rolled_xs, xs, "\n", NULL);
     }

@@ -75,7 +75,7 @@
         struct cfc_StringID *b
             = (struct cfc_StringID*)vb;
         return strcmp(a, b->string);
-    };
+    }
 
     static int
     S_identifier_or_keyword(const char *word) {

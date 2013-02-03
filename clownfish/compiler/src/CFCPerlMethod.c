@@ -231,9 +231,9 @@ S_self_assign_statement(CFCPerlMethod *self, CFCType *type,
 
     // Make an exception for deserialize -- allow self to be NULL if called as
     // a class method.
-    char *binding_func = strcmp(method_name, "deserialize") == 0
-                         ? "XSBind_maybe_sv_to_cfish_obj"
-                         : "XSBind_sv_to_cfish_obj";
+    const char *binding_func = strcmp(method_name, "deserialize") == 0
+                               ? "XSBind_maybe_sv_to_cfish_obj"
+                               : "XSBind_sv_to_cfish_obj";
     char pattern[] = "%s self = (%s)%s(ST(0), %s, NULL);";
     char *statement
         = CFCUtil_sprintf(pattern, type_c, type_c, binding_func, vtable_var);
