@@ -137,9 +137,9 @@ sub ACTION_code {
     $self->dispatch('ppport');
     $self->dispatch('parsers');
 
-    $self->extra_compiler_flags( join ' ',
+    $self->extra_compiler_flags(
         '-DCFCPERL',
-        $self->charmony("EXTRA_CFLAGS")
+        $self->split_like_shell($self->charmony("EXTRA_CFLAGS")),
     );
 
     $self->SUPER::ACTION_code;
