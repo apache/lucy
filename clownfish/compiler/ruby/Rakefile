@@ -21,8 +21,9 @@ def rbconfig
 end
 
 CLOWNFISH_RUBY_DIR      = File.absolute_path('.')
-CLOWNFISH_INCLUDE_DIR   = File.join('..','include')
-CLOWNFISH_SRC_DIR       = File.join('..','src')
+CLOWNFISH_INCLUDE_DIR   = File.join(CLOWNFISH_RUBY_DIR,'..','include')
+CLOWNFISH_SRC_DIR       = File.join(CLOWNFISH_RUBY_DIR,'..','src')
+CLOWNFISH_RUNTIME       = File.join('..','..','runtime','ruby')
 LEMON_SRC_DIR           = File.join('..','..','..','lemon')
 RUBY_EXT_CFC            = File.join('.','ext','Clownfish')
 
@@ -116,7 +117,7 @@ def extra_ccflags
   if defined?(rbconfig["CFLAGS"])
     ccflags += rbconfig['CFLAGS'] + ' '
   end
-
+  
   if ENV.has_key?('CFLAGS')
     ccflags += ENV['CFLAGS']
   end
@@ -143,7 +144,7 @@ def extra_ccflags
 end
 
 def includes
-  return "-I#{CLOWNFISH_INCLUDE_DIR} -I#{CLOWNFISH_SRC_DIR}"
+  return "-I#{CLOWNFISH_INCLUDE_DIR} -I#{CLOWNFISH_SRC_DIR} -I#{CLOWNFISH_RUNTIME}"
 end
 
 def make_command
