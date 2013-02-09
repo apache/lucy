@@ -47,7 +47,7 @@ CFCPerlSub_init(CFCPerlSub *self, CFCParamList *param_list,
     self->c_name = (char*)MALLOCATE(c_name_len);
     int j = 3;
     memcpy(self->c_name, "XS_", j);
-    for (int i = 0, max = strlen(self->perl_name); i < max; i++) {
+    for (int i = 0, max = (int)strlen(self->perl_name); i < max; i++) {
         char c = self->perl_name[i];
         if (c == ':') {
             while (self->perl_name[i + 1] == ':') { i++; }
@@ -137,7 +137,7 @@ struct allot_macro_map prim_type_to_allot_macro[] = {
 static char*
 S_allot_params_arg(CFCType *type, const char *label, int required) {
     const char *type_c_string = CFCType_to_c(type);
-    unsigned label_len = strlen(label);
+    unsigned label_len = (unsigned)strlen(label);
     const char *req_string = required ? "true" : "false";
 
     if (CFCType_is_object(type)) {

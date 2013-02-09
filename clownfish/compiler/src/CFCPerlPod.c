@@ -227,9 +227,9 @@ static char*
 S_global_replace(const char *string, const char *match,
                  const char *replacement) {
     char *found = (char*)string;
-    int   string_len      = strlen(string);
-    int   match_len       = strlen(match);
-    int   replacement_len = strlen(replacement);
+    int   string_len      = (int)strlen(string);
+    int   match_len       = (int)strlen(match);
+    int   replacement_len = (int)strlen(replacement);
     int   len_diff        = replacement_len - match_len;
 
     // Allocate space.
@@ -275,7 +275,7 @@ CFCPerlPod_gen_subroutine_pod(CFCPerlPod *self, CFCFunction *func,
     }
 
     CFCParamList *param_list = CFCFunction_get_param_list(func);
-    int num_vars = CFCParamList_num_vars(param_list);
+    int num_vars = (int)CFCParamList_num_vars(param_list);
     char *pod = CFCUtil_sprintf("=head2 %s", alias);
 
     // Get documentation, which may be inherited.

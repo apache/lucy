@@ -285,7 +285,7 @@ S_xsub_def_positional_args(CFCPerlMethod *self) {
     CFCParamList *param_list = CFCMethod_get_param_list(method);
     CFCVariable **arg_vars = CFCParamList_get_variables(param_list);
     const char **arg_inits = CFCParamList_get_initial_values(param_list);
-    unsigned num_vars = CFCParamList_num_vars(param_list);
+    unsigned num_vars = (unsigned)CFCParamList_num_vars(param_list);
     char *body = S_xsub_body(self);
 
     // Determine how many args are truly required and build an error check.
@@ -461,7 +461,7 @@ S_callback_start(CFCMethod *method) {
         "    SAVETMPS;\n"
         "    PUSHMARK(SP);\n"
         "    mPUSHs((SV*)Cfish_Obj_To_Host((cfish_Obj*)self));\n";
-    int num_args = CFCParamList_num_vars(param_list) - 1;
+    int num_args = (int)CFCParamList_num_vars(param_list) - 1;
     int num_to_extend = num_args == 0 ? 1
                       : num_args == 1 ? 2
                       : 1 + (num_args * 2);
@@ -495,7 +495,7 @@ S_callback_start(CFCMethod *method) {
         }
         else if (CFCType_is_integer(type)) {
             // Convert primitive integer types to IV Perl scalars.
-            int width = CFCType_get_width(type);
+            int width = (int)CFCType_get_width(type);
             if (width != 0 && width <= 4) {
                 params = CFCUtil_cat(params, "   mPUSHi(",
                                      name, ");\n", NULL);

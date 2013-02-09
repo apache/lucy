@@ -128,7 +128,7 @@ S_new_type(CFCParser *state, int flags, char *type_name,
     (void)state; /* unused */
     CFCType *type = NULL;
     size_t type_name_len = strlen(type_name);
-    int indirection = asterisk_postfix ? strlen(asterisk_postfix) : 0;
+    int indirection = asterisk_postfix ? (int)strlen(asterisk_postfix) : 0;
 
     /* Apply "nullable" to outermost pointer, but "const", etc to innermost
      * type. This is an ugly kludge and the Clownfish header language needs to
