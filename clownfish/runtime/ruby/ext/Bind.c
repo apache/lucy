@@ -48,7 +48,7 @@ S_cfish_array_to_ruby_array(cfish_VArray *varray) {
     if (num_elems) {
         //TODO Need to determine why c99 mode is not being honored
         uint32_t i;
-        for (i = 0; i < num_elems; i++) {
+        for (uint32_t i = 0; i < num_elems; i++) {
             cfish_Obj *val = Cfish_VA_Fetch(varray, i);
             if (val == NULL) {
                 continue;
