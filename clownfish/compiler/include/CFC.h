@@ -50,3 +50,5 @@
 #include "CFCPerlPod.h"
 #include "CFCPerlTypeMap.h"
 
+#include "CFCRuby.h"
+

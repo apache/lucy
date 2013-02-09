@@ -70,13 +70,23 @@ task :build_clownfish => [:build_charmonizer_tests] do
   core_binding = Clownfish::CFC::Binding::Core.new(:hierarchy => hierarchy, :header => autogen_header, :footer => '')
   core_binding.write_all_modified
 
+  ruby_binding = Clownfish::CFC::Binding::Ruby.new(
+    :parcel     => "Clownfish",
+    :hierarchy  => hierarchy,
+    :lib_dir    => LIB_DIR,
+    :boot_class => "Clownfish",
+    :header     => autogen_header,
+    :footer     => ''
+  )
+
   puts "Building Binding Code"
+  ruby_binding.write_boot
   Rake::Task['compile'].invoke
 
 end
 
 desc "Building Charmonizer Tests"
-task :build_charmonizer_tests => [:charmonize] do
+task :build_charmonizer_tests => [:charmony] do
   puts "Building Charmonizer Tests"
   flags = [
     '-fno-common',

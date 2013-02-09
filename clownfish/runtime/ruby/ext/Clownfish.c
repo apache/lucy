@@ -29,9 +29,9 @@ static VALUE cTest;
 static VALUE
 S_CFC_Test_Run_Tests(VALUE self_rb, VALUE package) {
 
-  if (strEQ(StringValuePtr(package), "TestCharBuf")) {
+  /*if (strEQ(StringValuePtr(package), "TestCharBuf")) {
     lucy_TestCB_run_tests();
-  }
+  }*/
 
   return Qnil;
 }
@@ -39,7 +39,7 @@ S_CFC_Test_Run_Tests(VALUE self_rb, VALUE package) {
 static void
 S_init_Test(void) {
     cTest = rb_define_class_under(mClownfish, "Test", rb_cObject);
-    rb_define_singleton_method(cTest, "run_tests", S_CFC_Hierarchy_Build, 0);
+//    rb_define_singleton_method(cTest, "run_tests", S_CFC_Hierarchy_Build, 0);
 }
 
 void

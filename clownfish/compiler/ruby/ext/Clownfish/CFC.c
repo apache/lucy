@@ -23,6 +23,7 @@ static VALUE mModel;
 static VALUE cHierarchy;
 static VALUE mBinding;
 static VALUE cBindCore;
+static VALUE cBindRuby;
 
 static VALUE
 S_CFC_Binding_Core_Alloc(VALUE klass) {
@@ -71,6 +72,56 @@ S_init_Binding_Core(void) {
 }
 
 static VALUE
+S_CFC_Binding_Ruby_Alloc(VALUE klass) {
+    void *ptr = NULL;
+    return Data_Wrap_Struct(klass, NULL, NULL, ptr);
+}
+
+static VALUE
+S_CFC_Binding_Ruby_Init(VALUE self_rb, VALUE params) {
+
+    CFCHierarchy* hierarchy_obj;
+    CFCParcel* parcel_obj;
+    CFCRuby* self;
+
+    VALUE hierarchy  = rb_hash_aref(params, ID2SYM(rb_intern("hierarchy"))); 
+    VALUE parcel     = rb_hash_aref(params, ID2SYM(rb_intern("parcel"))); 
+    VALUE lib_dir    = rb_hash_aref(params, ID2SYM(rb_intern("lib_dir"))); 
+    VALUE boot_class = rb_hash_aref(params, ID2SYM(rb_intern("boot_class"))); 
+    VALUE header     = rb_hash_aref(params, ID2SYM(rb_intern("header"))); 
+    VALUE footer     = rb_hash_aref(params, ID2SYM(rb_intern("footer"))); 
+
+    parcel_obj = CFCParcel_new(StringValuePtr(parcel), NULL, NULL);
+    Data_Get_Struct(hierarchy, CFCHierarchy, hierarchy_obj);
+    Data_Get_Struct(self_rb, CFCRuby, self);
+
+    self = CFCRuby_new(parcel_obj, hierarchy_obj, StringValuePtr(lib_dir), StringValuePtr(boot_class),
+                                StringValuePtr(header), StringValuePtr(footer));
+    DATA_PTR(self_rb) = self;
+
+    return self_rb;
+}
+
+static VALUE
+S_CFC_Binding_Ruby_Write_Boot(VALUE self_rb) {
+
+    CFCRuby *self;
+    Data_Get_Struct(self_rb, CFCRuby, self);
+    CFCRuby_write_boot(self);
+
+    return Qnil;
+}
+
+static void
+S_init_Binding_Ruby(void) {
+    cBindRuby = rb_define_class_under(mBinding, "Ruby", rb_cObject);
+    rb_define_alloc_func(cBindRuby, S_CFC_Binding_Ruby_Alloc);
+    rb_define_method(cBindRuby, "initialize", S_CFC_Binding_Ruby_Init, 1);
+    rb_define_method(cBindRuby, "write_boot",
+                     S_CFC_Binding_Ruby_Write_Boot, 0);
+}
+
+static VALUE
 S_CFC_Hierarchy_Alloc(VALUE klass) {
     void *ptr = NULL;
     return Data_Wrap_Struct(klass, NULL, NULL, ptr);
@@ -82,7 +133,7 @@ S_CFC_Hierarchy_Init(VALUE self_rb, VALUE params) {
   
     VALUE dest = rb_hash_aref(params, ID2SYM(rb_intern("dest"))); 
 
-    Data_Get_Struct(self_rb,CFCHierarchy, self);
+    Data_Get_Struct(self_rb, CFCHierarchy, self);
 
     self = CFCHierarchy_new(StringValuePtr(dest));
 
@@ -137,6 +188,7 @@ Init_CFC() {
     mBinding    = rb_define_module_under(mCFC, "Binding");
     mModel      = rb_define_module_under(mCFC, "Model");
     S_init_Binding_Core();
+    S_init_Binding_Ruby();
     S_init_Hierarchy();
 }
 
