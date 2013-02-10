@@ -22,14 +22,14 @@ def exe_path(*args)
 end
 
 BASE_PATH            = '..'
-CFC_BUILD            = File.join( CFC_DIR, 'Build' );
 CFC_DIR              = File.join( BASE_PATH, '..', 'compiler', 'ruby' );
+CFC_BUILD            = File.join( CFC_DIR, 'Build' );
+COMMON_SOURCE_DIR    = File.join(BASE_PATH, "common")
 CHARMONIZER_C        = File.join(COMMON_SOURCE_DIR, 'charmonizer.c')
 CHARMONIZER_EXE_PATH = File.absolute_path(exe_path('charmonizer'))
 CHARMONIZER_ORIG_DIR = File.absolute_path( File.join( BASE_PATH, '..', '..', 'charmonizer' ) )
 CHARMONY_H_PATH      = 'charmony.h'
 CHARMONY_RB_PATH     = 'Charmony.rb'
-COMMON_SOURCE_DIR    = File.join(BASE_PATH, "common")
 CORE_SOURCE_DIR      = File.absolute_path( BASE_PATH, 'core' );
 LIB_DIR              = 'lib';
 

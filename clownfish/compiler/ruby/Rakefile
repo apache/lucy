@@ -25,16 +25,16 @@ def exe_path(*args)
 end
 
 BASE_PATH = '..'
+COMMON_SOURCE_DIR       = File.join(BASE_PATH, "common")
 CHARMONIZER_C           = File.join(COMMON_SOURCE_DIR, 'charmonizer.c')
 CHARMONIZER_EXE_PATH    = File.absolute_path(exe_path('charmonizer'))
 CHARMONIZER_ORIG_DIR    = File.absolute_path( File.join( BASE_PATH, '..', '..', 'charmonizer' ) )
 CHARMONY_H_PATH         = 'charmony.h'
 CHARMONY_RB_PATH        = 'Charmony.rb'
-CLOWNFISH_INCLUDE_DIR   = File.join(CLOWNFISH_RUBY_DIR,'..','include')
 CLOWNFISH_RUBY_DIR      = File.absolute_path('.')
+CLOWNFISH_INCLUDE_DIR   = File.join(CLOWNFISH_RUBY_DIR,'..','include')
 CLOWNFISH_RUNTIME       = File.join('..','..','runtime','ruby')
 CLOWNFISH_SRC_DIR       = File.join(CLOWNFISH_RUBY_DIR,'..','src')
-COMMON_SOURCE_DIR       = File.join(BASE_PATH, "common")
 LEMON_SRC_DIR           = File.join('..','..','..','lemon')
 RUBY_EXT_CFC            = File.join('.','ext','Clownfish')
 
