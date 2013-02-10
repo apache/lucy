@@ -39,16 +39,18 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
         /* Tell GCC explicitly to run with maximum options. */
         chaz_CC_add_extra_cflags("-std=gnu99 -D_GNU_SOURCE");
     }
-    else if (chaz_Probe_compiler_is_msvc()) {
+    else if (chaz_Probe_msvc_version_num()) {
         /* Compile as C++ under MSVC. */
-        chaz_CC_add_extra_cflags("-TP");
+        chaz_CC_add_extra_cflags("/TP");
 
         /* Thwart stupid warnings. */
-        chaz_CC_add_extra_cflags("-D_CRT_SECURE_NO_WARNINGS");
-        chaz_CC_add_extra_cflags("-D_SCL_SECURE_NO_WARNINGS");
+        chaz_CC_add_extra_cflags("/D_CRT_SECURE_NO_WARNINGS");
+        chaz_CC_add_extra_cflags("/D_SCL_SECURE_NO_WARNINGS");
 
-        /* Redefine 'for' to fix broken 'for' scoping under MSVC6. */
-        chaz_CC_add_extra_cflags("-Dfor=\"if(0);else for\"");
+        if (chaz_Probe_msvc_version_num() < 1300) {
+            /* Redefine 'for' to fix broken 'for' scoping under MSVC6. */
+            chaz_CC_add_extra_cflags("/Dfor=\"if(0);else for\"");
+        }
     }
 }
 

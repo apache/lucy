@@ -162,6 +162,6 @@ chaz_Probe_gcc_version(void) {
 }
 
 int
-chaz_Probe_compiler_is_msvc(void) {
-    return chaz_CC_compiler_is_msvc();
+chaz_Probe_msvc_version_num(void) {
+    return chaz_CC_msvc_version_num();
 }

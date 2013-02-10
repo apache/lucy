@@ -370,7 +370,7 @@ chaz_CC_gcc_version(void) {
 }
 
 int
-chaz_CC_compiler_is_msvc(void) {
-    return !!chaz_CC.intval__MSC_VER;
+chaz_CC_msvc_version_num(void) {
+    return chaz_CC.intval__MSC_VER;
 }
 

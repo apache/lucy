@@ -87,10 +87,10 @@ chaz_Probe_gcc_version_num(void);
 const char*
 chaz_Probe_gcc_version(void);
 
-/* Returns true if the compiler is MSVC.
+/* Return the integer version of MSVC defined by _MSC_VER
  */
 int
-chaz_Probe_compiler_is_msvc(void);
+chaz_Probe_msvc_version_num(void);
 
 #ifdef __cplusplus
 }

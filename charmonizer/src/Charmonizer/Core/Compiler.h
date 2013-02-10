@@ -90,13 +90,13 @@ const char*
 chaz_CC_get_extra_cflags(void);
 
 int
-chaz_CC_gcc_version_num();
+chaz_CC_gcc_version_num(void);
 
 const char*
-chaz_CC_gcc_version();
+chaz_CC_gcc_version(void);
 
 int
-chaz_CC_compiler_is_msvc(void);
+chaz_CC_msvc_version_num(void);
 
 #ifdef __cplusplus
 }
