@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include "charmony.h"
+
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -78,20 +80,14 @@ CFCRuby_init(CFCRuby *self, CFCParcel *parcel, CFCHierarchy *hierarchy,
     const char *prefix   = CFCParcel_get_prefix(parcel);
     const char *inc_dest = CFCHierarchy_get_include_dest(hierarchy);
     const char *src_dest = CFCHierarchy_get_source_dest(hierarchy);
-    self->boot_h_file = CFCUtil_cat(CFCUtil_strdup(""), prefix, "boot.h",
-                                    NULL);
-    self->boot_c_file = CFCUtil_cat(CFCUtil_strdup(""), prefix, "boot.c",
-                                    NULL);
-    self->boot_h_path = CFCUtil_cat(CFCUtil_strdup(""), inc_dest,
-                                    CFCUTIL_PATH_SEP, self->boot_h_file,
-                                    NULL);
-    self->boot_c_path = CFCUtil_cat(CFCUtil_strdup(""), src_dest,
-                                    CFCUTIL_PATH_SEP, self->boot_c_file,
-                                    NULL);
+    self->boot_h_file = CFCUtil_sprintf("%sboot.h", prefix);
+    self->boot_c_file = CFCUtil_sprintf("%sboot.c", prefix);
+    self->boot_h_path = CFCUtil_sprintf("%s" CHY_DIR_SEP "%s", inc_dest,
+                                        self->boot_h_file);
+    self->boot_c_path = CFCUtil_sprintf("%s" CHY_DIR_SEP "%s", src_dest,
+                                        self->boot_c_file);
+    self->boot_func = CFCUtil_sprintf("%s%s_bootstrap", prefix, boot_class);
 
-    self->boot_func
-        = CFCUtil_cat(CFCUtil_strdup(""), CFCParcel_get_prefix(parcel),
-                      boot_class, "_bootstrap", NULL);
     for (int i = 0; self->boot_func[i] != 0; i++) {
         if (!isalnum(self->boot_func[i])) {
             self->boot_func[i] = '_';
