@@ -13,22 +13,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'rbconfig'
 require 'rake/clean' 
+import '../../runtime/ruby/Rakefile.common'
 
 def rbconfig
   RbConfig::CONFIG
 end
 
-CLOWNFISH_RUBY_DIR      = File.absolute_path('.')
+def exe_path(*args)
+  File.join(args).ext(RbConfig::CONFIG["EXEEXT"])
+end
+
+BASE_PATH = '..'
+CHARMONIZER_C           = File.join(COMMON_SOURCE_DIR, 'charmonizer.c')
+CHARMONIZER_EXE_PATH    = File.absolute_path(exe_path('charmonizer'))
+CHARMONIZER_ORIG_DIR    = File.absolute_path( File.join( BASE_PATH, '..', '..', 'charmonizer' ) )
+CHARMONY_H_PATH         = 'charmony.h'
+CHARMONY_RB_PATH        = 'Charmony.rb'
 CLOWNFISH_INCLUDE_DIR   = File.join(CLOWNFISH_RUBY_DIR,'..','include')
-CLOWNFISH_SRC_DIR       = File.join(CLOWNFISH_RUBY_DIR,'..','src')
+CLOWNFISH_RUBY_DIR      = File.absolute_path('.')
 CLOWNFISH_RUNTIME       = File.join('..','..','runtime','ruby')
+CLOWNFISH_SRC_DIR       = File.join(CLOWNFISH_RUBY_DIR,'..','src')
+COMMON_SOURCE_DIR       = File.join(BASE_PATH, "common")
 LEMON_SRC_DIR           = File.join('..','..','..','lemon')
 RUBY_EXT_CFC            = File.join('.','ext','Clownfish')
 
+
 desc "Build lemon"
-task :build_lemon do
+task :build_lemon => [:build_charmonizer_tests] do
   puts "Building lemon"
   run_make(LEMON_SRC_DIR,[])
 end
@@ -98,6 +110,66 @@ task :parse_y_files => [:build_lemon] do
   puts "Done."
 end
 
+desc "Building Charmonizer Tests"
+task :build_charmonizer_tests => [:charmony] do
+  puts "Building Charmonizer Tests"
+  flags = [
+    '-fno-common',
+    '-DFCRUBY',
+    '-fno-strict-aliasing',
+    '-pipe',
+    '-fstack-protector',
+    '-std=gnu99',
+    '-D_GNU_SOURCE',
+    '-I' + Dir.pwd
+  ].join(" ").gsub(/"/,'\"')
+
+  run_make( CHARMONIZER_ORIG_DIR, [ "DEFS=#{flags}", "tests"])
+end
+
+desc "Build and run charmonizer, creating charmony.h and charmony.rb"
+task :charmony do
+  # Compile charmonizer executable.
+  if !uptodate? CHARMONIZER_EXE_PATH, [CHARMONIZER_C]
+    outflag = cc_command.match(/cl\b/) ? "/Fe" : "-o "
+    command = "#{cc_command} #{outflag}#{CHARMONIZER_EXE_PATH} #{CHARMONIZER_C}"
+    puts command
+    if !system(command)
+      raise "Failed to compile #{CHARMONIZER_EXE_PATH}"
+    end
+  end
+
+  # Return if charmonizer output is current.
+  if uptodate? CHARMONY_RB_PATH, [CHARMONIZER_EXE_PATH]
+    next
+  end
+  puts "Running #{CHARMONIZER_EXE_PATH}...\n"
+
+  # Prepare arguments to charmonizer.
+  command = [
+    CHARMONIZER_EXE_PATH,
+    '--cc=' + quotify(cc_command),
+    '--enable-c',
+    '--enable-ruby',
+    '--',
+    all_ccflags,
+  ]
+  if (ENV['CHARM_VALGRIND'])
+    command.unshift("valgrind", "--leak-check=yes")
+  end
+
+  # Run charmonizer.
+  puts command.join(" ")
+  if !system(*command)
+    raise "Failed to run #{CHARMONIZER_EXE_PATH}: " + $?
+  end
+end
+CLEAN.include(CHARMONIZER_EXE_PATH)
+CLEAN.include(CHARMONY_H_PATH)
+CLEAN.include(CHARMONY_RB_PATH)
+# Clean up after charmonizer if it doesn't succeed on its own.
+CLEAN.include("_charm*")
+
 # Clean up after Lemonized files.
 Dir.glob(File.join(CLOWNFISH_SRC_DIR, '**', '*.y')).each do |y_file|
   CLEAN.include(y_file.ext('c'))
@@ -107,92 +179,6 @@ end
 
 task :default => [:clownfish]
 
-def cc_command
-  rbconfig["CC"]
-end
-
-def extra_ccflags 
-  ccflags = '-DCFCRUBY '
-  
-  if defined?(rbconfig["CFLAGS"])
-    ccflags += rbconfig['CFLAGS'] + ' '
-  end
-  
-  if ENV.has_key?('CFLAGS')
-    ccflags += ENV['CFLAGS']
-  end
-  
-  if ENV.has_key?('LUCY_VALGRIND')
-    ccflags += "-fno-inline-functions "
-  end
-  
-  # Compile as C++ under MSVC.  Turn off stupid warnings, too.
-  if cc_command =~ /^cl\b/ 
-    ccflags += '/TP -D_CRT_SECURE_NO_WARNINGS '
-  end
-  
-  # Blindly include GCC-specific flags even though we don't know that the
-  # compiler is GCC.
-  if ccflags !~ /-std=/
-    ccflags += "-std=gnu99 "
-  end
-  if ccflags !~ /-D_GNU_SOURCE/ 
-    ccflags += "-D_GNU_SOURCE "
-  end
-  
-  return ccflags
-end
-
 def includes
-  return "-I#{CLOWNFISH_INCLUDE_DIR} -I#{CLOWNFISH_SRC_DIR} -I#{CLOWNFISH_RUNTIME}"
+  return "-I#{CLOWNFISH_INCLUDE_DIR} -I#{CLOWNFISH_SRC_DIR} -I#{CLOWNFISH_RUBY_DIR} -I#{CLOWNFISH_RUNTIME}"
 end
-
-def make_command
-  command = rbconfig["make-prog"]
-  if !command
-    if RUBY_PLATFORM =~ /mswin/i
-      if cc_command =~ /^cl\b/
-        command = "nmake"
-      end
-    end
-  end
-  if !command
-    command = 'make'
-  end
-  return command
-end
-
-def run_make(dir, params)
-  current_dir = Dir.pwd
-  chdir(dir) if dir
-  command = params.clone
-  command.unshift("CC=#{cc_command}")
-  if RUBY_PLATFORM =~ /(mswin|mingw)/i
-    if cc_command =~ /^cl\b/ 
-      command.unshift("-f", "Makefile.MSVC")
-    else
-      command.unshift("-f", "Makefile.MinGW")
-    end
-  end
-  command.unshift(make_command)
-  success = system(*command)
-  if !success
-    raise "Make failed"
-  end
-  chdir(current_dir) if dir
-end
-
-def autogen_header
-  "
-/***********************************************
-
- !!!! DO NOT EDIT !!!!
-
- This file was auto-generated by Rakefile.
-
- ***********************************************/
- "
-
-end
-
-
