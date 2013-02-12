@@ -132,7 +132,7 @@ operate simultaneously:
 
     # Background merge process.
     my $manager = Lucy::Index::IndexManager->new;
-    $index_manager->set_write_lock_timeout(60_000);
+    $manager->set_write_lock_timeout(60_000);
     my $bg_merger = Lucy::Index::BackgroundMerger->new(
         index   => '/path/to/index',
         manager => $manager,
