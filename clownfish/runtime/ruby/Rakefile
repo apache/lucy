@@ -64,7 +64,7 @@ task :build_clownfish => [:build_charmonizer_tests] do
   hierarchy.build
   
   core_binding = Clownfish::CFC::Binding::Core.new(:hierarchy => hierarchy, :header => autogen_header, :footer => '')
-  core_binding.write_all_modified
+  modified = core_binding.write_all_modified
 
   ruby_binding = Clownfish::CFC::Binding::Ruby.new(
     :parcel     => "Clownfish",
@@ -75,8 +75,10 @@ task :build_clownfish => [:build_charmonizer_tests] do
     :footer     => ''
   )
 
-  puts "Building Binding Code"
-  ruby_binding.write_boot
+  if (modified)
+    puts "Building Binding Code"
+    ruby_binding.write_boot
+  end
   Rake::Task['compile'].invoke
 
 end

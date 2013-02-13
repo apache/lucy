@@ -55,11 +55,8 @@ S_CFC_Binding_Core_Write_All_Modified(int argc, VALUE *argv, VALUE self_rb) {
     CFCBindCore *self;
 
     int modified = argc > 0 && RTEST(argv[0]) ? 1 : 0;
-
     Data_Get_Struct(self_rb, CFCBindCore, self);
-    CFCBindCore_write_all_modified(self, modified);
-
-    return Qnil;
+    return INT2NUM(CFCBindCore_write_all_modified(self, modified));
 }
 
 static void
