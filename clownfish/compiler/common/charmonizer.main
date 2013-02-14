@@ -23,6 +23,17 @@
 #include "Charmonizer/Probe.h"
 #include "Charmonizer/Probe/Integers.h"
 
+#if defined(_WIN32) && !defined(__CYGWIN__)
+  #define DIR_SEP "\\"
+#else
+  #define DIR_SEP "/"
+#endif
+
+typedef struct SourceFileContext {
+    chaz_MakeVar *common_objs;
+    chaz_MakeVar *test_cfc_objs;
+} SourceFileContext;
+
 static void
 S_add_compiler_flags(struct chaz_CLIArgs *args) {
     if (chaz_Probe_gcc_version_num()) {
@@ -54,6 +65,147 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
     }
 }
 
+static void
+S_source_file_callback(char *file, void *context) {
+    SourceFileContext *sfc = (SourceFileContext*)context;
+    size_t file_len = strlen(file);
+    size_t obj_file_size;
+    const char *pattern;
+    char *obj_file;
+
+    if (strcmp(file, "CFCParseHeader.c") == 0) { return; }
+
+    /* Strip extension */
+    if (file_len <= 2 || memcmp(file + file_len - 2, ".c", 2) != 0) {
+        chaz_Util_warn("Unexpected source file name: %s", file);
+        return;
+    }
+    file[file_len-2] = '\0';
+
+    pattern = "$(SRC_DIR)" DIR_SEP "%s$(OBJ_EXT)";
+    obj_file_size = strlen(pattern) + file_len + 10;
+    obj_file = (char*)malloc(obj_file_size);
+    sprintf(obj_file, pattern, file);
+
+    if (strlen(file) >= 7 && memcmp(file, "CFCTest", 7) == 0) {
+        chaz_MakeVar_append(sfc->test_cfc_objs, obj_file);
+    }
+    else {
+        chaz_MakeVar_append(sfc->common_objs, obj_file);
+    }
+
+    free(obj_file);
+}
+
+static void
+S_write_makefile() {
+    SourceFileContext sfc;
+
+    const char *base_dir  = "..";
+    const char *lemon_dir = ".." DIR_SEP ".." DIR_SEP ".." DIR_SEP "lemon";
+    const char *exe_ext   = chaz_OS_exe_ext();
+    const char *obj_ext   = chaz_OS_obj_ext();
+
+    const char *parse_header_y = "$(SRC_DIR)" DIR_SEP "CFCParseHeader.y";
+    const char *parse_header_h = "$(SRC_DIR)" DIR_SEP "CFCParseHeader.h";
+    const char *parse_header_c = "$(SRC_DIR)" DIR_SEP "CFCParseHeader.c";
+
+    char *src_dir;
+    char *scratch;
+
+    chaz_MakeFile *makefile;
+    chaz_MakeVar  *var;
+    chaz_MakeRule *rule;
+
+    printf("Creating Makefile...\n");
+
+    src_dir = (char*)malloc(strlen(base_dir) + 20);
+    sprintf(src_dir, "%s" DIR_SEP "src", base_dir);
+
+    makefile = chaz_MakeFile_new();
+
+    /* Variables */
+
+    chaz_MakeFile_add_var(makefile, "SRC_DIR", src_dir);
+    scratch = (char*)malloc(strlen(base_dir) + 20);
+    sprintf(scratch, "%s" DIR_SEP "include", base_dir);
+    chaz_MakeFile_add_var(makefile, "INCLUDE_DIR", scratch);
+    free(scratch);
+    chaz_MakeFile_add_var(makefile, "LEMON_DIR", lemon_dir);
+
+    chaz_MakeFile_add_var(makefile, "EXE_EXT", exe_ext);
+    chaz_MakeFile_add_var(makefile, "OBJ_EXT", obj_ext);
+
+    chaz_MakeFile_add_var(makefile, "CC", chaz_CC_get_cc());
+
+    if (chaz_CC_msvc_version_num()) {
+        chaz_CC_add_extra_cflags("/nologo");
+    }
+    chaz_CC_set_optimization_level("2");
+    chaz_CC_add_include_dir(".");
+    chaz_CC_add_include_dir("$(INCLUDE_DIR)");
+    chaz_CC_add_include_dir("$(SRC_DIR)");
+
+    var = chaz_MakeFile_add_var(makefile, "CFLAGS", NULL);
+    chaz_MakeVar_append(var, chaz_CC_get_cflags());
+    chaz_MakeVar_append(var, chaz_CC_get_extra_cflags());
+
+    chaz_MakeFile_add_var(makefile, "LEMON_OBJS",
+                          "$(LEMON_DIR)" DIR_SEP "lemon$(OBJ_EXT)");
+
+    sfc.common_objs   = chaz_MakeFile_add_var(makefile, "COMMON_OBJS", NULL);
+    sfc.test_cfc_objs = chaz_MakeFile_add_var(makefile, "TEST_CFC_OBJS", NULL);
+
+    chaz_Make_list_files(src_dir, "c", S_source_file_callback, &sfc);
+
+    chaz_MakeVar_append(sfc.common_objs,
+                        "$(SRC_DIR)" DIR_SEP "CFCParseHeader$(OBJ_EXT)");
+    chaz_MakeVar_append(sfc.test_cfc_objs, "t" DIR_SEP "test_cfc$(OBJ_EXT)");
+
+    chaz_MakeFile_add_var(makefile, "CFC_OBJS", "cfc$(OBJ_EXT)");
+
+    chaz_MakeFile_add_var(makefile, "LEMON_EXE",
+                          "$(LEMON_DIR)" DIR_SEP "lemon$(EXE_EXT)");
+    chaz_MakeFile_add_var(makefile, "CFC_EXE", "cfc$(EXE_EXT)");
+    chaz_MakeFile_add_var(makefile, "TEST_CFC_EXE",
+                          "t" DIR_SEP "test_cfc$(EXE_EXT)");
+
+    /* Rules */
+
+    chaz_MakeFile_add_rule(makefile, "all", "$(CFC_EXE)");
+
+    chaz_MakeFile_add_exe(makefile, "$(LEMON_EXE)", "$(LEMON_OBJS)");
+
+    rule = chaz_MakeFile_add_rule(makefile, parse_header_c, NULL);
+    chaz_MakeRule_add_prereq(rule, "$(LEMON_EXE)");
+    chaz_MakeRule_add_prereq(rule, parse_header_y);
+    scratch = (char*)malloc(strlen(parse_header_y) + 20);
+    sprintf(scratch, "$(LEMON_EXE) -q %s", parse_header_y);
+    chaz_MakeRule_add_command(rule, scratch);
+    free(scratch);
+
+    chaz_MakeFile_add_rule(makefile, "$(COMMON_OBJS)", parse_header_c);
+
+    chaz_MakeFile_add_exe(makefile, "$(CFC_EXE)",
+                          "$(COMMON_OBJS) $(CFC_OBJS)");
+    chaz_MakeFile_add_exe(makefile, "$(TEST_CFC_EXE)",
+                          "$(COMMON_OBJS) $(TEST_CFC_OBJS)");
+
+    rule = chaz_MakeFile_add_rule(makefile, "test", "$(TEST_CFC_EXE)");
+    chaz_MakeRule_add_command(rule, "$(TEST_CFC_EXE)");
+
+    chaz_MakeFile_add_to_cleanup(makefile, "$(LEMON_OBJS)");
+    chaz_MakeFile_add_to_cleanup(makefile, "$(COMMON_OBJS)");
+    chaz_MakeFile_add_to_cleanup(makefile, "$(CFC_OBJS)");
+    chaz_MakeFile_add_to_cleanup(makefile, "$(TEST_CFC_OBJS)");
+    chaz_MakeFile_add_to_cleanup(makefile, parse_header_h);
+    chaz_MakeFile_add_to_cleanup(makefile, parse_header_c);
+
+    chaz_MakeFile_write(makefile);
+
+    free(src_dir);
+}
+
 int main(int argc, const char **argv) {
     /* Initialize. */
     {
@@ -72,6 +224,16 @@ int main(int argc, const char **argv) {
     chaz_Headers_run();
     chaz_Integers_run();
     chaz_Strings_run();
+
+    {
+        int i;
+        for (i = 0; i < argc; i++) {
+            if (strncmp(argv[i], "--enable-makefile", 17) == 0) {
+                S_write_makefile();
+                break;
+            }
+        }
+    }
 
     /* Clean up. */
     chaz_Probe_clean_up();

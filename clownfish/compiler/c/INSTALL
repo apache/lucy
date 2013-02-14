@@ -1,0 +1,15 @@
+Build instructions for the cfc command line tool
+================================================
+
+When building under UNIX and derivates run:
+
+$ ./configure
+$ make
+$ make test
+
+When building under Windows with MSVC run:
+
+$ configure.bat
+$ nmake
+$ nmake test
+
