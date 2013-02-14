@@ -118,6 +118,7 @@ chaz_Probe_init(struct chaz_CLIArgs *args) {
     chaz_CC_init(args->cc, args->cflags);
     chaz_ConfWriter_init();
     chaz_HeadCheck_init();
+    chaz_Make_init();
 
     /* Enable output. */
     if (args->charmony_h) {
@@ -147,6 +148,7 @@ chaz_Probe_clean_up(void) {
     /* Dispatch various clean up routines. */
     chaz_ConfWriter_clean_up();
     chaz_CC_clean_up();
+    chaz_Make_clean_up();
 
     if (chaz_Util_verbosity) { printf("Cleanup complete.\n"); }
 }

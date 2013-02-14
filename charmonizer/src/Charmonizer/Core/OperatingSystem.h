@@ -25,6 +25,9 @@
 extern "C" {
 #endif
 
+#define CHAZ_OS_POSIX    1
+#define CHAZ_OS_CMD_EXE  2
+
 /* Safely remove a file named [name]. Needed because of Windows quirks.
  * Returns true on success, false on failure.
  */
@@ -50,6 +53,11 @@ chaz_OS_run_redirected(const char *command, const char *path);
 int
 chaz_OS_run_local_redirected(const char *command, const char *path);
 
+/* Run a command and return the output from stdout.
+ */
+char*
+chaz_OS_run_and_capture(const char *command, size_t *output_len);
+
 /* Attempt to create a directory.
  */
 void
@@ -59,6 +67,17 @@ chaz_OS_mkdir(const char *filepath);
  */
 void
 chaz_OS_rmdir(const char *filepath);
+
+/* Return the operating system name.
+ */
+const char*
+chaz_OS_name(void);
+
+int
+chaz_OS_is_darwin(void);
+
+int
+chaz_OS_is_cygwin(void);
 
 /* Return the extension for an executable on this system.
  */
@@ -70,10 +89,20 @@ chaz_OS_exe_ext(void);
 const char*
 chaz_OS_obj_ext(void);
 
+/* Return the extension for a shared object on this system.
+ */
+const char*
+chaz_OS_shared_obj_ext(void);
+
 /* Return the equivalent of /dev/null on this system.
  */
 const char*
 chaz_OS_dev_null(void);
+
+/* Return the shell type of this system.
+ */
+int
+chaz_OS_shell_type(void);
 
 /* Initialize the Charmonizer/Core/OperatingSystem module.
  */

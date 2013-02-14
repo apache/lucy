@@ -74,6 +74,16 @@ chaz_CC_set_warnings_as_errors(const int flag);
 void
 chaz_CC_add_extra_cflags(const char *);
 
+/* Add include dir to extra cflags.
+ */
+void
+chaz_CC_add_include_dir(const char *dir);
+
+/* Set optimization level.
+ */
+void
+chaz_CC_set_optimization_level(const char *level);
+
 /* Accessor for the compiler executable's string representation.
  */
 const char*
@@ -97,6 +107,18 @@ chaz_CC_gcc_version(void);
 
 int
 chaz_CC_msvc_version_num(void);
+
+const char*
+chaz_CC_link_command(void);
+
+const char*
+chaz_CC_link_flags(void);
+
+const char*
+chaz_CC_link_shared_obj_flag(void);
+
+const char*
+chaz_CC_link_output_flag(void);
 
 #ifdef __cplusplus
 }

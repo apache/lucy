@@ -73,6 +73,7 @@ my @core = qw(
     ConfWriterPerl
     ConfWriterRuby
     HeaderChecker
+    Make
     OperatingSystem
     Util
 );

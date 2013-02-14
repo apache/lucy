@@ -342,6 +342,34 @@ chaz_CC_add_extra_cflags(const char *flags) {
     }
 }
 
+void
+chaz_CC_add_include_dir(const char *dir) {
+    size_t size = strlen(chaz_CC.include_flag) + strlen(dir) + 1;
+    char *flag = (char*)malloc(size);
+    sprintf(flag, "%s%s", chaz_CC.include_flag, dir);
+    chaz_CC_add_extra_cflags(flag);
+    free(flag);
+}
+
+void
+chaz_CC_set_optimization_level(const char *level) {
+    const char *opt_flag;
+    char *flag;
+    size_t size;
+
+    if (chaz_CC.intval__MSC_VER) {
+        opt_flag = "/O";
+    }
+    else {
+        opt_flag = "-O";
+    }
+    size = strlen(opt_flag) + strlen(level) + 1;
+    flag = (char*)malloc(size);
+    sprintf(flag, "%s%s", opt_flag, level);
+    chaz_CC_add_extra_cflags(flag);
+    free(flag);
+}
+
 const char*
 chaz_CC_get_cc(void) {
     return chaz_CC.cc_command;
@@ -373,4 +401,43 @@ int
 chaz_CC_msvc_version_num(void) {
     return chaz_CC.intval__MSC_VER;
 }
+
+const char*
+chaz_CC_link_command() {
+    if (chaz_CC.intval__MSC_VER) {
+        return "link";
+    }
+    else {
+        return chaz_CC.cc_command;
+    }
+}
+
+const char*
+chaz_CC_link_flags() {
+    return "";
+}
+
+const char*
+chaz_CC_link_shared_obj_flag() {
+    if (chaz_CC.intval__MSC_VER) {
+        return "/DLL";
+    }
+    else if (chaz_OS_is_darwin()) {
+        return "-dynamiclib ";
+    }
+    else {
+        return "-shared";
+    }
+}
+
+const char*
+chaz_CC_link_output_flag() {
+    if (chaz_CC.intval__MSC_VER) {
+        return "/OUT:";
+    }
+    else {
+        return "-o ";
+    }
+}
+
 

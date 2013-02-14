@@ -17,21 +17,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <ctype.h>
 
 #include "Charmonizer/Core/Compiler.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/OperatingSystem.h"
 
+#define CHAZ_OS_TARGET_PATH  "_charmonizer_target"
+#define CHAZ_OS_NAME_MAX     31
+
 static struct {
+    char name[CHAZ_OS_NAME_MAX+1];
     char dev_null[20];
     char exe_ext[5];
     char obj_ext[5];
+    char shared_obj_ext[7];
     char local_command_start[3];
     int  shell_type;
-} chaz_OS = { "", "", "", "", 0 };
-#define CHAZ_OS_POSIX    1
-#define CHAZ_OS_CMD_EXE  2
+} chaz_OS = { "", "", "", "", "", "", 0 };
 
 void
 chaz_OS_init(void) {
@@ -45,16 +49,43 @@ chaz_OS_init(void) {
 
     /* Detect shell based on whether the bitbucket is "/dev/null" or "nul". */
     if (chaz_Util_can_open_file("/dev/null")) {
+        char   *uname;
+        size_t  uname_len;
+        size_t i;
+
+        chaz_OS.shell_type = CHAZ_OS_POSIX;
+
+        /* Detect Unix name. */
+        uname = chaz_OS_run_and_capture("uname", &uname_len);
+        for (i = 0; i < CHAZ_OS_NAME_MAX && i < uname_len; i++) {
+            char c = uname[i];
+            if (!c || isspace(c)) { break; }
+            chaz_OS.name[i] = tolower(c);
+        }
+        if (i > 0) { chaz_OS.name[i] = '\0'; }
+        else       { strcpy(chaz_OS.name, "unknown_unix"); }
+        free(uname);
+
         strcpy(chaz_OS.dev_null, "/dev/null");
         strcpy(chaz_OS.exe_ext, "");
         strcpy(chaz_OS.obj_ext, ".o");
+        if (memcmp(chaz_OS.name, "darwin", 6) == 0) {
+            strcpy(chaz_OS.shared_obj_ext, ".dylib");
+        }
+        else if (memcmp(chaz_OS.name, "cygwin", 6) == 0) {
+            strcpy(chaz_OS.shared_obj_ext, ".dll");
+        }
+        else {
+            strcpy(chaz_OS.shared_obj_ext, ".so");
+        }
         strcpy(chaz_OS.local_command_start, "./");
-        chaz_OS.shell_type = CHAZ_OS_POSIX;
     }
     else if (chaz_Util_can_open_file("nul")) {
+        strcpy(chaz_OS.name, "windows");
         strcpy(chaz_OS.dev_null, "nul");
         strcpy(chaz_OS.exe_ext, ".exe");
         strcpy(chaz_OS.obj_ext, ".obj");
+        strcpy(chaz_OS.shared_obj_ext, ".dll");
         strcpy(chaz_OS.local_command_start, ".\\");
         chaz_OS.shell_type = CHAZ_OS_CMD_EXE;
     }
@@ -62,6 +93,21 @@ chaz_OS_init(void) {
         /* Bail out because we couldn't find anything like /dev/null. */
         chaz_Util_die("Couldn't find anything like /dev/null");
     }
+}
+
+const char*
+chaz_OS_name(void) {
+    return chaz_OS.name;
+}
+
+int
+chaz_OS_is_darwin(void) {
+    return memcmp(chaz_OS.name, "darwin", 6) == 0;
+}
+
+int
+chaz_OS_is_cygwin(void) {
+    return memcmp(chaz_OS.name, "cygwin", 6) == 0;
 }
 
 const char*
@@ -75,8 +121,18 @@ chaz_OS_obj_ext(void) {
 }
 
 const char*
+chaz_OS_shared_obj_ext(void) {
+    return chaz_OS.shared_obj_ext;
+}
+
+const char*
 chaz_OS_dev_null(void) {
     return chaz_OS.dev_null;
+}
+
+int
+chaz_OS_shell_type(void) {
+    return chaz_OS.shell_type;
 }
 
 int
@@ -151,6 +207,15 @@ chaz_OS_run_redirected(const char *command, const char *path) {
     retval = system(quiet_command);
     free(quiet_command);
     return retval;
+}
+
+char*
+chaz_OS_run_and_capture(const char *command, size_t *output_len) {
+    char *output;
+    chaz_OS_run_redirected(command, CHAZ_OS_TARGET_PATH);
+    output = chaz_Util_slurp_file(CHAZ_OS_TARGET_PATH, output_len);
+    chaz_Util_remove_and_verify(CHAZ_OS_TARGET_PATH);
+    return output;
 }
 
 void
