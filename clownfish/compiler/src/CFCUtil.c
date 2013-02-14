@@ -335,12 +335,6 @@ CFCUtil_make_path(const char *path) {
     size_t orig_len = strlen(target);
     size_t len = orig_len;
     for (size_t i = 0; i <= len; i++) {
-#ifndef WIN32
-        if (target[i] == '\\') {
-            i++;
-            continue;
-        }
-#endif
         if (target[i] == CHY_DIR_SEP_CHAR || i == len) {
             target[i] = 0; // NULL-terminate.
             struct stat stat_buf;
