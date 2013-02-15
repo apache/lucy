@@ -18,14 +18,21 @@ parcel Lucy;
 
 /** Testing framework.
  */
-inert class Lucy::Test { }
+inert class Lucy::Test {
+    inert bool
+    run_batch(CharBuf *class_name, TestFormatter *formatter);
+
+    inert bool
+    run_all_batches(TestFormatter *formatter);
+}
 
 class Lucy::Test::TestBatch inherits Clownfish::Obj {
-    int64_t    test_num;
-    int64_t    num_tests;
-    int64_t    num_passed;
-    int64_t    num_failed;
-    int64_t    num_skipped;
+    TestFormatter *formatter;
+    int64_t        test_num;
+    int64_t        num_tests;
+    int64_t        num_passed;
+    int64_t        num_failed;
+    int64_t        num_skipped;
 
     inert incremented TestBatch*
     new(int64_t num_tests);
@@ -33,8 +40,24 @@ class Lucy::Test::TestBatch inherits Clownfish::Obj {
     inert TestBatch*
     init(TestBatch *self, int64_t num_tests);
 
+    public void
+    Destroy(TestBatch *self);
+
     void
     Plan(TestBatch *self);
+
+    /* Will made be abstract later. */
+    void
+    Run(TestBatch *self);
+
+    int64_t
+    Get_Num_Planned(TestBatch *self);
+
+    int64_t
+    Get_Num_Tests(TestBatch *self);
+
+    int64_t
+    Get_Num_Failed(TestBatch *self);
 
     inert bool
     test_true(void *vself, bool condition, const char *pattern, ...);

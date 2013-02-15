@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,6 +23,60 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Test.h"
+#include "Clownfish/Test/Formatter/TestFormatterTAP.h"
+#include "Clownfish/Test/TestFormatter.h"
+#include "Clownfish/Test/TestRunner.h"
+
+static bool
+S_vtest_true(TestBatch *self, bool condition, const char *pattern,
+             va_list args);
+
+static VArray*
+S_all_test_batches() {
+    VArray *batches = VA_new(0);
+
+    return batches;
+}
+
+bool
+Test_run_batch(CharBuf *class_name, TestFormatter *formatter) {
+    VArray   *batches = S_all_test_batches();
+    uint32_t  size    = VA_Get_Size(batches);
+
+    for (uint32_t i = 0; i < size; ++i) {
+        TestBatch *batch = (TestBatch*)VA_Fetch(batches, i);
+
+        if (CB_Equals(TestBatch_Get_Class_Name(batch), (Obj*)class_name)) {
+            TestRunner *runner  = TestRunner_new(formatter);
+            bool result = TestRunner_Run_Batch(runner, batch);
+            DECREF(runner);
+            DECREF(batches);
+            return result;
+        }
+    }
+
+    DECREF(batches);
+    THROW(ERR, "Couldn't find test class '%o'", class_name);
+    UNREACHABLE_RETURN(bool);
+}
+
+bool
+Test_run_all_batches(TestFormatter *formatter) {
+    TestRunner *runner  = TestRunner_new(formatter);
+    VArray     *batches = S_all_test_batches();
+    uint32_t    size    = VA_Get_Size(batches);
+
+    for (uint32_t i = 0; i < size; ++i) {
+        TestBatch *batch = (TestBatch*)VA_Fetch(batches, i);
+        TestRunner_Run_Batch(runner, batch);
+    }
+
+    bool result = TestRunner_Finish(runner);
+
+    DECREF(runner);
+    DECREF(batches);
+    return result;
+}
 
 TestBatch*
 TestBatch_new(int64_t num_tests) {
@@ -35,6 +90,7 @@ TestBatch_init(TestBatch *self, int64_t num_tests) {
     self->num_tests       = num_tests;
 
     // Initialize.
+    self->formatter       = (TestFormatter*)TestFormatterTAP_new();
     self->test_num        = 0;
     self->num_passed      = 0;
     self->num_failed      = 0;
@@ -50,8 +106,33 @@ TestBatch_init(TestBatch *self, int64_t num_tests) {
 }
 
 void
+TestBatch_destroy(TestBatch *self) {
+    DECREF(self->formatter);
+    SUPER_DESTROY(self, TESTBATCH);
+}
+
+void
 TestBatch_plan(TestBatch *self) {
-    printf("1..%" PRId64 "\n", self->num_tests);
+    TestFormatter_Batch_Prologue(self->formatter, self);
+}
+
+void
+TestBatch_run(TestBatch *self) {
+}
+
+int64_t
+TestBatch_get_num_planned(TestBatch *self) {
+    return self->num_tests;
+}
+
+int64_t
+TestBatch_get_num_tests(TestBatch *self) {
+    return self->test_num;
+}
+
+int64_t
+TestBatch_get_num_failed(TestBatch *self) {
+    return self->num_failed;
 }
 
 bool
@@ -136,159 +217,92 @@ TestBatch_skip(void *vself, const char *pattern, ...) {
 bool
 TestBatch_vtest_true(TestBatch *self, bool condition, const char *pattern,
                      va_list args) {
-    // Increment test number.
-    self->test_num++;
-
-    // Test condition and pass or fail.
-    if (condition) {
-        self->num_passed++;
-        printf("ok %" PRId64 " - ", self->test_num);
-        vprintf(pattern, args);
-        printf("\n");
-        return true;
-    }
-    else {
-        self->num_failed++;
-        printf("not ok %" PRId64 " - ", self->test_num);
-        vprintf(pattern, args);
-        printf("\n");
-        return false;
-    }
+    return S_vtest_true(self, condition, pattern, args);
 }
 
 bool
 TestBatch_vtest_false(TestBatch *self, bool condition,
                       const char *pattern, va_list args) {
-    // Increment test number.
-    self->test_num++;
-
-    // Test condition and pass or fail.
-    if (!condition) {
-        self->num_passed++;
-        printf("ok %" PRId64 " - ", self->test_num);
-        vprintf(pattern, args);
-        printf("\n");
-        return true;
-    }
-    else {
-        self->num_failed++;
-        printf("not ok %" PRId64 " - ", self->test_num);
-        vprintf(pattern, args);
-        printf("\n");
-        return false;
-    }
+    return S_vtest_true(self, !condition, pattern, args);
 }
 
 bool
 TestBatch_vtest_int_equals(TestBatch *self, long got, long expected,
                            const char *pattern, va_list args) {
-    // Increment test number.
-    self->test_num++;
-
-    // Test condition and pass or fail.
-    if (expected == got) {
-        self->num_passed++;
-        printf("ok %" PRId64 " - ", self->test_num);
-        vprintf(pattern, args);
-        printf("\n");
-        return true;
+    bool pass = (got == expected);
+    S_vtest_true(self, pass, pattern, args);
+    if (!pass) {
+        TestFormatter_test_comment(self->formatter,
+                                   "Expected '%ld', got '%ld'.\n",
+                                   expected, got);
     }
-    else {
-        self->num_failed++;
-        printf("not ok %" PRId64 " - Expected '%ld', got '%ld'\n    ",
-               self->test_num, expected, got);
-        vprintf(pattern, args);
-        printf("\n");
-        return false;
-    }
+    return pass;
 }
 
 bool
 TestBatch_vtest_float_equals(TestBatch *self, double got, double expected,
                              const char *pattern, va_list args) {
-    double diff = expected / got;
-
-    // Increment test number.
-    self->test_num++;
-
-    // Evaluate condition and pass or fail.
-    if (diff > 0.00001) {
-        self->num_passed++;
-        printf("ok %" PRId64 " - ", self->test_num);
-        vprintf(pattern, args);
-        printf("\n");
-        return true;
+    double relative_error = got / expected - 1.0;
+    bool   pass           = (fabs(relative_error) < 1e-6);
+    S_vtest_true(self, pass, pattern, args);
+    if (!pass) {
+        TestFormatter_test_comment(self->formatter,
+                                   "Expected '%e', got '%e'.\n",
+                                   expected, got);
     }
-    else {
-        self->num_failed++;
-        printf("not ok %" PRId64 " - Expected '%f', got '%f'\n    ",
-               self->test_num, expected, got);
-        vprintf(pattern, args);
-        printf("\n");
-        return false;
-    }
+    return pass;
 }
 
 bool
 TestBatch_vtest_string_equals(TestBatch *self, const char *got,
                               const char *expected, const char *pattern,
                               va_list args) {
-    // Increment test number.
-    self->test_num++;
-
-    // Test condition and pass or fail.
-    if (strcmp(expected, got) == 0) {
-        self->num_passed++;
-        printf("ok %" PRId64 " - ", self->test_num);
-        vprintf(pattern, args);
-        printf("\n");
-        return true;
+    bool pass = (strcmp(got, expected) == 0);
+    S_vtest_true(self, pass, pattern, args);
+    if (!pass) {
+        TestFormatter_test_comment(self->formatter,
+                                   "Expected '%s', got '%s'.\n",
+                                   expected, got);
     }
-    else {
-        self->num_failed++;
-        printf("not ok %" PRId64 " - Expected '%s', got '%s'\n    ",
-               self->test_num, expected, got);
-        vprintf(pattern, args);
-        printf("\n");
-        return false;
-    }
+    return pass;
 }
 
 bool
 TestBatch_vpass(TestBatch *self, const char *pattern, va_list args) {
-    // Increment test number.
-    self->test_num++;
-
-    // Update counter, indicate pass.
-    self->num_passed++;
-    printf("ok %" PRId64 " - ", self->test_num);
-    vprintf(pattern, args);
-    printf("\n");
-
-    return true;
+    return S_vtest_true(self, true, pattern, args);
 }
 
 bool
 TestBatch_vfail(TestBatch *self, const char *pattern, va_list args) {
-    // Increment test number.
-    self->test_num++;
-
-    // Update counter, indicate failure.
-    self->num_failed++;
-    printf("not ok %" PRId64 " - ", self->test_num);
-    vprintf(pattern, args);
-    printf("\n");
-
-    return false;
+    return S_vtest_true(self, false, pattern, args);
 }
 
 void
 TestBatch_vskip(TestBatch *self, const char *pattern, va_list args) {
     self->test_num++;
-    printf("ok %" PRId64 " # SKIP ", self->test_num);
-    vprintf(pattern, args);
-    printf("\n");
+    // TODO: Add a VTest_Skip method to TestFormatter
+    TestFormatter_VTest_Result(self->formatter, true, self->num_tests,
+                               pattern, args);
     self->num_skipped++;
+}
+
+static bool
+S_vtest_true(TestBatch* self, bool condition, const char *pattern,
+             va_list args) {
+    // Increment test number.
+    self->test_num++;
+
+    if (condition) {
+        self->num_passed++;
+    }
+    else {
+        self->num_failed++;
+    }
+
+    TestFormatter_VTest_Result(self->formatter, condition, self->test_num,
+                               pattern, args);
+
+    return condition;
 }
 
 

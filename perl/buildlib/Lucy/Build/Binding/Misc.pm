@@ -307,7 +307,12 @@ PPCODE:
         lucy_TestHighlighter_run_tests();
     }
     else {
-        THROW(LUCY_ERR, "Unknown test id: %s", package);
+        lucy_CharBuf *class_name = lucy_CB_newf("%s", package);
+        lucy_TestFormatter *formatter
+            = (lucy_TestFormatter*)lucy_TestFormatterTAP_new();
+        lucy_Test_run_batch(class_name, formatter);
+        CFISH_DECREF(class_name);
+        CFISH_DECREF(formatter);
     }
 }
 END_XS_CODE
