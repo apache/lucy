@@ -26,6 +26,7 @@
 #include "Clownfish/Test/Formatter/TestFormatterTAP.h"
 #include "Clownfish/Test/TestFormatter.h"
 #include "Clownfish/Test/TestRunner.h"
+#include "Lucy/Test/Highlight/TestHeatMap.h"
 
 static bool
 S_vtest_true(TestBatch *self, bool condition, const char *pattern,
@@ -34,6 +35,8 @@ S_vtest_true(TestBatch *self, bool condition, const char *pattern,
 static VArray*
 S_all_test_batches() {
     VArray *batches = VA_new(0);
+
+    VA_Push(batches, (Obj*)TestHeatMap_new());
 
     return batches;
 }

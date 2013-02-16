@@ -22,6 +22,18 @@
 
 #include "Lucy/Search/Span.h"
 
+TestHeatMap*
+TestHeatMap_new() {
+    TestHeatMap *self = (TestHeatMap*)VTable_Make_Obj(TESTHEATMAP);
+    return TestHeatMap_init(self);
+}
+
+TestHeatMap*
+TestHeatMap_init(TestHeatMap *self) {
+    return (TestHeatMap*)TestBatch_init((TestBatch*)self, 13);
+}
+
+
 static void
 test_calc_proximity_boost(TestBatch *batch) {
     VArray  *spans    = VA_new(0);
@@ -159,15 +171,10 @@ test_flatten_spans(TestBatch *batch) {
 }
 
 void
-TestHeatMap_run_tests() {
-    TestBatch *batch = TestBatch_new(13);
-
-    TestBatch_Plan(batch);
-
+TestHeatMap_run(TestHeatMap *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_calc_proximity_boost(batch);
     test_flatten_spans(batch);
-
-    DECREF(batch);
 }
 
 

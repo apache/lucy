@@ -17,5 +17,5 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestHeatMap");
+Lucy::Test::run_tests("Lucy::Test::Highlight::TestHeatMap");
 

@@ -300,9 +300,6 @@ PPCODE:
         lucy_TestVArray_run_tests();
     }
     // Lucy::Highlight
-    else if (strEQ(package, "TestHeatMap")) {
-        lucy_TestHeatMap_run_tests();
-    }
     else if (strEQ(package, "TestHighlighter")) {
         lucy_TestHighlighter_run_tests();
     }

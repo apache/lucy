@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Highlight::TestHeatMap {
-    inert void
-    run_tests();
+class Lucy::Test::Highlight::TestHeatMap
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestHeatMap*
+    new();
+
+    inert TestHeatMap*
+    init(TestHeatMap *self);
+
+    void
+    Run(TestHeatMap *self);
 }
 
 
