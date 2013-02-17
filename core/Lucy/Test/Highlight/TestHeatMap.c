@@ -171,7 +171,7 @@ test_flatten_spans(TestBatch *batch) {
 }
 
 void
-TestHeatMap_run(TestHeatMap *self) {
+TestHeatMap_run_tests(TestHeatMap *self) {
     TestBatch *batch = (TestBatch*)self;
     test_calc_proximity_boost(batch);
     test_flatten_spans(batch);

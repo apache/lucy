@@ -50,9 +50,7 @@ Test_run_batch(CharBuf *class_name, TestFormatter *formatter) {
         TestBatch *batch = (TestBatch*)VA_Fetch(batches, i);
 
         if (CB_Equals(TestBatch_Get_Class_Name(batch), (Obj*)class_name)) {
-            TestRunner *runner  = TestRunner_new(formatter);
-            bool result = TestRunner_Run_Batch(runner, batch);
-            DECREF(runner);
+            bool result = TestBatch_Run(batch);
             DECREF(batches);
             return result;
         }
@@ -119,8 +117,30 @@ TestBatch_plan(TestBatch *self) {
     TestFormatter_Batch_Prologue(self->formatter, self);
 }
 
-void
+bool
 TestBatch_run(TestBatch *self) {
+    TestBatch_Plan(self);
+    TestBatch_Run_Tests(self);
+
+    bool failed = false;
+    if (self->num_failed > 0) {
+        failed = true;
+        TestFormatter_batch_comment(self->formatter, "%d/%d tests failed.\n",
+                                    self->num_failed, self->test_num);
+    }
+    if (self->test_num != self->num_tests) {
+        failed = true;
+        TestFormatter_batch_comment(self->formatter,
+                                    "Bad plan: You planned %d tests but ran"
+                                    " %d.\n",
+                                    self->num_tests, self->test_num);
+    }
+
+    return !failed;
+}
+
+void
+TestBatch_run_tests(TestBatch *self) {
 }
 
 int64_t

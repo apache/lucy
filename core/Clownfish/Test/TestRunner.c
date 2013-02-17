@@ -53,36 +53,17 @@ TestRunner_destroy(TestRunner *self) {
 
 bool
 TestRunner_run_batch(TestRunner *self, TestBatch *batch) {
-    TestBatch_Plan(batch);
-    TestBatch_Run(batch);
+    bool success = TestBatch_Run(batch);
 
-    int64_t num_planned = TestBatch_Get_Num_Planned(batch);
-    int64_t num_tests   = TestBatch_Get_Num_Tests(batch);
-    int64_t num_failed  = TestBatch_Get_Num_Failed(batch);
-    bool    failed      = false;
+    self->num_tests        += TestBatch_Get_Num_Tests(batch);
+    self->num_tests_failed += TestBatch_Get_Num_Failed(batch);
+    self->num_batches      += 1;
 
-    if (num_failed > 0) {
-        failed = true;
-        TestFormatter_batch_comment(self->formatter, "%d/%d tests failed.\n",
-                                    num_failed, num_tests);
-    }
-    if (num_tests != num_planned) {
-        failed = true;
-        TestFormatter_batch_comment(self->formatter,
-                                    "Bad plan: You planned %d tests but ran"
-                                    " %d.\n",
-                                    num_planned, num_tests);
-    }
-
-    self->num_tests         += num_tests;
-    self->num_tests_failed  += num_failed;
-    self->num_batches       += 1;
-
-    if (failed) {
+    if (!success) {
         self->num_batches_failed += 1;
     }
 
-    return !failed;
+    return success;
 }
 
 bool

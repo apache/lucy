@@ -46,9 +46,12 @@ class Lucy::Test::TestBatch inherits Clownfish::Obj {
     void
     Plan(TestBatch *self);
 
+    bool
+    Run(TestBatch *self);
+
     /* Will made be abstract later. */
     void
-    Run(TestBatch *self);
+    Run_Tests(TestBatch *self);
 
     int64_t
     Get_Num_Planned(TestBatch *self);

@@ -26,7 +26,7 @@ class Lucy::Test::Highlight::TestHeatMap
     init(TestHeatMap *self);
 
     void
-    Run(TestHeatMap *self);
+    Run_Tests(TestHeatMap *self);
 }
 
 
