@@ -16,6 +16,9 @@
 
 parcel Lucy;
 
+/**
+ * Run multiple test batches and collect statistics.
+ */
 class Clownfish::Test::TestRunner inherits Clownfish::Obj {
     TestFormatter *formatter;
     uint32_t       num_tests;
@@ -26,27 +29,47 @@ class Clownfish::Test::TestRunner inherits Clownfish::Obj {
     inert incremented TestRunner*
     new(TestFormatter *formatter);
 
+    /**
+     * @param formatter The test formatter to format the test output.
+     */
     inert TestRunner*
     init(TestRunner *self, TestFormatter *formatter);
 
     public void
     Destroy(TestRunner *self);
 
+    /** Run a test batch and collect statistics.
+     *
+     * @param batch The test batch.
+     * @return true if the test batch passed.
+     */
     bool
     Run_Batch(TestRunner *self, TestBatch *batch);
 
+    /** Print a summary after running all test batches.
+     *
+     * @return true if any tests were run and all test batches passed.
+     */
     bool
     Finish(TestRunner *self);
 
+    /** Return the number of tests run.
+     */
     uint32_t
     Get_Num_Tests(TestRunner *self);
 
+    /** Return the number of failed tests.
+     */
     uint32_t
     Get_Num_Tests_Failed(TestRunner *self);
 
+    /** Return the number of test batches run.
+     */
     uint32_t
     Get_Num_Batches(TestRunner *self);
 
+    /** Return the number of failed test batches.
+     */
     uint32_t
     Get_Num_Batches_Failed(TestRunner *self);
 }

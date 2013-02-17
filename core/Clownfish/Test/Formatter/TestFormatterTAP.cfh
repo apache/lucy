@@ -16,6 +16,10 @@
 
 parcel Lucy;
 
+/**
+ * A TestFormatter that produces TAP output (Test Anything Protocol).
+ * See http://testanything.org/
+ */
 class Clownfish::Test::Formatter::TestFormatterTAP
     inherits Clownfish::Test::TestFormatter {
 

@@ -16,6 +16,9 @@
 
 parcel Lucy;
 
+/**
+ * Abstract base class for Clownfish test formatters.
+ */
 abstract class Clownfish::Test::TestFormatter inherits Clownfish::Obj {
     inert TestFormatter*
     init(TestFormatter *self);
@@ -30,19 +33,44 @@ abstract class Clownfish::Test::TestFormatter inherits Clownfish::Obj {
     inert void
     batch_comment(void *vself, const char *fmt, ...);
 
+    /** Print output at the beginning of a test batch.
+     *
+     * @param batch The test batch.
+     */
     abstract void
     Batch_Prologue(TestFormatter *self, TestBatch *batch);
 
+    /** Print the result of a single test.
+     *
+     * @param pass True if the test passed, false otherwise.
+     * @param test_num The sequence number of the test.
+     * @param fmt printf-style format string.
+     * @param args Additional arguments.
+     */
     abstract void
     VTest_Result(TestFormatter *self, bool pass, uint32_t test_num,
                  const char *fmt, va_list args);
 
+    /** Print additional diagnosis for a test.
+     *
+     * @param fmt printf-style format string.
+     * @param args Additional arguments.
+     */
     abstract void
     VTest_Comment(TestFormatter *self, const char *fmt, va_list args);
 
+    /** Print additional diagnosis for a test batch.
+     *
+     * @param fmt printf-style format string.
+     * @param args Additional arguments.
+     */
     abstract void
     VBatch_Comment(TestFormatter *self, const char *fmt, va_list args);
 
+    /** Print test summary after running all test batches.
+     *
+     * @param runner The test runner.
+     */
     abstract void
     Summary(TestFormatter *self, TestRunner *runner);
 }

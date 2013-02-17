@@ -16,6 +16,10 @@
 
 parcel Lucy;
 
+/**
+ * A TestFormatter that produces human-readable output in a custom
+ * "Clownfish" format.
+ */
 class Clownfish::Test::Formatter::TestFormatterCF
     inherits Clownfish::Test::TestFormatter {
 

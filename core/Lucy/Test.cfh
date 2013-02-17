@@ -46,19 +46,32 @@ class Lucy::Test::TestBatch inherits Clownfish::Obj {
     void
     Plan(TestBatch *self);
 
+    /** Run the test batch and print test output and diagnosis.
+     *
+     * @return true if the test batch passed.
+     */
     bool
     Run(TestBatch *self);
 
-    /* Will made be abstract later. */
+    /** Run the tests of the test batch.
+     *
+     * This method will made be abstract later.
+     */
     void
     Run_Tests(TestBatch *self);
 
+    /** Return the number of tests planned.
+     */
     int64_t
     Get_Num_Planned(TestBatch *self);
 
+    /** Return the number of tests run.
+     */
     int64_t
     Get_Num_Tests(TestBatch *self);
 
+    /** Return the number of failed tests.
+     */
     int64_t
     Get_Num_Failed(TestBatch *self);
 
