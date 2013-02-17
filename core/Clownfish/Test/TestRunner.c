@@ -21,11 +21,9 @@
 #define CHY_USE_SHORT_NAMES
 
 #include "Clownfish/Test/TestRunner.h"
-#include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"
-#include "Clownfish/Test/Formatter/TestFormatterTAP.h"
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
-#include "Clownfish/VArray.h"
 #include "Clownfish/VTable.h"
 
 TestRunner*
