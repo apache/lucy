@@ -75,4 +75,64 @@ abstract class Clownfish::Test::TestFormatter inherits Clownfish::Obj {
     Summary(TestFormatter *self, TestRunner *runner);
 }
 
+/**
+ * A TestFormatter that produces human-readable output in a custom
+ * "Clownfish" format.
+ */
+class Clownfish::Test::Formatter::TestFormatterCF
+    inherits Clownfish::Test::TestFormatter {
+
+    inert incremented TestFormatterCF*
+    new();
+
+    inert TestFormatterCF*
+    init(TestFormatterCF *self);
+
+    void
+    Batch_Prologue(TestFormatterCF *self, TestBatch *batch);
+
+    void
+    VTest_Result(TestFormatterCF *self, bool pass, uint32_t test_num,
+                 const char *fmt, va_list args);
+
+    void
+    VTest_Comment(TestFormatterCF *self, const char *fmt, va_list args);
+
+    void
+    VBatch_Comment(TestFormatterCF *self, const char *fmt, va_list args);
+
+    void
+    Summary(TestFormatterCF *self, TestRunner *runner);
+}
+
+/**
+ * A TestFormatter that produces TAP output (Test Anything Protocol).
+ * See http://testanything.org/
+ */
+class Clownfish::Test::Formatter::TestFormatterTAP
+    inherits Clownfish::Test::TestFormatter {
+
+    inert incremented TestFormatterTAP*
+    new();
+
+    inert TestFormatterTAP*
+    init(TestFormatterTAP *self);
+
+    void
+    Batch_Prologue(TestFormatterTAP *self, TestBatch *batch);
+
+    void
+    VTest_Result(TestFormatterTAP *self, bool pass, uint32_t test_num,
+                 const char *fmt, va_list args);
+
+    void
+    VTest_Comment(TestFormatterTAP *self, const char *fmt, va_list args);
+
+    void
+    VBatch_Comment(TestFormatterTAP *self, const char *fmt, va_list args);
+
+    void
+    Summary(TestFormatterTAP *self, TestRunner *runner);
+}
+
 

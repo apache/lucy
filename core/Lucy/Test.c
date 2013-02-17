@@ -23,7 +23,6 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Test.h"
-#include "Clownfish/Test/Formatter/TestFormatterTAP.h"
 #include "Clownfish/Test/TestFormatter.h"
 #include "Clownfish/Test/TestRunner.h"
 #include "Lucy/Test/Highlight/TestHeatMap.h"
