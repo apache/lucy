@@ -250,14 +250,10 @@ TestBatch_destroy(TestBatch *self) {
     SUPER_DESTROY(self, TESTBATCH);
 }
 
-void
-TestBatch_plan(TestBatch *self) {
-    TestFormatter_Batch_Prologue(self->formatter, self);
-}
-
 bool
 TestBatch_run(TestBatch *self) {
-    TestBatch_Plan(self);
+    TestFormatter_Batch_Prologue(self->formatter, self);
+
     TestBatch_Run_Tests(self);
 
     bool failed = false;

@@ -43,9 +43,6 @@ class Lucy::Test::TestBatch inherits Clownfish::Obj {
     public void
     Destroy(TestBatch *self);
 
-    void
-    Plan(TestBatch *self);
-
     /** Run the test batch and print test output and diagnosis.
      *
      * @return true if the test batch passed.
