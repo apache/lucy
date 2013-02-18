@@ -273,10 +273,6 @@ TestBatch_run(TestBatch *self) {
     return !failed;
 }
 
-void
-TestBatch_run_tests(TestBatch *self) {
-}
-
 int64_t
 TestBatch_get_num_planned(TestBatch *self) {
     return self->num_tests;

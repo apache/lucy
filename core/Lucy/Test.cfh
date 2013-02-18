@@ -26,7 +26,7 @@ inert class Lucy::Test {
     run_all_batches(TestFormatter *formatter);
 }
 
-class Lucy::Test::TestBatch inherits Clownfish::Obj {
+abstract class Lucy::Test::TestBatch inherits Clownfish::Obj {
     TestFormatter *formatter;
     int64_t        test_num;
     int64_t        num_tests;
@@ -51,10 +51,8 @@ class Lucy::Test::TestBatch inherits Clownfish::Obj {
     Run(TestBatch *self);
 
     /** Run the tests of the test batch.
-     *
-     * This method will made be abstract later.
      */
-    void
+    abstract void
     Run_Tests(TestBatch *self);
 
     /** Return the number of tests planned.
