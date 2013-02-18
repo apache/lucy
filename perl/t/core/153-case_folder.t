@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestCaseFolder");
+my $success = Lucy::Test::run_tests("Lucy::Test::Analysis::TestCaseFolder");
+
+exit($success ? 0 : 1);
 

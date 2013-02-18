@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestMemoryPool");
+my $success = Lucy::Test::run_tests("Lucy::Test::Util::TestMemoryPool");
+
+exit($success ? 0 : 1);
 

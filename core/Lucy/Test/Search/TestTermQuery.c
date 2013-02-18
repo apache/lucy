@@ -23,6 +23,17 @@
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Search/TermQuery.h"
 
+TestTermQuery*
+TestTermQuery_new() {
+    TestTermQuery *self = (TestTermQuery*)VTable_Make_Obj(TESTTERMQUERY);
+    return TestTermQuery_init(self);
+}
+
+TestTermQuery*
+TestTermQuery_init(TestTermQuery *self) {
+    return (TestTermQuery*)TestBatch_init((TestBatch*)self, 4);
+}
+
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
     TermQuery *query         = TestUtils_make_term_query("content", "foo");
@@ -51,11 +62,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 void
-TestTermQuery_run_tests() {
-    TestBatch *batch = TestBatch_new(4);
-    TestBatch_Plan(batch);
+TestTermQuery_run_tests(TestTermQuery *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch);
-    DECREF(batch);
 }
 
 

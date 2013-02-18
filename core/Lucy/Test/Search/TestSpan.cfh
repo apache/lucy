@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Search::TestSpan {
-    inert void
-    run_tests();
+class Lucy::Test::Search::TestSpan
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestSpan*
+    new();
+
+    inert TestSpan*
+    init(TestSpan *self);
+
+    void
+    Run_Tests(TestSpan *self);
 }
 
 

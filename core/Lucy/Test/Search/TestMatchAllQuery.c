@@ -23,6 +23,17 @@
 #include "Lucy/Test/Search/TestMatchAllQuery.h"
 #include "Lucy/Search/MatchAllQuery.h"
 
+TestMatchAllQuery*
+TestMatchAllQuery_new() {
+    TestMatchAllQuery *self = (TestMatchAllQuery*)VTable_Make_Obj(TESTMATCHALLQUERY);
+    return TestMatchAllQuery_init(self);
+}
+
+TestMatchAllQuery*
+TestMatchAllQuery_init(TestMatchAllQuery *self) {
+    return (TestMatchAllQuery*)TestBatch_init((TestBatch*)self, 2);
+}
+
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
     MatchAllQuery *query = MatchAllQuery_new();
@@ -41,11 +52,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 
 
 void
-TestMatchAllQuery_run_tests() {
-    TestBatch *batch = TestBatch_new(2);
-    TestBatch_Plan(batch);
+TestMatchAllQuery_run_tests(TestMatchAllQuery *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch);
-    DECREF(batch);
 }
 
 

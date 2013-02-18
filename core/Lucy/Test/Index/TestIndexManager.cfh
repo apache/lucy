@@ -16,10 +16,16 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Index::TestIndexManager
-    cnick TestIxManager {
+class Lucy::Test::Index::TestIndexManager cnick TestIxManager
+    inherits Lucy::Test::TestBatch {
 
-    inert void
-    run_tests();
+    inert incremented TestIndexManager*
+    new();
+
+    inert TestIndexManager*
+    init(TestIndexManager *self);
+
+    void
+    Run_Tests(TestIndexManager *self);
 }
 

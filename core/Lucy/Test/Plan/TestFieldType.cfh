@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Plan::TestFieldType cnick TestFType {
-    inert void
-    run_tests();
+class Lucy::Test::Plan::TestFieldType cnick TestFType
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestFieldType*
+    new();
+
+    inert TestFieldType*
+    init(TestFieldType *self);
+
+    void
+    Run_Tests(TestFieldType *self);
 }
 
 class Lucy::Test::Plan::DummyFieldType inherits Lucy::Plan::FieldType {

@@ -45,6 +45,17 @@
 #define make_not_query    (Query*)lucy_TestUtils_make_not_query
 #define make_poly_query   (Query*)lucy_TestUtils_make_poly_query
 
+TestQueryParserLogic*
+TestQPLogic_new() {
+    TestQueryParserLogic *self = (TestQueryParserLogic*)VTable_Make_Obj(TESTQUERYPARSERLOGIC);
+    return TestQPLogic_init(self);
+}
+
+TestQueryParserLogic*
+TestQPLogic_init(TestQueryParserLogic *self) {
+    return (TestQueryParserLogic*)TestBatch_init((TestBatch*)self, 258);
+}
+
 static TestQueryParser*
 logical_test_empty_phrase(uint32_t boolop) {
     Query   *tree = make_leaf_query(NULL, "\"\"");
@@ -875,9 +886,9 @@ S_create_index() {
 }
 
 void
-TestQPLogic_run_tests() {
+TestQPLogic_run_tests(TestQueryParserLogic *self) {
     uint32_t i;
-    TestBatch     *batch      = TestBatch_new(258);
+    TestBatch     *batch      = (TestBatch*)self;
     Folder        *folder     = S_create_index();
     IndexSearcher *searcher   = IxSearcher_new((Obj*)folder);
     QueryParser   *or_parser  = QParser_new(IxSearcher_Get_Schema(searcher),
@@ -887,8 +898,6 @@ TestQPLogic_run_tests() {
                                             NULL, (CharBuf*)AND, NULL);
     QParser_Set_Heed_Colons(or_parser, true);
     QParser_Set_Heed_Colons(and_parser, true);
-
-    TestBatch_Plan(batch);
 
     // Run logical tests with default boolop of OR.
     for (i = 0; logical_test_funcs[i] != NULL; i++) {
@@ -957,6 +966,5 @@ TestQPLogic_run_tests() {
     DECREF(or_parser);
     DECREF(searcher);
     DECREF(folder);
-    DECREF(batch);
 }
 

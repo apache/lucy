@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Search::TestPhraseQuery {
-    inert void
-    run_tests();
+class Lucy::Test::Search::TestPhraseQuery
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestPhraseQuery*
+    new();
+
+    inert TestPhraseQuery*
+    init(TestPhraseQuery *self);
+
+    void
+    Run_Tests(TestPhraseQuery *self);
 }
 
 

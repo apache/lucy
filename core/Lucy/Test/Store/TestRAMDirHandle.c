@@ -23,6 +23,17 @@
 #include "Lucy/Store/RAMFolder.h"
 #include "Lucy/Store/RAMDirHandle.h"
 
+TestRAMDirHandle*
+TestRAMDH_new() {
+    TestRAMDirHandle *self = (TestRAMDirHandle*)VTable_Make_Obj(TESTRAMDIRHANDLE);
+    return TestRAMDH_init(self);
+}
+
+TestRAMDirHandle*
+TestRAMDH_init(TestRAMDirHandle *self) {
+    return (TestRAMDirHandle*)TestBatch_init((TestBatch*)self, 6);
+}
+
 static void
 test_all(TestBatch *batch) {
     RAMFolder *folder        = RAMFolder_new(NULL);
@@ -75,13 +86,9 @@ test_all(TestBatch *batch) {
 }
 
 void
-TestRAMDH_run_tests() {
-    TestBatch *batch = TestBatch_new(6);
-
-    TestBatch_Plan(batch);
+TestRAMDH_run_tests(TestRAMDirHandle *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_all(batch);
-
-    DECREF(batch);
 }
 
 

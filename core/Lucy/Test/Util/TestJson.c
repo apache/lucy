@@ -23,6 +23,21 @@
 #include "Lucy/Store/FileHandle.h"
 #include "Lucy/Store/RAMFolder.h"
 
+TestJson*
+TestJson_new() {
+    TestJson *self = (TestJson*)VTable_Make_Obj(TESTJSON);
+    return TestJson_init(self);
+}
+
+TestJson*
+TestJson_init(TestJson *self) {
+    int num_tests = 107;
+#ifndef LUCY_VALGRIND
+    num_tests += 28; // FIXME: syntax errors leak memory.
+#endif
+    return (TestJson*)TestBatch_init((TestBatch*)self, num_tests);
+}
+
 // Create a test data structure including at least one each of Hash, VArray,
 // and CharBuf.
 static Obj*
@@ -346,13 +361,8 @@ test_illegal_keys(TestBatch *batch) {
 }
 
 void
-TestJson_run_tests() {
-    int num_tests = 107;
-#ifndef LUCY_VALGRIND
-    num_tests += 28; // FIXME: syntax errors leak memory.
-#endif
-    TestBatch *batch = TestBatch_new(num_tests);
-    TestBatch_Plan(batch);
+TestJson_run_tests(TestJson *self) {
+    TestBatch *batch = (TestBatch*)self;
 
     // Test tolerance, then liberalize for testing.
     test_tolerance(batch);
@@ -370,7 +380,5 @@ TestJson_run_tests() {
 #ifndef LUCY_VALGRIND
     test_syntax_errors(batch);
 #endif
-
-    DECREF(batch);
 }
 

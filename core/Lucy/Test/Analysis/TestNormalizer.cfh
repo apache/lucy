@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Analysis::TestNormalizer {
-    inert void
-    run_tests();
+class Lucy::Test::Analysis::TestNormalizer
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestNormalizer*
+    new();
+
+    inert TestNormalizer*
+    init(TestNormalizer *self);
+
+    void
+    Run_Tests(TestNormalizer *self);
 }
 
 

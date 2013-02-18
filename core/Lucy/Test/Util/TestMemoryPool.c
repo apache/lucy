@@ -22,14 +22,23 @@
 #include "Lucy/Test/Util/TestMemoryPool.h"
 #include "Lucy/Util/MemoryPool.h"
 
-void
-TestMemPool_run_tests() {
-    TestBatch  *batch     = TestBatch_new(4);
-    MemoryPool *mem_pool  = MemPool_new(0);
-    MemoryPool *other     = MemPool_new(0);
-    char *ptr_a, *ptr_b;
+TestMemoryPool*
+TestMemPool_new() {
+    TestMemoryPool *self = (TestMemoryPool*)VTable_Make_Obj(TESTMEMORYPOOL);
+    return TestMemPool_init(self);
+}
 
-    TestBatch_Plan(batch);
+TestMemoryPool*
+TestMemPool_init(TestMemoryPool *self) {
+    return (TestMemoryPool*)TestBatch_init((TestBatch*)self, 4);
+}
+
+void
+TestMemPool_run_tests(TestMemoryPool *self) {
+    TestBatch  *batch    = (TestBatch*)self;
+    MemoryPool *mem_pool = MemPool_new(0);
+    MemoryPool *other    = MemPool_new(0);
+    char *ptr_a, *ptr_b;
 
     ptr_a = (char*)MemPool_Grab(mem_pool, 10);
     strcpy(ptr_a, "foo");
@@ -50,7 +59,6 @@ TestMemPool_run_tests() {
 
     DECREF(mem_pool);
     DECREF(other);
-    DECREF(batch);
 }
 
 

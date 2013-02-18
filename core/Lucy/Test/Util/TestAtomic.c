@@ -20,6 +20,17 @@
 #include "Lucy/Test/Util/TestAtomic.h"
 #include "Clownfish/Util/Atomic.h"
 
+TestAtomic*
+TestAtomic_new() {
+    TestAtomic *self = (TestAtomic*)VTable_Make_Obj(TESTATOMIC);
+    return TestAtomic_init(self);
+}
+
+TestAtomic*
+TestAtomic_init(TestAtomic *self) {
+    return (TestAtomic*)TestBatch_init((TestBatch*)self, 6);
+}
+
 static void
 test_cas_ptr(TestBatch *batch) {
     int    foo = 1;
@@ -48,14 +59,9 @@ test_cas_ptr(TestBatch *batch) {
 }
 
 void
-TestAtomic_run_tests() {
-    TestBatch *batch = TestBatch_new(6);
-
-    TestBatch_Plan(batch);
-
+TestAtomic_run_tests(TestAtomic *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_cas_ptr(batch);
-
-    DECREF(batch);
 }
 
 

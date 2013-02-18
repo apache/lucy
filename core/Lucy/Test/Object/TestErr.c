@@ -21,6 +21,17 @@
 #include "Lucy/Test/Object/TestErr.h"
 #include "Clownfish/Err.h"
 
+TestErr*
+TestErr_new() {
+    TestErr *self = (TestErr*)VTable_Make_Obj(TESTERR);
+    return TestErr_init(self);
+}
+
+TestErr*
+TestErr_init(TestErr *self) {
+    return (TestErr*)TestBatch_init((TestBatch*)self, 1);
+}
+
 static void
 test_To_String(TestBatch *batch) {
     CharBuf *message = CB_newf("oops");
@@ -33,13 +44,9 @@ test_To_String(TestBatch *batch) {
 }
 
 void
-TestErr_run_tests() {
-    TestBatch *batch = TestBatch_new(1);
-
-    TestBatch_Plan(batch);
+TestErr_run_tests(TestErr *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_To_String(batch);
-
-    DECREF(batch);
 }
 
 

@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Analysis::TestRegexTokenizer {
-    inert void
-    run_tests();
+class Lucy::Test::Analysis::TestRegexTokenizer
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestRegexTokenizer*
+    new();
+
+    inert TestRegexTokenizer*
+    init(TestRegexTokenizer *self);
+
+    void
+    Run_Tests(TestRegexTokenizer *self);
 }
 
 

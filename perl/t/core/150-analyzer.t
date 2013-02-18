@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestAnalyzer");
+my $success = Lucy::Test::run_tests("Lucy::Test::Analysis::TestAnalyzer");
+
+exit($success ? 0 : 1);
 

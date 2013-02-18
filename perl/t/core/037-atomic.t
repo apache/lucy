@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestAtomic");
+my $success = Lucy::Test::run_tests("Lucy::Test::Util::TestAtomic");
+
+exit($success ? 0 : 1);
 

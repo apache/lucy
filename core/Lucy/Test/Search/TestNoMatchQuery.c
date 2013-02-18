@@ -23,6 +23,17 @@
 #include "Lucy/Test/Search/TestNoMatchQuery.h"
 #include "Lucy/Search/NoMatchQuery.h"
 
+TestNoMatchQuery*
+TestNoMatchQuery_new() {
+    TestNoMatchQuery *self = (TestNoMatchQuery*)VTable_Make_Obj(TESTNOMATCHQUERY);
+    return TestNoMatchQuery_init(self);
+}
+
+TestNoMatchQuery*
+TestNoMatchQuery_init(TestNoMatchQuery *self) {
+    return (TestNoMatchQuery*)TestBatch_init((TestBatch*)self, 2);
+}
+
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
     NoMatchQuery *query = NoMatchQuery_new();
@@ -41,11 +52,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 
 
 void
-TestNoMatchQuery_run_tests() {
-    TestBatch *batch = TestBatch_new(2);
-    TestBatch_Plan(batch);
+TestNoMatchQuery_run_tests(TestNoMatchQuery *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch);
-    DECREF(batch);
 }
 
 

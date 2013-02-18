@@ -22,6 +22,17 @@
 #include "Lucy/Test/Analysis/TestCaseFolder.h"
 #include "Lucy/Analysis/CaseFolder.h"
 
+TestCaseFolder*
+TestCaseFolder_new() {
+    TestCaseFolder *self = (TestCaseFolder*)VTable_Make_Obj(TESTCASEFOLDER);
+    return TestCaseFolder_init(self);
+}
+
+TestCaseFolder*
+TestCaseFolder_init(TestCaseFolder *self) {
+    return (TestCaseFolder*)TestBatch_init((TestBatch*)self, 6);
+}
+
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
     CaseFolder *case_folder = CaseFolder_new();
@@ -55,15 +66,10 @@ test_analysis(TestBatch *batch) {
 }
 
 void
-TestCaseFolder_run_tests() {
-    TestBatch *batch = TestBatch_new(6);
-
-    TestBatch_Plan(batch);
-
+TestCaseFolder_run_tests(TestCaseFolder *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch);
     test_analysis(batch);
-
-    DECREF(batch);
 }
 
 

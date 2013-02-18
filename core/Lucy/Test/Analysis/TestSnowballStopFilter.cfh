@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Analysis::TestSnowballStopFilter cnick TestSnowStop {
-    inert void
-    run_tests();
+class Lucy::Test::Analysis::TestSnowballStopFilter cnick TestSnowStop
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestSnowballStopFilter*
+    new();
+
+    inert TestSnowballStopFilter*
+    init(TestSnowballStopFilter *self);
+
+    void
+    Run_Tests(TestSnowballStopFilter *self);
 }
 
 

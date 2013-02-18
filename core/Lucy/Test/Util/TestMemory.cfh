@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Util::TestMemory {
-    inert void
-    run_tests();
+class Lucy::Test::Util::TestMemory
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestMemory*
+    new();
+
+    inert TestMemory*
+    init(TestMemory *self);
+
+    void
+    Run_Tests(TestMemory *self);
 }
 
 

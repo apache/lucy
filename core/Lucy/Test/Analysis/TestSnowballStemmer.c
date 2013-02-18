@@ -23,6 +23,17 @@
 #include "Lucy/Store/FSFolder.h"
 #include "Lucy/Util/Json.h"
 
+TestSnowballStemmer*
+TestSnowStemmer_new() {
+    TestSnowballStemmer *self = (TestSnowballStemmer*)VTable_Make_Obj(TESTSNOWBALLSTEMMER);
+    return TestSnowStemmer_init(self);
+}
+
+TestSnowballStemmer*
+TestSnowStemmer_init(TestSnowballStemmer *self) {
+    return (TestSnowballStemmer*)TestBatch_init((TestBatch*)self, 153);
+}
+
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
     CharBuf *EN = (CharBuf*)ZCB_WRAP_STR("en", 2);
@@ -96,15 +107,10 @@ test_stemming(TestBatch *batch) {
 }
 
 void
-TestSnowStemmer_run_tests() {
-    TestBatch *batch = TestBatch_new(153);
-
-    TestBatch_Plan(batch);
-
+TestSnowStemmer_run_tests(TestSnowballStemmer *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch);
     test_stemming(batch);
-
-    DECREF(batch);
 }
 
 

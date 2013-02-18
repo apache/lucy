@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestLockFreeRegistry");
+my $success = Lucy::Test::run_tests("Lucy::Test::Object::TestLockFreeRegistry");
+
+exit($success ? 0 : 1);
 

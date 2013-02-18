@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestIndexManager");
+my $success = Lucy::Test::run_tests("Lucy::Test::Index::TestIndexManager");
+
+exit($success ? 0 : 1);
 

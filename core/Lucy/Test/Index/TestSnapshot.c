@@ -21,6 +21,17 @@
 #include "Lucy/Index/Snapshot.h"
 #include "Lucy/Store/RAMFolder.h"
 
+TestSnapshot*
+TestSnapshot_new() {
+    TestSnapshot *self = (TestSnapshot*)VTable_Make_Obj(TESTSNAPSHOT);
+    return TestSnapshot_init(self);
+}
+
+TestSnapshot*
+TestSnapshot_init(TestSnapshot *self) {
+    return (TestSnapshot*)TestBatch_init((TestBatch*)self, 9);
+}
+
 static void
 test_Add_and_Delete(TestBatch *batch) {
     Snapshot *snapshot = Snapshot_new();
@@ -95,13 +106,11 @@ test_Read_File_and_Write_File(TestBatch *batch) {
 }
 
 void
-TestSnapshot_run_tests() {
-    TestBatch *batch = TestBatch_new(9);
-    TestBatch_Plan(batch);
+TestSnapshot_run_tests(TestSnapshot *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Add_and_Delete(batch);
     test_path_handling(batch);
     test_Read_File_and_Write_File(batch);
-    DECREF(batch);
 }
 
 

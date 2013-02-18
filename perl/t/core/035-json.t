@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestJson");
+my $success = Lucy::Test::run_tests("Lucy::Test::Util::TestJson");
+
+exit($success ? 0 : 1);
 

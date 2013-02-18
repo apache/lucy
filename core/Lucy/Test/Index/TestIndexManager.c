@@ -20,6 +20,17 @@
 #include "Lucy/Test/Index/TestIndexManager.h"
 #include "Lucy/Index/IndexManager.h"
 
+TestIndexManager*
+TestIxManager_new() {
+    TestIndexManager *self = (TestIndexManager*)VTable_Make_Obj(TESTINDEXMANAGER);
+    return TestIxManager_init(self);
+}
+
+TestIndexManager*
+TestIxManager_init(TestIndexManager *self) {
+    return (TestIndexManager*)TestBatch_init((TestBatch*)self, 34);
+}
+
 static void
 test_Choose_Sparse(TestBatch *batch) {
     IndexManager *manager = IxManager_new(NULL, NULL);
@@ -49,10 +60,8 @@ test_Choose_Sparse(TestBatch *batch) {
 }
 
 void
-TestIxManager_run_tests() {
-    TestBatch *batch = TestBatch_new(34);
-    TestBatch_Plan(batch);
+TestIxManager_run_tests(TestIndexManager *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Choose_Sparse(batch);
-    DECREF(batch);
 }
 

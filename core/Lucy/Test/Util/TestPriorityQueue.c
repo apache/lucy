@@ -21,6 +21,17 @@
 #include "Lucy/Test/Util/TestPriorityQueue.h"
 #include "Lucy/Util/PriorityQueue.h"
 
+TestPriorityQueue*
+TestPriQ_new() {
+    TestPriorityQueue *self = (TestPriorityQueue*)VTable_Make_Obj(TESTPRIORITYQUEUE);
+    return TestPriQ_init(self);
+}
+
+TestPriorityQueue*
+TestPriQ_init(TestPriorityQueue *self) {
+    return (TestPriorityQueue*)TestBatch_init((TestBatch*)self, 17);
+}
+
 NumPriorityQueue*
 NumPriQ_new(uint32_t max_size) {
     NumPriorityQueue *self
@@ -145,17 +156,12 @@ test_random_insertion(TestBatch *batch) {
 }
 
 void
-TestPriQ_run_tests() {
-    TestBatch *batch = TestBatch_new(17);
-
-    TestBatch_Plan(batch);
-
+TestPriQ_run_tests(TestPriorityQueue *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Peek_and_Pop_All(batch);
     test_Insert_and_Pop(batch);
     test_discard(batch);
     test_random_insertion(batch);
-
-    DECREF(batch);
 }
 
 

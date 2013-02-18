@@ -30,6 +30,17 @@
 #include "Lucy/Store/RAMFileHandle.h"
 #include "Clownfish/Util/NumberUtils.h"
 
+TestIOPrimitives*
+TestIOPrimitives_new() {
+    TestIOPrimitives *self = (TestIOPrimitives*)VTable_Make_Obj(TESTIOPRIMITIVES);
+    return TestIOPrimitives_init(self);
+}
+
+TestIOPrimitives*
+TestIOPrimitives_init(TestIOPrimitives *self) {
+    return (TestIOPrimitives*)TestBatch_init((TestBatch*)self, 11);
+}
+
 static void
 test_i8(TestBatch *batch) {
     RAMFile    *file      = RAMFile_new(NULL, false);
@@ -410,12 +421,9 @@ test_f64(TestBatch *batch) {
 }
 
 void
-TestIOPrimitives_run_tests() {
-    TestBatch *batch = TestBatch_new(11);
-
+TestIOPrimitives_run_tests(TestIOPrimitives *self) {
+    TestBatch *batch = (TestBatch*)self;
     srand((unsigned int)time((time_t*)NULL));
-    TestBatch_Plan(batch);
-
     test_i8(batch);
     test_u8(batch);
     test_i32(batch);
@@ -426,8 +434,6 @@ TestIOPrimitives_run_tests() {
     test_c64(batch);
     test_f32(batch);
     test_f64(batch);
-
-    DECREF(batch);
 }
 
 

@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Util::TestStringHelper cnick TestStrHelp {
-    inert void
-    run_tests();
+class Lucy::Test::Util::TestStringHelper cnick TestStrHelp
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestStringHelper*
+    new();
+
+    inert TestStringHelper*
+    init(TestStringHelper *self);
+
+    void
+    Run_Tests(TestStringHelper *self);
 }
 
 

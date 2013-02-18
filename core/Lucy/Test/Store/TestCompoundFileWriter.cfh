@@ -16,10 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Store::TestCompoundFileWriter
-    cnick TestCFWriter {
-    inert void
-    run_tests();
+class Lucy::Test::Store::TestCompoundFileWriter cnick TestCFWriter
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestCompoundFileWriter*
+    new();
+
+    inert TestCompoundFileWriter*
+    init(TestCompoundFileWriter *self);
+
+    void
+    Run_Tests(TestCompoundFileWriter *self);
 }
 
 

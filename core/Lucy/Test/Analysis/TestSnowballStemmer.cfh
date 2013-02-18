@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Analysis::TestSnowballStemmer cnick TestSnowStemmer {
-    inert void
-    run_tests();
+class Lucy::Test::Analysis::TestSnowballStemmer cnick TestSnowStemmer
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestSnowballStemmer*
+    new();
+
+    inert TestSnowballStemmer*
+    init(TestSnowballStemmer *self);
+
+    void
+    Run_Tests(TestSnowballStemmer *self);
 }
 
 

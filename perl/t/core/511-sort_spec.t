@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestSortSpec");
+my $success = Lucy::Test::run_tests("Lucy::Test::Search::TestSortSpec");
+
+exit($success ? 0 : 1);
 

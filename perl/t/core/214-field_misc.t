@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestFieldMisc");
+my $success = Lucy::Test::run_tests("Lucy::Test::Plan::TestFieldMisc");
+
+exit($success ? 0 : 1);
 

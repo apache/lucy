@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestFieldType");
+my $success = Lucy::Test::run_tests("Lucy::Test::Plan::TestFieldType");
+
+exit($success ? 0 : 1);
 

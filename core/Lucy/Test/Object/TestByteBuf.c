@@ -21,6 +21,17 @@
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestByteBuf.h"
 
+TestByteBuf*
+TestBB_new() {
+    TestByteBuf *self = (TestByteBuf*)VTable_Make_Obj(TESTBYTEBUF);
+    return TestBB_init(self);
+}
+
+TestByteBuf*
+TestBB_init(TestByteBuf *self) {
+    return (TestByteBuf*)TestBatch_init((TestBatch*)self, 22);
+}
+
 static void
 test_Equals(TestBatch *batch) {
     ByteBuf *wanted = BB_new_bytes("foo", 4); // Include terminating NULL.
@@ -142,10 +153,8 @@ test_serialization(TestBatch *batch) {
 }
 
 void
-TestBB_run_tests() {
-    TestBatch *batch = TestBatch_new(22);
-    TestBatch_Plan(batch);
-
+TestBB_run_tests(TestByteBuf *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Equals(batch);
     test_Grow(batch);
     test_Clone(batch);
@@ -153,8 +162,6 @@ TestBB_run_tests() {
     test_Mimic(batch);
     test_Cat(batch);
     test_serialization(batch);
-
-    DECREF(batch);
 }
 
 

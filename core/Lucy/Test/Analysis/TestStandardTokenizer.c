@@ -23,6 +23,17 @@
 #include "Lucy/Store/FSFolder.h"
 #include "Lucy/Util/Json.h"
 
+TestStandardTokenizer*
+TestStandardTokenizer_new() {
+    TestStandardTokenizer *self = (TestStandardTokenizer*)VTable_Make_Obj(TESTSTANDARDTOKENIZER);
+    return TestStandardTokenizer_init(self);
+}
+
+TestStandardTokenizer*
+TestStandardTokenizer_init(TestStandardTokenizer *self) {
+    return (TestStandardTokenizer*)TestBatch_init((TestBatch*)self, 984);
+}
+
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
     StandardTokenizer *tokenizer = StandardTokenizer_new();
@@ -116,15 +127,10 @@ test_tokenizer(TestBatch *batch) {
 }
 
 void
-TestStandardTokenizer_run_tests() {
-    TestBatch *batch = TestBatch_new(984);
-
-    TestBatch_Plan(batch);
-
+TestStandardTokenizer_run_tests(TestStandardTokenizer *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch);
     test_tokenizer(batch);
-
-    DECREF(batch);
 }
 
 

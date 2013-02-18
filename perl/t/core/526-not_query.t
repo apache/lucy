@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestNOTQuery");
+my $success = Lucy::Test::run_tests("Lucy::Test::Search::TestNOTQuery");
+
+exit($success ? 0 : 1);
 

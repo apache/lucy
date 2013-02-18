@@ -23,6 +23,17 @@
 #include "Lucy/Search/BitVecMatcher.h"
 #include "Lucy/Search/SeriesMatcher.h"
 
+TestSeriesMatcher*
+TestSeriesMatcher_new() {
+    TestSeriesMatcher *self = (TestSeriesMatcher*)VTable_Make_Obj(TESTSERIESMATCHER);
+    return TestSeriesMatcher_init(self);
+}
+
+TestSeriesMatcher*
+TestSeriesMatcher_init(TestSeriesMatcher *self) {
+    return (TestSeriesMatcher*)TestBatch_init((TestBatch*)self, 135);
+}
+
 static SeriesMatcher*
 S_make_series_matcher(I32Array *doc_ids, I32Array *offsets, int32_t doc_max) {
     int32_t  num_doc_ids  = I32Arr_Get_Size(doc_ids);
@@ -123,11 +134,9 @@ test_matrix(TestBatch *batch) {
 }
 
 void
-TestSeriesMatcher_run_tests() {
-    TestBatch *batch = TestBatch_new(135);
-    TestBatch_Plan(batch);
+TestSeriesMatcher_run_tests(TestSeriesMatcher *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_matrix(batch);
-    DECREF(batch);
 }
 
 

@@ -21,6 +21,17 @@
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestVArray.h"
 
+TestVArray*
+TestVArray_new() {
+    TestVArray *self = (TestVArray*)VTable_Make_Obj(TESTVARRAY);
+    return TestVArray_init(self);
+}
+
+TestVArray*
+TestVArray_init(TestVArray *self) {
+    return (TestVArray*)TestBatch_init((TestBatch*)self, 45);
+}
+
 static CharBuf*
 S_new_cb(const char *text) {
     return CB_new_from_utf8(text, strlen(text));
@@ -315,11 +326,8 @@ test_serialization(TestBatch *batch) {
 }
 
 void
-TestVArray_run_tests() {
-    TestBatch *batch = TestBatch_new(45);
-
-    TestBatch_Plan(batch);
-
+TestVArray_run_tests(TestVArray *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Equals(batch);
     test_Store_Fetch(batch);
     test_Push_Pop_Shift_Unshift(batch);
@@ -331,8 +339,6 @@ TestVArray_run_tests() {
     test_Clone_and_Shallow_Copy(batch);
     test_Dump_and_Load(batch);
     test_serialization(batch);
-
-    DECREF(batch);
 }
 
 

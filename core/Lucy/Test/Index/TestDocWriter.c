@@ -21,12 +21,21 @@
 #include "Lucy/Test/Index/TestDocWriter.h"
 #include "Lucy/Index/DocWriter.h"
 
+TestDocWriter*
+TestDocWriter_new() {
+    TestDocWriter *self = (TestDocWriter*)VTable_Make_Obj(TESTDOCWRITER);
+    return TestDocWriter_init(self);
+}
+
+TestDocWriter*
+TestDocWriter_init(TestDocWriter *self) {
+    return (TestDocWriter*)TestBatch_init((TestBatch*)self, 1);
+}
+
 void
-TestDocWriter_run_tests() {
-    TestBatch *batch = TestBatch_new(1);
-    TestBatch_Plan(batch);
+TestDocWriter_run_tests(TestDocWriter *self) {
+    TestBatch *batch = (TestBatch*)self;
     PASS(batch, "placeholder");
-    DECREF(batch);
 }
 
 

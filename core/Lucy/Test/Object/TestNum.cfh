@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Object::TestNum {
-    inert void
-    run_tests();
+class Lucy::Test::Object::TestNum
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestNum*
+    new();
+
+    inert TestNum*
+    init(TestNum *self);
+
+    void
+    Run_Tests(TestNum *self);
 }
 
 

@@ -20,6 +20,17 @@
 #include "Lucy/Test/Util/TestIndexFileNames.h"
 #include "Lucy/Util/IndexFileNames.h"
 
+TestIndexFileNames*
+TestIxFileNames_new() {
+    TestIndexFileNames *self = (TestIndexFileNames*)VTable_Make_Obj(TESTINDEXFILENAMES);
+    return TestIxFileNames_init(self);
+}
+
+TestIndexFileNames*
+TestIxFileNames_init(TestIndexFileNames *self) {
+    return (TestIndexFileNames*)TestBatch_init((TestBatch*)self, 10);
+}
+
 static void
 test_local_part(TestBatch *batch) {
     ZombieCharBuf *source = ZCB_BLANK();
@@ -72,15 +83,10 @@ test_extract_gen(TestBatch *batch) {
 }
 
 void
-TestIxFileNames_run_tests() {
-    TestBatch *batch = TestBatch_new(10);
-
-    TestBatch_Plan(batch);
-
+TestIxFileNames_run_tests(TestIndexFileNames *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_local_part(batch);
     test_extract_gen(batch);
-
-    DECREF(batch);
 }
 
 

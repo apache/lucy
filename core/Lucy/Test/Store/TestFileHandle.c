@@ -24,6 +24,17 @@
 #include "Lucy/Store/FileHandle.h"
 #include "Lucy/Store/FileWindow.h"
 
+TestFileHandle*
+TestFH_new() {
+    TestFileHandle *self = (TestFileHandle*)VTable_Make_Obj(TESTFILEHANDLE);
+    return TestFH_init(self);
+}
+
+TestFileHandle*
+TestFH_init(TestFileHandle *self) {
+    return (TestFileHandle*)TestBatch_init((TestBatch*)self, 2);
+}
+
 static void
 S_no_op_method(const void *vself) {
     UNUSED_VAR(vself);
@@ -43,19 +54,16 @@ S_new_filehandle() {
 }
 
 void
-TestFH_run_tests() {
-    TestBatch     *batch  = TestBatch_new(2);
-    FileHandle    *fh     = S_new_filehandle();
-    ZombieCharBuf *foo    = ZCB_WRAP_STR("foo", 3);
-
-    TestBatch_Plan(batch);
+TestFH_run_tests(TestFileHandle *self) {
+    TestBatch     *batch = (TestBatch*)self;
+    FileHandle    *fh    = S_new_filehandle();
+    ZombieCharBuf *foo   = ZCB_WRAP_STR("foo", 3);
 
     TEST_TRUE(batch, CB_Equals_Str(FH_Get_Path(fh), "", 0), "Get_Path");
     FH_Set_Path(fh, (CharBuf*)foo);
     TEST_TRUE(batch, CB_Equals(FH_Get_Path(fh), (Obj*)foo), "Set_Path");
 
     DECREF(fh);
-    DECREF(batch);
 }
 
 

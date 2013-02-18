@@ -22,6 +22,17 @@
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Plan/BlobType.h"
 
+TestBlobType*
+TestBlobType_new() {
+    TestBlobType *self = (TestBlobType*)VTable_Make_Obj(TESTBLOBTYPE);
+    return TestBlobType_init(self);
+}
+
+TestBlobType*
+TestBlobType_init(TestBlobType *self) {
+    return (TestBlobType*)TestBatch_init((TestBatch*)self, 2);
+}
+
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
     BlobType *type            = BlobType_new(true);
@@ -43,11 +54,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 void
-TestBlobType_run_tests() {
-    TestBatch *batch = TestBatch_new(2);
-    TestBatch_Plan(batch);
+TestBlobType_run_tests(TestBlobType *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch);
-    DECREF(batch);
 }
 
 

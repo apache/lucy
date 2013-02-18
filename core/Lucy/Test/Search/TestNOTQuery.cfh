@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Search::TestNOTQuery {
-    inert void
-    run_tests();
+class Lucy::Test::Search::TestNOTQuery
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestNOTQuery*
+    new();
+
+    inert TestNOTQuery*
+    init(TestNOTQuery *self);
+
+    void
+    Run_Tests(TestNOTQuery *self);
 }
 
 

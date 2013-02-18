@@ -19,9 +19,17 @@ parcel Lucy;
 /** Tests for logical structure of Query objects output by QueryParser.
  */
 
-inert class Lucy::Test::Search::TestQueryParserLogic cnick TestQPLogic {
-    inert void
-    run_tests();
+class Lucy::Test::Search::TestQueryParserLogic cnick TestQPLogic
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestQueryParserLogic*
+    new();
+
+    inert TestQueryParserLogic*
+    init(TestQueryParserLogic *self);
+
+    void
+    Run_Tests(TestQueryParserLogic *self);
 }
 
 

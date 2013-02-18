@@ -21,6 +21,17 @@
 #include "Lucy/Test.h"
 #include "Lucy/Test/Util/TestMemory.h"
 
+TestMemory*
+TestMemory_new() {
+    TestMemory *self = (TestMemory*)VTable_Make_Obj(TESTMEMORY);
+    return TestMemory_init(self);
+}
+
+TestMemory*
+TestMemory_init(TestMemory *self) {
+    return (TestMemory*)TestBatch_init((TestBatch*)self, 30);
+}
+
 static void
 test_oversize__growth_rate(TestBatch *batch) {
     bool     success             = true;
@@ -99,15 +110,11 @@ test_oversize__rounding(TestBatch *batch) {
 }
 
 void
-TestMemory_run_tests() {
-    TestBatch *batch = TestBatch_new(30);
-
-    TestBatch_Plan(batch);
+TestMemory_run_tests(TestMemory *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_oversize__growth_rate(batch);
     test_oversize__ceiling(batch);
     test_oversize__rounding(batch);
-
-    DECREF(batch);
 }
 
 

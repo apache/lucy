@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Plan::TestBlobType {
-    inert void
-    run_tests();
+class Lucy::Test::Plan::TestBlobType
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestBlobType*
+    new();
+
+    inert TestBlobType*
+    init(TestBlobType *self);
+
+    void
+    Run_Tests(TestBlobType *self);
 }
 
 

@@ -21,12 +21,21 @@
 #include "Lucy/Test/Index/TestSegWriter.h"
 #include "Lucy/Index/SegWriter.h"
 
+TestSegWriter*
+TestSegWriter_new() {
+    TestSegWriter *self = (TestSegWriter*)VTable_Make_Obj(TESTSEGWRITER);
+    return TestSegWriter_init(self);
+}
+
+TestSegWriter*
+TestSegWriter_init(TestSegWriter *self) {
+    return (TestSegWriter*)TestBatch_init((TestBatch*)self, 1);
+}
+
 void
-TestSegWriter_run_tests() {
-    TestBatch *batch = TestBatch_new(1);
-    TestBatch_Plan(batch);
+TestSegWriter_run_tests(TestSegWriter *self) {
+    TestBatch *batch = (TestBatch*)self;
     PASS(batch, "placeholder");
-    DECREF(batch);
 }
 
 

@@ -20,9 +20,17 @@ parcel Lucy;
  * streamed sources.
  */
 
-inert class Lucy::Test::Store::TestInStream {
-    inert void
-    run_tests();
+class Lucy::Test::Store::TestInStream
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestInStream*
+    new();
+
+    inert TestInStream*
+    init(TestInStream *self);
+
+    void
+    Run_Tests(TestInStream *self);
 }
 
 

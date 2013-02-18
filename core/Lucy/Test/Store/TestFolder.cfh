@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Store::TestFolder {
-    inert void
-    run_tests();
+class Lucy::Test::Store::TestFolder
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestFolder*
+    new();
+
+    inert TestFolder*
+    init(TestFolder *self);
+
+    void
+    Run_Tests(TestFolder *self);
 }
 
 

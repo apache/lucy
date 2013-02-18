@@ -32,6 +32,17 @@
 #include "Lucy/Store/FSFolder.h"
 #include "Lucy/Store/OutStream.h"
 
+TestFSDirHandle*
+TestFSDH_new() {
+    TestFSDirHandle *self = (TestFSDirHandle*)VTable_Make_Obj(TESTFSDIRHANDLE);
+    return TestFSDH_init(self);
+}
+
+TestFSDirHandle*
+TestFSDH_init(TestFSDirHandle *self) {
+    return (TestFSDirHandle*)TestBatch_init((TestBatch*)self, 5);
+}
+
 static void
 test_all(TestBatch *batch) {
     CharBuf  *foo           = (CharBuf*)ZCB_WRAP_STR("foo", 3);
@@ -88,13 +99,9 @@ test_all(TestBatch *batch) {
 }
 
 void
-TestFSDH_run_tests() {
-    TestBatch *batch = TestBatch_new(5);
-
-    TestBatch_Plan(batch);
+TestFSDH_run_tests(TestFSDirHandle *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_all(batch);
-
-    DECREF(batch);
 }
 
 

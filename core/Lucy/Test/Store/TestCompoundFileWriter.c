@@ -31,6 +31,17 @@ static CharBuf *foo         = NULL;
 static CharBuf *bar         = NULL;
 static CharBuf *seg_1       = NULL;
 
+TestCompoundFileWriter*
+TestCFWriter_new() {
+    TestCompoundFileWriter *self = (TestCompoundFileWriter*)VTable_Make_Obj(TESTCOMPOUNDFILEWRITER);
+    return TestCFWriter_init(self);
+}
+
+TestCompoundFileWriter*
+TestCFWriter_init(TestCompoundFileWriter *self) {
+    return (TestCompoundFileWriter*)TestBatch_init((TestBatch*)self, 7);
+}
+
 static void
 S_init_strings(void) {
     cfmeta_file = CB_newf("cfmeta.json");
@@ -137,16 +148,12 @@ test_offsets(TestBatch *batch) {
 }
 
 void
-TestCFWriter_run_tests() {
-    TestBatch *batch = TestBatch_new(7);
-
+TestCFWriter_run_tests(TestCompoundFileWriter *self) {
+    TestBatch *batch = (TestBatch*)self;
     S_init_strings();
-    TestBatch_Plan(batch);
     test_Consolidate(batch);
     test_offsets(batch);
     S_destroy_strings();
-
-    DECREF(batch);
 }
 
 

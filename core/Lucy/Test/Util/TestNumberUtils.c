@@ -24,6 +24,17 @@
 #include "Lucy/Test/Util/TestNumberUtils.h"
 #include "Clownfish/Util/NumberUtils.h"
 
+TestNumberUtils*
+TestNumUtil_new() {
+    TestNumberUtils *self = (TestNumberUtils*)VTable_Make_Obj(TESTNUMBERUTILS);
+    return TestNumUtil_init(self);
+}
+
+TestNumberUtils*
+TestNumUtil_init(TestNumberUtils *self) {
+    return (TestNumberUtils*)TestBatch_init((TestBatch*)self, 1196);
+}
+
 static void
 test_u1(TestBatch *batch) {
     size_t    count   = 64;
@@ -345,12 +356,9 @@ test_bigend_f64(TestBatch *batch) {
 }
 
 void
-TestNumUtil_run_tests() {
-    TestBatch *batch = TestBatch_new(1196);
-
-    TestBatch_Plan(batch);
+TestNumUtil_run_tests(TestNumberUtils *self) {
+    TestBatch *batch = (TestBatch*)self;
     srand((unsigned int)time((time_t*)NULL));
-
     test_u1(batch);
     test_u2(batch);
     test_u4(batch);
@@ -361,8 +369,6 @@ TestNumUtil_run_tests() {
     test_bigend_u64(batch);
     test_bigend_f32(batch);
     test_bigend_f64(batch);
-
-    DECREF(batch);
 }
 
 

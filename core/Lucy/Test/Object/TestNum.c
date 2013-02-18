@@ -21,6 +21,17 @@
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestNum.h"
 
+TestNum*
+TestNum_new() {
+    TestNum *self = (TestNum*)VTable_Make_Obj(TESTNUM);
+    return TestNum_init(self);
+}
+
+TestNum*
+TestNum_init(TestNum *self) {
+    return (TestNum*)TestBatch_init((TestBatch*)self, 58);
+}
+
 static void
 test_To_String(TestBatch *batch) {
     Float32   *f32 = Float32_new(1.33f);
@@ -296,18 +307,14 @@ test_serialization(TestBatch *batch) {
 }
 
 void
-TestNum_run_tests() {
-    TestBatch *batch = TestBatch_new(58);
-    TestBatch_Plan(batch);
-
+TestNum_run_tests(TestNum *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_To_String(batch);
     test_accessors(batch);
     test_Equals_and_Compare_To(batch);
     test_Clone(batch);
     test_Mimic(batch);
     test_serialization(batch);
-
-    DECREF(batch);
 }
 
 

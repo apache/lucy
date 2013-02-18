@@ -22,6 +22,17 @@
 #include "Lucy/Test/Plan/TestFieldType.h"
 #include "Lucy/Test/TestUtils.h"
 
+TestFieldType*
+TestFType_new() {
+    TestFieldType *self = (TestFieldType*)VTable_Make_Obj(TESTFIELDTYPE);
+    return TestFType_init(self);
+}
+
+TestFieldType*
+TestFType_init(TestFieldType *self) {
+    return (TestFieldType*)TestBatch_init((TestBatch*)self, 9);
+}
+
 DummyFieldType*
 DummyFieldType_new() {
     DummyFieldType *self = (DummyFieldType*)VTable_Make_Obj(DUMMYFIELDTYPE);
@@ -93,12 +104,10 @@ test_Compare_Values(TestBatch *batch) {
 }
 
 void
-TestFType_run_tests() {
-    TestBatch *batch = TestBatch_new(9);
-    TestBatch_Plan(batch);
+TestFType_run_tests(TestFieldType *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch);
     test_Compare_Values(batch);
-    DECREF(batch);
 }
 
 

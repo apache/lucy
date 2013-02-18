@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Store::TestRAMFileHandle cnick TestRAMFH {
-    inert void
-    run_tests();
+class Lucy::Test::Store::TestRAMFileHandle cnick TestRAMFH
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestRAMFileHandle*
+    new();
+
+    inert TestRAMFileHandle*
+    init(TestRAMFileHandle *self);
+
+    void
+    Run_Tests(TestRAMFileHandle *self);
 }
 
 

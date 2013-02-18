@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Util::TestIndexFileNames cnick TestIxFileNames {
-    inert void
-    run_tests();
+class Lucy::Test::Util::TestIndexFileNames cnick TestIxFileNames
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestIndexFileNames*
+    new();
+
+    inert TestIndexFileNames*
+    init(TestIndexFileNames *self);
+
+    void
+    Run_Tests(TestIndexFileNames *self);
 }
 
 

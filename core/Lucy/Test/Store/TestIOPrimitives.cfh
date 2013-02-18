@@ -18,9 +18,17 @@ parcel Lucy;
 
 /** Tests reading and writing of primitive types using InStream/OutStream.
  */
-inert class Lucy::Test::Store::TestIOPrimitives {
-    inert void
-    run_tests();
+class Lucy::Test::Store::TestIOPrimitives
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestIOPrimitives*
+    new();
+
+    inert TestIOPrimitives*
+    init(TestIOPrimitives *self);
+
+    void
+    Run_Tests(TestIOPrimitives *self);
 }
 
 

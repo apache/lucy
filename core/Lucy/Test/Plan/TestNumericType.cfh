@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Plan::TestNumericType {
-    inert void
-    run_tests();
+class Lucy::Test::Plan::TestNumericType
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestNumericType*
+    new();
+
+    inert TestNumericType*
+    init(TestNumericType *self);
+
+    void
+    Run_Tests(TestNumericType *self);
 }
 
 

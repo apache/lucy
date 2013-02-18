@@ -23,6 +23,17 @@
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Search/LeafQuery.h"
 
+TestLeafQuery*
+TestLeafQuery_new() {
+    TestLeafQuery *self = (TestLeafQuery*)VTable_Make_Obj(TESTLEAFQUERY);
+    return TestLeafQuery_init(self);
+}
+
+TestLeafQuery*
+TestLeafQuery_init(TestLeafQuery *self) {
+    return (TestLeafQuery*)TestBatch_init((TestBatch*)self, 5);
+}
+
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
     LeafQuery *query         = TestUtils_make_leaf_query("content", "foo");
@@ -55,11 +66,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 void
-TestLeafQuery_run_tests() {
-    TestBatch *batch = TestBatch_new(5);
-    TestBatch_Plan(batch);
+TestLeafQuery_run_tests(TestLeafQuery *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch);
-    DECREF(batch);
 }
 
 

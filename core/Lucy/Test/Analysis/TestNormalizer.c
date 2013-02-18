@@ -24,6 +24,17 @@
 #include "Lucy/Store/FSFolder.h"
 #include "Lucy/Util/Json.h"
 
+TestNormalizer*
+TestNormalizer_new() {
+    TestNormalizer *self = (TestNormalizer*)VTable_Make_Obj(TESTNORMALIZER);
+    return TestNormalizer_init(self);
+}
+
+TestNormalizer*
+TestNormalizer_init(TestNormalizer *self) {
+    return (TestNormalizer*)TestBatch_init((TestBatch*)self, 20);
+}
+
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
     Normalizer *normalizer[4];
@@ -109,15 +120,10 @@ test_normalization(TestBatch *batch) {
 }
 
 void
-TestNormalizer_run_tests() {
-    TestBatch *batch = TestBatch_new(20);
-
-    TestBatch_Plan(batch);
-
+TestNormalizer_run_tests(TestNormalizer *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch);
     test_normalization(batch);
-
-    DECREF(batch);
 }
 
 

@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Highlight::TestHighlighter {
-    inert void
-    run_tests();
+class Lucy::Test::Highlight::TestHighlighter
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestHighlighter*
+    new();
+
+    inert TestHighlighter*
+    init(TestHighlighter *self);
+
+    void
+    Run_Tests(TestHighlighter *self);
 }
 
 

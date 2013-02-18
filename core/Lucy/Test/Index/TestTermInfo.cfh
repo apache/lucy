@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Index::TestTermInfo {
-    inert void
-    run_tests();
+class Lucy::Test::Index::TestTermInfo
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestTermInfo*
+    new();
+
+    inert TestTermInfo*
+    init(TestTermInfo *self);
+
+    void
+    Run_Tests(TestTermInfo *self);
 }
 
 

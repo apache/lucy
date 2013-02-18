@@ -21,6 +21,17 @@
 #include "Lucy/Test/Index/TestPolyReader.h"
 #include "Lucy/Index/PolyReader.h"
 
+TestPolyReader*
+TestPolyReader_new() {
+    TestPolyReader *self = (TestPolyReader*)VTable_Make_Obj(TESTPOLYREADER);
+    return TestPolyReader_init(self);
+}
+
+TestPolyReader*
+TestPolyReader_init(TestPolyReader *self) {
+    return (TestPolyReader*)TestBatch_init((TestBatch*)self, 1);
+}
+
 static void
 test_sub_tick(TestBatch *batch) {
     size_t num_segs = 255;
@@ -39,12 +50,8 @@ test_sub_tick(TestBatch *batch) {
 }
 
 void
-TestPolyReader_run_tests() {
-    TestBatch *batch = TestBatch_new(1);
-    TestBatch_Plan(batch);
-
+TestPolyReader_run_tests(TestPolyReader *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_sub_tick(batch);
-
-    DECREF(batch);
 }
 

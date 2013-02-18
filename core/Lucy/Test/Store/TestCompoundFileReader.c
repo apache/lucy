@@ -36,6 +36,17 @@ static CharBuf *baz         = NULL;
 static CharBuf *seg_1       = NULL;
 static CharBuf *stuff       = NULL;
 
+TestCompoundFileReader*
+TestCFReader_new() {
+    TestCompoundFileReader *self = (TestCompoundFileReader*)VTable_Make_Obj(TESTCOMPOUNDFILEREADER);
+    return TestCFReader_init(self);
+}
+
+TestCompoundFileReader*
+TestCFReader_init(TestCompoundFileReader *self) {
+    return (TestCompoundFileReader*)TestBatch_init((TestBatch*)self, 48);
+}
+
 static void
 S_init_strings(void) {
     cfmeta_file = CB_newf("cfmeta.json");
@@ -353,11 +364,9 @@ test_Close(TestBatch *batch) {
 }
 
 void
-TestCFReader_run_tests() {
-    TestBatch *batch = TestBatch_new(48);
-
+TestCFReader_run_tests(TestCompoundFileReader *self) {
+    TestBatch *batch = (TestBatch*)self;
     S_init_strings();
-    TestBatch_Plan(batch);
     test_open(batch);
     test_Local_MkDir_and_Find_Folder(batch);
     test_Local_Delete_and_Exists(batch);
@@ -366,8 +375,6 @@ TestCFReader_run_tests() {
     test_Local_Open_In(batch);
     test_Close(batch);
     S_destroy_strings();
-
-    DECREF(batch);
 }
 
 

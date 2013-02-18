@@ -37,6 +37,17 @@ static CharBuf *foo_boffo         = NULL;
 static CharBuf *foo_foo           = NULL;
 static CharBuf *nope              = NULL;
 
+TestFolder*
+TestFolder_new() {
+    TestFolder *self = (TestFolder*)VTable_Make_Obj(TESTFOLDER);
+    return TestFolder_init(self);
+}
+
+TestFolder*
+TestFolder_init(TestFolder *self) {
+    return (TestFolder*)TestBatch_init((TestBatch*)self, 79);
+}
+
 static void
 S_init_strings(void) {
     foo               = CB_newf("foo");
@@ -512,10 +523,8 @@ test_Slurp_File(TestBatch *batch) {
 }
 
 void
-TestFolder_run_tests() {
-    TestBatch *batch = TestBatch_new(79);
-
-    TestBatch_Plan(batch);
+TestFolder_run_tests(TestFolder *self) {
+    TestBatch *batch = (TestBatch*)self;
     S_init_strings();
     test_Exists(batch);
     test_Set_Path_and_Get_Path(batch);
@@ -530,7 +539,5 @@ TestFolder_run_tests() {
     test_Delete_Tree(batch);
     test_Slurp_File(batch);
     S_destroy_strings();
-
-    DECREF(batch);
 }
 

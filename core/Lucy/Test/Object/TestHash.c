@@ -23,6 +23,17 @@
 #include "Lucy/Test/Object/TestHash.h"
 #include "Clownfish/Hash.h"
 
+TestHash*
+TestHash_new() {
+    TestHash *self = (TestHash*)VTable_Make_Obj(TESTHASH);
+    return TestHash_init(self);
+}
+
+TestHash*
+TestHash_init(TestHash *self) {
+    return (TestHash*)TestBatch_init((TestBatch*)self, 29);
+}
+
 static void
 test_Equals(TestBatch *batch) {
     Hash *hash  = Hash_new(0);
@@ -260,20 +271,15 @@ test_stress(TestBatch *batch) {
 }
 
 void
-TestHash_run_tests() {
-    TestBatch *batch = TestBatch_new(29);
-
+TestHash_run_tests(TestHash *self) {
+    TestBatch *batch = (TestBatch*)self;
     srand((unsigned int)time((time_t*)NULL));
-
-    TestBatch_Plan(batch);
     test_Equals(batch);
     test_Store_and_Fetch(batch);
     test_Keys_Values_Iter(batch);
     test_Dump_and_Load(batch);
     test_serialization(batch);
     test_stress(batch);
-
-    DECREF(batch);
 }
 
 

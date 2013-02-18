@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestPolyReader");
+my $success = Lucy::Test::run_tests("Lucy::Test::Index::TestPolyReader");
+
+exit($success ? 0 : 1);
 

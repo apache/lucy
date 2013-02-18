@@ -18,9 +18,17 @@ parcel Lucy;
 
 /** Tests reading and writing of composite types using InStream/OutStream.
  */
-inert class Lucy::Test::Store::TestIOChunks {
-    inert void
-    run_tests();
+class Lucy::Test::Store::TestIOChunks
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestIOChunks*
+    new();
+
+    inert TestIOChunks*
+    init(TestIOChunks *self);
+
+    void
+    Run_Tests(TestIOChunks *self);
 }
 
 

@@ -37,6 +37,17 @@ static CharBuf *foo_foo       = NULL;
 static CharBuf *nope          = NULL;
 static CharBuf *nope_nyet     = NULL;
 
+TestRAMFolder*
+TestRAMFolder_new() {
+    TestRAMFolder *self = (TestRAMFolder*)VTable_Make_Obj(TESTRAMFOLDER);
+    return TestRAMFolder_init(self);
+}
+
+TestRAMFolder*
+TestRAMFolder_init(TestRAMFolder *self) {
+    return (TestRAMFolder*)TestBatch_init((TestBatch*)self, 98);
+}
+
 static void
 S_init_strings(void) {
     foo           = CB_newf("foo");
@@ -494,10 +505,8 @@ test_Close(TestBatch *batch) {
 }
 
 void
-TestRAMFolder_run_tests() {
-    TestBatch *batch = TestBatch_new(98);
-
-    TestBatch_Plan(batch);
+TestRAMFolder_run_tests(TestRAMFolder *self) {
+    TestBatch *batch = (TestBatch*)self;
     S_init_strings();
     test_Initialize_and_Check(batch);
     test_Local_Exists(batch);
@@ -511,8 +520,6 @@ TestRAMFolder_run_tests() {
     test_Hard_Link(batch);
     test_Close(batch);
     S_destroy_strings();
-
-    DECREF(batch);
 }
 
 

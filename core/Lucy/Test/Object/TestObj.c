@@ -22,6 +22,17 @@
 #include "Lucy/Test.h"
 #include "Lucy/Test/Object/TestObj.h"
 
+TestObj*
+TestObj_new() {
+    TestObj *self = (TestObj*)VTable_Make_Obj(TESTOBJ);
+    return TestObj_init(self);
+}
+
+TestObj*
+TestObj_init(TestObj *self) {
+    return (TestObj*)TestBatch_init((TestBatch*)self, 20);
+}
+
 static Obj*
 S_new_testobj() {
     ZombieCharBuf *klass = ZCB_WRAP_STR("TestObj", 7);
@@ -185,11 +196,8 @@ test_abstract_routines(TestBatch *batch) {
 }
 
 void
-TestObj_run_tests() {
-    TestBatch *batch = TestBatch_new(20);
-
-    TestBatch_Plan(batch);
-
+TestObj_run_tests(TestObj *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_refcounts(batch);
     test_To_String(batch);
     test_Dump(batch);
@@ -197,8 +205,6 @@ TestObj_run_tests() {
     test_Hash_Sum(batch);
     test_Is_A(batch);
     test_abstract_routines(batch);
-
-    DECREF(batch);
 }
 
 

@@ -16,16 +16,30 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Search::TestPolyQuery { }
+class Lucy::Test::Search::TestANDQuery
+    inherits Lucy::Test::TestBatch {
 
-inert class Lucy::Test::Search::TestANDQuery {
-    inert void
-    run_tests();
+    inert incremented TestANDQuery*
+    new();
+
+    inert TestANDQuery*
+    init(TestANDQuery *self);
+
+    void
+    Run_Tests(TestANDQuery *self);
 }
 
-inert class Lucy::Test::Search::TestORQuery {
-    inert void
-    run_tests();
+class Lucy::Test::Search::TestORQuery
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestORQuery*
+    new();
+
+    inert TestORQuery*
+    init(TestORQuery *self);
+
+    void
+    Run_Tests(TestORQuery *self);
 }
 
 

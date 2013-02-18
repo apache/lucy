@@ -23,6 +23,17 @@
 #include "Lucy/Plan/BlobType.h"
 #include "Lucy/Plan/NumericType.h"
 
+TestNumericType*
+TestNumericType_new() {
+    TestNumericType *self = (TestNumericType*)VTable_Make_Obj(TESTNUMERICTYPE);
+    return TestNumericType_init(self);
+}
+
+TestNumericType*
+TestNumericType_init(TestNumericType *self) {
+    return (TestNumericType*)TestBatch_init((TestBatch*)self, 12);
+}
+
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
     Int32Type   *i32 = Int32Type_new();
@@ -93,11 +104,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 void
-TestNumericType_run_tests() {
-    TestBatch *batch = TestBatch_new(12);
-    TestBatch_Plan(batch);
+TestNumericType_run_tests(TestNumericType *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch);
-    DECREF(batch);
 }
 
 

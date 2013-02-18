@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Util::TestJson  {
-    inert void
-    run_tests();
+class Lucy::Test::Util::TestJson
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestJson*
+    new();
+
+    inert TestJson*
+    init(TestJson *self);
+
+    void
+    Run_Tests(TestJson *self);
 }
 
 

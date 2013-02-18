@@ -41,6 +41,17 @@ static CharBuf *unindexed_but_analyzed_cb;
 static CharBuf *unindexed_unanalyzed_cb;
 static CharBuf *united_states_cb;
 
+TestFieldMisc*
+TestFieldMisc_new() {
+    TestFieldMisc *self = (TestFieldMisc*)VTable_Make_Obj(TESTFIELDMISC);
+    return TestFieldMisc_init(self);
+}
+
+TestFieldMisc*
+TestFieldMisc_init(TestFieldMisc *self) {
+    return (TestFieldMisc*)TestBatch_init((TestBatch*)self, 20);
+}
+
 static void
 S_init_strings() {
     analyzed_cb               = CB_newf("analyzed");
@@ -229,14 +240,12 @@ test_many_fields(TestBatch *batch) {
 }
 
 void
-TestFieldMisc_run_tests() {
-    TestBatch *batch = TestBatch_new(20);
-    TestBatch_Plan(batch);
+TestFieldMisc_run_tests(TestFieldMisc *self) {
+    TestBatch *batch = (TestBatch*)self;
     S_init_strings();
     test_spec_field(batch);
     test_many_fields(batch);
     S_destroy_strings();
-    DECREF(batch);
 }
 
 

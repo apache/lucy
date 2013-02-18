@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestRegexTokenizer");
+my $success = Lucy::Test::run_tests("Lucy::Test::Analysis::TestRegexTokenizer");
+
+exit($success ? 0 : 1);
 

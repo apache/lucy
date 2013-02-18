@@ -26,9 +26,17 @@ class Lucy::Test::Util::NumPriorityQueue cnick NumPriQ
     Less_Than(NumPriorityQueue *self, Obj *a, Obj *b);
 }
 
-inert class Lucy::Test::Util::TestPriorityQueue cnick TestPriQ {
-    inert void
-    run_tests();
+class Lucy::Test::Util::TestPriorityQueue cnick TestPriQ
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestPriorityQueue*
+    new();
+
+    inert TestPriorityQueue*
+    init(TestPriorityQueue *self);
+
+    void
+    Run_Tests(TestPriorityQueue *self);
 }
 
 

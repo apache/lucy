@@ -67,6 +67,17 @@ static CharBuf *random_float64s_cb;
 static CharBuf *random_int32s_cb;
 static CharBuf *random_int64s_cb;
 
+TestSortSpec*
+TestSortSpec_new() {
+    TestSortSpec *self = (TestSortSpec*)VTable_Make_Obj(TESTSORTSPEC);
+    return TestSortSpec_init(self);
+}
+
+TestSortSpec*
+TestSortSpec_init(TestSortSpec *self) {
+    return (TestSortSpec*)TestBatch_init((TestBatch*)self, 18);
+}
+
 static void
 S_init_strings() {
     air_cb      = CB_newf("air");
@@ -623,13 +634,11 @@ test_sort_spec(TestBatch *batch) {
 }
 
 void
-TestSortSpec_run_tests() {
-    TestBatch *batch = TestBatch_new(18);
-    TestBatch_Plan(batch);
+TestSortSpec_run_tests(TestSortSpec *self) {
+    TestBatch *batch = (TestBatch*)self;
     S_init_strings();
     test_sort_spec(batch);
     S_destroy_strings();
-    DECREF(batch);
 }
 
 

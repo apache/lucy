@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Index::TestDocWriter {
-    inert void
-    run_tests();
+class Lucy::Test::Index::TestDocWriter
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestDocWriter*
+    new();
+
+    inert TestDocWriter*
+    init(TestDocWriter *self);
+
+    void
+    Run_Tests(TestDocWriter *self);
 }
 
 

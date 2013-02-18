@@ -22,6 +22,17 @@
 #include "Lucy/Index/Segment.h"
 #include "Lucy/Store/RAMFolder.h"
 
+TestSegment*
+TestSeg_new() {
+    TestSegment *self = (TestSegment*)VTable_Make_Obj(TESTSEGMENT);
+    return TestSeg_init(self);
+}
+
+TestSegment*
+TestSeg_init(TestSegment *self) {
+    return (TestSegment*)TestBatch_init((TestBatch*)self, 21);
+}
+
 static void
 test_fields(TestBatch *batch) {
     Segment *segment = Seg_new(1);
@@ -149,18 +160,14 @@ test_Write_File_and_Read_File(TestBatch *batch) {
 }
 
 void
-TestSeg_run_tests() {
-    TestBatch *batch = TestBatch_new(21);
-
-    TestBatch_Plan(batch);
+TestSeg_run_tests(TestSegment *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_fields(batch);
     test_metadata_storage(batch);
     test_seg_name_and_num(batch);
     test_count(batch);
     test_Compare_To(batch);
     test_Write_File_and_Read_File(batch);
-
-    DECREF(batch);
 }
 
 

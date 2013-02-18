@@ -21,12 +21,21 @@
 #include "Lucy/Test/Index/TestHighlightWriter.h"
 #include "Lucy/Index/HighlightWriter.h"
 
+TestHighlightWriter*
+TestHLWriter_new() {
+    TestHighlightWriter *self = (TestHighlightWriter*)VTable_Make_Obj(TESTHIGHLIGHTWRITER);
+    return TestHLWriter_init(self);
+}
+
+TestHighlightWriter*
+TestHLWriter_init(TestHighlightWriter *self) {
+    return (TestHighlightWriter*)TestBatch_init((TestBatch*)self, 1);
+}
+
 void
-TestHLWriter_run_tests() {
-    TestBatch *batch = TestBatch_new(1);
-    TestBatch_Plan(batch);
+TestHLWriter_run_tests(TestHighlightWriter *self) {
+    TestBatch *batch = (TestBatch*)self;
     PASS(batch, "Placeholder");
-    DECREF(batch);
 }
 
 

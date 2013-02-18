@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Search::TestRangeQuery {
-    inert void
-    run_tests();
+class Lucy::Test::Search::TestRangeQuery
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestRangeQuery*
+    new();
+
+    inert TestRangeQuery*
+    init(TestRangeQuery *self);
+
+    void
+    Run_Tests(TestRangeQuery *self);
 }
 
 

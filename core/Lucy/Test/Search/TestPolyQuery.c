@@ -26,6 +26,28 @@
 #include "Lucy/Search/PolyQuery.h"
 #include "Lucy/Search/LeafQuery.h"
 
+TestANDQuery*
+TestANDQuery_new() {
+    TestANDQuery *self = (TestANDQuery*)VTable_Make_Obj(TESTANDQUERY);
+    return TestANDQuery_init(self);
+}
+
+TestANDQuery*
+TestANDQuery_init(TestANDQuery *self) {
+    return (TestANDQuery*)TestBatch_init((TestBatch*)self, 4);
+}
+
+TestORQuery*
+TestORQuery_new() {
+    TestORQuery *self = (TestORQuery*)VTable_Make_Obj(TESTORQUERY);
+    return TestORQuery_init(self);
+}
+
+TestORQuery*
+TestORQuery_init(TestORQuery *self) {
+    return (TestORQuery*)TestBatch_init((TestBatch*)self, 4);
+}
+
 static void
 test_Dump_Load_and_Equals(TestBatch *batch, uint32_t boolop) {
     LeafQuery *a_leaf  = TestUtils_make_leaf_query(NULL, "a");
@@ -66,19 +88,15 @@ test_Dump_Load_and_Equals(TestBatch *batch, uint32_t boolop) {
 }
 
 void
-TestANDQuery_run_tests() {
-    TestBatch *batch = TestBatch_new(4);
-    TestBatch_Plan(batch);
+TestANDQuery_run_tests(TestANDQuery *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch, BOOLOP_AND);
-    DECREF(batch);
 }
 
 void
-TestORQuery_run_tests() {
-    TestBatch *batch = TestBatch_new(4);
-    TestBatch_Plan(batch);
+TestORQuery_run_tests(TestORQuery *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch, BOOLOP_OR);
-    DECREF(batch);
 }
 
 

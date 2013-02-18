@@ -16,11 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Index::TestPostingListWriter
-    cnick TestPListWriter {
+class Lucy::Test::Index::TestPostingListWriter cnick TestPListWriter
+    inherits Lucy::Test::TestBatch {
 
-    inert void
-    run_tests();
+    inert incremented TestPostingListWriter*
+    new();
+
+    inert TestPostingListWriter*
+    init(TestPostingListWriter *self);
+
+    void
+    Run_Tests(TestPostingListWriter *self);
 }
 
 

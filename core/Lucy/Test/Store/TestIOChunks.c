@@ -30,6 +30,17 @@
 #include "Lucy/Store/RAMFileHandle.h"
 #include "Clownfish/Util/NumberUtils.h"
 
+TestIOChunks*
+TestIOChunks_new() {
+    TestIOChunks *self = (TestIOChunks*)VTable_Make_Obj(TESTIOCHUNKS);
+    return TestIOChunks_init(self);
+}
+
+TestIOChunks*
+TestIOChunks_init(TestIOChunks *self) {
+    return (TestIOChunks*)TestBatch_init((TestBatch*)self, 36);
+}
+
 static void
 test_Align(TestBatch *batch) {
     RAMFile    *file      = RAMFile_new(NULL, false);
@@ -105,17 +116,12 @@ test_Buf(TestBatch *batch) {
 }
 
 void
-TestIOChunks_run_tests() {
-    TestBatch *batch = TestBatch_new(36);
-
+TestIOChunks_run_tests(TestIOChunks *self) {
+    TestBatch *batch = (TestBatch*)self;
     srand((unsigned int)time((time_t*)NULL));
-    TestBatch_Plan(batch);
-
     test_Align(batch);
     test_Read_Write_Bytes(batch);
     test_Buf(batch);
-
-    DECREF(batch);
 }
 
 

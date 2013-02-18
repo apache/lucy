@@ -21,6 +21,17 @@
 #include "Lucy/Test/Search/TestSpan.h"
 #include "Lucy/Search/Span.h"
 
+TestSpan*
+TestSpan_new() {
+    TestSpan *self = (TestSpan*)VTable_Make_Obj(TESTSPAN);
+    return TestSpan_init(self);
+}
+
+TestSpan*
+TestSpan_init(TestSpan *self) {
+    return (TestSpan*)TestBatch_init((TestBatch*)self, 6);
+}
+
 void 
 test_span_init_values(TestBatch *batch) {
     Span* span = Span_new(2,3,7);
@@ -40,10 +51,7 @@ test_span_init_values(TestBatch *batch) {
 }
 
 void
-TestSpan_run_tests() {
-    TestBatch *batch = TestBatch_new(6);
-    TestBatch_Plan(batch);
+TestSpan_run_tests(TestSpan *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_span_init_values(batch);
-
-    DECREF(batch);
 }

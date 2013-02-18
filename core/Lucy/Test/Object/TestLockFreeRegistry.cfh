@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Object::TestLockFreeRegistry cnick TestLFReg {
-    inert void
-    run_tests();
+class Lucy::Test::Object::TestLockFreeRegistry cnick TestLFReg
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestLockFreeRegistry*
+    new();
+
+    inert TestLockFreeRegistry*
+    init(TestLockFreeRegistry *self);
+
+    void
+    Run_Tests(TestLockFreeRegistry *self);
 }
 
 /** Private test-only class for stressing LockFreeRegistry.

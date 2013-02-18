@@ -31,9 +31,19 @@ class Lucy::Test::TestSchema inherits Lucy::Plan::Schema {
 
     public incremented Architecture*
     Architecture(TestSchema *self);
+}
 
-    inert void
-    run_tests();
+class Lucy::Test::TestBatchSchema
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestBatchSchema*
+    new();
+
+    inert TestBatchSchema*
+    init(TestBatchSchema *self);
+
+    void
+    Run_Tests(TestBatchSchema *self);
 }
 
 

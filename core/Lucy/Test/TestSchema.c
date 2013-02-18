@@ -51,6 +51,17 @@ TestSchema_architecture(TestSchema *self) {
     return (Architecture*)TestArch_new();
 }
 
+TestBatchSchema*
+TestBatchSchema_new() {
+    TestBatchSchema *self = (TestBatchSchema*)VTable_Make_Obj(TESTBATCHSCHEMA);
+    return TestBatchSchema_init(self);
+}
+
+TestBatchSchema*
+TestBatchSchema_init(TestBatchSchema *self) {
+    return (TestBatchSchema*)TestBatch_init((TestBatch*)self, 4);
+}
+
 static void
 test_Equals(TestBatch *batch) {
     TestSchema *schema = TestSchema_new();
@@ -91,12 +102,10 @@ test_Dump_and_Load(TestBatch *batch) {
 }
 
 void
-TestSchema_run_tests() {
-    TestBatch *batch = TestBatch_new(4);
-    TestBatch_Plan(batch);
+TestBatchSchema_run_tests(TestBatchSchema *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Equals(batch);
     test_Dump_and_Load(batch);
-    DECREF(batch);
 }
 
 

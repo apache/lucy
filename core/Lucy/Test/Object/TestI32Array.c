@@ -23,6 +23,17 @@
 static int32_t source_ints[] = { -1, 0, INT32_MIN, INT32_MAX, 1 };
 static size_t num_ints = sizeof(source_ints) / sizeof(int32_t);
 
+TestI32Array*
+TestI32Arr_new() {
+    TestI32Array *self = (TestI32Array*)VTable_Make_Obj(TESTI32ARRAY);
+    return TestI32Arr_init(self);
+}
+
+TestI32Array*
+TestI32Arr_init(TestI32Array *self) {
+    return (TestI32Array*)TestBatch_init((TestBatch*)self, 4);
+}
+
 static void
 test_all(TestBatch *batch) {
     I32Array *i32_array = I32Arr_new(source_ints, num_ints);
@@ -58,13 +69,9 @@ test_all(TestBatch *batch) {
 }
 
 void
-TestI32Arr_run_tests() {
-    TestBatch *batch = TestBatch_new(4);
-
-    TestBatch_Plan(batch);
+TestI32Arr_run_tests(TestI32Array *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_all(batch);
-
-    DECREF(batch);
 }
 
 

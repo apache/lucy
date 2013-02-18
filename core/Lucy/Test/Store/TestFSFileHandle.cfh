@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Store::TestFSFileHandle cnick TestFSFH {
-    inert void
-    run_tests();
+class Lucy::Test::Store::TestFSFileHandle cnick TestFSFH
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestFSFileHandle*
+    new();
+
+    inert TestFSFileHandle*
+    init(TestFSFileHandle *self);
+
+    void
+    Run_Tests(TestFSFileHandle *self);
 }
 
 

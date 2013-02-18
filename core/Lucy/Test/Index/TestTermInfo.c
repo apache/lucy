@@ -21,6 +21,17 @@
 #include "Lucy/Test/Index/TestTermInfo.h"
 #include "Lucy/Index/TermInfo.h"
 
+TestTermInfo*
+TestTermInfo_new() {
+    TestTermInfo *self = (TestTermInfo*)VTable_Make_Obj(TESTTERMINFO);
+    return TestTermInfo_init(self);
+}
+
+TestTermInfo*
+TestTermInfo_init(TestTermInfo *self) {
+    return (TestTermInfo*)TestBatch_init((TestBatch*)self, 11);
+}
+
 void 
 test_freqfilepos(TestBatch *batch) {
     TermInfo* tinfo = TInfo_new(10);
@@ -55,10 +66,7 @@ test_freqfilepos(TestBatch *batch) {
 }
 
 void
-TestTermInfo_run_tests() {
-    TestBatch *batch = TestBatch_new(11);
-    TestBatch_Plan(batch);
+TestTermInfo_run_tests(TestTermInfo *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_freqfilepos(batch);
-
-    DECREF(batch);
 }

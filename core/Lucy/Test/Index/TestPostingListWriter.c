@@ -20,12 +20,21 @@
 #include "Lucy/Test.h"
 #include "Lucy/Test/Index/TestPostingListWriter.h"
 
+TestPostingListWriter*
+TestPListWriter_new() {
+    TestPostingListWriter *self = (TestPostingListWriter*)VTable_Make_Obj(TESTPOSTINGLISTWRITER);
+    return TestPListWriter_init(self);
+}
+
+TestPostingListWriter*
+TestPListWriter_init(TestPostingListWriter *self) {
+    return (TestPostingListWriter*)TestBatch_init((TestBatch*)self, 1);
+}
+
 void
-TestPListWriter_run_tests() {
-    TestBatch *batch = TestBatch_new(1);
-    TestBatch_Plan(batch);
+TestPListWriter_run_tests(TestPostingListWriter *self) {
+    TestBatch *batch = (TestBatch*)self;
     PASS(batch, "Placeholder");
-    DECREF(batch);
 }
 
 

@@ -30,6 +30,17 @@
 #include "Lucy/Store/RAMFileHandle.h"
 #include "Clownfish/Util/NumberUtils.h"
 
+TestInStream*
+TestInStream_new() {
+    TestInStream *self = (TestInStream*)VTable_Make_Obj(TESTINSTREAM);
+    return TestInStream_init(self);
+}
+
+TestInStream*
+TestInStream_init(TestInStream *self) {
+    return (TestInStream*)TestBatch_init((TestBatch*)self, 37);
+}
+
 static void
 test_refill(TestBatch *batch) {
     RAMFile    *file      = RAMFile_new(NULL, false);
@@ -201,17 +212,12 @@ test_Seek_and_Tell(TestBatch *batch) {
 }
 
 void
-TestInStream_run_tests() {
-    TestBatch *batch = TestBatch_new(37);
-
-    TestBatch_Plan(batch);
-
+TestInStream_run_tests(TestInStream *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_refill(batch);
     test_Clone_and_Reopen(batch);
     test_Close(batch);
     test_Seek_and_Tell(batch);
-
-    DECREF(batch);
 }
 
 

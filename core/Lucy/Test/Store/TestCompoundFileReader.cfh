@@ -16,10 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Store::TestCompoundFileReader
-    cnick TestCFReader {
-    inert void
-    run_tests();
+class Lucy::Test::Store::TestCompoundFileReader cnick TestCFReader
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestCompoundFileReader*
+    new();
+
+    inert TestCompoundFileReader*
+    init(TestCompoundFileReader *self);
+
+    void
+    Run_Tests(TestCompoundFileReader *self);
 }
 
 

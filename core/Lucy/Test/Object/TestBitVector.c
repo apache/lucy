@@ -21,6 +21,17 @@
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestBitVector.h"
 
+TestBitVector*
+TestBitVector_new() {
+    TestBitVector *self = (TestBitVector*)VTable_Make_Obj(TESTBITVECTOR);
+    return TestBitVector_init(self);
+}
+
+TestBitVector*
+TestBitVector_init(TestBitVector *self) {
+    return (TestBitVector*)TestBatch_init((TestBatch*)self, 1029);
+}
+
 static void
 test_Set_and_Get(TestBatch *batch) {
     unsigned i, max;
@@ -433,10 +444,8 @@ test_off_by_one_error() {
 }
 
 void
-TestBitVector_run_tests() {
-    TestBatch *batch = TestBatch_new(1029);
-
-    TestBatch_Plan(batch);
+TestBitVector_run_tests(TestBitVector *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Set_and_Get(batch);
     test_Flip(batch);
     test_Flip_Block_ascending(batch);
@@ -453,8 +462,6 @@ TestBitVector_run_tests() {
     test_Clone(batch);
     test_To_Array(batch);
     test_off_by_one_error();
-
-    DECREF(batch);
 }
 
 

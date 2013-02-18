@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Analysis::TestStandardTokenizer {
-    inert void
-    run_tests();
+class Lucy::Test::Analysis::TestStandardTokenizer
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestStandardTokenizer*
+    new();
+
+    inert TestStandardTokenizer*
+    init(TestStandardTokenizer *self);
+
+    void
+    Run_Tests(TestStandardTokenizer *self);
 }
 
 

@@ -24,6 +24,17 @@
 #include "Lucy/Search/RequiredOptionalQuery.h"
 #include "Lucy/Search/LeafQuery.h"
 
+TestReqOptQuery*
+TestReqOptQuery_new() {
+    TestReqOptQuery *self = (TestReqOptQuery*)VTable_Make_Obj(TESTREQOPTQUERY);
+    return TestReqOptQuery_init(self);
+}
+
+TestReqOptQuery*
+TestReqOptQuery_init(TestReqOptQuery *self) {
+    return (TestReqOptQuery*)TestBatch_init((TestBatch*)self, 4);
+}
+
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
     Query *a_leaf  = (Query*)TestUtils_make_leaf_query(NULL, "a");
@@ -57,11 +68,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 void
-TestReqOptQuery_run_tests() {
-    TestBatch *batch = TestBatch_new(4);
-    TestBatch_Plan(batch);
+TestReqOptQuery_run_tests(TestReqOptQuery *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch);
-    DECREF(batch);
 }
 
 

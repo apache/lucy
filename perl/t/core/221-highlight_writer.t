@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestHighlightWriter");
+my $success = Lucy::Test::run_tests("Lucy::Test::Index::TestHighlightWriter");
+
+exit($success ? 0 : 1);
 

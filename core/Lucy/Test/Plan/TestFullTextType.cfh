@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Plan::TestFullTextType {
-    inert void
-    run_tests();
+class Lucy::Test::Plan::TestFullTextType
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestFullTextType*
+    new();
+
+    inert TestFullTextType*
+    init(TestFullTextType *self);
+
+    void
+    Run_Tests(TestFullTextType *self);
 }
 
 

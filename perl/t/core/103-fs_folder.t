@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestFSFolder");
+my $success = Lucy::Test::run_tests("Lucy::Test::Store::TestFSFolder");
+
+exit($success ? 0 : 1);
 

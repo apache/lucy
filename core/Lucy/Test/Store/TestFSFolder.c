@@ -47,6 +47,18 @@ static bool
 S_create_test_symlinks(void);
 #endif /* CHY_HAS_WINDOWS_H */
 
+TestFSFolder*
+TestFSFolder_new() {
+    TestFSFolder *self = (TestFSFolder*)VTable_Make_Obj(TESTFSFOLDER);
+    return TestFSFolder_init(self);
+}
+
+TestFSFolder*
+TestFSFolder_init(TestFSFolder *self) {
+    uint32_t num_tests = TestFolderCommon_num_tests() + 9;
+    return (TestFSFolder*)TestBatch_init((TestBatch*)self, num_tests);
+}
+
 static Folder*
 S_set_up() {
     rmdir("_fstest");
@@ -163,17 +175,12 @@ test_disallow_updir(TestBatch *batch) {
 }
 
 void
-TestFSFolder_run_tests() {
-    uint32_t num_tests = TestFolderCommon_num_tests() + 9;
-    TestBatch *batch = TestBatch_new(num_tests);
-
-    TestBatch_Plan(batch);
+TestFSFolder_run_tests(TestFSFolder *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Initialize_and_Check(batch);
     TestFolderCommon_run_tests(batch, S_set_up, S_tear_down);
     test_protect_symlinks(batch);
     test_disallow_updir(batch);
-
-    DECREF(batch);
 }
 
 #ifdef ENABLE_SYMLINK_TESTS

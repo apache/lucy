@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestLeafQuery");
+my $success = Lucy::Test::run_tests("Lucy::Test::Search::TestLeafQuery");
+
+exit($success ? 0 : 1);
 

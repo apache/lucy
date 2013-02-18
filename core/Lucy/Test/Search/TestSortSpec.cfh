@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Search::TestSortSpec {
-    inert void
-    run_tests();
+class Lucy::Test::Search::TestSortSpec
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestSortSpec*
+    new();
+
+    inert TestSortSpec*
+    init(TestSortSpec *self);
+
+    void
+    Run_Tests(TestSortSpec *self);
 }
 
 class Lucy::Test::Search::TestReverseType inherits Lucy::Plan::Int32Type {

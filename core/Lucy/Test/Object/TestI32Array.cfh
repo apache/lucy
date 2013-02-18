@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Object::TestI32Array cnick TestI32Arr {
-    inert void
-    run_tests();
+class Lucy::Test::Object::TestI32Array cnick TestI32Arr
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestI32Array*
+    new();
+
+    inert TestI32Array*
+    init(TestI32Array *self);
+
+    void
+    Run_Tests(TestI32Array *self);
 }
 
 

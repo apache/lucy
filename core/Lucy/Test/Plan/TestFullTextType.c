@@ -24,6 +24,17 @@
 #include "Lucy/Analysis/Normalizer.h"
 #include "Lucy/Analysis/StandardTokenizer.h"
 
+TestFullTextType*
+TestFullTextType_new() {
+    TestFullTextType *self = (TestFullTextType*)VTable_Make_Obj(TESTFULLTEXTTYPE);
+    return TestFullTextType_init(self);
+}
+
+TestFullTextType*
+TestFullTextType_init(TestFullTextType *self) {
+    return (TestFullTextType*)TestBatch_init((TestBatch*)self, 10);
+}
+
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
     StandardTokenizer *tokenizer     = StandardTokenizer_new();
@@ -98,12 +109,10 @@ test_Compare_Values(TestBatch *batch) {
 }
 
 void
-TestFullTextType_run_tests() {
-    TestBatch *batch = TestBatch_new(10);
-    TestBatch_Plan(batch);
+TestFullTextType_run_tests(TestFullTextType *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch);
     test_Compare_Values(batch);
-    DECREF(batch);
 }
 
 

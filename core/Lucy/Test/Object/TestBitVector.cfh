@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Object::TestBitVector {
-    inert void
-    run_tests();
+class Lucy::Test::Object::TestBitVector
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestBitVector*
+    new();
+
+    inert TestBitVector*
+    init(TestBitVector *self);
+
+    void
+    Run_Tests(TestBitVector *self);
 }
 
 

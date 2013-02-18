@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Index::TestSnapshot {
-    inert void
-    run_tests();
+class Lucy::Test::Index::TestSnapshot
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestSnapshot*
+    new();
+
+    inert TestSnapshot*
+    init(TestSnapshot *self);
+
+    void
+    Run_Tests(TestSnapshot *self);
 }
 
 

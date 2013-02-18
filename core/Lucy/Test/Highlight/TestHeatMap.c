@@ -33,7 +33,6 @@ TestHeatMap_init(TestHeatMap *self) {
     return (TestHeatMap*)TestBatch_init((TestBatch*)self, 13);
 }
 
-
 static void
 test_calc_proximity_boost(TestBatch *batch) {
     VArray  *spans    = VA_new(0);

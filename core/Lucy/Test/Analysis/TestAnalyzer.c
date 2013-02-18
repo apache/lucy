@@ -22,6 +22,17 @@
 #include "Lucy/Analysis/Analyzer.h"
 #include "Lucy/Analysis/Inversion.h"
 
+TestAnalyzer*
+TestAnalyzer_new() {
+    TestAnalyzer *self = (TestAnalyzer*)VTable_Make_Obj(TESTANALYZER);
+    return TestAnalyzer_init(self);
+}
+
+TestAnalyzer*
+TestAnalyzer_init(TestAnalyzer *self) {
+    return (TestAnalyzer*)TestBatch_init((TestBatch*)self, 3);
+}
+
 DummyAnalyzer*
 DummyAnalyzer_new() {
     DummyAnalyzer *self = (DummyAnalyzer*)VTable_Make_Obj(DUMMYANALYZER);
@@ -53,14 +64,9 @@ test_analysis(TestBatch *batch) {
 }
 
 void
-TestAnalyzer_run_tests() {
-    TestBatch *batch = TestBatch_new(3);
-
-    TestBatch_Plan(batch);
-
+TestAnalyzer_run_tests(TestAnalyzer *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_analysis(batch);
-
-    DECREF(batch);
 }
 
 

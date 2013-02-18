@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Lucy::Test;
-Lucy::Test::run_tests("TestI32Array");
+my $success = Lucy::Test::run_tests("Lucy::Test::Object::TestI32Array");
+
+exit($success ? 0 : 1);
 

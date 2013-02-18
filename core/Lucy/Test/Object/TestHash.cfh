@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Object::TestHash {
-    inert void
-    run_tests();
+class Lucy::Test::Object::TestHash
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestHash*
+    new();
+
+    inert TestHash*
+    init(TestHash *self);
+
+    void
+    Run_Tests(TestHash *self);
 }
 
 

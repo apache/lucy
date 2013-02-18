@@ -21,6 +21,17 @@
 #include "Lucy/Test/Analysis/TestSnowballStopFilter.h"
 #include "Lucy/Analysis/SnowballStopFilter.h"
 
+TestSnowballStopFilter*
+TestSnowStop_new() {
+    TestSnowballStopFilter *self = (TestSnowballStopFilter*)VTable_Make_Obj(TESTSNOWBALLSTOPFILTER);
+    return TestSnowStop_init(self);
+}
+
+TestSnowballStopFilter*
+TestSnowStop_init(TestSnowballStopFilter *self) {
+    return (TestSnowballStopFilter*)TestBatch_init((TestBatch*)self, 3);
+}
+
 static SnowballStopFilter*
 S_make_stopfilter(void *unused, ...) {
     va_list args;
@@ -70,14 +81,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 void
-TestSnowStop_run_tests() {
-    TestBatch *batch = TestBatch_new(3);
-
-    TestBatch_Plan(batch);
-
+TestSnowStop_run_tests(TestSnowballStopFilter *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch);
-
-    DECREF(batch);
 }
 
 

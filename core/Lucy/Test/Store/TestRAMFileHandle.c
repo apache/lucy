@@ -27,6 +27,17 @@
 #include "Lucy/Store/FileWindow.h"
 #include "Lucy/Store/RAMFile.h"
 
+TestRAMFileHandle*
+TestRAMFH_new() {
+    TestRAMFileHandle *self = (TestRAMFileHandle*)VTable_Make_Obj(TESTRAMFILEHANDLE);
+    return TestRAMFH_init(self);
+}
+
+TestRAMFileHandle*
+TestRAMFH_init(TestRAMFileHandle *self) {
+    return (TestRAMFileHandle*)TestBatch_init((TestBatch*)self, 32);
+}
+
 static void
 test_open(TestBatch *batch) {
     RAMFileHandle *fh;
@@ -157,17 +168,13 @@ test_Window(TestBatch *batch) {
 }
 
 void
-TestRAMFH_run_tests() {
-    TestBatch *batch = TestBatch_new(32);
-
-    TestBatch_Plan(batch);
+TestRAMFH_run_tests(TestRAMFileHandle *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_open(batch);
     test_Read_Write(batch);
     test_Grow_and_Get_File(batch);
     test_Close(batch);
     test_Window(batch);
-
-    DECREF(batch);
 }
 
 

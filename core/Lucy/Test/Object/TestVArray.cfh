@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Object::TestVArray {
-    inert void
-    run_tests();
+class Lucy::Test::Object::TestVArray
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestVArray*
+    new();
+
+    inert TestVArray*
+    init(TestVArray *self);
+
+    void
+    Run_Tests(TestVArray *self);
 }
 
 

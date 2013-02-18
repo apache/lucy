@@ -22,6 +22,17 @@
 #include "Lucy/Analysis/RegexTokenizer.h"
 
 
+TestRegexTokenizer*
+TestRegexTokenizer_new() {
+    TestRegexTokenizer *self = (TestRegexTokenizer*)VTable_Make_Obj(TESTREGEXTOKENIZER);
+    return TestRegexTokenizer_init(self);
+}
+
+TestRegexTokenizer*
+TestRegexTokenizer_init(TestRegexTokenizer *self) {
+    return (TestRegexTokenizer*)TestBatch_init((TestBatch*)self, 3);
+}
+
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
     ZombieCharBuf *word_char_pattern  = ZCB_WRAP_STR("\\w+", 3);
@@ -56,14 +67,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 void
-TestRegexTokenizer_run_tests() {
-    TestBatch *batch = TestBatch_new(3);
-
-    TestBatch_Plan(batch);
-
+TestRegexTokenizer_run_tests(TestRegexTokenizer *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch);
-
-    DECREF(batch);
 }
 
 

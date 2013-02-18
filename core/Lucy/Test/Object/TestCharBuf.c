@@ -26,6 +26,17 @@
 static char smiley[] = { (char)0xE2, (char)0x98, (char)0xBA, 0 };
 static uint32_t smiley_len = 3;
 
+TestCharBuf*
+TestCB_new() {
+    TestCharBuf *self = (TestCharBuf*)VTable_Make_Obj(TESTCHARBUF);
+    return TestCB_init(self);
+}
+
+TestCharBuf*
+TestCB_init(TestCharBuf *self) {
+    return (TestCharBuf*)TestBatch_init((TestBatch*)self, 55);
+}
+
 static CharBuf*
 S_get_cb(const char *string) {
     return CB_new_from_utf8(string, strlen(string));
@@ -393,10 +404,8 @@ test_serialization(TestBatch *batch) {
 }
 
 void
-TestCB_run_tests() {
-    TestBatch *batch = TestBatch_new(55);
-    TestBatch_Plan(batch);
-
+TestCB_run_tests(TestCharBuf *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_vcatf_s(batch);
     test_vcatf_null_string(batch);
     test_vcatf_cb(batch);
@@ -421,8 +430,6 @@ TestCB_run_tests() {
     test_To_F64(batch);
     test_To_I64(batch);
     test_serialization(batch);
-
-    DECREF(batch);
 }
 
 

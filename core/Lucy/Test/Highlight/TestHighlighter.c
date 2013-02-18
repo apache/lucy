@@ -50,6 +50,17 @@
     "6 7 8 9 0 6 7 8 9 0 6 7 8 9 0 6 7 8 9 0 6 7 8 9 0 "
 #define TEST_STRING_LEN 425
 
+TestHighlighter*
+TestHighlighter_new() {
+    TestHighlighter *self = (TestHighlighter*)VTable_Make_Obj(TESTHIGHLIGHTER);
+    return TestHighlighter_init(self);
+}
+
+TestHighlighter*
+TestHighlighter_init(TestHighlighter *self) {
+    return (TestHighlighter*)TestBatch_init((TestBatch*)self, 35);
+}
+
 static void
 test_Find_Best_Fragment(TestBatch *batch, Searcher *searcher, Obj *query) {
     CharBuf *content = (CharBuf*)ZCB_WRAP_STR("content", 7);
@@ -571,15 +582,10 @@ test_hl_selection(TestBatch *batch) {
 }
 
 void
-TestHighlighter_run_tests() {
-    TestBatch *batch = TestBatch_new(35);
-
-    TestBatch_Plan(batch);
-
+TestHighlighter_run_tests(TestHighlighter *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_highlighting(batch);
     test_hl_selection(batch);
-
-    DECREF(batch);
 }
 
 

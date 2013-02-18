@@ -16,8 +16,16 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Index::TestPolyReader {
-    inert void
-    run_tests();
+class Lucy::Test::Index::TestPolyReader
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestPolyReader*
+    new();
+
+    inert TestPolyReader*
+    init(TestPolyReader *self);
+
+    void
+    Run_Tests(TestPolyReader *self);
 }
 

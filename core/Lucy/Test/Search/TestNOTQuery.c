@@ -24,6 +24,17 @@
 #include "Lucy/Search/NOTQuery.h"
 #include "Lucy/Search/LeafQuery.h"
 
+TestNOTQuery*
+TestNOTQuery_new() {
+    TestNOTQuery *self = (TestNOTQuery*)VTable_Make_Obj(TESTNOTQUERY);
+    return TestNOTQuery_init(self);
+}
+
+TestNOTQuery*
+TestNOTQuery_init(TestNOTQuery *self) {
+    return (TestNOTQuery*)TestBatch_init((TestBatch*)self, 4);
+}
+
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
     Query    *a_leaf        = (Query*)TestUtils_make_leaf_query(NULL, "a");
@@ -54,11 +65,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 void
-TestNOTQuery_run_tests() {
-    TestBatch *batch = TestBatch_new(4);
-    TestBatch_Plan(batch);
+TestNOTQuery_run_tests(TestNOTQuery *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch);
-    DECREF(batch);
 }
 
 

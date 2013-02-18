@@ -23,6 +23,17 @@
 #include "Lucy/Test/Search/TestRangeQuery.h"
 #include "Lucy/Search/RangeQuery.h"
 
+TestRangeQuery*
+TestRangeQuery_new() {
+    TestRangeQuery *self = (TestRangeQuery*)VTable_Make_Obj(TESTRANGEQUERY);
+    return TestRangeQuery_init(self);
+}
+
+TestRangeQuery*
+TestRangeQuery_init(TestRangeQuery *self) {
+    return (TestRangeQuery*)TestBatch_init((TestBatch*)self, 5);
+}
+
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
     RangeQuery *query 
@@ -60,11 +71,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 
 
 void
-TestRangeQuery_run_tests() {
-    TestBatch *batch = TestBatch_new(5);
-    TestBatch_Plan(batch);
+TestRangeQuery_run_tests(TestRangeQuery *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch);
-    DECREF(batch);
 }
 
 

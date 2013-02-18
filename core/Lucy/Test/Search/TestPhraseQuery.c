@@ -23,6 +23,17 @@
 #include "Lucy/Test/Search/TestPhraseQuery.h"
 #include "Lucy/Search/PhraseQuery.h"
 
+TestPhraseQuery*
+TestPhraseQuery_new() {
+    TestPhraseQuery *self = (TestPhraseQuery*)VTable_Make_Obj(TESTPHRASEQUERY);
+    return TestPhraseQuery_init(self);
+}
+
+TestPhraseQuery*
+TestPhraseQuery_init(TestPhraseQuery *self) {
+    return (TestPhraseQuery*)TestBatch_init((TestBatch*)self, 1);
+}
+
 static void
 test_Dump_And_Load(TestBatch *batch) {
     PhraseQuery *query
@@ -37,11 +48,9 @@ test_Dump_And_Load(TestBatch *batch) {
 }
 
 void
-TestPhraseQuery_run_tests() {
-    TestBatch *batch = TestBatch_new(1);
-    TestBatch_Plan(batch);
+TestPhraseQuery_run_tests(TestPhraseQuery *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_And_Load(batch);
-    DECREF(batch);
 }
 
 

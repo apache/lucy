@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Index::TestSegment cnick TestSeg {
-    inert void
-    run_tests();
+class Lucy::Test::Index::TestSegment cnick TestSeg
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestSegment*
+    new();
+
+    inert TestSegment*
+    init(TestSegment *self);
+
+    void
+    Run_Tests(TestSegment *self);
 }
 
 

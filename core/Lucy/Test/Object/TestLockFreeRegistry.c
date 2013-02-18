@@ -23,6 +23,17 @@
 #include "Lucy/Test/Object/TestLockFreeRegistry.h"
 #include "Clownfish/LockFreeRegistry.h"
 
+TestLockFreeRegistry*
+TestLFReg_new() {
+    TestLockFreeRegistry *self = (TestLockFreeRegistry*)VTable_Make_Obj(TESTLOCKFREEREGISTRY);
+    return TestLFReg_init(self);
+}
+
+TestLockFreeRegistry*
+TestLFReg_init(TestLockFreeRegistry *self) {
+    return (TestLockFreeRegistry*)TestBatch_init((TestBatch*)self, 6);
+}
+
 StupidHashCharBuf*
 StupidHashCharBuf_new(const char *text) {
     return (StupidHashCharBuf*)CB_new_from_utf8(text, strlen(text));
@@ -66,13 +77,9 @@ test_all(TestBatch *batch) {
 }
 
 void
-TestLFReg_run_tests() {
-    TestBatch *batch = TestBatch_new(6);
-
-    TestBatch_Plan(batch);
+TestLFReg_run_tests(TestLockFreeRegistry *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_all(batch);
-
-    DECREF(batch);
 }
 
 

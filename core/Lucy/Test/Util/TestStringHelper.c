@@ -27,6 +27,17 @@
  * it implements the standard in a more linear, easy-to-grok way.
  */
 #define TRAIL_OK(n) (n >= 0x80 && n <= 0xBF)
+TestStringHelper*
+TestStrHelp_new() {
+    TestStringHelper *self = (TestStringHelper*)VTable_Make_Obj(TESTSTRINGHELPER);
+    return TestStrHelp_init(self);
+}
+
+TestStringHelper*
+TestStrHelp_init(TestStringHelper *self) {
+    return (TestStringHelper*)TestBatch_init((TestBatch*)self, 41);
+}
+
 static bool
 S_utf8_valid_alt(const char *maybe_utf8, size_t size) {
     const uint8_t *string = (const uint8_t*)maybe_utf8;
@@ -327,11 +338,8 @@ test_utf8proc_normalization(TestBatch *batch) {
 }
 
 void
-TestStrHelp_run_tests() {
-    TestBatch *batch = TestBatch_new(41);
-
-    TestBatch_Plan(batch);
-
+TestStrHelp_run_tests(TestStringHelper *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_overlap(batch);
     test_to_base36(batch);
     test_utf8_round_trip(batch);
@@ -339,8 +347,6 @@ TestStrHelp_run_tests() {
     test_is_whitespace(batch);
     test_back_utf8_char(batch);
     test_utf8proc_normalization(batch);
-
-    DECREF(batch);
 }
 
 

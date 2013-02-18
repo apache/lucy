@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Search::TestReqOptQuery {
-    inert void
-    run_tests();
+class Lucy::Test::Search::TestReqOptQuery
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestReqOptQuery*
+    new();
+
+    inert TestReqOptQuery*
+    init(TestReqOptQuery *self);
+
+    void
+    Run_Tests(TestReqOptQuery *self);
 }
 
 

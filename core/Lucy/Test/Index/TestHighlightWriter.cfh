@@ -16,11 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Index::TestHighlightWriter
-    cnick TestHLWriter {
+class Lucy::Test::Index::TestHighlightWriter cnick TestHLWriter
+    inherits Lucy::Test::TestBatch {
 
-    inert void
-    run_tests();
+    inert incremented TestHighlightWriter*
+    new();
+
+    inert TestHighlightWriter*
+    init(TestHighlightWriter *self);
+
+    void
+    Run_Tests(TestHighlightWriter *self);
 }
 
 

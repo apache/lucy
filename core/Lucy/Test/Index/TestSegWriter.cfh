@@ -16,10 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Index::TestSegWriter  {
+class Lucy::Test::Index::TestSegWriter
+    inherits Lucy::Test::TestBatch {
 
-    inert void
-    run_tests();
+    inert incremented TestSegWriter*
+    new();
+
+    inert TestSegWriter*
+    init(TestSegWriter *self);
+
+    void
+    Run_Tests(TestSegWriter *self);
 }
 
 

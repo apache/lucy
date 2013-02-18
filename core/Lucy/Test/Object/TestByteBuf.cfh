@@ -18,10 +18,16 @@ parcel Lucy;
 parcel Lucy;
 
 class Lucy::Test::Object::TestByteBuf cnick TestBB
-    inherits Clownfish::Obj {
+    inherits Lucy::Test::TestBatch {
 
-    inert void
-    run_tests();
+    inert incremented TestByteBuf*
+    new();
+
+    inert TestByteBuf*
+    init(TestByteBuf *self);
+
+    void
+    Run_Tests(TestByteBuf *self);
 }
 
 

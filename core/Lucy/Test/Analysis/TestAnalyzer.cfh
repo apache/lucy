@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Analysis::TestAnalyzer {
-    inert void
-    run_tests();
+class Lucy::Test::Analysis::TestAnalyzer
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestAnalyzer*
+    new();
+
+    inert TestAnalyzer*
+    init(TestAnalyzer *self);
+
+    void
+    Run_Tests(TestAnalyzer *self);
 }
 
 class Lucy::Test::Analysis::DummyAnalyzer inherits Lucy::Analysis::Analyzer {

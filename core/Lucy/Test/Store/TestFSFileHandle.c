@@ -31,6 +31,17 @@
 #include "Lucy/Store/FSFileHandle.h"
 #include "Lucy/Store/FileWindow.h"
 
+TestFSFileHandle*
+TestFSFH_new() {
+    TestFSFileHandle *self = (TestFSFileHandle*)VTable_Make_Obj(TESTFSFILEHANDLE);
+    return TestFSFH_init(self);
+}
+
+TestFSFileHandle*
+TestFSFH_init(TestFSFileHandle *self) {
+    return (TestFSFileHandle*)TestBatch_init((TestBatch*)self, 46);
+}
+
 static void
 test_open(TestBatch *batch) {
 
@@ -241,16 +252,12 @@ test_Window(TestBatch *batch) {
 }
 
 void
-TestFSFH_run_tests() {
-    TestBatch *batch = TestBatch_new(46);
-
-    TestBatch_Plan(batch);
+TestFSFH_run_tests(TestFSFileHandle *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_open(batch);
     test_Read_Write(batch);
     test_Close(batch);
     test_Window(batch);
-
-    DECREF(batch);
 }
 
 

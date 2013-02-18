@@ -16,9 +16,17 @@
 
 parcel Lucy;
 
-inert class Lucy::Test::Plan::TestFieldMisc {
-    inert void
-    run_tests();
+class Lucy::Test::Plan::TestFieldMisc
+    inherits Lucy::Test::TestBatch {
+
+    inert incremented TestFieldMisc*
+    new();
+
+    inert TestFieldMisc*
+    init(TestFieldMisc *self);
+
+    void
+    Run_Tests(TestFieldMisc *self);
 }
 
 

@@ -26,6 +26,17 @@
 #include "Lucy/Analysis/SnowballStemmer.h"
 #include "Lucy/Analysis/StandardTokenizer.h"
 
+TestPolyAnalyzer*
+TestPolyAnalyzer_new() {
+    TestPolyAnalyzer *self = (TestPolyAnalyzer*)VTable_Make_Obj(TESTPOLYANALYZER);
+    return TestPolyAnalyzer_init(self);
+}
+
+TestPolyAnalyzer*
+TestPolyAnalyzer_init(TestPolyAnalyzer *self) {
+    return (TestPolyAnalyzer*)TestBatch_init((TestBatch*)self, 19);
+}
+
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
     CharBuf      *EN          = (CharBuf*)ZCB_WRAP_STR("en", 2);
@@ -157,15 +168,10 @@ test_Get_Analyzers(TestBatch *batch) {
 }
 
 void
-TestPolyAnalyzer_run_tests() {
-    TestBatch *batch = TestBatch_new(19);
-
-    TestBatch_Plan(batch);
-
+TestPolyAnalyzer_run_tests(TestPolyAnalyzer *self) {
+    TestBatch *batch = (TestBatch*)self;
     test_Dump_Load_and_Equals(batch);
     test_analysis(batch);
     test_Get_Analyzers(batch);
-
-    DECREF(batch);
 }
 
