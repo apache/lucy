@@ -218,15 +218,15 @@ Test_run_all_batches(TestFormatter *formatter) {
 }
 
 TestBatch*
-TestBatch_new(int64_t num_tests) {
+TestBatch_new(uint32_t num_planned) {
     TestBatch *self = (TestBatch*)VTable_Make_Obj(TESTBATCH);
-    return TestBatch_init(self, num_tests);
+    return TestBatch_init(self, num_planned);
 }
 
 TestBatch*
-TestBatch_init(TestBatch *self, int64_t num_tests) {
+TestBatch_init(TestBatch *self, uint32_t num_planned) {
     // Assign.
-    self->num_tests       = num_tests;
+    self->num_planned     = num_planned;
 
     // Initialize.
     self->formatter       = (TestFormatter*)TestFormatterTAP_new();
@@ -262,28 +262,28 @@ TestBatch_run(TestBatch *self) {
         TestFormatter_batch_comment(self->formatter, "%d/%d tests failed.\n",
                                     self->num_failed, self->test_num);
     }
-    if (self->test_num != self->num_tests) {
+    if (self->test_num != self->num_planned) {
         failed = true;
         TestFormatter_batch_comment(self->formatter,
                                     "Bad plan: You planned %d tests but ran"
                                     " %d.\n",
-                                    self->num_tests, self->test_num);
+                                    self->num_planned, self->test_num);
     }
 
     return !failed;
 }
 
-int64_t
+uint32_t
 TestBatch_get_num_planned(TestBatch *self) {
-    return self->num_tests;
+    return self->num_planned;
 }
 
-int64_t
+uint32_t
 TestBatch_get_num_tests(TestBatch *self) {
     return self->test_num;
 }
 
-int64_t
+uint32_t
 TestBatch_get_num_failed(TestBatch *self) {
     return self->num_failed;
 }
@@ -434,7 +434,7 @@ void
 TestBatch_vskip(TestBatch *self, const char *pattern, va_list args) {
     self->test_num++;
     // TODO: Add a VTest_Skip method to TestFormatter
-    TestFormatter_VTest_Result(self->formatter, true, self->num_tests,
+    TestFormatter_VTest_Result(self->formatter, true, self->test_num,
                                pattern, args);
     self->num_skipped++;
 }

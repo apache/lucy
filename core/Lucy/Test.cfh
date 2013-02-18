@@ -28,17 +28,17 @@ inert class Lucy::Test {
 
 abstract class Lucy::Test::TestBatch inherits Clownfish::Obj {
     TestFormatter *formatter;
-    int64_t        test_num;
-    int64_t        num_tests;
-    int64_t        num_passed;
-    int64_t        num_failed;
-    int64_t        num_skipped;
+    uint32_t        test_num;
+    uint32_t        num_planned;
+    uint32_t        num_passed;
+    uint32_t        num_failed;
+    uint32_t        num_skipped;
 
     inert incremented TestBatch*
-    new(int64_t num_tests);
+    new(uint32_t num_planned);
 
     inert TestBatch*
-    init(TestBatch *self, int64_t num_tests);
+    init(TestBatch *self, uint32_t num_planned);
 
     public void
     Destroy(TestBatch *self);
@@ -57,17 +57,17 @@ abstract class Lucy::Test::TestBatch inherits Clownfish::Obj {
 
     /** Return the number of tests planned.
      */
-    int64_t
+    uint32_t
     Get_Num_Planned(TestBatch *self);
 
     /** Return the number of tests run.
      */
-    int64_t
+    uint32_t
     Get_Num_Tests(TestBatch *self);
 
     /** Return the number of failed tests.
      */
-    int64_t
+    uint32_t
     Get_Num_Failed(TestBatch *self);
 
     inert bool

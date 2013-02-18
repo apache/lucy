@@ -75,7 +75,7 @@ void
 TestFormatterCF_batch_prologue(TestFormatterCF *self, TestBatch *batch) {
     UNUSED_VAR(self);
     CharBuf *class_name = TestBatch_Get_Class_Name(batch);
-    printf("Testing %s...\n", CB_Get_Ptr8(class_name));
+    printf("Running %s...\n", CB_Get_Ptr8(class_name));
 }
 
 void
@@ -144,7 +144,7 @@ TestFormatterTAP_init(TestFormatterTAP *self) {
 void
 TestFormatterTAP_batch_prologue(TestFormatterTAP *self, TestBatch *batch) {
     UNUSED_VAR(self);
-    printf("1..%" PRId64 "\n", TestBatch_Get_Num_Planned(batch));
+    printf("1..%u\n", TestBatch_Get_Num_Planned(batch));
 }
 
 void
@@ -153,7 +153,7 @@ TestFormatterTAP_vtest_result(TestFormatterTAP *self, bool pass,
                               va_list args) {
     UNUSED_VAR(self);
     const char *result = pass ? "ok" : "not ok";
-    printf("%s %d - ", result, test_num);
+    printf("%s %u - ", result, test_num);
     vprintf(fmt, args);
     printf("\n");
 }
