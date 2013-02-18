@@ -96,6 +96,9 @@
 #include "Lucy/Test/Util/TestPriorityQueue.h"
 #include "Lucy/Test/Util/TestStringHelper.h"
 
+static void
+S_unbuffer_stdout();
+
 static bool
 S_vtest_true(TestBatch *self, bool condition, const char *pattern,
              va_list args);
@@ -181,6 +184,8 @@ S_all_test_batches() {
 
 bool
 Test_run_batch(CharBuf *class_name, TestFormatter *formatter) {
+    S_unbuffer_stdout();
+
     VArray   *batches = S_all_test_batches();
     uint32_t  size    = VA_Get_Size(batches);
 
@@ -201,6 +206,8 @@ Test_run_batch(CharBuf *class_name, TestFormatter *formatter) {
 
 bool
 Test_run_all_batches(TestFormatter *formatter) {
+    S_unbuffer_stdout();
+
     TestRunner *runner  = TestRunner_new(formatter);
     VArray     *batches = S_all_test_batches();
     uint32_t    size    = VA_Get_Size(batches);
@@ -215,6 +222,14 @@ Test_run_all_batches(TestFormatter *formatter) {
     DECREF(runner);
     DECREF(batches);
     return result;
+}
+
+static void
+S_unbuffer_stdout() {
+    int check_val = setvbuf(stdout, NULL, _IONBF, 0);
+    if (check_val != 0) {
+        fprintf(stderr, "Failed when trying to unbuffer stdout\n");
+    }
 }
 
 TestBatch*
@@ -234,12 +249,6 @@ TestBatch_init(TestBatch *self, uint32_t num_planned) {
     self->num_passed      = 0;
     self->num_failed      = 0;
     self->num_skipped     = 0;
-
-    // Unbuffer stdout. TODO: move this elsewhere.
-    int check_val = setvbuf(stdout, NULL, _IONBF, 0);
-    if (check_val != 0) {
-        fprintf(stderr, "Failed when trying to unbuffer stdout\n");
-    }
 
     return self;
 }
