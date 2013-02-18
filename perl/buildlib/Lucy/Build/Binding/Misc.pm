@@ -23,8 +23,6 @@ sub bind_all {
     my $class = shift;
     $class->bind_lucy;
     $class->bind_test;
-    $class->bind_testutils;
-    $class->bind_testqueryparsersyntax;
     $class->bind_testschema;
     $class->bind_bbsortex;
 }
@@ -101,45 +99,6 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Test",
-    );
-    $binding->append_xs($xs_code);
-
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_testutils {
-    my $xs_code = <<'END_XS_CODE';
-MODULE = Lucy   PACKAGE = Lucy::Test::TestUtils
-
-SV*
-doc_set()
-CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(lucy_TestUtils_doc_set());
-OUTPUT: RETVAL
-END_XS_CODE
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Test::TestUtils",
-    );
-    $binding->append_xs($xs_code);
-
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_testqueryparsersyntax {
-    my $xs_code = <<'END_XS_CODE';
-MODULE = Lucy   PACKAGE = Lucy::Test::Search::TestQueryParserSyntax
-
-void
-run_tests(index);
-    lucy_Folder *index;
-PPCODE:
-    lucy_TestQPSyntax_run_tests(index);
-END_XS_CODE
-
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Test::Search::TestQueryParserSyntax",
     );
     $binding->append_xs($xs_code);
 

@@ -66,6 +66,7 @@
 #include "Lucy/Test/Search/TestPhraseQuery.h"
 #include "Lucy/Test/Search/TestPolyQuery.h"
 #include "Lucy/Test/Search/TestQueryParserLogic.h"
+#include "Lucy/Test/Search/TestQueryParserSyntax.h"
 #include "Lucy/Test/Search/TestRangeQuery.h"
 #include "Lucy/Test/Search/TestReqOptQuery.h"
 #include "Lucy/Test/Search/TestSeriesMatcher.h"
@@ -173,6 +174,7 @@ S_all_test_batches() {
     VA_Push(batches, (Obj*)TestSeriesMatcher_new());
     VA_Push(batches, (Obj*)TestORQuery_new());
     VA_Push(batches, (Obj*)TestQPLogic_new());
+    VA_Push(batches, (Obj*)TestQPSyntax_new());
 
     return batches;
 }
