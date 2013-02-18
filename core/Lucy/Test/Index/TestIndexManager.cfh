@@ -17,7 +17,7 @@
 parcel Lucy;
 
 class Lucy::Test::Index::TestIndexManager cnick TestIxManager
-    inherits Lucy::Test::TestBatch {
+    inherits Clownfish::Test::TestBatch {
 
     inert incremented TestIndexManager*
     new();

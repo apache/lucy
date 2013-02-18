@@ -22,8 +22,8 @@
 
 #include "Clownfish/Test/TestRunner.h"
 #include "Clownfish/Err.h"
+#include "Clownfish/Test/TestBatch.h"
 #include "Clownfish/Test/TestFormatter.h"
-#include "Lucy/Test.h"
 #include "Clownfish/VTable.h"
 
 TestRunner*

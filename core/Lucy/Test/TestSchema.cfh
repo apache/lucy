@@ -34,7 +34,7 @@ class Lucy::Test::TestSchema inherits Lucy::Plan::Schema {
 }
 
 class Lucy::Test::TestBatchSchema
-    inherits Lucy::Test::TestBatch {
+    inherits Clownfish::Test::TestBatch {
 
     inert incremented TestBatchSchema*
     new();

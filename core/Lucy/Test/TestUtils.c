@@ -20,6 +20,7 @@
 
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test.h"
+#include "Clownfish/Test/TestBatch.h"
 #include "Lucy/Analysis/Analyzer.h"
 #include "Lucy/Analysis/Inversion.h"
 #include "Lucy/Analysis/Token.h"

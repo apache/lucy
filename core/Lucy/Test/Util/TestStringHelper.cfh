@@ -17,7 +17,7 @@
 parcel Lucy;
 
 class Lucy::Test::Util::TestStringHelper cnick TestStrHelp
-    inherits Lucy::Test::TestBatch {
+    inherits Clownfish::Test::TestBatch {
 
     inert incremented TestStringHelper*
     new();

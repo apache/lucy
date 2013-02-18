@@ -17,7 +17,7 @@
 parcel Lucy;
 
 class Lucy::Test::Analysis::TestNormalizer
-    inherits Lucy::Test::TestBatch {
+    inherits Clownfish::Test::TestBatch {
 
     inert incremented TestNormalizer*
     new();

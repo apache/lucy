@@ -18,6 +18,7 @@
 
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestFolderCommon.h"
+#include "Clownfish/Test/TestBatch.h"
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/DirHandle.h"
 #include "Lucy/Store/FileHandle.h"

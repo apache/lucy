@@ -17,7 +17,7 @@
 parcel Lucy;
 
 class Lucy::Test::Search::TestMatchAllQuery
-    inherits Lucy::Test::TestBatch {
+    inherits Clownfish::Test::TestBatch {
 
     inert incremented TestMatchAllQuery*
     new();

@@ -17,7 +17,7 @@
 parcel Lucy;
 
 class Lucy::Test::Analysis::TestSnowballStopFilter cnick TestSnowStop
-    inherits Lucy::Test::TestBatch {
+    inherits Clownfish::Test::TestBatch {
 
     inert incremented TestSnowballStopFilter*
     new();

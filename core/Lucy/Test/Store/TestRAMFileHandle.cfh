@@ -17,7 +17,7 @@
 parcel Lucy;
 
 class Lucy::Test::Store::TestRAMFileHandle cnick TestRAMFH
-    inherits Lucy::Test::TestBatch {
+    inherits Clownfish::Test::TestBatch {
 
     inert incremented TestRAMFileHandle*
     new();

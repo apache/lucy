@@ -17,7 +17,7 @@
 parcel Lucy;
 
 class Lucy::Test::Util::TestMemoryPool cnick TestMemPool
-    inherits Lucy::Test::TestBatch {
+    inherits Clownfish::Test::TestBatch {
 
     inert incremented TestMemoryPool*
     new();

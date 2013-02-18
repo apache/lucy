@@ -17,7 +17,7 @@
 parcel Lucy;
 
 class Lucy::Test::Object::TestBitVector
-    inherits Lucy::Test::TestBatch {
+    inherits Clownfish::Test::TestBatch {
 
     inert incremented TestBitVector*
     new();

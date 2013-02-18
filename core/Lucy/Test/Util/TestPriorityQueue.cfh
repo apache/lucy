@@ -27,7 +27,7 @@ class Lucy::Test::Util::NumPriorityQueue cnick NumPriQ
 }
 
 class Lucy::Test::Util::TestPriorityQueue cnick TestPriQ
-    inherits Lucy::Test::TestBatch {
+    inherits Clownfish::Test::TestBatch {
 
     inert incremented TestPriorityQueue*
     new();

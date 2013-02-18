@@ -21,7 +21,7 @@ parcel Lucy;
  */
 
 class Lucy::Test::Store::TestInStream
-    inherits Lucy::Test::TestBatch {
+    inherits Clownfish::Test::TestBatch {
 
     inert incremented TestInStream*
     new();

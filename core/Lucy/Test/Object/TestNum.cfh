@@ -17,7 +17,7 @@
 parcel Lucy;
 
 class Lucy::Test::Object::TestNum
-    inherits Lucy::Test::TestBatch {
+    inherits Clownfish::Test::TestBatch {
 
     inert incremented TestNum*
     new();

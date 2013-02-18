@@ -17,7 +17,7 @@
 parcel Lucy;
 
 class Lucy::Test::Util::TestIndexFileNames cnick TestIxFileNames
-    inherits Lucy::Test::TestBatch {
+    inherits Clownfish::Test::TestBatch {
 
     inert incremented TestIndexFileNames*
     new();

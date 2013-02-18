@@ -23,7 +23,7 @@
 #include "Clownfish/Test/TestFormatter.h"
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"
-#include "Lucy/Test.h"
+#include "Clownfish/Test/TestBatch.h"
 #include "Clownfish/Test/TestRunner.h"
 #include "Clownfish/VTable.h"
 

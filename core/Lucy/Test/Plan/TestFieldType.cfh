@@ -17,7 +17,7 @@
 parcel Lucy;
 
 class Lucy::Test::Plan::TestFieldType cnick TestFType
-    inherits Lucy::Test::TestBatch {
+    inherits Clownfish::Test::TestBatch {
 
     inert incremented TestFieldType*
     new();

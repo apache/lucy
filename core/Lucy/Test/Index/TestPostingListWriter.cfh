@@ -17,7 +17,7 @@
 parcel Lucy;
 
 class Lucy::Test::Index::TestPostingListWriter cnick TestPListWriter
-    inherits Lucy::Test::TestBatch {
+    inherits Clownfish::Test::TestBatch {
 
     inert incremented TestPostingListWriter*
     new();
