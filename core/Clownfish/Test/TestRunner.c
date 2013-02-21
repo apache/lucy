@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-#include <string.h>
-
 #define C_LUCY_TESTRUNNER
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
