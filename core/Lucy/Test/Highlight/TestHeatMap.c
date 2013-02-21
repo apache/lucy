@@ -16,6 +16,7 @@
 
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Highlight/TestHeatMap.h"
 #include "Lucy/Highlight/HeatMap.h"
@@ -23,14 +24,14 @@
 #include "Lucy/Search/Span.h"
 
 TestHeatMap*
-TestHeatMap_new() {
+TestHeatMap_new(TestFormatter *formatter) {
     TestHeatMap *self = (TestHeatMap*)VTable_Make_Obj(TESTHEATMAP);
-    return TestHeatMap_init(self);
+    return TestHeatMap_init(self, formatter);
 }
 
 TestHeatMap*
-TestHeatMap_init(TestHeatMap *self) {
-    return (TestHeatMap*)TestBatch_init((TestBatch*)self, 13);
+TestHeatMap_init(TestHeatMap *self, TestFormatter *formatter) {
+    return (TestHeatMap*)TestBatch_init((TestBatch*)self, 13, formatter);
 }
 
 static void

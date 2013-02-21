@@ -26,6 +26,7 @@
   #include <unistd.h>
 #endif
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestFSDirHandle.h"
 #include "Lucy/Store/FSDirHandle.h"
@@ -33,14 +34,14 @@
 #include "Lucy/Store/OutStream.h"
 
 TestFSDirHandle*
-TestFSDH_new() {
+TestFSDH_new(TestFormatter *formatter) {
     TestFSDirHandle *self = (TestFSDirHandle*)VTable_Make_Obj(TESTFSDIRHANDLE);
-    return TestFSDH_init(self);
+    return TestFSDH_init(self, formatter);
 }
 
 TestFSDirHandle*
-TestFSDH_init(TestFSDirHandle *self) {
-    return (TestFSDirHandle*)TestBatch_init((TestBatch*)self, 5);
+TestFSDH_init(TestFSDirHandle *self, TestFormatter *formatter) {
+    return (TestFSDirHandle*)TestBatch_init((TestBatch*)self, 5, formatter);
 }
 
 static void

@@ -16,20 +16,21 @@
 
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Index/TestSnapshot.h"
 #include "Lucy/Index/Snapshot.h"
 #include "Lucy/Store/RAMFolder.h"
 
 TestSnapshot*
-TestSnapshot_new() {
+TestSnapshot_new(TestFormatter *formatter) {
     TestSnapshot *self = (TestSnapshot*)VTable_Make_Obj(TESTSNAPSHOT);
-    return TestSnapshot_init(self);
+    return TestSnapshot_init(self, formatter);
 }
 
 TestSnapshot*
-TestSnapshot_init(TestSnapshot *self) {
-    return (TestSnapshot*)TestBatch_init((TestBatch*)self, 9);
+TestSnapshot_init(TestSnapshot *self, TestFormatter *formatter) {
+    return (TestSnapshot*)TestBatch_init((TestBatch*)self, 9, formatter);
 }
 
 static void

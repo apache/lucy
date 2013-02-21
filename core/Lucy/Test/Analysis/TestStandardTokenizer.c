@@ -17,6 +17,7 @@
 #define C_LUCY_TESTSTANDARDTOKENIZER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Analysis/TestStandardTokenizer.h"
 #include "Lucy/Analysis/StandardTokenizer.h"
@@ -24,14 +25,14 @@
 #include "Lucy/Util/Json.h"
 
 TestStandardTokenizer*
-TestStandardTokenizer_new() {
+TestStandardTokenizer_new(TestFormatter *formatter) {
     TestStandardTokenizer *self = (TestStandardTokenizer*)VTable_Make_Obj(TESTSTANDARDTOKENIZER);
-    return TestStandardTokenizer_init(self);
+    return TestStandardTokenizer_init(self, formatter);
 }
 
 TestStandardTokenizer*
-TestStandardTokenizer_init(TestStandardTokenizer *self) {
-    return (TestStandardTokenizer*)TestBatch_init((TestBatch*)self, 984);
+TestStandardTokenizer_init(TestStandardTokenizer *self, TestFormatter *formatter) {
+    return (TestStandardTokenizer*)TestBatch_init((TestBatch*)self, 984, formatter);
 }
 
 static void

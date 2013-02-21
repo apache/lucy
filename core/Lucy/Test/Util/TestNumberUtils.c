@@ -19,20 +19,21 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Util/TestNumberUtils.h"
 #include "Clownfish/Util/NumberUtils.h"
 
 TestNumberUtils*
-TestNumUtil_new() {
+TestNumUtil_new(TestFormatter *formatter) {
     TestNumberUtils *self = (TestNumberUtils*)VTable_Make_Obj(TESTNUMBERUTILS);
-    return TestNumUtil_init(self);
+    return TestNumUtil_init(self, formatter);
 }
 
 TestNumberUtils*
-TestNumUtil_init(TestNumberUtils *self) {
-    return (TestNumberUtils*)TestBatch_init((TestBatch*)self, 1196);
+TestNumUtil_init(TestNumberUtils *self, TestFormatter *formatter) {
+    return (TestNumberUtils*)TestBatch_init((TestBatch*)self, 1196, formatter);
 }
 
 static void

@@ -20,10 +20,10 @@ class Lucy::Test::Object::TestObj
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestObj*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestObj*
-    init(TestObj *self);
+    init(TestObj *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestObj *self);

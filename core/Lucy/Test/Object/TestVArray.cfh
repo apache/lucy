@@ -20,10 +20,10 @@ class Lucy::Test::Object::TestVArray
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestVArray*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestVArray*
-    init(TestVArray *self);
+    init(TestVArray *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestVArray *self);

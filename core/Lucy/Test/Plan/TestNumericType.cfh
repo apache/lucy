@@ -20,10 +20,10 @@ class Lucy::Test::Plan::TestNumericType
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestNumericType*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestNumericType*
-    init(TestNumericType *self);
+    init(TestNumericType *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestNumericType *self);

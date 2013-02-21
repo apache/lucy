@@ -18,20 +18,21 @@
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Search/TestNoMatchQuery.h"
 #include "Lucy/Search/NoMatchQuery.h"
 
 TestNoMatchQuery*
-TestNoMatchQuery_new() {
+TestNoMatchQuery_new(TestFormatter *formatter) {
     TestNoMatchQuery *self = (TestNoMatchQuery*)VTable_Make_Obj(TESTNOMATCHQUERY);
-    return TestNoMatchQuery_init(self);
+    return TestNoMatchQuery_init(self, formatter);
 }
 
 TestNoMatchQuery*
-TestNoMatchQuery_init(TestNoMatchQuery *self) {
-    return (TestNoMatchQuery*)TestBatch_init((TestBatch*)self, 2);
+TestNoMatchQuery_init(TestNoMatchQuery *self, TestFormatter *formatter) {
+    return (TestNoMatchQuery*)TestBatch_init((TestBatch*)self, 2, formatter);
 }
 
 static void

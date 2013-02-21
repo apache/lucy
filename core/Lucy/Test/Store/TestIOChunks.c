@@ -21,6 +21,7 @@
 #include <time.h>
 
 #include "Lucy/Util/ToolSet.h"
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Store/TestIOChunks.h"
@@ -31,14 +32,14 @@
 #include "Clownfish/Util/NumberUtils.h"
 
 TestIOChunks*
-TestIOChunks_new() {
+TestIOChunks_new(TestFormatter *formatter) {
     TestIOChunks *self = (TestIOChunks*)VTable_Make_Obj(TESTIOCHUNKS);
-    return TestIOChunks_init(self);
+    return TestIOChunks_init(self, formatter);
 }
 
 TestIOChunks*
-TestIOChunks_init(TestIOChunks *self) {
-    return (TestIOChunks*)TestBatch_init((TestBatch*)self, 36);
+TestIOChunks_init(TestIOChunks *self, TestFormatter *formatter) {
+    return (TestIOChunks*)TestBatch_init((TestBatch*)self, 36, formatter);
 }
 
 static void

@@ -17,19 +17,20 @@
 #define C_LUCY_TESTTERMINFO
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Search/TestSpan.h"
 #include "Lucy/Search/Span.h"
 
 TestSpan*
-TestSpan_new() {
+TestSpan_new(TestFormatter *formatter) {
     TestSpan *self = (TestSpan*)VTable_Make_Obj(TESTSPAN);
-    return TestSpan_init(self);
+    return TestSpan_init(self, formatter);
 }
 
 TestSpan*
-TestSpan_init(TestSpan *self) {
-    return (TestSpan*)TestBatch_init((TestBatch*)self, 6);
+TestSpan_init(TestSpan *self, TestFormatter *formatter) {
+    return (TestSpan*)TestBatch_init((TestBatch*)self, 6, formatter);
 }
 
 void 

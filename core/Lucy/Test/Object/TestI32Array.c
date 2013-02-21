@@ -17,6 +17,7 @@
 #define C_LUCY_TESTI32ARRAY
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Object/TestI32Array.h"
 
@@ -24,14 +25,14 @@ static int32_t source_ints[] = { -1, 0, INT32_MIN, INT32_MAX, 1 };
 static size_t num_ints = sizeof(source_ints) / sizeof(int32_t);
 
 TestI32Array*
-TestI32Arr_new() {
+TestI32Arr_new(TestFormatter *formatter) {
     TestI32Array *self = (TestI32Array*)VTable_Make_Obj(TESTI32ARRAY);
-    return TestI32Arr_init(self);
+    return TestI32Arr_init(self, formatter);
 }
 
 TestI32Array*
-TestI32Arr_init(TestI32Array *self) {
-    return (TestI32Array*)TestBatch_init((TestBatch*)self, 4);
+TestI32Arr_init(TestI32Array *self, TestFormatter *formatter) {
+    return (TestI32Array*)TestBatch_init((TestBatch*)self, 4, formatter);
 }
 
 static void

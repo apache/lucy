@@ -20,10 +20,10 @@ class Lucy::Test::Search::TestSeriesMatcher
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestSeriesMatcher*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestSeriesMatcher*
-    init(TestSeriesMatcher *self);
+    init(TestSeriesMatcher *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestSeriesMatcher *self);

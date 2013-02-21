@@ -17,6 +17,7 @@
 #define C_LUCY_RAMFOLDER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestRAMDirHandle.h"
 #include "Lucy/Store/FileHandle.h"
@@ -24,14 +25,14 @@
 #include "Lucy/Store/RAMDirHandle.h"
 
 TestRAMDirHandle*
-TestRAMDH_new() {
+TestRAMDH_new(TestFormatter *formatter) {
     TestRAMDirHandle *self = (TestRAMDirHandle*)VTable_Make_Obj(TESTRAMDIRHANDLE);
-    return TestRAMDH_init(self);
+    return TestRAMDH_init(self, formatter);
 }
 
 TestRAMDirHandle*
-TestRAMDH_init(TestRAMDirHandle *self) {
-    return (TestRAMDirHandle*)TestBatch_init((TestBatch*)self, 6);
+TestRAMDH_init(TestRAMDirHandle *self, TestFormatter *formatter) {
+    return (TestRAMDirHandle*)TestBatch_init((TestBatch*)self, 6, formatter);
 }
 
 static void

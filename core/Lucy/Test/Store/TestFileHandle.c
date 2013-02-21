@@ -19,20 +19,21 @@
 #define C_LUCY_FILEWINDOW
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestFileHandle.h"
 #include "Lucy/Store/FileHandle.h"
 #include "Lucy/Store/FileWindow.h"
 
 TestFileHandle*
-TestFH_new() {
+TestFH_new(TestFormatter *formatter) {
     TestFileHandle *self = (TestFileHandle*)VTable_Make_Obj(TESTFILEHANDLE);
-    return TestFH_init(self);
+    return TestFH_init(self, formatter);
 }
 
 TestFileHandle*
-TestFH_init(TestFileHandle *self) {
-    return (TestFileHandle*)TestBatch_init((TestBatch*)self, 2);
+TestFH_init(TestFileHandle *self, TestFormatter *formatter) {
+    return (TestFileHandle*)TestBatch_init((TestBatch*)self, 2, formatter);
 }
 
 static void

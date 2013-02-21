@@ -17,6 +17,7 @@
 #define C_LUCY_TESTSNOWBALLSTEMMER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Analysis/TestSnowballStemmer.h"
 #include "Lucy/Analysis/SnowballStemmer.h"
@@ -24,14 +25,14 @@
 #include "Lucy/Util/Json.h"
 
 TestSnowballStemmer*
-TestSnowStemmer_new() {
+TestSnowStemmer_new(TestFormatter *formatter) {
     TestSnowballStemmer *self = (TestSnowballStemmer*)VTable_Make_Obj(TESTSNOWBALLSTEMMER);
-    return TestSnowStemmer_init(self);
+    return TestSnowStemmer_init(self, formatter);
 }
 
 TestSnowballStemmer*
-TestSnowStemmer_init(TestSnowballStemmer *self) {
-    return (TestSnowballStemmer*)TestBatch_init((TestBatch*)self, 153);
+TestSnowStemmer_init(TestSnowballStemmer *self, TestFormatter *formatter) {
+    return (TestSnowballStemmer*)TestBatch_init((TestBatch*)self, 153, formatter);
 }
 
 static void

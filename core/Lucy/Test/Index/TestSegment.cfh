@@ -20,10 +20,10 @@ class Lucy::Test::Index::TestSegment cnick TestSeg
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestSegment*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestSegment*
-    init(TestSegment *self);
+    init(TestSegment *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestSegment *self);

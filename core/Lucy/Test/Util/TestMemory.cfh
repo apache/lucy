@@ -20,10 +20,10 @@ class Lucy::Test::Util::TestMemory
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestMemory*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestMemory*
-    init(TestMemory *self);
+    init(TestMemory *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestMemory *self);

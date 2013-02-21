@@ -16,6 +16,7 @@
 
 
 #include "Lucy/Util/ToolSet.h"
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Plan/TestFieldMisc.h"
 
@@ -42,14 +43,14 @@ static CharBuf *unindexed_unanalyzed_cb;
 static CharBuf *united_states_cb;
 
 TestFieldMisc*
-TestFieldMisc_new() {
+TestFieldMisc_new(TestFormatter *formatter) {
     TestFieldMisc *self = (TestFieldMisc*)VTable_Make_Obj(TESTFIELDMISC);
-    return TestFieldMisc_init(self);
+    return TestFieldMisc_init(self, formatter);
 }
 
 TestFieldMisc*
-TestFieldMisc_init(TestFieldMisc *self) {
-    return (TestFieldMisc*)TestBatch_init((TestBatch*)self, 20);
+TestFieldMisc_init(TestFieldMisc *self, TestFormatter *formatter) {
+    return (TestFieldMisc*)TestBatch_init((TestBatch*)self, 20, formatter);
 }
 
 static void

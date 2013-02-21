@@ -18,6 +18,7 @@
 #define C_LUCY_NORMALIZER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Analysis/TestNormalizer.h"
 #include "Lucy/Analysis/Normalizer.h"
@@ -25,14 +26,14 @@
 #include "Lucy/Util/Json.h"
 
 TestNormalizer*
-TestNormalizer_new() {
+TestNormalizer_new(TestFormatter *formatter) {
     TestNormalizer *self = (TestNormalizer*)VTable_Make_Obj(TESTNORMALIZER);
-    return TestNormalizer_init(self);
+    return TestNormalizer_init(self, formatter);
 }
 
 TestNormalizer*
-TestNormalizer_init(TestNormalizer *self) {
-    return (TestNormalizer*)TestBatch_init((TestBatch*)self, 20);
+TestNormalizer_init(TestNormalizer *self, TestFormatter *formatter) {
+    return (TestNormalizer*)TestBatch_init((TestBatch*)self, 20, formatter);
 }
 
 static void

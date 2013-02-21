@@ -21,6 +21,7 @@
 #include <time.h>
 
 #include "Lucy/Util/ToolSet.h"
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Store/TestIOPrimitives.h"
@@ -31,14 +32,14 @@
 #include "Clownfish/Util/NumberUtils.h"
 
 TestIOPrimitives*
-TestIOPrimitives_new() {
+TestIOPrimitives_new(TestFormatter *formatter) {
     TestIOPrimitives *self = (TestIOPrimitives*)VTable_Make_Obj(TESTIOPRIMITIVES);
-    return TestIOPrimitives_init(self);
+    return TestIOPrimitives_init(self, formatter);
 }
 
 TestIOPrimitives*
-TestIOPrimitives_init(TestIOPrimitives *self) {
-    return (TestIOPrimitives*)TestBatch_init((TestBatch*)self, 11);
+TestIOPrimitives_init(TestIOPrimitives *self, TestFormatter *formatter) {
+    return (TestIOPrimitives*)TestBatch_init((TestBatch*)self, 11, formatter);
 }
 
 static void

@@ -22,10 +22,10 @@ class Lucy::Test::Store::TestIOChunks
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestIOChunks*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestIOChunks*
-    init(TestIOChunks *self);
+    init(TestIOChunks *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestIOChunks *self);

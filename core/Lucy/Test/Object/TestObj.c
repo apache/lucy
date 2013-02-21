@@ -19,18 +19,19 @@
 #define C_LUCY_TESTOBJ
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Object/TestObj.h"
 
 TestObj*
-TestObj_new() {
+TestObj_new(TestFormatter *formatter) {
     TestObj *self = (TestObj*)VTable_Make_Obj(TESTOBJ);
-    return TestObj_init(self);
+    return TestObj_init(self, formatter);
 }
 
 TestObj*
-TestObj_init(TestObj *self) {
-    return (TestObj*)TestBatch_init((TestBatch*)self, 20);
+TestObj_init(TestObj *self, TestFormatter *formatter) {
+    return (TestObj*)TestBatch_init((TestBatch*)self, 20, formatter);
 }
 
 static Obj*

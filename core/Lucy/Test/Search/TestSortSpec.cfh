@@ -20,10 +20,10 @@ class Lucy::Test::Search::TestSortSpec
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestSortSpec*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestSortSpec*
-    init(TestSortSpec *self);
+    init(TestSortSpec *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestSortSpec *self);

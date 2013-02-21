@@ -17,6 +17,7 @@
 #define C_LUCY_TESTHIGHLIGHTER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Highlight/TestHighlighter.h"
 #include "Lucy/Highlight/Highlighter.h"
@@ -51,14 +52,14 @@
 #define TEST_STRING_LEN 425
 
 TestHighlighter*
-TestHighlighter_new() {
+TestHighlighter_new(TestFormatter *formatter) {
     TestHighlighter *self = (TestHighlighter*)VTable_Make_Obj(TESTHIGHLIGHTER);
-    return TestHighlighter_init(self);
+    return TestHighlighter_init(self, formatter);
 }
 
 TestHighlighter*
-TestHighlighter_init(TestHighlighter *self) {
-    return (TestHighlighter*)TestBatch_init((TestBatch*)self, 35);
+TestHighlighter_init(TestHighlighter *self, TestFormatter *formatter) {
+    return (TestHighlighter*)TestBatch_init((TestBatch*)self, 35, formatter);
 }
 
 static void

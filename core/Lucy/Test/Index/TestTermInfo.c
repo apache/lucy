@@ -17,19 +17,20 @@
 #define C_LUCY_TESTTERMINFO
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Index/TestTermInfo.h"
 #include "Lucy/Index/TermInfo.h"
 
 TestTermInfo*
-TestTermInfo_new() {
+TestTermInfo_new(TestFormatter *formatter) {
     TestTermInfo *self = (TestTermInfo*)VTable_Make_Obj(TESTTERMINFO);
-    return TestTermInfo_init(self);
+    return TestTermInfo_init(self, formatter);
 }
 
 TestTermInfo*
-TestTermInfo_init(TestTermInfo *self) {
-    return (TestTermInfo*)TestBatch_init((TestBatch*)self, 11);
+TestTermInfo_init(TestTermInfo *self, TestFormatter *formatter) {
+    return (TestTermInfo*)TestBatch_init((TestBatch*)self, 11, formatter);
 }
 
 void 

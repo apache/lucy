@@ -17,19 +17,20 @@
 #define C_LUCY_TESTHIGHLIGHTWRITER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Index/TestHighlightWriter.h"
 #include "Lucy/Index/HighlightWriter.h"
 
 TestHighlightWriter*
-TestHLWriter_new() {
+TestHLWriter_new(TestFormatter *formatter) {
     TestHighlightWriter *self = (TestHighlightWriter*)VTable_Make_Obj(TESTHIGHLIGHTWRITER);
-    return TestHLWriter_init(self);
+    return TestHLWriter_init(self, formatter);
 }
 
 TestHighlightWriter*
-TestHLWriter_init(TestHighlightWriter *self) {
-    return (TestHighlightWriter*)TestBatch_init((TestBatch*)self, 1);
+TestHLWriter_init(TestHighlightWriter *self, TestFormatter *formatter) {
+    return (TestHighlightWriter*)TestBatch_init((TestBatch*)self, 1, formatter);
 }
 
 void

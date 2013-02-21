@@ -18,20 +18,21 @@
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Search/TestTermQuery.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Search/TermQuery.h"
 
 TestTermQuery*
-TestTermQuery_new() {
+TestTermQuery_new(TestFormatter *formatter) {
     TestTermQuery *self = (TestTermQuery*)VTable_Make_Obj(TESTTERMQUERY);
-    return TestTermQuery_init(self);
+    return TestTermQuery_init(self, formatter);
 }
 
 TestTermQuery*
-TestTermQuery_init(TestTermQuery *self) {
-    return (TestTermQuery*)TestBatch_init((TestBatch*)self, 4);
+TestTermQuery_init(TestTermQuery *self, TestFormatter *formatter) {
+    return (TestTermQuery*)TestBatch_init((TestBatch*)self, 4, formatter);
 }
 
 static void

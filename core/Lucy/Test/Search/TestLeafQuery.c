@@ -18,20 +18,21 @@
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Search/TestLeafQuery.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Search/LeafQuery.h"
 
 TestLeafQuery*
-TestLeafQuery_new() {
+TestLeafQuery_new(TestFormatter *formatter) {
     TestLeafQuery *self = (TestLeafQuery*)VTable_Make_Obj(TESTLEAFQUERY);
-    return TestLeafQuery_init(self);
+    return TestLeafQuery_init(self, formatter);
 }
 
 TestLeafQuery*
-TestLeafQuery_init(TestLeafQuery *self) {
-    return (TestLeafQuery*)TestBatch_init((TestBatch*)self, 5);
+TestLeafQuery_init(TestLeafQuery *self, TestFormatter *formatter) {
+    return (TestLeafQuery*)TestBatch_init((TestBatch*)self, 5, formatter);
 }
 
 static void

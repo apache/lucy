@@ -18,6 +18,7 @@
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Search/TestNOTQuery.h"
@@ -25,14 +26,14 @@
 #include "Lucy/Search/LeafQuery.h"
 
 TestNOTQuery*
-TestNOTQuery_new() {
+TestNOTQuery_new(TestFormatter *formatter) {
     TestNOTQuery *self = (TestNOTQuery*)VTable_Make_Obj(TESTNOTQUERY);
-    return TestNOTQuery_init(self);
+    return TestNOTQuery_init(self, formatter);
 }
 
 TestNOTQuery*
-TestNOTQuery_init(TestNOTQuery *self) {
-    return (TestNOTQuery*)TestBatch_init((TestBatch*)self, 4);
+TestNOTQuery_init(TestNOTQuery *self, TestFormatter *formatter) {
+    return (TestNOTQuery*)TestBatch_init((TestBatch*)self, 4, formatter);
 }
 
 static void

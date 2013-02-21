@@ -17,19 +17,20 @@
 #define C_LUCY_TESTVARRAY
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestVArray.h"
 
 TestVArray*
-TestVArray_new() {
+TestVArray_new(TestFormatter *formatter) {
     TestVArray *self = (TestVArray*)VTable_Make_Obj(TESTVARRAY);
-    return TestVArray_init(self);
+    return TestVArray_init(self, formatter);
 }
 
 TestVArray*
-TestVArray_init(TestVArray *self) {
-    return (TestVArray*)TestBatch_init((TestBatch*)self, 45);
+TestVArray_init(TestVArray *self, TestFormatter *formatter) {
+    return (TestVArray*)TestBatch_init((TestBatch*)self, 45, formatter);
 }
 
 static CharBuf*

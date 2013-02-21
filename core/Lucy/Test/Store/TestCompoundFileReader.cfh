@@ -20,10 +20,10 @@ class Lucy::Test::Store::TestCompoundFileReader cnick TestCFReader
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestCompoundFileReader*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestCompoundFileReader*
-    init(TestCompoundFileReader *self);
+    init(TestCompoundFileReader *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestCompoundFileReader *self);

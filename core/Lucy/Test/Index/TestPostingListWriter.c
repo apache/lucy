@@ -17,18 +17,19 @@
 #define C_LUCY_TESTPOSTINGLISTWRITER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Index/TestPostingListWriter.h"
 
 TestPostingListWriter*
-TestPListWriter_new() {
+TestPListWriter_new(TestFormatter *formatter) {
     TestPostingListWriter *self = (TestPostingListWriter*)VTable_Make_Obj(TESTPOSTINGLISTWRITER);
-    return TestPListWriter_init(self);
+    return TestPListWriter_init(self, formatter);
 }
 
 TestPostingListWriter*
-TestPListWriter_init(TestPostingListWriter *self) {
-    return (TestPostingListWriter*)TestBatch_init((TestBatch*)self, 1);
+TestPListWriter_init(TestPostingListWriter *self, TestFormatter *formatter) {
+    return (TestPostingListWriter*)TestBatch_init((TestBatch*)self, 1, formatter);
 }
 
 void

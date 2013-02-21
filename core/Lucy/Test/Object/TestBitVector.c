@@ -17,19 +17,20 @@
 #define C_LUCY_TESTBITVECTOR
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestBitVector.h"
 
 TestBitVector*
-TestBitVector_new() {
+TestBitVector_new(TestFormatter *formatter) {
     TestBitVector *self = (TestBitVector*)VTable_Make_Obj(TESTBITVECTOR);
-    return TestBitVector_init(self);
+    return TestBitVector_init(self, formatter);
 }
 
 TestBitVector*
-TestBitVector_init(TestBitVector *self) {
-    return (TestBitVector*)TestBatch_init((TestBatch*)self, 1029);
+TestBitVector_init(TestBitVector *self, TestFormatter *formatter) {
+    return (TestBitVector*)TestBatch_init((TestBatch*)self, 1029, formatter);
 }
 
 static void

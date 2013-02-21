@@ -19,6 +19,7 @@
 #define C_LUCY_FILEWINDOW
 
 #include "Lucy/Util/ToolSet.h"
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Store/TestInStream.h"
@@ -31,14 +32,14 @@
 #include "Clownfish/Util/NumberUtils.h"
 
 TestInStream*
-TestInStream_new() {
+TestInStream_new(TestFormatter *formatter) {
     TestInStream *self = (TestInStream*)VTable_Make_Obj(TESTINSTREAM);
-    return TestInStream_init(self);
+    return TestInStream_init(self, formatter);
 }
 
 TestInStream*
-TestInStream_init(TestInStream *self) {
-    return (TestInStream*)TestBatch_init((TestBatch*)self, 37);
+TestInStream_init(TestInStream *self, TestFormatter *formatter) {
+    return (TestInStream*)TestBatch_init((TestBatch*)self, 37, formatter);
 }
 
 static void

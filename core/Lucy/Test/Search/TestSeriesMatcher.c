@@ -18,20 +18,21 @@
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Search/TestSeriesMatcher.h"
 #include "Lucy/Search/BitVecMatcher.h"
 #include "Lucy/Search/SeriesMatcher.h"
 
 TestSeriesMatcher*
-TestSeriesMatcher_new() {
+TestSeriesMatcher_new(TestFormatter *formatter) {
     TestSeriesMatcher *self = (TestSeriesMatcher*)VTable_Make_Obj(TESTSERIESMATCHER);
-    return TestSeriesMatcher_init(self);
+    return TestSeriesMatcher_init(self, formatter);
 }
 
 TestSeriesMatcher*
-TestSeriesMatcher_init(TestSeriesMatcher *self) {
-    return (TestSeriesMatcher*)TestBatch_init((TestBatch*)self, 135);
+TestSeriesMatcher_init(TestSeriesMatcher *self, TestFormatter *formatter) {
+    return (TestSeriesMatcher*)TestBatch_init((TestBatch*)self, 135, formatter);
 }
 
 static SeriesMatcher*

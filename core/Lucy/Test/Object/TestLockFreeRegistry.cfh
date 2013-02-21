@@ -20,10 +20,10 @@ class Lucy::Test::Object::TestLockFreeRegistry cnick TestLFReg
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestLockFreeRegistry*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestLockFreeRegistry*
-    init(TestLockFreeRegistry *self);
+    init(TestLockFreeRegistry *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestLockFreeRegistry *self);

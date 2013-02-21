@@ -16,6 +16,7 @@
 
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Util/TestStringHelper.h"
 #include "Lucy/Test/TestUtils.h"
@@ -28,14 +29,14 @@
  */
 #define TRAIL_OK(n) (n >= 0x80 && n <= 0xBF)
 TestStringHelper*
-TestStrHelp_new() {
+TestStrHelp_new(TestFormatter *formatter) {
     TestStringHelper *self = (TestStringHelper*)VTable_Make_Obj(TESTSTRINGHELPER);
-    return TestStrHelp_init(self);
+    return TestStrHelp_init(self, formatter);
 }
 
 TestStringHelper*
-TestStrHelp_init(TestStringHelper *self) {
-    return (TestStringHelper*)TestBatch_init((TestBatch*)self, 41);
+TestStrHelp_init(TestStringHelper *self, TestFormatter *formatter) {
+    return (TestStringHelper*)TestBatch_init((TestBatch*)self, 41, formatter);
 }
 
 static bool

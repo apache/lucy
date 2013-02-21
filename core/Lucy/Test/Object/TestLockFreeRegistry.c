@@ -18,20 +18,21 @@
 
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestLockFreeRegistry.h"
 #include "Clownfish/LockFreeRegistry.h"
 
 TestLockFreeRegistry*
-TestLFReg_new() {
+TestLFReg_new(TestFormatter *formatter) {
     TestLockFreeRegistry *self = (TestLockFreeRegistry*)VTable_Make_Obj(TESTLOCKFREEREGISTRY);
-    return TestLFReg_init(self);
+    return TestLFReg_init(self, formatter);
 }
 
 TestLockFreeRegistry*
-TestLFReg_init(TestLockFreeRegistry *self) {
-    return (TestLockFreeRegistry*)TestBatch_init((TestBatch*)self, 6);
+TestLFReg_init(TestLockFreeRegistry *self, TestFormatter *formatter) {
+    return (TestLockFreeRegistry*)TestBatch_init((TestBatch*)self, 6, formatter);
 }
 
 StupidHashCharBuf*

@@ -17,6 +17,7 @@
 #define C_LUCY_TESTFULLTEXTTYPE
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Plan/TestFullTextType.h"
 #include "Lucy/Test/TestUtils.h"
@@ -25,14 +26,14 @@
 #include "Lucy/Analysis/StandardTokenizer.h"
 
 TestFullTextType*
-TestFullTextType_new() {
+TestFullTextType_new(TestFormatter *formatter) {
     TestFullTextType *self = (TestFullTextType*)VTable_Make_Obj(TESTFULLTEXTTYPE);
-    return TestFullTextType_init(self);
+    return TestFullTextType_init(self, formatter);
 }
 
 TestFullTextType*
-TestFullTextType_init(TestFullTextType *self) {
-    return (TestFullTextType*)TestBatch_init((TestBatch*)self, 10);
+TestFullTextType_init(TestFullTextType *self, TestFormatter *formatter) {
+    return (TestFullTextType*)TestBatch_init((TestBatch*)self, 10, formatter);
 }
 
 static void

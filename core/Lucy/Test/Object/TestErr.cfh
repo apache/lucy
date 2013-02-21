@@ -20,10 +20,10 @@ class Lucy::Test::Object::TestErr
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestErr*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestErr*
-    init(TestErr *self);
+    init(TestErr *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestErr *self);

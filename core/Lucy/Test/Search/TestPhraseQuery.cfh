@@ -20,10 +20,10 @@ class Lucy::Test::Search::TestPhraseQuery
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestPhraseQuery*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestPhraseQuery*
-    init(TestPhraseQuery *self);
+    init(TestPhraseQuery *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestPhraseQuery *self);

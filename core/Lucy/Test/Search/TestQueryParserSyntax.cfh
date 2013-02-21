@@ -23,10 +23,10 @@ class Lucy::Test::Search::TestQueryParserSyntax cnick TestQPSyntax
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestQueryParserSyntax*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestQueryParserSyntax*
-    init(TestQueryParserSyntax *self);
+    init(TestQueryParserSyntax *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestQueryParserSyntax *self);

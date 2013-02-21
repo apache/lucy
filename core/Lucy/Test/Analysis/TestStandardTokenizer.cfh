@@ -20,10 +20,10 @@ class Lucy::Test::Analysis::TestStandardTokenizer
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestStandardTokenizer*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestStandardTokenizer*
-    init(TestStandardTokenizer *self);
+    init(TestStandardTokenizer *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestStandardTokenizer *self);

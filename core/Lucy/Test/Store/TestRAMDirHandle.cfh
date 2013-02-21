@@ -20,10 +20,10 @@ class Lucy::Test::Store::TestRAMDirHandle cnick TestRAMDH
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestRAMDirHandle*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestRAMDirHandle*
-    init(TestRAMDirHandle *self);
+    init(TestRAMDirHandle *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestRAMDirHandle *self);

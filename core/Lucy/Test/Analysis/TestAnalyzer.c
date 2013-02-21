@@ -16,6 +16,7 @@
 
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Analysis/TestAnalyzer.h"
@@ -23,14 +24,14 @@
 #include "Lucy/Analysis/Inversion.h"
 
 TestAnalyzer*
-TestAnalyzer_new() {
+TestAnalyzer_new(TestFormatter *formatter) {
     TestAnalyzer *self = (TestAnalyzer*)VTable_Make_Obj(TESTANALYZER);
-    return TestAnalyzer_init(self);
+    return TestAnalyzer_init(self, formatter);
 }
 
 TestAnalyzer*
-TestAnalyzer_init(TestAnalyzer *self) {
-    return (TestAnalyzer*)TestBatch_init((TestBatch*)self, 3);
+TestAnalyzer_init(TestAnalyzer *self, TestFormatter *formatter) {
+    return (TestAnalyzer*)TestBatch_init((TestBatch*)self, 3, formatter);
 }
 
 DummyAnalyzer*

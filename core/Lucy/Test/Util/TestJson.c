@@ -17,6 +17,7 @@
 #include <string.h>
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Util/TestJson.h"
 #include "Lucy/Util/Json.h"
@@ -24,18 +25,18 @@
 #include "Lucy/Store/RAMFolder.h"
 
 TestJson*
-TestJson_new() {
+TestJson_new(TestFormatter *formatter) {
     TestJson *self = (TestJson*)VTable_Make_Obj(TESTJSON);
-    return TestJson_init(self);
+    return TestJson_init(self, formatter);
 }
 
 TestJson*
-TestJson_init(TestJson *self) {
+TestJson_init(TestJson *self, TestFormatter *formatter) {
     int num_tests = 107;
 #ifndef LUCY_VALGRIND
     num_tests += 28; // FIXME: syntax errors leak memory.
 #endif
-    return (TestJson*)TestBatch_init((TestBatch*)self, num_tests);
+    return (TestJson*)TestBatch_init((TestBatch*)self, num_tests, formatter);
 }
 
 // Create a test data structure including at least one each of Hash, VArray,

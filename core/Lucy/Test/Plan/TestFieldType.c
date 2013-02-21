@@ -18,19 +18,20 @@
 #define C_LUCY_DUMMYFIELDTYPE
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Plan/TestFieldType.h"
 #include "Lucy/Test/TestUtils.h"
 
 TestFieldType*
-TestFType_new() {
+TestFType_new(TestFormatter *formatter) {
     TestFieldType *self = (TestFieldType*)VTable_Make_Obj(TESTFIELDTYPE);
-    return TestFType_init(self);
+    return TestFType_init(self, formatter);
 }
 
 TestFieldType*
-TestFType_init(TestFieldType *self) {
-    return (TestFieldType*)TestBatch_init((TestBatch*)self, 9);
+TestFType_init(TestFieldType *self, TestFormatter *formatter) {
+    return (TestFieldType*)TestBatch_init((TestBatch*)self, 9, formatter);
 }
 
 DummyFieldType*

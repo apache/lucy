@@ -20,10 +20,10 @@ class Lucy::Test::Analysis::TestSnowballStemmer cnick TestSnowStemmer
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestSnowballStemmer*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestSnowballStemmer*
-    init(TestSnowballStemmer *self);
+    init(TestSnowballStemmer *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestSnowballStemmer *self);

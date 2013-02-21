@@ -23,10 +23,10 @@ class Lucy::Test::Search::TestQueryParserLogic cnick TestQPLogic
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestQueryParserLogic*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestQueryParserLogic*
-    init(TestQueryParserLogic *self);
+    init(TestQueryParserLogic *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestQueryParserLogic *self);

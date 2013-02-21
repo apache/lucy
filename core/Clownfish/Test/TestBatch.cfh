@@ -25,10 +25,10 @@ abstract class Clownfish::Test::TestBatch inherits Clownfish::Obj {
     uint32_t       num_skipped;
 
     inert incremented TestBatch*
-    new(uint32_t num_planned);
+    new(uint32_t num_planned, TestFormatter *formatter);
 
     inert TestBatch*
-    init(TestBatch *self, uint32_t num_planned);
+    init(TestBatch *self, uint32_t num_planned, TestFormatter *formatter);
 
     public void
     Destroy(TestBatch *self);

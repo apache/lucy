@@ -20,10 +20,10 @@ class Lucy::Test::Plan::TestFullTextType
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestFullTextType*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestFullTextType*
-    init(TestFullTextType *self);
+    init(TestFullTextType *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestFullTextType *self);

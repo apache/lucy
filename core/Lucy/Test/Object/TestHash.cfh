@@ -20,10 +20,10 @@ class Lucy::Test::Object::TestHash
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestHash*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestHash*
-    init(TestHash *self);
+    init(TestHash *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestHash *self);

@@ -21,10 +21,10 @@ class Lucy::Test::Object::TestCharBuf cnick TestCB
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestCharBuf*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestCharBuf*
-    init(TestCharBuf *self);
+    init(TestCharBuf *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestCharBuf *self);

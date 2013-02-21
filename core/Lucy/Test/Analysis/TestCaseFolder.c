@@ -17,20 +17,21 @@
 #define C_LUCY_TESTCASEFOLDER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Analysis/TestCaseFolder.h"
 #include "Lucy/Analysis/CaseFolder.h"
 
 TestCaseFolder*
-TestCaseFolder_new() {
+TestCaseFolder_new(TestFormatter *formatter) {
     TestCaseFolder *self = (TestCaseFolder*)VTable_Make_Obj(TESTCASEFOLDER);
-    return TestCaseFolder_init(self);
+    return TestCaseFolder_init(self, formatter);
 }
 
 TestCaseFolder*
-TestCaseFolder_init(TestCaseFolder *self) {
-    return (TestCaseFolder*)TestBatch_init((TestBatch*)self, 6);
+TestCaseFolder_init(TestCaseFolder *self, TestFormatter *formatter) {
+    return (TestCaseFolder*)TestBatch_init((TestBatch*)self, 6, formatter);
 }
 
 static void

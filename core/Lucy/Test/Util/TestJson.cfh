@@ -20,10 +20,10 @@ class Lucy::Test::Util::TestJson
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestJson*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestJson*
-    init(TestJson *self);
+    init(TestJson *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestJson *self);

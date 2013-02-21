@@ -26,20 +26,21 @@
   #include <io.h> // close
 #endif
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestFSFileHandle.h"
 #include "Lucy/Store/FSFileHandle.h"
 #include "Lucy/Store/FileWindow.h"
 
 TestFSFileHandle*
-TestFSFH_new() {
+TestFSFH_new(TestFormatter *formatter) {
     TestFSFileHandle *self = (TestFSFileHandle*)VTable_Make_Obj(TESTFSFILEHANDLE);
-    return TestFSFH_init(self);
+    return TestFSFH_init(self, formatter);
 }
 
 TestFSFileHandle*
-TestFSFH_init(TestFSFileHandle *self) {
-    return (TestFSFileHandle*)TestBatch_init((TestBatch*)self, 46);
+TestFSFH_init(TestFSFileHandle *self, TestFormatter *formatter) {
+    return (TestFSFileHandle*)TestBatch_init((TestBatch*)self, 46, formatter);
 }
 
 static void

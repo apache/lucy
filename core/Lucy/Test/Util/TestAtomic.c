@@ -16,19 +16,20 @@
 
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Util/TestAtomic.h"
 #include "Clownfish/Util/Atomic.h"
 
 TestAtomic*
-TestAtomic_new() {
+TestAtomic_new(TestFormatter *formatter) {
     TestAtomic *self = (TestAtomic*)VTable_Make_Obj(TESTATOMIC);
-    return TestAtomic_init(self);
+    return TestAtomic_init(self, formatter);
 }
 
 TestAtomic*
-TestAtomic_init(TestAtomic *self) {
-    return (TestAtomic*)TestBatch_init((TestBatch*)self, 6);
+TestAtomic_init(TestAtomic *self, TestFormatter *formatter) {
+    return (TestAtomic*)TestBatch_init((TestBatch*)self, 6, formatter);
 }
 
 static void

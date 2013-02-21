@@ -17,19 +17,20 @@
 #define C_LUCY_TESTNUM
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestNum.h"
 
 TestNum*
-TestNum_new() {
+TestNum_new(TestFormatter *formatter) {
     TestNum *self = (TestNum*)VTable_Make_Obj(TESTNUM);
-    return TestNum_init(self);
+    return TestNum_init(self, formatter);
 }
 
 TestNum*
-TestNum_init(TestNum *self) {
-    return (TestNum*)TestBatch_init((TestBatch*)self, 58);
+TestNum_init(TestNum *self, TestFormatter *formatter) {
+    return (TestNum*)TestBatch_init((TestBatch*)self, 58, formatter);
 }
 
 static void

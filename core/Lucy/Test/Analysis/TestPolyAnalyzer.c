@@ -17,6 +17,7 @@
 #define C_LUCY_TESTPOLYANALYZER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Analysis/TestPolyAnalyzer.h"
@@ -27,14 +28,14 @@
 #include "Lucy/Analysis/StandardTokenizer.h"
 
 TestPolyAnalyzer*
-TestPolyAnalyzer_new() {
+TestPolyAnalyzer_new(TestFormatter *formatter) {
     TestPolyAnalyzer *self = (TestPolyAnalyzer*)VTable_Make_Obj(TESTPOLYANALYZER);
-    return TestPolyAnalyzer_init(self);
+    return TestPolyAnalyzer_init(self, formatter);
 }
 
 TestPolyAnalyzer*
-TestPolyAnalyzer_init(TestPolyAnalyzer *self) {
-    return (TestPolyAnalyzer*)TestBatch_init((TestBatch*)self, 19);
+TestPolyAnalyzer_init(TestPolyAnalyzer *self, TestFormatter *formatter) {
+    return (TestPolyAnalyzer*)TestBatch_init((TestBatch*)self, 19, formatter);
 }
 
 static void

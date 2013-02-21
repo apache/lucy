@@ -18,19 +18,20 @@
 #define C_LUCY_MEMORYPOOL
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Util/TestMemoryPool.h"
 #include "Lucy/Util/MemoryPool.h"
 
 TestMemoryPool*
-TestMemPool_new() {
+TestMemPool_new(TestFormatter *formatter) {
     TestMemoryPool *self = (TestMemoryPool*)VTable_Make_Obj(TESTMEMORYPOOL);
-    return TestMemPool_init(self);
+    return TestMemPool_init(self, formatter);
 }
 
 TestMemoryPool*
-TestMemPool_init(TestMemoryPool *self) {
-    return (TestMemoryPool*)TestBatch_init((TestBatch*)self, 4);
+TestMemPool_init(TestMemoryPool *self, TestFormatter *formatter) {
+    return (TestMemoryPool*)TestBatch_init((TestBatch*)self, 4, formatter);
 }
 
 void

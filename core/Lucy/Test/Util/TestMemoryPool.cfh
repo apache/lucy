@@ -20,10 +20,10 @@ class Lucy::Test::Util::TestMemoryPool cnick TestMemPool
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestMemoryPool*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestMemoryPool*
-    init(TestMemoryPool *self);
+    init(TestMemoryPool *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestMemoryPool *self);

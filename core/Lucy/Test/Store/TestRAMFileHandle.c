@@ -21,6 +21,7 @@
 #define C_LUCY_FILEWINDOW
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestRAMFileHandle.h"
 #include "Lucy/Store/RAMFileHandle.h"
@@ -28,14 +29,14 @@
 #include "Lucy/Store/RAMFile.h"
 
 TestRAMFileHandle*
-TestRAMFH_new() {
+TestRAMFH_new(TestFormatter *formatter) {
     TestRAMFileHandle *self = (TestRAMFileHandle*)VTable_Make_Obj(TESTRAMFILEHANDLE);
-    return TestRAMFH_init(self);
+    return TestRAMFH_init(self, formatter);
 }
 
 TestRAMFileHandle*
-TestRAMFH_init(TestRAMFileHandle *self) {
-    return (TestRAMFileHandle*)TestBatch_init((TestBatch*)self, 32);
+TestRAMFH_init(TestRAMFileHandle *self, TestFormatter *formatter) {
+    return (TestRAMFileHandle*)TestBatch_init((TestBatch*)self, 32, formatter);
 }
 
 static void

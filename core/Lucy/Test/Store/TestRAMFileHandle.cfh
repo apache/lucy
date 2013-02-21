@@ -20,10 +20,10 @@ class Lucy::Test::Store::TestRAMFileHandle cnick TestRAMFH
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestRAMFileHandle*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestRAMFileHandle*
-    init(TestRAMFileHandle *self);
+    init(TestRAMFileHandle *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestRAMFileHandle *self);

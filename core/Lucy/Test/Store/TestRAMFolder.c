@@ -17,6 +17,7 @@
 #define C_LUCY_RAMFOLDER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestRAMFolder.h"
 #include "Lucy/Store/RAMFolder.h"
@@ -38,14 +39,14 @@ static CharBuf *nope          = NULL;
 static CharBuf *nope_nyet     = NULL;
 
 TestRAMFolder*
-TestRAMFolder_new() {
+TestRAMFolder_new(TestFormatter *formatter) {
     TestRAMFolder *self = (TestRAMFolder*)VTable_Make_Obj(TESTRAMFOLDER);
-    return TestRAMFolder_init(self);
+    return TestRAMFolder_init(self, formatter);
 }
 
 TestRAMFolder*
-TestRAMFolder_init(TestRAMFolder *self) {
-    return (TestRAMFolder*)TestBatch_init((TestBatch*)self, 98);
+TestRAMFolder_init(TestRAMFolder *self, TestFormatter *formatter) {
+    return (TestRAMFolder*)TestBatch_init((TestBatch*)self, 98, formatter);
 }
 
 static void

@@ -20,10 +20,10 @@ class Lucy::Test::Store::TestFSFolder
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestFSFolder*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestFSFolder*
-    init(TestFSFolder *self);
+    init(TestFSFolder *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestFSFolder *self);

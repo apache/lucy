@@ -17,19 +17,20 @@
 #define C_LUCY_TESTBYTEBUF
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestByteBuf.h"
 
 TestByteBuf*
-TestBB_new() {
+TestBB_new(TestFormatter *formatter) {
     TestByteBuf *self = (TestByteBuf*)VTable_Make_Obj(TESTBYTEBUF);
-    return TestBB_init(self);
+    return TestBB_init(self, formatter);
 }
 
 TestByteBuf*
-TestBB_init(TestByteBuf *self) {
-    return (TestByteBuf*)TestBatch_init((TestBatch*)self, 22);
+TestBB_init(TestByteBuf *self, TestFormatter *formatter) {
+    return (TestByteBuf*)TestBatch_init((TestBatch*)self, 22, formatter);
 }
 
 static void

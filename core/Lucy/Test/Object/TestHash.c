@@ -18,20 +18,21 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestHash.h"
 #include "Clownfish/Hash.h"
 
 TestHash*
-TestHash_new() {
+TestHash_new(TestFormatter *formatter) {
     TestHash *self = (TestHash*)VTable_Make_Obj(TESTHASH);
-    return TestHash_init(self);
+    return TestHash_init(self, formatter);
 }
 
 TestHash*
-TestHash_init(TestHash *self) {
-    return (TestHash*)TestBatch_init((TestBatch*)self, 29);
+TestHash_init(TestHash *self, TestFormatter *formatter) {
+    return (TestHash*)TestBatch_init((TestBatch*)self, 29, formatter);
 }
 
 static void

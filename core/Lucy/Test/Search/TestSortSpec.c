@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Search/TestSortSpec.h"
 #include "Lucy/Test/TestUtils.h"
@@ -68,14 +69,14 @@ static CharBuf *random_int32s_cb;
 static CharBuf *random_int64s_cb;
 
 TestSortSpec*
-TestSortSpec_new() {
+TestSortSpec_new(TestFormatter *formatter) {
     TestSortSpec *self = (TestSortSpec*)VTable_Make_Obj(TESTSORTSPEC);
-    return TestSortSpec_init(self);
+    return TestSortSpec_init(self, formatter);
 }
 
 TestSortSpec*
-TestSortSpec_init(TestSortSpec *self) {
-    return (TestSortSpec*)TestBatch_init((TestBatch*)self, 18);
+TestSortSpec_init(TestSortSpec *self, TestFormatter *formatter) {
+    return (TestSortSpec*)TestBatch_init((TestBatch*)self, 18, formatter);
 }
 
 static void

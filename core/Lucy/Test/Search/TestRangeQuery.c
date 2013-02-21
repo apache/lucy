@@ -18,20 +18,21 @@
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Search/TestRangeQuery.h"
 #include "Lucy/Search/RangeQuery.h"
 
 TestRangeQuery*
-TestRangeQuery_new() {
+TestRangeQuery_new(TestFormatter *formatter) {
     TestRangeQuery *self = (TestRangeQuery*)VTable_Make_Obj(TESTRANGEQUERY);
-    return TestRangeQuery_init(self);
+    return TestRangeQuery_init(self, formatter);
 }
 
 TestRangeQuery*
-TestRangeQuery_init(TestRangeQuery *self) {
-    return (TestRangeQuery*)TestBatch_init((TestBatch*)self, 5);
+TestRangeQuery_init(TestRangeQuery *self, TestFormatter *formatter) {
+    return (TestRangeQuery*)TestBatch_init((TestBatch*)self, 5, formatter);
 }
 
 static void

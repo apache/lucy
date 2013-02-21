@@ -19,6 +19,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestCharBuf.h"
@@ -27,14 +28,14 @@ static char smiley[] = { (char)0xE2, (char)0x98, (char)0xBA, 0 };
 static uint32_t smiley_len = 3;
 
 TestCharBuf*
-TestCB_new() {
+TestCB_new(TestFormatter *formatter) {
     TestCharBuf *self = (TestCharBuf*)VTable_Make_Obj(TESTCHARBUF);
-    return TestCB_init(self);
+    return TestCB_init(self, formatter);
 }
 
 TestCharBuf*
-TestCB_init(TestCharBuf *self) {
-    return (TestCharBuf*)TestBatch_init((TestBatch*)self, 55);
+TestCB_init(TestCharBuf *self, TestFormatter *formatter) {
+    return (TestCharBuf*)TestBatch_init((TestBatch*)self, 55, formatter);
 }
 
 static CharBuf*

@@ -20,10 +20,10 @@ class Lucy::Test::Store::TestCompoundFileWriter cnick TestCFWriter
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestCompoundFileWriter*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestCompoundFileWriter*
-    init(TestCompoundFileWriter *self);
+    init(TestCompoundFileWriter *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestCompoundFileWriter *self);

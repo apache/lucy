@@ -16,6 +16,7 @@
 
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestCompoundFileWriter.h"
 #include "Lucy/Store/CompoundFileWriter.h"
@@ -32,14 +33,14 @@ static CharBuf *bar         = NULL;
 static CharBuf *seg_1       = NULL;
 
 TestCompoundFileWriter*
-TestCFWriter_new() {
+TestCFWriter_new(TestFormatter *formatter) {
     TestCompoundFileWriter *self = (TestCompoundFileWriter*)VTable_Make_Obj(TESTCOMPOUNDFILEWRITER);
-    return TestCFWriter_init(self);
+    return TestCFWriter_init(self, formatter);
 }
 
 TestCompoundFileWriter*
-TestCFWriter_init(TestCompoundFileWriter *self) {
-    return (TestCompoundFileWriter*)TestBatch_init((TestBatch*)self, 7);
+TestCFWriter_init(TestCompoundFileWriter *self, TestFormatter *formatter) {
+    return (TestCompoundFileWriter*)TestBatch_init((TestBatch*)self, 7, formatter);
 }
 
 static void

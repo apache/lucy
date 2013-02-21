@@ -37,10 +37,10 @@ class Lucy::Test::TestBatchSchema
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestBatchSchema*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestBatchSchema*
-    init(TestBatchSchema *self);
+    init(TestBatchSchema *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestBatchSchema *self);

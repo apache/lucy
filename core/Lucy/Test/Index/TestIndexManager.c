@@ -16,19 +16,20 @@
 
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Index/TestIndexManager.h"
 #include "Lucy/Index/IndexManager.h"
 
 TestIndexManager*
-TestIxManager_new() {
+TestIxManager_new(TestFormatter *formatter) {
     TestIndexManager *self = (TestIndexManager*)VTable_Make_Obj(TESTINDEXMANAGER);
-    return TestIxManager_init(self);
+    return TestIxManager_init(self, formatter);
 }
 
 TestIndexManager*
-TestIxManager_init(TestIndexManager *self) {
-    return (TestIndexManager*)TestBatch_init((TestBatch*)self, 34);
+TestIxManager_init(TestIndexManager *self, TestFormatter *formatter) {
+    return (TestIndexManager*)TestBatch_init((TestBatch*)self, 34, formatter);
 }
 
 static void

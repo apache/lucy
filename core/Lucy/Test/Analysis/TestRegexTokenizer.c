@@ -17,20 +17,21 @@
 #define C_LUCY_TESTREGEXTOKENIZER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Analysis/TestRegexTokenizer.h"
 #include "Lucy/Analysis/RegexTokenizer.h"
 
 
 TestRegexTokenizer*
-TestRegexTokenizer_new() {
+TestRegexTokenizer_new(TestFormatter *formatter) {
     TestRegexTokenizer *self = (TestRegexTokenizer*)VTable_Make_Obj(TESTREGEXTOKENIZER);
-    return TestRegexTokenizer_init(self);
+    return TestRegexTokenizer_init(self, formatter);
 }
 
 TestRegexTokenizer*
-TestRegexTokenizer_init(TestRegexTokenizer *self) {
-    return (TestRegexTokenizer*)TestBatch_init((TestBatch*)self, 3);
+TestRegexTokenizer_init(TestRegexTokenizer *self, TestFormatter *formatter) {
+    return (TestRegexTokenizer*)TestBatch_init((TestBatch*)self, 3, formatter);
 }
 
 static void

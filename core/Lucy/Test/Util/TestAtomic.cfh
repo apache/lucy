@@ -20,10 +20,10 @@ class Lucy::Test::Util::TestAtomic
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestAtomic*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestAtomic*
-    init(TestAtomic *self);
+    init(TestAtomic *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestAtomic *self);

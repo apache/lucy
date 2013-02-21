@@ -19,6 +19,7 @@
 #include "Lucy/Util/ToolSet.h"
 #include <string.h>
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Search/TestQueryParserSyntax.h"
 #include "Lucy/Test/Search/TestQueryParser.h"
@@ -49,15 +50,15 @@
 #define make_poly_query   (Query*)lucy_TestUtils_make_poly_query
 
 TestQueryParserSyntax*
-TestQPSyntax_new() {
+TestQPSyntax_new(TestFormatter *formatter) {
     TestQueryParserSyntax *self
         = (TestQueryParserSyntax*)VTable_Make_Obj(TESTQUERYPARSERSYNTAX);
-    return TestQPSyntax_init(self);
+    return TestQPSyntax_init(self, formatter);
 }
 
 TestQueryParserSyntax*
-TestQPSyntax_init(TestQueryParserSyntax *self) {
-    return (TestQueryParserSyntax*)TestBatch_init((TestBatch*)self, 68);
+TestQPSyntax_init(TestQueryParserSyntax *self, TestFormatter *formatter) {
+    return (TestQueryParserSyntax*)TestBatch_init((TestBatch*)self, 68, formatter);
 }
 
 static Folder*

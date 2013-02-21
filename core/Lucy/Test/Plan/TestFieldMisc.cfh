@@ -20,10 +20,10 @@ class Lucy::Test::Plan::TestFieldMisc
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestFieldMisc*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestFieldMisc*
-    init(TestFieldMisc *self);
+    init(TestFieldMisc *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestFieldMisc *self);

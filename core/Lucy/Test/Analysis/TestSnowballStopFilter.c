@@ -17,19 +17,20 @@
 #define C_LUCY_TESTSNOWBALLSTOPFILTER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Analysis/TestSnowballStopFilter.h"
 #include "Lucy/Analysis/SnowballStopFilter.h"
 
 TestSnowballStopFilter*
-TestSnowStop_new() {
+TestSnowStop_new(TestFormatter *formatter) {
     TestSnowballStopFilter *self = (TestSnowballStopFilter*)VTable_Make_Obj(TESTSNOWBALLSTOPFILTER);
-    return TestSnowStop_init(self);
+    return TestSnowStop_init(self, formatter);
 }
 
 TestSnowballStopFilter*
-TestSnowStop_init(TestSnowballStopFilter *self) {
-    return (TestSnowballStopFilter*)TestBatch_init((TestBatch*)self, 3);
+TestSnowStop_init(TestSnowballStopFilter *self, TestFormatter *formatter) {
+    return (TestSnowballStopFilter*)TestBatch_init((TestBatch*)self, 3, formatter);
 }
 
 static SnowballStopFilter*

@@ -17,19 +17,20 @@
 #define C_LUCY_TESTDOCWRITER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Index/TestDocWriter.h"
 #include "Lucy/Index/DocWriter.h"
 
 TestDocWriter*
-TestDocWriter_new() {
+TestDocWriter_new(TestFormatter *formatter) {
     TestDocWriter *self = (TestDocWriter*)VTable_Make_Obj(TESTDOCWRITER);
-    return TestDocWriter_init(self);
+    return TestDocWriter_init(self, formatter);
 }
 
 TestDocWriter*
-TestDocWriter_init(TestDocWriter *self) {
-    return (TestDocWriter*)TestBatch_init((TestBatch*)self, 1);
+TestDocWriter_init(TestDocWriter *self, TestFormatter *formatter) {
+    return (TestDocWriter*)TestBatch_init((TestBatch*)self, 1, formatter);
 }
 
 void

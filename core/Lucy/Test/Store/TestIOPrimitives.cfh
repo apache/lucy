@@ -22,10 +22,10 @@ class Lucy::Test::Store::TestIOPrimitives
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestIOPrimitives*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestIOPrimitives*
-    init(TestIOPrimitives *self);
+    init(TestIOPrimitives *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestIOPrimitives *self);

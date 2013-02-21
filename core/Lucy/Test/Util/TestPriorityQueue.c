@@ -17,19 +17,20 @@
 #define C_LUCY_TESTPRIORITYQUEUE
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Util/TestPriorityQueue.h"
 #include "Lucy/Util/PriorityQueue.h"
 
 TestPriorityQueue*
-TestPriQ_new() {
+TestPriQ_new(TestFormatter *formatter) {
     TestPriorityQueue *self = (TestPriorityQueue*)VTable_Make_Obj(TESTPRIORITYQUEUE);
-    return TestPriQ_init(self);
+    return TestPriQ_init(self, formatter);
 }
 
 TestPriorityQueue*
-TestPriQ_init(TestPriorityQueue *self) {
-    return (TestPriorityQueue*)TestBatch_init((TestBatch*)self, 17);
+TestPriQ_init(TestPriorityQueue *self, TestFormatter *formatter) {
+    return (TestPriorityQueue*)TestBatch_init((TestBatch*)self, 17, formatter);
 }
 
 NumPriorityQueue*

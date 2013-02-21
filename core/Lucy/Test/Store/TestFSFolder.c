@@ -31,6 +31,7 @@
   #include <sys/stat.h>
 #endif
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestFSFolder.h"
 #include "Lucy/Test/Store/TestFolderCommon.h"
@@ -48,15 +49,15 @@ S_create_test_symlinks(void);
 #endif /* CHY_HAS_WINDOWS_H */
 
 TestFSFolder*
-TestFSFolder_new() {
+TestFSFolder_new(TestFormatter *formatter) {
     TestFSFolder *self = (TestFSFolder*)VTable_Make_Obj(TESTFSFOLDER);
-    return TestFSFolder_init(self);
+    return TestFSFolder_init(self, formatter);
 }
 
 TestFSFolder*
-TestFSFolder_init(TestFSFolder *self) {
+TestFSFolder_init(TestFSFolder *self, TestFormatter *formatter) {
     uint32_t num_tests = TestFolderCommon_num_tests() + 9;
-    return (TestFSFolder*)TestBatch_init((TestBatch*)self, num_tests);
+    return (TestFSFolder*)TestBatch_init((TestBatch*)self, num_tests, formatter);
 }
 
 static Folder*

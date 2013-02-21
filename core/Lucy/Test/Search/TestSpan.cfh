@@ -20,10 +20,10 @@ class Lucy::Test::Search::TestSpan
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestSpan*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestSpan*
-    init(TestSpan *self);
+    init(TestSpan *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestSpan *self);

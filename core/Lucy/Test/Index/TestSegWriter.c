@@ -17,19 +17,20 @@
 #define C_LUCY_TESTSEGWRITER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Index/TestSegWriter.h"
 #include "Lucy/Index/SegWriter.h"
 
 TestSegWriter*
-TestSegWriter_new() {
+TestSegWriter_new(TestFormatter *formatter) {
     TestSegWriter *self = (TestSegWriter*)VTable_Make_Obj(TESTSEGWRITER);
-    return TestSegWriter_init(self);
+    return TestSegWriter_init(self, formatter);
 }
 
 TestSegWriter*
-TestSegWriter_init(TestSegWriter *self) {
-    return (TestSegWriter*)TestBatch_init((TestBatch*)self, 1);
+TestSegWriter_init(TestSegWriter *self, TestFormatter *formatter) {
+    return (TestSegWriter*)TestBatch_init((TestBatch*)self, 1, formatter);
 }
 
 void

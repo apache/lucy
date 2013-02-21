@@ -18,6 +18,7 @@
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Search/TestReqOptQuery.h"
@@ -25,14 +26,14 @@
 #include "Lucy/Search/LeafQuery.h"
 
 TestReqOptQuery*
-TestReqOptQuery_new() {
+TestReqOptQuery_new(TestFormatter *formatter) {
     TestReqOptQuery *self = (TestReqOptQuery*)VTable_Make_Obj(TESTREQOPTQUERY);
-    return TestReqOptQuery_init(self);
+    return TestReqOptQuery_init(self, formatter);
 }
 
 TestReqOptQuery*
-TestReqOptQuery_init(TestReqOptQuery *self) {
-    return (TestReqOptQuery*)TestBatch_init((TestBatch*)self, 4);
+TestReqOptQuery_init(TestReqOptQuery *self, TestFormatter *formatter) {
+    return (TestReqOptQuery*)TestBatch_init((TestBatch*)self, 4, formatter);
 }
 
 static void

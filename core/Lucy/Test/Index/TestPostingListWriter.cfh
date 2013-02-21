@@ -20,10 +20,10 @@ class Lucy::Test::Index::TestPostingListWriter cnick TestPListWriter
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestPostingListWriter*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestPostingListWriter*
-    init(TestPostingListWriter *self);
+    init(TestPostingListWriter *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestPostingListWriter *self);

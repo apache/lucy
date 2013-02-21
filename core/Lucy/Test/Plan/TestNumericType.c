@@ -17,6 +17,7 @@
 #define C_LUCY_TESTNUMERICTYPE
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Plan/TestNumericType.h"
 #include "Lucy/Test/TestUtils.h"
@@ -24,14 +25,14 @@
 #include "Lucy/Plan/NumericType.h"
 
 TestNumericType*
-TestNumericType_new() {
+TestNumericType_new(TestFormatter *formatter) {
     TestNumericType *self = (TestNumericType*)VTable_Make_Obj(TESTNUMERICTYPE);
-    return TestNumericType_init(self);
+    return TestNumericType_init(self, formatter);
 }
 
 TestNumericType*
-TestNumericType_init(TestNumericType *self) {
-    return (TestNumericType*)TestBatch_init((TestBatch*)self, 12);
+TestNumericType_init(TestNumericType *self, TestFormatter *formatter) {
+    return (TestNumericType*)TestBatch_init((TestBatch*)self, 12, formatter);
 }
 
 static void

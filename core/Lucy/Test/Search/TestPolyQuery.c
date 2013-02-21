@@ -18,6 +18,7 @@
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Search/TestPolyQuery.h"
@@ -27,25 +28,25 @@
 #include "Lucy/Search/LeafQuery.h"
 
 TestANDQuery*
-TestANDQuery_new() {
+TestANDQuery_new(TestFormatter *formatter) {
     TestANDQuery *self = (TestANDQuery*)VTable_Make_Obj(TESTANDQUERY);
-    return TestANDQuery_init(self);
+    return TestANDQuery_init(self, formatter);
 }
 
 TestANDQuery*
-TestANDQuery_init(TestANDQuery *self) {
-    return (TestANDQuery*)TestBatch_init((TestBatch*)self, 4);
+TestANDQuery_init(TestANDQuery *self, TestFormatter *formatter) {
+    return (TestANDQuery*)TestBatch_init((TestBatch*)self, 4, formatter);
 }
 
 TestORQuery*
-TestORQuery_new() {
+TestORQuery_new(TestFormatter *formatter) {
     TestORQuery *self = (TestORQuery*)VTable_Make_Obj(TESTORQUERY);
-    return TestORQuery_init(self);
+    return TestORQuery_init(self, formatter);
 }
 
 TestORQuery*
-TestORQuery_init(TestORQuery *self) {
-    return (TestORQuery*)TestBatch_init((TestBatch*)self, 4);
+TestORQuery_init(TestORQuery *self, TestFormatter *formatter) {
+    return (TestORQuery*)TestBatch_init((TestBatch*)self, 4, formatter);
 }
 
 static void

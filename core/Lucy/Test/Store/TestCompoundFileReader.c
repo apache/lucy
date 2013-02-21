@@ -17,6 +17,7 @@
 #define C_LUCY_RAMFOLDER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestCompoundFileReader.h"
 #include "Lucy/Store/CompoundFileReader.h"
@@ -37,14 +38,14 @@ static CharBuf *seg_1       = NULL;
 static CharBuf *stuff       = NULL;
 
 TestCompoundFileReader*
-TestCFReader_new() {
+TestCFReader_new(TestFormatter *formatter) {
     TestCompoundFileReader *self = (TestCompoundFileReader*)VTable_Make_Obj(TESTCOMPOUNDFILEREADER);
-    return TestCFReader_init(self);
+    return TestCFReader_init(self, formatter);
 }
 
 TestCompoundFileReader*
-TestCFReader_init(TestCompoundFileReader *self) {
-    return (TestCompoundFileReader*)TestBatch_init((TestBatch*)self, 48);
+TestCFReader_init(TestCompoundFileReader *self, TestFormatter *formatter) {
+    return (TestCompoundFileReader*)TestBatch_init((TestBatch*)self, 48, formatter);
 }
 
 static void

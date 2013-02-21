@@ -17,6 +17,7 @@
 #define C_LUCY_TESTSCHEMA
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Plan/TestArchitecture.h"
 #include "Lucy/Test/TestSchema.h"
@@ -52,14 +53,14 @@ TestSchema_architecture(TestSchema *self) {
 }
 
 TestBatchSchema*
-TestBatchSchema_new() {
+TestBatchSchema_new(TestFormatter *formatter) {
     TestBatchSchema *self = (TestBatchSchema*)VTable_Make_Obj(TESTBATCHSCHEMA);
-    return TestBatchSchema_init(self);
+    return TestBatchSchema_init(self, formatter);
 }
 
 TestBatchSchema*
-TestBatchSchema_init(TestBatchSchema *self) {
-    return (TestBatchSchema*)TestBatch_init((TestBatch*)self, 4);
+TestBatchSchema_init(TestBatchSchema *self, TestFormatter *formatter) {
+    return (TestBatchSchema*)TestBatch_init((TestBatch*)self, 4, formatter);
 }
 
 static void

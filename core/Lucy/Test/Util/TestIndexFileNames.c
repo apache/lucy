@@ -16,19 +16,20 @@
 
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Util/TestIndexFileNames.h"
 #include "Lucy/Util/IndexFileNames.h"
 
 TestIndexFileNames*
-TestIxFileNames_new() {
+TestIxFileNames_new(TestFormatter *formatter) {
     TestIndexFileNames *self = (TestIndexFileNames*)VTable_Make_Obj(TESTINDEXFILENAMES);
-    return TestIxFileNames_init(self);
+    return TestIxFileNames_init(self, formatter);
 }
 
 TestIndexFileNames*
-TestIxFileNames_init(TestIndexFileNames *self) {
-    return (TestIndexFileNames*)TestBatch_init((TestBatch*)self, 10);
+TestIxFileNames_init(TestIndexFileNames *self, TestFormatter *formatter) {
+    return (TestIndexFileNames*)TestBatch_init((TestBatch*)self, 10, formatter);
 }
 
 static void

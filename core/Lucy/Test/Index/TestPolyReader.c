@@ -17,19 +17,20 @@
 #define C_LUCY_TESTPOLYREADER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Index/TestPolyReader.h"
 #include "Lucy/Index/PolyReader.h"
 
 TestPolyReader*
-TestPolyReader_new() {
+TestPolyReader_new(TestFormatter *formatter) {
     TestPolyReader *self = (TestPolyReader*)VTable_Make_Obj(TESTPOLYREADER);
-    return TestPolyReader_init(self);
+    return TestPolyReader_init(self, formatter);
 }
 
 TestPolyReader*
-TestPolyReader_init(TestPolyReader *self) {
-    return (TestPolyReader*)TestBatch_init((TestBatch*)self, 1);
+TestPolyReader_init(TestPolyReader *self, TestFormatter *formatter) {
+    return (TestPolyReader*)TestBatch_init((TestBatch*)self, 1, formatter);
 }
 
 static void

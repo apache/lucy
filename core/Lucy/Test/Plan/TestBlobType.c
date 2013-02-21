@@ -17,20 +17,21 @@
 #define C_LUCY_TESTBLOBTYPE
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Plan/TestBlobType.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Plan/BlobType.h"
 
 TestBlobType*
-TestBlobType_new() {
+TestBlobType_new(TestFormatter *formatter) {
     TestBlobType *self = (TestBlobType*)VTable_Make_Obj(TESTBLOBTYPE);
-    return TestBlobType_init(self);
+    return TestBlobType_init(self, formatter);
 }
 
 TestBlobType*
-TestBlobType_init(TestBlobType *self) {
-    return (TestBlobType*)TestBatch_init((TestBatch*)self, 2);
+TestBlobType_init(TestBlobType *self, TestFormatter *formatter) {
+    return (TestBlobType*)TestBatch_init((TestBatch*)self, 2, formatter);
 }
 
 static void

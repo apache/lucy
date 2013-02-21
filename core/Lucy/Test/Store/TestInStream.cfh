@@ -24,10 +24,10 @@ class Lucy::Test::Store::TestInStream
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestInStream*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestInStream*
-    init(TestInStream *self);
+    init(TestInStream *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestInStream *self);

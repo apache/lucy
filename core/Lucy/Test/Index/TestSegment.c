@@ -17,20 +17,21 @@
 #define C_LUCY_TESTSEG
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Index/TestSegment.h"
 #include "Lucy/Index/Segment.h"
 #include "Lucy/Store/RAMFolder.h"
 
 TestSegment*
-TestSeg_new() {
+TestSeg_new(TestFormatter *formatter) {
     TestSegment *self = (TestSegment*)VTable_Make_Obj(TESTSEGMENT);
-    return TestSeg_init(self);
+    return TestSeg_init(self, formatter);
 }
 
 TestSegment*
-TestSeg_init(TestSegment *self) {
-    return (TestSegment*)TestBatch_init((TestBatch*)self, 21);
+TestSeg_init(TestSegment *self, TestFormatter *formatter) {
+    return (TestSegment*)TestBatch_init((TestBatch*)self, 21, formatter);
 }
 
 static void

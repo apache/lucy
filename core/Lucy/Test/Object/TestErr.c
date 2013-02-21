@@ -16,20 +16,21 @@
 
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Test/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestErr.h"
 #include "Clownfish/Err.h"
 
 TestErr*
-TestErr_new() {
+TestErr_new(TestFormatter *formatter) {
     TestErr *self = (TestErr*)VTable_Make_Obj(TESTERR);
-    return TestErr_init(self);
+    return TestErr_init(self, formatter);
 }
 
 TestErr*
-TestErr_init(TestErr *self) {
-    return (TestErr*)TestBatch_init((TestBatch*)self, 1);
+TestErr_init(TestErr *self, TestFormatter *formatter) {
+    return (TestErr*)TestBatch_init((TestBatch*)self, 1, formatter);
 }
 
 static void

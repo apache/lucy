@@ -20,10 +20,10 @@ class Lucy::Test::Analysis::TestSnowballStopFilter cnick TestSnowStop
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestSnowballStopFilter*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestSnowballStopFilter*
-    init(TestSnowballStopFilter *self);
+    init(TestSnowballStopFilter *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestSnowballStopFilter *self);

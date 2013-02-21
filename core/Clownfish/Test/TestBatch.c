@@ -31,22 +31,23 @@ S_vtest_true(TestBatch *self, bool condition, const char *pattern,
              va_list args);
 
 TestBatch*
-TestBatch_new(uint32_t num_planned) {
+TestBatch_new(uint32_t num_planned, TestFormatter *formatter) {
     TestBatch *self = (TestBatch*)VTable_Make_Obj(TESTBATCH);
-    return TestBatch_init(self, num_planned);
+    return TestBatch_init(self, num_planned, formatter);
 }
 
 TestBatch*
-TestBatch_init(TestBatch *self, uint32_t num_planned) {
+TestBatch_init(TestBatch *self, uint32_t num_planned,
+               TestFormatter *formatter) {
     // Assign.
-    self->num_planned     = num_planned;
+    self->num_planned = num_planned;
+    self->formatter   = (TestFormatter*)INCREF(formatter);
 
     // Initialize.
-    self->formatter       = (TestFormatter*)TestFormatterTAP_new();
-    self->test_num        = 0;
-    self->num_passed      = 0;
-    self->num_failed      = 0;
-    self->num_skipped     = 0;
+    self->test_num    = 0;
+    self->num_passed  = 0;
+    self->num_failed  = 0;
+    self->num_skipped = 0;
 
     return self;
 }

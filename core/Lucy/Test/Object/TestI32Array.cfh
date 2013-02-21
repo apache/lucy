@@ -20,10 +20,10 @@ class Lucy::Test::Object::TestI32Array cnick TestI32Arr
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestI32Array*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestI32Array*
-    init(TestI32Array *self);
+    init(TestI32Array *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestI32Array *self);

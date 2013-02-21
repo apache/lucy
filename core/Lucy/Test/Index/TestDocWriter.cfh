@@ -20,10 +20,10 @@ class Lucy::Test::Index::TestDocWriter
     inherits Clownfish::Test::TestBatch {
 
     inert incremented TestDocWriter*
-    new();
+    new(TestFormatter *formatter);
 
     inert TestDocWriter*
-    init(TestDocWriter *self);
+    init(TestDocWriter *self, TestFormatter *formatter);
 
     void
     Run_Tests(TestDocWriter *self);
