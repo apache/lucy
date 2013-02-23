@@ -78,7 +78,7 @@ S_strip(char *comment) {
     FREEMEM(scratch);
 }
 
-const static CFCMeta CFCDOCUCOMMENT_META = {
+static const CFCMeta CFCDOCUCOMMENT_META = {
     "Clownfish::CFC::Model::DocuComment",
     sizeof(CFCDocuComment),
     (CFCBase_destroy_t)CFCDocuComment_destroy

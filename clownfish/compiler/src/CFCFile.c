@@ -43,7 +43,7 @@ struct CFCFile {
     char *guard_close;
 };
 
-const static CFCMeta CFCFILE_META = {
+static const CFCMeta CFCFILE_META = {
     "Clownfish::CFC::Model::File",
     sizeof(CFCFile),
     (CFCBase_destroy_t)CFCFile_destroy

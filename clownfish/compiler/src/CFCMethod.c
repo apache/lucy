@@ -43,7 +43,7 @@ struct CFCMethod {
     int is_novel;
 };
 
-const static CFCMeta CFCMETHOD_META = {
+static const CFCMeta CFCMETHOD_META = {
     "Clownfish::CFC::Model::Method",
     sizeof(CFCMethod),
     (CFCBase_destroy_t)CFCMethod_destroy

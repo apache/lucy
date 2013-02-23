@@ -30,7 +30,7 @@ struct CFCMemPool {
     char **arenas;
 };
 
-const static CFCMeta CFCMEMPOOL_META = {
+static const CFCMeta CFCMEMPOOL_META = {
     "Clownfish::MemPool",
     sizeof(CFCMemPool),
     (CFCBase_destroy_t)CFCMemPool_destroy

@@ -46,7 +46,7 @@ struct CFCRuby {
 static void
 S_replace_double_colons(char *text, char replacement);
 
-const static CFCMeta CFCRUBY_META = {
+static const CFCMeta CFCRUBY_META = {
     "Clownfish::CFC::Binding::Ruby",
     sizeof(CFCRuby),
     (CFCBase_destroy_t)CFCRuby_destroy

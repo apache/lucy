@@ -104,7 +104,7 @@ S_create_dumpables(CFCClass *self);
 static void
 S_bequeath_methods(CFCClass *self);
 
-const static CFCMeta CFCCLASS_META = {
+static const CFCMeta CFCCLASS_META = {
     "Clownfish::CFC::Model::Class",
     sizeof(CFCClass),
     (CFCBase_destroy_t)CFCClass_destroy

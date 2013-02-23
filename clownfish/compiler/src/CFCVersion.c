@@ -34,7 +34,7 @@ struct CFCVersion {
     char *vstring;
 };
 
-const static CFCMeta CFCVERSION_META = {
+static const CFCMeta CFCVERSION_META = {
     "Clownfish::CFC::Model::Version",
     sizeof(CFCVersion),
     (CFCBase_destroy_t)CFCVersion_destroy

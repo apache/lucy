@@ -100,7 +100,7 @@ static char*
 S_obj_callback_def(CFCMethod *method, const char *callback_start,
                    const char *refcount_mods);
 
-const static CFCMeta CFCPERLMETHOD_META = {
+static const CFCMeta CFCPERLMETHOD_META = {
     "Clownfish::CFC::Binding::Perl::Method",
     sizeof(CFCPerlMethod),
     (CFCBase_destroy_t)CFCPerlMethod_destroy

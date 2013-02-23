@@ -36,7 +36,7 @@ struct CFCFileSpec {
     int is_included;
 };
 
-const static CFCMeta CFCFILESPEC_META = {
+static const CFCMeta CFCFILESPEC_META = {
     "Clownfish::CFC::Model::FileSpec",
     sizeof(CFCFileSpec),
     (CFCBase_destroy_t)CFCFileSpec_destroy

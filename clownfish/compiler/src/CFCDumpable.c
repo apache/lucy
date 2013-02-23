@@ -61,7 +61,7 @@ struct CFCDumpable {
     CFCBase base;
 };
 
-const static CFCMeta CFCDUMPABLE_META = {
+static const CFCMeta CFCDUMPABLE_META = {
     "Clownfish::CFC::Dumpable",
     sizeof(CFCDumpable),
     (CFCBase_destroy_t)CFCDumpable_destroy

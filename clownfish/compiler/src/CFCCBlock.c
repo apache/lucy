@@ -24,7 +24,7 @@ struct CFCCBlock {
     char *contents;
 };
 
-const static CFCMeta CFCCBLOCK_META = {
+static const CFCMeta CFCCBLOCK_META = {
     "Clownfish::CFC::Model::CBlock",
     sizeof(CFCCBlock),
     (CFCBase_destroy_t)CFCCBlock_destroy

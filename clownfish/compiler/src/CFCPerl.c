@@ -57,7 +57,7 @@ S_replace_double_colons(char *text, char replacement);
 static void
 S_write_callbacks_c(CFCPerl *self);
 
-const static CFCMeta CFCPERL_META = {
+static const CFCMeta CFCPERL_META = {
     "Clownfish::CFC::Binding::Perl",
     sizeof(CFCPerl),
     (CFCBase_destroy_t)CFCPerl_destroy

@@ -126,7 +126,7 @@ S_validate_name_or_cnick(const char *orig) {
     return true;
 }
 
-const static CFCMeta CFCPARCEL_META = {
+static const CFCMeta CFCPARCEL_META = {
     "Clownfish::CFC::Model::Parcel",
     sizeof(CFCParcel),
     (CFCBase_destroy_t)CFCParcel_destroy

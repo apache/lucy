@@ -45,7 +45,7 @@ struct CFCParser {
     CFCParcel  *parcel;
 };
 
-const static CFCMeta CFCPARSER_META = {
+static const CFCMeta CFCPARSER_META = {
     "Clownfish::CFC::Parser",
     sizeof(CFCParser),
     (CFCBase_destroy_t)CFCParser_destroy

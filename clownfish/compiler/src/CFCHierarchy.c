@@ -84,7 +84,7 @@ S_fetch_file(CFCHierarchy *self, const char *path_part);
 static int
 S_do_propagate_modified(CFCHierarchy *self, CFCClass *klass, int modified);
 
-const static CFCMeta CFCHIERARCHY_META = {
+static const CFCMeta CFCHIERARCHY_META = {
     "Clownfish::CFC::Model::Hierarchy",
     sizeof(CFCHierarchy),
     (CFCBase_destroy_t)CFCHierarchy_destroy

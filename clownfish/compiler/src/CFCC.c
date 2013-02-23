@@ -34,7 +34,7 @@ struct CFCC {
     char         *footer;
 };
 
-const static CFCMeta CFCC_META = {
+static const CFCMeta CFCC_META = {
     "Clownfish::CFC::Binding::C",
     sizeof(CFCC),
     (CFCBase_destroy_t)CFCC_destroy

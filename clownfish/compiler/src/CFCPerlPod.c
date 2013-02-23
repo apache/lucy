@@ -49,7 +49,7 @@ struct CFCPerlPod {
     size_t   num_constructors;
 };
 
-const static CFCMeta CFCPERLPOD_META = {
+static const CFCMeta CFCPERLPOD_META = {
     "Clownfish::CFC::Binding::Perl::Pod",
     sizeof(CFCPerlPod),
     (CFCBase_destroy_t)CFCPerlPod_destroy

@@ -37,7 +37,7 @@ struct CFCParamList {
 static void
 S_generate_c_strings(CFCParamList *self);
 
-const static CFCMeta CFCPARAMLIST_META = {
+static const CFCMeta CFCPARAMLIST_META = {
     "Clownfish::CFC::Model::ParamList",
     sizeof(CFCParamList),
     (CFCBase_destroy_t)CFCParamList_destroy
