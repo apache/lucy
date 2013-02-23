@@ -16,6 +16,7 @@
 
 #include <string.h>
 
+#include "charmony.h"
 #include "CFCCClass.h"
 #include "CFCClass.h"
 #include "CFCDocuComment.h"
@@ -135,13 +136,13 @@ CFCCClass_create_man_page(CFCClass *klass) {
 
 static char*
 S_man_create_synopsis(CFCClass *klass) {
+    CHY_UNUSED_VAR(klass);
     return CFCUtil_strdup("");
 }
 
 static char*
 S_man_create_functions(CFCClass *klass) {
     CFCFunction **functions = CFCClass_functions(klass);
-    const char  *class_name = CFCClass_get_class_name(klass);
     char        *result     = CFCUtil_strdup(".SH FUNCTIONS\n");
 
     for (int func_num = 0; functions[func_num] != NULL; func_num++) {
@@ -163,7 +164,6 @@ S_man_create_functions(CFCClass *klass) {
 static char*
 S_man_create_methods(CFCClass *klass) {
     CFCMethod  **fresh_methods = CFCClass_fresh_methods(klass);
-    const char  *class_name    = CFCClass_get_class_name(klass);
     char        *result        = CFCUtil_strdup(".SH METHODS\n");
 
     for (int meth_num = 0; fresh_methods[meth_num] != NULL; meth_num++) {
@@ -282,7 +282,6 @@ S_man_escape_content(const char *content) {
     size_t  result_len = 0;
     size_t  result_cap = strlen(content) + 20;
     char   *result     = (char*)MALLOCATE(result_cap + 1);
-    int     fill       = 1;
 
     for (size_t i = 0; content[i]; i++) {
         char c[8];

@@ -104,6 +104,7 @@ StandardTokenizer_transform_text(StandardTokenizer *self, CharBuf *text) {
 void
 StandardTokenizer_tokenize_str(StandardTokenizer *self, const char *text,
                                size_t len, Inversion *inversion) {
+    UNUSED_VAR(self);
     if ((len >= 1 && (uint8_t)text[len - 1] >= 0xC0)
         ||  (len >= 2 && (uint8_t)text[len - 2] >= 0xE0)
         ||  (len >= 3 && (uint8_t)text[len - 3] >= 0xF0)) {

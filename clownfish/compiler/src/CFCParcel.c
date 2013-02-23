@@ -240,7 +240,6 @@ S_new_from_json(const char *json, const char *path) {
 
     for (size_t i = 0, max = parsed->num_kids; i < max; i += 2) {
         JSONNode *key   = parsed->kids[i];
-        JSONNode *value = parsed->kids[i + 1];
         if (strcmp(key->string, "name") == 0
             || strcmp(key->string, "nickname") == 0
             || strcmp(key->string, "version") == 0

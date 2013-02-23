@@ -176,6 +176,7 @@ OUTPUT: RETVAL
 void
 _clear_registry(...)
 PPCODE:
+    CHY_UNUSED_VAR(items);
     CFCClass_clear_registry();
 
 void
@@ -1068,7 +1069,7 @@ fetch(unused, name_sv)
     SV *unused;
     SV *name_sv;
 CODE:
-    (void)unused;
+    CHY_UNUSED_VAR(unused);
     const char *name  = SvOK(name_sv)  ? SvPV_nolen(name_sv)  : NULL;
     CFCParcel *self = CFCParcel_fetch(name);
     RETVAL = S_cfcbase_to_perlref(self);
@@ -1092,6 +1093,7 @@ OUTPUT: RETVAL
 SV*
 default_parcel(...)
 CODE:
+    CHY_UNUSED_VAR(items);
     CFCParcel *default_parcel = CFCParcel_default_parcel();
     RETVAL = S_cfcbase_to_perlref(default_parcel);
 OUTPUT: RETVAL
@@ -1099,6 +1101,7 @@ OUTPUT: RETVAL
 void
 reap_singletons(...)
 PPCODE:
+    CHY_UNUSED_VAR(items);
     CFCParcel_reap_singletons();
 
 void
@@ -1386,78 +1389,91 @@ OUTPUT: RETVAL
 unsigned
 CONST(...)
 CODE:
+    CHY_UNUSED_VAR(items);
     RETVAL = CFCTYPE_CONST;
 OUTPUT: RETVAL
 
 unsigned
 NULLABLE(...)
 CODE:
+    CHY_UNUSED_VAR(items);
     RETVAL = CFCTYPE_NULLABLE;
 OUTPUT: RETVAL
 
 unsigned
 INCREMENTED(...)
 CODE:
+    CHY_UNUSED_VAR(items);
     RETVAL = CFCTYPE_INCREMENTED;
 OUTPUT: RETVAL
 
 unsigned
 DECREMENTED(...)
 CODE:
+    CHY_UNUSED_VAR(items);
     RETVAL = CFCTYPE_DECREMENTED;
 OUTPUT: RETVAL
 
 unsigned
 VOID(...)
 CODE:
+    CHY_UNUSED_VAR(items);
     RETVAL = CFCTYPE_VOID;
 OUTPUT: RETVAL
 
 unsigned
 OBJECT(...)
 CODE:
+    CHY_UNUSED_VAR(items);
     RETVAL = CFCTYPE_OBJECT;
 OUTPUT: RETVAL
 
 unsigned
 PRIMITIVE(...)
 CODE:
+    CHY_UNUSED_VAR(items);
     RETVAL = CFCTYPE_PRIMITIVE;
 OUTPUT: RETVAL
 
 unsigned
 INTEGER(...)
 CODE:
+    CHY_UNUSED_VAR(items);
     RETVAL = CFCTYPE_INTEGER;
 OUTPUT: RETVAL
 
 unsigned
 FLOATING(...)
 CODE:
+    CHY_UNUSED_VAR(items);
     RETVAL = CFCTYPE_FLOATING;
 OUTPUT: RETVAL
 
 unsigned
 STRING_TYPE(...)
 CODE:
+    CHY_UNUSED_VAR(items);
     RETVAL = CFCTYPE_STRING_TYPE;
 OUTPUT: RETVAL
 
 unsigned
 VA_LIST(...)
 CODE:
+    CHY_UNUSED_VAR(items);
     RETVAL = CFCTYPE_VA_LIST;
 OUTPUT: RETVAL
 
 unsigned
 ARBITRARY(...)
 CODE:
+    CHY_UNUSED_VAR(items);
     RETVAL = CFCTYPE_ARBITRARY;
 OUTPUT: RETVAL
 
 unsigned
 COMPOSITE(...)
 CODE:
+    CHY_UNUSED_VAR(items);
     RETVAL = CFCTYPE_COMPOSITE;
 OUTPUT: RETVAL
 
@@ -1782,6 +1798,7 @@ func_declaration(unused, func)
     SV *unused;
     CFCFunction *func;
 CODE:
+    CHY_UNUSED_VAR(unused);
     RETVAL = S_sv_eat_c_string(CFCBindFunc_func_declaration(func));
 OUTPUT: RETVAL
 
@@ -1792,6 +1809,7 @@ abstract_method_def(unused, meth)
     SV *unused;
     CFCMethod *meth;
 CODE:
+    CHY_UNUSED_VAR(unused);
     RETVAL = S_sv_eat_c_string(CFCBindMeth_abstract_method_def(meth));
 OUTPUT: RETVAL
 
@@ -1815,6 +1833,7 @@ MODULE = Clownfish::CFC  PACKAGE = Clownfish::CFC::Binding::Core::Aliases
 SV*
 c_aliases(...)
 CODE:
+    CHY_UNUSED_VAR(items);
     RETVAL = S_sv_eat_c_string(CFCBindAliases_c_aliases());
 OUTPUT: RETVAL
 
@@ -2029,7 +2048,7 @@ register(unused, binding)
     SV *unused;
     CFCPerlClass *binding;
 PPCODE:
-    (void)unused;
+    CHY_UNUSED_VAR(unused);
     CFCPerlClass_add_to_registry(binding);
 
 SV*
@@ -2037,6 +2056,7 @@ singleton(unused_sv, class_name)
     SV *unused_sv;
     const char *class_name;
 CODE:
+    CHY_UNUSED_VAR(unused_sv);
     CFCPerlClass *binding = CFCPerlClass_singleton(class_name);
     RETVAL = S_cfcbase_to_perlref(binding);
 OUTPUT: RETVAL
@@ -2044,6 +2064,7 @@ OUTPUT: RETVAL
 SV*
 registered(...)
 CODE:
+    CHY_UNUSED_VAR(items);
     CFCPerlClass **registry = CFCPerlClass_registry();
     RETVAL = S_array_of_cfcbase_to_av((CFCBase**)registry);
 OUTPUT: RETVAL
@@ -2051,6 +2072,7 @@ OUTPUT: RETVAL
 void
 _clear_registry(...)
 PPCODE:
+    CHY_UNUSED_VAR(items);
     CFCPerlClass_clear_registry();
 
 void
@@ -2189,7 +2211,7 @@ SV*
 new(unused)
     SV *unused;
 CODE:
-    (void)unused;
+    CHY_UNUSED_VAR(unused);
     CFCPerlPod *self = CFCPerlPod_new();
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);

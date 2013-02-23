@@ -321,6 +321,7 @@ S_parse_subquery(QueryParser *self, VArray *elems, CharBuf *default_field,
 
 static void
 S_balance_parens(QueryParser *self, VArray *elems) {
+    UNUSED_VAR(self);
     // Count paren balance, eliminate unbalanced right parens.
     int64_t paren_depth = 0;
     size_t i = 0;
@@ -381,6 +382,7 @@ S_compose_inner_queries(QueryParser *self, VArray *elems,
 
 static void
 S_apply_plusses_and_negations(QueryParser *self, VArray *elems) {
+    UNUSED_VAR(self);
     for (uint32_t i = VA_Get_Size(elems); i--;) {
         ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
         if (ParserElem_Get_Type(elem) == TOKEN_QUERY) {
@@ -418,6 +420,7 @@ S_compose_not_queries(QueryParser *self, VArray *elems) {
 
 static void
 S_winnow_boolops(QueryParser *self, VArray *elems) {
+    UNUSED_VAR(self);
     for (uint32_t i = 0; i < VA_Get_Size(elems); i++) {
         ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
         if (ParserElem_Get_Type(elem) != TOKEN_QUERY) {

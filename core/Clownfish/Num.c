@@ -451,6 +451,7 @@ Bool_inc_refcount(BoolNum *self) {
 
 uint32_t
 Bool_dec_refcount(BoolNum *self) {
+    UNUSED_VAR(self);
     return 1;
 }
 
