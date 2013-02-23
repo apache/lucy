@@ -264,6 +264,8 @@ S_register(CFCClass *self) {
     registry_size++;
 }
 
+#define MAX_SINGLETON_LEN 256
+
 CFCClass*
 CFCClass_fetch_singleton(CFCParcel *parcel, const char *class_name) {
     CFCUTIL_NULL_CHECK(class_name);
@@ -276,11 +278,10 @@ CFCClass_fetch_singleton(CFCParcel *parcel, const char *class_name) {
     const char *prefix = parcel ? CFCParcel_get_prefix(parcel) : "";
     size_t prefix_len = strlen(prefix);
     size_t struct_sym_len = strlen(struct_sym);
-    const size_t MAX_LEN = 256;
-    if (prefix_len + struct_sym_len > MAX_LEN) {
+    if (prefix_len + struct_sym_len > MAX_SINGLETON_LEN) {
         CFCUtil_die("names too long: '%s', '%s'", prefix, struct_sym);
     }
-    char key[MAX_LEN + 1];
+    char key[MAX_SINGLETON_LEN + 1];
     sprintf(key, "%s%s", prefix, struct_sym);
     for (size_t i = 0; i < registry_size; i++) {
         if (strcmp(registry[i].key, key) == 0) {
@@ -407,16 +408,17 @@ CFCClass_has_attribute(CFCClass *self, const char *name) {
     return false;
 }
 
+#define MAX_FUNC_LEN 128
+
 static CFCFunction*
 S_find_func(CFCFunction **funcs, const char *sym) {
     if (!sym) {
         return NULL;
     }
 
-    const size_t MAX_LEN = 128;
-    char lcsym[MAX_LEN + 1];
+    char lcsym[MAX_FUNC_LEN + 1];
     size_t sym_len = strlen(sym);
-    if (sym_len > MAX_LEN) { CFCUtil_die("sym too long: '%s'", sym); }
+    if (sym_len > MAX_FUNC_LEN) { CFCUtil_die("sym too long: '%s'", sym); }
     for (size_t i = 0; i <= sym_len; i++) {
         lcsym[i] = tolower(sym[i]);
     }

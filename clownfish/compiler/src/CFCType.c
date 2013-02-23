@@ -188,6 +188,8 @@ CFCType_new_float(int flags, const char *specifier) {
     return CFCType_new(flags, NULL, specifier, 0, c_string);
 }
 
+#define MAX_SPECIFIER_LEN 256
+
 CFCType*
 CFCType_new_object(int flags, CFCParcel *parcel, const char *specifier,
                    int indirection) {
@@ -214,7 +216,6 @@ CFCType_new_object(int flags, CFCParcel *parcel, const char *specifier,
         flags |= CFCTYPE_STRING_TYPE;
     }
 
-    const size_t MAX_SPECIFIER_LEN = 256;
     char full_specifier[MAX_SPECIFIER_LEN + 1];
     char small_specifier[MAX_SPECIFIER_LEN + 1];
     if (isupper(*specifier)) {
@@ -270,6 +271,8 @@ CFCType_new_object(int flags, CFCParcel *parcel, const char *specifier,
     return CFCType_new(flags, parcel, full_specifier, 1, c_string);
 }
 
+#define MAX_COMPOSITE_LEN 256
+
 CFCType*
 CFCType_new_composite(int flags, CFCType *child, int indirection,
                       const char *array) {
@@ -281,14 +284,13 @@ CFCType_new_composite(int flags, CFCType *child, int indirection,
 
     // Cache C representation.
     // NOTE: Array postfixes are NOT included.
-    const size_t  MAX_LEN        = 256;
     const char   *child_c_string = CFCType_to_c(child);
     size_t        child_c_len    = strlen(child_c_string);
     size_t        amount         = child_c_len + indirection;
-    if (amount > MAX_LEN) {
+    if (amount > MAX_COMPOSITE_LEN) {
         CFCUtil_die("C representation too long");
     }
-    char c_string[MAX_LEN + 1];
+    char c_string[MAX_COMPOSITE_LEN + 1];
     strcpy(c_string, child_c_string);
     for (int i = 0; i < indirection; i++) {
         strncat(c_string, "*", 1);

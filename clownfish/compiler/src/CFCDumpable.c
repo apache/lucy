@@ -153,6 +153,8 @@ S_make_method_obj(CFCClass *klass, const char *method_name) {
     return method;
 }
 
+#define BUF_SIZE 400
+
 static void
 S_add_dump_method(CFCClass *klass) {
     CFCMethod *method = S_make_method_obj(klass, "Dump");
@@ -162,7 +164,6 @@ S_add_dump_method(CFCClass *klass) {
     const char *full_struct   = CFCClass_full_struct_sym(klass);
     const char *vtable_var    = CFCClass_full_vtable_var(klass);
     CFCClass   *parent        = CFCClass_get_parent(klass);
-    const size_t BUF_SIZE = 400;
     char buf[BUF_SIZE];
 
     if (parent && CFCClass_has_attribute(parent, "dumpable")) {
@@ -218,7 +219,6 @@ S_add_load_method(CFCClass *klass) {
     const char *full_struct   = CFCClass_full_struct_sym(klass);
     const char *vtable_var    = CFCClass_full_vtable_var(klass);
     CFCClass   *parent        = CFCClass_get_parent(klass);
-    const size_t BUF_SIZE = 400;
     char buf[BUF_SIZE];
 
     if (parent && CFCClass_has_attribute(parent, "dumpable")) {
