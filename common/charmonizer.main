@@ -56,6 +56,9 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
                 "-DLUCY_DEBUG -pedantic -Wall -Wextra "
                 "-Wno-variadic-macros "
             );
+            if (args->charmony_pm) {
+                chaz_CC_add_extra_cflags("-DPERL_GCC_PEDANTIC ");
+            }
         }
 
         /* Only core source files require this -- not our headers and

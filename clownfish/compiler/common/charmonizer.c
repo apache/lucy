@@ -4795,6 +4795,9 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
                 "-Wno-variadic-macros "
             );
         }
+        if (args->charmony_pm) {
+            chaz_CC_add_extra_cflags("-DPERL_GCC_PEDANTIC ");
+        }
 
         /* Tell GCC explicitly to run with maximum options. */
         chaz_CC_add_extra_cflags("-std=gnu99 -D_GNU_SOURCE");
