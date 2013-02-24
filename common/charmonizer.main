@@ -237,12 +237,17 @@ S_write_makefile() {
     chaz_MakeVar_append(var, "$(AUTOGEN_DIR)" DIR_SEP "source" DIR_SEP
                         "parcel$(OBJ_EXT)");
 
+    chaz_MakeFile_add_var(makefile, "TEST_LUCY_OBJS",
+                          "t" DIR_SEP "test_lucy$(OBJ_EXT)");
+
     /* Executables */
 
     chaz_MakeFile_add_var(makefile, "LEMON_EXE",
                           "$(LEMON_DIR)" DIR_SEP "lemon$(EXE_EXT)");
     chaz_MakeFile_add_var(makefile, "CFC_EXE",
                           "$(CFC_DIR)" DIR_SEP "cfc$(EXE_EXT)");
+    chaz_MakeFile_add_var(makefile, "TEST_LUCY_EXE",
+                          "t" DIR_SEP "test_lucy$(EXE_EXT)");
 
     /* Shared library */
 
@@ -276,6 +281,16 @@ S_write_makefile() {
     chaz_MakeFile_add_shared_obj(makefile, "$(LUCY_SHOBJ)", "$(LUCY_OBJS)",
                                  "");
 
+    chaz_MakeFile_add_rule(makefile, "$(TEST_LUCY_OBJS)", "$(AUTOGEN_DIR)");
+
+    rule = chaz_MakeFile_add_exe(makefile, "$(TEST_LUCY_EXE)",
+                                 "$(TEST_LUCY_OBJS)", "-L. -llucy");
+    chaz_MakeRule_add_prereq(rule, "$(LUCY_SHOBJ)");
+
+    rule = chaz_MakeFile_add_rule(makefile, "test", "$(TEST_LUCY_EXE)");
+    chaz_MakeRule_add_command(rule, "$(TEST_LUCY_EXE)");
+
+    chaz_MakeFile_add_to_cleanup(makefile, "$(TEST_LUCY_OBJS)");
     chaz_MakeFile_add_to_cleanup(makefile, "$(LUCY_OBJS)");
     chaz_MakeFile_add_to_cleanup(makefile, json_parser_h);
     chaz_MakeFile_add_to_cleanup(makefile, json_parser_c);
