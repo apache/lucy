@@ -225,10 +225,10 @@ chaz_MakeFile_add_to_cleanup(chaz_MakeFile *makefile, const char *target) {
     makefile->num_cleanups = num_cleanups;
 }
 
-void
+chaz_MakeRule*
 chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
-                      const char *objects) {
-    const char    *pattern     = "%s %s %s %s%s";
+                      const char *objects, const char *extra_link_flags) {
+    const char    *pattern     = "%s %s %s %s %s%s";
     const char    *link        = chaz_CC_link_command();
     const char    *link_flags  = chaz_CC_link_flags();
     const char    *output_flag = chaz_CC_link_output_flag();
@@ -241,21 +241,26 @@ chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
     size = strlen(pattern)
            + strlen(link)
            + strlen(link_flags)
+           + strlen(extra_link_flags)
            + strlen(objects)
            + strlen(output_flag)
            + strlen(exe)
            + 50;
     command = (char*)malloc(size);
-    sprintf(command, pattern, link, link_flags, objects, output_flag, exe);
+    sprintf(command, pattern, link, link_flags, extra_link_flags, objects,
+            output_flag, exe);
     chaz_MakeRule_add_command(rule, command);
 
     chaz_MakeFile_add_to_cleanup(makefile, exe);
+
+    return rule;
 }
 
-void
+chaz_MakeRule*
 chaz_MakeFile_add_shared_obj(chaz_MakeFile *makefile, const char *shared_obj,
-                             const char *objects) {
-    const char    *pattern     = "%s %s %s %s %s%s";
+                             const char *objects,
+                             const char *extra_link_flags) {
+    const char    *pattern     = "%s %s %s %s %s %s%s";
     const char    *link        = chaz_CC_link_command();
     const char    *shobj_flags = chaz_CC_link_shared_obj_flag();
     const char    *link_flags  = chaz_CC_link_flags();
@@ -270,16 +275,19 @@ chaz_MakeFile_add_shared_obj(chaz_MakeFile *makefile, const char *shared_obj,
            + strlen(link)
            + strlen(shobj_flags)
            + strlen(link_flags)
+           + strlen(extra_link_flags)
            + strlen(objects)
            + strlen(output_flag)
            + strlen(shared_obj)
            + 50;
     command = (char*)malloc(size);
-    sprintf(command, pattern, link, shobj_flags, link_flags, objects,
-            output_flag, shared_obj);
+    sprintf(command, pattern, link, shobj_flags, link_flags, extra_link_flags,
+            objects, output_flag, shared_obj);
     chaz_MakeRule_add_command(rule, command);
 
     chaz_MakeFile_add_to_cleanup(makefile, shared_obj);
+
+    return rule;
 }
 
 void

@@ -174,7 +174,7 @@ S_write_makefile() {
 
     chaz_MakeFile_add_rule(makefile, "all", "$(CFC_EXE)");
 
-    chaz_MakeFile_add_exe(makefile, "$(LEMON_EXE)", "$(LEMON_OBJS)");
+    chaz_MakeFile_add_exe(makefile, "$(LEMON_EXE)", "$(LEMON_OBJS)", "");
 
     rule = chaz_MakeFile_add_rule(makefile, parse_header_c, NULL);
     chaz_MakeRule_add_prereq(rule, "$(LEMON_EXE)");
@@ -187,9 +187,9 @@ S_write_makefile() {
     chaz_MakeFile_add_rule(makefile, "$(COMMON_OBJS)", parse_header_c);
 
     chaz_MakeFile_add_exe(makefile, "$(CFC_EXE)",
-                          "$(COMMON_OBJS) $(CFC_OBJS)");
+                          "$(COMMON_OBJS) $(CFC_OBJS)", "");
     chaz_MakeFile_add_exe(makefile, "$(TEST_CFC_EXE)",
-                          "$(COMMON_OBJS) $(TEST_CFC_OBJS)");
+                          "$(COMMON_OBJS) $(TEST_CFC_OBJS)", "");
 
     rule = chaz_MakeFile_add_rule(makefile, "test", "$(TEST_CFC_EXE)");
     chaz_MakeRule_add_command(rule, "$(TEST_CFC_EXE)");

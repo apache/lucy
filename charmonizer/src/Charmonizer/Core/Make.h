@@ -101,10 +101,11 @@ chaz_MakeFile_add_to_cleanup(chaz_MakeFile *makefile, const char *target);
  * @param makefile The makefile.
  * @param exe The name of the executable.
  * @param objects The list of object files.
+ * @param extra_link_flags Additional link flags.
  */
-void
+chaz_MakeRule*
 chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
-                      const char *objects);
+                      const char *objects, const char *extra_link_flags);
 
 /** Add a rule to link a shared object. The shared object will also be added to
  * the list of files to clean.
@@ -112,10 +113,12 @@ chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
  * @param makefile The makefile.
  * @param shared_obj The name of the shared object.
  * @param objects The list of object files.
+ * @param extra_link_flags Additional link flags.
  */
-void
+chaz_MakeRule*
 chaz_MakeFile_add_shared_obj(chaz_MakeFile *makefile, const char *shared_obj,
-                             const char *objects);
+                             const char *objects,
+                             const char *extra_link_flags);
 
 /** Write the makefile to a file named 'Makefile' in the current directory.
  *
