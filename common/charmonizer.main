@@ -278,8 +278,12 @@ S_write_makefile() {
     chaz_MakeRule_add_prereq(rule, json_parser_c);
     chaz_MakeRule_add_prereq(rule, "$(AUTOGEN_DIR)");
 
+    const char *link_flags = "";
+    if (chaz_HeadCheck_check_header("pcre.h")) {
+        link_flags = "-lpcre";
+    }
     chaz_MakeFile_add_shared_obj(makefile, "$(LUCY_SHOBJ)", "$(LUCY_OBJS)",
-                                 "");
+                                 link_flags);
 
     chaz_MakeFile_add_rule(makefile, "$(TEST_LUCY_OBJS)", "$(AUTOGEN_DIR)");
 

@@ -15,34 +15,161 @@
  */
 
 #define C_LUCY_REGEXTOKENIZER
+#define CHY_USE_SHORT_NAMES
+#define LUCY_USE_SHORT_NAMES
 
-#include "CFBind.h"
+#include "charmony.h"
+
+#include <string.h>
+
 #include "Lucy/Analysis/RegexTokenizer.h"
+#include "Clownfish/CharBuf.h"
+#include "Clownfish/Err.h"
+#include "Clownfish/Util/Memory.h"
+#include "Clownfish/Util/StringHelper.h"
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
 
-lucy_RegexTokenizer*
-lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
-                         const lucy_CharBuf *pattern) {
-    THROW(LUCY_ERR, "TODO");
-    UNREACHABLE_RETURN(lucy_RegexTokenizer*);
+#if defined(HAS_PCRE_H)
+
+#include <pcre.h>
+
+static uint32_t
+S_count_code_points(const char *string, size_t len);
+
+RegexTokenizer*
+RegexTokenizer_init(RegexTokenizer *self, const CharBuf *pattern) {
+    Analyzer_init((Analyzer*)self);
+
+    const char *pattern_ptr;
+    if (pattern) {
+        self->pattern = CB_Clone(pattern);
+        pattern_ptr = (char*)CB_Get_Ptr8(self->pattern);
+    }
+    else {
+        pattern_ptr = "\\w+(?:['\\x{2019}]\\w+)*";
+        self->pattern
+            = CB_new_from_trusted_utf8(pattern_ptr, strlen(pattern_ptr));
+    }
+
+    int options = PCRE_BSR_UNICODE
+                | PCRE_NEWLINE_LF
+                | PCRE_UTF8
+                | PCRE_NO_UTF8_CHECK;
+    const char *err_ptr;
+    int err_offset;
+    pcre *re = pcre_compile(pattern_ptr, options, &err_ptr, &err_offset, NULL);
+    if (!re) {
+        THROW(ERR, "%s", err_ptr);
+    }
+
+    // TODO: Check whether pcre_study improves performance
+
+    self->token_re = re;
+
+    return self;
 }
 
 void
-lucy_RegexTokenizer_set_token_re(lucy_RegexTokenizer *self, void *token_re) {
-    THROW(LUCY_ERR, "TODO");
+RegexTokenizer_set_token_re(RegexTokenizer *self, void *token_re) {
+    THROW(ERR, "TODO");
 }
 
 void
-lucy_RegexTokenizer_destroy(lucy_RegexTokenizer *self) {
-    THROW(LUCY_ERR, "TODO");
+RegexTokenizer_destroy(RegexTokenizer *self) {
+    DECREF(self->pattern);
+    pcre *re = (pcre*)self->token_re;
+    if (re) {
+        pcre_free(re);
+    }
+    SUPER_DESTROY(self, REGEXTOKENIZER);
 }
 
 void
-lucy_RegexTokenizer_tokenize_str(lucy_RegexTokenizer *self,
+RegexTokenizer_tokenize_str(RegexTokenizer *self,
                                  const char *string, size_t string_len,
-                                 lucy_Inversion *inversion) {
-    THROW(LUCY_ERR, "TODO");
+                                 Inversion *inversion) {
+    pcre      *re          = (pcre*)self->token_re;
+    int        byte_offset = 0;
+    uint32_t   cp_offset   = 0; // Code points
+    int        options     = PCRE_NO_UTF8_CHECK;
+    int        ovector[3];
+
+    int return_code = pcre_exec(re, NULL, string, string_len, byte_offset,
+                                options, ovector, 3);
+    while (return_code >= 0) {
+        const char *match     = string + ovector[0];
+        size_t      match_len = ovector[1] - ovector[0];
+
+        uint32_t cp_before  = S_count_code_points(string + byte_offset,
+                                                  ovector[0] - byte_offset);
+        uint32_t cp_start   = cp_offset + cp_before;
+        uint32_t cp_matched = S_count_code_points(match, match_len);
+        uint32_t cp_end     = cp_start + cp_matched;
+
+        // Add a token to the new inversion.
+        Token *token = Token_new(match, match_len, cp_start, cp_end, 1.0f, 1);
+        Inversion_Append(inversion, token);
+
+        byte_offset = ovector[1];
+        cp_offset   = cp_end;
+        return_code = pcre_exec(re, NULL, string, string_len, byte_offset,
+                                options, ovector, 3);
+    }
+
+    if (return_code != PCRE_ERROR_NOMATCH) {
+        THROW(ERR, "pcre_exec failed: %d", return_code);
+    }
 }
 
+static uint32_t
+S_count_code_points(const char *string, size_t len) {
+    uint32_t num_code_points = 0;
+    size_t i = 0;
+
+    while (i < len) {
+        i += StrHelp_UTF8_COUNT[(uint8_t)(string[i])];
+        ++num_code_points;
+    }
+
+    if (i != len) {
+        THROW(ERR, "Match between code point boundaries in '%s'", string);
+    }
+
+    return num_code_points;
+}
+
+#else // HAS_PCRE_H
+
+RegexTokenizer*
+RegexTokenizer_init(RegexTokenizer *self, const CharBuf *pattern) {
+    THROW(ERR,
+          "RegexTokenizer is not available because Lucy was compiled"
+          " without PCRE.");
+    UNREACHABLE_RETURN(RegexTokenizer*);
+}
+
+void
+RegexTokenizer_set_token_re(RegexTokenizer *self, void *token_re) {
+    THROW(ERR,
+          "RegexTokenizer is not available because Lucy was compiled"
+          " without PCRE.");
+}
+
+void
+RegexTokenizer_destroy(RegexTokenizer *self) {
+    THROW(ERR,
+          "RegexTokenizer is not available because Lucy was compiled"
+          " without PCRE.");
+}
+
+void
+RegexTokenizer_tokenize_str(RegexTokenizer *self, const char *string,
+                            size_t string_len, Inversion *inversion) {
+    THROW(ERR,
+          "RegexTokenizer is not available because Lucy was compiled"
+          " without PCRE.");
+}
+
+#endif // HAS_PCRE_H
 
