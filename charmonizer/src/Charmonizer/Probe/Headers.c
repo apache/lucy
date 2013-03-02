@@ -171,6 +171,7 @@ chaz_Headers_probe_posix(void) {
         "fcntl.h",
         "grp.h",
         "pwd.h",
+        "regex.h",
         "sys/stat.h",
         "sys/times.h",
         "sys/types.h",
