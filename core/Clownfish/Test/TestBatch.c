@@ -22,9 +22,17 @@
 #define LUCY_USE_SHORT_NAMES
 #include "Clownfish/Test/TestBatch.h"
 #include "Clownfish/CharBuf.h"
+#include "Clownfish/Err.h"
 #include "Clownfish/Test/TestFormatter.h"
 #include "Clownfish/VArray.h"
 #include "Clownfish/VTable.h"
+
+struct try_run_tests_context {
+    TestBatch *batch;
+};
+
+static void
+S_try_run_tests(void *context);
 
 static bool
 S_vtest_true(TestBatch *self, bool condition, const char *pattern,
@@ -62,9 +70,17 @@ bool
 TestBatch_run(TestBatch *self) {
     TestFormatter_Batch_Prologue(self->formatter, self);
 
-    TestBatch_Run_Tests(self);
+    struct try_run_tests_context args;
+    args.batch = self;
+    Err *err = Err_trap(S_try_run_tests, &args);
 
     bool failed = false;
+    if (err) {
+        failed = true;
+        CharBuf *mess = Err_Get_Mess(err);
+        INCREF(mess);
+        Err_warn_mess(mess);
+    }
     if (self->num_failed > 0) {
         failed = true;
         TestFormatter_batch_comment(self->formatter, "%d/%d tests failed.\n",
@@ -79,6 +95,13 @@ TestBatch_run(TestBatch *self) {
     }
 
     return !failed;
+}
+
+static void
+S_try_run_tests(void *context) {
+    struct try_run_tests_context *args
+        = (struct try_run_tests_context*)context;
+    TestBatch_Run_Tests(args->batch);
 }
 
 uint32_t
