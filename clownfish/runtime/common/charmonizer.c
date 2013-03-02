@@ -439,6 +439,7 @@ chaz_MakeFile_add_dir_to_cleanup(chaz_MakeFile *makefile, const char *dir);
  * @param makefile The makefile.
  * @param exe The name of the executable.
  * @param objects The list of object files.
+ * @param extra_link_flags Additional link flags.
  */
 chaz_MakeRule*
 chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
@@ -450,6 +451,7 @@ chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
  * @param makefile The makefile.
  * @param shared_obj The name of the shared object.
  * @param objects The list of object files.
+ * @param extra_link_flags Additional link flags.
  */
 chaz_MakeRule*
 chaz_MakeFile_add_shared_obj(chaz_MakeFile *makefile, const char *shared_obj,
@@ -1210,6 +1212,24 @@ void chaz_LargeFiles_run(void);
 void chaz_Memory_run(void);
 
 #endif /* H_CHAZ_MEMORY */
+
+
+
+
+/***************************************************************************/
+
+#line 21 "src/Charmonizer/Probe/RegularExpressions.h"
+/* Charmonizer/Probe/RegularExpressions.h -- regular expressions.
+ */
+
+#ifndef H_CHAZ_REGULAREXPRESSIONS
+#define H_CHAZ_REGULAREXPRESSIONS
+
+/* Run the RegularExpressions module.
+ */
+void chaz_RegularExpressions_run(void);
+
+#endif /* H_CHAZ_REGULAREXPRESSIONS */
 
 
 
@@ -4659,6 +4679,7 @@ chaz_Headers_probe_posix(void) {
         "fcntl.h",
         "grp.h",
         "pwd.h",
+        "regex.h",
         "sys/stat.h",
         "sys/times.h",
         "sys/types.h",
@@ -5542,6 +5563,51 @@ chaz_Memory_probe_alloca(void) {
             chaz_ConfWriter_add_def("chy_alloca", "_alloca");
         }
     }
+}
+
+
+
+/***************************************************************************/
+
+#line 17 "src/Charmonizer/Probe/RegularExpressions.c"
+/* #include "Charmonizer/Core/HeaderChecker.h" */
+/* #include "Charmonizer/Core/ConfWriter.h" */
+/* #include "Charmonizer/Probe/RegularExpressions.h" */
+
+void
+chaz_RegularExpressions_run(void) {
+    int has_regex_h     = chaz_HeadCheck_check_header("regex.h");
+    int has_pcre_h      = chaz_HeadCheck_check_header("pcre.h");
+    int has_pcreposix_h = chaz_HeadCheck_check_header("pcreposix.h");
+
+    chaz_ConfWriter_start_module("RegularExpressions");
+
+    /* PCRE headers. */
+    if (has_pcre_h) {
+        chaz_ConfWriter_add_def("HAS_PCRE_H", NULL);
+    }
+    if (has_pcreposix_h) {
+        chaz_ConfWriter_add_def("HAS_PCREPOSIX_H", NULL);
+    }
+
+    /* Check for OS X enhanced regexes. */
+    if (has_regex_h) {
+        const char *reg_enhanced_code =
+            CHAZ_QUOTE(  #include <regex.h>                             )
+            CHAZ_QUOTE(  int main(int argc, char **argv) {              )
+            CHAZ_QUOTE(      regex_t re;                                )
+            CHAZ_QUOTE(      if (regcomp(&re, "^", REG_ENHANCED)) {     )
+            CHAZ_QUOTE(          return 1;                              )
+            CHAZ_QUOTE(      }                                          )
+            CHAZ_QUOTE(      return 0;                                  )
+            CHAZ_QUOTE(  }                                              );
+
+        if (chaz_CC_test_compile(reg_enhanced_code)) {
+            chaz_ConfWriter_add_def("HAS_REG_ENHANCED", NULL);
+        }
+    }
+
+    chaz_ConfWriter_end_module();
 }
 
 

@@ -439,6 +439,7 @@ chaz_MakeFile_add_dir_to_cleanup(chaz_MakeFile *makefile, const char *dir);
  * @param makefile The makefile.
  * @param exe The name of the executable.
  * @param objects The list of object files.
+ * @param extra_link_flags Additional link flags.
  */
 chaz_MakeRule*
 chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
@@ -450,6 +451,7 @@ chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
  * @param makefile The makefile.
  * @param shared_obj The name of the shared object.
  * @param objects The list of object files.
+ * @param extra_link_flags Additional link flags.
  */
 chaz_MakeRule*
 chaz_MakeFile_add_shared_obj(chaz_MakeFile *makefile, const char *shared_obj,
@@ -4108,6 +4110,7 @@ chaz_Headers_probe_posix(void) {
         "fcntl.h",
         "grp.h",
         "pwd.h",
+        "regex.h",
         "sys/stat.h",
         "sys/times.h",
         "sys/types.h",
