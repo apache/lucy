@@ -95,6 +95,14 @@ chaz_MakeFile_add_rule(chaz_MakeFile *makefile, const char *target,
 void
 chaz_MakeFile_add_to_cleanup(chaz_MakeFile *makefile, const char *target);
 
+/** Add a directory to the 'clean' target.
+ *
+ * @param makefile The makefile.
+ * @param dir The directory.
+ */
+void
+chaz_MakeFile_add_dir_to_cleanup(chaz_MakeFile *makefile, const char *dir);
+
 /** Add a rule to link an executable. The executable will also be added to the
  * list of files to clean.
  *

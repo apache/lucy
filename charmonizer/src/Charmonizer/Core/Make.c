@@ -38,8 +38,10 @@ struct chaz_MakeFile {
     size_t          num_vars;
     chaz_MakeRule **rules;
     size_t          num_rules;
-    char          **cleanups;
-    size_t          num_cleanups;
+    char          **cleanup_files;
+    size_t          num_cleanup_files;
+    char          **cleanup_dirs;
+    size_t          num_cleanup_dirs;
 };
 
 /* Static vars. */
@@ -158,9 +160,13 @@ chaz_MakeFile_new() {
     makefile->rules[0] = NULL;
     makefile->num_rules = 0;
 
-    makefile->cleanups = (char**)malloc(sizeof(char*));
-    makefile->cleanups[0] = NULL;
-    makefile->num_cleanups = 0;
+    makefile->cleanup_files = (char**)malloc(sizeof(char*));
+    makefile->cleanup_files[0] = NULL;
+    makefile->num_cleanup_files = 0;
+
+    makefile->cleanup_dirs = (char**)malloc(sizeof(char*));
+    makefile->cleanup_dirs[0] = NULL;
+    makefile->num_cleanup_dirs = 0;
 
     return makefile;
 }
@@ -214,15 +220,26 @@ chaz_MakeFile_add_rule(chaz_MakeFile *makefile, const char *target,
 
 void
 chaz_MakeFile_add_to_cleanup(chaz_MakeFile *makefile, const char *target) {
-    char    *cleanup      = chaz_Util_strdup(target);
-    char   **cleanups     = makefile->cleanups;
-    size_t   num_cleanups = makefile->num_cleanups + 1;
+    char   **files     = makefile->cleanup_files;
+    size_t   num_files = makefile->num_cleanup_files + 1;
 
-    cleanups = (char**)realloc(cleanups, (num_cleanups + 1) * sizeof(char*));
-    cleanups[num_cleanups-1] = cleanup;
-    cleanups[num_cleanups]   = NULL;
-    makefile->cleanups = cleanups;
-    makefile->num_cleanups = num_cleanups;
+    files = (char**)realloc(files, (num_files + 1) * sizeof(char*));
+    files[num_files-1] = chaz_Util_strdup(target);
+    files[num_files]   = NULL;
+    makefile->cleanup_files     = files;
+    makefile->num_cleanup_files = num_files;
+}
+
+void
+chaz_MakeFile_add_dir_to_cleanup(chaz_MakeFile *makefile, const char *dir) {
+    char   **dirs     = makefile->cleanup_dirs;
+    size_t   num_dirs = makefile->num_cleanup_dirs + 1;
+
+    dirs = (char**)realloc(dirs, (num_dirs + 1) * sizeof(char*));
+    dirs[num_dirs-1] = chaz_Util_strdup(dir);
+    dirs[num_dirs]   = NULL;
+    makefile->cleanup_dirs     = dirs;
+    makefile->num_cleanup_dirs = num_dirs;
 }
 
 chaz_MakeRule*
@@ -293,62 +310,78 @@ chaz_MakeFile_add_shared_obj(chaz_MakeFile *makefile, const char *shared_obj,
 void
 chaz_MakeFile_write(chaz_MakeFile *makefile) {
     int     shell_type = chaz_OS_shell_type();
-    FILE   *file;
+    FILE   *out;
     size_t  i;
 
-    file = fopen("Makefile", "w");
-    if (!file) {
+    out = fopen("Makefile", "w");
+    if (!out) {
         chaz_Util_die("Can't open Makefile\n");
     }
 
     for (i = 0; makefile->vars[i]; i++) {
         chaz_MakeVar *var = makefile->vars[i];
-        fprintf(file, "%s = %s\n", var->name, var->value);
+        fprintf(out, "%s = %s\n", var->name, var->value);
     }
-    fprintf(file, "\n");
+    fprintf(out, "\n");
 
     for (i = 0; makefile->rules[i]; i++) {
         chaz_MakeRule *rule = makefile->rules[i];
-        fprintf(file, "%s :", rule->targets);
+        fprintf(out, "%s :", rule->targets);
         if (rule->prereqs) {
-            fprintf(file, " %s", rule->prereqs);
+            fprintf(out, " %s", rule->prereqs);
         }
-        fprintf(file, "\n");
+        fprintf(out, "\n");
         if (rule->commands) {
-            fprintf(file, "%s", rule->commands);
+            fprintf(out, "%s", rule->commands);
         }
-        fprintf(file, "\n");
+        fprintf(out, "\n");
     }
 
-    if (makefile->cleanups[0]) {
+    if (makefile->cleanup_files[0] || makefile->cleanup_dirs[0]) {
+        fprintf(out, "clean :\n");
         if (shell_type == CHAZ_OS_POSIX) {
-            fprintf(file, "clean :\n\trm -f");
-            for (i = 0; makefile->cleanups[i]; i++) {
-                const char *cleanup = makefile->cleanups[i];
-                fprintf(file, " \\\n\t    %s", cleanup);
+            if (makefile->cleanup_files[0]) {
+                fprintf(out, "\trm -f");
+                for (i = 0; makefile->cleanup_files[i]; i++) {
+                    const char *file = makefile->cleanup_files[i];
+                    fprintf(out, " \\\n\t    %s", file);
+                }
+                fprintf(out, "\n");
             }
-            fprintf(file, "\n\n");
+            if (makefile->cleanup_dirs[0]) {
+                fprintf(out, "\trm -rf");
+                for (i = 0; makefile->cleanup_dirs[i]; i++) {
+                    const char *dir = makefile->cleanup_dirs[i];
+                    fprintf(out, " \\\n\t    %s", dir);
+                }
+                fprintf(out, "\n");
+            }
         }
         else if (shell_type == CHAZ_OS_CMD_EXE) {
-            fprintf(file, "clean :\n");
-            for (i = 0; makefile->cleanups[i]; i++) {
-                const char *cleanup = makefile->cleanups[i];
-                fprintf(file, "\tfor %%i in (%s) do @if exist %%i del /f %%i\n",
-                        cleanup);
+            for (i = 0; makefile->cleanup_files[i]; i++) {
+                const char *file = makefile->cleanup_files[i];
+                fprintf(out, "\tfor %%i in (%s) do @if exist %%i del /f %%i\n",
+                        file);
             }
-            fprintf(file, "\n");
+            for (i = 0; makefile->cleanup_dirs[i]; i++) {
+                const char *dir = makefile->cleanup_dirs[i];
+                fprintf(out,
+                        "\tfor %%i in (%s) do @if exist %%i rmdir /s /q %%i\n",
+                        dir);
+            }
         }
         else {
             chaz_Util_die("Unsupported shell type: %d", shell_type);
         }
+        fprintf(out, "\n");
     }
 
-    fprintf(file, "distclean : clean\n");
+    fprintf(out, "distclean : clean\n");
     if (shell_type == CHAZ_OS_POSIX) {
-        fprintf(file, "\trm -f charmonizer$(EXE_EXT) charmony.h Makefile\n\n");
+        fprintf(out, "\trm -f charmonizer$(EXE_EXT) charmony.h Makefile\n\n");
     }
     else if (shell_type == CHAZ_OS_CMD_EXE) {
-        fprintf(file,
+        fprintf(out,
             "\tfor %%i in (charmonizer$(EXE_EXT) charmonizer$(OBJ_EXT)"
             " charmony.h Makefile) do @if exist %%i del /f %%i\n\n");
     }
@@ -358,16 +391,16 @@ chaz_MakeFile_write(chaz_MakeFile *makefile) {
 
     if (chaz_Make.is_nmake) {
         /* Inference rule for .c files. */
-        fprintf(file, ".c.obj :\n");
+        fprintf(out, ".c.obj :\n");
         if (chaz_CC_msvc_version_num()) {
-            fprintf(file, "\t$(CC) $(CFLAGS) /c $< /Fo$@\n\n");
+            fprintf(out, "\t$(CC) $(CFLAGS) /c $< /Fo$@\n\n");
         }
         else {
-            fprintf(file, "\t$(CC) $(CFLAGS) -c $< -o $@\n\n");
+            fprintf(out, "\t$(CC) $(CFLAGS) -c $< -o $@\n\n");
         }
     }
 
-    fclose(file);
+    fclose(out);
 }
 
 void
