@@ -13,15 +13,6 @@ routines whose interfaces are defined within "trunk/core".
 Once all the stubs have been implemented correctly, Lucy will theoretically
 build and pass its tests.
 
-There is one pair of files with an interface *not* defined in core.
-
-    c/src/CFBind.h
-    c/src/CFBind.c
-
-The CFBind files are there to hold conversion routines which are specific to C.
-Since it is impractical to impose a generic interface, they
-are not defined in core.
-
 ================================================================================
    HACKING
 ================================================================================
