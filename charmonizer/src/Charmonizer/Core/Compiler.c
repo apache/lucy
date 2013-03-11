@@ -409,6 +409,19 @@ chaz_CC_msvc_version_num(void) {
 }
 
 const char*
+chaz_CC_shared_obj_cflags() {
+    if (chaz_CC.intval__MSC_VER) {
+        return "";
+    }
+    else if (chaz_OS_is_darwin()) {
+        return "-fno-common";
+    }
+    else {
+        return "-fPIC";
+    }
+}
+
+const char*
 chaz_CC_link_command() {
     if (chaz_CC.intval__MSC_VER) {
         return "link";
@@ -429,7 +442,7 @@ chaz_CC_link_shared_obj_flag() {
         return "/DLL";
     }
     else if (chaz_OS_is_darwin()) {
-        return "-dynamiclib ";
+        return "-dynamiclib";
     }
     else {
         return "-shared";
@@ -444,6 +457,36 @@ chaz_CC_link_output_flag() {
     else {
         return "-o ";
     }
+}
+
+char*
+chaz_CC_library_path_flag(const char *directory) {
+    char *flag = (char*)malloc(20 + sizeof(directory));
+    if (chaz_CC.intval__MSC_VER) {
+        if (strcmp(directory, ".") == 0) {
+            /* The MS linker searches the current directory by default. */
+            strcpy(flag, "");
+        }
+        else {
+            sprintf(flag, "/LIBPATH:%s", directory);
+        }
+    }
+    else {
+        sprintf(flag, "-L%s", directory);
+    }
+    return flag;
+}
+
+char*
+chaz_CC_link_with_shared_obj_flag(const char *shared_obj) {
+    char *flag = (char*)malloc(20 + sizeof(shared_obj));
+    if (chaz_CC.intval__MSC_VER) {
+        sprintf(flag, "%s.lib", shared_obj);
+    }
+    else {
+        sprintf(flag, "-l%s", shared_obj);
+    }
+    return flag;
 }
 
 

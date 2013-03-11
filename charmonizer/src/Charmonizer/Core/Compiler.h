@@ -114,6 +114,9 @@ int
 chaz_CC_msvc_version_num(void);
 
 const char*
+chaz_CC_shared_obj_cflags(void);
+
+const char*
 chaz_CC_link_command(void);
 
 const char*
@@ -124,6 +127,12 @@ chaz_CC_link_shared_obj_flag(void);
 
 const char*
 chaz_CC_link_output_flag(void);
+
+char*
+chaz_CC_library_path_flag(const char *directory);
+
+char*
+chaz_CC_link_with_shared_obj_flag(const char *shared_obj);
 
 #ifdef __cplusplus
 }
