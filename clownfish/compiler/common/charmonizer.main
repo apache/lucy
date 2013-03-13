@@ -227,6 +227,7 @@ int main(int argc, const char **argv) {
     chaz_Headers_run();
     chaz_Integers_run();
     chaz_Strings_run();
+    chaz_UnusedVars_run();
 
     {
         int i;

@@ -1053,6 +1053,32 @@ void chaz_Strings_run(void);
 
 /***************************************************************************/
 
+#line 21 "src/Charmonizer/Probe/UnusedVars.h"
+/* Charmonizer/Probe/UnusedVars.h
+ */
+
+#ifndef H_CHAZ_UNUSED_VARS
+#define H_CHAZ_UNUSED_VARS
+
+#include <stdio.h>
+
+/* Run the UnusedVars module.
+ *
+ * These symbols are exported:
+ *
+ * UNUSED_VAR(var)
+ * UNREACHABLE_RETURN(type)
+ *
+ */
+void chaz_UnusedVars_run(void);
+
+#endif /* H_CHAZ_UNUSED_VARS */
+
+
+
+
+/***************************************************************************/
+
 #line 17 "src/Charmonizer/Core/Compiler.c"
 #include <string.h>
 #include <stdlib.h>
@@ -4746,6 +4772,30 @@ chaz_Strings_probe_c99_snprintf(void) {
 }
 
 
+/***************************************************************************/
+
+#line 17 "src/Charmonizer/Probe/UnusedVars.c"
+/* #include "Charmonizer/Core/ConfWriter.h" */
+/* #include "Charmonizer/Core/Util.h" */
+/* #include "Charmonizer/Probe/UnusedVars.h" */
+#include <string.h>
+#include <stdio.h>
+
+
+void
+chaz_UnusedVars_run(void) {
+    chaz_ConfWriter_start_module("UnusedVars");
+
+    /* Write the macros (no test, these are the same everywhere). */
+    chaz_ConfWriter_add_def("UNUSED_VAR(x)", "((void)x)");
+    chaz_ConfWriter_add_def("UNREACHABLE_RETURN(type)", "return (type)0");
+
+    chaz_ConfWriter_end_module();
+}
+
+
+
+
 #line 1 "clownfish/compiler/common/charmonizer.main"
 /* Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -4976,6 +5026,7 @@ int main(int argc, const char **argv) {
     chaz_Headers_run();
     chaz_Integers_run();
     chaz_Strings_run();
+    chaz_UnusedVars_run();
 
     {
         int i;
