@@ -87,6 +87,11 @@ chaz_CC_clean_up(void);
 void
 chaz_CC_set_warnings_as_errors(const int flag);
 
+/* (Re)set "extra" cflags.
+ */
+void
+chaz_CC_set_extra_cflags(const char *);
+
 /* Concatenate onto the end of the "extra" cflags.  A space will be inserted
  * automatically.
  */
@@ -918,6 +923,11 @@ void chaz_DirManip_run(void);
 void
 chaz_Floats_run(void);
 
+/* Determine which flags are needed to link against the math library.
+ */
+const char*
+chaz_Floats_math_library_flags(void);
+
 #endif /* H_CHAZ_FLOATS */
 
 
@@ -1638,6 +1648,12 @@ chaz_CC_capture_output(const char *source, size_t *output_len) {
     chaz_Util_remove_and_verify(CHAZ_CC_TARGET_PATH);
 
     return captured_output;
+}
+
+void
+chaz_CC_set_extra_cflags(const char *flags) {
+    free(chaz_CC.extra_cflags);
+    chaz_CC.extra_cflags = chaz_Util_strdup(flags);
 }
 
 void
@@ -3107,13 +3123,13 @@ chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
     size = strlen(pattern)
            + strlen(link)
            + strlen(link_flags)
-           + strlen(extra_link_flags)
            + strlen(objects)
+           + strlen(extra_link_flags)
            + strlen(output_flag)
            + strlen(exe)
            + 50;
     command = (char*)malloc(size);
-    sprintf(command, pattern, link, link_flags, extra_link_flags, objects,
+    sprintf(command, pattern, link, link_flags, objects, extra_link_flags,
             output_flag, exe);
     chaz_MakeRule_add_command(rule, command);
 
@@ -3141,14 +3157,14 @@ chaz_MakeFile_add_shared_obj(chaz_MakeFile *makefile, const char *shared_obj,
            + strlen(link)
            + strlen(shobj_flags)
            + strlen(link_flags)
-           + strlen(extra_link_flags)
            + strlen(objects)
+           + strlen(extra_link_flags)
            + strlen(output_flag)
            + strlen(shared_obj)
            + 50;
     command = (char*)malloc(size);
-    sprintf(command, pattern, link, shobj_flags, link_flags, extra_link_flags,
-            objects, output_flag, shared_obj);
+    sprintf(command, pattern, link, shobj_flags, link_flags, objects,
+            extra_link_flags, output_flag, shared_obj);
     chaz_MakeRule_add_command(rule, command);
 
     chaz_MakeFile_add_to_cleanup(makefile, shared_obj);
@@ -4374,6 +4390,43 @@ chaz_Floats_run(void) {
     chaz_ConfWriter_add_def("F64_NAN", "(chy_f64nan.d)");
 
     chaz_ConfWriter_end_module();
+}
+
+const char*
+chaz_Floats_math_library_flags(void) {
+    static const char sqrt_code[] =
+        CHAZ_QUOTE(  #include <math.h>                              )
+        CHAZ_QUOTE(  #include <stdio.h>                             )
+        CHAZ_QUOTE(  int main(void) {                               )
+        CHAZ_QUOTE(      printf("%p\n", sqrt);                      )
+        CHAZ_QUOTE(      return 0;                                  )
+        CHAZ_QUOTE(  }                                              );
+    char   *old_extra_cflags;
+    char   *output = NULL;
+    size_t  output_len;
+
+    output = chaz_CC_capture_output(sqrt_code, &output_len);
+    if (output != NULL) {
+        /* Linking against libm not needed. */
+        free(output);
+        return "";
+    }
+
+    old_extra_cflags = chaz_Util_strdup(chaz_CC_get_extra_cflags());
+    chaz_CC_add_extra_cflags("-lm");
+
+    output = chaz_CC_capture_output(sqrt_code, &output_len);
+
+    /* Restore extra cflags. */
+    chaz_CC_set_extra_cflags(old_extra_cflags);
+    free(old_extra_cflags);
+
+    if (output == NULL) {
+        chaz_Util_die("Don't know how to use math library.");
+    }
+
+    free(output);
+    return "-lm";
 }
 
 

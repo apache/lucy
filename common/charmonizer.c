@@ -87,6 +87,11 @@ chaz_CC_clean_up(void);
 void
 chaz_CC_set_warnings_as_errors(const int flag);
 
+/* (Re)set "extra" cflags.
+ */
+void
+chaz_CC_set_extra_cflags(const char *);
+
 /* Concatenate onto the end of the "extra" cflags.  A space will be inserted
  * automatically.
  */
@@ -918,6 +923,11 @@ void chaz_DirManip_run(void);
 void
 chaz_Floats_run(void);
 
+/* Determine which flags are needed to link against the math library.
+ */
+const char*
+chaz_Floats_math_library_flags(void);
+
 #endif /* H_CHAZ_FLOATS */
 
 
@@ -1638,6 +1648,12 @@ chaz_CC_capture_output(const char *source, size_t *output_len) {
     chaz_Util_remove_and_verify(CHAZ_CC_TARGET_PATH);
 
     return captured_output;
+}
+
+void
+chaz_CC_set_extra_cflags(const char *flags) {
+    free(chaz_CC.extra_cflags);
+    chaz_CC.extra_cflags = chaz_Util_strdup(flags);
 }
 
 void
@@ -3107,13 +3123,13 @@ chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
     size = strlen(pattern)
            + strlen(link)
            + strlen(link_flags)
-           + strlen(extra_link_flags)
            + strlen(objects)
+           + strlen(extra_link_flags)
            + strlen(output_flag)
            + strlen(exe)
            + 50;
     command = (char*)malloc(size);
-    sprintf(command, pattern, link, link_flags, extra_link_flags, objects,
+    sprintf(command, pattern, link, link_flags, objects, extra_link_flags,
             output_flag, exe);
     chaz_MakeRule_add_command(rule, command);
 
@@ -3141,14 +3157,14 @@ chaz_MakeFile_add_shared_obj(chaz_MakeFile *makefile, const char *shared_obj,
            + strlen(link)
            + strlen(shobj_flags)
            + strlen(link_flags)
-           + strlen(extra_link_flags)
            + strlen(objects)
+           + strlen(extra_link_flags)
            + strlen(output_flag)
            + strlen(shared_obj)
            + 50;
     command = (char*)malloc(size);
-    sprintf(command, pattern, link, shobj_flags, link_flags, extra_link_flags,
-            objects, output_flag, shared_obj);
+    sprintf(command, pattern, link, shobj_flags, link_flags, objects,
+            extra_link_flags, output_flag, shared_obj);
     chaz_MakeRule_add_command(rule, command);
 
     chaz_MakeFile_add_to_cleanup(makefile, shared_obj);
@@ -4374,6 +4390,43 @@ chaz_Floats_run(void) {
     chaz_ConfWriter_add_def("F64_NAN", "(chy_f64nan.d)");
 
     chaz_ConfWriter_end_module();
+}
+
+const char*
+chaz_Floats_math_library_flags(void) {
+    static const char sqrt_code[] =
+        CHAZ_QUOTE(  #include <math.h>                              )
+        CHAZ_QUOTE(  #include <stdio.h>                             )
+        CHAZ_QUOTE(  int main(void) {                               )
+        CHAZ_QUOTE(      printf("%p\n", sqrt);                      )
+        CHAZ_QUOTE(      return 0;                                  )
+        CHAZ_QUOTE(  }                                              );
+    char   *old_extra_cflags;
+    char   *output = NULL;
+    size_t  output_len;
+
+    output = chaz_CC_capture_output(sqrt_code, &output_len);
+    if (output != NULL) {
+        /* Linking against libm not needed. */
+        free(output);
+        return "";
+    }
+
+    old_extra_cflags = chaz_Util_strdup(chaz_CC_get_extra_cflags());
+    chaz_CC_add_extra_cflags("-lm");
+
+    output = chaz_CC_capture_output(sqrt_code, &output_len);
+
+    /* Restore extra cflags. */
+    chaz_CC_set_extra_cflags(old_extra_cflags);
+    free(old_extra_cflags);
+
+    if (output == NULL) {
+        chaz_Util_die("Don't know how to use math library.");
+    }
+
+    free(output);
+    return "-lm";
 }
 
 
@@ -6025,12 +6078,18 @@ S_write_makefile() {
 
     /* C compiler */
 
+    const char *math_link_flags = chaz_Floats_math_library_flags();
+
     chaz_MakeFile_add_var(makefile, "CC", chaz_CC_get_cc());
 
     if (chaz_CC_msvc_version_num()) {
         chaz_CC_add_extra_cflags("/nologo");
     }
     chaz_CC_set_optimization_level("2");
+
+    /* TODO: This makes extra_cflags and subsequent probes unusable. Find a
+     * better way to get flags for include dirs.
+     */
     chaz_CC_add_include_dir(".");
     chaz_CC_add_include_dir("$(SRC_DIR)");
     chaz_CC_add_include_dir("$(CORE_DIR)");
@@ -6123,16 +6182,26 @@ S_write_makefile() {
     chaz_MakeRule_add_command(rule, scratch);
     free(scratch);
 
+    /* Needed for parallel builds. */
+    rule = chaz_MakeFile_add_rule(makefile, "$(AUTOGEN_DIR)" DIR_SEP "source"
+                                  DIR_SEP "parcel.c", "$(AUTOGEN_DIR)");
+
     rule = chaz_MakeFile_add_rule(makefile, "$(LUCY_OBJS)", NULL);
     chaz_MakeRule_add_prereq(rule, json_parser_c);
     chaz_MakeRule_add_prereq(rule, "$(AUTOGEN_DIR)");
 
-    const char *link_flags = "";
+    const char *pcre_link_flags = "";
     if (chaz_HeadCheck_check_header("pcre.h")) {
-        link_flags = "-lpcre";
+        pcre_link_flags = "-lpcre";
     }
+    size_t link_flags_size = strlen(math_link_flags)
+                             + strlen(pcre_link_flags)
+                             + 20;
+    char *link_flags = (char*)malloc(link_flags_size);
+    sprintf(link_flags, "%s %s", math_link_flags, pcre_link_flags);
     chaz_MakeFile_add_shared_obj(makefile, "$(LUCY_SHOBJ)", "$(LUCY_OBJS)",
                                  link_flags);
+    free(link_flags);
 
     chaz_MakeFile_add_rule(makefile, "$(TEST_LUCY_OBJS)", "$(AUTOGEN_DIR)");
 
@@ -6141,7 +6210,11 @@ S_write_makefile() {
     chaz_MakeRule_add_prereq(rule, "$(LUCY_SHOBJ)");
 
     rule = chaz_MakeFile_add_rule(makefile, "test", "$(TEST_LUCY_EXE)");
-    chaz_MakeRule_add_command(rule, "$(TEST_LUCY_EXE)");
+    const char *test_command = "$(TEST_LUCY_EXE)";
+    if (strcmp(chaz_OS_shared_obj_ext(), ".so") == 0) {
+        test_command = "LD_LIBRARY_PATH=. $(TEST_LUCY_EXE)";
+    }
+    chaz_MakeRule_add_command(rule, test_command);
 
     chaz_MakeFile_add_to_cleanup(makefile, "$(TEST_LUCY_OBJS)");
     chaz_MakeFile_add_to_cleanup(makefile, "$(LUCY_OBJS)");

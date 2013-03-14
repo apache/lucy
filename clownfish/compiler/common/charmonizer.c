@@ -87,6 +87,11 @@ chaz_CC_clean_up(void);
 void
 chaz_CC_set_warnings_as_errors(const int flag);
 
+/* (Re)set "extra" cflags.
+ */
+void
+chaz_CC_set_extra_cflags(const char *);
+
 /* Concatenate onto the end of the "extra" cflags.  A space will be inserted
  * automatically.
  */
@@ -1338,6 +1343,12 @@ chaz_CC_capture_output(const char *source, size_t *output_len) {
     chaz_Util_remove_and_verify(CHAZ_CC_TARGET_PATH);
 
     return captured_output;
+}
+
+void
+chaz_CC_set_extra_cflags(const char *flags) {
+    free(chaz_CC.extra_cflags);
+    chaz_CC.extra_cflags = chaz_Util_strdup(flags);
 }
 
 void
@@ -2807,13 +2818,13 @@ chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
     size = strlen(pattern)
            + strlen(link)
            + strlen(link_flags)
-           + strlen(extra_link_flags)
            + strlen(objects)
+           + strlen(extra_link_flags)
            + strlen(output_flag)
            + strlen(exe)
            + 50;
     command = (char*)malloc(size);
-    sprintf(command, pattern, link, link_flags, extra_link_flags, objects,
+    sprintf(command, pattern, link, link_flags, objects, extra_link_flags,
             output_flag, exe);
     chaz_MakeRule_add_command(rule, command);
 
@@ -2841,14 +2852,14 @@ chaz_MakeFile_add_shared_obj(chaz_MakeFile *makefile, const char *shared_obj,
            + strlen(link)
            + strlen(shobj_flags)
            + strlen(link_flags)
-           + strlen(extra_link_flags)
            + strlen(objects)
+           + strlen(extra_link_flags)
            + strlen(output_flag)
            + strlen(shared_obj)
            + 50;
     command = (char*)malloc(size);
-    sprintf(command, pattern, link, shobj_flags, link_flags, extra_link_flags,
-            objects, output_flag, shared_obj);
+    sprintf(command, pattern, link, shobj_flags, link_flags, objects,
+            extra_link_flags, output_flag, shared_obj);
     chaz_MakeRule_add_command(rule, command);
 
     chaz_MakeFile_add_to_cleanup(makefile, shared_obj);
