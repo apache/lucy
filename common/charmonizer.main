@@ -280,6 +280,10 @@ S_write_makefile() {
     chaz_MakeRule_add_command(rule, scratch);
     free(scratch);
 
+    /* Needed for parallel builds. */
+    rule = chaz_MakeFile_add_rule(makefile, "$(AUTOGEN_DIR)" DIR_SEP "source"
+                                  DIR_SEP "parcel.c", "$(AUTOGEN_DIR)");
+
     rule = chaz_MakeFile_add_rule(makefile, "$(LUCY_OBJS)", NULL);
     chaz_MakeRule_add_prereq(rule, json_parser_c);
     chaz_MakeRule_add_prereq(rule, "$(AUTOGEN_DIR)");
