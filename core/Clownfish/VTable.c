@@ -51,7 +51,7 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
      * - Initialize refcount, parent, flags, obj_alloc_size, vt_alloc_size.
      * - Initialize method pointers.
      */
-    for (int i = 0; i < num_specs; ++i) {
+    for (size_t i = 0; i < num_specs; ++i) {
         VTableSpec *spec   = &specs[i];
         VTable     *parent = spec->parent ? *spec->parent : NULL;
 
@@ -73,7 +73,7 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
             memcpy(vtable->method_ptrs, parent->method_ptrs, parent_ptrs_size);
         }
 
-        for (int i = 0; i < spec->num_fresh; ++i) {
+        for (size_t i = 0; i < spec->num_fresh; ++i) {
             MethodSpec *mspec = &spec->method_specs[i];
             VTable_override(vtable, mspec->func, *mspec->offset);
         }
@@ -84,7 +84,7 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
     /* Pass 2:
      * - Initialize 'vtable' instance variable.
      */
-    for (int i = 0; i < num_specs; ++i) {
+    for (size_t i = 0; i < num_specs; ++i) {
         VTableSpec *spec   = &specs[i];
         VTable     *vtable = *spec->vtable;
 
@@ -97,14 +97,14 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
      * - Inititalize name and method array.
      * - Register vtable.
      */
-    for (int i = 0; i < num_specs; ++i) {
+    for (size_t i = 0; i < num_specs; ++i) {
         VTableSpec *spec   = &specs[i];
         VTable     *vtable = *spec->vtable;
 
         vtable->name    = CB_newf("%s", spec->name);
         vtable->methods = VA_new(0);
 
-        for (int i = 0; i < spec->num_fresh; ++i) {
+        for (size_t i = 0; i < spec->num_fresh; ++i) {
             MethodSpec *mspec = &spec->method_specs[i];
             if (mspec->is_novel) {
                 CharBuf *name = CB_newf("%s", mspec->name);

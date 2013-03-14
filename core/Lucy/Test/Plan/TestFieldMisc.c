@@ -127,7 +127,7 @@ S_add_doc(Indexer *indexer, CharBuf *field_name) {
 
 static void
 S_check(TestBatch *batch, RAMFolder *folder, CharBuf *field,
-        CharBuf *query_text, int expected_num_hits) {
+        CharBuf *query_text, uint32_t expected_num_hits) {
     TermQuery *query = TermQuery_new(field, (Obj*)query_text);
     IndexSearcher *searcher = IxSearcher_new((Obj*)folder);
     Hits *hits = IxSearcher_Hits(searcher, (Obj*)query, 0, 10, NULL);
