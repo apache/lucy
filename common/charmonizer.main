@@ -176,12 +176,18 @@ S_write_makefile() {
 
     /* C compiler */
 
+    const char *math_link_flags = chaz_Floats_math_library_flags();
+
     chaz_MakeFile_add_var(makefile, "CC", chaz_CC_get_cc());
 
     if (chaz_CC_msvc_version_num()) {
         chaz_CC_add_extra_cflags("/nologo");
     }
     chaz_CC_set_optimization_level("2");
+
+    /* TODO: This makes extra_cflags and subsequent probes unusable. Find a
+     * better way to get flags for include dirs.
+     */
     chaz_CC_add_include_dir(".");
     chaz_CC_add_include_dir("$(SRC_DIR)");
     chaz_CC_add_include_dir("$(CORE_DIR)");
@@ -278,12 +284,18 @@ S_write_makefile() {
     chaz_MakeRule_add_prereq(rule, json_parser_c);
     chaz_MakeRule_add_prereq(rule, "$(AUTOGEN_DIR)");
 
-    const char *link_flags = "";
+    const char *pcre_link_flags = "";
     if (chaz_HeadCheck_check_header("pcre.h")) {
-        link_flags = "-lpcre";
+        pcre_link_flags = "-lpcre";
     }
+    size_t link_flags_size = strlen(math_link_flags)
+                             + strlen(pcre_link_flags)
+                             + 20;
+    char *link_flags = (char*)malloc(link_flags_size);
+    sprintf(link_flags, "%s %s", math_link_flags, pcre_link_flags);
     chaz_MakeFile_add_shared_obj(makefile, "$(LUCY_SHOBJ)", "$(LUCY_OBJS)",
                                  link_flags);
+    free(link_flags);
 
     chaz_MakeFile_add_rule(makefile, "$(TEST_LUCY_OBJS)", "$(AUTOGEN_DIR)");
 
