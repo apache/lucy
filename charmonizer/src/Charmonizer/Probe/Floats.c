@@ -46,4 +46,41 @@ chaz_Floats_run(void) {
     chaz_ConfWriter_end_module();
 }
 
+const char*
+chaz_Floats_math_library_flags(void) {
+    static const char sqrt_code[] =
+        CHAZ_QUOTE(  #include <math.h>                              )
+        CHAZ_QUOTE(  #include <stdio.h>                             )
+        CHAZ_QUOTE(  int main(void) {                               )
+        CHAZ_QUOTE(      printf("%p\n", sqrt);                      )
+        CHAZ_QUOTE(      return 0;                                  )
+        CHAZ_QUOTE(  }                                              );
+    char   *old_extra_cflags;
+    char   *output = NULL;
+    size_t  output_len;
+
+    output = chaz_CC_capture_output(sqrt_code, &output_len);
+    if (output != NULL) {
+        /* Linking against libm not needed. */
+        free(output);
+        return "";
+    }
+
+    old_extra_cflags = chaz_Util_strdup(chaz_CC_get_extra_cflags());
+    chaz_CC_add_extra_cflags("-lm");
+
+    output = chaz_CC_capture_output(sqrt_code, &output_len);
+
+    /* Restore extra cflags. */
+    chaz_CC_set_extra_cflags(old_extra_cflags);
+    free(old_extra_cflags);
+
+    if (output == NULL) {
+        chaz_Util_die("Don't know how to use math library.");
+    }
+
+    free(output);
+    return "-lm";
+}
+
 

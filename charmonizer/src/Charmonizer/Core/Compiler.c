@@ -325,6 +325,12 @@ chaz_CC_capture_output(const char *source, size_t *output_len) {
 }
 
 void
+chaz_CC_set_extra_cflags(const char *flags) {
+    free(chaz_CC.extra_cflags);
+    chaz_CC.extra_cflags = chaz_Util_strdup(flags);
+}
+
+void
 chaz_CC_add_extra_cflags(const char *flags) {
     if (!strlen(chaz_CC.extra_cflags)) {
         free(chaz_CC.extra_cflags);

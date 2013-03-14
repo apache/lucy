@@ -42,6 +42,11 @@ extern "C" {
 void
 chaz_Floats_run(void);
 
+/* Determine which flags are needed to link against the math library.
+ */
+const char*
+chaz_Floats_math_library_flags(void);
+
 #ifdef __cplusplus
 }
 #endif
