@@ -308,7 +308,11 @@ S_write_makefile() {
     chaz_MakeRule_add_prereq(rule, "$(LUCY_SHOBJ)");
 
     rule = chaz_MakeFile_add_rule(makefile, "test", "$(TEST_LUCY_EXE)");
-    chaz_MakeRule_add_command(rule, "$(TEST_LUCY_EXE)");
+    const char *test_command = "$(TEST_LUCY_EXE)";
+    if (strcmp(chaz_OS_shared_obj_ext(), ".so") == 0) {
+        test_command = "LD_LIBRARY_PATH=. $(TEST_LUCY_EXE)";
+    }
+    chaz_MakeRule_add_command(rule, test_command);
 
     chaz_MakeFile_add_to_cleanup(makefile, "$(TEST_LUCY_OBJS)");
     chaz_MakeFile_add_to_cleanup(makefile, "$(LUCY_OBJS)");
