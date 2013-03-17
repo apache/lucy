@@ -95,7 +95,7 @@ sub ACTION_charmonizer_tests {
     print "Building Charmonizer Tests...\n\n";
     my $flags = join( " ",
         $self->config('ccflags'),
-        @{ $self->extra_compiler_flags },
+        $self->charmony('EXTRA_CFLAGS'),
         '-I' . rel2abs( getcwd() ),
     );
     $flags =~ s/"/\\"/g;
