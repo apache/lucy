@@ -184,6 +184,8 @@ S_write_makefile() {
         chaz_CC_add_extra_cflags("/nologo");
     }
     chaz_CC_set_optimization_level("2");
+    chaz_CC_disable_strict_aliasing();
+    chaz_CC_add_extra_cflags(chaz_CC_shared_obj_cflags());
 
     /* TODO: This makes extra_cflags and subsequent probes unusable. Find a
      * better way to get flags for include dirs.
@@ -288,24 +290,31 @@ S_write_makefile() {
     chaz_MakeRule_add_prereq(rule, json_parser_c);
     chaz_MakeRule_add_prereq(rule, "$(AUTOGEN_DIR)");
 
-    const char *pcre_link_flags = "";
+    char *pcre_link_flag;
     if (chaz_HeadCheck_check_header("pcre.h")) {
-        pcre_link_flags = "-lpcre";
+        pcre_link_flag = chaz_CC_link_with_shared_obj_flag("pcre");
     }
-    size_t link_flags_size = strlen(math_link_flags)
-                             + strlen(pcre_link_flags)
-                             + 20;
-    char *link_flags = (char*)malloc(link_flags_size);
-    sprintf(link_flags, "%s %s", math_link_flags, pcre_link_flags);
+    else {
+        pcre_link_flag = chaz_Util_strdup("");
+    }
+    char *link_flags
+        = chaz_Util_join(" ", math_link_flags, pcre_link_flag, NULL);
     chaz_MakeFile_add_shared_obj(makefile, "$(LUCY_SHOBJ)", "$(LUCY_OBJS)",
                                  link_flags);
     free(link_flags);
+    free(pcre_link_flag);
 
     chaz_MakeFile_add_rule(makefile, "$(TEST_LUCY_OBJS)", "$(AUTOGEN_DIR)");
 
+    char *library_path_flag = chaz_CC_library_path_flag(".");
+    char *lucy_link_flag    = chaz_CC_link_with_shared_obj_flag("lucy");
+    link_flags = chaz_Util_join(" ", library_path_flag, lucy_link_flag, NULL);
     rule = chaz_MakeFile_add_exe(makefile, "$(TEST_LUCY_EXE)",
-                                 "$(TEST_LUCY_OBJS)", "-L. -llucy");
+                                 "$(TEST_LUCY_OBJS)", link_flags);
     chaz_MakeRule_add_prereq(rule, "$(LUCY_SHOBJ)");
+    free(link_flags);
+    free(lucy_link_flag);
+    free(library_path_flag);
 
     rule = chaz_MakeFile_add_rule(makefile, "test", "$(TEST_LUCY_EXE)");
     const char *test_command = "$(TEST_LUCY_EXE)";
