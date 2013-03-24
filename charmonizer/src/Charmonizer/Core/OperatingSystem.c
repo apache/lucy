@@ -172,11 +172,9 @@ chaz_OS_remove(const char *name) {
 
 int
 chaz_OS_run_local_redirected(const char *command, const char *path) {
-    size_t size = strlen(command) + strlen(chaz_OS.local_command_start) + 20;
-    char *local_command = (char*)malloc(size);
-    int retval;
-    sprintf(local_command, "%s%s", chaz_OS.local_command_start, command);
-    retval = chaz_OS_run_redirected(local_command, path);
+    char *local_command
+        = chaz_Util_join("", chaz_OS.local_command_start, command, NULL);
+    int retval = chaz_OS_run_redirected(local_command, path);
     free(local_command);
     return retval;
 }
@@ -193,13 +191,7 @@ chaz_OS_run_redirected(const char *command, const char *path) {
     if (chaz_OS.shell_type == CHAZ_OS_POSIX
         || chaz_OS.shell_type == CHAZ_OS_CMD_EXE
         ) {
-        char pattern[] = "%s > %s 2>&1";
-        size_t size = sizeof(pattern)
-                      + strlen(command)
-                      + strlen(path)
-                      + 10;
-        quiet_command = (char*)malloc(size);
-        sprintf(quiet_command, pattern, command, path);
+        quiet_command = chaz_Util_join(" ", command, ">", path, "2>&1", NULL);
     }
     else {
         chaz_Util_die("Don't know the shell type");
@@ -224,9 +216,7 @@ chaz_OS_mkdir(const char *filepath) {
     if (chaz_OS.shell_type == CHAZ_OS_POSIX
         || chaz_OS.shell_type == CHAZ_OS_CMD_EXE
        ) {
-        unsigned size = sizeof("mkdir") + 1 + strlen(filepath) + 1;
-        command = (char*)malloc(size);
-        sprintf(command, "mkdir %s", filepath);
+        command = chaz_Util_join(" ", "mkdir", filepath, NULL);
     }
     else {
         chaz_Util_die("Don't know the shell type");
@@ -239,14 +229,10 @@ void
 chaz_OS_rmdir(const char *filepath) {
     char *command = NULL;
     if (chaz_OS.shell_type == CHAZ_OS_POSIX) {
-        unsigned size = strlen("rmdir") + 1 + strlen(filepath) + 1;
-        command = (char*)malloc(size);
-        sprintf(command, "rmdir %s", filepath);
+        command = chaz_Util_join(" ", "rmdir", filepath, NULL);
     }
     else if (chaz_OS.shell_type == CHAZ_OS_CMD_EXE) {
-        unsigned size = strlen("rmdir /q") + 1 + strlen(filepath) + 1;
-        command = (char*)malloc(size);
-        sprintf(command, "rmdir /q %s", filepath);
+        command = chaz_Util_join(" ", "rmdir", "/q", filepath, NULL);
     }
     else {
         chaz_Util_die("Don't know the shell type");

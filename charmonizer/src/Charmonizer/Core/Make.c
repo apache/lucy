@@ -123,10 +123,7 @@ chaz_Make_detect(const char *make1, ...) {
 static int
 chaz_Make_audition(const char *make) {
     int succeeded = 0;
-    const char pattern[] = "%s -f _charm_Makefile";
-    size_t size = strlen(make) + sizeof(pattern) + 10;
-    char *command = (char*)malloc(size);
-    sprintf(command, pattern, make);
+    char *command = chaz_Util_join(" ", make, "-f", "_charm_Makefile", NULL);
 
     chaz_Util_remove_and_verify("_charm_foo");
     chaz_OS_run_redirected(command, "_charm_foo");
@@ -436,8 +433,7 @@ chaz_MakeRule_add_target(chaz_MakeRule *rule, const char *target) {
         targets = chaz_Util_strdup(target);
     }
     else {
-        targets = (char*)malloc(strlen(rule->targets) + strlen(target) + 20);
-        sprintf(targets, "%s %s", rule->targets, target);
+        targets = chaz_Util_join(" ", rule->targets, target, NULL);
         free(rule->targets);
     }
 
@@ -452,8 +448,7 @@ chaz_MakeRule_add_prereq(chaz_MakeRule *rule, const char *prereq) {
         prereqs = chaz_Util_strdup(prereq);
     }
     else {
-        prereqs = (char*)malloc(strlen(rule->prereqs) + strlen(prereq) + 20);
-        sprintf(prereqs, "%s %s", rule->prereqs, prereq);
+        prereqs = chaz_Util_join(" ", rule->prereqs, prereq, NULL);
         free(rule->prereqs);
     }
 
@@ -485,21 +480,16 @@ chaz_MakeRule_add_command_make(chaz_MakeRule *rule, const char *dir,
 
     if (chaz_Make.is_gnu_make) {
         if (!target) {
-            size_t size = strlen(dir) + 20;
-            command = (char*)malloc(size);
-            sprintf(command, "$(MAKE) -C %s", dir);
+            command = chaz_Util_join(" ", "$(MAKE)", "-C", dir, NULL);
         }
         else {
-            size_t size = strlen(dir) + strlen(target) + 20;
-            command = (char*)malloc(size);
-            sprintf(command, "$(MAKE) -C %s %s", dir, target);
+            command = chaz_Util_join(" ", "$(MAKE)", "-C", dir, target, NULL);
         }
         chaz_MakeRule_add_command(rule, command);
         free(command);
     }
     else if (chaz_Make.is_nmake) {
-        command = (char*)malloc(strlen(dir) + 20);
-        sprintf(command, "cd %s", dir);
+        command = chaz_Util_join(" ", "cd", dir, NULL);
         chaz_MakeRule_add_command(rule, command);
         free(command);
 
@@ -507,9 +497,7 @@ chaz_MakeRule_add_command_make(chaz_MakeRule *rule, const char *dir,
             chaz_MakeRule_add_command(rule, "$(MAKE)");
         }
         else {
-            size_t size = strlen(target) + 20;
-            command = (char*)malloc(size);
-            sprintf(command, "$(MAKE) %s", target);
+            command = chaz_Util_join(" ", "$(MAKE)", target, NULL);
             chaz_MakeRule_add_command(rule, command);
             free(command);
         }

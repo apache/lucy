@@ -116,6 +116,50 @@ chaz_Util_strdup(const char *string) {
     return copy;
 }
 
+char*
+chaz_Util_join(const char *sep, ...) {
+    va_list args;
+    const char *string;
+    char *result, *p;
+    size_t sep_len = strlen(sep);
+    size_t size;
+    int i;
+
+    /* Determine result size. */
+    va_start(args, sep);
+    size = 1;
+    string = va_arg(args, const char*);
+    for (i = 0; string; ++i) {
+        if (i != 0) { size += sep_len; }
+        size += strlen(string);
+        string = va_arg(args, const char*);
+    }
+    va_end(args);
+
+    result = (char*)malloc(size);
+
+    /* Create result string. */
+    va_start(args, sep);
+    p = result;
+    string = va_arg(args, const char*);
+    for (i = 0; string; ++i) {
+        size_t len;
+        if (i != 0) {
+            memcpy(p, sep, sep_len);
+            p += sep_len;
+        }
+        len = strlen(string);
+        memcpy(p, string, len);
+        p += len;
+        string = va_arg(args, const char*);
+    }
+    va_end(args);
+
+    *p = '\0';
+
+    return result;
+}
+
 void
 chaz_Util_die(const char* format, ...) {
     va_list args;

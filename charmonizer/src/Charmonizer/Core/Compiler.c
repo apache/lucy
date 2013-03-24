@@ -84,16 +84,10 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     chaz_CC.extra_cflags    = chaz_Util_strdup("");
 
     /* Set names for the targets which we "try" to compile. */
-    {
-        const char *exe_ext = chaz_OS_exe_ext();
-        const char *obj_ext = chaz_OS_obj_ext();
-        size_t exe_len = strlen(CHAZ_CC_TRY_BASENAME) + strlen(exe_ext) + 1;
-        size_t obj_len = strlen(CHAZ_CC_TRY_BASENAME) + strlen(obj_ext) + 1;
-        chaz_CC.try_exe_name = (char*)malloc(exe_len);
-        chaz_CC.try_obj_name = (char*)malloc(obj_len);
-        sprintf(chaz_CC.try_exe_name, "%s%s", CHAZ_CC_TRY_BASENAME, exe_ext);
-        sprintf(chaz_CC.try_obj_name, "%s%s", CHAZ_CC_TRY_BASENAME, obj_ext);
-    }
+    chaz_CC.try_exe_name
+        = chaz_Util_join("", CHAZ_CC_TRY_BASENAME, chaz_OS_exe_ext(), NULL);
+    chaz_CC.try_obj_name
+        = chaz_Util_join("", CHAZ_CC_TRY_BASENAME, chaz_OS_obj_ext(), NULL);
 
     /* If we can't compile anything, game over. */
     if (chaz_Util_verbosity) {
@@ -337,12 +331,8 @@ chaz_CC_add_extra_cflags(const char *flags) {
         chaz_CC.extra_cflags = chaz_Util_strdup(flags);
     }
     else {
-        size_t size = strlen(chaz_CC.extra_cflags)
-                      + 1   // Space separation
-                      + strlen(flags)
-                      + 1;  // NULL termination
-        char *newflags = (char*)malloc(size);
-        sprintf(newflags, "%s %s", chaz_CC.extra_cflags, flags);
+        char *newflags
+            = chaz_Util_join(" ", chaz_CC.extra_cflags, flags, NULL);
         free(chaz_CC.extra_cflags);
         chaz_CC.extra_cflags = newflags;
     }
@@ -350,9 +340,7 @@ chaz_CC_add_extra_cflags(const char *flags) {
 
 void
 chaz_CC_add_include_dir(const char *dir) {
-    size_t size = strlen(chaz_CC.include_flag) + strlen(dir) + 1;
-    char *flag = (char*)malloc(size);
-    sprintf(flag, "%s%s", chaz_CC.include_flag, dir);
+    char *flag = chaz_Util_join("", chaz_CC.include_flag, dir, NULL);
     chaz_CC_add_extra_cflags(flag);
     free(flag);
 }
@@ -361,7 +349,6 @@ void
 chaz_CC_set_optimization_level(const char *level) {
     const char *opt_flag;
     char *flag;
-    size_t size;
 
     if (chaz_CC.intval__MSC_VER) {
         opt_flag = "/O";
@@ -369,9 +356,7 @@ chaz_CC_set_optimization_level(const char *level) {
     else {
         opt_flag = "-O";
     }
-    size = strlen(opt_flag) + strlen(level) + 1;
-    flag = (char*)malloc(size);
-    sprintf(flag, "%s%s", opt_flag, level);
+    flag = chaz_Util_join("", opt_flag, level, NULL);
     chaz_CC_add_extra_cflags(flag);
     free(flag);
 }
