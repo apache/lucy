@@ -89,6 +89,11 @@ chaz_CC_add_include_dir(const char *dir);
 void
 chaz_CC_set_optimization_level(const char *level);
 
+/* Disable strict aliasing.
+ */
+void
+chaz_CC_disable_strict_aliasing();
+
 /* Accessor for the compiler executable's string representation.
  */
 const char*

@@ -376,6 +376,13 @@ chaz_CC_set_optimization_level(const char *level) {
     free(flag);
 }
 
+void
+chaz_CC_disable_strict_aliasing() {
+    if (!chaz_CC.intval__MSC_VER) {
+       chaz_CC_add_extra_cflags("-fno-strict-aliasing");
+    }
+}
+
 const char*
 chaz_CC_get_cc(void) {
     return chaz_CC.cc_command;
