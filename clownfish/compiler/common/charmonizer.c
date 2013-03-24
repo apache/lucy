@@ -108,6 +108,11 @@ chaz_CC_add_include_dir(const char *dir);
 void
 chaz_CC_set_optimization_level(const char *level);
 
+/* Disable strict aliasing.
+ */
+void
+chaz_CC_disable_strict_aliasing();
+
 /* Accessor for the compiler executable's string representation.
  */
 const char*
@@ -133,6 +138,9 @@ int
 chaz_CC_msvc_version_num(void);
 
 const char*
+chaz_CC_shared_obj_cflags(void);
+
+const char*
 chaz_CC_link_command(void);
 
 const char*
@@ -143,6 +151,12 @@ chaz_CC_link_shared_obj_flag(void);
 
 const char*
 chaz_CC_link_output_flag(void);
+
+char*
+chaz_CC_library_path_flag(const char *directory);
+
+char*
+chaz_CC_link_with_shared_obj_flag(const char *shared_obj);
 
 #endif /* H_CHAZ_COMPILER */
 
@@ -646,6 +660,11 @@ chaz_Util_slurp_file(const char *file_path, size_t *len_ptr);
 char*
 chaz_Util_strdup(const char *string);
 
+/* Join a NULL-terminated list of strings using a separator.
+ */
+char*
+chaz_Util_join(const char *sep, ...);
+
 /* Get the length of a file (may overshoot on text files under DOS).
  */
 long
@@ -1105,16 +1124,10 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     chaz_CC.extra_cflags    = chaz_Util_strdup("");
 
     /* Set names for the targets which we "try" to compile. */
-    {
-        const char *exe_ext = chaz_OS_exe_ext();
-        const char *obj_ext = chaz_OS_obj_ext();
-        size_t exe_len = strlen(CHAZ_CC_TRY_BASENAME) + strlen(exe_ext) + 1;
-        size_t obj_len = strlen(CHAZ_CC_TRY_BASENAME) + strlen(obj_ext) + 1;
-        chaz_CC.try_exe_name = (char*)malloc(exe_len);
-        chaz_CC.try_obj_name = (char*)malloc(obj_len);
-        sprintf(chaz_CC.try_exe_name, "%s%s", CHAZ_CC_TRY_BASENAME, exe_ext);
-        sprintf(chaz_CC.try_obj_name, "%s%s", CHAZ_CC_TRY_BASENAME, obj_ext);
-    }
+    chaz_CC.try_exe_name
+        = chaz_Util_join("", CHAZ_CC_TRY_BASENAME, chaz_OS_exe_ext(), NULL);
+    chaz_CC.try_obj_name
+        = chaz_Util_join("", CHAZ_CC_TRY_BASENAME, chaz_OS_obj_ext(), NULL);
 
     /* If we can't compile anything, game over. */
     if (chaz_Util_verbosity) {
@@ -1358,12 +1371,8 @@ chaz_CC_add_extra_cflags(const char *flags) {
         chaz_CC.extra_cflags = chaz_Util_strdup(flags);
     }
     else {
-        size_t size = strlen(chaz_CC.extra_cflags)
-                      + 1   // Space separation
-                      + strlen(flags)
-                      + 1;  // NULL termination
-        char *newflags = (char*)malloc(size);
-        sprintf(newflags, "%s %s", chaz_CC.extra_cflags, flags);
+        char *newflags
+            = chaz_Util_join(" ", chaz_CC.extra_cflags, flags, NULL);
         free(chaz_CC.extra_cflags);
         chaz_CC.extra_cflags = newflags;
     }
@@ -1371,9 +1380,7 @@ chaz_CC_add_extra_cflags(const char *flags) {
 
 void
 chaz_CC_add_include_dir(const char *dir) {
-    size_t size = strlen(chaz_CC.include_flag) + strlen(dir) + 1;
-    char *flag = (char*)malloc(size);
-    sprintf(flag, "%s%s", chaz_CC.include_flag, dir);
+    char *flag = chaz_Util_join("", chaz_CC.include_flag, dir, NULL);
     chaz_CC_add_extra_cflags(flag);
     free(flag);
 }
@@ -1382,7 +1389,6 @@ void
 chaz_CC_set_optimization_level(const char *level) {
     const char *opt_flag;
     char *flag;
-    size_t size;
 
     if (chaz_CC.intval__MSC_VER) {
         opt_flag = "/O";
@@ -1390,11 +1396,16 @@ chaz_CC_set_optimization_level(const char *level) {
     else {
         opt_flag = "-O";
     }
-    size = strlen(opt_flag) + strlen(level) + 1;
-    flag = (char*)malloc(size);
-    sprintf(flag, "%s%s", opt_flag, level);
+    flag = chaz_Util_join("", opt_flag, level, NULL);
     chaz_CC_add_extra_cflags(flag);
     free(flag);
+}
+
+void
+chaz_CC_disable_strict_aliasing() {
+    if (!chaz_CC.intval__MSC_VER) {
+       chaz_CC_add_extra_cflags("-fno-strict-aliasing");
+    }
 }
 
 const char*
@@ -1430,6 +1441,19 @@ chaz_CC_msvc_version_num(void) {
 }
 
 const char*
+chaz_CC_shared_obj_cflags() {
+    if (chaz_CC.intval__MSC_VER) {
+        return "";
+    }
+    else if (chaz_OS_is_darwin()) {
+        return "-fno-common";
+    }
+    else {
+        return "-fPIC";
+    }
+}
+
+const char*
 chaz_CC_link_command() {
     if (chaz_CC.intval__MSC_VER) {
         return "link";
@@ -1450,7 +1474,7 @@ chaz_CC_link_shared_obj_flag() {
         return "/DLL";
     }
     else if (chaz_OS_is_darwin()) {
-        return "-dynamiclib ";
+        return "-dynamiclib";
     }
     else {
         return "-shared";
@@ -1465,6 +1489,36 @@ chaz_CC_link_output_flag() {
     else {
         return "-o ";
     }
+}
+
+char*
+chaz_CC_library_path_flag(const char *directory) {
+    char *flag = (char*)malloc(20 + sizeof(directory));
+    if (chaz_CC.intval__MSC_VER) {
+        if (strcmp(directory, ".") == 0) {
+            /* The MS linker searches the current directory by default. */
+            strcpy(flag, "");
+        }
+        else {
+            sprintf(flag, "/LIBPATH:%s", directory);
+        }
+    }
+    else {
+        sprintf(flag, "-L%s", directory);
+    }
+    return flag;
+}
+
+char*
+chaz_CC_link_with_shared_obj_flag(const char *shared_obj) {
+    char *flag = (char*)malloc(20 + sizeof(shared_obj));
+    if (chaz_CC.intval__MSC_VER) {
+        sprintf(flag, "%s.lib", shared_obj);
+    }
+    else {
+        sprintf(flag, "-l%s", shared_obj);
+    }
+    return flag;
 }
 
 
@@ -2683,10 +2737,7 @@ chaz_Make_detect(const char *make1, ...) {
 static int
 chaz_Make_audition(const char *make) {
     int succeeded = 0;
-    const char pattern[] = "%s -f _charm_Makefile";
-    size_t size = strlen(make) + sizeof(pattern) + 10;
-    char *command = (char*)malloc(size);
-    sprintf(command, pattern, make);
+    char *command = chaz_Util_join(" ", make, "-f", "_charm_Makefile", NULL);
 
     chaz_Util_remove_and_verify("_charm_foo");
     chaz_OS_run_redirected(command, "_charm_foo");
@@ -2996,8 +3047,7 @@ chaz_MakeRule_add_target(chaz_MakeRule *rule, const char *target) {
         targets = chaz_Util_strdup(target);
     }
     else {
-        targets = (char*)malloc(strlen(rule->targets) + strlen(target) + 20);
-        sprintf(targets, "%s %s", rule->targets, target);
+        targets = chaz_Util_join(" ", rule->targets, target, NULL);
         free(rule->targets);
     }
 
@@ -3012,8 +3062,7 @@ chaz_MakeRule_add_prereq(chaz_MakeRule *rule, const char *prereq) {
         prereqs = chaz_Util_strdup(prereq);
     }
     else {
-        prereqs = (char*)malloc(strlen(rule->prereqs) + strlen(prereq) + 20);
-        sprintf(prereqs, "%s %s", rule->prereqs, prereq);
+        prereqs = chaz_Util_join(" ", rule->prereqs, prereq, NULL);
         free(rule->prereqs);
     }
 
@@ -3045,21 +3094,16 @@ chaz_MakeRule_add_command_make(chaz_MakeRule *rule, const char *dir,
 
     if (chaz_Make.is_gnu_make) {
         if (!target) {
-            size_t size = strlen(dir) + 20;
-            command = (char*)malloc(size);
-            sprintf(command, "$(MAKE) -C %s", dir);
+            command = chaz_Util_join(" ", "$(MAKE)", "-C", dir, NULL);
         }
         else {
-            size_t size = strlen(dir) + strlen(target) + 20;
-            command = (char*)malloc(size);
-            sprintf(command, "$(MAKE) -C %s %s", dir, target);
+            command = chaz_Util_join(" ", "$(MAKE)", "-C", dir, target, NULL);
         }
         chaz_MakeRule_add_command(rule, command);
         free(command);
     }
     else if (chaz_Make.is_nmake) {
-        command = (char*)malloc(strlen(dir) + 20);
-        sprintf(command, "cd %s", dir);
+        command = chaz_Util_join(" ", "cd", dir, NULL);
         chaz_MakeRule_add_command(rule, command);
         free(command);
 
@@ -3067,9 +3111,7 @@ chaz_MakeRule_add_command_make(chaz_MakeRule *rule, const char *dir,
             chaz_MakeRule_add_command(rule, "$(MAKE)");
         }
         else {
-            size_t size = strlen(target) + 20;
-            command = (char*)malloc(size);
-            sprintf(command, "$(MAKE) %s", target);
+            command = chaz_Util_join(" ", "$(MAKE)", target, NULL);
             chaz_MakeRule_add_command(rule, command);
             free(command);
         }
@@ -3331,11 +3373,9 @@ chaz_OS_remove(const char *name) {
 
 int
 chaz_OS_run_local_redirected(const char *command, const char *path) {
-    size_t size = strlen(command) + strlen(chaz_OS.local_command_start) + 20;
-    char *local_command = (char*)malloc(size);
-    int retval;
-    sprintf(local_command, "%s%s", chaz_OS.local_command_start, command);
-    retval = chaz_OS_run_redirected(local_command, path);
+    char *local_command
+        = chaz_Util_join("", chaz_OS.local_command_start, command, NULL);
+    int retval = chaz_OS_run_redirected(local_command, path);
     free(local_command);
     return retval;
 }
@@ -3352,13 +3392,7 @@ chaz_OS_run_redirected(const char *command, const char *path) {
     if (chaz_OS.shell_type == CHAZ_OS_POSIX
         || chaz_OS.shell_type == CHAZ_OS_CMD_EXE
         ) {
-        char pattern[] = "%s > %s 2>&1";
-        size_t size = sizeof(pattern)
-                      + strlen(command)
-                      + strlen(path)
-                      + 10;
-        quiet_command = (char*)malloc(size);
-        sprintf(quiet_command, pattern, command, path);
+        quiet_command = chaz_Util_join(" ", command, ">", path, "2>&1", NULL);
     }
     else {
         chaz_Util_die("Don't know the shell type");
@@ -3383,9 +3417,7 @@ chaz_OS_mkdir(const char *filepath) {
     if (chaz_OS.shell_type == CHAZ_OS_POSIX
         || chaz_OS.shell_type == CHAZ_OS_CMD_EXE
        ) {
-        unsigned size = sizeof("mkdir") + 1 + strlen(filepath) + 1;
-        command = (char*)malloc(size);
-        sprintf(command, "mkdir %s", filepath);
+        command = chaz_Util_join(" ", "mkdir", filepath, NULL);
     }
     else {
         chaz_Util_die("Don't know the shell type");
@@ -3398,14 +3430,10 @@ void
 chaz_OS_rmdir(const char *filepath) {
     char *command = NULL;
     if (chaz_OS.shell_type == CHAZ_OS_POSIX) {
-        unsigned size = strlen("rmdir") + 1 + strlen(filepath) + 1;
-        command = (char*)malloc(size);
-        sprintf(command, "rmdir %s", filepath);
+        command = chaz_Util_join(" ", "rmdir", filepath, NULL);
     }
     else if (chaz_OS.shell_type == CHAZ_OS_CMD_EXE) {
-        unsigned size = strlen("rmdir /q") + 1 + strlen(filepath) + 1;
-        command = (char*)malloc(size);
-        sprintf(command, "rmdir /q %s", filepath);
+        command = chaz_Util_join(" ", "rmdir", "/q", filepath, NULL);
     }
     else {
         chaz_Util_die("Don't know the shell type");
@@ -3518,6 +3546,50 @@ chaz_Util_strdup(const char *string) {
     strncpy(copy, string, len);
     copy[len] = '\0';
     return copy;
+}
+
+char*
+chaz_Util_join(const char *sep, ...) {
+    va_list args;
+    const char *string;
+    char *result, *p;
+    size_t sep_len = strlen(sep);
+    size_t size;
+    int i;
+
+    /* Determine result size. */
+    va_start(args, sep);
+    size = 1;
+    string = va_arg(args, const char*);
+    for (i = 0; string; ++i) {
+        if (i != 0) { size += sep_len; }
+        size += strlen(string);
+        string = va_arg(args, const char*);
+    }
+    va_end(args);
+
+    result = (char*)malloc(size);
+
+    /* Create result string. */
+    va_start(args, sep);
+    p = result;
+    string = va_arg(args, const char*);
+    for (i = 0; string; ++i) {
+        size_t len;
+        if (i != 0) {
+            memcpy(p, sep, sep_len);
+            p += sep_len;
+        }
+        len = strlen(string);
+        memcpy(p, string, len);
+        p += len;
+        string = va_arg(args, const char*);
+    }
+    va_end(args);
+
+    *p = '\0';
+
+    return result;
 }
 
 void
