@@ -151,9 +151,9 @@ S_parse_single(const char *text, size_t len, lucy_StringIter *iter,
 }
 
 /*
- * Parse a word starting with an ALetter, Numeric or Katakana character.
- * Advances the iterator and returns the word break property of the current
- * character.
+ * Parse a word starting with an ALetter, Numeric, Katakana, or ExtendNumLet
+ * character. Advances the iterator and returns the word break property of the
+ * current character.
  */
 static int
 S_parse_word(const char *text, size_t len, lucy_StringIter *iter,

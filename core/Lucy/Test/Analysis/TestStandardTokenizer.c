@@ -26,20 +26,24 @@
 
 TestStandardTokenizer*
 TestStandardTokenizer_new(TestFormatter *formatter) {
-    TestStandardTokenizer *self = (TestStandardTokenizer*)VTable_Make_Obj(TESTSTANDARDTOKENIZER);
+    TestStandardTokenizer *self
+        = (TestStandardTokenizer*)VTable_Make_Obj(TESTSTANDARDTOKENIZER);
     return TestStandardTokenizer_init(self, formatter);
 }
 
 TestStandardTokenizer*
-TestStandardTokenizer_init(TestStandardTokenizer *self, TestFormatter *formatter) {
-    return (TestStandardTokenizer*)TestBatch_init((TestBatch*)self, 984, formatter);
+TestStandardTokenizer_init(TestStandardTokenizer *self,
+                           TestFormatter *formatter) {
+    TestBatch_init((TestBatch*)self, 1084, formatter);
+    return self;
 }
 
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
     StandardTokenizer *tokenizer = StandardTokenizer_new();
     Obj *dump  = StandardTokenizer_Dump(tokenizer);
-    StandardTokenizer *clone = (StandardTokenizer*)StandardTokenizer_Load(tokenizer, dump);
+    StandardTokenizer *clone
+        = (StandardTokenizer*)StandardTokenizer_Load(tokenizer, dump);
 
     TEST_TRUE(batch,
               StandardTokenizer_Equals(tokenizer, (Obj*)clone),

@@ -16,6 +16,8 @@
 package UnicodeTable;
 use strict;
 
+use IO::File;
+
 =head1 NAME
 
 UnicodeTable - Create compressed Unicode tables for C programs
@@ -110,7 +112,8 @@ sub read {
     my $map  = $opts->{map}  or die('map missing');
     $type = lc($type);
 
-    open( my $file, '<', $filename )
+    my $file = IO::File->new;
+    $file->open( $filename, '<' )
         or die("$filename: $!\n");
 
     while ( my $line = $file->getline ) {
