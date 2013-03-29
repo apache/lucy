@@ -36,6 +36,73 @@
 
 /***************************************************************************/
 
+#line 21 "src/Charmonizer/Core/CFlags.h"
+/* Charmonizer/Core/Compiler.h
+ */
+
+#ifndef H_CHAZ_FLAGS
+#define H_CHAZ_FLAGS
+
+#define CHAZ_CFLAGS_STYLE_POSIX  1
+#define CHAZ_CFLAGS_STYLE_GNU    2
+#define CHAZ_CFLAGS_STYLE_MSVC   3
+
+typedef struct chaz_CFlags chaz_CFlags;
+
+chaz_CFlags*
+chaz_CFlags_new(int style);
+
+void
+chaz_CFlags_destroy(chaz_CFlags *flags);
+
+const char*
+chaz_CFlags_get_string(chaz_CFlags *flags);
+
+void
+chaz_CFlags_append(chaz_CFlags *flags, const char *string);
+
+void
+chaz_CFlags_clear(chaz_CFlags *flags);
+
+void
+chaz_CFlags_set_output_obj(chaz_CFlags *flags, const char *filename);
+
+void
+chaz_CFlags_set_output_exe(chaz_CFlags *flags, const char *filename);
+
+void
+chaz_CFlags_add_include_dir(chaz_CFlags *flags, const char *dir);
+
+void
+chaz_CFlags_enable_optimization(chaz_CFlags *flags);
+
+void
+chaz_CFlags_disable_strict_aliasing(chaz_CFlags *flags);
+
+void
+chaz_CFlags_set_warnings_as_errors(chaz_CFlags *flags);
+
+void
+chaz_CFlags_compile_shared_library(chaz_CFlags *flags);
+
+void
+chaz_CFlags_link_shared_library(chaz_CFlags *flags);
+
+void
+chaz_CFlags_set_link_output(chaz_CFlags *flags, const char *filename);
+
+void
+chaz_CFlags_add_library_path(chaz_CFlags *flags, const char *directory);
+
+void
+chaz_CFlags_add_library(chaz_CFlags *flags, const char *library);
+
+#endif /* H_CHAZ_FLAGS */
+
+
+
+/***************************************************************************/
+
 #line 21 "src/Charmonizer/Core/Compiler.h"
 /* Charmonizer/Core/Compiler.h
  */
@@ -45,6 +112,7 @@
 
 #include <stddef.h>
 /* #include "Charmonizer/Core/Defines.h" */
+/* #include "Charmonizer/Core/CFlags.h" */
 
 /* Attempt to compile and link an executable.  Return true if the executable
  * file exists after the attempt.
@@ -84,35 +152,6 @@ chaz_CC_init(const char *cc_command, const char *cflags);
 void
 chaz_CC_clean_up(void);
 
-void
-chaz_CC_set_warnings_as_errors(const int flag);
-
-/* (Re)set "extra" cflags.
- */
-void
-chaz_CC_set_extra_cflags(const char *);
-
-/* Concatenate onto the end of the "extra" cflags.  A space will be inserted
- * automatically.
- */
-void
-chaz_CC_add_extra_cflags(const char *);
-
-/* Add include dir to extra cflags.
- */
-void
-chaz_CC_add_include_dir(const char *dir);
-
-/* Set optimization level.
- */
-void
-chaz_CC_set_optimization_level(const char *level);
-
-/* Disable strict aliasing.
- */
-void
-chaz_CC_disable_strict_aliasing();
-
 /* Accessor for the compiler executable's string representation.
  */
 const char*
@@ -123,10 +162,20 @@ chaz_CC_get_cc(void);
 const char*
 chaz_CC_get_cflags(void);
 
+/* Accessor for `cflags_style`.
+ */
+int
+chaz_CC_get_cflags_style(void);
+
 /* Accessor for `extra_cflags`.
  */
-const char*
+chaz_CFlags*
 chaz_CC_get_extra_cflags(void);
+
+/* Accessor for `temp_cflags`.
+ */
+chaz_CFlags*
+chaz_CC_get_temp_cflags(void);
 
 int
 chaz_CC_gcc_version_num(void);
@@ -138,25 +187,7 @@ int
 chaz_CC_msvc_version_num(void);
 
 const char*
-chaz_CC_shared_obj_cflags(void);
-
-const char*
 chaz_CC_link_command(void);
-
-const char*
-chaz_CC_link_flags(void);
-
-const char*
-chaz_CC_link_shared_obj_flag(void);
-
-const char*
-chaz_CC_link_output_flag(void);
-
-char*
-chaz_CC_library_path_flag(const char *directory);
-
-char*
-chaz_CC_link_with_shared_obj_flag(const char *shared_obj);
 
 #endif /* H_CHAZ_COMPILER */
 
@@ -373,6 +404,8 @@ chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
 #ifndef H_CHAZ_MAKE
 #define H_CHAZ_MAKE
 
+/* #include "Charmonizer/Core/CFlags.h" */
+
 typedef struct chaz_MakeFile chaz_MakeFile;
 typedef struct chaz_MakeVar chaz_MakeVar;
 typedef struct chaz_MakeRule chaz_MakeRule;
@@ -458,24 +491,23 @@ chaz_MakeFile_add_dir_to_cleanup(chaz_MakeFile *makefile, const char *dir);
  * @param makefile The makefile.
  * @param exe The name of the executable.
  * @param objects The list of object files.
- * @param extra_link_flags Additional link flags.
+ * @param library_flags Additional link flags for libraries.
  */
 chaz_MakeRule*
 chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
-                      const char *objects, const char *extra_link_flags);
+                      const char *objects, chaz_CFlags *library_flags);
 
-/** Add a rule to link a shared object. The shared object will also be added to
- * the list of files to clean.
+/** Add a rule to link a shared library. The shared library will also be added
+ * to the list of files to clean.
  *
  * @param makefile The makefile.
- * @param shared_obj The name of the shared object.
+ * @param shared_lib The name of the shared library.
  * @param objects The list of object files.
- * @param extra_link_flags Additional link flags.
+ * @param library_flags Additional link flags for libraries.
  */
 chaz_MakeRule*
-chaz_MakeFile_add_shared_obj(chaz_MakeFile *makefile, const char *shared_obj,
-                             const char *objects,
-                             const char *extra_link_flags);
+chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *shared_lib,
+                             const char *objects, chaz_CFlags *library_flags);
 
 /** Write the makefile to a file named 'Makefile' in the current directory.
  *
@@ -608,7 +640,7 @@ chaz_OS_obj_ext(void);
 /* Return the extension for a shared object on this system.
  */
 const char*
-chaz_OS_shared_obj_ext(void);
+chaz_OS_shared_lib_ext(void);
 
 /* Return the equivalent of /dev/null on this system.
  */
@@ -1079,6 +1111,238 @@ void chaz_UnusedVars_run(void);
 
 /***************************************************************************/
 
+#line 17 "src/Charmonizer/Core/CFlags.c"
+#include <string.h>
+#include <stdlib.h>
+/* #include "Charmonizer/Core/Flags.h" */
+/* #include "Charmonizer/Core/Util.h" */
+/* #include "Charmonizer/Core/OperatingSystem.h" */
+
+struct chaz_CFlags {
+    int   style;
+    char *string;
+};
+
+chaz_CFlags*
+chaz_CFlags_new(int style) {
+    chaz_CFlags *flags = (chaz_CFlags*)malloc(sizeof(chaz_CFlags));
+    flags->style  = style;
+    flags->string = chaz_Util_strdup("");
+    return flags;
+}
+
+void
+chaz_CFlags_destroy(chaz_CFlags *flags) {
+    free(flags->string);
+    free(flags);
+}
+
+const char*
+chaz_CFlags_get_string(chaz_CFlags *flags) {
+    return flags->string;
+}
+
+void
+chaz_CFlags_append(chaz_CFlags *flags, const char *string) {
+    char *new_string;
+    if (flags->string[0] == '\0') {
+        new_string = chaz_Util_strdup(string);
+    }
+    else {
+        new_string = chaz_Util_join(" ", flags->string, string, NULL);
+    }
+    free(flags->string);
+    flags->string = new_string;
+}
+
+void
+chaz_CFlags_clear(chaz_CFlags *flags) {
+    if (flags->string[0] != '\0') {
+        free(flags->string);
+        flags->string = chaz_Util_strdup("");
+    }
+}
+
+void
+chaz_CFlags_set_output_obj(chaz_CFlags *flags, const char *filename) {
+    const char *output;
+    char *string;
+    if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
+        output = "/c /Fo";
+    }
+    else {
+        /* POSIX */
+        output = "-c -o ";
+    }
+    string = chaz_Util_join("", output, filename, NULL);
+    chaz_CFlags_append(flags, string);
+    free(string);
+}
+
+void
+chaz_CFlags_set_output_exe(chaz_CFlags *flags, const char *filename) {
+    const char *output;
+    char *string;
+    if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
+        output = "/Fe";
+    }
+    else {
+        /* POSIX */
+        output = "-o ";
+    }
+    string = chaz_Util_join("", output, filename, NULL);
+    chaz_CFlags_append(flags, string);
+    free(string);
+}
+
+void
+chaz_CFlags_add_include_dir(chaz_CFlags *flags, const char *dir) {
+    const char *include;
+    char *string;
+    if (flags->style == CHAZ_CFLAGS_STYLE_MSVC)  {
+        include = "/I ";
+    }
+    else {
+        /* POSIX */
+        include = "-I ";
+    }
+    string = chaz_Util_join("", include, dir, NULL);
+    chaz_CFlags_append(flags, string);
+    free(string);
+}
+
+void
+chaz_CFlags_enable_optimization(chaz_CFlags *flags) {
+    const char *string;
+    if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
+        string = "/O2";
+    }
+    else if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
+        string = "-O2";
+    }
+    else {
+        /* POSIX */
+        string = "-O 1";
+    }
+    chaz_CFlags_append(flags, string);
+}
+
+void
+chaz_CFlags_disable_strict_aliasing(chaz_CFlags *flags) {
+    if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
+        return;
+    }
+    else if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
+        chaz_CFlags_append(flags, "-fno-strict-aliasing");
+    }
+    else {
+        chaz_Util_die("Unsupported compiler");
+    }
+}
+
+void
+chaz_CFlags_set_warnings_as_errors(chaz_CFlags *flags) {
+    const char *string;
+    if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
+        string = "/WX";
+    }
+    else if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
+        string = "-Werror";
+    }
+    else {
+        chaz_Util_die("Unsupported compiler");
+    }
+    chaz_CFlags_append(flags, string);
+}
+
+void
+chaz_CFlags_compile_shared_library(chaz_CFlags *flags) {
+    const char *string;
+    if (!flags->style == CHAZ_CFLAGS_STYLE_GNU) {
+        return;
+    }
+    if (chaz_OS_is_darwin()) {
+        string = "-fno-common";
+    }
+    else {
+        string = "-fPIC";
+    }
+    chaz_CFlags_append(flags, string);
+}
+
+void
+chaz_CFlags_link_shared_library(chaz_CFlags *flags) {
+    const char *string;
+    if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
+        string = "/DLL";
+    }
+    else if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
+        if (chaz_OS_is_darwin()) {
+            string = "-dynamiclib";
+        }
+        else {
+            string = "-shared";
+        }
+    }
+    else {
+        chaz_Util_die("Unsupported compiler");
+    }
+    chaz_CFlags_append(flags, string);
+}
+
+void
+chaz_CFlags_set_link_output(chaz_CFlags *flags, const char *filename) {
+    const char *output;
+    char *string;
+    if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
+        output = "/OUT:";
+    }
+    else {
+        output = "-o ";
+    }
+    string = chaz_Util_join("", output, filename, NULL);
+    chaz_CFlags_append(flags, string);
+    free(string);
+}
+
+void
+chaz_CFlags_add_library_path(chaz_CFlags *flags, const char *directory) {
+    const char *lib_path;
+    char *string;
+    if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
+        if (strcmp(directory, ".") == 0) {
+            /* The MS linker searches the current directory by default. */
+            return;
+        }
+        else {
+            lib_path = "/LIBPATH:";
+        }
+    }
+    else {
+        lib_path = "-L ";
+    }
+    string = chaz_Util_join("", lib_path, directory, NULL);
+    chaz_CFlags_append(flags, string);
+    free(string);
+}
+
+void
+chaz_CFlags_add_library(chaz_CFlags *flags, const char *library) {
+    char *string;
+    if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
+        string = chaz_Util_join("", library, ".lib", NULL);
+    }
+    else {
+        string = chaz_Util_join("", "-l ", library, NULL);
+    }
+    chaz_CFlags_append(flags, string);
+    free(string);
+}
+
+
+
+/***************************************************************************/
+
 #line 17 "src/Charmonizer/Core/Compiler.c"
 #include <string.h>
 #include <stdlib.h>
@@ -1101,41 +1365,23 @@ chaz_CC_detect_known_compilers(void);
 static struct {
     char     *cc_command;
     char     *cflags;
-    char     *extra_cflags;
     char     *try_exe_name;
     char     *try_obj_name;
-    char      include_flag[10];
-    char      object_flag[10];
-    char      exe_flag[10];
-    char      no_link_flag[10];
-    char      error_flag[10];
     char      gcc_version_str[30];
+    int       cflags_style;
     int       intval___GNUC__;
     int       intval___GNUC_MINOR__;
     int       intval___GNUC_PATCHLEVEL__;
     int       intval__MSC_VER;
     int       intval___clang__;
-    int       warnings_as_errors;
+    chaz_CFlags *extra_cflags;
+    chaz_CFlags *temp_cflags;
 } chaz_CC = {
-    NULL, NULL, NULL, NULL, NULL,
-    "", "", "", "", "", "",
-    0, 0, 0, 0, 0, 0
+    NULL, NULL, NULL, NULL,
+    "",
+    0, 0, 0, 0, 0, 0,
+    NULL, NULL
 };
-
-void
-chaz_CC_set_warnings_as_errors(const int flag) {
-    chaz_CC.warnings_as_errors = flag;
-    if (chaz_CC.warnings_as_errors) {
-        if (chaz_CC.intval__MSC_VER)  {
-            strcpy(chaz_CC.error_flag, "/WX");
-        } else {
-            strcpy(chaz_CC.error_flag, "-Werror");
-        }
-    }
-    else {
-        strcpy(chaz_CC.error_flag, "");
-    }
-}
 
 void
 chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
@@ -1145,9 +1391,10 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     if (chaz_Util_verbosity) { printf("Creating compiler object...\n"); }
 
     /* Assign, init. */
-    chaz_CC.cc_command      = chaz_Util_strdup(compiler_command);
-    chaz_CC.cflags          = chaz_Util_strdup(compiler_flags);
-    chaz_CC.extra_cflags    = chaz_Util_strdup("");
+    chaz_CC.cc_command   = chaz_Util_strdup(compiler_command);
+    chaz_CC.cflags       = chaz_Util_strdup(compiler_flags);
+    chaz_CC.extra_cflags = NULL;
+    chaz_CC.temp_cflags  = NULL;
 
     /* Set names for the targets which we "try" to compile. */
     chaz_CC.try_exe_name
@@ -1159,18 +1406,12 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     if (chaz_Util_verbosity) {
         printf("Trying to compile a small test file...\n");
     }
-    /* Try POSIX argument style. */
-    strcpy(chaz_CC.include_flag, "-I ");
-    strcpy(chaz_CC.object_flag,  "-o ");
-    strcpy(chaz_CC.exe_flag,     "-o ");
-    strcpy(chaz_CC.no_link_flag, "-c ");
+    /* Try MSVC argument style. */
+    chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_MSVC;
     compile_succeeded = chaz_CC_test_compile(code);
     if (!compile_succeeded) {
-        /* Try MSVC argument style. */
-        strcpy(chaz_CC.include_flag, "/I");
-        strcpy(chaz_CC.object_flag,  "/Fo");
-        strcpy(chaz_CC.exe_flag,     "/Fe");
-        strcpy(chaz_CC.no_link_flag, "/c");
+        /* Try POSIX argument style. */
+        chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_POSIX;
         compile_succeeded = chaz_CC_test_compile(code);
     }
     if (!compile_succeeded) {
@@ -1178,6 +1419,18 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     }
 
     chaz_CC_detect_known_compilers();
+
+    if (chaz_CC.intval___GNUC__) {
+        chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_GNU;
+    }
+    else if (chaz_CC.intval__MSC_VER) {
+        chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_MSVC;
+    }
+    else {
+        chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_POSIX;
+    }
+    chaz_CC.extra_cflags = chaz_CFlags_new(chaz_CC.cflags_style);
+    chaz_CC.temp_cflags  = chaz_CFlags_new(chaz_CC.cflags_style);
 }
 
 static const char chaz_CC_detect_macro_code[] =
@@ -1229,40 +1482,38 @@ void
 chaz_CC_clean_up(void) {
     free(chaz_CC.cc_command);
     free(chaz_CC.cflags);
-    free(chaz_CC.extra_cflags);
     free(chaz_CC.try_obj_name);
     free(chaz_CC.try_exe_name);
+    chaz_CFlags_destroy(chaz_CC.extra_cflags);
+    chaz_CFlags_destroy(chaz_CC.temp_cflags);
 }
 
 int
 chaz_CC_compile_exe(const char *source_path, const char *exe_name,
                     const char *code) {
-    const char *exe_ext        = chaz_OS_exe_ext();
-    size_t   exe_file_buf_size = strlen(exe_name) + strlen(exe_ext) + 1;
-    char    *exe_file          = (char*)malloc(exe_file_buf_size);
-    size_t   junk_buf_size     = exe_file_buf_size + 3;
-    char    *junk              = (char*)malloc(junk_buf_size);
-    size_t   exe_file_buf_len  = sprintf(exe_file, "%s%s", exe_name, exe_ext);
-    size_t   command_max_size  = strlen(chaz_CC.cc_command)
-                                 + strlen(chaz_CC.error_flag)
-                                 + strlen(source_path)
-                                 + strlen(chaz_CC.exe_flag)
-                                 + exe_file_buf_len
-                                 + strlen(chaz_CC.cflags)
-                                 + strlen(chaz_CC.extra_cflags)
-                                 + 200; /* command start, _charm_run, etc.  */
-    char *command = (char*)malloc(command_max_size);
+    chaz_CFlags *local_cflags = chaz_CFlags_new(chaz_CC.cflags_style);
+    const char *extra_cflags_string = "";
+    const char *temp_cflags_string  = "";
+    const char *local_cflags_string;
+    char *exe_file = chaz_Util_join("", exe_name, chaz_OS_exe_ext(), NULL);
+    char *command;
     int result;
 
     /* Write the source file. */
     chaz_Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
-    sprintf(command, "%s %s %s %s%s %s %s",
-            chaz_CC.cc_command, chaz_CC.error_flag, 
-            source_path, chaz_CC.exe_flag, 
-            exe_file,
-            chaz_CC.cflags, chaz_CC.extra_cflags);
+    if (chaz_CC.extra_cflags) {
+        extra_cflags_string = chaz_CFlags_get_string(chaz_CC.extra_cflags);
+    }
+    if (chaz_CC.temp_cflags) {
+        temp_cflags_string = chaz_CFlags_get_string(chaz_CC.temp_cflags);
+    }
+    chaz_CFlags_set_output_exe(local_cflags, exe_file);
+    local_cflags_string = chaz_CFlags_get_string(local_cflags);
+    command = chaz_Util_join(" ", chaz_CC.cc_command, chaz_CC.cflags,
+                             source_path, extra_cflags_string,
+                             temp_cflags_string, local_cflags_string, NULL);
     if (chaz_Util_verbosity < 2) {
         chaz_OS_run_quietly(command);
     }
@@ -1272,12 +1523,15 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
 
     if (chaz_CC.intval__MSC_VER) {
         /* Zap MSVC junk. */
+        size_t  junk_buf_size = strlen(exe_file) + 4;
+        char   *junk          = (char*)malloc(junk_buf_size);
         sprintf(junk, "%s.obj", exe_name);
         chaz_Util_remove_and_verify(junk);
         sprintf(junk, "%s.ilk", exe_name);
         chaz_Util_remove_and_verify(junk);
         sprintf(junk, "%s.pdb", exe_name);
         chaz_Util_remove_and_verify(junk);
+        free(junk);
     }
 
     /* See if compilation was successful.  Remove the source file. */
@@ -1286,8 +1540,8 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
         chaz_Util_die("Failed to remove '%s'", source_path);
     }
 
+    chaz_CFlags_destroy(local_cflags);
     free(command);
-    free(junk);
     free(exe_file);
     return result;
 }
@@ -1295,31 +1549,29 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
 int
 chaz_CC_compile_obj(const char *source_path, const char *obj_name,
                     const char *code) {
-    const char *obj_ext        = chaz_OS_obj_ext();
-    size_t   obj_file_buf_size = strlen(obj_name) + strlen(obj_ext) + 1;
-    char    *obj_file          = (char*)malloc(obj_file_buf_size);
-    size_t   obj_file_buf_len  = sprintf(obj_file, "%s%s", obj_name, obj_ext);
-    size_t   command_max_size  = strlen(chaz_CC.cc_command)
-                                 + strlen(chaz_CC.no_link_flag)
-                                 + strlen(chaz_CC.error_flag)
-                                 + strlen(source_path)
-                                 + strlen(chaz_CC.object_flag)
-                                 + obj_file_buf_len
-                                 + strlen(chaz_CC.cflags)
-                                 + strlen(chaz_CC.extra_cflags)
-                                 + 200; /* command start, _charm_run, etc.  */
-    char *command = (char*)malloc(command_max_size);
+    chaz_CFlags *local_cflags = chaz_CFlags_new(chaz_CC.cflags_style);
+    const char *extra_cflags_string = "";
+    const char *temp_cflags_string  = "";
+    const char *local_cflags_string;
+    char *obj_file = chaz_Util_join("", obj_name, chaz_OS_obj_ext(), NULL);
+    char *command;
     int result;
 
     /* Write the source file. */
     chaz_Util_write_file(source_path, code);
 
     /* Prepare and run the compiler command. */
-    sprintf(command, "%s %s %s %s %s%s %s %s",
-            chaz_CC.cc_command, chaz_CC.no_link_flag, chaz_CC.error_flag,
-            source_path, chaz_CC.object_flag, 
-            obj_file,
-            chaz_CC.cflags, chaz_CC.extra_cflags);
+    if (chaz_CC.extra_cflags) {
+        extra_cflags_string = chaz_CFlags_get_string(chaz_CC.extra_cflags);
+    }
+    if (chaz_CC.temp_cflags) {
+        temp_cflags_string = chaz_CFlags_get_string(chaz_CC.temp_cflags);
+    }
+    chaz_CFlags_set_output_obj(local_cflags, obj_file);
+    local_cflags_string = chaz_CFlags_get_string(local_cflags);
+    command = chaz_Util_join(" ", chaz_CC.cc_command, chaz_CC.cflags,
+                             source_path, extra_cflags_string,
+                             temp_cflags_string, local_cflags_string, NULL);
     if (chaz_Util_verbosity < 2) {
         chaz_OS_run_quietly(command);
     }
@@ -1333,6 +1585,7 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
         chaz_Util_die("Failed to remove '%s'", source_path);
     }
 
+    chaz_CFlags_destroy(local_cflags);
     free(command);
     free(obj_file);
     return result;
@@ -1384,56 +1637,6 @@ chaz_CC_capture_output(const char *source, size_t *output_len) {
     return captured_output;
 }
 
-void
-chaz_CC_set_extra_cflags(const char *flags) {
-    free(chaz_CC.extra_cflags);
-    chaz_CC.extra_cflags = chaz_Util_strdup(flags);
-}
-
-void
-chaz_CC_add_extra_cflags(const char *flags) {
-    if (!strlen(chaz_CC.extra_cflags)) {
-        free(chaz_CC.extra_cflags);
-        chaz_CC.extra_cflags = chaz_Util_strdup(flags);
-    }
-    else {
-        char *newflags
-            = chaz_Util_join(" ", chaz_CC.extra_cflags, flags, NULL);
-        free(chaz_CC.extra_cflags);
-        chaz_CC.extra_cflags = newflags;
-    }
-}
-
-void
-chaz_CC_add_include_dir(const char *dir) {
-    char *flag = chaz_Util_join("", chaz_CC.include_flag, dir, NULL);
-    chaz_CC_add_extra_cflags(flag);
-    free(flag);
-}
-
-void
-chaz_CC_set_optimization_level(const char *level) {
-    const char *opt_flag;
-    char *flag;
-
-    if (chaz_CC.intval__MSC_VER) {
-        opt_flag = "/O";
-    }
-    else {
-        opt_flag = "-O";
-    }
-    flag = chaz_Util_join("", opt_flag, level, NULL);
-    chaz_CC_add_extra_cflags(flag);
-    free(flag);
-}
-
-void
-chaz_CC_disable_strict_aliasing() {
-    if (!chaz_CC.intval__MSC_VER) {
-       chaz_CC_add_extra_cflags("-fno-strict-aliasing");
-    }
-}
-
 const char*
 chaz_CC_get_cc(void) {
     return chaz_CC.cc_command;
@@ -1444,9 +1647,19 @@ chaz_CC_get_cflags(void) {
     return chaz_CC.cflags;
 }
 
-const char*
+int
+chaz_CC_get_cflags_style(void) {
+    return chaz_CC.cflags_style;
+}
+
+chaz_CFlags*
 chaz_CC_get_extra_cflags(void) {
     return chaz_CC.extra_cflags;
+}
+
+chaz_CFlags*
+chaz_CC_get_temp_cflags(void) {
+    return chaz_CC.temp_cflags;
 }
 
 int
@@ -1467,19 +1680,6 @@ chaz_CC_msvc_version_num(void) {
 }
 
 const char*
-chaz_CC_shared_obj_cflags() {
-    if (chaz_CC.intval__MSC_VER) {
-        return "";
-    }
-    else if (chaz_OS_is_darwin()) {
-        return "-fno-common";
-    }
-    else {
-        return "-fPIC";
-    }
-}
-
-const char*
 chaz_CC_link_command() {
     if (chaz_CC.intval__MSC_VER) {
         return "link";
@@ -1487,64 +1687,6 @@ chaz_CC_link_command() {
     else {
         return chaz_CC.cc_command;
     }
-}
-
-const char*
-chaz_CC_link_flags() {
-    return "";
-}
-
-const char*
-chaz_CC_link_shared_obj_flag() {
-    if (chaz_CC.intval__MSC_VER) {
-        return "/DLL";
-    }
-    else if (chaz_OS_is_darwin()) {
-        return "-dynamiclib";
-    }
-    else {
-        return "-shared";
-    }
-}
-
-const char*
-chaz_CC_link_output_flag() {
-    if (chaz_CC.intval__MSC_VER) {
-        return "/OUT:";
-    }
-    else {
-        return "-o ";
-    }
-}
-
-char*
-chaz_CC_library_path_flag(const char *directory) {
-    char *flag = (char*)malloc(20 + sizeof(directory));
-    if (chaz_CC.intval__MSC_VER) {
-        if (strcmp(directory, ".") == 0) {
-            /* The MS linker searches the current directory by default. */
-            strcpy(flag, "");
-        }
-        else {
-            sprintf(flag, "/LIBPATH:%s", directory);
-        }
-    }
-    else {
-        sprintf(flag, "-L%s", directory);
-    }
-    return flag;
-}
-
-char*
-chaz_CC_link_with_shared_obj_flag(const char *shared_obj) {
-    char *flag = (char*)malloc(20 + sizeof(shared_obj));
-    if (chaz_CC.intval__MSC_VER) {
-        sprintf(flag, "%s.lib", shared_obj);
-    }
-    else {
-        sprintf(flag, "-l%s", shared_obj);
-    }
-    return flag;
 }
 
 
@@ -2881,66 +3023,60 @@ chaz_MakeFile_add_dir_to_cleanup(chaz_MakeFile *makefile, const char *dir) {
 
 chaz_MakeRule*
 chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
-                      const char *objects, const char *extra_link_flags) {
-    const char    *pattern     = "%s %s %s %s %s%s";
-    const char    *link        = chaz_CC_link_command();
-    const char    *link_flags  = chaz_CC_link_flags();
-    const char    *output_flag = chaz_CC_link_output_flag();
+                      const char *objects, chaz_CFlags *library_flags) {
+    int            cflags_style = chaz_CC_get_cflags_style();
+    chaz_CFlags   *local_flags  = chaz_CFlags_new(cflags_style);
+    const char    *link         = chaz_CC_link_command();
+    const char    *library_flags_string = "";
+    const char    *local_flags_string;
     chaz_MakeRule *rule;
     char          *command;
-    size_t         size;
 
     rule = chaz_MakeFile_add_rule(makefile, exe, objects);
 
-    size = strlen(pattern)
-           + strlen(link)
-           + strlen(link_flags)
-           + strlen(objects)
-           + strlen(extra_link_flags)
-           + strlen(output_flag)
-           + strlen(exe)
-           + 50;
-    command = (char*)malloc(size);
-    sprintf(command, pattern, link, link_flags, objects, extra_link_flags,
-            output_flag, exe);
+    if (library_flags) {
+        library_flags_string = chaz_CFlags_get_string(library_flags);
+    }
+    chaz_CFlags_set_link_output(local_flags, exe);
+    local_flags_string = chaz_CFlags_get_string(local_flags);
+    command = chaz_Util_join(" ", link, local_flags_string, objects,
+                             library_flags_string, NULL);
     chaz_MakeRule_add_command(rule, command);
 
     chaz_MakeFile_add_to_cleanup(makefile, exe);
 
+    chaz_CFlags_destroy(local_flags);
+    free(command);
     return rule;
 }
 
 chaz_MakeRule*
-chaz_MakeFile_add_shared_obj(chaz_MakeFile *makefile, const char *shared_obj,
-                             const char *objects,
-                             const char *extra_link_flags) {
-    const char    *pattern     = "%s %s %s %s %s %s%s";
-    const char    *link        = chaz_CC_link_command();
-    const char    *shobj_flags = chaz_CC_link_shared_obj_flag();
-    const char    *link_flags  = chaz_CC_link_flags();
-    const char    *output_flag = chaz_CC_link_output_flag();
+chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *shared_lib,
+                             const char *objects, chaz_CFlags *library_flags) {
+    int            cflags_style = chaz_CC_get_cflags_style();
+    chaz_CFlags   *local_flags  = chaz_CFlags_new(cflags_style);
+    const char    *link         = chaz_CC_link_command();
+    const char    *library_flags_string = "";
+    const char    *local_flags_string;
     chaz_MakeRule *rule;
     char          *command;
-    size_t         size;
 
-    rule = chaz_MakeFile_add_rule(makefile, shared_obj, objects);
+    rule = chaz_MakeFile_add_rule(makefile, shared_lib, objects);
 
-    size = strlen(pattern)
-           + strlen(link)
-           + strlen(shobj_flags)
-           + strlen(link_flags)
-           + strlen(objects)
-           + strlen(extra_link_flags)
-           + strlen(output_flag)
-           + strlen(shared_obj)
-           + 50;
-    command = (char*)malloc(size);
-    sprintf(command, pattern, link, shobj_flags, link_flags, objects,
-            extra_link_flags, output_flag, shared_obj);
+    if (library_flags) {
+        library_flags_string = chaz_CFlags_get_string(library_flags);
+    }
+    chaz_CFlags_link_shared_library(local_flags);
+    chaz_CFlags_set_link_output(local_flags, shared_lib);
+    local_flags_string = chaz_CFlags_get_string(local_flags);
+    command = chaz_Util_join(" ", link, local_flags_string, objects,
+                             library_flags_string, NULL);
     chaz_MakeRule_add_command(rule, command);
 
-    chaz_MakeFile_add_to_cleanup(makefile, shared_obj);
+    chaz_MakeFile_add_to_cleanup(makefile, shared_lib);
 
+    chaz_CFlags_destroy(local_flags);
+    free(command);
     return rule;
 }
 
@@ -3115,7 +3251,6 @@ chaz_MakeRule_add_command(chaz_MakeRule *rule, const char *command) {
 void
 chaz_MakeRule_add_command_make(chaz_MakeRule *rule, const char *dir,
                                const char *target) {
-    const char *make = chaz_Make.make_command;
     char *command;
 
     if (chaz_Make.is_gnu_make) {
@@ -3259,7 +3394,7 @@ static struct {
     char dev_null[20];
     char exe_ext[5];
     char obj_ext[5];
-    char shared_obj_ext[7];
+    char shared_lib_ext[7];
     char local_command_start[3];
     int  shell_type;
 } chaz_OS = { "", "", "", "", "", "", 0 };
@@ -3297,13 +3432,13 @@ chaz_OS_init(void) {
         strcpy(chaz_OS.exe_ext, "");
         strcpy(chaz_OS.obj_ext, ".o");
         if (memcmp(chaz_OS.name, "darwin", 6) == 0) {
-            strcpy(chaz_OS.shared_obj_ext, ".dylib");
+            strcpy(chaz_OS.shared_lib_ext, ".dylib");
         }
         else if (memcmp(chaz_OS.name, "cygwin", 6) == 0) {
-            strcpy(chaz_OS.shared_obj_ext, ".dll");
+            strcpy(chaz_OS.shared_lib_ext, ".dll");
         }
         else {
-            strcpy(chaz_OS.shared_obj_ext, ".so");
+            strcpy(chaz_OS.shared_lib_ext, ".so");
         }
         strcpy(chaz_OS.local_command_start, "./");
     }
@@ -3312,7 +3447,7 @@ chaz_OS_init(void) {
         strcpy(chaz_OS.dev_null, "nul");
         strcpy(chaz_OS.exe_ext, ".exe");
         strcpy(chaz_OS.obj_ext, ".obj");
-        strcpy(chaz_OS.shared_obj_ext, ".dll");
+        strcpy(chaz_OS.shared_lib_ext, ".dll");
         strcpy(chaz_OS.local_command_start, ".\\");
         chaz_OS.shell_type = CHAZ_OS_CMD_EXE;
     }
@@ -3348,8 +3483,8 @@ chaz_OS_obj_ext(void) {
 }
 
 const char*
-chaz_OS_shared_obj_ext(void) {
-    return chaz_OS.shared_obj_ext;
+chaz_OS_shared_lib_ext(void) {
+    return chaz_OS.shared_lib_ext;
 }
 
 const char*
@@ -3836,11 +3971,14 @@ chaz_Probe_msvc_version_num(void) {
 
 void
 chaz_BuildEnv_run(void) {
+    chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
+    const char  *extra_cflags_string = chaz_CFlags_get_string(extra_cflags);
+
     chaz_ConfWriter_start_module("BuildEnv");
 
     chaz_ConfWriter_add_def("CC", chaz_CC_get_cc());
     chaz_ConfWriter_add_def("CFLAGS", chaz_CC_get_cflags());
-    chaz_ConfWriter_add_def("EXTRA_CFLAGS", chaz_CC_get_extra_cflags());
+    chaz_ConfWriter_add_def("EXTRA_CFLAGS", extra_cflags_string);
 
     chaz_ConfWriter_end_module();
 }
@@ -4835,34 +4973,35 @@ typedef struct SourceFileContext {
 
 static void
 S_add_compiler_flags(struct chaz_CLIArgs *args) {
+    chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
+
     if (chaz_Probe_gcc_version_num()) {
         if (getenv("LUCY_VALGRIND")) {
-            chaz_CC_add_extra_cflags("-fno-inline-functions");
+            chaz_CFlags_append(extra_cflags, "-fno-inline-functions");
         }
         else if (getenv("LUCY_DEBUG")) {
-            chaz_CC_add_extra_cflags(
-                "-DLUCY_DEBUG -pedantic -Wall -Wextra "
-                "-Wno-variadic-macros "
+            chaz_CFlags_append(extra_cflags,
+                "-DLUCY_DEBUG -pedantic -Wall -Wextra -Wno-variadic-macros"
             );
         }
         if (args->charmony_pm) {
-            chaz_CC_add_extra_cflags("-DPERL_GCC_PEDANTIC ");
+            chaz_CFlags_append(extra_cflags, "-DPERL_GCC_PEDANTIC");
         }
 
         /* Tell GCC explicitly to run with maximum options. */
-        chaz_CC_add_extra_cflags("-std=gnu99 -D_GNU_SOURCE");
+        chaz_CFlags_append(extra_cflags, "-std=gnu99 -D_GNU_SOURCE");
     }
     else if (chaz_Probe_msvc_version_num()) {
         /* Compile as C++ under MSVC. */
-        chaz_CC_add_extra_cflags("/TP");
+        chaz_CFlags_append(extra_cflags, "/TP");
 
         /* Thwart stupid warnings. */
-        chaz_CC_add_extra_cflags("/D_CRT_SECURE_NO_WARNINGS");
-        chaz_CC_add_extra_cflags("/D_SCL_SECURE_NO_WARNINGS");
+        chaz_CFlags_append(extra_cflags, "/D_CRT_SECURE_NO_WARNINGS");
+        chaz_CFlags_append(extra_cflags, "/D_SCL_SECURE_NO_WARNINGS");
 
         if (chaz_Probe_msvc_version_num() < 1300) {
             /* Redefine 'for' to fix broken 'for' scoping under MSVC6. */
-            chaz_CC_add_extra_cflags("/Dfor=\"if(0);else for\"");
+            chaz_CFlags_append(extra_cflags, "/Dfor=\"if(0);else for\"");
         }
     }
 }
@@ -4901,6 +5040,8 @@ S_source_file_callback(char *file, void *context) {
 
 static void
 S_write_makefile() {
+    chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
+
     SourceFileContext sfc;
 
     const char *base_dir  = "..";
@@ -4941,16 +5082,16 @@ S_write_makefile() {
     chaz_MakeFile_add_var(makefile, "CC", chaz_CC_get_cc());
 
     if (chaz_CC_msvc_version_num()) {
-        chaz_CC_add_extra_cflags("/nologo");
+        chaz_CFlags_append(extra_cflags, "/nologo");
     }
-    chaz_CC_set_optimization_level("2");
-    chaz_CC_add_include_dir(".");
-    chaz_CC_add_include_dir("$(INCLUDE_DIR)");
-    chaz_CC_add_include_dir("$(SRC_DIR)");
+    chaz_CFlags_enable_optimization(extra_cflags);
+    chaz_CFlags_add_include_dir(extra_cflags, ".");
+    chaz_CFlags_add_include_dir(extra_cflags, "$(INCLUDE_DIR)");
+    chaz_CFlags_add_include_dir(extra_cflags, "$(SRC_DIR)");
 
     var = chaz_MakeFile_add_var(makefile, "CFLAGS", NULL);
     chaz_MakeVar_append(var, chaz_CC_get_cflags());
-    chaz_MakeVar_append(var, chaz_CC_get_extra_cflags());
+    chaz_MakeVar_append(var, chaz_CFlags_get_string(extra_cflags));
 
     chaz_MakeFile_add_var(makefile, "LEMON_OBJS",
                           "$(LEMON_DIR)" DIR_SEP "lemon$(OBJ_EXT)");
@@ -4976,7 +5117,7 @@ S_write_makefile() {
 
     chaz_MakeFile_add_rule(makefile, "all", "$(CFC_EXE)");
 
-    chaz_MakeFile_add_exe(makefile, "$(LEMON_EXE)", "$(LEMON_OBJS)", "");
+    chaz_MakeFile_add_exe(makefile, "$(LEMON_EXE)", "$(LEMON_OBJS)", NULL);
 
     rule = chaz_MakeFile_add_rule(makefile, parse_header_c, NULL);
     chaz_MakeRule_add_prereq(rule, "$(LEMON_EXE)");
@@ -4989,9 +5130,9 @@ S_write_makefile() {
     chaz_MakeFile_add_rule(makefile, "$(COMMON_OBJS)", parse_header_c);
 
     chaz_MakeFile_add_exe(makefile, "$(CFC_EXE)",
-                          "$(COMMON_OBJS) $(CFC_OBJS)", "");
+                          "$(COMMON_OBJS) $(CFC_OBJS)", NULL);
     chaz_MakeFile_add_exe(makefile, "$(TEST_CFC_EXE)",
-                          "$(COMMON_OBJS) $(TEST_CFC_OBJS)", "");
+                          "$(COMMON_OBJS) $(TEST_CFC_OBJS)", NULL);
 
     rule = chaz_MakeFile_add_rule(makefile, "test", "$(TEST_CFC_EXE)");
     chaz_MakeRule_add_command(rule, "$(TEST_CFC_EXE)");
