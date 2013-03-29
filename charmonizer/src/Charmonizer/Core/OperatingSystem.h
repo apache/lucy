@@ -92,7 +92,7 @@ chaz_OS_obj_ext(void);
 /* Return the extension for a shared object on this system.
  */
 const char*
-chaz_OS_shared_obj_ext(void);
+chaz_OS_shared_lib_ext(void);
 
 /* Return the equivalent of /dev/null on this system.
  */

@@ -241,66 +241,60 @@ chaz_MakeFile_add_dir_to_cleanup(chaz_MakeFile *makefile, const char *dir) {
 
 chaz_MakeRule*
 chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
-                      const char *objects, const char *extra_link_flags) {
-    const char    *pattern     = "%s %s %s %s %s%s";
-    const char    *link        = chaz_CC_link_command();
-    const char    *link_flags  = chaz_CC_link_flags();
-    const char    *output_flag = chaz_CC_link_output_flag();
+                      const char *objects, chaz_CFlags *library_flags) {
+    int            cflags_style = chaz_CC_get_cflags_style();
+    chaz_CFlags   *local_flags  = chaz_CFlags_new(cflags_style);
+    const char    *link         = chaz_CC_link_command();
+    const char    *library_flags_string = "";
+    const char    *local_flags_string;
     chaz_MakeRule *rule;
     char          *command;
-    size_t         size;
 
     rule = chaz_MakeFile_add_rule(makefile, exe, objects);
 
-    size = strlen(pattern)
-           + strlen(link)
-           + strlen(link_flags)
-           + strlen(objects)
-           + strlen(extra_link_flags)
-           + strlen(output_flag)
-           + strlen(exe)
-           + 50;
-    command = (char*)malloc(size);
-    sprintf(command, pattern, link, link_flags, objects, extra_link_flags,
-            output_flag, exe);
+    if (library_flags) {
+        library_flags_string = chaz_CFlags_get_string(library_flags);
+    }
+    chaz_CFlags_set_link_output(local_flags, exe);
+    local_flags_string = chaz_CFlags_get_string(local_flags);
+    command = chaz_Util_join(" ", link, local_flags_string, objects,
+                             library_flags_string, NULL);
     chaz_MakeRule_add_command(rule, command);
 
     chaz_MakeFile_add_to_cleanup(makefile, exe);
 
+    chaz_CFlags_destroy(local_flags);
+    free(command);
     return rule;
 }
 
 chaz_MakeRule*
-chaz_MakeFile_add_shared_obj(chaz_MakeFile *makefile, const char *shared_obj,
-                             const char *objects,
-                             const char *extra_link_flags) {
-    const char    *pattern     = "%s %s %s %s %s %s%s";
-    const char    *link        = chaz_CC_link_command();
-    const char    *shobj_flags = chaz_CC_link_shared_obj_flag();
-    const char    *link_flags  = chaz_CC_link_flags();
-    const char    *output_flag = chaz_CC_link_output_flag();
+chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *shared_lib,
+                             const char *objects, chaz_CFlags *library_flags) {
+    int            cflags_style = chaz_CC_get_cflags_style();
+    chaz_CFlags   *local_flags  = chaz_CFlags_new(cflags_style);
+    const char    *link         = chaz_CC_link_command();
+    const char    *library_flags_string = "";
+    const char    *local_flags_string;
     chaz_MakeRule *rule;
     char          *command;
-    size_t         size;
 
-    rule = chaz_MakeFile_add_rule(makefile, shared_obj, objects);
+    rule = chaz_MakeFile_add_rule(makefile, shared_lib, objects);
 
-    size = strlen(pattern)
-           + strlen(link)
-           + strlen(shobj_flags)
-           + strlen(link_flags)
-           + strlen(objects)
-           + strlen(extra_link_flags)
-           + strlen(output_flag)
-           + strlen(shared_obj)
-           + 50;
-    command = (char*)malloc(size);
-    sprintf(command, pattern, link, shobj_flags, link_flags, objects,
-            extra_link_flags, output_flag, shared_obj);
+    if (library_flags) {
+        library_flags_string = chaz_CFlags_get_string(library_flags);
+    }
+    chaz_CFlags_link_shared_library(local_flags);
+    chaz_CFlags_set_link_output(local_flags, shared_lib);
+    local_flags_string = chaz_CFlags_get_string(local_flags);
+    command = chaz_Util_join(" ", link, local_flags_string, objects,
+                             library_flags_string, NULL);
     chaz_MakeRule_add_command(rule, command);
 
-    chaz_MakeFile_add_to_cleanup(makefile, shared_obj);
+    chaz_MakeFile_add_to_cleanup(makefile, shared_lib);
 
+    chaz_CFlags_destroy(local_flags);
+    free(command);
     return rule;
 }
 
@@ -475,7 +469,6 @@ chaz_MakeRule_add_command(chaz_MakeRule *rule, const char *command) {
 void
 chaz_MakeRule_add_command_make(chaz_MakeRule *rule, const char *dir,
                                const char *target) {
-    const char *make = chaz_Make.make_command;
     char *command;
 
     if (chaz_Make.is_gnu_make) {

@@ -32,7 +32,7 @@ static struct {
     char dev_null[20];
     char exe_ext[5];
     char obj_ext[5];
-    char shared_obj_ext[7];
+    char shared_lib_ext[7];
     char local_command_start[3];
     int  shell_type;
 } chaz_OS = { "", "", "", "", "", "", 0 };
@@ -70,13 +70,13 @@ chaz_OS_init(void) {
         strcpy(chaz_OS.exe_ext, "");
         strcpy(chaz_OS.obj_ext, ".o");
         if (memcmp(chaz_OS.name, "darwin", 6) == 0) {
-            strcpy(chaz_OS.shared_obj_ext, ".dylib");
+            strcpy(chaz_OS.shared_lib_ext, ".dylib");
         }
         else if (memcmp(chaz_OS.name, "cygwin", 6) == 0) {
-            strcpy(chaz_OS.shared_obj_ext, ".dll");
+            strcpy(chaz_OS.shared_lib_ext, ".dll");
         }
         else {
-            strcpy(chaz_OS.shared_obj_ext, ".so");
+            strcpy(chaz_OS.shared_lib_ext, ".so");
         }
         strcpy(chaz_OS.local_command_start, "./");
     }
@@ -85,7 +85,7 @@ chaz_OS_init(void) {
         strcpy(chaz_OS.dev_null, "nul");
         strcpy(chaz_OS.exe_ext, ".exe");
         strcpy(chaz_OS.obj_ext, ".obj");
-        strcpy(chaz_OS.shared_obj_ext, ".dll");
+        strcpy(chaz_OS.shared_lib_ext, ".dll");
         strcpy(chaz_OS.local_command_start, ".\\");
         chaz_OS.shell_type = CHAZ_OS_CMD_EXE;
     }
@@ -121,8 +121,8 @@ chaz_OS_obj_ext(void) {
 }
 
 const char*
-chaz_OS_shared_obj_ext(void) {
-    return chaz_OS.shared_obj_ext;
+chaz_OS_shared_lib_ext(void) {
+    return chaz_OS.shared_lib_ext;
 }
 
 const char*

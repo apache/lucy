@@ -32,11 +32,12 @@ static const char chaz_SymbolVisibility_symbol_exporting_code[] =
 
 void
 chaz_SymbolVisibility_run(void) {
+    chaz_CFlags *temp_cflags = chaz_CC_get_temp_cflags();
     int can_control_visibility = false;
     char code_buf[sizeof(chaz_SymbolVisibility_symbol_exporting_code) + 100];
 
     chaz_ConfWriter_start_module("SymbolVisibility");
-    chaz_CC_set_warnings_as_errors(1);
+    chaz_CFlags_set_warnings_as_errors(temp_cflags);
 
     /* Windows. */
     if (!can_control_visibility) {
@@ -61,7 +62,8 @@ chaz_SymbolVisibility_run(void) {
             chaz_ConfWriter_add_def("IMPORT", NULL);
         }
     }
-    chaz_CC_set_warnings_as_errors(0);
+
+    chaz_CFlags_clear(temp_cflags);
 
     /* Default. */
     if (!can_control_visibility) {

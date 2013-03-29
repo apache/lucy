@@ -20,11 +20,14 @@
 
 void
 chaz_BuildEnv_run(void) {
+    chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
+    const char  *extra_cflags_string = chaz_CFlags_get_string(extra_cflags);
+
     chaz_ConfWriter_start_module("BuildEnv");
 
     chaz_ConfWriter_add_def("CC", chaz_CC_get_cc());
     chaz_ConfWriter_add_def("CFLAGS", chaz_CC_get_cflags());
-    chaz_ConfWriter_add_def("EXTRA_CFLAGS", chaz_CC_get_extra_cflags());
+    chaz_ConfWriter_add_def("EXTRA_CFLAGS", extra_cflags_string);
 
     chaz_ConfWriter_end_module();
 }

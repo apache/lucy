@@ -26,6 +26,7 @@ extern "C" {
 
 #include <stddef.h>
 #include "Charmonizer/Core/Defines.h"
+#include "Charmonizer/Core/CFlags.h"
 
 /* Attempt to compile and link an executable.  Return true if the executable
  * file exists after the attempt.
@@ -65,35 +66,6 @@ chaz_CC_init(const char *cc_command, const char *cflags);
 void
 chaz_CC_clean_up(void);
 
-void
-chaz_CC_set_warnings_as_errors(const int flag);
-
-/* (Re)set "extra" cflags.
- */
-void
-chaz_CC_set_extra_cflags(const char *);
-
-/* Concatenate onto the end of the "extra" cflags.  A space will be inserted
- * automatically.
- */
-void
-chaz_CC_add_extra_cflags(const char *);
-
-/* Add include dir to extra cflags.
- */
-void
-chaz_CC_add_include_dir(const char *dir);
-
-/* Set optimization level.
- */
-void
-chaz_CC_set_optimization_level(const char *level);
-
-/* Disable strict aliasing.
- */
-void
-chaz_CC_disable_strict_aliasing();
-
 /* Accessor for the compiler executable's string representation.
  */
 const char*
@@ -104,10 +76,20 @@ chaz_CC_get_cc(void);
 const char*
 chaz_CC_get_cflags(void);
 
+/* Accessor for `cflags_style`.
+ */
+int
+chaz_CC_get_cflags_style(void);
+
 /* Accessor for `extra_cflags`.
  */
-const char*
+chaz_CFlags*
 chaz_CC_get_extra_cflags(void);
+
+/* Accessor for `temp_cflags`.
+ */
+chaz_CFlags*
+chaz_CC_get_temp_cflags(void);
 
 int
 chaz_CC_gcc_version_num(void);
@@ -119,25 +101,7 @@ int
 chaz_CC_msvc_version_num(void);
 
 const char*
-chaz_CC_shared_obj_cflags(void);
-
-const char*
 chaz_CC_link_command(void);
-
-const char*
-chaz_CC_link_flags(void);
-
-const char*
-chaz_CC_link_shared_obj_flag(void);
-
-const char*
-chaz_CC_link_output_flag(void);
-
-char*
-chaz_CC_library_path_flag(const char *directory);
-
-char*
-chaz_CC_link_with_shared_obj_flag(const char *shared_obj);
 
 #ifdef __cplusplus
 }
