@@ -33,6 +33,11 @@ S_set_token_re_but_not_pattern(lucy_RegexTokenizer *self, void *token_re);
 static void
 S_set_pattern_from_token_re(lucy_RegexTokenizer *self, void *token_re);
 
+bool
+lucy_RegexTokenizer_is_available(void) {
+    return true;
+}
+
 lucy_RegexTokenizer*
 lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
                          const lucy_CharBuf *pattern) {

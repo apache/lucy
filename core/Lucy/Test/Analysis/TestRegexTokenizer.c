@@ -25,7 +25,8 @@
 
 TestRegexTokenizer*
 TestRegexTokenizer_new(TestFormatter *formatter) {
-    TestRegexTokenizer *self = (TestRegexTokenizer*)VTable_Make_Obj(TESTREGEXTOKENIZER);
+    TestRegexTokenizer *self
+        = (TestRegexTokenizer*)VTable_Make_Obj(TESTREGEXTOKENIZER);
     return TestRegexTokenizer_init(self, formatter);
 }
 
@@ -36,6 +37,13 @@ TestRegexTokenizer_init(TestRegexTokenizer *self, TestFormatter *formatter) {
 
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
+    if (!RegexTokenizer_is_available()) {
+        SKIP(batch, "RegexTokenizer not available");
+        SKIP(batch, "RegexTokenizer not available");
+        SKIP(batch, "RegexTokenizer not available");
+        return;
+    }
+
     ZombieCharBuf *word_char_pattern  = ZCB_WRAP_STR("\\w+", 3);
     ZombieCharBuf *whitespace_pattern = ZCB_WRAP_STR("\\S+", 3);
     RegexTokenizer *word_char_tokenizer

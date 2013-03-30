@@ -23,13 +23,15 @@
 #include "Lucy/Test/Analysis/TestPolyAnalyzer.h"
 #include "Lucy/Analysis/PolyAnalyzer.h"
 #include "Lucy/Analysis/Normalizer.h"
+#include "Lucy/Analysis/RegexTokenizer.h"
 #include "Lucy/Analysis/SnowballStopFilter.h"
 #include "Lucy/Analysis/SnowballStemmer.h"
 #include "Lucy/Analysis/StandardTokenizer.h"
 
 TestPolyAnalyzer*
 TestPolyAnalyzer_new(TestFormatter *formatter) {
-    TestPolyAnalyzer *self = (TestPolyAnalyzer*)VTable_Make_Obj(TESTPOLYANALYZER);
+    TestPolyAnalyzer *self
+        = (TestPolyAnalyzer*)VTable_Make_Obj(TESTPOLYANALYZER);
     return TestPolyAnalyzer_init(self, formatter);
 }
 
@@ -40,6 +42,13 @@ TestPolyAnalyzer_init(TestPolyAnalyzer *self, TestFormatter *formatter) {
 
 static void
 test_Dump_Load_and_Equals(TestBatch *batch) {
+    if (!RegexTokenizer_is_available()) {
+        SKIP(batch, "RegexTokenizer not available");
+        SKIP(batch, "RegexTokenizer not available");
+        SKIP(batch, "RegexTokenizer not available");
+        return;
+    }
+
     CharBuf      *EN          = (CharBuf*)ZCB_WRAP_STR("en", 2);
     CharBuf      *ES          = (CharBuf*)ZCB_WRAP_STR("es", 2);
     PolyAnalyzer *analyzer    = PolyAnalyzer_new(EN, NULL);

@@ -37,6 +37,11 @@
 static uint32_t
 S_count_code_points(const char *string, size_t len);
 
+bool
+RegexTokenizer_is_available(void) {
+    return true;
+}
+
 RegexTokenizer*
 RegexTokenizer_init(RegexTokenizer *self, const CharBuf *pattern) {
     Analyzer_init((Analyzer*)self);
@@ -140,6 +145,11 @@ S_count_code_points(const char *string, size_t len) {
 }
 
 #else // HAS_PCRE_H
+
+bool
+RegexTokenizer_is_available(void) {
+    return false;
+}
 
 RegexTokenizer*
 RegexTokenizer_init(RegexTokenizer *self, const CharBuf *pattern) {

@@ -380,6 +380,21 @@ static Lucy_TestQPSyntax_Test_t syntax_test_funcs[] = {
 
 static void
 test_query_parser_syntax(TestBatch *batch) {
+    if (!RegexTokenizer_is_available()) {
+        for (uint32_t i = 0; leaf_test_funcs[i] != NULL; i++) {
+            SKIP(batch, "RegexTokenizer not available");
+            SKIP(batch, "RegexTokenizer not available");
+            SKIP(batch, "RegexTokenizer not available");
+        }
+
+        for (uint32_t i = 0; syntax_test_funcs[i] != NULL; i++) {
+            SKIP(batch, "RegexTokenizer not available");
+            SKIP(batch, "RegexTokenizer not available");
+        }
+
+        return;
+    }
+
     Folder        *index    = build_index();
     IndexSearcher *searcher = IxSearcher_new((Obj*)index);
     QueryParser   *qparser  = QParser_new(IxSearcher_Get_Schema(searcher),
