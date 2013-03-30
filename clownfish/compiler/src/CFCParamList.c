@@ -105,6 +105,9 @@ S_generate_c_strings(CFCParamList *self) {
     if (self->variadic) {
         c_string_size += sizeof(", ...");
     }
+    if (self->num_vars == 0) {
+        c_string_size += sizeof("void");
+    }
     FREEMEM(self->c_string);
     FREEMEM(self->name_list);
     self->c_string  = (char*)MALLOCATE(c_string_size);
@@ -126,6 +129,9 @@ S_generate_c_strings(CFCParamList *self) {
             strcat(self->c_string, ", ");
             strcat(self->name_list, ", ");
         }
+    }
+    if (self->num_vars == 0) {
+        strcat(self->c_string, "void");
     }
 }
 

@@ -27,7 +27,7 @@ S_run_tests(CFCTest *test);
 
 const CFCTestBatch CFCTEST_BATCH_PARAM_LIST = {
     "Clownfish::CFC::Model::ParamList",
-    16,
+    21,
     S_run_tests
 };
 
@@ -65,6 +65,17 @@ S_run_tests(CFCTest *test) {
         OK(test, variables[0] != NULL, "get_variables");
         STR_EQ(test, CFCBase_get_cfc_class((CFCBase*)variables[0]),
                "Clownfish::CFC::Model::Variable", "get_variables return type");
+
+        CFCBase_decref((CFCBase*)param_list);
+    }
+
+    {
+        CFCParamList *param_list
+            = CFCTest_parse_param_list(test, parser, "()");
+        STR_EQ(test, CFCParamList_to_c(param_list), "void", "to_c");
+        INT_EQ(test, CFCParamList_num_vars(param_list), 0, "num_vars");
+        CFCVariable **variables = CFCParamList_get_variables(param_list);
+        OK(test, variables[0] == NULL, "get_variables");
 
         CFCBase_decref((CFCBase*)param_list);
     }
