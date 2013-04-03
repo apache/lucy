@@ -110,24 +110,24 @@ chaz_MakeFile_add_dir_to_cleanup(chaz_MakeFile *makefile, const char *dir);
  *
  * @param makefile The makefile.
  * @param exe The name of the executable.
- * @param objects The list of object files.
- * @param library_flags Additional link flags for libraries.
+ * @param sources The list of source files.
+ * @param link_flags Additional link flags.
  */
 chaz_MakeRule*
 chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
-                      const char *objects, chaz_CFlags *library_flags);
+                      const char *sources, chaz_CFlags *link_flags);
 
 /** Add a rule to link a shared library. The shared library will also be added
  * to the list of files to clean.
  *
  * @param makefile The makefile.
  * @param shared_lib The name of the shared library.
- * @param objects The list of object files.
- * @param library_flags Additional link flags for libraries.
+ * @param sources The list of source files.
+ * @param link_flags Additional link flags.
  */
 chaz_MakeRule*
 chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *shared_lib,
-                             const char *objects, chaz_CFlags *library_flags);
+                             const char *sources, chaz_CFlags *link_flags);
 
 /** Write the makefile to a file named 'Makefile' in the current directory.
  *
