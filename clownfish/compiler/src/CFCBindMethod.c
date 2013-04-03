@@ -86,12 +86,10 @@ S_final_method_def(CFCMethod *method, CFCClass *klass) {
 static char*
 S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
     CFCParamList *param_list = CFCMethod_get_param_list(method);
+    const char *PREFIX         = CFCClass_get_PREFIX(klass);
     const char *invoker_struct = CFCClass_full_struct_sym(klass);
     const char *common_struct 
         = CFCType_get_specifier(CFCMethod_self_type(method));
-
-    const char *visibility = CFCClass_included(klass)
-                             ? "CHY_IMPORT" : "CHY_EXPORT";
 
     char *full_meth_sym   = CFCMethod_full_method_sym(method, klass);
     char *full_offset_sym = CFCMethod_full_offset_sym(method, klass);
@@ -114,7 +112,7 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
     const char *maybe_return = CFCType_is_void(return_type) ? "" : "return ";
 
     const char pattern[] =
-        "extern %s size_t %s;\n"
+        "extern %sVISIBLE size_t %s;\n"
         "static CHY_INLINE %s\n"
         "%s(const %s *self%s) {\n"
         "    char *const method_address = *(char**)self + %s;\n"
@@ -122,7 +120,7 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
         "    %smethod((%s*)self%s);\n"
         "}\n";
     char *method_def
-        = CFCUtil_sprintf(pattern, visibility, full_offset_sym, ret_type_str,
+        = CFCUtil_sprintf(pattern, PREFIX, full_offset_sym, ret_type_str,
                           full_meth_sym, invoker_struct, params_minus_invoker,
                           full_offset_sym, full_typedef, full_typedef,
                           maybe_return, common_struct,

@@ -141,13 +141,11 @@ S_write_parcel_h(CFCBindCore *self) {
         CFCUtil_die("No source classes found.");
     }
     const char *prefix = CFCParcel_get_prefix(parcel);
+    const char *PREFIX = CFCParcel_get_PREFIX(parcel);
     FREEMEM(ordered);
 
     // Create Clownfish aliases if necessary.
     char *aliases = CFCBindAliases_c_aliases();
-
-    const char *visibility = strcmp(prefix, "lucy_") == 0
-                             ? "CHY_EXPORT" : "CHY_IMPORT";
 
     const char pattern[] =
         "%s\n"
@@ -160,6 +158,12 @@ S_write_parcel_h(CFCBindCore *self) {
         "\n"
         "#include <stddef.h>\n"
         "#include \"charmony.h\"\n"
+        "\n"
+        "#ifdef CFP_LUCY\n"
+        "  #define LUCY_VISIBLE CHY_EXPORT\n"
+        "#else\n"
+        "  #define LUCY_VISIBLE CHY_IMPORT\n"
+        "#endif\n"
         "\n"
         "%s\n"
         "%s\n"
@@ -193,7 +197,7 @@ S_write_parcel_h(CFCBindCore *self) {
         "     ((_full_meth ## _t)cfish_super_method(_vtable, \\\n"
         "                                           _full_meth ## _OFFSET))\n"
         "\n"
-        "extern %s size_t cfish_VTable_offset_of_parent;\n"
+        "extern %sVISIBLE size_t cfish_VTable_offset_of_parent;\n"
         "static CHY_INLINE cfish_method_t\n"
         "cfish_super_method(const void *vtable, size_t offset) {\n"
         "    char *vt_as_char = (char*)vtable;\n"
@@ -252,7 +256,7 @@ S_write_parcel_h(CFCBindCore *self) {
         "%s\n"
         "\n";
     char *file_content
-        = CFCUtil_sprintf(pattern, self->header, aliases, typedefs, visibility,
+        = CFCUtil_sprintf(pattern, self->header, aliases, typedefs, PREFIX,
                           prefix, prefix, self->footer);
 
     // Unlink then write file.
