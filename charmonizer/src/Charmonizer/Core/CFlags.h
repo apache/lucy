@@ -52,6 +52,10 @@ void
 chaz_CFlags_set_output_exe(chaz_CFlags *flags, const char *filename);
 
 void
+chaz_CFlags_add_define(chaz_CFlags *flags, const char *name,
+                       const char *value);
+
+void
 chaz_CFlags_add_include_dir(chaz_CFlags *flags, const char *dir);
 
 void
