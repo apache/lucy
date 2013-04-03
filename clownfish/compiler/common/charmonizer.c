@@ -71,6 +71,10 @@ void
 chaz_CFlags_set_output_exe(chaz_CFlags *flags, const char *filename);
 
 void
+chaz_CFlags_add_define(chaz_CFlags *flags, const char *name,
+                       const char *value);
+
+void
 chaz_CFlags_add_include_dir(chaz_CFlags *flags, const char *dir);
 
 void
@@ -1191,6 +1195,28 @@ chaz_CFlags_set_output_exe(chaz_CFlags *flags, const char *filename) {
         output = "-o ";
     }
     string = chaz_Util_join("", output, filename, NULL);
+    chaz_CFlags_append(flags, string);
+    free(string);
+}
+
+void
+chaz_CFlags_add_define(chaz_CFlags *flags, const char *name,
+                       const char *value) {
+    const char *define;
+    char *string;
+    if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
+        define = "/D";
+    }
+    else {
+        /* POSIX */
+        define = "-D ";
+    }
+    if (value) {
+        string = chaz_Util_join("", define, name, "=", value, NULL);
+    }
+    else {
+        string = chaz_Util_join("", define, name, NULL);
+    }
     chaz_CFlags_append(flags, string);
     free(string);
 }
