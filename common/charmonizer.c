@@ -6224,6 +6224,8 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
     if (args->charmony_pm) {
         chaz_CFlags_add_define(extra_cflags, "HAS_BOOL", NULL);
     }
+
+    chaz_CFlags_add_define(extra_cflags, "CFP_LUCY", NULL);
 }
 
 static void
