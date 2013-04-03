@@ -193,6 +193,7 @@ S_write_makefile() {
     chaz_CFlags_enable_optimization(extra_cflags);
     chaz_CFlags_disable_strict_aliasing(extra_cflags);
     chaz_CFlags_compile_shared_library(extra_cflags);
+    chaz_CFlags_hide_symbols(extra_cflags);
 
     /* TODO: This makes extra_cflags and subsequent probes unusable. Find a
      * better way to get flags for include dirs.

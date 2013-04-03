@@ -71,6 +71,9 @@ void
 chaz_CFlags_compile_shared_library(chaz_CFlags *flags);
 
 void
+chaz_CFlags_hide_symbols(chaz_CFlags *flags);
+
+void
 chaz_CFlags_link_shared_library(chaz_CFlags *flags);
 
 void
