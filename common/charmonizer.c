@@ -494,24 +494,24 @@ chaz_MakeFile_add_dir_to_cleanup(chaz_MakeFile *makefile, const char *dir);
  *
  * @param makefile The makefile.
  * @param exe The name of the executable.
- * @param objects The list of object files.
- * @param library_flags Additional link flags for libraries.
+ * @param sources The list of source files.
+ * @param link_flags Additional link flags.
  */
 chaz_MakeRule*
 chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
-                      const char *objects, chaz_CFlags *library_flags);
+                      const char *sources, chaz_CFlags *link_flags);
 
 /** Add a rule to link a shared library. The shared library will also be added
  * to the list of files to clean.
  *
  * @param makefile The makefile.
  * @param shared_lib The name of the shared library.
- * @param objects The list of object files.
- * @param library_flags Additional link flags for libraries.
+ * @param sources The list of source files.
+ * @param link_flags Additional link flags.
  */
 chaz_MakeRule*
 chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *shared_lib,
-                             const char *objects, chaz_CFlags *library_flags);
+                             const char *sources, chaz_CFlags *link_flags);
 
 /** Write the makefile to a file named 'Makefile' in the current directory.
  *
@@ -3328,24 +3328,24 @@ chaz_MakeFile_add_dir_to_cleanup(chaz_MakeFile *makefile, const char *dir) {
 
 chaz_MakeRule*
 chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
-                      const char *objects, chaz_CFlags *library_flags) {
+                      const char *sources, chaz_CFlags *link_flags) {
     int            cflags_style = chaz_CC_get_cflags_style();
     chaz_CFlags   *local_flags  = chaz_CFlags_new(cflags_style);
     const char    *link         = chaz_CC_link_command();
-    const char    *library_flags_string = "";
+    const char    *link_flags_string = "";
     const char    *local_flags_string;
     chaz_MakeRule *rule;
     char          *command;
 
-    rule = chaz_MakeFile_add_rule(makefile, exe, objects);
+    rule = chaz_MakeFile_add_rule(makefile, exe, sources);
 
-    if (library_flags) {
-        library_flags_string = chaz_CFlags_get_string(library_flags);
+    if (link_flags) {
+        link_flags_string = chaz_CFlags_get_string(link_flags);
     }
     chaz_CFlags_set_link_output(local_flags, exe);
     local_flags_string = chaz_CFlags_get_string(local_flags);
-    command = chaz_Util_join(" ", link, local_flags_string, objects,
-                             library_flags_string, NULL);
+    command = chaz_Util_join(" ", link, sources, link_flags_string,
+                             local_flags_string, NULL);
     chaz_MakeRule_add_command(rule, command);
 
     chaz_MakeFile_add_to_cleanup(makefile, exe);
@@ -3357,25 +3357,25 @@ chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
 
 chaz_MakeRule*
 chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *shared_lib,
-                             const char *objects, chaz_CFlags *library_flags) {
+                             const char *sources, chaz_CFlags *link_flags) {
     int            cflags_style = chaz_CC_get_cflags_style();
     chaz_CFlags   *local_flags  = chaz_CFlags_new(cflags_style);
     const char    *link         = chaz_CC_link_command();
-    const char    *library_flags_string = "";
+    const char    *link_flags_string = "";
     const char    *local_flags_string;
     chaz_MakeRule *rule;
     char          *command;
 
-    rule = chaz_MakeFile_add_rule(makefile, shared_lib, objects);
+    rule = chaz_MakeFile_add_rule(makefile, shared_lib, sources);
 
-    if (library_flags) {
-        library_flags_string = chaz_CFlags_get_string(library_flags);
+    if (link_flags) {
+        link_flags_string = chaz_CFlags_get_string(link_flags);
     }
     chaz_CFlags_link_shared_library(local_flags);
     chaz_CFlags_set_link_output(local_flags, shared_lib);
     local_flags_string = chaz_CFlags_get_string(local_flags);
-    command = chaz_Util_join(" ", link, local_flags_string, objects,
-                             library_flags_string, NULL);
+    command = chaz_Util_join(" ", link, sources, link_flags_string,
+                             local_flags_string, NULL);
     chaz_MakeRule_add_command(rule, command);
 
     chaz_MakeFile_add_to_cleanup(makefile, shared_lib);
@@ -6279,7 +6279,7 @@ S_write_makefile() {
 
     int          cflags_style = chaz_CC_get_cflags_style();
     chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
-    chaz_CFlags *library_cflags;
+    chaz_CFlags *link_flags;
     const char  *math_library;
 
     printf("Creating Makefile...\n");
@@ -6391,9 +6391,6 @@ S_write_makefile() {
     chaz_MakeVar_append(var, "$(AUTOGEN_DIR)" DIR_SEP "source" DIR_SEP
                         "parcel$(OBJ_EXT)");
 
-    chaz_MakeFile_add_var(makefile, "TEST_LUCY_OBJS",
-                          "t" DIR_SEP "test_lucy$(OBJ_EXT)");
-
     /* Executables */
 
     chaz_MakeFile_add_var(makefile, "LEMON_EXE",
@@ -6436,26 +6433,27 @@ S_write_makefile() {
     chaz_MakeRule_add_prereq(rule, json_parser_c);
     chaz_MakeRule_add_prereq(rule, "$(AUTOGEN_DIR)");
 
-    library_cflags = chaz_CFlags_new(cflags_style);
+    link_flags = chaz_CFlags_new(cflags_style);
     if (math_library) {
-        chaz_CFlags_add_library(library_cflags, math_library);
+        chaz_CFlags_add_library(link_flags, math_library);
     }
     if (chaz_HeadCheck_check_header("pcre.h")) {
-        chaz_CFlags_add_library(library_cflags, "pcre");
+        chaz_CFlags_add_library(link_flags, "pcre");
     }
     chaz_MakeFile_add_shared_lib(makefile, "$(LUCY_SHLIB)", "$(LUCY_OBJS)",
-                                 library_cflags);
-    chaz_CFlags_destroy(library_cflags);
+                                 link_flags);
+    chaz_CFlags_destroy(link_flags);
 
-    chaz_MakeFile_add_rule(makefile, "$(TEST_LUCY_OBJS)", "$(AUTOGEN_DIR)");
-
-    library_cflags = chaz_CFlags_new(cflags_style);
-    chaz_CFlags_add_library_path(library_cflags, ".");
-    chaz_CFlags_add_library(library_cflags, "lucy");
+    link_flags = chaz_CFlags_new(cflags_style);
+    chaz_CFlags_add_include_dir(link_flags, ".");
+    chaz_CFlags_add_include_dir(link_flags,
+                                "$(AUTOGEN_DIR)" DIR_SEP "include");
+    chaz_CFlags_add_library_path(link_flags, ".");
+    chaz_CFlags_add_library(link_flags, "lucy");
     rule = chaz_MakeFile_add_exe(makefile, "$(TEST_LUCY_EXE)",
-                                 "$(TEST_LUCY_OBJS)", library_cflags);
+                                 "t" DIR_SEP "test_lucy.c", link_flags);
     chaz_MakeRule_add_prereq(rule, "$(LUCY_SHLIB)");
-    chaz_CFlags_destroy(library_cflags);
+    chaz_CFlags_destroy(link_flags);
 
     rule = chaz_MakeFile_add_rule(makefile, "test", "$(TEST_LUCY_EXE)");
     const char *test_command = "$(TEST_LUCY_EXE)";
@@ -6464,7 +6462,6 @@ S_write_makefile() {
     }
     chaz_MakeRule_add_command(rule, test_command);
 
-    chaz_MakeFile_add_to_cleanup(makefile, "$(TEST_LUCY_OBJS)");
     chaz_MakeFile_add_to_cleanup(makefile, "$(LUCY_OBJS)");
     chaz_MakeFile_add_to_cleanup(makefile, json_parser_h);
     chaz_MakeFile_add_to_cleanup(makefile, json_parser_c);
