@@ -241,7 +241,7 @@ S_write_parcel_h(CFCBindCore *self) {
         "  #define VTableSpec               cfish_VTableSpec\n"
         "#endif\n"
         "\n"
-        "void\n"
+        "%sVISIBLE void\n"
         "%sbootstrap_parcel();\n"
         "\n"
         "void\n"
@@ -257,7 +257,7 @@ S_write_parcel_h(CFCBindCore *self) {
         "\n";
     char *file_content
         = CFCUtil_sprintf(pattern, self->header, aliases, typedefs, PREFIX,
-                          prefix, prefix, self->footer);
+                          PREFIX, prefix, prefix, self->footer);
 
     // Unlink then write file.
     const char *inc_dest = CFCHierarchy_get_include_dest(hierarchy);
