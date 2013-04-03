@@ -90,6 +90,9 @@ void
 chaz_CFlags_compile_shared_library(chaz_CFlags *flags);
 
 void
+chaz_CFlags_hide_symbols(chaz_CFlags *flags);
+
+void
 chaz_CFlags_link_shared_library(chaz_CFlags *flags);
 
 void
@@ -1294,6 +1297,14 @@ chaz_CFlags_compile_shared_library(chaz_CFlags *flags) {
         string = "-fPIC";
     }
     chaz_CFlags_append(flags, string);
+}
+
+void
+chaz_CFlags_hide_symbols(chaz_CFlags *flags) {
+    if (flags->style == CHAZ_CFLAGS_STYLE_GNU
+        && strcmp(chaz_OS_shared_lib_ext(), ".dll") != 0) {
+        chaz_CFlags_append(flags, "-fvisibility=hidden");
+    }
 }
 
 void

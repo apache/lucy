@@ -90,6 +90,9 @@ void
 chaz_CFlags_compile_shared_library(chaz_CFlags *flags);
 
 void
+chaz_CFlags_hide_symbols(chaz_CFlags *flags);
+
+void
 chaz_CFlags_link_shared_library(chaz_CFlags *flags);
 
 void
@@ -1573,6 +1576,14 @@ chaz_CFlags_compile_shared_library(chaz_CFlags *flags) {
         string = "-fPIC";
     }
     chaz_CFlags_append(flags, string);
+}
+
+void
+chaz_CFlags_hide_symbols(chaz_CFlags *flags) {
+    if (flags->style == CHAZ_CFLAGS_STYLE_GNU
+        && strcmp(chaz_OS_shared_lib_ext(), ".dll") != 0) {
+        chaz_CFlags_append(flags, "-fvisibility=hidden");
+    }
 }
 
 void
@@ -6328,6 +6339,7 @@ S_write_makefile() {
     chaz_CFlags_enable_optimization(extra_cflags);
     chaz_CFlags_disable_strict_aliasing(extra_cflags);
     chaz_CFlags_compile_shared_library(extra_cflags);
+    chaz_CFlags_hide_symbols(extra_cflags);
 
     /* TODO: This makes extra_cflags and subsequent probes unusable. Find a
      * better way to get flags for include dirs.
