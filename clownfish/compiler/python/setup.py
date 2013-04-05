@@ -11,25 +11,29 @@ import shutil
 import subprocess
 import sysconfig
 
+# Get a compiler object and and strings representing the compiler type and
+# CFLAGS.
+compiler = distutils.ccompiler.new_compiler()
+cflags = sysconfig.get_config_var('CFLAGS')
+compiler_type = distutils.ccompiler.get_default_compiler()
+
+# There's no public way to get a string representing the compiler executable
+# out of distutils, but the member variable has been in the same place for a
+# long time, so violating encapsulation may be ok.
+compiler_name = " ".join(compiler.compiler)
+
 BASE_DIR = os.path.abspath(os.path.join(os.pardir, os.pardir, os.pardir))
 PARENT_DIR      = os.path.abspath(os.pardir)
 CFC_SOURCE_DIR  = os.path.join(PARENT_DIR, 'src')
 CFC_INCLUDE_DIR = os.path.join(PARENT_DIR, 'include')
 COMMON_SOURCE_DIR    = os.path.join(PARENT_DIR, 'common')
 CHARMONIZER_C        = os.path.join(COMMON_SOURCE_DIR, 'charmonizer.c')
-CHARMONIZER_EXE_NAME = 'charmonizer' + sysconfig.get_config_var("EXE")
+CHARMONIZER_EXE_NAME = compiler.executable_filename('charmonizer')
 CHARMONIZER_EXE_PATH = os.path.join(os.curdir, CHARMONIZER_EXE_NAME)
 CHARMONY_H_PATH      = 'charmony.h'
 LEMON_DIR = os.path.join(BASE_DIR, 'lemon')
-LEMON_EXE_NAME = 'lemon' + sysconfig.get_config_var("EXE")
+LEMON_EXE_NAME = compiler.executable_filename('lemon')
 LEMON_EXE_PATH = os.path.join(LEMON_DIR, LEMON_EXE_NAME)
-
-# There's no good way to get a string representing the compiler executable out
-# of distutils, so for now we'll kludge it and assume it's the same as the
-# compiler used to build python.
-python_compiler = sysconfig.get_config_var('CC')
-cflags = sysconfig.get_config_var('CFLAGS')
-compiler_type   = distutils.ccompiler.get_default_compiler()
 
 def _quotify(text):
     text = text.replace('\\', '\\\\')
@@ -61,7 +65,7 @@ class charmony(_Command):
     def run(self):
         # Compile charmonizer.
         if newer_group([CHARMONIZER_C], CHARMONIZER_EXE_PATH):
-            command = [python_compiler]
+            command = [compiler_name]
             if compiler_type == 'msvc':
                 command.append('/Fe' + CHARMONIZER_EXE_PATH)
             else:
@@ -74,7 +78,7 @@ class charmony(_Command):
         if newer_group([CHARMONIZER_EXE_PATH], CHARMONY_H_PATH):
             command = [
                 CHARMONIZER_EXE_PATH,
-                '--cc=' + _quotify(python_compiler),
+                '--cc=' + _quotify(compiler_name),
                 '--enable-c',
                 '--',
                 cflags
@@ -93,7 +97,7 @@ class lemon(_Command):
         pass
     def run(self):
         if not os.path.exists(LEMON_EXE_PATH):
-            _run_make(['CC=' + python_compiler], directory=LEMON_DIR)
+            _run_make(['CC=' + _quotify(compiler_name)], directory=LEMON_DIR)
 
 class my_clean(_clean):
     paths_to_clean = [
