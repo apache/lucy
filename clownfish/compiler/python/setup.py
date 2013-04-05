@@ -7,6 +7,7 @@ import distutils.ccompiler
 import os
 import glob
 import platform
+import re
 import shutil
 import subprocess
 import sysconfig
@@ -34,6 +35,32 @@ CHARMONY_H_PATH      = 'charmony.h'
 LEMON_DIR = os.path.join(BASE_DIR, 'lemon')
 LEMON_EXE_NAME = compiler.executable_filename('lemon')
 LEMON_EXE_PATH = os.path.join(LEMON_DIR, LEMON_EXE_NAME)
+
+# Accumulate lists of source files and target files.
+c_filepaths = []
+y_filepaths = []
+paths_to_clean = [
+    CHARMONIZER_EXE_PATH,
+    CHARMONY_H_PATH,
+    '_charm*',
+]
+for (dirpath, dirnames, files) in os.walk(CFC_SOURCE_DIR):
+    for filename in files:
+        if filename.endswith('.y'):
+            path = os.path.join(dirpath, filename)
+            y_filepaths.append(path)
+            path = re.sub(r'y$', 'h', path)
+            paths_to_clean.append(path)
+            path = re.sub(r'h$', 'c', path)
+            paths_to_clean.append(path)
+            c_filepaths.append(path)
+            path = compiler.object_filenames([path])[0]
+            paths_to_clean.append(path)
+        if filename.endswith('.c'):
+            path = os.path.join(dirpath, filename)
+            c_filepaths.append(path)
+            path = compiler.object_filenames([path])[0]
+            paths_to_clean.append(path)
 
 def _quotify(text):
     text = text.replace('\\', '\\\\')
@@ -99,16 +126,25 @@ class lemon(_Command):
         if not os.path.exists(LEMON_EXE_PATH):
             _run_make(['CC=' + _quotify(compiler_name)], directory=LEMON_DIR)
 
+class parsers(_Command):
+    description = "Run .y files through lemon"
+    user_options = []
+    def initialize_options(self):
+        pass
+    def finalize_options(self):
+        pass
+    def run(self):
+        for y_path in y_filepaths:
+            target = re.sub(r'y$', 'c', y_path)
+            if newer_group([y_path], target):
+                command = [LEMON_EXE_PATH, '-c', y_path]
+                subprocess.check_call(command)
+
 class my_clean(_clean):
-    paths_to_clean = [
-        CHARMONIZER_EXE_PATH,
-        CHARMONY_H_PATH,
-        '_charm*',
-    ]
     def run(self):
         _clean.run(self)
         _run_make(command=['clean'], directory=LEMON_DIR)
-        for elem in self.paths_to_clean:
+        for elem in paths_to_clean:
             for path in glob.glob(elem):
                 print("removing " + path)
                 if os.path.isdir(path):
@@ -120,13 +156,8 @@ class my_build(_build):
     def run(self):
         self.run_command('charmony')
         self.run_command('lemon')
+        self.run_command('parsers')
         _build.run(self)
-
-c_filepaths = []
-for (dirpath, dirnames, files) in os.walk(CFC_SOURCE_DIR):
-    for filename in files:
-        if (filename.endswith('.c')):
-            c_filepaths.append(os.path.join(dirpath, filename))
 
 cfc_extension = Extension('clownfish.cfc',
                           define_macros = [('CFCPYTHON', None)],
@@ -148,6 +179,7 @@ setup(name = 'clownfish-cfc',
           'clean': my_clean,
           'lemon': lemon,
           'charmony': charmony,
+          'parsers': parsers,
       },
       ext_modules = [cfc_extension])
 
