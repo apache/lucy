@@ -44,6 +44,7 @@ paths_to_clean = [
     CHARMONY_H_PATH,
     '_charm*',
 ]
+c_filepaths.append(os.path.join('clownfish', '_cfc.c'))
 for (dirpath, dirnames, files) in os.walk(CFC_SOURCE_DIR):
     for filename in files:
         if filename.endswith('.y'):
@@ -159,7 +160,7 @@ class my_build(_build):
         self.run_command('parsers')
         _build.run(self)
 
-cfc_extension = Extension('clownfish.cfc',
+cfc_extension = Extension('clownfish._cfc',
                           define_macros = [('CFCPYTHON', None)],
                           include_dirs = [
                               CFC_INCLUDE_DIR,
@@ -174,6 +175,8 @@ setup(name = 'clownfish-cfc',
       author = 'Apache Lucy Project',
       author_email = 'dev at lucy dot apache dot org',
       url = 'http://lucy.apache.org',
+      packages = ['clownfish.cfc',
+                 ],
       cmdclass = {
           'build': my_build,
           'clean': my_clean,
