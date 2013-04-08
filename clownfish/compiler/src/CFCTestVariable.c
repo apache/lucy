@@ -77,7 +77,7 @@ S_run_tests(CFCTest *test) {
 
     {
         static const char *variable_strings[7] = {
-            "parcel int foo;",
+            "int foo;",
             "private Obj *obj;",
             "public inert int32_t **foo;",
             "Dog *fido;",

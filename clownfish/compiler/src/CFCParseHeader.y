@@ -309,19 +309,11 @@ major_block(A) ::= class_declaration(B). { A = (CFCBase*)B; }
 major_block(A) ::= cblock(B).            { A = (CFCBase*)B; }
 major_block(A) ::= parcel_definition(B). { A = (CFCBase*)B; }
 
-parcel_definition(A) ::= exposure_specifier(B) qualified_id(C) SEMICOLON.
+parcel_definition(A) ::= PARCEL qualified_id(B) SEMICOLON.
 {
-    if (strcmp(B, "parcel") != 0) {
-        /* Instead of this kludgy post-parse error trigger, we should require
-         * PARCEL in this production as opposed to exposure_specifier.
-         * However, that causes a parsing conflict because the keyword
-         * "parcel" has two meanings in the Clownfish header language (parcel
-         * declaration and exposure specifier). */
-         CFCUtil_die("A syntax error was detected when parsing '%s'", B);
-    }
-    A = CFCParcel_fetch(C);
+    A = CFCParcel_fetch(B);
     if (!A) {
-        A = CFCParcel_new(C, NULL, NULL);
+        A = CFCParcel_new(B, NULL, NULL);
         CFCParcel_register(A);
         CFCBase_decref((CFCBase*)A);
     }
@@ -513,7 +505,6 @@ type_name(A) ::= IDENTIFIER(B).         { A = B; }
 
 exposure_specifier(A) ::= PUBLIC(B).  { A = B; }
 exposure_specifier(A) ::= PRIVATE(B). { A = B; }
-exposure_specifier(A) ::= PARCEL(B).  { A = B; }
 exposure_specifier(A) ::= LOCAL(B).   { A = B; }
 
 type_qualifier(A) ::= CONST.       { A = CFCTYPE_CONST; }

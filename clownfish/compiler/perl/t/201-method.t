@@ -127,7 +127,7 @@ isa_ok(
     )
     for (
     'public int Do_Foo(Obj *self);',
-    'parcel Obj* Gimme_An_Obj(Obj *self);',
+    'Obj* Gimme_An_Obj(Obj *self);',
     'void Do_Whatever(Obj *self, uint32_t a_num, float real);',
     'private Foo* Fetch_Foo(Obj *self, int num);',
     );

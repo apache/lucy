@@ -75,7 +75,7 @@ isa_ok(
     "var_declaration_statement: $_"
     )
     for (
-    'parcel int foo;',
+    'int foo;',
     'private Obj *obj;',
     'public inert int32_t **foo;',
     'Dog *fido;'

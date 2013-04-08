@@ -307,8 +307,8 @@ S_run_tests(CFCTest *test) {
 
     {
         const char *class_src =
-            "parcel inert class Rigor::Mortis cnick Mort {\n"
-            "    parcel inert void lie_still();\n"
+            "inert class Rigor::Mortis cnick Mort {\n"
+            "    inert void lie_still();\n"
             "}\n";
         CFCClass *klass = CFCTest_parse_class(test, parser, class_src);
         OK(test, CFCClass_inert(klass),

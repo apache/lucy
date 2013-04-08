@@ -159,7 +159,7 @@ S_run_parser_tests(CFCTest *test) {
     {
         static const char *method_strings[4] = {
             "public int Do_Foo(Obj *self);",
-            "parcel Obj* Gimme_An_Obj(Obj *self);",
+            "Obj* Gimme_An_Obj(Obj *self);",
             "void Do_Whatever(Obj *self, uint32_t a_num, float real);",
             "private Foo* Fetch_Foo(Obj *self, int num);",
         };

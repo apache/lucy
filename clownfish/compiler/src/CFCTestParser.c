@@ -129,7 +129,7 @@ S_run_tests(CFCTest *test) {
 
     {
         static const char *const exposures[3] = {
-            "public", "private", "parcel"
+            "public", "private", ""
         };
         static int (*const accessors[3])(CFCSymbol *sym) = {
             CFCSymbol_public, CFCSymbol_private, CFCSymbol_parcel
