@@ -50,7 +50,6 @@
         {"int32_t", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
         {"int64_t", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
         {"int8_t", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
-        {"local", CFC_TOKENTYPE_LOCAL },
         {"long", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
         {"nullable", CFC_TOKENTYPE_NULLABLE },
         {"parcel", CFC_TOKENTYPE_PARCEL },
