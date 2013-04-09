@@ -161,7 +161,7 @@ S_run_parser_tests(CFCTest *test) {
             "public int Do_Foo(Obj *self);",
             "Obj* Gimme_An_Obj(Obj *self);",
             "void Do_Whatever(Obj *self, uint32_t a_num, float real);",
-            "private Foo* Fetch_Foo(Obj *self, int num);",
+            "Foo* Fetch_Foo(Obj *self, int num);",
         };
         for (int i = 0; i < 4; ++i) {
             CFCMethod *method

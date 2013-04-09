@@ -37,7 +37,7 @@ S_test_initial_value(CFCTest *test, CFCParser *parser,
 
 const CFCTestBatch CFCTEST_BATCH_PARSER = {
     "Clownfish::CFC::Model::Parser",
-    192,
+    189,
     S_run_tests
 };
 
@@ -128,13 +128,13 @@ S_run_tests(CFCTest *test) {
     }
 
     {
-        static const char *const exposures[3] = {
-            "public", "private", ""
+        static const char *const exposures[2] = {
+            "public", ""
         };
-        static int (*const accessors[3])(CFCSymbol *sym) = {
-            CFCSymbol_public, CFCSymbol_private, CFCSymbol_parcel
+        static int (*const accessors[2])(CFCSymbol *sym) = {
+            CFCSymbol_public, CFCSymbol_parcel
         };
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             const char *exposure = exposures[i];
             char *src = CFCUtil_sprintf("%s int32_t foo;", exposure);
             CFCVariable *var = CFCTest_parse_variable(test, parser, src);
@@ -251,7 +251,7 @@ S_run_tests(CFCTest *test) {
         CFCBase_decref((CFCBase*)method);
 
         const char *var_string =
-            "private Hash *hash;";
+            "public inert Hash *hash;";
         CFCVariable *var = CFCTest_parse_variable(test, parser, var_string);
         CFCBase_decref((CFCBase*)var);
     }

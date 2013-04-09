@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 88;
+use Test::More tests => 87;
 
 BEGIN { use_ok('Clownfish::CFC::Parser') }
 
@@ -61,7 +61,7 @@ is( $parser->parse("$_*")->get_specifier,
 ok( $parser->parse("const char")->const, "type_qualifier const" );
 
 ok( $parser->parse("$_ int32_t foo;")->$_, "exposure_specifier $_" )
-    for qw( public private );
+    for qw( public );
 
 ok( $parser->parse("int32_t foo;")->parcel,
     "exposure_specifier '' implicitly parcel" );
@@ -125,7 +125,7 @@ $parser->set_class_cnick('Obj');
 ok( $parser->parse($_), "declaration statement: $_" )
     for (
     'public Foo* Spew_Foo(Obj *self, uint32_t *how_many);',
-    'private Hash *hash;',
+    'public inert Hash *hash;',
     );
 
 is( $parser->parse("$_*")->get_specifier,

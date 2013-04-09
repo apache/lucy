@@ -228,12 +228,12 @@ S_run_tests(CFCTest *test) {
     {
         const char *class_src =
             "public class Foo::Foodie cnick Foodie inherits Foo {\n"
-            "    private int num;\n"
+            "    int num;\n"
             "}\n";
         CFCClass *klass = CFCTest_parse_class(test, parser, class_src);
         CFCSymbol **member_vars = (CFCSymbol**)CFCClass_member_vars(klass);
         OK(test, S_has_symbol(member_vars, "num"),
-           "parsed private member var");
+           "parsed member var");
 
         CFCBase_decref((CFCBase*)klass);
     }
@@ -250,11 +250,10 @@ S_run_tests(CFCTest *test) {
             "                           CharBuf *fave_food);\n"
             "    inert uint32_t count();\n"
             "    inert uint64_t num_dogs;\n"
+            "    public inert Dog *top_dog;\n"
             "\n"
-            "    private CharBuf *name;\n"
-            "    private bool     likes_to_go_fetch;\n"
-            "    private void     Chase_Tail(Dog *self);\n"
-            "\n"
+            "    CharBuf *name;\n"
+            "    bool     likes_to_go_fetch;\n"
             "    ChewToy *squishy;\n"
             "\n"
             "    void               Destroy(Dog *self);\n"
@@ -276,11 +275,11 @@ S_run_tests(CFCTest *test) {
         CFCSymbol **functions   = (CFCSymbol**)CFCClass_functions(klass);
         CFCSymbol **methods     = (CFCSymbol**)CFCClass_methods(klass);
         OK(test, S_has_symbol(inert_vars, "num_dogs"), "parsed inert var");
+        OK(test, S_has_symbol(inert_vars, "top_dog"), "parsed public inert var");
         OK(test, S_has_symbol(member_vars, "mom"), "parsed public member var");
         OK(test, S_has_symbol(member_vars, "squishy"),
            "parsed parcel member var");
         OK(test, S_has_symbol(functions, "init"), "parsed function");
-        OK(test, S_has_symbol(methods, "chase_tail"), "parsed private method");
         OK(test, S_has_symbol(methods, "destroy"), "parsed parcel method");
         OK(test, S_has_symbol(methods, "bury"), "parsed public method");
         OK(test, S_has_symbol(methods, "scratch"),

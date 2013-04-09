@@ -53,7 +53,6 @@
         {"long", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
         {"nullable", CFC_TOKENTYPE_NULLABLE },
         {"parcel", CFC_TOKENTYPE_PARCEL },
-        {"private", CFC_TOKENTYPE_PRIVATE },
         {"public", CFC_TOKENTYPE_PUBLIC },
         {"short", CFC_TOKENTYPE_INTEGER_TYPE_NAME },
         {"size_t", CFC_TOKENTYPE_INTEGER_TYPE_NAME },

@@ -504,7 +504,6 @@ type_name(A) ::= FLOAT_TYPE_NAME(B).    { A = B; }
 type_name(A) ::= IDENTIFIER(B).         { A = B; }
 
 exposure_specifier(A) ::= PUBLIC(B).  { A = B; }
-exposure_specifier(A) ::= PRIVATE(B). { A = B; }
 
 type_qualifier(A) ::= CONST.       { A = CFCTYPE_CONST; }
 type_qualifier(A) ::= NULLABLE.    { A = CFCTYPE_NULLABLE; }

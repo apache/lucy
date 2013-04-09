@@ -150,11 +150,11 @@ is( $parser->parse("class Fu::$_ inherits $_ { }")->get_parent_class_name,
     for ( 'Fooble', 'Foo::FooJr::FooIII' );
 
 my $class_content
-    = 'public class Foo::Foodie cnick Foodie inherits Foo { private int num; }';
+    = 'public class Foo::Foodie cnick Foodie inherits Foo { int num; }';
 my $class = $parser->parse($class_content);
 isa_ok( $class, "Clownfish::CFC::Model::Class", "class_declaration FooJr" );
 ok( ( scalar grep { $_->micro_sym eq 'num' } @{ $class->member_vars } ),
-    "parsed private member var" );
+    "parsed member var" );
 
 $class_content = q|
     /**
@@ -166,11 +166,10 @@ $class_content = q|
         public inert Dog* init(Dog *self, CharBuf *name, CharBuf *fave_food);
         inert uint32_t count();
         inert uint64_t num_dogs;
+        public inert Dog* top_dog;
 
-        private CharBuf *name;
-        private bool     likes_to_go_fetch;
-        private void     Chase_Tail(Dog *self);
-
+        CharBuf *name;
+        bool     likes_to_go_fetch;
         ChewToy *squishy;
 
         void               Destroy(Dog *self);
@@ -191,14 +190,14 @@ $class = $parser->parse($class_content);
 isa_ok( $class, "Clownfish::CFC::Model::Class", "class_declaration Dog" );
 ok( ( scalar grep { $_->micro_sym eq 'num_dogs' } @{ $class->inert_vars } ),
     "parsed inert var" );
+ok( ( scalar grep { $_->micro_sym eq 'top_dog' } @{ $class->inert_vars } ),
+    "parsed public inert var" );
 ok( ( scalar grep { $_->micro_sym eq 'mom' } @{ $class->member_vars } ),
     "parsed public member var" );
 ok( ( scalar grep { $_->micro_sym eq 'squishy' } @{ $class->member_vars } ),
     "parsed parcel member var" );
 ok( ( scalar grep { $_->micro_sym eq 'init' } @{ $class->functions } ),
     "parsed function" );
-ok( ( scalar grep { $_->micro_sym eq 'chase_tail' } @{ $class->methods } ),
-    "parsed private method" );
 ok( ( scalar grep { $_->micro_sym eq 'destroy' } @{ $class->methods } ),
     "parsed parcel method" );
 ok( ( scalar grep { $_->micro_sym eq 'bury' } @{ $class->methods } ),

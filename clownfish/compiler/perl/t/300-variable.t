@@ -76,7 +76,7 @@ isa_ok(
     )
     for (
     'int foo;',
-    'private Obj *obj;',
+    'inert Obj *obj;',
     'public inert int32_t **foo;',
     'Dog *fido;'
     );
