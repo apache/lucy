@@ -64,6 +64,11 @@ chaz_Make_list_files(const char *dir, const char *ext,
 chaz_MakeFile*
 chaz_MakeFile_new();
 
+/** MakeFile destructor.
+ */
+void
+chaz_MakeFile_destroy(chaz_MakeFile *makefile);
+
 /** Add a variable to a makefile.
  *
  * @param makefile The makefile.

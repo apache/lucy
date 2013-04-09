@@ -209,6 +209,7 @@ S_write_makefile() {
 
     chaz_MakeFile_write(makefile);
 
+    chaz_MakeFile_destroy(makefile);
     free(src_dir);
 }
 
