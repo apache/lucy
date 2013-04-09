@@ -144,6 +144,7 @@ S_write_makefile() {
 
     int          cflags_style = chaz_CC_get_cflags_style();
     chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
+    chaz_CFlags *makefile_cflags;
     chaz_CFlags *link_flags;
     const char  *math_library;
 
@@ -183,36 +184,36 @@ S_write_makefile() {
 
     /* C compiler */
 
-    math_library = chaz_Floats_math_library();
-
     chaz_MakeFile_add_var(makefile, "CC", chaz_CC_get_cc());
 
-    if (chaz_CC_msvc_version_num()) {
-        chaz_CFlags_append(extra_cflags, "/nologo");
-    }
-    chaz_CFlags_enable_optimization(extra_cflags);
-    chaz_CFlags_disable_strict_aliasing(extra_cflags);
-    chaz_CFlags_compile_shared_library(extra_cflags);
-    chaz_CFlags_hide_symbols(extra_cflags);
+    makefile_cflags = chaz_CFlags_new(cflags_style);
 
-    /* TODO: This makes extra_cflags and subsequent probes unusable. Find a
-     * better way to get flags for include dirs.
-     */
-    chaz_CFlags_add_include_dir(extra_cflags, ".");
-    chaz_CFlags_add_include_dir(extra_cflags, "$(SRC_DIR)");
-    chaz_CFlags_add_include_dir(extra_cflags, "$(CORE_DIR)");
-    chaz_CFlags_add_include_dir(extra_cflags,
+    if (chaz_CC_msvc_version_num()) {
+        chaz_CFlags_append(makefile_cflags, "/nologo");
+    }
+    chaz_CFlags_enable_optimization(makefile_cflags);
+    chaz_CFlags_disable_strict_aliasing(makefile_cflags);
+    chaz_CFlags_compile_shared_library(makefile_cflags);
+    chaz_CFlags_hide_symbols(makefile_cflags);
+
+    chaz_CFlags_add_include_dir(makefile_cflags, ".");
+    chaz_CFlags_add_include_dir(makefile_cflags, "$(SRC_DIR)");
+    chaz_CFlags_add_include_dir(makefile_cflags, "$(CORE_DIR)");
+    chaz_CFlags_add_include_dir(makefile_cflags,
                                 "$(AUTOGEN_DIR)" DIR_SEP "include");
-    chaz_CFlags_add_include_dir(extra_cflags,
+    chaz_CFlags_add_include_dir(makefile_cflags,
                                 "$(SNOWSTEM_DIR)" DIR_SEP "include");
-    chaz_CFlags_add_include_dir(extra_cflags,
+    chaz_CFlags_add_include_dir(makefile_cflags,
                                 "$(MODULES_DIR)" DIR_SEP "unicode" DIR_SEP
                                 "ucd");
-    chaz_CFlags_add_include_dir(extra_cflags, "$(UTF8PROC_DIR)");
+    chaz_CFlags_add_include_dir(makefile_cflags, "$(UTF8PROC_DIR)");
 
     var = chaz_MakeFile_add_var(makefile, "CFLAGS", NULL);
-    chaz_MakeVar_append(var, chaz_CC_get_cflags());
     chaz_MakeVar_append(var, chaz_CFlags_get_string(extra_cflags));
+    chaz_MakeVar_append(var, chaz_CFlags_get_string(makefile_cflags));
+    chaz_MakeVar_append(var, chaz_CC_get_cflags());
+
+    chaz_CFlags_destroy(makefile_cflags);
 
     /* Object files */
 
@@ -300,6 +301,7 @@ S_write_makefile() {
     chaz_MakeRule_add_prereq(rule, "$(AUTOGEN_DIR)");
 
     link_flags = chaz_CFlags_new(cflags_style);
+    math_library = chaz_Floats_math_library();
     if (math_library) {
         chaz_CFlags_add_library(link_flags, math_library);
     }
