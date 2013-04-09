@@ -451,6 +451,11 @@ chaz_Make_list_files(const char *dir, const char *ext,
 chaz_MakeFile*
 chaz_MakeFile_new();
 
+/** MakeFile destructor.
+ */
+void
+chaz_MakeFile_destroy(chaz_MakeFile *makefile);
+
 /** Add a variable to a makefile.
  *
  * @param makefile The makefile.
@@ -2987,6 +2992,40 @@ chaz_MakeFile_new() {
     return makefile;
 }
 
+void
+chaz_MakeFile_destroy(chaz_MakeFile *makefile) {
+    size_t i;
+
+    for (i = 0; makefile->vars[i]; i++) {
+        chaz_MakeVar *var = makefile->vars[i];
+        free(var->name);
+        free(var->value);
+        free(var);
+    }
+    free(makefile->vars);
+
+    for (i = 0; makefile->rules[i]; i++) {
+        chaz_MakeRule *rule = makefile->rules[i];
+        if (rule->targets)  { free(rule->targets); }
+        if (rule->prereqs)  { free(rule->prereqs); }
+        if (rule->commands) { free(rule->commands); }
+        free(rule);
+    }
+    free(makefile->rules);
+
+    for (i = 0; makefile->cleanup_files[i]; i++) {
+        free(makefile->cleanup_files[i]);
+    }
+    free(makefile->cleanup_files);
+
+    for (i = 0; makefile->cleanup_dirs[i]; i++) {
+        free(makefile->cleanup_dirs[i]);
+    }
+    free(makefile->cleanup_dirs);
+
+    free(makefile);
+}
+
 chaz_MakeVar*
 chaz_MakeFile_add_var(chaz_MakeFile *makefile, const char *name,
                       const char *value) {
@@ -5183,6 +5222,7 @@ S_write_makefile() {
 
     chaz_MakeFile_write(makefile);
 
+    chaz_MakeFile_destroy(makefile);
     free(src_dir);
 }
 
