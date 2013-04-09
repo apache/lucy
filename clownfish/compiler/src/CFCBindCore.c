@@ -341,8 +341,11 @@ S_write_parcel_c(CFCBindCore *self) {
         "\n"
         "void\n"
         "%sbootstrap_parcel() {\n"
+        "    static bool bootstrapped = false;\n"
+        "    if (bootstrapped) { return; }\n"
         "    cfish_VTable_bootstrap(vtable_specs, %d);\n"
         "    %sinit_parcel();\n"
+        "    bootstrapped = true;\n"
         "}\n"
         "\n"
         "%s\n";
