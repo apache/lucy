@@ -41,7 +41,7 @@ S_run_final_tests(CFCTest *test);
 
 const CFCTestBatch CFCTEST_BATCH_METHOD = {
     "Clownfish::CFC::Model::Method",
-    62,
+    66,
     S_run_tests
 };
 
@@ -163,7 +163,7 @@ S_run_parser_tests(CFCTest *test) {
             "void Do_Whatever(Obj *self, uint32_t a_num, float real);",
             "private Foo* Fetch_Foo(Obj *self, int num);",
         };
-        for (int i = 0; i < 2; ++i) {
+        for (int i = 0; i < 4; ++i) {
             CFCMethod *method
                 = CFCTest_parse_method(test, parser, method_strings[i]);
             CFCBase_decref((CFCBase*)method);
