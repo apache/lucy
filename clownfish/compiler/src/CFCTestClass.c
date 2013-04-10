@@ -255,6 +255,7 @@ S_run_tests(CFCTest *test) {
             "    CharBuf *name;\n"
             "    bool     likes_to_go_fetch;\n"
             "    ChewToy *squishy;\n"
+            "    Owner   *mom;\n"
             "\n"
             "    void               Destroy(Dog *self);\n"
             "    public CharBuf*    Bark(Dog *self);\n"
@@ -262,7 +263,6 @@ S_run_tests(CFCTest *test) {
             "    public void        Bite(Dog *self, Enemy *enemy);\n"
             "    public Thing      *Fetch(Dog *self, Thing *thing);\n"
             "    public final void  Bury(Dog *self, Bone *bone);\n"
-            "    public Owner      *mom;\n"
             "    public abstract incremented nullable Thing*\n"
             "    Scratch(Dog *self);\n"
             "\n"
@@ -276,9 +276,8 @@ S_run_tests(CFCTest *test) {
         CFCSymbol **methods     = (CFCSymbol**)CFCClass_methods(klass);
         OK(test, S_has_symbol(inert_vars, "num_dogs"), "parsed inert var");
         OK(test, S_has_symbol(inert_vars, "top_dog"), "parsed public inert var");
-        OK(test, S_has_symbol(member_vars, "mom"), "parsed public member var");
-        OK(test, S_has_symbol(member_vars, "squishy"),
-           "parsed parcel member var");
+        OK(test, S_has_symbol(member_vars, "mom"), "parsed member var");
+        OK(test, S_has_symbol(member_vars, "squishy"), "parsed member var");
         OK(test, S_has_symbol(functions, "init"), "parsed function");
         OK(test, S_has_symbol(methods, "destroy"), "parsed parcel method");
         OK(test, S_has_symbol(methods, "bury"), "parsed public method");

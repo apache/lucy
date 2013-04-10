@@ -397,13 +397,7 @@ class_defs(A) ::= class_defs(B) subroutine_declaration_statement(C).
 var_declaration_statement(A) ::= 
     type(D) declarator(E) SEMICOLON.
 {
-    A = S_new_var(state, CFCParser_dupe(state, "parcel"), NULL, D, E);
-}
-var_declaration_statement(A) ::= 
-    exposure_specifier(B)
-    type(D) declarator(E) SEMICOLON.
-{
-    A = S_new_var(state, B, NULL, D, E);
+    A = S_new_var(state, CFCParser_dupe(state, "private"), NULL, D, E);
 }
 var_declaration_statement(A) ::= 
     declaration_modifier_list(C)

@@ -60,11 +60,11 @@ is( $parser->parse("$_*")->get_specifier,
 
 ok( $parser->parse("const char")->const, "type_qualifier const" );
 
-ok( $parser->parse("$_ int32_t foo;")->$_, "exposure_specifier $_" )
+ok( $parser->parse("$_ inert int32_t foo;")->$_, "exposure_specifier $_" )
     for qw( public );
 
-ok( $parser->parse("int32_t foo;")->parcel,
-    "exposure_specifier '' implicitly parcel" );
+ok( $parser->parse("int32_t foo;")->private,
+    "exposure_specifier '' implicitly private" );
 
 isa_ok( $parser->parse($_), "Clownfish::CFC::Model::Type", "type $_" )
     for ( 'const char *', 'Obj*', 'i32_t', 'char[]', 'long[1]', 'i64_t[30]' );

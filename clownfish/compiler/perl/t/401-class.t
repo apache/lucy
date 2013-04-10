@@ -171,6 +171,7 @@ $class_content = q|
         CharBuf *name;
         bool     likes_to_go_fetch;
         ChewToy *squishy;
+        Owner   *mom;
 
         void               Destroy(Dog *self);
         public CharBuf*    Bark(Dog *self);
@@ -178,7 +179,6 @@ $class_content = q|
         public void        Bite(Dog *self, Enemy *enemy);
         public Thing      *Fetch(Dog *self, Thing *thing);
         public final void  Bury(Dog *self, Bone *bone);
-        public Owner      *mom;
         public abstract incremented nullable Thing*
         Scratch(Dog *self);
 
@@ -193,9 +193,9 @@ ok( ( scalar grep { $_->micro_sym eq 'num_dogs' } @{ $class->inert_vars } ),
 ok( ( scalar grep { $_->micro_sym eq 'top_dog' } @{ $class->inert_vars } ),
     "parsed public inert var" );
 ok( ( scalar grep { $_->micro_sym eq 'mom' } @{ $class->member_vars } ),
-    "parsed public member var" );
+    "parsed member var" );
 ok( ( scalar grep { $_->micro_sym eq 'squishy' } @{ $class->member_vars } ),
-    "parsed parcel member var" );
+    "parsed member var" );
 ok( ( scalar grep { $_->micro_sym eq 'init' } @{ $class->functions } ),
     "parsed function" );
 ok( ( scalar grep { $_->micro_sym eq 'destroy' } @{ $class->methods } ),

@@ -136,7 +136,7 @@ S_run_tests(CFCTest *test) {
         };
         for (int i = 0; i < 2; ++i) {
             const char *exposure = exposures[i];
-            char *src = CFCUtil_sprintf("%s int32_t foo;", exposure);
+            char *src = CFCUtil_sprintf("%s inert int32_t foo;", exposure);
             CFCVariable *var = CFCTest_parse_variable(test, parser, src);
             OK(test, accessors[i]((CFCSymbol*)var), "exposure_specifier %s",
                exposure);
