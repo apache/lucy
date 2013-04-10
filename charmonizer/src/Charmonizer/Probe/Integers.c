@@ -110,17 +110,20 @@ chaz_Integers_run(void) {
     /* Record sizeof() for several common integer types. */
     output = chaz_CC_capture_output(chaz_Integers_sizes_code, &output_len);
     if (output != NULL) {
+        char *ptr     = output;
         char *end_ptr = output;
 
-        sizeof_char  = strtol(output, &end_ptr, 10);
-        output       = end_ptr;
-        sizeof_short = strtol(output, &end_ptr, 10);
-        output       = end_ptr;
-        sizeof_int   = strtol(output, &end_ptr, 10);
-        output       = end_ptr;
-        sizeof_long  = strtol(output, &end_ptr, 10);
-        output       = end_ptr;
-        sizeof_ptr   = strtol(output, &end_ptr, 10);
+        sizeof_char  = strtol(ptr, &end_ptr, 10);
+        ptr          = end_ptr;
+        sizeof_short = strtol(ptr, &end_ptr, 10);
+        ptr          = end_ptr;
+        sizeof_int   = strtol(ptr, &end_ptr, 10);
+        ptr          = end_ptr;
+        sizeof_long  = strtol(ptr, &end_ptr, 10);
+        ptr          = end_ptr;
+        sizeof_ptr   = strtol(ptr, &end_ptr, 10);
+
+        free(output);
     }
 
     /* Determine whether long longs are available. */
@@ -129,6 +132,7 @@ chaz_Integers_run(void) {
     if (output != NULL) {
         has_long_long    = true;
         sizeof_long_long = strtol(output, NULL, 10);
+        free(output);
     }
 
     /* Determine whether the __int64 type is available. */
@@ -137,6 +141,7 @@ chaz_Integers_run(void) {
     if (output != NULL) {
         has___int64 = true;
         sizeof___int64 = strtol(output, NULL, 10);
+        free(output);
     }
 
     /* Figure out which integer types are available. */
@@ -181,12 +186,14 @@ chaz_Integers_run(void) {
         output = chaz_CC_capture_output(code_buf, &output_len);
         if (output != NULL) {
             strcpy(i64_t_postfix, "LL");
+            free(output);
         }
         else {
             sprintf(code_buf, chaz_Integers_literal64_code, "i64");
             output = chaz_CC_capture_output(code_buf, &output_len);
             if (output != NULL) {
                 strcpy(i64_t_postfix, "i64");
+                free(output);
             }
             else {
                 chaz_Util_die("64-bit types, but no literal syntax found");
@@ -196,12 +203,14 @@ chaz_Integers_run(void) {
         output = chaz_CC_capture_output(code_buf, &output_len);
         if (output != NULL) {
             strcpy(u64_t_postfix, "ULL");
+            free(output);
         }
         else {
             sprintf(code_buf, chaz_Integers_literal64_code, "Ui64");
             output = chaz_CC_capture_output(code_buf, &output_len);
             if (output != NULL) {
                 strcpy(u64_t_postfix, "Ui64");
+                free(output);
             }
             else {
                 chaz_Util_die("64-bit types, but no literal syntax found");
@@ -374,13 +383,14 @@ chaz_Integers_run(void) {
                 sprintf(code_buf, format_64_code, options[i], u64_t_postfix);
                 output = chaz_CC_capture_output(code_buf, &output_len);
 
-                if (output_len != 0
+                if (output != NULL
                     && strcmp(output, "18446744073709551615") == 0
                    ) {
                     sprintf(scratch, "\"%sd\"", options[i]);
                     chaz_ConfWriter_add_global_def("PRId64", scratch);
                     sprintf(scratch, "\"%su\"", options[i]);
                     chaz_ConfWriter_add_global_def("PRIu64", scratch);
+                    free(output);
                     break;
                 }
             }

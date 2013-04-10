@@ -101,7 +101,7 @@ chaz_HeadCheck_check_many_headers(const char **header_names) {
     static const char test_code[] = "int main() { return 0; }\n";
     int success;
     int i;
-    char *code_buf = chaz_Util_strdup("");
+    char *code_buf;
     size_t needed = sizeof(test_code) + 20;
 
     /* Build the source code string. */

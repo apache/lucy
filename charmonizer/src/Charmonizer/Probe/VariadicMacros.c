@@ -58,6 +58,7 @@ chaz_VariadicMacros_run(void) {
         has_iso_varmacros = true;
         chaz_ConfWriter_add_def("HAS_VARIADIC_MACROS", NULL);
         chaz_ConfWriter_add_def("HAS_ISO_VARIADIC_MACROS", NULL);
+        free(output);
     }
 
     /* Test for GNU-style variadic macros. */
@@ -69,6 +70,7 @@ chaz_VariadicMacros_run(void) {
             chaz_ConfWriter_add_def("HAS_VARIADIC_MACROS", NULL);
         }
         chaz_ConfWriter_add_def("HAS_GNUC_VARIADIC_MACROS", NULL);
+        free(output);
     }
 
     chaz_ConfWriter_end_module();
