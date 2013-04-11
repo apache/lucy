@@ -24,6 +24,9 @@
 #include "Clownfish/Util/NumberUtils.h"
 #include "Clownfish/Util/Memory.h"
 
+#define XSBIND_REFCOUNT_FLAG   1
+#define XSBIND_REFCOUNT_SHIFT  1
+
 // Convert a Perl hash into a Clownfish Hash.  Caller takes responsibility for
 // a refcount.
 static cfish_Hash*
@@ -611,34 +614,26 @@ S_lazy_init_host_obj(lucy_Obj *self) {
      * in excess of that. */
     size_t old_refcount = self->ref.count;
     self->ref.host_obj = inner_obj;
-    while (old_refcount > 1) {
-        SvREFCNT_inc_simple_void_NN(inner_obj);
-        old_refcount--;
-    }
+    SvREFCNT(inner_obj) += (old_refcount >> XSBIND_REFCOUNT_SHIFT) - 1;
 }
 
 uint32_t
 lucy_Obj_get_refcount(lucy_Obj *self) {
-    return self->ref.count < 4
-           ? self->ref.count
+    return self->ref.count & XSBIND_REFCOUNT_FLAG
+           ? self->ref.count >> XSBIND_REFCOUNT_SHIFT
            : SvREFCNT((SV*)self->ref.host_obj);
 }
 
 lucy_Obj*
 lucy_Obj_inc_refcount(lucy_Obj *self) {
-    switch (self->ref.count) {
-        case 0:
+    if (self->ref.count & XSBIND_REFCOUNT_FLAG) {
+        if (self->ref.count == XSBIND_REFCOUNT_FLAG) {
             CFISH_THROW(LUCY_ERR, "Illegal refcount of 0");
-            break; // useless
-        case 1:
-        case 2:
-            self->ref.count++;
-            break;
-        case 3:
-            S_lazy_init_host_obj(self);
-            // fall through
-        default:
-            SvREFCNT_inc_simple_void_NN((SV*)self->ref.host_obj);
+        }
+        self->ref.count += 1 << XSBIND_REFCOUNT_SHIFT;
+    }
+    else {
+        SvREFCNT_inc_simple_void_NN((SV*)self->ref.host_obj);
     }
     return self;
 }
@@ -646,30 +641,32 @@ lucy_Obj_inc_refcount(lucy_Obj *self) {
 uint32_t
 lucy_Obj_dec_refcount(lucy_Obj *self) {
     uint32_t modified_refcount = I32_MAX;
-    switch (self->ref.count) {
-        case 0:
+    if (self->ref.count & XSBIND_REFCOUNT_FLAG) {
+        if (self->ref.count == XSBIND_REFCOUNT_FLAG) {
             CFISH_THROW(LUCY_ERR, "Illegal refcount of 0");
-            break; // useless
-        case 1:
+        }
+        if (self->ref.count
+            == ((1 << XSBIND_REFCOUNT_SHIFT) | XSBIND_REFCOUNT_FLAG)) {
             modified_refcount = 0;
             Lucy_Obj_Destroy(self);
-            break;
-        case 2:
-        case 3:
-            modified_refcount = --self->ref.count;
-            break;
-        default:
-            modified_refcount = SvREFCNT((SV*)self->ref.host_obj) - 1;
-            // If the SV's refcount falls to 0, DESTROY will be invoked from
-            // Perl-space.
-            SvREFCNT_dec((SV*)self->ref.host_obj);
+        }
+        else {
+            self->ref.count -= 1 << XSBIND_REFCOUNT_SHIFT;
+            modified_refcount = self->ref.count >> XSBIND_REFCOUNT_SHIFT;
+        }
+    }
+    else {
+        modified_refcount = SvREFCNT((SV*)self->ref.host_obj) - 1;
+        // If the SV's refcount falls to 0, DESTROY will be invoked from
+        // Perl-space.
+        SvREFCNT_dec((SV*)self->ref.host_obj);
     }
     return modified_refcount;
 }
 
 void*
 lucy_Obj_to_host(lucy_Obj *self) {
-    if (self->ref.count < 4) { S_lazy_init_host_obj(self); }
+    if (self->ref.count & XSBIND_REFCOUNT_FLAG) { S_lazy_init_host_obj(self); }
     return newRV_inc((SV*)self->ref.host_obj);
 }
 
@@ -680,7 +677,7 @@ lucy_VTable_make_obj(lucy_VTable *self) {
     lucy_Obj *obj
         = (lucy_Obj*)lucy_Memory_wrapped_calloc(self->obj_alloc_size, 1);
     obj->vtable = self;
-    obj->ref.count = 1;
+    obj->ref.count = (1 << XSBIND_REFCOUNT_SHIFT) | XSBIND_REFCOUNT_FLAG;
     return obj;
 }
 
@@ -688,7 +685,7 @@ lucy_Obj*
 lucy_VTable_init_obj(lucy_VTable *self, void *allocation) {
     lucy_Obj *obj = (lucy_Obj*)allocation;
     obj->vtable = self;
-    obj->ref.count = 1;
+    obj->ref.count = (1 << XSBIND_REFCOUNT_SHIFT) | XSBIND_REFCOUNT_FLAG;
     return obj;
 }
 
@@ -758,7 +755,7 @@ lucy_VTable_find_parent_class(const lucy_CharBuf *class_name) {
 
 void*
 lucy_VTable_to_host(lucy_VTable *self) {
-    bool first_time = self->ref.count < 4 ? true : false;
+    bool first_time = self->ref.count & XSBIND_REFCOUNT_FLAG ? true : false;
     Lucy_VTable_To_Host_t to_host
         = CFISH_SUPER_METHOD_PTR(LUCY_VTABLE, Lucy_VTable_To_Host);
     SV *host_obj = (SV*)to_host(self);
@@ -923,7 +920,7 @@ lucy_Err_trap(Cfish_Err_Attempt_t routine, void *context) {
 
 void*
 lucy_LFReg_to_host(lucy_LockFreeRegistry *self) {
-    bool first_time = self->ref.count < 4 ? true : false;
+    bool first_time = self->ref.count & XSBIND_REFCOUNT_FLAG ? true : false;
     Lucy_LFReg_To_Host_t to_host
         = CFISH_SUPER_METHOD_PTR(LUCY_LOCKFREEREGISTRY, Lucy_LFReg_To_Host);
     SV *host_obj = (SV*)to_host(self);
