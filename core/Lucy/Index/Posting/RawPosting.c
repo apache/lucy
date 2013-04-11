@@ -33,13 +33,12 @@
 RawPosting*
 RawPost_new(void *pre_allocated_memory, int32_t doc_id, uint32_t freq,
             char *term_text, size_t term_text_len) {
-    RawPosting *self    = (RawPosting*)pre_allocated_memory;
-    self->vtable        = RAWPOSTING;
-    self->ref.count     = 1; // never used
-    self->doc_id        = doc_id;
-    self->freq          = freq;
-    self->content_len   = term_text_len;
-    self->aux_len       = 0;
+    RawPosting *self
+        = (RawPosting*)VTable_Init_Obj(RAWPOSTING, pre_allocated_memory);
+    self->doc_id      = doc_id;
+    self->freq        = freq;
+    self->content_len = term_text_len;
+    self->aux_len     = 0;
     memcpy(&self->blob, term_text, term_text_len);
 
     return self;

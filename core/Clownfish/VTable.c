@@ -48,7 +48,7 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
 {
     /* Pass 1:
      * - Allocate memory.
-     * - Initialize refcount, parent, flags, obj_alloc_size, vt_alloc_size.
+     * - Initialize parent, flags, obj_alloc_size, vt_alloc_size.
      * - Initialize method pointers.
      */
     for (size_t i = 0; i < num_specs; ++i) {
@@ -61,7 +61,6 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
         vt_alloc_size += spec->num_novel * sizeof(cfish_method_t);
         VTable *vtable = (VTable*)Memory_wrapped_calloc(vt_alloc_size, 1);
 
-        vtable->ref.count      = 1;
         vtable->parent         = parent;
         vtable->flags          = 0;
         vtable->obj_alloc_size = spec->obj_alloc_size;
@@ -83,12 +82,13 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
 
     /* Pass 2:
      * - Initialize 'vtable' instance variable.
+     * - Initialize refcount.
      */
     for (size_t i = 0; i < num_specs; ++i) {
         VTableSpec *spec   = &specs[i];
         VTable     *vtable = *spec->vtable;
 
-        vtable->vtable = VTABLE;
+        VTable_init_obj(VTABLE, vtable);
     }
 
     /* Now it's safe to call methods.
@@ -130,8 +130,8 @@ VTable_clone(VTable *self) {
         = (VTable*)Memory_wrapped_calloc(self->vt_alloc_size, 1);
 
     memcpy(twin, self, self->vt_alloc_size);
+    VTable_Init_Obj(self->vtable, twin); // Set refcount.
     twin->name = CB_Clone(self->name);
-    twin->ref.count = 1;
 
     return twin;
 }

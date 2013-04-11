@@ -923,24 +923,21 @@ ViewCB_grow(ViewCharBuf *self, size_t size) {
 ZombieCharBuf*
 ZCB_new(void *allocation) {
     static char empty_string[] = "";
-    ZombieCharBuf *self = (ZombieCharBuf*)allocation;
-    self->ref.count    = 1;
-    self->vtable       = ZOMBIECHARBUF;
-    self->cap          = 0;
-    self->size         = 0;
-    self->ptr          = empty_string;
+    ZombieCharBuf *self
+        = (ZombieCharBuf*)VTable_Init_Obj(ZOMBIECHARBUF, allocation);
+    self->cap  = 0;
+    self->size = 0;
+    self->ptr  = empty_string;
     return self;
 }
 
 ZombieCharBuf*
 ZCB_newf(void *allocation, size_t alloc_size, const char *pattern, ...) {
-    ZombieCharBuf *self = (ZombieCharBuf*)allocation;
-
-    self->ref.count    = 1;
-    self->vtable       = ZOMBIECHARBUF;
-    self->cap          = alloc_size - sizeof(ZombieCharBuf);
-    self->size         = 0;
-    self->ptr          = ((char*)allocation) + sizeof(ZombieCharBuf);
+    ZombieCharBuf *self
+        = (ZombieCharBuf*)VTable_Init_Obj(ZOMBIECHARBUF, allocation);
+    self->cap  = alloc_size - sizeof(ZombieCharBuf);
+    self->size = 0;
+    self->ptr  = ((char*)allocation) + sizeof(ZombieCharBuf);
 
     va_list args;
     va_start(args, pattern);
@@ -952,12 +949,11 @@ ZCB_newf(void *allocation, size_t alloc_size, const char *pattern, ...) {
 
 ZombieCharBuf*
 ZCB_wrap_str(void *allocation, const char *ptr, size_t size) {
-    ZombieCharBuf *self = (ZombieCharBuf*)allocation;
-    self->ref.count    = 1;
-    self->vtable       = ZOMBIECHARBUF;
-    self->cap          = 0;
-    self->size         = size;
-    self->ptr          = (char*)ptr;
+    ZombieCharBuf *self
+        = (ZombieCharBuf*)VTable_Init_Obj(ZOMBIECHARBUF, allocation);
+    self->cap  = 0;
+    self->size = size;
+    self->ptr  = (char*)ptr;
     return self;
 }
 
