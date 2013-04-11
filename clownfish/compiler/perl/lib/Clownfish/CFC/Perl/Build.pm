@@ -323,6 +323,7 @@ sub ACTION_clownfish {
         $self->add_to_cleanup($xs_filepath);
         $perl_binding->write_callbacks;
         $perl_binding->write_boot;
+        $perl_binding->write_hostdefs;
         $perl_binding->write_bindings;
         $self->_write_pod($perl_binding);
     }

@@ -344,7 +344,7 @@ S_struct_definition(CFCBindClass *self) {
         strcat(member_decs, member_dec);
     }
 
-    char pattern[] = "struct %s {%s\n};\n";
+    char pattern[] = "struct %s {\n    CFISH_OBJ_HEAD%s\n};\n";
     char *struct_def = CFCUtil_sprintf(pattern, struct_sym, member_decs);
 
     FREEMEM(member_decs);

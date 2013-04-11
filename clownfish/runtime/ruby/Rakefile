@@ -78,6 +78,7 @@ task :build_clownfish => [:build_charmonizer_tests] do
   if (modified)
     puts "Building Binding Code"
     ruby_binding.write_boot
+    ruby_binding.write_hostdefs
   end
   Rake::Task['compile'].invoke
 

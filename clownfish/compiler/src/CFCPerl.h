@@ -103,6 +103,11 @@ CFCPerl_write_bindings(CFCPerl *self);
 void
 CFCPerl_write_callbacks(CFCPerl *self);
 
+/** Generate hostdefs file.
+ */
+void
+CFCPerl_write_hostdefs(CFCPerl *self);
+
 /** Generate the "typemap" file needed by the XS compiler.
  */
 void

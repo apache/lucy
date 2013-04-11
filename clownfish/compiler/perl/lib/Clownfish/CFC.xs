@@ -1911,6 +1911,12 @@ PPCODE:
     CFCPerl_write_boot(self);
 
 void
+write_hostdefs(self)
+    CFCPerl *self;
+PPCODE:
+    CFCPerl_write_hostdefs(self);
+
+void
 write_bindings(self)
     CFCPerl *self;
 PPCODE:

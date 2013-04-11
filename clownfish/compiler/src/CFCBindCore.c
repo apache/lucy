@@ -158,6 +158,7 @@ S_write_parcel_h(CFCBindCore *self) {
         "\n"
         "#include <stddef.h>\n"
         "#include \"charmony.h\"\n"
+        "#include \"hostdefs.h\"\n"
         "\n"
         "#ifdef CFP_LUCY\n"
         "  #define LUCY_VISIBLE CHY_EXPORT\n"

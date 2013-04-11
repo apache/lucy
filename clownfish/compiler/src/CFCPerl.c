@@ -315,6 +315,32 @@ S_write_boot_c(CFCPerl *self) {
 }
 
 void
+CFCPerl_write_hostdefs(CFCPerl *self) {
+    const char pattern[] =
+        "%s\n"
+        "\n"
+        "#ifndef H_CFISH_HOSTDEFS\n"
+        "#define H_CFISH_HOSTDEFS 1\n"
+        "\n"
+        "#define CFISH_OBJ_HEAD\n"
+        "\n"
+        "#endif /* H_CFISH_HOSTDEFS */\n"
+        "\n"
+        "%s\n";
+    char *content
+        = CFCUtil_sprintf(pattern, self->header, self->footer);
+
+    // Unlink then write file.
+    const char *inc_dest = CFCHierarchy_get_include_dest(self->hierarchy);
+    char *filepath = CFCUtil_sprintf("%s" CHY_DIR_SEP "hostdefs.h", inc_dest);
+    remove(filepath);
+    CFCUtil_write_file(filepath, content, strlen(content));
+    FREEMEM(filepath);
+
+    FREEMEM(content);
+}
+
+void
 CFCPerl_write_boot(CFCPerl *self) {
     S_write_boot_h(self);
     S_write_boot_c(self);

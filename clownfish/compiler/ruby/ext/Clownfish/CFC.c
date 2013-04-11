@@ -109,6 +109,16 @@ S_CFC_Binding_Ruby_Write_Boot(VALUE self_rb) {
     return Qnil;
 }
 
+static VALUE
+S_CFC_Binding_Ruby_Write_Hostdefs(VALUE self_rb) {
+
+    CFCRuby *self;
+    Data_Get_Struct(self_rb, CFCRuby, self);
+    CFCRuby_write_hostdefs(self);
+
+    return Qnil;
+}
+
 static void
 S_init_Binding_Ruby(void) {
     cBindRuby = rb_define_class_under(mBinding, "Ruby", rb_cObject);
@@ -116,6 +126,8 @@ S_init_Binding_Ruby(void) {
     rb_define_method(cBindRuby, "initialize", S_CFC_Binding_Ruby_Init, 1);
     rb_define_method(cBindRuby, "write_boot",
                      S_CFC_Binding_Ruby_Write_Boot, 0);
+    rb_define_method(cBindRuby, "write_hostdefs",
+                     S_CFC_Binding_Ruby_Write_Hostdefs, 0);
 }
 
 static VALUE
