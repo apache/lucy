@@ -230,7 +230,7 @@ __C__
 
 static CHY_INLINE void
 lucy_Err_abstract_class_check(lucy_Obj *obj, lucy_VTable *vtable) {
-    lucy_VTable *const my_vtable = *(lucy_VTable**)obj;
+    lucy_VTable *const my_vtable = (lucy_VTable*)((cfish_Dummy*)obj)->vtable;
     if (my_vtable == vtable) {
         lucy_CharBuf *mess = CFISH_MAKE_MESS("%o is an abstract class",
                                              Lucy_Obj_Get_Class_Name(obj));

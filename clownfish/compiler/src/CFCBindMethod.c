@@ -115,14 +115,13 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
         "extern %sVISIBLE size_t %s;\n"
         "static CHY_INLINE %s\n"
         "%s(const %s *self%s) {\n"
-        "    char *const method_address = *(char**)self + %s;\n"
-        "    const %s method = *((%s*)method_address);\n"
+        "    const %s method = (%s)cfish_obj_method(self, %s);\n"
         "    %smethod((%s*)self%s);\n"
         "}\n";
     char *method_def
         = CFCUtil_sprintf(pattern, PREFIX, full_offset_sym, ret_type_str,
                           full_meth_sym, invoker_struct, params_minus_invoker,
-                          full_offset_sym, full_typedef, full_typedef,
+                          full_typedef, full_typedef, full_offset_sym,
                           maybe_return, common_struct,
                           arg_names_minus_invoker);
 

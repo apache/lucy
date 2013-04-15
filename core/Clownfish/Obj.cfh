@@ -22,7 +22,6 @@ parcel Lucy;
 public class Clownfish::Obj {
 
     VTable *vtable;
-    lucy_ref_t ref;
 
     /** Abstract initializer.
      */
