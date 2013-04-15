@@ -22,7 +22,24 @@
 #include "Clownfish/VTable.h"
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"
+#include "Clownfish/Util/Memory.h"
 #include "Clownfish/VArray.h"
+
+Obj*
+VTable_make_obj(VTable *self) {
+    Obj *obj = (Obj*)Memory_wrapped_calloc(self->obj_alloc_size, 1);
+    obj->vtable = self;
+    obj->ref.count = 1;
+    return obj;
+}
+
+Obj*
+VTable_init_obj(VTable *self, void *allocation) {
+    Obj *obj = (Obj*)allocation;
+    obj->vtable = self;
+    obj->ref.count = 1;
+    return obj;
+}
 
 Obj*
 VTable_foster_obj(VTable *self, void *host_obj) {

@@ -676,6 +676,23 @@ lucy_Obj_to_host(lucy_Obj *self) {
 /*************************** Clownfish::VTable ******************************/
 
 lucy_Obj*
+lucy_VTable_make_obj(lucy_VTable *self) {
+    lucy_Obj *obj
+        = (lucy_Obj*)lucy_Memory_wrapped_calloc(self->obj_alloc_size, 1);
+    obj->vtable = self;
+    obj->ref.count = 1;
+    return obj;
+}
+
+lucy_Obj*
+lucy_VTable_init_obj(lucy_VTable *self, void *allocation) {
+    lucy_Obj *obj = (lucy_Obj*)allocation;
+    obj->vtable = self;
+    obj->ref.count = 1;
+    return obj;
+}
+
+lucy_Obj*
 lucy_VTable_foster_obj(lucy_VTable *self, void *host_obj) {
     lucy_Obj *obj
         = (lucy_Obj*)lucy_Memory_wrapped_calloc(self->obj_alloc_size, 1);

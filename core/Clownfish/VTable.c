@@ -277,22 +277,6 @@ VTable_singleton(const CharBuf *class_name, VTable *parent) {
 }
 
 Obj*
-VTable_make_obj(VTable *self) {
-    Obj *obj = (Obj*)Memory_wrapped_calloc(self->obj_alloc_size, 1);
-    obj->vtable = self;
-    obj->ref.count = 1;
-    return obj;
-}
-
-Obj*
-VTable_init_obj(VTable *self, void *allocation) {
-    Obj *obj = (Obj*)allocation;
-    obj->vtable = self;
-    obj->ref.count = 1;
-    return obj;
-}
-
-Obj*
 VTable_load_obj(VTable *self, Obj *dump) {
     Obj_Load_t load = METHOD_PTR(self, Lucy_Obj_Load);
     if (load == Obj_load) {
