@@ -31,7 +31,9 @@ static void
 S_lazy_init_host_obj(lucy_Obj *self) {
     SV *inner_obj = newSV(0);
     SvOBJECT_on(inner_obj);
+#if (PERL_VERSION <= 16)
     PL_sv_objcount++;
+#endif
     SvUPGRADE(inner_obj, SVt_PVMG);
     sv_setiv(inner_obj, PTR2IV(self));
 
