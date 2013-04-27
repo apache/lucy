@@ -1292,7 +1292,7 @@ chaz_CFlags_set_warnings_as_errors(chaz_CFlags *flags) {
 void
 chaz_CFlags_compile_shared_library(chaz_CFlags *flags) {
     const char *string;
-    if (!flags->style == CHAZ_CFLAGS_STYLE_GNU) {
+    if (flags->style != CHAZ_CFLAGS_STYLE_GNU) {
         return;
     }
     if (chaz_OS_is_darwin()) {

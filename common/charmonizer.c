@@ -1571,7 +1571,7 @@ chaz_CFlags_set_warnings_as_errors(chaz_CFlags *flags) {
 void
 chaz_CFlags_compile_shared_library(chaz_CFlags *flags) {
     const char *string;
-    if (!flags->style == CHAZ_CFLAGS_STYLE_GNU) {
+    if (flags->style != CHAZ_CFLAGS_STYLE_GNU) {
         return;
     }
     if (chaz_OS_is_darwin()) {
@@ -6235,7 +6235,11 @@ chaz_VariadicMacros_run(void) {
 /* #include "Charmonizer/Core/ConfWriterPerl.h" */
 /* #include "Charmonizer/Core/ConfWriterRuby.h" */
 
-#define DIR_SEP "/"
+#if defined(_WIN32) && !defined(__CYGWIN__)
+  #define DIR_SEP "\\"
+#else
+  #define DIR_SEP "/"
+#endif
 
 typedef struct SourceFileContext {
     chaz_MakeVar *var;
@@ -6344,6 +6348,7 @@ S_write_makefile() {
     chaz_CFlags *makefile_cflags;
     chaz_CFlags *link_flags;
     const char  *math_library;
+    const char  *test_command;
 
     printf("Creating Makefile...\n");
 
@@ -6521,7 +6526,7 @@ S_write_makefile() {
     chaz_CFlags_destroy(link_flags);
 
     rule = chaz_MakeFile_add_rule(makefile, "test", "$(TEST_LUCY_EXE)");
-    const char *test_command = "$(TEST_LUCY_EXE)";
+    test_command = "$(TEST_LUCY_EXE)";
     if (strcmp(shlib_ext, ".so") == 0) {
         test_command = "LD_LIBRARY_PATH=. $(TEST_LUCY_EXE)";
     }
