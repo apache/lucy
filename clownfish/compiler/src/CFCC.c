@@ -154,9 +154,9 @@ CFCC_write_man_pages(CFCC *self) {
         char *man_page = man_pages[j++];
         if (!man_page) { continue; }
 
-        const char *class_name = CFCClass_get_class_name(klass);
-        char *filename
-            = CFCUtil_sprintf("%s" CHY_DIR_SEP "%s.3", man3_path, class_name);
+        const char *full_struct_sym = CFCClass_full_struct_sym(klass);
+        char *filename = CFCUtil_sprintf("%s" CHY_DIR_SEP "%s.3", man3_path,
+                                         full_struct_sym);
         CFCUtil_write_if_changed(filename, man_page, strlen(man_page));
         FREEMEM(filename);
         FREEMEM(man_page);

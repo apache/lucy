@@ -115,7 +115,7 @@ Doc_equals(Doc *self, Obj *other) {
     if (twin == self)                    { return true;  }
     if (!Obj_Is_A(other, DOC)) { return false; }
 
-    return Hash_Equals(self->fields, twin->fields);
+    return Hash_Equals((Hash*)self->fields, (Obj*)twin->fields);
 }
 
 void
