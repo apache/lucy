@@ -122,6 +122,18 @@ chaz_MakeRule*
 chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
                       const char *sources, chaz_CFlags *link_flags);
 
+/** Add a rule to compile and link an executable. The executable will also be
+ * added to the list of files to clean.
+ *
+ * @param makefile The makefile.
+ * @param exe The name of the executable.
+ * @param sources The list of source files.
+ * @param cflags Additional compiler flags.
+ */
+chaz_MakeRule*
+chaz_MakeFile_add_compiled_exe(chaz_MakeFile *makefile, const char *exe,
+                               const char *sources, chaz_CFlags *cflags);
+
 /** Add a rule to link a shared library. The shared library will also be added
  * to the list of files to clean.
  *

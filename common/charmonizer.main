@@ -150,6 +150,7 @@ S_write_makefile() {
     chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
     chaz_CFlags *makefile_cflags;
     chaz_CFlags *link_flags;
+    chaz_CFlags *test_cflags;
     const char  *math_library;
     const char  *test_command;
 
@@ -317,16 +318,20 @@ S_write_makefile() {
                                  link_flags);
     chaz_CFlags_destroy(link_flags);
 
-    link_flags = chaz_CFlags_new(cflags_style);
-    chaz_CFlags_add_include_dir(link_flags, ".");
-    chaz_CFlags_add_include_dir(link_flags,
+    test_cflags = chaz_CFlags_new(cflags_style);
+    if (chaz_CC_msvc_version_num()) {
+        chaz_CFlags_append(test_cflags, "/nologo");
+    }
+    chaz_CFlags_add_include_dir(test_cflags, ".");
+    chaz_CFlags_add_include_dir(test_cflags,
                                 "$(AUTOGEN_DIR)" DIR_SEP "include");
-    chaz_CFlags_add_library_path(link_flags, ".");
-    chaz_CFlags_add_library(link_flags, "lucy");
-    rule = chaz_MakeFile_add_exe(makefile, "$(TEST_LUCY_EXE)",
-                                 "t" DIR_SEP "test_lucy.c", link_flags);
+    chaz_CFlags_add_library_path(test_cflags, ".");
+    chaz_CFlags_add_library(test_cflags, "lucy");
+    rule = chaz_MakeFile_add_compiled_exe(makefile, "$(TEST_LUCY_EXE)",
+                                          "t" DIR_SEP "test_lucy.c",
+                                          test_cflags);
     chaz_MakeRule_add_prereq(rule, "$(LUCY_SHLIB)");
-    chaz_CFlags_destroy(link_flags);
+    chaz_CFlags_destroy(test_cflags);
 
     rule = chaz_MakeFile_add_rule(makefile, "test", "$(TEST_LUCY_EXE)");
     test_command = "$(TEST_LUCY_EXE)";

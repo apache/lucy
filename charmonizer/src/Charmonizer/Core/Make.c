@@ -303,6 +303,35 @@ chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
 }
 
 chaz_MakeRule*
+chaz_MakeFile_add_compiled_exe(chaz_MakeFile *makefile, const char *exe,
+                               const char *sources, chaz_CFlags *cflags) {
+    int            cflags_style  = chaz_CC_get_cflags_style();
+    chaz_CFlags   *local_flags   = chaz_CFlags_new(cflags_style);
+    const char    *cc            = chaz_CC_get_cc();
+    const char    *cflags_string = "";
+    const char    *local_flags_string;
+    chaz_MakeRule *rule;
+    char          *command;
+
+    rule = chaz_MakeFile_add_rule(makefile, exe, sources);
+
+    if (cflags) {
+        cflags_string = chaz_CFlags_get_string(cflags);
+    }
+    chaz_CFlags_set_output_exe(local_flags, exe);
+    local_flags_string = chaz_CFlags_get_string(local_flags);
+    command = chaz_Util_join(" ", cc, sources, cflags_string,
+                             local_flags_string, NULL);
+    chaz_MakeRule_add_command(rule, command);
+
+    chaz_MakeFile_add_to_cleanup(makefile, exe);
+
+    chaz_CFlags_destroy(local_flags);
+    free(command);
+    return rule;
+}
+
+chaz_MakeRule*
 chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *shared_lib,
                              const char *sources, chaz_CFlags *link_flags) {
     int            cflags_style = chaz_CC_get_cflags_style();
