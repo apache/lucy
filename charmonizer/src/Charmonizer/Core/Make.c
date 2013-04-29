@@ -332,7 +332,7 @@ chaz_MakeFile_add_compiled_exe(chaz_MakeFile *makefile, const char *exe,
 }
 
 chaz_MakeRule*
-chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *shared_lib,
+chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *name,
                              const char *sources, chaz_CFlags *link_flags) {
     int            cflags_style = chaz_CC_get_cflags_style();
     chaz_CFlags   *local_flags  = chaz_CFlags_new(cflags_style);
@@ -340,8 +340,10 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *shared_lib,
     const char    *link_flags_string = "";
     const char    *local_flags_string;
     chaz_MakeRule *rule;
+    char          *shared_lib;
     char          *command;
 
+    shared_lib = chaz_CC_shared_lib_file(name);
     rule = chaz_MakeFile_add_rule(makefile, shared_lib, sources);
 
     if (link_flags) {
@@ -357,6 +359,7 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *shared_lib,
     chaz_MakeFile_add_to_cleanup(makefile, shared_lib);
 
     chaz_CFlags_destroy(local_flags);
+    free(shared_lib);
     free(command);
     return rule;
 }

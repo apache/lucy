@@ -103,6 +103,9 @@ chaz_CC_msvc_version_num(void);
 const char*
 chaz_CC_link_command(void);
 
+char*
+chaz_CC_shared_lib_file(const char *name);
+
 #ifdef __cplusplus
 }
 #endif

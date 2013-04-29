@@ -359,4 +359,19 @@ chaz_CC_link_command() {
     }
 }
 
+char*
+chaz_CC_shared_lib_file(const char *name) {
+    const char *prefix = "";
+    if (!chaz_CC.intval__MSC_VER) {
+        if (strcmp(chaz_OS_name(), "cygwin") == 0) {
+            prefix = "cyg";
+        }
+        else {
+            prefix = "lib";
+        }
+    }
+    const char *shlib_ext = chaz_OS_shared_lib_ext();
+    return chaz_Util_join("", prefix, name, shlib_ext, NULL);
+}
+
 

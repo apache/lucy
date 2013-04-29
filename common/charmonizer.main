@@ -128,10 +128,9 @@ static void
 S_write_makefile() {
     SourceFileContext sfc;
 
-    const char *base_dir  = "..";
-    const char *exe_ext   = chaz_OS_exe_ext();
-    const char *obj_ext   = chaz_OS_obj_ext();
-    const char *shlib_ext = chaz_OS_shared_lib_ext();
+    const char *base_dir = "..";
+    const char *exe_ext  = chaz_OS_exe_ext();
+    const char *obj_ext  = chaz_OS_obj_ext();
 
     const char *json_parser_y = "$(CORE_DIR)" DIR_SEP "Lucy" DIR_SEP "Util"
                                 DIR_SEP "Json" DIR_SEP "JsonParser.y";
@@ -153,6 +152,7 @@ S_write_makefile() {
     chaz_CFlags *test_cflags;
     const char  *math_library;
     const char  *test_command;
+    char        *shared_lib;
 
     printf("Creating Makefile...\n");
 
@@ -186,7 +186,6 @@ S_write_makefile() {
 
     chaz_MakeFile_add_var(makefile, "EXE_EXT", exe_ext);
     chaz_MakeFile_add_var(makefile, "OBJ_EXT", obj_ext);
-    chaz_MakeFile_add_var(makefile, "SHLIB_EXT", shlib_ext);
 
     /* C compiler */
 
@@ -273,13 +272,10 @@ S_write_makefile() {
     chaz_MakeFile_add_var(makefile, "TEST_LUCY_EXE",
                           "t" DIR_SEP "test_lucy$(EXE_EXT)");
 
-    /* Shared library */
-
-    chaz_MakeFile_add_var(makefile, "LUCY_SHLIB", "liblucy$(SHLIB_EXT)");
-
     /* Rules */
 
-    chaz_MakeFile_add_rule(makefile, "all", "$(LUCY_SHLIB)");
+    shared_lib = chaz_CC_shared_lib_file("lucy");
+    chaz_MakeFile_add_rule(makefile, "all", shared_lib);
 
     chaz_MakeFile_add_exe(makefile, "$(LEMON_EXE)", "$(LEMON_OBJS)", NULL);
 
@@ -314,8 +310,7 @@ S_write_makefile() {
     if (chaz_HeadCheck_check_header("pcre.h")) {
         chaz_CFlags_add_library(link_flags, "pcre");
     }
-    chaz_MakeFile_add_shared_lib(makefile, "$(LUCY_SHLIB)", "$(LUCY_OBJS)",
-                                 link_flags);
+    chaz_MakeFile_add_shared_lib(makefile, "lucy", "$(LUCY_OBJS)", link_flags);
     chaz_CFlags_destroy(link_flags);
 
     test_cflags = chaz_CFlags_new(cflags_style);
@@ -330,12 +325,12 @@ S_write_makefile() {
     rule = chaz_MakeFile_add_compiled_exe(makefile, "$(TEST_LUCY_EXE)",
                                           "t" DIR_SEP "test_lucy.c",
                                           test_cflags);
-    chaz_MakeRule_add_prereq(rule, "$(LUCY_SHLIB)");
+    chaz_MakeRule_add_prereq(rule, shared_lib);
     chaz_CFlags_destroy(test_cflags);
 
     rule = chaz_MakeFile_add_rule(makefile, "test", "$(TEST_LUCY_EXE)");
     test_command = "$(TEST_LUCY_EXE)";
-    if (strcmp(shlib_ext, ".so") == 0) {
+    if (strcmp(chaz_OS_shared_lib_ext(), ".so") == 0) {
         test_command = "LD_LIBRARY_PATH=. $(TEST_LUCY_EXE)";
     }
     chaz_MakeRule_add_command(rule, test_command);
@@ -348,6 +343,7 @@ S_write_makefile() {
     chaz_MakeFile_write(makefile);
 
     chaz_MakeFile_destroy(makefile);
+    free(shared_lib);
 }
 
 int main(int argc, const char **argv) {

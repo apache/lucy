@@ -138,12 +138,12 @@ chaz_MakeFile_add_compiled_exe(chaz_MakeFile *makefile, const char *exe,
  * to the list of files to clean.
  *
  * @param makefile The makefile.
- * @param shared_lib The name of the shared library.
+ * @param name The name of the shared library without prefix or extension.
  * @param sources The list of source files.
  * @param link_flags Additional link flags.
  */
 chaz_MakeRule*
-chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *shared_lib,
+chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *name,
                              const char *sources, chaz_CFlags *link_flags);
 
 /** Write the makefile to a file named 'Makefile' in the current directory.
