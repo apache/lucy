@@ -160,7 +160,8 @@ chaz_CFlags_disable_strict_aliasing(chaz_CFlags *flags) {
         chaz_CFlags_append(flags, "-fno-strict-aliasing");
     }
     else {
-        chaz_Util_die("Unsupported compiler");
+        chaz_Util_die("Don't know how to disable strict aliasing with '%s'",
+                      chaz_CC_get_cc());
     }
 }
 
@@ -174,7 +175,8 @@ chaz_CFlags_set_warnings_as_errors(chaz_CFlags *flags) {
         string = "-Werror";
     }
     else {
-        chaz_Util_die("Unsupported compiler");
+        chaz_Util_die("Don't know how to set warnings as errors with '%s'",
+                      chaz_CC_get_cc());
     }
     chaz_CFlags_append(flags, string);
 }
@@ -217,7 +219,8 @@ chaz_CFlags_link_shared_library(chaz_CFlags *flags) {
         }
     }
     else {
-        chaz_Util_die("Unsupported compiler");
+        chaz_Util_die("Don't know how to link a shared library with '%s'",
+                      chaz_CC_get_cc());
     }
     chaz_CFlags_append(flags, string);
 }
