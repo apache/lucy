@@ -70,6 +70,14 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
 }
 
 static void
+S_add_common_cflags(chaz_CFlags *cflags) {
+    if (chaz_CC_msvc_version_num()) {
+        chaz_CFlags_append(cflags, "/nologo");
+    }
+    chaz_CFlags_enable_optimization(cflags);
+}
+
+static void
 S_source_file_callback(char *file, void *context) {
     SourceFileContext *sfc = (SourceFileContext*)context;
     size_t file_len = strlen(file);
@@ -124,6 +132,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
     chaz_CFlags *makefile_cflags;
     chaz_CFlags *link_flags;
+    chaz_CFlags *lemon_cflags;
 
     printf("Creating Makefile...\n");
 
@@ -152,11 +161,8 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeFile_add_var(makefile, "CC", chaz_CC_get_cc());
 
     makefile_cflags = chaz_CFlags_new(cflags_style);
+    S_add_common_cflags(makefile_cflags);
 
-    if (chaz_CC_msvc_version_num()) {
-        chaz_CFlags_append(makefile_cflags, "/nologo");
-    }
-    chaz_CFlags_enable_optimization(makefile_cflags);
     chaz_CFlags_add_include_dir(makefile_cflags, ".");
     chaz_CFlags_add_include_dir(makefile_cflags, "$(INCLUDE_DIR)");
     chaz_CFlags_add_include_dir(makefile_cflags, "$(SRC_DIR)");
@@ -172,9 +178,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_CFlags_destroy(makefile_cflags);
 
     /* Object files */
-
-    chaz_MakeFile_add_var(makefile, "LEMON_OBJS",
-                          "$(LEMON_DIR)" DIR_SEP "lemon$(OBJ_EXT)");
 
     sfc.common_objs   = chaz_MakeFile_add_var(makefile, "COMMON_OBJS", NULL);
     sfc.test_cfc_objs = chaz_MakeFile_add_var(makefile, "TEST_CFC_OBJS", NULL);
@@ -199,7 +202,12 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     chaz_MakeFile_add_rule(makefile, "all", "$(CFC_EXE)");
 
-    chaz_MakeFile_add_exe(makefile, "$(LEMON_EXE)", "$(LEMON_OBJS)", NULL);
+    lemon_cflags = chaz_CFlags_new(cflags_style);
+    S_add_common_cflags(lemon_cflags);
+    chaz_MakeFile_add_compiled_exe(makefile, "$(LEMON_EXE)",
+                                   "$(LEMON_DIR)" DIR_SEP "lemon.c",
+                                   lemon_cflags);
+    chaz_CFlags_destroy(lemon_cflags);
 
     rule = chaz_MakeFile_add_rule(makefile, parse_header_c, NULL);
     chaz_MakeRule_add_prereq(rule, "$(LEMON_EXE)");
@@ -249,7 +257,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
         chaz_MakeFile_add_dir_to_cleanup(makefile, "coverage");
     }
 
-    chaz_MakeFile_add_to_cleanup(makefile, "$(LEMON_OBJS)");
     chaz_MakeFile_add_to_cleanup(makefile, "$(COMMON_OBJS)");
     chaz_MakeFile_add_to_cleanup(makefile, "$(CFC_OBJS)");
     chaz_MakeFile_add_to_cleanup(makefile, "$(TEST_CFC_OBJS)");
