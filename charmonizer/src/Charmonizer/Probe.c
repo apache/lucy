@@ -56,6 +56,12 @@ chaz_Probe_parse_cli_args(int argc, const char *argv[],
             args->charmony_rb = 1;
             output_enabled = 1;
         }
+        else if (strcmp(arg, "--enable-makefile") == 0) {
+            args->write_makefile = 1;
+        }
+        else if (strcmp(arg, "--enable-coverage") == 0) {
+            args->code_coverage = 1;
+        }
         else if (memcmp(arg, "--cc=", 5) == 0) {
             if (strlen(arg) > CHAZ_PROBE_MAX_CC_LEN - 5) {
                 fprintf(stderr, "Exceeded max length for compiler command");

@@ -274,4 +274,15 @@ chaz_CFlags_add_library(chaz_CFlags *flags, const char *library) {
     free(string);
 }
 
+void
+chaz_CFlags_enable_code_coverage(chaz_CFlags *flags) {
+    if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
+        chaz_CFlags_append(flags, "--coverage");
+    }
+    else {
+        chaz_Util_die("Don't know how to enable code coverage with '%s'",
+                      chaz_CC_get_cc());
+    }
+}
+
 

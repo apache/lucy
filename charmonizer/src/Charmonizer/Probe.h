@@ -34,6 +34,8 @@ struct chaz_CLIArgs {
     int  charmony_pm;
     int  charmony_rb;
     int  verbosity;
+    int  write_makefile;
+    int  code_coverage;
 };
 
 /* Parse command line arguments, initializing and filling in the supplied

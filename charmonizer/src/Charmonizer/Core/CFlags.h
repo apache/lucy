@@ -85,6 +85,9 @@ chaz_CFlags_add_library_path(chaz_CFlags *flags, const char *directory);
 void
 chaz_CFlags_add_library(chaz_CFlags *flags, const char *library);
 
+void
+chaz_CFlags_enable_code_coverage(chaz_CFlags *flags);
+
 #ifdef __cplusplus
 }
 #endif
