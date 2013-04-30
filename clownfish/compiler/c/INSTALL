@@ -1,15 +1,26 @@
-Build instructions for the cfc command line tool
+Build instructions for the Apache Lucy C library
 ================================================
 
-When building under UNIX and derivates run:
+When building under UNIX and derivatives run:
 
-$ ./configure
-$ make
-$ make test
+    $ ./configure
+    $ make
+    $ make test
 
 When building under Windows with MSVC run:
 
-$ configure.bat
-$ nmake
-$ nmake test
+    $ configure.bat
+    $ nmake
+    $ nmake test
+
+Configuration
+-------------
+
+    ./configure [ options ] [ -- cflags ]
+
+Options include
+
+    --enable-coverage
+        Enable code coverage. Create HTML pages with coverage data using
+        lcov by running "make coverage".
 
