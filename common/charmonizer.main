@@ -152,6 +152,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeFile *makefile;
     chaz_MakeVar  *var;
     chaz_MakeRule *rule;
+    chaz_MakeRule *clean_rule;
 
     int          cflags_style = chaz_CC_get_cflags_style();
     chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
@@ -291,7 +292,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_CFlags_destroy(lemon_cflags);
 
     rule = chaz_MakeFile_add_rule(makefile, "$(CFC_EXE)", NULL);
-    chaz_MakeRule_add_command_make(rule, "$(CFC_DIR)", NULL);
+    chaz_MakeRule_add_make_command(rule, "$(CFC_DIR)", NULL);
 
     rule = chaz_MakeFile_add_rule(makefile, "$(AUTOGEN_DIR)", "$(CFC_EXE)");
     chaz_MakeRule_add_command(rule, "$(CFC_EXE) --source=$(CORE_DIR) "
@@ -367,15 +368,19 @@ S_write_makefile(struct chaz_CLIArgs *args) {
                                   " --branch-coverage"
                                   " --output-directory coverage"
                                   " lucy.info");
-
-        chaz_MakeFile_add_to_cleanup(makefile, "lucy.info");
-        chaz_MakeFile_add_dir_to_cleanup(makefile, "coverage");
     }
 
-    chaz_MakeFile_add_to_cleanup(makefile, "$(LUCY_OBJS)");
-    chaz_MakeFile_add_to_cleanup(makefile, json_parser_h);
-    chaz_MakeFile_add_to_cleanup(makefile, json_parser_c);
-    chaz_MakeFile_add_dir_to_cleanup(makefile, "$(AUTOGEN_DIR)");
+    clean_rule = chaz_MakeFile_clean_rule(makefile);
+
+    chaz_MakeRule_add_rm_command(clean_rule, "$(LUCY_OBJS)");
+    chaz_MakeRule_add_rm_command(clean_rule, json_parser_h);
+    chaz_MakeRule_add_rm_command(clean_rule, json_parser_c);
+    chaz_MakeRule_add_recursive_rm_command(clean_rule, "$(AUTOGEN_DIR)");
+
+    if (args->code_coverage) {
+        chaz_MakeRule_add_rm_command(clean_rule, "lucy.info");
+        chaz_MakeRule_add_recursive_rm_command(clean_rule, "coverage");
+    }
 
     chaz_MakeFile_write(makefile);
 

@@ -127,6 +127,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeFile *makefile;
     chaz_MakeVar  *var;
     chaz_MakeRule *rule;
+    chaz_MakeRule *clean_rule;
 
     int          cflags_style = chaz_CC_get_cflags_style();
     chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
@@ -252,16 +253,20 @@ S_write_makefile(struct chaz_CLIArgs *args) {
                                   " --branch-coverage"
                                   " --output-directory coverage"
                                   " cfc.info");
-
-        chaz_MakeFile_add_to_cleanup(makefile, "cfc.info");
-        chaz_MakeFile_add_dir_to_cleanup(makefile, "coverage");
     }
 
-    chaz_MakeFile_add_to_cleanup(makefile, "$(COMMON_OBJS)");
-    chaz_MakeFile_add_to_cleanup(makefile, "$(CFC_OBJS)");
-    chaz_MakeFile_add_to_cleanup(makefile, "$(TEST_CFC_OBJS)");
-    chaz_MakeFile_add_to_cleanup(makefile, parse_header_h);
-    chaz_MakeFile_add_to_cleanup(makefile, parse_header_c);
+    clean_rule = chaz_MakeFile_clean_rule(makefile);
+
+    chaz_MakeRule_add_rm_command(clean_rule, "$(COMMON_OBJS)");
+    chaz_MakeRule_add_rm_command(clean_rule, "$(CFC_OBJS)");
+    chaz_MakeRule_add_rm_command(clean_rule, "$(TEST_CFC_OBJS)");
+    chaz_MakeRule_add_rm_command(clean_rule, parse_header_h);
+    chaz_MakeRule_add_rm_command(clean_rule, parse_header_c);
+
+    if (args->code_coverage) {
+        chaz_MakeRule_add_rm_command(clean_rule, "cfc.info");
+        chaz_MakeRule_add_recursive_rm_command(clean_rule, "coverage");
+    }
 
     chaz_MakeFile_write(makefile);
 

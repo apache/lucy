@@ -94,21 +94,19 @@ chaz_MakeRule*
 chaz_MakeFile_add_rule(chaz_MakeFile *makefile, const char *target,
                        const char *prereq);
 
-/** Add a file to the 'clean' target.
+/** Return the rule for the 'clean' target.
  *
  * @param makefile The makefile.
- * @param target The filename.
  */
-void
-chaz_MakeFile_add_to_cleanup(chaz_MakeFile *makefile, const char *target);
+chaz_MakeRule*
+chaz_MakeFile_clean_rule(chaz_MakeFile *makefile);
 
-/** Add a directory to the 'clean' target.
+/** Return the rule for the 'distclean' target.
  *
  * @param makefile The makefile.
- * @param dir The directory.
  */
-void
-chaz_MakeFile_add_dir_to_cleanup(chaz_MakeFile *makefile, const char *dir);
+chaz_MakeRule*
+chaz_MakeFile_distclean_rule(chaz_MakeFile *makefile);
 
 /** Add a rule to link an executable. The executable will also be added to the
  * list of files to clean.
@@ -186,6 +184,22 @@ chaz_MakeRule_add_prereq(chaz_MakeRule *rule, const char *prereq);
 void
 chaz_MakeRule_add_command(chaz_MakeRule *rule, const char *command);
 
+/** Add a command to remove one or more files.
+ *
+ * @param rule The rule.
+ * @param files The list of files.
+ */
+void
+chaz_MakeRule_add_rm_command(chaz_MakeRule *rule, const char *files);
+
+/** Add a command to remove one or more directories.
+ *
+ * @param rule The rule.
+ * @param dirs The list of directories.
+ */
+void
+chaz_MakeRule_add_recursive_rm_command(chaz_MakeRule *rule, const char *dirs);
+
 /** Add one or more commands to call another makefile recursively.
  *
  * @param rule The rule.
@@ -193,7 +207,7 @@ chaz_MakeRule_add_command(chaz_MakeRule *rule, const char *command);
  * @param target The target to call. Pass NULL for the default target.
  */
 void
-chaz_MakeRule_add_command_make(chaz_MakeRule *rule, const char *dir,
+chaz_MakeRule_add_make_command(chaz_MakeRule *rule, const char *dir,
                                const char *target);
 
 #ifdef __cplusplus
