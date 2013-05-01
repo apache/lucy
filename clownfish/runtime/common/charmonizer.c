@@ -487,21 +487,19 @@ chaz_MakeRule*
 chaz_MakeFile_add_rule(chaz_MakeFile *makefile, const char *target,
                        const char *prereq);
 
-/** Add a file to the 'clean' target.
+/** Return the rule for the 'clean' target.
  *
  * @param makefile The makefile.
- * @param target The filename.
  */
-void
-chaz_MakeFile_add_to_cleanup(chaz_MakeFile *makefile, const char *target);
+chaz_MakeRule*
+chaz_MakeFile_clean_rule(chaz_MakeFile *makefile);
 
-/** Add a directory to the 'clean' target.
+/** Return the rule for the 'distclean' target.
  *
  * @param makefile The makefile.
- * @param dir The directory.
  */
-void
-chaz_MakeFile_add_dir_to_cleanup(chaz_MakeFile *makefile, const char *dir);
+chaz_MakeRule*
+chaz_MakeFile_distclean_rule(chaz_MakeFile *makefile);
 
 /** Add a rule to link an executable. The executable will also be added to the
  * list of files to clean.
@@ -579,6 +577,22 @@ chaz_MakeRule_add_prereq(chaz_MakeRule *rule, const char *prereq);
 void
 chaz_MakeRule_add_command(chaz_MakeRule *rule, const char *command);
 
+/** Add a command to remove one or more files.
+ *
+ * @param rule The rule.
+ * @param files The list of files.
+ */
+void
+chaz_MakeRule_add_rm_command(chaz_MakeRule *rule, const char *files);
+
+/** Add a command to remove one or more directories.
+ *
+ * @param rule The rule.
+ * @param dirs The list of directories.
+ */
+void
+chaz_MakeRule_add_recursive_rm_command(chaz_MakeRule *rule, const char *dirs);
+
 /** Add one or more commands to call another makefile recursively.
  *
  * @param rule The rule.
@@ -586,7 +600,7 @@ chaz_MakeRule_add_command(chaz_MakeRule *rule, const char *command);
  * @param target The target to call. Pass NULL for the default target.
  */
 void
-chaz_MakeRule_add_command_make(chaz_MakeRule *rule, const char *dir,
+chaz_MakeRule_add_make_command(chaz_MakeRule *rule, const char *dir,
                                const char *target);
 
 #endif /* H_CHAZ_MAKE */
@@ -3190,10 +3204,8 @@ struct chaz_MakeFile {
     size_t          num_vars;
     chaz_MakeRule **rules;
     size_t          num_rules;
-    char          **cleanup_files;
-    size_t          num_cleanup_files;
-    char          **cleanup_dirs;
-    size_t          num_cleanup_dirs;
+    chaz_MakeRule  *clean;
+    chaz_MakeRule  *distclean;
 };
 
 /* Static vars. */
@@ -3222,6 +3234,15 @@ chaz_Make_detect(const char *make1, ...);
 
 static int
 chaz_Make_audition(const char *make);
+
+static chaz_MakeRule*
+S_new_rule(const char *target, const char *prereq);
+
+static void
+S_destroy_rule(chaz_MakeRule *rule);
+
+static void
+S_write_rule(chaz_MakeRule *rule, FILE *out);
 
 void
 chaz_Make_init(void) {
@@ -3309,13 +3330,12 @@ chaz_MakeFile_new() {
     makefile->rules[0] = NULL;
     makefile->num_rules = 0;
 
-    makefile->cleanup_files = (char**)malloc(sizeof(char*));
-    makefile->cleanup_files[0] = NULL;
-    makefile->num_cleanup_files = 0;
+    makefile->clean     = S_new_rule("clean", NULL);
+    makefile->distclean = S_new_rule("distclean", "clean");
 
-    makefile->cleanup_dirs = (char**)malloc(sizeof(char*));
-    makefile->cleanup_dirs[0] = NULL;
-    makefile->num_cleanup_dirs = 0;
+    chaz_MakeRule_add_rm_command(makefile->distclean,
+                                 "charmonizer$(EXE_EXT) charmonizer$(OBJ_EXT)"
+                                 " charmony.h Makefile");
 
     return makefile;
 }
@@ -3333,23 +3353,12 @@ chaz_MakeFile_destroy(chaz_MakeFile *makefile) {
     free(makefile->vars);
 
     for (i = 0; makefile->rules[i]; i++) {
-        chaz_MakeRule *rule = makefile->rules[i];
-        if (rule->targets)  { free(rule->targets); }
-        if (rule->prereqs)  { free(rule->prereqs); }
-        if (rule->commands) { free(rule->commands); }
-        free(rule);
+        S_destroy_rule(makefile->rules[i]);
     }
     free(makefile->rules);
 
-    for (i = 0; makefile->cleanup_files[i]; i++) {
-        free(makefile->cleanup_files[i]);
-    }
-    free(makefile->cleanup_files);
-
-    for (i = 0; makefile->cleanup_dirs[i]; i++) {
-        free(makefile->cleanup_dirs[i]);
-    }
-    free(makefile->cleanup_dirs);
+    S_destroy_rule(makefile->clean);
+    S_destroy_rule(makefile->distclean);
 
     free(makefile);
 }
@@ -3380,16 +3389,9 @@ chaz_MakeFile_add_var(chaz_MakeFile *makefile, const char *name,
 chaz_MakeRule*
 chaz_MakeFile_add_rule(chaz_MakeFile *makefile, const char *target,
                        const char *prereq) {
-    chaz_MakeRule  *rule      = (chaz_MakeRule*)malloc(sizeof(chaz_MakeRule));
+    chaz_MakeRule  *rule      = S_new_rule(target, prereq);
     chaz_MakeRule **rules     = makefile->rules;
     size_t          num_rules = makefile->num_rules + 1;
-
-    rule->targets  = NULL;
-    rule->prereqs  = NULL;
-    rule->commands = NULL;
-
-    if (target) { chaz_MakeRule_add_target(rule, target); }
-    if (prereq) { chaz_MakeRule_add_prereq(rule, prereq); }
 
     rules = (chaz_MakeRule**)realloc(rules,
                                      (num_rules + 1) * sizeof(chaz_MakeRule*));
@@ -3401,28 +3403,14 @@ chaz_MakeFile_add_rule(chaz_MakeFile *makefile, const char *target,
     return rule;
 }
 
-void
-chaz_MakeFile_add_to_cleanup(chaz_MakeFile *makefile, const char *target) {
-    char   **files     = makefile->cleanup_files;
-    size_t   num_files = makefile->num_cleanup_files + 1;
-
-    files = (char**)realloc(files, (num_files + 1) * sizeof(char*));
-    files[num_files-1] = chaz_Util_strdup(target);
-    files[num_files]   = NULL;
-    makefile->cleanup_files     = files;
-    makefile->num_cleanup_files = num_files;
+chaz_MakeRule*
+chaz_MakeFile_clean_rule(chaz_MakeFile *makefile) {
+    return makefile->clean;
 }
 
-void
-chaz_MakeFile_add_dir_to_cleanup(chaz_MakeFile *makefile, const char *dir) {
-    char   **dirs     = makefile->cleanup_dirs;
-    size_t   num_dirs = makefile->num_cleanup_dirs + 1;
-
-    dirs = (char**)realloc(dirs, (num_dirs + 1) * sizeof(char*));
-    dirs[num_dirs-1] = chaz_Util_strdup(dir);
-    dirs[num_dirs]   = NULL;
-    makefile->cleanup_dirs     = dirs;
-    makefile->num_cleanup_dirs = num_dirs;
+chaz_MakeRule*
+chaz_MakeFile_distclean_rule(chaz_MakeFile *makefile) {
+    return makefile->distclean;
 }
 
 chaz_MakeRule*
@@ -3447,7 +3435,7 @@ chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
                              local_flags_string, NULL);
     chaz_MakeRule_add_command(rule, command);
 
-    chaz_MakeFile_add_to_cleanup(makefile, exe);
+    chaz_MakeRule_add_rm_command(makefile->clean, exe);
 
     chaz_CFlags_destroy(local_flags);
     free(command);
@@ -3476,7 +3464,8 @@ chaz_MakeFile_add_compiled_exe(chaz_MakeFile *makefile, const char *exe,
                              local_flags_string, NULL);
     chaz_MakeRule_add_command(rule, command);
 
-    chaz_MakeFile_add_to_cleanup(makefile, exe);
+    chaz_MakeRule_add_rm_command(makefile->clean, exe);
+    /* TODO: Clean .obj file on Windows. */
 
     chaz_CFlags_destroy(local_flags);
     free(command);
@@ -3508,7 +3497,7 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *name,
                              local_flags_string, NULL);
     chaz_MakeRule_add_command(rule, command);
 
-    chaz_MakeFile_add_to_cleanup(makefile, shared_lib);
+    chaz_MakeRule_add_rm_command(makefile->clean, shared_lib);
 
     chaz_CFlags_destroy(local_flags);
     free(shared_lib);
@@ -3534,69 +3523,11 @@ chaz_MakeFile_write(chaz_MakeFile *makefile) {
     fprintf(out, "\n");
 
     for (i = 0; makefile->rules[i]; i++) {
-        chaz_MakeRule *rule = makefile->rules[i];
-        fprintf(out, "%s :", rule->targets);
-        if (rule->prereqs) {
-            fprintf(out, " %s", rule->prereqs);
-        }
-        fprintf(out, "\n");
-        if (rule->commands) {
-            fprintf(out, "%s", rule->commands);
-        }
-        fprintf(out, "\n");
+        S_write_rule(makefile->rules[i], out);
     }
 
-    if (makefile->cleanup_files[0] || makefile->cleanup_dirs[0]) {
-        fprintf(out, "clean :\n");
-        if (shell_type == CHAZ_OS_POSIX) {
-            if (makefile->cleanup_files[0]) {
-                fprintf(out, "\trm -f");
-                for (i = 0; makefile->cleanup_files[i]; i++) {
-                    const char *file = makefile->cleanup_files[i];
-                    fprintf(out, " \\\n\t    %s", file);
-                }
-                fprintf(out, "\n");
-            }
-            if (makefile->cleanup_dirs[0]) {
-                fprintf(out, "\trm -rf");
-                for (i = 0; makefile->cleanup_dirs[i]; i++) {
-                    const char *dir = makefile->cleanup_dirs[i];
-                    fprintf(out, " \\\n\t    %s", dir);
-                }
-                fprintf(out, "\n");
-            }
-        }
-        else if (shell_type == CHAZ_OS_CMD_EXE) {
-            for (i = 0; makefile->cleanup_files[i]; i++) {
-                const char *file = makefile->cleanup_files[i];
-                fprintf(out, "\tfor %%i in (%s) do @if exist %%i del /f %%i\n",
-                        file);
-            }
-            for (i = 0; makefile->cleanup_dirs[i]; i++) {
-                const char *dir = makefile->cleanup_dirs[i];
-                fprintf(out,
-                        "\tfor %%i in (%s) do @if exist %%i rmdir /s /q %%i\n",
-                        dir);
-            }
-        }
-        else {
-            chaz_Util_die("Unsupported shell type: %d", shell_type);
-        }
-        fprintf(out, "\n");
-    }
-
-    fprintf(out, "distclean : clean\n");
-    if (shell_type == CHAZ_OS_POSIX) {
-        fprintf(out, "\trm -f charmonizer$(EXE_EXT) charmony.h Makefile\n\n");
-    }
-    else if (shell_type == CHAZ_OS_CMD_EXE) {
-        fprintf(out,
-            "\tfor %%i in (charmonizer$(EXE_EXT) charmonizer$(OBJ_EXT)"
-            " charmony.h Makefile) do @if exist %%i del /f %%i\n\n");
-    }
-    else {
-        chaz_Util_die("Unsupported shell type: %d", shell_type);
-    }
+    S_write_rule(makefile->clean, out);
+    S_write_rule(makefile->distclean, out);
 
     if (chaz_Make.is_nmake) {
         /* Inference rule for .c files. */
@@ -3635,6 +3566,41 @@ chaz_MakeVar_append(chaz_MakeVar *var, const char *element) {
     free(var->value);
     var->value = value;
     var->num_elements++;
+}
+
+static chaz_MakeRule*
+S_new_rule(const char *target, const char *prereq) {
+    chaz_MakeRule *rule = (chaz_MakeRule*)malloc(sizeof(chaz_MakeRule));
+
+    rule->targets  = NULL;
+    rule->prereqs  = NULL;
+    rule->commands = NULL;
+
+    if (target) { chaz_MakeRule_add_target(rule, target); }
+    if (prereq) { chaz_MakeRule_add_prereq(rule, prereq); }
+
+    return rule;
+}
+
+static void
+S_destroy_rule(chaz_MakeRule *rule) {
+    if (rule->targets)  { free(rule->targets); }
+    if (rule->prereqs)  { free(rule->prereqs); }
+    if (rule->commands) { free(rule->commands); }
+    free(rule);
+}
+
+static void
+S_write_rule(chaz_MakeRule *rule, FILE *out) {
+    fprintf(out, "%s :", rule->targets);
+    if (rule->prereqs) {
+        fprintf(out, " %s", rule->prereqs);
+    }
+    fprintf(out, "\n");
+    if (rule->commands) {
+        fprintf(out, "%s", rule->commands);
+    }
+    fprintf(out, "\n");
 }
 
 void
@@ -3685,7 +3651,47 @@ chaz_MakeRule_add_command(chaz_MakeRule *rule, const char *command) {
 }
 
 void
-chaz_MakeRule_add_command_make(chaz_MakeRule *rule, const char *dir,
+chaz_MakeRule_add_rm_command(chaz_MakeRule *rule, const char *files) {
+    int   shell_type = chaz_OS_shell_type();
+    char *command;
+
+    if (shell_type == CHAZ_OS_POSIX) {
+        command = chaz_Util_join(" ", "rm -f", files, NULL);
+    }
+    else if (shell_type == CHAZ_OS_CMD_EXE) {
+        command = chaz_Util_join("", "for %i in (", files,
+                                 ") do @if exist %i del /f %i\n", NULL);
+    }
+    else {
+        chaz_Util_die("Unsupported shell type: %d", shell_type);
+    }
+
+    chaz_MakeRule_add_command(rule, command);
+    free(command);
+}
+
+void
+chaz_MakeRule_add_recursive_rm_command(chaz_MakeRule *rule, const char *dirs) {
+    int   shell_type = chaz_OS_shell_type();
+    char *command;
+
+    if (shell_type == CHAZ_OS_POSIX) {
+        command = chaz_Util_join(" ", "rm -rf", dirs, NULL);
+    }
+    else if (shell_type == CHAZ_OS_CMD_EXE) {
+        command = chaz_Util_join("", "for %i in (", dirs,
+                                 ") do @if exist %i rmdir /s /q %i\n", NULL);
+    }
+    else {
+        chaz_Util_die("Unsupported shell type: %d", shell_type);
+    }
+
+    chaz_MakeRule_add_command(rule, command);
+    free(command);
+}
+
+void
+chaz_MakeRule_add_make_command(chaz_MakeRule *rule, const char *dir,
                                const char *target) {
     char *command;
 
