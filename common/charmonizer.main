@@ -153,6 +153,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeVar  *var;
     chaz_MakeRule *rule;
     chaz_MakeRule *clean_rule;
+    chaz_MakeRule *distclean_rule;
 
     int          cflags_style = chaz_CC_get_cflags_style();
     chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
@@ -381,6 +382,11 @@ S_write_makefile(struct chaz_CLIArgs *args) {
         chaz_MakeRule_add_rm_command(clean_rule, "lucy.info");
         chaz_MakeRule_add_recursive_rm_command(clean_rule, "coverage");
     }
+
+    chaz_MakeRule_add_make_command(clean_rule, "$(CFC_DIR)", "clean");
+
+    distclean_rule = chaz_MakeFile_distclean_rule(makefile);
+    chaz_MakeRule_add_make_command(distclean_rule, "$(CFC_DIR)", "distclean");
 
     chaz_MakeFile_write(makefile);
 
