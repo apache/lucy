@@ -316,6 +316,9 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeRule_add_prereq(rule, "$(AUTOGEN_DIR)");
 
     link_flags = chaz_CFlags_new(cflags_style);
+    if (chaz_CC_msvc_version_num()) {
+        chaz_CFlags_append(link_flags, "/nologo");
+    }
     math_library = chaz_Floats_math_library();
     if (math_library) {
         chaz_CFlags_add_library(link_flags, math_library);

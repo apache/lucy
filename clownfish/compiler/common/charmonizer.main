@@ -221,6 +221,9 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeFile_add_rule(makefile, "$(COMMON_OBJS)", parse_header_c);
 
     link_flags = chaz_CFlags_new(cflags_style);
+    if (chaz_CC_msvc_version_num()) {
+        chaz_CFlags_append(link_flags, "/nologo");
+    }
     if (args->code_coverage) {
         chaz_CFlags_enable_code_coverage(link_flags);
     }
