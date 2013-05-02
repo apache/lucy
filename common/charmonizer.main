@@ -373,7 +373,18 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     clean_rule = chaz_MakeFile_clean_rule(makefile);
 
-    chaz_MakeRule_add_rm_command(clean_rule, "$(LUCY_OBJS)");
+    if (chaz_OS_shell_type() == CHAZ_OS_CMD_EXE) {
+        /*
+         * The length of the command would exceed the limit of 8191
+         * characters. As a work-around, delete all .obj files in BASE_DIR
+         * using 'del /s /q'.
+         */
+        chaz_MakeRule_add_command(clean_rule, "del /s /q $(BASE_DIR)\\*.obj");
+    }
+    else {
+        chaz_MakeRule_add_rm_command(clean_rule, "$(LUCY_OBJS)");
+    }
+
     chaz_MakeRule_add_rm_command(clean_rule, json_parser_h);
     chaz_MakeRule_add_rm_command(clean_rule, json_parser_c);
     chaz_MakeRule_add_recursive_rm_command(clean_rule, "$(AUTOGEN_DIR)");
