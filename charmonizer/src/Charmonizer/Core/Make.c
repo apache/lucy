@@ -333,6 +333,17 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *name,
 
     chaz_MakeRule_add_rm_command(makefile->clean, shared_lib);
 
+    if (chaz_CC_msvc_version_num()) {
+        /* Remove import library and export file under MSVC. */
+        char *filename;
+        filename = chaz_Util_join("", name, ".lib", NULL);
+        chaz_MakeRule_add_rm_command(makefile->clean, filename);
+        free(filename);
+        filename = chaz_Util_join("", name, ".exp", NULL);
+        chaz_MakeRule_add_rm_command(makefile->clean, filename);
+        free(filename);
+    }
+
     chaz_CFlags_destroy(local_flags);
     free(shared_lib);
     free(command);
