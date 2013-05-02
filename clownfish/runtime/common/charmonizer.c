@@ -2061,6 +2061,7 @@ chaz_CC_link_command() {
 char*
 chaz_CC_shared_lib_file(const char *name) {
     const char *prefix = "";
+    const char *shlib_ext = chaz_OS_shared_lib_ext();
     if (!chaz_CC.intval__MSC_VER) {
         if (strcmp(chaz_OS_name(), "cygwin") == 0) {
             prefix = "cyg";
@@ -2069,7 +2070,6 @@ chaz_CC_shared_lib_file(const char *name) {
             prefix = "lib";
         }
     }
-    const char *shlib_ext = chaz_OS_shared_lib_ext();
     return chaz_Util_join("", prefix, name, shlib_ext, NULL);
 }
 
@@ -3499,6 +3499,17 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *name,
 
     chaz_MakeRule_add_rm_command(makefile->clean, shared_lib);
 
+    if (chaz_CC_msvc_version_num()) {
+        /* Remove import library and export file under MSVC. */
+        char *filename;
+        filename = chaz_Util_join("", name, ".lib", NULL);
+        chaz_MakeRule_add_rm_command(makefile->clean, filename);
+        free(filename);
+        filename = chaz_Util_join("", name, ".exp", NULL);
+        chaz_MakeRule_add_rm_command(makefile->clean, filename);
+        free(filename);
+    }
+
     chaz_CFlags_destroy(local_flags);
     free(shared_lib);
     free(command);
@@ -3660,7 +3671,7 @@ chaz_MakeRule_add_rm_command(chaz_MakeRule *rule, const char *files) {
     }
     else if (shell_type == CHAZ_OS_CMD_EXE) {
         command = chaz_Util_join("", "for %i in (", files,
-                                 ") do @if exist %i del /f %i\n", NULL);
+                                 ") do @if exist %i del /f %i", NULL);
     }
     else {
         chaz_Util_die("Unsupported shell type: %d", shell_type);
@@ -3680,7 +3691,7 @@ chaz_MakeRule_add_recursive_rm_command(chaz_MakeRule *rule, const char *dirs) {
     }
     else if (shell_type == CHAZ_OS_CMD_EXE) {
         command = chaz_Util_join("", "for %i in (", dirs,
-                                 ") do @if exist %i rmdir /s /q %i\n", NULL);
+                                 ") do @if exist %i rmdir /s /q %i", NULL);
     }
     else {
         chaz_Util_die("Unsupported shell type: %d", shell_type);
@@ -3711,10 +3722,10 @@ chaz_MakeRule_add_make_command(chaz_MakeRule *rule, const char *dir,
         free(command);
 
         if (!target) {
-            chaz_MakeRule_add_command(rule, "$(MAKE)");
+            chaz_MakeRule_add_command(rule, "$(MAKE) /nologo");
         }
         else {
-            command = chaz_Util_join(" ", "$(MAKE)", target, NULL);
+            command = chaz_Util_join(" ", "$(MAKE) /nologo", target, NULL);
             chaz_MakeRule_add_command(rule, command);
             free(command);
         }
@@ -4776,8 +4787,9 @@ chaz_Floats_math_library(void) {
     static const char sqrt_code[] =
         CHAZ_QUOTE(  #include <math.h>                              )
         CHAZ_QUOTE(  #include <stdio.h>                             )
+        CHAZ_QUOTE(  typedef double (*sqrt_t)(double);              )
         CHAZ_QUOTE(  int main(void) {                               )
-        CHAZ_QUOTE(      printf("%p\n", sqrt);                      )
+        CHAZ_QUOTE(      printf("%p\n", (sqrt_t)sqrt);              )
         CHAZ_QUOTE(      return 0;                                  )
         CHAZ_QUOTE(  }                                              );
     chaz_CFlags *temp_cflags = chaz_CC_get_temp_cflags();
