@@ -556,10 +556,10 @@ chaz_MakeRule_add_make_command(chaz_MakeRule *rule, const char *dir,
         free(command);
 
         if (!target) {
-            chaz_MakeRule_add_command(rule, "$(MAKE)");
+            chaz_MakeRule_add_command(rule, "$(MAKE) /nologo");
         }
         else {
-            command = chaz_Util_join(" ", "$(MAKE)", target, NULL);
+            command = chaz_Util_join(" ", "$(MAKE) /nologo", target, NULL);
             chaz_MakeRule_add_command(rule, command);
             free(command);
         }
