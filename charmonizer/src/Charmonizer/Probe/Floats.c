@@ -51,8 +51,9 @@ chaz_Floats_math_library(void) {
     static const char sqrt_code[] =
         CHAZ_QUOTE(  #include <math.h>                              )
         CHAZ_QUOTE(  #include <stdio.h>                             )
+        CHAZ_QUOTE(  typedef double (*sqrt_t)(double);              )
         CHAZ_QUOTE(  int main(void) {                               )
-        CHAZ_QUOTE(      printf("%p\n", sqrt);                      )
+        CHAZ_QUOTE(      printf("%p\n", (sqrt_t)sqrt);              )
         CHAZ_QUOTE(      return 0;                                  )
         CHAZ_QUOTE(  }                                              );
     chaz_CFlags *temp_cflags = chaz_CC_get_temp_cflags();
