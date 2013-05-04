@@ -292,7 +292,11 @@ S_write_makefile(struct chaz_CLIArgs *args) {
                                    lemon_cflags);
     chaz_CFlags_destroy(lemon_cflags);
 
-    rule = chaz_MakeFile_add_rule(makefile, "$(CFC_EXE)", NULL);
+    /*
+     * CFC also builds LEMON_EXE, so it might be built twice at the same time
+     * in parallel builds. Adding LEMON_EXE as prereq of CFC_EXE avoids this.
+     */
+    rule = chaz_MakeFile_add_rule(makefile, "$(CFC_EXE)", "$(LEMON_EXE)");
     chaz_MakeRule_add_make_command(rule, "$(CFC_DIR)", NULL);
 
     rule = chaz_MakeFile_add_rule(makefile, "$(AUTOGEN_DIR)", "$(CFC_EXE)");
