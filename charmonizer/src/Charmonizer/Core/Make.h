@@ -47,6 +47,11 @@ chaz_Make_clean_up(void);
 const char*
 chaz_Make_get_make(void);
 
+/** Return the type of shell used by the detected 'make' executable.
+ */
+int
+chaz_Make_shell_type(void);
+
 /** Recursively list files in a directory. For every file a callback is called
  * with the filename and a context variable.
  *

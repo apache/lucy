@@ -47,9 +47,10 @@ static struct {
     char *make_command;
     int   is_gnu_make;
     int   is_nmake;
+    int   shell_type;
 } chaz_Make = {
     NULL,
-    0, 0
+    0, 0, 0
 };
 
 /* Detect make command.
@@ -82,16 +83,24 @@ void
 chaz_Make_init(void) {
     const char *make;
 
-    chaz_Make_detect("make", "gmake", "nmake", "dmake", NULL);
+    chaz_Make_detect("make", "gmake", "nmake", "dmake", "mingw32-make",
+                     "mingw64-make", NULL);
     make = chaz_Make.make_command;
 
     if (make) {
-        if (strcmp(make, "make") == 0 || strcmp(make, "gmake") == 0) {
+        if (strcmp(make, "make") == 0
+            || strcmp(make, "gmake") == 0
+            || strcmp(make, "mingw32-make") == 0
+            || strcmp(make, "mingw64-make") == 0
+           ) {
             /* TODO: Add a feature test for GNU make. */
             chaz_Make.is_gnu_make = 1;
+            /* TODO: Feature test which shell GNU make uses on Windows. */
+            chaz_Make.shell_type = CHAZ_OS_POSIX;
         }
         else if (strcmp(make, "nmake") == 0) {
             chaz_Make.is_nmake = 1;
+            chaz_Make.shell_type = CHAZ_OS_CMD_EXE;
         }
     }
 }
@@ -104,6 +113,11 @@ chaz_Make_clean_up(void) {
 const char*
 chaz_Make_get_make(void) {
     return chaz_Make.make_command;
+}
+
+int
+chaz_Make_shell_type(void) {
+    return chaz_Make.shell_type;
 }
 
 static int
@@ -352,7 +366,6 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *name,
 
 void
 chaz_MakeFile_write(chaz_MakeFile *makefile) {
-    int     shell_type = chaz_OS_shell_type();
     FILE   *out;
     size_t  i;
 
@@ -497,18 +510,17 @@ chaz_MakeRule_add_command(chaz_MakeRule *rule, const char *command) {
 
 void
 chaz_MakeRule_add_rm_command(chaz_MakeRule *rule, const char *files) {
-    int   shell_type = chaz_OS_shell_type();
     char *command;
 
-    if (shell_type == CHAZ_OS_POSIX) {
+    if (chaz_Make.shell_type == CHAZ_OS_POSIX) {
         command = chaz_Util_join(" ", "rm -f", files, NULL);
     }
-    else if (shell_type == CHAZ_OS_CMD_EXE) {
+    else if (chaz_Make.shell_type == CHAZ_OS_CMD_EXE) {
         command = chaz_Util_join("", "for %i in (", files,
                                  ") do @if exist %i del /f %i", NULL);
     }
     else {
-        chaz_Util_die("Unsupported shell type: %d", shell_type);
+        chaz_Util_die("Unsupported shell type: %d", chaz_Make.shell_type);
     }
 
     chaz_MakeRule_add_command(rule, command);
@@ -517,18 +529,17 @@ chaz_MakeRule_add_rm_command(chaz_MakeRule *rule, const char *files) {
 
 void
 chaz_MakeRule_add_recursive_rm_command(chaz_MakeRule *rule, const char *dirs) {
-    int   shell_type = chaz_OS_shell_type();
     char *command;
 
-    if (shell_type == CHAZ_OS_POSIX) {
+    if (chaz_Make.shell_type == CHAZ_OS_POSIX) {
         command = chaz_Util_join(" ", "rm -rf", dirs, NULL);
     }
-    else if (shell_type == CHAZ_OS_CMD_EXE) {
+    else if (chaz_Make.shell_type == CHAZ_OS_CMD_EXE) {
         command = chaz_Util_join("", "for %i in (", dirs,
                                  ") do @if exist %i rmdir /s /q %i", NULL);
     }
     else {
-        chaz_Util_die("Unsupported shell type: %d", shell_type);
+        chaz_Util_die("Unsupported shell type: %d", chaz_Make.shell_type);
     }
 
     chaz_MakeRule_add_command(rule, command);

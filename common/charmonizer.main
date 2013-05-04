@@ -376,7 +376,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     clean_rule = chaz_MakeFile_clean_rule(makefile);
 
-    if (chaz_OS_shell_type() == CHAZ_OS_CMD_EXE) {
+    if (chaz_Make_shell_type() == CHAZ_OS_CMD_EXE) {
         /*
          * The length of the command would exceed the limit of 8191
          * characters. As a work-around, delete all .obj files in BASE_DIR
