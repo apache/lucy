@@ -1328,7 +1328,9 @@ chaz_CFlags_set_warnings_as_errors(chaz_CFlags *flags) {
 void
 chaz_CFlags_compile_shared_library(chaz_CFlags *flags) {
     const char *string;
-    if (flags->style != CHAZ_CFLAGS_STYLE_GNU) {
+    if (flags->style != CHAZ_CFLAGS_STYLE_GNU
+        || strcmp(chaz_OS_shared_lib_ext(), ".dll") == 0
+       ) {
         return;
     }
     if (chaz_OS_is_darwin()) {
@@ -1784,7 +1786,7 @@ chaz_CC_shared_lib_file(const char *name) {
     const char *prefix = "";
     const char *shlib_ext = chaz_OS_shared_lib_ext();
     if (!chaz_CC.intval__MSC_VER) {
-        if (strcmp(chaz_OS_name(), "cygwin") == 0) {
+        if (chaz_OS_is_cygwin()) {
             prefix = "cyg";
         }
         else {
