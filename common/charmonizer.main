@@ -138,7 +138,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     const char *base_dir = "..";
     const char *exe_ext  = chaz_OS_exe_ext();
-    const char *obj_ext  = chaz_OS_obj_ext();
+    const char *obj_ext  = chaz_CC_obj_ext();
 
     const char *json_parser_y = "$(CORE_DIR)" DIR_SEP "Lucy" DIR_SEP "Util"
                                 DIR_SEP "Json" DIR_SEP "JsonParser.y";

@@ -36,7 +36,7 @@ static struct {
     char     *cc_command;
     char     *cflags;
     char     *try_exe_name;
-    char     *try_obj_name;
+    char      obj_ext[10];
     char      gcc_version_str[30];
     int       cflags_style;
     int       intval___GNUC__;
@@ -47,8 +47,8 @@ static struct {
     chaz_CFlags *extra_cflags;
     chaz_CFlags *temp_cflags;
 } chaz_CC = {
-    NULL, NULL, NULL, NULL,
-    "",
+    NULL, NULL, NULL,
+    "", "",
     0, 0, 0, 0, 0, 0,
     NULL, NULL
 };
@@ -69,18 +69,18 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     /* Set names for the targets which we "try" to compile. */
     chaz_CC.try_exe_name
         = chaz_Util_join("", CHAZ_CC_TRY_BASENAME, chaz_OS_exe_ext(), NULL);
-    chaz_CC.try_obj_name
-        = chaz_Util_join("", CHAZ_CC_TRY_BASENAME, chaz_OS_obj_ext(), NULL);
 
     /* If we can't compile anything, game over. */
     if (chaz_Util_verbosity) {
         printf("Trying to compile a small test file...\n");
     }
     /* Try MSVC argument style. */
+    strcpy(chaz_CC.obj_ext, ".obj");
     chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_MSVC;
     compile_succeeded = chaz_CC_test_compile(code);
     if (!compile_succeeded) {
         /* Try POSIX argument style. */
+        strcpy(chaz_CC.obj_ext, ".o");
         chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_POSIX;
         compile_succeeded = chaz_CC_test_compile(code);
     }
@@ -152,7 +152,6 @@ void
 chaz_CC_clean_up(void) {
     free(chaz_CC.cc_command);
     free(chaz_CC.cflags);
-    free(chaz_CC.try_obj_name);
     free(chaz_CC.try_exe_name);
     chaz_CFlags_destroy(chaz_CC.extra_cflags);
     chaz_CFlags_destroy(chaz_CC.temp_cflags);
@@ -223,7 +222,7 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
     const char *extra_cflags_string = "";
     const char *temp_cflags_string  = "";
     const char *local_cflags_string;
-    char *obj_file = chaz_Util_join("", obj_name, chaz_OS_obj_ext(), NULL);
+    char *obj_file = chaz_Util_join("", obj_name, chaz_CC.obj_ext, NULL);
     char *command;
     int result;
 
@@ -264,12 +263,15 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
 int
 chaz_CC_test_compile(const char *source) {
     int compile_succeeded;
-    if (!chaz_Util_remove_and_verify(chaz_CC.try_obj_name)) {
-        chaz_Util_die("Failed to delete file '%s'", chaz_CC.try_obj_name);
+    char *try_obj_name
+        = chaz_Util_join("", CHAZ_CC_TRY_BASENAME, chaz_CC.obj_ext, NULL);
+    if (!chaz_Util_remove_and_verify(try_obj_name)) {
+        chaz_Util_die("Failed to delete file '%s'", try_obj_name);
     }
     compile_succeeded = chaz_CC_compile_obj(CHAZ_CC_TRY_SOURCE_PATH,
                                             CHAZ_CC_TRY_BASENAME, source);
-    chaz_Util_remove_and_verify(chaz_CC.try_obj_name);
+    chaz_Util_remove_and_verify(try_obj_name);
+    free(try_obj_name);
     return compile_succeeded;
 }
 
@@ -330,6 +332,11 @@ chaz_CC_get_extra_cflags(void) {
 chaz_CFlags*
 chaz_CC_get_temp_cflags(void) {
     return chaz_CC.temp_cflags;
+}
+
+const char*
+chaz_CC_obj_ext(void) {
+    return chaz_CC.obj_ext;
 }
 
 int

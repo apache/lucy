@@ -91,6 +91,11 @@ chaz_CC_get_extra_cflags(void);
 chaz_CFlags*
 chaz_CC_get_temp_cflags(void);
 
+/* Return the extension for a compiled object.
+ */
+const char*
+chaz_CC_obj_ext(void);
+
 int
 chaz_CC_gcc_version_num(void);
 

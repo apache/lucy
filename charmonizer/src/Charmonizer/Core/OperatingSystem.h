@@ -84,11 +84,6 @@ chaz_OS_is_cygwin(void);
 const char*
 chaz_OS_exe_ext(void);
 
-/* Return the extension for a compiled object on this system.
- */
-const char*
-chaz_OS_obj_ext(void);
-
 /* Return the extension for a shared object on this system.
  */
 const char*
