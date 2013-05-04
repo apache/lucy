@@ -364,7 +364,7 @@ chaz_CC_shared_lib_file(const char *name) {
     const char *prefix = "";
     const char *shlib_ext = chaz_OS_shared_lib_ext();
     if (!chaz_CC.intval__MSC_VER) {
-        if (strcmp(chaz_OS_name(), "cygwin") == 0) {
+        if (chaz_OS_is_cygwin()) {
             prefix = "cyg";
         }
         else {
