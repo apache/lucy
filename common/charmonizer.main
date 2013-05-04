@@ -125,7 +125,7 @@ S_source_file_callback(char *file, void *context) {
     file[file_len-2] = '\0';
 
     pattern = "%s" DIR_SEP "%s$(OBJ_EXT)";
-    obj_file_size = strlen(pattern) + file_len + 10;
+    obj_file_size = strlen(pattern) + strlen(sfc->dir) + file_len + 10;
     obj_file = (char*)malloc(obj_file_size);
     sprintf(obj_file, pattern, sfc->dir, file);
     chaz_MakeVar_append(sfc->var, obj_file);
