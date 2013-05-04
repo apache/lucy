@@ -187,6 +187,11 @@ chaz_CC_get_extra_cflags(void);
 chaz_CFlags*
 chaz_CC_get_temp_cflags(void);
 
+/* Return the extension for a compiled object.
+ */
+const char*
+chaz_CC_obj_ext(void);
+
 int
 chaz_CC_gcc_version_num(void);
 
@@ -440,6 +445,11 @@ chaz_Make_clean_up(void);
 const char*
 chaz_Make_get_make(void);
 
+/** Return the type of shell used by the detected 'make' executable.
+ */
+int
+chaz_Make_shell_type(void);
+
 /** Recursively list files in a directory. For every file a callback is called
  * with the filename and a context variable.
  *
@@ -675,11 +685,6 @@ chaz_OS_is_cygwin(void);
  */
 const char*
 chaz_OS_exe_ext(void);
-
-/* Return the extension for a compiled object on this system.
- */
-const char*
-chaz_OS_obj_ext(void);
 
 /* Return the extension for a shared object on this system.
  */
@@ -1737,7 +1742,7 @@ static struct {
     char     *cc_command;
     char     *cflags;
     char     *try_exe_name;
-    char     *try_obj_name;
+    char      obj_ext[10];
     char      gcc_version_str[30];
     int       cflags_style;
     int       intval___GNUC__;
@@ -1748,8 +1753,8 @@ static struct {
     chaz_CFlags *extra_cflags;
     chaz_CFlags *temp_cflags;
 } chaz_CC = {
-    NULL, NULL, NULL, NULL,
-    "",
+    NULL, NULL, NULL,
+    "", "",
     0, 0, 0, 0, 0, 0,
     NULL, NULL
 };
@@ -1770,18 +1775,18 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     /* Set names for the targets which we "try" to compile. */
     chaz_CC.try_exe_name
         = chaz_Util_join("", CHAZ_CC_TRY_BASENAME, chaz_OS_exe_ext(), NULL);
-    chaz_CC.try_obj_name
-        = chaz_Util_join("", CHAZ_CC_TRY_BASENAME, chaz_OS_obj_ext(), NULL);
 
     /* If we can't compile anything, game over. */
     if (chaz_Util_verbosity) {
         printf("Trying to compile a small test file...\n");
     }
     /* Try MSVC argument style. */
+    strcpy(chaz_CC.obj_ext, ".obj");
     chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_MSVC;
     compile_succeeded = chaz_CC_test_compile(code);
     if (!compile_succeeded) {
         /* Try POSIX argument style. */
+        strcpy(chaz_CC.obj_ext, ".o");
         chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_POSIX;
         compile_succeeded = chaz_CC_test_compile(code);
     }
@@ -1853,7 +1858,6 @@ void
 chaz_CC_clean_up(void) {
     free(chaz_CC.cc_command);
     free(chaz_CC.cflags);
-    free(chaz_CC.try_obj_name);
     free(chaz_CC.try_exe_name);
     chaz_CFlags_destroy(chaz_CC.extra_cflags);
     chaz_CFlags_destroy(chaz_CC.temp_cflags);
@@ -1924,7 +1928,7 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
     const char *extra_cflags_string = "";
     const char *temp_cflags_string  = "";
     const char *local_cflags_string;
-    char *obj_file = chaz_Util_join("", obj_name, chaz_OS_obj_ext(), NULL);
+    char *obj_file = chaz_Util_join("", obj_name, chaz_CC.obj_ext, NULL);
     char *command;
     int result;
 
@@ -1965,12 +1969,15 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_name,
 int
 chaz_CC_test_compile(const char *source) {
     int compile_succeeded;
-    if (!chaz_Util_remove_and_verify(chaz_CC.try_obj_name)) {
-        chaz_Util_die("Failed to delete file '%s'", chaz_CC.try_obj_name);
+    char *try_obj_name
+        = chaz_Util_join("", CHAZ_CC_TRY_BASENAME, chaz_CC.obj_ext, NULL);
+    if (!chaz_Util_remove_and_verify(try_obj_name)) {
+        chaz_Util_die("Failed to delete file '%s'", try_obj_name);
     }
     compile_succeeded = chaz_CC_compile_obj(CHAZ_CC_TRY_SOURCE_PATH,
                                             CHAZ_CC_TRY_BASENAME, source);
-    chaz_Util_remove_and_verify(chaz_CC.try_obj_name);
+    chaz_Util_remove_and_verify(try_obj_name);
+    free(try_obj_name);
     return compile_succeeded;
 }
 
@@ -2031,6 +2038,11 @@ chaz_CC_get_extra_cflags(void) {
 chaz_CFlags*
 chaz_CC_get_temp_cflags(void) {
     return chaz_CC.temp_cflags;
+}
+
+const char*
+chaz_CC_obj_ext(void) {
+    return chaz_CC.obj_ext;
 }
 
 int
@@ -3215,9 +3227,10 @@ static struct {
     char *make_command;
     int   is_gnu_make;
     int   is_nmake;
+    int   shell_type;
 } chaz_Make = {
     NULL,
-    0, 0
+    0, 0, 0
 };
 
 /* Detect make command.
@@ -3250,16 +3263,24 @@ void
 chaz_Make_init(void) {
     const char *make;
 
-    chaz_Make_detect("make", "gmake", "nmake", "dmake", NULL);
+    chaz_Make_detect("make", "gmake", "nmake", "dmake", "mingw32-make",
+                     "mingw64-make", NULL);
     make = chaz_Make.make_command;
 
     if (make) {
-        if (strcmp(make, "make") == 0 || strcmp(make, "gmake") == 0) {
+        if (strcmp(make, "make") == 0
+            || strcmp(make, "gmake") == 0
+            || strcmp(make, "mingw32-make") == 0
+            || strcmp(make, "mingw64-make") == 0
+           ) {
             /* TODO: Add a feature test for GNU make. */
             chaz_Make.is_gnu_make = 1;
+            /* TODO: Feature test which shell GNU make uses on Windows. */
+            chaz_Make.shell_type = CHAZ_OS_POSIX;
         }
         else if (strcmp(make, "nmake") == 0) {
             chaz_Make.is_nmake = 1;
+            chaz_Make.shell_type = CHAZ_OS_CMD_EXE;
         }
     }
 }
@@ -3272,6 +3293,11 @@ chaz_Make_clean_up(void) {
 const char*
 chaz_Make_get_make(void) {
     return chaz_Make.make_command;
+}
+
+int
+chaz_Make_shell_type(void) {
+    return chaz_Make.shell_type;
 }
 
 static int
@@ -3520,7 +3546,6 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *name,
 
 void
 chaz_MakeFile_write(chaz_MakeFile *makefile) {
-    int     shell_type = chaz_OS_shell_type();
     FILE   *out;
     size_t  i;
 
@@ -3665,18 +3690,17 @@ chaz_MakeRule_add_command(chaz_MakeRule *rule, const char *command) {
 
 void
 chaz_MakeRule_add_rm_command(chaz_MakeRule *rule, const char *files) {
-    int   shell_type = chaz_OS_shell_type();
     char *command;
 
-    if (shell_type == CHAZ_OS_POSIX) {
+    if (chaz_Make.shell_type == CHAZ_OS_POSIX) {
         command = chaz_Util_join(" ", "rm -f", files, NULL);
     }
-    else if (shell_type == CHAZ_OS_CMD_EXE) {
+    else if (chaz_Make.shell_type == CHAZ_OS_CMD_EXE) {
         command = chaz_Util_join("", "for %i in (", files,
                                  ") do @if exist %i del /f %i", NULL);
     }
     else {
-        chaz_Util_die("Unsupported shell type: %d", shell_type);
+        chaz_Util_die("Unsupported shell type: %d", chaz_Make.shell_type);
     }
 
     chaz_MakeRule_add_command(rule, command);
@@ -3685,18 +3709,17 @@ chaz_MakeRule_add_rm_command(chaz_MakeRule *rule, const char *files) {
 
 void
 chaz_MakeRule_add_recursive_rm_command(chaz_MakeRule *rule, const char *dirs) {
-    int   shell_type = chaz_OS_shell_type();
     char *command;
 
-    if (shell_type == CHAZ_OS_POSIX) {
+    if (chaz_Make.shell_type == CHAZ_OS_POSIX) {
         command = chaz_Util_join(" ", "rm -rf", dirs, NULL);
     }
-    else if (shell_type == CHAZ_OS_CMD_EXE) {
+    else if (chaz_Make.shell_type == CHAZ_OS_CMD_EXE) {
         command = chaz_Util_join("", "for %i in (", dirs,
                                  ") do @if exist %i rmdir /s /q %i", NULL);
     }
     else {
-        chaz_Util_die("Unsupported shell type: %d", shell_type);
+        chaz_Util_die("Unsupported shell type: %d", chaz_Make.shell_type);
     }
 
     chaz_MakeRule_add_command(rule, command);
@@ -3848,11 +3871,10 @@ static struct {
     char name[CHAZ_OS_NAME_MAX+1];
     char dev_null[20];
     char exe_ext[5];
-    char obj_ext[5];
     char shared_lib_ext[7];
     char local_command_start[3];
     int  shell_type;
-} chaz_OS = { "", "", "", "", "", "", 0 };
+} chaz_OS = { "", "", "", "", "", 0 };
 
 void
 chaz_OS_init(void) {
@@ -3885,7 +3907,6 @@ chaz_OS_init(void) {
 
         strcpy(chaz_OS.dev_null, "/dev/null");
         strcpy(chaz_OS.exe_ext, "");
-        strcpy(chaz_OS.obj_ext, ".o");
         if (memcmp(chaz_OS.name, "darwin", 6) == 0) {
             strcpy(chaz_OS.shared_lib_ext, ".dylib");
         }
@@ -3901,7 +3922,6 @@ chaz_OS_init(void) {
         strcpy(chaz_OS.name, "windows");
         strcpy(chaz_OS.dev_null, "nul");
         strcpy(chaz_OS.exe_ext, ".exe");
-        strcpy(chaz_OS.obj_ext, ".obj");
         strcpy(chaz_OS.shared_lib_ext, ".dll");
         strcpy(chaz_OS.local_command_start, ".\\");
         chaz_OS.shell_type = CHAZ_OS_CMD_EXE;
@@ -3930,11 +3950,6 @@ chaz_OS_is_cygwin(void) {
 const char*
 chaz_OS_exe_ext(void) {
     return chaz_OS.exe_ext;
-}
-
-const char*
-chaz_OS_obj_ext(void) {
-    return chaz_OS.obj_ext;
 }
 
 const char*
@@ -5978,6 +5993,11 @@ chaz_Memory_probe_alloca(void) {
         chaz_ConfWriter_add_def("alloca", "alloca");
     }
     if (!has_alloca) {
+        /*
+         * FIXME: Under MinGW, alloca is defined in malloc.h. This probe
+         * produces compiler warnings but works regardless. These warnings
+         * are subsequently repeated during the build.
+         */
         sprintf(code_buf, alloca_code, "stdlib.h", "alloca");
         if (chaz_CC_test_compile(code_buf)) {
             has_alloca    = true;
