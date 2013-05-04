@@ -77,6 +77,11 @@ chaz_Memory_probe_alloca(void) {
         chaz_ConfWriter_add_def("alloca", "alloca");
     }
     if (!has_alloca) {
+        /*
+         * FIXME: Under MinGW, alloca is defined in malloc.h. This probe
+         * produces compiler warnings but works regardless. These warnings
+         * are subsequently repeated during the build.
+         */
         sprintf(code_buf, alloca_code, "stdlib.h", "alloca");
         if (chaz_CC_test_compile(code_buf)) {
             has_alloca    = true;
