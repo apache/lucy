@@ -6449,7 +6449,7 @@ S_source_file_callback(char *file, void *context) {
     file[file_len-2] = '\0';
 
     pattern = "%s" DIR_SEP "%s$(OBJ_EXT)";
-    obj_file_size = strlen(pattern) + file_len + 10;
+    obj_file_size = strlen(pattern) + strlen(sfc->dir) + file_len + 10;
     obj_file = (char*)malloc(obj_file_size);
     sprintf(obj_file, pattern, sfc->dir, file);
     chaz_MakeVar_append(sfc->var, obj_file);
@@ -6616,7 +6616,11 @@ S_write_makefile(struct chaz_CLIArgs *args) {
                                    lemon_cflags);
     chaz_CFlags_destroy(lemon_cflags);
 
-    rule = chaz_MakeFile_add_rule(makefile, "$(CFC_EXE)", NULL);
+    /*
+     * CFC also builds LEMON_EXE, so it might be built twice at the same time
+     * in parallel builds. Adding LEMON_EXE as prereq of CFC_EXE avoids this.
+     */
+    rule = chaz_MakeFile_add_rule(makefile, "$(CFC_EXE)", "$(LEMON_EXE)");
     chaz_MakeRule_add_make_command(rule, "$(CFC_DIR)", NULL);
 
     rule = chaz_MakeFile_add_rule(makefile, "$(AUTOGEN_DIR)", "$(CFC_EXE)");
