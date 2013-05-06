@@ -57,10 +57,15 @@ RegexTokenizer_init(RegexTokenizer *self, const CharBuf *pattern) {
             = CB_new_from_trusted_utf8(pattern_ptr, strlen(pattern_ptr));
     }
 
-    int options = PCRE_BSR_UNICODE
-                | PCRE_NEWLINE_LF
-                | PCRE_UTF8
-                | PCRE_NO_UTF8_CHECK;
+    int options = PCRE_UTF8 | PCRE_NO_UTF8_CHECK;
+#ifdef PCRE_BSR_UNICODE
+    // Available since PCRE 7.4
+    options |= PCRE_BSR_UNICODE;
+#endif
+#ifdef PCRE_NEWLINE_LF
+    // Available since PCRE 6.7
+    options |= PCRE_NEWLINE_LF;
+#endif
     const char *err_ptr;
     int err_offset;
     pcre *re = pcre_compile(pattern_ptr, options, &err_ptr, &err_offset, NULL);
