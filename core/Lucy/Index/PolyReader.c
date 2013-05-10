@@ -355,7 +355,7 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
                 THROW(ERR, "Supplied snapshot objects must not be empty");
             }
             else {
-                Str_Inc_RefCount(target_snap_file);
+                target_snap_file = (String*)INCREF(target_snap_file);
             }
         }
         else {
