@@ -80,8 +80,7 @@ TestBatchRunner_Run_Batch_IMP(TestBatchRunner *self, TestBatch *batch) {
     if (err) {
         failed = true;
         String *mess = Err_Get_Mess(err);
-        INCREF(mess);
-        Err_warn_mess(mess);
+        Err_warn_mess((String*)INCREF(mess));
     }
     if (self->num_failed > 0) {
         failed = true;

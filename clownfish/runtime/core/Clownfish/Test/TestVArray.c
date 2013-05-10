@@ -88,7 +88,7 @@ test_Store_Fetch(TestBatchRunner *runner) {
     TEST_INT_EQ(runner, 3, VA_Get_Size(array), "Store updates size");
     TEST_TRUE(runner, Str_Equals_Utf8(elem, "foo", 3), "Store");
 
-    INCREF(elem);
+    elem = (String*)INCREF(elem);
     TEST_INT_EQ(runner, 2, Str_Get_RefCount(elem),
                 "start with refcount of 2");
     VA_Store(array, 2, (Obj*)Str_newf("bar"));

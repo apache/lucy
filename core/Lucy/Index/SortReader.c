@@ -90,16 +90,15 @@ DefSortReader_init(DefaultSortReader *self, Schema *schema, Folder *folder,
                                     HASH));
         ivars->null_ords = (Hash*)Hash_Fetch_Utf8(metadata, "null_ords", 9);
         if (ivars->null_ords) {
-            CERTIFY(ivars->null_ords, HASH);
-            INCREF(ivars->null_ords);
+            ivars->null_ords = (Hash*)INCREF(CERTIFY(ivars->null_ords, HASH));
         }
         else {
             ivars->null_ords = Hash_new(0);
         }
         ivars->ord_widths = (Hash*)Hash_Fetch_Utf8(metadata, "ord_widths", 10);
         if (ivars->ord_widths) {
-            CERTIFY(ivars->ord_widths, HASH);
-            INCREF(ivars->ord_widths);
+            ivars->ord_widths
+                = (Hash*)INCREF(CERTIFY(ivars->ord_widths, HASH));
         }
         else {
             ivars->ord_widths = Hash_new(0);

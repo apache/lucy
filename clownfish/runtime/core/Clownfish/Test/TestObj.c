@@ -54,7 +54,7 @@ test_refcounts(TestBatchRunner *runner) {
     TEST_INT_EQ(runner, Obj_Get_RefCount(obj), 1,
                 "Correct starting refcount");
 
-    Obj_Inc_RefCount(obj);
+    obj = Obj_Inc_RefCount(obj);
     TEST_INT_EQ(runner, Obj_Get_RefCount(obj), 2, "Inc_RefCount");
 
     Obj_Dec_RefCount(obj);
