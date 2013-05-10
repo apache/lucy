@@ -375,7 +375,7 @@ Bool_Hash_Sum_IMP(BoolNum *self) {
 
 String*
 Bool_To_String_IMP(BoolNum *self) {
-    return (String*)Str_Inc_RefCount(self->string);
+    return (String*)INCREF(self->string);
 }
 
 bool
