@@ -62,7 +62,7 @@ LexIndex_init(LexIndex *self, Schema *schema, Folder *folder,
         DECREF(self);
         Err_throw_mess(ERR, mess);
     }
-    INCREF(ivars->field_type);
+    ivars->field_type = (FieldType*)INCREF(ivars->field_type);
     ivars->term_stepper = FType_Make_Term_Stepper(ivars->field_type);
     ivars->ixix_in = Folder_Open_In(folder, ixix_file);
     if (!ivars->ixix_in) {

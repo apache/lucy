@@ -128,10 +128,9 @@ Snapshot_Read_File_IMP(Snapshot *self, Folder *folder, const String *path) {
         }
 
         // Build up list of entries.
-        VArray *list = (VArray*)CERTIFY(
+        VArray *list = (VArray*)INCREF(CERTIFY(
                            Hash_Fetch_Utf8(snap_data, "entries", 7),
-                           VARRAY);
-        INCREF(list);
+                           VARRAY));
         if (format == 1 || (format == 2 && subformat < 1)) {
             VArray *cleaned = S_clean_segment_contents(list);
             DECREF(list);

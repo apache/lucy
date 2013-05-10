@@ -36,8 +36,7 @@ Doc_init(Doc *self, void *fields, int32_t doc_id) {
     Hash *hash;
 
     if (fields) {
-        hash = (Hash *)CERTIFY(fields, HASH);
-        INCREF(hash);
+        hash = (Hash *)INCREF(CERTIFY(fields, HASH));
     }
     else {
         hash = Hash_new(0);
@@ -64,8 +63,7 @@ Doc_Get_Size_IMP(Doc *self) {
 void
 Doc_Store_IMP(Doc *self, const String *field, Obj *value) {
     Hash *hash = (Hash*)Doc_IVARS(self)->fields;
-    Hash_Store(hash, (Obj *)field, value);
-    INCREF(value);
+    Hash_Store(hash, (Obj *)field, INCREF(value));
 }
 
 void

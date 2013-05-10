@@ -44,9 +44,9 @@ ParserElem_Destroy_IMP(ParserElem *self) {
 void
 ParserElem_Set_Value_IMP(ParserElem *self, Obj *value) {
     ParserElemIVARS *const ivars = ParserElem_IVARS(self);
-    INCREF(value);
+    Obj *new_value = INCREF(value);
     DECREF(ivars->value);
-    ivars->value = value;
+    ivars->value = new_value;
 }
 
 Obj*

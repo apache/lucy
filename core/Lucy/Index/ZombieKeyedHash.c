@@ -99,7 +99,7 @@ ZKHash_Make_Key_IMP(ZombieKeyedHash *self, Obj *key, int32_t hash_sum) {
      * reaches 4.  However, we must never call Destroy() for these objects,
      * because they will try to free() their initial allocation, which is
      * invalid because it's part of a MemoryPool arena. */
-    INCREF(retval);
+    retval = INCREF(retval);
 
     return retval;
 }
