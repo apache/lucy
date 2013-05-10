@@ -299,11 +299,11 @@ bool
 CFReaderDH_Close_IMP(CFReaderDirHandle *self) {
     CFReaderDirHandleIVARS *const ivars = CFReaderDH_IVARS(self);
     if (ivars->elems) {
-        VA_Dec_RefCount(ivars->elems);
+        DECREF(ivars->elems);
         ivars->elems = NULL;
     }
     if (ivars->cf_reader) {
-        CFReader_Dec_RefCount(ivars->cf_reader);
+        DECREF(ivars->cf_reader);
         ivars->cf_reader = NULL;
     }
     return true;

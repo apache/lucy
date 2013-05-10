@@ -73,15 +73,15 @@ TextSortCache_Destroy_IMP(TextSortCache *self) {
     TextSortCacheIVARS *const ivars = TextSortCache_IVARS(self);
     if (ivars->ord_in) {
         InStream_Close(ivars->ord_in);
-        InStream_Dec_RefCount(ivars->ord_in);
+        DECREF(ivars->ord_in);
     }
     if (ivars->ix_in) {
         InStream_Close(ivars->ix_in);
-        InStream_Dec_RefCount(ivars->ix_in);
+        DECREF(ivars->ix_in);
     }
     if (ivars->dat_in) {
         InStream_Close(ivars->dat_in);
-        InStream_Dec_RefCount(ivars->dat_in);
+        DECREF(ivars->dat_in);
     }
     SUPER_DESTROY(self, TEXTSORTCACHE);
 }

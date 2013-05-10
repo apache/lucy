@@ -70,7 +70,7 @@ Snapshot_Delete_Entry_IMP(Snapshot *self, const String *entry) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
     Obj *val = Hash_Delete(ivars->entries, (Obj*)entry);
     if (val) {
-        Obj_Dec_RefCount(val);
+        DECREF(val);
         return true;
     }
     else {
