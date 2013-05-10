@@ -118,19 +118,19 @@ void
 DefSortReader_Close_IMP(DefaultSortReader *self) {
     DefaultSortReaderIVARS *const ivars = DefSortReader_IVARS(self);
     if (ivars->caches) {
-        Hash_Dec_RefCount(ivars->caches);
+        DECREF(ivars->caches);
         ivars->caches = NULL;
     }
     if (ivars->counts) {
-        Hash_Dec_RefCount(ivars->counts);
+        DECREF(ivars->counts);
         ivars->counts = NULL;
     }
     if (ivars->null_ords) {
-        Hash_Dec_RefCount(ivars->null_ords);
+        DECREF(ivars->null_ords);
         ivars->null_ords = NULL;
     }
     if (ivars->ord_widths) {
-        Hash_Dec_RefCount(ivars->ord_widths);
+        DECREF(ivars->ord_widths);
         ivars->ord_widths = NULL;
     }
 }

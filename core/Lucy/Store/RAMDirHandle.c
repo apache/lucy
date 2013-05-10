@@ -42,11 +42,11 @@ bool
 RAMDH_Close_IMP(RAMDirHandle *self) {
     RAMDirHandleIVARS *const ivars = RAMDH_IVARS(self);
     if (ivars->elems) {
-        VA_Dec_RefCount(ivars->elems);
+        DECREF(ivars->elems);
         ivars->elems = NULL;
     }
     if (ivars->folder) {
-        RAMFolder_Dec_RefCount(ivars->folder);
+        DECREF(ivars->folder);
         ivars->folder = NULL;
     }
     return true;

@@ -70,11 +70,11 @@ NumSortCache_Destroy_IMP(NumericSortCache *self) {
     NumericSortCacheIVARS *const ivars = NumSortCache_IVARS(self);
     if (ivars->ord_in) {
         InStream_Close(ivars->ord_in);
-        InStream_Dec_RefCount(ivars->ord_in);
+        DECREF(ivars->ord_in);
     }
     if (ivars->dat_in) {
         InStream_Close(ivars->dat_in);
-        InStream_Dec_RefCount(ivars->dat_in);
+        DECREF(ivars->dat_in);
     }
     SUPER_DESTROY(self, NUMERICSORTCACHE);
 }
