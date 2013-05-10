@@ -600,7 +600,7 @@ S_lazy_init_host_obj(lucy_Obj *self) {
 #if (PERL_VERSION <= 16)
     PL_sv_objcount++;
 #endif
-    SvUPGRADE(inner_obj, SVt_PVMG);
+    (void)SvUPGRADE(inner_obj, SVt_PVMG);
     sv_setiv(inner_obj, PTR2IV(self));
 
     // Connect class association.

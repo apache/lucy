@@ -77,7 +77,7 @@ S_compile_token_re(const cfish_CharBuf *pattern) {
     call_pv("Lucy::Analysis::RegexTokenizer::_compile_token_re", G_SCALAR);
     SPAGAIN;
     SV *token_re_sv = POPs;
-    SvREFCNT_inc(token_re_sv);
+    (void)SvREFCNT_inc(token_re_sv);
     PUTBACK;
     FREETMPS;
     LEAVE;

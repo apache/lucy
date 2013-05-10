@@ -75,7 +75,7 @@ S_nfreeze_fields(lucy_Doc *self) {
     call_pv("Storable::nfreeze", G_SCALAR);
     SPAGAIN;
     SV *frozen = POPs;
-    SvREFCNT_inc(frozen);
+    (void)SvREFCNT_inc(frozen);
     PUTBACK;
     FREETMPS;
     LEAVE;
@@ -118,7 +118,7 @@ S_thaw_fields(lucy_InStream *instream) {
         CFISH_THROW(CFISH_ERR, "thaw failed");
     }
     HV *fields = (HV*)SvRV(frozen);
-    SvREFCNT_inc((SV*)fields);
+    (void)SvREFCNT_inc((SV*)fields);
     PUTBACK;
     FREETMPS;
     LEAVE;

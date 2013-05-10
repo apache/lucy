@@ -161,7 +161,7 @@ PPCODE:
     UV offset = items == 4 ? SvUV(ST(3)) : 0;
     char *ptr;
     size_t total_len = offset + len;
-    SvUPGRADE(buffer_sv, SVt_PV);
+    (void)SvUPGRADE(buffer_sv, SVt_PV);
     if (!SvPOK(buffer_sv)) { SvCUR_set(buffer_sv, 0); }
     ptr = SvGROW(buffer_sv, total_len + 1);
     Lucy_InStream_Read_Bytes(self, ptr + offset, len);
@@ -196,7 +196,7 @@ read_raw_c64(self, buffer_sv)
 CODE:
 {
     char *ptr;
-    SvUPGRADE(buffer_sv, SVt_PV);
+    (void)SvUPGRADE(buffer_sv, SVt_PV);
     ptr = SvGROW(buffer_sv, 10 + 1);
     RETVAL = Lucy_InStream_Read_Raw_C64(self, ptr);
     SvPOK_on(buffer_sv);
