@@ -27,7 +27,13 @@
 #include "CFCUtil.h"
 
 static char*
+S_man_create_name(CFCClass *klass);
+
+static char*
 S_man_create_synopsis(CFCClass *klass);
+
+static char*
+S_man_create_description(CFCClass *klass);
 
 static char*
 S_man_create_functions(CFCClass *klass);
@@ -71,19 +77,14 @@ char*
 CFCCClass_create_man_page(CFCClass *klass) {
     const char *class_name = CFCClass_get_class_name(klass);
 
-    CFCDocuComment *docucom = CFCClass_get_docucomment(klass);
-    if (!docucom) { return NULL; }
-
-    // Get the class's brief description.
-    const char *raw_brief = CFCDocuComment_get_brief(docucom);
-    char *brief = S_man_escape_content(raw_brief);
-
-    // Get the class's long description.
-    const char *raw_description = CFCDocuComment_get_long(docucom);
-    char *description = S_man_escape_content(raw_description);
+    // Create NAME.
+    char *name = S_man_create_name(klass);
 
     // Create SYNOPSIS.
     char *synopsis = S_man_create_synopsis(klass);
+
+    // Create DESCRIPTION.
+    char *description = S_man_create_description(klass);
 
     // Create CONSTRUCTORS.
     char *functions_man = S_man_create_functions(klass);
@@ -111,27 +112,42 @@ CFCCClass_create_man_page(CFCClass *klass) {
     ".\\\" See the License for the specific language governing permissions and\n"
     ".\\\" limitations under the License.\n"
     ".TH %s 3\n"
-    ".SH NAME\n"
-    "%s - %s\n"
     "%s"
-    ".SH DESCRIPTION\n"
-    "%s\n"
+    "%s"
+    "%s"
     "%s"
     "%s"
     "%s";
     char *man_page
-        = CFCUtil_sprintf(pattern, class_name, class_name, brief, synopsis,
-                          description, functions_man, methods_man,
-                          inheritance);
+        = CFCUtil_sprintf(pattern, class_name, name, synopsis, description,
+                          functions_man, methods_man, inheritance);
 
-    FREEMEM(brief);
     FREEMEM(synopsis);
-    FREEMEM(description);
     FREEMEM(functions_man);
     FREEMEM(methods_man);
     FREEMEM(inheritance);
 
     return man_page;
+}
+
+static char*
+S_man_create_name(CFCClass *klass) {
+    char *result = CFCUtil_strdup(".SH NAME\n");
+    result = CFCUtil_cat(result, CFCClass_get_class_name(klass), NULL);
+
+    CFCDocuComment *docucom = CFCClass_get_docucomment(klass);
+    if (docucom) {
+        const char *raw_brief = CFCDocuComment_get_brief(docucom);
+        if (raw_brief && raw_brief[0] != '\0') {
+            char *brief = S_man_escape_content(raw_brief);
+            result = CFCUtil_cat(result, " - ", brief, NULL);
+            FREEMEM(brief);
+        }
+    }
+
+    result = CFCUtil_cat(result, "\n", NULL);
+
+    return result;
 }
 
 static char*
@@ -141,13 +157,34 @@ S_man_create_synopsis(CFCClass *klass) {
 }
 
 static char*
+S_man_create_description(CFCClass *klass) {
+    char *result  = CFCUtil_strdup("");
+
+    CFCDocuComment *docucom = CFCClass_get_docucomment(klass);
+    if (!docucom) { return result; }
+
+    const char *raw_description = CFCDocuComment_get_long(docucom);
+    if (!raw_description || raw_description[0] == '\0') { return result; }
+
+    char *description = S_man_escape_content(raw_description);
+    result = CFCUtil_cat(result, ".SH DESCRIPTION\n", description, "\n", NULL);
+    FREEMEM(description);
+
+    return result;
+}
+
+static char*
 S_man_create_functions(CFCClass *klass) {
     CFCFunction **functions = CFCClass_functions(klass);
-    char        *result     = CFCUtil_strdup(".SH FUNCTIONS\n");
+    char         *result    = CFCUtil_strdup("");
 
     for (int func_num = 0; functions[func_num] != NULL; func_num++) {
         CFCFunction *func = functions[func_num];
         if (!CFCFunction_public(func)) { continue; }
+
+        if (result[0] == '\0') {
+            result = CFCUtil_cat(result, ".SH FUNCTIONS\n", NULL);
+        }
 
         const char *micro_sym     = CFCFunction_micro_sym(func);
         const char *full_func_sym = CFCFunction_full_func_sym(func);
@@ -164,11 +201,15 @@ S_man_create_functions(CFCClass *klass) {
 static char*
 S_man_create_methods(CFCClass *klass) {
     CFCMethod  **fresh_methods = CFCClass_fresh_methods(klass);
-    char        *result        = CFCUtil_strdup(".SH METHODS\n");
+    char        *result        = CFCUtil_strdup("");
 
     for (int meth_num = 0; fresh_methods[meth_num] != NULL; meth_num++) {
         CFCMethod *method = fresh_methods[meth_num];
         if (!CFCMethod_public(method)) { continue; }
+
+        if (result[0] == '\0') {
+            result = CFCUtil_cat(result, ".SH METHODS\n", NULL);
+        }
 
         const char *macro_sym = CFCMethod_get_macro_sym(method);
         char *full_method_sym = CFCMethod_full_method_sym(method, NULL);
