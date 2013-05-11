@@ -239,6 +239,10 @@ CFCClass_destroy(CFCClass *self) {
 
 static void
 S_register(CFCClass *self) {
+    /*
+     * TODO: Verify that there isn't a class with the same class_name in
+     * another parcel. Verify that cnick is unique within this parcel.
+     */
     if (registry_size == registry_cap) {
         size_t new_cap = registry_cap + 10;
         registry = (CFCClassRegEntry*)REALLOCATE(
@@ -443,6 +447,7 @@ CFCClass_method(CFCClass *self, const char *sym) {
 
 CFCMethod*
 CFCClass_fresh_method(CFCClass *self, const char *sym) {
+    // TODO: Comparing classes by cnick isn't safe with multiple parcels.
     CFCMethod *method = CFCClass_method(self, sym);
     if (method) {
         const char *cnick = CFCClass_get_cnick(self);
@@ -614,6 +619,7 @@ CFCClass_tree_to_ladder(CFCClass *self) {
 
 static CFCSymbol**
 S_fresh_syms(CFCClass *self, CFCSymbol **syms) {
+    // TODO: Comparing classes by cnick isn't safe with multiple parcels.
     const char *cnick = CFCClass_get_cnick(self);
     size_t count = 0;
     while (syms[count] != NULL) { count++; }
