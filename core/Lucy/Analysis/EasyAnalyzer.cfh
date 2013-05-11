@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-/** A simple analyzer chain
+/** A simple analyzer chain.
  *
  * EasyAnalyzer is an analyzer chain consisting of a
  * L<StandardTokenizer|Lucy::Analysis::StandardTokenizer>, a
