@@ -43,6 +43,9 @@ static char*
 S_man_create_methods(CFCClass *klass);
 
 static char*
+S_man_create_inherited_methods(CFCClass *klass);
+
+static char*
 S_man_create_func(CFCClass *klass, CFCFunction *func, const char *short_sym,
                   const char *full_sym);
 
@@ -203,20 +206,86 @@ S_man_create_functions(CFCClass *klass) {
 
 static char*
 S_man_create_methods(CFCClass *klass) {
-    CFCMethod  **fresh_methods = CFCClass_fresh_methods(klass);
-    char        *result        = CFCUtil_strdup("");
+    CFCMethod **fresh_methods = CFCClass_fresh_methods(klass);
+    char       *methods_man   = CFCUtil_strdup("");
+    char       *novel_man     = CFCUtil_strdup("");
+    char       *result;
 
     for (int meth_num = 0; fresh_methods[meth_num] != NULL; meth_num++) {
         CFCMethod *method = fresh_methods[meth_num];
-        if (!CFCMethod_public(method)) { continue; }
-
-        if (result[0] == '\0') {
-            result = CFCUtil_cat(result, ".SH METHODS\n", NULL);
+        if (!CFCMethod_public(method) || !CFCMethod_novel(method)) {
+            continue;
         }
 
         const char *macro_sym = CFCMethod_get_macro_sym(method);
         char *full_method_sym = CFCMethod_full_method_sym(method, NULL);
+        char *method_man = S_man_create_func(klass, (CFCFunction*)method,
+                                             macro_sym, full_method_sym);
 
+        if (CFCMethod_abstract(method)) {
+            if (methods_man[0] == '\0') {
+                methods_man = CFCUtil_cat(methods_man,
+                                          ".SS Abstract methods\n", NULL);
+            }
+            methods_man = CFCUtil_cat(methods_man, method_man, NULL);
+        }
+        else {
+            if (novel_man[0] == '\0') {
+                novel_man = CFCUtil_cat(novel_man,
+                                        ".SS Novel methods\n", NULL);
+            }
+            novel_man = CFCUtil_cat(novel_man, method_man, NULL);
+        }
+
+        FREEMEM(method_man);
+        FREEMEM(full_method_sym);
+    }
+
+    methods_man = CFCUtil_cat(methods_man, novel_man, NULL);
+
+    // Add methods from parent classes excluding Clownfish::Obj
+    CFCClass *parent = CFCClass_get_parent(klass);
+    while (parent) {
+        if (strcmp(CFCClass_get_class_name(parent), "Clownfish::Obj") == 0) {
+            break;
+        }
+        char *inherited_man = S_man_create_inherited_methods(parent);
+        methods_man = CFCUtil_cat(methods_man, inherited_man, NULL);
+        FREEMEM(inherited_man);
+        parent = CFCClass_get_parent(parent);
+    }
+
+    if (methods_man[0] == '\0') {
+        result = CFCUtil_strdup("");
+    }
+    else {
+        result = CFCUtil_sprintf(".SH METHODS\n%s", methods_man);
+    }
+
+    FREEMEM(methods_man);
+    FREEMEM(novel_man);
+    FREEMEM(fresh_methods);
+    return result;
+}
+
+static char*
+S_man_create_inherited_methods(CFCClass *klass) {
+    CFCMethod **fresh_methods = CFCClass_fresh_methods(klass);
+    char       *result        = CFCUtil_strdup("");
+
+    for (int meth_num = 0; fresh_methods[meth_num] != NULL; meth_num++) {
+        CFCMethod *method = fresh_methods[meth_num];
+        if (!CFCMethod_public(method) || !CFCMethod_novel(method)) {
+            continue;
+        }
+
+        if (result[0] == '\0') {
+            result = CFCUtil_cat(result, ".SS Methods inherited from ",
+                                 CFCClass_get_class_name(klass), "\n", NULL);
+        }
+
+        const char *macro_sym = CFCMethod_get_macro_sym(method);
+        char *full_method_sym = CFCMethod_full_method_sym(method, NULL);
         char *method_man = S_man_create_func(klass, (CFCFunction*)method,
                                              macro_sym, full_method_sym);
         result = CFCUtil_cat(result, method_man, NULL);
@@ -226,7 +295,6 @@ S_man_create_methods(CFCClass *klass) {
     }
 
     FREEMEM(fresh_methods);
-
     return result;
 }
 
