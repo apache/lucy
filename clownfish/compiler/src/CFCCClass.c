@@ -23,6 +23,7 @@
 #include "CFCFunction.h"
 #include "CFCMethod.h"
 #include "CFCParamList.h"
+#include "CFCSymbol.h"
 #include "CFCType.h"
 #include "CFCUtil.h"
 
@@ -75,6 +76,8 @@ CFCCClass_callback_decs(CFCClass *klass) {
 
 char*
 CFCCClass_create_man_page(CFCClass *klass) {
+    if (!CFCSymbol_public((CFCSymbol*)klass)) { return NULL; }
+
     const char *class_name = CFCClass_get_class_name(klass);
 
     // Create NAME.
