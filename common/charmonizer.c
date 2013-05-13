@@ -36,12 +36,58 @@
 
 /***************************************************************************/
 
-#line 21 "src/Charmonizer/Core/CFlags.h"
-/* Charmonizer/Core/Compiler.h
+#line 21 "src/Charmonizer/Core/SharedLibrary.h"
+/* Charmonizer/Core/SharedLibrary.h
  */
 
-#ifndef H_CHAZ_FLAGS
-#define H_CHAZ_FLAGS
+#ifndef H_CHAZ_SHARED_LIB
+#define H_CHAZ_SHARED_LIB
+
+typedef struct chaz_SharedLib chaz_SharedLib;
+
+chaz_SharedLib*
+chaz_SharedLib_new(const char *name, const char *version,
+                   const char *major_version);
+
+void
+chaz_SharedLib_destroy(chaz_SharedLib *flags);
+
+const char*
+chaz_SharedLib_get_name(chaz_SharedLib *lib);
+
+const char*
+chaz_SharedLib_get_version(chaz_SharedLib *lib);
+
+const char*
+chaz_SharedLib_get_major_version(chaz_SharedLib *lib);
+
+char*
+chaz_SharedLib_filename(chaz_SharedLib *lib);
+
+char*
+chaz_SharedLib_major_version_filename(chaz_SharedLib *lib);
+
+char*
+chaz_SharedLib_no_version_filename(chaz_SharedLib *lib);
+
+char*
+chaz_SharedLib_implib_filename(chaz_SharedLib *lib);
+
+char*
+chaz_SharedLib_export_filename(chaz_SharedLib *lib);
+
+#endif /* H_CHAZ_SHARED_LIB */
+
+
+
+/***************************************************************************/
+
+#line 21 "src/Charmonizer/Core/CFlags.h"
+/* Charmonizer/Core/CFlags.h
+ */
+
+#ifndef H_CHAZ_CFLAGS
+#define H_CHAZ_CFLAGS
 
 #define CHAZ_CFLAGS_STYLE_POSIX  1
 #define CHAZ_CFLAGS_STYLE_GNU    2
@@ -96,18 +142,25 @@ void
 chaz_CFlags_link_shared_library(chaz_CFlags *flags);
 
 void
+chaz_CFlags_set_shared_library_version(chaz_CFlags *flags,
+                                       chaz_SharedLib *lib);
+
+void
 chaz_CFlags_set_link_output(chaz_CFlags *flags, const char *filename);
 
 void
 chaz_CFlags_add_library_path(chaz_CFlags *flags, const char *directory);
 
 void
-chaz_CFlags_add_library(chaz_CFlags *flags, const char *library);
+chaz_CFlags_add_library(chaz_CFlags *flags, chaz_SharedLib *lib);
+
+void
+chaz_CFlags_add_external_library(chaz_CFlags *flags, const char *library);
 
 void
 chaz_CFlags_enable_code_coverage(chaz_CFlags *flags);
 
-#endif /* H_CHAZ_FLAGS */
+#endif /* H_CHAZ_CFLAGS */
 
 
 
@@ -172,11 +225,6 @@ chaz_CC_get_cc(void);
 const char*
 chaz_CC_get_cflags(void);
 
-/* Accessor for `cflags_style`.
- */
-int
-chaz_CC_get_cflags_style(void);
-
 /* Accessor for `extra_cflags`.
  */
 chaz_CFlags*
@@ -186,6 +234,11 @@ chaz_CC_get_extra_cflags(void);
  */
 chaz_CFlags*
 chaz_CC_get_temp_cflags(void);
+
+/* Return a new CFlags object.
+ */
+chaz_CFlags*
+chaz_CC_new_cflags(void);
 
 /* Return the extension for a compiled object.
  */
@@ -203,9 +256,6 @@ chaz_CC_msvc_version_num(void);
 
 const char*
 chaz_CC_link_command(void);
-
-char*
-chaz_CC_shared_lib_file(const char *name);
 
 #endif /* H_CHAZ_COMPILER */
 
@@ -416,19 +466,21 @@ chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
 /***************************************************************************/
 
 #line 21 "src/Charmonizer/Core/Make.h"
-/* Charmonizer/Core/Compiler.h
+/* Charmonizer/Core/Make.h
  */
 
 #ifndef H_CHAZ_MAKE
 #define H_CHAZ_MAKE
 
 /* #include "Charmonizer/Core/CFlags.h" */
+/* #include "Charmonizer/Core/SharedLib.h" */
 
 typedef struct chaz_MakeFile chaz_MakeFile;
 typedef struct chaz_MakeVar chaz_MakeVar;
 typedef struct chaz_MakeRule chaz_MakeRule;
 
-typedef void (*chaz_Make_list_files_callback_t)(char *file, void *context);
+typedef void (*chaz_Make_list_files_callback_t)(const char *dir, char *file,
+                                                void *context);
 
 /** Initialize the environment.
  */
@@ -539,13 +591,30 @@ chaz_MakeFile_add_compiled_exe(chaz_MakeFile *makefile, const char *exe,
  * to the list of files to clean.
  *
  * @param makefile The makefile.
- * @param name The name of the shared library without prefix or extension.
+ * @param lib The shared library.
  * @param sources The list of source files.
  * @param link_flags Additional link flags.
  */
 chaz_MakeRule*
-chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *name,
+chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
                              const char *sources, chaz_CFlags *link_flags);
+
+/** Add a rule to build the lemon parser generator.
+ *
+ * @param makefile The makefile.
+ * @param dir The lemon directory.
+ */
+chaz_MakeRule*
+chaz_MakeFile_add_lemon_exe(chaz_MakeFile *makefile, const char *dir);
+
+/** Add a rule for a lemon grammar.
+ *
+ * @param makefile The makefile.
+ * @param base_name The filename of the grammar without extension.
+ */
+chaz_MakeRule*
+chaz_MakeFile_add_lemon_grammar(chaz_MakeFile *makefile,
+                                const char *base_name);
 
 /** Write the makefile to a file named 'Makefile' in the current directory.
  *
@@ -695,6 +764,11 @@ chaz_OS_shared_lib_ext(void);
  */
 const char*
 chaz_OS_dev_null(void);
+
+/* Return the directory separator on this system.
+ */
+const char*
+chaz_OS_dir_sep(void);
 
 /* Return the shell type of this system.
  */
@@ -1441,12 +1515,136 @@ void chaz_VariadicMacros_run(void);
 
 /***************************************************************************/
 
+#line 17 "src/Charmonizer/Core/SharedLibrary.c"
+#include <string.h>
+#include <stdlib.h>
+/* #include "Charmonizer/Core/SharedLib.h" */
+/* #include "Charmonizer/Core/Compiler.h" */
+/* #include "Charmonizer/Core/Util.h" */
+/* #include "Charmonizer/Core/OperatingSystem.h" */
+
+struct chaz_SharedLib {
+    char *name;
+    char *version;
+    char *major_version;
+};
+
+static char*
+S_build_filename(chaz_SharedLib *lib, const char *version, const char *ext);
+
+static const char*
+S_get_prefix(void);
+
+chaz_SharedLib*
+chaz_SharedLib_new(const char *name, const char *version,
+                   const char *major_version) {
+    chaz_SharedLib *lib = (chaz_SharedLib*)malloc(sizeof(chaz_SharedLib));
+    lib->name          = chaz_Util_strdup(name);
+    lib->version       = chaz_Util_strdup(version);
+    lib->major_version = chaz_Util_strdup(major_version);
+    return lib;
+}
+
+void
+chaz_SharedLib_destroy(chaz_SharedLib *lib) {
+    free(lib->name);
+    free(lib->version);
+    free(lib->major_version);
+    free(lib);
+}
+
+const char*
+chaz_SharedLib_get_name(chaz_SharedLib *lib) {
+    return lib->name;
+}
+
+const char*
+chaz_SharedLib_get_version(chaz_SharedLib *lib) {
+    return lib->version;
+}
+
+const char*
+chaz_SharedLib_get_major_version(chaz_SharedLib *lib) {
+    return lib->major_version;
+}
+
+char*
+chaz_SharedLib_filename(chaz_SharedLib *lib) {
+    const char *shlib_ext = chaz_OS_shared_lib_ext();
+
+    if (strcmp(shlib_ext, ".dll") == 0) {
+        return S_build_filename(lib, lib->major_version, shlib_ext);
+    }
+    else {
+        return S_build_filename(lib, lib->version, shlib_ext);
+    }
+}
+
+char*
+chaz_SharedLib_major_version_filename(chaz_SharedLib *lib) {
+    const char *shlib_ext = chaz_OS_shared_lib_ext();
+
+    return S_build_filename(lib, lib->major_version, shlib_ext);
+}
+
+char*
+chaz_SharedLib_no_version_filename(chaz_SharedLib *lib) {
+    const char *prefix    = S_get_prefix();
+    const char *shlib_ext = chaz_OS_shared_lib_ext();
+
+    return chaz_Util_join("", prefix, lib->name, shlib_ext, NULL);
+}
+
+char*
+chaz_SharedLib_implib_filename(chaz_SharedLib *lib) {
+    return S_build_filename(lib, lib->major_version, ".lib");
+}
+
+char*
+chaz_SharedLib_export_filename(chaz_SharedLib *lib) {
+    return S_build_filename(lib, lib->major_version, ".exp");
+}
+
+static char*
+S_build_filename(chaz_SharedLib *lib, const char *version, const char *ext) {
+    const char *prefix    = S_get_prefix();
+    const char *shlib_ext = chaz_OS_shared_lib_ext();
+
+    if (strcmp(shlib_ext, ".dll") == 0) {
+        return chaz_Util_join("", prefix, lib->name, "-", version, ext, NULL);
+    }
+    else if (strcmp(shlib_ext, ".dylib") == 0) {
+        return chaz_Util_join("", prefix, lib->name, ".", version, ext, NULL);
+    }
+    else {
+        return chaz_Util_join("", prefix, lib->name, ext, ".", version, NULL);
+    }
+}
+
+static const char*
+S_get_prefix() {
+    if (chaz_CC_msvc_version_num()) {
+        return "";
+    }
+    else if (chaz_OS_is_cygwin()) {
+        return "cyg";
+    }
+    else {
+        return "lib";
+    }
+}
+
+
+
+/***************************************************************************/
+
 #line 17 "src/Charmonizer/Core/CFlags.c"
 #include <string.h>
 #include <stdlib.h>
-/* #include "Charmonizer/Core/Flags.h" */
+/* #include "Charmonizer/Core/CFlags.h" */
 /* #include "Charmonizer/Core/Util.h" */
 /* #include "Charmonizer/Core/OperatingSystem.h" */
+/* #include "Charmonizer/Core/SharedLibrary.h" */
 
 struct chaz_CFlags {
     int   style;
@@ -1641,7 +1839,7 @@ chaz_CFlags_link_shared_library(chaz_CFlags *flags) {
         string = "/DLL";
     }
     else if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
-        if (chaz_OS_is_darwin()) {
+        if (strcmp(chaz_OS_shared_lib_ext(), ".dylib") == 0) {
             string = "-dynamiclib";
         }
         else {
@@ -1653,6 +1851,30 @@ chaz_CFlags_link_shared_library(chaz_CFlags *flags) {
                       chaz_CC_get_cc());
     }
     chaz_CFlags_append(flags, string);
+}
+
+void
+chaz_CFlags_set_shared_library_version(chaz_CFlags *flags,
+                                       chaz_SharedLib *lib) {
+    const char *shlib_ext = chaz_OS_shared_lib_ext();
+    char       *string;
+
+    if (flags->style != CHAZ_CFLAGS_STYLE_GNU
+        || strcmp(shlib_ext, ".dll") == 0) {
+        return;
+    }
+
+    if (strcmp(chaz_OS_shared_lib_ext(), ".dylib") == 0) {
+        const char *version = chaz_SharedLib_get_version(lib);
+        string = chaz_Util_join(" ", "-current_version", version, NULL);
+    }
+    else {
+        char *soname = chaz_SharedLib_major_version_filename(lib);
+        string = chaz_Util_join("", "-Wl,-soname,", soname, NULL);
+        free(soname);
+    }
+    chaz_CFlags_append(flags, string);
+    free(string);
 }
 
 void
@@ -1692,13 +1914,26 @@ chaz_CFlags_add_library_path(chaz_CFlags *flags, const char *directory) {
 }
 
 void
-chaz_CFlags_add_library(chaz_CFlags *flags, const char *library) {
+chaz_CFlags_add_library(chaz_CFlags *flags, chaz_SharedLib *lib) {
+    char *filename;
+    if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
+        filename = chaz_SharedLib_implib_filename(lib);
+    }
+    else {
+        filename = chaz_SharedLib_filename(lib);
+    }
+    chaz_CFlags_append(flags, filename);
+    free(filename);
+}
+
+void
+chaz_CFlags_add_external_library(chaz_CFlags *flags, const char *library) {
     char *string;
     if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
         string = chaz_Util_join("", library, ".lib", NULL);
     }
     else {
-        string = chaz_Util_join("", "-l ", library, NULL);
+        string = chaz_Util_join(" ", "-l", library, NULL);
     }
     chaz_CFlags_append(flags, string);
     free(string);
@@ -2025,11 +2260,6 @@ chaz_CC_get_cflags(void) {
     return chaz_CC.cflags;
 }
 
-int
-chaz_CC_get_cflags_style(void) {
-    return chaz_CC.cflags_style;
-}
-
 chaz_CFlags*
 chaz_CC_get_extra_cflags(void) {
     return chaz_CC.extra_cflags;
@@ -2038,6 +2268,11 @@ chaz_CC_get_extra_cflags(void) {
 chaz_CFlags*
 chaz_CC_get_temp_cflags(void) {
     return chaz_CC.temp_cflags;
+}
+
+chaz_CFlags*
+chaz_CC_new_cflags(void) {
+    return chaz_CFlags_new(chaz_CC.cflags_style);
 }
 
 const char*
@@ -2070,21 +2305,6 @@ chaz_CC_link_command() {
     else {
         return chaz_CC.cc_command;
     }
-}
-
-char*
-chaz_CC_shared_lib_file(const char *name) {
-    const char *prefix = "";
-    const char *shlib_ext = chaz_OS_shared_lib_ext();
-    if (!chaz_CC.intval__MSC_VER) {
-        if (chaz_OS_is_cygwin()) {
-            prefix = "cyg";
-        }
-        else {
-            prefix = "lib";
-        }
-    }
-    return chaz_Util_join("", prefix, name, shlib_ext, NULL);
 }
 
 
@@ -3349,6 +3569,9 @@ chaz_Make_audition(const char *make) {
 chaz_MakeFile*
 chaz_MakeFile_new() {
     chaz_MakeFile *makefile = (chaz_MakeFile*)malloc(sizeof(chaz_MakeFile));
+    const char    *exe_ext  = chaz_OS_exe_ext();
+    const char    *obj_ext  = chaz_CC_obj_ext();
+    char *generated;
 
     makefile->vars = (chaz_MakeVar**)malloc(sizeof(chaz_MakeVar*));
     makefile->vars[0] = NULL;
@@ -3361,10 +3584,11 @@ chaz_MakeFile_new() {
     makefile->clean     = S_new_rule("clean", NULL);
     makefile->distclean = S_new_rule("distclean", "clean");
 
-    chaz_MakeRule_add_rm_command(makefile->distclean,
-                                 "charmonizer$(EXE_EXT) charmonizer$(OBJ_EXT)"
-                                 " charmony.h Makefile");
+    generated = chaz_Util_join("", "charmonizer", exe_ext, " charmonizer",
+                               obj_ext, " charmony.h Makefile", NULL);
+    chaz_MakeRule_add_rm_command(makefile->distclean, generated);
 
+    free(generated);
     return makefile;
 }
 
@@ -3444,8 +3668,7 @@ chaz_MakeFile_distclean_rule(chaz_MakeFile *makefile) {
 chaz_MakeRule*
 chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
                       const char *sources, chaz_CFlags *link_flags) {
-    int            cflags_style = chaz_CC_get_cflags_style();
-    chaz_CFlags   *local_flags  = chaz_CFlags_new(cflags_style);
+    chaz_CFlags   *local_flags  = chaz_CC_new_cflags();
     const char    *link         = chaz_CC_link_command();
     const char    *link_flags_string = "";
     const char    *local_flags_string;
@@ -3456,6 +3679,9 @@ chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
 
     if (link_flags) {
         link_flags_string = chaz_CFlags_get_string(link_flags);
+    }
+    if (chaz_CC_msvc_version_num()) {
+        chaz_CFlags_append(local_flags, "/nologo");
     }
     chaz_CFlags_set_link_output(local_flags, exe);
     local_flags_string = chaz_CFlags_get_string(local_flags);
@@ -3473,8 +3699,7 @@ chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
 chaz_MakeRule*
 chaz_MakeFile_add_compiled_exe(chaz_MakeFile *makefile, const char *exe,
                                const char *sources, chaz_CFlags *cflags) {
-    int            cflags_style  = chaz_CC_get_cflags_style();
-    chaz_CFlags   *local_flags   = chaz_CFlags_new(cflags_style);
+    chaz_CFlags   *local_flags   = chaz_CC_new_cflags();
     const char    *cc            = chaz_CC_get_cc();
     const char    *cflags_string = "";
     const char    *local_flags_string;
@@ -3485,6 +3710,9 @@ chaz_MakeFile_add_compiled_exe(chaz_MakeFile *makefile, const char *exe,
 
     if (cflags) {
         cflags_string = chaz_CFlags_get_string(cflags);
+    }
+    if (chaz_CC_msvc_version_num()) {
+        chaz_CFlags_append(local_flags, "/nologo");
     }
     chaz_CFlags_set_output_exe(local_flags, exe);
     local_flags_string = chaz_CFlags_get_string(local_flags);
@@ -3501,45 +3729,91 @@ chaz_MakeFile_add_compiled_exe(chaz_MakeFile *makefile, const char *exe,
 }
 
 chaz_MakeRule*
-chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *name,
+chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
                              const char *sources, chaz_CFlags *link_flags) {
-    int            cflags_style = chaz_CC_get_cflags_style();
-    chaz_CFlags   *local_flags  = chaz_CFlags_new(cflags_style);
+    chaz_CFlags   *local_flags  = chaz_CC_new_cflags();
     const char    *link         = chaz_CC_link_command();
     const char    *link_flags_string = "";
     const char    *local_flags_string;
     chaz_MakeRule *rule;
-    char          *shared_lib;
+    char          *filename;
     char          *command;
 
-    shared_lib = chaz_CC_shared_lib_file(name);
-    rule = chaz_MakeFile_add_rule(makefile, shared_lib, sources);
+    filename = chaz_SharedLib_filename(lib);
+    rule = chaz_MakeFile_add_rule(makefile, filename, sources);
 
     if (link_flags) {
         link_flags_string = chaz_CFlags_get_string(link_flags);
     }
+    if (chaz_CC_msvc_version_num()) {
+        chaz_CFlags_append(local_flags, "/nologo");
+    }
     chaz_CFlags_link_shared_library(local_flags);
-    chaz_CFlags_set_link_output(local_flags, shared_lib);
+    chaz_CFlags_set_shared_library_version(local_flags, lib);
+    chaz_CFlags_set_link_output(local_flags, filename);
     local_flags_string = chaz_CFlags_get_string(local_flags);
     command = chaz_Util_join(" ", link, sources, link_flags_string,
                              local_flags_string, NULL);
     chaz_MakeRule_add_command(rule, command);
 
-    chaz_MakeRule_add_rm_command(makefile->clean, shared_lib);
+    chaz_MakeRule_add_rm_command(makefile->clean, filename);
 
     if (chaz_CC_msvc_version_num()) {
         /* Remove import library and export file under MSVC. */
-        char *filename;
-        filename = chaz_Util_join("", name, ".lib", NULL);
-        chaz_MakeRule_add_rm_command(makefile->clean, filename);
-        free(filename);
-        filename = chaz_Util_join("", name, ".exp", NULL);
-        chaz_MakeRule_add_rm_command(makefile->clean, filename);
-        free(filename);
+        char *lib_filename = chaz_SharedLib_implib_filename(lib);
+        char *exp_filename = chaz_SharedLib_export_filename(lib);
+        chaz_MakeRule_add_rm_command(makefile->clean, lib_filename);
+        chaz_MakeRule_add_rm_command(makefile->clean, exp_filename);
+        free(lib_filename);
+        free(exp_filename);
     }
 
     chaz_CFlags_destroy(local_flags);
-    free(shared_lib);
+    free(filename);
+    free(command);
+    return rule;
+}
+
+chaz_MakeRule*
+chaz_MakeFile_add_lemon_exe(chaz_MakeFile *makefile, const char *dir) {
+    chaz_CFlags   *cflags = chaz_CC_new_cflags();
+    chaz_MakeRule *rule;
+    const char *dir_sep = chaz_OS_dir_sep();
+    const char *exe_ext = chaz_OS_exe_ext();
+    char *lemon_exe = chaz_Util_join("", dir, dir_sep, "lemon", exe_ext, NULL);
+    char *lemon_c   = chaz_Util_join(dir_sep, dir, "lemon.c", NULL);
+
+    chaz_CFlags_enable_optimization(cflags);
+    chaz_MakeFile_add_var(makefile, "LEMON_EXE", lemon_exe);
+    rule = chaz_MakeFile_add_compiled_exe(makefile, "$(LEMON_EXE)", lemon_c,
+                                          cflags);
+
+    chaz_CFlags_destroy(cflags);
+    free(lemon_c);
+    free(lemon_exe);
+    return rule;
+}
+
+chaz_MakeRule*
+chaz_MakeFile_add_lemon_grammar(chaz_MakeFile *makefile,
+                                const char *base_name) {
+    char *c_file  = chaz_Util_join(".", base_name, "c", NULL);
+    char *h_file  = chaz_Util_join(".", base_name, "h", NULL);
+    char *y_file  = chaz_Util_join(".", base_name, "y", NULL);
+    char *command = chaz_Util_join(" ", "$(LEMON_EXE) -q", y_file, NULL);
+
+    chaz_MakeRule *rule = chaz_MakeFile_add_rule(makefile, c_file, y_file);
+    chaz_MakeRule *clean_rule = chaz_MakeFile_clean_rule(makefile);
+
+    chaz_MakeRule_add_prereq(rule, "$(LEMON_EXE)");
+    chaz_MakeRule_add_command(rule, command);
+
+    chaz_MakeRule_add_rm_command(clean_rule, h_file);
+    chaz_MakeRule_add_rm_command(clean_rule, c_file);
+
+    free(c_file);
+    free(h_file);
+    free(y_file);
     free(command);
     return rule;
 }
@@ -3571,7 +3845,7 @@ chaz_MakeFile_write(chaz_MakeFile *makefile) {
         /* Inference rule for .c files. */
         fprintf(out, ".c.obj :\n");
         if (chaz_CC_msvc_version_num()) {
-            fprintf(out, "\t$(CC) $(CFLAGS) /c $< /Fo$@\n\n");
+            fprintf(out, "\t$(CC) /nologo $(CFLAGS) /c $< /Fo$@\n\n");
         }
         else {
             fprintf(out, "\t$(CC) $(CFLAGS) -c $< -o $@\n\n");
@@ -3843,7 +4117,7 @@ chaz_Make_list_files(const char *dir, const char *ext,
                           file);
         }
 
-        callback(file + prefix_len, context);
+        callback(dir, file + prefix_len, context);
     }
 
     free(prefix);
@@ -3870,11 +4144,12 @@ chaz_Make_list_files(const char *dir, const char *ext,
 static struct {
     char name[CHAZ_OS_NAME_MAX+1];
     char dev_null[20];
+    char dir_sep[2];
     char exe_ext[5];
     char shared_lib_ext[7];
     char local_command_start[3];
     int  shell_type;
-} chaz_OS = { "", "", "", "", "", 0 };
+} chaz_OS = { "", "", "", "", "", "", 0 };
 
 void
 chaz_OS_init(void) {
@@ -3906,6 +4181,7 @@ chaz_OS_init(void) {
         free(uname);
 
         strcpy(chaz_OS.dev_null, "/dev/null");
+        strcpy(chaz_OS.dir_sep, "/");
         strcpy(chaz_OS.exe_ext, "");
         if (memcmp(chaz_OS.name, "darwin", 6) == 0) {
             strcpy(chaz_OS.shared_lib_ext, ".dylib");
@@ -3921,6 +4197,7 @@ chaz_OS_init(void) {
     else if (chaz_Util_can_open_file("nul")) {
         strcpy(chaz_OS.name, "windows");
         strcpy(chaz_OS.dev_null, "nul");
+        strcpy(chaz_OS.dir_sep, "\\");
         strcpy(chaz_OS.exe_ext, ".exe");
         strcpy(chaz_OS.shared_lib_ext, ".dll");
         strcpy(chaz_OS.local_command_start, ".\\");
@@ -3960,6 +4237,11 @@ chaz_OS_shared_lib_ext(void) {
 const char*
 chaz_OS_dev_null(void) {
     return chaz_OS.dev_null;
+}
+
+const char*
+chaz_OS_dir_sep(void) {
+    return chaz_OS.dir_sep;
 }
 
 int
@@ -4658,23 +4940,9 @@ chaz_DirManip_try_rmdir(void) {
     if (chaz_DirManip_compile_rmdir("direct.h"))   { return; }
 }
 
-static int
-chaz_DirManip_is_cygwin(void) {
-    static int is_cygwin = -1;
-    static const char cygwin_code[] =
-        CHAZ_QUOTE(#ifndef __CYGWIN__            )
-        CHAZ_QUOTE(  #error "Not Cygwin"         )
-        CHAZ_QUOTE(#endif                        )
-        CHAZ_QUOTE(int main() { return 0; }      );
-    if (is_cygwin == -1) {
-        is_cygwin = chaz_CC_test_compile(cygwin_code);
-    }
-    return is_cygwin;
-}
-
 void
 chaz_DirManip_run(void) {
-    char dir_sep[3];
+    const char *dir_sep = chaz_OS_dir_sep();
     int remove_zaps_dirs = false;
     int has_dirent_h = chaz_HeadCheck_check_header("dirent.h");
     int has_direct_h = chaz_HeadCheck_check_header("direct.h");
@@ -4730,16 +4998,6 @@ chaz_DirManip_run(void) {
         sprintf(scratch, "%s(_dir)", chaz_DirManip.mkdir_command);
         chaz_ConfWriter_add_def("makedir(_dir, _mode)", scratch);
         chaz_ConfWriter_add_def("MAKEDIR_MODE_IGNORED", "1");
-    }
-
-    if (chaz_DirManip_is_cygwin()) {
-        strcpy(dir_sep, "/");
-    }
-    else if (chaz_HeadCheck_check_header("windows.h")) {
-        strcpy(dir_sep, "\\\\");
-    }
-    else {
-        strcpy(dir_sep, "/");
     }
 
     {
@@ -4820,7 +5078,7 @@ chaz_Floats_math_library(void) {
         return NULL;
     }
 
-    chaz_CFlags_add_library(temp_cflags, "m");
+    chaz_CFlags_add_external_library(temp_cflags, "m");
     output = chaz_CC_capture_output(sqrt_code, &output_len);
     chaz_CFlags_clear(temp_cflags);
 
@@ -5653,7 +5911,7 @@ typedef struct chaz_LargeFiles_unbuff_combo {
 
 /* Check for a 64-bit file pointer type.
  */
-static const int
+static int
 chaz_LargeFiles_probe_off64(void);
 
 /* Check what name 64-bit ftell, fseek go by.
@@ -5720,7 +5978,7 @@ chaz_LargeFiles_run(void) {
     chaz_ConfWriter_end_module();
 }
 
-static const int
+static int
 chaz_LargeFiles_probe_off64(void) {
     static const char off64_code[] =
         CHAZ_QUOTE(  %s                                        )
@@ -6362,16 +6620,12 @@ chaz_VariadicMacros_run(void) {
 /* #include "Charmonizer/Core/ConfWriterPerl.h" */
 /* #include "Charmonizer/Core/ConfWriterRuby.h" */
 
-#if defined(_WIN32) && !defined(__CYGWIN__)
-  #define DIR_SEP "\\"
-#else
-  #define DIR_SEP "/"
-#endif
-
 typedef struct SourceFileContext {
     chaz_MakeVar *var;
-    const char *dir;
 } SourceFileContext;
+
+static const char lucy_version[]       = "0.3.0";
+static const char lucy_major_version[] = "0.3";
 
 static void
 S_add_compiler_flags(struct chaz_CLIArgs *args) {
@@ -6421,39 +6675,50 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
     chaz_CFlags_add_define(extra_cflags, "CFP_LUCY", NULL);
 }
 
-static void
-S_add_common_cflags(chaz_CFlags *cflags) {
-    if (chaz_CC_msvc_version_num()) {
-        chaz_CFlags_append(cflags, "/nologo");
-    }
-    chaz_CFlags_enable_optimization(cflags);
+static int
+S_ends_with(const char *string, const char *postfix) {
+    size_t len         = strlen(string);
+    size_t postfix_len = strlen(postfix);
+    return len >= postfix_len
+           && memcmp(string + len - postfix_len, postfix, postfix_len) == 0;
 }
 
 static void
-S_source_file_callback(char *file, void *context) {
+S_c_file_callback(const char *dir, char *file, void *context) {
     SourceFileContext *sfc = (SourceFileContext*)context;
-    const char *json_parser_c = "Lucy" DIR_SEP "Util" DIR_SEP "Json" DIR_SEP
-                                "JsonParser.c";
+    const char *dir_sep = chaz_OS_dir_sep();
+    const char *obj_ext = chaz_CC_obj_ext();
     size_t file_len = strlen(file);
-    size_t obj_file_size;
-    const char *pattern;
     char *obj_file;
 
-    if (strcmp(file, json_parser_c) == 0) { return; }
-
     /* Strip extension */
-    if (file_len <= 2 || memcmp(file + file_len - 2, ".c", 2) != 0) {
-        chaz_Util_warn("Unexpected source file name: %s", file);
+    if (!S_ends_with(file, ".c")) {
+        chaz_Util_warn("Unexpected C filename: %s", file);
         return;
     }
     file[file_len-2] = '\0';
 
-    pattern = "%s" DIR_SEP "%s$(OBJ_EXT)";
-    obj_file_size = strlen(pattern) + strlen(sfc->dir) + file_len + 10;
-    obj_file = (char*)malloc(obj_file_size);
-    sprintf(obj_file, pattern, sfc->dir, file);
-    chaz_MakeVar_append(sfc->var, obj_file);
-    free(obj_file);
+    if (!S_ends_with(file, "JsonParser")) {
+        obj_file = chaz_Util_join("", dir, dir_sep, file, obj_ext, NULL);
+        chaz_MakeVar_append(sfc->var, obj_file);
+        free(obj_file);
+    }
+}
+
+static void
+S_cfh_file_callback(const char *dir, char *file, void *context) {
+    SourceFileContext *sfc = (SourceFileContext*)context;
+    const char *dir_sep = chaz_OS_dir_sep();
+    char *cfh_file;
+
+    if (!S_ends_with(file, ".cfh")) {
+        chaz_Util_warn("Unexpected Clownfish header filename: %s", file);
+        return;
+    }
+
+    cfh_file = chaz_Util_join(dir_sep, dir, file, NULL);
+    chaz_MakeVar_append(sfc->var, cfh_file);
+    free(cfh_file);
 }
 
 static void
@@ -6461,17 +6726,34 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     SourceFileContext sfc;
 
     const char *base_dir = "..";
+    const char *dir_sep  = chaz_OS_dir_sep();
     const char *exe_ext  = chaz_OS_exe_ext();
     const char *obj_ext  = chaz_CC_obj_ext();
 
-    const char *json_parser_y = "$(CORE_DIR)" DIR_SEP "Lucy" DIR_SEP "Util"
-                                DIR_SEP "Json" DIR_SEP "JsonParser.y";
-    const char *json_parser_h = "$(CORE_DIR)" DIR_SEP "Lucy" DIR_SEP "Util"
-                                DIR_SEP "Json" DIR_SEP "JsonParser.h";
-    const char *json_parser_c = "$(CORE_DIR)" DIR_SEP "Lucy" DIR_SEP "Util"
-                                DIR_SEP "Json" DIR_SEP "JsonParser.c";
+    char *core_dir      = chaz_Util_join(dir_sep, base_dir, "core", NULL);
+    char *lemon_dir     = chaz_Util_join(dir_sep, base_dir, "lemon", NULL);
+    char *cfc_dir       = chaz_Util_join(dir_sep, base_dir, "clownfish",
+                                         "compiler", "c", NULL);
+    char *modules_dir   = chaz_Util_join(dir_sep, base_dir, "modules", NULL);
+    char *snowstem_dir  = chaz_Util_join(dir_sep, modules_dir, "analysis",
+                                         "snowstem", "source", NULL);
+    char *snowstop_dir  = chaz_Util_join(dir_sep, modules_dir, "analysis",
+                                         "snowstop", "source", NULL);
+    char *ucd_dir       = chaz_Util_join(dir_sep, modules_dir, "unicode",
+                                         "ucd", NULL);
+    char *utf8proc_dir  = chaz_Util_join(dir_sep, modules_dir, "unicode",
+                                         "utf8proc", NULL);
+    char *json_parser   = chaz_Util_join(dir_sep, core_dir, "Lucy", "Util",
+                                         "Json", "JsonParser", NULL);
+    char *cfc_exe       = chaz_Util_join("", cfc_dir, dir_sep, "cfc", exe_ext,
+                                         NULL);
+    char *test_lucy_exe = chaz_Util_join("", "t", dir_sep, "test_lucy",
+                                         exe_ext, NULL);
 
-    char *scratch;
+    char *autogen_inc_dir
+        = chaz_Util_join(dir_sep, "autogen", "include", NULL);
+    char *snowstem_inc_dir
+        = chaz_Util_join(dir_sep, snowstem_dir, "include", NULL);
 
     chaz_MakeFile *makefile;
     chaz_MakeVar  *var;
@@ -6479,15 +6761,16 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeRule *clean_rule;
     chaz_MakeRule *distclean_rule;
 
-    int          cflags_style = chaz_CC_get_cflags_style();
     chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
     chaz_CFlags *makefile_cflags;
-    chaz_CFlags *lemon_cflags;
     chaz_CFlags *link_flags;
     chaz_CFlags *test_cflags;
-    const char  *math_library;
-    const char  *test_command;
-    char        *shared_lib;
+
+    chaz_SharedLib *lib;
+    const char     *math_library = chaz_Floats_math_library();
+    char           *lib_filename;
+    char           *test_command;
+    char           *scratch;
 
     printf("Creating Makefile...\n");
 
@@ -6495,40 +6778,15 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     /* Directories */
 
-    chaz_MakeFile_add_var(makefile, "SRC_DIR", "src");
-    chaz_MakeFile_add_var(makefile, "AUTOGEN_DIR", "autogen");
     chaz_MakeFile_add_var(makefile, "BASE_DIR", base_dir);
-    chaz_MakeFile_add_var(makefile, "CORE_DIR",
-                          "$(BASE_DIR)" DIR_SEP "core");
-    chaz_MakeFile_add_var(makefile, "MODULES_DIR",
-                          "$(BASE_DIR)" DIR_SEP "modules");
-    chaz_MakeFile_add_var(makefile, "LEMON_DIR",
-                          "$(BASE_DIR)" DIR_SEP "lemon");
-    chaz_MakeFile_add_var(makefile, "CFC_DIR",
-                          "$(BASE_DIR)" DIR_SEP "clownfish" DIR_SEP "compiler"
-                          DIR_SEP "c");
-    chaz_MakeFile_add_var(makefile, "SNOWSTEM_DIR",
-                          "$(MODULES_DIR)" DIR_SEP "analysis" DIR_SEP
-                          "snowstem" DIR_SEP "source");
-    chaz_MakeFile_add_var(makefile, "SNOWSTOP_DIR",
-                          "$(MODULES_DIR)" DIR_SEP "analysis" DIR_SEP
-                          "snowstop" DIR_SEP "source");
-    chaz_MakeFile_add_var(makefile, "UTF8PROC_DIR",
-                          "$(MODULES_DIR)" DIR_SEP "unicode" DIR_SEP
-                          "utf8proc");
-
-    /* File extensions */
-
-    chaz_MakeFile_add_var(makefile, "EXE_EXT", exe_ext);
-    chaz_MakeFile_add_var(makefile, "OBJ_EXT", obj_ext);
 
     /* C compiler */
 
     chaz_MakeFile_add_var(makefile, "CC", chaz_CC_get_cc());
 
-    makefile_cflags = chaz_CFlags_new(cflags_style);
-    S_add_common_cflags(makefile_cflags);
+    makefile_cflags = chaz_CC_new_cflags();
 
+    chaz_CFlags_enable_optimization(makefile_cflags);
     chaz_CFlags_disable_strict_aliasing(makefile_cflags);
     chaz_CFlags_compile_shared_library(makefile_cflags);
     chaz_CFlags_hide_symbols(makefile_cflags);
@@ -6537,16 +6795,11 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     }
 
     chaz_CFlags_add_include_dir(makefile_cflags, ".");
-    chaz_CFlags_add_include_dir(makefile_cflags, "$(SRC_DIR)");
-    chaz_CFlags_add_include_dir(makefile_cflags, "$(CORE_DIR)");
-    chaz_CFlags_add_include_dir(makefile_cflags,
-                                "$(AUTOGEN_DIR)" DIR_SEP "include");
-    chaz_CFlags_add_include_dir(makefile_cflags,
-                                "$(SNOWSTEM_DIR)" DIR_SEP "include");
-    chaz_CFlags_add_include_dir(makefile_cflags,
-                                "$(MODULES_DIR)" DIR_SEP "unicode" DIR_SEP
-                                "ucd");
-    chaz_CFlags_add_include_dir(makefile_cflags, "$(UTF8PROC_DIR)");
+    chaz_CFlags_add_include_dir(makefile_cflags, core_dir);
+    chaz_CFlags_add_include_dir(makefile_cflags, autogen_inc_dir);
+    chaz_CFlags_add_include_dir(makefile_cflags, snowstem_inc_dir);
+    chaz_CFlags_add_include_dir(makefile_cflags, ucd_dir);
+    chaz_CFlags_add_include_dir(makefile_cflags, utf8proc_dir);
 
     var = chaz_MakeFile_add_var(makefile, "CFLAGS", NULL);
     chaz_MakeVar_append(var, chaz_CFlags_get_string(extra_cflags));
@@ -6560,129 +6813,109 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     var = chaz_MakeFile_add_var(makefile, "LUCY_OBJS", NULL);
     sfc.var = var;
 
-    sfc.dir = "$(SRC_DIR)";
-    chaz_Make_list_files("src", "c", S_source_file_callback, &sfc);
+    chaz_Make_list_files("src",        "c", S_c_file_callback, &sfc);
+    chaz_Make_list_files(core_dir,     "c", S_c_file_callback, &sfc);
+    chaz_Make_list_files(snowstem_dir, "c", S_c_file_callback, &sfc);
+    chaz_Make_list_files(snowstop_dir, "c", S_c_file_callback, &sfc);
+    chaz_Make_list_files(utf8proc_dir, "c", S_c_file_callback, &sfc);
 
-    scratch = (char*)malloc(strlen(base_dir) + 20);
-    sprintf(scratch, "%s" DIR_SEP "core", base_dir);
-    sfc.dir = "$(CORE_DIR)";
-    chaz_Make_list_files(scratch, "c", S_source_file_callback, &sfc);
-    free(scratch);
-    chaz_MakeVar_append(var, "$(CORE_DIR)" DIR_SEP "Lucy" DIR_SEP "Util"
-                        DIR_SEP "Json" DIR_SEP "JsonParser$(OBJ_EXT)");
-
-    scratch = (char*)malloc(strlen(base_dir) + 80);
-    sprintf(scratch, "%s" DIR_SEP "modules" DIR_SEP "analysis" DIR_SEP
-            "snowstem" DIR_SEP "source", base_dir);
-    sfc.dir = "$(SNOWSTEM_DIR)";
-    chaz_Make_list_files(scratch, "c", S_source_file_callback, &sfc);
+    scratch = chaz_Util_join("", json_parser, obj_ext, NULL);
+    chaz_MakeVar_append(var, scratch);
     free(scratch);
 
-    scratch = (char*)malloc(strlen(base_dir) + 80);
-    sprintf(scratch, "%s" DIR_SEP "modules" DIR_SEP "analysis" DIR_SEP
-            "snowstop" DIR_SEP "source", base_dir);
-    sfc.dir = "$(SNOWSTOP_DIR)";
-    chaz_Make_list_files(scratch, "c", S_source_file_callback, &sfc);
+    scratch = chaz_Util_join("", "autogen", dir_sep, "source", dir_sep,
+                             "parcel", obj_ext, NULL);
+    chaz_MakeVar_append(var, scratch);
     free(scratch);
 
-    scratch = (char*)malloc(strlen(base_dir) + 80);
-    sprintf(scratch, "%s" DIR_SEP "modules" DIR_SEP "unicode" DIR_SEP
-            "utf8proc", base_dir);
-    sfc.dir = "$(UTF8PROC_DIR)";
-    chaz_Make_list_files(scratch, "c", S_source_file_callback, &sfc);
-    free(scratch);
+    /* Clownfish header files */
 
-    chaz_MakeVar_append(var, "$(AUTOGEN_DIR)" DIR_SEP "source" DIR_SEP
-                        "parcel$(OBJ_EXT)");
+    var = chaz_MakeFile_add_var(makefile, "CLOWNFISH_HEADERS", NULL);
+    sfc.var = var;
 
-    /* Executables */
-
-    chaz_MakeFile_add_var(makefile, "LEMON_EXE",
-                          "$(LEMON_DIR)" DIR_SEP "lemon$(EXE_EXT)");
-    chaz_MakeFile_add_var(makefile, "CFC_EXE",
-                          "$(CFC_DIR)" DIR_SEP "cfc$(EXE_EXT)");
-    chaz_MakeFile_add_var(makefile, "TEST_LUCY_EXE",
-                          "t" DIR_SEP "test_lucy$(EXE_EXT)");
+    chaz_Make_list_files(core_dir, "cfh", S_cfh_file_callback, &sfc);
 
     /* Rules */
 
-    shared_lib = chaz_CC_shared_lib_file("lucy");
-    chaz_MakeFile_add_rule(makefile, "all", shared_lib);
+    lib = chaz_SharedLib_new("lucy", lucy_version, lucy_major_version);
+    lib_filename = chaz_SharedLib_filename(lib);
+    chaz_MakeFile_add_rule(makefile, "all", lib_filename);
 
-    lemon_cflags = chaz_CFlags_new(cflags_style);
-    S_add_common_cflags(lemon_cflags);
-    chaz_MakeFile_add_compiled_exe(makefile, "$(LEMON_EXE)",
-                                   "$(LEMON_DIR)" DIR_SEP "lemon.c",
-                                   lemon_cflags);
-    chaz_CFlags_destroy(lemon_cflags);
+    chaz_MakeFile_add_lemon_exe(makefile, lemon_dir);
+    chaz_MakeFile_add_lemon_grammar(makefile, json_parser);
 
     /*
      * CFC also builds LEMON_EXE, so it might be built twice at the same time
      * in parallel builds. Adding LEMON_EXE as prereq of CFC_EXE avoids this.
      */
-    rule = chaz_MakeFile_add_rule(makefile, "$(CFC_EXE)", "$(LEMON_EXE)");
-    chaz_MakeRule_add_make_command(rule, "$(CFC_DIR)", NULL);
+    rule = chaz_MakeFile_add_rule(makefile, cfc_exe, "$(LEMON_EXE)");
+    chaz_MakeRule_add_make_command(rule, cfc_dir, NULL);
 
-    rule = chaz_MakeFile_add_rule(makefile, "$(AUTOGEN_DIR)", "$(CFC_EXE)");
-    chaz_MakeRule_add_command(rule, "$(CFC_EXE) --source=$(CORE_DIR) "
-                              "--dest=$(AUTOGEN_DIR) --header=cfc_header");
-
-    rule = chaz_MakeFile_add_rule(makefile, json_parser_c, NULL);
-    chaz_MakeRule_add_prereq(rule, "$(LEMON_EXE)");
-    chaz_MakeRule_add_prereq(rule, json_parser_y);
-    scratch = (char*)malloc(strlen(json_parser_y) + 20);
-    sprintf(scratch, "$(LEMON_EXE) -q %s", json_parser_y);
+    rule = chaz_MakeFile_add_rule(makefile, "autogen", cfc_exe);
+    chaz_MakeRule_add_prereq(rule, "$(CLOWNFISH_HEADERS)");
+    scratch = chaz_Util_join("", cfc_exe, " --source=", core_dir,
+                             " --dest=autogen --header=cfc_header", NULL);
     chaz_MakeRule_add_command(rule, scratch);
+    /* TODO: Find a way to touch the autogen directory on Windows. */
+    if (chaz_Make_shell_type() == CHAZ_OS_POSIX) {
+        chaz_MakeRule_add_command(rule, "touch autogen");
+    }
     free(scratch);
 
     /* Needed for parallel builds. */
-    rule = chaz_MakeFile_add_rule(makefile, "$(AUTOGEN_DIR)" DIR_SEP "source"
-                                  DIR_SEP "parcel.c", "$(AUTOGEN_DIR)");
+    scratch = chaz_Util_join(dir_sep, "autogen", "source", "parcel.c", NULL);
+    rule = chaz_MakeFile_add_rule(makefile, scratch, "autogen");
+    free(scratch);
 
-    rule = chaz_MakeFile_add_rule(makefile, "$(LUCY_OBJS)", NULL);
-    chaz_MakeRule_add_prereq(rule, json_parser_c);
-    chaz_MakeRule_add_prereq(rule, "$(AUTOGEN_DIR)");
+    rule = chaz_MakeFile_add_rule(makefile, "$(LUCY_OBJS)", "autogen");
+    /*
+     * The dependency is actually on JsonParser.h, but make doesn't cope
+     * well with multiple output files.
+     */
+    scratch = chaz_Util_join(".", json_parser, "c", NULL);
+    chaz_MakeRule_add_prereq(rule, scratch);
+    free(scratch);
 
-    link_flags = chaz_CFlags_new(cflags_style);
+    link_flags = chaz_CC_new_cflags();
     if (chaz_CC_msvc_version_num()) {
         chaz_CFlags_append(link_flags, "/nologo");
     }
-    math_library = chaz_Floats_math_library();
     if (math_library) {
-        chaz_CFlags_add_library(link_flags, math_library);
+        chaz_CFlags_add_external_library(link_flags, math_library);
     }
     if (chaz_HeadCheck_check_header("pcre.h")) {
-        chaz_CFlags_add_library(link_flags, "pcre");
+        chaz_CFlags_add_external_library(link_flags, "pcre");
     }
     if (args->code_coverage) {
         chaz_CFlags_enable_code_coverage(link_flags);
     }
-    chaz_MakeFile_add_shared_lib(makefile, "lucy", "$(LUCY_OBJS)", link_flags);
+    chaz_MakeFile_add_shared_lib(makefile, lib, "$(LUCY_OBJS)", link_flags);
     chaz_CFlags_destroy(link_flags);
 
-    test_cflags = chaz_CFlags_new(cflags_style);
-    S_add_common_cflags(test_cflags);
+    test_cflags = chaz_CC_new_cflags();
+    chaz_CFlags_enable_optimization(test_cflags);
     chaz_CFlags_add_include_dir(test_cflags, ".");
-    chaz_CFlags_add_include_dir(test_cflags,
-                                "$(AUTOGEN_DIR)" DIR_SEP "include");
-    chaz_CFlags_add_library_path(test_cflags, ".");
-    chaz_CFlags_add_library(test_cflags, "lucy");
-    rule = chaz_MakeFile_add_compiled_exe(makefile, "$(TEST_LUCY_EXE)",
-                                          "t" DIR_SEP "test_lucy.c",
+    chaz_CFlags_add_include_dir(test_cflags, autogen_inc_dir);
+    chaz_CFlags_add_library(link_flags, lib);
+    scratch = chaz_Util_join(dir_sep, "t", "test_lucy.c", NULL);
+    rule = chaz_MakeFile_add_compiled_exe(makefile, test_lucy_exe, scratch,
                                           test_cflags);
-    chaz_MakeRule_add_prereq(rule, shared_lib);
+    free(scratch);
+    chaz_MakeRule_add_prereq(rule, lib_filename);
     chaz_CFlags_destroy(test_cflags);
 
-    rule = chaz_MakeFile_add_rule(makefile, "test", "$(TEST_LUCY_EXE)");
-    test_command = "$(TEST_LUCY_EXE)";
+    rule = chaz_MakeFile_add_rule(makefile, "test", test_lucy_exe);
     if (strcmp(chaz_OS_shared_lib_ext(), ".so") == 0) {
-        test_command = "LD_LIBRARY_PATH=. $(TEST_LUCY_EXE)";
+        test_command = chaz_Util_join(" ", "LD_LIBRARY_PATH=.", test_lucy_exe,
+                                      NULL);
+    }
+    else {
+        test_command = chaz_Util_strdup(test_lucy_exe);
     }
     chaz_MakeRule_add_command(rule, test_command);
 
     if (args->code_coverage) {
-        rule = chaz_MakeFile_add_rule(makefile, "coverage",
-                                      "$(TEST_LUCY_EXE)");
+        rule = chaz_MakeFile_add_rule(makefile, "coverage", test_lucy_exe);
         chaz_MakeRule_add_command(rule,
                                   "lcov"
                                   " --zerocounters"
@@ -6716,24 +6949,37 @@ S_write_makefile(struct chaz_CLIArgs *args) {
         chaz_MakeRule_add_rm_command(clean_rule, "$(LUCY_OBJS)");
     }
 
-    chaz_MakeRule_add_rm_command(clean_rule, json_parser_h);
-    chaz_MakeRule_add_rm_command(clean_rule, json_parser_c);
-    chaz_MakeRule_add_recursive_rm_command(clean_rule, "$(AUTOGEN_DIR)");
+    chaz_MakeRule_add_recursive_rm_command(clean_rule, "autogen");
 
     if (args->code_coverage) {
         chaz_MakeRule_add_rm_command(clean_rule, "lucy.info");
         chaz_MakeRule_add_recursive_rm_command(clean_rule, "coverage");
     }
 
-    chaz_MakeRule_add_make_command(clean_rule, "$(CFC_DIR)", "clean");
+    chaz_MakeRule_add_make_command(clean_rule, cfc_dir, "clean");
 
     distclean_rule = chaz_MakeFile_distclean_rule(makefile);
-    chaz_MakeRule_add_make_command(distclean_rule, "$(CFC_DIR)", "distclean");
+    chaz_MakeRule_add_make_command(distclean_rule, cfc_dir, "distclean");
 
     chaz_MakeFile_write(makefile);
 
     chaz_MakeFile_destroy(makefile);
-    free(shared_lib);
+    chaz_SharedLib_destroy(lib);
+    free(core_dir);
+    free(lemon_dir);
+    free(cfc_dir);
+    free(modules_dir);
+    free(snowstem_dir);
+    free(snowstop_dir);
+    free(ucd_dir);
+    free(utf8proc_dir);
+    free(json_parser);
+    free(cfc_exe);
+    free(test_lucy_exe);
+    free(autogen_inc_dir);
+    free(snowstem_inc_dir);
+    free(lib_filename);
+    free(test_command);
 }
 
 int main(int argc, const char **argv) {
