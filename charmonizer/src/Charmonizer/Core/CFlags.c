@@ -16,9 +16,10 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "Charmonizer/Core/Flags.h"
+#include "Charmonizer/Core/CFlags.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Core/OperatingSystem.h"
+#include "Charmonizer/Core/SharedLibrary.h"
 
 struct chaz_CFlags {
     int   style;
@@ -264,13 +265,26 @@ chaz_CFlags_add_library_path(chaz_CFlags *flags, const char *directory) {
 }
 
 void
-chaz_CFlags_add_library(chaz_CFlags *flags, const char *library) {
+chaz_CFlags_add_library(chaz_CFlags *flags, chaz_SharedLib *lib) {
+    char *filename;
+    if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
+        filename = chaz_SharedLib_implib_filename(lib);
+    }
+    else {
+        filename = chaz_SharedLib_filename(lib);
+    }
+    chaz_CFlags_append(flags, filename);
+    free(filename);
+}
+
+void
+chaz_CFlags_add_external_library(chaz_CFlags *flags, const char *library) {
     char *string;
     if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
         string = chaz_Util_join("", library, ".lib", NULL);
     }
     else {
-        string = chaz_Util_join("", "-l ", library, NULL);
+        string = chaz_Util_join(" ", "-l", library, NULL);
     }
     chaz_CFlags_append(flags, string);
     free(string);

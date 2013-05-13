@@ -49,6 +49,9 @@ typedef struct SourceFileContext {
     const char *dir;
 } SourceFileContext;
 
+static const char lucy_version[]       = "0.3.0";
+static const char lucy_major_version[] = "0.3";
+
 static void
 S_add_compiler_flags(struct chaz_CLIArgs *args) {
     chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
@@ -147,8 +150,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     const char *json_parser_c = "$(CORE_DIR)" DIR_SEP "Lucy" DIR_SEP "Util"
                                 DIR_SEP "Json" DIR_SEP "JsonParser.c";
 
-    char *scratch;
-
     chaz_MakeFile *makefile;
     chaz_MakeVar  *var;
     chaz_MakeRule *rule;
@@ -161,9 +162,12 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_CFlags *lemon_cflags;
     chaz_CFlags *link_flags;
     chaz_CFlags *test_cflags;
-    const char  *math_library;
-    const char  *test_command;
-    char        *shared_lib;
+
+    chaz_SharedLib *lib;
+    const char     *math_library;
+    const char     *test_command;
+    char           *lib_filename;
+    char           *scratch;
 
     printf("Creating Makefile...\n");
 
@@ -282,8 +286,9 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     /* Rules */
 
-    shared_lib = chaz_CC_shared_lib_file("lucy");
-    chaz_MakeFile_add_rule(makefile, "all", shared_lib);
+    lib = chaz_SharedLib_new("lucy", lucy_version, lucy_major_version);
+    lib_filename = chaz_SharedLib_filename(lib);
+    chaz_MakeFile_add_rule(makefile, "all", lib_filename);
 
     lemon_cflags = chaz_CFlags_new(cflags_style);
     S_add_common_cflags(lemon_cflags);
@@ -325,15 +330,15 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     }
     math_library = chaz_Floats_math_library();
     if (math_library) {
-        chaz_CFlags_add_library(link_flags, math_library);
+        chaz_CFlags_add_external_library(link_flags, math_library);
     }
     if (chaz_HeadCheck_check_header("pcre.h")) {
-        chaz_CFlags_add_library(link_flags, "pcre");
+        chaz_CFlags_add_external_library(link_flags, "pcre");
     }
     if (args->code_coverage) {
         chaz_CFlags_enable_code_coverage(link_flags);
     }
-    chaz_MakeFile_add_shared_lib(makefile, "lucy", "$(LUCY_OBJS)", link_flags);
+    chaz_MakeFile_add_shared_lib(makefile, lib, "$(LUCY_OBJS)", link_flags);
     chaz_CFlags_destroy(link_flags);
 
     test_cflags = chaz_CFlags_new(cflags_style);
@@ -341,12 +346,11 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_CFlags_add_include_dir(test_cflags, ".");
     chaz_CFlags_add_include_dir(test_cflags,
                                 "$(AUTOGEN_DIR)" DIR_SEP "include");
-    chaz_CFlags_add_library_path(test_cflags, ".");
-    chaz_CFlags_add_library(test_cflags, "lucy");
+    chaz_CFlags_add_library(link_flags, lib);
     rule = chaz_MakeFile_add_compiled_exe(makefile, "$(TEST_LUCY_EXE)",
                                           "t" DIR_SEP "test_lucy.c",
                                           test_cflags);
-    chaz_MakeRule_add_prereq(rule, shared_lib);
+    chaz_MakeRule_add_prereq(rule, lib_filename);
     chaz_CFlags_destroy(test_cflags);
 
     rule = chaz_MakeFile_add_rule(makefile, "test", "$(TEST_LUCY_EXE)");
@@ -409,7 +413,8 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeFile_write(makefile);
 
     chaz_MakeFile_destroy(makefile);
-    free(shared_lib);
+    chaz_SharedLib_destroy(lib);
+    free(lib_filename);
 }
 
 int main(int argc, const char **argv) {

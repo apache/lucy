@@ -2,6 +2,6 @@
 /autogen/
 /charmonizer
 /charmony.h
-/liblucy.dylib
-/liblucy.so
+/liblucy.*.dylib
+/liblucy.so.*
 /t/test_lucy

@@ -67,7 +67,7 @@ chaz_Floats_math_library(void) {
         return NULL;
     }
 
-    chaz_CFlags_add_library(temp_cflags, "m");
+    chaz_CFlags_add_external_library(temp_cflags, "m");
     output = chaz_CC_capture_output(sqrt_code, &output_len);
     chaz_CFlags_clear(temp_cflags);
 

@@ -67,6 +67,7 @@ if ( !@probes ) {
 }
 
 my @core = qw(
+    SharedLibrary
     CFlags
     Compiler
     ConfWriter

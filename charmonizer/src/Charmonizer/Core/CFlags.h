@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-/* Charmonizer/Core/Compiler.h
+/* Charmonizer/Core/CFlags.h
  */
 
-#ifndef H_CHAZ_FLAGS
-#define H_CHAZ_FLAGS
+#ifndef H_CHAZ_CFLAGS
+#define H_CHAZ_CFLAGS
 
 #ifdef __cplusplus
 extern "C" {
@@ -83,7 +83,10 @@ void
 chaz_CFlags_add_library_path(chaz_CFlags *flags, const char *directory);
 
 void
-chaz_CFlags_add_library(chaz_CFlags *flags, const char *library);
+chaz_CFlags_add_library(chaz_CFlags *flags, chaz_SharedLib *lib);
+
+void
+chaz_CFlags_add_external_library(chaz_CFlags *flags, const char *library);
 
 void
 chaz_CFlags_enable_code_coverage(chaz_CFlags *flags);
@@ -92,6 +95,6 @@ chaz_CFlags_enable_code_coverage(chaz_CFlags *flags);
 }
 #endif
 
-#endif /* H_CHAZ_FLAGS */
+#endif /* H_CHAZ_CFLAGS */
 
 

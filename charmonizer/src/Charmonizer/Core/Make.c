@@ -321,7 +321,7 @@ chaz_MakeFile_add_compiled_exe(chaz_MakeFile *makefile, const char *exe,
 }
 
 chaz_MakeRule*
-chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *name,
+chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
                              const char *sources, chaz_CFlags *link_flags) {
     int            cflags_style = chaz_CC_get_cflags_style();
     chaz_CFlags   *local_flags  = chaz_CFlags_new(cflags_style);
@@ -329,37 +329,36 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, const char *name,
     const char    *link_flags_string = "";
     const char    *local_flags_string;
     chaz_MakeRule *rule;
-    char          *shared_lib;
+    char          *filename;
     char          *command;
 
-    shared_lib = chaz_CC_shared_lib_file(name);
-    rule = chaz_MakeFile_add_rule(makefile, shared_lib, sources);
+    filename = chaz_SharedLib_filename(lib);
+    rule = chaz_MakeFile_add_rule(makefile, filename, sources);
 
     if (link_flags) {
         link_flags_string = chaz_CFlags_get_string(link_flags);
     }
     chaz_CFlags_link_shared_library(local_flags);
-    chaz_CFlags_set_link_output(local_flags, shared_lib);
+    chaz_CFlags_set_link_output(local_flags, filename);
     local_flags_string = chaz_CFlags_get_string(local_flags);
     command = chaz_Util_join(" ", link, sources, link_flags_string,
                              local_flags_string, NULL);
     chaz_MakeRule_add_command(rule, command);
 
-    chaz_MakeRule_add_rm_command(makefile->clean, shared_lib);
+    chaz_MakeRule_add_rm_command(makefile->clean, filename);
 
     if (chaz_CC_msvc_version_num()) {
         /* Remove import library and export file under MSVC. */
-        char *filename;
-        filename = chaz_Util_join("", name, ".lib", NULL);
-        chaz_MakeRule_add_rm_command(makefile->clean, filename);
-        free(filename);
-        filename = chaz_Util_join("", name, ".exp", NULL);
-        chaz_MakeRule_add_rm_command(makefile->clean, filename);
-        free(filename);
+        char *lib_filename = chaz_SharedLib_implib_filename(lib);
+        char *exp_filename = chaz_SharedLib_export_filename(lib);
+        chaz_MakeRule_add_rm_command(makefile->clean, lib_filename);
+        chaz_MakeRule_add_rm_command(makefile->clean, exp_filename);
+        free(lib_filename);
+        free(exp_filename);
     }
 
     chaz_CFlags_destroy(local_flags);
-    free(shared_lib);
+    free(filename);
     free(command);
     return rule;
 }
