@@ -77,6 +77,10 @@ void
 chaz_CFlags_link_shared_library(chaz_CFlags *flags);
 
 void
+chaz_CFlags_set_shared_library_version(chaz_CFlags *flags,
+                                       chaz_SharedLib *lib);
+
+void
 chaz_CFlags_set_link_output(chaz_CFlags *flags, const char *filename);
 
 void

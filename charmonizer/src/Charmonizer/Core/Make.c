@@ -339,6 +339,7 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
         link_flags_string = chaz_CFlags_get_string(link_flags);
     }
     chaz_CFlags_link_shared_library(local_flags);
+    chaz_CFlags_set_shared_library_version(local_flags, lib);
     chaz_CFlags_set_link_output(local_flags, filename);
     local_flags_string = chaz_CFlags_get_string(local_flags);
     command = chaz_Util_join(" ", link, sources, link_flags_string,

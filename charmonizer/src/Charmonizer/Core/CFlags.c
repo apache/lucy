@@ -214,7 +214,7 @@ chaz_CFlags_link_shared_library(chaz_CFlags *flags) {
         string = "/DLL";
     }
     else if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
-        if (chaz_OS_is_darwin()) {
+        if (strcmp(chaz_OS_shared_lib_ext(), ".dylib") == 0) {
             string = "-dynamiclib";
         }
         else {
@@ -226,6 +226,30 @@ chaz_CFlags_link_shared_library(chaz_CFlags *flags) {
                       chaz_CC_get_cc());
     }
     chaz_CFlags_append(flags, string);
+}
+
+void
+chaz_CFlags_set_shared_library_version(chaz_CFlags *flags,
+                                       chaz_SharedLib *lib) {
+    const char *shlib_ext = chaz_OS_shared_lib_ext();
+    char       *string;
+
+    if (flags->style != CHAZ_CFLAGS_STYLE_GNU
+        || strcmp(shlib_ext, ".dll") == 0) {
+        return;
+    }
+
+    if (strcmp(chaz_OS_shared_lib_ext(), ".dylib") == 0) {
+        const char *version = chaz_SharedLib_get_version(lib);
+        string = chaz_Util_join(" ", "-current_version", version, NULL);
+    }
+    else {
+        char *soname = chaz_SharedLib_major_version_filename(lib);
+        string = chaz_Util_join("", "-Wl,-soname,", soname, NULL);
+        free(soname);
+    }
+    chaz_CFlags_append(flags, string);
+    free(string);
 }
 
 void
