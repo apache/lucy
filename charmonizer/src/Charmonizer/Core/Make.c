@@ -276,6 +276,9 @@ chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
     if (link_flags) {
         link_flags_string = chaz_CFlags_get_string(link_flags);
     }
+    if (chaz_CC_msvc_version_num()) {
+        chaz_CFlags_append(local_flags, "/nologo");
+    }
     chaz_CFlags_set_link_output(local_flags, exe);
     local_flags_string = chaz_CFlags_get_string(local_flags);
     command = chaz_Util_join(" ", link, sources, link_flags_string,
@@ -303,6 +306,9 @@ chaz_MakeFile_add_compiled_exe(chaz_MakeFile *makefile, const char *exe,
 
     if (cflags) {
         cflags_string = chaz_CFlags_get_string(cflags);
+    }
+    if (chaz_CC_msvc_version_num()) {
+        chaz_CFlags_append(local_flags, "/nologo");
     }
     chaz_CFlags_set_output_exe(local_flags, exe);
     local_flags_string = chaz_CFlags_get_string(local_flags);
@@ -334,6 +340,9 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
 
     if (link_flags) {
         link_flags_string = chaz_CFlags_get_string(link_flags);
+    }
+    if (chaz_CC_msvc_version_num()) {
+        chaz_CFlags_append(local_flags, "/nologo");
     }
     chaz_CFlags_link_shared_library(local_flags);
     chaz_CFlags_set_shared_library_version(local_flags, lib);
@@ -388,7 +397,7 @@ chaz_MakeFile_write(chaz_MakeFile *makefile) {
         /* Inference rule for .c files. */
         fprintf(out, ".c.obj :\n");
         if (chaz_CC_msvc_version_num()) {
-            fprintf(out, "\t$(CC) $(CFLAGS) /c $< /Fo$@\n\n");
+            fprintf(out, "\t$(CC) /nologo $(CFLAGS) /c $< /Fo$@\n\n");
         }
         else {
             fprintf(out, "\t$(CC) $(CFLAGS) -c $< -o $@\n\n");

@@ -70,14 +70,6 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
 }
 
 static void
-S_add_common_cflags(chaz_CFlags *cflags) {
-    if (chaz_CC_msvc_version_num()) {
-        chaz_CFlags_append(cflags, "/nologo");
-    }
-    chaz_CFlags_enable_optimization(cflags);
-}
-
-static void
 S_source_file_callback(char *file, void *context) {
     SourceFileContext *sfc = (SourceFileContext*)context;
     size_t file_len = strlen(file);
@@ -161,8 +153,8 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeFile_add_var(makefile, "CC", chaz_CC_get_cc());
 
     makefile_cflags = chaz_CC_new_cflags();
-    S_add_common_cflags(makefile_cflags);
 
+    chaz_CFlags_enable_optimization(makefile_cflags);
     chaz_CFlags_add_include_dir(makefile_cflags, ".");
     chaz_CFlags_add_include_dir(makefile_cflags, "$(INCLUDE_DIR)");
     chaz_CFlags_add_include_dir(makefile_cflags, "$(SRC_DIR)");
@@ -203,7 +195,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeFile_add_rule(makefile, "all", "$(CFC_EXE)");
 
     lemon_cflags = chaz_CC_new_cflags();
-    S_add_common_cflags(lemon_cflags);
+    chaz_CFlags_enable_optimization(lemon_cflags);
     chaz_MakeFile_add_compiled_exe(makefile, "$(LEMON_EXE)",
                                    "$(LEMON_DIR)" DIR_SEP "lemon.c",
                                    lemon_cflags);
