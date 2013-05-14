@@ -30,11 +30,12 @@
 static struct {
     char name[CHAZ_OS_NAME_MAX+1];
     char dev_null[20];
+    char dir_sep[2];
     char exe_ext[5];
     char shared_lib_ext[7];
     char local_command_start[3];
     int  shell_type;
-} chaz_OS = { "", "", "", "", "", 0 };
+} chaz_OS = { "", "", "", "", "", "", 0 };
 
 void
 chaz_OS_init(void) {
@@ -66,6 +67,7 @@ chaz_OS_init(void) {
         free(uname);
 
         strcpy(chaz_OS.dev_null, "/dev/null");
+        strcpy(chaz_OS.dir_sep, "/");
         strcpy(chaz_OS.exe_ext, "");
         if (memcmp(chaz_OS.name, "darwin", 6) == 0) {
             strcpy(chaz_OS.shared_lib_ext, ".dylib");
@@ -81,6 +83,7 @@ chaz_OS_init(void) {
     else if (chaz_Util_can_open_file("nul")) {
         strcpy(chaz_OS.name, "windows");
         strcpy(chaz_OS.dev_null, "nul");
+        strcpy(chaz_OS.dir_sep, "\\");
         strcpy(chaz_OS.exe_ext, ".exe");
         strcpy(chaz_OS.shared_lib_ext, ".dll");
         strcpy(chaz_OS.local_command_start, ".\\");
@@ -120,6 +123,11 @@ chaz_OS_shared_lib_ext(void) {
 const char*
 chaz_OS_dev_null(void) {
     return chaz_OS.dev_null;
+}
+
+const char*
+chaz_OS_dir_sep(void) {
+    return chaz_OS.dir_sep;
 }
 
 int

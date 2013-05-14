@@ -94,6 +94,11 @@ chaz_OS_shared_lib_ext(void);
 const char*
 chaz_OS_dev_null(void);
 
+/* Return the directory separator on this system.
+ */
+const char*
+chaz_OS_dir_sep(void);
+
 /* Return the shell type of this system.
  */
 int

@@ -117,23 +117,9 @@ chaz_DirManip_try_rmdir(void) {
     if (chaz_DirManip_compile_rmdir("direct.h"))   { return; }
 }
 
-static int
-chaz_DirManip_is_cygwin(void) {
-    static int is_cygwin = -1;
-    static const char cygwin_code[] =
-        CHAZ_QUOTE(#ifndef __CYGWIN__            )
-        CHAZ_QUOTE(  #error "Not Cygwin"         )
-        CHAZ_QUOTE(#endif                        )
-        CHAZ_QUOTE(int main() { return 0; }      );
-    if (is_cygwin == -1) {
-        is_cygwin = chaz_CC_test_compile(cygwin_code);
-    }
-    return is_cygwin;
-}
-
 void
 chaz_DirManip_run(void) {
-    char dir_sep[3];
+    const char *dir_sep = chaz_OS_dir_sep();
     int remove_zaps_dirs = false;
     int has_dirent_h = chaz_HeadCheck_check_header("dirent.h");
     int has_direct_h = chaz_HeadCheck_check_header("direct.h");
@@ -189,16 +175,6 @@ chaz_DirManip_run(void) {
         sprintf(scratch, "%s(_dir)", chaz_DirManip.mkdir_command);
         chaz_ConfWriter_add_def("makedir(_dir, _mode)", scratch);
         chaz_ConfWriter_add_def("MAKEDIR_MODE_IGNORED", "1");
-    }
-
-    if (chaz_DirManip_is_cygwin()) {
-        strcpy(dir_sep, "/");
-    }
-    else if (chaz_HeadCheck_check_header("windows.h")) {
-        strcpy(dir_sep, "\\\\");
-    }
-    else {
-        strcpy(dir_sep, "/");
     }
 
     {
