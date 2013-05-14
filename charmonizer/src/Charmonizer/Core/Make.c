@@ -370,6 +370,50 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
     return rule;
 }
 
+chaz_MakeRule*
+chaz_MakeFile_add_lemon_exe(chaz_MakeFile *makefile, const char *dir) {
+    chaz_CFlags   *cflags = chaz_CC_new_cflags();
+    chaz_MakeRule *rule;
+    const char *dir_sep = chaz_OS_dir_sep();
+    const char *exe_ext = chaz_OS_exe_ext();
+    char *lemon_exe = chaz_Util_join("", dir, dir_sep, "lemon", exe_ext, NULL);
+    char *lemon_c   = chaz_Util_join(dir_sep, dir, "lemon.c", NULL);
+
+    chaz_CFlags_enable_optimization(cflags);
+    chaz_MakeFile_add_var(makefile, "LEMON_EXE", lemon_exe);
+    rule = chaz_MakeFile_add_compiled_exe(makefile, "$(LEMON_EXE)", lemon_c,
+                                          cflags);
+
+    chaz_CFlags_destroy(cflags);
+    free(lemon_c);
+    free(lemon_exe);
+    return rule;
+}
+
+chaz_MakeRule*
+chaz_MakeFile_add_lemon_grammar(chaz_MakeFile *makefile,
+                                const char *base_name) {
+    char *c_file  = chaz_Util_join(".", base_name, "c", NULL);
+    char *h_file  = chaz_Util_join(".", base_name, "h", NULL);
+    char *y_file  = chaz_Util_join(".", base_name, "y", NULL);
+    char *command = chaz_Util_join(" ", "$(LEMON_EXE) -q", y_file, NULL);
+
+    chaz_MakeRule *rule = chaz_MakeFile_add_rule(makefile, c_file, y_file);
+    chaz_MakeRule *clean_rule = chaz_MakeFile_clean_rule(makefile);
+
+    chaz_MakeRule_add_prereq(rule, "$(LEMON_EXE)");
+    chaz_MakeRule_add_command(rule, command);
+
+    chaz_MakeRule_add_rm_command(clean_rule, h_file);
+    chaz_MakeRule_add_rm_command(clean_rule, c_file);
+
+    free(c_file);
+    free(h_file);
+    free(y_file);
+    free(command);
+    return rule;
+}
+
 void
 chaz_MakeFile_write(chaz_MakeFile *makefile) {
     FILE   *out;

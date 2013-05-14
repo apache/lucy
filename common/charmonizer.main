@@ -135,12 +135,8 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     const char *exe_ext  = chaz_OS_exe_ext();
     const char *obj_ext  = chaz_CC_obj_ext();
 
-    const char *json_parser_y = "$(CORE_DIR)" DIR_SEP "Lucy" DIR_SEP "Util"
-                                DIR_SEP "Json" DIR_SEP "JsonParser.y";
-    const char *json_parser_h = "$(CORE_DIR)" DIR_SEP "Lucy" DIR_SEP "Util"
-                                DIR_SEP "Json" DIR_SEP "JsonParser.h";
-    const char *json_parser_c = "$(CORE_DIR)" DIR_SEP "Lucy" DIR_SEP "Util"
-                                DIR_SEP "Json" DIR_SEP "JsonParser.c";
+    const char *json_parser = "$(CORE_DIR)" DIR_SEP "Lucy" DIR_SEP "Util"
+                              DIR_SEP "Json" DIR_SEP "JsonParser";
 
     chaz_MakeFile *makefile;
     chaz_MakeVar  *var;
@@ -150,7 +146,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
     chaz_CFlags *makefile_cflags;
-    chaz_CFlags *lemon_cflags;
     chaz_CFlags *link_flags;
     chaz_CFlags *test_cflags;
 
@@ -173,8 +168,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
                           "$(BASE_DIR)" DIR_SEP "core");
     chaz_MakeFile_add_var(makefile, "MODULES_DIR",
                           "$(BASE_DIR)" DIR_SEP "modules");
-    chaz_MakeFile_add_var(makefile, "LEMON_DIR",
-                          "$(BASE_DIR)" DIR_SEP "lemon");
     chaz_MakeFile_add_var(makefile, "CFC_DIR",
                           "$(BASE_DIR)" DIR_SEP "clownfish" DIR_SEP "compiler"
                           DIR_SEP "c");
@@ -239,8 +232,9 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     sfc.dir = "$(CORE_DIR)";
     chaz_Make_list_files(scratch, "c", S_source_file_callback, &sfc);
     free(scratch);
-    chaz_MakeVar_append(var, "$(CORE_DIR)" DIR_SEP "Lucy" DIR_SEP "Util"
-                        DIR_SEP "Json" DIR_SEP "JsonParser$(OBJ_EXT)");
+    scratch = chaz_Util_join("", json_parser, "$(OBJ_EXT)", NULL);
+    chaz_MakeVar_append(var, scratch);
+    free(scratch);
 
     scratch = (char*)malloc(strlen(base_dir) + 80);
     sprintf(scratch, "%s" DIR_SEP "modules" DIR_SEP "analysis" DIR_SEP
@@ -268,8 +262,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     /* Executables */
 
-    chaz_MakeFile_add_var(makefile, "LEMON_EXE",
-                          "$(LEMON_DIR)" DIR_SEP "lemon$(EXE_EXT)");
     chaz_MakeFile_add_var(makefile, "CFC_EXE",
                           "$(CFC_DIR)" DIR_SEP "cfc$(EXE_EXT)");
     chaz_MakeFile_add_var(makefile, "TEST_LUCY_EXE",
@@ -281,12 +273,8 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     lib_filename = chaz_SharedLib_filename(lib);
     chaz_MakeFile_add_rule(makefile, "all", lib_filename);
 
-    lemon_cflags = chaz_CC_new_cflags();
-    chaz_CFlags_enable_optimization(lemon_cflags);
-    chaz_MakeFile_add_compiled_exe(makefile, "$(LEMON_EXE)",
-                                   "$(LEMON_DIR)" DIR_SEP "lemon.c",
-                                   lemon_cflags);
-    chaz_CFlags_destroy(lemon_cflags);
+    chaz_MakeFile_add_lemon_exe(makefile, "$(BASE_DIR)" DIR_SEP "lemon");
+    chaz_MakeFile_add_lemon_grammar(makefile, json_parser);
 
     /*
      * CFC also builds LEMON_EXE, so it might be built twice at the same time
@@ -299,21 +287,18 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeRule_add_command(rule, "$(CFC_EXE) --source=$(CORE_DIR) "
                               "--dest=$(AUTOGEN_DIR) --header=cfc_header");
 
-    rule = chaz_MakeFile_add_rule(makefile, json_parser_c, NULL);
-    chaz_MakeRule_add_prereq(rule, "$(LEMON_EXE)");
-    chaz_MakeRule_add_prereq(rule, json_parser_y);
-    scratch = (char*)malloc(strlen(json_parser_y) + 20);
-    sprintf(scratch, "$(LEMON_EXE) -q %s", json_parser_y);
-    chaz_MakeRule_add_command(rule, scratch);
-    free(scratch);
-
     /* Needed for parallel builds. */
     rule = chaz_MakeFile_add_rule(makefile, "$(AUTOGEN_DIR)" DIR_SEP "source"
                                   DIR_SEP "parcel.c", "$(AUTOGEN_DIR)");
 
-    rule = chaz_MakeFile_add_rule(makefile, "$(LUCY_OBJS)", NULL);
-    chaz_MakeRule_add_prereq(rule, json_parser_c);
-    chaz_MakeRule_add_prereq(rule, "$(AUTOGEN_DIR)");
+    rule = chaz_MakeFile_add_rule(makefile, "$(LUCY_OBJS)", "$(AUTOGEN_DIR)");
+    /*
+     * The dependency is actually on JsonParser.h, but make doesn't cope
+     * well with multiple output files.
+     */
+    scratch = chaz_Util_join(".", json_parser, "c", NULL);
+    chaz_MakeRule_add_prereq(rule, scratch);
+    free(scratch);
 
     link_flags = chaz_CC_new_cflags();
     if (chaz_CC_msvc_version_num()) {
@@ -387,8 +372,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
         chaz_MakeRule_add_rm_command(clean_rule, "$(LUCY_OBJS)");
     }
 
-    chaz_MakeRule_add_rm_command(clean_rule, json_parser_h);
-    chaz_MakeRule_add_rm_command(clean_rule, json_parser_c);
     chaz_MakeRule_add_recursive_rm_command(clean_rule, "$(AUTOGEN_DIR)");
 
     if (args->code_coverage) {

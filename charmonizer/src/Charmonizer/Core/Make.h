@@ -150,6 +150,23 @@ chaz_MakeRule*
 chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
                              const char *sources, chaz_CFlags *link_flags);
 
+/** Add a rule to build the lemon parser generator.
+ *
+ * @param makefile The makefile.
+ * @param dir The lemon directory.
+ */
+chaz_MakeRule*
+chaz_MakeFile_add_lemon_exe(chaz_MakeFile *makefile, const char *dir);
+
+/** Add a rule for a lemon grammar.
+ *
+ * @param makefile The makefile.
+ * @param base_name The filename of the grammar without extension.
+ */
+chaz_MakeRule*
+chaz_MakeFile_add_lemon_grammar(chaz_MakeFile *makefile,
+                                const char *base_name);
+
 /** Write the makefile to a file named 'Makefile' in the current directory.
  *
  * @param makefile The makefile.

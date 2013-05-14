@@ -109,9 +109,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     const char *exe_ext  = chaz_OS_exe_ext();
     const char *obj_ext  = chaz_CC_obj_ext();
 
-    const char *parse_header_y = "$(SRC_DIR)" DIR_SEP "CFCParseHeader.y";
-    const char *parse_header_h = "$(SRC_DIR)" DIR_SEP "CFCParseHeader.h";
-    const char *parse_header_c = "$(SRC_DIR)" DIR_SEP "CFCParseHeader.c";
+    const char *parse_header = "$(SRC_DIR)" DIR_SEP "CFCParseHeader";
 
     char *src_dir;
     char *scratch;
@@ -124,7 +122,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
     chaz_CFlags *makefile_cflags;
     chaz_CFlags *link_flags;
-    chaz_CFlags *lemon_cflags;
 
     printf("Creating Makefile...\n");
 
@@ -139,9 +136,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeFile_add_var(makefile, "SRC_DIR", src_dir);
     chaz_MakeFile_add_var(makefile, "INCLUDE_DIR",
                           "$(BASE_DIR)" DIR_SEP "include");
-    chaz_MakeFile_add_var(makefile, "LEMON_DIR",
-                          "$(BASE_DIR)" DIR_SEP ".." DIR_SEP ".." DIR_SEP
-                          "lemon");
 
     /* File extensions */
 
@@ -176,16 +170,15 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     chaz_Make_list_files(src_dir, "c", S_source_file_callback, &sfc);
 
-    chaz_MakeVar_append(sfc.common_objs,
-                        "$(SRC_DIR)" DIR_SEP "CFCParseHeader$(OBJ_EXT)");
+    scratch = chaz_Util_join("", parse_header, "$(OBJ_EXT)", NULL);
+    chaz_MakeVar_append(sfc.common_objs, scratch);
+    free(scratch);
     chaz_MakeVar_append(sfc.test_cfc_objs, "t" DIR_SEP "test_cfc$(OBJ_EXT)");
 
     chaz_MakeFile_add_var(makefile, "CFC_OBJS", "cfc$(OBJ_EXT)");
 
     /* Executables */
 
-    chaz_MakeFile_add_var(makefile, "LEMON_EXE",
-                          "$(LEMON_DIR)" DIR_SEP "lemon$(EXE_EXT)");
     chaz_MakeFile_add_var(makefile, "CFC_EXE", "cfc$(EXE_EXT)");
     chaz_MakeFile_add_var(makefile, "TEST_CFC_EXE",
                           "t" DIR_SEP "test_cfc$(EXE_EXT)");
@@ -194,22 +187,17 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     chaz_MakeFile_add_rule(makefile, "all", "$(CFC_EXE)");
 
-    lemon_cflags = chaz_CC_new_cflags();
-    chaz_CFlags_enable_optimization(lemon_cflags);
-    chaz_MakeFile_add_compiled_exe(makefile, "$(LEMON_EXE)",
-                                   "$(LEMON_DIR)" DIR_SEP "lemon.c",
-                                   lemon_cflags);
-    chaz_CFlags_destroy(lemon_cflags);
+    chaz_MakeFile_add_lemon_exe(makefile, "$(BASE_DIR)" DIR_SEP ".." DIR_SEP
+                                ".." DIR_SEP "lemon");
+    chaz_MakeFile_add_lemon_grammar(makefile, parse_header);
 
-    rule = chaz_MakeFile_add_rule(makefile, parse_header_c, NULL);
-    chaz_MakeRule_add_prereq(rule, "$(LEMON_EXE)");
-    chaz_MakeRule_add_prereq(rule, parse_header_y);
-    scratch = (char*)malloc(strlen(parse_header_y) + 20);
-    sprintf(scratch, "$(LEMON_EXE) -q %s", parse_header_y);
-    chaz_MakeRule_add_command(rule, scratch);
+    /*
+     * The dependency is actually on CFCParseHeader.h, but make doesn't cope
+     * well with multiple output files.
+     */
+    scratch = chaz_Util_join(".", parse_header, "c", NULL);
+    chaz_MakeFile_add_rule(makefile, "$(COMMON_OBJS)", scratch);
     free(scratch);
-
-    chaz_MakeFile_add_rule(makefile, "$(COMMON_OBJS)", parse_header_c);
 
     link_flags = chaz_CC_new_cflags();
     if (chaz_CC_msvc_version_num()) {
@@ -254,8 +242,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeRule_add_rm_command(clean_rule, "$(COMMON_OBJS)");
     chaz_MakeRule_add_rm_command(clean_rule, "$(CFC_OBJS)");
     chaz_MakeRule_add_rm_command(clean_rule, "$(TEST_CFC_OBJS)");
-    chaz_MakeRule_add_rm_command(clean_rule, parse_header_h);
-    chaz_MakeRule_add_rm_command(clean_rule, parse_header_c);
 
     if (args->code_coverage) {
         chaz_MakeRule_add_rm_command(clean_rule, "cfc.info");
