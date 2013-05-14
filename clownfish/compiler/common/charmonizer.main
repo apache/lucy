@@ -70,7 +70,7 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
 }
 
 static void
-S_source_file_callback(char *file, void *context) {
+S_source_file_callback(const char *dir, char *file, void *context) {
     SourceFileContext *sfc = (SourceFileContext*)context;
     size_t file_len = strlen(file);
     size_t obj_file_size;
@@ -86,11 +86,7 @@ S_source_file_callback(char *file, void *context) {
     }
     file[file_len-2] = '\0';
 
-    pattern = "$(SRC_DIR)" DIR_SEP "%s$(OBJ_EXT)";
-    obj_file_size = strlen(pattern) + file_len + 10;
-    obj_file = (char*)malloc(obj_file_size);
-    sprintf(obj_file, pattern, file);
-
+    obj_file = chaz_Util_join("", dir, DIR_SEP, file, "$(OBJ_EXT)", NULL);
     if (strlen(file) >= 7 && memcmp(file, "CFCTest", 7) == 0) {
         chaz_MakeVar_append(sfc->test_cfc_objs, obj_file);
     }
@@ -109,9 +105,16 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     const char *exe_ext  = chaz_OS_exe_ext();
     const char *obj_ext  = chaz_CC_obj_ext();
 
-    const char *parse_header = "$(SRC_DIR)" DIR_SEP "CFCParseHeader";
+    char *lemon_dir    = chaz_Util_join(DIR_SEP, base_dir, "..", "..", "lemon",
+                                        NULL);
+    char *src_dir      = chaz_Util_join(DIR_SEP, base_dir, "src", NULL);
+    char *include_dir  = chaz_Util_join(DIR_SEP, base_dir, "include", NULL);
+    char *parse_header = chaz_Util_join(DIR_SEP, src_dir, "CFCParseHeader",
+                                        NULL);
+    char *cfc_exe      = chaz_Util_join("", "cfc", exe_ext, NULL);
+    char *test_cfc_exe = chaz_Util_join("", "t", DIR_SEP, "test_cfc", exe_ext,
+                                        NULL);
 
-    char *src_dir;
     char *scratch;
 
     chaz_MakeFile *makefile;
@@ -125,17 +128,11 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     printf("Creating Makefile...\n");
 
-    src_dir = (char*)malloc(strlen(base_dir) + 20);
-    sprintf(src_dir, "%s" DIR_SEP "src", base_dir);
-
     makefile = chaz_MakeFile_new();
 
     /* Directories */
 
     chaz_MakeFile_add_var(makefile, "BASE_DIR", base_dir);
-    chaz_MakeFile_add_var(makefile, "SRC_DIR", src_dir);
-    chaz_MakeFile_add_var(makefile, "INCLUDE_DIR",
-                          "$(BASE_DIR)" DIR_SEP "include");
 
     /* File extensions */
 
@@ -150,8 +147,8 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     chaz_CFlags_enable_optimization(makefile_cflags);
     chaz_CFlags_add_include_dir(makefile_cflags, ".");
-    chaz_CFlags_add_include_dir(makefile_cflags, "$(INCLUDE_DIR)");
-    chaz_CFlags_add_include_dir(makefile_cflags, "$(SRC_DIR)");
+    chaz_CFlags_add_include_dir(makefile_cflags, include_dir);
+    chaz_CFlags_add_include_dir(makefile_cflags, src_dir);
     if (args->code_coverage) {
         chaz_CFlags_enable_code_coverage(makefile_cflags);
     }
@@ -177,18 +174,11 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     chaz_MakeFile_add_var(makefile, "CFC_OBJS", "cfc$(OBJ_EXT)");
 
-    /* Executables */
-
-    chaz_MakeFile_add_var(makefile, "CFC_EXE", "cfc$(EXE_EXT)");
-    chaz_MakeFile_add_var(makefile, "TEST_CFC_EXE",
-                          "t" DIR_SEP "test_cfc$(EXE_EXT)");
-
     /* Rules */
 
-    chaz_MakeFile_add_rule(makefile, "all", "$(CFC_EXE)");
+    chaz_MakeFile_add_rule(makefile, "all", cfc_exe);
 
-    chaz_MakeFile_add_lemon_exe(makefile, "$(BASE_DIR)" DIR_SEP ".." DIR_SEP
-                                ".." DIR_SEP "lemon");
+    chaz_MakeFile_add_lemon_exe(makefile, lemon_dir);
     chaz_MakeFile_add_lemon_grammar(makefile, parse_header);
 
     /*
@@ -206,23 +196,22 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     if (args->code_coverage) {
         chaz_CFlags_enable_code_coverage(link_flags);
     }
-    chaz_MakeFile_add_exe(makefile, "$(CFC_EXE)",
-                          "$(COMMON_OBJS) $(CFC_OBJS)", link_flags);
-    chaz_MakeFile_add_exe(makefile, "$(TEST_CFC_EXE)",
+    chaz_MakeFile_add_exe(makefile, cfc_exe, "$(COMMON_OBJS) $(CFC_OBJS)",
+                          link_flags);
+    chaz_MakeFile_add_exe(makefile, test_cfc_exe,
                           "$(COMMON_OBJS) $(TEST_CFC_OBJS)", link_flags);
     chaz_CFlags_destroy(link_flags);
 
-    rule = chaz_MakeFile_add_rule(makefile, "test", "$(TEST_CFC_EXE)");
-    chaz_MakeRule_add_command(rule, "$(TEST_CFC_EXE)");
+    rule = chaz_MakeFile_add_rule(makefile, "test", test_cfc_exe);
+    chaz_MakeRule_add_command(rule, test_cfc_exe);
 
     if (args->code_coverage) {
-        rule = chaz_MakeFile_add_rule(makefile, "coverage",
-                                      "$(TEST_CFC_EXE)");
+        rule = chaz_MakeFile_add_rule(makefile, "coverage", test_cfc_exe);
         chaz_MakeRule_add_command(rule,
                                   "lcov"
                                   " --zerocounters"
                                   " --directory $(BASE_DIR)");
-        chaz_MakeRule_add_command(rule, "$(TEST_CFC_EXE)");
+        chaz_MakeRule_add_command(rule, test_cfc_exe);
         chaz_MakeRule_add_command(rule,
                                   "lcov"
                                   " --capture"
@@ -251,7 +240,12 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeFile_write(makefile);
 
     chaz_MakeFile_destroy(makefile);
+    free(lemon_dir);
     free(src_dir);
+    free(include_dir);
+    free(parse_header);
+    free(cfc_exe);
+    free(test_cfc_exe);
 }
 
 int main(int argc, const char **argv) {

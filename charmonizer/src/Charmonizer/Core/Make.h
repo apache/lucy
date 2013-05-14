@@ -31,7 +31,8 @@ typedef struct chaz_MakeFile chaz_MakeFile;
 typedef struct chaz_MakeVar chaz_MakeVar;
 typedef struct chaz_MakeRule chaz_MakeRule;
 
-typedef void (*chaz_Make_list_files_callback_t)(char *file, void *context);
+typedef void (*chaz_Make_list_files_callback_t)(const char *dir, char *file,
+                                                void *context);
 
 /** Initialize the environment.
  */

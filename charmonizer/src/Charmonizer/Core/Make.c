@@ -713,7 +713,7 @@ chaz_Make_list_files(const char *dir, const char *ext,
                           file);
         }
 
-        callback(file + prefix_len, context);
+        callback(dir, file + prefix_len, context);
     }
 
     free(prefix);
