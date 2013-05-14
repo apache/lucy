@@ -319,11 +319,6 @@ chaz_CC_get_cflags(void) {
     return chaz_CC.cflags;
 }
 
-int
-chaz_CC_get_cflags_style(void) {
-    return chaz_CC.cflags_style;
-}
-
 chaz_CFlags*
 chaz_CC_get_extra_cflags(void) {
     return chaz_CC.extra_cflags;
@@ -332,6 +327,11 @@ chaz_CC_get_extra_cflags(void) {
 chaz_CFlags*
 chaz_CC_get_temp_cflags(void) {
     return chaz_CC.temp_cflags;
+}
+
+chaz_CFlags*
+chaz_CC_new_cflags(void) {
+    return chaz_CFlags_new(chaz_CC.cflags_style);
 }
 
 const char*

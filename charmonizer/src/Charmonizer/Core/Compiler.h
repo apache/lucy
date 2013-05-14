@@ -76,11 +76,6 @@ chaz_CC_get_cc(void);
 const char*
 chaz_CC_get_cflags(void);
 
-/* Accessor for `cflags_style`.
- */
-int
-chaz_CC_get_cflags_style(void);
-
 /* Accessor for `extra_cflags`.
  */
 chaz_CFlags*
@@ -90,6 +85,11 @@ chaz_CC_get_extra_cflags(void);
  */
 chaz_CFlags*
 chaz_CC_get_temp_cflags(void);
+
+/* Return a new CFlags object.
+ */
+chaz_CFlags*
+chaz_CC_new_cflags(void);
 
 /* Return the extension for a compiled object.
  */

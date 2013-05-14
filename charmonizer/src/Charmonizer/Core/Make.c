@@ -264,8 +264,7 @@ chaz_MakeFile_distclean_rule(chaz_MakeFile *makefile) {
 chaz_MakeRule*
 chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
                       const char *sources, chaz_CFlags *link_flags) {
-    int            cflags_style = chaz_CC_get_cflags_style();
-    chaz_CFlags   *local_flags  = chaz_CFlags_new(cflags_style);
+    chaz_CFlags   *local_flags  = chaz_CC_new_cflags();
     const char    *link         = chaz_CC_link_command();
     const char    *link_flags_string = "";
     const char    *local_flags_string;
@@ -293,8 +292,7 @@ chaz_MakeFile_add_exe(chaz_MakeFile *makefile, const char *exe,
 chaz_MakeRule*
 chaz_MakeFile_add_compiled_exe(chaz_MakeFile *makefile, const char *exe,
                                const char *sources, chaz_CFlags *cflags) {
-    int            cflags_style  = chaz_CC_get_cflags_style();
-    chaz_CFlags   *local_flags   = chaz_CFlags_new(cflags_style);
+    chaz_CFlags   *local_flags   = chaz_CC_new_cflags();
     const char    *cc            = chaz_CC_get_cc();
     const char    *cflags_string = "";
     const char    *local_flags_string;
@@ -323,8 +321,7 @@ chaz_MakeFile_add_compiled_exe(chaz_MakeFile *makefile, const char *exe,
 chaz_MakeRule*
 chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
                              const char *sources, chaz_CFlags *link_flags) {
-    int            cflags_style = chaz_CC_get_cflags_style();
-    chaz_CFlags   *local_flags  = chaz_CFlags_new(cflags_style);
+    chaz_CFlags   *local_flags  = chaz_CC_new_cflags();
     const char    *link         = chaz_CC_link_command();
     const char    *link_flags_string = "";
     const char    *local_flags_string;

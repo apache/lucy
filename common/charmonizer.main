@@ -156,7 +156,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeRule *clean_rule;
     chaz_MakeRule *distclean_rule;
 
-    int          cflags_style = chaz_CC_get_cflags_style();
     chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
     chaz_CFlags *makefile_cflags;
     chaz_CFlags *lemon_cflags;
@@ -206,7 +205,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     chaz_MakeFile_add_var(makefile, "CC", chaz_CC_get_cc());
 
-    makefile_cflags = chaz_CFlags_new(cflags_style);
+    makefile_cflags = chaz_CC_new_cflags();
     S_add_common_cflags(makefile_cflags);
 
     chaz_CFlags_disable_strict_aliasing(makefile_cflags);
@@ -290,7 +289,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     lib_filename = chaz_SharedLib_filename(lib);
     chaz_MakeFile_add_rule(makefile, "all", lib_filename);
 
-    lemon_cflags = chaz_CFlags_new(cflags_style);
+    lemon_cflags = chaz_CC_new_cflags();
     S_add_common_cflags(lemon_cflags);
     chaz_MakeFile_add_compiled_exe(makefile, "$(LEMON_EXE)",
                                    "$(LEMON_DIR)" DIR_SEP "lemon.c",
@@ -324,7 +323,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeRule_add_prereq(rule, json_parser_c);
     chaz_MakeRule_add_prereq(rule, "$(AUTOGEN_DIR)");
 
-    link_flags = chaz_CFlags_new(cflags_style);
+    link_flags = chaz_CC_new_cflags();
     if (chaz_CC_msvc_version_num()) {
         chaz_CFlags_append(link_flags, "/nologo");
     }
@@ -341,7 +340,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeFile_add_shared_lib(makefile, lib, "$(LUCY_OBJS)", link_flags);
     chaz_CFlags_destroy(link_flags);
 
-    test_cflags = chaz_CFlags_new(cflags_style);
+    test_cflags = chaz_CC_new_cflags();
     S_add_common_cflags(test_cflags);
     chaz_CFlags_add_include_dir(test_cflags, ".");
     chaz_CFlags_add_include_dir(test_cflags,
