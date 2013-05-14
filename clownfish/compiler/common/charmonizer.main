@@ -23,12 +23,6 @@
 #include "Charmonizer/Probe.h"
 #include "Charmonizer/Probe/Integers.h"
 
-#if defined(_WIN32) && !defined(__CYGWIN__)
-  #define DIR_SEP "\\"
-#else
-  #define DIR_SEP "/"
-#endif
-
 typedef struct SourceFileContext {
     chaz_MakeVar *common_objs;
     chaz_MakeVar *test_cfc_objs;
@@ -72,6 +66,7 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
 static void
 S_source_file_callback(const char *dir, char *file, void *context) {
     SourceFileContext *sfc = (SourceFileContext*)context;
+    const char *dir_sep = chaz_OS_dir_sep();
     const char *obj_ext = chaz_CC_obj_ext();
     size_t file_len = strlen(file);
     char *obj_file;
@@ -85,7 +80,7 @@ S_source_file_callback(const char *dir, char *file, void *context) {
     }
     file[file_len-2] = '\0';
 
-    obj_file = chaz_Util_join("", dir, DIR_SEP, file, obj_ext, NULL);
+    obj_file = chaz_Util_join("", dir, dir_sep, file, obj_ext, NULL);
     if (strlen(file) >= 7 && memcmp(file, "CFCTest", 7) == 0) {
         chaz_MakeVar_append(sfc->test_cfc_objs, obj_file);
     }
@@ -101,17 +96,18 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     SourceFileContext sfc;
 
     const char *base_dir = "..";
+    const char *dir_sep  = chaz_OS_dir_sep();
     const char *exe_ext  = chaz_OS_exe_ext();
     const char *obj_ext  = chaz_CC_obj_ext();
 
-    char *lemon_dir    = chaz_Util_join(DIR_SEP, base_dir, "..", "..", "lemon",
+    char *lemon_dir    = chaz_Util_join(dir_sep, base_dir, "..", "..", "lemon",
                                         NULL);
-    char *src_dir      = chaz_Util_join(DIR_SEP, base_dir, "src", NULL);
-    char *include_dir  = chaz_Util_join(DIR_SEP, base_dir, "include", NULL);
-    char *parse_header = chaz_Util_join(DIR_SEP, src_dir, "CFCParseHeader",
+    char *src_dir      = chaz_Util_join(dir_sep, base_dir, "src", NULL);
+    char *include_dir  = chaz_Util_join(dir_sep, base_dir, "include", NULL);
+    char *parse_header = chaz_Util_join(dir_sep, src_dir, "CFCParseHeader",
                                         NULL);
     char *cfc_exe      = chaz_Util_join("", "cfc", exe_ext, NULL);
-    char *test_cfc_exe = chaz_Util_join("", "t", DIR_SEP, "test_cfc", exe_ext,
+    char *test_cfc_exe = chaz_Util_join("", "t", dir_sep, "test_cfc", exe_ext,
                                         NULL);
 
     char *scratch;
@@ -165,7 +161,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeVar_append(sfc.common_objs, scratch);
     free(scratch);
 
-    scratch = chaz_Util_join("", "t", DIR_SEP, "test_cfc", obj_ext, NULL);
+    scratch = chaz_Util_join("", "t", dir_sep, "test_cfc", obj_ext, NULL);
     chaz_MakeVar_append(sfc.test_cfc_objs, scratch);
     free(scratch);
 

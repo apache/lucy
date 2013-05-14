@@ -38,12 +38,6 @@
 #include "Charmonizer/Core/ConfWriterPerl.h"
 #include "Charmonizer/Core/ConfWriterRuby.h"
 
-#if defined(_WIN32) && !defined(__CYGWIN__)
-  #define DIR_SEP "\\"
-#else
-  #define DIR_SEP "/"
-#endif
-
 typedef struct SourceFileContext {
     chaz_MakeVar *var;
 } SourceFileContext;
@@ -99,27 +93,34 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
     chaz_CFlags_add_define(extra_cflags, "CFP_LUCY", NULL);
 }
 
+static int
+S_ends_with(const char *string, const char *postfix) {
+    size_t len         = strlen(string);
+    size_t postfix_len = strlen(postfix);
+    return len >= postfix_len
+           && memcmp(string + len - postfix_len, postfix, postfix_len) == 0;
+}
+
 static void
 S_source_file_callback(const char *dir, char *file, void *context) {
     SourceFileContext *sfc = (SourceFileContext*)context;
-    const char *obj_ext       = chaz_CC_obj_ext();
-    const char *json_parser_c = "Lucy" DIR_SEP "Util" DIR_SEP "Json" DIR_SEP
-                                "JsonParser.c";
+    const char *dir_sep = chaz_OS_dir_sep();
+    const char *obj_ext = chaz_CC_obj_ext();
     size_t file_len = strlen(file);
     char *obj_file;
 
-    if (strcmp(file, json_parser_c) == 0) { return; }
-
     /* Strip extension */
-    if (file_len <= 2 || memcmp(file + file_len - 2, ".c", 2) != 0) {
+    if (!S_ends_with(file, ".c")) {
         chaz_Util_warn("Unexpected source file name: %s", file);
         return;
     }
     file[file_len-2] = '\0';
 
-    obj_file = chaz_Util_join("", dir, DIR_SEP, file, obj_ext, NULL);
-    chaz_MakeVar_append(sfc->var, obj_file);
-    free(obj_file);
+    if (!S_ends_with(file, "JsonParser")) {
+        obj_file = chaz_Util_join("", dir, dir_sep, file, obj_ext, NULL);
+        chaz_MakeVar_append(sfc->var, obj_file);
+        free(obj_file);
+    }
 }
 
 static void
@@ -127,30 +128,34 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     SourceFileContext sfc;
 
     const char *base_dir = "..";
+    const char *dir_sep  = chaz_OS_dir_sep();
     const char *exe_ext  = chaz_OS_exe_ext();
     const char *obj_ext  = chaz_CC_obj_ext();
 
-    char *core_dir      = chaz_Util_join(DIR_SEP, base_dir, "core", NULL);
-    char *lemon_dir     = chaz_Util_join(DIR_SEP, base_dir, "lemon", NULL);
-    char *cfc_dir       = chaz_Util_join(DIR_SEP, base_dir, "clownfish",
+    char *core_dir      = chaz_Util_join(dir_sep, base_dir, "core", NULL);
+    char *lemon_dir     = chaz_Util_join(dir_sep, base_dir, "lemon", NULL);
+    char *cfc_dir       = chaz_Util_join(dir_sep, base_dir, "clownfish",
                                          "compiler", "c", NULL);
-    char *modules_dir   = chaz_Util_join(DIR_SEP, base_dir, "modules", NULL);
-    char *snowstem_dir  = chaz_Util_join(DIR_SEP, modules_dir, "analysis",
+    char *modules_dir   = chaz_Util_join(dir_sep, base_dir, "modules", NULL);
+    char *snowstem_dir  = chaz_Util_join(dir_sep, modules_dir, "analysis",
                                          "snowstem", "source", NULL);
-    char *snowstem_inc_dir = chaz_Util_join(DIR_SEP, snowstem_dir, "include",
-                                            NULL);
-    char *snowstop_dir  = chaz_Util_join(DIR_SEP, modules_dir, "analysis",
+    char *snowstop_dir  = chaz_Util_join(dir_sep, modules_dir, "analysis",
                                          "snowstop", "source", NULL);
-    char *ucd_dir       = chaz_Util_join(DIR_SEP, modules_dir, "unicode",
+    char *ucd_dir       = chaz_Util_join(dir_sep, modules_dir, "unicode",
                                          "ucd", NULL);
-    char *utf8proc_dir  = chaz_Util_join(DIR_SEP, modules_dir, "unicode",
+    char *utf8proc_dir  = chaz_Util_join(dir_sep, modules_dir, "unicode",
                                          "utf8proc", NULL);
-    char *json_parser   = chaz_Util_join(DIR_SEP, core_dir, "Lucy", "Util",
+    char *json_parser   = chaz_Util_join(dir_sep, core_dir, "Lucy", "Util",
                                          "Json", "JsonParser", NULL);
-    char *cfc_exe       = chaz_Util_join("", cfc_dir, DIR_SEP, "cfc", exe_ext,
+    char *cfc_exe       = chaz_Util_join("", cfc_dir, dir_sep, "cfc", exe_ext,
                                          NULL);
-    char *test_lucy_exe = chaz_Util_join("", "t", DIR_SEP, "test_lucy",
+    char *test_lucy_exe = chaz_Util_join("", "t", dir_sep, "test_lucy",
                                          exe_ext, NULL);
+
+    char *autogen_inc_dir
+        = chaz_Util_join(dir_sep, "autogen", "include", NULL);
+    char *snowstem_inc_dir
+        = chaz_Util_join(dir_sep, snowstem_dir, "include", NULL);
 
     chaz_MakeFile *makefile;
     chaz_MakeVar  *var;
@@ -193,7 +198,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     chaz_CFlags_add_include_dir(makefile_cflags, ".");
     chaz_CFlags_add_include_dir(makefile_cflags, core_dir);
-    chaz_CFlags_add_include_dir(makefile_cflags, "autogen" DIR_SEP "include");
+    chaz_CFlags_add_include_dir(makefile_cflags, autogen_inc_dir);
     chaz_CFlags_add_include_dir(makefile_cflags, snowstem_inc_dir);
     chaz_CFlags_add_include_dir(makefile_cflags, ucd_dir);
     chaz_CFlags_add_include_dir(makefile_cflags, utf8proc_dir);
@@ -220,7 +225,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeVar_append(var, scratch);
     free(scratch);
 
-    scratch = chaz_Util_join("", "autogen", DIR_SEP, "source", DIR_SEP,
+    scratch = chaz_Util_join("", "autogen", dir_sep, "source", dir_sep,
                              "parcel", obj_ext, NULL);
     chaz_MakeVar_append(var, scratch);
     free(scratch);
@@ -248,8 +253,9 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     free(scratch);
 
     /* Needed for parallel builds. */
-    rule = chaz_MakeFile_add_rule(makefile, "autogen" DIR_SEP "source"
-                                  DIR_SEP "parcel.c", "autogen");
+    scratch = chaz_Util_join(dir_sep, "autogen", "source", "parcel.c", NULL);
+    rule = chaz_MakeFile_add_rule(makefile, scratch, "autogen");
+    free(scratch);
 
     rule = chaz_MakeFile_add_rule(makefile, "$(LUCY_OBJS)", "autogen");
     /*
@@ -279,11 +285,12 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     test_cflags = chaz_CC_new_cflags();
     chaz_CFlags_enable_optimization(test_cflags);
     chaz_CFlags_add_include_dir(test_cflags, ".");
-    chaz_CFlags_add_include_dir(test_cflags, "autogen" DIR_SEP "include");
+    chaz_CFlags_add_include_dir(test_cflags, autogen_inc_dir);
     chaz_CFlags_add_library(link_flags, lib);
-    rule = chaz_MakeFile_add_compiled_exe(makefile, test_lucy_exe,
-                                          "t" DIR_SEP "test_lucy.c",
+    scratch = chaz_Util_join(dir_sep, "t", "test_lucy.c", NULL);
+    rule = chaz_MakeFile_add_compiled_exe(makefile, test_lucy_exe, scratch,
                                           test_cflags);
+    free(scratch);
     chaz_MakeRule_add_prereq(rule, lib_filename);
     chaz_CFlags_destroy(test_cflags);
 
@@ -353,13 +360,14 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     free(cfc_dir);
     free(modules_dir);
     free(snowstem_dir);
-    free(snowstem_inc_dir);
     free(snowstop_dir);
     free(ucd_dir);
     free(utf8proc_dir);
     free(json_parser);
     free(cfc_exe);
     free(test_lucy_exe);
+    free(autogen_inc_dir);
+    free(snowstem_inc_dir);
     free(lib_filename);
     free(test_command);
 }
