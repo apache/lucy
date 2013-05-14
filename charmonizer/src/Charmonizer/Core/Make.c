@@ -169,6 +169,9 @@ chaz_Make_audition(const char *make) {
 chaz_MakeFile*
 chaz_MakeFile_new() {
     chaz_MakeFile *makefile = (chaz_MakeFile*)malloc(sizeof(chaz_MakeFile));
+    const char    *exe_ext  = chaz_OS_exe_ext();
+    const char    *obj_ext  = chaz_CC_obj_ext();
+    char *generated;
 
     makefile->vars = (chaz_MakeVar**)malloc(sizeof(chaz_MakeVar*));
     makefile->vars[0] = NULL;
@@ -181,10 +184,11 @@ chaz_MakeFile_new() {
     makefile->clean     = S_new_rule("clean", NULL);
     makefile->distclean = S_new_rule("distclean", "clean");
 
-    chaz_MakeRule_add_rm_command(makefile->distclean,
-                                 "charmonizer$(EXE_EXT) charmonizer$(OBJ_EXT)"
-                                 " charmony.h Makefile");
+    generated = chaz_Util_join("", "charmonizer", exe_ext, " charmonizer",
+                               obj_ext, " charmony.h Makefile", NULL);
+    chaz_MakeRule_add_rm_command(makefile->distclean, generated);
 
+    free(generated);
     return makefile;
 }
 

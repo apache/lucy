@@ -102,11 +102,10 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
 static void
 S_source_file_callback(const char *dir, char *file, void *context) {
     SourceFileContext *sfc = (SourceFileContext*)context;
+    const char *obj_ext       = chaz_CC_obj_ext();
     const char *json_parser_c = "Lucy" DIR_SEP "Util" DIR_SEP "Json" DIR_SEP
                                 "JsonParser.c";
     size_t file_len = strlen(file);
-    size_t obj_file_size;
-    const char *pattern;
     char *obj_file;
 
     if (strcmp(file, json_parser_c) == 0) { return; }
@@ -118,7 +117,7 @@ S_source_file_callback(const char *dir, char *file, void *context) {
     }
     file[file_len-2] = '\0';
 
-    obj_file = chaz_Util_join("", dir, DIR_SEP, file, "$(OBJ_EXT)", NULL);
+    obj_file = chaz_Util_join("", dir, DIR_SEP, file, obj_ext, NULL);
     chaz_MakeVar_append(sfc->var, obj_file);
     free(obj_file);
 }
@@ -178,11 +177,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     chaz_MakeFile_add_var(makefile, "BASE_DIR", base_dir);
 
-    /* File extensions */
-
-    chaz_MakeFile_add_var(makefile, "EXE_EXT", exe_ext);
-    chaz_MakeFile_add_var(makefile, "OBJ_EXT", obj_ext);
-
     /* C compiler */
 
     chaz_MakeFile_add_var(makefile, "CC", chaz_CC_get_cc());
@@ -222,12 +216,14 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_Make_list_files(snowstop_dir, "c", S_source_file_callback, &sfc);
     chaz_Make_list_files(utf8proc_dir, "c", S_source_file_callback, &sfc);
 
-    scratch = chaz_Util_join("", json_parser, "$(OBJ_EXT)", NULL);
+    scratch = chaz_Util_join("", json_parser, obj_ext, NULL);
     chaz_MakeVar_append(var, scratch);
     free(scratch);
 
-    chaz_MakeVar_append(var, "autogen" DIR_SEP "source" DIR_SEP
-                        "parcel$(OBJ_EXT)");
+    scratch = chaz_Util_join("", "autogen", DIR_SEP, "source", DIR_SEP,
+                             "parcel", obj_ext, NULL);
+    chaz_MakeVar_append(var, scratch);
+    free(scratch);
 
     /* Rules */
 

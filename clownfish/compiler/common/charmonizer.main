@@ -72,9 +72,8 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
 static void
 S_source_file_callback(const char *dir, char *file, void *context) {
     SourceFileContext *sfc = (SourceFileContext*)context;
+    const char *obj_ext = chaz_CC_obj_ext();
     size_t file_len = strlen(file);
-    size_t obj_file_size;
-    const char *pattern;
     char *obj_file;
 
     if (strcmp(file, "CFCParseHeader.c") == 0) { return; }
@@ -86,7 +85,7 @@ S_source_file_callback(const char *dir, char *file, void *context) {
     }
     file[file_len-2] = '\0';
 
-    obj_file = chaz_Util_join("", dir, DIR_SEP, file, "$(OBJ_EXT)", NULL);
+    obj_file = chaz_Util_join("", dir, DIR_SEP, file, obj_ext, NULL);
     if (strlen(file) >= 7 && memcmp(file, "CFCTest", 7) == 0) {
         chaz_MakeVar_append(sfc->test_cfc_objs, obj_file);
     }
@@ -134,11 +133,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     chaz_MakeFile_add_var(makefile, "BASE_DIR", base_dir);
 
-    /* File extensions */
-
-    chaz_MakeFile_add_var(makefile, "EXE_EXT", exe_ext);
-    chaz_MakeFile_add_var(makefile, "OBJ_EXT", obj_ext);
-
     /* C compiler */
 
     chaz_MakeFile_add_var(makefile, "CC", chaz_CC_get_cc());
@@ -167,12 +161,17 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     chaz_Make_list_files(src_dir, "c", S_source_file_callback, &sfc);
 
-    scratch = chaz_Util_join("", parse_header, "$(OBJ_EXT)", NULL);
+    scratch = chaz_Util_join("", parse_header, obj_ext, NULL);
     chaz_MakeVar_append(sfc.common_objs, scratch);
     free(scratch);
-    chaz_MakeVar_append(sfc.test_cfc_objs, "t" DIR_SEP "test_cfc$(OBJ_EXT)");
 
-    chaz_MakeFile_add_var(makefile, "CFC_OBJS", "cfc$(OBJ_EXT)");
+    scratch = chaz_Util_join("", "t", DIR_SEP, "test_cfc", obj_ext, NULL);
+    chaz_MakeVar_append(sfc.test_cfc_objs, scratch);
+    free(scratch);
+
+    scratch = chaz_Util_join("", "cfc", obj_ext, NULL);
+    chaz_MakeFile_add_var(makefile, "CFC_OBJS", scratch);
+    free(scratch);
 
     /* Rules */
 
