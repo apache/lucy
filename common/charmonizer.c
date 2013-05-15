@@ -3755,8 +3755,19 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
     command = chaz_Util_join(" ", link, sources, link_flags_string,
                              local_flags_string, NULL);
     chaz_MakeRule_add_command(rule, command);
+    free(command);
 
     chaz_MakeRule_add_rm_command(makefile->clean, filename);
+
+    if (strcmp(chaz_OS_shared_lib_ext(), ".so") == 0) {
+        /* Add symlink for soname. */
+        char *soname = chaz_SharedLib_major_version_filename(lib);
+        command = chaz_Util_join(" ", "ln -sf", filename, soname, NULL);
+        chaz_MakeRule_add_command(rule, command);
+        free(command);
+        chaz_MakeRule_add_rm_command(makefile->clean, soname);
+        free(soname);
+    }
 
     if (chaz_CC_msvc_version_num()) {
         /* Remove import library and export file under MSVC. */
@@ -3770,7 +3781,6 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
 
     chaz_CFlags_destroy(local_flags);
     free(filename);
-    free(command);
     return rule;
 }
 
@@ -6901,7 +6911,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_CFlags_enable_optimization(test_cflags);
     chaz_CFlags_add_include_dir(test_cflags, ".");
     chaz_CFlags_add_include_dir(test_cflags, autogen_inc_dir);
-    chaz_CFlags_add_library(link_flags, lib);
+    chaz_CFlags_add_library(test_cflags, lib);
     scratch = chaz_Util_join(dir_sep, "t", "test_lucy.c", NULL);
     rule = chaz_MakeFile_add_compiled_exe(makefile, test_lucy_exe, scratch,
                                           test_cflags);
