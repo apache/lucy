@@ -314,7 +314,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_CFlags_enable_optimization(test_cflags);
     chaz_CFlags_add_include_dir(test_cflags, ".");
     chaz_CFlags_add_include_dir(test_cflags, autogen_inc_dir);
-    chaz_CFlags_add_library(link_flags, lib);
+    chaz_CFlags_add_library(test_cflags, lib);
     scratch = chaz_Util_join(dir_sep, "t", "test_lucy.c", NULL);
     rule = chaz_MakeFile_add_compiled_exe(makefile, test_lucy_exe, scratch,
                                           test_cflags);
