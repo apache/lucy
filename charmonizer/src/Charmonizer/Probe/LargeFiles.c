@@ -47,7 +47,7 @@ typedef struct chaz_LargeFiles_unbuff_combo {
 
 /* Check for a 64-bit file pointer type.
  */
-static const int
+static int
 chaz_LargeFiles_probe_off64(void);
 
 /* Check what name 64-bit ftell, fseek go by.
@@ -114,7 +114,7 @@ chaz_LargeFiles_run(void) {
     chaz_ConfWriter_end_module();
 }
 
-static const int
+static int
 chaz_LargeFiles_probe_off64(void) {
     static const char off64_code[] =
         CHAZ_QUOTE(  %s                                        )
