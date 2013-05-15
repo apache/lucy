@@ -3843,11 +3843,12 @@ chaz_MakeFile_write(chaz_MakeFile *makefile) {
 
     if (chaz_Make.is_nmake) {
         /* Inference rule for .c files. */
-        fprintf(out, ".c.obj :\n");
         if (chaz_CC_msvc_version_num()) {
+            fprintf(out, ".c.obj :\n");
             fprintf(out, "\t$(CC) /nologo $(CFLAGS) /c $< /Fo$@\n\n");
         }
         else {
+            fprintf(out, ".c.o :\n");
             fprintf(out, "\t$(CC) $(CFLAGS) -c $< -o $@\n\n");
         }
     }
@@ -5000,7 +5001,11 @@ chaz_DirManip_run(void) {
         chaz_ConfWriter_add_def("MAKEDIR_MODE_IGNORED", "1");
     }
 
-    {
+    if (strcmp(dir_sep, "\\") == 0) {
+        chaz_ConfWriter_add_def("DIR_SEP", "\"\\\\\"");
+        chaz_ConfWriter_add_def("DIR_SEP_CHAR", "'\\\\'");
+    }
+    else {
         char scratch[5];
         sprintf(scratch, "\"%s\"", dir_sep);
         chaz_ConfWriter_add_def("DIR_SEP", scratch);
@@ -6943,7 +6948,10 @@ S_write_makefile(struct chaz_CLIArgs *args) {
          * characters. As a work-around, delete all .obj files in BASE_DIR
          * using 'del /s /q'.
          */
-        chaz_MakeRule_add_command(clean_rule, "del /s /q $(BASE_DIR)\\*.obj");
+        scratch = chaz_Util_join("", "del /s /q ", base_dir, "\\*", obj_ext,
+                                 NULL);
+        chaz_MakeRule_add_command(clean_rule, scratch);
+        free(scratch);
     }
     else {
         chaz_MakeRule_add_rm_command(clean_rule, "$(LUCY_OBJS)");
