@@ -102,7 +102,7 @@ S_ends_with(const char *string, const char *postfix) {
 }
 
 static void
-S_source_file_callback(const char *dir, char *file, void *context) {
+S_c_file_callback(const char *dir, char *file, void *context) {
     SourceFileContext *sfc = (SourceFileContext*)context;
     const char *dir_sep = chaz_OS_dir_sep();
     const char *obj_ext = chaz_CC_obj_ext();
@@ -111,7 +111,7 @@ S_source_file_callback(const char *dir, char *file, void *context) {
 
     /* Strip extension */
     if (!S_ends_with(file, ".c")) {
-        chaz_Util_warn("Unexpected source file name: %s", file);
+        chaz_Util_warn("Unexpected C filename: %s", file);
         return;
     }
     file[file_len-2] = '\0';
@@ -121,6 +121,22 @@ S_source_file_callback(const char *dir, char *file, void *context) {
         chaz_MakeVar_append(sfc->var, obj_file);
         free(obj_file);
     }
+}
+
+static void
+S_cfh_file_callback(const char *dir, char *file, void *context) {
+    SourceFileContext *sfc = (SourceFileContext*)context;
+    const char *dir_sep = chaz_OS_dir_sep();
+    char *cfh_file;
+
+    if (!S_ends_with(file, ".cfh")) {
+        chaz_Util_warn("Unexpected Clownfish header filename: %s", file);
+        return;
+    }
+
+    cfh_file = chaz_Util_join(dir_sep, dir, file, NULL);
+    chaz_MakeVar_append(sfc->var, cfh_file);
+    free(cfh_file);
 }
 
 static void
@@ -215,11 +231,11 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     var = chaz_MakeFile_add_var(makefile, "LUCY_OBJS", NULL);
     sfc.var = var;
 
-    chaz_Make_list_files("src",        "c", S_source_file_callback, &sfc);
-    chaz_Make_list_files(core_dir,     "c", S_source_file_callback, &sfc);
-    chaz_Make_list_files(snowstem_dir, "c", S_source_file_callback, &sfc);
-    chaz_Make_list_files(snowstop_dir, "c", S_source_file_callback, &sfc);
-    chaz_Make_list_files(utf8proc_dir, "c", S_source_file_callback, &sfc);
+    chaz_Make_list_files("src",        "c", S_c_file_callback, &sfc);
+    chaz_Make_list_files(core_dir,     "c", S_c_file_callback, &sfc);
+    chaz_Make_list_files(snowstem_dir, "c", S_c_file_callback, &sfc);
+    chaz_Make_list_files(snowstop_dir, "c", S_c_file_callback, &sfc);
+    chaz_Make_list_files(utf8proc_dir, "c", S_c_file_callback, &sfc);
 
     scratch = chaz_Util_join("", json_parser, obj_ext, NULL);
     chaz_MakeVar_append(var, scratch);
@@ -229,6 +245,13 @@ S_write_makefile(struct chaz_CLIArgs *args) {
                              "parcel", obj_ext, NULL);
     chaz_MakeVar_append(var, scratch);
     free(scratch);
+
+    /* Clownfish header files */
+
+    var = chaz_MakeFile_add_var(makefile, "CLOWNFISH_HEADERS", NULL);
+    sfc.var = var;
+
+    chaz_Make_list_files(core_dir, "cfh", S_cfh_file_callback, &sfc);
 
     /* Rules */
 
@@ -247,9 +270,14 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeRule_add_make_command(rule, cfc_dir, NULL);
 
     rule = chaz_MakeFile_add_rule(makefile, "autogen", cfc_exe);
+    chaz_MakeRule_add_prereq(rule, "$(CLOWNFISH_HEADERS)");
     scratch = chaz_Util_join("", cfc_exe, " --source=", core_dir,
                              " --dest=autogen --header=cfc_header", NULL);
     chaz_MakeRule_add_command(rule, scratch);
+    /* TODO: Find a way to touch the autogen directory on Windows. */
+    if (chaz_Make_shell_type() == CHAZ_OS_POSIX) {
+        chaz_MakeRule_add_command(rule, "touch autogen");
+    }
     free(scratch);
 
     /* Needed for parallel builds. */
