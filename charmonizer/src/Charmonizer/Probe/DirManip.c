@@ -177,7 +177,11 @@ chaz_DirManip_run(void) {
         chaz_ConfWriter_add_def("MAKEDIR_MODE_IGNORED", "1");
     }
 
-    {
+    if (strcmp(dir_sep, "\\") == 0) {
+        chaz_ConfWriter_add_def("DIR_SEP", "\"\\\\\"");
+        chaz_ConfWriter_add_def("DIR_SEP_CHAR", "'\\\\'");
+    }
+    else {
         char scratch[5];
         sprintf(scratch, "\"%s\"", dir_sep);
         chaz_ConfWriter_add_def("DIR_SEP", scratch);
