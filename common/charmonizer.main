@@ -361,7 +361,10 @@ S_write_makefile(struct chaz_CLIArgs *args) {
          * characters. As a work-around, delete all .obj files in BASE_DIR
          * using 'del /s /q'.
          */
-        chaz_MakeRule_add_command(clean_rule, "del /s /q $(BASE_DIR)\\*.obj");
+        scratch = chaz_Util_join("", "del /s /q ", base_dir, "\\*", obj_ext,
+                                 NULL);
+        chaz_MakeRule_add_command(clean_rule, scratch);
+        free(scratch);
     }
     else {
         chaz_MakeRule_add_rm_command(clean_rule, "$(LUCY_OBJS)");

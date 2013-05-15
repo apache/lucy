@@ -443,11 +443,12 @@ chaz_MakeFile_write(chaz_MakeFile *makefile) {
 
     if (chaz_Make.is_nmake) {
         /* Inference rule for .c files. */
-        fprintf(out, ".c.obj :\n");
         if (chaz_CC_msvc_version_num()) {
+            fprintf(out, ".c.obj :\n");
             fprintf(out, "\t$(CC) /nologo $(CFLAGS) /c $< /Fo$@\n\n");
         }
         else {
+            fprintf(out, ".c.o :\n");
             fprintf(out, "\t$(CC) $(CFLAGS) -c $< -o $@\n\n");
         }
     }
