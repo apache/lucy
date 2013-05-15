@@ -52,6 +52,7 @@ Obj_dec_refcount(Obj *self) {
 
 void*
 Obj_to_host(Obj *self) {
+    UNUSED_VAR(self);
     THROW(ERR, "TODO");
     UNREACHABLE_RETURN(void*);
 }

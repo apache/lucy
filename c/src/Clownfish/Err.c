@@ -62,6 +62,7 @@ Err_do_throw(Err *error) {
 
 void*
 Err_to_host(Err *self) {
+    UNUSED_VAR(self);
     THROW(ERR, "TODO");
     UNREACHABLE_RETURN(void*);
 }

@@ -23,6 +23,7 @@
 
 void*
 LFReg_to_host(LockFreeRegistry *self) {
+    UNUSED_VAR(self);
     THROW(ERR, "TODO");
     UNREACHABLE_RETURN(void*);
 }

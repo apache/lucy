@@ -43,6 +43,8 @@ VTable_init_obj(VTable *self, void *allocation) {
 
 Obj*
 VTable_foster_obj(VTable *self, void *host_obj) {
+    UNUSED_VAR(self);
+    UNUSED_VAR(host_obj);
     THROW(ERR, "TODO");
     UNREACHABLE_RETURN(Obj*);
 }
@@ -61,12 +63,14 @@ VTable_fresh_host_methods(const CharBuf *class_name) {
 
 CharBuf*
 VTable_find_parent_class(const CharBuf *class_name) {
+    UNUSED_VAR(class_name);
     THROW(ERR, "TODO");
     UNREACHABLE_RETURN(CharBuf*);
 }
 
 void*
 VTable_to_host(VTable *self) {
+    UNUSED_VAR(self);
     THROW(ERR, "TODO");
     UNREACHABLE_RETURN(void*);
 }

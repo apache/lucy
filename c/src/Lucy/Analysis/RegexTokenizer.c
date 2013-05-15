@@ -82,6 +82,8 @@ RegexTokenizer_init(RegexTokenizer *self, const CharBuf *pattern) {
 
 void
 RegexTokenizer_set_token_re(RegexTokenizer *self, void *token_re) {
+    UNUSED_VAR(self);
+    UNUSED_VAR(token_re);
     THROW(ERR, "TODO");
 }
 
@@ -158,6 +160,8 @@ RegexTokenizer_is_available(void) {
 
 RegexTokenizer*
 RegexTokenizer_init(RegexTokenizer *self, const CharBuf *pattern) {
+    UNUSED_VAR(self);
+    UNUSED_VAR(pattern);
     THROW(ERR,
           "RegexTokenizer is not available because Lucy was compiled"
           " without PCRE.");
@@ -166,6 +170,8 @@ RegexTokenizer_init(RegexTokenizer *self, const CharBuf *pattern) {
 
 void
 RegexTokenizer_set_token_re(RegexTokenizer *self, void *token_re) {
+    UNUSED_VAR(self);
+    UNUSED_VAR(token_re);
     THROW(ERR,
           "RegexTokenizer is not available because Lucy was compiled"
           " without PCRE.");
@@ -173,6 +179,7 @@ RegexTokenizer_set_token_re(RegexTokenizer *self, void *token_re) {
 
 void
 RegexTokenizer_destroy(RegexTokenizer *self) {
+    UNUSED_VAR(self);
     THROW(ERR,
           "RegexTokenizer is not available because Lucy was compiled"
           " without PCRE.");
@@ -181,6 +188,10 @@ RegexTokenizer_destroy(RegexTokenizer *self) {
 void
 RegexTokenizer_tokenize_str(RegexTokenizer *self, const char *string,
                             size_t string_len, Inversion *inversion) {
+    UNUSED_VAR(self);
+    UNUSED_VAR(string);
+    UNUSED_VAR(string_len);
+    UNUSED_VAR(inversion);
     THROW(ERR,
           "RegexTokenizer is not available because Lucy was compiled"
           " without PCRE.");

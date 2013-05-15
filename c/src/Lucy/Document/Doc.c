@@ -92,18 +92,22 @@ Doc_extract(Doc *self, CharBuf *field,
 
 void*
 Doc_to_host(Doc *self) {
+    UNUSED_VAR(self);
     THROW(ERR, "TODO");
     UNREACHABLE_RETURN(void*);
 }
 
 Hash*
 Doc_dump(Doc *self) {
+    UNUSED_VAR(self);
     THROW(ERR, "TODO");
     UNREACHABLE_RETURN(Hash*);
 }
 
 Doc*
 Doc_load(Doc *self, Obj *dump) {
+    UNUSED_VAR(self);
+    UNUSED_VAR(dump);
     THROW(ERR, "TODO");
     UNREACHABLE_RETURN(Doc*);
 }
