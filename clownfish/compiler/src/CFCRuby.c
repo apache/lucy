@@ -196,7 +196,7 @@ S_write_boot_c(CFCRuby *self) {
         "\n"
         "#include \"charmony.h\"\n"
         "#include \"%s\"\n"
-        "#include \"parcel.h\"\n"
+        "#include \"%sparcel.h\"\n"
         "#include \"Clownfish/CharBuf.h\"\n"
         "#include \"Clownfish/VTable.h\"\n"
         "%s\n"
@@ -211,17 +211,10 @@ S_write_boot_c(CFCRuby *self) {
         "%s\n"
         "\n";
 
-    size_t size = sizeof(pattern)
-                  + strlen(self->header)
-                  + strlen(self->boot_h_file)
-                  + strlen(pound_includes)
-                  + strlen(self->boot_func)
-                  + strlen(prefix)
-                  + strlen(self->footer)
-                  + 100;
-    char *content = (char*)MALLOCATE(size);
-    sprintf(content, pattern, self->header, self->boot_h_file, pound_includes,
-            self->boot_func, prefix, self->footer);
+    char *content
+        = CFCUtil_sprintf(pattern, self->header, self->boot_h_file, prefix,
+                          pound_includes, self->boot_func, prefix,
+                          self->footer);
     CFCUtil_write_file(self->boot_c_path, content, strlen(content));
 
     FREEMEM(content);

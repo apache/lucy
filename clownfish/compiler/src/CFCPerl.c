@@ -48,6 +48,7 @@ struct CFCPerl {
     char *boot_h_path;
     char *boot_c_path;
     char *boot_func;
+    char *parcel_h_file;
 };
 
 // Modify a string in place, swapping out "::" for the supplied character.
@@ -112,6 +113,9 @@ CFCPerl_init(CFCPerl *self, CFCParcel *parcel, CFCHierarchy *hierarchy,
         }
     }
 
+    // Derive the name of the "parcel.h" file.
+    self->parcel_h_file = CFCUtil_sprintf("%sparcel.h", prefix);
+
     return self;
 }
 
@@ -129,6 +133,7 @@ CFCPerl_destroy(CFCPerl *self) {
     FREEMEM(self->boot_h_path);
     FREEMEM(self->boot_c_path);
     FREEMEM(self->boot_func);
+    FREEMEM(self->parcel_h_file);
     CFCBase_destroy((CFCBase*)self);
 }
 
@@ -283,7 +288,7 @@ S_write_boot_c(CFCPerl *self) {
         "#include \"perl.h\"\n"
         "#include \"XSUB.h\"\n"
         "#include \"%s\"\n"
-        "#include \"parcel.h\"\n"
+        "#include \"%s\"\n"
         "#include \"Clownfish/CharBuf.h\"\n"
         "#include \"Clownfish/VTable.h\"\n"
         "%s\n"
@@ -303,8 +308,8 @@ S_write_boot_c(CFCPerl *self) {
         "\n";
     char *content
         = CFCUtil_sprintf(pattern, self->header, self->boot_h_file,
-                          pound_includes, self->boot_func, prefix, alias_adds,
-                          isa_pushes, self->footer);
+                          self->parcel_h_file, pound_includes, self->boot_func,
+                          prefix, alias_adds, isa_pushes, self->footer);
     CFCUtil_write_file(self->boot_c_path, content, strlen(content));
 
     FREEMEM(content);
@@ -360,7 +365,7 @@ S_xs_file_contents(CFCPerl *self, const char *generated_xs,
         "%s"
         "\n"
         "#include \"XSBind.h\"\n"
-        "#include \"parcel.h\"\n"
+        "#include \"%s\"\n"
         "#include \"%s\"\n"
         "\n"
         "#include \"Clownfish/Util/Memory.h\"\n"
@@ -383,9 +388,10 @@ S_xs_file_contents(CFCPerl *self, const char *generated_xs,
         "\n"
         "%s";
     char *contents
-        = CFCUtil_sprintf(pattern, self->header, self->boot_h_file,
-                          generated_xs, self->boot_class, self->boot_class,
-                          xs_init, hand_rolled_xs, self->footer);
+        = CFCUtil_sprintf(pattern, self->header, self->parcel_h_file,
+                          self->boot_h_file, generated_xs, self->boot_class,
+                          self->boot_class, xs_init, hand_rolled_xs,
+                          self->footer);
 
     return contents;
 }
@@ -497,7 +503,7 @@ S_write_callbacks_c(CFCPerl *self) {
         "\n"
         "#include \"XSBind.h\"\n"
         "#include \"callbacks.h\"\n"
-        "#include \"parcel.h\"\n"
+        "#include \"%s\"\n"
         "\n"
         "static void\n"
         "S_finish_callback_void(const char *meth_name) {\n"
@@ -570,7 +576,8 @@ S_write_callbacks_c(CFCPerl *self) {
         "    return retval;\n"
         "}\n"
         "\n";
-    char *content = CFCUtil_sprintf(pattern, self->header);
+    char *content
+        = CFCUtil_sprintf(pattern, self->header, self->parcel_h_file);
 
     for (size_t i = 0; ordered[i] != NULL; i++) {
         CFCClass *klass = ordered[i];

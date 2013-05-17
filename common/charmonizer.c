@@ -6839,7 +6839,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     free(scratch);
 
     scratch = chaz_Util_join("", "autogen", dir_sep, "source", dir_sep,
-                             "parcel", obj_ext, NULL);
+                             "lucy_parcel", obj_ext, NULL);
     chaz_MakeVar_append(var, scratch);
     free(scratch);
 
@@ -6878,7 +6878,8 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     free(scratch);
 
     /* Needed for parallel builds. */
-    scratch = chaz_Util_join(dir_sep, "autogen", "source", "parcel.c", NULL);
+    scratch = chaz_Util_join(dir_sep, "autogen", "source", "lucy_parcel.c",
+                             NULL);
     rule = chaz_MakeFile_add_rule(makefile, scratch, "autogen");
     free(scratch);
 
