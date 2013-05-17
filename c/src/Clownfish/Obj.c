@@ -23,19 +23,19 @@
 
 uint32_t
 Obj_get_refcount(Obj *self) {
-    return self->ref.count;
+    return self->refcount;
 }
 
 Obj*
 Obj_inc_refcount(Obj *self) {
-    self->ref.count++;
+    self->refcount++;
     return self;
 }
 
 uint32_t
 Obj_dec_refcount(Obj *self) {
     uint32_t modified_refcount = INT32_MAX;
-    switch (self->ref.count) {
+    switch (self->refcount) {
         case 0:
             THROW(ERR, "Illegal refcount of 0");
             break; // useless
@@ -44,7 +44,7 @@ Obj_dec_refcount(Obj *self) {
             Obj_Destroy(self);
             break;
         default:
-            modified_refcount = --self->ref.count;
+            modified_refcount = --self->refcount;
             break;
     }
     return modified_refcount;

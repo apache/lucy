@@ -29,7 +29,7 @@ Obj*
 VTable_make_obj(VTable *self) {
     Obj *obj = (Obj*)Memory_wrapped_calloc(self->obj_alloc_size, 1);
     obj->vtable = self;
-    obj->ref.count = 1;
+    obj->refcount = 1;
     return obj;
 }
 
@@ -37,7 +37,7 @@ Obj*
 VTable_init_obj(VTable *self, void *allocation) {
     Obj *obj = (Obj*)allocation;
     obj->vtable = self;
-    obj->ref.count = 1;
+    obj->refcount = 1;
     return obj;
 }
 
