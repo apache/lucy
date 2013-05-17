@@ -281,10 +281,8 @@ S_process_dump_member(CFCClass *klass, CFCVariable *member, char *buf,
     unsigned name_len = (unsigned)strlen(name);
     const char *specifier = CFCType_get_specifier(type);
 
-    // Skip the VTable and the refcount/host-object.
-    if (strcmp(specifier, "lucy_VTable") == 0
-        || strcmp(specifier, "lucy_ref_t") == 0
-       ) {
+    // Skip the VTable.
+    if (strcmp(specifier, "lucy_VTable") == 0) {
         return;
     }
 
@@ -344,10 +342,8 @@ S_process_load_member(CFCClass *klass, CFCVariable *member, char *buf,
     char extraction[200];
     const char *specifier = CFCType_get_specifier(type);
 
-    // Skip the VTable and the refcount/host-object.
-    if (strcmp(specifier, "lucy_VTable") == 0
-        || strcmp(specifier, "lucy_ref_t") == 0
-       ) {
+    // Skip the VTable.
+    if (strcmp(specifier, "lucy_VTable") == 0) {
         return;
     }
 

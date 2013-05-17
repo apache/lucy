@@ -24,7 +24,6 @@ struct alias {
 };
 
 struct alias aliases[] = {
-    {"cfish_ref_t", "lucy_ref_t"},
     {"cfish_method_t", "lucy_method_t"},
     {"cfish_method", "lucy_method"},
     {"cfish_super_method", "lucy_super_method"},
