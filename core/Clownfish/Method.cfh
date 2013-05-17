@@ -21,15 +21,15 @@ parcel Lucy;
 
 class Clownfish::Method inherits Clownfish::Obj {
 
-    CharBuf       *name;
-    lucy_method_t  callback_func;
-    size_t         offset;
+    CharBuf        *name;
+    cfish_method_t  callback_func;
+    size_t          offset;
 
     inert Method*
-    new(const CharBuf *name, lucy_method_t callback_func, size_t offset);
+    new(const CharBuf *name, cfish_method_t callback_func, size_t offset);
 
     inert Method*
-    init(Method *self, const CharBuf *name, lucy_method_t callback_func,
+    init(Method *self, const CharBuf *name, cfish_method_t callback_func,
          size_t offset);
 
     incremented Obj*

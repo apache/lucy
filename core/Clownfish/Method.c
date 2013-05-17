@@ -24,13 +24,13 @@
 #include "Clownfish/VTable.h"
 
 Method*
-Method_new(const CharBuf *name, lucy_method_t callback_func, size_t offset) {
+Method_new(const CharBuf *name, cfish_method_t callback_func, size_t offset) {
     Method *self = (Method*)VTable_Make_Obj(METHOD);
     return Method_init(self, name, callback_func, offset);
 }
 
 Method*
-Method_init(Method *self, const CharBuf *name, lucy_method_t callback_func,
+Method_init(Method *self, const CharBuf *name, cfish_method_t callback_func,
             size_t offset) {
     self->name          = CB_Clone(name);
     self->callback_func = callback_func;
