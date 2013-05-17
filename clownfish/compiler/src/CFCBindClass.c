@@ -125,7 +125,6 @@ S_to_c_header_inert(CFCBindClass *self) {
     char *short_names     = S_short_names(self);
 
     char pattern[] =
-        "#include \"charmony.h\"\n"
         "#include \"%sparcel.h\"\n"
         "\n"
         "/* Declare this class's inert variables.\n"
@@ -167,7 +166,6 @@ S_to_c_header_dynamic(CFCBindClass *self) {
     char *short_names           = S_short_names(self);
 
     char pattern[] =
-        "#include \"charmony.h\"\n"
         "#include \"%sparcel.h\"\n"
         "\n"
         "/* Include the header for this class's parent. \n"
