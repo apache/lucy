@@ -24,6 +24,8 @@ struct alias {
 };
 
 struct alias aliases[] = {
+    {"CFISH_VISIBLE", "LUCY_VISIBLE"},
+
     {"cfish_Obj", "lucy_Obj"},
     {"CFISH_OBJ", "LUCY_OBJ"},
     {"Cfish_Obj_Dump", "Lucy_Obj_Dump"},

@@ -206,7 +206,7 @@ S_write_parcel_h(CFCBindCore *self) {
         "     ((_full_meth ## _t)cfish_super_method(_vtable, \\\n"
         "                                           _full_meth ## _OFFSET))\n"
         "\n"
-        "extern %sVISIBLE size_t cfish_VTable_offset_of_parent;\n"
+        "extern CFISH_VISIBLE size_t cfish_VTable_offset_of_parent;\n"
         "static CHY_INLINE cfish_method_t\n"
         "cfish_super_method(const void *vtable, size_t offset) {\n"
         "    char *vt_as_char = (char*)vtable;\n"
@@ -266,7 +266,7 @@ S_write_parcel_h(CFCBindCore *self) {
         "\n";
     char *file_content
         = CFCUtil_sprintf(pattern, self->header, aliases, typedefs, PREFIX,
-                          PREFIX, prefix, prefix, self->footer);
+                          prefix, prefix, self->footer);
 
     // Unlink then write file.
     const char *inc_dest = CFCHierarchy_get_include_dest(hierarchy);
