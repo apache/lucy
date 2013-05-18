@@ -157,6 +157,7 @@ S_write_parcel_h(CFCBindCore *self) {
         "extern \"C\" {\n"
         "#endif\n"
         "\n"
+        "#include <stdarg.h>\n"
         "#include <stddef.h>\n"
         "#include \"charmony.h\"\n"
         "#include \"hostdefs.h\"\n"

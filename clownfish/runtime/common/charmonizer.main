@@ -128,11 +128,6 @@ int main(int argc, const char **argv) {
         "#endif\n\n"
     );
     chaz_ConfWriter_append_conf(
-        "#ifdef CHY_HAS_STDARG_H\n"
-        "  #include <stdarg.h>\n"
-        "#endif\n\n"
-    );
-    chaz_ConfWriter_append_conf(
         "#ifdef CHY_HAS_ALLOCA_H\n"
         "  #include <alloca.h>\n"
         "#elif defined(CHY_HAS_MALLOC_H)\n"
