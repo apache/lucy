@@ -30,7 +30,7 @@ chaz_Booleans_run(void) {
     }
     else {
         chaz_ConfWriter_append_conf(
-            "#ifndef __cplusplus\n"
+            "#if (defined(CHY_EMPLOY_BOOLEANS) && !defined(__cplusplus))\n"
             "  typedef int bool;\n"
             "  #ifndef true\n"
             "    #define true 1\n"

@@ -31,6 +31,9 @@
 #include "CFCParcel.h"
 #include "CFCUtil.h"
 
+#define STRING(s)  #s
+#define XSTRING(s) STRING(s)
+
 struct CFCBindCore {
     CFCBase base;
     CFCHierarchy *hierarchy;
@@ -48,6 +51,15 @@ S_write_parcel_h(CFCBindCore *self);
  */
 static void
 S_write_parcel_c(CFCBindCore *self);
+
+static char*
+S_charmony_defines();
+
+static char*
+S_charmony_stdbool_defines();
+
+char*
+S_charmony_stdint_defines();
 
 static const CFCMeta CFCBINDCORE_META = {
     "Clownfish::CFC::Binding::Core",
@@ -119,6 +131,8 @@ S_write_parcel_h(CFCBindCore *self) {
     CFCHierarchy *hierarchy = self->hierarchy;
     CFCParcel    *parcel    = NULL;
 
+    char *charmony_defines = S_charmony_defines();
+
     // Declare object structs for all instantiable classes.
     // Obtain parcel prefix for use in bootstrap function name.
     char *typedefs = CFCUtil_strdup("");
@@ -160,6 +174,9 @@ S_write_parcel_h(CFCBindCore *self) {
         "#include <stdarg.h>\n"
         "#include <stddef.h>\n"
         "#include \"charmony.h\"\n"
+        "\n"
+        "%s"
+        "\n"
         "#include \"hostdefs.h\"\n"
         "\n"
         "#ifdef CFP_LUCY\n"
@@ -266,8 +283,8 @@ S_write_parcel_h(CFCBindCore *self) {
         "%s\n"
         "\n";
     char *file_content
-        = CFCUtil_sprintf(pattern, self->header, aliases, typedefs, PREFIX,
-                          prefix, prefix, self->footer);
+        = CFCUtil_sprintf(pattern, self->header, charmony_defines, aliases,
+                          typedefs, PREFIX, prefix, prefix, self->footer);
 
     // Unlink then write file.
     const char *inc_dest = CFCHierarchy_get_include_dest(hierarchy);
@@ -277,6 +294,7 @@ S_write_parcel_h(CFCBindCore *self) {
     CFCUtil_write_file(filepath, file_content, strlen(file_content));
     FREEMEM(filepath);
 
+    FREEMEM(charmony_defines);
     FREEMEM(aliases);
     FREEMEM(typedefs);
     FREEMEM(file_content);
@@ -456,6 +474,71 @@ CFCBindCore_write_callbacks_h(CFCBindCore *self) {
     FREEMEM(includes);
     FREEMEM(all_cb_decs);
     FREEMEM(file_content);
+}
+
+static char*
+S_charmony_defines() {
+    char *stdbool_defs = S_charmony_stdbool_defines();
+    char *stdint_defs  = S_charmony_stdint_defines();
+
+    const char *pattern =
+        "#define CFISH_INLINE %s\n"
+        "#define CFISH_EXPORT %s\n"
+        "#define CFISH_IMPORT %s\n"
+        "\n"
+        "%s"
+        "%s";
+    char *defines
+        = CFCUtil_sprintf(pattern, XSTRING(CHY_INLINE), XSTRING(CHY_EXPORT),
+                          XSTRING(CHY_IMPORT), stdbool_defs, stdint_defs);
+
+    FREEMEM(stdbool_defs);
+    FREEMEM(stdint_defs);
+    return defines;
+}
+
+static char*
+S_charmony_stdbool_defines() {
+#ifdef CHY_HAS_STDBOOL_H
+    const char *defines = "#include <stdbool.h>\n";
+#else
+    const char *defines =
+        "#if (!defined(__cplusplus) && !defined(CFISH_HAS_STDBOOL))\n"
+        "  typedef int bool;\n"
+        "  #ifndef true\n"
+        "    #define true 1\n"
+        "  #endif\n"
+        "  #ifndef false\n"
+        "    #define false 0\n"
+        "  #endif\n"
+        "#endif\n";
+#endif
+
+    return CFCUtil_strdup(defines);
+}
+
+char*
+S_charmony_stdint_defines() {
+#ifdef CHY_HAS_STDINT_H
+    return CFCUtil_strdup("#include <stdint.h>\n");
+#else
+    const char *pattern =
+        "#ifndef CFISH_HAS_STDINT\n"
+        "  typedef %s int8_t;\n"
+        "  typedef %s uint8_t;\n"
+        "  typedef %s int16_t;\n"
+        "  typedef %s uint16_t;\n"
+        "  typedef %s int32_t;\n"
+        "  typedef %s uint32_t;\n"
+        "  typedef %s int64_t;\n"
+        "  typedef %s uint64_t;\n"
+        "#endif\n";
+    return CFCUtil_sprintf(pattern,
+                           XSTRING(CHY_INT8_T),  XSTRING(CHY_UINT8_T),
+                           XSTRING(CHY_INT16_T), XSTRING(CHY_UINT16_T),
+                           XSTRING(CHY_INT32_T), XSTRING(CHY_UINT32_T),
+                           XSTRING(CHY_INT64_T), XSTRING(CHY_UINT64_T));
+#endif
 }
 
 

@@ -426,6 +426,13 @@ int main(int argc, const char **argv) {
         }
     }
 
+    /* Employ integer features but don't define stdint types in charmony.h. */
+    chaz_ConfWriter_append_conf(
+        "#define CHY_EMPLOY_INTEGERLIMITS\n"
+        "#define CHY_EMPLOY_INTEGERLITERALS\n"
+        "#define CHY_EMPLOY_INTEGERFORMATSTRINGS\n\n"
+    );
+
     /* Run probe modules. */
     chaz_BuildEnv_run();
     chaz_DirManip_run();

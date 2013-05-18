@@ -44,6 +44,7 @@ typedef struct chaz_ConfElem {
 /* Static vars. */
 static struct {
     FILE          *fh;
+    char          *MODULE_NAME;
     chaz_ConfElem *defs;
     size_t         def_cap;
     size_t         def_count;
@@ -141,18 +142,17 @@ chaz_ConfWriterC_vappend_conf(const char *fmt, va_list args) {
 
 static int
 chaz_ConfWriterC_sym_is_uppercase(const char *sym) {
-    unsigned i;
-    for (i = 0; sym[i] != 0; i++) {
-        if (!isupper(sym[i])) {
-            if (islower(sym[i])) {
-                return false;
-            }
-            else if (sym[i] != '_') {
-                return true;
-            }
-        }
+    return isupper(sym[0]);
+}
+
+static char*
+chaz_ConfWriterC_uppercase_string(const char *src) {
+    char *retval = chaz_Util_strdup(src);
+    size_t i;
+    for (i = 0; retval[i]; ++i) {
+        retval[i] = toupper(retval[i]);
     }
-    return true;
+    return retval;
 }
 
 static void
@@ -187,9 +187,10 @@ chaz_ConfWriterC_add_global_def(const char *sym, const char *value) {
 
 static void
 chaz_ConfWriterC_append_global_def_to_conf(const char *sym,
-        const char *value) {
+                                           const char *value) {
     char *name_end = strchr(sym, '(');
     if (name_end == NULL) {
+        if (strcmp(sym, value) == 0) { return; }
         fprintf(chaz_ConfWriterC.fh, "#ifndef %s\n", sym);
     }
     else {
@@ -231,7 +232,8 @@ chaz_ConfWriterC_add_global_typedef(const char *type, const char *alias) {
 
 static void
 chaz_ConfWriterC_append_global_typedef_to_conf(const char *type,
-        const char *alias) {
+                                               const char *alias) {
+    if (strcmp(type, alias) == 0) { return; }
     fprintf(chaz_ConfWriterC.fh, "typedef %s %s;\n", type, alias);
 }
 
@@ -260,32 +262,37 @@ chaz_ConfWriterC_append_local_include_to_conf(const char *header) {
 static void
 chaz_ConfWriterC_start_module(const char *module_name) {
     fprintf(chaz_ConfWriterC.fh, "\n/* %s */\n", module_name);
+    chaz_ConfWriterC.MODULE_NAME
+        = chaz_ConfWriterC_uppercase_string(module_name);
 }
 
 static void
 chaz_ConfWriterC_end_module(void) {
+    size_t num_globals = 0;
     size_t i;
     chaz_ConfElem *defs = chaz_ConfWriterC.defs;
     for (i = 0; i < chaz_ConfWriterC.def_count; i++) {
         switch (defs[i].type) {
+            case CHAZ_CONFELEM_GLOBAL_DEF:
+                ++num_globals;
+            /* fall through */
             case CHAZ_CONFELEM_DEF:
                 chaz_ConfWriterC_append_def_to_conf(defs[i].str1,
                                                     defs[i].str2);
                 break;
-            case CHAZ_CONFELEM_GLOBAL_DEF:
-                chaz_ConfWriterC_append_global_def_to_conf(defs[i].str1,
-                                                           defs[i].str2);
-                break;
+            case CHAZ_CONFELEM_GLOBAL_TYPEDEF: {
+                ++num_globals;
+                char *sym = chaz_ConfWriterC_uppercase_string(defs[i].str1);
+                chaz_ConfWriterC_append_def_to_conf(sym, defs[i].str2);
+                free(sym);
+            }
+            /* fall through */
             case CHAZ_CONFELEM_TYPEDEF:
                 chaz_ConfWriterC_append_typedef_to_conf(defs[i].str2,
                                                         defs[i].str1);
                 break;
-            case CHAZ_CONFELEM_GLOBAL_TYPEDEF:
-                chaz_ConfWriterC_append_global_typedef_to_conf(defs[i].str2,
-                                                               defs[i].str1);
-                break;
             case CHAZ_CONFELEM_SYS_INCLUDE:
-                chaz_ConfWriterC_append_sys_include_to_conf(defs[i].str1);
+                ++num_globals;
                 break;
             case CHAZ_CONFELEM_LOCAL_INCLUDE:
                 chaz_ConfWriterC_append_local_include_to_conf(defs[i].str1);
@@ -303,7 +310,7 @@ chaz_ConfWriterC_end_module(void) {
     );
     for (i = 0; i < chaz_ConfWriterC.def_count; i++) {
         switch (defs[i].type) {
-            case CHAZ_CONFELEM_DEF: 
+            case CHAZ_CONFELEM_DEF:
             case CHAZ_CONFELEM_TYPEDEF:
                 {
                     const char *sym = defs[i].str1;
@@ -330,8 +337,41 @@ chaz_ConfWriterC_end_module(void) {
     }
 
     fprintf(chaz_ConfWriterC.fh, "#endif /* USE_SHORT_NAMES */\n");
+
+    /* Write out global definitions and system includes. */
+    if (num_globals) {
+        fprintf(chaz_ConfWriterC.fh, "\n#ifdef CHY_EMPLOY_%s\n\n",
+                chaz_ConfWriterC.MODULE_NAME);
+        for (i = 0; i < chaz_ConfWriterC.def_count; i++) {
+            switch (defs[i].type) {
+                case CHAZ_CONFELEM_GLOBAL_DEF:
+                    chaz_ConfWriterC_append_global_def_to_conf(defs[i].str1,
+                                                               defs[i].str2);
+                    break;
+                case CHAZ_CONFELEM_GLOBAL_TYPEDEF:
+                    chaz_ConfWriterC_append_global_typedef_to_conf(
+                            defs[i].str2, defs[i].str1);
+                    break;
+                case CHAZ_CONFELEM_SYS_INCLUDE:
+                    chaz_ConfWriterC_append_sys_include_to_conf(defs[i].str1);
+                    break;
+                case CHAZ_CONFELEM_DEF:
+                case CHAZ_CONFELEM_TYPEDEF:
+                case CHAZ_CONFELEM_LOCAL_INCLUDE:
+                    /* no-op */
+                    break;
+                default:
+                    chaz_Util_die("Internal error: bad element type %d",
+                                  (int)defs[i].type);
+            }
+        }
+        fprintf(chaz_ConfWriterC.fh, "\n#endif /* EMPLOY_%s */\n",
+                chaz_ConfWriterC.MODULE_NAME);
+    }
+
     fprintf(chaz_ConfWriterC.fh, "\n");
 
+    free(chaz_ConfWriterC.MODULE_NAME);
     chaz_ConfWriterC_clear_def_list();
 }
 

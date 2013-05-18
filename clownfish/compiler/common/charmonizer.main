@@ -255,12 +255,18 @@ int main(int argc, const char **argv) {
         S_add_compiler_flags(&args);
     }
 
+    /* Define stdint types in charmony.h. */
+    chaz_ConfWriter_append_conf("#define CHY_EMPLOY_INTEGERTYPES\n\n");
+
     /* Run probe modules. */
     chaz_BuildEnv_run();
     chaz_DirManip_run();
     chaz_Headers_run();
+    chaz_FuncMacro_run();
+    chaz_Booleans_run();
     chaz_Integers_run();
     chaz_Strings_run();
+    chaz_SymbolVisibility_run();
     chaz_UnusedVars_run();
 
     if (args.write_makefile) {
