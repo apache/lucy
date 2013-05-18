@@ -83,7 +83,7 @@ Doc_extract(Doc *self, CharBuf *field,
     Hash *hash = (Hash *)self->fields;
     Obj  *obj  = Hash_Fetch(hash, (Obj *)field);
 
-    if (obj && Obj_Is_A(obj, CHARBUF)) {
+    if (target && obj && Obj_Is_A(obj, CHARBUF)) {
         ViewCB_Assign(target, (CharBuf *)obj);
     }
 
