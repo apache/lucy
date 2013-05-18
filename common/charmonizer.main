@@ -313,7 +313,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     test_cflags = chaz_CC_new_cflags();
     chaz_CFlags_enable_optimization(test_cflags);
-    chaz_CFlags_add_include_dir(test_cflags, ".");
     chaz_CFlags_add_include_dir(test_cflags, autogen_inc_dir);
     chaz_CFlags_add_library(test_cflags, lib);
     scratch = chaz_Util_join(dir_sep, "t", "test_lucy.c", NULL);
