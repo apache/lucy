@@ -253,7 +253,8 @@ CFCRuby_write_hostdefs(CFCRuby *self) {
 
     // Unlink then write file.
     const char *inc_dest = CFCHierarchy_get_include_dest(self->hierarchy);
-    char *filepath = CFCUtil_sprintf("%s" CHY_DIR_SEP "hostdefs.h", inc_dest);
+    char *filepath = CFCUtil_sprintf("%s" CHY_DIR_SEP "cfish_hostdefs.h",
+                                     inc_dest);
     remove(filepath);
     CFCUtil_write_file(filepath, content, strlen(content));
     FREEMEM(filepath);

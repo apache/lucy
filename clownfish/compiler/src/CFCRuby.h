@@ -85,7 +85,7 @@ CFCRuby_destroy(CFCRuby *self);
 void
 CFCRuby_write_boot(CFCRuby *self);
 
-/** Write out hostdefs.h file.
+/** Write out cfish_hostdefs.h file.
  */
 void
 CFCRuby_write_hostdefs(CFCRuby *self);

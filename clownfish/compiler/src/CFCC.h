@@ -49,7 +49,7 @@ CFCC_destroy(CFCC *self);
 void
 CFCC_write_callbacks(CFCC *self);
 
-/** Write the "hostdefs.h" header file.
+/** Write the "cfish_hostdefs.h" header file.
  */
 void
 CFCC_write_hostdefs(CFCC *self);

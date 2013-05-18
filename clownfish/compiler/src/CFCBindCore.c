@@ -176,7 +176,7 @@ S_write_parcel_h(CFCBindCore *self) {
         "\n"
         "%s"
         "\n"
-        "#include \"hostdefs.h\"\n"
+        "#include \"cfish_hostdefs.h\"\n"
         "\n"
         "#ifdef CFP_LUCY\n"
         "  #include \"charmony.h\"\n"
