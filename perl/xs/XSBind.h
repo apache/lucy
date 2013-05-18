@@ -50,7 +50,7 @@ cfish_XSBind_new_blank_obj(SV *either_sv);
 /** Test whether an SV is defined.  Handles "get" magic, unlike SvOK on its
  * own.
  */
-static CHY_INLINE bool
+static CFISH_INLINE bool
 cfish_XSBind_sv_defined(SV *sv) {
     if (!sv || !SvANY(sv)) { return false; }
     if (SvGMAGICAL(sv)) { mg_get(sv); }
@@ -81,7 +81,7 @@ cfish_XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable,
  * The new SV has single refcount for which the caller must take
  * responsibility.
  */
-static CHY_INLINE SV*
+static CFISH_INLINE SV*
 cfish_XSBind_cfish_obj_to_sv(cfish_Obj *obj) {
     return obj ? (SV*)Cfish_Obj_To_Host(obj) : newSV(0);
 }
@@ -94,7 +94,7 @@ cfish_XSBind_cfish_obj_to_sv(cfish_Obj *obj) {
  * after creating the SV. This is useful when the Clownfish expression creates a new
  * refcount, e.g.  a call to a constructor.
  */
-static CHY_INLINE SV*
+static CFISH_INLINE SV*
 cfish_XSBind_cfish_obj_to_sv_noinc(cfish_Obj *obj) {
     SV *retval;
     if (obj) {

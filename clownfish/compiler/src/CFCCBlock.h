@@ -28,7 +28,7 @@
  *
  *     __C__
  *     #include <stdio.h>
- *     static CHY_INLINE void
+ *     static CFISH_INLINE void
  *     crust_Lobster_say_hello(crust_Lobster *self)
  *     {
  *         printf("Prepare to die, human scum.\n");

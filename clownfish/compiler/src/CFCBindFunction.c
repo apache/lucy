@@ -30,7 +30,7 @@ CFCBindFunc_func_declaration(CFCFunction *func) {
     const char   *full_func_sym  = CFCFunction_full_func_sym(func);
     const char   *param_list_str = CFCParamList_to_c(param_list);
     const char   *inline_prop    = CFCFunction_inline(func)
-                                   ? "static CHY_INLINE "
+                                   ? "static CFISH_INLINE "
                                    : "";
     char *buf = CFCUtil_sprintf("%s%s\n%s(%s);", inline_prop, ret_type_str,
                                 full_func_sym, param_list_str);

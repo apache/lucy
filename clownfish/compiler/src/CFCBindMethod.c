@@ -113,7 +113,7 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
 
     const char pattern[] =
         "extern %sVISIBLE size_t %s;\n"
-        "static CHY_INLINE %s\n"
+        "static CFISH_INLINE %s\n"
         "%s(const %s *self%s) {\n"
         "    const %s method = (%s)cfish_obj_method(self, %s);\n"
         "    %smethod((%s*)self%s);\n"

@@ -167,7 +167,7 @@ public abstract class Lucy::Plan::FieldType cnick FType
 
 __C__
 
-static CHY_INLINE int32_t
+static CFISH_INLINE int32_t
 lucy_FType_null_back_compare_values(lucy_FieldType *self,
                                     lucy_Obj *a, lucy_Obj *b) {
     if (a == NULL) {

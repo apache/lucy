@@ -516,7 +516,7 @@ S_write_callbacks_c(CFCPerl *self) {
         "    LEAVE;\n"
         "}\n"
         "\n"
-        "static CHY_INLINE SV*\n"
+        "static CFISH_INLINE SV*\n"
         "SI_do_callback_sv(const char *meth_name) {\n"
         "    int count = call_method(meth_name, G_SCALAR);\n"
         "    if (count != 1) {\n"
