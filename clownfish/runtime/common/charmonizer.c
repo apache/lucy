@@ -2456,6 +2456,7 @@ typedef struct chaz_ConfElem {
 /* Static vars. */
 static struct {
     FILE          *fh;
+    char          *MODULE_NAME;
     chaz_ConfElem *defs;
     size_t         def_cap;
     size_t         def_count;
@@ -2553,18 +2554,17 @@ chaz_ConfWriterC_vappend_conf(const char *fmt, va_list args) {
 
 static int
 chaz_ConfWriterC_sym_is_uppercase(const char *sym) {
-    unsigned i;
-    for (i = 0; sym[i] != 0; i++) {
-        if (!isupper(sym[i])) {
-            if (islower(sym[i])) {
-                return false;
-            }
-            else if (sym[i] != '_') {
-                return true;
-            }
-        }
+    return isupper(sym[0]);
+}
+
+static char*
+chaz_ConfWriterC_uppercase_string(const char *src) {
+    char *retval = chaz_Util_strdup(src);
+    size_t i;
+    for (i = 0; retval[i]; ++i) {
+        retval[i] = toupper(retval[i]);
     }
-    return true;
+    return retval;
 }
 
 static void
@@ -2599,9 +2599,10 @@ chaz_ConfWriterC_add_global_def(const char *sym, const char *value) {
 
 static void
 chaz_ConfWriterC_append_global_def_to_conf(const char *sym,
-        const char *value) {
+                                           const char *value) {
     char *name_end = strchr(sym, '(');
     if (name_end == NULL) {
+        if (strcmp(sym, value) == 0) { return; }
         fprintf(chaz_ConfWriterC.fh, "#ifndef %s\n", sym);
     }
     else {
@@ -2643,7 +2644,8 @@ chaz_ConfWriterC_add_global_typedef(const char *type, const char *alias) {
 
 static void
 chaz_ConfWriterC_append_global_typedef_to_conf(const char *type,
-        const char *alias) {
+                                               const char *alias) {
+    if (strcmp(type, alias) == 0) { return; }
     fprintf(chaz_ConfWriterC.fh, "typedef %s %s;\n", type, alias);
 }
 
@@ -2672,32 +2674,37 @@ chaz_ConfWriterC_append_local_include_to_conf(const char *header) {
 static void
 chaz_ConfWriterC_start_module(const char *module_name) {
     fprintf(chaz_ConfWriterC.fh, "\n/* %s */\n", module_name);
+    chaz_ConfWriterC.MODULE_NAME
+        = chaz_ConfWriterC_uppercase_string(module_name);
 }
 
 static void
 chaz_ConfWriterC_end_module(void) {
+    size_t num_globals = 0;
     size_t i;
     chaz_ConfElem *defs = chaz_ConfWriterC.defs;
     for (i = 0; i < chaz_ConfWriterC.def_count; i++) {
         switch (defs[i].type) {
+            case CHAZ_CONFELEM_GLOBAL_DEF:
+                ++num_globals;
+            /* fall through */
             case CHAZ_CONFELEM_DEF:
                 chaz_ConfWriterC_append_def_to_conf(defs[i].str1,
                                                     defs[i].str2);
                 break;
-            case CHAZ_CONFELEM_GLOBAL_DEF:
-                chaz_ConfWriterC_append_global_def_to_conf(defs[i].str1,
-                                                           defs[i].str2);
-                break;
+            case CHAZ_CONFELEM_GLOBAL_TYPEDEF: {
+                ++num_globals;
+                char *sym = chaz_ConfWriterC_uppercase_string(defs[i].str1);
+                chaz_ConfWriterC_append_def_to_conf(sym, defs[i].str2);
+                free(sym);
+            }
+            /* fall through */
             case CHAZ_CONFELEM_TYPEDEF:
                 chaz_ConfWriterC_append_typedef_to_conf(defs[i].str2,
                                                         defs[i].str1);
                 break;
-            case CHAZ_CONFELEM_GLOBAL_TYPEDEF:
-                chaz_ConfWriterC_append_global_typedef_to_conf(defs[i].str2,
-                                                               defs[i].str1);
-                break;
             case CHAZ_CONFELEM_SYS_INCLUDE:
-                chaz_ConfWriterC_append_sys_include_to_conf(defs[i].str1);
+                ++num_globals;
                 break;
             case CHAZ_CONFELEM_LOCAL_INCLUDE:
                 chaz_ConfWriterC_append_local_include_to_conf(defs[i].str1);
@@ -2715,7 +2722,7 @@ chaz_ConfWriterC_end_module(void) {
     );
     for (i = 0; i < chaz_ConfWriterC.def_count; i++) {
         switch (defs[i].type) {
-            case CHAZ_CONFELEM_DEF: 
+            case CHAZ_CONFELEM_DEF:
             case CHAZ_CONFELEM_TYPEDEF:
                 {
                     const char *sym = defs[i].str1;
@@ -2742,8 +2749,41 @@ chaz_ConfWriterC_end_module(void) {
     }
 
     fprintf(chaz_ConfWriterC.fh, "#endif /* USE_SHORT_NAMES */\n");
+
+    /* Write out global definitions and system includes. */
+    if (num_globals) {
+        fprintf(chaz_ConfWriterC.fh, "\n#ifdef CHY_EMPLOY_%s\n\n",
+                chaz_ConfWriterC.MODULE_NAME);
+        for (i = 0; i < chaz_ConfWriterC.def_count; i++) {
+            switch (defs[i].type) {
+                case CHAZ_CONFELEM_GLOBAL_DEF:
+                    chaz_ConfWriterC_append_global_def_to_conf(defs[i].str1,
+                                                               defs[i].str2);
+                    break;
+                case CHAZ_CONFELEM_GLOBAL_TYPEDEF:
+                    chaz_ConfWriterC_append_global_typedef_to_conf(
+                            defs[i].str2, defs[i].str1);
+                    break;
+                case CHAZ_CONFELEM_SYS_INCLUDE:
+                    chaz_ConfWriterC_append_sys_include_to_conf(defs[i].str1);
+                    break;
+                case CHAZ_CONFELEM_DEF:
+                case CHAZ_CONFELEM_TYPEDEF:
+                case CHAZ_CONFELEM_LOCAL_INCLUDE:
+                    /* no-op */
+                    break;
+                default:
+                    chaz_Util_die("Internal error: bad element type %d",
+                                  (int)defs[i].type);
+            }
+        }
+        fprintf(chaz_ConfWriterC.fh, "\n#endif /* EMPLOY_%s */\n",
+                chaz_ConfWriterC.MODULE_NAME);
+    }
+
     fprintf(chaz_ConfWriterC.fh, "\n");
 
+    free(chaz_ConfWriterC.MODULE_NAME);
     chaz_ConfWriterC_clear_def_list();
 }
 
@@ -4806,7 +4846,7 @@ chaz_Booleans_run(void) {
     }
     else {
         chaz_ConfWriter_append_conf(
-            "#ifndef __cplusplus\n"
+            "#if (defined(CHY_EMPLOY_BOOLEANS) && !defined(__cplusplus))\n"
             "  typedef int bool;\n"
             "  #ifndef true\n"
             "    #define true 1\n"
@@ -5053,14 +5093,35 @@ chaz_Floats_run(void) {
     chaz_ConfWriter_start_module("Floats");
 
     chaz_ConfWriter_append_conf(
-        "typedef union { uint32_t i; float f; } chy_floatu32;\n"
-        "typedef union { uint64_t i; double d; } chy_floatu64;\n"
-        "static const chy_floatu32 chy_f32inf    = {UINT32_C(0x7f800000)};\n"
-        "static const chy_floatu32 chy_f32neginf = {UINT32_C(0xff800000)};\n"
-        "static const chy_floatu32 chy_f32nan    = {UINT32_C(0x7fc00000)};\n"
-        "static const chy_floatu64 chy_f64inf    = {UINT64_C(0x7ff0000000000000)};\n"
-        "static const chy_floatu64 chy_f64neginf = {UINT64_C(0xfff0000000000000)};\n"
-        "static const chy_floatu64 chy_f64nan    = {UINT64_C(0x7ff8000000000000)};\n"
+        "typedef union { unsigned char c[4]; float f; } chy_floatu32;\n"
+        "typedef union { unsigned char c[8]; double d; } chy_floatu64;\n"
+        "#ifdef CHY_BIG_END\n"
+        "static const chy_floatu32 chy_f32inf\n"
+        "    = { { 0x7F, 0x80, 0, 0 } };\n"
+        "static const chy_floatu32 chy_f32neginf\n"
+        "    = { { 0xFF, 0x80, 0, 0 } };\n"
+        "static const chy_floatu32 chy_f32nan\n"
+        "    = { { 0x7F, 0xC0, 0, 0 } };\n"
+        "static const chy_floatu64 chy_f64inf\n"
+        "    = { { 0x7F, 0xF0, 0, 0, 0, 0, 0, 0 } };\n"
+        "static const chy_floatu64 chy_f64neginf\n"
+        "    = { { 0xFF, 0xF0, 0, 0, 0, 0, 0, 0 } };\n"
+        "static const chy_floatu64 chy_f64nan\n"
+        "    = { { 0x7F, 0xF8, 0, 0, 0, 0, 0, 0 } };\n"
+        "#else /* BIG_END */\n"
+        "static const chy_floatu32 chy_f32inf\n"
+        "    = { { 0, 0, 0x80, 0x7F } };\n"
+        "static const chy_floatu32 chy_f32neginf\n"
+        "    = { { 0, 0, 0x80, 0xFF } };\n"
+        "static const chy_floatu32 chy_f32nan\n"
+        "    = { { 0, 0, 0xC0, 0x7F } };\n"
+        "static const chy_floatu64 chy_f64inf\n"
+        "    = { { 0, 0, 0, 0, 0, 0, 0xF0, 0x7F } };\n"
+        "static const chy_floatu64 chy_f64neginf\n"
+        "    = { { 0, 0, 0, 0, 0, 0, 0xF0, 0xFF } };\n"
+        "static const chy_floatu64 chy_f64nan\n"
+        "    = { { 0, 0, 0, 0, 0, 0, 0xF8, 0x7F } };\n"
+        "#endif /* BIG_END */\n"
     );
     chaz_ConfWriter_add_def("F32_INF", "(chy_f32inf.f)");
     chaz_ConfWriter_add_def("F32_NEGINF", "(chy_f32neginf.f)");
@@ -5517,7 +5578,7 @@ static const char chaz_Integers_u64_to_double_code[] =
     CHAZ_QUOTE(  #include <stdio.h>                        )
     CHAZ_QUOTE(  int main()                                )
     CHAZ_QUOTE(  {                                         )
-    CHAZ_QUOTE(      unsigned __int64 int_num = 0;         )
+    CHAZ_QUOTE(      unsigned %s int_num = 0;              )
     CHAZ_QUOTE(      double float_num;                     )
     CHAZ_QUOTE(      float_num = (double)int_num;          )
     CHAZ_QUOTE(      printf("%%f\n", float_num);           )
@@ -5674,13 +5735,6 @@ chaz_Integers_run(void) {
         }
     }
 
-    /* Determine whether conversion of unsigned __int64 to double works */
-    if (has___int64) {
-        if (!chaz_CC_test_compile(chaz_Integers_u64_to_double_code)) {
-            can_convert_u64_to_double = false;
-        }
-    }
-
     /* Write out some conditional defines. */
     if (has_inttypes) {
         chaz_ConfWriter_add_def("HAS_INTTYPES_H", NULL);
@@ -5729,92 +5783,179 @@ chaz_Integers_run(void) {
         chaz_ConfWriter_add_def("HAS_INT64_T", NULL);
     }
 
-    /* Write typedefs, maximums/minimums and literals macros. */
+    /* Create macro for promoting pointers to integers. */
+    if (has_64) {
+        if (sizeof_ptr == 8) {
+            chaz_ConfWriter_add_def("PTR_TO_I64(ptr)",
+                                    "((int64_t)(uint64_t)(ptr))");
+        }
+        else {
+            chaz_ConfWriter_add_def("PTR_TO_I64(ptr)",
+                                    "((int64_t)(uint32_t)(ptr))");
+        }
+    }
+
+    /* Create macro for converting uint64_t to double. */
+    if (has_64) {
+        /*
+         * Determine whether unsigned 64-bit integers can be converted to
+         * double. Older MSVC versions don't support this conversion.
+         */
+        sprintf(code_buf, chaz_Integers_u64_to_double_code, i64_t_type);
+        output = chaz_CC_capture_output(code_buf, &output_len);
+        if (output != NULL) {
+            chaz_ConfWriter_add_def("U64_TO_DOUBLE(num)", "((double)(num))");
+            free(output);
+        }
+        else {
+            chaz_ConfWriter_add_def(
+                "U64_TO_DOUBLE(num)",
+                "((num) & UINT64_C(0x8000000000000000) ? "
+                "(double)(int64_t)((num) & UINT64_C(0x7FFFFFFFFFFFFFFF)) + "
+                "9223372036854775808.0 : "
+                "(double)(int64_t)(num))");
+        }
+    }
+
+    chaz_ConfWriter_end_module();
+
+    /* Integer typedefs. */
+
+    chaz_ConfWriter_start_module("IntegerTypes");
+
+    if (has_stdint) {
+        chaz_ConfWriter_add_sys_include("stdint.h");
+    }
+    else {
+        /* We support only the following subset of stdint.h
+         *   int8_t
+         *   int16_t
+         *   int32_t
+         *   int64_t
+         *   uint8_t
+         *   uint16_t
+         *   uint32_t
+         *   uint64_t
+         */
+        if (has_8) {
+            chaz_ConfWriter_add_global_typedef("signed char", "int8_t");
+            chaz_ConfWriter_add_global_typedef("unsigned char", "uint8_t");
+        }
+        if (has_16) {
+            chaz_ConfWriter_add_global_typedef("signed short", "int16_t");
+            chaz_ConfWriter_add_global_typedef("unsigned short", "uint16_t");
+        }
+        if (has_32) {
+            chaz_ConfWriter_add_global_typedef(i32_t_type, "int32_t");
+            sprintf(scratch, "unsigned %s", i32_t_type);
+            chaz_ConfWriter_add_global_typedef(scratch, "uint32_t");
+        }
+        if (has_64) {
+            chaz_ConfWriter_add_global_typedef(i64_t_type, "int64_t");
+            sprintf(scratch, "unsigned %s", i64_t_type);
+            chaz_ConfWriter_add_global_typedef(scratch, "uint64_t");
+        }
+    }
+
+    chaz_ConfWriter_end_module();
+
+    /* Integer limits. */
+
+    chaz_ConfWriter_start_module("IntegerLimits");
+
+    if (has_stdint) {
+        chaz_ConfWriter_add_sys_include("stdint.h");
+    }
+    else {
+        /* We support only the following subset of stdint.h
+         *   INT8_MAX
+         *   INT16_MAX
+         *   INT32_MAX
+         *   INT64_MAX
+         *   INT8_MIN
+         *   INT16_MIN
+         *   INT32_MIN
+         *   INT64_MIN
+         *   UINT8_MAX
+         *   UINT16_MAX
+         *   UINT32_MAX
+         *   UINT64_MAX
+         *   SIZE_MAX
+         */
+        if (has_8) {
+            chaz_ConfWriter_add_global_def("INT8_MAX", "127");
+            chaz_ConfWriter_add_global_def("INT8_MIN", "-128");
+            chaz_ConfWriter_add_global_def("UINT8_MAX", "255");
+        }
+        if (has_16) {
+            chaz_ConfWriter_add_global_def("INT16_MAX", "32767");
+            chaz_ConfWriter_add_global_def("INT16_MIN", "-32768");
+            chaz_ConfWriter_add_global_def("UINT16_MAX", "65535");
+        }
+        if (has_32) {
+            chaz_ConfWriter_add_global_def("INT32_MAX", "2147483647");
+            chaz_ConfWriter_add_global_def("INT32_MIN", "(-INT32_MAX-1)");
+            chaz_ConfWriter_add_global_def("UINT32_MAX", "4294967295U");
+        }
+        if (has_64) {
+            sprintf(scratch, "9223372036854775807%s", i64_t_postfix);
+            chaz_ConfWriter_add_global_def("INT64_MAX", scratch);
+            chaz_ConfWriter_add_global_def("INT64_MIN", "(-INT64_MAX-1)");
+            sprintf(scratch, "18446744073709551615%s", u64_t_postfix);
+            chaz_ConfWriter_add_global_def("UINT64_MAX", scratch);
+        }
+        chaz_ConfWriter_add_global_def("SIZE_MAX", "((size_t)-1)");
+    }
+
+    chaz_ConfWriter_end_module();
+
+    /* Integer literals. */
+
+    chaz_ConfWriter_start_module("IntegerLiterals");
+
+    if (has_stdint) {
+        chaz_ConfWriter_add_sys_include("stdint.h");
+    }
+    else {
+        /* We support only the following subset of stdint.h
+         *   INT32_C
+         *   INT64_C
+         *   UINT32_C
+         *   UINT64_C
+         */
+        if (has_32) {
+            if (strcmp(i32_t_postfix, "") == 0) {
+                chaz_ConfWriter_add_global_def("INT32_C(n)", "n");
+            }
+            else {
+                sprintf(scratch, "n##%s", i32_t_postfix);
+                chaz_ConfWriter_add_global_def("INT32_C(n)", scratch);
+            }
+            sprintf(scratch, "n##%s", u32_t_postfix);
+            chaz_ConfWriter_add_global_def("UINT32_C(n)", scratch);
+        }
+        if (has_64) {
+            sprintf(scratch, "n##%s", i64_t_postfix);
+            chaz_ConfWriter_add_global_def("INT64_C(n)", scratch);
+            sprintf(scratch, "n##%s", u64_t_postfix);
+            chaz_ConfWriter_add_global_def("UINT64_C(n)", scratch);
+        }
+    }
+
+    chaz_ConfWriter_end_module();
+
+    /* Integer format strings. */
+
+    chaz_ConfWriter_start_module("IntegerFormatStrings");
+
     if (has_inttypes) {
         chaz_ConfWriter_add_sys_include("inttypes.h");
     }
     else {
-        if (has_stdint) {
-            chaz_ConfWriter_add_sys_include("stdint.h");
-        }
-        else {
-            /* We support only the following subset of stdint.h
-             *   int8_t
-             *   int16_t
-             *   int32_t
-             *   int64_t
-             *   uint8_t
-             *   uint16_t
-             *   uint32_t
-             *   uint64_t
-             *   INT8_MAX
-             *   INT16_MAX
-             *   INT32_MAX
-             *   INT64_MAX
-             *   INT8_MIN
-             *   INT16_MIN
-             *   INT32_MIN
-             *   INT64_MIN
-             *   UINT8_MAX
-             *   UINT16_MAX
-             *   UINT32_MAX
-             *   UINT64_MAX
-             *   SIZE_MAX
-             *   INT32_C
-             *   INT64_C
-             *   UINT32_C
-             *   UINT64_C
-             */
-            if (has_8) {
-                chaz_ConfWriter_add_global_typedef("signed char", "int8_t");
-                chaz_ConfWriter_add_global_typedef("unsigned char", "uint8_t");
-                chaz_ConfWriter_add_global_def("INT8_MAX", "127");
-                chaz_ConfWriter_add_global_def("INT8_MIN", "-128");
-                chaz_ConfWriter_add_global_def("UINT8_MAX", "255");
-            }
-            if (has_16) {
-                chaz_ConfWriter_add_global_typedef("signed short", "int16_t");
-                chaz_ConfWriter_add_global_typedef("unsigned short",
-                                                   "uint16_t");
-                chaz_ConfWriter_add_global_def("INT16_MAX", "32767");
-                chaz_ConfWriter_add_global_def("INT16_MIN", "-32768");
-                chaz_ConfWriter_add_global_def("UINT16_MAX", "65535");
-            }
-            if (has_32) {
-                chaz_ConfWriter_add_global_typedef(i32_t_type, "int32_t");
-                sprintf(scratch, "unsigned %s", i32_t_type);
-                chaz_ConfWriter_add_global_typedef(scratch, "uint32_t");
-                chaz_ConfWriter_add_global_def("INT32_MAX", "2147483647");
-                chaz_ConfWriter_add_global_def("INT32_MIN", "(-INT32_MAX-1)");
-                chaz_ConfWriter_add_global_def("UINT32_MAX", "4294967295U");
-                if (strcmp(i32_t_postfix, "") == 0) {
-                    chaz_ConfWriter_add_global_def("INT32_C(n)", "n");
-                }
-                else {
-                    sprintf(scratch, "n##%s", i32_t_postfix);
-                    chaz_ConfWriter_add_global_def("INT32_C(n)", scratch);
-                }
-                sprintf(scratch, "n##%s", u32_t_postfix);
-                chaz_ConfWriter_add_global_def("UINT32_C(n)", scratch);
-            }
-            if (has_64) {
-                chaz_ConfWriter_add_global_typedef(i64_t_type, "int64_t");
-                sprintf(scratch, "unsigned %s", i64_t_type);
-                chaz_ConfWriter_add_global_typedef(scratch, "uint64_t");
-                sprintf(scratch, "9223372036854775807%s", i64_t_postfix);
-                chaz_ConfWriter_add_global_def("INT64_MAX", scratch);
-                chaz_ConfWriter_add_global_def("INT64_MIN", "(-INT64_MAX-1)");
-                sprintf(scratch, "18446744073709551615%s", u64_t_postfix);
-                chaz_ConfWriter_add_global_def("UINT64_MAX", scratch);
-                sprintf(scratch, "n##%s", i64_t_postfix);
-                chaz_ConfWriter_add_global_def("INT64_C(n)", scratch);
-                sprintf(scratch, "n##%s", u64_t_postfix);
-                chaz_ConfWriter_add_global_def("UINT64_C(n)", scratch);
-            }
-            chaz_ConfWriter_add_global_def("SIZE_MAX", "((size_t)-1)");
-        }
-
-        /* Create the PRId64 and PRIu64 printf macros. */
+        /* We support only the following subset of inttypes.h
+         *   PRId64
+         *   PRIu64
+         */
         if (has_64) {
             int i;
             const char *options[] = {
@@ -5851,32 +5992,6 @@ chaz_Integers_run(void) {
                 }
             }
         }
-    }
-
-    /* Create macro for promoting pointers to integers. */
-    if (has_64) {
-        if (sizeof_ptr == 8) {
-            chaz_ConfWriter_add_def("PTR_TO_I64(ptr)",
-                                    "((int64_t)(uint64_t)(ptr))");
-        }
-        else {
-            chaz_ConfWriter_add_def("PTR_TO_I64(ptr)",
-                                    "((int64_t)(uint32_t)(ptr))");
-        }
-    }
-
-    /* Create macro for converting uint64_t to double. */
-    if (can_convert_u64_to_double) {
-        chaz_ConfWriter_add_def("U64_TO_DOUBLE(num)",
-                                "((double)(num))");
-    }
-    else {
-        chaz_ConfWriter_add_def(
-            "U64_TO_DOUBLE(num)",
-            "((num) & UINT64_C(0x8000000000000000) ? "
-            "(double)(int64_t)((num) & UINT64_C(0x7FFFFFFFFFFFFFFF)) + "
-            "9223372036854775808.0 : "
-            "(double)(int64_t)(num))");
     }
 
     chaz_ConfWriter_end_module();
