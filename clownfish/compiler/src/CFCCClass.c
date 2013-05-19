@@ -26,6 +26,7 @@
 #include "CFCSymbol.h"
 #include "CFCType.h"
 #include "CFCUtil.h"
+#include "CFCVariable.h"
 
 static char*
 S_man_create_name(CFCClass *klass);
@@ -48,6 +49,9 @@ S_man_create_inherited_methods(CFCClass *klass);
 static char*
 S_man_create_func(CFCClass *klass, CFCFunction *func, const char *short_sym,
                   const char *full_sym);
+
+static char*
+S_man_create_param_list(CFCFunction *func, const char *full_sym);
 
 static char*
 S_man_create_inheritance(CFCClass *klass);
@@ -301,24 +305,28 @@ S_man_create_inherited_methods(CFCClass *klass) {
 static char*
 S_man_create_func(CFCClass *klass, CFCFunction *func, const char *short_sym,
                   const char *full_sym) {
-    CFCType *return_type
-        = CFCFunction_get_return_type(func);
+    CFCType    *return_type   = CFCFunction_get_return_type(func);
     const char *return_type_c = CFCType_to_c(return_type);
+    const char *incremented   = "";
 
-    CFCParamList *param_list
-        = CFCFunction_get_param_list(func);
-    const char *param_list_c = CFCParamList_to_c(param_list);
+    if (CFCType_incremented(return_type)) {
+        incremented = " // incremented";
+    }
+
+    char *param_list = S_man_create_param_list(func, full_sym);
 
     const char *pattern =
         ".TP\n"
         ".B %s\n"
         ".na\n"
-        "%s\n"
+        "%s%s\n"
         ".br\n"
-        ".BR \"%s\" \"(%s);\"\n"
+        "%s"
         ".ad\n";
-    char *result = CFCUtil_sprintf(pattern, short_sym, return_type_c, full_sym,
-                                   param_list_c);
+    char *result = CFCUtil_sprintf(pattern, short_sym, return_type_c,
+                                   incremented, param_list);
+
+    FREEMEM(param_list);
 
     // Get documentation, which may be inherited.
     CFCDocuComment *docucomment = CFCFunction_get_docucomment(func);
@@ -366,6 +374,43 @@ S_man_create_func(CFCClass *klass, CFCFunction *func, const char *short_sym,
             FREEMEM(doc);
         }
     }
+
+    return result;
+}
+
+static char*
+S_man_create_param_list(CFCFunction *func, const char *full_sym) {
+    CFCParamList  *param_list = CFCFunction_get_param_list(func);
+    CFCVariable  **variables  = CFCParamList_get_variables(param_list);
+
+    if (!variables[0]) {
+        return CFCUtil_sprintf(".BR %s (void);\n", full_sym);
+    }
+
+    char *result = CFCUtil_sprintf(".BR %s (", full_sym);
+
+    for (int i = 0; variables[i]; ++i) {
+        CFCVariable *variable = variables[i];
+        CFCType     *type     = CFCVariable_get_type(variable);
+        const char  *type_c   = CFCType_to_c(type);
+        const char  *name     = CFCVariable_micro_sym(variable);
+
+        result = CFCUtil_cat(result, "\n.br\n.RB \"    ", type_c, " \" ", name,
+                             NULL);
+
+        if (variables[i+1] || CFCType_decremented(type)) {
+            result = CFCUtil_cat(result, " \"", NULL);
+            if (variables[i+1]) {
+                result = CFCUtil_cat(result, ",", NULL);
+            }
+            else {
+                result = CFCUtil_cat(result, " // decremented", NULL);
+            }
+            result = CFCUtil_cat(result, "\"", NULL);
+        }
+    }
+
+    result = CFCUtil_cat(result, "\n.br\n);\n.br\n", NULL);
 
     return result;
 }
