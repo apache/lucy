@@ -206,6 +206,8 @@ S_new_type(CFCParser *state, int flags, char *type_name,
 } /* End include block. */
 
 %syntax_error {
+    (void)yymajor;
+    (void)yyminor;
     CFCParser_set_errors(state, true);
 }
 

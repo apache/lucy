@@ -34,6 +34,8 @@
 %extra_argument { lucy_JsonParserState *state }
 
 %syntax_error {
+    (void)yymajor;
+    (void)yyminor;
     state->errors = true;
 }
 
