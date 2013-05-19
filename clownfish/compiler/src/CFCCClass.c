@@ -28,6 +28,17 @@
 #include "CFCUtil.h"
 #include "CFCVariable.h"
 
+#ifndef true
+    #define true 1
+    #define false 0
+#endif
+
+typedef struct CFCPodLink {
+    size_t      total_size;
+    const char *text;
+    size_t      text_size;
+} CFCPodLink;
+
 static char*
 S_man_create_name(CFCClass *klass);
 
@@ -58,6 +69,9 @@ S_man_create_inheritance(CFCClass *klass);
 
 static char*
 S_man_escape_content(const char *content);
+
+static void
+S_parse_pod_link(const char *content, CFCPodLink *pod_link);
 
 // Declare dummy host callbacks.
 char*
@@ -150,7 +164,7 @@ S_man_create_name(CFCClass *klass) {
         const char *raw_brief = CFCDocuComment_get_brief(docucom);
         if (raw_brief && raw_brief[0] != '\0') {
             char *brief = S_man_escape_content(raw_brief);
-            result = CFCUtil_cat(result, " - ", brief, NULL);
+            result = CFCUtil_cat(result, " \\- ", brief, NULL);
             FREEMEM(brief);
         }
     }
@@ -437,46 +451,100 @@ S_man_create_inheritance(CFCClass *klass) {
 static char*
 S_man_escape_content(const char *content) {
     size_t  result_len = 0;
-    size_t  result_cap = strlen(content) + 20;
+    size_t  result_cap = strlen(content) + 256;
     char   *result     = (char*)MALLOCATE(result_cap + 1);
 
     for (size_t i = 0; content[i]; i++) {
-        char c[8];
-        int  num_chars = 1;
+        const char *subst      = content + i;
+        size_t      subst_size = 1;
 
-        c[0] = content[i];
-
-        switch (c[0]) {
+        switch (content[i]) {
             case '\\':
-                c[1] = 'e';
-                num_chars = 2;
+                // Escape backslash.
+                subst      = "\\e";
+                subst_size = 2;
                 break;
             case '-':
-                c[0] = '\\';
-                c[1] = '-';
-                num_chars = 2;
+                // Escape hyphen.
+                subst      = "\\-";
+                subst_size = 2;
                 break;
             case '\n':
+                // Escape dot after newline.
                 if (content[i+1] == '.') {
-                    memcpy(c + num_chars, "\\&", 2);
-                    num_chars += 2;
+                    subst      = "\n\\";
+                    subst_size = 2;
+                }
+                break;
+            case '<':
+                // <code> markup.
+                if (strncmp(content + i + 1, "code>", 5) == 0) {
+                    subst      = "\\fI";
+                    subst_size = 3;
+                    i += 5;
+                }
+                else if (strncmp(content + i + 1, "/code>", 6) == 0) {
+                    subst      = "\\fP";
+                    subst_size = 3;
+                    i += 6;
+                }
+                break;
+            case 'L':
+                if (content[i+1] == '<') {
+                    // POD-style link.
+                    struct CFCPodLink pod_link;
+                    S_parse_pod_link(content + i + 2, &pod_link);
+                    if (pod_link.total_size) {
+                        subst      = pod_link.text;
+                        subst_size = pod_link.text_size;
+                        i += pod_link.total_size + 1;
+                    }
                 }
                 break;
             default:
                 break;
         }
 
-        if (result_len + num_chars > result_cap) {
-            result_cap += 50;
+        if (result_len + subst_size > result_cap) {
+            result_cap += 256;
             result = (char*)REALLOCATE(result, result_cap + 1);
         }
 
-        memcpy(result + result_len, c, num_chars);
-        result_len += num_chars;
+        memcpy(result + result_len, subst, subst_size);
+        result_len += subst_size;
     }
 
     result[result_len] = '\0';
 
     return result;
+}
+
+// Quick and dirty parsing of POD links. The syntax isn't fully supported
+// and the result isn't man-escaped. But it should be good enough for now
+// since at some point we'll switch to another format anyway.
+static void
+S_parse_pod_link(const char *content, CFCPodLink *pod_link) {
+    int in_text = true;
+
+    for (size_t i = 0; i < 256 && content[i]; ++i) {
+        if (content[i] == '|') {
+            if (in_text) {
+                pod_link->text_size = i;
+                in_text = false;
+            }
+        }
+        else if (content[i] == '>') {
+            pod_link->total_size = i + 1;
+            pod_link->text       = content;
+            if (in_text) {
+                pod_link->text_size = i;
+            }
+            return;
+        }
+    }
+
+    pod_link->total_size = 0;
+    pod_link->text       = NULL;
+    pod_link->text_size  = 0;
 }
 
