@@ -305,7 +305,7 @@ CODE:
     }
     if (ints_av && SvTYPE(ints_av) == SVt_PVAV) {
         int32_t size  = av_len(ints_av) + 1;
-        int32_t *ints = (int32_t*)LUCY_MALLOCATE(size * sizeof(int32_t));
+        int32_t *ints = (int32_t*)CFISH_MALLOCATE(size * sizeof(int32_t));
         int32_t i;
 
         for (i = 0; i < size; i++) {

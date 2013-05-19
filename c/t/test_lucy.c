@@ -21,13 +21,13 @@
 
 int
 main() {
-    lucy_TestFormatterCF *formatter;
+    cfish_TestFormatterCF *formatter;
     bool success;
 
     lucy_bootstrap_parcel();
 
-    formatter = lucy_TestFormatterCF_new();
-    success = lucy_Test_run_all_batches((lucy_TestFormatter*)formatter);
+    formatter = cfish_TestFormatterCF_new();
+    success = lucy_Test_run_all_batches((cfish_TestFormatter*)formatter);
     CFISH_DECREF(formatter);
 
     return success ? EXIT_SUCCESS : EXIT_FAILURE;

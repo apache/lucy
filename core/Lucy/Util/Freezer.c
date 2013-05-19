@@ -141,7 +141,7 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
                 BoolNum *self = (BoolNum*)obj;
                 if (self && self != CFISH_TRUE && self != CFISH_FALSE) {
                     Bool_Dec_RefCount_t super_decref
-                        = SUPER_METHOD_PTR(BOOLNUM, Lucy_Bool_Dec_RefCount);
+                        = SUPER_METHOD_PTR(BOOLNUM, Cfish_Bool_Dec_RefCount);
                     super_decref(self);
                 }
                 obj = value ? CFISH_TRUE : CFISH_FALSE;

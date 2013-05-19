@@ -70,7 +70,7 @@ Err_to_host(Err *self) {
 void
 Err_throw_mess(VTable *vtable, CharBuf *message) {
     Err_Make_t make
-        = METHOD_PTR(CERTIFY(vtable, VTABLE), Lucy_Err_Make);
+        = METHOD_PTR(CERTIFY(vtable, VTABLE), Cfish_Err_Make);
     Err *err = (Err*)CERTIFY(make(NULL), ERR);
     Err_Cat_Mess(err, message);
     DECREF(message);

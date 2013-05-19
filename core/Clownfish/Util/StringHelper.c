@@ -24,7 +24,7 @@
 #include "Clownfish/Err.h"
 #include "Clownfish/Util/Memory.h"
 
-const uint8_t lucy_StrHelp_UTF8_COUNT[] = {
+const uint8_t cfish_StrHelp_UTF8_COUNT[] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,

@@ -27,13 +27,13 @@ __C__
  * <code>new_value</code> and return true.  Otherwise, return false.
  */
 static CFISH_INLINE bool
-lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value);
+cfish_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value);
 
 /************************** Single threaded *******************************/
 #ifdef LUCY_NOTHREADS
 
 static CFISH_INLINE bool
-lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
+cfish_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
     if (*target == old_value) {
         *target = new_value;
         return true;
@@ -48,7 +48,7 @@ lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
 #include <libkern/OSAtomic.h>
 
 static CFISH_INLINE bool
-lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
+cfish_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
     return OSAtomicCompareAndSwapPtr(old_value, new_value, target);
 }
 
@@ -56,12 +56,12 @@ lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
 #elif defined(CHY_HAS_WINDOWS_H)
 
 bool
-lucy_Atomic_wrapped_cas_ptr(void *volatile *target, void *old_value,
+cfish_Atomic_wrapped_cas_ptr(void *volatile *target, void *old_value,
                             void *new_value);
 
 static CFISH_INLINE bool
-lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
-    return lucy_Atomic_wrapped_cas_ptr(target, old_value, new_value);
+cfish_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
+    return cfish_Atomic_wrapped_cas_ptr(target, old_value, new_value);
 }
 
 /**************************** Solaris 10 and later ************************/
@@ -69,7 +69,7 @@ lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
 #include <sys/atomic.h>
 
 static CFISH_INLINE bool
-lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
+cfish_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
     return atomic_cas_ptr(target, old_value, new_value) == old_value;
 }
 
@@ -77,18 +77,18 @@ lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
 #elif defined(CHY_HAS_PTHREAD_H)
 #include <pthread.h>
 
-extern pthread_mutex_t lucy_Atomic_mutex;
+extern pthread_mutex_t cfish_Atomic_mutex;
 
 static CFISH_INLINE bool
-lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
-    pthread_mutex_lock(&lucy_Atomic_mutex);
+cfish_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
+    pthread_mutex_lock(&cfish_Atomic_mutex);
     if (*target == old_value) {
         *target = new_value;
-        pthread_mutex_unlock(&lucy_Atomic_mutex);
+        pthread_mutex_unlock(&cfish_Atomic_mutex);
         return true;
     }
     else {
-        pthread_mutex_unlock(&lucy_Atomic_mutex);
+        pthread_mutex_unlock(&cfish_Atomic_mutex);
         return false;
     }
 }
@@ -101,7 +101,7 @@ lucy_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
 #endif // Big platform if-else chain.
 
 #ifdef LUCY_USE_SHORT_NAMES
-  #define Atomic_cas_ptr lucy_Atomic_cas_ptr
+  #define Atomic_cas_ptr cfish_Atomic_cas_ptr
 #endif
 
 __END_C__

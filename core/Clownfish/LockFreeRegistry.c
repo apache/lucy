@@ -24,13 +24,13 @@
 #include "Clownfish/Util/Atomic.h"
 #include "Clownfish/Util/Memory.h"
 
-typedef struct lucy_LFRegEntry {
+typedef struct cfish_LFRegEntry {
     Obj *key;
     Obj *value;
     int32_t hash_sum;
-    struct lucy_LFRegEntry *volatile next;
-} lucy_LFRegEntry;
-#define LFRegEntry lucy_LFRegEntry
+    struct cfish_LFRegEntry *volatile next;
+} cfish_LFRegEntry;
+#define LFRegEntry cfish_LFRegEntry
 
 LockFreeRegistry*
 LFReg_new(size_t capacity) {

@@ -278,7 +278,7 @@ VTable_singleton(const CharBuf *class_name, VTable *parent) {
 
 Obj*
 VTable_load_obj(VTable *self, Obj *dump) {
-    Obj_Load_t load = METHOD_PTR(self, Lucy_Obj_Load);
+    Obj_Load_t load = METHOD_PTR(self, Cfish_Obj_Load);
     if (load == Obj_load) {
         THROW(ERR, "Abstract method Load() not defined for %o", self->name);
     }

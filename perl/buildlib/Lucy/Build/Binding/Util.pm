@@ -252,7 +252,7 @@ to_base36(num)
     uint64_t num;
 CODE:
 {
-    char base36[lucy_StrHelp_MAX_BASE36_BYTES];
+    char base36[cfish_StrHelp_MAX_BASE36_BYTES];
     size_t size = lucy_StrHelp_to_base36(num, &base36);
     RETVAL = newSVpvn(base36, size);
 }

@@ -127,7 +127,7 @@ void
 lucy_RegexTokenizer_destroy(lucy_RegexTokenizer *self) {
     CFISH_DECREF(self->pattern);
     ReREFCNT_dec(((REGEXP*)self->token_re));
-    LUCY_SUPER_DESTROY(self, LUCY_REGEXTOKENIZER);
+    CFISH_SUPER_DESTROY(self, LUCY_REGEXTOKENIZER);
 }
 
 void

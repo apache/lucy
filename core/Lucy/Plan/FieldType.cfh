@@ -169,7 +169,7 @@ __C__
 
 static CFISH_INLINE int32_t
 lucy_FType_null_back_compare_values(lucy_FieldType *self,
-                                    lucy_Obj *a, lucy_Obj *b) {
+                                    cfish_Obj *a, cfish_Obj *b) {
     if (a == NULL) {
         if (b == NULL) { return 0; }
         else { return 1; }

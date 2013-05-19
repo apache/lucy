@@ -30,7 +30,7 @@
 void*
 LucyParseJsonAlloc(void * (*allocate)(size_t));
 void
-LucyParseJson(void *json_parser, int token_type, lucy_Obj *value,
+LucyParseJson(void *json_parser, int token_type, Obj *value,
               lucy_JsonParserState *state);
 void
 LucyParseJsonFree(void *json_parser, void(*freemem)(void*));
@@ -368,14 +368,14 @@ S_to_json(Obj *dump, CharBuf *json, int32_t depth) {
 
 static Obj*
 S_parse_json(char *text, size_t size) {
-    void *json_parser = LucyParseJsonAlloc(lucy_Memory_wrapped_malloc);
+    void *json_parser = LucyParseJsonAlloc(Memory_wrapped_malloc);
     if (json_parser == NULL) {
         CharBuf *mess = MAKE_MESS("Failed to allocate JSON parser");
         Err_set_error(Err_new(mess));
         return NULL;
     }
     Obj *dump = S_do_parse_json(json_parser, text, size);
-    LucyParseJsonFree(json_parser, lucy_Memory_wrapped_free);
+    LucyParseJsonFree(json_parser, Memory_wrapped_free);
     return dump;
 }
 

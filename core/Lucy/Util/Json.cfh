@@ -62,8 +62,8 @@ __C__
 
 struct lucy_JsonParserState 
 {
-    lucy_Obj   *result;
-    bool    errors;
+    cfish_Obj *result;
+    bool       errors;
 };
 typedef struct lucy_JsonParserState lucy_JsonParserState;
 

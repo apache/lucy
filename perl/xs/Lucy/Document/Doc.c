@@ -237,7 +237,7 @@ lucy_Doc_equals(lucy_Doc *self, lucy_Obj *other) {
 void
 lucy_Doc_destroy(lucy_Doc *self) {
     if (self->fields) { SvREFCNT_dec((SV*)self->fields); }
-    LUCY_SUPER_DESTROY(self, LUCY_DOC);
+    CFISH_SUPER_DESTROY(self, LUCY_DOC);
 }
 
 
