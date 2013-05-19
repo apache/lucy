@@ -513,7 +513,7 @@ CODE:
         CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
     }
     const char *type_str = SvPVutf8_nolen(type_sv);
-    lucy_Obj *value = NULL;
+    cfish_Obj *value = NULL;
     uint32_t type = 0;
 
     if (strcmp(type_str, "OPEN_PAREN") == 0) {
@@ -539,11 +539,11 @@ CODE:
     }
     else if (strcmp(type_str, "FIELD") == 0) {
         type = LUCY_QPARSER_TOKEN_FIELD; 
-        value = CFISH_CERTIFY(XSBind_perl_to_cfish(value_sv), LUCY_CHARBUF);
+        value = CFISH_CERTIFY(XSBind_perl_to_cfish(value_sv), CFISH_CHARBUF);
     }
     else if (strcmp(type_str, "STRING") == 0) {
         type = LUCY_QPARSER_TOKEN_STRING; 
-        value = CFISH_CERTIFY(XSBind_perl_to_cfish(value_sv), LUCY_CHARBUF);
+        value = CFISH_CERTIFY(XSBind_perl_to_cfish(value_sv), CFISH_CHARBUF);
     }
     else if (strcmp(type_str, "QUERY") == 0) {
         type = LUCY_QPARSER_TOKEN_QUERY; 

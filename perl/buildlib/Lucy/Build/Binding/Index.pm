@@ -407,8 +407,8 @@ set_race_condition_debug1(val_sv)
     SV *val_sv;
 PPCODE:
     CFISH_DECREF(lucy_PolyReader_race_condition_debug1);
-    lucy_PolyReader_race_condition_debug1 = (lucy_CharBuf*)
-        XSBind_maybe_sv_to_cfish_obj(val_sv, LUCY_CHARBUF, NULL);
+    lucy_PolyReader_race_condition_debug1 = (cfish_CharBuf*)
+        XSBind_maybe_sv_to_cfish_obj(val_sv, CFISH_CHARBUF, NULL);
     if (lucy_PolyReader_race_condition_debug1) {
         (void)CFISH_INCREF(lucy_PolyReader_race_condition_debug1);
     }
@@ -584,7 +584,7 @@ PPCODE:
         }
     }
     else if (items == 1) {
-        CFISH_THROW(LUCY_ERR, "Missing required argument 'doc'");
+        CFISH_THROW(CFISH_ERR, "Missing required argument 'doc'");
     }
 
     // Either get a Doc or use the stock doc.
@@ -602,8 +602,8 @@ PPCODE:
         }
     }
     if (!doc) {
-        THROW(LUCY_ERR, "Need either a hashref or a %o",
-              Lucy_VTable_Get_Name(LUCY_DOC));
+        THROW(CFISH_ERR, "Need either a hashref or a %o",
+              Cfish_VTable_Get_Name(LUCY_DOC));
     }
 
     Lucy_Indexer_Add_Doc(self, doc, boost);
@@ -1116,8 +1116,8 @@ CODE:
         CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
     }
     {
-        lucy_Obj *blank = Lucy_SortCache_Make_Blank(self);
-        lucy_Obj *value = Lucy_SortCache_Value(self, ord, blank);
+        cfish_Obj *blank = Lucy_SortCache_Make_Blank(self);
+        cfish_Obj *value = Lucy_SortCache_Value(self, ord, blank);
         RETVAL = XSBind_cfish_to_perl(value);
         CFISH_DECREF(blank);
     }

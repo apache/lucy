@@ -60,10 +60,10 @@ lucy_DefDocReader_fetch_doc(lucy_DefaultDocReader *self, int32_t doc_id) {
         *SvEND(field_name_sv) = '\0';
 
         // Find the Field's FieldType.
-        lucy_ZombieCharBuf *field_name_zcb
+        cfish_ZombieCharBuf *field_name_zcb
             = CFISH_ZCB_WRAP_STR(field_name_ptr, field_name_len);
-        Lucy_ZCB_Assign_Str(field_name_zcb, field_name_ptr, field_name_len);
-        type = Lucy_Schema_Fetch_Type(schema, (lucy_CharBuf*)field_name_zcb);
+        Cfish_ZCB_Assign_Str(field_name_zcb, field_name_ptr, field_name_len);
+        type = Lucy_Schema_Fetch_Type(schema, (cfish_CharBuf*)field_name_zcb);
 
         // Read the field value.
         switch (Lucy_FType_Primitive_ID(type) & lucy_FType_PRIMITIVE_ID_MASK) {
@@ -107,7 +107,7 @@ lucy_DefDocReader_fetch_doc(lucy_DefaultDocReader *self, int32_t doc_id) {
                 break;
             default:
                 value_sv = NULL;
-                CFISH_THROW(LUCY_ERR, "Unrecognized type: %o", type);
+                CFISH_THROW(CFISH_ERR, "Unrecognized type: %o", type);
         }
 
         // Store the value.

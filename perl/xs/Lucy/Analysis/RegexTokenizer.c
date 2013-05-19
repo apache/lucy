@@ -40,20 +40,20 @@ lucy_RegexTokenizer_is_available(void) {
 
 lucy_RegexTokenizer*
 lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
-                         const lucy_CharBuf *pattern) {
+                         const cfish_CharBuf *pattern) {
     lucy_Analyzer_init((lucy_Analyzer*)self);
     #define DEFAULT_PATTERN "\\w+(?:['\\x{2019}]\\w+)*"
     if (pattern) {
-        if (Lucy_CB_Find_Str(pattern, "\\p", 2) != -1
-            || Lucy_CB_Find_Str(pattern, "\\P", 2) != -1
+        if (Cfish_CB_Find_Str(pattern, "\\p", 2) != -1
+            || Cfish_CB_Find_Str(pattern, "\\P", 2) != -1
            ) {
             CFISH_DECREF(self);
-            THROW(LUCY_ERR, "\\p and \\P constructs forbidden");
+            THROW(CFISH_ERR, "\\p and \\P constructs forbidden");
         }
-        self->pattern = Lucy_CB_Clone(pattern);
+        self->pattern = Cfish_CB_Clone(pattern);
     }
     else {
-        self->pattern = lucy_CB_new_from_trusted_utf8(
+        self->pattern = cfish_CB_new_from_trusted_utf8(
                             DEFAULT_PATTERN, sizeof(DEFAULT_PATTERN) - 1);
     }
 
@@ -94,12 +94,12 @@ S_set_token_re_but_not_pattern(lucy_RegexTokenizer *self, void *token_re) {
         magic = mg_find((SV*)token_re, PERL_MAGIC_qr);
     }
     if (!magic) {
-        THROW(LUCY_ERR, "token_re is not a qr// entity");
+        THROW(CFISH_ERR, "token_re is not a qr// entity");
     }
     REGEXP *rx = (REGEXP*)magic->mg_obj;
 #endif
     if (rx == NULL) {
-        THROW(LUCY_ERR, "Failed to extract REGEXP from token_re '%s'",
+        THROW(CFISH_ERR, "Failed to extract REGEXP from token_re '%s'",
               SvPV_nolen((SV*)token_re));
     }
     if (self->token_re) { ReREFCNT_dec(((REGEXP*)self->token_re)); }
@@ -112,7 +112,7 @@ S_set_pattern_from_token_re(lucy_RegexTokenizer *self, void *token_re) {
     SV *rv = newRV((SV*)token_re);
     STRLEN len = 0;
     char *ptr = SvPVutf8((SV*)rv, len);
-    Lucy_CB_Mimic_Str(self->pattern, ptr, len);
+    Cfish_CB_Mimic_Str(self->pattern, ptr, len);
     SvREFCNT_dec(rv);
 }
 
@@ -171,16 +171,16 @@ lucy_RegexTokenizer_tokenize_str(lucy_RegexTokenizer *self,
 
         // Get start and end offsets in Unicode code points.
         for (; string_arg < start_ptr; num_code_points++) {
-            string_arg += lucy_StrHelp_UTF8_COUNT[(uint8_t)(*string_arg)];
+            string_arg += cfish_StrHelp_UTF8_COUNT[(uint8_t)(*string_arg)];
             if (string_arg > string_end) {
-                THROW(LUCY_ERR, "scanned past end of '%s'", string_beg);
+                THROW(CFISH_ERR, "scanned past end of '%s'", string_beg);
             }
         }
         start = num_code_points;
         for (; string_arg < end_ptr; num_code_points++) {
-            string_arg += lucy_StrHelp_UTF8_COUNT[(uint8_t)(*string_arg)];
+            string_arg += cfish_StrHelp_UTF8_COUNT[(uint8_t)(*string_arg)];
             if (string_arg > string_end) {
-                THROW(LUCY_ERR, "scanned past end of '%s'", string_beg);
+                THROW(CFISH_ERR, "scanned past end of '%s'", string_beg);
             }
         }
         end = num_code_points;

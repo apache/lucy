@@ -117,7 +117,7 @@ MODULE = Lucy   PACKAGE = Lucy::Util::Freezer
 
 void
 freeze(obj, outstream)
-    lucy_Obj *obj;
+    cfish_Obj *obj;
     lucy_OutStream *outstream;
 PPCODE:
     lucy_Freezer_serialize(obj, outstream);
@@ -126,7 +126,7 @@ SV*
 thaw(instream)
     lucy_InStream *instream;
 CODE:
-    lucy_Obj *obj = lucy_Freezer_thaw(instream);
+    cfish_Obj *obj = lucy_Freezer_thaw(instream);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(obj);
 OUTPUT: RETVAL
 
@@ -147,7 +147,7 @@ MODULE = Lucy   PACKAGE = Lucy::Util::IndexFileNames
 
 uint64_t
 extract_gen(name)
-    const lucy_CharBuf *name;
+    const cfish_CharBuf *name;
 CODE:
     RETVAL = lucy_IxFileNames_extract_gen(name);
 OUTPUT: RETVAL
@@ -157,7 +157,7 @@ latest_snapshot(folder)
     lucy_Folder *folder;
 CODE:
 {
-    lucy_CharBuf *latest = lucy_IxFileNames_latest_snapshot(folder);
+    cfish_CharBuf *latest = lucy_IxFileNames_latest_snapshot(folder);
     RETVAL = XSBind_cb_to_sv(latest);
     CFISH_DECREF(latest);
 }
@@ -253,7 +253,7 @@ to_base36(num)
 CODE:
 {
     char base36[cfish_StrHelp_MAX_BASE36_BYTES];
-    size_t size = lucy_StrHelp_to_base36(num, &base36);
+    size_t size = cfish_StrHelp_to_base36(num, &base36);
     RETVAL = newSVpvn(base36, size);
 }
 OUTPUT: RETVAL
@@ -285,7 +285,7 @@ CODE:
 {
     STRLEN len;
     char *ptr = SvPV(sv, len);
-    RETVAL = lucy_StrHelp_utf8_valid(ptr, len);
+    RETVAL = cfish_StrHelp_utf8_valid(ptr, len);
 }
 OUTPUT: RETVAL
 
@@ -305,7 +305,7 @@ PPCODE:
 {
     STRLEN len;
     char *ptr = SvPV(catted, len);
-    if (SvUTF8(sv)) { CFISH_THROW(LUCY_ERR, "Can't cat_bytes onto a UTF-8 SV"); }
+    if (SvUTF8(sv)) { CFISH_THROW(CFISH_ERR, "Can't cat_bytes onto a UTF-8 SV"); }
     sv_catpvn(sv, ptr, len);
 }
 END_XS_CODE

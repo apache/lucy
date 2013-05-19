@@ -43,35 +43,35 @@ S_fetch_entry(lucy_Inverter *self, HE *hash_entry) {
     else {
         key = HeKEY(hash_entry);
         key_len = he_key_len;
-        if (!lucy_StrHelp_utf8_valid(key, key_len)) {
+        if (!cfish_StrHelp_utf8_valid(key, key_len)) {
             SV *key_sv = HeSVKEY_force(hash_entry);
             key = SvPVutf8(key_sv, key_len);
         }
     }
 
-    lucy_ZombieCharBuf *field = CFISH_ZCB_WRAP_STR(key, key_len);
+    cfish_ZombieCharBuf *field = CFISH_ZCB_WRAP_STR(key, key_len);
     int32_t field_num
-        = Lucy_Seg_Field_Num(self->segment, (lucy_CharBuf*)field);
+        = Lucy_Seg_Field_Num(self->segment, (cfish_CharBuf*)field);
     if (!field_num) {
         // This field seems not to be in the segment yet.  Try to find it in
         // the Schema.
-        if (Lucy_Schema_Fetch_Type(schema, (lucy_CharBuf*)field)) {
+        if (Lucy_Schema_Fetch_Type(schema, (cfish_CharBuf*)field)) {
             // The field is in the Schema.  Get a field num from the Segment.
             field_num = Lucy_Seg_Add_Field(self->segment,
-                                           (lucy_CharBuf*)field);
+                                           (cfish_CharBuf*)field);
         }
         else {
             // We've truly failed to find the field.  The user must
             // not have spec'd it.
-            THROW(LUCY_ERR, "Unknown field name: '%s'", key);
+            THROW(CFISH_ERR, "Unknown field name: '%s'", key);
         }
     }
 
     lucy_InverterEntry *entry
-        = (lucy_InverterEntry*)Lucy_VA_Fetch(self->entry_pool, field_num);
+        = (lucy_InverterEntry*)Cfish_VA_Fetch(self->entry_pool, field_num);
     if (!entry) {
-        entry = lucy_InvEntry_new(schema, (lucy_CharBuf*)field, field_num);
-        Lucy_VA_Store(self->entry_pool, field_num, (lucy_Obj*)entry);
+        entry = lucy_InvEntry_new(schema, (cfish_CharBuf*)field, field_num);
+        Cfish_VA_Store(self->entry_pool, field_num, (cfish_Obj*)entry);
     }
     return entry;
 }
@@ -96,44 +96,44 @@ lucy_Inverter_invert_doc(lucy_Inverter *self, lucy_Doc *doc) {
             case lucy_FType_TEXT: {
                     STRLEN val_len;
                     char *val_ptr = SvPVutf8(value_sv, val_len);
-                    lucy_ViewCharBuf *value
-                        = (lucy_ViewCharBuf*)inv_entry->value;
-                    Lucy_ViewCB_Assign_Str(value, val_ptr, val_len);
+                    cfish_ViewCharBuf *value
+                        = (cfish_ViewCharBuf*)inv_entry->value;
+                    Cfish_ViewCB_Assign_Str(value, val_ptr, val_len);
                     break;
                 }
             case lucy_FType_BLOB: {
                     STRLEN val_len;
                     char *val_ptr = SvPV(value_sv, val_len);
-                    lucy_ViewByteBuf *value
-                        = (lucy_ViewByteBuf*)inv_entry->value;
-                    Lucy_ViewBB_Assign_Bytes(value, val_ptr, val_len);
+                    cfish_ViewByteBuf *value
+                        = (cfish_ViewByteBuf*)inv_entry->value;
+                    Cfish_ViewBB_Assign_Bytes(value, val_ptr, val_len);
                     break;
                 }
             case lucy_FType_INT32: {
-                    lucy_Integer32* value = (lucy_Integer32*)inv_entry->value;
-                    Lucy_Int32_Set_Value(value, SvIV(value_sv));
+                    cfish_Integer32* value = (cfish_Integer32*)inv_entry->value;
+                    Cfish_Int32_Set_Value(value, SvIV(value_sv));
                     break;
                 }
             case lucy_FType_INT64: {
-                    lucy_Integer64* value = (lucy_Integer64*)inv_entry->value;
+                    cfish_Integer64* value = (cfish_Integer64*)inv_entry->value;
                     int64_t val = sizeof(IV) == 8
                                   ? SvIV(value_sv)
                                   : (int64_t)SvNV(value_sv); // lossy
-                    Lucy_Int64_Set_Value(value, val);
+                    Cfish_Int64_Set_Value(value, val);
                     break;
                 }
             case lucy_FType_FLOAT32: {
-                    lucy_Float32* value = (lucy_Float32*)inv_entry->value;
-                    Lucy_Float32_Set_Value(value, (float)SvNV(value_sv));
+                    cfish_Float32* value = (cfish_Float32*)inv_entry->value;
+                    Cfish_Float32_Set_Value(value, (float)SvNV(value_sv));
                     break;
                 }
             case lucy_FType_FLOAT64: {
-                    lucy_Float64* value = (lucy_Float64*)inv_entry->value;
-                    Lucy_Float64_Set_Value(value, SvNV(value_sv));
+                    cfish_Float64* value = (cfish_Float64*)inv_entry->value;
+                    Cfish_Float64_Set_Value(value, SvNV(value_sv));
                     break;
                 }
             default:
-                THROW(LUCY_ERR, "Unrecognized type: %o", type);
+                THROW(CFISH_ERR, "Unrecognized type: %o", type);
         }
 
         Lucy_Inverter_Add_Field(self, inv_entry);

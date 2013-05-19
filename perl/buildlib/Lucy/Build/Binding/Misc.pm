@@ -46,7 +46,7 @@ to_clownfish(sv)
     SV *sv;
 CODE:
 {
-    lucy_Obj *obj = XSBind_perl_to_cfish(sv);
+    cfish_Obj *obj = XSBind_perl_to_cfish(sv);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(obj);
 }
 OUTPUT: RETVAL
@@ -58,7 +58,7 @@ CODE:
 {
     if (sv_isobject(sv) && sv_derived_from(sv, "Clownfish::Obj")) {
         IV tmp = SvIV(SvRV(sv));
-        lucy_Obj* obj = INT2PTR(lucy_Obj*, tmp);
+        cfish_Obj* obj = INT2PTR(cfish_Obj*, tmp);
         RETVAL = XSBind_cfish_to_perl(obj);
     }
     else {
@@ -69,16 +69,16 @@ OUTPUT: RETVAL
 
 void
 STORABLE_freeze(self, ...)
-    lucy_Obj *self;
+    cfish_Obj *self;
 PPCODE:
 {
     CHY_UNUSED_VAR(self);
     if (items < 2 || !SvTRUE(ST(1))) {
         SV *retval;
-        lucy_ByteBuf *serialized_bb;
+        cfish_ByteBuf *serialized_bb;
         lucy_RAMFileHandle *file_handle
             = lucy_RAMFH_open(NULL, LUCY_FH_WRITE_ONLY | LUCY_FH_CREATE, NULL);
-        lucy_OutStream *target = lucy_OutStream_open((lucy_Obj*)file_handle);
+        lucy_OutStream *target = lucy_OutStream_open((cfish_Obj*)file_handle);
 
         lucy_Freezer_serialize(self, target);
 
@@ -90,7 +90,7 @@ PPCODE:
         CFISH_DECREF(target);
 
         if (SvCUR(retval) == 0) { // Thwart Storable bug
-            THROW(LUCY_ERR, "Calling serialize produced an empty string");
+            THROW(CFISH_ERR, "Calling serialize produced an empty string");
         }
         ST(0) = sv_2mortal(retval);
         XSRETURN(1);
@@ -114,19 +114,19 @@ STORABLE_thaw(blank_obj, cloning, serialized_sv)
 PPCODE:
 {
     char *class_name = HvNAME(SvSTASH(SvRV(blank_obj)));
-    lucy_ZombieCharBuf *klass
+    cfish_ZombieCharBuf *klass
         = CFISH_ZCB_WRAP_STR(class_name, strlen(class_name));
-    lucy_VTable *vtable
-        = (lucy_VTable*)lucy_VTable_singleton((lucy_CharBuf*)klass, NULL);
+    cfish_VTable *vtable
+        = (cfish_VTable*)cfish_VTable_singleton((cfish_CharBuf*)klass, NULL);
     STRLEN len;
     char *ptr = SvPV(serialized_sv, len);
-    lucy_ViewByteBuf *contents = lucy_ViewBB_new(ptr, len);
-    lucy_RAMFile *ram_file = lucy_RAMFile_new((lucy_ByteBuf*)contents, true);
+    cfish_ViewByteBuf *contents = cfish_ViewBB_new(ptr, len);
+    lucy_RAMFile *ram_file = lucy_RAMFile_new((cfish_ByteBuf*)contents, true);
     lucy_RAMFileHandle *file_handle
         = lucy_RAMFH_open(NULL, LUCY_FH_READ_ONLY, ram_file);
-    lucy_InStream *instream = lucy_InStream_open((lucy_Obj*)file_handle);
-    lucy_Obj *self = Lucy_VTable_Foster_Obj(vtable, blank_obj);
-    lucy_Obj *deserialized = lucy_Freezer_deserialize(self, instream);
+    lucy_InStream *instream = lucy_InStream_open((cfish_Obj*)file_handle);
+    cfish_Obj *self = Cfish_VTable_Foster_Obj(vtable, blank_obj);
+    cfish_Obj *deserialized = lucy_Freezer_deserialize(self, instream);
 
     CHY_UNUSED_VAR(cloning);
     CFISH_DECREF(contents);
@@ -136,7 +136,7 @@ PPCODE:
 
     // Catch bad deserialize() override.
     if (deserialized != self) {
-        THROW(LUCY_ERR, "Error when deserializing obj of class %o", klass);
+        THROW(CFISH_ERR, "Error when deserializing obj of class %o", klass);
     }
 }
 END_XS_CODE
@@ -158,9 +158,9 @@ bool
 run_tests(package)
     char *package;
 CODE:
-    lucy_CharBuf *class_name = lucy_CB_newf("%s", package);
-    lucy_TestFormatter *formatter
-        = (lucy_TestFormatter*)lucy_TestFormatterTAP_new();
+    cfish_CharBuf *class_name = cfish_CB_newf("%s", package);
+    cfish_TestFormatter *formatter
+        = (cfish_TestFormatter*)cfish_TestFormatterTAP_new();
     bool result = lucy_Test_run_batch(class_name, formatter);
     CFISH_DECREF(class_name);
     CFISH_DECREF(formatter);
@@ -202,8 +202,8 @@ CODE:
 {
     void *address = Lucy_BBSortEx_Fetch(self);
     if (address) {
-        RETVAL = XSBind_cfish_to_perl(*(lucy_Obj**)address);
-        CFISH_DECREF(*(lucy_Obj**)address);
+        RETVAL = XSBind_cfish_to_perl(*(cfish_Obj**)address);
+        CFISH_DECREF(*(cfish_Obj**)address);
     }
     else {
         RETVAL = newSV(0);
@@ -218,7 +218,7 @@ CODE:
 {
     void *address = Lucy_BBSortEx_Peek(self);
     if (address) {
-        RETVAL = XSBind_cfish_to_perl(*(lucy_Obj**)address);
+        RETVAL = XSBind_cfish_to_perl(*(cfish_Obj**)address);
     }
     else {
         RETVAL = newSV(0);
@@ -229,7 +229,7 @@ OUTPUT: RETVAL
 void
 feed(self, bb)
     lucy_BBSortEx *self;
-    lucy_ByteBuf *bb;
+    cfish_ByteBuf *bb;
 CODE:
     CFISH_INCREF(bb);
     Lucy_BBSortEx_Feed(self, &bb);

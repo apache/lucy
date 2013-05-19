@@ -44,7 +44,7 @@ extern "C" {
 /** Given either a class name or a perl object, manufacture a new Clownfish
  * object suitable for supplying to a cfish_Foo_init() function.
  */
-LUCY_VISIBLE cfish_Obj*
+CFISH_VISIBLE cfish_Obj*
 cfish_XSBind_new_blank_obj(SV *either_sv);
 
 /** Test whether an SV is defined.  Handles "get" magic, unlike SvOK on its
@@ -64,13 +64,13 @@ cfish_XSBind_sv_defined(SV *sv) {
  * <code>allocation</code>, assign the SV's string to it, and return that
  * instead.  If all else fails, throw an exception.
  */
-LUCY_VISIBLE cfish_Obj*
+CFISH_VISIBLE cfish_Obj*
 cfish_XSBind_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation);
 
 /** As XSBind_sv_to_cfish_obj above, but returns NULL instead of throwing an
  * exception.
  */
-LUCY_VISIBLE cfish_Obj*
+CFISH_VISIBLE cfish_Obj*
 cfish_XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable,
                                    void *allocation);
 
@@ -116,24 +116,24 @@ cfish_XSBind_cfish_obj_to_sv_noinc(cfish_Obj *obj) {
  * SVs, ByteBufs to SVs, VArrays to Perl array refs, Hashes to Perl hashrefs,
  * and any other object to a Perl object wrapping the Clownfish Obj.
  */
-LUCY_VISIBLE SV*
+CFISH_VISIBLE SV*
 cfish_XSBind_cfish_to_perl(cfish_Obj *obj);
 
 /** Deep conversion of Perl data structures to Clownfish objects -- Perl hash
  * to Hash, Perl array to VArray, Clownfish objects stripped of their
  * wrappers, and everything else stringified and turned to a CharBuf.
  */
-LUCY_VISIBLE cfish_Obj*
+CFISH_VISIBLE cfish_Obj*
 cfish_XSBind_perl_to_cfish(SV *sv);
 
 /** Convert a ByteBuf into a new string SV.
  */
-LUCY_VISIBLE SV*
+CFISH_VISIBLE SV*
 cfish_XSBind_bb_to_sv(const cfish_ByteBuf *bb);
 
 /** Convert a CharBuf into a new UTF-8 string SV.
  */
-LUCY_VISIBLE SV*
+CFISH_VISIBLE SV*
 cfish_XSBind_cb_to_sv(const cfish_CharBuf *cb);
 
 /** Perl-specific wrapper for Err#trap.  The "routine" must be either a
@@ -144,15 +144,15 @@ cfish_XSBind_trap(SV *routine, SV *context);
 
 /** Turn on overloading for the supplied Perl object and its class.
  */
-LUCY_VISIBLE void
+CFISH_VISIBLE void
 cfish_XSBind_enable_overload(void *pobj);
 
 /** Process hash-style params passed to an XS subroutine.  The varargs must be
  * a NULL-terminated series of ALLOT_ macros.
  *
  *     cfish_XSBind_allot_params(stack, start, num_stack_elems,
- *          ALLOT_OBJ(&field, "field", 5, LUCY_CHARBUF, true, alloca(cfish_ZCB_size()),
- *          ALLOT_OBJ(&term, "term", 4, LUCY_CHARBUF, true, alloca(cfish_ZCB_size()),
+ *          ALLOT_OBJ(&field, "field", 5, CFISH_CHARBUF, true, alloca(cfish_ZCB_size()),
+ *          ALLOT_OBJ(&term, "term", 4, CFISH_CHARBUF, true, alloca(cfish_ZCB_size()),
  *          NULL);
  *
  * The following ALLOT_ macros are available for primitive types:
@@ -208,7 +208,7 @@ cfish_XSBind_enable_overload(void *pobj);
  * (generally, the XS variable "items").
  * @return true on success, false on failure (sets Err_error).
  */
-LUCY_VISIBLE bool
+CFISH_VISIBLE bool
 cfish_XSBind_allot_params(SV** stack, int32_t start,
                           int32_t num_stack_elems, ...);
 

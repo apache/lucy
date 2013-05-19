@@ -214,7 +214,7 @@ static const char typemap_start[] =
     "uint32_t\tCHY_UNSIGNED_INT\n"
     "uint64_t\tCHY_BIG_UNSIGNED_INT\n"
     "\n"
-    "const lucy_CharBuf*\tCONST_CHARBUF\n";
+    "const cfish_CharBuf*\tCONST_CHARBUF\n";
 
 
 static const char typemap_input[] =
@@ -274,6 +274,32 @@ CFCPerlTypeMap_write_xs_typemap(CFCHierarchy *hierarchy) {
 
         const char *full_struct_sym = CFCClass_full_struct_sym(klass);
         const char *vtable_var      = CFCClass_full_vtable_var(klass);
+
+        /* Temporary hack until the Clownfish parcel is ready. */
+        if (strcmp(full_struct_sym, "lucy_ByteBuf") == 0) {
+            full_struct_sym = "cfish_ByteBuf";
+            vtable_var      = "CFISH_BYTEBUF";
+        }
+        else if (strcmp(full_struct_sym, "lucy_CharBuf") == 0) {
+            full_struct_sym = "cfish_CharBuf";
+            vtable_var      = "CFISH_CHARBUF";
+        }
+        else if (strcmp(full_struct_sym, "lucy_Hash") == 0) {
+            full_struct_sym = "cfish_Hash";
+            vtable_var      = "CFISH_HASH";
+        }
+        else if (strcmp(full_struct_sym, "lucy_Obj") == 0) {
+            full_struct_sym = "cfish_Obj";
+            vtable_var      = "CFISH_OBJ";
+        }
+        else if (strcmp(full_struct_sym, "lucy_VArray") == 0) {
+            full_struct_sym = "cfish_VArray";
+            vtable_var      = "CFISH_VARRAY";
+        }
+        else if (strcmp(full_struct_sym, "lucy_VTable") == 0) {
+            full_struct_sym = "cfish_VTable";
+            vtable_var      = "CFISH_VTABLE";
+        }
 
         start = CFCUtil_cat(start, full_struct_sym, "*\t", vtable_var, "_\n",
                             NULL);
