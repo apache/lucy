@@ -197,6 +197,9 @@ CFCHierarchy_build(CFCHierarchy *self) {
     for (size_t i = 0; self->includes[i] != NULL; i++) {
         S_parse_cf_files(self, self->includes[i], 1);
     }
+    for (int i = 0; self->classes[i] != NULL; i++) {
+        CFCClass_resolve_types(self->classes[i], self->classes);
+    }
     S_connect_classes(self);
     for (size_t i = 0; self->trees[i] != NULL; i++) {
         CFCClass_grow_tree(self->trees[i]);

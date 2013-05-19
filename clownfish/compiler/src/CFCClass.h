@@ -150,6 +150,11 @@ CFCClass_fresh_method(CFCClass *self, const char *sym);
 struct CFCMethod*
 CFCClass_find_novel_method(CFCClass *self, const char *sym);
 
+/** Find the actual class of all object variables without prefix.
+ */
+void
+CFCClass_resolve_types(CFCClass *self, CFCClass **classes);
+
 /** Bequeath all inherited methods and members to children.
  */
 void

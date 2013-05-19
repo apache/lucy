@@ -21,6 +21,7 @@
 #include "CFCClass.h"
 #include "CFCFile.h"
 #include "CFCFileSpec.h"
+#include "CFCParcel.h"
 #include "CFCParser.h"
 #include "CFCTest.h"
 #include "CFCType.h"
@@ -32,7 +33,7 @@ S_run_tests(CFCTest *test);
 
 const CFCTestBatch CFCTEST_BATCH_FILE = {
     "Clownfish::CFC::Model::File",
-    19,
+    21,
     S_run_tests
 };
 
@@ -50,6 +51,8 @@ S_run_tests(CFCTest *test) {
             "    Foo *foo;\n"
             "    Bar *bar;\n"
             "}\n"
+            "class Foo {}\n"
+            "class Bar {}\n"
             "__C__\n"
             "int foo;\n"
             "__END_C__\n";
@@ -88,13 +91,17 @@ S_run_tests(CFCTest *test) {
         FREEMEM(h_path);
 
         CFCClass **classes = CFCFile_classes(file);
-        OK(test, classes[0] != NULL && classes[1] == NULL,
+        OK(test,
+           classes[0] != NULL && classes[1] != NULL && classes[2] != NULL
+           && classes[3] == NULL,
            "classes() filters blocks");
         CFCVariable **member_vars = CFCClass_member_vars(classes[0]);
         CFCType *foo_type = CFCVariable_get_type(member_vars[0]);
+        CFCType_resolve(foo_type, classes);
         STR_EQ(test, CFCType_get_specifier(foo_type), "stuff_Foo",
                "file production picked up parcel def");
         CFCType *bar_type = CFCVariable_get_type(member_vars[1]);
+        CFCType_resolve(bar_type, classes);
         STR_EQ(test, CFCType_get_specifier(bar_type), "stuff_Bar",
                "parcel def is sticky");
 
@@ -104,8 +111,12 @@ S_run_tests(CFCTest *test) {
         STR_EQ(test, CFCBase_get_cfc_class(blocks[1]),
                "Clownfish::CFC::Model::Class", "blocks[1]");
         STR_EQ(test, CFCBase_get_cfc_class(blocks[2]),
-               "Clownfish::CFC::Model::CBlock", "blocks[2]");
-        OK(test, blocks[3] == NULL, "blocks[3]");
+               "Clownfish::CFC::Model::Class", "blocks[2]");
+        STR_EQ(test, CFCBase_get_cfc_class(blocks[3]),
+               "Clownfish::CFC::Model::Class", "blocks[3]");
+        STR_EQ(test, CFCBase_get_cfc_class(blocks[4]),
+               "Clownfish::CFC::Model::CBlock", "blocks[4]");
+        OK(test, blocks[5] == NULL, "blocks[5]");
 
         CFCBase_decref((CFCBase*)file);
     }
@@ -128,5 +139,8 @@ S_run_tests(CFCTest *test) {
 
     CFCBase_decref((CFCBase*)file_spec);
     CFCBase_decref((CFCBase*)parser);
+
+    CFCClass_clear_registry();
+    CFCParcel_reap_singletons();
 }
 

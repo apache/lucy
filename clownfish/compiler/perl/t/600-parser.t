@@ -54,9 +54,12 @@ for (qw( void float uint32_t int64_t uint8_t bool )) {
 isa_ok( $parser->parse("bool"),
     "Clownfish::CFC::Model::Type", "Charmony integer specifier bool" );
 
-is( $parser->parse("$_*")->get_specifier,
-    "crust_$_", "object_type_specifier $_" )
-    for qw( ByteBuf Obj ANDMatcher );
+for (qw( ByteBuf Obj ANDMatcher )) {
+    my $class = $parser->parse("class $_ {}");
+    my $type  = $parser->parse("$_*");
+    $type->resolve([ $class ]);
+    is( $type->get_specifier, "crust_$_", "object_type_specifier $_" );
+}
 
 ok( $parser->parse("const char")->const, "type_qualifier const" );
 
@@ -128,9 +131,13 @@ ok( $parser->parse($_), "declaration statement: $_" )
     'public inert Hash *hash;',
     );
 
-is( $parser->parse("$_*")->get_specifier,
-    "crust_$_", "object_type_specifier: $_" )
-    for (qw( Foo FooJr FooIII Foo4th ));
+for (qw( Foo FooJr FooIII Foo4th )) {
+    my $class = $parser->parse("class $_ {}");
+    my $type  = $parser->parse("$_*");
+    $type->resolve([ $class ]);
+    is( $type->get_specifier, "crust_$_", "object_type_specifier: $_" )
+}
+Clownfish::CFC::Model::Class->_clear_registry();
 
 SKIP: {
     skip( "Can't recover from bad specifier under flex/lemon parser", 6 );

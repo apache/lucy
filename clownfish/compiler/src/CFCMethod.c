@@ -113,27 +113,32 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     const char *prefix    = CFCMethod_get_prefix(self);
     const char *last_colon = strrchr(class_name, ':');
     const char *struct_sym = last_colon ? last_colon + 1 : class_name;
-    char *wanted = CFCUtil_sprintf("%s%s", prefix, struct_sym);
-    int mismatch = strcmp(wanted, specifier);
-    FREEMEM(wanted);
-    if (mismatch) {
-        CFCUtil_die("First arg type doesn't match class: '%s' '%s'",
-                    class_name, specifier);
+    if (strcmp(specifier, struct_sym) != 0) {
+        char *wanted = CFCUtil_sprintf("%s%s", prefix, struct_sym);
+        int mismatch = strcmp(wanted, specifier);
+        FREEMEM(wanted);
+        if (mismatch) {
+            CFCUtil_die("First arg type doesn't match class: '%s' '%s'",
+                        class_name, specifier);
+        }
     }
 
     self->macro_sym     = CFCUtil_strdup(macro_sym);
     self->is_final      = is_final;
     self->is_abstract   = is_abstract;
 
-    // Derive more symbols.
-    const char *full_func_sym = CFCMethod_implementing_func_sym(self);
-    self->full_override_sym = CFCUtil_sprintf("%s_OVERRIDE", full_func_sym);
+    self->full_override_sym = NULL;
 
     // Assume that this method is novel until we discover when applying
     // inheritance that it overrides another.
     self->is_novel = true;
 
     return self;
+}
+
+void
+CFCMethod_resolve_types(CFCMethod *self, struct CFCClass **classes) {
+    CFCFunction_resolve_types((CFCFunction*)self, classes);
 }
 
 void
@@ -288,6 +293,11 @@ CFCMethod_full_typedef(CFCMethod *self, CFCClass *invoker) {
 
 const char*
 CFCMethod_full_override_sym(CFCMethod *self) {
+    if (!self->full_override_sym) {
+        const char *full_func_sym = CFCMethod_implementing_func_sym(self);
+        self->full_override_sym
+            = CFCUtil_sprintf("%s_OVERRIDE", full_func_sym);
+    }
     return self->full_override_sym;
 }
 

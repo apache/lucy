@@ -84,6 +84,12 @@ CFCFunction_init(CFCFunction *self, CFCParcel *parcel, const char *exposure,
 }
 
 void
+CFCFunction_resolve_types(CFCFunction *self, struct CFCClass **classes) {
+    CFCType_resolve(self->return_type, classes);
+    CFCParamList_resolve_types(self->param_list, classes);
+}
+
+void
 CFCFunction_destroy(CFCFunction *self) {
     CFCBase_decref((CFCBase*)self->return_type);
     CFCBase_decref((CFCBase*)self->param_list);

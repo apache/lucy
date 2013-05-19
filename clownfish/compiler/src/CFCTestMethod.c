@@ -16,6 +16,7 @@
 
 #define CFC_USE_TEST_MACROS
 #include "CFCBase.h"
+#include "CFCClass.h"
 #include "CFCMethod.h"
 #include "CFCParamList.h"
 #include "CFCParcel.h"
@@ -41,7 +42,7 @@ S_run_final_tests(CFCTest *test);
 
 const CFCTestBatch CFCTEST_BATCH_METHOD = {
     "Clownfish::CFC::Model::Method",
-    66,
+    70,
     S_run_tests
 };
 
@@ -225,6 +226,11 @@ S_run_final_tests(CFCTest *test) {
     CFCParser *parser = CFCParser_new();
     CFCParcel *neato_parcel
         = CFCTest_parse_parcel(test, parser, "parcel Neato;");
+    CFCClass *obj_class
+        = CFCTest_parse_class(test, parser, "class Obj {}");
+    CFCClass *foo_class
+        = CFCTest_parse_class(test, parser, "class Neato::Foo {}");
+    CFCClass *class_list[3] = { obj_class, foo_class, NULL };
     CFCType *return_type = CFCTest_parse_type(test, parser, "Obj*");
     CFCParamList *param_list
         = CFCTest_parse_param_list(test, parser, "(Foo *self)");
@@ -233,6 +239,7 @@ S_run_final_tests(CFCTest *test) {
         = CFCMethod_new(neato_parcel, NULL, "Neato::Foo", "Foo",
                         "Return_An_Obj", return_type, param_list,
                         NULL, 0, 0);
+    CFCMethod_resolve_types(not_final, class_list);
     CFCMethod *final = CFCMethod_finalize(not_final);
     OK(test, CFCMethod_compatible(not_final, final),
        "finalize clones properly");
@@ -241,11 +248,14 @@ S_run_final_tests(CFCTest *test) {
 
     CFCBase_decref((CFCBase*)parser);
     CFCBase_decref((CFCBase*)neato_parcel);
+    CFCBase_decref((CFCBase*)obj_class);
+    CFCBase_decref((CFCBase*)foo_class);
     CFCBase_decref((CFCBase*)return_type);
     CFCBase_decref((CFCBase*)param_list);
     CFCBase_decref((CFCBase*)not_final);
     CFCBase_decref((CFCBase*)final);
 
+    CFCClass_clear_registry();
     CFCParcel_reap_singletons();
 }
 

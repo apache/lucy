@@ -25,6 +25,7 @@ extern "C" {
 #endif
 
 typedef struct CFCType CFCType;
+struct CFCClass;
 struct CFCParcel;
 
 #define CFCTYPE_CONST       0x00000001
@@ -50,15 +51,14 @@ struct CFCParcel;
  * array subscripts.
  * @param indirection integer indicating level of indirection. Example: the C
  * type "float**" has a specifier of "float" and indirection 2.
- * @param c_string The C representation of the type.
  */
 CFCType*
 CFCType_new(int flags, struct CFCParcel *parcel, const char *specifier,
-            int indirection, const char *c_string);
+            int indirection);
 
 CFCType*
 CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel,
-             const char *specifier, int indirection, const char *c_string);
+             const char *specifier, int indirection);
 
 /** Return a Type representing an integer primitive.
  *
@@ -173,6 +173,11 @@ CFCType_new_va_list(void);
 CFCType*
 CFCType_new_arbitrary(struct CFCParcel *parcel, const char *specifier);
 
+/** Find the actual class of an object variable without prefix.
+ */
+void
+CFCType_resolve(CFCType *self, struct CFCClass **classes);
+
 void
 CFCType_destroy(CFCType *self);
 
@@ -207,11 +212,6 @@ CFCType_get_indirection(CFCType *self);
  */
 struct CFCParcel*
 CFCType_get_parcel(CFCType *self);
-
-/** Set the C representation of the Type.
- */
-void
-CFCType_set_c_string(CFCType *self, const char *c_string);
 
 /** Return the C representation of the type.
  */

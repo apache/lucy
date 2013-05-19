@@ -16,6 +16,7 @@
 
 #define CFC_USE_TEST_MACROS
 #include "CFCBase.h"
+#include "CFCClass.h"
 #include "CFCParcel.h"
 #include "CFCParser.h"
 #include "CFCSymbol.h"
@@ -28,7 +29,7 @@ S_run_tests(CFCTest *test);
 
 const CFCTestBatch CFCTEST_BATCH_VARIABLE = {
     "Clownfish::CFC::Model::Variable",
-    27,
+    29,
     S_run_tests
 };
 
@@ -37,11 +38,14 @@ S_run_tests(CFCTest *test) {
     CFCParser *parser = CFCParser_new();
     CFCParcel *neato_parcel
         = CFCTest_parse_parcel(test, parser, "parcel Neato;");
+    CFCClass *foo_class = CFCTest_parse_class(test, parser, "class Foo {}");
+    CFCClass *class_list[2] = { foo_class, NULL };
 
     {
         CFCType *type = CFCTest_parse_type(test, parser, "float*");
         CFCVariable *var
             = CFCVariable_new(NULL, NULL, NULL, NULL, "foo", type, 0);
+        CFCVariable_resolve_type(var, class_list);
         STR_EQ(test, CFCVariable_local_c(var), "float* foo", "local_c");
         STR_EQ(test, CFCVariable_local_declaration(var), "float* foo;",
                "local_declaration");
@@ -55,6 +59,7 @@ S_run_tests(CFCTest *test) {
         CFCType *type = CFCTest_parse_type(test, parser, "float[1]");
         CFCVariable *var
             = CFCVariable_new(NULL, NULL, NULL, NULL, "foo", type, 0);
+        CFCVariable_resolve_type(var, class_list);
         STR_EQ(test, CFCVariable_local_c(var), "float foo[1]",
                "to_c appends array to var name rather than type specifier");
 
@@ -68,6 +73,7 @@ S_run_tests(CFCTest *test) {
             = CFCVariable_new(neato_parcel, NULL,
                               "Crustacean::Lobster::LobsterClaw", "LobClaw",
                               "foo", type, 0);
+        CFCVariable_resolve_type(var, class_list);
         STR_EQ(test, CFCVariable_global_c(var), "neato_Foo* neato_LobClaw_foo",
                "global_c");
 
@@ -94,7 +100,9 @@ S_run_tests(CFCTest *test) {
 
     CFCBase_decref((CFCBase*)parser);
     CFCBase_decref((CFCBase*)neato_parcel);
+    CFCBase_decref((CFCBase*)foo_class);
 
+    CFCClass_clear_registry();
     CFCParcel_reap_singletons();
 }
 

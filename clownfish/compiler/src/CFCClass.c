@@ -459,6 +459,22 @@ CFCClass_fresh_method(CFCClass *self, const char *sym) {
     return NULL;
 }
 
+void
+CFCClass_resolve_types(CFCClass *self, CFCClass **classes) {
+    for (size_t i = 0; self->functions[i] != NULL; i++) {
+        CFCFunction_resolve_types(self->functions[i], classes);
+    }
+    for (size_t i = 0; self->methods[i] != NULL; i++) {
+        CFCMethod_resolve_types(self->methods[i], classes);
+    }
+    for (size_t i = 0; self->member_vars[i] != NULL; i++) {
+        CFCVariable_resolve_type(self->member_vars[i], classes);
+    }
+    for (size_t i = 0; self->inert_vars[i] != NULL; i++) {
+        CFCVariable_resolve_type(self->inert_vars[i], classes);
+    }
+}
+
 // Pass down member vars to from parent to children.
 static void
 S_bequeath_member_vars(CFCClass *self) {

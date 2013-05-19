@@ -25,6 +25,7 @@ extern "C" {
 #endif
 
 typedef struct CFCParamList CFCParamList;
+struct CFCClass;
 struct CFCVariable;
 
 /**
@@ -35,6 +36,9 @@ CFCParamList_new(int variadic);
 
 CFCParamList*
 CFCParamList_init(CFCParamList *self, int variadic);
+
+void
+CFCParamList_resolve_types(CFCParamList *self, struct CFCClass **classes);
 
 void
 CFCParamList_destroy(CFCParamList *self);

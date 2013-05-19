@@ -49,6 +49,7 @@ my $var = Clownfish::CFC::Model::Variable->new(
     micro_sym => 'foo',
     type      => new_type('float*')
 );
+$var->resolve_type([]);
 is( $var->local_c,           'float* foo',  "local_c" );
 is( $var->local_declaration, 'float* foo;', "declaration" );
 ok( $var->local, "default to local access" );
@@ -57,9 +58,11 @@ $var = Clownfish::CFC::Model::Variable->new(
     micro_sym => 'foo',
     type      => new_type('float[1]')
 );
+$var->resolve_type([]);
 is( $var->local_c, 'float foo[1]',
     "to_c appends array to var name rather than type specifier" );
 
+my $foo_class = $parser->parse("class Foo {}");
 $var = Clownfish::CFC::Model::Variable->new(
     parcel      => 'Neato',
     micro_sym   => 'foo',
@@ -67,6 +70,7 @@ $var = Clownfish::CFC::Model::Variable->new(
     class_name  => 'Crustacean::Lobster::LobsterClaw',
     class_cnick => 'LobClaw',
 );
+$var->resolve_type([ $foo_class ]);
 is( $var->global_c, 'neato_Foo* neato_LobClaw_foo', "global_c" );
 
 isa_ok(

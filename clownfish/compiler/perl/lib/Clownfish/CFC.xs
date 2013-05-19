@@ -84,6 +84,26 @@ S_array_of_cfcbase_to_av(CFCBase **things) {
     return retval;
 }
 
+// Transform a Perl arrayref into a NULL-terminated array of CFCBase*.
+static CFCBase**
+S_av_to_array_of_cfcbase(SV *ref, const char *class_name) {
+    if (!SvROK(ref)) { croak("Not an arrayref"); }
+    SV *sv = SvRV(ref);
+    if (SvTYPE(sv) != SVt_PVAV) { croak("Not an arrayref"); }
+    AV *av = (AV*)sv;
+    size_t size = av_len(av) + 1;
+    CFCBase **retval = (CFCBase**)CALLOCATE(size + 1, sizeof(CFCBase*));
+    for (size_t i = 0; i < size; i++) {
+        SV **elem = av_fetch(av, i, 0);
+        if (!*elem || !sv_derived_from(*elem, class_name)) {
+            croak("Array element not of type %s", class_name);
+        }
+        IV objint = SvIV((SV*)SvRV(*elem));
+        retval[i] = INT2PTR(CFCBase*, objint);
+    }
+    return retval;
+}
+
 static SV*
 S_sv_eat_c_string(char *string) {
     if (string) {
@@ -270,6 +290,17 @@ CODE:
     CFCMethod *method = CFCClass_fresh_method(self, sym);
     RETVAL = S_cfcbase_to_perlref(method);
 OUTPUT: RETVAL
+
+void
+resolve_types(self, classes_sv)
+    CFCClass *self;
+    SV *classes_sv;
+PPCODE:
+    CFCClass **classes
+        = (CFCClass**)S_av_to_array_of_cfcbase(classes_sv,
+                                               "Clownfish::CFC::Model::Class");
+    CFCClass_resolve_types(self, classes);
+    FREEMEM(classes);
 
 void
 _set_or_get(self, ...)
@@ -682,6 +713,17 @@ CODE:
 OUTPUT: RETVAL
 
 void
+resolve_types(self, classes_sv)
+    CFCFunction *self;
+    SV *classes_sv;
+PPCODE:
+    CFCClass **classes
+        = (CFCClass**)S_av_to_array_of_cfcbase(classes_sv,
+                                               "Clownfish::CFC::Model::Class");
+    CFCFunction_resolve_types(self, classes);
+    FREEMEM(classes);
+
+void
 _set_or_get(self, ...)
     CFCFunction *self;
 ALIAS:
@@ -874,6 +916,17 @@ CODE:
     CFCBase_decref((CFCBase*)finalized);
 OUTPUT: RETVAL
 
+void
+resolve_types(self, classes_sv)
+    CFCMethod *self;
+    SV *classes_sv;
+PPCODE:
+    CFCClass **classes
+        = (CFCClass**)S_av_to_array_of_cfcbase(classes_sv,
+                                               "Clownfish::CFC::Model::Class");
+    CFCMethod_resolve_types(self, classes);
+    FREEMEM(classes);
+
 SV*
 _various_method_syms(self, invoker)
     CFCMethod *self;
@@ -968,6 +1021,17 @@ add_param(self, variable, value_sv)
 PPCODE:
     const char *value = SvOK(value_sv) ? SvPV_nolen(value_sv) : NULL;
     CFCParamList_add_param(self, variable, value);
+
+void
+resolve_types(self, classes_sv)
+    CFCParamList *self;
+    SV *classes_sv;
+PPCODE:
+    CFCClass **classes
+        = (CFCClass**)S_av_to_array_of_cfcbase(classes_sv,
+                                               "Clownfish::CFC::Model::Class");
+    CFCParamList_resolve_types(self, classes);
+    FREEMEM(classes);
 
 void
 _set_or_get(self, ...)
@@ -1278,15 +1342,13 @@ PPCODE:
 MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::Type
 
 SV*
-_new(flags, parcel, specifier, indirection, c_string)
+_new(flags, parcel, specifier, indirection)
     int flags;
     CFCParcel *parcel;
     const char *specifier;
     int indirection;
-    const char *c_string;
 CODE:
-    CFCType *self = CFCType_new(flags, parcel, specifier, indirection,
-                                c_string);
+    CFCType *self = CFCType_new(flags, parcel, specifier, indirection);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -1478,6 +1540,17 @@ CODE:
 OUTPUT: RETVAL
 
 void
+resolve(self, classes_sv)
+    CFCType *self;
+    SV *classes_sv;
+PPCODE:
+    CFCClass **classes
+        = (CFCClass**)S_av_to_array_of_cfcbase(classes_sv,
+                                               "Clownfish::CFC::Model::Class");
+    CFCType_resolve(self, classes);
+    FREEMEM(classes);
+
+void
 _set_or_get(self, ...)
     CFCType *self;
 ALIAS:
@@ -1485,7 +1558,6 @@ ALIAS:
     get_specifier   = 2
     get_parcel      = 4
     get_indirection = 6
-    set_c_string    = 7
     to_c            = 8
     const           = 10
     set_nullable    = 11
@@ -1522,8 +1594,6 @@ PPCODE:
         case 6:
             retval = newSViv(CFCType_get_indirection(self));
             break;
-        case 7:
-            CFCType_set_c_string(self, SvPV_nolen(ST(1)));
         case 8: {
                 const char *c_string = CFCType_to_c(self);
                 retval = newSVpvn(c_string, strlen(c_string));
@@ -1690,6 +1760,17 @@ equals(self, other)
 CODE:
     RETVAL = CFCVariable_equals(self, other);
 OUTPUT: RETVAL
+
+void
+resolve_type(self, classes_sv)
+    CFCVariable *self;
+    SV *classes_sv;
+PPCODE:
+    CFCClass **classes
+        = (CFCClass**)S_av_to_array_of_cfcbase(classes_sv,
+                                               "Clownfish::CFC::Model::Class");
+    CFCVariable_resolve_type(self, classes);
+    FREEMEM(classes);
 
 void
 _set_or_get(self, ...)

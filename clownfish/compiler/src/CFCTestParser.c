@@ -37,7 +37,7 @@ S_test_initial_value(CFCTest *test, CFCParser *parser,
 
 const CFCTestBatch CFCTEST_BATCH_PARSER = {
     "Clownfish::CFC::Model::Parser",
-    189,
+    203,
     S_run_tests
 };
 
@@ -108,17 +108,30 @@ S_run_tests(CFCTest *test) {
         static const char *const class_names[7] = {
             "ByteBuf", "Obj", "ANDMatcher", "Foo", "FooJr", "FooIII", "Foo4th"
         };
+        CFCClass *class_list[8];
+        for (int i = 0; i < 7; ++i) {
+            char *class_code = CFCUtil_sprintf("class %s {}", class_names[i]);
+            CFCClass *klass = CFCTest_parse_class(test, parser, class_code);
+            class_list[i] = klass;
+            FREEMEM(class_code);
+        }
+        class_list[7] = NULL;
         for (int i = 0; i < 7; ++i) {
             const char *class_name = class_names[i];
             char *src      = CFCUtil_sprintf("%s*", class_name);
             char *expected = CFCUtil_sprintf("crust_%s", class_name);
             CFCType *type = CFCTest_parse_type(test, parser, src);
+            CFCType_resolve(type, class_list);
             STR_EQ(test, CFCType_get_specifier(type), expected,
                    "object_type_specifier: %s", class_name);
             FREEMEM(src);
             FREEMEM(expected);
             CFCBase_decref((CFCBase*)type);
         }
+        for (int i = 0; i < 7; ++i) {
+            CFCBase_decref((CFCBase*)class_list[i]);
+        }
+        CFCClass_clear_registry();
     }
 
     {

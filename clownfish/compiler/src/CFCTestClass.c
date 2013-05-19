@@ -39,7 +39,7 @@ S_has_symbol(CFCSymbol **symbols, const char *micro_sym);
 
 const CFCTestBatch CFCTEST_BATCH_CLASS = {
     "Clownfish::CFC::Model::Class",
-    83,
+    87,
     S_run_tests
 };
 
@@ -49,6 +49,10 @@ S_run_tests(CFCTest *test) {
 
     CFCParcel *neato = CFCParcel_new("Neato", NULL, NULL);
     CFCFileSpec *file_spec = CFCFileSpec_new(".", "Foo/FooJr", 0);
+    CFCClass *thing_class
+        = CFCTest_parse_class(test, parser, "class Thing {}");
+    CFCClass *widget_class
+        = CFCTest_parse_class(test, parser, "class Widget {}");
 
     CFCVariable *thing;
     CFCVariable *widget;
@@ -118,6 +122,13 @@ S_run_tests(CFCTest *test) {
     CFCMethod *do_stuff
         = CFCTest_parse_method(test, parser, "void Do_Stuff(Foo *self);");
     CFCClass_add_method(foo, do_stuff);
+
+    CFCClass *class_list[6] = {
+        foo, foo_jr, final_foo, thing_class, widget_class, NULL
+    };
+    CFCClass_resolve_types(foo, class_list);
+    CFCClass_resolve_types(foo_jr, class_list);
+    CFCClass_resolve_types(final_foo, class_list);
 
     CFCClass_add_child(foo, foo_jr);
     CFCClass_add_child(foo_jr, final_foo);
@@ -330,6 +341,8 @@ S_run_tests(CFCTest *test) {
     CFCBase_decref((CFCBase*)parser);
     CFCBase_decref((CFCBase*)neato);
     CFCBase_decref((CFCBase*)file_spec);
+    CFCBase_decref((CFCBase*)thing_class);
+    CFCBase_decref((CFCBase*)widget_class);
     CFCBase_decref((CFCBase*)thing);
     CFCBase_decref((CFCBase*)widget);
     CFCBase_decref((CFCBase*)tread_water);

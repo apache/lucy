@@ -428,7 +428,6 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
         specifier   => undef,
         indirection => undef,
         parcel      => undef,
-        c_string    => undef,
         void        => undef,
         object      => undef,
         primitive   => undef,
@@ -466,9 +465,8 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
 
         my $indirection = $args{indirection} || 0;
         my $specifier   = $args{specifier}   || '';
-        my $c_string    = $args{c_string}    || '';
 
-        return _new( $flags, $parcel, $specifier, $indirection, $c_string );
+        return _new( $flags, $parcel, $specifier, $indirection );
     }
 
     our %new_integer_PARAMS = (

@@ -37,12 +37,16 @@ for my $bad_specifier (qw( foo Foo_Bar FOOBAR 1Foo 1FOO )) {
         "constructor rejects bad specifier $bad_specifier" );
 }
 
-for my $specifier (qw( Foo FooJr FooIII Foo4th )) {
-    is( $parser->parse("$specifier*")->get_specifier,
-        "neato_$specifier", "object_type_specifier: $specifier" );
+my @specifiers = qw( Foo FooJr FooIII Foo4th );
+my @classes = map { $parser->parse("class $_ {}") } @specifiers;
+
+for my $specifier (@specifiers) {
+    my $type = $parser->parse("$specifier*");
+    $type->resolve(\@classes);
+    is( $type->get_specifier, "neato_$specifier",
+        "object_type_specifier: $specifier" );
     is( $parser->parse("neato_$specifier*")->get_specifier,
         "neato_$specifier", "object_type_specifier: neato_$specifier" );
-    my $type = $parser->parse("$specifier*");
     ok( $type && $type->is_object, "$specifier*" );
     $type = $parser->parse("neato_$specifier*");
     ok( $type && $type->is_object, "neato_$specifier*" );
@@ -80,10 +84,15 @@ ok( $foo_type->equals($another_foo), "equals" );
 my $bar_type = Clownfish::CFC::Model::Type->new_object( specifier => 'Bar' );
 ok( !$foo_type->equals($bar_type), "different specifier spoils equals" );
 
+my $foreign_foo_class = Clownfish::CFC::Model::Class->create(
+    parcel     => 'Foreign',
+    class_name => 'Foo',
+);
 my $foreign_foo = Clownfish::CFC::Model::Type->new_object(
     specifier => 'Foo',
     parcel    => 'Foreign',
 );
+$foreign_foo->resolve([ $foreign_foo_class ]);
 ok( !$foo_type->equals($foreign_foo), "different parcel spoils equals" );
 is( $foreign_foo->get_specifier, "foreign_Foo",
     "prepend parcel prefix to specifier" );
@@ -108,10 +117,14 @@ ok( !$foo_type->equals($decremented_foo),
     "different decremented spoils equals"
 );
 
+my $foo_class = Clownfish::CFC::Model::Class->create(
+    class_name => 'Foo',
+);
 my $const_foo = Clownfish::CFC::Model::Type->new_object(
     specifier => 'Foo',
     const     => 1,
 );
+$const_foo->resolve([ $foo_class ]);
 ok( !$foo_type->equals($const_foo), "different const spoils equals" );
 like( $const_foo->to_c, qr/const/, "const included in C representation" );
 

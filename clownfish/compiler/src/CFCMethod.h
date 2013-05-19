@@ -71,6 +71,9 @@ CFCMethod_init(CFCMethod *self, struct CFCParcel *parcel,
                int is_abstract);
 
 void
+CFCMethod_resolve_types(CFCMethod *self, struct CFCClass **classes);
+
+void
 CFCMethod_destroy(CFCMethod *self);
 
 /** Returns true if the methods have signatures and attributes which allow one

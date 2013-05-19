@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 19;
+use Test::More tests => 21;
 use File::Spec::Functions qw( catdir );
 
 use Clownfish::CFC::Model::File;
@@ -30,6 +30,8 @@ my $class_content      = qq|
         Foo *foo;
         Bar *bar;
     }
+    class Foo {}
+    class Bar {}
 |;
 my $c_block = "__C__\nint foo;\n__END_C__\n";
 
@@ -63,18 +65,22 @@ is( $file->c_path('path/to'),   "$path_to_stuff_thing.c",   "c_path" );
 is( $file->h_path('path/to'),   "$path_to_stuff_thing.h",   "h_path" );
 
 my $classes = $file->classes;
-is( scalar @$classes, 1, "classes() filters blocks" );
+is( scalar @$classes, 3, "classes() filters blocks" );
 my $class = $classes->[0];
 my ( $foo, $bar ) = @{ $class->member_vars };
+$foo->resolve_type($classes);
+$bar->resolve_type($classes);
 is( $foo->get_type->get_specifier,
     'stuff_Foo', 'file production picked up parcel def' );
 is( $bar->get_type->get_specifier, 'stuff_Bar', 'parcel def is sticky' );
 
 my $blocks = $file->blocks;
-is( scalar @$blocks, 3, "all three blocks" );
+is( scalar @$blocks, 5, "all five blocks" );
 isa_ok( $blocks->[0], "Clownfish::CFC::Model::Parcel" );
 isa_ok( $blocks->[1], "Clownfish::CFC::Model::Class" );
-isa_ok( $blocks->[2], "Clownfish::CFC::Model::CBlock" );
+isa_ok( $blocks->[2], "Clownfish::CFC::Model::Class" );
+isa_ok( $blocks->[3], "Clownfish::CFC::Model::Class" );
+isa_ok( $blocks->[4], "Clownfish::CFC::Model::CBlock" );
 
 $file = $parser->_parse_file( $class_content, $file_spec );
 ($class) = @{ $file->classes };

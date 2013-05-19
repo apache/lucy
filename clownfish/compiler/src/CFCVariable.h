@@ -34,6 +34,7 @@ extern "C" {
 #endif
 
 typedef struct CFCVariable CFCVariable;
+struct CFCClass;
 struct CFCParcel;
 struct CFCType;
 
@@ -54,6 +55,9 @@ CFCVariable_init(CFCVariable *self, struct CFCParcel *parcel,
                  const char *exposure, const char *class_name,
                  const char *class_cnick, const char *micro_sym,
                  struct CFCType *type, int inert);
+
+void
+CFCVariable_resolve_type(CFCVariable *self, struct CFCClass **classes);
 
 void
 CFCVariable_destroy(CFCVariable *self);

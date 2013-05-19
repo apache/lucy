@@ -19,6 +19,7 @@
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -294,6 +295,11 @@ S_format_cfish_vtest_result(int pass, int test_num, const char *fmt,
                             va_list args) {
     if (!pass) {
         printf("  Failed test %d: ", test_num);
+        vprintf(fmt, args);
+        printf("\n");
+    }
+    else if (getenv("CFCTEST_VERBOSE")) {
+        printf("  Passed test %d: ", test_num);
         vprintf(fmt, args);
         printf("\n");
     }

@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 10;
 use Clownfish::CFC::Model::Parcel;
 
 my $neato_parcel = Clownfish::CFC::Model::Parcel->new( name => 'Neato' );
@@ -29,9 +29,7 @@ my $type = Clownfish::CFC::Model::Type->new(
 is( ${ $type->get_parcel },
     $$neato_parcel, "constructor changes parcel name to Parcel singleton" );
 
-is( $type->to_c, '', "to_c()" );
-$type->set_c_string("mytype_t");
-is( $type->to_c, "mytype_t", "set_c_string()" );
+is( $type->to_c, "mytype_t", "to_c()" );
 ok( !$type->const, "const() is off by default" );
 is( $type->get_specifier, "mytype_t", "get_specifier()" );
 

@@ -26,6 +26,7 @@
 #define CFC_NEED_BASE_STRUCT_DEF
 #include "CFCBase.h"
 #include "CFCType.h"
+#include "CFCClass.h"
 #include "CFCParcel.h"
 #include "CFCSymbol.h"
 #include "CFCUtil.h"
@@ -51,10 +52,9 @@ static const CFCMeta CFCTYPE_META = {
 
 CFCType*
 CFCType_new(int flags, struct CFCParcel *parcel, const char *specifier,
-            int indirection, const char *c_string) {
+            int indirection) {
     CFCType *self = (CFCType*)CFCBase_allocate(&CFCTYPE_META);
-    return CFCType_init(self, flags, parcel, specifier, indirection,
-                        c_string);
+    return CFCType_init(self, flags, parcel, specifier, indirection);
 }
 
 static void
@@ -83,24 +83,17 @@ S_check_flags(int supplied, int acceptable, const char *type_name) {
 
 CFCType*
 CFCType_init(CFCType *self, int flags, struct CFCParcel *parcel,
-             const char *specifier, int indirection, const char *c_string) {
+             const char *specifier, int indirection) {
     self->flags       = flags;
     self->parcel      = (CFCParcel*)CFCBase_incref((CFCBase*)parcel);
     self->specifier   = CFCUtil_strdup(specifier);
     self->indirection = indirection;
-    self->c_string    = c_string ? CFCUtil_strdup(c_string) : CFCUtil_strdup("");
+    self->c_string    = NULL;
     self->width       = 0;
     self->array       = NULL;
     self->child       = NULL;
-    if (flags & CFCTYPE_OBJECT) {
-        self->vtable_var = CFCUtil_strdup(specifier);
-        for (int i = 0; self->vtable_var[i] != 0; i++) {
-            self->vtable_var[i] = toupper(self->vtable_var[i]);
-        }
-    }
-    else {
-        self->vtable_var  = NULL;
-    }
+    self->vtable_var  = NULL;
+
     return self;
 }
 
@@ -133,22 +126,13 @@ CFCType_new_integer(int flags, const char *specifier) {
         CFCUtil_die("Unknown integer specifier: '%s'", specifier);
     }
 
-    // Cache the C representation of this type.
-    char c_string[32];
-    if (flags & CFCTYPE_CONST) {
-        sprintf(c_string, "const %s", specifier);
-    }
-    else {
-        strcpy(c_string, specifier);
-    }
-
     // Add flags.
     flags |= CFCTYPE_PRIMITIVE;
     flags |= CFCTYPE_INTEGER;
     S_check_flags(flags, CFCTYPE_CONST | CFCTYPE_PRIMITIVE | CFCTYPE_INTEGER,
                   "Integer");
 
-    CFCType *self = CFCType_new(flags, NULL, specifier, 0, c_string);
+    CFCType *self = CFCType_new(flags, NULL, specifier, 0);
     self->width = width;
     return self;
 }
@@ -171,24 +155,13 @@ CFCType_new_float(int flags, const char *specifier) {
         }
     }
 
-    // Cache the C representation of this type.
-    char c_string[32];
-    if (flags & CFCTYPE_CONST) {
-        sprintf(c_string, "const %s", specifier);
-    }
-    else {
-        strcpy(c_string, specifier);
-    }
-
     flags |= CFCTYPE_PRIMITIVE;
     flags |= CFCTYPE_FLOATING;
     S_check_flags(flags, CFCTYPE_CONST | CFCTYPE_PRIMITIVE | CFCTYPE_FLOATING,
                   "Floating");
 
-    return CFCType_new(flags, NULL, specifier, 0, c_string);
+    return CFCType_new(flags, NULL, specifier, 0);
 }
-
-#define MAX_SPECIFIER_LEN 256
 
 CFCType*
 CFCType_new_object(int flags, CFCParcel *parcel, const char *specifier,
@@ -216,48 +189,19 @@ CFCType_new_object(int flags, CFCParcel *parcel, const char *specifier,
         flags |= CFCTYPE_STRING_TYPE;
     }
 
-    char full_specifier[MAX_SPECIFIER_LEN + 1];
-    char small_specifier[MAX_SPECIFIER_LEN + 1];
-    if (isupper(*specifier)) {
-        const char *prefix = CFCParcel_get_prefix(parcel);
-        if (strlen(prefix) + strlen(specifier) > MAX_SPECIFIER_LEN) {
-            CFCUtil_die("Specifier and/or parcel prefix too long");
-        }
-        sprintf(full_specifier, "%s%s", prefix, specifier);
-        strcpy(small_specifier, specifier);
-    }
-    else if (!isalpha(*specifier)) {
+    // Validate specifier.
+    if (!isalpha(*specifier)) {
         CFCUtil_die("Invalid specifier: '%s'", specifier);
     }
-    else {
-        if (strlen(specifier) > MAX_SPECIFIER_LEN) {
-            CFCUtil_die("Specifier too long");
+    const char *small_specifier = specifier;
+    while (!isupper(*small_specifier)) {
+        if (!isalnum(*small_specifier) && *small_specifier != '_') {
+            CFCUtil_die("Invalid specifier: '%s'", specifier);
         }
-        const char *probe = specifier;
-        while (*probe) {
-            if (isupper(*probe)) {
-                break;
-            }
-            else if (!isalnum(*probe) && *probe != '_') {
-                CFCUtil_die("Invalid specifier: '%s'", specifier);
-            }
-            probe++;
-        }
-        strcpy(full_specifier, specifier);
-        strcpy(small_specifier, probe);
+        small_specifier++;
     }
-
     if (!CFCSymbol_validate_class_name_component(small_specifier)) {
         CFCUtil_die("Invalid specifier: '%s'", specifier);
-    }
-
-    // Cache C representation.
-    char c_string[MAX_SPECIFIER_LEN + 10];
-    if (flags & CFCTYPE_CONST) {
-        sprintf(c_string, "const %s*", full_specifier);
-    }
-    else {
-        sprintf(c_string, "%s*", full_specifier);
     }
 
     int acceptable_flags = CFCTYPE_OBJECT
@@ -268,10 +212,8 @@ CFCType_new_object(int flags, CFCParcel *parcel, const char *specifier,
                            | CFCTYPE_DECREMENTED;
     S_check_flags(flags, acceptable_flags, "Object");
 
-    return CFCType_new(flags, parcel, full_specifier, 1, c_string);
+    return CFCType_new(flags, parcel, specifier, 1);
 }
-
-#define MAX_COMPOSITE_LEN 256
 
 CFCType*
 CFCType_new_composite(int flags, CFCType *child, int indirection,
@@ -282,22 +224,8 @@ CFCType_new_composite(int flags, CFCType *child, int indirection,
     flags |= CFCTYPE_COMPOSITE;
     S_check_flags(flags, CFCTYPE_COMPOSITE | CFCTYPE_NULLABLE, "Composite");
 
-    // Cache C representation.
-    // NOTE: Array postfixes are NOT included.
-    const char   *child_c_string = CFCType_to_c(child);
-    size_t        child_c_len    = strlen(child_c_string);
-    size_t        amount         = child_c_len + indirection;
-    if (amount > MAX_COMPOSITE_LEN) {
-        CFCUtil_die("C representation too long");
-    }
-    char c_string[MAX_COMPOSITE_LEN + 1];
-    strcpy(c_string, child_c_string);
-    for (int i = 0; i < indirection; i++) {
-        strncat(c_string, "*", 1);
-    }
-
     CFCType *self = CFCType_new(flags, NULL, CFCType_get_specifier(child),
-                                indirection, c_string);
+                                indirection);
     self->child = (CFCType*)CFCBase_incref((CFCBase*)child);
 
     // Record array spec.
@@ -312,14 +240,13 @@ CFCType_new_composite(int flags, CFCType *child, int indirection,
 CFCType*
 CFCType_new_void(int is_const) {
     int flags = CFCTYPE_VOID;
-    const char *c_string = is_const ? "const void" : "void";
     if (is_const) { flags |= CFCTYPE_CONST; }
-    return CFCType_new(flags, NULL, "void", 0, c_string);
+    return CFCType_new(flags, NULL, "void", 0);
 }
 
 CFCType*
 CFCType_new_va_list(void) {
-    return CFCType_new(CFCTYPE_VA_LIST, NULL, "va_list", 0, "va_list");
+    return CFCType_new(CFCTYPE_VA_LIST, NULL, "va_list", 0);
 }
 
 CFCType*
@@ -331,7 +258,45 @@ CFCType_new_arbitrary(CFCParcel *parcel, const char *specifier) {
         }
     }
 
-    return CFCType_new(CFCTYPE_ARBITRARY, parcel, specifier, 0, specifier);
+    return CFCType_new(CFCTYPE_ARBITRARY, parcel, specifier, 0);
+}
+
+void
+CFCType_resolve(CFCType *self, CFCClass **classes) {
+    if (CFCType_is_composite(self)) {
+        CFCType_resolve(self->child, classes);
+        return;
+    }
+    if (!CFCType_is_object(self)) {
+        return;
+    }
+
+    if (isupper(self->specifier[0])) {
+        // Try to find class from class list.
+        CFCClass *klass     = NULL;
+        char     *specifier = self->specifier;
+
+        for (size_t i = 0; classes[i]; ++i) {
+            CFCClass   *maybe_class = classes[i];
+            const char *struct_sym  = CFCClass_get_struct_sym(maybe_class);
+
+            if (strcmp(specifier, struct_sym) == 0) {
+                if (klass) {
+                    CFCUtil_die("Type '%s' is ambigious", specifier);
+                }
+                klass = maybe_class;
+            }
+        }
+
+        if (!klass) {
+            CFCUtil_die("No class found for type '%s'", specifier);
+        }
+
+        // Create actual specifier with prefix.
+        const char *prefix = CFCClass_get_prefix(klass);
+        self->specifier = CFCUtil_sprintf("%s%s", prefix, specifier);
+        FREEMEM(specifier);
+    }
 }
 
 void
@@ -406,6 +371,12 @@ CFCType_get_specifier(CFCType *self) {
 
 const char*
 CFCType_get_vtable_var(CFCType *self) {
+    if (!self->vtable_var) {
+        self->vtable_var = CFCUtil_strdup(self->specifier);
+        for (int i = 0; self->vtable_var[i] != 0; i++) {
+            self->vtable_var[i] = toupper(self->vtable_var[i]);
+        }
+    }
     return self->vtable_var;
 }
 
@@ -419,15 +390,43 @@ CFCType_get_parcel(CFCType *self) {
     return self->parcel;
 }
 
-void
-CFCType_set_c_string(CFCType *self, const char *c_string) {
-    FREEMEM(self->c_string);
-    self->c_string = CFCUtil_strdup(c_string);
-}
-
 const char*
 CFCType_to_c(CFCType *self) {
-    return self->c_string;
+    char *c_string = self->c_string;
+
+    if (c_string) { return c_string; }
+
+    if (CFCType_is_composite(self)) {
+        // NOTE: Array postfixes are NOT included.
+        const char *child_c_string = CFCType_to_c(self->child);
+        size_t      child_c_len    = strlen(child_c_string);
+        size_t      amount         = child_c_len + self->indirection;
+        c_string = (char*)MALLOCATE(amount + 1);
+        strcpy(c_string, child_c_string);
+        for (int i = 0; i < self->indirection; i++) {
+            strncat(c_string, "*", 1);
+        }
+    }
+    else if (CFCType_is_object(self)) {
+        if (CFCType_const(self)) {
+            c_string = CFCUtil_sprintf("const %s*", self->specifier);
+        }
+        else {
+            c_string = CFCUtil_sprintf("%s*", self->specifier);
+        }
+    }
+    else {
+        if (CFCType_const(self)) {
+            c_string = CFCUtil_sprintf("const %s", self->specifier);
+        }
+        else {
+            c_string = CFCUtil_strdup(self->specifier);
+        }
+    }
+
+    self->c_string = c_string;
+
+    return c_string;
 }
 
 size_t

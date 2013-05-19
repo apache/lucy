@@ -16,6 +16,7 @@
 
 #define CFC_USE_TEST_MACROS
 #include "CFCBase.h"
+#include "CFCClass.h"
 #include "CFCParamList.h"
 #include "CFCParcel.h"
 #include "CFCParser.h"
@@ -27,7 +28,7 @@ S_run_tests(CFCTest *test);
 
 const CFCTestBatch CFCTEST_BATCH_PARAM_LIST = {
     "Clownfish::CFC::Model::ParamList",
-    21,
+    23,
     S_run_tests
 };
 
@@ -36,10 +37,13 @@ S_run_tests(CFCTest *test) {
     CFCParser *parser = CFCParser_new();
     CFCParcel *neato_parcel
         = CFCTest_parse_parcel(test, parser, "parcel Neato;");
+    CFCClass *obj_class = CFCTest_parse_class(test, parser, "class Obj {}");
+    CFCClass *class_list[2] = { obj_class, NULL };
 
     {
         CFCParamList *param_list
             = CFCTest_parse_param_list(test, parser, "(Obj *self, int num)");
+        CFCParamList_resolve_types(param_list, class_list);
         OK(test, !CFCParamList_variadic(param_list), "not variadic");
         STR_EQ(test, CFCParamList_to_c(param_list), "neato_Obj* self, int num",
                "to_c");
@@ -53,6 +57,7 @@ S_run_tests(CFCTest *test) {
         CFCParamList *param_list
             = CFCTest_parse_param_list(test, parser,
                                        "(Obj *self=NULL, int num, ...)");
+        CFCParamList_resolve_types(param_list, class_list);
         OK(test, CFCParamList_variadic(param_list), "variadic");
         STR_EQ(test, CFCParamList_to_c(param_list),
                "neato_Obj* self, int num, ...", "to_c");
@@ -72,6 +77,7 @@ S_run_tests(CFCTest *test) {
     {
         CFCParamList *param_list
             = CFCTest_parse_param_list(test, parser, "()");
+        CFCParamList_resolve_types(param_list, class_list);
         STR_EQ(test, CFCParamList_to_c(param_list), "void", "to_c");
         INT_EQ(test, CFCParamList_num_vars(param_list), 0, "num_vars");
         CFCVariable **variables = CFCParamList_get_variables(param_list);
@@ -82,7 +88,9 @@ S_run_tests(CFCTest *test) {
 
     CFCBase_decref((CFCBase*)parser);
     CFCBase_decref((CFCBase*)neato_parcel);
+    CFCBase_decref((CFCBase*)obj_class);
 
+    CFCClass_clear_registry();
     CFCParcel_reap_singletons();
 }
 

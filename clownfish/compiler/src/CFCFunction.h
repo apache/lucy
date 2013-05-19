@@ -29,6 +29,7 @@ struct CFCParcel;
 struct CFCType;
 struct CFCDocuComment;
 struct CFCParamList;
+struct CFCClass;
 
 #ifdef CFC_NEED_FUNCTION_STRUCT_DEF
 #define CFC_NEED_SYMBOL_STRUCT_DEF
@@ -109,6 +110,11 @@ CFCFunction_micro_sym(CFCFunction *self);
 
 int
 CFCFunction_public(CFCFunction *self);
+
+/** Find the actual class of all object variables without prefix.
+ */
+void
+CFCFunction_resolve_types(CFCFunction *self, struct CFCClass **classes);
 
 #ifdef __cplusplus
 }
