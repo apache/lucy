@@ -4,7 +4,7 @@ set -e
 version=0.3.0
 major_version=0.3
 
-function usage()
+usage()
 {
     echo "Usage: install.sh --prefix path"
 }
