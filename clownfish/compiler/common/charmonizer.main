@@ -257,6 +257,7 @@ int main(int argc, const char **argv) {
 
     /* Define stdint types in charmony.h. */
     chaz_ConfWriter_append_conf("#define CHY_EMPLOY_INTEGERTYPES\n\n");
+    chaz_ConfWriter_append_conf("#define CHY_EMPLOY_INTEGERLITERALS\n\n");
 
     /* Run probe modules. */
     chaz_BuildEnv_run();
