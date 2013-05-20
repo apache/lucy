@@ -137,10 +137,11 @@ sub ACTION_code {
     $self->dispatch('ppport');
     $self->dispatch('parsers');
 
-    $self->extra_compiler_flags(
-        '-DCFCPERL',
-        $self->split_like_shell($self->charmony("EXTRA_CFLAGS")),
-    );
+    my @flags = $self->split_like_shell($self->charmony("EXTRA_CFLAGS"));
+    # The flag for the MSVC6 hack contains spaces. Make sure it stays quoted.
+    @flags = map { /\s/ ? qq{"$_"} : $_ } @flags;
+
+    $self->extra_compiler_flags( '-DCFCPERL', @flags );
 
     $self->SUPER::ACTION_code;
 }
