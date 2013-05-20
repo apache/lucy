@@ -20,6 +20,11 @@
 #include "CFCSymbol.h"
 #include "CFCTest.h"
 
+#ifndef true
+  #define true 1
+  #define false 0
+#endif
+
 static void
 S_run_tests(CFCTest *test);
 
@@ -89,7 +94,8 @@ S_run_tests(CFCTest *test) {
     }
 
     {
-        CFCParcel *lucifer_parcel = CFCParcel_new("Lucifer", NULL, NULL);
+        CFCParcel *lucifer_parcel
+            = CFCParcel_new("Lucifer", NULL, NULL, false);
         CFCParcel_register(lucifer_parcel);
         CFCSymbol *lucifer
             = CFCSymbol_new(lucifer_parcel, "parcel", NULL, NULL, "sym");
@@ -103,7 +109,7 @@ S_run_tests(CFCTest *test) {
         const char *PREFIX = CFCSymbol_get_PREFIX(lucifer);
         STR_EQ(test, PREFIX, "LUCIFER_", "get_PREFIX");
 
-        CFCParcel *luser_parcel = CFCParcel_new("Luser", NULL, NULL);
+        CFCParcel *luser_parcel = CFCParcel_new("Luser", NULL, NULL, false);
         CFCParcel_register(luser_parcel);
         CFCSymbol *luser
             = CFCSymbol_new(luser_parcel, "parcel", NULL, NULL, "sym");
@@ -127,7 +133,7 @@ S_run_tests(CFCTest *test) {
     }
 
     {
-        CFCParcel *eep_parcel = CFCParcel_new("Eep", NULL, NULL);
+        CFCParcel *eep_parcel = CFCParcel_new("Eep", NULL, NULL, false);
         CFCParcel_register(eep_parcel);
         CFCSymbol *eep
             = CFCSymbol_new(eep_parcel, "parcel", "Op::Ork", NULL, "ah_ah");

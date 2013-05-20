@@ -27,6 +27,11 @@
 #include "CFCUtil.h"
 #include "CFCVariable.h"
 
+#ifndef true
+  #define true 1
+  #define false 0
+#endif
+
 static void
 S_run_tests(CFCTest *test);
 
@@ -49,7 +54,8 @@ S_run_tests(CFCTest *test) {
     {
         CFCParcel *fish = CFCTest_parse_parcel(test, parser, "parcel Fish;");
 
-        CFCParcel *registered = CFCParcel_new("Crustacean", "Crust", NULL);
+        CFCParcel *registered
+            = CFCParcel_new("Crustacean", "Crust", NULL, false);
         CFCParcel_register(registered);
         CFCParcel *parcel
             = CFCTest_parse_parcel(test, parser, "parcel Crustacean;");

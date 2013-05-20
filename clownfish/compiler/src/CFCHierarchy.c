@@ -58,6 +58,10 @@ struct CFCHierarchy {
     size_t num_classes;
 };
 
+typedef struct CFCParseParcelFilesContext {
+    int is_included;
+} CFCParseParcelFilesContext;
+
 // CFCUtil_walk() callback which parses .cfp files.
 static void
 S_parse_parcel_files(const char *path, void *context);
@@ -185,11 +189,14 @@ CFCHierarchy_add_include_dir(CFCHierarchy *self, const char *include_dir) {
 
 void
 CFCHierarchy_build(CFCHierarchy *self) {
+    CFCParseParcelFilesContext context;
+    context.is_included = false;
     for (size_t i = 0; self->sources[i] != NULL; i++) {
-        CFCUtil_walk(self->sources[i], S_parse_parcel_files, NULL);
+        CFCUtil_walk(self->sources[i], S_parse_parcel_files, &context);
     }
+    context.is_included = false;
     for (size_t i = 0; self->includes[i] != NULL; i++) {
-        CFCUtil_walk(self->includes[i], S_parse_parcel_files, NULL);
+        CFCUtil_walk(self->includes[i], S_parse_parcel_files, &context);
     }
     for (size_t i = 0; self->sources[i] != NULL; i++) {
         S_parse_cf_files(self, self->sources[i], 0);
@@ -207,8 +214,8 @@ CFCHierarchy_build(CFCHierarchy *self) {
 }
 
 static void
-S_parse_parcel_files(const char *path, void *context) {
-    (void)context; // unused
+S_parse_parcel_files(const char *path, void *arg) {
+    CFCParseParcelFilesContext *context = (CFCParseParcelFilesContext*)arg;
 
     // Ignore hidden files.
     if (strstr(path, CHY_DIR_SEP ".") != NULL) {
@@ -218,7 +225,8 @@ S_parse_parcel_files(const char *path, void *context) {
     // Parse .cfp files and register the parcels they define.
     size_t path_len = strlen(path);
     if (path_len > 4 && (strcmp((path + path_len - 4), ".cfp") == 0)) {
-        CFCParcel *parcel = CFCParcel_new_from_file(path);
+        CFCParcel *parcel = CFCParcel_new_from_file(path,
+                                                    context->is_included);
         CFCParcel *existing = CFCParcel_fetch(CFCParcel_get_name(parcel));
         if (existing) {
             if (!CFCParcel_equals(parcel, existing)) {

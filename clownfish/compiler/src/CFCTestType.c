@@ -79,7 +79,7 @@ S_run_tests(CFCTest *test) {
 
 static void
 S_run_basic_tests(CFCTest *test) {
-    CFCParcel *neato_parcel = CFCParcel_new("Neato", NULL, NULL);
+    CFCParcel *neato_parcel = CFCParcel_new("Neato", NULL, NULL, false);
     CFCParcel_register(neato_parcel);
     CFCType *type = CFCType_new(0, neato_parcel, "mytype_t", 0);
 
@@ -328,7 +328,7 @@ S_run_object_tests(CFCTest *test) {
         CFCBase_decref((CFCBase*)parser);
     }
 
-    CFCParcel *neato_parcel = CFCParcel_new("Neato", NULL, NULL);
+    CFCParcel *neato_parcel = CFCParcel_new("Neato", NULL, NULL, false);
     CFCClass *foo_class
         = CFCClass_create(neato_parcel, NULL, "Foo", NULL, NULL, NULL, NULL,
                           NULL, false, false);
@@ -351,7 +351,8 @@ S_run_object_tests(CFCTest *test) {
     }
 
     {
-        CFCParcel *foreign_parcel = CFCParcel_new("Foreign", NULL, NULL);
+        CFCParcel *foreign_parcel
+            = CFCParcel_new("Foreign", NULL, NULL, false);
         CFCClass *foreign_foo_class
             = CFCClass_create(foreign_parcel, NULL, "Foo", NULL, NULL, NULL,
                               NULL, NULL, false, false);
@@ -418,7 +419,7 @@ S_run_va_list_tests(CFCTest *test) {
 static void
 S_run_arbitrary_tests(CFCTest *test) {
     {
-        CFCParcel *neato_parcel = CFCParcel_new("Neato", NULL, NULL);
+        CFCParcel *neato_parcel = CFCParcel_new("Neato", NULL, NULL, false);
         CFCParcel_register(neato_parcel);
 
         CFCType *foo = CFCType_new_arbitrary(neato_parcel, "foo_t");

@@ -320,38 +320,41 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
     use Carp;
 
     our %new_PARAMS = (
-        name    => undef,
-        cnick   => undef,
-        version => undef,
+        name        => undef,
+        cnick       => undef,
+        version     => undef,
+        is_included => undef,
     );
 
     sub new {
         my ( $either, %args ) = @_;
         verify_args( \%new_PARAMS, %args ) or confess $@;
         confess "no subclassing allowed" unless $either eq __PACKAGE__;
-        return _new( @args{qw( name cnick version )} );
+        return _new( @args{qw( name cnick version is_included )} );
     }
 
     our %new_from_json_PARAMS = (
-        json => undef,
+        json        => undef,
+        is_included => undef,
     );
 
     sub new_from_json {
         my ( $either, %args ) = @_;
         verify_args( \%new_from_json_PARAMS, %args ) or confess $@;
         confess "no subclassing allowed" unless $either eq __PACKAGE__;
-        return _new_from_json( $args{json} );
+        return _new_from_json( @args{qw( json is_included )} );
     }
 
     our %new_from_file_PARAMS = (
-        path => undef,
+        path        => undef,
+        is_included => undef,
     );
 
     sub new_from_file {
         my ( $either, %args ) = @_;
         verify_args( \%new_from_file_PARAMS, %args ) or confess $@;
         confess "no subclassing allowed" unless $either eq __PACKAGE__;
-        return _new_from_file( $args{path} );
+        return _new_from_file( @args{qw( path is_included )} );
     }
 
 #    $parcel = Clownfish::CFC::Model::Parcel->acquire($parcel_name_or_parcel_object);

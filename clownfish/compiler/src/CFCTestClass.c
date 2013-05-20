@@ -31,6 +31,11 @@
 #include "CFCUtil.h"
 #include "CFCVariable.h"
 
+#ifndef true
+  #define true 1
+  #define false 0
+#endif
+
 static void
 S_run_tests(CFCTest *test);
 
@@ -47,7 +52,7 @@ static void
 S_run_tests(CFCTest *test) {
     CFCParser *parser = CFCParser_new();
 
-    CFCParcel *neato = CFCParcel_new("Neato", NULL, NULL);
+    CFCParcel *neato = CFCParcel_new("Neato", NULL, NULL, false);
     CFCFileSpec *file_spec = CFCFileSpec_new(".", "Foo/FooJr", 0);
     CFCClass *thing_class
         = CFCTest_parse_class(test, parser, "class Thing {}");

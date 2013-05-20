@@ -50,6 +50,12 @@ CFCParcel_fetch(const char *name);
 void
 CFCParcel_register(CFCParcel *self);
 
+/** Return a NULL-terminated list of all registered parcels that are not
+ * included. Must be freed by the caller.
+ */
+CFCParcel**
+CFCParcel_source_parcels(void);
+
 /** Decref all singletons at shutdown.
  */
 void
@@ -57,17 +63,17 @@ CFCParcel_reap_singletons(void);
 
 CFCParcel*
 CFCParcel_new(const char *name, const char *cnick,
-              struct CFCVersion *version);
+              struct CFCVersion *version, int is_included);
 
 CFCParcel*
-CFCParcel_new_from_file(const char *path);
+CFCParcel_new_from_file(const char *path, int is_included);
 
 CFCParcel*
-CFCParcel_new_from_json(const char *json);
+CFCParcel_new_from_json(const char *json, int is_included);
 
 CFCParcel*
 CFCParcel_init(CFCParcel *self, const char *name, const char *cnick,
-               struct CFCVersion *version);
+               struct CFCVersion *version, int is_included);
 
 void
 CFCParcel_destroy(CFCParcel *self);
@@ -103,6 +109,11 @@ CFCParcel_get_Prefix(CFCParcel *self);
  */
 const char*
 CFCParcel_get_PREFIX(CFCParcel *self);
+
+/** Return true if the parcel is from an include directory.
+ */
+int
+CFCParcel_included(CFCParcel *self);
 
 #ifdef __cplusplus
 }

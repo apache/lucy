@@ -16,16 +16,26 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 15;
 use File::Spec::Functions qw( catfile );
 
 BEGIN { use_ok('Clownfish::CFC::Model::Parcel') }
 
-isa_ok(
-    Clownfish::CFC::Model::Parcel->new( name => "Foo" ),
-    "Clownfish::CFC::Model::Parcel",
-    "new"
+my $foo = Clownfish::CFC::Model::Parcel->new( name => "Foo" );
+isa_ok( $foo, "Clownfish::CFC::Model::Parcel", "new" );
+ok( !$foo->included, "not included" );
+$foo->register;
+
+my $included_foo = Clownfish::CFC::Model::Parcel->new(
+    name        => "IncludedFoo",
+    is_included => 1,
 );
+ok( $included_foo->included, "included" );
+$included_foo->register;
+
+my $source_parcels = Clownfish::CFC::Model::Parcel->source_parcels;
+is( @$source_parcels, 1, "number of source parcels" );
+is( $source_parcels->[0]->get_name, "Foo", "name of source parcel" );
 
 my $json = qq|
         {

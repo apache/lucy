@@ -315,7 +315,12 @@ parcel_definition(A) ::= PARCEL qualified_id(B) SEMICOLON.
 {
     A = CFCParcel_fetch(B);
     if (!A) {
-        A = CFCParcel_new(B, NULL, NULL);
+        CFCFileSpec *file_spec = CFCParser_get_file_spec(state);
+        int is_included = false;
+        if (file_spec) {
+            is_included = CFCFileSpec_included(file_spec);
+        }
+        A = CFCParcel_new(B, NULL, NULL, is_included);
         CFCParcel_register(A);
         CFCBase_decref((CFCBase*)A);
     }

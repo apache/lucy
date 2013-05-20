@@ -37,6 +37,7 @@ struct CFCParcel {
     char *prefix;
     char *Prefix;
     char *PREFIX;
+    int is_included;
 };
 
 static CFCParcel *default_parcel = NULL;
@@ -105,6 +106,27 @@ CFCParcel_register(CFCParcel *self) {
     registry[num_registered]   = NULL;
 }
 
+CFCParcel**
+CFCParcel_source_parcels(void) {
+    size_t size = (num_registered + 1) * sizeof(CFCParcel*);
+    CFCParcel **parcels = (CFCParcel**)MALLOCATE(size);
+    size_t n = 0;
+
+    for (size_t i = 0; registry[i]; ++i) {
+        CFCParcel  *parcel = registry[i];
+        const char *prefix = CFCParcel_get_prefix(parcel);
+
+        // Skip default and included parcels.
+        if (*prefix && !CFCParcel_included(parcel)) {
+            parcels[n++] = parcel;
+        }
+    }
+
+    parcels[n] = NULL;
+
+    return parcels;
+}
+
 void
 CFCParcel_reap_singletons(void) {
     for (size_t i = 0; i < num_registered; i++) {
@@ -133,14 +155,15 @@ static const CFCMeta CFCPARCEL_META = {
 };
 
 CFCParcel*
-CFCParcel_new(const char *name, const char *cnick, CFCVersion *version) {
+CFCParcel_new(const char *name, const char *cnick, CFCVersion *version,
+              int is_included) {
     CFCParcel *self = (CFCParcel*)CFCBase_allocate(&CFCPARCEL_META);
-    return CFCParcel_init(self, name, cnick, version);
+    return CFCParcel_init(self, name, cnick, version, is_included);
 }
 
 CFCParcel*
 CFCParcel_init(CFCParcel *self, const char *name, const char *cnick,
-               CFCVersion *version) {
+               CFCVersion *version, int is_included) {
     // Validate name.
     if (!name || !S_validate_name_or_cnick(name)) {
         CFCUtil_die("Invalid name: '%s'", name ? name : "[NULL]");
@@ -190,11 +213,14 @@ CFCParcel_init(CFCParcel *self, const char *name, const char *cnick,
     self->Prefix[prefix_len] = '\0';
     self->PREFIX[prefix_len] = '\0';
 
+    // Set is_included.
+    self->is_included = is_included;
+
     return self;
 }
 
 static CFCParcel*
-S_new_from_json(const char *json, const char *path) {
+S_new_from_json(const char *json, const char *path, int is_included) {
     JSONNode *parsed = S_parse_json_for_parcel(json);
     if (!parsed) {
         CFCUtil_die("Invalid JSON parcel definition in '%s'", path);
@@ -235,7 +261,7 @@ S_new_from_json(const char *json, const char *path) {
     if (!version) {
         CFCUtil_die("Missing required key 'version' (filepath '%s')", path);
     }
-    CFCParcel *self = CFCParcel_new(name, nickname, version);
+    CFCParcel *self = CFCParcel_new(name, nickname, version, is_included);
     CFCBase_decref((CFCBase*)version);
 
     for (size_t i = 0, max = parsed->num_kids; i < max; i += 2) {
@@ -257,15 +283,15 @@ S_new_from_json(const char *json, const char *path) {
 }
 
 CFCParcel*
-CFCParcel_new_from_json(const char *json) {
-    return S_new_from_json(json, "[NULL]");
+CFCParcel_new_from_json(const char *json, int is_included) {
+    return S_new_from_json(json, "[NULL]", is_included);
 }
 
 CFCParcel*
-CFCParcel_new_from_file(const char *path) {
+CFCParcel_new_from_file(const char *path, int is_included) {
     size_t len;
     char *json = CFCUtil_slurp_text(path, &len);
-    CFCParcel *self = S_new_from_json(json, path);
+    CFCParcel *self = S_new_from_json(json, path, is_included);
     FREEMEM(json);
     return self;
 }
@@ -284,7 +310,7 @@ CFCParcel_destroy(CFCParcel *self) {
 CFCParcel*
 CFCParcel_default_parcel(void) {
     if (default_parcel == NULL) {
-        default_parcel = CFCParcel_new("", "", NULL);
+        default_parcel = CFCParcel_new("", "", NULL, false);
     }
     return default_parcel;
 }
@@ -296,6 +322,7 @@ CFCParcel_equals(CFCParcel *self, CFCParcel *other) {
     if (CFCVersion_compare_to(self->version, other->version) != 0) {
         return false;
     }
+    if (self->is_included != other->is_included) { return false; }
     return true;
 }
 
@@ -327,6 +354,11 @@ CFCParcel_get_Prefix(CFCParcel *self) {
 const char*
 CFCParcel_get_PREFIX(CFCParcel *self) {
     return self->PREFIX;
+}
+
+int
+CFCParcel_included(CFCParcel *self) {
+    return self->is_included;
 }
 
 /*****************************************************************************

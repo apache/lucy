@@ -23,20 +23,32 @@
 #include "CFCVersion.h"
 #include "CFCTest.h"
 
+#ifndef true
+  #define true 1
+  #define false 0
+#endif
+
 static void
 S_run_tests(CFCTest *test);
 
 const CFCTestBatch CFCTEST_BATCH_PARCEL = {
     "Clownfish::CFC::Model::Parcel",
-    10,
+    12,
     S_run_tests
 };
 
 static void
 S_run_tests(CFCTest *test) {
     {
-        CFCParcel *parcel = CFCParcel_new("Foo", NULL, NULL);
+        CFCParcel *parcel = CFCParcel_new("Foo", NULL, NULL, false);
         OK(test, parcel != NULL, "new");
+        OK(test, !CFCParcel_included(parcel), "not included");
+        CFCBase_decref((CFCBase*)parcel);
+    }
+
+    {
+        CFCParcel *parcel = CFCParcel_new("Foo", NULL, NULL, true);
+        OK(test, CFCParcel_included(parcel), "included");
         CFCBase_decref((CFCBase*)parcel);
     }
 
@@ -47,14 +59,14 @@ S_run_tests(CFCTest *test) {
             "            \"nickname\": \"Crust\",\n"
             "            \"version\": \"v0.1.0\"\n"
             "        }\n";
-        CFCParcel *parcel = CFCParcel_new_from_json(json);
+        CFCParcel *parcel = CFCParcel_new_from_json(json, false);
         OK(test, parcel != NULL, "new_from_json");
         CFCBase_decref((CFCBase*)parcel);
     }
 
     {
         const char *path = "t" CHY_DIR_SEP "cfsource" CHY_DIR_SEP "Animal.cfp";
-        CFCParcel *parcel = CFCParcel_new_from_file(path);
+        CFCParcel *parcel = CFCParcel_new_from_file(path, false);
         OK(test, parcel != NULL, "new_from_file");
         CFCBase_decref((CFCBase*)parcel);
     }
@@ -72,7 +84,7 @@ S_run_tests(CFCTest *test) {
     }
 
     {
-        CFCParcel *parcel = CFCParcel_new("Crustacean", "Crust", NULL);
+        CFCParcel *parcel = CFCParcel_new("Crustacean", "Crust", NULL, false);
         CFCParcel_register(parcel);
         STR_EQ(test, CFCVersion_get_vstring(CFCParcel_get_version(parcel)),
                "v0", "get_version");

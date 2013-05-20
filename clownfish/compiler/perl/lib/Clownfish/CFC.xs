@@ -1098,32 +1098,35 @@ PPCODE:
 MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::Parcel
 
 SV*
-_new(name_sv, cnick_sv, version)
+_new(name_sv, cnick_sv, version, is_included)
     SV *name_sv;
     SV *cnick_sv;
     CFCVersion *version;
+    bool is_included;
 CODE:
     const char *name  = SvOK(name_sv)  ? SvPV_nolen(name_sv)  : NULL;
     const char *cnick = SvOK(cnick_sv) ? SvPV_nolen(cnick_sv) : NULL;
-    CFCParcel *self = CFCParcel_new(name, cnick, version);
+    CFCParcel *self = CFCParcel_new(name, cnick, version, is_included);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
 SV*
-_new_from_file(path)
+_new_from_file(path, is_included)
     const char *path;
+    bool is_included;
 CODE:
-    CFCParcel *self = CFCParcel_new_from_file(path);
+    CFCParcel *self = CFCParcel_new_from_file(path, is_included);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
 
 SV*
-_new_from_json(json)
+_new_from_json(json, is_included)
     const char *json;
+    bool is_included;
 CODE:
-    CFCParcel *self = CFCParcel_new_from_json(json);
+    CFCParcel *self = CFCParcel_new_from_json(json, is_included);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL
@@ -1162,6 +1165,15 @@ CODE:
     RETVAL = S_cfcbase_to_perlref(default_parcel);
 OUTPUT: RETVAL
 
+SV*
+source_parcels(...)
+CODE:
+    CHY_UNUSED_VAR(items);
+    CFCParcel **source_parcels = CFCParcel_source_parcels();
+    RETVAL = S_array_of_cfcbase_to_av((CFCBase**)source_parcels);
+    FREEMEM(source_parcels);
+OUTPUT: RETVAL
+
 void
 reap_singletons(...)
 PPCODE:
@@ -1178,6 +1190,7 @@ ALIAS:
     get_Prefix = 8
     get_PREFIX = 10
     get_version = 12
+    included    = 14
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -1210,6 +1223,9 @@ PPCODE:
                 CFCVersion *value = CFCParcel_get_version(self);
                 retval = S_cfcbase_to_perlref(value);
             }
+            break;
+        case 14:
+            retval = newSViv(CFCParcel_included(self));
             break;
     END_SET_OR_GET_SWITCH
 }
