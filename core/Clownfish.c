@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
+#include "Clownfish/Num.h"
+#include "Clownfish/Hash.h"
+#include "Clownfish/Err.h"
+
 void
-lucy_init_parcel() {
+cfish_init_parcel() {
+    cfish_Bool_init_class();
+    cfish_Hash_init_class();
+    cfish_Err_init_class();
 }
 

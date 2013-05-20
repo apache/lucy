@@ -119,8 +119,7 @@ CFCBindClass_to_c_header(CFCBindClass *self) {
 
 static char*
 S_to_c_header_inert(CFCBindClass *self) {
-    //const char *prefix    = CFCClass_get_prefix(self->client);
-    const char *prefix    = "lucy_";
+    const char *prefix    = CFCClass_get_prefix(self->client);
     char *inert_func_decs = S_sub_declarations(self);
     char *inert_var_defs  = S_inert_var_declarations(self);
     char *short_names     = S_short_names(self);
@@ -156,10 +155,8 @@ static char*
 S_to_c_header_dynamic(CFCBindClass *self) {
     const char *privacy_symbol  = CFCClass_privacy_symbol(self->client);
     const char *vt_var          = CFCClass_full_vtable_var(self->client);
-    //const char *prefix          = CFCClass_get_prefix(self->client);
-    //const char *PREFIX          = CFCClass_get_PREFIX(self->client);
-    const char *prefix          = "lucy_";
-    const char *PREFIX          = "LUCY_";
+    const char *prefix          = CFCClass_get_prefix(self->client);
+    const char *PREFIX          = CFCClass_get_PREFIX(self->client);
     char *struct_def            = S_struct_definition(self);
     char *parent_include        = S_parent_include(self);
     char *sub_declarations      = S_sub_declarations(self);
@@ -168,8 +165,12 @@ S_to_c_header_dynamic(CFCBindClass *self) {
     char *method_defs           = S_method_defs(self);
     char *short_names           = S_short_names(self);
 
+    // We must include lucy_parcel.h for the Serialize/Deserialize methods.
+    // This should be removed when InStream and OutStream are moved to the
+    // Clownfish parcel or serialization is reworked.
     char pattern[] =
         "#include \"%sparcel.h\"\n"
+        "#include \"lucy_parcel.h\"\n" // For serialize/deserialize
         "\n"
         "/* Include the header for this class's parent. \n"
         " */\n"

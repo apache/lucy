@@ -2001,16 +2001,15 @@ PPCODE:
 MODULE = Clownfish   PACKAGE = Clownfish::CFC::Binding::Perl
 
 SV*
-_new(parcel, hierarchy, lib_dir, boot_class, header, footer)
-    CFCParcel *parcel;
+_new(hierarchy, lib_dir, boot_class, header, footer)
     CFCHierarchy *hierarchy;
     const char *lib_dir;
     const char *boot_class;
     const char *header;
     const char *footer;
 CODE:
-    CFCPerl *self = CFCPerl_new(parcel, hierarchy, lib_dir, boot_class,
-                                header, footer);
+    CFCPerl *self = CFCPerl_new(hierarchy, lib_dir, boot_class, header,
+                                footer);
     RETVAL = S_cfcbase_to_perlref(self);
     CFCBase_decref((CFCBase*)self);
 OUTPUT: RETVAL

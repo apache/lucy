@@ -24,7 +24,6 @@ struct alias {
 };
 
 struct alias aliases[] = {
-    {"CFISH_VISIBLE", "LUCY_VISIBLE"},
     {NULL, NULL}
 };
 

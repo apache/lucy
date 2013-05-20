@@ -110,6 +110,11 @@ CFCParcel_get_Prefix(CFCParcel *self);
 const char*
 CFCParcel_get_PREFIX(CFCParcel *self);
 
+/* Return the Parcel's privacy symbol.
+ */
+const char*
+CFCParcel_get_privacy_sym(CFCParcel *self);
+
 /** Return true if the parcel is from an include directory.
  */
 int

@@ -36,19 +36,13 @@
 
 struct CFCPerl {
     CFCBase base;
-    CFCParcel *parcel;
     CFCHierarchy *hierarchy;
     char *lib_dir;
     char *boot_class;
     char *header;
     char *footer;
     char *xs_path;
-    char *boot_h_file;
-    char *boot_c_file;
-    char *boot_h_path;
-    char *boot_c_path;
     char *boot_func;
-    char *parcel_h_file;
 };
 
 // Modify a string in place, swapping out "::" for the supplied character.
@@ -65,24 +59,20 @@ static const CFCMeta CFCPERL_META = {
 };
 
 CFCPerl*
-CFCPerl_new(CFCParcel *parcel, CFCHierarchy *hierarchy, const char *lib_dir,
+CFCPerl_new(CFCHierarchy *hierarchy, const char *lib_dir,
             const char *boot_class, const char *header, const char *footer) {
     CFCPerl *self = (CFCPerl*)CFCBase_allocate(&CFCPERL_META);
-    return CFCPerl_init(self, parcel, hierarchy, lib_dir, boot_class, header,
-                        footer);
+    return CFCPerl_init(self, hierarchy, lib_dir, boot_class, header, footer);
 }
 
 CFCPerl*
-CFCPerl_init(CFCPerl *self, CFCParcel *parcel, CFCHierarchy *hierarchy,
-             const char *lib_dir, const char *boot_class, const char *header,
-             const char *footer) {
-    CFCUTIL_NULL_CHECK(parcel);
+CFCPerl_init(CFCPerl *self, CFCHierarchy *hierarchy, const char *lib_dir,
+             const char *boot_class, const char *header, const char *footer) {
     CFCUTIL_NULL_CHECK(hierarchy);
     CFCUTIL_NULL_CHECK(lib_dir);
     CFCUTIL_NULL_CHECK(boot_class);
     CFCUTIL_NULL_CHECK(header);
     CFCUTIL_NULL_CHECK(footer);
-    self->parcel     = (CFCParcel*)CFCBase_incref((CFCBase*)parcel);
     self->hierarchy  = (CFCHierarchy*)CFCBase_incref((CFCBase*)hierarchy);
     self->lib_dir    = CFCUtil_strdup(lib_dir);
     self->boot_class = CFCUtil_strdup(boot_class);
@@ -94,47 +84,26 @@ CFCPerl_init(CFCPerl *self, CFCParcel *parcel, CFCHierarchy *hierarchy,
                                     boot_class);
     S_replace_double_colons(self->xs_path, CHY_DIR_SEP_CHAR);
 
-    // Derive the name of the files containing bootstrapping code.
-    const char *prefix   = CFCParcel_get_prefix(parcel);
-    const char *inc_dest = CFCHierarchy_get_include_dest(hierarchy);
-    const char *src_dest = CFCHierarchy_get_source_dest(hierarchy);
-    self->boot_h_file = CFCUtil_sprintf("%sboot.h", prefix);
-    self->boot_c_file = CFCUtil_sprintf("%sboot.c", prefix);
-    self->boot_h_path = CFCUtil_sprintf("%s" CHY_DIR_SEP "%s", inc_dest,
-                                        self->boot_h_file);
-    self->boot_c_path = CFCUtil_sprintf("%s" CHY_DIR_SEP "%s", src_dest,
-                                        self->boot_c_file);
-
     // Derive the name of the bootstrap function.
-    self->boot_func = CFCUtil_sprintf("%s%s_bootstrap", prefix, boot_class);
+    self->boot_func = CFCUtil_sprintf("cfish_%s_bootstrap", boot_class);
     for (int i = 0; self->boot_func[i] != 0; i++) {
         if (!isalnum(self->boot_func[i])) {
             self->boot_func[i] = '_';
         }
     }
 
-    // Derive the name of the "parcel.h" file.
-    //self->parcel_h_file = CFCUtil_sprintf("%sparcel.h", prefix);
-    self->parcel_h_file = CFCUtil_sprintf("%sparcel.h", "lucy_");
-
     return self;
 }
 
 void
 CFCPerl_destroy(CFCPerl *self) {
-    CFCBase_decref((CFCBase*)self->parcel);
     CFCBase_decref((CFCBase*)self->hierarchy);
     FREEMEM(self->lib_dir);
     FREEMEM(self->boot_class);
     FREEMEM(self->header);
     FREEMEM(self->footer);
     FREEMEM(self->xs_path);
-    FREEMEM(self->boot_h_file);
-    FREEMEM(self->boot_c_file);
-    FREEMEM(self->boot_h_path);
-    FREEMEM(self->boot_c_path);
     FREEMEM(self->boot_func);
-    FREEMEM(self->parcel_h_file);
     CFCBase_destroy((CFCBase*)self);
 }
 
@@ -221,7 +190,11 @@ S_write_boot_h(CFCPerl *self) {
     char *content
         = CFCUtil_sprintf(pattern, self->header, guard, guard, self->boot_func,
                           guard, self->footer);
-    CFCUtil_write_file(self->boot_h_path, content, strlen(content));
+
+    const char *inc_dest = CFCHierarchy_get_include_dest(self->hierarchy);
+    char *boot_h_path = CFCUtil_sprintf("%s" CHY_DIR_SEP "boot.h", inc_dest);
+    CFCUtil_write_file(boot_h_path, content, strlen(content));
+    FREEMEM(boot_h_path);
 
     FREEMEM(content);
     FREEMEM(guard);
@@ -229,11 +202,18 @@ S_write_boot_h(CFCPerl *self) {
 
 static void
 S_write_boot_c(CFCPerl *self) {
-    CFCClass **ordered   = CFCHierarchy_ordered_classes(self->hierarchy);
-    char *pound_includes = CFCUtil_strdup("");
-    char *alias_adds     = CFCUtil_strdup("");
-    char *isa_pushes     = CFCUtil_strdup("");
-    const char *prefix   = CFCParcel_get_prefix(self->parcel);
+    CFCClass  **ordered   = CFCHierarchy_ordered_classes(self->hierarchy);
+    CFCParcel **parcels   = CFCParcel_source_parcels();
+    char *pound_includes  = CFCUtil_strdup("");
+    char *bootstrap_code  = CFCUtil_strdup("");
+    char *alias_adds      = CFCUtil_strdup("");
+    char *isa_pushes      = CFCUtil_strdup("");
+
+    for (size_t i = 0; parcels[i]; ++i) {
+        const char *prefix = CFCParcel_get_prefix(parcels[i]);
+        bootstrap_code = CFCUtil_cat(bootstrap_code, "    ", prefix,
+                                     "bootstrap_parcel();\n", NULL);
+    }
 
     for (size_t i = 0; ordered[i] != NULL; i++) {
         CFCClass *klass = ordered[i];
@@ -284,18 +264,18 @@ S_write_boot_c(CFCPerl *self) {
     const char pattern[] =
         "%s\n"
         "\n"
-        "#include \"%s\"\n"
+        "#include \"cfish_parcel.h\"\n"
         "#include \"EXTERN.h\"\n"
         "#include \"perl.h\"\n"
         "#include \"XSUB.h\"\n"
-        "#include \"%s\"\n"
+        "#include \"boot.h\"\n"
         "#include \"Clownfish/CharBuf.h\"\n"
         "#include \"Clownfish/VTable.h\"\n"
         "%s\n"
         "\n"
         "void\n"
         "%s() {\n"
-        "    %sbootstrap_parcel();\n"
+        "%s"
         "\n"
         "    cfish_ZombieCharBuf *alias = CFISH_ZCB_WRAP_STR(\"\", 0);\n"
         "%s"
@@ -307,15 +287,21 @@ S_write_boot_c(CFCPerl *self) {
         "%s\n"
         "\n";
     char *content
-        = CFCUtil_sprintf(pattern, self->header, self->parcel_h_file,
-                          self->boot_h_file, pound_includes, self->boot_func,
-                          prefix, alias_adds, isa_pushes, self->footer);
-    CFCUtil_write_file(self->boot_c_path, content, strlen(content));
+        = CFCUtil_sprintf(pattern, self->header, pound_includes,
+                          self->boot_func, bootstrap_code, alias_adds,
+                          isa_pushes, self->footer);
+
+    const char *src_dest = CFCHierarchy_get_source_dest(self->hierarchy);
+    char *boot_c_path = CFCUtil_sprintf("%s" CHY_DIR_SEP "boot.c", src_dest);
+    CFCUtil_write_file(boot_c_path, content, strlen(content));
+    FREEMEM(boot_c_path);
 
     FREEMEM(content);
     FREEMEM(isa_pushes);
     FREEMEM(alias_adds);
+    FREEMEM(bootstrap_code);
     FREEMEM(pound_includes);
+    FREEMEM(parcels);
     FREEMEM(ordered);
 }
 
@@ -366,8 +352,7 @@ S_xs_file_contents(CFCPerl *self, const char *generated_xs,
         "%s"
         "\n"
         "#include \"XSBind.h\"\n"
-        "#include \"%s\"\n"
-        "#include \"%s\"\n"
+        "#include \"boot.h\"\n"
         "\n"
         "#include \"Clownfish/Util/Memory.h\"\n"
         "#include \"Clownfish/Util/StringHelper.h\"\n"
@@ -389,10 +374,9 @@ S_xs_file_contents(CFCPerl *self, const char *generated_xs,
         "\n"
         "%s";
     char *contents
-        = CFCUtil_sprintf(pattern, self->header, self->parcel_h_file,
-                          self->boot_h_file, generated_xs, self->boot_class,
-                          self->boot_class, xs_init, hand_rolled_xs,
-                          self->footer);
+        = CFCUtil_sprintf(pattern, self->header, generated_xs,
+                          self->boot_class, self->boot_class, xs_init,
+                          hand_rolled_xs, self->footer);
 
     return contents;
 }
@@ -504,7 +488,6 @@ S_write_callbacks_c(CFCPerl *self) {
         "\n"
         "#include \"XSBind.h\"\n"
         "#include \"callbacks.h\"\n"
-        "#include \"%s\"\n"
         "\n"
         "static void\n"
         "S_finish_callback_void(const char *meth_name) {\n"
@@ -577,8 +560,7 @@ S_write_callbacks_c(CFCPerl *self) {
         "    return retval;\n"
         "}\n"
         "\n";
-    char *content
-        = CFCUtil_sprintf(pattern, self->header, self->parcel_h_file);
+    char *content = CFCUtil_sprintf(pattern, self->header);
 
     for (size_t i = 0; ordered[i] != NULL; i++) {
         CFCClass *klass = ordered[i];

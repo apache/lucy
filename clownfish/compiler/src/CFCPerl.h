@@ -67,14 +67,13 @@ struct CFCHierarchy;
  * typically copyright information.
  */
 CFCPerl*
-CFCPerl_new(struct CFCParcel *parcel, struct CFCHierarchy *hierarchy,
-            const char *lib_dir, const char *boot_class, const char *header,
-            const char *footer);
+CFCPerl_new(struct CFCHierarchy *hierarchy, const char *lib_dir,
+            const char *boot_class, const char *header, const char *footer);
 
 CFCPerl*
-CFCPerl_init(CFCPerl *self, struct CFCParcel *parcel,
-             struct CFCHierarchy *hierarchy, const char *lib_dir,
-             const char *boot_class, const char *header, const char *footer);
+CFCPerl_init(CFCPerl *self, struct CFCHierarchy *hierarchy,
+             const char *lib_dir, const char *boot_class, const char *header,
+             const char *footer);
 
 void
 CFCPerl_destroy(CFCPerl *self);

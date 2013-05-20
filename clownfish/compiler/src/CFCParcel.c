@@ -37,6 +37,7 @@ struct CFCParcel {
     char *prefix;
     char *Prefix;
     char *PREFIX;
+    char *privacy_sym;
     int is_included;
     char **dependent_parcels;
     size_t num_dependent_parcels;
@@ -217,6 +218,15 @@ CFCParcel_init(CFCParcel *self, const char *name, const char *cnick,
     self->Prefix[prefix_len] = '\0';
     self->PREFIX[prefix_len] = '\0';
 
+    // Derive privacy symbol.
+    size_t privacy_sym_len = cnick_len + 4;
+    self->privacy_sym = (char*)MALLOCATE(privacy_sym_len + 1);
+    memcpy(self->privacy_sym, "CFP_", 4);
+    for (size_t i = 0; i < cnick_len; i++) {
+        self->privacy_sym[i+4] = toupper(self->cnick[i]);
+    }
+    self->privacy_sym[privacy_sym_len] = '\0';
+
     // Set is_included.
     self->is_included = is_included;
 
@@ -314,6 +324,7 @@ CFCParcel_destroy(CFCParcel *self) {
     FREEMEM(self->prefix);
     FREEMEM(self->Prefix);
     FREEMEM(self->PREFIX);
+    FREEMEM(self->privacy_sym);
     for (size_t i = 0; self->dependent_parcels[i]; ++i) {
         FREEMEM(self->dependent_parcels[i]);
     }
@@ -372,6 +383,11 @@ CFCParcel_get_Prefix(CFCParcel *self) {
 const char*
 CFCParcel_get_PREFIX(CFCParcel *self) {
     return self->PREFIX;
+}
+
+const char*
+CFCParcel_get_privacy_sym(CFCParcel *self) {
+    return self->privacy_sym;
 }
 
 int
