@@ -284,10 +284,10 @@ S_write_boot_c(CFCPerl *self) {
         "%s\n"
         "\n"
         "#include \"charmony.h\"\n"
+        "#include \"%s\"\n"
         "#include \"EXTERN.h\"\n"
         "#include \"perl.h\"\n"
         "#include \"XSUB.h\"\n"
-        "#include \"%s\"\n"
         "#include \"%s\"\n"
         "#include \"Clownfish/CharBuf.h\"\n"
         "#include \"Clownfish/VTable.h\"\n"
@@ -307,8 +307,8 @@ S_write_boot_c(CFCPerl *self) {
         "%s\n"
         "\n";
     char *content
-        = CFCUtil_sprintf(pattern, self->header, self->boot_h_file,
-                          self->parcel_h_file, pound_includes, self->boot_func,
+        = CFCUtil_sprintf(pattern, self->header, self->parcel_h_file,
+                          self->boot_h_file, pound_includes, self->boot_func,
                           prefix, alias_adds, isa_pushes, self->footer);
     CFCUtil_write_file(self->boot_c_path, content, strlen(content));
 
