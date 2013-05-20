@@ -2499,10 +2499,10 @@ chaz_ConfWriterC_end_module(void) {
                                                     defs[i].str2);
                 break;
             case CHAZ_CONFELEM_GLOBAL_TYPEDEF: {
-                ++num_globals;
                 char *sym = chaz_ConfWriterC_uppercase_string(defs[i].str1);
                 chaz_ConfWriterC_append_def_to_conf(sym, defs[i].str2);
                 free(sym);
+                ++num_globals;
             }
             /* fall through */
             case CHAZ_CONFELEM_TYPEDEF:
@@ -6094,6 +6094,7 @@ int main(int argc, const char **argv) {
 
     /* Define stdint types in charmony.h. */
     chaz_ConfWriter_append_conf("#define CHY_EMPLOY_INTEGERTYPES\n\n");
+    chaz_ConfWriter_append_conf("#define CHY_EMPLOY_INTEGERLITERALS\n\n");
 
     /* Run probe modules. */
     chaz_BuildEnv_run();
