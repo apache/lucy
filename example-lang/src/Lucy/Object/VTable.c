@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#define C_LUCY_OBJ
-#define C_LUCY_VTABLE
+#define C_CFISH_OBJ
+#define C_CFISH_VTABLE
 
 #include "CFBind.h"
 

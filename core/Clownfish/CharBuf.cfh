@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+parcel Clownfish;
 
 /**
  * Growable buffer holding Unicode characters.
@@ -396,7 +396,7 @@ __C__
 #define CFISH_ZCB_WRAP_STR(ptr, size) \
     cfish_ZCB_wrap_str(alloca(cfish_ZCB_size()), ptr, size)
 
-#ifdef LUCY_USE_SHORT_NAMES
+#ifdef CFISH_USE_SHORT_NAMES
   #define ZCB_BLANK             CFISH_ZCB_BLANK
   #define ZCB_WRAP              CFISH_ZCB_WRAP
   #define ZCB_WRAP_STR          CFISH_ZCB_WRAP_STR

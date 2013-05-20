@@ -15,9 +15,10 @@
  */
 
 #define CHY_USE_SHORT_NAMES
+#define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
-#define C_LUCY_OBJ
-#define C_LUCY_VTABLE
+#define C_CFISH_OBJ
+#define C_CFISH_VTABLE
 
 #include "Clownfish/VTable.h"
 #include "Clownfish/CharBuf.h"

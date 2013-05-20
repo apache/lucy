@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-#define C_LUCY_NUM
-#define C_LUCY_INTNUM
-#define C_LUCY_FLOATNUM
-#define C_LUCY_INTEGER32
-#define C_LUCY_INTEGER64
-#define C_LUCY_FLOAT32
-#define C_LUCY_FLOAT64
-#define C_LUCY_BOOLNUM
-#define C_LUCY_VIEWCHARBUF
+#define C_CFISH_NUM
+#define C_CFISH_INTNUM
+#define C_CFISH_FLOATNUM
+#define C_CFISH_INTEGER32
+#define C_CFISH_INTEGER64
+#define C_CFISH_FLOAT32
+#define C_CFISH_FLOAT64
+#define C_CFISH_BOOLNUM
+#define C_CFISH_VIEWCHARBUF
+#define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 

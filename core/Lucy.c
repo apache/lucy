@@ -20,8 +20,8 @@
 
 void
 lucy_init_parcel() {
-    lucy_Bool_init_class();
-    lucy_Hash_init_class();
-    lucy_Err_init_class();
+    cfish_Bool_init_class();
+    cfish_Hash_init_class();
+    cfish_Err_init_class();
 }
 

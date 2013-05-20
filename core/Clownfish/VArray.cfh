@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+parcel Clownfish;
 
 __C__
 #include "Clownfish/Util/SortUtils.h"
@@ -22,7 +22,7 @@ __C__
 typedef bool
 (*Cfish_VA_Gather_Test_t)(cfish_VArray *self, uint32_t tick, void *data);
 
-#ifdef LUCY_USE_SHORT_NAMES
+#ifdef CFISH_USE_SHORT_NAMES
   #define VA_Gather_Test_t Cfish_VA_Gather_Test_t
 #endif
 __END_C__

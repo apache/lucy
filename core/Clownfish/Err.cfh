@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+parcel Clownfish;
 
 __C__
 typedef void 
 (*Cfish_Err_Attempt_t)(void *context);
 
-#ifdef LUCY_USE_SHORT_NAMES
+#ifdef CFISH_USE_SHORT_NAMES
   #define Err_Attempt_t Cfish_Err_Attempt_t
 #endif
 __END_C__
@@ -241,7 +241,7 @@ cfish_Err_abstract_class_check(cfish_Obj *obj, cfish_VTable *vtable) {
 #define CFISH_ABSTRACT_CLASS_CHECK(_obj, _vtable) \
     cfish_Err_abstract_class_check(((cfish_Obj*)_obj), _vtable)
 
-#ifdef LUCY_USE_SHORT_NAMES
+#ifdef CFISH_USE_SHORT_NAMES
   #define THROW                 CFISH_THROW
   #define RETHROW               CFISH_RETHROW
   #define WARN                  CFISH_WARN

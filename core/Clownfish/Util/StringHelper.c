@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-#define C_LUCY_STRINGHELPER
+#define C_CFISH_STRINGHELPER
 #include <string.h>
 
+#define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 

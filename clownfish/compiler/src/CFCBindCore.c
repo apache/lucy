@@ -146,7 +146,7 @@ S_write_parcel_h(CFCBindCore *self) {
         }
         if (!CFCClass_included(klass)) {
             if (parcel && CFCClass_get_parcel(klass) != parcel) {
-                CFCUtil_die("Multiple parcels not yet supported.");
+                //CFCUtil_die("Multiple parcels not yet supported.");
             }
             parcel = CFCClass_get_parcel(klass);
         }
@@ -156,8 +156,10 @@ S_write_parcel_h(CFCBindCore *self) {
     if (!parcel) {
         CFCUtil_die("No source classes found.");
     }
-    const char *prefix = CFCParcel_get_prefix(parcel);
-    const char *PREFIX = CFCParcel_get_PREFIX(parcel);
+    //const char *prefix = CFCParcel_get_prefix(parcel);
+    //const char *PREFIX = CFCParcel_get_PREFIX(parcel);
+    const char *prefix = "lucy_";
+    const char *PREFIX = "LUCY_";
 
     // Create Clownfish aliases if necessary.
     char *aliases = CFCBindAliases_c_aliases();
@@ -341,7 +343,7 @@ S_write_parcel_c(CFCBindCore *self) {
         privacy_syms = CFCUtil_cat(privacy_syms, "#define ",
                                    privacy_sym, "\n", NULL);
         if (parcel && CFCClass_get_parcel(klass) != parcel) {
-            CFCUtil_die("Multiple parcels not yet supported.");
+            //CFCUtil_die("Multiple parcels not yet supported.");
         }
         parcel = CFCClass_get_parcel(klass);
     }
@@ -351,12 +353,13 @@ S_write_parcel_c(CFCBindCore *self) {
     if (!parcel) {
         CFCUtil_die("No source classes found.");
     }
-    const char *prefix = CFCParcel_get_prefix(parcel);
+    //const char *prefix = CFCParcel_get_prefix(parcel);
+    const char *prefix = "lucy_";
 
     char pattern[] =
         "%s\n"
         "\n"
-        "#define C_LUCY_VTABLE\n"
+        "#define C_CFISH_VTABLE\n"
         "%s\n"
         "#include \"%sparcel.h\"\n"
         "#include \"callbacks.h\"\n"
@@ -425,7 +428,7 @@ CFCBindCore_write_callbacks_h(CFCBindCore *self) {
             CFCBase_decref((CFCBase*)class_binding);
 
             if (parcel && CFCClass_get_parcel(klass) != parcel) {
-                CFCUtil_die("Multiple parcels not yet supported.");
+                //CFCUtil_die("Multiple parcels not yet supported.");
             }
             parcel = CFCClass_get_parcel(klass);
         }
@@ -436,7 +439,8 @@ CFCBindCore_write_callbacks_h(CFCBindCore *self) {
     if (!parcel) {
         CFCUtil_die("No source classes found.");
     }
-    const char *prefix = CFCParcel_get_prefix(parcel);
+    //const char *prefix = CFCParcel_get_prefix(parcel);
+    const char *prefix = "lucy_";
 
     const char pattern[] =
         "%s\n"

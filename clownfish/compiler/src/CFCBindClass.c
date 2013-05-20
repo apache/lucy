@@ -119,7 +119,8 @@ CFCBindClass_to_c_header(CFCBindClass *self) {
 
 static char*
 S_to_c_header_inert(CFCBindClass *self) {
-    const char *prefix    = CFCClass_get_prefix(self->client);
+    //const char *prefix    = CFCClass_get_prefix(self->client);
+    const char *prefix    = "lucy_";
     char *inert_func_decs = S_sub_declarations(self);
     char *inert_var_defs  = S_inert_var_declarations(self);
     char *short_names     = S_short_names(self);
@@ -155,8 +156,10 @@ static char*
 S_to_c_header_dynamic(CFCBindClass *self) {
     const char *privacy_symbol  = CFCClass_privacy_symbol(self->client);
     const char *vt_var          = CFCClass_full_vtable_var(self->client);
-    const char *prefix          = CFCClass_get_prefix(self->client);
-    const char *PREFIX          = CFCClass_get_PREFIX(self->client);
+    //const char *prefix          = CFCClass_get_prefix(self->client);
+    //const char *PREFIX          = CFCClass_get_PREFIX(self->client);
+    const char *prefix          = "lucy_";
+    const char *PREFIX          = "LUCY_";
     char *struct_def            = S_struct_definition(self);
     char *parent_include        = S_parent_include(self);
     char *sub_declarations      = S_sub_declarations(self);

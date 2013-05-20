@@ -16,6 +16,7 @@
 
 #define C_LUCY_DOC
 #define CHY_USE_SHORT_NAMES
+#define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
 
 #include "Lucy/Document/Doc.h"

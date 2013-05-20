@@ -17,6 +17,7 @@
 #define C_LUCY_INVERTER
 #define C_LUCY_INVERTERENTRY
 #define CHY_USE_SHORT_NAMES
+#define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
 
 #include "Lucy/Index/Inverter.h"

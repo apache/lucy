@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-#define C_LUCY_CHARBUF
-#define C_LUCY_VIEWCHARBUF
-#define C_LUCY_ZOMBIECHARBUF
+#define C_CFISH_CHARBUF
+#define C_CFISH_VIEWCHARBUF
+#define C_CFISH_ZOMBIECHARBUF
+#define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 

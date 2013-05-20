@@ -18,7 +18,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define C_LUCY_TESTBATCH
+#define C_CFISH_TESTBATCH
+#define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 

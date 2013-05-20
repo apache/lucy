@@ -42,9 +42,7 @@ CFCPerlTypeMap_from_perl(CFCType *type, const char *xs_var) {
         const char *struct_sym = CFCType_get_specifier(type);
         const char *vtable_var = CFCType_get_vtable_var(type);
         const char *allocation;
-        if (strcmp(struct_sym, "lucy_CharBuf") == 0
-            || strcmp(struct_sym, "cfish_CharBuf") == 0
-            || strcmp(struct_sym, "lucy_Obj") == 0
+        if (strcmp(struct_sym, "cfish_CharBuf") == 0
             || strcmp(struct_sym, "cfish_Obj") == 0
            ) {
             // Share buffers rather than copy between Perl scalars and
@@ -274,32 +272,6 @@ CFCPerlTypeMap_write_xs_typemap(CFCHierarchy *hierarchy) {
 
         const char *full_struct_sym = CFCClass_full_struct_sym(klass);
         const char *vtable_var      = CFCClass_full_vtable_var(klass);
-
-        /* Temporary hack until the Clownfish parcel is ready. */
-        if (strcmp(full_struct_sym, "lucy_ByteBuf") == 0) {
-            full_struct_sym = "cfish_ByteBuf";
-            vtable_var      = "CFISH_BYTEBUF";
-        }
-        else if (strcmp(full_struct_sym, "lucy_CharBuf") == 0) {
-            full_struct_sym = "cfish_CharBuf";
-            vtable_var      = "CFISH_CHARBUF";
-        }
-        else if (strcmp(full_struct_sym, "lucy_Hash") == 0) {
-            full_struct_sym = "cfish_Hash";
-            vtable_var      = "CFISH_HASH";
-        }
-        else if (strcmp(full_struct_sym, "lucy_Obj") == 0) {
-            full_struct_sym = "cfish_Obj";
-            vtable_var      = "CFISH_OBJ";
-        }
-        else if (strcmp(full_struct_sym, "lucy_VArray") == 0) {
-            full_struct_sym = "cfish_VArray";
-            vtable_var      = "CFISH_VARRAY";
-        }
-        else if (strcmp(full_struct_sym, "lucy_VTable") == 0) {
-            full_struct_sym = "cfish_VTable";
-            vtable_var      = "CFISH_VTABLE";
-        }
 
         start = CFCUtil_cat(start, full_struct_sym, "*\t", vtable_var, "_\n",
                             NULL);

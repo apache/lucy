@@ -115,8 +115,8 @@ S_make_method_obj(CFCClass *klass, const char *method_name) {
     const char *klass_cnick  = CFCClass_get_cnick(klass);
     CFCParcel  *klass_parcel = CFCClass_get_parcel(klass);
 
-    CFCType *return_type
-        = CFCType_new_object(CFCTYPE_INCREMENTED, klass_parcel, "lucy_Obj", 1);
+    CFCType *return_type = CFCType_new_object(CFCTYPE_INCREMENTED,
+                                              klass_parcel, "cfish_Obj", 1);
     CFCType *self_type = CFCType_new_object(0, klass_parcel,
                                             klass_full_struct_sym, 1);
     CFCVariable *self_var = CFCVariable_new(NULL, NULL, NULL, NULL, "self",
@@ -128,7 +128,7 @@ S_make_method_obj(CFCClass *klass, const char *method_name) {
         CFCParamList_add_param(param_list, self_var, NULL);
     }
     else if (strcmp(method_name, "Load") == 0) {
-        CFCType *dump_type = CFCType_new_object(0, klass_parcel, "lucy_Obj",
+        CFCType *dump_type = CFCType_new_object(0, klass_parcel, "cfish_Obj",
                                                 1);
         CFCVariable *dump_var = CFCVariable_new(NULL, NULL, NULL, NULL, "dump",
                                                 dump_type, false);
@@ -175,7 +175,7 @@ S_add_dump_method(CFCClass *klass) {
             "cfish_Obj*\n"
             "%s(%s *self)\n"
             "{\n"
-            "    %s super_dump = SUPER_METHOD_PTR(%s, %s);\n"
+            "    %s super_dump = CFISH_SUPER_METHOD_PTR(%s, %s);\n"
             "    cfish_Hash *dump = (cfish_Hash*)super_dump(self);\n";
         char *autocode
             = CFCUtil_sprintf(pattern, full_func_sym, full_struct,
@@ -231,7 +231,7 @@ S_add_load_method(CFCClass *klass) {
             "%s(%s *self, cfish_Obj *dump)\n"
             "{\n"
             "    cfish_Hash *source = (cfish_Hash*)CFISH_CERTIFY(dump, CFISH_HASH);\n"
-            "    %s super_load = SUPER_METHOD_PTR(%s, %s);\n"
+            "    %s super_load = CFISH_SUPER_METHOD_PTR(%s, %s);\n"
             "    %s *loaded = (%s*)super_load(self, dump);\n";
         char *autocode
             = CFCUtil_sprintf(pattern, full_func_sym, full_struct,
@@ -283,7 +283,7 @@ S_process_dump_member(CFCClass *klass, CFCVariable *member, char *buf,
     const char *specifier = CFCType_get_specifier(type);
 
     // Skip the VTable.
-    if (strcmp(specifier, "lucy_VTable") == 0) {
+    if (strcmp(specifier, "cfish_VTable") == 0) {
         return;
     }
 
@@ -344,7 +344,7 @@ S_process_load_member(CFCClass *klass, CFCVariable *member, char *buf,
     const char *specifier = CFCType_get_specifier(type);
 
     // Skip the VTable.
-    if (strcmp(specifier, "lucy_VTable") == 0) {
+    if (strcmp(specifier, "cfish_VTable") == 0) {
         return;
     }
 

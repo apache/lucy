@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-#define C_LUCY_VARRAY
+#define C_CFISH_VARRAY
 #include <string.h>
 #include <stdlib.h>
 
+#define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 

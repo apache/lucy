@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#define C_LUCY_OBJ
-#define C_LUCY_VTABLE
-#define C_LUCY_LOCKFREEREGISTRY
+#define C_CFISH_OBJ
+#define C_CFISH_VTABLE
+#define C_CFISH_LOCKFREEREGISTRY
 #define NEED_newRV_noinc
 #include "XSBind.h"
 #include "Clownfish/LockFreeRegistry.h"

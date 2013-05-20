@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_LUCY_LOCKFREEREGISTRY
+#define C_CFISH_LOCKFREEREGISTRY
 
 #include "CFBind.h"
 #include "Clownfish/LockFreeRegistry.h"

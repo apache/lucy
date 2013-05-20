@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+parcel Clownfish;
 
 inert class Clownfish::Util::Memory {
 
@@ -61,7 +61,7 @@ __C__
 #define CFISH_REALLOCATE   cfish_Memory_wrapped_realloc
 #define CFISH_FREEMEM      cfish_Memory_wrapped_free
 
-#ifdef LUCY_USE_SHORT_NAMES
+#ifdef CFISH_USE_SHORT_NAMES
   #define MALLOCATE                       CFISH_MALLOCATE
   #define CALLOCATE                       CFISH_CALLOCATE
   #define REALLOCATE                      CFISH_REALLOCATE

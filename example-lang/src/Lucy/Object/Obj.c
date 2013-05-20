@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_LUCY_OBJ
+#define C_CFISH_OBJ
 
 #include "CFBind.h"
 

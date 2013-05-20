@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+parcel Clownfish;
 
 /** Base class for all objects.
  */
@@ -201,7 +201,7 @@ cfish_Obj_decref(cfish_Obj *self) {
 
 #define CFISH_DECREF(_self) cfish_Obj_decref((cfish_Obj*)_self)
 
-#ifdef LUCY_USE_SHORT_NAMES
+#ifdef CFISH_USE_SHORT_NAMES
   #define SUPER_DESTROY(_self, _vtable)   CFISH_SUPER_DESTROY(_self, _vtable)
   #define INCREF(_self)                   CFISH_INCREF(_self)
   #define DECREF(_self)                   CFISH_DECREF(_self)

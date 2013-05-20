@@ -114,7 +114,8 @@ CFCPerl_init(CFCPerl *self, CFCParcel *parcel, CFCHierarchy *hierarchy,
     }
 
     // Derive the name of the "parcel.h" file.
-    self->parcel_h_file = CFCUtil_sprintf("%sparcel.h", prefix);
+    //self->parcel_h_file = CFCUtil_sprintf("%sparcel.h", prefix);
+    self->parcel_h_file = CFCUtil_sprintf("%sparcel.h", "lucy_");
 
     return self;
 }

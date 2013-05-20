@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 

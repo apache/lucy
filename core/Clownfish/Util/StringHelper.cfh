@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+parcel Clownfish;
 
 inert class Clownfish::Util::StringHelper cnick StrHelp {
 
@@ -75,7 +75,7 @@ __C__
  * terminating NULL.
  */
 #define cfish_StrHelp_MAX_BASE36_BYTES 14
-#ifdef LUCY_USE_SHORT_NAMES
+#ifdef CFISH_USE_SHORT_NAMES
   #define StrHelp_MAX_BASE36_BYTES cfish_StrHelp_MAX_BASE36_BYTES
 #endif
 __END_C__

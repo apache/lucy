@@ -101,7 +101,7 @@ OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
+        parcel     => "Clownfish",
         class_name => "Clownfish::ByteBuf",
     );
     $binding->append_xs($xs_code);
@@ -162,7 +162,7 @@ OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
+        parcel     => "Clownfish",
         class_name => "Clownfish::CharBuf",
     );
     $binding->append_xs($xs_code);
@@ -210,7 +210,7 @@ OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
+        parcel     => "Clownfish",
         class_name => "Clownfish::Err",
     );
     $binding->bind_constructor( alias => '_new' );
@@ -270,7 +270,7 @@ PPCODE:
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
+        parcel     => "Clownfish",
         class_name => "Clownfish::Hash",
     );
     $binding->exclude_method($_) for @hand_rolled;
@@ -357,7 +357,7 @@ END_XS_CODE
 
 sub bind_lockfreeregistry {
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
+        parcel     => "Clownfish",
         class_name => "Clownfish::LockFreeRegistry",
     );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
@@ -381,7 +381,7 @@ OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
+        parcel     => "Clownfish",
         class_name => "Clownfish::Float32",
     );
     $binding->append_xs($float32_xs_code);
@@ -408,7 +408,7 @@ OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
+        parcel     => "Clownfish",
         class_name => "Clownfish::Float64",
     );
     $binding->append_xs($float64_xs_code);
@@ -533,7 +533,7 @@ OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
+        parcel     => "Clownfish",
         class_name => "Clownfish::Obj",
     );
     $binding->bind_method( alias => '_load', method => 'Load' );
@@ -614,7 +614,7 @@ OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
+        parcel     => "Clownfish",
         class_name => "Clownfish::VArray",
     );
     $binding->exclude_method($_) for @hand_rolled;
@@ -671,7 +671,7 @@ OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
+        parcel     => "Clownfish",
         class_name => "Clownfish::VTable",
     );
     $binding->exclude_method($_) for @hand_rolled;

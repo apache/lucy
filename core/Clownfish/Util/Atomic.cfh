@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+parcel Clownfish;
 
 /** Provide atomic memory operations.
  */
@@ -100,7 +100,7 @@ cfish_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
 
 #endif // Big platform if-else chain.
 
-#ifdef LUCY_USE_SHORT_NAMES
+#ifdef CFISH_USE_SHORT_NAMES
   #define Atomic_cas_ptr cfish_Atomic_cas_ptr
 #endif
 

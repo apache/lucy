@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-#define C_LUCY_OBJ
+#define C_CFISH_OBJ
 #define CHY_USE_SHORT_NAMES
+#define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
 
 #include "Clownfish/Obj.h"

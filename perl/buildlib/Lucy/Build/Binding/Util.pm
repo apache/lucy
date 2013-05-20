@@ -311,7 +311,7 @@ PPCODE:
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
+        parcel     => "Clownfish",
         class_name => "Clownfish::Util::StringHelper",
     );
     $binding->append_xs($xs_code);

@@ -18,7 +18,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#define C_LUCY_TESTBATCH
+#define C_CFISH_TESTBATCH
+#define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
 #include "Clownfish/Test/TestBatch.h"
 #include "Clownfish/CharBuf.h"

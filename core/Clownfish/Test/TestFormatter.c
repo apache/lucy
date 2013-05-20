@@ -16,7 +16,8 @@
 
 #include <stdio.h>
 
-#define C_LUCY_TESTFORMATTER
+#define C_CFISH_TESTFORMATTER
+#define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
