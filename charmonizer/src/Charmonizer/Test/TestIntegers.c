@@ -15,6 +15,8 @@
  */
 
 #define CHAZ_USE_SHORT_NAMES
+#define CHY_EMPLOY_BOOLEANS
+#define CHY_EMPLOY_INTEGERTYPES
 
 #include "Charmonizer/Test.h"
 #include "charmony.h"
