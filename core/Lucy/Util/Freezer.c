@@ -20,11 +20,20 @@
 #include "Lucy/Util/Freezer.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Document/Doc.h"
+#include "Lucy/Index/Similarity.h"
+#include "Lucy/Index/DocVector.h"
+#include "Lucy/Index/TermVector.h"
+#include "Lucy/Search/Query.h"
+#include "Lucy/Search/SortRule.h"
+#include "Lucy/Search/SortSpec.h"
+#include "Lucy/Search/MatchDoc.h"
+#include "Lucy/Search/TopDocs.h"
 
 void
 Freezer_freeze(Obj *obj, OutStream *outstream) {
-    CB_Serialize(Obj_Get_Class_Name(obj), outstream);
-    Obj_Serialize(obj, outstream);
+    CB_serialize(Obj_Get_Class_Name(obj), outstream);
+    Freezer_serialize(obj, outstream);
 }
 
 Obj*
@@ -34,7 +43,145 @@ Freezer_thaw(InStream *instream) {
     VTable *vtable = VTable_singleton(class_name, NULL);
     Obj *blank = VTable_Make_Obj(vtable);
     DECREF(class_name);
-    return Obj_Deserialize(blank, instream);
+    return Freezer_deserialize(blank, instream);
 }
 
+void
+Freezer_serialize(Obj *obj, OutStream *outstream) {
+    VTable *vtable = Obj_Get_VTable(obj);
+    if (Obj_Is_A(obj, CHARBUF)) {
+        CB_serialize((CharBuf*)obj, outstream);
+    }
+    else if (Obj_Is_A(obj, BYTEBUF)) {
+        BB_serialize((ByteBuf*)obj, outstream);
+    }
+    else if (Obj_Is_A(obj, VARRAY)) {
+        VA_serialize((VArray*)obj, outstream);
+    }
+    else if (Obj_Is_A(obj, HASH)) {
+        Hash_serialize((Hash*)obj, outstream);
+    }
+    else if (Obj_Is_A(obj, NUM)) {
+        if (Obj_Is_A(obj, INTNUM)) {
+            if (Obj_Is_A(obj, BOOLNUM)) {
+                Bool_serialize((BoolNum*)obj, outstream);
+            }
+            else if (Obj_Is_A(obj, INTEGER32)) {
+                Int32_serialize((Integer32*)obj, outstream);
+            }
+            else if (Obj_Is_A(obj, INTEGER64)) {
+                Int64_serialize((Integer64*)obj, outstream);
+            }
+        }
+        else if (Obj_Is_A(obj, FLOATNUM)) {
+            if (Obj_Is_A(obj, FLOAT32)) {
+                Float32_serialize((Float32*)obj, outstream);
+            }
+            else if (Obj_Is_A(obj, FLOAT64)) {
+                Float64_serialize((Float64*)obj, outstream);
+            }
+        }
+    }
+    else if (Obj_Is_A(obj, QUERY)) {
+        Query_Serialize((Query*)obj, outstream);
+    }
+    else if (Obj_Is_A(obj, DOC)) {
+        Doc_Serialize((Doc*)obj, outstream);
+    }
+    else if (Obj_Is_A(obj, DOCVECTOR)) {
+        DocVec_Serialize((DocVector*)obj, outstream);
+    }
+    else if (Obj_Is_A(obj, TERMVECTOR)) {
+        TV_Serialize((TermVector*)obj, outstream);
+    }
+    else if (Obj_Is_A(obj, SIMILARITY)) {
+        Sim_Serialize((Similarity*)obj, outstream);
+    }
+    else if (Obj_Is_A(obj, MATCHDOC)) {
+        MatchDoc_Serialize((MatchDoc*)obj, outstream);
+    }
+    else if (Obj_Is_A(obj, TOPDOCS)) {
+        TopDocs_Serialize((TopDocs*)obj, outstream);
+    }
+    else if (Obj_Is_A(obj, SORTSPEC)) {
+        SortSpec_Serialize((SortSpec*)obj, outstream);
+    }
+    else if (Obj_Is_A(obj, SORTRULE)) {
+        SortRule_Serialize((SortRule*)obj, outstream);
+    }
+    else {
+        THROW(ERR, "Don't know how to serialize a %o",
+              Obj_Get_Class_Name(obj));
+    }
+}
 
+Obj*
+Freezer_deserialize(Obj *obj, InStream *instream) {
+    VTable *vtable = Obj_Get_VTable(obj);
+    if (Obj_Is_A(obj, CHARBUF)) {
+        obj = (Obj*)CB_deserialize((CharBuf*)obj, instream);
+    }
+    else if (Obj_Is_A(obj, BYTEBUF)) {
+        obj = (Obj*)BB_deserialize((ByteBuf*)obj, instream);
+    }
+    else if (Obj_Is_A(obj, VARRAY)) {
+        obj = (Obj*)VA_deserialize((VArray*)obj, instream);
+    }
+    else if (Obj_Is_A(obj, HASH)) {
+        obj = (Obj*)Hash_deserialize((Hash*)obj, instream);
+    }
+    else if (Obj_Is_A(obj, NUM)) {
+        if (Obj_Is_A(obj, INTNUM)) {
+            if (Obj_Is_A(obj, BOOLNUM)) {
+                obj = (Obj*)Bool_deserialize((BoolNum*)obj, instream);
+            }
+            else if (Obj_Is_A(obj, INTEGER32)) {
+                obj = (Obj*)Int32_deserialize((Integer32*)obj, instream);
+            }
+            else if (Obj_Is_A(obj, INTEGER64)) {
+                obj = (Obj*)Int64_deserialize((Integer64*)obj, instream);
+            }
+        }
+        else if (Obj_Is_A(obj, FLOATNUM)) {
+            if (Obj_Is_A(obj, FLOAT32)) {
+                obj = (Obj*)Float32_deserialize((Float32*)obj, instream);
+            }
+            else if (Obj_Is_A(obj, FLOAT64)) {
+                obj = (Obj*)Float64_deserialize((Float64*)obj, instream);
+            }
+        }
+    }
+    else if (Obj_Is_A(obj, QUERY)) {
+        obj = (Obj*)Query_Deserialize((Query*)obj, instream);
+    }
+    else if (Obj_Is_A(obj, DOC)) {
+        obj = (Obj*)Doc_Deserialize((Doc*)obj, instream);
+    }
+    else if (Obj_Is_A(obj, DOCVECTOR)) {
+        obj = (Obj*)DocVec_Deserialize((DocVector*)obj, instream);
+    }
+    else if (Obj_Is_A(obj, TERMVECTOR)) {
+        obj = (Obj*)TV_Deserialize((TermVector*)obj, instream);
+    }
+    else if (Obj_Is_A(obj, SIMILARITY)) {
+        obj = (Obj*)Sim_Deserialize((Similarity*)obj, instream);
+    }
+    else if (Obj_Is_A(obj, MATCHDOC)) {
+        obj = (Obj*)MatchDoc_Deserialize((MatchDoc*)obj, instream);
+    }
+    else if (Obj_Is_A(obj, TOPDOCS)) {
+        obj = (Obj*)TopDocs_Deserialize((TopDocs*)obj, instream);
+    }
+    else if (Obj_Is_A(obj, SORTSPEC)) {
+        obj = (Obj*)SortSpec_Deserialize((SortSpec*)obj, instream);
+    }
+    else if (Obj_Is_A(obj, SORTRULE)) {
+        obj = (Obj*)SortRule_Deserialize((SortRule*)obj, instream);
+    }
+    else {
+        THROW(ERR, "Don't know how to deserialize a %o",
+              Obj_Get_Class_Name(obj));
+    }
+
+    return obj;
+}

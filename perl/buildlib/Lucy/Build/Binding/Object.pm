@@ -572,7 +572,7 @@ PPCODE:
             = lucy_RAMFH_open(NULL, LUCY_FH_WRITE_ONLY | LUCY_FH_CREATE, NULL);
         lucy_OutStream *target = lucy_OutStream_open((lucy_Obj*)file_handle);
 
-        Lucy_Obj_Serialize(self, target);
+        lucy_Freezer_serialize(self, target);
 
         Lucy_OutStream_Close(target);
         serialized_bb
@@ -618,7 +618,7 @@ PPCODE:
         = lucy_RAMFH_open(NULL, LUCY_FH_READ_ONLY, ram_file);
     lucy_InStream *instream = lucy_InStream_open((lucy_Obj*)file_handle);
     lucy_Obj *self = Lucy_VTable_Foster_Obj(vtable, blank_obj);
-    lucy_Obj *deserialized = Lucy_Obj_Deserialize(self, instream);
+    lucy_Obj *deserialized = lucy_Freezer_deserialize(self, instream);
 
     CHY_UNUSED_VAR(cloning);
     CFISH_DECREF(contents);

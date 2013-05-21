@@ -30,7 +30,7 @@ sub open_in {
 }
 
 package OnceRemoved;
-use base qw( Clownfish::Obj );
+use base qw( Lucy::Search::Query );
 
 our $serialize_was_called = 0;
 sub serialize {

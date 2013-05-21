@@ -27,6 +27,18 @@ inert class Lucy::Util::Freezer {
      */
     inert incremented Obj*
     thaw(InStream *instream);
+
+    /** Serialize an object to the outstream, but without the context provided
+     * by freeze().
+     */
+    inert void
+    serialize(Obj *obj, OutStream *outstream);
+
+    /** Deserialize an object from the instream, according to the class of the
+     * supplied blank.
+     */
+    inert incremented Obj*
+    deserialize(Obj *obj, InStream *instream);
 }
 
 __C__

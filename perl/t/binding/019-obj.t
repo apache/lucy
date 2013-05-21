@@ -19,7 +19,7 @@ use warnings;
 use Test::More tests => 19;
 
 package TestObj;
-use base qw( Clownfish::Obj );
+use base qw( Lucy::Search::Query );
 
 our $version = $Lucy::VERSION;
 
@@ -46,7 +46,7 @@ use base qw( TestObj );
 }
 
 package BadSerialize;
-use base qw( Clownfish::Obj );
+use base qw( Lucy::Search::Query );
 {
     sub serialize { }
 }
