@@ -22,6 +22,7 @@ $VERSION = eval $VERSION;
 sub bind_all {
     my $class = shift;
     $class->bind_debug;
+    $class->bind_freezer;
     $class->bind_indexfilenames;
     $class->bind_memorypool;
     $class->bind_priorityqueue;
@@ -104,6 +105,36 @@ END_XS_CODE
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Util::Debug",
+    );
+    $binding->append_xs($xs_code);
+
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_freezer {
+    my $xs_code = <<'END_XS_CODE';
+MODULE = Lucy   PACKAGE = Lucy::Util::Freezer
+
+void
+freeze(obj, outstream)
+    lucy_Obj *obj;
+    lucy_OutStream *outstream;
+PPCODE:
+    lucy_Freezer_serialize(obj, outstream);
+
+SV*
+thaw(instream)
+    lucy_InStream *instream;
+CODE:
+    lucy_Obj *obj = lucy_Freezer_thaw(instream);
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(obj);
+OUTPUT: RETVAL
+
+END_XS_CODE
+
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Lucy",
+        class_name => "Lucy::Util::Freezer",
     );
     $binding->append_xs($xs_code);
 
