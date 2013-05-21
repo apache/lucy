@@ -129,6 +129,8 @@ S_index_documents(Schema *schema, CharBuf *folder) {
     );
 
     Indexer_Commit(indexer);
+
+    DECREF(indexer);
 }
 
 static void
