@@ -1,0 +1,12 @@
+prefix=@prefix@
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: lucy
+Version: @version@
+URL: http://lucy.apache.org/
+Description: lucy - Apache Lucy C library
+Requires: 
+Libs: -L${libdir} -llucy 
+Cflags: -I${includedir} 

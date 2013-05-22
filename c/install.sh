@@ -74,3 +74,11 @@ cp -R autogen/include/LucyX $prefix/include
 
 cp -R autogen/man $prefix
 
+# create pkg-config file
+# some platforms require .bak extension for temp file
+cp lucy.pc.in lucy.pc
+sed -i.bak "s,@version@,$version,g" lucy.pc
+sed -i.bak "s,@prefix@,$prefix,g" lucy.pc
+rm lucy.pc.bak
+mkdir -p $prefix/lib/pkgconfig
+cp lucy.pc $prefix/lib/pkgconfig
