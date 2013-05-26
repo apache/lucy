@@ -289,19 +289,6 @@ CFCParcel_default_parcel(void) {
     return default_parcel;
 }
 
-CFCParcel*
-CFCParcel_clownfish_parcel(void) {
-    CFCParcel *parcel = CFCParcel_fetch("Lucy");
-    if (!parcel) {
-        CFCVersion *version = CFCVersion_new("v0.3.0");
-        parcel = CFCParcel_new("Lucy", "Lucy", version);
-        CFCParcel_register(parcel);
-        CFCBase_decref((CFCBase*)version);
-        CFCBase_decref((CFCBase*)parcel);
-    }
-    return parcel;
-}
-
 int
 CFCParcel_equals(CFCParcel *self, CFCParcel *other) {
     if (strcmp(self->name, other->name)) { return false; }

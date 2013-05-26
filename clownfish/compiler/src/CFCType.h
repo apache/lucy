@@ -202,6 +202,9 @@ CFCType_get_vtable_var(CFCType *self);
 int
 CFCType_get_indirection(CFCType *self);
 
+/* Return the parcel in which the Type is used. Note that for class types,
+ * this is not neccessarily the parcel where class is defined.
+ */
 struct CFCParcel*
 CFCType_get_parcel(CFCType *self);
 

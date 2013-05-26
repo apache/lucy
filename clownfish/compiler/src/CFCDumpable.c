@@ -114,10 +114,9 @@ S_make_method_obj(CFCClass *klass, const char *method_name) {
     const char *klass_name   = CFCClass_get_class_name(klass);
     const char *klass_cnick  = CFCClass_get_cnick(klass);
     CFCParcel  *klass_parcel = CFCClass_get_parcel(klass);
-    CFCParcel  *cf_parcel    = CFCParcel_clownfish_parcel();
 
     CFCType *return_type
-        = CFCType_new_object(CFCTYPE_INCREMENTED, cf_parcel, "Obj", 1);
+        = CFCType_new_object(CFCTYPE_INCREMENTED, klass_parcel, "Obj", 1);
     CFCType *self_type = CFCType_new_object(0, klass_parcel, klass_struct_sym, 1);
     CFCVariable *self_var = CFCVariable_new(NULL, NULL, NULL, NULL, "self",
                                             self_type, false);
@@ -128,7 +127,7 @@ S_make_method_obj(CFCClass *klass, const char *method_name) {
         CFCParamList_add_param(param_list, self_var, NULL);
     }
     else if (strcmp(method_name, "Load") == 0) {
-        CFCType *dump_type = CFCType_new_object(0, cf_parcel, "Obj", 1);
+        CFCType *dump_type = CFCType_new_object(0, klass_parcel, "Obj", 1);
         CFCVariable *dump_var = CFCVariable_new(NULL, NULL, NULL, NULL, "dump",
                                                 dump_type, false);
         param_list = CFCParamList_new(false);
