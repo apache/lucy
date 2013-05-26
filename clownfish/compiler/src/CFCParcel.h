@@ -115,6 +115,29 @@ CFCParcel_get_PREFIX(CFCParcel *self);
 int
 CFCParcel_included(CFCParcel *self);
 
+/** Add another Parcel that the Parcel depends on.
+ */
+void
+CFCParcel_add_dependent_parcel(CFCParcel *self, CFCParcel *dependent);
+
+/** Add another Parcel containing superclasses that subclasses in the Parcel
+ * extend. Also adds the other Parcel to the Parcel's dependencies.
+ */
+void
+CFCParcel_add_inherited_parcel(CFCParcel *self, CFCParcel *inherited);
+
+/** Return a NULL-terminated array of all Parcels that the Parcel depends on.
+ * Must be freed by the caller.
+ */
+CFCParcel**
+CFCParcel_dependent_parcels(CFCParcel *self);
+
+/** Return a NULL-terminated array of all Parcels containing superclasses that
+ * subclasses in the Parcel extend. Must be freed by the caller.
+ */
+CFCParcel**
+CFCParcel_inherited_parcels(CFCParcel *self);
+
 #ifdef __cplusplus
 }
 #endif

@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 17;
 use File::Spec::Functions qw( catfile );
 
 BEGIN { use_ok('Clownfish::CFC::Model::Parcel') }
@@ -36,6 +36,20 @@ $included_foo->register;
 my $source_parcels = Clownfish::CFC::Model::Parcel->source_parcels;
 is( @$source_parcels, 1, "number of source parcels" );
 is( $source_parcels->[0]->get_name, "Foo", "name of source parcel" );
+
+my $dependent_foo = Clownfish::CFC::Model::Parcel->new(
+    name        => "DependentFoo",
+    is_included => 1,
+);
+$dependent_foo->register;
+
+$foo->add_inherited_parcel($included_foo);
+$foo->add_dependent_parcel($dependent_foo);
+my @dep_names = sort(map { $_->get_name } @{ $foo->dependent_parcels });
+is_deeply( \@dep_names, [ "DependentFoo", "IncludedFoo" ],
+           "dependent_parcels" );
+my @inh_names = sort(map { $_->get_name } @{ $foo->inherited_parcels });
+is_deeply( \@inh_names, [ "IncludedFoo" ], "inherited_parcels" );
 
 my $json = qq|
         {

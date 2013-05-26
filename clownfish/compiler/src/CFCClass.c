@@ -323,6 +323,11 @@ CFCClass_add_child(CFCClass *self, CFCClass *child) {
     self->children[self->num_kids - 1]
         = (CFCClass*)CFCBase_incref((CFCBase*)child);
     self->children[self->num_kids] = NULL;
+
+    // Add parcel dependency.
+    CFCParcel *parcel       = CFCClass_get_parcel(self);
+    CFCParcel *child_parcel = CFCClass_get_parcel(child);
+    CFCParcel_add_inherited_parcel(child_parcel, parcel);
 }
 
 void
