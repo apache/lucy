@@ -18,49 +18,6 @@ parcel TestLucy;
 
 inert class Lucy::Test::TestUtils  {
 
-    /** Testing-only CharBuf factory which uses strlen().
-     */
-    inert incremented CharBuf*
-    get_cb(const char *utf8);
-
-    /** Return a random unsigned 64-bit integer.
-     */
-    inert uint64_t
-    random_u64();
-
-    /** Return an array of <code>count</code> random 64-bit integers where
-     * <code>min <= n < limit</code>.
-     *
-     * If <code>buf</code> is NULL, it will be allocated, otherwise it will
-     * be used.
-     */
-    inert int64_t*
-    random_i64s(int64_t *buf, size_t count, int64_t min, int64_t limit);
-
-    /** Return an array of <code>count</code> random unsigned, 64-bit integers
-     * where <code>min <= n < limit</code>.
-     *
-     * If <code>buf</code> is NULL, it will be allocated, otherwise it will
-     * be used.
-     */
-    inert uint64_t*
-    random_u64s(uint64_t *buf, size_t count, uint64_t min, uint64_t limit);
-
-    /** Return an array of <code>count</code> random double-precision floating
-     * point numbers between 0 and 1.
-     *
-     * If <code>buf</code> is NULL, it will be allocated, otherwise it will
-     * be used.
-     */
-    inert double*
-    random_f64s(double *buf, size_t count);
-
-    /** Return a string with a random (legal) sequence of code points.
-     * @param length Length of the string in code points.
-     */
-    inert incremented CharBuf*
-    random_string(size_t length);
-
     /** Return a VArray of CharBufs, each representing the content for a
      * document in the shared collection.
      */
@@ -101,12 +58,6 @@ inert class Lucy::Test::TestUtils  {
      */
     inert incremented PolyQuery*
     make_poly_query(uint32_t boolop, ...);
-
-    /** Return the result of round-tripping the object through FREEZE and
-     * THAW.
-     */
-    inert incremented Obj*
-    freeze_thaw(Obj *object);
 
     /** Verify an Analyzer's transform, transform_text, and split methods.
      */

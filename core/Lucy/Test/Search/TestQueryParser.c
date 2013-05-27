@@ -19,6 +19,7 @@
 #include "Lucy/Util/ToolSet.h"
 #include <string.h>
 
+#include "Clownfish/TestHarness/TestUtils.h"
 #include "Lucy/Test/Search/TestQueryParser.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Search/TermQuery.h"
