@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTLEAFQUERY
+#define C_TESTLUCY_TESTLEAFQUERY
+#define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 

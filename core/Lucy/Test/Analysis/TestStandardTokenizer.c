@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTSTANDARDTOKENIZER
+#define C_TESTLUCY_TESTSTANDARDTOKENIZER
+#define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
 #include "Clownfish/Test/TestFormatter.h"

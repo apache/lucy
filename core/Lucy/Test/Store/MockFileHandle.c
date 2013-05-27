@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-#define C_LUCY_MOCKFILEHANDLE
+#define C_TESTLUCY_MOCKFILEHANDLE
 #define C_LUCY_FILEWINDOW
+#define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Test/Store/MockFileHandle.h"

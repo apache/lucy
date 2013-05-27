@@ -26,11 +26,11 @@ main() {
     bool success = true;
 
     testcfish_bootstrap_parcel();
-    lucy_bootstrap_parcel();
+    testlucy_bootstrap_parcel();
 
     formatter = cfish_TestFormatterCF_new();
     success &= testcfish_Test_run_all_batches((cfish_TestFormatter*)formatter);
-    success &= lucy_Test_run_all_batches((cfish_TestFormatter*)formatter);
+    success &= testlucy_Test_run_all_batches((cfish_TestFormatter*)formatter);
     CFISH_DECREF(formatter);
 
     return success ? EXIT_SUCCESS : EXIT_FAILURE;

@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTQUERYPARSER
+#define C_TESTLUCY_TESTQUERYPARSER
+#define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 #include <string.h>
 

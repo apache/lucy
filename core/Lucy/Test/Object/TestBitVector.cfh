@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+parcel TestLucy;
 
 class Lucy::Test::Object::TestBitVector
     inherits Clownfish::Test::TestBatch {

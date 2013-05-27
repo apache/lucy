@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTQUERYPARSERLOGIC
-#define C_LUCY_TESTQUERYPARSER
+#define C_TESTLUCY_TESTQUERYPARSERLOGIC
+#define C_TESTLUCY_TESTQUERYPARSER
+#define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 #include <string.h>
 
@@ -42,9 +43,9 @@
 #include "Lucy/Search/RequiredOptionalQuery.h"
 #include "Lucy/Store/RAMFolder.h"
 
-#define make_leaf_query   (Query*)lucy_TestUtils_make_leaf_query
-#define make_not_query    (Query*)lucy_TestUtils_make_not_query
-#define make_poly_query   (Query*)lucy_TestUtils_make_poly_query
+#define make_leaf_query   (Query*)TestUtils_make_leaf_query
+#define make_not_query    (Query*)TestUtils_make_not_query
+#define make_poly_query   (Query*)TestUtils_make_poly_query
 
 TestQueryParserLogic*
 TestQPLogic_new(TestFormatter *formatter) {

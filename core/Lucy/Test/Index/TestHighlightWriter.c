@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTHIGHLIGHTWRITER
+#define C_TESTLUCY_TESTHIGHLIGHTWRITER
+#define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
 #include "Clownfish/Test/TestFormatter.h"

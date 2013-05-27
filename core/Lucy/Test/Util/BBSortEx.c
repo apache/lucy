@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-#define C_LUCY_BBSORTEX
+#define C_TESTLUCY_BBSORTEX
+#define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Test/Util/BBSortEx.h"
@@ -54,14 +55,14 @@ BBSortEx_clear_cache(BBSortEx *self) {
     }
     self->mem_consumed = 0;
     BBSortEx_Clear_Cache_t super_clear_cache
-        = SUPER_METHOD_PTR(BBSORTEX, Lucy_BBSortEx_Clear_Cache);
+        = SUPER_METHOD_PTR(BBSORTEX, TestLucy_BBSortEx_Clear_Cache);
     super_clear_cache(self);
 }
 
 void
 BBSortEx_feed(BBSortEx *self, void *data) {
     BBSortEx_Feed_t super_feed
-        = SUPER_METHOD_PTR(BBSORTEX, Lucy_BBSortEx_Feed);
+        = SUPER_METHOD_PTR(BBSORTEX, TestLucy_BBSortEx_Feed);
     super_feed(self, data);
 
     // Flush() if necessary.

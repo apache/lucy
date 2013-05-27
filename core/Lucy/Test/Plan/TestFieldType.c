@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTFIELDTYPE
+#define C_TESTLUCY_TESTFIELDTYPE
 #define C_LUCY_DUMMYFIELDTYPE
+#define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
 #include "Clownfish/Test/TestFormatter.h"

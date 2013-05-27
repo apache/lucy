@@ -14,19 +14,7 @@
  * limitations under the License.
  */
 
-parcel TestLucy;
-
-class Lucy::Test::Analysis::TestCaseFolder
-    inherits Clownfish::Test::TestBatch {
-
-    inert incremented TestCaseFolder*
-    new(TestFormatter *formatter);
-
-    inert TestCaseFolder*
-    init(TestCaseFolder *self, TestFormatter *formatter);
-
-    void
-    Run_Tests(TestCaseFolder *self);
+void
+testlucy_init_parcel() {
 }
-
 

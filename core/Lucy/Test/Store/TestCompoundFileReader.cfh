@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+parcel TestLucy;
 
 class Lucy::Test::Store::TestCompoundFileReader cnick TestCFReader
     inherits Clownfish::Test::TestBatch {

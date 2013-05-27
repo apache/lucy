@@ -15,7 +15,8 @@
  */
 
 
-#define C_LUCY_TESTREVERSETYPE
+#define C_TESTLUCY_TESTREVERSETYPE
+#define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 #include <stdio.h>
 #include <stdlib.h>

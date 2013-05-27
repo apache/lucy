@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTPRIORITYQUEUE
+#define C_TESTLUCY_TESTPRIORITYQUEUE
+#define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
 #include "Clownfish/Test/TestFormatter.h"

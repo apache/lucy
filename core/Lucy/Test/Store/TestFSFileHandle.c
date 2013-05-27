@@ -18,6 +18,7 @@
 
 #define C_LUCY_FSFILEHANDLE
 #define C_LUCY_FILEWINDOW
+#define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
 #ifdef CHY_HAS_UNISTD_H

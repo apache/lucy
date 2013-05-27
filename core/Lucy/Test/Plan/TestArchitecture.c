@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTARCHITECTURE
+#define C_TESTLUCY_TESTARCHITECTURE
+#define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Test.h"

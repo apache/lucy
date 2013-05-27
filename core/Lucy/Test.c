@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 
+#define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Test.h"
