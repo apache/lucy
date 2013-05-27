@@ -146,7 +146,9 @@ CFCCClass_create_man_page(CFCClass *klass) {
         = CFCUtil_sprintf(pattern, class_name, name, synopsis, description,
                           functions_man, methods_man, inheritance);
 
+    FREEMEM(name);
     FREEMEM(synopsis);
+    FREEMEM(description);
     FREEMEM(functions_man);
     FREEMEM(methods_man);
     FREEMEM(inheritance);
