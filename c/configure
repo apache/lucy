@@ -16,7 +16,7 @@
 # limitations under the License.
 
 echo Configuring cfc
-(cd ../clownfish/compiler/c && ./configure)
+(cd ../clownfish/compiler/c && ./configure "$@")
 echo
 
 probe_clang() { clang -v; }
@@ -47,5 +47,5 @@ echo $command
 $command || exit
 
 echo Running charmonizer
-./charmonizer --cc=$CC --enable-c --enable-makefile $@
+./charmonizer --cc=$CC --enable-c --enable-makefile "$@"
 
