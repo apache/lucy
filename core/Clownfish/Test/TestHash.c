@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-#include "Lucy/Util/ToolSet.h"
 #include <stdlib.h>
 #include <time.h>
 
-#include "Clownfish/Test/TestFormatter.h"
-#include "Lucy/Test.h"
-#include "Lucy/Test/TestUtils.h"
-#include "Lucy/Test/Object/TestHash.h"
+#define CFISH_USE_SHORT_NAMES
+#define TESTCFISH_USE_SHORT_NAMES
+
+#include "Clownfish/Test/TestHash.h"
+
+#include "Clownfish/CharBuf.h"
 #include "Clownfish/Hash.h"
+#include "Clownfish/Num.h"
+#include "Clownfish/Test.h"
+#include "Clownfish/Test/TestFormatter.h"
+#include "Clownfish/Test/TestUtils.h"
+#include "Clownfish/VArray.h"
+#include "Clownfish/VTable.h"
 
 TestHash*
 TestHash_new(TestFormatter *formatter) {

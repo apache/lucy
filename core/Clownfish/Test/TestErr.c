@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-#include "Lucy/Util/ToolSet.h"
+#define CFISH_USE_SHORT_NAMES
+#define TESTCFISH_USE_SHORT_NAMES
 
-#include "Clownfish/Test/TestFormatter.h"
-#include "Lucy/Test.h"
-#include "Lucy/Test/TestUtils.h"
-#include "Lucy/Test/Object/TestErr.h"
+#include "Clownfish/Test/TestErr.h"
+
+#include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"
+#include "Clownfish/Test.h"
+#include "Clownfish/Test/TestFormatter.h"
+#include "Clownfish/VTable.h"
 
 TestErr*
 TestErr_new(TestFormatter *formatter) {

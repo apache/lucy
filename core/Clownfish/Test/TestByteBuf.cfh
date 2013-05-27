@@ -14,25 +14,19 @@
  * limitations under the License.
  */
 
-#include <stdlib.h>
+parcel TestClownfish;
 
-#include "Clownfish/Test/TestFormatter.h"
-#include "Clownfish/Test.h"
-#include "Lucy/Test.h"
+class Clownfish::Test::TestByteBuf cnick TestBB
+    inherits Clownfish::Test::TestBatch {
 
-int
-main() {
-    cfish_TestFormatterCF *formatter;
-    bool success = true;
+    inert incremented TestByteBuf*
+    new(TestFormatter *formatter);
 
-    testcfish_bootstrap_parcel();
-    lucy_bootstrap_parcel();
+    inert TestByteBuf*
+    init(TestByteBuf *self, TestFormatter *formatter);
 
-    formatter = cfish_TestFormatterCF_new();
-    success &= testcfish_Test_run_all_batches((cfish_TestFormatter*)formatter);
-    success &= lucy_Test_run_all_batches((cfish_TestFormatter*)formatter);
-    CFISH_DECREF(formatter);
-
-    return success ? EXIT_SUCCESS : EXIT_FAILURE;
+    void
+    Run_Tests(TestByteBuf *self);
 }
+
 

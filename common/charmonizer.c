@@ -6833,6 +6833,7 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
     }
 
     chaz_CFlags_add_define(extra_cflags, "CFP_CFISH", NULL);
+    chaz_CFlags_add_define(extra_cflags, "CFP_TESTCFISH", NULL);
     chaz_CFlags_add_define(extra_cflags, "CFP_LUCY", NULL);
 }
 
@@ -6989,6 +6990,10 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeVar_append(var, scratch);
     free(scratch);
     scratch = chaz_Util_join("", "autogen", dir_sep, "source", dir_sep,
+                             "testcfish_parcel", obj_ext, NULL);
+    chaz_MakeVar_append(var, scratch);
+    free(scratch);
+    scratch = chaz_Util_join("", "autogen", dir_sep, "source", dir_sep,
                              "lucy_parcel", obj_ext, NULL);
     chaz_MakeVar_append(var, scratch);
     free(scratch);
@@ -7030,6 +7035,9 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     /* Needed for parallel builds. */
     scratch = chaz_Util_join(dir_sep, "autogen", "source", "cfish_parcel.c",
                              NULL);
+    rule = chaz_MakeFile_add_rule(makefile, scratch, "autogen");
+    scratch = chaz_Util_join(dir_sep, "autogen", "source",
+                             "testcfish_parcel.c", NULL);
     rule = chaz_MakeFile_add_rule(makefile, scratch, "autogen");
     free(scratch);
     scratch = chaz_Util_join(dir_sep, "autogen", "source", "lucy_parcel.c",

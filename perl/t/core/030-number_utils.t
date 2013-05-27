@@ -16,8 +16,10 @@
 use strict;
 use warnings;
 
-use Lucy::Test;
-my $success = Lucy::Test::run_tests("Lucy::Test::Util::TestNumberUtils");
+use Clownfish::Test;
+my $success = Clownfish::Test::run_tests(
+    "Clownfish::Test::Util::TestNumberUtils"
+);
 
 exit($success ? 0 : 1);
 

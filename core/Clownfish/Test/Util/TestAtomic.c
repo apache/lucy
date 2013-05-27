@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-#include "Lucy/Util/ToolSet.h"
+#define CFISH_USE_SHORT_NAMES
+#define TESTCFISH_USE_SHORT_NAMES
 
+#include "Clownfish/Test/Util/TestAtomic.h"
+
+#include "Clownfish/Test.h"
 #include "Clownfish/Test/TestFormatter.h"
-#include "Lucy/Test.h"
-#include "Lucy/Test/Util/TestAtomic.h"
 #include "Clownfish/Util/Atomic.h"
+#include "Clownfish/VTable.h"
 
 TestAtomic*
 TestAtomic_new(TestFormatter *formatter) {

@@ -22,7 +22,8 @@ $VERSION = eval $VERSION;
 sub bind_all {
     my $class = shift;
     $class->bind_lucy;
-    $class->bind_test;
+    $class->bind_cfish_test;
+    $class->bind_lucy_test;
     $class->bind_testschema;
     $class->bind_bbsortex;
 }
@@ -150,7 +151,35 @@ END_XS_CODE
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
-sub bind_test {
+sub bind_cfish_test {
+    my $xs_code = <<'END_XS_CODE';
+MODULE = Lucy   PACKAGE = Clownfish::Test
+
+bool
+run_tests(package)
+    char *package;
+CODE:
+    cfish_CharBuf *class_name = cfish_CB_newf("%s", package);
+    cfish_TestFormatter *formatter
+        = (cfish_TestFormatter*)cfish_TestFormatterTAP_new();
+    bool result = testcfish_Test_run_batch(class_name, formatter);
+    CFISH_DECREF(class_name);
+    CFISH_DECREF(formatter);
+
+    RETVAL = result;
+OUTPUT: RETVAL
+END_XS_CODE
+
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "TestClownfish",
+        class_name => "Clownfish::Test",
+    );
+    $binding->append_xs($xs_code);
+
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_lucy_test {
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Test
 

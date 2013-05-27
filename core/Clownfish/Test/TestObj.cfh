@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+parcel TestClownfish;
 
-class Lucy::Test::Object::TestHash
+class Clownfish::Test::TestObj
     inherits Clownfish::Test::TestBatch {
 
-    inert incremented TestHash*
+    inert incremented TestObj*
     new(TestFormatter *formatter);
 
-    inert TestHash*
-    init(TestHash *self, TestFormatter *formatter);
+    inert TestObj*
+    init(TestObj *self, TestFormatter *formatter);
 
     void
-    Run_Tests(TestHash *self);
+    Run_Tests(TestObj *self);
 }
 
 

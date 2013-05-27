@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-parcel Lucy;
-parcel Lucy;
+parcel TestClownfish;
 
-class Lucy::Test::Object::TestCharBuf cnick TestCB
+class Clownfish::Test::Util::TestStringHelper cnick TestStrHelp
     inherits Clownfish::Test::TestBatch {
 
-    inert incremented TestCharBuf*
+    inert incremented TestStringHelper*
     new(TestFormatter *formatter);
 
-    inert TestCharBuf*
-    init(TestCharBuf *self, TestFormatter *formatter);
+    inert TestStringHelper*
+    init(TestStringHelper *self, TestFormatter *formatter);
 
     void
-    Run_Tests(TestCharBuf *self);
+    Run_Tests(TestStringHelper *self);
 }
 
 

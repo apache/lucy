@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-#include "Lucy/Util/ToolSet.h"
+#include <string.h>
 
+#define CFISH_USE_SHORT_NAMES
+#define TESTCFISH_USE_SHORT_NAMES
+
+#include "Clownfish/Test/Util/TestStringHelper.h"
+
+#include "Clownfish/CharBuf.h"
+#include "Clownfish/Err.h"
+#include "Clownfish/Test.h"
 #include "Clownfish/Test/TestFormatter.h"
-#include "Lucy/Test.h"
-#include "Lucy/Test/Util/TestStringHelper.h"
-#include "Lucy/Test/TestUtils.h"
+#include "Clownfish/Test/TestUtils.h"
 #include "Clownfish/Util/StringHelper.h"
-#include "utf8proc.h"
+#include "Clownfish/VTable.h"
 #include "Lucy/Util/Json.h"
+#include "utf8proc.h"
 
 /* This alternative implementation of utf8_valid() is (presumably) slower, but
  * it implements the standard in a more linear, easy-to-grok way.

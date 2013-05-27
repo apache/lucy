@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTMEMORYPOOL
-#define C_LUCY_MEMORYPOOL
-#include "Lucy/Util/ToolSet.h"
+#define CHY_USE_SHORT_NAMES
+#define CFISH_USE_SHORT_NAMES
+#define TESTCFISH_USE_SHORT_NAMES
 
+#include "Clownfish/Test/Util/TestMemory.h"
+
+#include "Clownfish/Test.h"
 #include "Clownfish/Test/TestFormatter.h"
-#include "Lucy/Test.h"
-#include "Lucy/Test/Util/TestMemory.h"
+#include "Clownfish/Util/Memory.h"
+#include "Clownfish/VTable.h"
 
 TestMemory*
 TestMemory_new(TestFormatter *formatter) {

@@ -78,7 +78,7 @@ TestUtils_random_f64s(double *buf, size_t count) {
     return f64s;
 }
 
-uint32_t
+static uint32_t
 S_random_code_point(void) {
     uint32_t code_point = 0;
     while (1) {

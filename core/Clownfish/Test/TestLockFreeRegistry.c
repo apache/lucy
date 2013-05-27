@@ -16,13 +16,16 @@
 
 #include <string.h>
 
-#include "Lucy/Util/ToolSet.h"
+#define CHY_USE_SHORT_NAMES
+#define CFISH_USE_SHORT_NAMES
+#define TESTCFISH_USE_SHORT_NAMES
 
-#include "Clownfish/Test/TestFormatter.h"
-#include "Lucy/Test.h"
-#include "Lucy/Test/TestUtils.h"
-#include "Lucy/Test/Object/TestLockFreeRegistry.h"
+#include "Clownfish/Test/TestLockFreeRegistry.h"
+
 #include "Clownfish/LockFreeRegistry.h"
+#include "Clownfish/Test.h"
+#include "Clownfish/Test/TestFormatter.h"
+#include "Clownfish/VTable.h"
 
 TestLockFreeRegistry*
 TestLFReg_new(TestFormatter *formatter) {

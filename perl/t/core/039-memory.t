@@ -16,8 +16,8 @@
 use strict;
 use warnings;
 
-use Lucy::Test;
-my $success = Lucy::Test::run_tests("Lucy::Test::Util::TestMemory");
+use Clownfish::Test;
+my $success = Clownfish::Test::run_tests("Clownfish::Test::Util::TestMemory");
 
 exit($success ? 0 : 1);
 

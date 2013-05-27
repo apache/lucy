@@ -16,8 +16,10 @@
 use strict;
 use warnings;
 
-use Lucy::Test;
-my $success = Lucy::Test::run_tests("Lucy::Test::Object::TestLockFreeRegistry");
+use Clownfish::Test;
+my $success = Clownfish::Test::run_tests(
+    "Clownfish::Test::TestLockFreeRegistry"
+);
 
 exit($success ? 0 : 1);
 

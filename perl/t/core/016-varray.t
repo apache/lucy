@@ -16,8 +16,8 @@
 use strict;
 use warnings;
 
-use Lucy::Test;
-my $success = Lucy::Test::run_tests("Lucy::Test::Object::TestVArray");
+use Clownfish::Test;
+my $success = Clownfish::Test::run_tests("Clownfish::Test::TestVArray");
 
 exit($success ? 0 : 1);
 

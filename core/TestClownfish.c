@@ -14,19 +14,7 @@
  * limitations under the License.
  */
 
-parcel Lucy;
-
-class Lucy::Test::Util::TestStringHelper cnick TestStrHelp
-    inherits Clownfish::Test::TestBatch {
-
-    inert incremented TestStringHelper*
-    new(TestFormatter *formatter);
-
-    inert TestStringHelper*
-    init(TestStringHelper *self, TestFormatter *formatter);
-
-    void
-    Run_Tests(TestStringHelper *self);
+void
+testcfish_init_parcel() {
 }
-
 

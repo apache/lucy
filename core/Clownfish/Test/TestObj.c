@@ -16,12 +16,17 @@
 
 #include <stdio.h>
 
-#define C_LUCY_TESTOBJ
-#include "Lucy/Util/ToolSet.h"
+#define CHY_USE_SHORT_NAMES
+#define CFISH_USE_SHORT_NAMES
+#define TESTCFISH_USE_SHORT_NAMES
 
+#include "Clownfish/Test/TestObj.h"
+
+#include "Clownfish/CharBuf.h"
+#include "Clownfish/Err.h"
+#include "Clownfish/Test.h"
 #include "Clownfish/Test/TestFormatter.h"
-#include "Lucy/Test.h"
-#include "Lucy/Test/Object/TestObj.h"
+#include "Clownfish/VTable.h"
 
 TestObj*
 TestObj_new(TestFormatter *formatter) {

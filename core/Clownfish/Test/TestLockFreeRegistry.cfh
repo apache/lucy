@@ -14,19 +14,30 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+parcel TestClownfish;
 
-class Lucy::Test::Object::TestObj
+class Clownfish::Test::TestLockFreeRegistry cnick TestLFReg
     inherits Clownfish::Test::TestBatch {
 
-    inert incremented TestObj*
+    inert incremented TestLockFreeRegistry*
     new(TestFormatter *formatter);
 
-    inert TestObj*
-    init(TestObj *self, TestFormatter *formatter);
+    inert TestLockFreeRegistry*
+    init(TestLockFreeRegistry *self, TestFormatter *formatter);
 
     void
-    Run_Tests(TestObj *self);
+    Run_Tests(TestLockFreeRegistry *self);
+}
+
+/** Private test-only class for stressing LockFreeRegistry.
+ */
+class Clownfish::Test::StupidHashCharBuf inherits Clownfish::CharBuf {
+    inert incremented StupidHashCharBuf*
+    new(const char *text);
+
+    /** Always returns 1, guaranteeing collisions. */
+    public int32_t
+    Hash_Sum(StupidHashCharBuf *self);
 }
 
 

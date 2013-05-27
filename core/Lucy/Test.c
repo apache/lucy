@@ -42,15 +42,7 @@
 #include "Lucy/Test/Index/TestSnapshot.h"
 #include "Lucy/Test/Index/TestTermInfo.h"
 #include "Lucy/Test/Object/TestBitVector.h"
-#include "Lucy/Test/Object/TestByteBuf.h"
-#include "Lucy/Test/Object/TestCharBuf.h"
-#include "Lucy/Test/Object/TestErr.h"
-#include "Lucy/Test/Object/TestHash.h"
 #include "Lucy/Test/Object/TestI32Array.h"
-#include "Lucy/Test/Object/TestLockFreeRegistry.h"
-#include "Lucy/Test/Object/TestNum.h"
-#include "Lucy/Test/Object/TestObj.h"
-#include "Lucy/Test/Object/TestVArray.h"
 #include "Lucy/Test/Plan/TestBlobType.h"
 #include "Lucy/Test/Plan/TestFieldMisc.h"
 #include "Lucy/Test/Plan/TestFieldType.h"
@@ -84,14 +76,10 @@
 #include "Lucy/Test/Store/TestRAMFileHandle.h"
 #include "Lucy/Test/Store/TestRAMFolder.h"
 #include "Lucy/Test/TestSchema.h"
-#include "Lucy/Test/Util/TestAtomic.h"
 #include "Lucy/Test/Util/TestIndexFileNames.h"
 #include "Lucy/Test/Util/TestJson.h"
-#include "Lucy/Test/Util/TestMemory.h"
 #include "Lucy/Test/Util/TestMemoryPool.h"
-#include "Lucy/Test/Util/TestNumberUtils.h"
 #include "Lucy/Test/Util/TestPriorityQueue.h"
-#include "Lucy/Test/Util/TestStringHelper.h"
 
 static void
 S_unbuffer_stdout();
@@ -102,22 +90,10 @@ S_all_test_batches(TestFormatter *formatter) {
 
     VA_Push(batches, (Obj*)TestPriQ_new(formatter));
     VA_Push(batches, (Obj*)TestBitVector_new(formatter));
-    VA_Push(batches, (Obj*)TestVArray_new(formatter));
-    VA_Push(batches, (Obj*)TestHash_new(formatter));
-    VA_Push(batches, (Obj*)TestObj_new(formatter));
-    VA_Push(batches, (Obj*)TestErr_new(formatter));
-    VA_Push(batches, (Obj*)TestBB_new(formatter));
     VA_Push(batches, (Obj*)TestMemPool_new(formatter));
-    VA_Push(batches, (Obj*)TestCB_new(formatter));
-    VA_Push(batches, (Obj*)TestNumUtil_new(formatter));
-    VA_Push(batches, (Obj*)TestNum_new(formatter));
-    VA_Push(batches, (Obj*)TestStrHelp_new(formatter));
     VA_Push(batches, (Obj*)TestIxFileNames_new(formatter));
     VA_Push(batches, (Obj*)TestJson_new(formatter));
     VA_Push(batches, (Obj*)TestI32Arr_new(formatter));
-    VA_Push(batches, (Obj*)TestAtomic_new(formatter));
-    VA_Push(batches, (Obj*)TestLFReg_new(formatter));
-    VA_Push(batches, (Obj*)TestMemory_new(formatter));
     VA_Push(batches, (Obj*)TestRAMFH_new(formatter));
     VA_Push(batches, (Obj*)TestFSFH_new(formatter));
     VA_Push(batches, (Obj*)TestInStream_new(formatter));

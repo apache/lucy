@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTNUMBERUTILS
-#include "Lucy/Util/ToolSet.h"
 #include <stdlib.h>
 #include <time.h>
 
+#define CFISH_USE_SHORT_NAMES
+#define TESTCFISH_USE_SHORT_NAMES
+
+#include "Clownfish/Test/Util/TestNumberUtils.h"
+
+#include "Clownfish/Err.h"
+#include "Clownfish/Test.h"
 #include "Clownfish/Test/TestFormatter.h"
-#include "Lucy/Test.h"
-#include "Lucy/Test/TestUtils.h"
-#include "Lucy/Test/Util/TestNumberUtils.h"
+#include "Clownfish/Test/TestUtils.h"
+#include "Clownfish/Util/Memory.h"
 #include "Clownfish/Util/NumberUtils.h"
+#include "Clownfish/VTable.h"
 
 TestNumberUtils*
 TestNumUtil_new(TestFormatter *formatter) {

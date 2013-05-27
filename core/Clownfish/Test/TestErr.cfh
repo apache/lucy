@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+parcel TestClownfish;
 
-class Lucy::Test::Util::TestNumberUtils cnick TestNumUtil
+class Clownfish::Test::TestErr
     inherits Clownfish::Test::TestBatch {
 
-    inert incremented TestNumberUtils*
+    inert incremented TestErr*
     new(TestFormatter *formatter);
 
-    inert TestNumberUtils*
-    init(TestNumberUtils *self, TestFormatter *formatter);
+    inert TestErr*
+    init(TestErr *self, TestFormatter *formatter);
 
     void
-    Run_Tests(TestNumberUtils *self);
+    Run_Tests(TestErr *self);
 }
-
 

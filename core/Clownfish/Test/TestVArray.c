@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-#define C_LUCY_TESTVARRAY
-#include "Lucy/Util/ToolSet.h"
+#include <string.h>
 
+#define CFISH_USE_SHORT_NAMES
+#define TESTCFISH_USE_SHORT_NAMES
+
+#include "Clownfish/Test/TestVArray.h"
+
+#include "Clownfish/CharBuf.h"
+#include "Clownfish/Err.h"
+#include "Clownfish/Num.h"
+#include "Clownfish/Test.h"
 #include "Clownfish/Test/TestFormatter.h"
-#include "Lucy/Test.h"
-#include "Lucy/Test/TestUtils.h"
-#include "Lucy/Test/Object/TestVArray.h"
+#include "Clownfish/Test/TestUtils.h"
+#include "Clownfish/VArray.h"
+#include "Clownfish/VTable.h"
 
 TestVArray*
 TestVArray_new(TestFormatter *formatter) {
