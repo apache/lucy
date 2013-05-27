@@ -17,7 +17,10 @@
 #include "CFCBase.h"
 #include "CFCBindCore.h"
 #include "CFCC.h"
+#include "CFCClass.h"
+#include "CFCLexHeader.h"
 #include "CFCHierarchy.h"
+#include "CFCParcel.h"
 #include "CFCUtil.h"
 
 #include <stdio.h>
@@ -196,6 +199,10 @@ main(int argc, char **argv) {
     CFCBase_decref((CFCBase*)hierarchy);
     FREEMEM(header);
     FREEMEM(footer);
+
+    CFCClass_clear_registry();
+    CFCParcel_reap_singletons();
+    yylex_destroy();
 
     S_free_arguments(&args);
 
