@@ -18,25 +18,19 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Index/TestPostingListWriter.h"
 
 TestPostingListWriter*
-TestPListWriter_new(TestFormatter *formatter) {
-    TestPostingListWriter *self = (TestPostingListWriter*)VTable_Make_Obj(TESTPOSTINGLISTWRITER);
-    return TestPListWriter_init(self, formatter);
-}
-
-TestPostingListWriter*
-TestPListWriter_init(TestPostingListWriter *self, TestFormatter *formatter) {
-    return (TestPostingListWriter*)TestBatch_init((TestBatch*)self, 1, formatter);
+TestPListWriter_new() {
+    return (TestPostingListWriter*)VTable_Make_Obj(TESTPOSTINGLISTWRITER);
 }
 
 void
-TestPListWriter_run_tests(TestPostingListWriter *self) {
-    TestBatch *batch = (TestBatch*)self;
-    PASS(batch, "Placeholder");
+TestPListWriter_run(TestPostingListWriter *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 1);
+    PASS(runner, "Placeholder");
 }
 
 

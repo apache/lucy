@@ -19,25 +19,20 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Util/TestMemoryPool.h"
 #include "Lucy/Util/MemoryPool.h"
 
 TestMemoryPool*
-TestMemPool_new(TestFormatter *formatter) {
-    TestMemoryPool *self = (TestMemoryPool*)VTable_Make_Obj(TESTMEMORYPOOL);
-    return TestMemPool_init(self, formatter);
-}
-
-TestMemoryPool*
-TestMemPool_init(TestMemoryPool *self, TestFormatter *formatter) {
-    return (TestMemoryPool*)TestBatch_init((TestBatch*)self, 4, formatter);
+TestMemPool_new() {
+    return (TestMemoryPool*)VTable_Make_Obj(TESTMEMORYPOOL);
 }
 
 void
-TestMemPool_run_tests(TestMemoryPool *self) {
-    TestBatch  *batch    = (TestBatch*)self;
+TestMemPool_run(TestMemoryPool *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
+
     MemoryPool *mem_pool = MemPool_new(0);
     MemoryPool *other    = MemPool_new(0);
     char *ptr_a, *ptr_b;
@@ -47,17 +42,17 @@ TestMemPool_run_tests(TestMemoryPool *self) {
     MemPool_Release_All(mem_pool);
 
     ptr_b = (char*)MemPool_Grab(mem_pool, 10);
-    TEST_STR_EQ(batch, ptr_b, "foo", "Recycle RAM on Release_All");
+    TEST_STR_EQ(runner, ptr_b, "foo", "Recycle RAM on Release_All");
 
     ptr_a = mem_pool->buf;
     MemPool_Resize(mem_pool, ptr_b, 6);
-    TEST_TRUE(batch, mem_pool->buf < ptr_a, "Resize");
+    TEST_TRUE(runner, mem_pool->buf < ptr_a, "Resize");
 
     ptr_a = (char*)MemPool_Grab(other, 20);
     MemPool_Release_All(other);
     MemPool_Eat(other, mem_pool);
-    TEST_TRUE(batch, other->buf == mem_pool->buf, "Eat");
-    TEST_TRUE(batch, other->buf != NULL, "Eat");
+    TEST_TRUE(runner, other->buf == mem_pool->buf, "Eat");
+    TEST_TRUE(runner, other->buf != NULL, "Eat");
 
     DECREF(mem_pool);
     DECREF(other);

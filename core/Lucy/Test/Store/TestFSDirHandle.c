@@ -27,7 +27,7 @@
   #include <unistd.h>
 #endif
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestFSDirHandle.h"
 #include "Lucy/Store/FSDirHandle.h"
@@ -35,18 +35,12 @@
 #include "Lucy/Store/OutStream.h"
 
 TestFSDirHandle*
-TestFSDH_new(TestFormatter *formatter) {
-    TestFSDirHandle *self = (TestFSDirHandle*)VTable_Make_Obj(TESTFSDIRHANDLE);
-    return TestFSDH_init(self, formatter);
-}
-
-TestFSDirHandle*
-TestFSDH_init(TestFSDirHandle *self, TestFormatter *formatter) {
-    return (TestFSDirHandle*)TestBatch_init((TestBatch*)self, 5, formatter);
+TestFSDH_new() {
+    return (TestFSDirHandle*)VTable_Make_Obj(TESTFSDIRHANDLE);
 }
 
 static void
-test_all(TestBatch *batch) {
+test_all(TestBatchRunner *runner) {
     CharBuf  *foo           = (CharBuf*)ZCB_WRAP_STR("foo", 3);
     CharBuf  *boffo         = (CharBuf*)ZCB_WRAP_STR("boffo", 5);
     CharBuf  *foo_boffo     = (CharBuf*)ZCB_WRAP_STR("foo/boffo", 9);
@@ -84,12 +78,12 @@ test_all(TestBatch *batch) {
             boffo_was_dir = FSDH_Entry_Is_Dir(dh);
         }
     }
-    TEST_INT_EQ(batch, 2, count, "correct number of entries");
-    TEST_TRUE(batch, saw_foo, "Directory was iterated over");
-    TEST_TRUE(batch, foo_was_dir,
+    TEST_INT_EQ(runner, 2, count, "correct number of entries");
+    TEST_TRUE(runner, saw_foo, "Directory was iterated over");
+    TEST_TRUE(runner, foo_was_dir,
               "Dir correctly identified by Entry_Is_Dir");
-    TEST_TRUE(batch, saw_boffo, "File was iterated over");
-    TEST_FALSE(batch, boffo_was_dir,
+    TEST_TRUE(runner, saw_boffo, "File was iterated over");
+    TEST_FALSE(runner, boffo_was_dir,
                "File correctly identified by Entry_Is_Dir");
 
     DECREF(dh);
@@ -101,9 +95,9 @@ test_all(TestBatch *batch) {
 }
 
 void
-TestFSDH_run_tests(TestFSDirHandle *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_all(batch);
+TestFSDH_run(TestFSDirHandle *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 5);
+    test_all(runner);
 }
 
 

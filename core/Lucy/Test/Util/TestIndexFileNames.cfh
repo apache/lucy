@@ -20,13 +20,10 @@ class Lucy::Test::Util::TestIndexFileNames cnick TestIxFileNames
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestIndexFileNames*
-    new(TestFormatter *formatter);
-
-    inert TestIndexFileNames*
-    init(TestIndexFileNames *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestIndexFileNames *self);
+    Run(TestIndexFileNames *self, TestBatchRunner *runner);
 }
 
 

@@ -20,13 +20,10 @@ class Lucy::Test::Search::TestNoMatchQuery
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestNoMatchQuery*
-    new(TestFormatter *formatter);
-
-    inert TestNoMatchQuery*
-    init(TestNoMatchQuery *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestNoMatchQuery *self);
+    Run(TestNoMatchQuery *self, TestBatchRunner *runner);
 }
 
 

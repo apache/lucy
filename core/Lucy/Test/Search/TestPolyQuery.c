@@ -19,7 +19,7 @@
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Search/TestPolyQuery.h"
@@ -29,29 +29,17 @@
 #include "Lucy/Search/LeafQuery.h"
 
 TestANDQuery*
-TestANDQuery_new(TestFormatter *formatter) {
-    TestANDQuery *self = (TestANDQuery*)VTable_Make_Obj(TESTANDQUERY);
-    return TestANDQuery_init(self, formatter);
-}
-
-TestANDQuery*
-TestANDQuery_init(TestANDQuery *self, TestFormatter *formatter) {
-    return (TestANDQuery*)TestBatch_init((TestBatch*)self, 4, formatter);
+TestANDQuery_new() {
+    return (TestANDQuery*)VTable_Make_Obj(TESTANDQUERY);
 }
 
 TestORQuery*
-TestORQuery_new(TestFormatter *formatter) {
-    TestORQuery *self = (TestORQuery*)VTable_Make_Obj(TESTORQUERY);
-    return TestORQuery_init(self, formatter);
-}
-
-TestORQuery*
-TestORQuery_init(TestORQuery *self, TestFormatter *formatter) {
-    return (TestORQuery*)TestBatch_init((TestBatch*)self, 4, formatter);
+TestORQuery_new() {
+    return (TestORQuery*)VTable_Make_Obj(TESTORQUERY);
 }
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch, uint32_t boolop) {
+test_Dump_Load_and_Equals(TestBatchRunner *runner, uint32_t boolop) {
     LeafQuery *a_leaf  = TestUtils_make_leaf_query(NULL, "a");
     LeafQuery *b_leaf  = TestUtils_make_leaf_query(NULL, "b");
     LeafQuery *c_leaf  = TestUtils_make_leaf_query(NULL, "c");
@@ -69,14 +57,14 @@ test_Dump_Load_and_Equals(TestBatch *batch, uint32_t boolop) {
     Obj *dump = (Obj*)PolyQuery_Dump(query);
     PolyQuery *clone = (PolyQuery*)Obj_Load(dump, dump);
 
-    TEST_FALSE(batch, PolyQuery_Equals(query, (Obj*)kids_differ),
+    TEST_FALSE(runner, PolyQuery_Equals(query, (Obj*)kids_differ),
                "Different kids spoil Equals");
-    TEST_TRUE(batch, PolyQuery_Equals(query, (Obj*)boost_differs),
+    TEST_TRUE(runner, PolyQuery_Equals(query, (Obj*)boost_differs),
               "Equals with identical boosts");
     PolyQuery_Set_Boost(boost_differs, 1.5);
-    TEST_FALSE(batch, PolyQuery_Equals(query, (Obj*)boost_differs),
+    TEST_FALSE(runner, PolyQuery_Equals(query, (Obj*)boost_differs),
                "Different boost spoils Equals");
-    TEST_TRUE(batch, PolyQuery_Equals(query, (Obj*)clone),
+    TEST_TRUE(runner, PolyQuery_Equals(query, (Obj*)clone),
               "Dump => Load round trip");
 
     DECREF(a_leaf);
@@ -90,15 +78,15 @@ test_Dump_Load_and_Equals(TestBatch *batch, uint32_t boolop) {
 }
 
 void
-TestANDQuery_run_tests(TestANDQuery *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Dump_Load_and_Equals(batch, BOOLOP_AND);
+TestANDQuery_run(TestANDQuery *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
+    test_Dump_Load_and_Equals(runner, BOOLOP_AND);
 }
 
 void
-TestORQuery_run_tests(TestORQuery *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Dump_Load_and_Equals(batch, BOOLOP_OR);
+TestORQuery_run(TestORQuery *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
+    test_Dump_Load_and_Equals(runner, BOOLOP_OR);
 }
 
 

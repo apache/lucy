@@ -20,13 +20,10 @@ class Lucy::Test::Search::TestMatchAllQuery
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestMatchAllQuery*
-    new(TestFormatter *formatter);
-
-    inert TestMatchAllQuery*
-    init(TestMatchAllQuery *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestMatchAllQuery *self);
+    Run(TestMatchAllQuery *self, TestBatchRunner *runner);
 }
 
 

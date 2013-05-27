@@ -20,13 +20,10 @@ class Lucy::Test::Index::TestHighlightWriter cnick TestHLWriter
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestHighlightWriter*
-    new(TestFormatter *formatter);
-
-    inert TestHighlightWriter*
-    init(TestHighlightWriter *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestHighlightWriter *self);
+    Run(TestHighlightWriter *self, TestBatchRunner *runner);
 }
 
 

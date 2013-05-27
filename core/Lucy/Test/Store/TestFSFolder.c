@@ -32,7 +32,7 @@
   #include <sys/stat.h>
 #endif
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestFSFolder.h"
 #include "Lucy/Test/Store/TestFolderCommon.h"
@@ -50,15 +50,8 @@ S_create_test_symlinks(void);
 #endif /* CHY_HAS_WINDOWS_H */
 
 TestFSFolder*
-TestFSFolder_new(TestFormatter *formatter) {
-    TestFSFolder *self = (TestFSFolder*)VTable_Make_Obj(TESTFSFOLDER);
-    return TestFSFolder_init(self, formatter);
-}
-
-TestFSFolder*
-TestFSFolder_init(TestFSFolder *self, TestFormatter *formatter) {
-    uint32_t num_tests = TestFolderCommon_num_tests() + 9;
-    return (TestFSFolder*)TestBatch_init((TestBatch*)self, num_tests, formatter);
+TestFSFolder_new() {
+    return (TestFSFolder*)VTable_Make_Obj(TESTFSFOLDER);
 }
 
 static Folder*
@@ -84,22 +77,22 @@ S_tear_down() {
 }
 
 static void
-test_Initialize_and_Check(TestBatch *batch) {
+test_Initialize_and_Check(TestBatchRunner *runner) {
     rmdir("_fstest");
     CharBuf  *test_dir = (CharBuf*)ZCB_WRAP_STR("_fstest", 7);
     FSFolder *folder   = FSFolder_new(test_dir);
-    TEST_FALSE(batch, FSFolder_Check(folder),
+    TEST_FALSE(runner, FSFolder_Check(folder),
                "Check() returns false when folder dir doesn't exist");
     FSFolder_Initialize(folder);
-    PASS(batch, "Initialize() concludes without incident");
-    TEST_TRUE(batch, FSFolder_Check(folder),
+    PASS(runner, "Initialize() concludes without incident");
+    TEST_TRUE(runner, FSFolder_Check(folder),
               "Initialize() created dir, and now Check() succeeds");
     DECREF(folder);
     S_tear_down();
 }
 
 static void
-test_protect_symlinks(TestBatch *batch) {
+test_protect_symlinks(TestBatchRunner *runner) {
 #ifdef ENABLE_SYMLINK_TESTS
     FSFolder *folder    = (FSFolder*)S_set_up();
     CharBuf  *foo       = (CharBuf*)ZCB_WRAP_STR("foo", 3);
@@ -112,11 +105,11 @@ test_protect_symlinks(TestBatch *batch) {
     DECREF(outstream);
 
     if (!S_create_test_symlinks()) {
-        FAIL(batch, "symlink creation failed");
-        FAIL(batch, "symlink creation failed");
-        FAIL(batch, "symlink creation failed");
-        FAIL(batch, "symlink creation failed");
-        FAIL(batch, "symlink creation failed");
+        FAIL(runner, "symlink creation failed");
+        FAIL(runner, "symlink creation failed");
+        FAIL(runner, "symlink creation failed");
+        FAIL(runner, "symlink creation failed");
+        FAIL(runner, "symlink creation failed");
         // Try to clean up anyway.
         FSFolder_Delete_Tree(folder, foo);
         FSFolder_Delete_Tree(folder, bar);
@@ -130,33 +123,33 @@ test_protect_symlinks(TestBatch *batch) {
                 saw_bazooka_boffo = true;
             }
         }
-        TEST_FALSE(batch, saw_bazooka_boffo,
+        TEST_FALSE(runner, saw_bazooka_boffo,
                    "List_R() shouldn't follow symlinks");
         DECREF(list);
 
-        TEST_TRUE(batch, FSFolder_Delete_Tree(folder, bar),
+        TEST_TRUE(runner, FSFolder_Delete_Tree(folder, bar),
                   "Delete_Tree() returns true");
-        TEST_FALSE(batch, FSFolder_Exists(folder, bar),
+        TEST_FALSE(runner, FSFolder_Exists(folder, bar),
                    "Tree is really gone");
-        TEST_TRUE(batch, FSFolder_Exists(folder, foo),
+        TEST_TRUE(runner, FSFolder_Exists(folder, foo),
                   "Original folder sill there");
-        TEST_TRUE(batch, FSFolder_Exists(folder, foo_boffo),
+        TEST_TRUE(runner, FSFolder_Exists(folder, foo_boffo),
                   "Delete_Tree() did not follow directory symlink");
         FSFolder_Delete_Tree(folder, foo);
     }
     DECREF(folder);
     S_tear_down();
 #else
-    SKIP(batch, "Tests requiring symlink() disabled");
-    SKIP(batch, "Tests requiring symlink() disabled");
-    SKIP(batch, "Tests requiring symlink() disabled");
-    SKIP(batch, "Tests requiring symlink() disabled");
-    SKIP(batch, "Tests requiring symlink() disabled");
+    SKIP(runner, "Tests requiring symlink() disabled");
+    SKIP(runner, "Tests requiring symlink() disabled");
+    SKIP(runner, "Tests requiring symlink() disabled");
+    SKIP(runner, "Tests requiring symlink() disabled");
+    SKIP(runner, "Tests requiring symlink() disabled");
 #endif // ENABLE_SYMLINK_TESTS
 }
 
 void
-test_disallow_updir(TestBatch *batch) {
+test_disallow_updir(TestBatchRunner *runner) {
     FSFolder *outer_folder = (FSFolder*)S_set_up();
 
     CharBuf *foo = (CharBuf*)ZCB_WRAP_STR("foo", 3);
@@ -167,7 +160,7 @@ test_disallow_updir(TestBatch *batch) {
     CharBuf *inner_path = (CharBuf*)ZCB_WRAP_STR("_fstest/foo", 11);
     FSFolder *foo_folder = FSFolder_new(inner_path);
     CharBuf *up_bar = (CharBuf*)ZCB_WRAP_STR("../bar", 6);
-    TEST_FALSE(batch, FSFolder_Exists(foo_folder, up_bar),
+    TEST_FALSE(runner, FSFolder_Exists(foo_folder, up_bar),
                "up-dirs are inaccessible.");
 
     DECREF(foo_folder);
@@ -178,12 +171,13 @@ test_disallow_updir(TestBatch *batch) {
 }
 
 void
-TestFSFolder_run_tests(TestFSFolder *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Initialize_and_Check(batch);
-    TestFolderCommon_run_tests(batch, S_set_up, S_tear_down);
-    test_protect_symlinks(batch);
-    test_disallow_updir(batch);
+TestFSFolder_run(TestFSFolder *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self,
+                          TestFolderCommon_num_tests() + 9);
+    test_Initialize_and_Check(runner);
+    TestFolderCommon_run_tests(runner, S_set_up, S_tear_down);
+    test_protect_symlinks(runner);
+    test_disallow_updir(runner);
 }
 
 #ifdef ENABLE_SYMLINK_TESTS

@@ -19,25 +19,19 @@
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Search/TestTermQuery.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Search/TermQuery.h"
 
 TestTermQuery*
-TestTermQuery_new(TestFormatter *formatter) {
-    TestTermQuery *self = (TestTermQuery*)VTable_Make_Obj(TESTTERMQUERY);
-    return TestTermQuery_init(self, formatter);
-}
-
-TestTermQuery*
-TestTermQuery_init(TestTermQuery *self, TestFormatter *formatter) {
-    return (TestTermQuery*)TestBatch_init((TestBatch*)self, 4, formatter);
+TestTermQuery_new() {
+    return (TestTermQuery*)VTable_Make_Obj(TESTTERMQUERY);
 }
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch) {
+test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     TermQuery *query         = TestUtils_make_term_query("content", "foo");
     TermQuery *field_differs = TestUtils_make_term_query("stuff", "foo");
     TermQuery *term_differs  = TestUtils_make_term_query("content", "bar");
@@ -45,14 +39,14 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
     Obj       *dump          = (Obj*)TermQuery_Dump(query);
     TermQuery *clone         = (TermQuery*)TermQuery_Load(term_differs, dump);
 
-    TEST_FALSE(batch, TermQuery_Equals(query, (Obj*)field_differs),
+    TEST_FALSE(runner, TermQuery_Equals(query, (Obj*)field_differs),
                "Equals() false with different field");
-    TEST_FALSE(batch, TermQuery_Equals(query, (Obj*)term_differs),
+    TEST_FALSE(runner, TermQuery_Equals(query, (Obj*)term_differs),
                "Equals() false with different term");
     TermQuery_Set_Boost(boost_differs, 0.5);
-    TEST_FALSE(batch, TermQuery_Equals(query, (Obj*)boost_differs),
+    TEST_FALSE(runner, TermQuery_Equals(query, (Obj*)boost_differs),
                "Equals() false with different boost");
-    TEST_TRUE(batch, TermQuery_Equals(query, (Obj*)clone),
+    TEST_TRUE(runner, TermQuery_Equals(query, (Obj*)clone),
               "Dump => Load round trip");
 
     DECREF(query);
@@ -64,9 +58,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 void
-TestTermQuery_run_tests(TestTermQuery *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Dump_Load_and_Equals(batch);
+TestTermQuery_run(TestTermQuery *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
+    test_Dump_Load_and_Equals(runner);
 }
 
 

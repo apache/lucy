@@ -22,35 +22,29 @@
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Test.h"
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Clownfish/VTable.h"
 
 TestErr*
-TestErr_new(TestFormatter *formatter) {
-    TestErr *self = (TestErr*)VTable_Make_Obj(TESTERR);
-    return TestErr_init(self, formatter);
-}
-
-TestErr*
-TestErr_init(TestErr *self, TestFormatter *formatter) {
-    return (TestErr*)TestBatch_init((TestBatch*)self, 1, formatter);
+TestErr_new() {
+    return (TestErr*)VTable_Make_Obj(TESTERR);
 }
 
 static void
-test_To_String(TestBatch *batch) {
+test_To_String(TestBatchRunner *runner) {
     CharBuf *message = CB_newf("oops");
     Err *error = Err_new(message);
     CharBuf *string = Err_To_String(error);
-    TEST_TRUE(batch, CB_Equals(message, (Obj*)string),
+    TEST_TRUE(runner, CB_Equals(message, (Obj*)string),
               "Stringifies as message");
     DECREF(string);
     DECREF(error);
 }
 
 void
-TestErr_run_tests(TestErr *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_To_String(batch);
+TestErr_run(TestErr *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 1);
+    test_To_String(runner);
 }
 
 

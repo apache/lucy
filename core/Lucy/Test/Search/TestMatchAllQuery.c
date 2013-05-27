@@ -19,32 +19,26 @@
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Search/TestMatchAllQuery.h"
 #include "Lucy/Search/MatchAllQuery.h"
 
 TestMatchAllQuery*
-TestMatchAllQuery_new(TestFormatter *formatter) {
-    TestMatchAllQuery *self = (TestMatchAllQuery*)VTable_Make_Obj(TESTMATCHALLQUERY);
-    return TestMatchAllQuery_init(self, formatter);
-}
-
-TestMatchAllQuery*
-TestMatchAllQuery_init(TestMatchAllQuery *self, TestFormatter *formatter) {
-    return (TestMatchAllQuery*)TestBatch_init((TestBatch*)self, 2, formatter);
+TestMatchAllQuery_new() {
+    return (TestMatchAllQuery*)VTable_Make_Obj(TESTMATCHALLQUERY);
 }
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch) {
+test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     MatchAllQuery *query = MatchAllQuery_new();
     Obj           *dump  = (Obj*)MatchAllQuery_Dump(query);
     MatchAllQuery *clone = (MatchAllQuery*)MatchAllQuery_Load(query, dump);
 
-    TEST_TRUE(batch, MatchAllQuery_Equals(query, (Obj*)clone),
+    TEST_TRUE(runner, MatchAllQuery_Equals(query, (Obj*)clone),
               "Dump => Load round trip");
-    TEST_FALSE(batch, MatchAllQuery_Equals(query, (Obj*)CFISH_TRUE),
+    TEST_FALSE(runner, MatchAllQuery_Equals(query, (Obj*)CFISH_TRUE),
                "Equals");
 
     DECREF(query);
@@ -54,9 +48,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 
 
 void
-TestMatchAllQuery_run_tests(TestMatchAllQuery *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Dump_Load_and_Equals(batch);
+TestMatchAllQuery_run(TestMatchAllQuery *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 2);
+    test_Dump_Load_and_Equals(runner);
 }
 
 

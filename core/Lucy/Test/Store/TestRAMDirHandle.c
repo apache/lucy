@@ -18,7 +18,7 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestRAMDirHandle.h"
 #include "Lucy/Store/FileHandle.h"
@@ -26,18 +26,12 @@
 #include "Lucy/Store/RAMDirHandle.h"
 
 TestRAMDirHandle*
-TestRAMDH_new(TestFormatter *formatter) {
-    TestRAMDirHandle *self = (TestRAMDirHandle*)VTable_Make_Obj(TESTRAMDIRHANDLE);
-    return TestRAMDH_init(self, formatter);
-}
-
-TestRAMDirHandle*
-TestRAMDH_init(TestRAMDirHandle *self, TestFormatter *formatter) {
-    return (TestRAMDirHandle*)TestBatch_init((TestBatch*)self, 6, formatter);
+TestRAMDH_new() {
+    return (TestRAMDirHandle*)VTable_Make_Obj(TESTRAMDIRHANDLE);
 }
 
 static void
-test_all(TestBatch *batch) {
+test_all(TestBatchRunner *runner) {
     RAMFolder *folder        = RAMFolder_new(NULL);
     CharBuf   *foo           = (CharBuf*)ZCB_WRAP_STR("foo", 3);
     CharBuf   *boffo         = (CharBuf*)ZCB_WRAP_STR("boffo", 5);
@@ -70,17 +64,17 @@ test_all(TestBatch *batch) {
             boffo_was_dir = RAMDH_Entry_Is_Dir(dh);
         }
     }
-    TEST_INT_EQ(batch, 2, count, "correct number of entries");
-    TEST_TRUE(batch, saw_foo, "Directory was iterated over");
-    TEST_TRUE(batch, foo_was_dir,
+    TEST_INT_EQ(runner, 2, count, "correct number of entries");
+    TEST_TRUE(runner, saw_foo, "Directory was iterated over");
+    TEST_TRUE(runner, foo_was_dir,
               "Dir correctly identified by Entry_Is_Dir");
-    TEST_TRUE(batch, saw_boffo, "File was iterated over");
-    TEST_FALSE(batch, boffo_was_dir,
+    TEST_TRUE(runner, saw_boffo, "File was iterated over");
+    TEST_FALSE(runner, boffo_was_dir,
                "File correctly identified by Entry_Is_Dir");
 
     uint32_t refcount = RAMFolder_Get_RefCount(folder);
     RAMDH_Close(dh);
-    TEST_INT_EQ(batch, RAMFolder_Get_RefCount(folder), refcount - 1,
+    TEST_INT_EQ(runner, RAMFolder_Get_RefCount(folder), refcount - 1,
                 "Folder reference released by Close()");
 
     DECREF(dh);
@@ -88,9 +82,9 @@ test_all(TestBatch *batch) {
 }
 
 void
-TestRAMDH_run_tests(TestRAMDirHandle *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_all(batch);
+TestRAMDH_run(TestRAMDirHandle *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 6);
+    test_all(runner);
 }
 
 

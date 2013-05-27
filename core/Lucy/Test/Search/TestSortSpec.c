@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Clownfish/TestHarness/TestUtils.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Search/TestSortSpec.h"
@@ -71,14 +71,8 @@ static CharBuf *random_int32s_cb;
 static CharBuf *random_int64s_cb;
 
 TestSortSpec*
-TestSortSpec_new(TestFormatter *formatter) {
-    TestSortSpec *self = (TestSortSpec*)VTable_Make_Obj(TESTSORTSPEC);
-    return TestSortSpec_init(self, formatter);
-}
-
-TestSortSpec*
-TestSortSpec_init(TestSortSpec *self, TestFormatter *formatter) {
-    return (TestSortSpec*)TestBatch_init((TestBatch*)self, 18, formatter);
+TestSortSpec_new() {
+    return (TestSortSpec*)VTable_Make_Obj(TESTSORTSPEC);
 }
 
 static void
@@ -387,7 +381,7 @@ S_attempt_sorted_search(void *context) {
 }
 
 static void
-test_sort_spec(TestBatch *batch) {
+test_sort_spec(TestBatchRunner *runner) {
     RAMFolder *folder  = RAMFolder_new(NULL);
     Schema    *schema  = S_create_schema();
     Indexer   *indexer = NULL;
@@ -457,12 +451,12 @@ test_sort_spec(TestBatch *batch) {
     VA_Push(wanted, INCREF(airplane_cb));
     VA_Push(wanted, INCREF(bike_cb));
     VA_Push(wanted, INCREF(car_cb));
-    TEST_TRUE(batch, VA_Equals(results, (Obj*)wanted), "sort by one criteria");
+    TEST_TRUE(runner, VA_Equals(results, (Obj*)wanted), "sort by one criteria");
     DECREF(results);
 
 #ifdef LUCY_VALGRIND
-    SKIP(batch, "known leaks");
-    SKIP(batch, "known leaks");
+    SKIP(runner, "known leaks");
+    SKIP(runner, "known leaks");
 #else
     Err *error;
     SortContext sort_ctx;
@@ -470,7 +464,7 @@ test_sort_spec(TestBatch *batch) {
 
     sort_ctx.sort_field = nope_cb;
     error = Err_trap(S_attempt_sorted_search, &sort_ctx);
-    TEST_TRUE(batch, error != NULL
+    TEST_TRUE(runner, error != NULL
               && Err_Is_A(error, ERR)
               && CB_Find_Str(Err_Get_Mess(error), "sortable", 8) != -1,
               "sorting on a non-sortable field throws an error");
@@ -478,7 +472,7 @@ test_sort_spec(TestBatch *batch) {
 
     sort_ctx.sort_field = unknown_cb;
     error = Err_trap(S_attempt_sorted_search, &sort_ctx);
-    TEST_TRUE(batch, error != NULL
+    TEST_TRUE(runner, error != NULL
               && Err_Is_A(error, ERR)
               && CB_Find_Str(Err_Get_Mess(error), "sortable", 8) != -1,
               "sorting on an unknown field throws an error");
@@ -491,7 +485,7 @@ test_sort_spec(TestBatch *batch) {
     VA_Push(wanted, INCREF(bike_cb));
     VA_Push(wanted, INCREF(car_cb));
     VA_Push(wanted, INCREF(airplane_cb));
-    TEST_TRUE(batch, VA_Equals(results, (Obj*)wanted), "sort by one criteria");
+    TEST_TRUE(runner, VA_Equals(results, (Obj*)wanted), "sort by one criteria");
     DECREF(results);
 
     results = S_test_sorted_search(searcher, vehicle_cb, 100,
@@ -500,7 +494,7 @@ test_sort_spec(TestBatch *batch) {
     VA_Push(wanted, INCREF(car_cb));
     VA_Push(wanted, INCREF(bike_cb));
     VA_Push(wanted, INCREF(airplane_cb));
-    TEST_TRUE(batch, VA_Equals(results, (Obj*)wanted), "reverse sort");
+    TEST_TRUE(runner, VA_Equals(results, (Obj*)wanted), "reverse sort");
     DECREF(results);
 
     results = S_test_sorted_search(searcher, vehicle_cb, 100,
@@ -509,7 +503,7 @@ test_sort_spec(TestBatch *batch) {
     VA_Push(wanted, INCREF(airplane_cb));
     VA_Push(wanted, INCREF(bike_cb));
     VA_Push(wanted, INCREF(car_cb));
-    TEST_TRUE(batch, VA_Equals(results, (Obj*)wanted), "multiple criteria");
+    TEST_TRUE(runner, VA_Equals(results, (Obj*)wanted), "multiple criteria");
     DECREF(results);
 
     results = S_test_sorted_search(searcher, vehicle_cb, 100,
@@ -518,7 +512,7 @@ test_sort_spec(TestBatch *batch) {
     VA_Push(wanted, INCREF(airplane_cb));
     VA_Push(wanted, INCREF(car_cb));
     VA_Push(wanted, INCREF(bike_cb));
-    TEST_TRUE(batch, VA_Equals(results, (Obj*)wanted),
+    TEST_TRUE(runner, VA_Equals(results, (Obj*)wanted),
               "multiple criteria with reverse");
     DECREF(results);
 
@@ -526,38 +520,38 @@ test_sort_spec(TestBatch *batch) {
                                    speed_cb, true, NULL);
     results2 = S_test_sorted_search(searcher, vehicle_cb, 100,
                                     sloth_cb, false, NULL);
-    TEST_TRUE(batch, VA_Equals(results, (Obj*)results2),
+    TEST_TRUE(runner, VA_Equals(results, (Obj*)results2),
               "FieldType_Compare_Values");
     DECREF(results2);
     DECREF(results);
 
     results = S_test_sorted_search(searcher, random_cb, 100,
                                    name_cb, false, NULL);
-    TEST_TRUE(batch, VA_Equals(results, (Obj*)random_strings),
+    TEST_TRUE(runner, VA_Equals(results, (Obj*)random_strings),
               "random strings");
     DECREF(results);
 
     results = S_test_sorted_search(searcher, random_int32s_cb, 100,
                                    int32_cb, false, NULL);
-    TEST_TRUE(batch, VA_Equals(results, (Obj*)random_int32s),
+    TEST_TRUE(runner, VA_Equals(results, (Obj*)random_int32s),
               "int32");
     DECREF(results);
 
     results = S_test_sorted_search(searcher, random_int64s_cb, 100,
                                    int64_cb, false, NULL);
-    TEST_TRUE(batch, VA_Equals(results, (Obj*)random_int64s),
+    TEST_TRUE(runner, VA_Equals(results, (Obj*)random_int64s),
               "int64");
     DECREF(results);
 
     results = S_test_sorted_search(searcher, random_float32s_cb, 100,
                                    float32_cb, false, NULL);
-    TEST_TRUE(batch, VA_Equals(results, (Obj*)random_float32s),
+    TEST_TRUE(runner, VA_Equals(results, (Obj*)random_float32s),
               "float32");
     DECREF(results);
 
     results = S_test_sorted_search(searcher, random_float64s_cb, 100,
                                    float64_cb, false, NULL);
-    TEST_TRUE(batch, VA_Equals(results, (Obj*)random_float64s),
+    TEST_TRUE(runner, VA_Equals(results, (Obj*)random_float64s),
               "float64");
     DECREF(results);
 
@@ -568,7 +562,7 @@ test_sort_spec(TestBatch *batch) {
     VA_Push(wanted, INCREF(airplane_cb));
     VA_Push(wanted, INCREF(bike_cb));
     VA_Push(wanted, INCREF(car_cb));
-    TEST_TRUE(batch, VA_Equals(results, (Obj*)wanted),
+    TEST_TRUE(runner, VA_Equals(results, (Obj*)wanted),
               "sorting on field with no values sorts by doc id");
     DECREF(results);
     DECREF(bbbcca_cb);
@@ -580,7 +574,7 @@ test_sort_spec(TestBatch *batch) {
     VA_Clear(wanted);
     VA_Push(wanted, INCREF(car_cb));
     VA_Push(wanted, INCREF(nn_cb));
-    TEST_TRUE(batch, VA_Equals(results, (Obj*)wanted),
+    TEST_TRUE(runner, VA_Equals(results, (Obj*)wanted),
               "doc with NULL value sorts last");
     DECREF(results);
     DECREF(nn_cb);
@@ -591,7 +585,7 @@ test_sort_spec(TestBatch *batch) {
     results2 = S_test_sorted_search(searcher, num_cb, 30,
                                     name_cb, false, NULL);
     VA_Resize(results2, 10);
-    TEST_TRUE(batch, VA_Equals(results, (Obj*)results2),
+    TEST_TRUE(runner, VA_Equals(results, (Obj*)results2),
               "same order regardless of queue size");
     DECREF(results2);
     DECREF(results);
@@ -601,7 +595,7 @@ test_sort_spec(TestBatch *batch) {
     results2 = S_test_sorted_search(searcher, num_cb, 30,
                                     name_cb, true, NULL);
     VA_Resize(results2, 10);
-    TEST_TRUE(batch, VA_Equals(results, (Obj*)results2),
+    TEST_TRUE(runner, VA_Equals(results, (Obj*)results2),
               "same order regardless of queue size (reverse sort)");
     DECREF(results2);
     DECREF(results);
@@ -621,7 +615,7 @@ test_sort_spec(TestBatch *batch) {
     VA_Push(wanted, INCREF(airplane_cb));
     VA_Push(wanted, INCREF(bike_cb));
     VA_Push(wanted, INCREF(car_cb));
-    TEST_TRUE(batch, VA_Equals(results, (Obj*)wanted), "Multi-segment sort");
+    TEST_TRUE(runner, VA_Equals(results, (Obj*)wanted), "Multi-segment sort");
     DECREF(results);
     DECREF(searcher);
 
@@ -637,10 +631,10 @@ test_sort_spec(TestBatch *batch) {
 }
 
 void
-TestSortSpec_run_tests(TestSortSpec *self) {
-    TestBatch *batch = (TestBatch*)self;
+TestSortSpec_run(TestSortSpec *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 18);
     S_init_strings();
-    test_sort_spec(batch);
+    test_sort_spec(runner);
     S_destroy_strings();
 }
 

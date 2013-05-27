@@ -22,10 +22,11 @@
 #define CHY_USE_SHORT_NAMES
 
 #include "Clownfish/TestHarness/TestFormatter.h"
+
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/TestHarness/TestBatch.h"
-#include "Clownfish/TestHarness/TestRunner.h"
+#include "Clownfish/TestHarness/TestSuiteRunner.h"
 #include "Clownfish/VTable.h"
 
 TestFormatter*
@@ -35,28 +36,27 @@ TestFormatter_init(TestFormatter *self) {
 }
 
 void
-TestFormatter_test_result(void *vself, bool pass, uint32_t test_num,
+TestFormatter_test_result(TestFormatter *self, bool pass, uint32_t test_num,
                           const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    TestFormatter_VTest_Result((TestFormatter*)vself, pass, test_num, fmt,
-                               args);
+    TestFormatter_VTest_Result(self, pass, test_num, fmt, args);
     va_end(args);
 }
 
 void
-TestFormatter_test_comment(void *vself, const char *fmt, ...) {
+TestFormatter_test_comment(TestFormatter *self, const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    TestFormatter_VTest_Comment((TestFormatter*)vself, fmt, args);
+    TestFormatter_VTest_Comment(self, fmt, args);
     va_end(args);
 }
 
 void
-TestFormatter_batch_comment(void *vself, const char *fmt, ...) {
+TestFormatter_batch_comment(TestFormatter *self, const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    TestFormatter_VBatch_Comment((TestFormatter*)vself, fmt, args);
+    TestFormatter_VBatch_Comment(self, fmt, args);
     va_end(args);
 }
 
@@ -73,7 +73,8 @@ TestFormatterCF_init(TestFormatterCF *self) {
 }
 
 void
-TestFormatterCF_batch_prologue(TestFormatterCF *self, TestBatch *batch) {
+TestFormatterCF_batch_prologue(TestFormatterCF *self, TestBatch *batch,
+                               uint32_t num_planned) {
     UNUSED_VAR(self);
     CharBuf *class_name = TestBatch_Get_Class_Name(batch);
     printf("Running %s...\n", CB_Get_Ptr8(class_name));
@@ -108,12 +109,13 @@ TestFormatterCF_vbatch_comment(TestFormatterCF *self, const char *fmt,
 }
 
 void
-TestFormatterCF_summary(TestFormatterCF *self, TestRunner *runner) {
+TestFormatterCF_summary(TestFormatterCF *self, TestSuiteRunner *runner) {
     UNUSED_VAR(self);
-    uint32_t num_batches        = TestRunner_Get_Num_Batches(runner);
-    uint32_t num_batches_failed = TestRunner_Get_Num_Batches_Failed(runner);
-    uint32_t num_tests          = TestRunner_Get_Num_Tests(runner);
-    uint32_t num_tests_failed   = TestRunner_Get_Num_Tests_Failed(runner);
+    uint32_t num_batches = TestSuiteRunner_Get_Num_Batches(runner);
+    uint32_t num_batches_failed
+        = TestSuiteRunner_Get_Num_Batches_Failed(runner);
+    uint32_t num_tests = TestSuiteRunner_Get_Num_Tests(runner);
+    uint32_t num_tests_failed = TestSuiteRunner_Get_Num_Tests_Failed(runner);
 
     if (num_batches == 0) {
         printf("No tests planned or run.\n");
@@ -143,9 +145,10 @@ TestFormatterTAP_init(TestFormatterTAP *self) {
 }
 
 void
-TestFormatterTAP_batch_prologue(TestFormatterTAP *self, TestBatch *batch) {
+TestFormatterTAP_batch_prologue(TestFormatterTAP *self, TestBatch *batch,
+                                uint32_t num_planned) {
     UNUSED_VAR(self);
-    printf("1..%u\n", TestBatch_Get_Num_Planned(batch));
+    printf("1..%u\n", num_planned);
 }
 
 void
@@ -176,7 +179,7 @@ TestFormatterTAP_vbatch_comment(TestFormatterTAP *self, const char *fmt,
 }
 
 void
-TestFormatterTAP_summary(TestFormatterTAP *self, TestRunner *runner) {
+TestFormatterTAP_summary(TestFormatterTAP *self, TestSuiteRunner *runner) {
     UNUSED_VAR(self);
     UNUSED_VAR(runner);
 }

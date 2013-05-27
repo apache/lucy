@@ -17,22 +17,30 @@
 #include <stdlib.h>
 
 #include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestSuite.h"
 #include "Clownfish/Test.h"
 #include "Lucy/Test.h"
 
 int
 main() {
-    cfish_TestFormatterCF *formatter;
+    cfish_TestFormatter *formatter;
+    cfish_TestSuite     *cfish_suite;
+    cfish_TestSuite     *lucy_suite;
     bool success = true;
 
     testcfish_bootstrap_parcel();
     testlucy_bootstrap_parcel();
 
-    formatter = cfish_TestFormatterCF_new();
-    success &= testcfish_Test_run_all_batches((cfish_TestFormatter*)formatter);
-    success &= testlucy_Test_run_all_batches((cfish_TestFormatter*)formatter);
-    CFISH_DECREF(formatter);
+    formatter   = (cfish_TestFormatter*)cfish_TestFormatterCF_new();
+    cfish_suite = testcfish_Test_create_test_suite();
+    lucy_suite  = testlucy_Test_create_test_suite();
 
+    success &= Cfish_TestSuite_Run_All_Batches(cfish_suite, formatter);
+    success &= Cfish_TestSuite_Run_All_Batches(lucy_suite, formatter);
+
+    CFISH_DECREF(formatter);
+    CFISH_DECREF(cfish_suite);
+    CFISH_DECREF(lucy_suite);
     return success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 

@@ -30,13 +30,10 @@ class Lucy::Test::Util::TestPriorityQueue cnick TestPriQ
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestPriorityQueue*
-    new(TestFormatter *formatter);
-
-    inert TestPriorityQueue*
-    init(TestPriorityQueue *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestPriorityQueue *self);
+    Run(TestPriorityQueue *self, TestBatchRunner *runner);
 }
 
 

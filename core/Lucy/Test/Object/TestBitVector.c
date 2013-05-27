@@ -18,71 +18,65 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Clownfish/TestHarness/TestUtils.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestBitVector.h"
 
 TestBitVector*
-TestBitVector_new(TestFormatter *formatter) {
-    TestBitVector *self = (TestBitVector*)VTable_Make_Obj(TESTBITVECTOR);
-    return TestBitVector_init(self, formatter);
-}
-
-TestBitVector*
-TestBitVector_init(TestBitVector *self, TestFormatter *formatter) {
-    return (TestBitVector*)TestBatch_init((TestBatch*)self, 1029, formatter);
+TestBitVector_new() {
+    return (TestBitVector*)VTable_Make_Obj(TESTBITVECTOR);
 }
 
 static void
-test_Set_and_Get(TestBatch *batch) {
+test_Set_and_Get(TestBatchRunner *runner) {
     unsigned i, max;
     const uint32_t  three     = 3;
     const uint32_t  seventeen = 17;
     BitVector      *bit_vec   = BitVec_new(8);
 
     BitVec_Set(bit_vec, three);
-    TEST_TRUE(batch, BitVec_Get_Capacity(bit_vec) < seventeen,
+    TEST_TRUE(runner, BitVec_Get_Capacity(bit_vec) < seventeen,
               "set below cap");
     BitVec_Set(bit_vec, seventeen);
-    TEST_TRUE(batch, BitVec_Get_Capacity(bit_vec) > seventeen,
+    TEST_TRUE(runner, BitVec_Get_Capacity(bit_vec) > seventeen,
               "set above cap causes BitVector to grow");
 
     for (i = 0, max = BitVec_Get_Capacity(bit_vec); i < max; i++) {
         if (i == three || i == seventeen) {
-            TEST_TRUE(batch, BitVec_Get(bit_vec, i), "set/get %d", i);
+            TEST_TRUE(runner, BitVec_Get(bit_vec, i), "set/get %d", i);
         }
         else {
-            TEST_FALSE(batch, BitVec_Get(bit_vec, i), "get %d", i);
+            TEST_FALSE(runner, BitVec_Get(bit_vec, i), "get %d", i);
         }
     }
-    TEST_FALSE(batch, BitVec_Get(bit_vec, i), "out of range get");
+    TEST_FALSE(runner, BitVec_Get(bit_vec, i), "out of range get");
 
     DECREF(bit_vec);
 }
 
 static void
-test_Flip(TestBatch *batch) {
+test_Flip(TestBatchRunner *runner) {
     BitVector *bit_vec = BitVec_new(0);
     int i;
 
     for (i = 0; i <= 20; i++) { BitVec_Flip(bit_vec, i); }
     for (i = 0; i <= 20; i++) {
-        TEST_TRUE(batch, BitVec_Get(bit_vec, i), "flip on %d", i);
+        TEST_TRUE(runner, BitVec_Get(bit_vec, i), "flip on %d", i);
     }
-    TEST_FALSE(batch, BitVec_Get(bit_vec, i), "no flip %d", i);
+    TEST_FALSE(runner, BitVec_Get(bit_vec, i), "no flip %d", i);
     for (i = 0; i <= 20; i++) { BitVec_Flip(bit_vec, i); }
     for (i = 0; i <= 20; i++) {
-        TEST_FALSE(batch, BitVec_Get(bit_vec, i), "flip off %d", i);
+        TEST_FALSE(runner, BitVec_Get(bit_vec, i), "flip off %d", i);
     }
-    TEST_FALSE(batch, BitVec_Get(bit_vec, i), "still no flip %d", i);
+    TEST_FALSE(runner, BitVec_Get(bit_vec, i), "still no flip %d", i);
 
     DECREF(bit_vec);
 }
 
 static void
-test_Flip_Block_ascending(TestBatch *batch) {
+test_Flip_Block_ascending(TestBatchRunner *runner) {
     BitVector *bit_vec = BitVec_new(0);
     int i;
 
@@ -92,11 +86,11 @@ test_Flip_Block_ascending(TestBatch *batch) {
 
     for (i = 0; i <= 20; i++) {
         if (i % 2 == 0) {
-            TEST_TRUE(batch, BitVec_Get(bit_vec, i),
+            TEST_TRUE(runner, BitVec_Get(bit_vec, i),
                       "Flip_Block ascending %d", i);
         }
         else {
-            TEST_FALSE(batch, BitVec_Get(bit_vec, i),
+            TEST_FALSE(runner, BitVec_Get(bit_vec, i),
                        "Flip_Block ascending %d", i);
         }
     }
@@ -105,7 +99,7 @@ test_Flip_Block_ascending(TestBatch *batch) {
 }
 
 static void
-test_Flip_Block_descending(TestBatch *batch) {
+test_Flip_Block_descending(TestBatchRunner *runner) {
     BitVector *bit_vec = BitVec_new(0);
     int i;
 
@@ -115,11 +109,11 @@ test_Flip_Block_descending(TestBatch *batch) {
 
     for (i = 0; i <= 20; i++) {
         if (i % 2) {
-            TEST_TRUE(batch, BitVec_Get(bit_vec, i),
+            TEST_TRUE(runner, BitVec_Get(bit_vec, i),
                       "Flip_Block descending %d", i);
         }
         else {
-            TEST_FALSE(batch, BitVec_Get(bit_vec, i),
+            TEST_FALSE(runner, BitVec_Get(bit_vec, i),
                        "Flip_Block descending %d", i);
         }
     }
@@ -128,7 +122,7 @@ test_Flip_Block_descending(TestBatch *batch) {
 }
 
 static void
-test_Flip_Block_bulk(TestBatch *batch) {
+test_Flip_Block_bulk(TestBatchRunner *runner) {
     int32_t offset;
 
     for (offset = 0; offset <= 17; offset++) {
@@ -147,7 +141,7 @@ test_Flip_Block_bulk(TestBatch *batch) {
                     if (BitVec_Get(bit_vec, i)) { break; }
                 }
             }
-            TEST_INT_EQ(batch, i, 18, "Flip_Block(%d, %d)", offset, len);
+            TEST_INT_EQ(runner, i, 18, "Flip_Block(%d, %d)", offset, len);
 
             DECREF(bit_vec);
         }
@@ -155,7 +149,7 @@ test_Flip_Block_bulk(TestBatch *batch) {
 }
 
 static void
-test_Mimic(TestBatch *batch) {
+test_Mimic(TestBatchRunner *runner) {
     int foo;
 
     for (foo = 0; foo <= 17; foo++) {
@@ -172,7 +166,7 @@ test_Mimic(TestBatch *batch) {
             for (i = 0; i <= 17; i++) {
                 if (BitVec_Get(foo_vec, i) && i != bar) { break; }
             }
-            TEST_INT_EQ(batch, i, 18, "Mimic(%d, %d)", foo, bar);
+            TEST_INT_EQ(runner, i, 18, "Mimic(%d, %d)", foo, bar);
 
             DECREF(foo_vec);
             DECREF(bar_vec);
@@ -232,17 +226,17 @@ S_verify_logical_op(BitVector *bit_vec, BitVector *set_1, BitVector *set_2,
 }
 
 static void
-test_Or(TestBatch *batch) {
+test_Or(TestBatchRunner *runner) {
     BitVector *smaller = S_create_set(1);
     BitVector *larger  = S_create_set(2);
     BitVector *set_1   = S_create_set(1);
     BitVector *set_2   = S_create_set(2);
 
     BitVec_Or(smaller, set_2);
-    TEST_INT_EQ(batch, S_verify_logical_op(smaller, set_1, set_2, OP_OR),
+    TEST_INT_EQ(runner, S_verify_logical_op(smaller, set_1, set_2, OP_OR),
                 50, "OR with self smaller than other");
     BitVec_Or(larger, set_1);
-    TEST_INT_EQ(batch, S_verify_logical_op(larger, set_1, set_2, OP_OR),
+    TEST_INT_EQ(runner, S_verify_logical_op(larger, set_1, set_2, OP_OR),
                 50, "OR with other smaller than self");
 
     DECREF(smaller);
@@ -252,17 +246,17 @@ test_Or(TestBatch *batch) {
 }
 
 static void
-test_Xor(TestBatch *batch) {
+test_Xor(TestBatchRunner *runner) {
     BitVector *smaller = S_create_set(1);
     BitVector *larger  = S_create_set(2);
     BitVector *set_1   = S_create_set(1);
     BitVector *set_2   = S_create_set(2);
 
     BitVec_Xor(smaller, set_2);
-    TEST_INT_EQ(batch, S_verify_logical_op(smaller, set_1, set_2, OP_XOR),
+    TEST_INT_EQ(runner, S_verify_logical_op(smaller, set_1, set_2, OP_XOR),
                 50, "XOR with self smaller than other");
     BitVec_Xor(larger, set_1);
-    TEST_INT_EQ(batch, S_verify_logical_op(larger, set_1, set_2, OP_XOR),
+    TEST_INT_EQ(runner, S_verify_logical_op(larger, set_1, set_2, OP_XOR),
                 50, "XOR with other smaller than self");
 
     DECREF(smaller);
@@ -272,17 +266,17 @@ test_Xor(TestBatch *batch) {
 }
 
 static void
-test_And(TestBatch *batch) {
+test_And(TestBatchRunner *runner) {
     BitVector *smaller = S_create_set(1);
     BitVector *larger  = S_create_set(2);
     BitVector *set_1   = S_create_set(1);
     BitVector *set_2   = S_create_set(2);
 
     BitVec_And(smaller, set_2);
-    TEST_INT_EQ(batch, S_verify_logical_op(smaller, set_1, set_2, OP_AND),
+    TEST_INT_EQ(runner, S_verify_logical_op(smaller, set_1, set_2, OP_AND),
                 50, "AND with self smaller than other");
     BitVec_And(larger, set_1);
-    TEST_INT_EQ(batch, S_verify_logical_op(larger, set_1, set_2, OP_AND),
+    TEST_INT_EQ(runner, S_verify_logical_op(larger, set_1, set_2, OP_AND),
                 50, "AND with other smaller than self");
 
     DECREF(smaller);
@@ -292,18 +286,18 @@ test_And(TestBatch *batch) {
 }
 
 static void
-test_And_Not(TestBatch *batch) {
+test_And_Not(TestBatchRunner *runner) {
     BitVector *smaller = S_create_set(1);
     BitVector *larger  = S_create_set(2);
     BitVector *set_1   = S_create_set(1);
     BitVector *set_2   = S_create_set(2);
 
     BitVec_And_Not(smaller, set_2);
-    TEST_INT_EQ(batch,
+    TEST_INT_EQ(runner,
                 S_verify_logical_op(smaller, set_1, set_2, OP_AND_NOT),
                 50, "AND_NOT with self smaller than other");
     BitVec_And_Not(larger, set_1);
-    TEST_INT_EQ(batch,
+    TEST_INT_EQ(runner,
                 S_verify_logical_op(larger, set_2, set_1, OP_AND_NOT),
                 50, "AND_NOT with other smaller than self");
 
@@ -314,7 +308,7 @@ test_And_Not(TestBatch *batch) {
 }
 
 static void
-test_Count(TestBatch *batch) {
+test_Count(TestBatchRunner *runner) {
     int i;
     int shuffled[64];
     BitVector *bit_vec = BitVec_new(64);
@@ -330,29 +324,29 @@ test_Count(TestBatch *batch) {
         BitVec_Set(bit_vec, shuffled[i]);
         if (BitVec_Count(bit_vec) != (uint32_t)(i + 1)) { break; }
     }
-    TEST_INT_EQ(batch, i, 64, "Count() returns the right number of bits");
+    TEST_INT_EQ(runner, i, 64, "Count() returns the right number of bits");
 
     DECREF(bit_vec);
 }
 
 static void
-test_Next_Hit(TestBatch *batch) {
+test_Next_Hit(TestBatchRunner *runner) {
     int i;
 
     for (i = 24; i <= 33; i++) {
         int probe;
         BitVector *bit_vec = BitVec_new(64);
         BitVec_Set(bit_vec, i);
-        TEST_INT_EQ(batch, BitVec_Next_Hit(bit_vec, 0), i,
+        TEST_INT_EQ(runner, BitVec_Next_Hit(bit_vec, 0), i,
                     "Next_Hit for 0 is %d", i);
-        TEST_INT_EQ(batch, BitVec_Next_Hit(bit_vec, 0), i,
+        TEST_INT_EQ(runner, BitVec_Next_Hit(bit_vec, 0), i,
                     "Next_Hit for 1 is %d", i);
         for (probe = 15; probe <= i; probe++) {
-            TEST_INT_EQ(batch, BitVec_Next_Hit(bit_vec, probe), i,
+            TEST_INT_EQ(runner, BitVec_Next_Hit(bit_vec, probe), i,
                         "Next_Hit for %d is %d", probe, i);
         }
         for (probe = i + 1; probe <= i + 9; probe++) {
-            TEST_INT_EQ(batch, BitVec_Next_Hit(bit_vec, probe), -1,
+            TEST_INT_EQ(runner, BitVec_Next_Hit(bit_vec, probe), -1,
                         "no Next_Hit for %d when max is %d", probe, i);
         }
         DECREF(bit_vec);
@@ -360,16 +354,16 @@ test_Next_Hit(TestBatch *batch) {
 }
 
 static void
-test_Clear_All(TestBatch *batch) {
+test_Clear_All(TestBatchRunner *runner) {
     BitVector *bit_vec = BitVec_new(64);
     BitVec_Flip_Block(bit_vec, 0, 63);
     BitVec_Clear_All(bit_vec);
-    TEST_INT_EQ(batch, BitVec_Next_Hit(bit_vec, 0), -1, "Clear_All");
+    TEST_INT_EQ(runner, BitVec_Next_Hit(bit_vec, 0), -1, "Clear_All");
     DECREF(bit_vec);
 }
 
 static void
-test_Clone(TestBatch *batch) {
+test_Clone(TestBatchRunner *runner) {
     int i;
     BitVector *self = BitVec_new(30);
     BitVector *twin;
@@ -383,8 +377,8 @@ test_Clone(TestBatch *batch) {
     for (i = 0; i < 50; i++) {
         if (BitVec_Get(self, i) != BitVec_Get(twin, i)) { break; }
     }
-    TEST_INT_EQ(batch, i, 50, "Clone");
-    TEST_INT_EQ(batch, BitVec_Count(twin), 4, "clone Count");
+    TEST_INT_EQ(runner, i, 50, "Clone");
+    TEST_INT_EQ(runner, BitVec_Count(twin), 4, "clone Count");
 
     DECREF(self);
     DECREF(twin);
@@ -399,7 +393,7 @@ S_compare_u64s(void *context, const void *va, const void *vb) {
 }
 
 static void
-test_To_Array(TestBatch *batch) {
+test_To_Array(TestBatchRunner *runner) {
     uint64_t  *source_ints = TestUtils_random_u64s(NULL, 20, 0, 200);
     BitVector *bit_vec = BitVec_new(0);
     I32Array  *array;
@@ -426,7 +420,7 @@ test_To_Array(TestBatch *batch) {
     for (i = 0; i < num_unique; i++) {
         if (I32Arr_Get(array, i) != (int32_t)source_ints[i]) { break; }
     }
-    TEST_INT_EQ(batch, i, num_unique, "To_Array (%ld == %ld)", i,
+    TEST_INT_EQ(runner, i, num_unique, "To_Array (%ld == %ld)", i,
                 num_unique);
 
     DECREF(array);
@@ -447,23 +441,23 @@ test_off_by_one_error() {
 }
 
 void
-TestBitVector_run_tests(TestBitVector *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Set_and_Get(batch);
-    test_Flip(batch);
-    test_Flip_Block_ascending(batch);
-    test_Flip_Block_descending(batch);
-    test_Flip_Block_bulk(batch);
-    test_Mimic(batch);
-    test_Or(batch);
-    test_Xor(batch);
-    test_And(batch);
-    test_And_Not(batch);
-    test_Count(batch);
-    test_Next_Hit(batch);
-    test_Clear_All(batch);
-    test_Clone(batch);
-    test_To_Array(batch);
+TestBitVector_run(TestBitVector *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 1029);
+    test_Set_and_Get(runner);
+    test_Flip(runner);
+    test_Flip_Block_ascending(runner);
+    test_Flip_Block_descending(runner);
+    test_Flip_Block_bulk(runner);
+    test_Mimic(runner);
+    test_Or(runner);
+    test_Xor(runner);
+    test_And(runner);
+    test_And_Not(runner);
+    test_Count(runner);
+    test_Next_Hit(runner);
+    test_Clear_All(runner);
+    test_Clone(runner);
+    test_To_Array(runner);
     test_off_by_one_error();
 }
 

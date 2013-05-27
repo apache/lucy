@@ -18,7 +18,7 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Plan/TestArchitecture.h"
 #include "Lucy/Test/TestSchema.h"
@@ -54,18 +54,12 @@ TestSchema_architecture(TestSchema *self) {
 }
 
 TestBatchSchema*
-TestBatchSchema_new(TestFormatter *formatter) {
-    TestBatchSchema *self = (TestBatchSchema*)VTable_Make_Obj(TESTBATCHSCHEMA);
-    return TestBatchSchema_init(self, formatter);
-}
-
-TestBatchSchema*
-TestBatchSchema_init(TestBatchSchema *self, TestFormatter *formatter) {
-    return (TestBatchSchema*)TestBatch_init((TestBatch*)self, 4, formatter);
+TestBatchSchema_new() {
+    return (TestBatchSchema*)VTable_Make_Obj(TESTBATCHSCHEMA);
 }
 
 static void
-test_Equals(TestBatch *batch) {
+test_Equals(TestBatchRunner *runner) {
     TestSchema *schema = TestSchema_new();
     TestSchema *arch_differs = TestSchema_new();
     TestSchema *spec_differs = TestSchema_new();
@@ -73,15 +67,15 @@ test_Equals(TestBatch *batch) {
     FullTextType *type = (FullTextType*)TestSchema_Fetch_Type(spec_differs,
                                                               content);
 
-    TEST_TRUE(batch, TestSchema_Equals(schema, (Obj*)schema), "Equals");
+    TEST_TRUE(runner, TestSchema_Equals(schema, (Obj*)schema), "Equals");
 
     FullTextType_Set_Boost(type, 2.0f);
-    TEST_FALSE(batch, TestSchema_Equals(schema, (Obj*)spec_differs),
+    TEST_FALSE(runner, TestSchema_Equals(schema, (Obj*)spec_differs),
                "Equals spoiled by differing FieldType");
 
     DECREF(arch_differs->arch);
     arch_differs->arch = Arch_new();
-    TEST_FALSE(batch, TestSchema_Equals(schema, (Obj*)arch_differs),
+    TEST_FALSE(runner, TestSchema_Equals(schema, (Obj*)arch_differs),
                "Equals spoiled by differing Architecture");
 
     DECREF(schema);
@@ -90,12 +84,12 @@ test_Equals(TestBatch *batch) {
 }
 
 static void
-test_Dump_and_Load(TestBatch *batch) {
+test_Dump_and_Load(TestBatchRunner *runner) {
     TestSchema *schema = TestSchema_new();
     Obj        *dump   = (Obj*)TestSchema_Dump(schema);
     TestSchema *loaded = (TestSchema*)Obj_Load(dump, dump);
 
-    TEST_FALSE(batch, TestSchema_Equals(schema, (Obj*)loaded),
+    TEST_FALSE(runner, TestSchema_Equals(schema, (Obj*)loaded),
                "Dump => Load round trip");
 
     DECREF(schema);
@@ -104,10 +98,10 @@ test_Dump_and_Load(TestBatch *batch) {
 }
 
 void
-TestBatchSchema_run_tests(TestBatchSchema *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Equals(batch);
-    test_Dump_and_Load(batch);
+TestBatchSchema_run(TestBatchSchema *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
+    test_Equals(runner);
+    test_Dump_and_Load(runner);
 }
 
 

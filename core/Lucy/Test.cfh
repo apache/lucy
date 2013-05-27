@@ -16,27 +16,11 @@
 
 parcel TestLucy;
 
-/** Testing framework.
+/** Lucy test suite.
  */
 inert class Lucy::Test {
-    inert bool
-    run_batch(CharBuf *class_name, TestFormatter *formatter);
-
-    inert bool
-    run_all_batches(TestFormatter *formatter);
+    inert incremented TestSuite*
+    create_test_suite();
 }
-
-__C__
-#ifdef LUCY_USE_SHORT_NAMES
-  #define TEST_TRUE                    cfish_TestBatch_test_true
-  #define TEST_FALSE                   cfish_TestBatch_test_false
-  #define TEST_INT_EQ                  cfish_TestBatch_test_int_equals
-  #define TEST_FLOAT_EQ                cfish_TestBatch_test_float_equals
-  #define TEST_STR_EQ                  cfish_TestBatch_test_string_equals
-  #define PASS                         cfish_TestBatch_pass
-  #define FAIL                         cfish_TestBatch_fail
-  #define SKIP                         cfish_TestBatch_skip
-#endif
-__END_C__
 
 

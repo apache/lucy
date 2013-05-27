@@ -20,12 +20,9 @@ class Lucy::Test::Index::TestIndexManager cnick TestIxManager
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestIndexManager*
-    new(TestFormatter *formatter);
-
-    inert TestIndexManager*
-    init(TestIndexManager *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestIndexManager *self);
+    Run(TestIndexManager *self, TestBatchRunner *runner);
 }
 

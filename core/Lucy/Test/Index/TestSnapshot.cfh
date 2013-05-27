@@ -20,13 +20,10 @@ class Lucy::Test::Index::TestSnapshot
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestSnapshot*
-    new(TestFormatter *formatter);
-
-    inert TestSnapshot*
-    init(TestSnapshot *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestSnapshot *self);
+    Run(TestSnapshot *self, TestBatchRunner *runner);
 }
 
 

@@ -20,13 +20,10 @@ class Lucy::Test::Analysis::TestNormalizer
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestNormalizer*
-    new(TestFormatter *formatter);
-
-    inert TestNormalizer*
-    init(TestNormalizer *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestNormalizer *self);
+    Run(TestNormalizer *self, TestBatchRunner *runner);
 }
 
 

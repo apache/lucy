@@ -19,21 +19,15 @@
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Search/TestSeriesMatcher.h"
 #include "Lucy/Search/BitVecMatcher.h"
 #include "Lucy/Search/SeriesMatcher.h"
 
 TestSeriesMatcher*
-TestSeriesMatcher_new(TestFormatter *formatter) {
-    TestSeriesMatcher *self = (TestSeriesMatcher*)VTable_Make_Obj(TESTSERIESMATCHER);
-    return TestSeriesMatcher_init(self, formatter);
-}
-
-TestSeriesMatcher*
-TestSeriesMatcher_init(TestSeriesMatcher *self, TestFormatter *formatter) {
-    return (TestSeriesMatcher*)TestBatch_init((TestBatch*)self, 135, formatter);
+TestSeriesMatcher_new() {
+    return (TestSeriesMatcher*)VTable_Make_Obj(TESTSERIESMATCHER);
 }
 
 static SeriesMatcher*
@@ -82,7 +76,7 @@ S_generate_match_list(int32_t first, int32_t max, int32_t doc_inc) {
 }
 
 static void
-S_do_test_matrix(TestBatch *batch, int32_t doc_max, int32_t first_doc_id,
+S_do_test_matrix(TestBatchRunner *runner, int32_t doc_max, int32_t first_doc_id,
                  int32_t doc_inc, int32_t offset_inc) {
     I32Array *doc_ids
         = S_generate_match_list(first_doc_id, doc_max, doc_inc);
@@ -97,7 +91,7 @@ S_do_test_matrix(TestBatch *batch, int32_t doc_max, int32_t first_doc_id,
         if (got != I32Arr_Get(doc_ids, num_in_agreement)) { break; }
         num_in_agreement++;
     }
-    TEST_INT_EQ(batch, num_in_agreement, I32Arr_Get_Size(doc_ids),
+    TEST_INT_EQ(runner, num_in_agreement, I32Arr_Get_Size(doc_ids),
                 "doc_max=%d first_doc_id=%d doc_inc=%d offset_inc=%d",
                 doc_max, first_doc_id, doc_inc, offset_inc);
 
@@ -107,7 +101,7 @@ S_do_test_matrix(TestBatch *batch, int32_t doc_max, int32_t first_doc_id,
 }
 
 static void
-test_matrix(TestBatch *batch) {
+test_matrix(TestBatchRunner *runner) {
     int32_t doc_max_nums[]     = { 10, 100, 1000, 0 };
     int32_t first_doc_ids[]    = { 1, 2, 10, 0 };
     int32_t doc_inc_nums[]     = { 20, 13, 9, 4, 2, 0 };
@@ -126,7 +120,7 @@ test_matrix(TestBatch *batch) {
                         continue;
                     }
                     else {
-                        S_do_test_matrix(batch, doc_max, first_doc_id,
+                        S_do_test_matrix(runner, doc_max, first_doc_id,
                                          doc_inc, offset_inc);
                     }
                 }
@@ -136,9 +130,9 @@ test_matrix(TestBatch *batch) {
 }
 
 void
-TestSeriesMatcher_run_tests(TestSeriesMatcher *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_matrix(batch);
+TestSeriesMatcher_run(TestSeriesMatcher *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 135);
+    test_matrix(runner);
 }
 
 

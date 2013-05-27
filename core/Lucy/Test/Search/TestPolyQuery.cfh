@@ -20,26 +20,20 @@ class Lucy::Test::Search::TestANDQuery
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestANDQuery*
-    new(TestFormatter *formatter);
-
-    inert TestANDQuery*
-    init(TestANDQuery *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestANDQuery *self);
+    Run(TestANDQuery *self, TestBatchRunner *runner);
 }
 
 class Lucy::Test::Search::TestORQuery
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestORQuery*
-    new(TestFormatter *formatter);
-
-    inert TestORQuery*
-    init(TestORQuery *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestORQuery *self);
+    Run(TestORQuery *self, TestBatchRunner *runner);
 }
 
 

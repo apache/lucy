@@ -20,13 +20,10 @@ class Clownfish::Test::Util::TestMemory
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestMemory*
-    new(TestFormatter *formatter);
-
-    inert TestMemory*
-    init(TestMemory *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestMemory *self);
+    Run(TestMemory *self, TestBatchRunner *runner);
 }
 
 

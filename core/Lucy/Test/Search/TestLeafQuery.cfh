@@ -20,13 +20,10 @@ class Lucy::Test::Search::TestLeafQuery
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestLeafQuery*
-    new(TestFormatter *formatter);
-
-    inert TestLeafQuery*
-    init(TestLeafQuery *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestLeafQuery *self);
+    Run(TestLeafQuery *self, TestBatchRunner *runner);
 }
 
 

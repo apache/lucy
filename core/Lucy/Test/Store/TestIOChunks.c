@@ -22,7 +22,7 @@
 
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Clownfish/TestHarness/TestUtils.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
@@ -34,25 +34,19 @@
 #include "Clownfish/Util/NumberUtils.h"
 
 TestIOChunks*
-TestIOChunks_new(TestFormatter *formatter) {
-    TestIOChunks *self = (TestIOChunks*)VTable_Make_Obj(TESTIOCHUNKS);
-    return TestIOChunks_init(self, formatter);
-}
-
-TestIOChunks*
-TestIOChunks_init(TestIOChunks *self, TestFormatter *formatter) {
-    return (TestIOChunks*)TestBatch_init((TestBatch*)self, 36, formatter);
+TestIOChunks_new() {
+    return (TestIOChunks*)VTable_Make_Obj(TESTIOCHUNKS);
 }
 
 static void
-test_Align(TestBatch *batch) {
+test_Align(TestBatchRunner *runner) {
     RAMFile    *file      = RAMFile_new(NULL, false);
     OutStream  *outstream = OutStream_open((Obj*)file);
 
     for (int32_t i = 1; i < 32; i++) {
         int64_t random_bytes = TestUtils_random_u64() % 32;
         while (random_bytes--) { OutStream_Write_U8(outstream, 0); }
-        TEST_TRUE(batch, (OutStream_Align(outstream, i) % i) == 0,
+        TEST_TRUE(runner, (OutStream_Align(outstream, i) % i) == 0,
                   "Align to %ld", (long)i);
     }
     DECREF(file);
@@ -60,7 +54,7 @@ test_Align(TestBatch *batch) {
 }
 
 static void
-test_Read_Write_Bytes(TestBatch *batch) {
+test_Read_Write_Bytes(TestBatchRunner *runner) {
     RAMFile    *file      = RAMFile_new(NULL, false);
     OutStream  *outstream = OutStream_open((Obj*)file);
     InStream   *instream;
@@ -71,7 +65,7 @@ test_Read_Write_Bytes(TestBatch *batch) {
 
     instream = InStream_open((Obj*)file);
     InStream_Read_Bytes(instream, buf, 4);
-    TEST_TRUE(batch, strcmp(buf, "foo") == 0, "Read_Bytes Write_Bytes");
+    TEST_TRUE(runner, strcmp(buf, "foo") == 0, "Read_Bytes Write_Bytes");
 
     DECREF(instream);
     DECREF(outstream);
@@ -79,7 +73,7 @@ test_Read_Write_Bytes(TestBatch *batch) {
 }
 
 static void
-test_Buf(TestBatch *batch) {
+test_Buf(TestBatchRunner *runner) {
     RAMFile    *file      = RAMFile_new(NULL, false);
     OutStream  *outstream = OutStream_open((Obj*)file);
     size_t      size      = IO_STREAM_BUF_SIZE * 2 + 5;
@@ -93,24 +87,24 @@ test_Buf(TestBatch *batch) {
 
     instream = InStream_open((Obj*)file);
     buf = InStream_Buf(instream, 5);
-    TEST_INT_EQ(batch, instream->limit - buf, IO_STREAM_BUF_SIZE,
+    TEST_INT_EQ(runner, instream->limit - buf, IO_STREAM_BUF_SIZE,
                 "Small request bumped up");
 
     buf += IO_STREAM_BUF_SIZE - 10; // 10 bytes left in buffer.
     InStream_Advance_Buf(instream, buf);
 
     buf = InStream_Buf(instream, 10);
-    TEST_INT_EQ(batch, instream->limit - buf, 10,
+    TEST_INT_EQ(runner, instream->limit - buf, 10,
                 "Exact request doesn't trigger refill");
 
     buf = InStream_Buf(instream, 11);
-    TEST_INT_EQ(batch, instream->limit - buf, IO_STREAM_BUF_SIZE,
+    TEST_INT_EQ(runner, instream->limit - buf, IO_STREAM_BUF_SIZE,
                 "Requesting over limit triggers refill");
 
     int64_t  expected = InStream_Length(instream) - InStream_Tell(instream);
     char    *buff     = InStream_Buf(instream, 100000);
     int64_t  got      = PTR_TO_I64(instream->limit) - PTR_TO_I64(buff);
-    TEST_TRUE(batch, got == expected,
+    TEST_TRUE(runner, got == expected,
               "Requests greater than file size get pared down");
 
     DECREF(instream);
@@ -119,12 +113,12 @@ test_Buf(TestBatch *batch) {
 }
 
 void
-TestIOChunks_run_tests(TestIOChunks *self) {
-    TestBatch *batch = (TestBatch*)self;
+TestIOChunks_run(TestIOChunks *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 36);
     srand((unsigned int)time((time_t*)NULL));
-    test_Align(batch);
-    test_Read_Write_Bytes(batch);
-    test_Buf(batch);
+    test_Align(runner);
+    test_Read_Write_Bytes(runner);
+    test_Buf(runner);
 }
 
 

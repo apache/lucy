@@ -20,13 +20,10 @@ class Lucy::Test::Search::TestReqOptQuery
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestReqOptQuery*
-    new(TestFormatter *formatter);
-
-    inert TestReqOptQuery*
-    init(TestReqOptQuery *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestReqOptQuery *self);
+    Run(TestReqOptQuery *self, TestBatchRunner *runner);
 }
 
 

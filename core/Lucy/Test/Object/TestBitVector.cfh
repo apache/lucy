@@ -20,13 +20,10 @@ class Lucy::Test::Object::TestBitVector
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestBitVector*
-    new(TestFormatter *formatter);
-
-    inert TestBitVector*
-    init(TestBitVector *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestBitVector *self);
+    Run(TestBitVector *self, TestBatchRunner *runner);
 }
 
 

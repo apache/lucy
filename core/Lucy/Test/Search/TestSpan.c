@@ -18,42 +18,36 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Search/TestSpan.h"
 #include "Lucy/Search/Span.h"
 
 TestSpan*
-TestSpan_new(TestFormatter *formatter) {
-    TestSpan *self = (TestSpan*)VTable_Make_Obj(TESTSPAN);
-    return TestSpan_init(self, formatter);
-}
-
-TestSpan*
-TestSpan_init(TestSpan *self, TestFormatter *formatter) {
-    return (TestSpan*)TestBatch_init((TestBatch*)self, 6, formatter);
+TestSpan_new() {
+    return (TestSpan*)VTable_Make_Obj(TESTSPAN);
 }
 
 void 
-test_span_init_values(TestBatch *batch) {
+test_span_init_values(TestBatchRunner *runner) {
     Span* span = Span_new(2,3,7);
-    TEST_INT_EQ(batch, Span_Get_Offset(span), 2, "get_offset" );
-    TEST_INT_EQ(batch, Span_Get_Length(span), 3, "get_length" );
-    TEST_INT_EQ(batch, Span_Get_Weight(span), 7, "get_weight" );
+    TEST_INT_EQ(runner, Span_Get_Offset(span), 2, "get_offset" );
+    TEST_INT_EQ(runner, Span_Get_Length(span), 3, "get_length" );
+    TEST_INT_EQ(runner, Span_Get_Weight(span), 7, "get_weight" );
 
     Span_Set_Offset(span, 10);
     Span_Set_Length(span, 1);
     Span_Set_Weight(span, 4);
 
-    TEST_INT_EQ(batch, Span_Get_Offset(span), 10, "set_offset" );
-    TEST_INT_EQ(batch, Span_Get_Length(span), 1, "set_length" );
-    TEST_INT_EQ(batch, Span_Get_Weight(span), 4, "set_weight" );
+    TEST_INT_EQ(runner, Span_Get_Offset(span), 10, "set_offset" );
+    TEST_INT_EQ(runner, Span_Get_Length(span), 1, "set_length" );
+    TEST_INT_EQ(runner, Span_Get_Weight(span), 4, "set_weight" );
 
     DECREF(span);
 }
 
 void
-TestSpan_run_tests(TestSpan *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_span_init_values(batch);
+TestSpan_run(TestSpan *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 6);
+    test_span_init_values(runner);
 }

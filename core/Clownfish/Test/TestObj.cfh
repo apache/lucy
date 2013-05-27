@@ -20,13 +20,10 @@ class Clownfish::Test::TestObj
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestObj*
-    new(TestFormatter *formatter);
-
-    inert TestObj*
-    init(TestObj *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestObj *self);
+    Run(TestObj *self, TestBatchRunner *runner);
 }
 
 

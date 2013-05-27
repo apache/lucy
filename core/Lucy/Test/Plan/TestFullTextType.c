@@ -18,7 +18,7 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Plan/TestFullTextType.h"
 #include "Lucy/Test/TestUtils.h"
@@ -27,18 +27,12 @@
 #include "Lucy/Analysis/StandardTokenizer.h"
 
 TestFullTextType*
-TestFullTextType_new(TestFormatter *formatter) {
-    TestFullTextType *self = (TestFullTextType*)VTable_Make_Obj(TESTFULLTEXTTYPE);
-    return TestFullTextType_init(self, formatter);
-}
-
-TestFullTextType*
-TestFullTextType_init(TestFullTextType *self, TestFormatter *formatter) {
-    return (TestFullTextType*)TestBatch_init((TestBatch*)self, 10, formatter);
+TestFullTextType_new() {
+    return (TestFullTextType*)VTable_Make_Obj(TESTFULLTEXTTYPE);
 }
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch) {
+test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     StandardTokenizer *tokenizer     = StandardTokenizer_new();
     Normalizer        *normalizer    = Normalizer_new(NULL, true, false);
     FullTextType      *type          = FullTextType_new((Analyzer*)tokenizer);
@@ -60,19 +54,19 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
     Hash_Store_Str((Hash*)another_dump, "analyzer", 8, INCREF(tokenizer));
     FullTextType *another_clone = FullTextType_Load(type, another_dump);
 
-    TEST_FALSE(batch, FullTextType_Equals(type, (Obj*)boost_differs),
+    TEST_FALSE(runner, FullTextType_Equals(type, (Obj*)boost_differs),
                "Equals() false with different boost");
-    TEST_FALSE(batch, FullTextType_Equals(type, (Obj*)other),
+    TEST_FALSE(runner, FullTextType_Equals(type, (Obj*)other),
                "Equals() false with different Analyzer");
-    TEST_FALSE(batch, FullTextType_Equals(type, (Obj*)not_indexed),
+    TEST_FALSE(runner, FullTextType_Equals(type, (Obj*)not_indexed),
                "Equals() false with indexed => false");
-    TEST_FALSE(batch, FullTextType_Equals(type, (Obj*)not_stored),
+    TEST_FALSE(runner, FullTextType_Equals(type, (Obj*)not_stored),
                "Equals() false with stored => false");
-    TEST_FALSE(batch, FullTextType_Equals(type, (Obj*)highlightable),
+    TEST_FALSE(runner, FullTextType_Equals(type, (Obj*)highlightable),
                "Equals() false with highlightable => true");
-    TEST_TRUE(batch, FullTextType_Equals(type, (Obj*)clone),
+    TEST_TRUE(runner, FullTextType_Equals(type, (Obj*)clone),
               "Dump => Load round trip");
-    TEST_TRUE(batch, FullTextType_Equals(type, (Obj*)another_clone),
+    TEST_TRUE(runner, FullTextType_Equals(type, (Obj*)another_clone),
               "Dump_For_Schema => Load round trip");
 
     DECREF(another_clone);
@@ -90,19 +84,19 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 static void
-test_Compare_Values(TestBatch *batch) {
+test_Compare_Values(TestBatchRunner *runner) {
     StandardTokenizer *tokenizer = StandardTokenizer_new();
     FullTextType      *type      = FullTextType_new((Analyzer*)tokenizer);
     ZombieCharBuf     *a         = ZCB_WRAP_STR("a", 1);
     ZombieCharBuf     *b         = ZCB_WRAP_STR("b", 1);
 
-    TEST_TRUE(batch,
+    TEST_TRUE(runner,
               FullTextType_Compare_Values(type, (Obj*)a, (Obj*)b) < 0,
               "a less than b");
-    TEST_TRUE(batch,
+    TEST_TRUE(runner,
               FullTextType_Compare_Values(type, (Obj*)b, (Obj*)a) > 0,
               "b greater than a");
-    TEST_TRUE(batch,
+    TEST_TRUE(runner,
               FullTextType_Compare_Values(type, (Obj*)b, (Obj*)b) == 0,
               "b equals b");
 
@@ -111,10 +105,10 @@ test_Compare_Values(TestBatch *batch) {
 }
 
 void
-TestFullTextType_run_tests(TestFullTextType *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Dump_Load_and_Equals(batch);
-    test_Compare_Values(batch);
+TestFullTextType_run(TestFullTextType *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 10);
+    test_Dump_Load_and_Equals(runner);
+    test_Compare_Values(runner);
 }
 
 

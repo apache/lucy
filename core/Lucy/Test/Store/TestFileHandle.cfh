@@ -20,13 +20,10 @@ class Lucy::Test::Store::TestFileHandle cnick TestFH
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestFileHandle*
-    new(TestFormatter *formatter);
-
-    inert TestFileHandle*
-    init(TestFileHandle *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestFileHandle *self);
+    Run(TestFileHandle *self, TestBatchRunner *runner);
 }
 
 

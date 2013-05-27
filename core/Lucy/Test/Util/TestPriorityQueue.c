@@ -18,20 +18,14 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Util/TestPriorityQueue.h"
 #include "Lucy/Util/PriorityQueue.h"
 
 TestPriorityQueue*
-TestPriQ_new(TestFormatter *formatter) {
-    TestPriorityQueue *self = (TestPriorityQueue*)VTable_Make_Obj(TESTPRIORITYQUEUE);
-    return TestPriQ_init(self, formatter);
-}
-
-TestPriorityQueue*
-TestPriQ_init(TestPriorityQueue *self, TestFormatter *formatter) {
-    return (TestPriorityQueue*)TestBatch_init((TestBatch*)self, 17, formatter);
+TestPriQ_new() {
+    return (TestPriorityQueue*)VTable_Make_Obj(TESTPRIORITYQUEUE);
 }
 
 NumPriorityQueue*
@@ -65,7 +59,7 @@ S_pop_num(NumPriorityQueue *pq) {
 }
 
 static void
-test_Peek_and_Pop_All(TestBatch *batch) {
+test_Peek_and_Pop_All(TestBatchRunner *runner) {
     NumPriorityQueue *pq = NumPriQ_new(5);
     Float64 *val;
 
@@ -75,27 +69,27 @@ test_Peek_and_Pop_All(TestBatch *batch) {
     S_insert_num(pq, 20);
     S_insert_num(pq, 10);
     val = (Float64*)CERTIFY(NumPriQ_Peek(pq), FLOAT64);
-    TEST_INT_EQ(batch, (long)Float64_Get_Value(val), 1,
+    TEST_INT_EQ(runner, (long)Float64_Get_Value(val), 1,
                 "peek at the least item in the queue");
 
     VArray  *got = NumPriQ_Pop_All(pq);
     val = (Float64*)CERTIFY(VA_Fetch(got, 0), FLOAT64);
-    TEST_INT_EQ(batch, (long)Float64_Get_Value(val), 20, "pop_all");
+    TEST_INT_EQ(runner, (long)Float64_Get_Value(val), 20, "pop_all");
     val = (Float64*)CERTIFY(VA_Fetch(got, 1), FLOAT64);
-    TEST_INT_EQ(batch, (long)Float64_Get_Value(val), 10, "pop_all");
+    TEST_INT_EQ(runner, (long)Float64_Get_Value(val), 10, "pop_all");
     val = (Float64*)CERTIFY(VA_Fetch(got, 2), FLOAT64);
-    TEST_INT_EQ(batch, (long)Float64_Get_Value(val),  3, "pop_all");
+    TEST_INT_EQ(runner, (long)Float64_Get_Value(val),  3, "pop_all");
     val = (Float64*)CERTIFY(VA_Fetch(got, 3), FLOAT64);
-    TEST_INT_EQ(batch, (long)Float64_Get_Value(val),  2, "pop_all");
+    TEST_INT_EQ(runner, (long)Float64_Get_Value(val),  2, "pop_all");
     val = (Float64*)CERTIFY(VA_Fetch(got, 4), FLOAT64);
-    TEST_INT_EQ(batch, (long)Float64_Get_Value(val),  1, "pop_all");
+    TEST_INT_EQ(runner, (long)Float64_Get_Value(val),  1, "pop_all");
 
     DECREF(got);
     DECREF(pq);
 }
 
 static void
-test_Insert_and_Pop(TestBatch *batch) {
+test_Insert_and_Pop(TestBatchRunner *runner) {
     NumPriorityQueue *pq = NumPriQ_new(5);
 
     S_insert_num(pq, 3);
@@ -104,20 +98,20 @@ test_Insert_and_Pop(TestBatch *batch) {
     S_insert_num(pq, 20);
     S_insert_num(pq, 10);
 
-    TEST_INT_EQ(batch, S_pop_num(pq), 1, "Pop");
-    TEST_INT_EQ(batch, S_pop_num(pq), 2, "Pop");
-    TEST_INT_EQ(batch, S_pop_num(pq), 3, "Pop");
-    TEST_INT_EQ(batch, S_pop_num(pq), 10, "Pop");
+    TEST_INT_EQ(runner, S_pop_num(pq), 1, "Pop");
+    TEST_INT_EQ(runner, S_pop_num(pq), 2, "Pop");
+    TEST_INT_EQ(runner, S_pop_num(pq), 3, "Pop");
+    TEST_INT_EQ(runner, S_pop_num(pq), 10, "Pop");
 
     S_insert_num(pq, 7);
-    TEST_INT_EQ(batch, S_pop_num(pq), 7,
+    TEST_INT_EQ(runner, S_pop_num(pq), 7,
                 "Insert after Pop still sorts correctly");
 
     DECREF(pq);
 }
 
 static void
-test_discard(TestBatch *batch) {
+test_discard(TestBatchRunner *runner) {
     int32_t i;
     NumPriorityQueue *pq = NumPriQ_new(5);
 
@@ -126,17 +120,17 @@ test_discard(TestBatch *batch) {
     for (i = 1590; i <= 1600; i++) { S_insert_num(pq, i); }
     S_insert_num(pq, 5);
 
-    TEST_INT_EQ(batch, S_pop_num(pq), 1596, "discard waste");
-    TEST_INT_EQ(batch, S_pop_num(pq), 1597, "discard waste");
-    TEST_INT_EQ(batch, S_pop_num(pq), 1598, "discard waste");
-    TEST_INT_EQ(batch, S_pop_num(pq), 1599, "discard waste");
-    TEST_INT_EQ(batch, S_pop_num(pq), 1600, "discard waste");
+    TEST_INT_EQ(runner, S_pop_num(pq), 1596, "discard waste");
+    TEST_INT_EQ(runner, S_pop_num(pq), 1597, "discard waste");
+    TEST_INT_EQ(runner, S_pop_num(pq), 1598, "discard waste");
+    TEST_INT_EQ(runner, S_pop_num(pq), 1599, "discard waste");
+    TEST_INT_EQ(runner, S_pop_num(pq), 1600, "discard waste");
 
     DECREF(pq);
 }
 
 static void
-test_random_insertion(TestBatch *batch) {
+test_random_insertion(TestBatchRunner *runner) {
     int i;
     int shuffled[64];
     NumPriorityQueue *pq = NumPriQ_new(64);
@@ -152,18 +146,18 @@ test_random_insertion(TestBatch *batch) {
     for (i = 0; i < 64; i++) {
         if (S_pop_num(pq) != i) { break; }
     }
-    TEST_INT_EQ(batch, i, 64, "random insertion");
+    TEST_INT_EQ(runner, i, 64, "random insertion");
 
     DECREF(pq);
 }
 
 void
-TestPriQ_run_tests(TestPriorityQueue *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Peek_and_Pop_All(batch);
-    test_Insert_and_Pop(batch);
-    test_discard(batch);
-    test_random_insertion(batch);
+TestPriQ_run(TestPriorityQueue *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 17);
+    test_Peek_and_Pop_All(runner);
+    test_Insert_and_Pop(runner);
+    test_discard(runner);
+    test_random_insertion(runner);
 }
 
 

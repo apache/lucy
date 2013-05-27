@@ -20,21 +20,15 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestFileHandle.h"
 #include "Lucy/Store/FileHandle.h"
 #include "Lucy/Store/FileWindow.h"
 
 TestFileHandle*
-TestFH_new(TestFormatter *formatter) {
-    TestFileHandle *self = (TestFileHandle*)VTable_Make_Obj(TESTFILEHANDLE);
-    return TestFH_init(self, formatter);
-}
-
-TestFileHandle*
-TestFH_init(TestFileHandle *self, TestFormatter *formatter) {
-    return (TestFileHandle*)TestBatch_init((TestBatch*)self, 2, formatter);
+TestFH_new() {
+    return (TestFileHandle*)VTable_Make_Obj(TESTFILEHANDLE);
 }
 
 static void
@@ -56,14 +50,15 @@ S_new_filehandle() {
 }
 
 void
-TestFH_run_tests(TestFileHandle *self) {
-    TestBatch     *batch = (TestBatch*)self;
+TestFH_run(TestFileHandle *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 2);
+
     FileHandle    *fh    = S_new_filehandle();
     ZombieCharBuf *foo   = ZCB_WRAP_STR("foo", 3);
 
-    TEST_TRUE(batch, CB_Equals_Str(FH_Get_Path(fh), "", 0), "Get_Path");
+    TEST_TRUE(runner, CB_Equals_Str(FH_Get_Path(fh), "", 0), "Get_Path");
     FH_Set_Path(fh, (CharBuf*)foo);
-    TEST_TRUE(batch, CB_Equals(FH_Get_Path(fh), (Obj*)foo), "Set_Path");
+    TEST_TRUE(runner, CB_Equals(FH_Get_Path(fh), (Obj*)foo), "Set_Path");
 
     DECREF(fh);
 }

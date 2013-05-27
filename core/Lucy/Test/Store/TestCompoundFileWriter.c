@@ -17,7 +17,7 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestCompoundFileWriter.h"
 #include "Lucy/Store/CompoundFileWriter.h"
@@ -34,14 +34,8 @@ static CharBuf *bar         = NULL;
 static CharBuf *seg_1       = NULL;
 
 TestCompoundFileWriter*
-TestCFWriter_new(TestFormatter *formatter) {
-    TestCompoundFileWriter *self = (TestCompoundFileWriter*)VTable_Make_Obj(TESTCOMPOUNDFILEWRITER);
-    return TestCFWriter_init(self, formatter);
-}
-
-TestCompoundFileWriter*
-TestCFWriter_init(TestCompoundFileWriter *self, TestFormatter *formatter) {
-    return (TestCompoundFileWriter*)TestBatch_init((TestBatch*)self, 7, formatter);
+TestCFWriter_new() {
+    return (TestCompoundFileWriter*)VTable_Make_Obj(TESTCOMPOUNDFILEWRITER);
 }
 
 static void
@@ -79,7 +73,7 @@ S_folder_with_contents() {
 }
 
 static void
-test_Consolidate(TestBatch *batch) {
+test_Consolidate(TestBatchRunner *runner) {
     Folder *folder = S_folder_with_contents();
     FileHandle *fh;
 
@@ -93,23 +87,23 @@ test_Consolidate(TestBatch *batch) {
 
     CompoundFileWriter *cf_writer = CFWriter_new(folder);
     CFWriter_Consolidate(cf_writer);
-    PASS(batch, "Consolidate completes despite leftover files");
+    PASS(runner, "Consolidate completes despite leftover files");
     DECREF(cf_writer);
 
-    TEST_TRUE(batch, Folder_Exists(folder, cf_file),
+    TEST_TRUE(runner, Folder_Exists(folder, cf_file),
               "cf.dat file written");
-    TEST_TRUE(batch, Folder_Exists(folder, cfmeta_file),
+    TEST_TRUE(runner, Folder_Exists(folder, cfmeta_file),
               "cfmeta.json file written");
-    TEST_FALSE(batch, Folder_Exists(folder, foo),
+    TEST_FALSE(runner, Folder_Exists(folder, foo),
                "original file zapped");
-    TEST_FALSE(batch, Folder_Exists(folder, cfmeta_temp),
+    TEST_FALSE(runner, Folder_Exists(folder, cfmeta_temp),
                "detritus from failed consolidation zapped");
 
     DECREF(folder);
 }
 
 static void
-test_offsets(TestBatch *batch) {
+test_offsets(TestBatchRunner *runner) {
     Folder *folder = S_folder_with_contents();
     CompoundFileWriter *cf_writer = CFWriter_new(folder);
     Hash    *cf_metadata;
@@ -126,7 +120,7 @@ test_offsets(TestBatch *batch) {
     Obj     *filestats;
     bool     offsets_ok = true;
 
-    TEST_TRUE(batch, Hash_Get_Size(files) > 0, "Multiple files");
+    TEST_TRUE(runner, Hash_Get_Size(files) > 0, "Multiple files");
 
     Hash_Iterate(files);
     while (Hash_Next(files, (Obj**)&file, &filestats)) {
@@ -135,13 +129,13 @@ test_offsets(TestBatch *batch) {
         int64_t offs = Obj_To_I64(offset);
         if (offs % 8 != 0) {
             offsets_ok = false;
-            FAIL(batch, "Offset %" PRId64 " for %s not a multiple of 8",
+            FAIL(runner, "Offset %" PRId64 " for %s not a multiple of 8",
                  offset, CB_Get_Ptr8(file));
             break;
         }
     }
     if (offsets_ok) {
-        PASS(batch, "All offsets are multiples of 8");
+        PASS(runner, "All offsets are multiples of 8");
     }
 
     DECREF(cf_metadata);
@@ -150,11 +144,11 @@ test_offsets(TestBatch *batch) {
 }
 
 void
-TestCFWriter_run_tests(TestCompoundFileWriter *self) {
-    TestBatch *batch = (TestBatch*)self;
+TestCFWriter_run(TestCompoundFileWriter *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 7);
     S_init_strings();
-    test_Consolidate(batch);
-    test_offsets(batch);
+    test_Consolidate(runner);
+    test_offsets(runner);
     S_destroy_strings();
 }
 

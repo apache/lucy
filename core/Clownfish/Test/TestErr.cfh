@@ -20,12 +20,9 @@ class Clownfish::Test::TestErr
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestErr*
-    new(TestFormatter *formatter);
-
-    inert TestErr*
-    init(TestErr *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestErr *self);
+    Run(TestErr *self, TestBatchRunner *runner);
 }
 

@@ -20,13 +20,10 @@ class Lucy::Test::Highlight::TestHighlighter
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestHighlighter*
-    new(TestFormatter *formatter);
-
-    inert TestHighlighter*
-    init(TestHighlighter *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestHighlighter *self);
+    Run(TestHighlighter *self, TestBatchRunner *runner);
 }
 
 

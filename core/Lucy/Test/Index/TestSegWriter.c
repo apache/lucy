@@ -18,26 +18,20 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Index/TestSegWriter.h"
 #include "Lucy/Index/SegWriter.h"
 
 TestSegWriter*
-TestSegWriter_new(TestFormatter *formatter) {
-    TestSegWriter *self = (TestSegWriter*)VTable_Make_Obj(TESTSEGWRITER);
-    return TestSegWriter_init(self, formatter);
-}
-
-TestSegWriter*
-TestSegWriter_init(TestSegWriter *self, TestFormatter *formatter) {
-    return (TestSegWriter*)TestBatch_init((TestBatch*)self, 1, formatter);
+TestSegWriter_new() {
+    return (TestSegWriter*)VTable_Make_Obj(TESTSEGWRITER);
 }
 
 void
-TestSegWriter_run_tests(TestSegWriter *self) {
-    TestBatch *batch = (TestBatch*)self;
-    PASS(batch, "placeholder");
+TestSegWriter_run(TestSegWriter *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 1);
+    PASS(runner, "placeholder");
 }
 
 

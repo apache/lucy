@@ -18,34 +18,28 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Analysis/TestCaseFolder.h"
 #include "Lucy/Analysis/CaseFolder.h"
 
 TestCaseFolder*
-TestCaseFolder_new(TestFormatter *formatter) {
-    TestCaseFolder *self = (TestCaseFolder*)VTable_Make_Obj(TESTCASEFOLDER);
-    return TestCaseFolder_init(self, formatter);
-}
-
-TestCaseFolder*
-TestCaseFolder_init(TestCaseFolder *self, TestFormatter *formatter) {
-    return (TestCaseFolder*)TestBatch_init((TestBatch*)self, 6, formatter);
+TestCaseFolder_new() {
+    return (TestCaseFolder*)VTable_Make_Obj(TESTCASEFOLDER);
 }
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch) {
+test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     CaseFolder *case_folder = CaseFolder_new();
     CaseFolder *other       = CaseFolder_new();
     Obj        *dump        = (Obj*)CaseFolder_Dump(case_folder);
     CaseFolder *clone       = (CaseFolder*)CaseFolder_Load(other, dump);
 
-    TEST_TRUE(batch, CaseFolder_Equals(case_folder, (Obj*)other), "Equals");
-    TEST_FALSE(batch, CaseFolder_Equals(case_folder, (Obj*)CFISH_TRUE),
+    TEST_TRUE(runner, CaseFolder_Equals(case_folder, (Obj*)other), "Equals");
+    TEST_FALSE(runner, CaseFolder_Equals(case_folder, (Obj*)CFISH_TRUE),
                "Not Equals");
-    TEST_TRUE(batch, CaseFolder_Equals(case_folder, (Obj*)clone),
+    TEST_TRUE(runner, CaseFolder_Equals(case_folder, (Obj*)clone),
               "Dump => Load round trip");
 
     DECREF(case_folder);
@@ -55,12 +49,12 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 static void
-test_analysis(TestBatch *batch) {
+test_analysis(TestBatchRunner *runner) {
     CaseFolder *case_folder = CaseFolder_new();
     CharBuf *source = CB_newf("caPiTal ofFensE");
     VArray *wanted = VA_new(1);
     VA_Push(wanted, (Obj*)CB_newf("capital offense"));
-    TestUtils_test_analyzer(batch, (Analyzer*)case_folder, source, wanted,
+    TestUtils_test_analyzer(runner, (Analyzer*)case_folder, source, wanted,
                             "lowercase plain text");
     DECREF(wanted);
     DECREF(source);
@@ -68,10 +62,10 @@ test_analysis(TestBatch *batch) {
 }
 
 void
-TestCaseFolder_run_tests(TestCaseFolder *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Dump_Load_and_Equals(batch);
-    test_analysis(batch);
+TestCaseFolder_run(TestCaseFolder *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 6);
+    test_Dump_Load_and_Equals(runner);
+    test_analysis(runner);
 }
 
 

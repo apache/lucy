@@ -18,26 +18,20 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Index/TestDocWriter.h"
 #include "Lucy/Index/DocWriter.h"
 
 TestDocWriter*
-TestDocWriter_new(TestFormatter *formatter) {
-    TestDocWriter *self = (TestDocWriter*)VTable_Make_Obj(TESTDOCWRITER);
-    return TestDocWriter_init(self, formatter);
-}
-
-TestDocWriter*
-TestDocWriter_init(TestDocWriter *self, TestFormatter *formatter) {
-    return (TestDocWriter*)TestBatch_init((TestBatch*)self, 1, formatter);
+TestDocWriter_new() {
+    return (TestDocWriter*)VTable_Make_Obj(TESTDOCWRITER);
 }
 
 void
-TestDocWriter_run_tests(TestDocWriter *self) {
-    TestBatch *batch = (TestBatch*)self;
-    PASS(batch, "placeholder");
+TestDocWriter_run(TestDocWriter *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 1);
+    PASS(runner, "placeholder");
 }
 
 

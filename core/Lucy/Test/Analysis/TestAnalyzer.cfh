@@ -20,13 +20,10 @@ class Lucy::Test::Analysis::TestAnalyzer
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestAnalyzer*
-    new(TestFormatter *formatter);
-
-    inert TestAnalyzer*
-    init(TestAnalyzer *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestAnalyzer *self);
+    Run(TestAnalyzer *self, TestBatchRunner *runner);
 }
 
 class Lucy::Test::Analysis::DummyAnalyzer inherits Lucy::Analysis::Analyzer {

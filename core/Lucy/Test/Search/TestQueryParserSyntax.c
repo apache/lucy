@@ -20,7 +20,7 @@
 #include "Lucy/Util/ToolSet.h"
 #include <string.h>
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Search/TestQueryParserSyntax.h"
 #include "Lucy/Test/Search/TestQueryParser.h"
@@ -51,15 +51,8 @@
 #define make_poly_query   (Query*)TestUtils_make_poly_query
 
 TestQueryParserSyntax*
-TestQPSyntax_new(TestFormatter *formatter) {
-    TestQueryParserSyntax *self
-        = (TestQueryParserSyntax*)VTable_Make_Obj(TESTQUERYPARSERSYNTAX);
-    return TestQPSyntax_init(self, formatter);
-}
-
-TestQueryParserSyntax*
-TestQPSyntax_init(TestQueryParserSyntax *self, TestFormatter *formatter) {
-    return (TestQueryParserSyntax*)TestBatch_init((TestBatch*)self, 68, formatter);
+TestQPSyntax_new() {
+    return (TestQueryParserSyntax*)VTable_Make_Obj(TESTQUERYPARSERSYNTAX);
 }
 
 static Folder*
@@ -380,17 +373,17 @@ static Lucy_TestQPSyntax_Test_t syntax_test_funcs[] = {
 };
 
 static void
-test_query_parser_syntax(TestBatch *batch) {
+test_query_parser_syntax(TestBatchRunner *runner) {
     if (!RegexTokenizer_is_available()) {
         for (uint32_t i = 0; leaf_test_funcs[i] != NULL; i++) {
-            SKIP(batch, "RegexTokenizer not available");
-            SKIP(batch, "RegexTokenizer not available");
-            SKIP(batch, "RegexTokenizer not available");
+            SKIP(runner, "RegexTokenizer not available");
+            SKIP(runner, "RegexTokenizer not available");
+            SKIP(runner, "RegexTokenizer not available");
         }
 
         for (uint32_t i = 0; syntax_test_funcs[i] != NULL; i++) {
-            SKIP(batch, "RegexTokenizer not available");
-            SKIP(batch, "RegexTokenizer not available");
+            SKIP(runner, "RegexTokenizer not available");
+            SKIP(runner, "RegexTokenizer not available");
         }
 
         return;
@@ -410,11 +403,11 @@ test_query_parser_syntax(TestBatch *batch) {
         Query *parsed   = QParser_Parse(qparser, test_case->query_string);
         Hits  *hits     = IxSearcher_Hits(searcher, (Obj*)parsed, 0, 10, NULL);
 
-        TEST_TRUE(batch, Query_Equals(tree, (Obj*)test_case->tree),
+        TEST_TRUE(runner, Query_Equals(tree, (Obj*)test_case->tree),
                   "tree()    %s", (char*)CB_Get_Ptr8(test_case->query_string));
-        TEST_TRUE(batch, Query_Equals(expanded, (Obj*)test_case->expanded),
+        TEST_TRUE(runner, Query_Equals(expanded, (Obj*)test_case->expanded),
                   "expand_leaf()    %s", (char*)CB_Get_Ptr8(test_case->query_string));
-        TEST_INT_EQ(batch, Hits_Total_Hits(hits), test_case->num_hits,
+        TEST_INT_EQ(runner, Hits_Total_Hits(hits), test_case->num_hits,
                     "hits:    %s", (char*)CB_Get_Ptr8(test_case->query_string));
         DECREF(hits);
         DECREF(parsed);
@@ -430,9 +423,9 @@ test_query_parser_syntax(TestBatch *batch) {
         Query *parsed = QParser_Parse(qparser, test_case->query_string);
         Hits  *hits   = IxSearcher_Hits(searcher, (Obj*)parsed, 0, 10, NULL);
 
-        TEST_TRUE(batch, Query_Equals(tree, (Obj*)test_case->tree),
+        TEST_TRUE(runner, Query_Equals(tree, (Obj*)test_case->tree),
                   "tree()    %s", (char*)CB_Get_Ptr8(test_case->query_string));
-        TEST_INT_EQ(batch, Hits_Total_Hits(hits), test_case->num_hits,
+        TEST_INT_EQ(runner, Hits_Total_Hits(hits), test_case->num_hits,
                     "hits:    %s", (char*)CB_Get_Ptr8(test_case->query_string));
         DECREF(hits);
         DECREF(parsed);
@@ -446,9 +439,9 @@ test_query_parser_syntax(TestBatch *batch) {
 }
 
 void
-TestQPSyntax_run_tests(TestQueryParserSyntax *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_query_parser_syntax(batch);
+TestQPSyntax_run(TestQueryParserSyntax *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 68);
+    test_query_parser_syntax(runner);
 }
 
 

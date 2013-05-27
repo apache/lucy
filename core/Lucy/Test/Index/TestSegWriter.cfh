@@ -20,13 +20,10 @@ class Lucy::Test::Index::TestSegWriter
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestSegWriter*
-    new(TestFormatter *formatter);
-
-    inert TestSegWriter*
-    init(TestSegWriter *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestSegWriter *self);
+    Run(TestSegWriter *self, TestBatchRunner *runner);
 }
 
 

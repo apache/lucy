@@ -17,7 +17,7 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Analysis/TestAnalyzer.h"
@@ -25,14 +25,8 @@
 #include "Lucy/Analysis/Inversion.h"
 
 TestAnalyzer*
-TestAnalyzer_new(TestFormatter *formatter) {
-    TestAnalyzer *self = (TestAnalyzer*)VTable_Make_Obj(TESTANALYZER);
-    return TestAnalyzer_init(self, formatter);
-}
-
-TestAnalyzer*
-TestAnalyzer_init(TestAnalyzer *self, TestFormatter *formatter) {
-    return (TestAnalyzer*)TestBatch_init((TestBatch*)self, 3, formatter);
+TestAnalyzer_new() {
+    return (TestAnalyzer*)VTable_Make_Obj(TESTANALYZER);
 }
 
 DummyAnalyzer*
@@ -53,12 +47,12 @@ DummyAnalyzer_transform(DummyAnalyzer *self, Inversion *inversion) {
 }
 
 static void
-test_analysis(TestBatch *batch) {
+test_analysis(TestBatchRunner *runner) {
     DummyAnalyzer *analyzer = DummyAnalyzer_new();
     CharBuf *source = CB_newf("foo bar baz");
     VArray *wanted = VA_new(1);
     VA_Push(wanted, (Obj*)CB_newf("foo bar baz"));
-    TestUtils_test_analyzer(batch, (Analyzer*)analyzer, source, wanted,
+    TestUtils_test_analyzer(runner, (Analyzer*)analyzer, source, wanted,
                             "test basic analysis");
     DECREF(wanted);
     DECREF(source);
@@ -66,9 +60,9 @@ test_analysis(TestBatch *batch) {
 }
 
 void
-TestAnalyzer_run_tests(TestAnalyzer *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_analysis(batch);
+TestAnalyzer_run(TestAnalyzer *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 3);
+    test_analysis(runner);
 }
 
 

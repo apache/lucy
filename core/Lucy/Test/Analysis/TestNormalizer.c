@@ -19,7 +19,7 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Analysis/TestNormalizer.h"
 #include "Lucy/Analysis/Normalizer.h"
@@ -27,18 +27,12 @@
 #include "Lucy/Util/Json.h"
 
 TestNormalizer*
-TestNormalizer_new(TestFormatter *formatter) {
-    TestNormalizer *self = (TestNormalizer*)VTable_Make_Obj(TESTNORMALIZER);
-    return TestNormalizer_init(self, formatter);
-}
-
-TestNormalizer*
-TestNormalizer_init(TestNormalizer *self, TestFormatter *formatter) {
-    return (TestNormalizer*)TestBatch_init((TestBatch*)self, 20, formatter);
+TestNormalizer_new() {
+    return (TestNormalizer*)VTable_Make_Obj(TESTNORMALIZER);
 }
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch) {
+test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     Normalizer *normalizer[4];
 
     CharBuf *NFC  = (CharBuf*)ZCB_WRAP_STR("NFC",  3);
@@ -49,13 +43,13 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
     normalizer[2] = Normalizer_new(NFKC, false, false);
     normalizer[3] = Normalizer_new(NFKC, true,  true);
 
-    TEST_FALSE(batch,
+    TEST_FALSE(runner,
                Normalizer_Equals(normalizer[0], (Obj*)normalizer[1]),
                "Equals() false with different normalization form");
-    TEST_FALSE(batch,
+    TEST_FALSE(runner,
                Normalizer_Equals(normalizer[0], (Obj*)normalizer[2]),
                "Equals() false with different case_fold flag");
-    TEST_FALSE(batch,
+    TEST_FALSE(runner,
                Normalizer_Equals(normalizer[0], (Obj*)normalizer[3]),
                "Equals() false with different strip_accents flag");
 
@@ -63,7 +57,7 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
         Obj *dump = (Obj*)Normalizer_Dump(normalizer[i]);
         Normalizer *clone = (Normalizer*)Normalizer_Load(normalizer[i], dump);
 
-        TEST_TRUE(batch,
+        TEST_TRUE(runner,
                   Normalizer_Equals(normalizer[i], (Obj*)clone),
                   "Dump => Load round trip");
 
@@ -74,7 +68,7 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 static void
-test_normalization(TestBatch *batch) {
+test_normalization(TestBatchRunner *runner) {
     CharBuf  *path           = CB_newf("modules");
     FSFolder *modules_folder = FSFolder_new(path);
     if (!FSFolder_Check(modules_folder)) {
@@ -104,7 +98,7 @@ test_normalization(TestBatch *batch) {
             CharBuf *word = (CharBuf*)VA_Fetch(words, j);
             VArray  *got  = Normalizer_Split(normalizer, word);
             CharBuf *norm = (CharBuf*)VA_Fetch(got, 0);
-            TEST_TRUE(batch,
+            TEST_TRUE(runner,
                       norm
                       && CB_Is_A(norm, CHARBUF)
                       && CB_Equals(norm, VA_Fetch(norms, j)),
@@ -122,10 +116,10 @@ test_normalization(TestBatch *batch) {
 }
 
 void
-TestNormalizer_run_tests(TestNormalizer *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Dump_Load_and_Equals(batch);
-    test_normalization(batch);
+TestNormalizer_run(TestNormalizer *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 20);
+    test_Dump_Load_and_Equals(runner);
+    test_normalization(runner);
 }
 
 

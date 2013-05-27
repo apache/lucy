@@ -20,13 +20,10 @@ class Lucy::Test::Search::TestRangeQuery
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestRangeQuery*
-    new(TestFormatter *formatter);
-
-    inert TestRangeQuery*
-    init(TestRangeQuery *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestRangeQuery *self);
+    Run(TestRangeQuery *self, TestBatchRunner *runner);
 }
 
 

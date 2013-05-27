@@ -20,13 +20,10 @@ class Lucy::Test::Search::TestNOTQuery
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestNOTQuery*
-    new(TestFormatter *formatter);
-
-    inert TestNOTQuery*
-    init(TestNOTQuery *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestNOTQuery *self);
+    Run(TestNOTQuery *self, TestBatchRunner *runner);
 }
 
 

@@ -20,13 +20,10 @@ class Lucy::Test::Highlight::TestHeatMap
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestHeatMap*
-    new(TestFormatter *formatter);
-
-    inert TestHeatMap*
-    init(TestHeatMap *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestHeatMap *self);
+    Run(TestHeatMap *self, TestBatchRunner *runner);
 }
 
 

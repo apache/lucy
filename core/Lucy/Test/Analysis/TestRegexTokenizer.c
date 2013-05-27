@@ -18,30 +18,23 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Analysis/TestRegexTokenizer.h"
 #include "Lucy/Analysis/RegexTokenizer.h"
 
 
 TestRegexTokenizer*
-TestRegexTokenizer_new(TestFormatter *formatter) {
-    TestRegexTokenizer *self
-        = (TestRegexTokenizer*)VTable_Make_Obj(TESTREGEXTOKENIZER);
-    return TestRegexTokenizer_init(self, formatter);
-}
-
-TestRegexTokenizer*
-TestRegexTokenizer_init(TestRegexTokenizer *self, TestFormatter *formatter) {
-    return (TestRegexTokenizer*)TestBatch_init((TestBatch*)self, 3, formatter);
+TestRegexTokenizer_new() {
+    return (TestRegexTokenizer*)VTable_Make_Obj(TESTREGEXTOKENIZER);
 }
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch) {
+test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     if (!RegexTokenizer_is_available()) {
-        SKIP(batch, "RegexTokenizer not available");
-        SKIP(batch, "RegexTokenizer not available");
-        SKIP(batch, "RegexTokenizer not available");
+        SKIP(runner, "RegexTokenizer not available");
+        SKIP(runner, "RegexTokenizer not available");
+        SKIP(runner, "RegexTokenizer not available");
         return;
     }
 
@@ -58,13 +51,13 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
     RegexTokenizer *whitespace_clone
         = RegexTokenizer_Load(whitespace_tokenizer, whitespace_dump);
 
-    TEST_FALSE(batch,
+    TEST_FALSE(runner,
                RegexTokenizer_Equals(word_char_tokenizer, (Obj*)whitespace_tokenizer),
                "Equals() false with different pattern");
-    TEST_TRUE(batch,
+    TEST_TRUE(runner,
               RegexTokenizer_Equals(word_char_tokenizer, (Obj*)word_char_clone),
               "Dump => Load round trip");
-    TEST_TRUE(batch,
+    TEST_TRUE(runner,
               RegexTokenizer_Equals(whitespace_tokenizer, (Obj*)whitespace_clone),
               "Dump => Load round trip");
 
@@ -77,9 +70,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 void
-TestRegexTokenizer_run_tests(TestRegexTokenizer *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Dump_Load_and_Equals(batch);
+TestRegexTokenizer_run(TestRegexTokenizer *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 3);
+    test_Dump_Load_and_Equals(runner);
 }
 
 

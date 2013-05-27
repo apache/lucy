@@ -14,25 +14,27 @@
  * limitations under the License.
  */
 
-#define C_CFISH_TESTRUNNER
+#define C_CFISH_TESTSUITERUNNER
 #define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
-#include "Clownfish/TestHarness/TestRunner.h"
+#include "Clownfish/TestHarness/TestSuiteRunner.h"
+
 #include "Clownfish/Err.h"
 #include "Clownfish/TestHarness/TestBatch.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Clownfish/TestHarness/TestFormatter.h"
 #include "Clownfish/VTable.h"
 
-TestRunner*
-TestRunner_new(TestFormatter *formatter) {
-    TestRunner *self = (TestRunner*)VTable_Make_Obj(TESTRUNNER);
-    return TestRunner_init(self, formatter);
+TestSuiteRunner*
+TestSuiteRunner_new(TestFormatter *formatter) {
+    TestSuiteRunner *self = (TestSuiteRunner*)VTable_Make_Obj(TESTSUITERUNNER);
+    return TestSuiteRunner_init(self, formatter);
 }
 
-TestRunner*
-TestRunner_init(TestRunner *self, TestFormatter *formatter) {
+TestSuiteRunner*
+TestSuiteRunner_init(TestSuiteRunner *self, TestFormatter *formatter) {
     self->formatter          = (TestFormatter*)INCREF(formatter);
     self->num_tests          = 0;
     self->num_tests_failed   = 0;
@@ -43,50 +45,52 @@ TestRunner_init(TestRunner *self, TestFormatter *formatter) {
 }
 
 void
-TestRunner_destroy(TestRunner *self) {
+TestSuiteRunner_destroy(TestSuiteRunner *self) {
     DECREF(self->formatter);
-    SUPER_DESTROY(self, TESTRUNNER);
+    SUPER_DESTROY(self, TESTSUITERUNNER);
 }
 
 bool
-TestRunner_run_batch(TestRunner *self, TestBatch *batch) {
-    bool success = TestBatch_Run(batch);
+TestSuiteRunner_run_batch(TestSuiteRunner *self, TestBatch *batch) {
+    TestBatchRunner *batch_runner = TestBatchRunner_new(self->formatter);
+    bool success = TestBatchRunner_Run_Batch(batch_runner, batch);
 
-    self->num_tests        += TestBatch_Get_Num_Tests(batch);
-    self->num_tests_failed += TestBatch_Get_Num_Failed(batch);
+    self->num_tests        += TestBatchRunner_Get_Num_Tests(batch_runner);
+    self->num_tests_failed += TestBatchRunner_Get_Num_Failed(batch_runner);
     self->num_batches      += 1;
 
     if (!success) {
         self->num_batches_failed += 1;
     }
 
+    DECREF(batch_runner);
     return success;
 }
 
 bool
-TestRunner_finish(TestRunner *self) {
+TestSuiteRunner_finish(TestSuiteRunner *self) {
     TestFormatter_Summary(self->formatter, self);
 
     return self->num_batches != 0 && self->num_batches_failed == 0;
 }
 
 uint32_t
-TestRunner_get_num_tests(TestRunner *self) {
+TestSuiteRunner_get_num_tests(TestSuiteRunner *self) {
     return self->num_tests;
 }
 
 uint32_t
-TestRunner_get_num_tests_failed(TestRunner *self) {
+TestSuiteRunner_get_num_tests_failed(TestSuiteRunner *self) {
     return self->num_tests_failed;
 }
 
 uint32_t
-TestRunner_get_num_batches(TestRunner *self) {
+TestSuiteRunner_get_num_batches(TestSuiteRunner *self) {
     return self->num_batches;
 }
 
 uint32_t
-TestRunner_get_num_batches_failed(TestRunner *self) {
+TestSuiteRunner_get_num_batches_failed(TestSuiteRunner *self) {
     return self->num_batches_failed;
 }
 

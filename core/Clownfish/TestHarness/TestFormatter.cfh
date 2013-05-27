@@ -16,29 +16,29 @@
 
 parcel Clownfish;
 
-/**
- * Abstract base class for Clownfish test formatters.
+/** Abstract base class for Clownfish test formatters.
  */
 abstract class Clownfish::TestHarness::TestFormatter inherits Clownfish::Obj {
     inert TestFormatter*
     init(TestFormatter *self);
 
     inert void
-    test_result(void *vself, bool pass, uint32_t test_num, const char *fmt,
-                ...);
+    test_result(TestFormatter *self, bool pass, uint32_t test_num,
+                const char *fmt, ...);
 
     inert void
-    test_comment(void *vself, const char *fmt, ...);
+    test_comment(TestFormatter *self, const char *fmt, ...);
 
     inert void
-    batch_comment(void *vself, const char *fmt, ...);
+    batch_comment(TestFormatter *self, const char *fmt, ...);
 
     /** Print output at the beginning of a test batch.
      *
      * @param batch The test batch.
      */
     abstract void
-    Batch_Prologue(TestFormatter *self, TestBatch *batch);
+    Batch_Prologue(TestFormatter *self, TestBatch *batch,
+                   uint32_t num_planned);
 
     /** Print the result of a single test.
      *
@@ -72,10 +72,11 @@ abstract class Clownfish::TestHarness::TestFormatter inherits Clownfish::Obj {
      * @param runner The test runner.
      */
     abstract void
-    Summary(TestFormatter *self, TestRunner *runner);
+    Summary(TestFormatter *self, TestSuiteRunner *runner);
 }
 
-/**
+/** TestFormatter for "Clownfish" format.
+ *
  * A TestFormatter that produces human-readable output in a custom
  * "Clownfish" format.
  */
@@ -89,7 +90,8 @@ class Clownfish::Test::Formatter::TestFormatterCF
     init(TestFormatterCF *self);
 
     void
-    Batch_Prologue(TestFormatterCF *self, TestBatch *batch);
+    Batch_Prologue(TestFormatterCF *self, TestBatch *batch,
+                   uint32_t num_planned);
 
     void
     VTest_Result(TestFormatterCF *self, bool pass, uint32_t test_num,
@@ -102,10 +104,11 @@ class Clownfish::Test::Formatter::TestFormatterCF
     VBatch_Comment(TestFormatterCF *self, const char *fmt, va_list args);
 
     void
-    Summary(TestFormatterCF *self, TestRunner *runner);
+    Summary(TestFormatterCF *self, TestSuiteRunner *runner);
 }
 
-/**
+/** TestFormatter for TAP output.
+ *
  * A TestFormatter that produces TAP output (Test Anything Protocol).
  * See http://testanything.org/
  */
@@ -119,7 +122,8 @@ class Clownfish::Test::Formatter::TestFormatterTAP
     init(TestFormatterTAP *self);
 
     void
-    Batch_Prologue(TestFormatterTAP *self, TestBatch *batch);
+    Batch_Prologue(TestFormatterTAP *self, TestBatch *batch,
+                   uint32_t num_planned);
 
     void
     VTest_Result(TestFormatterTAP *self, bool pass, uint32_t test_num,
@@ -132,7 +136,7 @@ class Clownfish::Test::Formatter::TestFormatterTAP
     VBatch_Comment(TestFormatterTAP *self, const char *fmt, va_list args);
 
     void
-    Summary(TestFormatterTAP *self, TestRunner *runner);
+    Summary(TestFormatterTAP *self, TestSuiteRunner *runner);
 }
 
 

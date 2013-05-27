@@ -18,41 +18,44 @@
 #include <stdio.h>
 #include <string.h>
 
-#define C_CFISH_TESTBATCH
+#define C_CFISH_TESTBATCHRUNNER
 #define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
-#include "Clownfish/TestHarness/TestBatch.h"
+
+#include "Clownfish/TestHarness/TestBatchRunner.h"
+
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"
+#include "Clownfish/TestHarness/TestBatch.h"
 #include "Clownfish/TestHarness/TestFormatter.h"
 #include "Clownfish/VArray.h"
 #include "Clownfish/VTable.h"
 
 struct try_run_tests_context {
-    TestBatch *batch;
+    TestBatchRunner *runner;
+    TestBatch       *batch;
 };
 
 static void
 S_try_run_tests(void *context);
 
 static bool
-S_vtest_true(TestBatch *self, bool condition, const char *pattern,
+S_vtest_true(TestBatchRunner *self, bool condition, const char *pattern,
              va_list args);
 
-TestBatch*
-TestBatch_new(uint32_t num_planned, TestFormatter *formatter) {
-    TestBatch *self = (TestBatch*)VTable_Make_Obj(TESTBATCH);
-    return TestBatch_init(self, num_planned, formatter);
+TestBatchRunner*
+TestBatchRunner_new(TestFormatter *formatter) {
+    TestBatchRunner *self = (TestBatchRunner*)VTable_Make_Obj(TESTBATCHRUNNER);
+    return TestBatchRunner_init(self, formatter);
 }
 
-TestBatch*
-TestBatch_init(TestBatch *self, uint32_t num_planned,
-               TestFormatter *formatter) {
+TestBatchRunner*
+TestBatchRunner_init(TestBatchRunner *self, TestFormatter *formatter) {
     // Assign.
-    self->num_planned = num_planned;
     self->formatter   = (TestFormatter*)INCREF(formatter);
 
     // Initialize.
+    self->num_planned = 0;
     self->test_num    = 0;
     self->num_passed  = 0;
     self->num_failed  = 0;
@@ -62,17 +65,16 @@ TestBatch_init(TestBatch *self, uint32_t num_planned,
 }
 
 void
-TestBatch_destroy(TestBatch *self) {
+TestBatchRunner_destroy(TestBatchRunner *self) {
     DECREF(self->formatter);
-    SUPER_DESTROY(self, TESTBATCH);
+    SUPER_DESTROY(self, TESTBATCHRUNNER);
 }
 
 bool
-TestBatch_run(TestBatch *self) {
-    TestFormatter_Batch_Prologue(self->formatter, self);
-
+TestBatchRunner_run_batch(TestBatchRunner *self, TestBatch *batch) {
     struct try_run_tests_context args;
-    args.batch = self;
+    args.runner = self;
+    args.batch  = batch;
     Err *err = Err_trap(S_try_run_tests, &args);
 
     bool failed = false;
@@ -102,118 +104,127 @@ static void
 S_try_run_tests(void *context) {
     struct try_run_tests_context *args
         = (struct try_run_tests_context*)context;
-    TestBatch_Run_Tests(args->batch);
+    TestBatch_Run(args->batch, args->runner);
+}
+
+void
+TestBatchRunner_plan(TestBatchRunner *self, TestBatch *batch,
+                     uint32_t num_planned) {
+    self->num_planned = num_planned;
+    TestFormatter_Batch_Prologue(self->formatter, batch, num_planned);
 }
 
 uint32_t
-TestBatch_get_num_planned(TestBatch *self) {
+TestBatchRunner_get_num_planned(TestBatchRunner *self) {
     return self->num_planned;
 }
 
 uint32_t
-TestBatch_get_num_tests(TestBatch *self) {
+TestBatchRunner_get_num_tests(TestBatchRunner *self) {
     return self->test_num;
 }
 
 uint32_t
-TestBatch_get_num_failed(TestBatch *self) {
+TestBatchRunner_get_num_failed(TestBatchRunner *self) {
     return self->num_failed;
 }
 
 bool
-TestBatch_test_true(void *vself, bool condition, const char *pattern, ...) {
-    va_list args;
-    va_start(args, pattern);
-    bool result = TestBatch_VTest_True((TestBatch*)vself, condition,
-                                         pattern, args);
-    va_end(args);
-    return result;
-}
-
-bool
-TestBatch_test_false(void *vself, bool condition, const char *pattern, ...) {
-    va_list args;
-    va_start(args, pattern);
-    bool result = TestBatch_VTest_False((TestBatch*)vself, condition,
-                                          pattern, args);
-    va_end(args);
-    return result;
-}
-
-bool
-TestBatch_test_int_equals(void *vself, long got, long expected,
+TestBatchRunner_test_true(TestBatchRunner *self, bool condition,
                           const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
-    bool result = TestBatch_VTest_Int_Equals((TestBatch*)vself, got,
-                                               expected, pattern, args);
+    bool result = TestBatchRunner_VTest_True(self, condition, pattern, args);
     va_end(args);
     return result;
 }
 
 bool
-TestBatch_test_float_equals(void *vself, double got, double expected,
-                            const char *pattern, ...) {
+TestBatchRunner_test_false(TestBatchRunner *self, bool condition,
+                           const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
-    bool result = TestBatch_VTest_Float_Equals((TestBatch*)vself, got,
-                                                 expected, pattern, args);
+    bool result = TestBatchRunner_VTest_False(self, condition, pattern, args);
     va_end(args);
     return result;
 }
 
 bool
-TestBatch_test_string_equals(void *vself, const char *got,
-                             const char *expected, const char *pattern, ...) {
+TestBatchRunner_test_int_equals(TestBatchRunner *self, long got, long expected,
+                                const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
-    bool result = TestBatch_VTest_String_Equals((TestBatch*)vself, got,
-                                                  expected, pattern, args);
+    bool result = TestBatchRunner_VTest_Int_Equals(self, got, expected,
+                                                   pattern, args);
     va_end(args);
     return result;
 }
 
 bool
-TestBatch_pass(void *vself, const char *pattern, ...) {
+TestBatchRunner_test_float_equals(TestBatchRunner *self, double got,
+                                  double expected, const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
-    bool result = TestBatch_VPass((TestBatch*)vself, pattern, args);
+    bool result = TestBatchRunner_VTest_Float_Equals(self, got, expected,
+                                                     pattern, args);
     va_end(args);
     return result;
 }
 
 bool
-TestBatch_fail(void *vself, const char *pattern, ...) {
+TestBatchRunner_test_string_equals(TestBatchRunner *self, const char *got,
+                                   const char *expected, const char *pattern,
+                                   ...) {
     va_list args;
     va_start(args, pattern);
-    bool result = TestBatch_VFail((TestBatch*)vself, pattern, args);
+    bool result = TestBatchRunner_VTest_String_Equals(self, got, expected,
+                                                      pattern, args);
+    va_end(args);
+    return result;
+}
+
+bool
+TestBatchRunner_pass(TestBatchRunner *self, const char *pattern, ...) {
+    va_list args;
+    va_start(args, pattern);
+    bool result = TestBatchRunner_VPass(self, pattern, args);
+    va_end(args);
+    return result;
+}
+
+bool
+TestBatchRunner_fail(TestBatchRunner *self, const char *pattern, ...) {
+    va_list args;
+    va_start(args, pattern);
+    bool result = TestBatchRunner_VFail(self, pattern, args);
     va_end(args);
     return result;
 }
 
 void
-TestBatch_skip(void *vself, const char *pattern, ...) {
+TestBatchRunner_skip(TestBatchRunner *self, const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
-    TestBatch_VSkip((TestBatch*)vself, pattern, args);
+    TestBatchRunner_VSkip(self, pattern, args);
     va_end(args);
 }
 
 bool
-TestBatch_vtest_true(TestBatch *self, bool condition, const char *pattern,
-                     va_list args) {
+TestBatchRunner_vtest_true(TestBatchRunner *self, bool condition,
+                           const char *pattern, va_list args) {
     return S_vtest_true(self, condition, pattern, args);
 }
 
 bool
-TestBatch_vtest_false(TestBatch *self, bool condition,
-                      const char *pattern, va_list args) {
+TestBatchRunner_vtest_false(TestBatchRunner *self, bool condition,
+                            const char *pattern, va_list args) {
     return S_vtest_true(self, !condition, pattern, args);
 }
 
 bool
-TestBatch_vtest_int_equals(TestBatch *self, long got, long expected,
-                           const char *pattern, va_list args) {
+TestBatchRunner_vtest_int_equals(TestBatchRunner *self, long got,
+                                 long expected, const char *pattern,
+                                 va_list args) {
     bool pass = (got == expected);
     S_vtest_true(self, pass, pattern, args);
     if (!pass) {
@@ -225,8 +236,9 @@ TestBatch_vtest_int_equals(TestBatch *self, long got, long expected,
 }
 
 bool
-TestBatch_vtest_float_equals(TestBatch *self, double got, double expected,
-                             const char *pattern, va_list args) {
+TestBatchRunner_vtest_float_equals(TestBatchRunner *self, double got,
+                                   double expected, const char *pattern,
+                                   va_list args) {
     double relative_error = got / expected - 1.0;
     bool   pass           = (fabs(relative_error) < 1e-6);
     S_vtest_true(self, pass, pattern, args);
@@ -239,9 +251,9 @@ TestBatch_vtest_float_equals(TestBatch *self, double got, double expected,
 }
 
 bool
-TestBatch_vtest_string_equals(TestBatch *self, const char *got,
-                              const char *expected, const char *pattern,
-                              va_list args) {
+TestBatchRunner_vtest_string_equals(TestBatchRunner *self, const char *got,
+                                    const char *expected, const char *pattern,
+                                    va_list args) {
     bool pass = (strcmp(got, expected) == 0);
     S_vtest_true(self, pass, pattern, args);
     if (!pass) {
@@ -253,17 +265,20 @@ TestBatch_vtest_string_equals(TestBatch *self, const char *got,
 }
 
 bool
-TestBatch_vpass(TestBatch *self, const char *pattern, va_list args) {
+TestBatchRunner_vpass(TestBatchRunner *self, const char *pattern,
+                      va_list args) {
     return S_vtest_true(self, true, pattern, args);
 }
 
 bool
-TestBatch_vfail(TestBatch *self, const char *pattern, va_list args) {
+TestBatchRunner_vfail(TestBatchRunner *self, const char *pattern,
+                      va_list args) {
     return S_vtest_true(self, false, pattern, args);
 }
 
 void
-TestBatch_vskip(TestBatch *self, const char *pattern, va_list args) {
+TestBatchRunner_vskip(TestBatchRunner *self, const char *pattern,
+                      va_list args) {
     self->test_num++;
     // TODO: Add a VTest_Skip method to TestFormatter
     TestFormatter_VTest_Result(self->formatter, true, self->test_num,
@@ -272,7 +287,7 @@ TestBatch_vskip(TestBatch *self, const char *pattern, va_list args) {
 }
 
 static bool
-S_vtest_true(TestBatch* self, bool condition, const char *pattern,
+S_vtest_true(TestBatchRunner* self, bool condition, const char *pattern,
              va_list args) {
     // Increment test number.
     self->test_num++;

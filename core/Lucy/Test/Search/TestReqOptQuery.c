@@ -19,7 +19,7 @@
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Search/TestReqOptQuery.h"
@@ -27,18 +27,12 @@
 #include "Lucy/Search/LeafQuery.h"
 
 TestReqOptQuery*
-TestReqOptQuery_new(TestFormatter *formatter) {
-    TestReqOptQuery *self = (TestReqOptQuery*)VTable_Make_Obj(TESTREQOPTQUERY);
-    return TestReqOptQuery_init(self, formatter);
-}
-
-TestReqOptQuery*
-TestReqOptQuery_init(TestReqOptQuery *self, TestFormatter *formatter) {
-    return (TestReqOptQuery*)TestBatch_init((TestBatch*)self, 4, formatter);
+TestReqOptQuery_new() {
+    return (TestReqOptQuery*)VTable_Make_Obj(TESTREQOPTQUERY);
 }
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch) {
+test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     Query *a_leaf  = (Query*)TestUtils_make_leaf_query(NULL, "a");
     Query *b_leaf  = (Query*)TestUtils_make_leaf_query(NULL, "b");
     Query *c_leaf  = (Query*)TestUtils_make_leaf_query(NULL, "c");
@@ -49,14 +43,14 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
     RequiredOptionalQuery *clone
         = (RequiredOptionalQuery*)Obj_Load(dump, dump);
 
-    TEST_FALSE(batch, ReqOptQuery_Equals(query, (Obj*)kids_differ),
+    TEST_FALSE(runner, ReqOptQuery_Equals(query, (Obj*)kids_differ),
                "Different kids spoil Equals");
-    TEST_TRUE(batch, ReqOptQuery_Equals(query, (Obj*)boost_differs),
+    TEST_TRUE(runner, ReqOptQuery_Equals(query, (Obj*)boost_differs),
               "Equals with identical boosts");
     ReqOptQuery_Set_Boost(boost_differs, 1.5);
-    TEST_FALSE(batch, ReqOptQuery_Equals(query, (Obj*)boost_differs),
+    TEST_FALSE(runner, ReqOptQuery_Equals(query, (Obj*)boost_differs),
                "Different boost spoils Equals");
-    TEST_TRUE(batch, ReqOptQuery_Equals(query, (Obj*)clone),
+    TEST_TRUE(runner, ReqOptQuery_Equals(query, (Obj*)clone),
               "Dump => Load round trip");
 
     DECREF(a_leaf);
@@ -70,9 +64,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 void
-TestReqOptQuery_run_tests(TestReqOptQuery *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Dump_Load_and_Equals(batch);
+TestReqOptQuery_run(TestReqOptQuery *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
+    test_Dump_Load_and_Equals(runner);
 }
 
 

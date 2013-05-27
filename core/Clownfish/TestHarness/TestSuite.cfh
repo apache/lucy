@@ -14,16 +14,30 @@
  * limitations under the License.
  */
 
-parcel TestLucy;
+parcel Clownfish;
 
-class Lucy::Test::Analysis::TestRegexTokenizer
-    inherits Clownfish::TestHarness::TestBatch {
+/** Manage a collection of test batches.
+ */
+class Clownfish::TestHarness::TestSuite inherits Clownfish::Obj {
+    VArray *batches;
 
-    inert incremented TestRegexTokenizer*
+    inert incremented TestSuite*
     new();
 
+    inert TestSuite*
+    init(TestSuite *self);
+
+    public void
+    Destroy(TestSuite *self);
+
     void
-    Run(TestRegexTokenizer *self, TestBatchRunner *runner);
+    Add_Batch(TestSuite *self, decremented TestBatch *batch);
+
+    bool
+    Run_Batch(TestSuite *self, CharBuf *class_name, TestFormatter *formatter);
+
+    bool
+    Run_All_Batches(TestSuite *self, TestFormatter *formatter);
 }
 
 

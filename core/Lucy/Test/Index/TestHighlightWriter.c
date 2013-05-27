@@ -18,26 +18,20 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Index/TestHighlightWriter.h"
 #include "Lucy/Index/HighlightWriter.h"
 
 TestHighlightWriter*
-TestHLWriter_new(TestFormatter *formatter) {
-    TestHighlightWriter *self = (TestHighlightWriter*)VTable_Make_Obj(TESTHIGHLIGHTWRITER);
-    return TestHLWriter_init(self, formatter);
-}
-
-TestHighlightWriter*
-TestHLWriter_init(TestHighlightWriter *self, TestFormatter *formatter) {
-    return (TestHighlightWriter*)TestBatch_init((TestBatch*)self, 1, formatter);
+TestHLWriter_new() {
+    return (TestHighlightWriter*)VTable_Make_Obj(TESTHIGHLIGHTWRITER);
 }
 
 void
-TestHLWriter_run_tests(TestHighlightWriter *self) {
-    TestBatch *batch = (TestBatch*)self;
-    PASS(batch, "Placeholder");
+TestHLWriter_run(TestHighlightWriter *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 1);
+    PASS(runner, "Placeholder");
 }
 
 

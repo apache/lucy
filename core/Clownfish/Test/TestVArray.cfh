@@ -20,13 +20,10 @@ class Clownfish::Test::TestVArray
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestVArray*
-    new(TestFormatter *formatter);
-
-    inert TestVArray*
-    init(TestVArray *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestVArray *self);
+    Run(TestVArray *self, TestBatchRunner *runner);
 }
 
 

@@ -18,25 +18,19 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Index/TestSegment.h"
 #include "Lucy/Index/Segment.h"
 #include "Lucy/Store/RAMFolder.h"
 
 TestSegment*
-TestSeg_new(TestFormatter *formatter) {
-    TestSegment *self = (TestSegment*)VTable_Make_Obj(TESTSEGMENT);
-    return TestSeg_init(self, formatter);
-}
-
-TestSegment*
-TestSeg_init(TestSegment *self, TestFormatter *formatter) {
-    return (TestSegment*)TestBatch_init((TestBatch*)self, 21, formatter);
+TestSeg_new() {
+    return (TestSegment*)VTable_Make_Obj(TESTSEGMENT);
 }
 
 static void
-test_fields(TestBatch *batch) {
+test_fields(TestBatchRunner *runner) {
     Segment *segment = Seg_new(1);
     ZombieCharBuf *foo = ZCB_WRAP_STR("foo", 3);
     ZombieCharBuf *bar = ZCB_WRAP_STR("bar", 3);
@@ -44,34 +38,34 @@ test_fields(TestBatch *batch) {
     int32_t field_num;
 
     field_num = Seg_Add_Field(segment, (CharBuf*)foo);
-    TEST_TRUE(batch, field_num == 1,
+    TEST_TRUE(runner, field_num == 1,
               "Add_Field returns field number, and field numbers start at 1");
     field_num = Seg_Add_Field(segment, (CharBuf*)bar);
-    TEST_TRUE(batch, field_num == 2, "add a second field");
+    TEST_TRUE(runner, field_num == 2, "add a second field");
     field_num = Seg_Add_Field(segment, (CharBuf*)foo);
-    TEST_TRUE(batch, field_num == 1,
+    TEST_TRUE(runner, field_num == 1,
               "Add_Field returns existing field number if field is already known");
 
-    TEST_TRUE(batch, ZCB_Equals(bar, (Obj*)Seg_Field_Name(segment, 2)),
+    TEST_TRUE(runner, ZCB_Equals(bar, (Obj*)Seg_Field_Name(segment, 2)),
               "Field_Name");
-    TEST_TRUE(batch, Seg_Field_Name(segment, 3) == NULL,
+    TEST_TRUE(runner, Seg_Field_Name(segment, 3) == NULL,
               "Field_Name returns NULL for unknown field number");
-    TEST_TRUE(batch, Seg_Field_Num(segment, (CharBuf*)bar) == 2,
+    TEST_TRUE(runner, Seg_Field_Num(segment, (CharBuf*)bar) == 2,
               "Field_Num");
-    TEST_TRUE(batch, Seg_Field_Num(segment, (CharBuf*)baz) == 0,
+    TEST_TRUE(runner, Seg_Field_Num(segment, (CharBuf*)baz) == 0,
               "Field_Num returns 0 for unknown field name");
 
     DECREF(segment);
 }
 
 static void
-test_metadata_storage(TestBatch *batch) {
+test_metadata_storage(TestBatchRunner *runner) {
     Segment *segment = Seg_new(1);
     CharBuf *got;
 
     Seg_Store_Metadata_Str(segment, "foo", 3, (Obj*)CB_newf("bar"));
     got = (CharBuf*)Seg_Fetch_Metadata_Str(segment, "foo", 3);
-    TEST_TRUE(batch,
+    TEST_TRUE(runner,
               got
               && CB_Is_A(got, CHARBUF)
               && CB_Equals_Str(got, "bar", 3),
@@ -81,44 +75,44 @@ test_metadata_storage(TestBatch *batch) {
 }
 
 static void
-test_seg_name_and_num(TestBatch *batch) {
+test_seg_name_and_num(TestBatchRunner *runner) {
     Segment *segment_z = Seg_new(35);
     CharBuf *seg_z_name = Seg_num_to_name(35);
-    TEST_TRUE(batch, Seg_Get_Number(segment_z) == INT64_C(35), "Get_Number");
-    TEST_TRUE(batch, CB_Equals_Str(Seg_Get_Name(segment_z), "seg_z", 5),
+    TEST_TRUE(runner, Seg_Get_Number(segment_z) == INT64_C(35), "Get_Number");
+    TEST_TRUE(runner, CB_Equals_Str(Seg_Get_Name(segment_z), "seg_z", 5),
               "Get_Name");
-    TEST_TRUE(batch, CB_Equals_Str(seg_z_name, "seg_z", 5),
+    TEST_TRUE(runner, CB_Equals_Str(seg_z_name, "seg_z", 5),
               "num_to_name");
     DECREF(seg_z_name);
     DECREF(segment_z);
 }
 
 static void
-test_count(TestBatch *batch) {
+test_count(TestBatchRunner *runner) {
     Segment *segment = Seg_new(100);
 
-    TEST_TRUE(batch, Seg_Get_Count(segment) == 0, "count starts off at 0");
+    TEST_TRUE(runner, Seg_Get_Count(segment) == 0, "count starts off at 0");
     Seg_Set_Count(segment, 120);
-    TEST_TRUE(batch, Seg_Get_Count(segment) == 120, "Set_Count");
-    TEST_TRUE(batch, Seg_Increment_Count(segment, 10) == 130,
+    TEST_TRUE(runner, Seg_Get_Count(segment) == 120, "Set_Count");
+    TEST_TRUE(runner, Seg_Increment_Count(segment, 10) == 130,
               "Increment_Count");
 
     DECREF(segment);
 }
 
 static void
-test_Compare_To(TestBatch *batch) {
+test_Compare_To(TestBatchRunner *runner) {
     Segment *segment_1      = Seg_new(1);
     Segment *segment_2      = Seg_new(2);
     Segment *also_segment_2 = Seg_new(2);
 
-    TEST_TRUE(batch, Seg_Compare_To(segment_1, (Obj*)segment_2) < 0,
+    TEST_TRUE(runner, Seg_Compare_To(segment_1, (Obj*)segment_2) < 0,
               "Compare_To 1 < 2");
-    TEST_TRUE(batch, Seg_Compare_To(segment_2, (Obj*)segment_1) > 0,
+    TEST_TRUE(runner, Seg_Compare_To(segment_2, (Obj*)segment_1) > 0,
               "Compare_To 1 < 2");
-    TEST_TRUE(batch, Seg_Compare_To(segment_1, (Obj*)segment_1) == 0,
+    TEST_TRUE(runner, Seg_Compare_To(segment_1, (Obj*)segment_1) == 0,
               "Compare_To identity");
-    TEST_TRUE(batch, Seg_Compare_To(segment_2, (Obj*)also_segment_2) == 0,
+    TEST_TRUE(runner, Seg_Compare_To(segment_2, (Obj*)also_segment_2) == 0,
               "Compare_To 2 == 2");
 
     DECREF(segment_1);
@@ -127,7 +121,7 @@ test_Compare_To(TestBatch *batch) {
 }
 
 static void
-test_Write_File_and_Read_File(TestBatch *batch) {
+test_Write_File_and_Read_File(TestBatchRunner *runner) {
     RAMFolder *folder  = RAMFolder_new(NULL);
     Segment   *segment = Seg_new(100);
     Segment   *got     = Seg_new(100);
@@ -144,13 +138,13 @@ test_Write_File_and_Read_File(TestBatch *batch) {
     Seg_Write_File(segment, (Folder*)folder);
     Seg_Read_File(got, (Folder*)folder);
 
-    TEST_TRUE(batch, Seg_Get_Count(got) == Seg_Get_Count(segment),
+    TEST_TRUE(runner, Seg_Get_Count(got) == Seg_Get_Count(segment),
               "Round-trip count through file");
-    TEST_TRUE(batch,
+    TEST_TRUE(runner,
               Seg_Field_Num(got, jetsam) == Seg_Field_Num(segment, jetsam),
               "Round trip field names through file");
     meta = (CharBuf*)Seg_Fetch_Metadata_Str(got, "foo", 3);
-    TEST_TRUE(batch,
+    TEST_TRUE(runner,
               meta
               && CB_Is_A(meta, CHARBUF)
               && CB_Equals_Str(meta, "bar", 3),
@@ -162,14 +156,14 @@ test_Write_File_and_Read_File(TestBatch *batch) {
 }
 
 void
-TestSeg_run_tests(TestSegment *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_fields(batch);
-    test_metadata_storage(batch);
-    test_seg_name_and_num(batch);
-    test_count(batch);
-    test_Compare_To(batch);
-    test_Write_File_and_Read_File(batch);
+TestSeg_run(TestSegment *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 21);
+    test_fields(runner);
+    test_metadata_storage(runner);
+    test_seg_name_and_num(runner);
+    test_count(runner);
+    test_Compare_To(runner);
+    test_Write_File_and_Read_File(runner);
 }
 
 

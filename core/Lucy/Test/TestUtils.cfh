@@ -62,7 +62,7 @@ inert class Lucy::Test::TestUtils  {
     /** Verify an Analyzer's transform, transform_text, and split methods.
      */
     inert void
-    test_analyzer(TestBatch *batch, Analyzer *analyzer, CharBuf *source,
+    test_analyzer(TestBatchRunner *runner, Analyzer *analyzer, CharBuf *source,
                   VArray *expected, const char *message);
 }
 

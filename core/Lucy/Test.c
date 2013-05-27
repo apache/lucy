@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-#include <stdio.h>
-
+#define CFISH_USE_SHORT_NAMES
 #define TESTLUCY_USE_SHORT_NAMES
-#include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Test.h"
+
 #include "Clownfish/TestHarness/TestBatch.h"
-#include "Clownfish/TestHarness/TestFormatter.h"
-#include "Clownfish/TestHarness/TestRunner.h"
+#include "Clownfish/TestHarness/TestSuite.h"
+
 #include "Lucy/Test/Analysis/TestAnalyzer.h"
 #include "Lucy/Test/Analysis/TestCaseFolder.h"
 #include "Lucy/Test/Analysis/TestNormalizer.h"
@@ -82,124 +81,71 @@
 #include "Lucy/Test/Util/TestMemoryPool.h"
 #include "Lucy/Test/Util/TestPriorityQueue.h"
 
-static void
-S_unbuffer_stdout();
+TestSuite*
+Test_create_test_suite() {
+    TestSuite *suite = TestSuite_new();
 
-static VArray*
-S_all_test_batches(TestFormatter *formatter) {
-    VArray *batches = VA_new(0);
+    TestSuite_Add_Batch(suite, (TestBatch*)TestPriQ_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestBitVector_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestMemPool_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestIxFileNames_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestJson_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestI32Arr_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestRAMFH_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestFSFH_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestInStream_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestFH_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestIOPrimitives_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestIOChunks_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestRAMDH_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestFSDH_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestFSFolder_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestRAMFolder_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestFolder_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestIxManager_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestCFWriter_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestCFReader_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestAnalyzer_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestPolyAnalyzer_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestCaseFolder_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestRegexTokenizer_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestSnowStop_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestSnowStemmer_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestNormalizer_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestStandardTokenizer_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestSnapshot_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestTermInfo_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestFieldMisc_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestBatchSchema_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestDocWriter_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestHLWriter_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestPListWriter_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestSegWriter_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestPolyReader_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestFullTextType_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestBlobType_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestNumericType_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestFType_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestSeg_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestHighlighter_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestSpan_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestHeatMap_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestTermQuery_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestPhraseQuery_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestSortSpec_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestRangeQuery_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestANDQuery_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestMatchAllQuery_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestNOTQuery_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestReqOptQuery_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestLeafQuery_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestNoMatchQuery_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestSeriesMatcher_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestORQuery_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestQPLogic_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestQPSyntax_new());
 
-    VA_Push(batches, (Obj*)TestPriQ_new(formatter));
-    VA_Push(batches, (Obj*)TestBitVector_new(formatter));
-    VA_Push(batches, (Obj*)TestMemPool_new(formatter));
-    VA_Push(batches, (Obj*)TestIxFileNames_new(formatter));
-    VA_Push(batches, (Obj*)TestJson_new(formatter));
-    VA_Push(batches, (Obj*)TestI32Arr_new(formatter));
-    VA_Push(batches, (Obj*)TestRAMFH_new(formatter));
-    VA_Push(batches, (Obj*)TestFSFH_new(formatter));
-    VA_Push(batches, (Obj*)TestInStream_new(formatter));
-    VA_Push(batches, (Obj*)TestFH_new(formatter));
-    VA_Push(batches, (Obj*)TestIOPrimitives_new(formatter));
-    VA_Push(batches, (Obj*)TestIOChunks_new(formatter));
-    VA_Push(batches, (Obj*)TestRAMDH_new(formatter));
-    VA_Push(batches, (Obj*)TestFSDH_new(formatter));
-    VA_Push(batches, (Obj*)TestFSFolder_new(formatter));
-    VA_Push(batches, (Obj*)TestRAMFolder_new(formatter));
-    VA_Push(batches, (Obj*)TestFolder_new(formatter));
-    VA_Push(batches, (Obj*)TestIxManager_new(formatter));
-    VA_Push(batches, (Obj*)TestCFWriter_new(formatter));
-    VA_Push(batches, (Obj*)TestCFReader_new(formatter));
-    VA_Push(batches, (Obj*)TestAnalyzer_new(formatter));
-    VA_Push(batches, (Obj*)TestPolyAnalyzer_new(formatter));
-    VA_Push(batches, (Obj*)TestCaseFolder_new(formatter));
-    VA_Push(batches, (Obj*)TestRegexTokenizer_new(formatter));
-    VA_Push(batches, (Obj*)TestSnowStop_new(formatter));
-    VA_Push(batches, (Obj*)TestSnowStemmer_new(formatter));
-    VA_Push(batches, (Obj*)TestNormalizer_new(formatter));
-    VA_Push(batches, (Obj*)TestStandardTokenizer_new(formatter));
-    VA_Push(batches, (Obj*)TestSnapshot_new(formatter));
-    VA_Push(batches, (Obj*)TestTermInfo_new(formatter));
-    VA_Push(batches, (Obj*)TestFieldMisc_new(formatter));
-    VA_Push(batches, (Obj*)TestBatchSchema_new(formatter));
-    VA_Push(batches, (Obj*)TestDocWriter_new(formatter));
-    VA_Push(batches, (Obj*)TestHLWriter_new(formatter));
-    VA_Push(batches, (Obj*)TestPListWriter_new(formatter));
-    VA_Push(batches, (Obj*)TestSegWriter_new(formatter));
-    VA_Push(batches, (Obj*)TestPolyReader_new(formatter));
-    VA_Push(batches, (Obj*)TestFullTextType_new(formatter));
-    VA_Push(batches, (Obj*)TestBlobType_new(formatter));
-    VA_Push(batches, (Obj*)TestNumericType_new(formatter));
-    VA_Push(batches, (Obj*)TestFType_new(formatter));
-    VA_Push(batches, (Obj*)TestSeg_new(formatter));
-    VA_Push(batches, (Obj*)TestHighlighter_new(formatter));
-    VA_Push(batches, (Obj*)TestSpan_new(formatter));
-    VA_Push(batches, (Obj*)TestHeatMap_new(formatter));
-    VA_Push(batches, (Obj*)TestTermQuery_new(formatter));
-    VA_Push(batches, (Obj*)TestPhraseQuery_new(formatter));
-    VA_Push(batches, (Obj*)TestSortSpec_new(formatter));
-    VA_Push(batches, (Obj*)TestRangeQuery_new(formatter));
-    VA_Push(batches, (Obj*)TestANDQuery_new(formatter));
-    VA_Push(batches, (Obj*)TestMatchAllQuery_new(formatter));
-    VA_Push(batches, (Obj*)TestNOTQuery_new(formatter));
-    VA_Push(batches, (Obj*)TestReqOptQuery_new(formatter));
-    VA_Push(batches, (Obj*)TestLeafQuery_new(formatter));
-    VA_Push(batches, (Obj*)TestNoMatchQuery_new(formatter));
-    VA_Push(batches, (Obj*)TestSeriesMatcher_new(formatter));
-    VA_Push(batches, (Obj*)TestORQuery_new(formatter));
-    VA_Push(batches, (Obj*)TestQPLogic_new(formatter));
-    VA_Push(batches, (Obj*)TestQPSyntax_new(formatter));
-
-    return batches;
-}
-
-bool
-Test_run_batch(CharBuf *class_name, TestFormatter *formatter) {
-    S_unbuffer_stdout();
-
-    VArray   *batches = S_all_test_batches(formatter);
-    uint32_t  size    = VA_Get_Size(batches);
-
-    for (uint32_t i = 0; i < size; ++i) {
-        TestBatch *batch = (TestBatch*)VA_Fetch(batches, i);
-
-        if (CB_Equals(TestBatch_Get_Class_Name(batch), (Obj*)class_name)) {
-            bool result = TestBatch_Run(batch);
-            DECREF(batches);
-            return result;
-        }
-    }
-
-    DECREF(batches);
-    THROW(ERR, "Couldn't find test class '%o'", class_name);
-    UNREACHABLE_RETURN(bool);
-}
-
-bool
-Test_run_all_batches(TestFormatter *formatter) {
-    S_unbuffer_stdout();
-
-    TestRunner *runner  = TestRunner_new(formatter);
-    VArray     *batches = S_all_test_batches(formatter);
-    uint32_t    size    = VA_Get_Size(batches);
-
-    for (uint32_t i = 0; i < size; ++i) {
-        TestBatch *batch = (TestBatch*)VA_Fetch(batches, i);
-        TestRunner_Run_Batch(runner, batch);
-    }
-
-    bool result = TestRunner_Finish(runner);
-
-    DECREF(runner);
-    DECREF(batches);
-    return result;
-}
-
-static void
-S_unbuffer_stdout() {
-    int check_val = setvbuf(stdout, NULL, _IONBF, 0);
-    if (check_val != 0) {
-        fprintf(stderr, "Failed when trying to unbuffer stdout\n");
-    }
+    return suite;
 }
 
 

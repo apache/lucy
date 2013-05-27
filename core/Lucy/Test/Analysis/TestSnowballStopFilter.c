@@ -18,20 +18,14 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Analysis/TestSnowballStopFilter.h"
 #include "Lucy/Analysis/SnowballStopFilter.h"
 
 TestSnowballStopFilter*
-TestSnowStop_new(TestFormatter *formatter) {
-    TestSnowballStopFilter *self = (TestSnowballStopFilter*)VTable_Make_Obj(TESTSNOWBALLSTOPFILTER);
-    return TestSnowStop_init(self, formatter);
-}
-
-TestSnowballStopFilter*
-TestSnowStop_init(TestSnowballStopFilter *self, TestFormatter *formatter) {
-    return (TestSnowballStopFilter*)TestBatch_init((TestBatch*)self, 3, formatter);
+TestSnowStop_new() {
+    return (TestSnowballStopFilter*)VTable_Make_Obj(TESTSNOWBALLSTOPFILTER);
 }
 
 static SnowballStopFilter*
@@ -54,7 +48,7 @@ S_make_stopfilter(void *unused, ...) {
 }
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch) {
+test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     SnowballStopFilter *stopfilter =
         S_make_stopfilter(NULL, "foo", "bar", "baz", NULL);
     SnowballStopFilter *other =
@@ -64,13 +58,13 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
     SnowballStopFilter *clone       = (SnowballStopFilter*)SnowStop_Load(other, dump);
     SnowballStopFilter *other_clone = (SnowballStopFilter*)SnowStop_Load(other, other_dump);
 
-    TEST_FALSE(batch,
+    TEST_FALSE(runner,
                SnowStop_Equals(stopfilter, (Obj*)other),
                "Equals() false with different stoplist");
-    TEST_TRUE(batch,
+    TEST_TRUE(runner,
               SnowStop_Equals(stopfilter, (Obj*)clone),
               "Dump => Load round trip");
-    TEST_TRUE(batch,
+    TEST_TRUE(runner,
               SnowStop_Equals(other, (Obj*)other_clone),
               "Dump => Load round trip");
 
@@ -83,9 +77,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 void
-TestSnowStop_run_tests(TestSnowballStopFilter *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Dump_Load_and_Equals(batch);
+TestSnowStop_run(TestSnowballStopFilter *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 3);
+    test_Dump_Load_and_Equals(runner);
 }
 
 

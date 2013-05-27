@@ -19,7 +19,7 @@
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Search/TestNOTQuery.h"
@@ -27,18 +27,12 @@
 #include "Lucy/Search/LeafQuery.h"
 
 TestNOTQuery*
-TestNOTQuery_new(TestFormatter *formatter) {
-    TestNOTQuery *self = (TestNOTQuery*)VTable_Make_Obj(TESTNOTQUERY);
-    return TestNOTQuery_init(self, formatter);
-}
-
-TestNOTQuery*
-TestNOTQuery_init(TestNOTQuery *self, TestFormatter *formatter) {
-    return (TestNOTQuery*)TestBatch_init((TestBatch*)self, 4, formatter);
+TestNOTQuery_new() {
+    return (TestNOTQuery*)VTable_Make_Obj(TESTNOTQUERY);
 }
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch) {
+test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     Query    *a_leaf        = (Query*)TestUtils_make_leaf_query(NULL, "a");
     Query    *b_leaf        = (Query*)TestUtils_make_leaf_query(NULL, "b");
     NOTQuery *query         = NOTQuery_new(a_leaf);
@@ -47,14 +41,14 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
     Obj      *dump          = (Obj*)NOTQuery_Dump(query);
     NOTQuery *clone         = (NOTQuery*)Obj_Load(dump, dump);
 
-    TEST_FALSE(batch, NOTQuery_Equals(query, (Obj*)kids_differ),
+    TEST_FALSE(runner, NOTQuery_Equals(query, (Obj*)kids_differ),
                "Different kids spoil Equals");
-    TEST_TRUE(batch, NOTQuery_Equals(query, (Obj*)boost_differs),
+    TEST_TRUE(runner, NOTQuery_Equals(query, (Obj*)boost_differs),
               "Equals with identical boosts");
     NOTQuery_Set_Boost(boost_differs, 1.5);
-    TEST_FALSE(batch, NOTQuery_Equals(query, (Obj*)boost_differs),
+    TEST_FALSE(runner, NOTQuery_Equals(query, (Obj*)boost_differs),
                "Different boost spoils Equals");
-    TEST_TRUE(batch, NOTQuery_Equals(query, (Obj*)clone),
+    TEST_TRUE(runner, NOTQuery_Equals(query, (Obj*)clone),
               "Dump => Load round trip");
 
     DECREF(a_leaf);
@@ -67,9 +61,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 void
-TestNOTQuery_run_tests(TestNOTQuery *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Dump_Load_and_Equals(batch);
+TestNOTQuery_run(TestNOTQuery *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
+    test_Dump_Load_and_Equals(runner);
 }
 
 

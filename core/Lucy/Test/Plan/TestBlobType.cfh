@@ -20,13 +20,10 @@ class Lucy::Test::Plan::TestBlobType
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestBlobType*
-    new(TestFormatter *formatter);
-
-    inert TestBlobType*
-    init(TestBlobType *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestBlobType *self);
+    Run(TestBlobType *self, TestBatchRunner *runner);
 }
 
 

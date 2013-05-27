@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-#include <stdio.h>
-
-#define CHY_USE_SHORT_NAMES
 #define CFISH_USE_SHORT_NAMES
 #define TESTCFISH_USE_SHORT_NAMES
 
 #include "Clownfish/Test.h"
 
-#include "Clownfish/Err.h"
 #include "Clownfish/TestHarness/TestBatch.h"
-#include "Clownfish/TestHarness/TestFormatter.h"
-#include "Clownfish/TestHarness/TestRunner.h"
-#include "Clownfish/VArray.h"
+#include "Clownfish/TestHarness/TestSuite.h"
 
 #include "Clownfish/Test/TestByteBuf.h"
 #include "Clownfish/Test/TestCharBuf.h"
@@ -41,77 +35,24 @@
 #include "Clownfish/Test/Util/TestNumberUtils.h"
 #include "Clownfish/Test/Util/TestStringHelper.h"
 
-static void
-S_unbuffer_stdout();
+TestSuite*
+Test_create_test_suite() {
+    TestSuite *suite = TestSuite_new();
 
-static VArray*
-S_all_test_batches(TestFormatter *formatter) {
-    VArray *batches = VA_new(0);
+    TestSuite_Add_Batch(suite, (TestBatch*)TestVArray_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestHash_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestObj_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestErr_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestBB_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestCB_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestNumUtil_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestNum_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestStrHelp_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestAtomic_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestLFReg_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestMemory_new());
 
-    VA_Push(batches, (Obj*)TestVArray_new(formatter));
-    VA_Push(batches, (Obj*)TestHash_new(formatter));
-    VA_Push(batches, (Obj*)TestObj_new(formatter));
-    VA_Push(batches, (Obj*)TestErr_new(formatter));
-    VA_Push(batches, (Obj*)TestBB_new(formatter));
-    VA_Push(batches, (Obj*)TestCB_new(formatter));
-    VA_Push(batches, (Obj*)TestNumUtil_new(formatter));
-    VA_Push(batches, (Obj*)TestNum_new(formatter));
-    VA_Push(batches, (Obj*)TestStrHelp_new(formatter));
-    VA_Push(batches, (Obj*)TestAtomic_new(formatter));
-    VA_Push(batches, (Obj*)TestLFReg_new(formatter));
-    VA_Push(batches, (Obj*)TestMemory_new(formatter));
-
-    return batches;
-}
-
-bool
-Test_run_batch(CharBuf *class_name, TestFormatter *formatter) {
-    S_unbuffer_stdout();
-
-    VArray   *batches = S_all_test_batches(formatter);
-    uint32_t  size    = VA_Get_Size(batches);
-
-    for (uint32_t i = 0; i < size; ++i) {
-        TestBatch *batch = (TestBatch*)VA_Fetch(batches, i);
-
-        if (CB_Equals(TestBatch_Get_Class_Name(batch), (Obj*)class_name)) {
-            bool result = TestBatch_Run(batch);
-            DECREF(batches);
-            return result;
-        }
-    }
-
-    DECREF(batches);
-    THROW(ERR, "Couldn't find test class '%o'", class_name);
-    UNREACHABLE_RETURN(bool);
-}
-
-bool
-Test_run_all_batches(TestFormatter *formatter) {
-    S_unbuffer_stdout();
-
-    TestRunner *runner  = TestRunner_new(formatter);
-    VArray     *batches = S_all_test_batches(formatter);
-    uint32_t    size    = VA_Get_Size(batches);
-
-    for (uint32_t i = 0; i < size; ++i) {
-        TestBatch *batch = (TestBatch*)VA_Fetch(batches, i);
-        TestRunner_Run_Batch(runner, batch);
-    }
-
-    bool result = TestRunner_Finish(runner);
-
-    DECREF(runner);
-    DECREF(batches);
-    return result;
-}
-
-static void
-S_unbuffer_stdout() {
-    int check_val = setvbuf(stdout, NULL, _IONBF, 0);
-    if (check_val != 0) {
-        fprintf(stderr, "Failed when trying to unbuffer stdout\n");
-    }
+    return suite;
 }
 
 

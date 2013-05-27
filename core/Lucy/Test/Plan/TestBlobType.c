@@ -18,34 +18,28 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Plan/TestBlobType.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Plan/BlobType.h"
 
 TestBlobType*
-TestBlobType_new(TestFormatter *formatter) {
-    TestBlobType *self = (TestBlobType*)VTable_Make_Obj(TESTBLOBTYPE);
-    return TestBlobType_init(self, formatter);
-}
-
-TestBlobType*
-TestBlobType_init(TestBlobType *self, TestFormatter *formatter) {
-    return (TestBlobType*)TestBatch_init((TestBatch*)self, 2, formatter);
+TestBlobType_new() {
+    return (TestBlobType*)VTable_Make_Obj(TESTBLOBTYPE);
 }
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch) {
+test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     BlobType *type            = BlobType_new(true);
     Obj      *dump            = (Obj*)BlobType_Dump(type);
     Obj      *clone           = Obj_Load(dump, dump);
     Obj      *another_dump    = (Obj*)BlobType_Dump_For_Schema(type);
     BlobType *another_clone   = BlobType_Load(type, another_dump);
 
-    TEST_TRUE(batch, BlobType_Equals(type, (Obj*)clone),
+    TEST_TRUE(runner, BlobType_Equals(type, (Obj*)clone),
               "Dump => Load round trip");
-    TEST_TRUE(batch, BlobType_Equals(type, (Obj*)another_clone),
+    TEST_TRUE(runner, BlobType_Equals(type, (Obj*)another_clone),
               "Dump_For_Schema => Load round trip");
 
     DECREF(type);
@@ -56,9 +50,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 void
-TestBlobType_run_tests(TestBlobType *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Dump_Load_and_Equals(batch);
+TestBlobType_run(TestBlobType *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 2);
+    test_Dump_Load_and_Equals(runner);
 }
 
 

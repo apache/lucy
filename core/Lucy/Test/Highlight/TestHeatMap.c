@@ -17,7 +17,7 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Highlight/TestHeatMap.h"
 #include "Lucy/Highlight/HeatMap.h"
@@ -25,18 +25,12 @@
 #include "Lucy/Search/Span.h"
 
 TestHeatMap*
-TestHeatMap_new(TestFormatter *formatter) {
-    TestHeatMap *self = (TestHeatMap*)VTable_Make_Obj(TESTHEATMAP);
-    return TestHeatMap_init(self, formatter);
-}
-
-TestHeatMap*
-TestHeatMap_init(TestHeatMap *self, TestFormatter *formatter) {
-    return (TestHeatMap*)TestBatch_init((TestBatch*)self, 13, formatter);
+TestHeatMap_new() {
+    return (TestHeatMap*)VTable_Make_Obj(TESTHEATMAP);
 }
 
 static void
-test_calc_proximity_boost(TestBatch *batch) {
+test_calc_proximity_boost(TestBatchRunner *runner) {
     VArray  *spans    = VA_new(0);
     HeatMap *heat_map = HeatMap_new(spans, 133);
     Span    *span1    = Span_new(  0, 10, 1.0f);
@@ -50,10 +44,10 @@ test_calc_proximity_boost(TestBatch *batch) {
     float smaller_boost = HeatMap_Calc_Proximity_Boost(heat_map, span1, span4);
     float zero_boost    = HeatMap_Calc_Proximity_Boost(heat_map, span1, span5);
 
-    TEST_TRUE(batch, big_boost == eq_big_boost,
+    TEST_TRUE(runner, big_boost == eq_big_boost,
               "overlapping and abutting produce the same proximity boost");
-    TEST_TRUE(batch, big_boost > smaller_boost, "closer is better");
-    TEST_TRUE(batch, zero_boost == 0.0,
+    TEST_TRUE(runner, big_boost > smaller_boost, "closer is better");
+    TEST_TRUE(runner, zero_boost == 0.0,
               "distance outside of window yields no prox boost");
 
     DECREF(span1);
@@ -66,7 +60,7 @@ test_calc_proximity_boost(TestBatch *batch) {
 }
 
 static void
-test_flatten_spans(TestBatch *batch) {
+test_flatten_spans(TestBatchRunner *runner) {
     VArray  *spans    = VA_new(8);
     VArray  *wanted   = VA_new(8);
     HeatMap *heat_map = HeatMap_new(spans, 133);
@@ -79,12 +73,12 @@ test_flatten_spans(TestBatch *batch) {
     VA_Push(wanted, (Obj*)Span_new(10,  6, 1.0f));
     VA_Push(wanted, (Obj*)Span_new(16,  4, 3.0f));
     VA_Push(wanted, (Obj*)Span_new(20, 10, 2.0f));
-    TEST_TRUE(batch, VA_Equals(flattened, (Obj*)wanted),
+    TEST_TRUE(runner, VA_Equals(flattened, (Obj*)wanted),
               "flatten two overlapping spans");
     VA_Clear(wanted);
     boosts = HeatMap_Generate_Proximity_Boosts(heat_map, spans);
     VA_Push(wanted, (Obj*)Span_new(10, 20, 3.0f));
-    TEST_TRUE(batch, VA_Equals(boosts, (Obj*)wanted),
+    TEST_TRUE(runner, VA_Equals(boosts, (Obj*)wanted),
               "prox boosts for overlap");
     VA_Clear(wanted);
     VA_Clear(spans);
@@ -99,11 +93,11 @@ test_flatten_spans(TestBatch *batch) {
     VA_Push(wanted, (Obj*)Span_new(16,  4, 3.0f));
     VA_Push(wanted, (Obj*)Span_new(20, 10, 2.0f));
     VA_Push(wanted, (Obj*)Span_new(50,  1, 1.0f));
-    TEST_TRUE(batch, VA_Equals(flattened, (Obj*)wanted),
+    TEST_TRUE(runner, VA_Equals(flattened, (Obj*)wanted),
               "flatten two overlapping spans, leave hole, then third span");
     VA_Clear(wanted);
     boosts = HeatMap_Generate_Proximity_Boosts(heat_map, spans);
-    TEST_TRUE(batch, VA_Get_Size(boosts) == 2 + 1,
+    TEST_TRUE(runner, VA_Get_Size(boosts) == 2 + 1,
               "boosts generated for each unique pair, since all were in range");
     VA_Clear(spans);
     DECREF(boosts);
@@ -118,11 +112,11 @@ test_flatten_spans(TestBatch *batch) {
     VA_Push(wanted, (Obj*)Span_new(16,  2, 7.0f));
     VA_Push(wanted, (Obj*)Span_new(18,  2, 3.0f));
     VA_Push(wanted, (Obj*)Span_new(20, 10, 2.0f));
-    TEST_TRUE(batch, VA_Equals(flattened, (Obj*)wanted),
+    TEST_TRUE(runner, VA_Equals(flattened, (Obj*)wanted),
               "flatten three overlapping spans");
     VA_Clear(wanted);
     boosts = HeatMap_Generate_Proximity_Boosts(heat_map, spans);
-    TEST_TRUE(batch, VA_Get_Size(boosts) == 2 + 1,
+    TEST_TRUE(runner, VA_Get_Size(boosts) == 2 + 1,
               "boosts generated for each unique pair, since all were in range");
     VA_Clear(spans);
     DECREF(boosts);
@@ -137,11 +131,11 @@ test_flatten_spans(TestBatch *batch) {
     VA_Push(wanted, (Obj*)Span_new(16,  4,  7.0f));
     VA_Push(wanted, (Obj*)Span_new(20, 10,  6.0f));
     VA_Push(wanted, (Obj*)Span_new(30, 10, 10.0f));
-    TEST_TRUE(batch, VA_Equals(flattened, (Obj*)wanted),
+    TEST_TRUE(runner, VA_Equals(flattened, (Obj*)wanted),
               "flatten 4 spans, middle two have identical range");
     VA_Clear(wanted);
     boosts = HeatMap_Generate_Proximity_Boosts(heat_map, spans);
-    TEST_TRUE(batch, VA_Get_Size(boosts) == 3 + 2 + 1,
+    TEST_TRUE(runner, VA_Get_Size(boosts) == 3 + 2 + 1,
               "boosts generated for each unique pair, since all were in range");
     VA_Clear(spans);
     DECREF(boosts);
@@ -156,11 +150,11 @@ test_flatten_spans(TestBatch *batch) {
     VA_Push(wanted, (Obj*)Span_new( 16,  4,  7.0f));
     VA_Push(wanted, (Obj*)Span_new( 20, 10,  2.0f));
     VA_Push(wanted, (Obj*)Span_new(230, 10, 10.0f));
-    TEST_TRUE(batch, VA_Equals(flattened, (Obj*)wanted),
+    TEST_TRUE(runner, VA_Equals(flattened, (Obj*)wanted),
               "flatten 4 spans, middle two have identical starts but different ends");
     VA_Clear(wanted);
     boosts = HeatMap_Generate_Proximity_Boosts(heat_map, spans);
-    TEST_TRUE(batch, VA_Get_Size(boosts) == 2 + 1,
+    TEST_TRUE(runner, VA_Get_Size(boosts) == 2 + 1,
               "boosts not generated for out of range span");
     VA_Clear(spans);
     DECREF(boosts);
@@ -172,10 +166,10 @@ test_flatten_spans(TestBatch *batch) {
 }
 
 void
-TestHeatMap_run_tests(TestHeatMap *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_calc_proximity_boost(batch);
-    test_flatten_spans(batch);
+TestHeatMap_run(TestHeatMap *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 13);
+    test_calc_proximity_boost(runner);
+    test_flatten_spans(runner);
 }
 
 

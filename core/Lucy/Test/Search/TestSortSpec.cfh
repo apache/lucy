@@ -20,13 +20,10 @@ class Lucy::Test::Search::TestSortSpec
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestSortSpec*
-    new(TestFormatter *formatter);
-
-    inert TestSortSpec*
-    init(TestSortSpec *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestSortSpec *self);
+    Run(TestSortSpec *self, TestBatchRunner *runner);
 }
 
 class Lucy::Test::Search::TestReverseType inherits Lucy::Plan::Int32Type {

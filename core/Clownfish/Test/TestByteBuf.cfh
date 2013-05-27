@@ -20,13 +20,10 @@ class Clownfish::Test::TestByteBuf cnick TestBB
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestByteBuf*
-    new(TestFormatter *formatter);
-
-    inert TestByteBuf*
-    init(TestByteBuf *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestByteBuf *self);
+    Run(TestByteBuf *self, TestBatchRunner *runner);
 }
 
 

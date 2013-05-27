@@ -19,20 +19,14 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Plan/TestFieldType.h"
 #include "Lucy/Test/TestUtils.h"
 
 TestFieldType*
-TestFType_new(TestFormatter *formatter) {
-    TestFieldType *self = (TestFieldType*)VTable_Make_Obj(TESTFIELDTYPE);
-    return TestFType_init(self, formatter);
-}
-
-TestFieldType*
-TestFType_init(TestFieldType *self, TestFormatter *formatter) {
-    return (TestFieldType*)TestBatch_init((TestBatch*)self, 9, formatter);
+TestFType_new() {
+    return (TestFieldType*)VTable_Make_Obj(TESTFIELDTYPE);
 }
 
 DummyFieldType*
@@ -50,7 +44,7 @@ S_alt_field_type() {
 }
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch) {
+test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     FieldType   *type          = (FieldType*)DummyFieldType_new();
     FieldType   *other         = (FieldType*)DummyFieldType_new();
     FieldType   *class_differs = S_alt_field_type();
@@ -66,17 +60,17 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
     FType_Set_Indexed(indexed, true);
     FType_Set_Stored(stored, true);
 
-    TEST_TRUE(batch, FType_Equals(type, (Obj*)other),
+    TEST_TRUE(runner, FType_Equals(type, (Obj*)other),
               "Equals() true with identical stats");
-    TEST_FALSE(batch, FType_Equals(type, (Obj*)class_differs),
+    TEST_FALSE(runner, FType_Equals(type, (Obj*)class_differs),
                "Equals() false with subclass");
-    TEST_FALSE(batch, FType_Equals(type, (Obj*)class_differs),
+    TEST_FALSE(runner, FType_Equals(type, (Obj*)class_differs),
                "Equals() false with super class");
-    TEST_FALSE(batch, FType_Equals(type, (Obj*)boost_differs),
+    TEST_FALSE(runner, FType_Equals(type, (Obj*)boost_differs),
                "Equals() false with different boost");
-    TEST_FALSE(batch, FType_Equals(type, (Obj*)indexed),
+    TEST_FALSE(runner, FType_Equals(type, (Obj*)indexed),
                "Equals() false with indexed => true");
-    TEST_FALSE(batch, FType_Equals(type, (Obj*)stored),
+    TEST_FALSE(runner, FType_Equals(type, (Obj*)stored),
                "Equals() false with stored => true");
 
     DECREF(stored);
@@ -87,18 +81,18 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 static void
-test_Compare_Values(TestBatch *batch) {
+test_Compare_Values(TestBatchRunner *runner) {
     FieldType     *type = (FieldType*)DummyFieldType_new();
     ZombieCharBuf *a    = ZCB_WRAP_STR("a", 1);
     ZombieCharBuf *b    = ZCB_WRAP_STR("b", 1);
 
-    TEST_TRUE(batch,
+    TEST_TRUE(runner,
               FType_Compare_Values(type, (Obj*)a, (Obj*)b) < 0,
               "a less than b");
-    TEST_TRUE(batch,
+    TEST_TRUE(runner,
               FType_Compare_Values(type, (Obj*)b, (Obj*)a) > 0,
               "b greater than a");
-    TEST_TRUE(batch,
+    TEST_TRUE(runner,
               FType_Compare_Values(type, (Obj*)b, (Obj*)b) == 0,
               "b equals b");
 
@@ -106,10 +100,10 @@ test_Compare_Values(TestBatch *batch) {
 }
 
 void
-TestFType_run_tests(TestFieldType *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Dump_Load_and_Equals(batch);
-    test_Compare_Values(batch);
+TestFType_run(TestFieldType *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 9);
+    test_Dump_Load_and_Equals(runner);
+    test_Compare_Values(runner);
 }
 
 

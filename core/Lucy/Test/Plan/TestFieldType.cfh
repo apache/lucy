@@ -20,13 +20,10 @@ class Lucy::Test::Plan::TestFieldType cnick TestFType
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestFieldType*
-    new(TestFormatter *formatter);
-
-    inert TestFieldType*
-    init(TestFieldType *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestFieldType *self);
+    Run(TestFieldType *self, TestBatchRunner *runner);
 }
 
 class Lucy::Test::Plan::DummyFieldType inherits Lucy::Plan::FieldType {

@@ -19,25 +19,19 @@
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Search/TestLeafQuery.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Search/LeafQuery.h"
 
 TestLeafQuery*
-TestLeafQuery_new(TestFormatter *formatter) {
-    TestLeafQuery *self = (TestLeafQuery*)VTable_Make_Obj(TESTLEAFQUERY);
-    return TestLeafQuery_init(self, formatter);
-}
-
-TestLeafQuery*
-TestLeafQuery_init(TestLeafQuery *self, TestFormatter *formatter) {
-    return (TestLeafQuery*)TestBatch_init((TestBatch*)self, 5, formatter);
+TestLeafQuery_new() {
+    return (TestLeafQuery*)VTable_Make_Obj(TESTLEAFQUERY);
 }
 
 static void
-test_Dump_Load_and_Equals(TestBatch *batch) {
+test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     LeafQuery *query         = TestUtils_make_leaf_query("content", "foo");
     LeafQuery *field_differs = TestUtils_make_leaf_query("stuff", "foo");
     LeafQuery *null_field    = TestUtils_make_leaf_query(NULL, "foo");
@@ -46,16 +40,16 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
     Obj       *dump          = (Obj*)LeafQuery_Dump(query);
     LeafQuery *clone         = (LeafQuery*)LeafQuery_Load(term_differs, dump);
 
-    TEST_FALSE(batch, LeafQuery_Equals(query, (Obj*)field_differs),
+    TEST_FALSE(runner, LeafQuery_Equals(query, (Obj*)field_differs),
                "Equals() false with different field");
-    TEST_FALSE(batch, LeafQuery_Equals(query, (Obj*)null_field),
+    TEST_FALSE(runner, LeafQuery_Equals(query, (Obj*)null_field),
                "Equals() false with null field");
-    TEST_FALSE(batch, LeafQuery_Equals(query, (Obj*)term_differs),
+    TEST_FALSE(runner, LeafQuery_Equals(query, (Obj*)term_differs),
                "Equals() false with different term");
     LeafQuery_Set_Boost(boost_differs, 0.5);
-    TEST_FALSE(batch, LeafQuery_Equals(query, (Obj*)boost_differs),
+    TEST_FALSE(runner, LeafQuery_Equals(query, (Obj*)boost_differs),
                "Equals() false with different boost");
-    TEST_TRUE(batch, LeafQuery_Equals(query, (Obj*)clone),
+    TEST_TRUE(runner, LeafQuery_Equals(query, (Obj*)clone),
               "Dump => Load round trip");
 
     DECREF(query);
@@ -68,9 +62,9 @@ test_Dump_Load_and_Equals(TestBatch *batch) {
 }
 
 void
-TestLeafQuery_run_tests(TestLeafQuery *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Dump_Load_and_Equals(batch);
+TestLeafQuery_run(TestLeafQuery *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 5);
+    test_Dump_Load_and_Equals(runner);
 }
 
 

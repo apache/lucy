@@ -20,12 +20,9 @@ class Lucy::Test::Index::TestPolyReader
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestPolyReader*
-    new(TestFormatter *formatter);
-
-    inert TestPolyReader*
-    init(TestPolyReader *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestPolyReader *self);
+    Run(TestPolyReader *self, TestBatchRunner *runner);
 }
 

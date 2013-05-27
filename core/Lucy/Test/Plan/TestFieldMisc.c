@@ -17,7 +17,7 @@
 
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Plan/TestFieldMisc.h"
 
@@ -44,14 +44,8 @@ static CharBuf *unindexed_unanalyzed_cb;
 static CharBuf *united_states_cb;
 
 TestFieldMisc*
-TestFieldMisc_new(TestFormatter *formatter) {
-    TestFieldMisc *self = (TestFieldMisc*)VTable_Make_Obj(TESTFIELDMISC);
-    return TestFieldMisc_init(self, formatter);
-}
-
-TestFieldMisc*
-TestFieldMisc_init(TestFieldMisc *self, TestFormatter *formatter) {
-    return (TestFieldMisc*)TestBatch_init((TestBatch*)self, 20, formatter);
+TestFieldMisc_new() {
+    return (TestFieldMisc*)VTable_Make_Obj(TESTFIELDMISC);
 }
 
 static void
@@ -127,13 +121,13 @@ S_add_doc(Indexer *indexer, CharBuf *field_name) {
 }
 
 static void
-S_check(TestBatch *batch, RAMFolder *folder, CharBuf *field,
+S_check(TestBatchRunner *runner, RAMFolder *folder, CharBuf *field,
         CharBuf *query_text, uint32_t expected_num_hits) {
     TermQuery *query = TermQuery_new(field, (Obj*)query_text);
     IndexSearcher *searcher = IxSearcher_new((Obj*)folder);
     Hits *hits = IxSearcher_Hits(searcher, (Obj*)query, 0, 10, NULL);
 
-    TEST_TRUE(batch, Hits_Total_Hits(hits) == expected_num_hits,
+    TEST_TRUE(runner, Hits_Total_Hits(hits) == expected_num_hits,
               "%s correct num hits", CB_Get_Ptr8(field));
 
     // Don't check the contents of the hit if there aren't any.
@@ -141,7 +135,7 @@ S_check(TestBatch *batch, RAMFolder *folder, CharBuf *field,
         HitDoc *hit = Hits_Next(hits);
         ViewCharBuf *value = (ViewCharBuf*)ZCB_BLANK();
         HitDoc_Extract(hit, field, value);
-        TEST_TRUE(batch, CB_Equals(united_states_cb, (Obj*)value),
+        TEST_TRUE(runner, CB_Equals(united_states_cb, (Obj*)value),
                   "%s correct doc returned", CB_Get_Ptr8(field));
         DECREF(hit);
     }
@@ -152,7 +146,7 @@ S_check(TestBatch *batch, RAMFolder *folder, CharBuf *field,
 }
 
 static void
-test_spec_field(TestBatch *batch) {
+test_spec_field(TestBatchRunner *runner) {
     RAMFolder *folder  = RAMFolder_new(NULL);
     Schema    *schema  = S_create_schema();
     Indexer   *indexer = Indexer_new(schema, (Obj*)folder, NULL, 0);
@@ -165,13 +159,13 @@ test_spec_field(TestBatch *batch) {
 
     Indexer_Commit(indexer);
 
-    S_check(batch, folder, analyzed_cb,               states_cb,        1);
-    S_check(batch, folder, easy_analyzed_cb,          state_cb,         1);
-    S_check(batch, folder, string_cb,                 united_states_cb, 1);
-    S_check(batch, folder, unindexed_but_analyzed_cb, state_cb,         0);
-    S_check(batch, folder, unindexed_but_analyzed_cb, united_states_cb, 0);
-    S_check(batch, folder, unindexed_unanalyzed_cb,   state_cb,         0);
-    S_check(batch, folder, unindexed_unanalyzed_cb,   united_states_cb, 0);
+    S_check(runner, folder, analyzed_cb,               states_cb,        1);
+    S_check(runner, folder, easy_analyzed_cb,          state_cb,         1);
+    S_check(runner, folder, string_cb,                 united_states_cb, 1);
+    S_check(runner, folder, unindexed_but_analyzed_cb, state_cb,         0);
+    S_check(runner, folder, unindexed_but_analyzed_cb, united_states_cb, 0);
+    S_check(runner, folder, unindexed_unanalyzed_cb,   state_cb,         0);
+    S_check(runner, folder, unindexed_unanalyzed_cb,   united_states_cb, 0);
 
     DECREF(indexer);
     DECREF(schema);
@@ -191,7 +185,7 @@ S_add_many_fields_doc(Indexer *indexer, CharBuf *content, int num_fields) {
 }
 
 static void
-test_many_fields(TestBatch *batch) {
+test_many_fields(TestBatchRunner *runner) {
     Schema            *schema    = Schema_new();
     StandardTokenizer *tokenizer = StandardTokenizer_new();
     FullTextType      *type      = FullTextType_new((Analyzer*)tokenizer);
@@ -223,7 +217,7 @@ test_many_fields(TestBatch *batch) {
         // See if our search results match as expected.
         IndexSearcher *searcher = IxSearcher_new((Obj*)folder);
         Hits *hits = IxSearcher_Hits(searcher, (Obj*)query, 0, 100, NULL);
-        TEST_TRUE(batch, Hits_Total_Hits(hits) == 2,
+        TEST_TRUE(runner, Hits_Total_Hits(hits) == 2,
                   "correct number of hits for %d fields", num_fields);
         HitDoc *top_hit = Hits_Next(hits);
 
@@ -242,11 +236,11 @@ test_many_fields(TestBatch *batch) {
 }
 
 void
-TestFieldMisc_run_tests(TestFieldMisc *self) {
-    TestBatch *batch = (TestBatch*)self;
+TestFieldMisc_run(TestFieldMisc *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 20);
     S_init_strings();
-    test_spec_field(batch);
-    test_many_fields(batch);
+    test_spec_field(runner);
+    test_many_fields(runner);
     S_destroy_strings();
 }
 

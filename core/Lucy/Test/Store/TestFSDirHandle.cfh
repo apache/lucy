@@ -20,13 +20,10 @@ class Lucy::Test::Store::TestFSDirHandle cnick TestFSDH
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestFSDirHandle*
-    new(TestFormatter *formatter);
-
-    inert TestFSDirHandle*
-    init(TestFSDirHandle *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestFSDirHandle *self);
+    Run(TestFSDirHandle *self, TestBatchRunner *runner);
 }
 
 

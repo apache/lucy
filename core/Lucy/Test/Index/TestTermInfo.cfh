@@ -20,13 +20,10 @@ class Lucy::Test::Index::TestTermInfo
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestTermInfo*
-    new(TestFormatter *formatter);
-
-    inert TestTermInfo*
-    init(TestTermInfo *self, TestFormatter *formatter);
+    new();
 
     void
-    Run_Tests(TestTermInfo *self);
+    Run(TestTermInfo *self, TestBatchRunner *runner);
 }
 
 

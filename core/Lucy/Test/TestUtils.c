@@ -21,7 +21,7 @@
 
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test.h"
-#include "Clownfish/TestHarness/TestBatch.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Clownfish/TestHarness/TestUtils.h"
 #include "Lucy/Analysis/Analyzer.h"
 #include "Lucy/Analysis/Inversion.h"
@@ -127,8 +127,9 @@ TestUtils_make_range_query(const char *field, const char *lower_term,
 }
 
 void
-TestUtils_test_analyzer(TestBatch *batch, Analyzer *analyzer, CharBuf *source,
-                        VArray *expected, const char *message) {
+TestUtils_test_analyzer(TestBatchRunner *runner, Analyzer *analyzer,
+                        CharBuf *source, VArray *expected,
+                        const char *message) {
     Token *seed = Token_new((char*)CB_Get_Ptr8(source), CB_Get_Size(source),
                             0, 0, 1.0f, 1);
     Inversion *starter = Inversion_new(seed);
@@ -140,7 +141,7 @@ TestUtils_test_analyzer(TestBatch *batch, Analyzer *analyzer, CharBuf *source,
             = CB_new_from_utf8(Token_Get_Text(token), Token_Get_Len(token));
         VA_Push(got, (Obj*)token_text);
     }
-    TEST_TRUE(batch, VA_Equals(expected, (Obj*)got),
+    TEST_TRUE(runner, VA_Equals(expected, (Obj*)got),
               "Transform(): %s", message);
     DECREF(transformed);
 
@@ -151,13 +152,13 @@ TestUtils_test_analyzer(TestBatch *batch, Analyzer *analyzer, CharBuf *source,
             = CB_new_from_utf8(Token_Get_Text(token), Token_Get_Len(token));
         VA_Push(got, (Obj*)token_text);
     }
-    TEST_TRUE(batch, VA_Equals(expected, (Obj*)got),
+    TEST_TRUE(runner, VA_Equals(expected, (Obj*)got),
               "Transform_Text(): %s", message);
     DECREF(transformed);
 
     DECREF(got);
     got = Analyzer_Split(analyzer, source);
-    TEST_TRUE(batch, VA_Equals(expected, (Obj*)got), "Split(): %s", message);
+    TEST_TRUE(runner, VA_Equals(expected, (Obj*)got), "Split(): %s", message);
 
     DECREF(got);
     DECREF(starter);

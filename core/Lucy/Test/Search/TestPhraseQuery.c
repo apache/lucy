@@ -19,30 +19,24 @@
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
-#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Search/TestPhraseQuery.h"
 #include "Lucy/Search/PhraseQuery.h"
 
 TestPhraseQuery*
-TestPhraseQuery_new(TestFormatter *formatter) {
-    TestPhraseQuery *self = (TestPhraseQuery*)VTable_Make_Obj(TESTPHRASEQUERY);
-    return TestPhraseQuery_init(self, formatter);
-}
-
-TestPhraseQuery*
-TestPhraseQuery_init(TestPhraseQuery *self, TestFormatter *formatter) {
-    return (TestPhraseQuery*)TestBatch_init((TestBatch*)self, 1, formatter);
+TestPhraseQuery_new() {
+    return (TestPhraseQuery*)VTable_Make_Obj(TESTPHRASEQUERY);
 }
 
 static void
-test_Dump_And_Load(TestBatch *batch) {
+test_Dump_And_Load(TestBatchRunner *runner) {
     PhraseQuery *query
         = TestUtils_make_phrase_query("content", "a", "b", "c", NULL);
     Obj         *dump  = (Obj*)PhraseQuery_Dump(query);
     PhraseQuery *twin = (PhraseQuery*)Obj_Load(dump, dump);
-    TEST_TRUE(batch, PhraseQuery_Equals(query, (Obj*)twin),
+    TEST_TRUE(runner, PhraseQuery_Equals(query, (Obj*)twin),
               "Dump => Load round trip");
     DECREF(query);
     DECREF(dump);
@@ -50,9 +44,9 @@ test_Dump_And_Load(TestBatch *batch) {
 }
 
 void
-TestPhraseQuery_run_tests(TestPhraseQuery *self) {
-    TestBatch *batch = (TestBatch*)self;
-    test_Dump_And_Load(batch);
+TestPhraseQuery_run(TestPhraseQuery *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 1);
+    test_Dump_And_Load(runner);
 }
 
 
