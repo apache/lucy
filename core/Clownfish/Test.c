@@ -23,9 +23,9 @@
 #include "Clownfish/Test.h"
 
 #include "Clownfish/Err.h"
-#include "Clownfish/Test/TestBatch.h"
-#include "Clownfish/Test/TestFormatter.h"
-#include "Clownfish/Test/TestRunner.h"
+#include "Clownfish/TestHarness/TestBatch.h"
+#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestRunner.h"
 #include "Clownfish/VArray.h"
 
 #include "Clownfish/Test/TestByteBuf.h"

@@ -17,7 +17,7 @@
 parcel TestLucy;
 
 class Lucy::Test::Search::TestANDQuery
-    inherits Clownfish::Test::TestBatch {
+    inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestANDQuery*
     new(TestFormatter *formatter);
@@ -30,7 +30,7 @@ class Lucy::Test::Search::TestANDQuery
 }
 
 class Lucy::Test::Search::TestORQuery
-    inherits Clownfish::Test::TestBatch {
+    inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestORQuery*
     new(TestFormatter *formatter);

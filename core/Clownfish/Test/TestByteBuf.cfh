@@ -17,7 +17,7 @@
 parcel TestClownfish;
 
 class Clownfish::Test::TestByteBuf cnick TestBB
-    inherits Clownfish::Test::TestBatch {
+    inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestByteBuf*
     new(TestFormatter *formatter);

@@ -21,10 +21,10 @@
 #define C_CFISH_TESTBATCH
 #define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
-#include "Clownfish/Test/TestBatch.h"
+#include "Clownfish/TestHarness/TestBatch.h"
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"
-#include "Clownfish/Test/TestFormatter.h"
+#include "Clownfish/TestHarness/TestFormatter.h"
 #include "Clownfish/VArray.h"
 #include "Clownfish/VTable.h"
 

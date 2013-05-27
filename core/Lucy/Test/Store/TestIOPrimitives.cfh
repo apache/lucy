@@ -19,7 +19,7 @@ parcel TestLucy;
 /** Tests reading and writing of primitive types using InStream/OutStream.
  */
 class Lucy::Test::Store::TestIOPrimitives
-    inherits Clownfish::Test::TestBatch {
+    inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestIOPrimitives*
     new(TestFormatter *formatter);

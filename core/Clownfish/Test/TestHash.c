@@ -26,8 +26,8 @@
 #include "Clownfish/Hash.h"
 #include "Clownfish/Num.h"
 #include "Clownfish/Test.h"
-#include "Clownfish/Test/TestFormatter.h"
-#include "Clownfish/Test/TestUtils.h"
+#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestUtils.h"
 #include "Clownfish/VArray.h"
 #include "Clownfish/VTable.h"
 

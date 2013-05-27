@@ -27,7 +27,7 @@
   #include <unistd.h>
 #endif
 
-#include "Clownfish/Test/TestFormatter.h"
+#include "Clownfish/TestHarness/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestFSDirHandle.h"
 #include "Lucy/Store/FSDirHandle.h"

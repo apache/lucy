@@ -19,7 +19,7 @@ parcel Clownfish;
 /**
  * Run multiple test batches and collect statistics.
  */
-class Clownfish::Test::TestRunner inherits Clownfish::Obj {
+class Clownfish::TestHarness::TestRunner inherits Clownfish::Obj {
     TestFormatter *formatter;
     uint32_t       num_tests;
     uint32_t       num_tests_failed;

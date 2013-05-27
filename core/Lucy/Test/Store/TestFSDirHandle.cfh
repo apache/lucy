@@ -17,7 +17,7 @@
 parcel TestLucy;
 
 class Lucy::Test::Store::TestFSDirHandle cnick TestFSDH
-    inherits Clownfish::Test::TestBatch {
+    inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestFSDirHandle*
     new(TestFormatter *formatter);

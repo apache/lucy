@@ -21,7 +21,7 @@
 #include "Clownfish/Test/Util/TestMemory.h"
 
 #include "Clownfish/Test.h"
-#include "Clownfish/Test/TestFormatter.h"
+#include "Clownfish/TestHarness/TestFormatter.h"
 #include "Clownfish/Util/Memory.h"
 #include "Clownfish/VTable.h"
 

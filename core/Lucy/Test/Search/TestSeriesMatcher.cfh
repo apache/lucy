@@ -17,7 +17,7 @@
 parcel TestLucy;
 
 class Lucy::Test::Search::TestSeriesMatcher
-    inherits Clownfish::Test::TestBatch {
+    inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestSeriesMatcher*
     new(TestFormatter *formatter);

@@ -17,7 +17,7 @@
 parcel TestClownfish;
 
 class Clownfish::Test::Util::TestNumberUtils cnick TestNumUtil
-    inherits Clownfish::Test::TestBatch {
+    inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestNumberUtils*
     new(TestFormatter *formatter);

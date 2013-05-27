@@ -21,7 +21,7 @@
 #define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
 
-#include "Clownfish/Test/TestUtils.h"
+#include "Clownfish/TestHarness/TestUtils.h"
 
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Util/Memory.h"

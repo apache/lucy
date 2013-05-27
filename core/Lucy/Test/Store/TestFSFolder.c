@@ -32,7 +32,7 @@
   #include <sys/stat.h>
 #endif
 
-#include "Clownfish/Test/TestFormatter.h"
+#include "Clownfish/TestHarness/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestFSFolder.h"
 #include "Lucy/Test/Store/TestFolderCommon.h"

@@ -27,7 +27,7 @@
   #include <io.h> // close
 #endif
 
-#include "Clownfish/Test/TestFormatter.h"
+#include "Clownfish/TestHarness/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestFSFileHandle.h"
 #include "Lucy/Store/FSFileHandle.h"

@@ -21,11 +21,11 @@
 #define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
-#include "Clownfish/Test/TestFormatter.h"
+#include "Clownfish/TestHarness/TestFormatter.h"
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"
-#include "Clownfish/Test/TestBatch.h"
-#include "Clownfish/Test/TestRunner.h"
+#include "Clownfish/TestHarness/TestBatch.h"
+#include "Clownfish/TestHarness/TestRunner.h"
 #include "Clownfish/VTable.h"
 
 TestFormatter*

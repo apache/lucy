@@ -26,8 +26,8 @@
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Num.h"
 #include "Clownfish/Test.h"
-#include "Clownfish/Test/TestFormatter.h"
-#include "Clownfish/Test/TestUtils.h"
+#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestUtils.h"
 #include "Clownfish/VTable.h"
 
 static char smiley[] = { (char)0xE2, (char)0x98, (char)0xBA, 0 };

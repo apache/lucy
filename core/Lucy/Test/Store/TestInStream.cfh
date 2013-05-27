@@ -21,7 +21,7 @@ parcel TestLucy;
  */
 
 class Lucy::Test::Store::TestInStream
-    inherits Clownfish::Test::TestBatch {
+    inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestInStream*
     new(TestFormatter *formatter);

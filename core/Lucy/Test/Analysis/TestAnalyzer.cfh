@@ -17,7 +17,7 @@
 parcel TestLucy;
 
 class Lucy::Test::Analysis::TestAnalyzer
-    inherits Clownfish::Test::TestBatch {
+    inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestAnalyzer*
     new(TestFormatter *formatter);

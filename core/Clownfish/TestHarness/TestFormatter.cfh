@@ -19,7 +19,7 @@ parcel Clownfish;
 /**
  * Abstract base class for Clownfish test formatters.
  */
-abstract class Clownfish::Test::TestFormatter inherits Clownfish::Obj {
+abstract class Clownfish::TestHarness::TestFormatter inherits Clownfish::Obj {
     inert TestFormatter*
     init(TestFormatter *self);
 
@@ -80,7 +80,7 @@ abstract class Clownfish::Test::TestFormatter inherits Clownfish::Obj {
  * "Clownfish" format.
  */
 class Clownfish::Test::Formatter::TestFormatterCF
-    inherits Clownfish::Test::TestFormatter {
+    inherits Clownfish::TestHarness::TestFormatter {
 
     inert incremented TestFormatterCF*
     new();
@@ -110,7 +110,7 @@ class Clownfish::Test::Formatter::TestFormatterCF
  * See http://testanything.org/
  */
 class Clownfish::Test::Formatter::TestFormatterTAP
-    inherits Clownfish::Test::TestFormatter {
+    inherits Clownfish::TestHarness::TestFormatter {
 
     inert incremented TestFormatterTAP*
     new();

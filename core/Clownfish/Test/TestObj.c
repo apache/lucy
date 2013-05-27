@@ -25,7 +25,7 @@
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Test.h"
-#include "Clownfish/Test/TestFormatter.h"
+#include "Clownfish/TestHarness/TestFormatter.h"
 #include "Clownfish/VTable.h"
 
 TestObj*

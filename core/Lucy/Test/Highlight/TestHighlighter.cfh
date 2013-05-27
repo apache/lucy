@@ -17,7 +17,7 @@
 parcel TestLucy;
 
 class Lucy::Test::Highlight::TestHighlighter
-    inherits Clownfish::Test::TestBatch {
+    inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestHighlighter*
     new(TestFormatter *formatter);

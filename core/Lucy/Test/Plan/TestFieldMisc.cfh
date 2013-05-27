@@ -17,7 +17,7 @@
 parcel TestLucy;
 
 class Lucy::Test::Plan::TestFieldMisc
-    inherits Clownfish::Test::TestBatch {
+    inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestFieldMisc*
     new(TestFormatter *formatter);

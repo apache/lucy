@@ -17,7 +17,7 @@
 parcel TestClownfish;
 
 class Clownfish::Test::Util::TestStringHelper cnick TestStrHelp
-    inherits Clownfish::Test::TestBatch {
+    inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestStringHelper*
     new(TestFormatter *formatter);

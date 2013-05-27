@@ -17,7 +17,7 @@
 parcel TestClownfish;
 
 class Clownfish::Test::TestLockFreeRegistry cnick TestLFReg
-    inherits Clownfish::Test::TestBatch {
+    inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestLockFreeRegistry*
     new(TestFormatter *formatter);

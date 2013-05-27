@@ -17,7 +17,7 @@
 parcel TestClownfish;
 
 class Clownfish::Test::TestErr
-    inherits Clownfish::Test::TestBatch {
+    inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestErr*
     new(TestFormatter *formatter);

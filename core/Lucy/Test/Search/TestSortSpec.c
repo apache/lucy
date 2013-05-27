@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "Clownfish/Test/TestFormatter.h"
+#include "Clownfish/TestHarness/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Search/TestSortSpec.h"
 #include "Lucy/Test/TestUtils.h"

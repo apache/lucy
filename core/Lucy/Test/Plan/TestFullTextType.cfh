@@ -17,7 +17,7 @@
 parcel TestLucy;
 
 class Lucy::Test::Plan::TestFullTextType
-    inherits Clownfish::Test::TestBatch {
+    inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestFullTextType*
     new(TestFormatter *formatter);

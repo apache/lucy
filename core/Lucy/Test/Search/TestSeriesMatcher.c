@@ -19,7 +19,7 @@
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
-#include "Clownfish/Test/TestFormatter.h"
+#include "Clownfish/TestHarness/TestFormatter.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Search/TestSeriesMatcher.h"
 #include "Lucy/Search/BitVecMatcher.h"

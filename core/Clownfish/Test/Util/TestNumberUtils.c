@@ -24,8 +24,8 @@
 
 #include "Clownfish/Err.h"
 #include "Clownfish/Test.h"
-#include "Clownfish/Test/TestFormatter.h"
-#include "Clownfish/Test/TestUtils.h"
+#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestUtils.h"
 #include "Clownfish/Util/Memory.h"
 #include "Clownfish/Util/NumberUtils.h"
 #include "Clownfish/VTable.h"

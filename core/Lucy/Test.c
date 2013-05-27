@@ -20,9 +20,9 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Test.h"
-#include "Clownfish/Test/TestBatch.h"
-#include "Clownfish/Test/TestFormatter.h"
-#include "Clownfish/Test/TestRunner.h"
+#include "Clownfish/TestHarness/TestBatch.h"
+#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestRunner.h"
 #include "Lucy/Test/Analysis/TestAnalyzer.h"
 #include "Lucy/Test/Analysis/TestCaseFolder.h"
 #include "Lucy/Test/Analysis/TestNormalizer.h"

@@ -17,7 +17,7 @@
 parcel TestLucy;
 
 class Lucy::Test::Store::TestFolder
-    inherits Clownfish::Test::TestBatch {
+    inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestFolder*
     new(TestFormatter *formatter);

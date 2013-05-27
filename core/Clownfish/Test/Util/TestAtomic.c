@@ -20,7 +20,7 @@
 #include "Clownfish/Test/Util/TestAtomic.h"
 
 #include "Clownfish/Test.h"
-#include "Clownfish/Test/TestFormatter.h"
+#include "Clownfish/TestHarness/TestFormatter.h"
 #include "Clownfish/Util/Atomic.h"
 #include "Clownfish/VTable.h"
 

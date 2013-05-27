@@ -20,7 +20,7 @@ parcel TestLucy;
  */
 
 class Lucy::Test::Search::TestQueryParserLogic cnick TestQPLogic
-    inherits Clownfish::Test::TestBatch {
+    inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestQueryParserLogic*
     new(TestFormatter *formatter);

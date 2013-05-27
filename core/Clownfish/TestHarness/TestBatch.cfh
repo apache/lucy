@@ -16,7 +16,7 @@
 
 parcel Clownfish;
 
-abstract class Clownfish::Test::TestBatch inherits Clownfish::Obj {
+abstract class Clownfish::TestHarness::TestBatch inherits Clownfish::Obj {
     TestFormatter *formatter;
     uint32_t       test_num;
     uint32_t       num_planned;
