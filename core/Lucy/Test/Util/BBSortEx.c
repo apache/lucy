@@ -60,7 +60,7 @@ BBSortEx_clear_cache(BBSortEx *self) {
 
 void
 BBSortEx_feed(BBSortEx *self, void *data) {
-    SortEx_feed((SortExternal*)self, data);
+    SortEx_Feed((SortExternal*)self, data);
 
     // Flush() if necessary.
     ByteBuf *bytebuf = (ByteBuf*)CERTIFY(*(ByteBuf**)data, BYTEBUF);
