@@ -60,7 +60,9 @@ BBSortEx_clear_cache(BBSortEx *self) {
 
 void
 BBSortEx_feed(BBSortEx *self, void *data) {
-    SortEx_Feed((SortExternal*)self, data);
+    BBSortEx_Feed_t super_feed
+        = SUPER_METHOD_PTR(self->vtable, Lucy_BBSortEx_Feed);
+    super_feed(self, data);
 
     // Flush() if necessary.
     ByteBuf *bytebuf = (ByteBuf*)CERTIFY(*(ByteBuf**)data, BYTEBUF);
