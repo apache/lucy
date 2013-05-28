@@ -3579,6 +3579,7 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
                              const char *sources, chaz_CFlags *link_flags) {
     chaz_CFlags   *local_flags  = chaz_CC_new_cflags();
     const char    *link         = chaz_CC_link_command();
+    const char    *shlib_ext    = chaz_OS_shared_lib_ext();
     const char    *link_flags_string = "";
     const char    *local_flags_string;
     chaz_MakeRule *rule;
@@ -3591,13 +3592,25 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
     if (link_flags) {
         link_flags_string = chaz_CFlags_get_string(link_flags);
     }
+
     if (chaz_CC_msvc_version_num()) {
         chaz_CFlags_append(local_flags, "/nologo");
     }
     chaz_CFlags_link_shared_library(local_flags);
+    if (strcmp(shlib_ext, ".dylib") == 0) {
+        /* Set temporary install name with full path on Darwin. */
+        const char *dir_sep = chaz_OS_dir_sep();
+        char *major_v_name = chaz_SharedLib_major_version_filename(lib);
+        char *install_name = chaz_Util_join("", "-install_name $(CURDIR)",
+                                            dir_sep, major_v_name, NULL);
+        chaz_CFlags_append(local_flags, install_name);
+        free(major_v_name);
+        free(install_name);
+    }
     chaz_CFlags_set_shared_library_version(local_flags, lib);
     chaz_CFlags_set_link_output(local_flags, filename);
     local_flags_string = chaz_CFlags_get_string(local_flags);
+
     command = chaz_Util_join(" ", link, sources, link_flags_string,
                              local_flags_string, NULL);
     chaz_MakeRule_add_command(rule, command);
@@ -3605,14 +3618,31 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
 
     chaz_MakeRule_add_rm_command(makefile->clean, filename);
 
-    if (strcmp(chaz_OS_shared_lib_ext(), ".so") == 0) {
-        /* Add symlink for soname. */
-        char *soname = chaz_SharedLib_major_version_filename(lib);
-        command = chaz_Util_join(" ", "ln -sf", filename, soname, NULL);
+    /* Add symlinks. */
+    if (strcmp(shlib_ext, ".dll") != 0) {
+        char *major_v_name = chaz_SharedLib_major_version_filename(lib);
+        char *no_v_name    = chaz_SharedLib_no_version_filename(lib);
+
+        command = chaz_Util_join(" ", "ln -sf", filename, major_v_name, NULL);
         chaz_MakeRule_add_command(rule, command);
         free(command);
-        chaz_MakeRule_add_rm_command(makefile->clean, soname);
-        free(soname);
+
+        if (strcmp(shlib_ext, ".dylib") == 0) {
+            command = chaz_Util_join(" ", "ln -sf", filename, no_v_name,
+                                     NULL);
+        }
+        else {
+            command = chaz_Util_join(" ", "ln -sf", major_v_name, no_v_name,
+                                     NULL);
+        }
+        chaz_MakeRule_add_command(rule, command);
+        free(command);
+
+        chaz_MakeRule_add_rm_command(makefile->clean, major_v_name);
+        chaz_MakeRule_add_rm_command(makefile->clean, no_v_name);
+
+        free(major_v_name);
+        free(no_v_name);
     }
 
     if (chaz_CC_msvc_version_num()) {
