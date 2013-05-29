@@ -54,14 +54,14 @@ BBSortEx_clear_cache(BBSortEx *self) {
     }
     self->mem_consumed = 0;
     BBSortEx_Clear_Cache_t super_clear_cache
-        = SUPER_METHOD_PTR(self->vtable, Lucy_BBSortEx_Clear_Cache);
+        = SUPER_METHOD_PTR(BBSORTEX, Lucy_BBSortEx_Clear_Cache);
     super_clear_cache(self);
 }
 
 void
 BBSortEx_feed(BBSortEx *self, void *data) {
     BBSortEx_Feed_t super_feed
-        = SUPER_METHOD_PTR(self->vtable, Lucy_BBSortEx_Feed);
+        = SUPER_METHOD_PTR(BBSORTEX, Lucy_BBSortEx_Feed);
     super_feed(self, data);
 
     // Flush() if necessary.
