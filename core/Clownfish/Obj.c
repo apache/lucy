@@ -68,24 +68,6 @@ Obj_equals(Obj *self, Obj *other) {
     return (self == other);
 }
 
-void
-Obj_serialize(Obj *self, OutStream *outstream) {
-    CharBuf *class_name = Obj_Get_Class_Name(self);
-    CB_Serialize(class_name, outstream);
-}
-
-Obj*
-Obj_deserialize(Obj *self, InStream *instream) {
-    CharBuf *class_name
-        = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
-    CharBuf *my_class = VTable_Get_Name(self->vtable);
-    if (!CB_Equals(class_name, (Obj*)my_class)) {
-        THROW(ERR, "Class mismatch: %o %o", class_name, my_class);
-    }
-    DECREF(class_name);
-    return Obj_init(self);
-}
-
 CharBuf*
 Obj_to_string(Obj *self) {
 #if (SIZEOF_PTR == 4)

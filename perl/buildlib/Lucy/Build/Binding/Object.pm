@@ -146,15 +146,6 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_deserialize(self, instream)
-    lucy_CharBuf *self;
-    lucy_InStream *instream;
-CODE:
-    lucy_CharBuf *thawed = Lucy_CB_Deserialize(self, instream);
-    RETVAL = (SV*)Lucy_CB_To_Host(thawed);
-OUTPUT: RETVAL
-
-SV*
 to_perl(self)
     lucy_CharBuf *self;
 CODE:

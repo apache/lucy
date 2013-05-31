@@ -17,7 +17,7 @@ use strict;
 use warnings;
 use lib 'buildlib';
 
-use Test::More tests => 6;
+use Test::More tests => 5;
 use Storable qw( freeze thaw );
 use Lucy::Test::TestUtils qw( utf8_test_strings );
 
@@ -35,18 +35,4 @@ is( $dupe->to_perl, $charbuf->to_perl, "freeze/thaw" );
 
 my $clone = $charbuf->clone;
 is( $clone->to_perl, Clownfish::CharBuf->new($smiley)->to_perl, "clone" );
-
-my $ram_file = Lucy::Store::RAMFile->new;
-my $outstream = Lucy::Store::OutStream->open( file => $ram_file )
-    or die Lucy->error;
-$charbuf->serialize($outstream);
-$outstream->close;
-my $instream = Lucy::Store::InStream->open( file => $ram_file )
-    or die Lucy->error;
-my $charbuf_vtable
-    = Clownfish::VTable->singleton( class_name => 'Clownfish::CharBuf',
-    );
-my $deserialized = $charbuf_vtable->make_obj->deserialize($instream);
-is_deeply( $charbuf->to_perl, $deserialized->to_perl,
-    "serialize/deserialize" );
 

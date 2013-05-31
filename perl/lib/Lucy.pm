@@ -306,13 +306,12 @@ sub error {$Clownfish::Err::error}
     $VERSION = eval $VERSION;
 
     {
-        # Defeat obscure bugs in the XS auto-generation by redefining clone()
-        # and deserialize().  (Because of how the typemap works for CharBuf*,
+        # Defeat obscure bugs in the XS auto-generation by redefining clone().
+        # (Because of how the typemap works for CharBuf*,
         # the auto-generated methods return UTF-8 Perl scalars rather than
         # actual CharBuf objects.)
         no warnings 'redefine';
-        sub clone       { shift->_clone(@_) }
-        sub deserialize { shift->_deserialize(@_) }
+        sub clone { shift->_clone(@_) }
     }
 }
 
