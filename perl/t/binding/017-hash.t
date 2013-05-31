@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
+use Test::More tests => 3;
 use Storable qw( nfreeze thaw );
 use Lucy::Test;
 use Lucy qw( to_perl to_clownfish );
@@ -31,18 +31,6 @@ ok( !defined( $hash->fetch("blah") ),
 my $frozen = nfreeze($hash);
 my $thawed = thaw($frozen);
 is_deeply( $thawed->to_perl, $hash->to_perl, "freeze/thaw" );
-
-my $ram_file = Lucy::Store::RAMFile->new;
-my $outstream = Lucy::Store::OutStream->open( file => $ram_file )
-    or die Lucy->error;
-$hash->serialize($outstream);
-$outstream->close;
-my $instream = Lucy::Store::InStream->open( file => $ram_file )
-    or die Lucy->error;
-my $hash_vtable
-    = Clownfish::VTable->singleton( class_name => 'Clownfish::Hash' );
-my $deserialized = $hash_vtable->make_obj->deserialize($instream);
-is_deeply( $hash->to_perl, $deserialized->to_perl, "serialize/deserialize" );
 
 my %hash_with_utf8_keys = ( "\x{263a}" => "foo" );
 my $round_tripped = to_perl( to_clownfish( \%hash_with_utf8_keys ) );

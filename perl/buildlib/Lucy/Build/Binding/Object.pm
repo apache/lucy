@@ -228,16 +228,6 @@ sub bind_hash {
 
     my $xs_code = <<'END_XS_CODE';
 MODULE =  Lucy    PACKAGE = Clownfish::Hash
-
-SV*
-_deserialize(self, instream)
-    lucy_Hash *self;
-    lucy_InStream *instream;
-CODE:
-    lucy_Hash *thawed = Lucy_Hash_Deserialize(self, instream);
-    RETVAL = (SV*)Lucy_Hash_To_Host(thawed);
-OUTPUT: RETVAL
-
 SV*
 _fetch(self, key)
     lucy_Hash *self;

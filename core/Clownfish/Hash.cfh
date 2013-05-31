@@ -140,12 +140,6 @@ class Clownfish::Hash inherits Clownfish::Obj {
     Load(Hash *self, Obj *dump);
 
     public void
-    Serialize(Hash *self, OutStream *outstream);
-
-    public incremented Hash*
-    Deserialize(decremented Hash *self, InStream *instream);
-
-    public void
     Destroy(Hash *self);
 }
 

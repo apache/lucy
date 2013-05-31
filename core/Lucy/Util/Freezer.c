@@ -58,7 +58,7 @@ Freezer_serialize(Obj *obj, OutStream *outstream) {
         Freezer_serialize_varray((VArray*)obj, outstream);
     }
     else if (Obj_Is_A(obj, HASH)) {
-        Hash_serialize((Hash*)obj, outstream);
+        Freezer_serialize_hash((Hash*)obj, outstream);
     }
     else if (Obj_Is_A(obj, NUM)) {
         if (Obj_Is_A(obj, INTNUM)) {
@@ -132,7 +132,7 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
         obj = (Obj*)Freezer_deserialize_varray((VArray*)obj, instream);
     }
     else if (Obj_Is_A(obj, HASH)) {
-        obj = (Obj*)Hash_deserialize((Hash*)obj, instream);
+        obj = (Obj*)Freezer_deserialize_hash((Hash*)obj, instream);
     }
     else if (Obj_Is_A(obj, NUM)) {
         if (Obj_Is_A(obj, INTNUM)) {
@@ -288,5 +288,75 @@ VArray*
 Freezer_read_varray(InStream *instream) {
     VArray *array = (VArray*)VTable_Make_Obj(VARRAY);
     return Freezer_deserialize_varray(array, instream);
+}
+
+void
+Freezer_serialize_hash(Hash *hash, OutStream *outstream) {
+    Obj *key;
+    Obj *val;
+    uint32_t charbuf_count = 0;
+    uint32_t hash_size = Hash_Get_Size(hash);
+    OutStream_Write_C32(outstream, hash_size);
+
+    // Write CharBuf keys first.  CharBuf keys are the common case; grouping
+    // them together is a form of run-length-encoding and saves space, since
+    // we omit the per-key class name.
+    Hash_Iterate(hash);
+    while (Hash_Next(hash, &key, &val)) {
+        if (Obj_Is_A(key, CHARBUF)) { charbuf_count++; }
+    }
+    OutStream_Write_C32(outstream, charbuf_count);
+    Hash_Iterate(hash);
+    while (Hash_Next(hash, &key, &val)) {
+        if (Obj_Is_A(key, CHARBUF)) {
+            Freezer_serialize_charbuf((CharBuf*)key, outstream);
+            FREEZE(val, outstream);
+        }
+    }
+
+    // Punt on the classes of the remaining keys.
+    Hash_Iterate(hash);
+    while (Hash_Next(hash, &key, &val)) {
+        if (!Obj_Is_A(key, CHARBUF)) {
+            FREEZE(key, outstream);
+            FREEZE(val, outstream);
+        }
+    }
+}
+
+Hash*
+Freezer_deserialize_hash(Hash *hash, InStream *instream) {
+    uint32_t size         = InStream_Read_C32(instream);
+    uint32_t num_charbufs = InStream_Read_C32(instream);
+    uint32_t num_other    = size - num_charbufs;
+    CharBuf *key          = num_charbufs ? CB_new(0) : NULL;
+
+    Hash_init(hash, size);
+
+    // Read key-value pairs with CharBuf keys.
+    while (num_charbufs--) {
+        uint32_t len = InStream_Read_C32(instream);
+        char *key_buf = CB_Grow(key, len);
+        InStream_Read_Bytes(instream, key_buf, len);
+        key_buf[len] = '\0';
+        CB_Set_Size(key, len);
+        Hash_Store(hash, (Obj*)key, THAW(instream));
+    }
+    DECREF(key);
+
+    // Read remaining key/value pairs.
+    while (num_other--) {
+        Obj *k = THAW(instream);
+        Hash_Store(hash, k, THAW(instream));
+        DECREF(k);
+    }
+
+    return hash;
+}
+
+Hash*
+Freezer_read_hash(InStream *instream) {
+    Hash *hash = (Hash*)VTable_Make_Obj(HASH);
+    return Freezer_deserialize_hash(hash, instream);
 }
 

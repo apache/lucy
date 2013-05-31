@@ -362,14 +362,6 @@ sub error {$Clownfish::Err::error}
 }
 
 {
-    package Clownfish::Hash;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    no warnings 'redefine';
-    sub deserialize { shift->_deserialize(@_) }
-}
-
-{
     package Clownfish::VArray;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;

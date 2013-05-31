@@ -21,6 +21,7 @@
 #include "Lucy/Index/TermVector.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Util/Freezer.h"
 
 // Extract a document's compressed TermVector data into (term_text =>
 // compressed positional data) pairs.
@@ -47,16 +48,14 @@ DocVec_init(DocVector *self) {
 
 void
 DocVec_serialize(DocVector *self, OutStream *outstream) {
-    Hash_Serialize(self->field_bufs, outstream);
-    Hash_Serialize(self->field_vectors, outstream);
+    Freezer_serialize_hash(self->field_bufs, outstream);
+    Freezer_serialize_hash(self->field_vectors, outstream);
 }
 
 DocVector*
 DocVec_deserialize(DocVector *self, InStream *instream) {
-    self->field_bufs
-        = Hash_Deserialize((Hash*)VTable_Make_Obj(HASH), instream);
-    self->field_vectors
-        = Hash_Deserialize((Hash*)VTable_Make_Obj(HASH), instream);
+    self->field_bufs    = Freezer_read_hash(instream);
+    self->field_vectors = Freezer_read_hash(instream);
     return self;
 }
 

@@ -25,6 +25,7 @@
 #include "Clownfish/VTable.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Util/Freezer.h"
 
 Doc*
 Doc_init(Doc *self, void *fields, int32_t doc_id) {
@@ -65,14 +66,13 @@ Doc_store(Doc *self, const CharBuf *field, Obj *value) {
 void
 Doc_serialize(Doc *self, OutStream *outstream) {
     Hash *hash = (Hash *)self->fields;
-    Hash_Serialize(hash, outstream);
+    Freezer_serialize_hash(hash, outstream);
     OutStream_Write_C32(outstream, self->doc_id);
 }
 
 Doc*
 Doc_deserialize(Doc *self, InStream *instream) {
-     Hash *hash = (Hash*)VTable_Make_Obj(HASH);
-     self->fields = Hash_Deserialize(hash, instream);
+     self->fields = Freezer_read_hash(instream);
      self->doc_id = InStream_Read_C32(instream);
      return self;
 }

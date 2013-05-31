@@ -66,6 +66,15 @@ inert class Lucy::Util::Freezer {
 
     inert incremented VArray*
     read_varray(InStream *instream);
+
+    inert void
+    serialize_hash(Hash *hash, OutStream *outstream);
+
+    inert incremented Hash*
+    deserialize_hash(decremented Hash *hash, InStream *instream);
+
+    inert incremented Hash*
+    read_hash(InStream *instream);
 }
 
 __C__
