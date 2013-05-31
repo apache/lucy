@@ -63,21 +63,26 @@ Freezer_serialize(Obj *obj, OutStream *outstream) {
     else if (Obj_Is_A(obj, NUM)) {
         if (Obj_Is_A(obj, INTNUM)) {
             if (Obj_Is_A(obj, BOOLNUM)) {
-                Bool_serialize((BoolNum*)obj, outstream);
+                bool val = Bool_Get_Value((BoolNum*)obj);
+                OutStream_Write_U8(outstream, (uint8_t)val);
             }
             else if (Obj_Is_A(obj, INTEGER32)) {
-                Int32_serialize((Integer32*)obj, outstream);
+                int32_t val = Int32_Get_Value((Integer32*)obj);
+                OutStream_Write_C32(outstream, (uint32_t)val);
             }
             else if (Obj_Is_A(obj, INTEGER64)) {
-                Int64_serialize((Integer64*)obj, outstream);
+                int64_t val = Int64_Get_Value((Integer64*)obj);
+                OutStream_Write_C64(outstream, (uint64_t)val);
             }
         }
         else if (Obj_Is_A(obj, FLOATNUM)) {
             if (Obj_Is_A(obj, FLOAT32)) {
-                Float32_serialize((Float32*)obj, outstream);
+                float val = Float32_Get_Value((Float32*)obj);
+                OutStream_Write_F32(outstream, val);
             }
             else if (Obj_Is_A(obj, FLOAT64)) {
-                Float64_serialize((Float64*)obj, outstream);
+                double val = Float64_Get_Value((Float64*)obj);
+                OutStream_Write_F64(outstream, val);
             }
         }
     }
@@ -132,21 +137,32 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
     else if (Obj_Is_A(obj, NUM)) {
         if (Obj_Is_A(obj, INTNUM)) {
             if (Obj_Is_A(obj, BOOLNUM)) {
-                obj = (Obj*)Bool_deserialize((BoolNum*)obj, instream);
+                bool value = (bool)InStream_Read_U8(instream);
+                BoolNum *self = (BoolNum*)obj;
+                if (self && self != CFISH_TRUE && self != CFISH_FALSE) {
+                    Bool_Dec_RefCount_t super_decref
+                        = SUPER_METHOD_PTR(BOOLNUM, Lucy_Bool_Dec_RefCount);
+                    super_decref(self);
+                }
+                obj = value ? CFISH_TRUE : CFISH_FALSE;
             }
             else if (Obj_Is_A(obj, INTEGER32)) {
-                obj = (Obj*)Int32_deserialize((Integer32*)obj, instream);
+                int32_t value = (int32_t)InStream_Read_C32(instream);
+                obj = (Obj*)Int32_init((Integer32*)obj, value);
             }
             else if (Obj_Is_A(obj, INTEGER64)) {
-                obj = (Obj*)Int64_deserialize((Integer64*)obj, instream);
+                int64_t value = (int64_t)InStream_Read_C64(instream);
+                obj = (Obj*)Int64_init((Integer64*)obj, value);
             }
         }
         else if (Obj_Is_A(obj, FLOATNUM)) {
             if (Obj_Is_A(obj, FLOAT32)) {
-                obj = (Obj*)Float32_deserialize((Float32*)obj, instream);
+                float value = InStream_Read_F32(instream);
+                obj = (Obj*)Float32_init((Float32*)obj, value);
             }
             else if (Obj_Is_A(obj, FLOAT64)) {
-                obj = (Obj*)Float64_deserialize((Float64*)obj, instream);
+                double value = InStream_Read_F64(instream);
+                obj = (Obj*)Float64_init((Float64*)obj, value);
             }
         }
     }
