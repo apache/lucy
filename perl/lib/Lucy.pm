@@ -386,7 +386,6 @@ sub error {$Clownfish::Err::error}
     $VERSION = eval $VERSION;
     no warnings 'redefine';
     sub clone       { CORE::shift->_clone }
-    sub deserialize { CORE::shift->_deserialize(@_) }
 }
 
 {

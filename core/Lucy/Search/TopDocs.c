@@ -24,6 +24,7 @@
 #include "Lucy/Search/SortSpec.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Util/Freezer.h"
 
 TopDocs*
 TopDocs_new(VArray *match_docs, uint32_t total_hits) {
@@ -46,14 +47,13 @@ TopDocs_destroy(TopDocs *self) {
 
 void
 TopDocs_serialize(TopDocs *self, OutStream *outstream) {
-    VA_Serialize(self->match_docs, outstream);
+    Freezer_serialize_varray(self->match_docs, outstream);
     OutStream_Write_C32(outstream, self->total_hits);
 }
 
 TopDocs*
 TopDocs_deserialize(TopDocs *self, InStream *instream) {
-    self->match_docs
-        = VA_Deserialize((VArray*)VTable_Make_Obj(VARRAY), instream);
+    self->match_docs = Freezer_read_varray(instream);
     self->total_hits = InStream_Read_C32(instream);
     return self;
 }

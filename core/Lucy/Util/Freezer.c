@@ -55,7 +55,7 @@ Freezer_serialize(Obj *obj, OutStream *outstream) {
         BB_serialize((ByteBuf*)obj, outstream);
     }
     else if (Obj_Is_A(obj, VARRAY)) {
-        VA_serialize((VArray*)obj, outstream);
+        Freezer_serialize_varray((VArray*)obj, outstream);
     }
     else if (Obj_Is_A(obj, HASH)) {
         Hash_serialize((Hash*)obj, outstream);
@@ -124,7 +124,7 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
         obj = (Obj*)BB_deserialize((ByteBuf*)obj, instream);
     }
     else if (Obj_Is_A(obj, VARRAY)) {
-        obj = (Obj*)VA_deserialize((VArray*)obj, instream);
+        obj = (Obj*)Freezer_deserialize_varray((VArray*)obj, instream);
     }
     else if (Obj_Is_A(obj, HASH)) {
         obj = (Obj*)Hash_deserialize((Hash*)obj, instream);
@@ -215,4 +215,41 @@ Freezer_read_charbuf(InStream *instream) {
     return Freezer_deserialize_charbuf(charbuf, instream);
 }
 
+void
+Freezer_serialize_varray(VArray *array, OutStream *outstream) {
+    uint32_t last_valid_tick = 0;
+    size_t size = VA_Get_Size(array);
+    OutStream_Write_C32(outstream, size);
+    for (uint32_t i = 0; i < size; i++) {
+        Obj *elem = VA_Fetch(array, i);
+        if (elem) {
+            OutStream_Write_C32(outstream, i - last_valid_tick);
+            FREEZE(elem, outstream);
+            last_valid_tick = i;
+        }
+    }
+    // Terminate.
+    OutStream_Write_C32(outstream, size - last_valid_tick);
+}
+
+VArray*
+Freezer_deserialize_varray(VArray *array, InStream *instream) {
+    uint32_t size = InStream_Read_C32(instream);
+    VA_init(array, size);
+    for (uint32_t tick = InStream_Read_C32(instream);
+         tick < size;
+         tick += InStream_Read_C32(instream)
+        ) {
+        Obj *obj = THAW(instream);
+        VA_Store(array, tick, obj);
+    }
+    VA_Resize(array, size);
+    return array;
+}
+
+VArray*
+Freezer_read_varray(InStream *instream) {
+    VArray *array = (VArray*)VTable_Make_Obj(VARRAY);
+    return Freezer_deserialize_varray(array, instream);
+}
 

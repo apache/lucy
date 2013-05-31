@@ -657,15 +657,6 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_deserialize(self, instream)
-    lucy_VArray *self;
-    lucy_InStream *instream;
-CODE:
-    lucy_VArray *thawed = Lucy_VA_Deserialize(self, instream);
-    RETVAL = (SV*)Lucy_VA_To_Host(thawed);
-OUTPUT: RETVAL
-
-SV*
 _clone(self)
     lucy_VArray *self;
 CODE:

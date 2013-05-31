@@ -48,6 +48,15 @@ inert class Lucy::Util::Freezer {
 
     inert incremented CharBuf*
     read_charbuf(InStream *instream);
+
+    inert void
+    serialize_varray(VArray *array, OutStream *outstream);
+
+    inert incremented VArray*
+    deserialize_varray(decremented VArray *array, InStream *instream);
+
+    inert incremented VArray*
+    read_varray(InStream *instream);
 }
 
 __C__

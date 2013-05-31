@@ -20,6 +20,7 @@
 #include "Lucy/Search/MatchDoc.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Util/Freezer.h"
 
 MatchDoc*
 MatchDoc_new(int32_t doc_id, float score, VArray *values) {
@@ -46,7 +47,7 @@ MatchDoc_serialize(MatchDoc *self, OutStream *outstream) {
     OutStream_Write_C32(outstream, self->doc_id);
     OutStream_Write_F32(outstream, self->score);
     OutStream_Write_U8(outstream, self->values ? 1 : 0);
-    if (self->values) { VA_Serialize(self->values, outstream); }
+    if (self->values) { Freezer_serialize_varray(self->values, outstream); }
 }
 
 MatchDoc*
@@ -54,8 +55,7 @@ MatchDoc_deserialize(MatchDoc *self, InStream *instream) {
     self->doc_id = InStream_Read_C32(instream);
     self->score  = InStream_Read_F32(instream);
     if (InStream_Read_U8(instream)) {
-        self->values
-            = VA_Deserialize((VArray*)VTable_Make_Obj(VARRAY), instream);
+        self->values = Freezer_read_varray(instream);
     }
     return self;
 }

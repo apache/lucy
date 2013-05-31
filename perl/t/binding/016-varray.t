@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 2;
 use Storable qw( nfreeze thaw );
 use Lucy::Test;
 
@@ -28,19 +28,6 @@ $varray->delete(3);
 my $frozen = nfreeze($varray);
 my $thawed = thaw($frozen);
 is_deeply( $thawed->to_perl, $varray->to_perl, "freeze/thaw" );
-
-my $ram_file = Lucy::Store::RAMFile->new;
-my $outstream = Lucy::Store::OutStream->open( file => $ram_file )
-    or die Lucy->error;
-$varray->serialize($outstream);
-$outstream->close;
-my $instream = Lucy::Store::InStream->open( file => $ram_file )
-    or die Lucy->error;
-my $vtable
-    = Clownfish::VTable->singleton( class_name => 'Clownfish::VArray', );
-my $deserialized = $vtable->make_obj->deserialize($instream);
-is_deeply( $varray->to_perl, $deserialized->to_perl,
-    "serialize/deserialize" );
 
 $twin = $varray->_clone;
 is_deeply( $twin->to_perl, $varray->to_perl, "clone" );

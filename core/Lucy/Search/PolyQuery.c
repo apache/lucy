@@ -168,7 +168,7 @@ PolyCompiler_highlight_spans(PolyCompiler *self, Searcher *searcher,
 void
 PolyCompiler_serialize(PolyCompiler *self, OutStream *outstream) {
     Freezer_serialize_charbuf(PolyCompiler_Get_Class_Name(self), outstream);
-    VA_Serialize(self->children, outstream);
+    Freezer_serialize_varray(self->children, outstream);
     PolyCompiler_Serialize_t super_serialize
         = SUPER_METHOD_PTR(POLYCOMPILER, Lucy_PolyCompiler_Serialize);
     super_serialize(self, outstream);
@@ -178,8 +178,7 @@ PolyCompiler*
 PolyCompiler_deserialize(PolyCompiler *self, InStream *instream) {
     CharBuf *class_name = Freezer_read_charbuf(instream);
     DECREF(class_name); // TODO Don't serialize class name.
-    self->children
-        = VA_Deserialize((VArray*)VTable_Make_Obj(VARRAY), instream);
+    self->children = Freezer_read_varray(instream);
     PolyCompiler_Deserialize_t super_deserialize
         = SUPER_METHOD_PTR(POLYCOMPILER, Lucy_PolyCompiler_Deserialize);
     return super_deserialize(self, instream);
