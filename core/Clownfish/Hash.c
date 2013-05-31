@@ -186,7 +186,7 @@ Hash_serialize(Hash *self, OutStream *outstream) {
     Hash_Iterate(self);
     while (Hash_Next(self, &key, &val)) {
         if (Obj_Is_A(key, CHARBUF)) {
-            Obj_Serialize(key, outstream);
+            Freezer_serialize_charbuf((CharBuf*)key, outstream);
             FREEZE(val, outstream);
         }
     }

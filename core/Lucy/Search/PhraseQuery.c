@@ -75,15 +75,14 @@ S_do_init(PhraseQuery *self, CharBuf *field, VArray *terms, float boost) {
 void
 PhraseQuery_serialize(PhraseQuery *self, OutStream *outstream) {
     OutStream_Write_F32(outstream, self->boost);
-    CB_Serialize(self->field, outstream);
+    Freezer_serialize_charbuf(self->field, outstream);
     VA_Serialize(self->terms, outstream);
 }
 
 PhraseQuery*
 PhraseQuery_deserialize(PhraseQuery *self, InStream *instream) {
     float boost = InStream_Read_F32(instream);
-    CharBuf *field
-        = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
+    CharBuf *field = Freezer_read_charbuf(instream);
     VArray *terms
         = VA_Deserialize((VArray*)VTable_Make_Obj(VARRAY), instream);
     return S_do_init(self, field, terms, boost);

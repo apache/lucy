@@ -29,6 +29,7 @@
 #include "Lucy/Plan/Schema.h"
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Util/Freezer.h"
 
 static OutStream*
 S_lazy_init(DocWriter *self);
@@ -108,7 +109,7 @@ DocWriter_add_inverted_doc(DocWriter *self, Inverter *inverter,
         if (FType_Stored(type)) {
             CharBuf *field = Inverter_Get_Field_Name(inverter);
             Obj *value = Inverter_Get_Value(inverter);
-            CB_Serialize(field, dat_out);
+            Freezer_serialize_charbuf(field, dat_out);
             switch (FType_Primitive_ID(type) & FType_PRIMITIVE_ID_MASK) {
                 case FType_TEXT: {
                     uint8_t *buf  = CB_Get_Ptr8((CharBuf*)value);

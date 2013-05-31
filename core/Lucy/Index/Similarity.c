@@ -29,6 +29,7 @@
 #include "Lucy/Plan/Schema.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Util/Freezer.h"
 
 Similarity*
 Sim_new() {
@@ -98,13 +99,12 @@ Sim_load(Similarity *self, Obj *dump) {
 void
 Sim_serialize(Similarity *self, OutStream *target) {
     // Only the class name.
-    CB_Serialize(Sim_Get_Class_Name(self), target);
+    Freezer_serialize_charbuf(Sim_Get_Class_Name(self), target);
 }
 
 Similarity*
 Sim_deserialize(Similarity *self, InStream *instream) {
-    CharBuf *class_name
-        = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
+    CharBuf *class_name = Freezer_read_charbuf(instream);
     if (!CB_Equals(class_name, (Obj*)Sim_Get_Class_Name(self))) {
         THROW(ERR, "Class name mismatch: '%o' '%o'", Sim_Get_Class_Name(self),
               class_name);

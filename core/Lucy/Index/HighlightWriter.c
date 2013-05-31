@@ -36,6 +36,7 @@
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Store/InStream.h"
+#include "Lucy/Util/Freezer.h"
 
 static OutStream*
 S_lazy_init(HighlightWriter *self);
@@ -127,7 +128,7 @@ HLWriter_add_inverted_doc(HighlightWriter *self, Inverter *inverter,
             CharBuf   *field     = Inverter_Get_Field_Name(inverter);
             Inversion *inversion = Inverter_Get_Inversion(inverter);
             ByteBuf   *tv_buf    = HLWriter_TV_Buf(self, inversion);
-            CB_Serialize(field, dat_out);
+            Freezer_serialize_charbuf(field, dat_out);
             BB_Serialize(tv_buf, dat_out);
             DECREF(tv_buf);
         }

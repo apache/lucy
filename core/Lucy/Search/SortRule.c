@@ -20,6 +20,7 @@
 #include "Lucy/Search/SortRule.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Util/Freezer.h"
 
 int32_t SortRule_FIELD  = 0;
 int32_t SortRule_SCORE  = 1;
@@ -61,8 +62,7 @@ SortRule*
 SortRule_deserialize(SortRule *self, InStream *instream) {
     self->type = InStream_Read_C32(instream);
     if (self->type == SortRule_FIELD) {
-        self->field
-            = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
+        self->field = Freezer_read_charbuf(instream);
     }
     self->reverse = InStream_Read_C32(instream);
     return self;
@@ -72,7 +72,7 @@ void
 SortRule_serialize(SortRule *self, OutStream *target) {
     OutStream_Write_C32(target, self->type);
     if (self->type == SortRule_FIELD) {
-        CB_Serialize(self->field, target);
+        Freezer_serialize_charbuf(self->field, target);
     }
     OutStream_Write_C32(target, !!self->reverse);
 }

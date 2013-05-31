@@ -96,6 +96,11 @@ CB_new_from_trusted_utf8(const char *ptr, size_t size) {
 CharBuf*
 CB_new_steal_from_trusted_str(char *ptr, size_t size, size_t cap) {
     CharBuf *self = (CharBuf*)VTable_Make_Obj(CHARBUF);
+    return CB_init_steal_trusted_str(self, ptr, size, cap);
+}
+
+CharBuf*
+CB_init_steal_trusted_str(CharBuf *self, char *ptr, size_t size, size_t cap) {
     self->ptr  = ptr;
     self->size = size;
     self->cap  = cap;

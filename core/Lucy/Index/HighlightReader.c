@@ -29,6 +29,7 @@
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Store/Folder.h"
+#include "Lucy/Util/Freezer.h"
 
 HighlightReader*
 HLReader_init(HighlightReader *self, Schema *schema, Folder *folder,
@@ -191,8 +192,7 @@ DefHLReader_fetch_doc_vec(DefaultHighlightReader *self, int32_t doc_id) {
 
     uint32_t num_fields = InStream_Read_C32(dat_in);
     while (num_fields--) {
-        CharBuf *field
-            = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), dat_in);
+        CharBuf *field = Freezer_read_charbuf(dat_in);
         ByteBuf *field_buf
             = BB_Deserialize((ByteBuf*)VTable_Make_Obj(BYTEBUF), dat_in);
         DocVec_Add_Field_Buf(doc_vec, field, field_buf);

@@ -22,6 +22,7 @@
 #include "Lucy/Search/Searcher.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Util/Freezer.h"
 
 LeafQuery*
 LeafQuery_new(const CharBuf *field, const CharBuf *text) {
@@ -82,25 +83,24 @@ void
 LeafQuery_serialize(LeafQuery *self, OutStream *outstream) {
     if (self->field) {
         OutStream_Write_U8(outstream, true);
-        CB_Serialize(self->field, outstream);
+        Freezer_serialize_charbuf(self->field, outstream);
     }
     else {
         OutStream_Write_U8(outstream, false);
     }
-    CB_Serialize(self->text, outstream);
+    Freezer_serialize_charbuf(self->text, outstream);
     OutStream_Write_F32(outstream, self->boost);
 }
 
 LeafQuery*
 LeafQuery_deserialize(LeafQuery *self, InStream *instream) {
     if (InStream_Read_U8(instream)) {
-        self->field
-            = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
+        self->field = Freezer_read_charbuf(instream);
     }
     else {
         self->field = NULL;
     }
-    self->text = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
+    self->text = Freezer_read_charbuf(instream);
     self->boost = InStream_Read_F32(instream);
     return self;
 }

@@ -21,6 +21,7 @@
 #include "Lucy/Index/TermVector.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Util/Freezer.h"
 
 TermVector*
 TV_new(const CharBuf *field, const CharBuf *text, I32Array *positions,
@@ -81,8 +82,8 @@ TV_serialize(TermVector *self, OutStream *target) {
     int32_t *starts = self->start_offsets->ints;
     int32_t *ends   = self->start_offsets->ints;
 
-    CB_Serialize(self->field, target);
-    CB_Serialize(self->text, target);
+    Freezer_serialize_charbuf(self->field, target);
+    Freezer_serialize_charbuf(self->text, target);
     OutStream_Write_C32(target, self->num_pos);
 
     for (uint32_t i = 0; i < self->num_pos; i++) {
@@ -94,10 +95,8 @@ TV_serialize(TermVector *self, OutStream *target) {
 
 TermVector*
 TV_deserialize(TermVector *self, InStream *instream) {
-    CharBuf *field
-        = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
-    CharBuf *text
-        = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
+    CharBuf *field = Freezer_read_charbuf(instream);
+    CharBuf *text  = Freezer_read_charbuf(instream);
     uint32_t num_pos = InStream_Read_C32(instream);
 
     // Read positional data.

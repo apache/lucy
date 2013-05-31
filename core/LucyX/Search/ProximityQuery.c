@@ -79,7 +79,7 @@ S_do_init(ProximityQuery *self, CharBuf *field, VArray *terms, float boost,
 void
 ProximityQuery_serialize(ProximityQuery *self, OutStream *outstream) {
     OutStream_Write_F32(outstream, self->boost);
-    CB_Serialize(self->field, outstream);
+    Freezer_serialize_charbuf(self->field, outstream);
     VA_Serialize(self->terms, outstream);
     OutStream_Write_C32(outstream, self->within);
 }
@@ -87,8 +87,7 @@ ProximityQuery_serialize(ProximityQuery *self, OutStream *outstream) {
 ProximityQuery*
 ProximityQuery_deserialize(ProximityQuery *self, InStream *instream) {
     float boost = InStream_Read_F32(instream);
-    CharBuf *field 
-        = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
+    CharBuf *field = Freezer_read_charbuf(instream);
     VArray *terms 
         = VA_deserialize((VArray*)VTable_Make_Obj(VARRAY), instream);
     uint32_t within = InStream_Read_C32(instream);

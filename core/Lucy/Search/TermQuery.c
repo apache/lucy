@@ -57,15 +57,14 @@ TermQuery_destroy(TermQuery *self) {
 
 void
 TermQuery_serialize(TermQuery *self, OutStream *outstream) {
-    CB_Serialize(self->field, outstream);
+    Freezer_serialize_charbuf(self->field, outstream);
     FREEZE(self->term, outstream);
     OutStream_Write_F32(outstream, self->boost);
 }
 
 TermQuery*
 TermQuery_deserialize(TermQuery *self, InStream *instream) {
-    self->field
-        = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
+    self->field = Freezer_read_charbuf(instream);
     self->term  = (Obj*)THAW(instream);
     self->boost = InStream_Read_F32(instream);
     return self;
