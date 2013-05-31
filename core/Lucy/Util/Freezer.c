@@ -32,14 +32,13 @@
 
 void
 Freezer_freeze(Obj *obj, OutStream *outstream) {
-    CB_serialize(Obj_Get_Class_Name(obj), outstream);
+    Freezer_serialize_charbuf(Obj_Get_Class_Name(obj), outstream);
     Freezer_serialize(obj, outstream);
 }
 
 Obj*
 Freezer_thaw(InStream *instream) {
-    CharBuf *class_name
-        = CB_Deserialize((CharBuf*)VTable_Make_Obj(CHARBUF), instream);
+    CharBuf *class_name = Freezer_read_charbuf(instream);
     VTable *vtable = VTable_singleton(class_name, NULL);
     Obj *blank = VTable_Make_Obj(vtable);
     DECREF(class_name);
@@ -50,7 +49,7 @@ void
 Freezer_serialize(Obj *obj, OutStream *outstream) {
     VTable *vtable = Obj_Get_VTable(obj);
     if (Obj_Is_A(obj, CHARBUF)) {
-        CB_serialize((CharBuf*)obj, outstream);
+        Freezer_serialize_charbuf((CharBuf*)obj, outstream);
     }
     else if (Obj_Is_A(obj, BYTEBUF)) {
         BB_serialize((ByteBuf*)obj, outstream);
@@ -119,7 +118,7 @@ Obj*
 Freezer_deserialize(Obj *obj, InStream *instream) {
     VTable *vtable = Obj_Get_VTable(obj);
     if (Obj_Is_A(obj, CHARBUF)) {
-        obj = (Obj*)CB_deserialize((CharBuf*)obj, instream);
+        obj = (Obj*)Freezer_deserialize_charbuf((CharBuf*)obj, instream);
     }
     else if (Obj_Is_A(obj, BYTEBUF)) {
         obj = (Obj*)BB_deserialize((ByteBuf*)obj, instream);
@@ -185,3 +184,35 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
 
     return obj;
 }
+
+void
+Freezer_serialize_charbuf(CharBuf *charbuf, OutStream *outstream) {
+    size_t size  = CB_Get_Size(charbuf);
+    uint8_t *buf = CB_Get_Ptr8(charbuf);
+    OutStream_Write_C64(outstream, size);
+    OutStream_Write_Bytes(outstream, buf, size);
+}
+
+CharBuf*
+Freezer_deserialize_charbuf(CharBuf *charbuf, InStream *instream) {
+    size_t size = InStream_Read_C32(instream);
+    if (size == SIZE_MAX) {
+        THROW(ERR, "Can't deserialize SIZE_MAX bytes");
+    }
+    size_t cap = Memory_oversize(size + 1, sizeof(char));
+    char *buf = MALLOCATE(cap);
+    InStream_Read_Bytes(instream, buf, size);
+    buf[size] = '\0';
+    if (!StrHelp_utf8_valid(buf, size)) {
+        THROW(ERR, "Attempt to deserialize invalid UTF-8");
+    }
+    return CB_init_steal_trusted_str(charbuf, buf, size, cap);
+}
+
+CharBuf*
+Freezer_read_charbuf(InStream *instream) {
+    CharBuf *charbuf = (CharBuf*)VTable_Make_Obj(CHARBUF);
+    return Freezer_deserialize_charbuf(charbuf, instream);
+}
+
+

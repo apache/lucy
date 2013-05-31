@@ -57,6 +57,13 @@ class Clownfish::CharBuf cnick CB
     inert incremented CharBuf*
     new_steal_from_trusted_str(char *ptr, size_t size, size_t cap);
 
+    /** Initialize the CharBuf using the passed-in string.  Do not check
+     * validity of supplied UTF-8.
+     */
+    public inert CharBuf*
+    init_steal_trusted_str(decremented CharBuf *self, char *ptr,
+                           size_t size, size_t cap);
+
     /** Return a pointer to a new CharBuf which contains formatted data
      * expanded according to CB_VCatF.
      *
