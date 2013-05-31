@@ -52,7 +52,7 @@ Freezer_serialize(Obj *obj, OutStream *outstream) {
         Freezer_serialize_charbuf((CharBuf*)obj, outstream);
     }
     else if (Obj_Is_A(obj, BYTEBUF)) {
-        BB_serialize((ByteBuf*)obj, outstream);
+        Freezer_serialize_bytebuf((ByteBuf*)obj, outstream);
     }
     else if (Obj_Is_A(obj, VARRAY)) {
         Freezer_serialize_varray((VArray*)obj, outstream);
@@ -126,7 +126,7 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
         obj = (Obj*)Freezer_deserialize_charbuf((CharBuf*)obj, instream);
     }
     else if (Obj_Is_A(obj, BYTEBUF)) {
-        obj = (Obj*)BB_deserialize((ByteBuf*)obj, instream);
+        obj = (Obj*)Freezer_deserialize_bytebuf((ByteBuf*)obj, instream);
     }
     else if (Obj_Is_A(obj, VARRAY)) {
         obj = (Obj*)Freezer_deserialize_varray((VArray*)obj, instream);
@@ -229,6 +229,27 @@ CharBuf*
 Freezer_read_charbuf(InStream *instream) {
     CharBuf *charbuf = (CharBuf*)VTable_Make_Obj(CHARBUF);
     return Freezer_deserialize_charbuf(charbuf, instream);
+}
+
+void
+Freezer_serialize_bytebuf(ByteBuf *bytebuf, OutStream *outstream) {
+    size_t size = BB_Get_Size(bytebuf);
+    OutStream_Write_C32(outstream, size);
+    OutStream_Write_Bytes(outstream, BB_Get_Buf(bytebuf), size);
+}
+
+ByteBuf*
+Freezer_deserialize_bytebuf(ByteBuf *bytebuf, InStream *instream) {
+    size_t size = InStream_Read_C32(instream);
+    char   *buf = MALLOCATE(size);
+    InStream_Read_Bytes(instream, buf, size);
+    return BB_init_steal_bytes(bytebuf, buf, size, size);
+}
+
+ByteBuf*
+Freezer_read_bytebuf(InStream *instream) {
+    ByteBuf *bytebuf = (ByteBuf*)VTable_Make_Obj(BYTEBUF);
+    return Freezer_deserialize_bytebuf(bytebuf, instream);
 }
 
 void

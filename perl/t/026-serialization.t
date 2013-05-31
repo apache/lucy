@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 6;
 
 package BasicObj;
 use base qw( Lucy::Search::Query );
@@ -92,6 +92,8 @@ sub run_test_cycle {
     my $frozen = freeze($orig);
     my $thawed = thaw($frozen);
     is( $transform->($thawed), $transform->($orig), "$class: freeze/thaw" );
+
+    return unless $class->can("serialize");
 
     my $ram_file = Lucy::Store::RAMFile->new;
     my $outstream = Lucy::Store::OutStream->open( file => $ram_file )

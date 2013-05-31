@@ -50,6 +50,15 @@ inert class Lucy::Util::Freezer {
     read_charbuf(InStream *instream);
 
     inert void
+    serialize_bytebuf(ByteBuf *bytebuf, OutStream *outstream);
+
+    inert incremented ByteBuf*
+    deserialize_bytebuf(decremented ByteBuf *bytebuf, InStream *instream);
+
+    inert incremented ByteBuf*
+    read_bytebuf(InStream *instream);
+
+    inert void
     serialize_varray(VArray *array, OutStream *outstream);
 
     inert incremented VArray*

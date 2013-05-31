@@ -193,8 +193,7 @@ DefHLReader_fetch_doc_vec(DefaultHighlightReader *self, int32_t doc_id) {
     uint32_t num_fields = InStream_Read_C32(dat_in);
     while (num_fields--) {
         CharBuf *field = Freezer_read_charbuf(dat_in);
-        ByteBuf *field_buf
-            = BB_Deserialize((ByteBuf*)VTable_Make_Obj(BYTEBUF), dat_in);
+        ByteBuf *field_buf = Freezer_read_bytebuf(dat_in);
         DocVec_Add_Field_Buf(doc_vec, field, field_buf);
         DECREF(field_buf);
         DECREF(field);

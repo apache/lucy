@@ -129,7 +129,7 @@ HLWriter_add_inverted_doc(HighlightWriter *self, Inverter *inverter,
             Inversion *inversion = Inverter_Get_Inversion(inverter);
             ByteBuf   *tv_buf    = HLWriter_TV_Buf(self, inversion);
             Freezer_serialize_charbuf(field, dat_out);
-            BB_Serialize(tv_buf, dat_out);
+            Freezer_serialize_bytebuf(tv_buf, dat_out);
             DECREF(tv_buf);
         }
     }

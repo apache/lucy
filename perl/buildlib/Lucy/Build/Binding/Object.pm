@@ -98,15 +98,6 @@ CODE:
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
-
-SV*
-_deserialize(self, instream)
-    lucy_ByteBuf *self;
-    lucy_InStream *instream;
-CODE:
-    lucy_ByteBuf *thawed = Lucy_BB_Deserialize(self, instream);
-    RETVAL = (SV*)Lucy_BB_To_Host(thawed);
-OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(

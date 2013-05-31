@@ -62,6 +62,12 @@ BB_new_bytes(const void *bytes, size_t size) {
 ByteBuf*
 BB_new_steal_bytes(void *bytes, size_t size, size_t capacity) {
     ByteBuf *self = (ByteBuf*)VTable_Make_Obj(BYTEBUF);
+    return BB_init_steal_bytes(self, bytes, size, capacity);
+}
+
+ByteBuf*
+BB_init_steal_bytes(ByteBuf *self, void *bytes, size_t size,
+                    size_t capacity) {
     self->buf  = (char*)bytes;
     self->size = size;
     self->cap  = capacity;
@@ -190,22 +196,6 @@ char*
 BB_grow(ByteBuf *self, size_t size) {
     if (size > self->cap) { S_grow(self, size); }
     return self->buf;
-}
-
-void
-BB_serialize(ByteBuf *self, OutStream *target) {
-    OutStream_Write_C32(target, self->size);
-    OutStream_Write_Bytes(target, self->buf, self->size);
-}
-
-ByteBuf*
-BB_deserialize(ByteBuf *self, InStream *instream) {
-    const size_t size = InStream_Read_C32(instream);
-    const size_t capacity = size ? size : sizeof(int64_t);
-    if (capacity > self->cap) { S_grow(self, capacity); }
-    self->size = size;
-    InStream_Read_Bytes(instream, self->buf, size);
-    return self;
 }
 
 int

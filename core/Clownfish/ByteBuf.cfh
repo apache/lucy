@@ -47,6 +47,12 @@ class Clownfish::ByteBuf cnick BB inherits Clownfish::Obj {
     inert incremented ByteBuf*
     new_steal_bytes(void *bytes, size_t size, size_t capacity);
 
+    /** Initialize the ByteBuf and assume ownership of the passed-in string.
+     */
+    public inert ByteBuf*
+    init_steal_bytes(ByteBuf *self, void *bytes, size_t size,
+                     size_t capacity);
+
     /** Lexical comparison of two ByteBufs, with level of indirection set to
      * please qsort and friends.
      */
@@ -119,12 +125,6 @@ class Clownfish::ByteBuf cnick BB inherits Clownfish::Obj {
 
     public int32_t
     Hash_Sum(ByteBuf *self);
-
-    public void
-    Serialize(ByteBuf *self, OutStream *outstream);
-
-    public incremented ByteBuf*
-    Deserialize(decremented ByteBuf *self, InStream *instream);
 }
 
 /**
