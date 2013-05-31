@@ -72,7 +72,10 @@ TextTermStepper_reset(TextTermStepper *self) {
 void
 TextTermStepper_write_key_frame(TextTermStepper *self, OutStream *outstream,
                                 Obj *value) {
-    Obj_Serialize(value, outstream);
+    uint8_t *buf  = CB_Get_Ptr8((CharBuf*)value);
+    size_t   size = CB_Get_Size((CharBuf*)value);
+    OutStream_Write_C32(outstream, size);
+    OutStream_Write_Bytes(outstream, buf, size);
     Obj_Mimic(self->value, value);
 }
 

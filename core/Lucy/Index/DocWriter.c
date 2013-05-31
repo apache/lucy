@@ -109,7 +109,44 @@ DocWriter_add_inverted_doc(DocWriter *self, Inverter *inverter,
             CharBuf *field = Inverter_Get_Field_Name(inverter);
             Obj *value = Inverter_Get_Value(inverter);
             CB_Serialize(field, dat_out);
-            Obj_Serialize(value, dat_out);
+            switch (FType_Primitive_ID(type) & FType_PRIMITIVE_ID_MASK) {
+                case FType_TEXT: {
+                    uint8_t *buf  = CB_Get_Ptr8((CharBuf*)value);
+                    size_t   size = CB_Get_Size((CharBuf*)value);
+                    OutStream_Write_C32(dat_out, size);
+                    OutStream_Write_Bytes(dat_out, buf, size);
+                    break;
+                }
+                case FType_BLOB: {
+                    char   *buf  = BB_Get_Buf((ByteBuf*)value);
+                    size_t  size = BB_Get_Size((ByteBuf*)value);
+                    OutStream_Write_C32(dat_out, size);
+                    OutStream_Write_Bytes(dat_out, buf, size);
+                    break;
+                }
+                case FType_INT32: {
+                    int32_t val = Int32_Get_Value((Integer32*)value);
+                    OutStream_Write_C32(dat_out, val);
+                    break;
+                }
+                case FType_INT64: {
+                    int64_t val = Int64_Get_Value((Integer64*)value);
+                    OutStream_Write_C64(dat_out, val);
+                    break;
+                }
+                case FType_FLOAT32: {
+                    float val = Float32_Get_Value((Float32*)value);
+                    OutStream_Write_F32(dat_out, val);
+                    break;
+                }
+                case FType_FLOAT64: {
+                    double val = Float64_Get_Value((Float64*)value);
+                    OutStream_Write_F64(dat_out, val);
+                    break;
+                }
+                default:
+                    THROW(ERR, "Unrecognized type: %o", type);
+            }
         }
     }
 
