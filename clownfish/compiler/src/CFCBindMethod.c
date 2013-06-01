@@ -97,6 +97,9 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
 
     // Prepare parameter lists, minus invoker.  The invoker gets forced to
     // "self" later.
+    if (CFCParamList_variadic(param_list)) {
+        CFCUtil_die("Variadic methods not supported");
+    }
     const char *arg_names_minus_invoker = CFCParamList_name_list(param_list);
     const char *params_minus_invoker    = CFCParamList_to_c(param_list);
     while (*arg_names_minus_invoker && *arg_names_minus_invoker != ',') {
