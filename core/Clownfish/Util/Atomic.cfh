@@ -30,7 +30,7 @@ static CFISH_INLINE bool
 cfish_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value);
 
 /************************** Single threaded *******************************/
-#ifdef LUCY_NOTHREADS
+#ifdef CFISH_NOTHREADS
 
 static CFISH_INLINE bool
 cfish_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {

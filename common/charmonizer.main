@@ -445,7 +445,7 @@ int main(int argc, const char **argv) {
         for (i = 0; i < argc; i++) {
             if (strncmp(argv[i], "--disable-threads", 17) == 0) {
                 chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
-                chaz_CFlags_append(extra_cflags, "-DLUCY_NOTHREADS");
+                chaz_CFlags_append(extra_cflags, "-DCFISH_NOTHREADS");
                 break;
             }
         }
