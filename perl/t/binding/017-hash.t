@@ -16,8 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
-use Storable qw( nfreeze thaw );
+use Test::More tests => 2;
 use Lucy::Test;
 use Lucy qw( to_perl to_clownfish );
 
@@ -27,10 +26,6 @@ $hash->store( "baz", Clownfish::CharBuf->new("banana") );
 
 ok( !defined( $hash->fetch("blah") ),
     "fetch for a non-existent key returns undef" );
-
-my $frozen = nfreeze($hash);
-my $thawed = thaw($frozen);
-is_deeply( $thawed->to_perl, $hash->to_perl, "freeze/thaw" );
 
 my %hash_with_utf8_keys = ( "\x{263a}" => "foo" );
 my $round_tripped = to_perl( to_clownfish( \%hash_with_utf8_keys ) );

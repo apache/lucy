@@ -16,8 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
-use Storable qw( nfreeze thaw );
+use Test::More tests => 1;
 use Lucy::Test;
 
 my ( $varray, $twin );
@@ -25,10 +24,6 @@ my ( $varray, $twin );
 $varray = Clownfish::VArray->new( capacity => 5 );
 $varray->push( Clownfish::CharBuf->new($_) ) for 1 .. 5;
 $varray->delete(3);
-my $frozen = nfreeze($varray);
-my $thawed = thaw($frozen);
-is_deeply( $thawed->to_perl, $varray->to_perl, "freeze/thaw" );
-
 $twin = $varray->_clone;
 is_deeply( $twin->to_perl, $varray->to_perl, "clone" );
 

@@ -17,8 +17,7 @@ use strict;
 use warnings;
 use lib 'buildlib';
 
-use Test::More tests => 5;
-use Storable qw( freeze thaw );
+use Test::More tests => 3;
 use Lucy::Test::TestUtils qw( utf8_test_strings );
 
 my ( $smiley, $not_a_smiley, $frowny ) = utf8_test_strings();
@@ -28,11 +27,6 @@ isa_ok( $charbuf, "Clownfish::CharBuf" );
 is( $charbuf->to_perl, $smiley, "round trip UTF-8" );
 
 $charbuf = Clownfish::CharBuf->new($smiley);
-my $dupe = thaw( freeze($charbuf) );
-isa_ok( $dupe, "Clownfish::CharBuf",
-    "thaw/freeze produces correct object" );
-is( $dupe->to_perl, $charbuf->to_perl, "freeze/thaw" );
-
 my $clone = $charbuf->clone;
 is( $clone->to_perl, Clownfish::CharBuf->new($smiley)->to_perl, "clone" );
 

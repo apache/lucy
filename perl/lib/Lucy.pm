@@ -25,7 +25,13 @@ $VERSION = eval $VERSION;
 
 use Exporter 'import';
 BEGIN {
-    our @EXPORT_OK = qw( to_clownfish to_perl kdump );
+    our @EXPORT_OK = qw(
+        to_clownfish
+        to_perl
+        kdump
+        STORABLE_freeze
+        STORABLE_thaw
+        );
 }
 
 # On most UNIX variants, this flag makes DynaLoader pass RTLD_GLOBAL to
@@ -108,6 +114,7 @@ sub error {$Clownfish::Err::error}
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     use Storable ();  # Needed by serialize/deserialize.
+    use Lucy qw( STORABLE_freeze STORABLE_thaw );
 
     use overload
         fallback => 1,
@@ -127,7 +134,16 @@ sub error {$Clownfish::Err::error}
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     use Lucy qw( to_clownfish to_perl );
+    use Carp qw( confess );
     sub load { return $_[0]->_load( to_clownfish( $_[1] ) ) }
+    sub STORABLE_freeze {
+        my $class_name = shift->get_class_name;
+        confess("Storable serialization not implemented for $class_name");
+    }
+    sub STORABLE_thaw {
+        my $class_name = shift->get_class_name;
+        confess("Storable serialization not implemented for $class_name");
+    }
 }
 
 {
@@ -170,6 +186,13 @@ sub error {$Clownfish::Err::error}
 
     no warnings 'redefine';
     sub DESTROY { }    # leak all
+}
+
+{
+    package Lucy::Index::DocVector;
+    our $VERSION = '0.003000';
+    $VERSION = eval $VERSION;
+    use Lucy qw( STORABLE_freeze STORABLE_thaw );
 }
 
 {
@@ -224,6 +247,20 @@ sub error {$Clownfish::Err::error}
 }
 
 {
+    package Lucy::Index::Similarity;
+    our $VERSION = '0.003000';
+    $VERSION = eval $VERSION;
+    use Lucy qw( STORABLE_freeze STORABLE_thaw );
+}
+
+{
+    package Lucy::Index::TermVector;
+    our $VERSION = '0.003000';
+    $VERSION = eval $VERSION;
+    use Lucy qw( STORABLE_freeze STORABLE_thaw );
+}
+
+{
     package Lucy::Search::Compiler;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
@@ -243,9 +280,17 @@ sub error {$Clownfish::Err::error}
 }
 
 {
+    package Lucy::Search::MatchDoc;
+    our $VERSION = '0.003000';
+    $VERSION = eval $VERSION;
+    use Lucy qw( STORABLE_freeze STORABLE_thaw );
+}
+
+{
     package Lucy::Search::Query;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
+    use Lucy qw( STORABLE_freeze STORABLE_thaw );
 
     sub make_compiler {
         my ( $self, %args ) = @_;
@@ -259,6 +304,7 @@ sub error {$Clownfish::Err::error}
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     use Carp;
+    use Lucy qw( STORABLE_freeze STORABLE_thaw );
 
     my %types = (
         field  => FIELD(),
@@ -272,6 +318,20 @@ sub error {$Clownfish::Err::error}
         confess("Invalid type: '$type'") unless defined $types{$type};
         return $either->_new( %args, type => $types{$type} );
     }
+}
+
+{
+    package Lucy::Search::SortSpec;
+    our $VERSION = '0.003000';
+    $VERSION = eval $VERSION;
+    use Lucy qw( STORABLE_freeze STORABLE_thaw );
+}
+
+{
+    package Lucy::Search::TopDocs;
+    our $VERSION = '0.003000';
+    $VERSION = eval $VERSION;
+    use Lucy qw( STORABLE_freeze STORABLE_thaw );
 }
 
 {

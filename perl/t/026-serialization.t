@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 5;
 
 package BasicObj;
 use base qw( Lucy::Search::Query );
@@ -71,9 +71,6 @@ run_test_cycle( $obj, sub { ref( $_[0] ) } );
 
 my $subclassed_obj = MyObj->new("bar");
 run_test_cycle( $subclassed_obj, sub { shift->get_extra } );
-
-my $bb = Clownfish::ByteBuf->new("foo");
-run_test_cycle( $bb, sub { shift->to_perl } );
 
 SKIP: {
     skip( "Invalid deserialization causes leaks", 1 ) if $ENV{LUCY_VALGRIND};
