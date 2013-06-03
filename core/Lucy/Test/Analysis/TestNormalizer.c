@@ -20,11 +20,13 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Clownfish/TestHarness/TestBatchRunner.h"
+#include "Clownfish/TestHarness/TestUtils.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Analysis/TestNormalizer.h"
 #include "Lucy/Analysis/Normalizer.h"
 #include "Lucy/Store/FSFolder.h"
 #include "Lucy/Util/Json.h"
+#include "utf8proc.h"
 
 TestNormalizer*
 TestNormalizer_new() {
@@ -115,11 +117,63 @@ test_normalization(TestBatchRunner *runner) {
     DECREF(path);
 }
 
+static void
+test_utf8proc_normalization(TestBatchRunner *runner) {
+    SKIP(runner, "utf8proc can't handle control chars or Unicode non-chars");
+    return;
+
+    for (int32_t i = 0; i < 100; i++) {
+        CharBuf *source = TestUtils_random_string(rand() % 40);
+
+        // Normalize once.
+        uint8_t *normalized;
+        int32_t check = utf8proc_map(CB_Get_Ptr8(source), CB_Get_Size(source),
+                                     &normalized,
+                                     UTF8PROC_STABLE  |
+                                     UTF8PROC_COMPOSE |
+                                     UTF8PROC_COMPAT  |
+                                     UTF8PROC_CASEFOLD);
+        if (check < 0) {
+            lucy_Json_set_tolerant(1);
+            CharBuf *json = lucy_Json_to_json((Obj*)source);
+            if (!json) {
+                json = CB_newf("[failed to encode]");
+            }
+            FAIL(runner, "Failed to normalize: %s", CB_Get_Ptr8(json));
+            DECREF(json);
+            DECREF(source);
+            return;
+        }
+
+        // Normalize again.
+        size_t normalized_len = strlen((char*)normalized);
+        uint8_t *dupe;
+        int32_t dupe_check = utf8proc_map(normalized, normalized_len, &dupe,
+                                          UTF8PROC_STABLE  |
+                                          UTF8PROC_COMPOSE |
+                                          UTF8PROC_COMPAT  |
+                                          UTF8PROC_CASEFOLD);
+        if (dupe_check < 0) {
+            THROW(ERR, "Unexpected normalization error: %i32", dupe_check);
+        }
+        int comparison = strcmp((char*)normalized, (char*)dupe);
+        free(dupe);
+        free(normalized);
+        DECREF(source);
+        if (comparison != 0) {
+            FAIL(runner, "Not fully normalized");
+            return;
+        }
+    }
+    PASS(runner, "Normalization successful.");
+}
+
 void
 TestNormalizer_run(TestNormalizer *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 20);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 21);
     test_Dump_Load_and_Equals(runner);
     test_normalization(runner);
+    test_utf8proc_normalization(runner);
 }
 
 

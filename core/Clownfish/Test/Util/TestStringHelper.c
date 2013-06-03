@@ -25,11 +25,8 @@
 #include "Clownfish/Err.h"
 #include "Clownfish/Test.h"
 #include "Clownfish/TestHarness/TestBatchRunner.h"
-#include "Clownfish/TestHarness/TestUtils.h"
 #include "Clownfish/Util/StringHelper.h"
 #include "Clownfish/VTable.h"
-#include "Lucy/Util/Json.h"
-#include "utf8proc.h"
 
 /* This alternative implementation of utf8_valid() is (presumably) slower, but
  * it implements the standard in a more linear, easy-to-grok way.
@@ -288,67 +285,15 @@ test_back_utf8_char(TestBatchRunner *runner) {
               "back_utf8_char returns NULL when end == start");
 }
 
-static void
-test_utf8proc_normalization(TestBatchRunner *runner) {
-    SKIP(runner, "utf8proc can't handle control chars or Unicode non-chars");
-    return;
-
-    for (int32_t i = 0; i < 100; i++) {
-        CharBuf *source = TestUtils_random_string(rand() % 40);
-
-        // Normalize once.
-        uint8_t *normalized;
-        int32_t check = utf8proc_map(CB_Get_Ptr8(source), CB_Get_Size(source),
-                                     &normalized,
-                                     UTF8PROC_STABLE  |
-                                     UTF8PROC_COMPOSE |
-                                     UTF8PROC_COMPAT  |
-                                     UTF8PROC_CASEFOLD);
-        if (check < 0) {
-            lucy_Json_set_tolerant(1);
-            CharBuf *json = lucy_Json_to_json((Obj*)source);
-            if (!json) {
-                json = CB_newf("[failed to encode]");
-            }
-            FAIL(runner, "Failed to normalize: %s", CB_Get_Ptr8(json));
-            DECREF(json);
-            DECREF(source);
-            return;
-        }
-
-        // Normalize again.
-        size_t normalized_len = strlen((char*)normalized);
-        uint8_t *dupe;
-        int32_t dupe_check = utf8proc_map(normalized, normalized_len, &dupe,
-                                          UTF8PROC_STABLE  |
-                                          UTF8PROC_COMPOSE |
-                                          UTF8PROC_COMPAT  |
-                                          UTF8PROC_CASEFOLD);
-        if (dupe_check < 0) {
-            THROW(ERR, "Unexpected normalization error: %i32", dupe_check);
-        }
-        int comparison = strcmp((char*)normalized, (char*)dupe);
-        free(dupe);
-        free(normalized);
-        DECREF(source);
-        if (comparison != 0) {
-            FAIL(runner, "Not fully normalized");
-            return;
-        }
-    }
-    PASS(runner, "Normalization successful.");
-}
-
 void
 TestStrHelp_run(TestStringHelper *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 41);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 40);
     test_overlap(runner);
     test_to_base36(runner);
     test_utf8_round_trip(runner);
     test_utf8_valid(runner);
     test_is_whitespace(runner);
     test_back_utf8_char(runner);
-    test_utf8proc_normalization(runner);
 }
 
 
