@@ -20,7 +20,6 @@
 
 #define C_CFISH_TESTBATCHRUNNER
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 

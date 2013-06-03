@@ -17,7 +17,6 @@
 #define C_CFISH_BYTEBUF
 #define C_CFISH_VIEWBYTEBUF
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
 #include <stdlib.h>
@@ -28,8 +27,6 @@
 #include "Clownfish/VTable.h"
 #include "Clownfish/ByteBuf.h"
 #include "Clownfish/Err.h"
-#include "Lucy/Store/InStream.h"
-#include "Lucy/Store/OutStream.h"
 #include "Clownfish/Util/Memory.h"
 
 static void

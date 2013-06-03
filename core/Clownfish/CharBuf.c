@@ -18,7 +18,6 @@
 #define C_CFISH_VIEWCHARBUF
 #define C_CFISH_ZOMBIECHARBUF
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
 #include <string.h>
@@ -30,8 +29,6 @@
 #include "Clownfish/CharBuf.h"
 
 #include "Clownfish/Err.h"
-#include "Lucy/Store/InStream.h"
-#include "Lucy/Store/OutStream.h"
 #include "Clownfish/Util/Memory.h"
 #include "Clownfish/Util/StringHelper.h"
 

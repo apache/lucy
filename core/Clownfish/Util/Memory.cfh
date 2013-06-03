@@ -37,8 +37,8 @@ inert class Clownfish::Util::Memory {
     wrapped_realloc(void *ptr, size_t size);
 
     /** Free memory.  (Wrapping is necessary in cases where memory allocated
-     * within the Lucy library has to be freed in an external environment where
-     * "free" may have been redefined.)
+     * within the Clownfish library has to be freed in an external environment
+     * where "free" may have been redefined.)
      */
     inert void
     wrapped_free(void *ptr);

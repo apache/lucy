@@ -17,7 +17,6 @@
 #define C_CFISH_OBJ
 #define C_CFISH_VTABLE
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
 #include <stdlib.h>
@@ -29,8 +28,6 @@
 #include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/VTable.h"
-#include "Lucy/Store/InStream.h"
-#include "Lucy/Store/OutStream.h"
 #include "Clownfish/Util/Memory.h"
 
 Obj*

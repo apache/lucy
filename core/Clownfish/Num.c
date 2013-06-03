@@ -24,15 +24,12 @@
 #define C_CFISH_BOOLNUM
 #define C_CFISH_VIEWCHARBUF
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
 #include "Clownfish/Num.h"
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/VTable.h"
-#include "Lucy/Store/InStream.h"
-#include "Lucy/Store/OutStream.h"
 
 Num*
 Num_init(Num *self) {

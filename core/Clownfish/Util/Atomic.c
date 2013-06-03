@@ -16,7 +16,6 @@
 
 #define C_CFISH_ATOMIC
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 #include "Clownfish/Util/Atomic.h"
 
 /********************************** Windows ********************************/
