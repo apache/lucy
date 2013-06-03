@@ -60,12 +60,6 @@ inert class Clownfish::TestHarness::TestUtils  {
      */
     inert incremented CharBuf*
     random_string(size_t length);
-
-    /** Return the result of round-tripping the object through FREEZE and
-     * THAW.
-     */
-    inert incremented Obj*
-    freeze_thaw(Obj *object);
 }
 
 

@@ -315,22 +315,9 @@ test_Dump_and_Load(TestBatchRunner *runner) {
     DECREF(loaded);
 }
 
-static void
-test_serialization(TestBatchRunner *runner) {
-    VArray *array = VA_new(0);
-    VArray *dupe;
-    VA_Store(array, 1, (Obj*)CB_newf("foo"));
-    VA_Store(array, 3, (Obj*)CB_newf("bar"));
-    dupe = (VArray*)TestUtils_freeze_thaw((Obj*)array);
-    TEST_TRUE(runner, dupe && VA_Equals(array, (Obj*)dupe),
-              "Round trip through FREEZE/THAW");
-    DECREF(dupe);
-    DECREF(array);
-}
-
 void
 TestVArray_run(TestVArray *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 45);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 44);
     test_Equals(runner);
     test_Store_Fetch(runner);
     test_Push_Pop_Shift_Unshift(runner);
@@ -341,7 +328,6 @@ TestVArray_run(TestVArray *self, TestBatchRunner *runner) {
     test_Slice(runner);
     test_Clone_and_Shallow_Copy(runner);
     test_Dump_and_Load(runner);
-    test_serialization(runner);
 }
 
 

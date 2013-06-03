@@ -19,16 +19,11 @@
 
 #define CHY_USE_SHORT_NAMES
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 
 #include "Clownfish/TestHarness/TestUtils.h"
 
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Util/Memory.h"
-#include "Lucy/Store/InStream.h"
-#include "Lucy/Store/OutStream.h"
-#include "Lucy/Store/RAMFile.h"
-#include "Lucy/Util/Freezer.h"
 
 uint64_t
 TestUtils_random_u64() {
@@ -115,26 +110,6 @@ TestUtils_random_string(size_t length) {
 CharBuf*
 TestUtils_get_cb(const char *ptr) {
     return CB_new_from_utf8(ptr, strlen(ptr));
-}
-
-Obj*
-TestUtils_freeze_thaw(Obj *object) {
-    if (object) {
-        RAMFile *ram_file = RAMFile_new(NULL, false);
-        OutStream *outstream = OutStream_open((Obj*)ram_file);
-        FREEZE(object, outstream);
-        OutStream_Close(outstream);
-        DECREF(outstream);
-
-        InStream *instream = InStream_open((Obj*)ram_file);
-        Obj *retval = THAW(instream);
-        DECREF(instream);
-        DECREF(ram_file);
-        return retval;
-    }
-    else {
-        return NULL;
-    }
 }
 
 

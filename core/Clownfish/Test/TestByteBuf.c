@@ -142,26 +142,15 @@ test_Cat(TestBatchRunner *runner) {
     DECREF(wanted);
 }
 
-static void
-test_serialization(TestBatchRunner *runner) {
-    ByteBuf *wanted = BB_new_bytes("foobar", 6);
-    ByteBuf *got    = (ByteBuf*)TestUtils_freeze_thaw((Obj*)wanted);
-    TEST_TRUE(runner, got && BB_Equals(wanted, (Obj*)got),
-              "Serialization round trip");
-    DECREF(wanted);
-    DECREF(got);
-}
-
 void
 TestBB_run(TestByteBuf *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 22);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 21);
     test_Equals(runner);
     test_Grow(runner);
     test_Clone(runner);
     test_compare(runner);
     test_Mimic(runner);
     test_Cat(runner);
-    test_serialization(runner);
 }
 
 
