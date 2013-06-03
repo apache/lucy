@@ -3,5 +3,7 @@
 /charmonizer
 /charmony.h
 /liblucy.*.dylib
+/liblucy.dylib
+/liblucy.so
 /liblucy.so.*
 /t/test_lucy
