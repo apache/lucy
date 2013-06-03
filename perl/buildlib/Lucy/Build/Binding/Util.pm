@@ -130,13 +130,6 @@ CODE:
     RETVAL = CFISH_OBJ_TO_SV_NOINC(obj);
 OUTPUT: RETVAL
 
-void
-serialize(obj, outstream)
-    lucy_Obj *obj;
-    lucy_OutStream *outstream;
-PPCODE:
-    lucy_Freezer_serialize(obj, outstream);
-
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
