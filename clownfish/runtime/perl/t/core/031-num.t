@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Clownfish::Test;
-Clownfish::Test::run_tests("TestNum");
+my $success = Clownfish::Test::run_tests("Clownfish::Test::TestNum");
+
+exit($success ? 0 : 1);
 

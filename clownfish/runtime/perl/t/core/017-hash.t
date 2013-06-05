@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Clownfish::Test;
-Clownfish::Test::run_tests("TestHash");
+my $success = Clownfish::Test::run_tests("Clownfish::Test::TestHash");
+
+exit($success ? 0 : 1);
 

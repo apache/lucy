@@ -13,11 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-use strict;
-use warnings;
+package Clownfish::Util::StringHelper;
+use Clownfish;
+our $VERSION = '0.003000';
+$VERSION = eval $VERSION;
 
-use Clownfish::Test;
-my $success = Clownfish::Test::run_tests("Clownfish::Test::TestErr");
+1;
 
-exit($success ? 0 : 1);
+__END__
+
 

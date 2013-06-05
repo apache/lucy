@@ -1,0 +1,16 @@
+*.pod
+/Build
+/Charmony.pm
+/MYMETA.json
+/MYMETA.yml
+/_build/
+/autogen/
+/blib/
+/charmonizer
+/charmonize.c
+/charmony.h
+/lib/Clownfish.c
+/lib/Clownfish.xs
+/ppport.h
+/typemap
+

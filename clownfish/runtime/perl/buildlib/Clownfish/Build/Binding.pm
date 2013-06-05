@@ -33,14 +33,16 @@ sub bind_all {
     $class->bind_obj;
     $class->bind_varray;
     $class->bind_vtable;
+    $class->bind_method;
+    $class->bind_stringhelper;
 }
 
 sub bind_clownfish {
     my $xs_code = <<'END_XS_CODE';
-MODULE = Clownfish    PACKAGE = Clownfish 
+MODULE = Clownfish    PACKAGE = Clownfish
 
 BOOT:
-    lucy_Clownfish_bootstrap();
+    cfish_Clownfish_bootstrap();
 
 IV
 _dummy_function()
@@ -54,7 +56,7 @@ to_clownfish(sv)
     SV *sv;
 CODE:
 {
-    lucy_Obj *obj = XSBind_perl_to_cfish(sv);
+    cfish_Obj *obj = XSBind_perl_to_cfish(sv);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(obj);
 }
 OUTPUT: RETVAL
@@ -66,7 +68,7 @@ CODE:
 {
     if (sv_isobject(sv) && sv_derived_from(sv, "Clownfish::Obj")) {
         IV tmp = SvIV(SvRV(sv));
-        lucy_Obj* obj = INT2PTR(lucy_Obj*, tmp);
+        cfish_Obj* obj = INT2PTR(cfish_Obj*, tmp);
         RETVAL = XSBind_cfish_to_perl(obj);
     }
     else {
@@ -89,56 +91,25 @@ sub bind_test {
     my $xs_code = <<'END_XS_CODE';
 MODULE = Clownfish   PACKAGE = Clownfish::Test
 
-void
+bool
 run_tests(package)
     char *package;
-PPCODE:
-{
-    if (strEQ(package, "TestByteBuf")) {
-        lucy_TestBB_run_tests();
-    }
-    else if (strEQ(package, "TestCharBuf")) {
-        lucy_TestCB_run_tests();
-    }
-    else if (strEQ(package, "TestErr")) {
-        lucy_TestErr_run_tests();
-    }
-    else if (strEQ(package, "TestHash")) {
-        lucy_TestHash_run_tests();
-    }
-    else if (strEQ(package, "TestLockFreeRegistry")) {
-        lucy_TestLFReg_run_tests();
-    }
-    else if (strEQ(package, "TestObj")) {
-        lucy_TestObj_run_tests();
-    }
-    else if (strEQ(package, "TestNum")) {
-        lucy_TestNum_run_tests();
-    }
-    else if (strEQ(package, "TestVArray")) {
-        lucy_TestVArray_run_tests();
-    }
-    // Clownfish::Util
-    else if (strEQ(package, "TestAtomic")) {
-        lucy_TestAtomic_run_tests();
-    }
-    else if (strEQ(package, "TestMemory")) {
-        lucy_TestMemory_run_tests();
-    }
-    else if (strEQ(package, "TestNumberUtils")) {
-        lucy_TestNumUtil_run_tests();
-    }
-    else if (strEQ(package, "TestStringHelper")) {
-        lucy_TestStrHelp_run_tests();
-    }
-    else {
-        THROW(LUCY_ERR, "Unknown test id: %s", package);
-    }
-}
+CODE:
+    cfish_CharBuf *class_name = cfish_CB_newf("%s", package);
+    cfish_TestFormatter *formatter
+        = (cfish_TestFormatter*)cfish_TestFormatterTAP_new();
+    cfish_TestSuite *suite = testcfish_Test_create_test_suite();
+    bool result = Cfish_TestSuite_Run_Batch(suite, class_name, formatter);
+    CFISH_DECREF(class_name);
+    CFISH_DECREF(formatter);
+    CFISH_DECREF(suite);
+
+    RETVAL = result;
+OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Clownfish",
+        parcel     => "TestClownfish",
         class_name => "Clownfish::Test",
     );
     $binding->append_xs($xs_code);
@@ -158,9 +129,9 @@ CODE:
 {
     STRLEN size;
     char *ptr = SvPV(sv, size);
-    lucy_ByteBuf *self = (lucy_ByteBuf*)XSBind_new_blank_obj(either_sv);
-    lucy_BB_init(self, size);
-    Lucy_BB_Mimic_Bytes(self, ptr, size);
+    cfish_ByteBuf *self = (cfish_ByteBuf*)XSBind_new_blank_obj(either_sv);
+    cfish_BB_init(self, size);
+    Cfish_BB_Mimic_Bytes(self, ptr, size);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
@@ -188,23 +159,23 @@ CODE:
 {
     STRLEN size;
     char *ptr = SvPVutf8(sv, size);
-    lucy_CharBuf *self = (lucy_CharBuf*)XSBind_new_blank_obj(either_sv);
-    lucy_CB_init(self, size);
-    Lucy_CB_Cat_Trusted_Str(self, ptr, size);
+    cfish_CharBuf *self = (cfish_CharBuf*)XSBind_new_blank_obj(either_sv);
+    cfish_CB_init(self, size);
+    Cfish_CB_Cat_Trusted_Str(self, ptr, size);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
 
 SV*
 _clone(self)
-    lucy_CharBuf *self;
+    cfish_CharBuf *self;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(lucy_CB_clone(self));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(cfish_CB_clone(self));
 OUTPUT: RETVAL
 
 SV*
 to_perl(self)
-    lucy_CharBuf *self;
+    cfish_CharBuf *self;
 CODE:
     RETVAL = XSBind_cb_to_sv(self);
 OUTPUT: RETVAL
@@ -219,8 +190,8 @@ CODE:
 {
     STRLEN size;
     char *ptr = SvPVutf8(sv, size);
-    lucy_ViewCharBuf *self
-        = lucy_ViewCB_new_from_trusted_utf8(ptr, size);
+    cfish_ViewCharBuf *self
+        = cfish_ViewCB_new_from_trusted_utf8(ptr, size);
     CHY_UNUSED_VAR(unused);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
@@ -263,7 +234,7 @@ END_SYNOPSIS
     $pod_spec->set_synopsis($synopsis);
 
     my $xs_code = <<'END_XS_CODE';
-MODULE =  Clownfish    PACKAGE = Clownfish::Err
+MODULE = Clownfish    PACKAGE = Clownfish::Err
 
 SV*
 trap(routine_sv, context_sv)
@@ -293,37 +264,37 @@ sub bind_hash {
     );
 
     my $xs_code = <<'END_XS_CODE';
-MODULE =  Clownfish    PACKAGE = Clownfish::Hash
+MODULE = Clownfish    PACKAGE = Clownfish::Hash
 SV*
 _fetch(self, key)
-    lucy_Hash *self;
-    const lucy_CharBuf *key;
+    cfish_Hash *self;
+    const cfish_CharBuf *key;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV(lucy_Hash_fetch(self, (lucy_Obj*)key));
+    RETVAL = CFISH_OBJ_TO_SV(cfish_Hash_fetch(self, (cfish_Obj*)key));
 OUTPUT: RETVAL
 
 void
 store(self, key, value);
-    lucy_Hash          *self;
-    const lucy_CharBuf *key;
-    lucy_Obj           *value;
+    cfish_Hash          *self;
+    const cfish_CharBuf *key;
+    cfish_Obj           *value;
 PPCODE:
 {
     if (value) { CFISH_INCREF(value); }
-    lucy_Hash_store(self, (lucy_Obj*)key, value);
+    cfish_Hash_store(self, (cfish_Obj*)key, value);
 }
 
 void
 next(self)
-    lucy_Hash *self;
+    cfish_Hash *self;
 PPCODE:
 {
-    lucy_Obj *key;
-    lucy_Obj *val;
+    cfish_Obj *key;
+    cfish_Obj *val;
 
-    if (Lucy_Hash_Next(self, &key, &val)) {
-        SV *key_sv = (SV*)Lucy_Obj_To_Host(key);
-        SV *val_sv = (SV*)Lucy_Obj_To_Host(val);
+    if (Cfish_Hash_Next(self, &key, &val)) {
+        SV *key_sv = (SV*)Cfish_Obj_To_Host(key);
+        SV *val_sv = (SV*)Cfish_Obj_To_Host(val);
 
         XPUSHs(sv_2mortal(key_sv));
         XPUSHs(sv_2mortal(val_sv));
@@ -363,8 +334,8 @@ new(either_sv, value)
     float  value;
 CODE:
 {
-    lucy_Float32 *self = (lucy_Float32*)XSBind_new_blank_obj(either_sv);
-    lucy_Float32_init(self, value);
+    cfish_Float32 *self = (cfish_Float32*)XSBind_new_blank_obj(either_sv);
+    cfish_Float32_init(self, value);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
@@ -390,8 +361,8 @@ new(either_sv, value)
     double  value;
 CODE:
 {
-    lucy_Float64 *self = (lucy_Float64*)XSBind_new_blank_obj(either_sv);
-    lucy_Float64_init(self, value);
+    cfish_Float64 *self = (cfish_Float64*)XSBind_new_blank_obj(either_sv);
+    cfish_Float64_init(self, value);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
@@ -512,12 +483,12 @@ MODULE = Clownfish     PACKAGE = Clownfish::Obj
 
 bool
 is_a(self, class_name)
-    lucy_Obj *self;
-    const lucy_CharBuf *class_name;
+    cfish_Obj *self;
+    const cfish_CharBuf *class_name;
 CODE:
 {
-    lucy_VTable *target = lucy_VTable_fetch_vtable(class_name);
-    RETVAL = Lucy_Obj_Is_A(self, target);
+    cfish_VTable *target = cfish_VTable_fetch_vtable(class_name);
+    RETVAL = Cfish_Obj_Is_A(self, target);
 }
 OUTPUT: RETVAL
 END_XS_CODE
@@ -549,57 +520,57 @@ MODULE = Clownfish   PACKAGE = Clownfish::VArray
 
 SV*
 shallow_copy(self)
-    lucy_VArray *self;
+    cfish_VArray *self;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(Lucy_VA_Shallow_Copy(self));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(Cfish_VA_Shallow_Copy(self));
 OUTPUT: RETVAL
 
 SV*
 _clone(self)
-    lucy_VArray *self;
+    cfish_VArray *self;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(Lucy_VA_Clone(self));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(Cfish_VA_Clone(self));
 OUTPUT: RETVAL
 
 SV*
 shift(self)
-    lucy_VArray *self;
+    cfish_VArray *self;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(Lucy_VA_Shift(self));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(Cfish_VA_Shift(self));
 OUTPUT: RETVAL
 
 SV*
 pop(self)
-    lucy_VArray *self;
+    cfish_VArray *self;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(Lucy_VA_Pop(self));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(Cfish_VA_Pop(self));
 OUTPUT: RETVAL
 
 SV*
 delete(self, tick)
-    lucy_VArray *self;
+    cfish_VArray *self;
     uint32_t    tick;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(Lucy_VA_Delete(self, tick));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(Cfish_VA_Delete(self, tick));
 OUTPUT: RETVAL
 
 void
 store(self, tick, value);
-    lucy_VArray *self;
+    cfish_VArray *self;
     uint32_t     tick;
-    lucy_Obj    *value;
+    cfish_Obj    *value;
 PPCODE:
 {
     if (value) { CFISH_INCREF(value); }
-    lucy_VA_store(self, tick, value);
+    cfish_VA_store(self, tick, value);
 }
 
 SV*
 fetch(self, tick)
-    lucy_VArray *self;
+    cfish_VArray *self;
     uint32_t     tick;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV(Lucy_VA_Fetch(self, tick));
+    RETVAL = CFISH_OBJ_TO_SV(Cfish_VA_Fetch(self, tick));
 OUTPUT: RETVAL
 END_XS_CODE
 
@@ -622,10 +593,26 @@ MODULE = Clownfish   PACKAGE = Clownfish::VTable
 SV*
 _get_registry()
 CODE:
-    if (lucy_VTable_registry == NULL) {
-        lucy_VTable_init_registry();
+    if (cfish_VTable_registry == NULL) {
+        cfish_VTable_init_registry();
     }
-    RETVAL = (SV*)Lucy_Obj_To_Host((lucy_Obj*)lucy_VTable_registry);
+    RETVAL = (SV*)Cfish_Obj_To_Host((cfish_Obj*)cfish_VTable_registry);
+OUTPUT: RETVAL
+
+SV*
+fetch_vtable(unused_sv, class_name_sv)
+    SV *unused_sv;
+    SV *class_name_sv;
+CODE:
+{
+    CHY_UNUSED_VAR(unused_sv);
+    STRLEN size;
+    char *ptr = SvPVutf8(class_name_sv, size);
+    cfish_ZombieCharBuf *class_name = CFISH_ZCB_WRAP_STR(ptr, size);
+    cfish_VTable *vtable
+        = cfish_VTable_fetch_vtable((cfish_CharBuf*)class_name);
+    RETVAL = vtable ? (SV*)Cfish_VTable_To_Host(vtable) : &PL_sv_undef;
+}
 OUTPUT: RETVAL
 
 SV*
@@ -634,28 +621,28 @@ singleton(unused_sv, ...)
 CODE:
 {
     CHY_UNUSED_VAR(unused_sv);
-    lucy_CharBuf *class_name = NULL;
-    lucy_VTable  *parent     = NULL;
+    cfish_CharBuf *class_name = NULL;
+    cfish_VTable  *parent     = NULL;
     bool args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
                               ALLOT_OBJ(&class_name, "class_name", 10, true,
-                                        LUCY_CHARBUF, alloca(cfish_ZCB_size())),
+                                        CFISH_CHARBUF, alloca(cfish_ZCB_size())),
                               ALLOT_OBJ(&parent, "parent", 6, false,
-                                        LUCY_VTABLE, NULL),
+                                        CFISH_VTABLE, NULL),
                               NULL);
     if (!args_ok) {
         CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
     }
-    lucy_VTable *singleton = lucy_VTable_singleton(class_name, parent);
-    RETVAL = (SV*)Lucy_VTable_To_Host(singleton);
+    cfish_VTable *singleton = cfish_VTable_singleton(class_name, parent);
+    RETVAL = (SV*)Cfish_VTable_To_Host(singleton);
 }
 OUTPUT: RETVAL
 
 SV*
 make_obj(self)
-    lucy_VTable *self;
+    cfish_VTable *self;
 CODE:
-    lucy_Obj *blank = Lucy_VTable_Make_Obj(self);
+    cfish_Obj *blank = Cfish_VTable_Make_Obj(self);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(blank);
 OUTPUT: RETVAL
 END_XS_CODE
@@ -665,6 +652,115 @@ END_XS_CODE
         class_name => "Clownfish::VTable",
     );
     $binding->exclude_method($_) for @hand_rolled;
+    $binding->append_xs($xs_code);
+
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_method {
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Clownfish",
+        class_name => "Clownfish::Method",
+    );
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_stringhelper {
+    my $xs_code = <<'END_XS_CODE';
+MODULE = Clownfish   PACKAGE = Clownfish::Util::StringHelper
+
+=for comment
+
+Turn an SV's UTF8 flag on.  Equivalent to Encode::_utf8_on, but we don't have
+to load Encode.
+
+=cut
+
+void
+utf8_flag_on(sv)
+    SV *sv;
+PPCODE:
+    SvUTF8_on(sv);
+
+=for comment
+
+Turn an SV's UTF8 flag off.
+
+=cut
+
+void
+utf8_flag_off(sv)
+    SV *sv;
+PPCODE:
+    SvUTF8_off(sv);
+
+SV*
+to_base36(num)
+    uint64_t num;
+CODE:
+{
+    char base36[cfish_StrHelp_MAX_BASE36_BYTES];
+    size_t size = cfish_StrHelp_to_base36(num, &base36);
+    RETVAL = newSVpvn(base36, size);
+}
+OUTPUT: RETVAL
+
+IV
+from_base36(str)
+    char *str;
+CODE:
+    RETVAL = strtol(str, NULL, 36);
+OUTPUT: RETVAL
+
+=for comment
+
+Upgrade a SV to UTF8, converting Latin1 if necessary. Equivalent to
+utf::upgrade().
+
+=cut
+
+void
+utf8ify(sv)
+    SV *sv;
+PPCODE:
+    sv_utf8_upgrade(sv);
+
+bool
+utf8_valid(sv)
+    SV *sv;
+CODE:
+{
+    STRLEN len;
+    char *ptr = SvPV(sv, len);
+    RETVAL = cfish_StrHelp_utf8_valid(ptr, len);
+}
+OUTPUT: RETVAL
+
+=for comment
+
+Concatenate one scalar onto the end of the other, ignoring UTF-8 status of the
+second scalar.  This is necessary because $not_utf8 . $utf8 results in a
+scalar which has been infected by the UTF-8 flag of the second argument.
+
+=cut
+
+void
+cat_bytes(sv, catted)
+    SV *sv;
+    SV *catted;
+PPCODE:
+{
+    STRLEN len;
+    char *ptr = SvPV(catted, len);
+    if (SvUTF8(sv)) { CFISH_THROW(CFISH_ERR, "Can't cat_bytes onto a UTF-8 SV"); }
+    sv_catpvn(sv, ptr, len);
+}
+END_XS_CODE
+
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Clownfish",
+        class_name => "Clownfish::Util::StringHelper",
+    );
     $binding->append_xs($xs_code);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);

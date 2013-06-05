@@ -17,5 +17,7 @@ use strict;
 use warnings;
 
 use Clownfish::Test;
-Clownfish::Test::run_tests("TestMemory");
+my $success = Clownfish::Test::run_tests("Clownfish::Test::Util::TestMemory");
+
+exit($success ? 0 : 1);
 

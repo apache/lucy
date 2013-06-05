@@ -14,7 +14,7 @@
 # limitations under the License.
 
 package Clownfish::Err;
-use Lucy;
+use Clownfish;
 our $VERSION = '0.003000';
 $VERSION = eval $VERSION;
 
