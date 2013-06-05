@@ -165,12 +165,8 @@ S_to_c_header_dynamic(CFCBindClass *self) {
     char *method_defs           = S_method_defs(self);
     char *short_names           = S_short_names(self);
 
-    // We must include lucy_parcel.h for the Serialize/Deserialize methods.
-    // This should be removed when InStream and OutStream are moved to the
-    // Clownfish parcel or serialization is reworked.
     char pattern[] =
         "#include \"%sparcel.h\"\n"
-        "#include \"lucy_parcel.h\"\n" // For serialize/deserialize
         "\n"
         "/* Include the header for this class's parent. \n"
         " */\n"
