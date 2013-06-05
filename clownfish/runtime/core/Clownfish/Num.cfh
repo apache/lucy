@@ -270,8 +270,8 @@ class Clownfish::BoolNum cnick Bool inherits Clownfish::IntNum {
 
 __C__
 
-#define CFISH_TRUE  lucy_Bool_true_singleton
-#define CFISH_FALSE lucy_Bool_false_singleton
+#define CFISH_TRUE  cfish_Bool_true_singleton
+#define CFISH_FALSE cfish_Bool_false_singleton
 
 __END_C__
 

@@ -31,7 +31,7 @@ class Clownfish::VTable inherits Clownfish::Obj {
     size_t             obj_alloc_size;
     size_t             vt_alloc_size;
     VArray            *methods;
-    lucy_method_t[1]   method_ptrs; /* flexible array */
+    cfish_method_t[1]  method_ptrs; /* flexible array */
 
     inert LockFreeRegistry *registry;
     inert size_t offset_of_parent;
@@ -92,7 +92,7 @@ class Clownfish::VTable inherits Clownfish::Obj {
     /** Replace a function pointer in the VTable.
      */
     void
-    Override(VTable *self, lucy_method_t method_ptr, size_t offset);
+    Override(VTable *self, cfish_method_t method_ptr, size_t offset);
 
     /** Create an empty object of the type defined by the VTable: allocate,
      * assign its vtable and give it an initial refcount of 1.  The caller is
@@ -118,6 +118,13 @@ class Clownfish::VTable inherits Clownfish::Obj {
     Obj*
     Foster_Obj(VTable *self, void *host_obj);
 
+    void
+    Add_Host_Method_Alias(VTable *self, const char *alias,
+                          const char *meth_name);
+
+    void
+    Exclude_Host_Method(VTable *self, const char *meth_name);
+
     CharBuf*
     Get_Name(VTable *self);
 
@@ -126,6 +133,9 @@ class Clownfish::VTable inherits Clownfish::Obj {
 
     size_t
     Get_Obj_Alloc_Size(VTable *self);
+
+    VArray*
+    Get_Methods(VTable *self);
 
     public incremented VTable*
     Clone(VTable *self);

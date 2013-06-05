@@ -16,7 +16,6 @@
 
 #define C_CFISH_SORTUTILS
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
 #include <string.h>
@@ -34,22 +33,22 @@
 // Recursive merge sorting functions.
 static void
 S_msort4(void *velems, void *vscratch, uint32_t left, uint32_t right,
-         Lucy_Sort_Compare_t compare, void *context);
+         Cfish_Sort_Compare_t compare, void *context);
 static void
 S_msort8(void *velems, void *vscratch, uint32_t left, uint32_t right,
-         Lucy_Sort_Compare_t compare, void *context);
+         Cfish_Sort_Compare_t compare, void *context);
 static void
 S_msort_any(void *velems, void *vscratch, uint32_t left, uint32_t right,
-            Lucy_Sort_Compare_t compare, void *context, size_t width);
+            Cfish_Sort_Compare_t compare, void *context, size_t width);
 
 static INLINE void
 SI_merge(void *left_vptr,  uint32_t left_size,
          void *right_vptr, uint32_t right_size,
-         void *vdest, size_t width, Lucy_Sort_Compare_t compare, void *context);
+         void *vdest, size_t width, Cfish_Sort_Compare_t compare, void *context);
 
 void
 Sort_mergesort(void *elems, void *scratch, uint32_t num_elems, uint32_t width,
-               Lucy_Sort_Compare_t compare, void *context) {
+               Cfish_Sort_Compare_t compare, void *context) {
     // Arrays of 0 or 1 items are already sorted.
     if (num_elems < 2) { return; }
 
@@ -80,7 +79,7 @@ Sort_mergesort(void *elems, void *scratch, uint32_t num_elems, uint32_t width,
 void
 Sort_merge(void *left_ptr,  uint32_t left_size,
            void *right_ptr, uint32_t right_size,
-           void *dest, size_t width, Lucy_Sort_Compare_t compare,
+           void *dest, size_t width, Cfish_Sort_Compare_t compare,
            void *context) {
     switch (width) {
         case 0:
@@ -104,7 +103,7 @@ Sort_merge(void *left_ptr,  uint32_t left_size,
 #define WIDTH 4
 static void
 S_msort4(void *velems, void *vscratch, uint32_t left, uint32_t right,
-         Lucy_Sort_Compare_t compare, void *context) {
+         Cfish_Sort_Compare_t compare, void *context) {
     uint8_t *elems   = (uint8_t*)velems;
     uint8_t *scratch = (uint8_t*)vscratch;
     if (right > left) {
@@ -122,7 +121,7 @@ S_msort4(void *velems, void *vscratch, uint32_t left, uint32_t right,
 #define WIDTH 8
 static void
 S_msort8(void *velems, void *vscratch, uint32_t left, uint32_t right,
-         Lucy_Sort_Compare_t compare, void *context) {
+         Cfish_Sort_Compare_t compare, void *context) {
     uint8_t *elems   = (uint8_t*)velems;
     uint8_t *scratch = (uint8_t*)vscratch;
     if (right > left) {
@@ -139,7 +138,7 @@ S_msort8(void *velems, void *vscratch, uint32_t left, uint32_t right,
 #undef WIDTH
 static void
 S_msort_any(void *velems, void *vscratch, uint32_t left, uint32_t right,
-            Lucy_Sort_Compare_t compare, void *context, size_t width) {
+            Cfish_Sort_Compare_t compare, void *context, size_t width) {
     uint8_t *elems   = (uint8_t*)velems;
     uint8_t *scratch = (uint8_t*)vscratch;
     if (right > left) {
@@ -156,7 +155,7 @@ S_msort_any(void *velems, void *vscratch, uint32_t left, uint32_t right,
 static INLINE void
 SI_merge(void *left_vptr,  uint32_t left_size,
          void *right_vptr, uint32_t right_size,
-         void *vdest, size_t width, Lucy_Sort_Compare_t compare,
+         void *vdest, size_t width, Cfish_Sort_Compare_t compare,
          void *context) {
     uint8_t *left_ptr    = (uint8_t*)left_vptr;
     uint8_t *right_ptr   = (uint8_t*)right_vptr;
@@ -189,10 +188,10 @@ SI_merge(void *left_vptr,  uint32_t left_size,
 // Quicksort implementations optimized for four-byte and eight-byte elements.
 static void
 S_qsort4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
-         Lucy_Sort_Compare_t compare, void *context);
+         Cfish_Sort_Compare_t compare, void *context);
 static void
 S_qsort8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
-         Lucy_Sort_Compare_t compare, void *context);
+         Cfish_Sort_Compare_t compare, void *context);
 
 // Swap two elements.
 static INLINE void
@@ -222,14 +221,14 @@ SI_exchange8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right);
  */
 static INLINE FOUR_BYTE_TYPE*
 SI_choose_pivot4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
-                 Lucy_Sort_Compare_t compare, void *context);
+                 Cfish_Sort_Compare_t compare, void *context);
 static INLINE EIGHT_BYTE_TYPE*
 SI_choose_pivot8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
-                 Lucy_Sort_Compare_t compare, void *context);
+                 Cfish_Sort_Compare_t compare, void *context);
 
 void
 Sort_quicksort(void *elems, size_t num_elems, size_t width,
-               Lucy_Sort_Compare_t compare, void *context) {
+               Cfish_Sort_Compare_t compare, void *context) {
     // Arrays of 0 or 1 items are already sorted.
     if (num_elems < 2) { return; }
 
@@ -261,7 +260,7 @@ SI_exchange4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right) {
 
 static INLINE FOUR_BYTE_TYPE*
 SI_choose_pivot4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
-                 Lucy_Sort_Compare_t compare, void *context) {
+                 Cfish_Sort_Compare_t compare, void *context) {
     if (right - left > 1) {
         int32_t mid = left + (right - left) / 2;
         if (compare(context, elems + left, elems + mid) > 0) {
@@ -279,7 +278,7 @@ SI_choose_pivot4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
 
 static void
 S_qsort4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
-         Lucy_Sort_Compare_t compare, void *context) {
+         Cfish_Sort_Compare_t compare, void *context) {
     FOUR_BYTE_TYPE *const pivot
         = SI_choose_pivot4(elems, left, right, compare, context);
     int32_t i = left - 1;
@@ -366,7 +365,7 @@ SI_exchange8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right) {
 
 static INLINE EIGHT_BYTE_TYPE*
 SI_choose_pivot8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
-                 Lucy_Sort_Compare_t compare, void *context) {
+                 Cfish_Sort_Compare_t compare, void *context) {
     if (right - left > 1) {
         int32_t mid = left + (right - left) / 2;
         if (compare(context, elems + left, elems + mid) > 0) {
@@ -384,7 +383,7 @@ SI_choose_pivot8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
 
 static void
 S_qsort8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
-         Lucy_Sort_Compare_t compare, void *context) {
+         Cfish_Sort_Compare_t compare, void *context) {
     EIGHT_BYTE_TYPE *const pivot
         = SI_choose_pivot8(elems, left, right, compare, context);
     int32_t i = left - 1;

@@ -16,7 +16,6 @@
 
 #define C_CFISH_ATOMIC
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 #include "Clownfish/Util/Atomic.h"
 
 /********************************** Windows ********************************/
@@ -24,7 +23,7 @@
 #include <windows.h>
 
 bool
-lucy_Atomic_wrapped_cas_ptr(void *volatile *target, void *old_value,
+cfish_Atomic_wrapped_cas_ptr(void *volatile *target, void *old_value,
                             void *new_value) {
     return InterlockedCompareExchangePointer(target, new_value, old_value)
            == old_value;
@@ -34,7 +33,7 @@ lucy_Atomic_wrapped_cas_ptr(void *volatile *target, void *old_value,
 #elif defined(CHY_HAS_PTHREAD_H)
 
 #include <pthread.h>
-pthread_mutex_t lucy_Atomic_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t cfish_Atomic_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 #endif
 

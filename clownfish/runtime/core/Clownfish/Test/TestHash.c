@@ -18,36 +18,43 @@
 #include <time.h>
 
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
-#define CHY_USE_SHORT_NAMES
+#define TESTCFISH_USE_SHORT_NAMES
 
-#include "Clownfish/Test.h"
-#include "Clownfish/Test/TestUtils.h"
 #include "Clownfish/Test/TestHash.h"
-#include "Clownfish/Hash.h"
+
 #include "Clownfish/CharBuf.h"
-#include "Clownfish/VArray.h"
+#include "Clownfish/Hash.h"
 #include "Clownfish/Num.h"
+#include "Clownfish/Test.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
+#include "Clownfish/TestHarness/TestUtils.h"
+#include "Clownfish/VArray.h"
+#include "Clownfish/VTable.h"
+
+TestHash*
+TestHash_new() {
+    return (TestHash*)VTable_Make_Obj(TESTHASH);
+}
 
 static void
-test_Equals(TestBatch *batch) {
+test_Equals(TestBatchRunner *runner) {
     Hash *hash  = Hash_new(0);
     Hash *other = Hash_new(0);
     ZombieCharBuf *stuff = ZCB_WRAP_STR("stuff", 5);
 
-    TEST_TRUE(batch, Hash_Equals(hash, (Obj*)other),
+    TEST_TRUE(runner, Hash_Equals(hash, (Obj*)other),
               "Empty hashes are equal");
 
     Hash_Store_Str(hash, "foo", 3, (Obj*)CFISH_TRUE);
-    TEST_FALSE(batch, Hash_Equals(hash, (Obj*)other),
+    TEST_FALSE(runner, Hash_Equals(hash, (Obj*)other),
                "Add one pair and Equals returns false");
 
     Hash_Store_Str(other, "foo", 3, (Obj*)CFISH_TRUE);
-    TEST_TRUE(batch, Hash_Equals(hash, (Obj*)other),
+    TEST_TRUE(runner, Hash_Equals(hash, (Obj*)other),
               "Add a matching pair and Equals returns true");
 
     Hash_Store_Str(other, "foo", 3, INCREF(stuff));
-    TEST_FALSE(batch, Hash_Equals(hash, (Obj*)other),
+    TEST_FALSE(runner, Hash_Equals(hash, (Obj*)other),
                "Non-matching value spoils Equals");
 
     DECREF(hash);
@@ -55,7 +62,7 @@ test_Equals(TestBatch *batch) {
 }
 
 static void
-test_Store_and_Fetch(TestBatch *batch) {
+test_Store_and_Fetch(TestBatchRunner *runner) {
     Hash          *hash         = Hash_new(100);
     Hash          *dupe         = Hash_new(100);
     const uint32_t starting_cap = Hash_Get_Capacity(hash);
@@ -71,9 +78,9 @@ test_Store_and_Fetch(TestBatch *batch) {
         Hash_Store(dupe, (Obj*)cb, INCREF(cb));
         VA_Push(expected, INCREF(cb));
     }
-    TEST_TRUE(batch, Hash_Equals(hash, (Obj*)dupe), "Equals");
+    TEST_TRUE(runner, Hash_Equals(hash, (Obj*)dupe), "Equals");
 
-    TEST_INT_EQ(batch, Hash_Get_Capacity(hash), starting_cap,
+    TEST_INT_EQ(runner, Hash_Get_Capacity(hash), starting_cap,
                 "Initial capacity sufficient (no rebuilds)");
 
     for (int32_t i = 0; i < 100; i++) {
@@ -82,37 +89,37 @@ test_Store_and_Fetch(TestBatch *batch) {
         VA_Push(got, (Obj*)INCREF(elem));
     }
 
-    TEST_TRUE(batch, VA_Equals(got, (Obj*)expected),
+    TEST_TRUE(runner, VA_Equals(got, (Obj*)expected),
               "basic Store and Fetch");
-    TEST_INT_EQ(batch, Hash_Get_Size(hash), 100,
+    TEST_INT_EQ(runner, Hash_Get_Size(hash), 100,
                 "size incremented properly by Hash_Store");
 
-    TEST_TRUE(batch, Hash_Fetch(hash, (Obj*)foo) == NULL,
+    TEST_TRUE(runner, Hash_Fetch(hash, (Obj*)foo) == NULL,
               "Fetch against non-existent key returns NULL");
 
     Hash_Store(hash, (Obj*)forty, INCREF(foo));
-    TEST_TRUE(batch, ZCB_Equals(foo, Hash_Fetch(hash, (Obj*)forty)),
+    TEST_TRUE(runner, ZCB_Equals(foo, Hash_Fetch(hash, (Obj*)forty)),
               "Hash_Store replaces existing value");
-    TEST_FALSE(batch, Hash_Equals(hash, (Obj*)dupe),
+    TEST_FALSE(runner, Hash_Equals(hash, (Obj*)dupe),
                "replacement value spoils equals");
-    TEST_INT_EQ(batch, Hash_Get_Size(hash), 100,
+    TEST_INT_EQ(runner, Hash_Get_Size(hash), 100,
                 "size unaffected after value replaced");
 
-    TEST_TRUE(batch, Hash_Delete(hash, (Obj*)forty) == (Obj*)foo,
+    TEST_TRUE(runner, Hash_Delete(hash, (Obj*)forty) == (Obj*)foo,
               "Delete returns value");
     DECREF(foo);
-    TEST_INT_EQ(batch, Hash_Get_Size(hash), 99,
+    TEST_INT_EQ(runner, Hash_Get_Size(hash), 99,
                 "size decremented by successful Delete");
-    TEST_TRUE(batch, Hash_Delete(hash, (Obj*)forty) == NULL,
+    TEST_TRUE(runner, Hash_Delete(hash, (Obj*)forty) == NULL,
               "Delete returns NULL when key not found");
-    TEST_INT_EQ(batch, Hash_Get_Size(hash), 99,
+    TEST_INT_EQ(runner, Hash_Get_Size(hash), 99,
                 "size not decremented by unsuccessful Delete");
     DECREF(Hash_Delete(dupe, (Obj*)forty));
-    TEST_TRUE(batch, VA_Equals(got, (Obj*)expected), "Equals after Delete");
+    TEST_TRUE(runner, VA_Equals(got, (Obj*)expected), "Equals after Delete");
 
     Hash_Clear(hash);
-    TEST_TRUE(batch, Hash_Fetch(hash, (Obj*)twenty) == NULL, "Clear");
-    TEST_TRUE(batch, Hash_Get_Size(hash) == 0, "size is 0 after Clear");
+    TEST_TRUE(runner, Hash_Fetch(hash, (Obj*)twenty) == NULL, "Clear");
+    TEST_TRUE(runner, Hash_Get_Size(hash) == 0, "size is 0 after Clear");
 
     DECREF(hash);
     DECREF(dupe);
@@ -121,7 +128,7 @@ test_Store_and_Fetch(TestBatch *batch) {
 }
 
 static void
-test_Keys_Values_Iter(TestBatch *batch) {
+test_Keys_Values_Iter(TestBatchRunner *runner) {
     Hash     *hash     = Hash_new(0); // trigger multiple rebuilds.
     VArray   *expected = VA_new(100);
     VArray   *keys;
@@ -139,8 +146,8 @@ test_Keys_Values_Iter(TestBatch *batch) {
     values = Hash_Values(hash);
     VA_Sort(keys, NULL, NULL);
     VA_Sort(values, NULL, NULL);
-    TEST_TRUE(batch, VA_Equals(keys, (Obj*)expected), "Keys");
-    TEST_TRUE(batch, VA_Equals(values, (Obj*)expected), "Values");
+    TEST_TRUE(runner, VA_Equals(keys, (Obj*)expected), "Keys");
+    TEST_TRUE(runner, VA_Equals(values, (Obj*)expected), "Values");
     VA_Clear(keys);
     VA_Clear(values);
 
@@ -156,16 +163,16 @@ test_Keys_Values_Iter(TestBatch *batch) {
 
     VA_Sort(keys, NULL, NULL);
     VA_Sort(values, NULL, NULL);
-    TEST_TRUE(batch, VA_Equals(keys, (Obj*)expected), "Keys from Iter");
-    TEST_TRUE(batch, VA_Equals(values, (Obj*)expected), "Values from Iter");
+    TEST_TRUE(runner, VA_Equals(keys, (Obj*)expected), "Keys from Iter");
+    TEST_TRUE(runner, VA_Equals(values, (Obj*)expected), "Values from Iter");
 
     {
         ZombieCharBuf *forty = ZCB_WRAP_STR("40", 2);
         ZombieCharBuf *nope  = ZCB_WRAP_STR("nope", 4);
         Obj *key = Hash_Find_Key(hash, (Obj*)forty, ZCB_Hash_Sum(forty));
-        TEST_TRUE(batch, Obj_Equals(key, (Obj*)forty), "Find_Key");
+        TEST_TRUE(runner, Obj_Equals(key, (Obj*)forty), "Find_Key");
         key = Hash_Find_Key(hash, (Obj*)nope, ZCB_Hash_Sum(nope)),
-        TEST_TRUE(batch, key == NULL,
+        TEST_TRUE(runner, key == NULL,
                   "Find_Key returns NULL for non-existent key");
     }
 
@@ -176,7 +183,7 @@ test_Keys_Values_Iter(TestBatch *batch) {
 }
 
 static void
-test_Dump_and_Load(TestBatch *batch) {
+test_Dump_and_Load(TestBatchRunner *runner) {
     Hash *hash = Hash_new(0);
     Obj  *dump;
     Hash *loaded;
@@ -185,7 +192,7 @@ test_Dump_and_Load(TestBatch *batch) {
                    (Obj*)CB_new_from_trusted_utf8("foo", 3));
     dump = (Obj*)Hash_Dump(hash);
     loaded = (Hash*)Obj_Load(dump, dump);
-    TEST_TRUE(batch, Hash_Equals(hash, (Obj*)loaded),
+    TEST_TRUE(runner, Hash_Equals(hash, (Obj*)loaded),
               "Dump => Load round trip");
     DECREF(dump);
     DECREF(loaded);
@@ -197,7 +204,7 @@ test_Dump_and_Load(TestBatch *batch) {
     dump = (Obj*)Hash_Dump(hash);
     loaded = (Hash*)Obj_Load(dump, dump);
 
-    TEST_TRUE(batch, Hash_Equals(hash, (Obj*)loaded),
+    TEST_TRUE(runner, Hash_Equals(hash, (Obj*)loaded),
               "Load still works with _class if it's not a real class");
     DECREF(dump);
     DECREF(loaded);
@@ -208,7 +215,7 @@ test_Dump_and_Load(TestBatch *batch) {
 }
 
 static void
-test_stress(TestBatch *batch) {
+test_stress(TestBatchRunner *runner) {
     Hash     *hash     = Hash_new(0); // trigger multiple rebuilds.
     VArray   *expected = VA_new(1000);
     VArray   *keys;
@@ -236,8 +243,8 @@ test_stress(TestBatch *batch) {
     values = Hash_Values(hash);
     VA_Sort(keys, NULL, NULL);
     VA_Sort(values, NULL, NULL);
-    TEST_TRUE(batch, VA_Equals(keys, (Obj*)expected), "stress Keys");
-    TEST_TRUE(batch, VA_Equals(values, (Obj*)expected), "stress Values");
+    TEST_TRUE(runner, VA_Equals(keys, (Obj*)expected), "stress Keys");
+    TEST_TRUE(runner, VA_Equals(values, (Obj*)expected), "stress Values");
 
     DECREF(keys);
     DECREF(values);
@@ -246,19 +253,14 @@ test_stress(TestBatch *batch) {
 }
 
 void
-TestHash_run_tests() {
-    TestBatch *batch = TestBatch_new(28);
-
+TestHash_run(TestHash *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 28);
     srand((unsigned int)time((time_t*)NULL));
-
-    TestBatch_Plan(batch);
-    test_Equals(batch);
-    test_Store_and_Fetch(batch);
-    test_Keys_Values_Iter(batch);
-    test_Dump_and_Load(batch);
-    test_stress(batch);
-
-    DECREF(batch);
+    test_Equals(runner);
+    test_Store_and_Fetch(runner);
+    test_Keys_Values_Iter(runner);
+    test_Dump_and_Load(runner);
+    test_stress(runner);
 }
 
 

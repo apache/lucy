@@ -19,9 +19,9 @@
 #include "Clownfish/Err.h"
 
 void
-lucy_init_parcel() {
-    lucy_Bool_init_class();
-    lucy_Hash_init_class();
-    lucy_Err_init_class();
+cfish_init_parcel() {
+    cfish_Bool_init_class();
+    cfish_Hash_init_class();
+    cfish_Err_init_class();
 }
 

@@ -388,15 +388,15 @@ class Clownfish::ZombieCharBuf cnick ZCB
 
 __C__
 
-#define CFISH_ZCB_BLANK() lucy_ZCB_new(alloca(lucy_ZCB_size()))
+#define CFISH_ZCB_BLANK() cfish_ZCB_new(alloca(cfish_ZCB_size()))
 
 #define CFISH_ZCB_WRAP(source) \
-    lucy_ZCB_wrap(alloca(lucy_ZCB_size()), source)
+    cfish_ZCB_wrap(alloca(cfish_ZCB_size()), source)
 
 #define CFISH_ZCB_WRAP_STR(ptr, size) \
-    lucy_ZCB_wrap_str(alloca(lucy_ZCB_size()), ptr, size)
+    cfish_ZCB_wrap_str(alloca(cfish_ZCB_size()), ptr, size)
 
-#ifdef LUCY_USE_SHORT_NAMES
+#ifdef CFISH_USE_SHORT_NAMES
   #define ZCB_BLANK             CFISH_ZCB_BLANK
   #define ZCB_WRAP              CFISH_ZCB_WRAP
   #define ZCB_WRAP_STR          CFISH_ZCB_WRAP_STR

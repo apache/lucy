@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-parcel Clownfish;
+parcel TestClownfish;
 
-inert class Clownfish::Test::TestHash {
-    inert void
-    run_tests();
+class Clownfish::Test::TestHash
+    inherits Clownfish::TestHarness::TestBatch {
+
+    inert incremented TestHash*
+    new();
+
+    void
+    Run(TestHash *self, TestBatchRunner *runner);
 }
 
 

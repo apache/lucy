@@ -18,10 +18,9 @@ parcel Clownfish;
 
 __C__
 typedef void 
-(*Lucy_Err_Attempt_t)(void *context);
+(*Cfish_Err_Attempt_t)(void *context);
 
-#define Cfish_Err_Attempt_t Lucy_Err_Attempt_t
-#ifdef LUCY_USE_SHORT_NAMES
+#ifdef CFISH_USE_SHORT_NAMES
   #define Err_Attempt_t Cfish_Err_Attempt_t
 #endif
 __END_C__
@@ -181,68 +180,68 @@ __C__
 #endif
 
 #define CFISH_ERR_ADD_FRAME(_error) \
-    Lucy_Err_Add_Frame(_error, __FILE__, __LINE__, \
-                       CFISH_ERR_FUNC_MACRO)
+    Cfish_Err_Add_Frame(_error, __FILE__, __LINE__, \
+                        CFISH_ERR_FUNC_MACRO)
 
 #define CFISH_RETHROW(_error) \
-    lucy_Err_rethrow((lucy_Err*)_error, __FILE__, __LINE__, \
-                     CFISH_ERR_FUNC_MACRO)
+    cfish_Err_rethrow((cfish_Err*)_error, __FILE__, __LINE__, \
+                      CFISH_ERR_FUNC_MACRO)
 
-/** Macro version of lucy_Err_throw_at which inserts contextual information
+/** Macro version of cfish_Err_throw_at which inserts contextual information
  * automatically, provided that the compiler supports the necessary features.
  */
 #ifdef CHY_HAS_VARIADIC_MACROS
  #ifdef CHY_HAS_ISO_VARIADIC_MACROS
   #define CFISH_THROW(_vtable, ...) \
-    lucy_Err_throw_at(_vtable, __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, \
-                      __VA_ARGS__)
-  #define CFISH_WARN(...) \
-    lucy_Err_warn_at(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, __VA_ARGS__)
-  #define CFISH_MAKE_MESS(...) \
-    lucy_Err_make_mess(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, \
+    cfish_Err_throw_at(_vtable, __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, \
                        __VA_ARGS__)
+  #define CFISH_WARN(...) \
+    cfish_Err_warn_at(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, __VA_ARGS__)
+  #define CFISH_MAKE_MESS(...) \
+    cfish_Err_make_mess(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, \
+                        __VA_ARGS__)
  #elif defined(CHY_HAS_GNUC_VARIADIC_MACROS)
   #define CFISH_THROW(_vtable, args...) \
-    lucy_Err_throw_at(_vtable, __FILE__, __LINE__, \
-                      CFISH_ERR_FUNC_MACRO, ##args)
+    cfish_Err_throw_at(_vtable, __FILE__, __LINE__, \
+                       CFISH_ERR_FUNC_MACRO, ##args)
   #define CFISH_WARN(args...) \
-    lucy_Err_warn_at(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, ##args)
+    cfish_Err_warn_at(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, ##args)
   #define CFISH_MAKE_MESS(args...) \
-    lucy_Err_make_mess(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, ##args)
+    cfish_Err_make_mess(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, ##args)
  #endif
 #else
   void
-  CFISH_THROW(lucy_VTable *vtable, char* format, ...);
+  CFISH_THROW(cfish_VTable *vtable, char* format, ...);
   void
   CFISH_WARN(char* format, ...);
-  lucy_CharBuf*
+  cfish_CharBuf*
   CFISH_MAKE_MESS(char* format, ...);
 #endif
 
 #define CFISH_DOWNCAST(_obj, _vtable) \
-    lucy_Err_downcast((lucy_Obj*)(_obj), (_vtable), \
-                      __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO)
+    cfish_Err_downcast((cfish_Obj*)(_obj), (_vtable), \
+                       __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO)
 
 
 #define CFISH_CERTIFY(_obj, _vtable) \
-    lucy_Err_certify((lucy_Obj*)(_obj), (_vtable), \
-                     __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO)
+    cfish_Err_certify((cfish_Obj*)(_obj), (_vtable), \
+                      __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO)
 
-static CHY_INLINE void
-lucy_Err_abstract_class_check(lucy_Obj *obj, lucy_VTable *vtable) {
-    lucy_VTable *const my_vtable = *(lucy_VTable**)obj;
+static CFISH_INLINE void
+cfish_Err_abstract_class_check(cfish_Obj *obj, cfish_VTable *vtable) {
+    cfish_VTable *const my_vtable = (cfish_VTable*)((cfish_Dummy*)obj)->vtable;
     if (my_vtable == vtable) {
-        lucy_CharBuf *mess = CFISH_MAKE_MESS("%o is an abstract class",
-                                             Lucy_Obj_Get_Class_Name(obj));
-        Lucy_Obj_Dec_RefCount(obj);
-        lucy_Err_throw_mess(LUCY_ERR, mess);
+        cfish_CharBuf *mess = CFISH_MAKE_MESS("%o is an abstract class",
+                                              Cfish_Obj_Get_Class_Name(obj));
+        Cfish_Obj_Dec_RefCount(obj);
+        cfish_Err_throw_mess(CFISH_ERR, mess);
     }
 }
 
 #define CFISH_ABSTRACT_CLASS_CHECK(_obj, _vtable) \
-    lucy_Err_abstract_class_check(((lucy_Obj*)_obj), _vtable)
+    cfish_Err_abstract_class_check(((cfish_Obj*)_obj), _vtable)
 
-#ifdef LUCY_USE_SHORT_NAMES
+#ifdef CFISH_USE_SHORT_NAMES
   #define THROW                 CFISH_THROW
   #define RETHROW               CFISH_RETHROW
   #define WARN                  CFISH_WARN

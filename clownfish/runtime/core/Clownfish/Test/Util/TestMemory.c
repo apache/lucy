@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-#define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
+#define CFISH_USE_SHORT_NAMES
+#define TESTCFISH_USE_SHORT_NAMES
+
+#include "Clownfish/Test/Util/TestMemory.h"
 
 #include "Clownfish/Test.h"
-#include "Clownfish/Test/Util/TestMemory.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Clownfish/Util/Memory.h"
+#include "Clownfish/VTable.h"
+
+TestMemory*
+TestMemory_new() {
+    return (TestMemory*)VTable_Make_Obj(TESTMEMORY);
+}
 
 static void
-test_oversize__growth_rate(TestBatch *batch) {
+test_oversize__growth_rate(TestBatchRunner *runner) {
     bool     success             = true;
     uint64_t size                = 0;
     double   growth_count        = 0;
@@ -33,7 +41,7 @@ test_oversize__growth_rate(TestBatch *batch) {
         uint64_t next_size = Memory_oversize((size_t)size + 1, sizeof(void*));
         if (next_size < size) {
             success = false;
-            FAIL(batch, "Asked for %" PRId64 ", got smaller amount %" PRId64,
+            FAIL(runner, "Asked for %" PRId64 ", got smaller amount %" PRId64,
                  size + 1, next_size);
             break;
         }
@@ -44,7 +52,7 @@ test_oversize__growth_rate(TestBatch *batch) {
             double sum = growth_rate + (growth_count - 1) * average_growth_rate;
             average_growth_rate = sum / growth_count;
             if (average_growth_rate < 1.1) {
-                FAIL(batch, "Average growth rate dropped below 1.1x: %f",
+                FAIL(runner, "Average growth rate dropped below 1.1x: %f",
                      average_growth_rate);
                 success = false;
                 break;
@@ -52,9 +60,9 @@ test_oversize__growth_rate(TestBatch *batch) {
         }
         size = next_size;
     }
-    TEST_TRUE(batch, growth_count > 0, "Grew %f times", growth_count);
+    TEST_TRUE(runner, growth_count > 0, "Grew %f times", growth_count);
     if (success) {
-        TEST_TRUE(batch, average_growth_rate > 1.1,
+        TEST_TRUE(runner, average_growth_rate > 1.1,
                   "Growth rate of oversize() averages above 1.1: %.3f",
                   average_growth_rate);
     }
@@ -62,26 +70,26 @@ test_oversize__growth_rate(TestBatch *batch) {
     for (int minimum = 1; minimum < 8; minimum++) {
         uint64_t next_size = Memory_oversize(minimum, sizeof(void*));
         double growth_rate = U64_TO_DOUBLE(next_size) / (double)minimum;
-        TEST_TRUE(batch, growth_rate > 1.2,
+        TEST_TRUE(runner, growth_rate > 1.2,
                   "Growth rate is higher for smaller arrays (%d, %.3f)", minimum,
                   growth_rate);
     }
 }
 
 static void
-test_oversize__ceiling(TestBatch *batch) {
+test_oversize__ceiling(TestBatchRunner *runner) {
     for (int width = 0; width < 10; width++) {
         size_t size = Memory_oversize(SIZE_MAX, width);
-        TEST_TRUE(batch, size == SIZE_MAX,
+        TEST_TRUE(runner, size == SIZE_MAX,
                   "Memory_oversize hits ceiling at SIZE_MAX (width %d)", width);
         size = Memory_oversize(SIZE_MAX - 1, width);
-        TEST_TRUE(batch, size == SIZE_MAX,
+        TEST_TRUE(runner, size == SIZE_MAX,
                   "Memory_oversize hits ceiling at SIZE_MAX (width %d)", width);
     }
 }
 
 static void
-test_oversize__rounding(TestBatch *batch) {
+test_oversize__rounding(TestBatchRunner *runner) {
     int widths[] = { 1, 2, 4, 0 };
 
     for (int width_tick = 0; widths[width_tick] != 0; width_tick++) {
@@ -90,25 +98,21 @@ test_oversize__rounding(TestBatch *batch) {
             size_t size = Memory_oversize(i, width);
             size_t bytes = size * width;
             if (bytes % sizeof(void*) != 0) {
-                FAIL(batch, "Rounding failure for %d, width %d",
+                FAIL(runner, "Rounding failure for %d, width %d",
                      i, width);
                 return;
             }
         }
     }
-    PASS(batch, "Round allocations up to the size of a pointer");
+    PASS(runner, "Round allocations up to the size of a pointer");
 }
 
 void
-TestMemory_run_tests() {
-    TestBatch *batch = TestBatch_new(30);
-
-    TestBatch_Plan(batch);
-    test_oversize__growth_rate(batch);
-    test_oversize__ceiling(batch);
-    test_oversize__rounding(batch);
-
-    DECREF(batch);
+TestMemory_run(TestMemory *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 30);
+    test_oversize__growth_rate(runner);
+    test_oversize__ceiling(runner);
+    test_oversize__rounding(runner);
 }
 
 

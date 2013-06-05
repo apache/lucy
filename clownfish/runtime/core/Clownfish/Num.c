@@ -24,7 +24,6 @@
 #define C_CFISH_BOOLNUM
 #define C_CFISH_VIEWCHARBUF
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
 #include "Clownfish/Num.h"
@@ -390,6 +389,7 @@ Bool_inc_refcount(BoolNum *self) {
 
 uint32_t
 Bool_dec_refcount(BoolNum *self) {
+    UNUSED_VAR(self);
     return 1;
 }
 

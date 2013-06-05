@@ -17,7 +17,6 @@
 #define C_CFISH_HASH
 #define C_CFISH_HASHTOMBSTONE
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
 #include <string.h>
@@ -33,7 +32,7 @@
 
 static HashTombStone *TOMBSTONE;
 
-#define HashEntry lucy_HashEntry
+#define HashEntry cfish_HashEntry
 
 typedef struct HashEntry {
     Obj     *key;
@@ -142,7 +141,7 @@ Hash_load(Hash *self, Obj *dump) {
 
         // Dispatch to an alternate Load() method.
         if (vtable) {
-            Obj_Load_t load = METHOD_PTR(vtable, Lucy_Obj_Load);
+            Obj_Load_t load = METHOD_PTR(vtable, Cfish_Obj_Load);
             if (load == Obj_load) {
                 THROW(ERR, "Abstract method Load() not defined for %o",
                       VTable_Get_Name(vtable));

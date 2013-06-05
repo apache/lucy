@@ -1,0 +1,76 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Clownfish;
+
+/** Run multiple test batches and collect statistics.
+ */
+class Clownfish::TestHarness::TestSuiteRunner inherits Clownfish::Obj {
+    TestFormatter *formatter;
+    uint32_t       num_tests;
+    uint32_t       num_tests_failed;
+    uint32_t       num_batches;
+    uint32_t       num_batches_failed;
+
+    inert incremented TestSuiteRunner*
+    new(TestFormatter *formatter);
+
+    /**
+     * @param formatter The test formatter to format the test output.
+     */
+    inert TestSuiteRunner*
+    init(TestSuiteRunner *self, TestFormatter *formatter);
+
+    public void
+    Destroy(TestSuiteRunner *self);
+
+    /** Run a test batch and collect statistics.
+     *
+     * @param batch The test batch.
+     * @return true if the test batch passed.
+     */
+    bool
+    Run_Batch(TestSuiteRunner *self, TestBatch *batch);
+
+    /** Print a summary after running all test batches.
+     *
+     * @return true if any tests were run and all test batches passed.
+     */
+    bool
+    Finish(TestSuiteRunner *self);
+
+    /** Return the number of tests run.
+     */
+    uint32_t
+    Get_Num_Tests(TestSuiteRunner *self);
+
+    /** Return the number of failed tests.
+     */
+    uint32_t
+    Get_Num_Tests_Failed(TestSuiteRunner *self);
+
+    /** Return the number of test batches run.
+     */
+    uint32_t
+    Get_Num_Batches(TestSuiteRunner *self);
+
+    /** Return the number of failed test batches.
+     */
+    uint32_t
+    Get_Num_Batches_Failed(TestSuiteRunner *self);
+}
+
+

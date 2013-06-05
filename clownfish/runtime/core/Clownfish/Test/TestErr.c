@@ -15,34 +15,36 @@
  */
 
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
-#define CHY_USE_SHORT_NAMES
+#define TESTCFISH_USE_SHORT_NAMES
 
-#include "Clownfish/Test.h"
-#include "Clownfish/Test/TestUtils.h"
 #include "Clownfish/Test/TestErr.h"
-#include "Clownfish/Err.h"
+
 #include "Clownfish/CharBuf.h"
+#include "Clownfish/Err.h"
+#include "Clownfish/Test.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
+#include "Clownfish/VTable.h"
+
+TestErr*
+TestErr_new() {
+    return (TestErr*)VTable_Make_Obj(TESTERR);
+}
 
 static void
-test_To_String(TestBatch *batch) {
+test_To_String(TestBatchRunner *runner) {
     CharBuf *message = CB_newf("oops");
     Err *error = Err_new(message);
     CharBuf *string = Err_To_String(error);
-    TEST_TRUE(batch, CB_Equals(message, (Obj*)string),
+    TEST_TRUE(runner, CB_Equals(message, (Obj*)string),
               "Stringifies as message");
     DECREF(string);
     DECREF(error);
 }
 
 void
-TestErr_run_tests() {
-    TestBatch *batch = TestBatch_new(1);
-
-    TestBatch_Plan(batch);
-    test_To_String(batch);
-
-    DECREF(batch);
+TestErr_run(TestErr *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 1);
+    test_To_String(runner);
 }
 
 

@@ -14,19 +14,29 @@
  * limitations under the License.
  */
 
-#define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
-#define CHY_USE_SHORT_NAMES
+#include <string.h>
 
-#include "Clownfish/Test.h"
+#define CFISH_USE_SHORT_NAMES
+#define TESTCFISH_USE_SHORT_NAMES
+
 #include "Clownfish/Test/Util/TestStringHelper.h"
-#include "Clownfish/Test/TestUtils.h"
+
+#include "Clownfish/CharBuf.h"
+#include "Clownfish/Err.h"
+#include "Clownfish/Test.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Clownfish/Util/StringHelper.h"
+#include "Clownfish/VTable.h"
 
 /* This alternative implementation of utf8_valid() is (presumably) slower, but
  * it implements the standard in a more linear, easy-to-grok way.
  */
 #define TRAIL_OK(n) (n >= 0x80 && n <= 0xBF)
+TestStringHelper*
+TestStrHelp_new() {
+    return (TestStringHelper*)VTable_Make_Obj(TESTSTRINGHELPER);
+}
+
 static bool
 S_utf8_valid_alt(const char *maybe_utf8, size_t size) {
     const uint8_t *string = (const uint8_t*)maybe_utf8;
@@ -117,35 +127,35 @@ S_utf8_valid_alt(const char *maybe_utf8, size_t size) {
 }
 
 static void
-test_overlap(TestBatch *batch) {
+test_overlap(TestBatchRunner *runner) {
     int32_t result;
     result = StrHelp_overlap("", "", 0, 0);
-    TEST_INT_EQ(batch, result, 0, "two empty strings");
+    TEST_INT_EQ(runner, result, 0, "two empty strings");
     result = StrHelp_overlap("", "foo", 0, 3);
-    TEST_INT_EQ(batch, result, 0, "first string is empty");
+    TEST_INT_EQ(runner, result, 0, "first string is empty");
     result = StrHelp_overlap("foo", "", 3, 0);
-    TEST_INT_EQ(batch, result, 0, "second string is empty");
+    TEST_INT_EQ(runner, result, 0, "second string is empty");
     result = StrHelp_overlap("foo", "foo", 3, 3);
-    TEST_INT_EQ(batch, result, 3, "equal strings");
+    TEST_INT_EQ(runner, result, 3, "equal strings");
     result = StrHelp_overlap("foo bar", "foo", 7, 3);
-    TEST_INT_EQ(batch, result, 3, "first string is longer");
+    TEST_INT_EQ(runner, result, 3, "first string is longer");
     result = StrHelp_overlap("foo", "foo bar", 3, 7);
-    TEST_INT_EQ(batch, result, 3, "second string is longer");
+    TEST_INT_EQ(runner, result, 3, "second string is longer");
 }
 
 
 static void
-test_to_base36(TestBatch *batch) {
+test_to_base36(TestBatchRunner *runner) {
     char buffer[StrHelp_MAX_BASE36_BYTES];
     StrHelp_to_base36(UINT64_MAX, buffer);
-    TEST_STR_EQ(batch, "3w5e11264sgsf", buffer, "base36 UINT64_MAX");
+    TEST_STR_EQ(runner, "3w5e11264sgsf", buffer, "base36 UINT64_MAX");
     StrHelp_to_base36(1, buffer);
-    TEST_STR_EQ(batch, "1", buffer, "base36 1");
-    TEST_INT_EQ(batch, buffer[1], 0, "base36 NULL termination");
+    TEST_STR_EQ(runner, "1", buffer, "base36 1");
+    TEST_INT_EQ(runner, buffer[1], 0, "base36 NULL termination");
 }
 
 static void
-test_utf8_round_trip(TestBatch *batch) {
+test_utf8_round_trip(TestBatchRunner *runner) {
     uint32_t code_point;
     for (code_point = 0; code_point <= 0x10FFFF; code_point++) {
         char buffer[4];
@@ -175,120 +185,115 @@ test_utf8_round_trip(TestBatch *batch) {
         }
     }
     if (code_point == 0x110000) {
-        PASS(batch, "Successfully round tripped 0 - 0x10FFFF");
+        PASS(runner, "Successfully round tripped 0 - 0x10FFFF");
     }
     else {
-        FAIL(batch, "Failed round trip at 0x%.1X", (unsigned)code_point);
+        FAIL(runner, "Failed round trip at 0x%.1X", (unsigned)code_point);
     }
 }
 
 static void
-S_test_validity(TestBatch *batch, const char *content, size_t size,
+S_test_validity(TestBatchRunner *runner, const char *content, size_t size,
                 bool expected, const char *description) {
     bool sane = StrHelp_utf8_valid(content, size);
     bool double_check = S_utf8_valid_alt(content, size);
     if (sane != double_check) {
-        FAIL(batch, "Disagreement: %s", description);
+        FAIL(runner, "Disagreement: %s", description);
     }
     else {
-        TEST_TRUE(batch, sane == expected, "%s", description);
+        TEST_TRUE(runner, sane == expected, "%s", description);
     }
 }
 
 static void
-test_utf8_valid(TestBatch *batch) {
+test_utf8_valid(TestBatchRunner *runner) {
     // Musical symbol G clef:
     // Code point: U+1D11E
     // UTF-16:     0xD834 0xDD1E
     // UTF-8       0xF0 0x9D 0x84 0x9E
-    S_test_validity(batch, "\xF0\x9D\x84\x9E", 4, true,
+    S_test_validity(runner, "\xF0\x9D\x84\x9E", 4, true,
                     "Musical symbol G clef");
-    S_test_validity(batch, "\xED\xA0\xB4\xED\xB4\x9E", 6, false,
+    S_test_validity(runner, "\xED\xA0\xB4\xED\xB4\x9E", 6, false,
                     "G clef as UTF-8 encoded UTF-16 surrogates");
-    S_test_validity(batch, ".\xED\xA0\xB4.", 5, false,
+    S_test_validity(runner, ".\xED\xA0\xB4.", 5, false,
                     "Isolated high surrogate");
-    S_test_validity(batch, ".\xED\xB4\x9E.", 5, false,
+    S_test_validity(runner, ".\xED\xB4\x9E.", 5, false,
                     "Isolated low surrogate");
 
     // Shortest form.
-    S_test_validity(batch, ".\xC1\x9C.", 4, false,
+    S_test_validity(runner, ".\xC1\x9C.", 4, false,
                     "Non-shortest form ASCII backslash");
-    S_test_validity(batch, ".\xC0\xAF.", 4, false,
+    S_test_validity(runner, ".\xC0\xAF.", 4, false,
                     "Non-shortest form ASCII slash");
-    S_test_validity(batch, ".\xC0\x80.", 4, false,
+    S_test_validity(runner, ".\xC0\x80.", 4, false,
                     "Non-shortest form ASCII NUL character");
 
     // Range.
-    S_test_validity(batch, "\xF8\x88\x80\x80\x80", 5, false, "5-byte UTF-8");
+    S_test_validity(runner, "\xF8\x88\x80\x80\x80", 5, false, "5-byte UTF-8");
 
     // Bad continuations.
-    S_test_validity(batch, "\xE2\x98\xBA\xE2\x98\xBA", 6, true,
+    S_test_validity(runner, "\xE2\x98\xBA\xE2\x98\xBA", 6, true,
                     "SmileySmiley");
-    S_test_validity(batch, "\xE2\xBA\xE2\x98\xBA", 5, false,
+    S_test_validity(runner, "\xE2\xBA\xE2\x98\xBA", 5, false,
                     "missing first continuation byte");
-    S_test_validity(batch, "\xE2\x98\xE2\x98\xBA", 5, false,
+    S_test_validity(runner, "\xE2\x98\xE2\x98\xBA", 5, false,
                     "missing second continuation byte");
-    S_test_validity(batch, "\xE2\xE2\x98\xBA", 4, false,
+    S_test_validity(runner, "\xE2\xE2\x98\xBA", 4, false,
                     "missing both continuation bytes");
-    S_test_validity(batch, "\xBA\xE2\x98\xBA\xE2\xBA", 5, false,
+    S_test_validity(runner, "\xBA\xE2\x98\xBA\xE2\xBA", 5, false,
                     "missing first continuation byte (end)");
-    S_test_validity(batch, "\xE2\x98\xBA\xE2\x98", 5, false,
+    S_test_validity(runner, "\xE2\x98\xBA\xE2\x98", 5, false,
                     "missing second continuation byte (end)");
-    S_test_validity(batch, "\xE2\x98\xBA\xE2", 4, false,
+    S_test_validity(runner, "\xE2\x98\xBA\xE2", 4, false,
                     "missing both continuation bytes (end)");
-    S_test_validity(batch, "\xBA\xE2\x98\xBA", 4, false,
+    S_test_validity(runner, "\xBA\xE2\x98\xBA", 4, false,
                     "isolated continuation byte 0xBA");
-    S_test_validity(batch, "\x98\xE2\x98\xBA", 4, false,
+    S_test_validity(runner, "\x98\xE2\x98\xBA", 4, false,
                     "isolated continuation byte 0x98");
-    S_test_validity(batch, "\xE2\x98\xBA\xBA", 4, false,
+    S_test_validity(runner, "\xE2\x98\xBA\xBA", 4, false,
                     "isolated continuation byte 0xBA (end)");
-    S_test_validity(batch, "\xE2\x98\xBA\x98", 4, false,
+    S_test_validity(runner, "\xE2\x98\xBA\x98", 4, false,
                     "isolated continuation byte 0x98 (end)");
 }
 
 static void
-test_is_whitespace(TestBatch *batch) {
-    TEST_TRUE(batch, StrHelp_is_whitespace(' '), "space is whitespace");
-    TEST_TRUE(batch, StrHelp_is_whitespace('\n'), "newline is whitespace");
-    TEST_TRUE(batch, StrHelp_is_whitespace('\t'), "tab is whitespace");
-    TEST_TRUE(batch, StrHelp_is_whitespace('\v'),
+test_is_whitespace(TestBatchRunner *runner) {
+    TEST_TRUE(runner, StrHelp_is_whitespace(' '), "space is whitespace");
+    TEST_TRUE(runner, StrHelp_is_whitespace('\n'), "newline is whitespace");
+    TEST_TRUE(runner, StrHelp_is_whitespace('\t'), "tab is whitespace");
+    TEST_TRUE(runner, StrHelp_is_whitespace('\v'),
               "vertical tab is whitespace");
-    TEST_TRUE(batch, StrHelp_is_whitespace(0x180E),
+    TEST_TRUE(runner, StrHelp_is_whitespace(0x180E),
               "Mongolian vowel separator is whitespace");
-    TEST_FALSE(batch, StrHelp_is_whitespace('a'), "'a' isn't whitespace");
-    TEST_FALSE(batch, StrHelp_is_whitespace(0), "NULL isn't whitespace");
-    TEST_FALSE(batch, StrHelp_is_whitespace(0x263A),
+    TEST_FALSE(runner, StrHelp_is_whitespace('a'), "'a' isn't whitespace");
+    TEST_FALSE(runner, StrHelp_is_whitespace(0), "NULL isn't whitespace");
+    TEST_FALSE(runner, StrHelp_is_whitespace(0x263A),
                "Smiley isn't whitespace");
 }
 
 static void
-test_back_utf8_char(TestBatch *batch) {
+test_back_utf8_char(TestBatchRunner *runner) {
     char buffer[4];
     char *buf = buffer + 1;
     uint32_t len = StrHelp_encode_utf8_char(0x263A, buffer);
     char *end = buffer + len;
-    TEST_TRUE(batch, StrHelp_back_utf8_char(end, buffer) == buffer,
+    TEST_TRUE(runner, StrHelp_back_utf8_char(end, buffer) == buffer,
               "back_utf8_char");
-    TEST_TRUE(batch, StrHelp_back_utf8_char(end, buf) == NULL,
+    TEST_TRUE(runner, StrHelp_back_utf8_char(end, buf) == NULL,
               "back_utf8_char returns NULL rather than back up beyond start");
-    TEST_TRUE(batch, StrHelp_back_utf8_char(buffer, buffer) == NULL,
+    TEST_TRUE(runner, StrHelp_back_utf8_char(buffer, buffer) == NULL,
               "back_utf8_char returns NULL when end == start");
 }
 
 void
-TestStrHelp_run_tests() {
-    TestBatch *batch = TestBatch_new(40);
-
-    TestBatch_Plan(batch);
-
-    test_overlap(batch);
-    test_to_base36(batch);
-    test_utf8_round_trip(batch);
-    test_utf8_valid(batch);
-    test_is_whitespace(batch);
-    test_back_utf8_char(batch);
-
-    DECREF(batch);
+TestStrHelp_run(TestStringHelper *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 40);
+    test_overlap(runner);
+    test_to_base36(runner);
+    test_utf8_round_trip(runner);
+    test_utf8_valid(runner);
+    test_is_whitespace(runner);
+    test_back_utf8_char(runner);
 }
 
 

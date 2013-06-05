@@ -16,7 +16,6 @@
 
 #define C_CFISH_NUMBERUTILS
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
 #include <string.h>

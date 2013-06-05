@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-parcel Clownfish;
+parcel TestClownfish;
 
-inert class Clownfish::Test::Util::TestNumberUtils cnick TestNumUtil {
-    inert void
-    run_tests();
+class Clownfish::Test::Util::TestNumberUtils cnick TestNumUtil
+    inherits Clownfish::TestHarness::TestBatch {
+
+    inert incremented TestNumberUtils*
+    new();
+
+    void
+    Run(TestNumberUtils *self, TestBatchRunner *runner);
 }
 
 

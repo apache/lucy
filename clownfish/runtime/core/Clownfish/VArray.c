@@ -19,7 +19,6 @@
 #include <stdlib.h>
 
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
 #include "Clownfish/VTable.h"
@@ -274,7 +273,7 @@ S_default_compare(void *context, const void *va, const void *vb) {
 }
 
 void
-VA_sort(VArray *self, Lucy_Sort_Compare_t compare, void *context) {
+VA_sort(VArray *self, Cfish_Sort_Compare_t compare, void *context) {
     if (!compare) { compare = S_default_compare; }
     Sort_quicksort(self->elems, self->size, sizeof(void*), compare, context);
 }
@@ -299,7 +298,7 @@ VA_equals(VArray *self, Obj *other) {
 }
 
 VArray*
-VA_gather(VArray *self, Lucy_VA_Gather_Test_t test, void *data) {
+VA_gather(VArray *self, VA_Gather_Test_t test, void *data) {
     VArray *gathered = VA_new(self->size);
     for (uint32_t i = 0, max = self->size; i < max; i++) {
         if (test(self, i, data)) {

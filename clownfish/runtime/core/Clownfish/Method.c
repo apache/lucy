@@ -16,7 +16,6 @@
 
 #define C_CFISH_METHOD
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
 #include "Clownfish/Method.h"
@@ -25,17 +24,19 @@
 #include "Clownfish/VTable.h"
 
 Method*
-Method_new(const CharBuf *name, lucy_method_t callback_func, size_t offset) {
+Method_new(const CharBuf *name, cfish_method_t callback_func, size_t offset) {
     Method *self = (Method*)VTable_Make_Obj(METHOD);
     return Method_init(self, name, callback_func, offset);
 }
 
 Method*
-Method_init(Method *self, const CharBuf *name, lucy_method_t callback_func,
+Method_init(Method *self, const CharBuf *name, cfish_method_t callback_func,
             size_t offset) {
     self->name          = CB_Clone(name);
+    self->host_alias    = NULL;
     self->callback_func = callback_func;
     self->offset        = offset;
+    self->is_excluded   = false;
     return self;
 }
 
@@ -60,6 +61,21 @@ Method_get_refcount(Method *self) {
     UNUSED_VAR(self);
     // See comments in VTable.c
     return 1;
+}
+
+CharBuf*
+Method_get_name(Method *self) {
+    return self->name;
+}
+
+CharBuf*
+Method_get_host_alias(Method *self) {
+    return self->host_alias;
+}
+
+bool
+Method_is_excluded_from_host(Method *self) {
+    return self->is_excluded;
 }
 
 

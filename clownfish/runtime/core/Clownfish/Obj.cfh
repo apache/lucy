@@ -22,7 +22,6 @@ parcel Clownfish;
 public class Clownfish::Obj {
 
     VTable *vtable;
-    lucy_ref_t ref;
 
     /** Abstract initializer.
      */
@@ -176,34 +175,34 @@ public class Clownfish::Obj {
 }
 
 __C__
-static CHY_INLINE void
-lucy_Obj_super_destroy(lucy_Obj *self, lucy_VTable *vtable) {
-    Lucy_Obj_Destroy_t super_destroy
-        = CFISH_SUPER_METHOD_PTR(vtable, Lucy_Obj_Destroy);
+static CFISH_INLINE void
+cfish_Obj_super_destroy(cfish_Obj *self, cfish_VTable *vtable) {
+    Cfish_Obj_Destroy_t super_destroy
+        = CFISH_SUPER_METHOD_PTR(vtable, Cfish_Obj_Destroy);
     super_destroy(self);
 }
 
-#define LUCY_SUPER_DESTROY(_self, _vtable) \
-    lucy_Obj_super_destroy((lucy_Obj*)_self, _vtable)
+#define CFISH_SUPER_DESTROY(_self, _vtable) \
+    cfish_Obj_super_destroy((cfish_Obj*)_self, _vtable)
 
-static CHY_INLINE lucy_Obj*
-lucy_Obj_incref(lucy_Obj *self) {
-    if (self != NULL) { return Lucy_Obj_Inc_RefCount(self); }
+static CFISH_INLINE cfish_Obj*
+cfish_Obj_incref(cfish_Obj *self) {
+    if (self != NULL) { return Cfish_Obj_Inc_RefCount(self); }
     else { return NULL; }
 }
 
-#define CFISH_INCREF(_self) lucy_Obj_incref((lucy_Obj*)_self)
+#define CFISH_INCREF(_self) cfish_Obj_incref((cfish_Obj*)_self)
 
-static CHY_INLINE uint32_t
-lucy_Obj_decref(lucy_Obj *self) {
-    if (self != NULL) { return Lucy_Obj_Dec_RefCount(self); }
+static CFISH_INLINE uint32_t
+cfish_Obj_decref(cfish_Obj *self) {
+    if (self != NULL) { return Cfish_Obj_Dec_RefCount(self); }
     else { return 0; }
 }
 
-#define CFISH_DECREF(_self) lucy_Obj_decref((lucy_Obj*)_self)
+#define CFISH_DECREF(_self) cfish_Obj_decref((cfish_Obj*)_self)
 
-#ifdef LUCY_USE_SHORT_NAMES
-  #define SUPER_DESTROY(_self, _vtable)   LUCY_SUPER_DESTROY(_self, _vtable)
+#ifdef CFISH_USE_SHORT_NAMES
+  #define SUPER_DESTROY(_self, _vtable)   CFISH_SUPER_DESTROY(_self, _vtable)
   #define INCREF(_self)                   CFISH_INCREF(_self)
   #define DECREF(_self)                   CFISH_DECREF(_self)
 #endif

@@ -16,7 +16,7 @@
 
 parcel Clownfish;
 
-inert class Clownfish::Test::TestUtils  {
+inert class Clownfish::TestHarness::TestUtils  {
 
     /** Testing-only CharBuf factory which uses strlen().
      */
@@ -61,4 +61,5 @@ inert class Clownfish::Test::TestUtils  {
     inert incremented CharBuf*
     random_string(size_t length);
 }
+
 

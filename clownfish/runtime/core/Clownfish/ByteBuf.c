@@ -17,7 +17,6 @@
 #define C_CFISH_BYTEBUF
 #define C_CFISH_VIEWBYTEBUF
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
 #include <stdlib.h>
@@ -61,6 +60,12 @@ BB_new_bytes(const void *bytes, size_t size) {
 ByteBuf*
 BB_new_steal_bytes(void *bytes, size_t size, size_t capacity) {
     ByteBuf *self = (ByteBuf*)VTable_Make_Obj(BYTEBUF);
+    return BB_init_steal_bytes(self, bytes, size, capacity);
+}
+
+ByteBuf*
+BB_init_steal_bytes(ByteBuf *self, void *bytes, size_t size,
+                    size_t capacity) {
     self->buf  = (char*)bytes;
     self->size = size;
     self->cap  = capacity;

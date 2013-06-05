@@ -74,9 +74,9 @@ __C__
 /** The maximum number of bytes encoded by to_base36(), including the
  * terminating NULL.
  */
-#define lucy_StrHelp_MAX_BASE36_BYTES 14
-#ifdef LUCY_USE_SHORT_NAMES
-  #define StrHelp_MAX_BASE36_BYTES lucy_StrHelp_MAX_BASE36_BYTES
+#define cfish_StrHelp_MAX_BASE36_BYTES 14
+#ifdef CFISH_USE_SHORT_NAMES
+  #define StrHelp_MAX_BASE36_BYTES cfish_StrHelp_MAX_BASE36_BYTES
 #endif
 __END_C__
 

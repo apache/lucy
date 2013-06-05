@@ -16,14 +16,21 @@
 
 #include <string.h>
 
-#define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
+#define CFISH_USE_SHORT_NAMES
+#define TESTCFISH_USE_SHORT_NAMES
 
-#include "Clownfish/Test.h"
-#include "Clownfish/Test/TestUtils.h"
 #include "Clownfish/Test/TestLockFreeRegistry.h"
+
 #include "Clownfish/LockFreeRegistry.h"
+#include "Clownfish/Test.h"
+#include "Clownfish/TestHarness/TestBatchRunner.h"
+#include "Clownfish/VTable.h"
+
+TestLockFreeRegistry*
+TestLFReg_new() {
+    return (TestLockFreeRegistry*)VTable_Make_Obj(TESTLOCKFREEREGISTRY);
+}
 
 StupidHashCharBuf*
 StupidHashCharBuf_new(const char *text) {
@@ -37,27 +44,27 @@ StupidHashCharBuf_hash_sum(StupidHashCharBuf *self) {
 }
 
 static void
-test_all(TestBatch *batch) {
+test_all(TestBatchRunner *runner) {
     LockFreeRegistry *registry = LFReg_new(10);
     StupidHashCharBuf *foo = StupidHashCharBuf_new("foo");
     StupidHashCharBuf *bar = StupidHashCharBuf_new("bar");
     StupidHashCharBuf *baz = StupidHashCharBuf_new("baz");
     StupidHashCharBuf *foo_dupe = StupidHashCharBuf_new("foo");
 
-    TEST_TRUE(batch, LFReg_Register(registry, (Obj*)foo, (Obj*)foo),
+    TEST_TRUE(runner, LFReg_Register(registry, (Obj*)foo, (Obj*)foo),
               "Register() returns true on success");
-    TEST_FALSE(batch,
+    TEST_FALSE(runner,
                LFReg_Register(registry, (Obj*)foo_dupe, (Obj*)foo_dupe),
                "Can't Register() keys that test equal");
 
-    TEST_TRUE(batch, LFReg_Register(registry, (Obj*)bar, (Obj*)bar),
+    TEST_TRUE(runner, LFReg_Register(registry, (Obj*)bar, (Obj*)bar),
               "Register() key with the same Hash_Sum but that isn't Equal");
 
-    TEST_TRUE(batch, LFReg_Fetch(registry, (Obj*)foo_dupe) == (Obj*)foo,
+    TEST_TRUE(runner, LFReg_Fetch(registry, (Obj*)foo_dupe) == (Obj*)foo,
               "Fetch()");
-    TEST_TRUE(batch, LFReg_Fetch(registry, (Obj*)bar) == (Obj*)bar,
+    TEST_TRUE(runner, LFReg_Fetch(registry, (Obj*)bar) == (Obj*)bar,
               "Fetch() again");
-    TEST_TRUE(batch, LFReg_Fetch(registry, (Obj*)baz) == NULL,
+    TEST_TRUE(runner, LFReg_Fetch(registry, (Obj*)baz) == NULL,
               "Fetch() non-existent key returns NULL");
 
     DECREF(foo_dupe);
@@ -68,13 +75,9 @@ test_all(TestBatch *batch) {
 }
 
 void
-TestLFReg_run_tests() {
-    TestBatch *batch = TestBatch_new(6);
-
-    TestBatch_Plan(batch);
-    test_all(batch);
-
-    DECREF(batch);
+TestLFReg_run(TestLockFreeRegistry *self, TestBatchRunner *runner) {
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 6);
+    test_all(runner);
 }
 
 

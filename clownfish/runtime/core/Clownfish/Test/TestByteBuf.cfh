@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-parcel Clownfish;
+parcel TestClownfish;
 
 class Clownfish::Test::TestByteBuf cnick TestBB
-    inherits Clownfish::Obj {
+    inherits Clownfish::TestHarness::TestBatch {
 
-    inert void
-    run_tests();
+    inert incremented TestByteBuf*
+    new();
+
+    void
+    Run(TestByteBuf *self, TestBatchRunner *runner);
 }
 
 

@@ -1,0 +1,142 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Clownfish;
+
+/** Abstract base class for Clownfish test formatters.
+ */
+abstract class Clownfish::TestHarness::TestFormatter inherits Clownfish::Obj {
+    inert TestFormatter*
+    init(TestFormatter *self);
+
+    inert void
+    test_result(TestFormatter *self, bool pass, uint32_t test_num,
+                const char *fmt, ...);
+
+    inert void
+    test_comment(TestFormatter *self, const char *fmt, ...);
+
+    inert void
+    batch_comment(TestFormatter *self, const char *fmt, ...);
+
+    /** Print output at the beginning of a test batch.
+     *
+     * @param batch The test batch.
+     */
+    abstract void
+    Batch_Prologue(TestFormatter *self, TestBatch *batch,
+                   uint32_t num_planned);
+
+    /** Print the result of a single test.
+     *
+     * @param pass True if the test passed, false otherwise.
+     * @param test_num The sequence number of the test.
+     * @param fmt printf-style format string.
+     * @param args Additional arguments.
+     */
+    abstract void
+    VTest_Result(TestFormatter *self, bool pass, uint32_t test_num,
+                 const char *fmt, va_list args);
+
+    /** Print additional diagnosis for a test.
+     *
+     * @param fmt printf-style format string.
+     * @param args Additional arguments.
+     */
+    abstract void
+    VTest_Comment(TestFormatter *self, const char *fmt, va_list args);
+
+    /** Print additional diagnosis for a test batch.
+     *
+     * @param fmt printf-style format string.
+     * @param args Additional arguments.
+     */
+    abstract void
+    VBatch_Comment(TestFormatter *self, const char *fmt, va_list args);
+
+    /** Print test summary after running all test batches.
+     *
+     * @param runner The test runner.
+     */
+    abstract void
+    Summary(TestFormatter *self, TestSuiteRunner *runner);
+}
+
+/** TestFormatter for "Clownfish" format.
+ *
+ * A TestFormatter that produces human-readable output in a custom
+ * "Clownfish" format.
+ */
+class Clownfish::Test::Formatter::TestFormatterCF
+    inherits Clownfish::TestHarness::TestFormatter {
+
+    inert incremented TestFormatterCF*
+    new();
+
+    inert TestFormatterCF*
+    init(TestFormatterCF *self);
+
+    void
+    Batch_Prologue(TestFormatterCF *self, TestBatch *batch,
+                   uint32_t num_planned);
+
+    void
+    VTest_Result(TestFormatterCF *self, bool pass, uint32_t test_num,
+                 const char *fmt, va_list args);
+
+    void
+    VTest_Comment(TestFormatterCF *self, const char *fmt, va_list args);
+
+    void
+    VBatch_Comment(TestFormatterCF *self, const char *fmt, va_list args);
+
+    void
+    Summary(TestFormatterCF *self, TestSuiteRunner *runner);
+}
+
+/** TestFormatter for TAP output.
+ *
+ * A TestFormatter that produces TAP output (Test Anything Protocol).
+ * See http://testanything.org/
+ */
+class Clownfish::Test::Formatter::TestFormatterTAP
+    inherits Clownfish::TestHarness::TestFormatter {
+
+    inert incremented TestFormatterTAP*
+    new();
+
+    inert TestFormatterTAP*
+    init(TestFormatterTAP *self);
+
+    void
+    Batch_Prologue(TestFormatterTAP *self, TestBatch *batch,
+                   uint32_t num_planned);
+
+    void
+    VTest_Result(TestFormatterTAP *self, bool pass, uint32_t test_num,
+                 const char *fmt, va_list args);
+
+    void
+    VTest_Comment(TestFormatterTAP *self, const char *fmt, va_list args);
+
+    void
+    VBatch_Comment(TestFormatterTAP *self, const char *fmt, va_list args);
+
+    void
+    Summary(TestFormatterTAP *self, TestSuiteRunner *runner);
+}
+
+

@@ -19,9 +19,10 @@
 #define C_CFISH_CHARBUF
 #define C_CFISH_METHOD
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -42,6 +43,9 @@ size_t VTable_offset_of_parent = offsetof(VTable, parent);
 static void
 S_scrunch_charbuf(CharBuf *source, CharBuf *target);
 
+static Method*
+S_find_method(VTable *self, const char *meth_name);
+
 LockFreeRegistry *VTable_registry = NULL;
 
 void
@@ -49,10 +53,10 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
 {
     /* Pass 1:
      * - Allocate memory.
-     * - Initialize refcount, parent, flags, obj_alloc_size, vt_alloc_size.
+     * - Initialize parent, flags, obj_alloc_size, vt_alloc_size.
      * - Initialize method pointers.
      */
-    for (int i = 0; i < num_specs; ++i) {
+    for (size_t i = 0; i < num_specs; ++i) {
         VTableSpec *spec   = &specs[i];
         VTable     *parent = spec->parent ? *spec->parent : NULL;
 
@@ -62,7 +66,6 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
         vt_alloc_size += spec->num_novel * sizeof(cfish_method_t);
         VTable *vtable = (VTable*)Memory_wrapped_calloc(vt_alloc_size, 1);
 
-        vtable->ref.count      = 1;
         vtable->parent         = parent;
         vtable->flags          = 0;
         vtable->obj_alloc_size = spec->obj_alloc_size;
@@ -74,7 +77,7 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
             memcpy(vtable->method_ptrs, parent->method_ptrs, parent_ptrs_size);
         }
 
-        for (int i = 0; i < spec->num_fresh; ++i) {
+        for (size_t i = 0; i < spec->num_fresh; ++i) {
             MethodSpec *mspec = &spec->method_specs[i];
             VTable_override(vtable, mspec->func, *mspec->offset);
         }
@@ -84,12 +87,13 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
 
     /* Pass 2:
      * - Initialize 'vtable' instance variable.
+     * - Initialize refcount.
      */
-    for (int i = 0; i < num_specs; ++i) {
+    for (size_t i = 0; i < num_specs; ++i) {
         VTableSpec *spec   = &specs[i];
         VTable     *vtable = *spec->vtable;
 
-        vtable->vtable = VTABLE;
+        VTable_init_obj(VTABLE, vtable);
     }
 
     /* Now it's safe to call methods.
@@ -98,14 +102,14 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
      * - Inititalize name and method array.
      * - Register vtable.
      */
-    for (int i = 0; i < num_specs; ++i) {
+    for (size_t i = 0; i < num_specs; ++i) {
         VTableSpec *spec   = &specs[i];
         VTable     *vtable = *spec->vtable;
 
         vtable->name    = CB_newf("%s", spec->name);
         vtable->methods = VA_new(0);
 
-        for (int i = 0; i < spec->num_fresh; ++i) {
+        for (size_t i = 0; i < spec->num_fresh; ++i) {
             MethodSpec *mspec = &spec->method_specs[i];
             if (mspec->is_novel) {
                 CharBuf *name = CB_newf("%s", mspec->name);
@@ -131,8 +135,8 @@ VTable_clone(VTable *self) {
         = (VTable*)Memory_wrapped_calloc(self->vt_alloc_size, 1);
 
     memcpy(twin, self, self->vt_alloc_size);
+    VTable_Init_Obj(self->vtable, twin); // Set refcount.
     twin->name = CB_Clone(self->name);
-    twin->ref.count = 1;
 
     return twin;
 }
@@ -151,24 +155,24 @@ VTable_dec_refcount(VTable *self) {
 uint32_t
 VTable_get_refcount(VTable *self) {
     UNUSED_VAR(self);
-    /* VTable_Get_RefCount() lies to other Lucy code about the refcount
+    /* VTable_Get_RefCount() lies to other Clownfish code about the refcount
      * because we don't want to have to synchronize access to the cached host
      * object to which we have delegated responsibility for keeping refcounts.
-     * It always returns 1 because 1 is a positive number, and thus other Lucy
-     * code will be fooled into believing it never needs to take action such
-     * as initiating a destructor.
+     * It always returns 1 because 1 is a positive number, and thus other
+     * Clownfish code will be fooled into believing it never needs to take
+     * action such as initiating a destructor.
      *
      * It's possible that the host has in fact increased the refcount of the
      * cached host object if there are multiple refs to it on the other side
-     * of the Lucy/host border, but returning 1 is good enough to fool Lucy
-     * code.
+     * of the Clownfish/host border, but returning 1 is good enough to fool
+     * Clownfish code.
      */
     return 1;
 }
 
 void
-VTable_override(VTable *self, lucy_method_t method, size_t offset) {
-    union { char *char_ptr; lucy_method_t *func_ptr; } pointer;
+VTable_override(VTable *self, cfish_method_t method, size_t offset) {
+    union { char *char_ptr; cfish_method_t *func_ptr; } pointer;
     pointer.char_ptr = ((char*)self) + offset;
     pointer.func_ptr[0] = method;
 }
@@ -186,6 +190,11 @@ VTable_get_parent(VTable *self) {
 size_t
 VTable_get_obj_alloc_size(VTable *self) {
     return self->obj_alloc_size;
+}
+
+VArray*
+VTable_get_methods(VTable *self) {
+    return self->methods;
 }
 
 void
@@ -236,7 +245,6 @@ VTable_singleton(const CharBuf *class_name, VTable *parent) {
         if (num_fresh) {
             Hash *meths = Hash_new(num_fresh);
             CharBuf *scrunched = CB_new(0);
-            ZombieCharBuf *callback_name = ZCB_BLANK();
             for (uint32_t i = 0; i < num_fresh; i++) {
                 CharBuf *meth = (CharBuf*)VA_fetch(fresh_host_methods, i);
                 S_scrunch_charbuf(meth, scrunched);
@@ -279,24 +287,8 @@ VTable_singleton(const CharBuf *class_name, VTable *parent) {
 }
 
 Obj*
-VTable_make_obj(VTable *self) {
-    Obj *obj = (Obj*)Memory_wrapped_calloc(self->obj_alloc_size, 1);
-    obj->vtable = self;
-    obj->ref.count = 1;
-    return obj;
-}
-
-Obj*
-VTable_init_obj(VTable *self, void *allocation) {
-    Obj *obj = (Obj*)allocation;
-    obj->vtable = self;
-    obj->ref.count = 1;
-    return obj;
-}
-
-Obj*
 VTable_load_obj(VTable *self, Obj *dump) {
-    Obj_Load_t load = METHOD_PTR(self, Lucy_Obj_Load);
+    Obj_Load_t load = METHOD_PTR(self, Cfish_Obj_Load);
     if (load == Obj_load) {
         THROW(ERR, "Abstract method Load() not defined for %o", self->name);
     }
@@ -362,6 +354,42 @@ VTable_fetch_vtable(const CharBuf *class_name) {
         vtable = (VTable*)LFReg_Fetch(VTable_registry, (Obj*)class_name);
     }
     return vtable;
+}
+
+void
+VTable_add_host_method_alias(VTable *self, const char *alias,
+                             const char *meth_name) {
+    Method *method = S_find_method(self, meth_name);
+    if (!method) {
+        fprintf(stderr, "Method %s not found\n", meth_name);
+        abort();
+    }
+    method->host_alias = CB_newf("%s", alias);
+}
+
+void
+VTable_exclude_host_method(VTable *self, const char *meth_name) {
+    Method *method = S_find_method(self, meth_name);
+    if (!method) {
+        fprintf(stderr, "Method %s not found\n", meth_name);
+        abort();
+    }
+    method->is_excluded = true;
+}
+
+static Method*
+S_find_method(VTable *self, const char *name) {
+    size_t   name_len = strlen(name);
+    uint32_t size     = VA_Get_Size(self->methods);
+
+    for (uint32_t i = 0; i < size; i++) {
+        Method *method = (Method*)VA_Fetch(self->methods, i);
+        if (CB_Equals_Str(method->name, name, name_len)) {
+            return method;
+        }
+    }
+
+    return NULL;
 }
 
 

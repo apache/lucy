@@ -14,27 +14,15 @@
  * limitations under the License.
  */
 
-parcel TestClownfish;
+parcel Clownfish;
 
-class Clownfish::Test::TestLockFreeRegistry cnick TestLFReg
-    inherits Clownfish::TestHarness::TestBatch {
-
-    inert incremented TestLockFreeRegistry*
-    new();
-
-    void
-    Run(TestLockFreeRegistry *self, TestBatchRunner *runner);
-}
-
-/** Private test-only class for stressing LockFreeRegistry.
+/** Abstract base class for test modules.
  */
-class Clownfish::Test::StupidHashCharBuf inherits Clownfish::CharBuf {
-    inert incremented StupidHashCharBuf*
-    new(const char *text);
-
-    /** Always returns 1, guaranteeing collisions. */
-    public int32_t
-    Hash_Sum(StupidHashCharBuf *self);
+abstract class Clownfish::TestHarness::TestBatch inherits Clownfish::Obj {
+    /** Run the tests of the test batch.
+     */
+    abstract void
+    Run(TestBatch *self, TestBatchRunner *runner);
 }
 
 

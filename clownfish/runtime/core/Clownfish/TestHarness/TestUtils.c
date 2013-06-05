@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define C_LUCY_TESTUTILS
-#define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
+#define CFISH_USE_SHORT_NAMES
 
-#include "Clownfish/Test/TestUtils.h"
-#include "Clownfish/Test.h"
-#include "Clownfish/Util/Memory.h"
+#include "Clownfish/TestHarness/TestUtils.h"
+
 #include "Clownfish/CharBuf.h"
+#include "Clownfish/Util/Memory.h"
 
 uint64_t
 TestUtils_random_u64() {
@@ -64,12 +62,12 @@ TestUtils_random_f64s(double *buf, size_t count) {
     double *f64s = buf ? buf : (double*)CALLOCATE(count, sizeof(double));
     for (size_t i = 0; i < count; i++) {
         uint64_t num = TestUtils_random_u64();
-        f64s[i] = (double)num / UINT64_MAX;
+        f64s[i] = U64_TO_DOUBLE(num) / UINT64_MAX;
     }
     return f64s;
 }
 
-uint32_t
+static uint32_t
 S_random_code_point(void) {
     uint32_t code_point = 0;
     while (1) {
@@ -113,4 +111,5 @@ CharBuf*
 TestUtils_get_cb(const char *ptr) {
     return CB_new_from_utf8(ptr, strlen(ptr));
 }
+
 
