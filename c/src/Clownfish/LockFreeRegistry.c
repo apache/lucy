@@ -17,7 +17,6 @@
 #define C_CFISH_LOCKFREEREGISTRY
 #define CHY_USE_SHORT_NAMES
 #define CFISH_USE_SHORT_NAMES
-#define LUCY_USE_SHORT_NAMES
 
 #include "Clownfish/LockFreeRegistry.h"
 #include "Clownfish/Err.h"
