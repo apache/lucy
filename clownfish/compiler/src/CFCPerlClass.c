@@ -258,8 +258,6 @@ CFCPerlClass_method_bindings(CFCPerlClass *self) {
     CFCPerlMethod **bound 
         = (CFCPerlMethod**)CALLOCATE(1, sizeof(CFCPerlMethod*));
 
-    int parent_included = (parent && CFCClass_included(parent));
- 
      // Iterate over the class's fresh methods.
     for (size_t i = 0; fresh_methods[i] != NULL; i++) {
         CFCMethod  *method    = fresh_methods[i];
@@ -267,8 +265,13 @@ CFCPerlClass_method_bindings(CFCPerlClass *self) {
         const char *meth_name = CFCMethod_get_macro_sym(method);
 
         // Only deal with methods when they are novel (i.e. first declared)
-        // or the parent class is included.
-        if (!CFCMethod_novel(method) && !parent_included) { continue; }
+        // or the parent's definition is from an included parcel (i.e. they
+        // are first declared in this parcel).
+        if (!CFCMethod_novel(method)) {
+            CFCMethod *parent_method = CFCClass_method(parent, meth_name);
+            CFCParcel *parcel = CFCMethod_get_parcel(parent_method);
+            if (!CFCParcel_included(parcel)) { continue; }
+        }
 
         // Skip private methods.
         if (CFCSymbol_private((CFCSymbol*)method)) { continue; }
