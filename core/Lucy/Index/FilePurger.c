@@ -92,7 +92,7 @@ FilePurger_purge(FilePurger *self) {
         // get deleted after they've been emptied.
         VA_Sort(purgables, NULL, NULL);
         for (uint32_t i = VA_Get_Size(purgables); i--;) {
-            CharBuf *entry = (CharBuf*)VA_fetch(purgables, i);
+            CharBuf *entry = (CharBuf*)VA_Fetch(purgables, i);
             if (Hash_Fetch(self->disallowed, (Obj*)entry)) { continue; }
             if (!Folder_Delete(folder, entry)) {
                 if (Folder_Exists(folder, entry)) {
