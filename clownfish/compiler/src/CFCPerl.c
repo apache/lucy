@@ -356,9 +356,6 @@ S_xs_file_contents(CFCPerl *self, const char *generated_xs,
         "#include \"XSBind.h\"\n"
         "#include \"boot.h\"\n"
         "\n"
-        "#include \"Clownfish/Util/Memory.h\"\n"
-        "#include \"Clownfish/Util/StringHelper.h\"\n"
-        "\n"
         "%s\n"
         "\n"
         "MODULE = %s   PACKAGE = %s\n"
@@ -406,7 +403,8 @@ CFCPerl_write_bindings(CFCPerl *self) {
     // Pound-includes for generated headers.
     for (size_t i = 0; ordered[i] != NULL; i++) {
         CFCClass *klass = ordered[i];
-        if (CFCClass_included(klass)) { continue; }
+        // TODO: Don't include headers for parcels the source parcels don't
+        // depend on.
         const char *include_h = CFCClass_include_h(klass);
         generated_xs = CFCUtil_cat(generated_xs, "#include \"", include_h,
                                    "\"\n", NULL);
