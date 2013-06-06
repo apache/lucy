@@ -188,6 +188,8 @@ CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
     self->is_final    = !!is_final;
     self->is_inert    = !!is_inert;
 
+    // TODO: Check that file_spec->is_included matches parcel->is_included.
+
     // Store in registry.
     S_register(self);
 
