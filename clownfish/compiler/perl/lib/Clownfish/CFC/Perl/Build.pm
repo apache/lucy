@@ -240,7 +240,7 @@ sub _compile_clownfish {
         my $package_name = $pm_filepath;
         $package_name =~ s/buildlib\/(.*)\.pm$/$1/;
         $package_name =~ s/\//::/g;
-        $package_name->bind_all;
+        $package_name->bind_all($hierarchy);
     }
 
     my $binding = Clownfish::CFC::Binding::Perl->new(

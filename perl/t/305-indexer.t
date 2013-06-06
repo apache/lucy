@@ -58,7 +58,7 @@ do {
     # Fake a write lock.
     $folder->delete("locks/write.lock") or die "Couldn't delete 'write.lock'";
     my $outstream = $folder->open_out('locks/write.lock')
-        or die Lucy->error;
+        or die Clownfish->error;
     while ( kill( 0, $pid ) ) {
         $pid++;
     }

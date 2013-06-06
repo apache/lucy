@@ -47,7 +47,7 @@ sub new {
         }
         my $filename = $segment->get_name . "/bytebufdocs.dat";
         $instream{$$self} = $self->get_folder->open_in($filename)
-            or confess Lucy->error;
+            or confess Clownfish->error;
     }
 
     return $self;

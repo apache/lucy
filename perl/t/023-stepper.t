@@ -46,10 +46,10 @@ use Test::More tests => 1;
 use Lucy::Test;
 
 my $folder = Lucy::Store::RAMFolder->new;
-my $outstream = $folder->open_out("foo") or die Lucy->error;
+my $outstream = $folder->open_out("foo") or die Clownfish->error;
 $outstream->write_c32(10) for 1 .. 5;
 $outstream->close;
-my $instream = $folder->open_in("foo") or die Lucy->error;
+my $instream = $folder->open_in("foo") or die Clownfish->error;
 my $stepper = MyStepper->new;
 
 my @got;

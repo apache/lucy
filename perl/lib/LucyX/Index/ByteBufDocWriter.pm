@@ -50,7 +50,7 @@ sub _lazy_init {
     my $folder    = $self->get_folder;
     my $filename  = $self->get_segment->get_name . "/bytebufdocs.dat";
     my $outstream = $outstream{$$self} = $folder->open_out($filename)
-        or confess Lucy->error;
+        or confess Clownfish->error;
     my $nulls = "\0" x $width{$$self};
     $outstream->print($nulls);
 

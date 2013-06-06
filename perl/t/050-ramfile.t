@@ -23,7 +23,7 @@ my ( $ram_file, $outstream, $instream, $foo );
 
 $ram_file = Lucy::Store::RAMFile->new;
 $outstream = Lucy::Store::OutStream->open( file => $ram_file )
-    or die Lucy->error;
+    or die Clownfish->error;
 $outstream->print("foo");
 $outstream->flush;
 is( $ram_file->get_contents, "foo", '$ramfile->get_contents' );
@@ -36,7 +36,7 @@ is( $ram_file->get_contents, "foo$long_string",
     "store a string spread out over several buffers" );
 
 $instream = Lucy::Store::InStream->open( file => $ram_file )
-    or die Lucy->error;
+    or die Clownfish->error;
 $instream->read( $foo, 3 );
 is( $foo, 'foo', "instream reads ramfile properly" );
 
@@ -49,14 +49,14 @@ like( $@, qr/EOF/, "reading past EOF throws an error" );
 
 $ram_file = Lucy::Store::RAMFile->new;
 $outstream = Lucy::Store::OutStream->open( file => $ram_file )
-    or die Lucy->error;
+    or die Clownfish->error;
 my $BUF_SIZE  = Lucy::Store::FileHandle::_BUF_SIZE();
 my $rep_count = $BUF_SIZE - 1;
 $outstream->print( 'a' x $rep_count );
 $outstream->print('foo');
 $outstream->close;
 $instream = Lucy::Store::InStream->open( file => $ram_file )
-    or die Lucy->error;
+    or die Clownfish->error;
 $instream->read( $long_dupe, $rep_count );
 undef $foo;
 $instream->read( $foo, 3 );
@@ -64,13 +64,13 @@ is( $foo, 'foo', "read across buffer boundary " );
 
 $ram_file = Lucy::Store::RAMFile->new;
 $outstream = Lucy::Store::OutStream->open( file => $ram_file )
-    or die Lucy->error;
+    or die Clownfish->error;
 $outstream->print( 'a' x 1024 );
 $outstream->print('foo');
 $outstream->close;
 
 $instream = Lucy::Store::InStream->open( file => $ram_file )
-    or die Lucy->error;
+    or die Clownfish->error;
 $instream->seek(1024);
 undef $foo;
 $instream->read( $foo, 3 );

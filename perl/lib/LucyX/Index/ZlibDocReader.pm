@@ -47,9 +47,9 @@ sub new {
         my $ix_filename  = $segment->get_name . "/zdocs.ix";
         my $folder       = $self->get_folder;
         $ix_in{$$self} = $folder->open_in($ix_filename)
-            or confess Lucy->error;
+            or confess Clownfish->error;
         $dat_in{$$self} = $folder->open_in($dat_filename)
-            or confess Lucy->error;
+            or confess Clownfish->error;
 
         # Remember which fields are binary.
         my $schema = $self->get_schema;

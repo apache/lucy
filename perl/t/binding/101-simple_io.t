@@ -31,11 +31,11 @@ sub check_round_trip {
     my $read_method  = "read_$type";
     my $file         = Lucy::Store::RAMFile->new;
     my $outstream    = Lucy::Store::OutStream->open( file => $file )
-        or die Lucy->error;
+        or die Clownfish->error;
     $outstream->$write_method($_) for @$expected;
     $outstream->close;
     my $instream = Lucy::Store::InStream->open( file => $file )
-        or die Lucy->error;
+        or die Clownfish->error;
     my @got;
     push @got, $instream->$read_method for @$expected;
     is_deeply( \@got, $expected, $type );
@@ -52,7 +52,7 @@ sub check_round_trip_bytes {
     }
     $outstream->close;
     my $instream = Lucy::Store::InStream->open( file => $file )
-        or die Lucy->error;
+        or die Clownfish->error;
     my @got;
     for (@$expected) {
         my $buf;

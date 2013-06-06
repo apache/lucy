@@ -18,7 +18,7 @@ use warnings;
 
 use Test::More tests => 2;
 use Lucy::Test;
-use Lucy qw( to_perl to_clownfish );
+use Clownfish qw( to_perl to_clownfish );
 
 my $hash = Clownfish::Hash->new( capacity => 10 );
 $hash->store( "foo", Clownfish::CharBuf->new("bar") );

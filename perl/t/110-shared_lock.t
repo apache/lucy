@@ -63,7 +63,7 @@ my $content = $folder->slurp_file("locks/ness-3.lock");
 $content =~ s/$$/123456789/;
 $folder->delete('locks/ness-3.lock') or die "Can't delete 'ness-3.lock'";
 my $outstream = $folder->open_out('locks/ness-3.lock')
-    or die Lucy->error;
+    or die Clownfish->error;
 $outstream->print($content);
 $outstream->close;
 
@@ -82,7 +82,7 @@ ok( $lock->is_locked, "it's locked" );
 $content = $folder->slurp_file("locks/ness-1.lock");
 $content =~ s/nessie/sting/;
 $folder->delete('locks/ness-1.lock') or die "Can't delete 'ness-1.lock'";
-$outstream = $folder->open_out('locks/ness-1.lock') or die Lucy->error;
+$outstream = $folder->open_out('locks/ness-1.lock') or die Clownfish->error;
 $outstream->print($content);
 $outstream->close;
 

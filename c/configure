@@ -15,7 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-(cd ../clownfish/compiler/c && ./configure "$@")
+# This also configures CFC
+(cd ../clownfish/runtime/c && ./configure "$@")
 echo
 
 echo Configuring Lucy...

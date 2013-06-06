@@ -46,13 +46,13 @@ sub new_outstream {
         exclusive  => 1,
     );
     my $outstream = Lucy::Store::OutStream->open( file => $fh )
-        or confess Lucy->error;
+        or confess Clownfish->error;
     return $outstream;
 }
 
 sub new_instream {
     undef $instream;
-    return $folder->open_in($filename) || confess Lucy->error;
+    return $folder->open_in($filename) || confess Clownfish->error;
 }
 
 $outstream = new_outstream();

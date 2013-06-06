@@ -94,11 +94,11 @@ sub run_test_cycle {
 
     my $ram_file = Lucy::Store::RAMFile->new;
     my $outstream = Lucy::Store::OutStream->open( file => $ram_file )
-        or confess Lucy->error;
+        or confess Clownfish->error;
     $orig->serialize($outstream);
     $outstream->close;
     my $instream = Lucy::Store::InStream->open( file => $ram_file )
-        or confess Lucy->error;
+        or confess Clownfish->error;
     my $deserialized = $vtable->make_obj->deserialize($instream);
 
     is( $transform->($deserialized),

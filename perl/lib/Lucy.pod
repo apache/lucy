@@ -205,7 +205,7 @@ single public class method.
 
 =head2 error
 
-    my $instream = $folder->open_in( file => 'foo' ) or die Lucy->error;
+    my $instream = $folder->open_in( file => 'foo' ) or die Clownfish->error;
 
 Access a shared variable which is set by some routines on failure.  It will
 always be either a L<Clownfish::Err> object or undef.

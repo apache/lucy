@@ -30,6 +30,10 @@ my $UTF8PROC_SRC_DIR = catdir( $MODULES_DIR, qw( unicode utf8proc ) );
 my $CORE_SOURCE_DIR  = catdir( @BASE_PATH, 'core' );
 my $XS_SOURCE_DIR    = 'xs';
 
+my $CFR_DIR             = catdir( @BASE_PATH, qw( clownfish runtime ) );
+my $CFR_CORE_SOURCE_DIR = catdir( $CFR_DIR, 'core' );
+my $CFR_XS_SOURCE_DIR   = catdir( $CFR_DIR, qw( perl xs ) );
+
 my $builder = Lucy::Build->new(
     module_name => 'Lucy',
     license     => 'apache',
@@ -58,6 +62,7 @@ my $builder = Lucy::Build->new(
         $SNOWSTEM_INC_DIR,
         $UCD_INC_DIR,
         $UTF8PROC_SRC_DIR,
+        $CFR_XS_SOURCE_DIR,
     ],
     clownfish_params => {
         source => [
@@ -67,10 +72,11 @@ my $builder = Lucy::Build->new(
             $SNOWSTOP_SRC_DIR,
             $UTF8PROC_SRC_DIR,
         ],
+        include => [
+            $CFR_CORE_SOURCE_DIR,
+        ],
     },
-    extra_compiler_flags => join( ' ', map { "-DCFP_$_" } qw(
-        CFISH TESTCFISH LUCY TESTLUCY
-    ) ),
+    extra_compiler_flags => '-DCFP_LUCY -DCFP_TESTLUCY',
     add_to_cleanup => [
         qw(
             Lucy-*

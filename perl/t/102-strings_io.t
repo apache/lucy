@@ -23,33 +23,33 @@ my ( @items, $packed, $template, $buf, $file, $out, $in, $correct );
 
 $file = Lucy::Store::RAMFile->new;
 $out = Lucy::Store::OutStream->open( file => $file )
-    or die Lucy->error;
+    or die Clownfish->error;
 $out->write_c64(10000);
 $out->close;
 $in = Lucy::Store::InStream->open( file => $file )
-    or die Lucy->error;
+    or die Clownfish->error;
 $in->read_raw_c64($buf);
 $correct = $file->get_contents;
 is( $buf, $correct, "read_raw_c64" );
 
 $file = Lucy::Store::RAMFile->new;
 $out = Lucy::Store::OutStream->open( file => $file )
-    or die Lucy->error;
+    or die Clownfish->error;
 $out->print("mint");
 $out->close;
 $buf = "funny";
 $in = Lucy::Store::InStream->open( file => $file )
-    or die Lucy->error;
+    or die Clownfish->error;
 $in->read( $buf, 1 );
 is( $buf, "munny", 'read' );
 
 $file = Lucy::Store::RAMFile->new;
 $out = Lucy::Store::OutStream->open( file => $file )
-    or die Lucy->error;
+    or die Clownfish->error;
 $out->print("cute");
 $out->close;
 $in = Lucy::Store::InStream->open( file => $file )
-    or die Lucy->error;
+    or die Clownfish->error;
 $buf = "buzz";
 $in->read( $buf, 3, 4 );
 is( $buf, "buzzcut", 'read with offset' );

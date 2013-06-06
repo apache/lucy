@@ -18,7 +18,7 @@ use warnings;
 
 use Test::More tests => 3;
 use Lucy::Test;
-use Lucy qw( to_perl to_clownfish );
+use Clownfish qw( to_perl to_clownfish );
 
 my %complex_data_structure = (
     a => [ 1, 2, 3, { ooga => 'booga' } ],

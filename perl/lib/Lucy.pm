@@ -23,12 +23,10 @@ use 5.008003;
 our $VERSION = '0.003000';
 $VERSION = eval $VERSION;
 
+use Clownfish;
 use Exporter 'import';
 BEGIN {
     our @EXPORT_OK = qw(
-        to_clownfish
-        to_perl
-        kdump
         STORABLE_freeze
         STORABLE_thaw
         );
@@ -47,16 +45,6 @@ BEGIN {
     _init_autobindings();
 }
 
-sub kdump {
-    require Data::Dumper;
-    my $kdumper = Data::Dumper->new( [@_] );
-    $kdumper->Sortkeys( sub { return [ sort keys %{ $_[0] } ] } );
-    $kdumper->Indent(1);
-    warn $kdumper->Dump;
-}
-
-sub error {$Clownfish::Err::error}
-
 {
     package Lucy::Util::IndexFileNames;
     our $VERSION = '0.003000';
@@ -66,24 +54,6 @@ sub error {$Clownfish::Err::error}
         our @EXPORT_OK = qw(
             extract_gen
             latest_snapshot
-        );
-    }
-}
-
-{
-    package Clownfish::Util::StringHelper;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    BEGIN {
-        push our @ISA, 'Exporter';
-        our @EXPORT_OK = qw(
-            utf8_flag_on
-            utf8_flag_off
-            to_base36
-            from_base36
-            utf8ify
-            utf8_valid
-            cat_bytes
         );
     }
 }
@@ -122,20 +92,8 @@ sub error {$Clownfish::Err::error}
 }
 
 {
-    package Clownfish::LockFreeRegistry;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    no warnings 'redefine';
-    sub DESTROY { }    # leak all
-}
-
-{
     package Clownfish::Obj;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    use Lucy qw( to_clownfish to_perl );
     use Carp qw( confess );
-    sub load { return $_[0]->_load( to_clownfish( $_[1] ) ) }
     sub STORABLE_freeze {
         my $class_name = shift->get_class_name;
         confess("Storable serialization not implemented for $class_name");
@@ -144,48 +102,6 @@ sub error {$Clownfish::Err::error}
         my $class_name = shift->get_class_name;
         confess("Storable serialization not implemented for $class_name");
     }
-}
-
-{
-    package Clownfish::VTable;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-
-    sub _find_parent_class {
-        my $package = shift;
-        no strict 'refs';
-        for my $parent ( @{"$package\::ISA"} ) {
-            return $parent if $parent->isa('Clownfish::Obj');
-        }
-        return;
-    }
-
-    sub _fresh_host_methods {
-        my $package = shift;
-        no strict 'refs';
-        my $stash = \%{"$package\::"};
-        my $methods
-            = Clownfish::VArray->new( capacity => scalar keys %$stash );
-        while ( my ( $symbol, $glob ) = each %$stash ) {
-            next if ref $glob;
-            next unless *$glob{CODE};
-            $methods->push( Clownfish::CharBuf->new($symbol) );
-        }
-        return $methods;
-    }
-
-    sub _register {
-        my ( $singleton, $parent ) = @_;
-        my $singleton_class = $singleton->get_name;
-        my $parent_class    = $parent->get_name;
-        if ( !$singleton_class->isa($parent_class) ) {
-            no strict 'refs';
-            push @{"$singleton_class\::ISA"}, $parent_class;
-        }
-    }
-
-    no warnings 'redefine';
-    sub DESTROY { }    # leak all
 }
 
 {
@@ -238,7 +154,7 @@ sub error {$Clownfish::Err::error}
     package Lucy::Index::Segment;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
-    use Lucy qw( to_clownfish );
+    use Clownfish qw( to_clownfish );
     sub store_metadata {
         my ( $self, %args ) = @_;
         $self->_store_metadata( %args,
@@ -339,94 +255,6 @@ sub error {$Clownfish::Err::error}
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     sub to_arrayref { shift->to_array->to_arrayref }
-}
-
-{
-    package Clownfish::ViewByteBuf;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    use Carp;
-    sub new { confess "ViewByteBuf objects can only be created from C." }
-}
-
-{
-    package Clownfish::CharBuf;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-
-    {
-        # Defeat obscure bugs in the XS auto-generation by redefining clone().
-        # (Because of how the typemap works for CharBuf*,
-        # the auto-generated methods return UTF-8 Perl scalars rather than
-        # actual CharBuf objects.)
-        no warnings 'redefine';
-        sub clone { shift->_clone(@_) }
-    }
-}
-
-{
-    package Clownfish::ViewCharBuf;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    use Carp;
-    sub new { confess "ViewCharBuf has no public constructor." }
-}
-
-{
-    package Clownfish::ZombieCharBuf;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    use Carp;
-    sub new { confess "ZombieCharBuf objects can only be created from C." }
-    no warnings 'redefine';
-    sub DESTROY { }
-}
-
-{
-    package Clownfish::Err;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    sub do_to_string { shift->to_string }
-    use Scalar::Util qw( blessed );
-    use Carp qw( confess longmess );
-    use overload
-        '""'     => \&do_to_string,
-        fallback => 1;
-
-    sub new {
-        my ( $either, $message ) = @_;
-        my ( undef, $file, $line ) = caller;
-        $message .= ", $file line $line\n";
-        return $either->_new( mess => Clownfish::CharBuf->new($message) );
-    }
-
-    sub do_throw {
-        my $err      = shift;
-        my $longmess = longmess();
-        $longmess =~ s/^\s*/\t/;
-        $err->cat_mess($longmess);
-        die $err;
-    }
-
-    our $error;
-    sub set_error {
-        my $val = $_[1];
-        if ( defined $val ) {
-            confess("Not a Clownfish::Err")
-                unless ( blessed($val)
-                && $val->isa("Clownfish::Err") );
-        }
-        $error = $val;
-    }
-    sub get_error {$error}
-}
-
-{
-    package Clownfish::VArray;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    no warnings 'redefine';
-    sub clone       { CORE::shift->_clone }
 }
 
 {

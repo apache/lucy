@@ -381,9 +381,9 @@ CFCPerlPod_perlify_doc_text(CFCPerlPod *self, const char *source) {
     copy = S_global_replace(orig, "NULL", "undef");
     FREEMEM(orig);
 
-    // Change "Err_error" to "Lucy->error".
+    // Change "Err_error" to "Clownfish->error".
     orig = copy;
-    copy = S_global_replace(orig, "Err_error", "Lucy->error");
+    copy = S_global_replace(orig, "Err_error", "Clownfish->error");
     FREEMEM(orig);
 
     return copy;

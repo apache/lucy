@@ -20,7 +20,7 @@ use lib 'buildlib';
 use Test::More skip_all => 'Disabled until test ported to C';
 #use Test::More tests => 5;
 use Lucy::Test;
-use Lucy qw( to_perl );
+use Clownfish qw( to_perl );
 
 my $letters = Clownfish::VArray->new( capacity => 26 );
 $letters->push( Clownfish::ByteBuf->new($_) ) for 'a' .. 'z';
