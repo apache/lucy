@@ -168,7 +168,7 @@ main(int argc, char **argv) {
         CFCHierarchy_add_source_dir(hierarchy, args.source_dirs[i]);
     }
     for (i = 0; args.include_dirs[i]; ++i) {
-        CFCHierarchy_add_source_dir(hierarchy, args.include_dirs[i]);
+        CFCHierarchy_add_include_dir(hierarchy, args.include_dirs[i]);
     }
 
     CFCHierarchy_build(hierarchy);
