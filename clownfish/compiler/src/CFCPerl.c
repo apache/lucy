@@ -203,16 +203,18 @@ S_write_boot_h(CFCPerl *self) {
 static void
 S_write_boot_c(CFCPerl *self) {
     CFCClass  **ordered   = CFCHierarchy_ordered_classes(self->hierarchy);
-    CFCParcel **parcels   = CFCParcel_source_parcels();
+    CFCParcel **parcels   = CFCParcel_all_parcels();
     char *pound_includes  = CFCUtil_strdup("");
     char *bootstrap_code  = CFCUtil_strdup("");
     char *alias_adds      = CFCUtil_strdup("");
     char *isa_pushes      = CFCUtil_strdup("");
 
     for (size_t i = 0; parcels[i]; ++i) {
-        const char *prefix = CFCParcel_get_prefix(parcels[i]);
-        bootstrap_code = CFCUtil_cat(bootstrap_code, "    ", prefix,
-                                     "bootstrap_parcel();\n", NULL);
+        if (!CFCParcel_included(parcels[i])) {
+            const char *prefix = CFCParcel_get_prefix(parcels[i]);
+            bootstrap_code = CFCUtil_cat(bootstrap_code, "    ", prefix,
+                                         "bootstrap_parcel();\n", NULL);
+        }
     }
 
     for (size_t i = 0; ordered[i] != NULL; i++) {

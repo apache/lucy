@@ -112,7 +112,7 @@ CFCParcel_register(CFCParcel *self) {
 }
 
 CFCParcel**
-CFCParcel_source_parcels(void) {
+CFCParcel_all_parcels(void) {
     size_t size = (num_registered + 1) * sizeof(CFCParcel*);
     CFCParcel **parcels = (CFCParcel**)MALLOCATE(size);
     size_t n = 0;
@@ -121,8 +121,8 @@ CFCParcel_source_parcels(void) {
         CFCParcel  *parcel = registry[i];
         const char *prefix = CFCParcel_get_prefix(parcel);
 
-        // Skip default and included parcels.
-        if (*prefix && !CFCParcel_included(parcel)) {
+        // Skip default parcel.
+        if (*prefix) {
             parcels[n++] = parcel;
         }
     }

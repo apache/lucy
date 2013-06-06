@@ -50,11 +50,11 @@ CFCParcel_fetch(const char *name);
 void
 CFCParcel_register(CFCParcel *self);
 
-/** Return a NULL-terminated list of all registered parcels that are not
- * included. Must be freed by the caller.
+/** Return a NULL-terminated list of all registered parcels. Must be freed by
+ * the caller.
  */
 CFCParcel**
-CFCParcel_source_parcels(void);
+CFCParcel_all_parcels(void);
 
 /** Decref all singletons at shutdown.
  */

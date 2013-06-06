@@ -1166,12 +1166,12 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-source_parcels(...)
+all_parcels(...)
 CODE:
     CHY_UNUSED_VAR(items);
-    CFCParcel **source_parcels = CFCParcel_source_parcels();
-    RETVAL = S_array_of_cfcbase_to_av((CFCBase**)source_parcels);
-    FREEMEM(source_parcels);
+    CFCParcel **all_parcels = CFCParcel_all_parcels();
+    RETVAL = S_array_of_cfcbase_to_av((CFCBase**)all_parcels);
+    FREEMEM(all_parcels);
 OUTPUT: RETVAL
 
 void

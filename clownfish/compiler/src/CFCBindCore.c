@@ -115,11 +115,14 @@ CFCBindCore_write_all_modified(CFCBindCore *self, int modified) {
     // If any class definition has changed, rewrite the parcel.h and parcel.c
     // files.
     if (modified) {
-        CFCParcel **parcels = CFCParcel_source_parcels();
+        CFCParcel **parcels = CFCParcel_all_parcels();
         for (size_t i = 0; parcels[i]; ++i) {
             CFCParcel *parcel = parcels[i];
+            // TODO: Skip parcels the source parcels don't depend on.
             S_write_parcel_h(self, parcel);
-            S_write_parcel_c(self, parcel);
+            if (!CFCParcel_included(parcel)) {
+                S_write_parcel_c(self, parcel);
+            }
         }
         FREEMEM(parcels);
     }

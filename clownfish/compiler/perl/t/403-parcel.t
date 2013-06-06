@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 17;
+use Test::More tests => 16;
 use File::Spec::Functions qw( catfile );
 
 BEGIN { use_ok('Clownfish::CFC::Model::Parcel') }
@@ -33,9 +33,9 @@ my $included_foo = Clownfish::CFC::Model::Parcel->new(
 ok( $included_foo->included, "included" );
 $included_foo->register;
 
-my $source_parcels = Clownfish::CFC::Model::Parcel->source_parcels;
-is( @$source_parcels, 1, "number of source parcels" );
-is( $source_parcels->[0]->get_name, "Foo", "name of source parcel" );
+my $parcels = Clownfish::CFC::Model::Parcel->all_parcels;
+my @names = sort(map { $_->get_name } @$parcels);
+is_deeply( \@names, [ "Foo", "IncludedFoo" ], "all_parcels" );
 
 my $dependent_foo = Clownfish::CFC::Model::Parcel->new(
     name        => "DependentFoo",
