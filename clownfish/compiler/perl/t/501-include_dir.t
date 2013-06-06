@@ -69,6 +69,7 @@ my $file_clash  = catdir(qw( t cfclash file ));
     is( $num_included, 3, "included class count" );
 
     Clownfish::CFC::Model::Class->_clear_registry();
+    Clownfish::CFC::Model::Parcel->reap_singletons();
 }
 
 # Two sources
@@ -95,6 +96,7 @@ my $file_clash  = catdir(qw( t cfclash file ));
     }
 
     Clownfish::CFC::Model::Class->_clear_registry();
+    Clownfish::CFC::Model::Parcel->reap_singletons();
 }
 
 # Name clashes
@@ -110,6 +112,7 @@ my $file_clash  = catdir(qw( t cfclash file ));
     like( $@, qr/Conflict with existing class Animal::Dog/, "source/source class name clash" );
 
     Clownfish::CFC::Model::Class->_clear_registry();
+    Clownfish::CFC::Model::Parcel->reap_singletons();
 }
 
 {
@@ -124,6 +127,7 @@ my $file_clash  = catdir(qw( t cfclash file ));
     like( $@, qr/File \Q$filename\E already registered/, "source/source filename clash" );
 
     Clownfish::CFC::Model::Class->_clear_registry();
+    Clownfish::CFC::Model::Parcel->reap_singletons();
 }
 
 {
@@ -137,6 +141,7 @@ my $file_clash  = catdir(qw( t cfclash file ));
     like( $@, qr/Conflict with existing class Animal::Dog/, "source/include class name clash" );
 
     Clownfish::CFC::Model::Class->_clear_registry();
+    Clownfish::CFC::Model::Parcel->reap_singletons();
 }
 
 {
@@ -151,6 +156,7 @@ my $file_clash  = catdir(qw( t cfclash file ));
     is( scalar @$classes, 3, "source/include filename clash" );
 
     Clownfish::CFC::Model::Class->_clear_registry();
+    Clownfish::CFC::Model::Parcel->reap_singletons();
 }
 
 # Clean up.

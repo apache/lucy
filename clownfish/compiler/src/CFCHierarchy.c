@@ -194,7 +194,7 @@ CFCHierarchy_build(CFCHierarchy *self) {
     for (size_t i = 0; self->sources[i] != NULL; i++) {
         CFCUtil_walk(self->sources[i], S_parse_parcel_files, &context);
     }
-    context.is_included = false;
+    context.is_included = true;
     for (size_t i = 0; self->includes[i] != NULL; i++) {
         CFCUtil_walk(self->includes[i], S_parse_parcel_files, &context);
     }

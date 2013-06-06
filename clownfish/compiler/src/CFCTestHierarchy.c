@@ -32,6 +32,7 @@
 #include "CFCClass.h"
 #include "CFCFile.h"
 #include "CFCHierarchy.h"
+#include "CFCParcel.h"
 #include "CFCTest.h"
 #include "CFCUtil.h"
 
@@ -156,6 +157,7 @@ S_run_basic_tests(CFCTest *test) {
 
     CFCBase_decref((CFCBase*)hierarchy);
     CFCClass_clear_registry();
+    CFCParcel_reap_singletons();
 }
 
 static void
@@ -194,6 +196,7 @@ S_run_include_tests(CFCTest *test) {
         FREEMEM(classes);
         CFCBase_decref((CFCBase*)hierarchy);
         CFCClass_clear_registry();
+        CFCParcel_reap_singletons();
     }
 
     {
@@ -222,6 +225,7 @@ S_run_include_tests(CFCTest *test) {
         FREEMEM(classes);
         CFCBase_decref((CFCBase*)hierarchy);
         CFCClass_clear_registry();
+        CFCParcel_reap_singletons();
     }
 
     rmdir(T_CFDEST_INCLUDE);
