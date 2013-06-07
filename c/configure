@@ -15,9 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-echo Configuring cfc
 (cd ../clownfish/compiler/c && ./configure "$@")
 echo
+
+echo Configuring Lucy...
 
 probe_clang() { clang -v; }
 probe_gcc()   { gcc -v; }

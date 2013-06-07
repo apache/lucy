@@ -15,11 +15,12 @@ rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 rem See the License for the specific language governing permissions and
 rem limitations under the License.
 
-echo Configuring cfc
 cd ..\clownfish\compiler\c
 call configure.bat
 cd ..\..\..\c
 echo.
+
+echo Configuring Lucy...
 
 cl >nul 2>nul
 if not errorlevel 1 goto found_cl
