@@ -188,6 +188,18 @@ CFCMethod_novel(CFCMethod *self);
 struct CFCType*
 CFCMethod_self_type(CFCMethod *self);
 
+void
+CFCMethod_set_host_alias(CFCMethod *self, const char *alias);
+
+const char*
+CFCMethod_get_host_alias(CFCMethod *self);
+
+void
+CFCMethod_exclude_from_host(CFCMethod *self);
+
+int
+CFCMethod_excluded_from_host(CFCMethod *self);
+
 struct CFCParcel*
 CFCMethod_get_parcel(CFCMethod *self);
 

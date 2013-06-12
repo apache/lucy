@@ -42,7 +42,7 @@ S_run_final_tests(CFCTest *test);
 
 const CFCTestBatch CFCTEST_BATCH_METHOD = {
     "Clownfish::CFC::Model::Method",
-    70,
+    74,
     S_run_tests
 };
 
@@ -138,6 +138,31 @@ S_run_basic_tests(CFCTest *test) {
            "... reversed");
         CFCBase_decref((CFCBase*)self_differs_list);
         CFCBase_decref((CFCBase*)self_differs);
+    }
+
+    {
+        CFCMethod *aliased
+            = CFCMethod_new(neato_parcel, NULL, "Neato::Foo", "Foo",
+                            "Aliased", return_type, param_list,
+                            NULL, 0, 0);
+        OK(test, !CFCMethod_get_host_alias(aliased),
+           "no host alias by default");
+        CFCMethod_set_host_alias(aliased, "Host_Alias");
+        STR_EQ(test, CFCMethod_get_host_alias(aliased), "Host_Alias",
+               "set/get host alias");
+        CFCBase_decref((CFCBase*)aliased);
+    }
+
+    {
+        CFCMethod *excluded
+            = CFCMethod_new(neato_parcel, NULL, "Neato::Foo", "Foo",
+                            "Excluded", return_type, param_list,
+                            NULL, 0, 0);
+        OK(test, !CFCMethod_excluded_from_host(excluded),
+           "not excluded by default");
+        CFCMethod_exclude_from_host(excluded);
+        OK(test, CFCMethod_excluded_from_host(excluded), "exclude from host");
+        CFCBase_decref((CFCBase*)excluded);
     }
 
     CFCBase_decref((CFCBase*)parser);

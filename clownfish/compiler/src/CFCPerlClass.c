@@ -43,11 +43,6 @@ struct CFCPerlClass {
     CFCClass *client;
     char *xs_code;
     CFCPerlPod *pod_spec;
-    char **meth_aliases;
-    char **meth_names;
-    size_t num_methods;
-    char **excluded;
-    size_t num_excluded;
     char **cons_aliases;
     char **cons_inits;
     size_t num_cons;
@@ -83,11 +78,6 @@ CFCPerlClass_init(CFCPerlClass *self, CFCParcel *parcel,
     self->client = CFCClass_fetch_singleton(parcel, class_name); 
     self->pod_spec          = NULL;
     self->xs_code           = NULL;
-    self->meth_aliases      = NULL;
-    self->meth_names        = NULL;
-    self->num_methods       = 0;
-    self->excluded          = NULL;
-    self->num_excluded      = 0;
     self->cons_aliases      = NULL;
     self->cons_inits        = NULL;
     self->num_cons          = 0;
@@ -104,16 +94,6 @@ CFCPerlClass_destroy(CFCPerlClass *self) {
     CFCBase_decref((CFCBase*)self->pod_spec);
     FREEMEM(self->class_name);
     FREEMEM(self->xs_code);
-    for (size_t i = 0; i < self->num_methods; i++) {
-        FREEMEM(self->meth_aliases[i]);
-        FREEMEM(self->meth_names[i]);
-    }
-    FREEMEM(self->meth_aliases);
-    FREEMEM(self->meth_names);
-    for (size_t i = 0; i < self->num_excluded; i++) {
-        FREEMEM(self->excluded[i]);
-    }
-    FREEMEM(self->excluded);
     for (size_t i = 0; i < self->num_cons; i++) {
         FREEMEM(self->cons_aliases[i]);
         FREEMEM(self->cons_inits[i]);
@@ -185,25 +165,39 @@ CFCPerlClass_clear_registry(void) {
 
 void
 CFCPerlClass_bind_method(CFCPerlClass *self, const char *alias,
-                         const char *method) {
-    size_t size = (self->num_methods + 1) * sizeof(char*);
-    self->meth_aliases = (char**)REALLOCATE(self->meth_aliases, size);
-    self->meth_names   = (char**)REALLOCATE(self->meth_names,   size);
-    self->meth_aliases[self->num_methods] = (char*)CFCUtil_strdup(alias);
-    self->meth_names[self->num_methods]   = (char*)CFCUtil_strdup(method);
-    self->num_methods++;
+                         const char *meth_name) {
     if (!self->client) {
         CFCUtil_die("Can't bind_method %s -- can't find client for %s",
                     alias, self->class_name);
     }
+    CFCMethod *method = CFCClass_method(self->client, meth_name);
+    if (!method) {
+        CFCUtil_die("Can't bind_method %s -- can't find method %s in %s",
+                    alias, meth_name, self->class_name);
+    }
+    if (strcmp(CFCMethod_get_class_name(method), self->class_name) != 0) {
+        CFCUtil_die("Can't bind_method %s -- method %s not fresh in %s",
+                    alias, meth_name, self->class_name);
+    }
+    CFCMethod_set_host_alias(method, alias);
 }
 
 void
-CFCPerlClass_exclude_method(CFCPerlClass *self, const char *method) {
-    size_t size = (self->num_excluded + 1) * sizeof(char*);
-    self->excluded = (char**)REALLOCATE(self->excluded, size);
-    self->excluded[self->num_excluded] = (char*)CFCUtil_strdup(method);
-    self->num_excluded++;
+CFCPerlClass_exclude_method(CFCPerlClass *self, const char *meth_name) {
+    if (!self->client) {
+        CFCUtil_die("Can't exclude_method %s -- can't find client for %s",
+                    meth_name, self->class_name);
+    }
+    CFCMethod *method = CFCClass_method(self->client, meth_name);
+    if (!method) {
+        CFCUtil_die("Can't exclude_method %s -- method not found in %s",
+                    meth_name, self->class_name);
+    }
+    if (strcmp(CFCMethod_get_class_name(method), self->class_name) != 0) {
+        CFCUtil_die("Can't exclude_method %s -- method not fresh in %s",
+                    meth_name, self->class_name);
+    }
+    CFCMethod_exclude_from_host(method);
 }
 
 void
@@ -261,7 +255,6 @@ CFCPerlClass_method_bindings(CFCPerlClass *self) {
      // Iterate over the class's fresh methods.
     for (size_t i = 0; fresh_methods[i] != NULL; i++) {
         CFCMethod  *method    = fresh_methods[i];
-        const char *alias     = CFCMethod_micro_sym(method);
         const char *meth_name = CFCMethod_get_macro_sym(method);
 
         // Only deal with methods when they are novel (i.e. first declared)
@@ -277,14 +270,9 @@ CFCPerlClass_method_bindings(CFCPerlClass *self) {
         if (CFCSymbol_private((CFCSymbol*)method)) { continue; }
 
         // Skip methods which have been explicitly excluded.
-        int is_excluded = 0;
-        for (size_t j = 0; j < self->num_excluded; j++) {
-            if (strcmp(self->excluded[j], meth_name) == 0) {
-                is_excluded = 1;
-                break;
-            }
+        if (CFCMethod_excluded_from_host(method)) {
+            continue;
         }
-        if (is_excluded) { continue; }
 
         // Skip methods with types which cannot be mapped automatically.
         CFCParamList *param_list  = CFCMethod_get_param_list(method);
@@ -294,13 +282,9 @@ CFCPerlClass_method_bindings(CFCPerlClass *self) {
         }
 
         // See if the user wants the method to have a specific alias.
-        for (size_t j = 0; j < self->num_methods; j++) {
-            const char *maybe = self->meth_names[j];
-            if (strcmp(maybe, meth_name) == 0) {
-                if (self->meth_aliases[j]) {
-                    alias = self->meth_aliases[j];
-                }
-            }
+        const char *alias = CFCMethod_get_host_alias(method);
+        if (!alias) {
+            alias = CFCMethod_micro_sym(method);
         }
 
         /* Create an XSub binding for each override.  Each of these directly

@@ -38,9 +38,11 @@ struct CFCMethod {
     CFCFunction function;
     char *macro_sym;
     char *full_override_sym;
+    char *host_alias;
     int is_final;
     int is_abstract;
     int is_novel;
+    int is_excluded;
 };
 
 static const CFCMeta CFCMETHOD_META = {
@@ -123,11 +125,12 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
         }
     }
 
-    self->macro_sym     = CFCUtil_strdup(macro_sym);
-    self->is_final      = is_final;
-    self->is_abstract   = is_abstract;
-
+    self->macro_sym         = CFCUtil_strdup(macro_sym);
     self->full_override_sym = NULL;
+    self->host_alias        = NULL;
+    self->is_final          = is_final;
+    self->is_abstract       = is_abstract;
+    self->is_excluded       = false;
 
     // Assume that this method is novel until we discover when applying
     // inheritance that it overrides another.
@@ -145,6 +148,7 @@ void
 CFCMethod_destroy(CFCMethod *self) {
     FREEMEM(self->macro_sym);
     FREEMEM(self->full_override_sym);
+    FREEMEM(self->host_alias);
     CFCFunction_destroy((CFCFunction*)self);
 }
 
@@ -226,6 +230,43 @@ CFCMethod_finalize(CFCMethod *self) {
                         self->function.docucomment, true,
                         self->is_abstract);
     return finalized;
+}
+
+void
+CFCMethod_set_host_alias(CFCMethod *self, const char *alias) {
+    if (!alias || !alias[0]) {
+        CFCUtil_die("Missing required param 'alias'");
+    }
+    if (!self->is_novel) {
+        CFCUtil_die("Can't set_host_alias %s -- method %s not novel in %s",
+                    alias, self->macro_sym, CFCMethod_get_class_name(self));
+    }
+    if (self->host_alias) {
+        if (strcmp(self->host_alias, alias) == 0) { return; }
+        CFCUtil_die("Can't set_host_alias %s -- already set to %s for method"
+                    " %s in %s", alias, self->host_alias, self->macro_sym,
+                    CFCMethod_get_class_name(self));
+    }
+    self->host_alias = CFCUtil_strdup(alias);
+}
+
+const char*
+CFCMethod_get_host_alias(CFCMethod *self) {
+    return self->host_alias;
+}
+
+void
+CFCMethod_exclude_from_host(CFCMethod *self) {
+    if (!self->is_novel) {
+        CFCUtil_die("Can't exclude_from_host -- method %s not novel in %s",
+                    self->macro_sym, CFCMethod_get_class_name(self));
+    }
+    self->is_excluded = true;
+}
+
+int
+CFCMethod_excluded_from_host(CFCMethod *self) {
+    return self->is_excluded;
 }
 
 static char*

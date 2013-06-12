@@ -927,6 +927,12 @@ PPCODE:
     CFCMethod_resolve_types(self, classes);
     FREEMEM(classes);
 
+void
+exclude_from_host(self)
+    CFCMethod *self;
+PPCODE:
+    CFCMethod_exclude_from_host(self);
+
 SV*
 _various_method_syms(self, invoker)
     CFCMethod *self;
@@ -965,12 +971,15 @@ void
 _set_or_get(self, ...)
     CFCMethod *self;
 ALIAS:
-    get_macro_sym     = 2
-    full_override_sym = 10
-    abstract          = 12
-    novel             = 14
-    final             = 16
-    self_type         = 18
+    get_macro_sym      = 2
+    full_override_sym  = 10
+    abstract           = 12
+    novel              = 14
+    final              = 16
+    self_type          = 18
+    set_host_alias     = 19
+    get_host_alias     = 20
+    excluded_from_host = 22
 PPCODE:
 {
     START_SET_OR_GET_SWITCH
@@ -997,6 +1006,21 @@ PPCODE:
                 CFCType *type = CFCMethod_self_type(self);
                 retval = S_cfcbase_to_perlref(type);
             }
+            break;
+        case 19: {
+                const char *value = SvOK(ST(1)) ? SvPVutf8_nolen(ST(1)) : NULL;
+                CFCMethod_set_host_alias(self, value);
+            }
+            break;
+        case 20: {
+                const char *value = CFCMethod_get_host_alias(self);
+                if (value) {
+                    retval = newSVpvn(value, strlen(value));
+                }
+            }
+            break;
+        case 22:
+            retval = newSViv(CFCMethod_excluded_from_host(self));
             break;
     END_SET_OR_GET_SWITCH
 }
