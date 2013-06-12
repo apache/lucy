@@ -162,6 +162,11 @@ CFCPerlClass_add_class_alias(CFCPerlClass *self, const char *alias);
 const char**
 CFCPerlClass_get_class_aliases(CFCPerlClass *self);
 
+/** Return C code which initializes method metadata.
+ */
+char*
+CFCPerlClass_method_metadata_code(CFCPerlClass *self);
+
 #ifdef __cplusplus
 }
 #endif

@@ -546,3 +546,32 @@ CFCPerlClass_get_class_aliases(CFCPerlClass *self) {
     return (const char **)self->class_aliases;
 }
 
+// Generate C code which initializes method metadata.
+char*
+CFCPerlClass_method_metadata_code(CFCPerlClass *self) {
+    const char *vtable_var = CFCClass_full_vtable_var(self->client);
+    CFCMethod **fresh_methods = CFCClass_fresh_methods(self->client);
+    char *code = CFCUtil_strdup("");
+
+    for (int i = 0; fresh_methods[i] != NULL; i++) {
+        CFCMethod *method = fresh_methods[i];
+        if (!CFCMethod_novel(method)) { continue; }
+
+        const char *macro_sym = CFCMethod_get_macro_sym(method);
+        const char *alias     = CFCMethod_get_host_alias(method);
+        if (alias) {
+            code = CFCUtil_cat(code, "    Cfish_VTable_Add_Host_Method_Alias(",
+                               vtable_var, ", \"", alias, "\", \"", macro_sym,
+                               "\");\n", NULL);
+        }
+        if (CFCMethod_excluded_from_host(method)) {
+            code = CFCUtil_cat(code, "    Cfish_VTable_Exclude_Host_Method(",
+                               vtable_var, ", \"", macro_sym, "\");\n", NULL);
+        }
+    }
+
+    FREEMEM(fresh_methods);
+    return code;
+}
+
+

@@ -249,6 +249,11 @@ S_write_boot_c(CFCPerl *self) {
                 FREEMEM(alias_adds);
                 alias_adds = new_alias_adds;
             }
+
+            char *metadata_code
+                = CFCPerlClass_method_metadata_code(class_binding);
+            alias_adds = CFCUtil_cat(alias_adds, metadata_code, NULL);
+            FREEMEM(metadata_code);
         }
 
         CFCClass *parent = CFCClass_get_parent(klass);
