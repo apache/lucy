@@ -256,21 +256,30 @@ CFCPerlClass_method_bindings(CFCPerlClass *self) {
     for (size_t i = 0; fresh_methods[i] != NULL; i++) {
         CFCMethod  *method    = fresh_methods[i];
         const char *meth_name = CFCMethod_get_macro_sym(method);
+        CFCMethod  *novel_method;
 
         // Only deal with methods when they are novel (i.e. first declared)
         // or the parent's definition is from an included parcel (i.e. they
         // are first declared in this parcel).
-        if (!CFCMethod_novel(method)) {
+        if (CFCMethod_novel(method)) {
+            novel_method = method;
+        }
+        else {
             CFCMethod *parent_method = CFCClass_method(parent, meth_name);
             CFCParcel *parcel = CFCMethod_get_parcel(parent_method);
             if (!CFCParcel_included(parcel)) { continue; }
+
+            novel_method = CFCClass_find_novel_method(parent, meth_name);
+            if (!novel_method) {
+                CFCUtil_die("Novel method not found");
+            }
         }
 
         // Skip private methods.
         if (CFCSymbol_private((CFCSymbol*)method)) { continue; }
 
         // Skip methods which have been explicitly excluded.
-        if (CFCMethod_excluded_from_host(method)) {
+        if (CFCMethod_excluded_from_host(novel_method)) {
             continue;
         }
 
@@ -282,7 +291,7 @@ CFCPerlClass_method_bindings(CFCPerlClass *self) {
         }
 
         // See if the user wants the method to have a specific alias.
-        const char *alias = CFCMethod_get_host_alias(method);
+        const char *alias = CFCMethod_get_host_alias(novel_method);
         if (!alias) {
             alias = CFCMethod_micro_sym(method);
         }
