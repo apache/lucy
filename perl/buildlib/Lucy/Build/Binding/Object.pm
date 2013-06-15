@@ -33,6 +33,7 @@ sub bind_all {
     $class->bind_obj;
     $class->bind_varray;
     $class->bind_vtable;
+    $class->bind_method;
 }
 
 sub bind_bitvector {
@@ -639,6 +640,22 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
+fetch_vtable(unused_sv, class_name_sv)
+    SV *unused_sv;
+    SV *class_name_sv;
+CODE:
+{
+    CHY_UNUSED_VAR(unused_sv);
+    STRLEN size;
+    char *ptr = SvPVutf8(class_name_sv, size);
+    cfish_ZombieCharBuf *class_name = CFISH_ZCB_WRAP_STR(ptr, size);
+   cfish_VTable *vtable
+        = cfish_VTable_fetch_vtable((cfish_CharBuf*)class_name);
+    RETVAL = vtable ? (SV*)Cfish_VTable_To_Host(vtable) : &PL_sv_undef;
+}
+OUTPUT: RETVAL
+
+SV*
 singleton(unused_sv, ...)
     SV *unused_sv;
 CODE:
@@ -677,6 +694,14 @@ END_XS_CODE
     $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);
 
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_method {
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Clownfish",
+       class_name => "Clownfish::Method",
+    );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

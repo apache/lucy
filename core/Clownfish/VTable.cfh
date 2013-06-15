@@ -118,6 +118,13 @@ class Clownfish::VTable inherits Clownfish::Obj {
     Obj*
     Foster_Obj(VTable *self, void *host_obj);
 
+    void
+    Add_Host_Method_Alias(VTable *self, const char *alias,
+                          const char *meth_name);
+
+    void
+    Exclude_Host_Method(VTable *self, const char *meth_name);
+
     CharBuf*
     Get_Name(VTable *self);
 
@@ -126,6 +133,9 @@ class Clownfish::VTable inherits Clownfish::Obj {
 
     size_t
     Get_Obj_Alloc_Size(VTable *self);
+
+    VArray*
+    Get_Methods(VTable *self);
 
     public incremented VTable*
     Clone(VTable *self);

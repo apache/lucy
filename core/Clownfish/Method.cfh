@@ -22,8 +22,10 @@ parcel Clownfish;
 class Clownfish::Method inherits Clownfish::Obj {
 
     CharBuf        *name;
+    CharBuf        *host_alias;
     cfish_method_t  callback_func;
     size_t          offset;
+    bool            is_excluded;
 
     inert Method*
     new(const CharBuf *name, cfish_method_t callback_func, size_t offset);
@@ -31,6 +33,15 @@ class Clownfish::Method inherits Clownfish::Obj {
     inert Method*
     init(Method *self, const CharBuf *name, cfish_method_t callback_func,
          size_t offset);
+
+    CharBuf*
+    Get_Name(Method *self);
+
+    nullable CharBuf*
+    Get_Host_Alias(Method *self);
+
+    bool
+    Is_Excluded_From_Host(Method *self);
 
     incremented Obj*
     Inc_RefCount(Method *self);

@@ -21,6 +21,8 @@
 #define CFISH_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -40,6 +42,9 @@ size_t VTable_offset_of_parent = offsetof(VTable, parent);
 // Remove spaces and underscores, convert to lower case.
 static void
 S_scrunch_charbuf(CharBuf *source, CharBuf *target);
+
+static Method*
+S_find_method(VTable *self, const char *meth_name);
 
 LockFreeRegistry *VTable_registry = NULL;
 
@@ -185,6 +190,11 @@ VTable_get_parent(VTable *self) {
 size_t
 VTable_get_obj_alloc_size(VTable *self) {
     return self->obj_alloc_size;
+}
+
+VArray*
+VTable_get_methods(VTable *self) {
+    return self->methods;
 }
 
 void
@@ -344,6 +354,42 @@ VTable_fetch_vtable(const CharBuf *class_name) {
         vtable = (VTable*)LFReg_Fetch(VTable_registry, (Obj*)class_name);
     }
     return vtable;
+}
+
+void
+VTable_add_host_method_alias(VTable *self, const char *alias,
+                             const char *meth_name) {
+    Method *method = S_find_method(self, meth_name);
+    if (!method) {
+        fprintf(stderr, "Method %s not found\n", meth_name);
+        abort();
+    }
+    method->host_alias = CB_newf("%s", alias);
+}
+
+void
+VTable_exclude_host_method(VTable *self, const char *meth_name) {
+    Method *method = S_find_method(self, meth_name);
+    if (!method) {
+        fprintf(stderr, "Method %s not found\n", meth_name);
+        abort();
+    }
+    method->is_excluded = true;
+}
+
+static Method*
+S_find_method(VTable *self, const char *name) {
+    size_t   name_len = strlen(name);
+    uint32_t size     = VA_Get_Size(self->methods);
+
+    for (uint32_t i = 0; i < size; i++) {
+        Method *method = (Method*)VA_Fetch(self->methods, i);
+        if (CB_Equals_Str(method->name, name, name_len)) {
+            return method;
+        }
+    }
+
+    return NULL;
 }
 
 
