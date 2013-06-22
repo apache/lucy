@@ -1,0 +1,467 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+=head1 NAME
+
+Clownfish - Short description.
+
+=head1 VERSION
+
+0.3.0
+
+=head1 DESCRIPTION
+
+Clownfish is an object system for C designed to easily create bindings for
+dynamic languages, so-called host languages. Classes are declared in Clownfish
+header files with a C<.cfh> extension. The Clownfish headers are used by the
+Clownfish compiler to generate C header files and host language bindings.
+Class methods, functions and variables are defined in normal C source files.
+
+=head2 Features
+
+=over
+
+=item *
+
+Designed to support multiple host languages. Currently, only Perl is supported.
+
+=item *
+
+Support for stand-alone C libraries and executables.
+
+=item *
+
+Subclassing and method overriding from the host language.
+
+=item *
+
+Support for host language idioms like named parameters or default argument
+values.
+
+=item *
+
+Highly performant object system with lazy creation of host language objects.
+
+=item *
+
+Runtime with classes for commonly used data structures like strings, dynamic
+arrays and hash tables.
+
+=item *
+
+Modularity.
+
+=item *
+
+Introspection.
+
+=item *
+
+Documentation generator.
+
+=back
+
+=head2 Planned features
+
+=over
+
+=item *
+
+Support for more host languages.
+
+=item *
+
+Guaranteed ABI stability when adding or reordering methods or instance
+variables.
+
+=back
+
+=head1 USING CLOWNFISH CLASSES
+
+TODO: Simple introduction
+
+=head1 WRITING CLOWNFISH CLASSES
+
+=head2 Parcels
+
+Every Clownfish class belongs to a Clownfish parcel. Parcels are used for
+namespacing and versioning. Information about parcels is stored in C<.cfp>
+files which contain a JSON hash with the following keys:
+
+=over
+
+=item name
+
+The parcel's name. It must contain only letters.
+
+=item nickname
+
+A short nickname. It must contain only letters. This nickname, followed by an
+underscore, is used to prefix generated C symbols and macros. Depending on the
+kind of symbol, a lowercase, mixed case, or uppercase prefix will be used.
+
+=item version
+
+A version specifier of the following form (without whitespace):
+
+    version-specifier = "v" version-number
+    version-number = digit | digit "." version-number
+
+=back
+
+An example C<.cfp> file might look like:
+
+    {
+        "name": "Pathfinder",
+        "nickname": "Pfind",
+        "version": "v2.3.8"
+    }
+
+A parcel specifier of the following form is used in Clownfish header files:
+
+    parcel-specifier = "parcel" parcel-name ";"
+    parcel-name = identifier
+
+For example:
+
+    parcel Pathfinder;
+
+All classes following a parcel specifier will be associated with that parcel.
+
+=head3 Bootstrapping
+
+TODO
+
+=head3 Short names
+
+If a macro with the uppercase name C<{PARCEL_NICK}_USE_SHORT_NAMES> is
+defined before including a generated C header, additional macros without the
+parcel prefix will be defined for most symbols.
+
+Example:
+
+    #define PFIND_USE_SHORT_NAMES
+    #include <Pathfinder/Graph.h>
+    #include <Pathfinder/Path.h>
+
+    /* Prefixes can be omitted. */
+    Path *path = Graph_Find_Shortest_Path(graph);
+
+    /* Without PFIND_USE_SHORT_NAMES, one would have to write: */
+    pfind_Path *path = Pfind_Graph_Find_Shortest_Path(graph);
+
+For object types in Clownfish header files, prefixes of class structs can
+also be omitted unless multiple parcels declare classes with the same last
+component of the class name.
+
+=head2 Declaring classes
+
+Classes are declared in Clownfish header files using a declaration of the
+following form:
+
+    class-declaration = class-exposure-specifier?
+                        class-modifier*
+                        "class" class-name
+                        ("cnick" class-nickname)?
+                        ("inherits" class-name)?
+                        "{" class-contents "}"
+    class-exposure-specifier = "public"
+    class-modifier = "inert" | "abstract" | "final"
+    class-name = identifier | identifier "::" class-name
+    class-nickname = identifier
+    class-contents = (variable-declaration | function-declaration)*
+
+Class name components must start with an uppercase letter and must not contain
+underscores. The last component must contain at least one lowercase letter and
+must be unique for every class in a parcel.
+
+For every class, a struct with the name C<{parcel_nick}_{Class_Last_Comp}>
+and a corresponding typedef are declared in the generated C header. The struct
+members are only visible if the uppercase macro
+C<C_{PARCEL_NICK}_{CLASS_LAST_COMP}> is defined before including the header
+file.
+
+For every class, a global variable with the uppercase name
+C<{PARCEL_NICK}_{CLASS_LAST_COMP}> is defined. This variable is a pointer to
+a Clownfish::VTable object which is initialized when bootstrapping the parcel.
+
+Example of a class declaration:
+
+    parcel Pathfinder;
+
+    public class Pathfinder::Graph::VisibilityGraph cnick VisGraph
+        extends Clownfish::Obj {
+        /* Variables and functions */
+    }
+
+This will generate:
+
+    struct pfind_VisibilityGraph {
+        /* Instance variables */
+    };
+    typedef struct pfind_VisibilityGraph pfind_VisibilityGraph;
+    extern cfish_VTable *PFIND_VISIBILITYGRAPH;
+
+=head3 Class exposure
+
+Classes without public exposure have parcel exposure. They are not visible
+outside of the parcel and must not contain public variables or functions.
+
+=head3 Inert classes
+
+Inert classes must contain only inert variables or inert methods, that is,
+neither instance variables nor methods. They must not inherit from another
+class or be inherited from. All other classes (except Clownfish::Obj) must
+inherit from Clownfish::Obj or another class.
+
+=head3 Abstract classes
+
+Only abstract classes may contain abstract methods. They must not be
+instantiated directly.
+
+=head3 Final classes
+
+Final classes must not be inherited from. They must not be abstract.
+
+=head2 Variables
+
+Variables are declared with a declaration of the following form:
+
+    variable-declaration = variable-exposure-specifier?
+                           variable-modifier*
+                           type variable-name ";"
+    variable-exposure-specifier = "public"
+    variable-modifier = "inert"
+    variable-name = identifier
+
+=head3 Inert variables
+
+Inert variables are class variables of which only a single copy exists.
+They are declared in the generated C header with the name
+C<{parcel_nick}_{Class_Nick}_{Variable_Name}> and must be defined in a C
+source file.
+
+Example:
+
+    public class Pathfinder::Path {
+        public inert int max_path_length;
+    }
+
+This will generate:
+
+    extern int pfind_Path_max_path_length;
+
+The C source file defining the variable will typically use short names. So the
+definition will look like:
+
+    int Path_max_path_length = 5000;
+
+=head3 Inert variable exposure
+
+Inert variables without public exposure have parcel exposure. They are not
+visible outside of the parcel.
+
+=head3 Instance variables
+
+Non-inert variables are instance variables and added to the class struct. They
+must not have an exposure specifier.
+
+Example:
+
+    public class Pathfinder::Path {
+        int num_nodes;
+
+        public int
+        Get_Num_Nodes(Path *self);
+    }
+
+This will add a C<num_nodes> member to struct C<pfind_Path>. To access the
+member, the macro C<C_PFIND_PATH> must be defined before including the
+generated header file:
+
+    #define C_PFIND_PATH
+    #define PFIND_USE_SHORT_NAMES
+    #include "Pathfinder/Path.h"
+
+    int
+    Path_get_num_nodes(Path *self) {
+        return self->num_nodes;
+    }
+
+=head2 Functions
+
+    function-declaration = function-exposure-specifier?
+                           function-modifier*
+                           return-type function-name
+                           "(" param-list? ")" ";"
+    function-exposure-specifier = "public"
+    function-modifier = "inert" | "inline" | "abstract" | "final"
+    return-type = return-type-qualifier* type
+    return-type-qualifier = "incremented" | "nullable"
+    function-name = identifier
+    param-list = param | param "," param-list
+    param = param-qualifier* type param-name ("=" scalar-constant)?
+    param-name = identifier
+    param-qualifier = "decremented"
+
+=head3 Function exposure
+
+Functions without public exposure have parcel exposure. They are not
+visible outside of the parcel.
+
+=head3 Inert functions
+
+Inert functions are dispatched statically. They are declared in the generated
+C header with the name C<{parcel_nick}_{Class_Nick}_{Function_Name}>
+and must be defined in a C source file. They must be neither abstract nor
+final.
+
+Example:
+
+    public class Pathfinder::Graph::VisibilityGraph cnick VisGraph
+        extends Clownfish::Obj {
+
+        public inert incremented VisibilityGraph*
+        new(int node_capacity);
+    }
+
+This will generate:
+
+    pfind_VisibilityGraph*
+    pfind_VisGraph_new(int node_capacity);
+
+The C source file implementing the inert function will typically use short
+names. So the implementation will look like:
+
+    #define PFIND_USE_SHORT_NAMES
+    #include "Pathfinder/Graph/VisibilityGraph.h"
+
+    VisibilityGraph*
+    VisGraph_new(int node_capacity) {
+        /* Implementation */
+    }
+
+=head3 Methods
+
+Non-inert functions are dynamically dispatched methods. Their name must start
+with an uppercase letter and every underscore must be followed by an uppercase
+letter. For every method, a wrapper for dynamic dispatch is declared in the
+generated C header with the name
+C<{Parcel_Nick}_{Class_Nick}_{Method_Name}>. Additionally, an
+implementing function is declared with the name
+C<{parcel_nick}_{Class_Nick}_{method_name}>. The implementing function
+of non-abstract methods must be defined in a C source file. The first parameter
+of a method must be a pointer to an object of the class.
+
+TODO: Method typedefs
+TODO: METHOD_PTR
+
+Example:
+
+    public class Pathfinder::Graph::VisibilityGraph cnick VisGraph
+        extends Clownfish::Obj {
+
+        public void
+        Add_Node(VisibilityGraph *self, decremented Node *node);
+    }
+
+This will generate:
+
+    /* Wrapper for dynamic dispatch */
+    void
+    Pfind_VisGraph_Add_Node(pfind_VisibilityGraph *self, pfind_Node *node);
+
+    /* Implementing function */
+    void
+    pfind_VisGraph_add_node(pfind_VisibilityGraph *self, pfind_Node *node);
+
+The C source file implementing the method will typically use short names. So
+the implementation will look like:
+
+    #define PFIND_USE_SHORT_NAMES
+    #include "Pathfinder/Graph/VisibilityGraph.h"
+
+    void
+    VisGraph_add_node(VisibilityGraph *self, Node *node) {
+        /* Implementation */
+    }
+
+=head3 Abstract methods
+
+For abstract methods, the Clownfish compiler generates an implementing function
+which throws an error. They should be overridden in a subclass.
+
+=head3 Final methods
+
+Final methods must not be overridden. They must not be abstract.
+
+=head3 Inline functions
+
+TODO
+
+=head3 Nullable return type
+
+If a function has a nullable return type, it must return a pointer.
+Non-nullable functions must never return the NULL pointer.
+
+=head3 Incremented return type
+
+Incremented return types must be pointers to Clownfish objects. The function
+will either return a new object with an initial reference count of 1 or
+increment the reference count. The caller must decrement the reference count of
+the returned object when it's no longer used.
+
+For returned objects with non-incremented return type, usually no additional
+handling of reference counts is required. Only if an object is returned from an
+accessor or a collection object and the caller wants to use the object longer
+than the returning object retains a reference, it must increment the reference
+count itself and decrement when the object is no longer used.
+
+=head3 Decremented return type
+
+Decremented parameters must be pointers to Clownfish objects. The function
+will either decrement the reference count of the passed-in object or retain a
+reference without incrementing the reference count. If the caller wants to use
+the passed-in object afterwards, it usually must increment its reference count
+before the call and decrement it when it's no longer used. If the caller does
+not make further use of the passed-in object, it must not decrement its
+reference count after the call.
+
+=head3 Default parameter values
+
+TODO
+
+=head2 Memory management
+
+TODO: Reference counting
+TODO: INCREF/DECREF macros
+TODO: Destroy method
+
+=head2 Constructors
+
+TODO
+
+=head2 Inheritance
+
+TODO: init functions
+TODO: SUPER_METHOD_PTR, SUPER_DESTROY
+
+=head1 COPYRIGHT
+
+Apache Clownfish is distributed under the Apache License, Version 2.0, as
+described in the file C<LICENSE> included with the distribution.
+
+=cut
+
