@@ -15,7 +15,6 @@
  */
 
 #define C_LUCY_QUERYPARSER
-#define C_CFISH_VIEWCHARBUF
 #include <stdlib.h>
 #include <ctype.h>
 #include "Lucy/Util/ToolSet.h"
