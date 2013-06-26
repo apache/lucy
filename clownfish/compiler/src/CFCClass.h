@@ -246,6 +246,12 @@ CFCClass_get_struct_sym(CFCClass *self);
 const char*
 CFCClass_full_struct_sym(CFCClass *self);
 
+const char*
+CFCClass_short_ivars_name(CFCClass *self);
+
+const char*
+CFCClass_full_ivars_name(CFCClass *self);
+
 /** The short name of the global VTable object for this class.
  */
 const char*

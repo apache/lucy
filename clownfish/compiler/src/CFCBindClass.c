@@ -152,11 +152,37 @@ S_to_c_header_inert(CFCBindClass *self) {
 }
 
 static char*
+S_ivars_hack(CFCBindClass *self) {
+    const char *full_struct = CFCClass_full_struct_sym(self->client);
+    const char *full_ivars  = CFCClass_full_ivars_name(self->client);
+    const char *short_ivars = CFCClass_short_ivars_name(self->client);
+    const char *prefix      = CFCClass_get_PREFIX(self->client);
+    const char *class_cnick = CFCClass_get_cnick(self->client);
+    char pattern[] =
+        "typedef struct %s %s;\n"
+        "static CHY_INLINE %s*\n"
+        "%s%s_IVARS(%s *self) {\n"
+        "   return (%s*)self;\n"
+        "}\n"
+        "#ifdef %sUSE_SHORT_NAMES\n"
+        "  #define %s %s\n"
+        "  #define %s_IVARS %s%s_IVARS\n"
+        "#endif\n";
+    char *content
+        = CFCUtil_sprintf(pattern, full_struct, full_ivars, full_ivars, prefix,
+                          class_cnick, full_struct, full_ivars, prefix,
+                          short_ivars, full_ivars, class_cnick, prefix,
+                          class_cnick);
+    return content;
+}
+
+static char*
 S_to_c_header_dynamic(CFCBindClass *self) {
     const char *privacy_symbol  = CFCClass_privacy_symbol(self->client);
     const char *vt_var          = CFCClass_full_vtable_var(self->client);
     const char *prefix          = CFCClass_get_prefix(self->client);
     const char *PREFIX          = CFCClass_get_PREFIX(self->client);
+    char *ivars                 = S_ivars_hack(self);
     char *struct_def            = S_struct_definition(self);
     char *parent_include        = S_parent_include(self);
     char *sub_declarations      = S_sub_declarations(self);
@@ -177,6 +203,7 @@ S_to_c_header_dynamic(CFCBindClass *self) {
         " */\n"
         "\n"
         "#ifdef %s\n"
+        "%s\n"
         "%s\n"
         "#endif /* %s */\n"
         "\n"
@@ -214,10 +241,11 @@ S_to_c_header_dynamic(CFCBindClass *self) {
         "\n";
     char *content
         = CFCUtil_sprintf(pattern, prefix, parent_include, privacy_symbol,
-                          struct_def, privacy_symbol, inert_var_defs,
+                          ivars, struct_def, privacy_symbol, inert_var_defs,
                           sub_declarations, method_typedefs, method_defs,
                           PREFIX, vt_var, short_names);
 
+    FREEMEM(ivars);
     FREEMEM(struct_def);
     FREEMEM(parent_include);
     FREEMEM(sub_declarations);

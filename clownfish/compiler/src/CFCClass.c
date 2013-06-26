@@ -77,6 +77,8 @@ struct CFCClass {
     int is_inert;
     char *struct_sym;
     char *full_struct_sym;
+    char *ivars_name;
+    char *full_ivars_name;
     char *short_vtable_var;
     char *full_vtable_var;
     char *privacy_symbol;
@@ -174,6 +176,8 @@ CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
     }
     self->short_vtable_var[struct_sym_len] = '\0';
     self->full_struct_sym = CFCUtil_sprintf("%s%s", prefix, self->struct_sym);
+    self->ivars_name      = CFCUtil_sprintf("%sIVARS", self->struct_sym);
+    self->full_ivars_name = CFCUtil_sprintf("%sIVARS", self->full_struct_sym);
     size_t full_struct_sym_len = strlen(self->full_struct_sym);
     self->full_vtable_var = (char*)MALLOCATE(full_struct_sym_len + 1);
     for (i = 0; self->full_struct_sym[i] != '\0'; i++) {
@@ -250,6 +254,8 @@ CFCClass_destroy(CFCClass *self) {
     FREEMEM(self->autocode);
     FREEMEM(self->parent_class_name);
     FREEMEM(self->struct_sym);
+    FREEMEM(self->ivars_name);
+    FREEMEM(self->full_ivars_name);
     FREEMEM(self->short_vtable_var);
     FREEMEM(self->full_struct_sym);
     FREEMEM(self->full_vtable_var);
@@ -820,6 +826,16 @@ CFCClass_get_struct_sym(CFCClass *self) {
 const char*
 CFCClass_full_struct_sym(CFCClass *self) {
     return self->full_struct_sym;
+}
+
+const char*
+CFCClass_short_ivars_name(CFCClass *self) {
+    return self->ivars_name;
+}
+
+const char*
+CFCClass_full_ivars_name(CFCClass *self) {
+    return self->full_ivars_name;
 }
 
 const char*
