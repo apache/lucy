@@ -51,56 +51,62 @@ IxSearcher_new(Obj *index) {
 
 IndexSearcher*
 IxSearcher_init(IndexSearcher *self, Obj *index) {
+    IndexSearcherIVARS *const ivars = IxSearcher_IVARS(self);
     if (Obj_Is_A(index, INDEXREADER)) {
-        self->reader = (IndexReader*)INCREF(index);
+        ivars->reader = (IndexReader*)INCREF(index);
     }
     else {
-        self->reader = IxReader_open(index, NULL, NULL);
+        ivars->reader = IxReader_open(index, NULL, NULL);
     }
-    Searcher_init((Searcher*)self, IxReader_Get_Schema(self->reader));
-    self->seg_readers = IxReader_Seg_Readers(self->reader);
-    self->seg_starts  = IxReader_Offsets(self->reader);
-    self->doc_reader = (DocReader*)IxReader_Fetch(
-                           self->reader, VTable_Get_Name(DOCREADER));
-    self->hl_reader = (HighlightReader*)IxReader_Fetch(
-                          self->reader, VTable_Get_Name(HIGHLIGHTREADER));
-    if (self->doc_reader) { INCREF(self->doc_reader); }
-    if (self->hl_reader)  { INCREF(self->hl_reader); }
+    Searcher_init((Searcher*)self, IxReader_Get_Schema(ivars->reader));
+    ivars->seg_readers = IxReader_Seg_Readers(ivars->reader);
+    ivars->seg_starts  = IxReader_Offsets(ivars->reader);
+    ivars->doc_reader = (DocReader*)IxReader_Fetch(
+                           ivars->reader, VTable_Get_Name(DOCREADER));
+    ivars->hl_reader = (HighlightReader*)IxReader_Fetch(
+                          ivars->reader, VTable_Get_Name(HIGHLIGHTREADER));
+    if (ivars->doc_reader) { INCREF(ivars->doc_reader); }
+    if (ivars->hl_reader)  { INCREF(ivars->hl_reader); }
 
     return self;
 }
 
 void
 IxSearcher_destroy(IndexSearcher *self) {
-    DECREF(self->reader);
-    DECREF(self->doc_reader);
-    DECREF(self->hl_reader);
-    DECREF(self->seg_readers);
-    DECREF(self->seg_starts);
+    IndexSearcherIVARS *const ivars = IxSearcher_IVARS(self);
+    DECREF(ivars->reader);
+    DECREF(ivars->doc_reader);
+    DECREF(ivars->hl_reader);
+    DECREF(ivars->seg_readers);
+    DECREF(ivars->seg_starts);
     SUPER_DESTROY(self, INDEXSEARCHER);
 }
 
 HitDoc*
 IxSearcher_fetch_doc(IndexSearcher *self, int32_t doc_id) {
-    if (!self->doc_reader) { THROW(ERR, "No DocReader"); }
-    return DocReader_Fetch_Doc(self->doc_reader, doc_id);
+    IndexSearcherIVARS *const ivars = IxSearcher_IVARS(self);
+    if (!ivars->doc_reader) { THROW(ERR, "No DocReader"); }
+    return DocReader_Fetch_Doc(ivars->doc_reader, doc_id);
 }
 
 DocVector*
 IxSearcher_fetch_doc_vec(IndexSearcher *self, int32_t doc_id) {
-    if (!self->hl_reader) { THROW(ERR, "No HighlightReader"); }
-    return HLReader_Fetch_Doc_Vec(self->hl_reader, doc_id);
+    IndexSearcherIVARS *const ivars = IxSearcher_IVARS(self);
+    if (!ivars->hl_reader) { THROW(ERR, "No HighlightReader"); }
+    return HLReader_Fetch_Doc_Vec(ivars->hl_reader, doc_id);
 }
 
 int32_t
 IxSearcher_doc_max(IndexSearcher *self) {
-    return IxReader_Doc_Max(self->reader);
+    IndexSearcherIVARS *const ivars = IxSearcher_IVARS(self);
+    return IxReader_Doc_Max(ivars->reader);
 }
 
 uint32_t
 IxSearcher_doc_freq(IndexSearcher *self, const CharBuf *field, Obj *term) {
+    IndexSearcherIVARS *const ivars = IxSearcher_IVARS(self);
     LexiconReader *lex_reader
-        = (LexiconReader*)IxReader_Fetch(self->reader,
+        = (LexiconReader*)IxReader_Fetch(ivars->reader,
                                          VTable_Get_Name(LEXICONREADER));
     return lex_reader ? LexReader_Doc_Freq(lex_reader, field, term) : 0;
 }
@@ -123,8 +129,9 @@ IxSearcher_top_docs(IndexSearcher *self, Query *query, uint32_t num_wanted,
 
 void
 IxSearcher_collect(IndexSearcher *self, Query *query, Collector *collector) {
-    VArray   *const seg_readers = self->seg_readers;
-    I32Array *const seg_starts  = self->seg_starts;
+    IndexSearcherIVARS *const ivars = IxSearcher_IVARS(self);
+    VArray   *const seg_readers = ivars->seg_readers;
+    I32Array *const seg_starts  = ivars->seg_starts;
     bool      need_score        = Coll_Need_Score(collector);
     Compiler *compiler = Query_Is_A(query, COMPILER)
                          ? (Compiler*)INCREF(query)
@@ -156,7 +163,7 @@ IxSearcher_collect(IndexSearcher *self, Query *query, Collector *collector) {
 
 IndexReader*
 IxSearcher_get_reader(IndexSearcher *self) {
-    return self->reader;
+    return IxSearcher_IVARS(self)->reader;
 }
 
 void

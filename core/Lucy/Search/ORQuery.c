@@ -56,13 +56,14 @@ ORQuery_equals(ORQuery *self, Obj *other) {
 
 CharBuf*
 ORQuery_to_string(ORQuery *self) {
-    uint32_t num_kids = VA_Get_Size(self->children);
+    ORQueryIVARS *const ivars = ORQuery_IVARS(self);
+    uint32_t num_kids = VA_Get_Size(ivars->children);
     if (!num_kids) { return CB_new_from_trusted_utf8("()", 2); }
     else {
         CharBuf *retval = CB_new_from_trusted_utf8("(", 1);
         uint32_t last_kid = num_kids - 1;
         for (uint32_t i = 0; i < num_kids; i++) {
-            CharBuf *kid_string = Obj_To_String(VA_Fetch(self->children, i));
+            CharBuf *kid_string = Obj_To_String(VA_Fetch(ivars->children, i));
             CB_Cat(retval, kid_string);
             DECREF(kid_string);
             if (i == last_kid) {
@@ -95,11 +96,12 @@ ORCompiler_init(ORCompiler *self, ORQuery *parent, Searcher *searcher,
 Matcher*
 ORCompiler_make_matcher(ORCompiler *self, SegReader *reader,
                         bool need_score) {
-    uint32_t num_kids = VA_Get_Size(self->children);
+    ORCompilerIVARS *const ivars = ORCompiler_IVARS(self);
+    uint32_t num_kids = VA_Get_Size(ivars->children);
 
     if (num_kids == 1) {
         // No need for an ORMatcher wrapper.
-        Compiler *only_child = (Compiler*)VA_Fetch(self->children, 0);
+        Compiler *only_child = (Compiler*)VA_Fetch(ivars->children, 0);
         return Compiler_Make_Matcher(only_child, reader, need_score);
     }
     else {
@@ -108,7 +110,7 @@ ORCompiler_make_matcher(ORCompiler *self, SegReader *reader,
 
         // Accumulate sub-matchers.
         for (uint32_t i = 0; i < num_kids; i++) {
-            Compiler *child = (Compiler*)VA_Fetch(self->children, i);
+            Compiler *child = (Compiler*)VA_Fetch(ivars->children, i);
             Matcher *submatcher
                 = Compiler_Make_Matcher(child, reader, need_score);
             VA_Push(submatchers, (Obj*)submatcher);

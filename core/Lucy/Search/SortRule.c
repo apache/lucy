@@ -35,9 +35,10 @@ SortRule_new(int32_t type, const CharBuf *field, bool reverse) {
 SortRule*
 SortRule_init(SortRule *self, int32_t type, const CharBuf *field,
               bool reverse) {
-    self->field    = field ? CB_Clone(field) : NULL;
-    self->type     = type;
-    self->reverse  = reverse;
+    SortRuleIVARS *ivars = SortRule_IVARS(self);
+    ivars->field    = field ? CB_Clone(field) : NULL;
+    ivars->type     = type;
+    ivars->reverse  = reverse;
 
     // Validate.
     if (type == SortRule_FIELD) {
@@ -54,42 +55,45 @@ SortRule_init(SortRule *self, int32_t type, const CharBuf *field,
 
 void
 SortRule_destroy(SortRule *self) {
-    DECREF(self->field);
+    SortRuleIVARS *ivars = SortRule_IVARS(self);
+    DECREF(ivars->field);
     SUPER_DESTROY(self, SORTRULE);
 }
 
 SortRule*
 SortRule_deserialize(SortRule *self, InStream *instream) {
-    self->type = InStream_Read_C32(instream);
-    if (self->type == SortRule_FIELD) {
-        self->field = Freezer_read_charbuf(instream);
+    SortRuleIVARS *ivars = SortRule_IVARS(self);
+    ivars->type = InStream_Read_C32(instream);
+    if (ivars->type == SortRule_FIELD) {
+        ivars->field = Freezer_read_charbuf(instream);
     }
-    self->reverse = InStream_Read_C32(instream);
+    ivars->reverse = InStream_Read_C32(instream);
     return self;
 }
 
 void
 SortRule_serialize(SortRule *self, OutStream *target) {
-    OutStream_Write_C32(target, self->type);
-    if (self->type == SortRule_FIELD) {
-        Freezer_serialize_charbuf(self->field, target);
+    SortRuleIVARS *ivars = SortRule_IVARS(self);
+    OutStream_Write_C32(target, ivars->type);
+    if (ivars->type == SortRule_FIELD) {
+        Freezer_serialize_charbuf(ivars->field, target);
     }
-    OutStream_Write_C32(target, !!self->reverse);
+    OutStream_Write_C32(target, !!ivars->reverse);
 }
 
 CharBuf*
 SortRule_get_field(SortRule *self) {
-    return self->field;
+    return SortRule_IVARS(self)->field;
 }
 
 int32_t
 SortRule_get_type(SortRule *self) {
-    return self->type;
+    return SortRule_IVARS(self)->type;
 }
 
 bool
 SortRule_get_reverse(SortRule *self) {
-    return self->reverse;
+    return SortRule_IVARS(self)->reverse;
 }
 
 

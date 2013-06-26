@@ -52,11 +52,12 @@ RangeQuery*
 RangeQuery_init(RangeQuery *self, const CharBuf *field, Obj *lower_term,
                 Obj *upper_term, bool include_lower, bool include_upper) {
     Query_init((Query*)self, 0.0f);
-    self->field          = CB_Clone(field);
-    self->lower_term     = lower_term ? Obj_Clone(lower_term) : NULL;
-    self->upper_term     = upper_term ? Obj_Clone(upper_term) : NULL;
-    self->include_lower  = include_lower;
-    self->include_upper  = include_upper;
+    RangeQueryIVARS *const ivars = RangeQuery_IVARS(self);
+    ivars->field          = CB_Clone(field);
+    ivars->lower_term     = lower_term ? Obj_Clone(lower_term) : NULL;
+    ivars->upper_term     = upper_term ? Obj_Clone(upper_term) : NULL;
+    ivars->include_lower  = include_lower;
+    ivars->include_upper  = include_upper;
     if (!upper_term && !lower_term) {
         DECREF(self);
         self = NULL;
@@ -67,45 +68,48 @@ RangeQuery_init(RangeQuery *self, const CharBuf *field, Obj *lower_term,
 
 void
 RangeQuery_destroy(RangeQuery *self) {
-    DECREF(self->field);
-    DECREF(self->lower_term);
-    DECREF(self->upper_term);
+    RangeQueryIVARS *const ivars = RangeQuery_IVARS(self);
+    DECREF(ivars->field);
+    DECREF(ivars->lower_term);
+    DECREF(ivars->upper_term);
     SUPER_DESTROY(self, RANGEQUERY);
 }
 
 bool
 RangeQuery_equals(RangeQuery *self, Obj *other) {
-    RangeQuery *twin = (RangeQuery*)other;
-    if (twin == self)                               { return true; }
-    if (!Obj_Is_A(other, RANGEQUERY))               { return false; }
-    if (self->boost != twin->boost)                 { return false; }
-    if (!CB_Equals(self->field, (Obj*)twin->field)) { return false; }
-    if (self->lower_term && !twin->lower_term)      { return false; }
-    if (self->upper_term && !twin->upper_term)      { return false; }
-    if (!self->lower_term && twin->lower_term)      { return false; }
-    if (!self->upper_term && twin->upper_term)      { return false; }
-    if (self->lower_term
-        && !Obj_Equals(self->lower_term, twin->lower_term)) { return false; }
-    if (self->upper_term
-        && !Obj_Equals(self->upper_term, twin->upper_term)) { return false; }
-    if (self->include_lower != twin->include_lower)         { return false; }
-    if (self->include_upper != twin->include_upper)         { return false; }
+    if ((RangeQuery*)other == self)                   { return true; }
+    if (!Obj_Is_A(other, RANGEQUERY))                 { return false; }
+    RangeQueryIVARS *const ivars = RangeQuery_IVARS(self);
+    RangeQueryIVARS *const ovars = RangeQuery_IVARS((RangeQuery*)other);
+    if (ivars->boost != ovars->boost)                 { return false; }
+    if (!CB_Equals(ivars->field, (Obj*)ovars->field)) { return false; }
+    if (ivars->lower_term && !ovars->lower_term)      { return false; }
+    if (ivars->upper_term && !ovars->upper_term)      { return false; }
+    if (!ivars->lower_term && ovars->lower_term)      { return false; }
+    if (!ivars->upper_term && ovars->upper_term)      { return false; }
+    if (ivars->lower_term
+        && !Obj_Equals(ivars->lower_term, ovars->lower_term)) { return false; }
+    if (ivars->upper_term
+        && !Obj_Equals(ivars->upper_term, ovars->upper_term)) { return false; }
+    if (ivars->include_lower != ovars->include_lower)         { return false; }
+    if (ivars->include_upper != ovars->include_upper)         { return false; }
     return true;
 }
 
 CharBuf*
 RangeQuery_to_string(RangeQuery *self) {
-    CharBuf *lower_term_str = self->lower_term
-                              ? Obj_To_String(self->lower_term)
+    RangeQueryIVARS *const ivars = RangeQuery_IVARS(self);
+    CharBuf *lower_term_str = ivars->lower_term
+                              ? Obj_To_String(ivars->lower_term)
                               : CB_new_from_trusted_utf8("*", 1);
-    CharBuf *upper_term_str = self->upper_term
-                              ? Obj_To_String(self->upper_term)
+    CharBuf *upper_term_str = ivars->upper_term
+                              ? Obj_To_String(ivars->upper_term)
                               : CB_new_from_trusted_utf8("*", 1);
-    CharBuf *retval = CB_newf("%o:%s%o TO %o%s", self->field,
-                              self->include_lower ? "[" : "{",
+    CharBuf *retval = CB_newf("%o:%s%o TO %o%s", ivars->field,
+                              ivars->include_lower ? "[" : "{",
                               lower_term_str,
                               upper_term_str,
-                              self->include_upper ? "]" : "}"
+                              ivars->include_upper ? "]" : "}"
                              );
     DECREF(upper_term_str);
     DECREF(lower_term_str);
@@ -114,24 +118,25 @@ RangeQuery_to_string(RangeQuery *self) {
 
 void
 RangeQuery_serialize(RangeQuery *self, OutStream *outstream) {
-    OutStream_Write_F32(outstream, self->boost);
-    Freezer_serialize_charbuf(self->field, outstream);
-    if (self->lower_term) {
+    RangeQueryIVARS *const ivars = RangeQuery_IVARS(self);
+    OutStream_Write_F32(outstream, ivars->boost);
+    Freezer_serialize_charbuf(ivars->field, outstream);
+    if (ivars->lower_term) {
         OutStream_Write_U8(outstream, true);
-        FREEZE(self->lower_term, outstream);
+        FREEZE(ivars->lower_term, outstream);
     }
     else {
         OutStream_Write_U8(outstream, false);
     }
-    if (self->upper_term) {
+    if (ivars->upper_term) {
         OutStream_Write_U8(outstream, true);
-        FREEZE(self->upper_term, outstream);
+        FREEZE(ivars->upper_term, outstream);
     }
     else {
         OutStream_Write_U8(outstream, false);
     }
-    OutStream_Write_U8(outstream, self->include_lower);
-    OutStream_Write_U8(outstream, self->include_upper);
+    OutStream_Write_U8(outstream, ivars->include_lower);
+    OutStream_Write_U8(outstream, ivars->include_upper);
 }
 
 RangeQuery*
@@ -184,11 +189,12 @@ RangeCompiler_init(RangeCompiler *self, RangeQuery *parent,
 Matcher*
 RangeCompiler_make_matcher(RangeCompiler *self, SegReader *reader,
                            bool need_score) {
-    RangeQuery *parent = (RangeQuery*)self->parent;
+    RangeQuery *parent = (RangeQuery*)RangeCompiler_IVARS(self)->parent;
+    const CharBuf *field = RangeQuery_IVARS(parent)->field;
     SortReader *sort_reader
         = (SortReader*)SegReader_Fetch(reader, VTable_Get_Name(SORTREADER));
     SortCache *sort_cache = sort_reader
-                            ? SortReader_Fetch_Sort_Cache(sort_reader, parent->field)
+                            ? SortReader_Fetch_Sort_Cache(sort_reader, field)
                             : NULL;
     UNUSED_VAR(need_score);
 
@@ -212,8 +218,8 @@ RangeCompiler_make_matcher(RangeCompiler *self, SegReader *reader,
 
 static int32_t
 S_find_lower_bound(RangeCompiler *self, SortCache *sort_cache) {
-    RangeQuery *parent      = (RangeQuery*)self->parent;
-    Obj        *lower_term  = parent->lower_term;
+    RangeQuery *parent      = (RangeQuery*)RangeCompiler_IVARS(self)->parent;
+    Obj        *lower_term  = RangeQuery_IVARS(parent)->lower_term;
     int32_t     lower_bound = 0;
 
     if (lower_term) {
@@ -230,7 +236,7 @@ S_find_lower_bound(RangeCompiler *self, SortCache *sort_cache) {
                                  : Obj_Equals(lower_term, low_found);
 
             lower_bound = low_ord;
-            if (!exact_match || !parent->include_lower) {
+            if (!exact_match || !RangeQuery_IVARS(parent)->include_lower) {
                 lower_bound++;
             }
             DECREF(value);
@@ -242,8 +248,8 @@ S_find_lower_bound(RangeCompiler *self, SortCache *sort_cache) {
 
 static int32_t
 S_find_upper_bound(RangeCompiler *self, SortCache *sort_cache) {
-    RangeQuery *parent     = (RangeQuery*)self->parent;
-    Obj        *upper_term = parent->upper_term;
+    RangeQuery *parent     = (RangeQuery*)RangeCompiler_IVARS(self)->parent;
+    Obj        *upper_term = RangeQuery_IVARS(parent)->upper_term;
     int32_t     retval     = INT32_MAX;
 
     if (upper_term) {
@@ -260,7 +266,7 @@ S_find_upper_bound(RangeCompiler *self, SortCache *sort_cache) {
                                  : Obj_Equals(upper_term, (Obj*)hi_found);
 
             retval = hi_ord;
-            if (exact_match && !parent->include_upper) {
+            if (exact_match && !RangeQuery_IVARS(parent)->include_upper) {
                 retval--;
             }
             DECREF(value);

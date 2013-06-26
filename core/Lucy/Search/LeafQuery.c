@@ -32,76 +32,82 @@ LeafQuery_new(const CharBuf *field, const CharBuf *text) {
 
 LeafQuery*
 LeafQuery_init(LeafQuery *self, const CharBuf *field, const CharBuf *text) {
+    LeafQueryIVARS *const ivars = LeafQuery_IVARS(self);
     Query_init((Query*)self, 1.0f);
-    self->field       = field ? CB_Clone(field) : NULL;
-    self->text        = CB_Clone(text);
+    ivars->field       = field ? CB_Clone(field) : NULL;
+    ivars->text        = CB_Clone(text);
     return self;
 }
 
 void
 LeafQuery_destroy(LeafQuery *self) {
-    DECREF(self->field);
-    DECREF(self->text);
+    LeafQueryIVARS *const ivars = LeafQuery_IVARS(self);
+    DECREF(ivars->field);
+    DECREF(ivars->text);
     SUPER_DESTROY(self, LEAFQUERY);
 }
 
 CharBuf*
 LeafQuery_get_field(LeafQuery *self) {
-    return self->field;
+    return LeafQuery_IVARS(self)->field;
 }
 
 CharBuf*
 LeafQuery_get_text(LeafQuery *self) {
-    return self->text;
+    return LeafQuery_IVARS(self)->text;
 }
 
 bool
 LeafQuery_equals(LeafQuery *self, Obj *other) {
-    LeafQuery *twin = (LeafQuery*)other;
-    if (twin == self)                  { return true; }
+    if ((LeafQuery*)other == self)     { return true; }
     if (!Obj_Is_A(other, LEAFQUERY))   { return false; }
-    if (self->boost != twin->boost)    { return false; }
-    if (!!self->field ^ !!twin->field) { return false; }
-    if (self->field) {
-        if (!CB_Equals(self->field, (Obj*)twin->field)) { return false; }
+    LeafQueryIVARS *const ivars = LeafQuery_IVARS(self);
+    LeafQueryIVARS *const ovars = LeafQuery_IVARS((LeafQuery*)other);
+    if (ivars->boost != ovars->boost)    { return false; }
+    if (!!ivars->field ^ !!ovars->field) { return false; }
+    if (ivars->field) {
+        if (!CB_Equals(ivars->field, (Obj*)ovars->field)) { return false; }
     }
-    if (!CB_Equals(self->text, (Obj*)twin->text)) { return false; }
+    if (!CB_Equals(ivars->text, (Obj*)ovars->text)) { return false; }
     return true;
 }
 
 CharBuf*
 LeafQuery_to_string(LeafQuery *self) {
-    if (self->field) {
-        return CB_newf("%o:%o", self->field, self->text);
+    LeafQueryIVARS *const ivars = LeafQuery_IVARS(self);
+    if (ivars->field) {
+        return CB_newf("%o:%o", ivars->field, ivars->text);
     }
     else {
-        return CB_Clone(self->text);
+        return CB_Clone(ivars->text);
     }
 }
 
 void
 LeafQuery_serialize(LeafQuery *self, OutStream *outstream) {
-    if (self->field) {
+    LeafQueryIVARS *const ivars = LeafQuery_IVARS(self);
+    if (ivars->field) {
         OutStream_Write_U8(outstream, true);
-        Freezer_serialize_charbuf(self->field, outstream);
+        Freezer_serialize_charbuf(ivars->field, outstream);
     }
     else {
         OutStream_Write_U8(outstream, false);
     }
-    Freezer_serialize_charbuf(self->text, outstream);
-    OutStream_Write_F32(outstream, self->boost);
+    Freezer_serialize_charbuf(ivars->text, outstream);
+    OutStream_Write_F32(outstream, ivars->boost);
 }
 
 LeafQuery*
 LeafQuery_deserialize(LeafQuery *self, InStream *instream) {
+    LeafQueryIVARS *const ivars = LeafQuery_IVARS(self);
     if (InStream_Read_U8(instream)) {
-        self->field = Freezer_read_charbuf(instream);
+        ivars->field = Freezer_read_charbuf(instream);
     }
     else {
-        self->field = NULL;
+        ivars->field = NULL;
     }
-    self->text = Freezer_read_charbuf(instream);
-    self->boost = InStream_Read_F32(instream);
+    ivars->text = Freezer_read_charbuf(instream);
+    ivars->boost = InStream_Read_F32(instream);
     return self;
 }
 

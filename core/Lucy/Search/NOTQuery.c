@@ -43,17 +43,20 @@ NOTQuery_init(NOTQuery *self, Query *negated_query) {
 
 Query*
 NOTQuery_get_negated_query(NOTQuery *self) {
-    return (Query*)VA_Fetch(self->children, 0);
+    NOTQueryIVARS *const ivars = NOTQuery_IVARS(self);
+    return (Query*)VA_Fetch(ivars->children, 0);
 }
 
 void
 NOTQuery_set_negated_query(NOTQuery *self, Query *negated_query) {
-    VA_Store(self->children, 0, INCREF(negated_query));
+    NOTQueryIVARS *const ivars = NOTQuery_IVARS(self);
+    VA_Store(ivars->children, 0, INCREF(negated_query));
 }
 
 CharBuf*
 NOTQuery_to_string(NOTQuery *self) {
-    CharBuf *neg_string = Obj_To_String(VA_Fetch(self->children, 0));
+    NOTQueryIVARS *const ivars = NOTQuery_IVARS(self);
+    CharBuf *neg_string = Obj_To_String(VA_Fetch(ivars->children, 0));
     CharBuf *retval = CB_newf("-%o", neg_string);
     DECREF(neg_string);
     return retval;
@@ -111,8 +114,9 @@ NOTCompiler_highlight_spans(NOTCompiler *self, Searcher *searcher,
 Matcher*
 NOTCompiler_make_matcher(NOTCompiler *self, SegReader *reader,
                          bool need_score) {
+    NOTCompilerIVARS *const ivars = NOTCompiler_IVARS(self);
     Compiler *negated_compiler
-        = (Compiler*)CERTIFY(VA_Fetch(self->children, 0), COMPILER);
+        = (Compiler*)CERTIFY(VA_Fetch(ivars->children, 0), COMPILER);
     Matcher *negated_matcher
         = Compiler_Make_Matcher(negated_compiler, reader, false);
     UNUSED_VAR(need_score);

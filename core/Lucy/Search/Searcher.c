@@ -32,16 +32,18 @@
 
 Searcher*
 Searcher_init(Searcher *self, Schema *schema) {
-    self->schema  = (Schema*)INCREF(schema);
-    self->qparser = NULL;
+    SearcherIVARS *const ivars = Searcher_IVARS(self);
+    ivars->schema  = (Schema*)INCREF(schema);
+    ivars->qparser = NULL;
     ABSTRACT_CLASS_CHECK(self, SEARCHER);
     return self;
 }
 
 void
 Searcher_destroy(Searcher *self) {
-    DECREF(self->schema);
-    DECREF(self->qparser);
+    SearcherIVARS *const ivars = Searcher_IVARS(self);
+    DECREF(ivars->schema);
+    DECREF(ivars->qparser);
     SUPER_DESTROY(self, SEARCHER);
 }
 
@@ -63,6 +65,7 @@ Searcher_hits(Searcher *self, Obj *query, uint32_t offset, uint32_t num_wanted,
 
 Query*
 Searcher_glean_query(Searcher *self, Obj *query) {
+    SearcherIVARS *const ivars = Searcher_IVARS(self);
     Query *real_query = NULL;
 
     if (!query) {
@@ -72,10 +75,10 @@ Searcher_glean_query(Searcher *self, Obj *query) {
         real_query = (Query*)INCREF(query);
     }
     else if (Obj_Is_A(query, CHARBUF)) {
-        if (!self->qparser) {
-            self->qparser = QParser_new(self->schema, NULL, NULL, NULL);
+        if (!ivars->qparser) {
+            ivars->qparser = QParser_new(ivars->schema, NULL, NULL, NULL);
         }
-        real_query = QParser_Parse(self->qparser, (CharBuf*)query);
+        real_query = QParser_Parse(ivars->qparser, (CharBuf*)query);
     }
     else {
         THROW(ERR, "Invalid type for 'query' param: %o",
@@ -87,7 +90,7 @@ Searcher_glean_query(Searcher *self, Obj *query) {
 
 Schema*
 Searcher_get_schema(Searcher *self) {
-    return self->schema;
+    return Searcher_IVARS(self)->schema;
 }
 
 void

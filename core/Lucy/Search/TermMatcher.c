@@ -27,40 +27,43 @@ TermMatcher*
 TermMatcher_init(TermMatcher *self, Similarity *similarity, PostingList *plist,
                  Compiler *compiler) {
     Matcher_init((Matcher*)self);
+    TermMatcherIVARS *const ivars = TermMatcher_IVARS(self);
 
     // Assign.
-    self->sim           = (Similarity*)INCREF(similarity);
-    self->plist         = (PostingList*)INCREF(plist);
-    self->compiler      = (Compiler*)INCREF(compiler);
-    self->weight        = Compiler_Get_Weight(compiler);
+    ivars->sim           = (Similarity*)INCREF(similarity);
+    ivars->plist         = (PostingList*)INCREF(plist);
+    ivars->compiler      = (Compiler*)INCREF(compiler);
+    ivars->weight        = Compiler_Get_Weight(compiler);
 
     // Init.
-    self->posting        = NULL;
+    ivars->posting        = NULL;
 
     return self;
 }
 
 void
 TermMatcher_destroy(TermMatcher *self) {
-    DECREF(self->sim);
-    DECREF(self->plist);
-    DECREF(self->compiler);
+    TermMatcherIVARS *const ivars = TermMatcher_IVARS(self);
+    DECREF(ivars->sim);
+    DECREF(ivars->plist);
+    DECREF(ivars->compiler);
     SUPER_DESTROY(self, TERMMATCHER);
 }
 
 int32_t
 TermMatcher_next(TermMatcher* self) {
-    PostingList *const plist = self->plist;
+    TermMatcherIVARS *const ivars = TermMatcher_IVARS(self);
+    PostingList *const plist = ivars->plist;
     if (plist) {
         int32_t doc_id = PList_Next(plist);
         if (doc_id) {
-            self->posting = PList_Get_Posting(plist);
+            ivars->posting = PList_Get_Posting(plist);
             return doc_id;
         }
         else {
             // Reclaim resources a little early.
             DECREF(plist);
-            self->plist = NULL;
+            ivars->plist = NULL;
             return 0;
         }
     }
@@ -69,17 +72,18 @@ TermMatcher_next(TermMatcher* self) {
 
 int32_t
 TermMatcher_advance(TermMatcher *self, int32_t target) {
-    PostingList *const plist = self->plist;
+    TermMatcherIVARS *const ivars = TermMatcher_IVARS(self);
+    PostingList *const plist = ivars->plist;
     if (plist) {
         int32_t doc_id = PList_Advance(plist, target);
         if (doc_id) {
-            self->posting = PList_Get_Posting(plist);
+            ivars->posting = PList_Get_Posting(plist);
             return doc_id;
         }
         else {
             // Reclaim resources a little early.
             DECREF(plist);
-            self->plist = NULL;
+            ivars->plist = NULL;
             return 0;
         }
     }
@@ -88,7 +92,8 @@ TermMatcher_advance(TermMatcher *self, int32_t target) {
 
 int32_t
 TermMatcher_get_doc_id(TermMatcher* self) {
-    return Post_Get_Doc_ID(self->posting);
+    TermMatcherIVARS *const ivars = TermMatcher_IVARS(self);
+    return Post_Get_Doc_ID(ivars->posting);
 }
 
 

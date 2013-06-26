@@ -42,9 +42,10 @@ MatchAllQuery_init(MatchAllQuery *self) {
 
 bool
 MatchAllQuery_equals(MatchAllQuery *self, Obj *other) {
-    MatchAllQuery *twin = (MatchAllQuery*)other;
     if (!Obj_Is_A(other, MATCHALLQUERY)) { return false; }
-    if (self->boost != twin->boost)      { return false; }
+    MatchAllQueryIVARS *const ivars = MatchAllQuery_IVARS(self);
+    MatchAllQueryIVARS *const ovars = MatchAllQuery_IVARS((MatchAllQuery*)other);
+    if (ivars->boost != ovars->boost)    { return false; }
     return true;
 }
 

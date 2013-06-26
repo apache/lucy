@@ -56,27 +56,30 @@ PhraseQuery_init(PhraseQuery *self, const CharBuf *field, VArray *terms) {
 
 void
 PhraseQuery_destroy(PhraseQuery *self) {
-    DECREF(self->terms);
-    DECREF(self->field);
+    PhraseQueryIVARS *const ivars = PhraseQuery_IVARS(self);
+    DECREF(ivars->terms);
+    DECREF(ivars->field);
     SUPER_DESTROY(self, PHRASEQUERY);
 }
 
 static PhraseQuery*
 S_do_init(PhraseQuery *self, CharBuf *field, VArray *terms, float boost) {
     Query_init((Query*)self, boost);
+    PhraseQueryIVARS *const ivars = PhraseQuery_IVARS(self);
     for (uint32_t i = 0, max = VA_Get_Size(terms); i < max; i++) {
         CERTIFY(VA_Fetch(terms, i), OBJ);
     }
-    self->field = field;
-    self->terms = terms;
+    ivars->field = field;
+    ivars->terms = terms;
     return self;
 }
 
 void
 PhraseQuery_serialize(PhraseQuery *self, OutStream *outstream) {
-    OutStream_Write_F32(outstream, self->boost);
-    Freezer_serialize_charbuf(self->field, outstream);
-    Freezer_serialize_varray(self->terms, outstream);
+    PhraseQueryIVARS *const ivars = PhraseQuery_IVARS(self);
+    OutStream_Write_F32(outstream, ivars->boost);
+    Freezer_serialize_charbuf(ivars->field, outstream);
+    Freezer_serialize_varray(ivars->terms, outstream);
 }
 
 PhraseQuery*
@@ -89,26 +92,28 @@ PhraseQuery_deserialize(PhraseQuery *self, InStream *instream) {
 
 bool
 PhraseQuery_equals(PhraseQuery *self, Obj *other) {
-    PhraseQuery *twin = (PhraseQuery*)other;
-    if (twin == self)                  { return true; }
+    if ((PhraseQuery*)other == self)   { return true; }
     if (!Obj_Is_A(other, PHRASEQUERY)) { return false; }
-    if (self->boost != twin->boost)    { return false; }
-    if (self->field && !twin->field)   { return false; }
-    if (!self->field && twin->field)   { return false; }
-    if (self->field && !CB_Equals(self->field, (Obj*)twin->field)) {
+    PhraseQueryIVARS *const ivars = PhraseQuery_IVARS(self);
+    PhraseQueryIVARS *const ovars = PhraseQuery_IVARS((PhraseQuery*)other);
+    if (ivars->boost != ovars->boost)  { return false; }
+    if (ivars->field && !ovars->field) { return false; }
+    if (!ivars->field && ovars->field) { return false; }
+    if (ivars->field && !CB_Equals(ivars->field, (Obj*)ovars->field)) {
         return false;
     }
-    if (!VA_Equals(twin->terms, (Obj*)self->terms)) { return false; }
+    if (!VA_Equals(ovars->terms, (Obj*)ivars->terms)) { return false; }
     return true;
 }
 
 CharBuf*
 PhraseQuery_to_string(PhraseQuery *self) {
-    uint32_t  num_terms = VA_Get_Size(self->terms);
-    CharBuf  *retval    = CB_Clone(self->field);
+    PhraseQueryIVARS *const ivars = PhraseQuery_IVARS(self);
+    uint32_t  num_terms = VA_Get_Size(ivars->terms);
+    CharBuf  *retval    = CB_Clone(ivars->field);
     CB_Cat_Trusted_Str(retval, ":\"", 2);
     for (uint32_t i = 0; i < num_terms; i++) {
-        Obj     *term        = VA_Fetch(self->terms, i);
+        Obj     *term        = VA_Fetch(ivars->terms, i);
         CharBuf *term_string = Obj_To_String(term);
         CB_Cat(retval, term_string);
         DECREF(term_string);
@@ -123,12 +128,13 @@ PhraseQuery_to_string(PhraseQuery *self) {
 Compiler*
 PhraseQuery_make_compiler(PhraseQuery *self, Searcher *searcher,
                           float boost, bool subordinate) {
-    if (VA_Get_Size(self->terms) == 1) {
+    PhraseQueryIVARS *const ivars = PhraseQuery_IVARS(self);
+    if (VA_Get_Size(ivars->terms) == 1) {
         // Optimize for one-term "phrases".
-        Obj *term = VA_Fetch(self->terms, 0);
-        TermQuery *term_query = TermQuery_new(self->field, term);
+        Obj *term = VA_Fetch(ivars->terms, 0);
+        TermQuery *term_query = TermQuery_new(ivars->field, term);
         TermCompiler *term_compiler;
-        TermQuery_Set_Boost(term_query, self->boost);
+        TermQuery_Set_Boost(term_query, ivars->boost);
         term_compiler
             = (TermCompiler*)TermQuery_Make_Compiler(term_query, searcher,
                                                      boost, subordinate);
@@ -147,12 +153,12 @@ PhraseQuery_make_compiler(PhraseQuery *self, Searcher *searcher,
 
 CharBuf*
 PhraseQuery_get_field(PhraseQuery *self) {
-    return self->field;
+    return PhraseQuery_IVARS(self)->field;
 }
 
 VArray*
 PhraseQuery_get_terms(PhraseQuery *self) {
-    return self->terms;
+    return PhraseQuery_IVARS(self)->terms;
 }
 
 /*********************************************************************/
@@ -166,9 +172,11 @@ PhraseCompiler_new(PhraseQuery *parent, Searcher *searcher, float boost) {
 PhraseCompiler*
 PhraseCompiler_init(PhraseCompiler *self, PhraseQuery *parent,
                     Searcher *searcher, float boost) {
+    PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
+    PhraseQueryIVARS *const parent_ivars = PhraseQuery_IVARS(parent);
     Schema     *schema = Searcher_Get_Schema(searcher);
-    Similarity *sim    = Schema_Fetch_Sim(schema, parent->field);
-    VArray     *terms  = parent->terms;
+    Similarity *sim    = Schema_Fetch_Sim(schema, parent_ivars->field);
+    VArray     *terms  = parent_ivars->terms;
 
     // Try harder to find a Similarity if necessary.
     if (!sim) { sim = Schema_Get_Similarity(schema); }
@@ -177,27 +185,28 @@ PhraseCompiler_init(PhraseCompiler *self, PhraseQuery *parent,
     Compiler_init((Compiler*)self, (Query*)parent, searcher, sim, boost);
 
     // Store IDF for the phrase.
-    self->idf = 0;
+    ivars->idf = 0;
     for (uint32_t i = 0, max = VA_Get_Size(terms); i < max; i++) {
         Obj     *term     = VA_Fetch(terms, i);
         int32_t  doc_max  = Searcher_Doc_Max(searcher);
-        int32_t  doc_freq = Searcher_Doc_Freq(searcher, parent->field, term);
-        self->idf += Sim_IDF(sim, doc_freq, doc_max);
+        int32_t  doc_freq = Searcher_Doc_Freq(searcher, parent_ivars->field, term);
+        ivars->idf += Sim_IDF(sim, doc_freq, doc_max);
     }
 
     // Calculate raw weight.
-    self->raw_weight = self->idf * self->boost;
+    ivars->raw_weight = ivars->idf * ivars->boost;
 
     return self;
 }
 
 void
 PhraseCompiler_serialize(PhraseCompiler *self, OutStream *outstream) {
+    PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
     Compiler_serialize((Compiler*)self, outstream);
-    OutStream_Write_F32(outstream, self->idf);
-    OutStream_Write_F32(outstream, self->raw_weight);
-    OutStream_Write_F32(outstream, self->query_norm_factor);
-    OutStream_Write_F32(outstream, self->normalized_weight);
+    OutStream_Write_F32(outstream, ivars->idf);
+    OutStream_Write_F32(outstream, ivars->raw_weight);
+    OutStream_Write_F32(outstream, ivars->query_norm_factor);
+    OutStream_Write_F32(outstream, ivars->normalized_weight);
 }
 
 PhraseCompiler*
@@ -205,47 +214,54 @@ PhraseCompiler_deserialize(PhraseCompiler *self, InStream *instream) {
     PhraseCompiler_Deserialize_t super_deserialize
         = SUPER_METHOD_PTR(PHRASECOMPILER, Lucy_PhraseCompiler_Deserialize);
     self = super_deserialize(self, instream);
-    self->idf               = InStream_Read_F32(instream);
-    self->raw_weight        = InStream_Read_F32(instream);
-    self->query_norm_factor = InStream_Read_F32(instream);
-    self->normalized_weight = InStream_Read_F32(instream);
+    PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
+    ivars->idf               = InStream_Read_F32(instream);
+    ivars->raw_weight        = InStream_Read_F32(instream);
+    ivars->query_norm_factor = InStream_Read_F32(instream);
+    ivars->normalized_weight = InStream_Read_F32(instream);
     return self;
 }
 
 bool
 PhraseCompiler_equals(PhraseCompiler *self, Obj *other) {
-    PhraseCompiler *twin = (PhraseCompiler*)other;
-    if (!Obj_Is_A(other, PHRASECOMPILER))                   { return false; }
-    if (!Compiler_equals((Compiler*)self, other))           { return false; }
-    if (self->idf != twin->idf)                             { return false; }
-    if (self->raw_weight != twin->raw_weight)               { return false; }
-    if (self->query_norm_factor != twin->query_norm_factor) { return false; }
-    if (self->normalized_weight != twin->normalized_weight) { return false; }
+    if (!Obj_Is_A(other, PHRASECOMPILER))                     { return false; }
+    if (!Compiler_equals((Compiler*)self, other))             { return false; }
+    PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
+    PhraseCompilerIVARS *const ovars
+        = PhraseCompiler_IVARS((PhraseCompiler*)other);
+    if (ivars->idf != ovars->idf)                             { return false; }
+    if (ivars->raw_weight != ovars->raw_weight)               { return false; }
+    if (ivars->query_norm_factor != ovars->query_norm_factor) { return false; }
+    if (ivars->normalized_weight != ovars->normalized_weight) { return false; }
     return true;
 }
 
 float
 PhraseCompiler_get_weight(PhraseCompiler *self) {
-    return self->normalized_weight;
+    return PhraseCompiler_IVARS(self)->normalized_weight;
 }
 
 float
 PhraseCompiler_sum_of_squared_weights(PhraseCompiler *self) {
-    return self->raw_weight * self->raw_weight;
+    PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
+    return ivars->raw_weight * ivars->raw_weight;
 }
 
 void
 PhraseCompiler_apply_norm_factor(PhraseCompiler *self, float factor) {
-    self->query_norm_factor = factor;
-    self->normalized_weight = self->raw_weight * self->idf * factor;
+    PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
+    ivars->query_norm_factor = factor;
+    ivars->normalized_weight = ivars->raw_weight * ivars->idf * factor;
 }
 
 Matcher*
 PhraseCompiler_make_matcher(PhraseCompiler *self, SegReader *reader,
                             bool need_score) {
     UNUSED_VAR(need_score);
-    PhraseQuery *const parent    = (PhraseQuery*)self->parent;
-    VArray *const      terms     = parent->terms;
+    PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
+    PhraseQueryIVARS *const parent_ivars
+        = PhraseQuery_IVARS((PhraseQuery*)ivars->parent);
+    VArray *const      terms     = parent_ivars->terms;
     uint32_t           num_terms = VA_Get_Size(terms);
 
     // Bail if there are no terms.
@@ -271,7 +287,7 @@ PhraseCompiler_make_matcher(PhraseCompiler *self, SegReader *reader,
     for (uint32_t i = 0; i < num_terms; i++) {
         Obj *term = VA_Fetch(terms, i);
         PostingList *plist
-            = PListReader_Posting_List(plist_reader, parent->field, term);
+            = PListReader_Posting_List(plist_reader, parent_ivars->field, term);
 
         // Bail if any one of the terms isn't in the index.
         if (!plist || !PList_Get_Doc_Freq(plist)) {
@@ -291,15 +307,17 @@ PhraseCompiler_make_matcher(PhraseCompiler *self, SegReader *reader,
 VArray*
 PhraseCompiler_highlight_spans(PhraseCompiler *self, Searcher *searcher,
                                DocVector *doc_vec, const CharBuf *field) {
-    PhraseQuery *const parent    = (PhraseQuery*)self->parent;
-    VArray *const      terms     = parent->terms;
+    PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
+    PhraseQueryIVARS *const parent_ivars
+        = PhraseQuery_IVARS((PhraseQuery*)ivars->parent);
+    VArray *const      terms     = parent_ivars->terms;
     VArray *const      spans     = VA_new(0);
     const uint32_t     num_terms = VA_Get_Size(terms);
     UNUSED_VAR(searcher);
 
     // Bail if no terms or field doesn't match.
     if (!num_terms) { return spans; }
-    if (!CB_Equals(field, (Obj*)parent->field)) { return spans; }
+    if (!CB_Equals(field, (Obj*)parent_ivars->field)) { return spans; }
 
     VArray *term_vectors    = VA_new(num_terms);
     BitVector *posit_vec       = BitVec_new(0);

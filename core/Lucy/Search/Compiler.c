@@ -32,21 +32,23 @@
 Compiler*
 Compiler_init(Compiler *self, Query *parent, Searcher *searcher,
               Similarity *sim, float boost) {
+    CompilerIVARS *const ivars = Compiler_IVARS(self);
     Query_init((Query*)self, boost);
     if (!sim) {
         Schema *schema = Searcher_Get_Schema(searcher);
         sim = Schema_Get_Similarity(schema);
     }
-    self->parent  = (Query*)INCREF(parent);
-    self->sim     = (Similarity*)INCREF(sim);
+    ivars->parent  = (Query*)INCREF(parent);
+    ivars->sim     = (Similarity*)INCREF(sim);
     ABSTRACT_CLASS_CHECK(self, COMPILER);
     return self;
 }
 
 void
 Compiler_destroy(Compiler *self) {
-    DECREF(self->parent);
-    DECREF(self->sim);
+    CompilerIVARS *const ivars = Compiler_IVARS(self);
+    DECREF(ivars->parent);
+    DECREF(ivars->sim);
     SUPER_DESTROY(self, COMPILER);
 }
 
@@ -57,12 +59,12 @@ Compiler_get_weight(Compiler *self) {
 
 Similarity*
 Compiler_get_similarity(Compiler *self) {
-    return self->sim;
+    return Compiler_IVARS(self)->sim;
 }
 
 Query*
 Compiler_get_parent(Compiler *self) {
-    return self->parent;
+    return Compiler_IVARS(self)->parent;
 }
 
 float
@@ -79,11 +81,13 @@ Compiler_apply_norm_factor(Compiler *self, float factor) {
 
 void
 Compiler_normalize(Compiler *self) {
+    CompilerIVARS *const ivars = Compiler_IVARS(self);
+
     // factor = (tf_q * idf_t)
     float factor = Compiler_Sum_Of_Squared_Weights(self);
 
     // factor /= norm_q
-    factor = Sim_Query_Norm(self->sim, factor);
+    factor = Sim_Query_Norm(ivars->sim, factor);
 
     // weight *= factor
     Compiler_Apply_Norm_Factor(self, factor);
@@ -101,7 +105,8 @@ Compiler_highlight_spans(Compiler *self, Searcher *searcher,
 
 CharBuf*
 Compiler_to_string(Compiler *self) {
-    CharBuf *stringified_query = Query_To_String(self->parent);
+    CompilerIVARS *const ivars = Compiler_IVARS(self);
+    CharBuf *stringified_query = Query_To_String(ivars->parent);
     CharBuf *string = CB_new_from_trusted_utf8("compiler(", 9);
     CB_Cat(string, stringified_query);
     CB_Cat_Trusted_Str(string, ")", 1);
@@ -111,28 +116,31 @@ Compiler_to_string(Compiler *self) {
 
 bool
 Compiler_equals(Compiler *self, Obj *other) {
-    Compiler *twin = (Compiler*)other;
-    if (twin == self)                                    { return true; }
-    if (!Obj_Is_A(other, COMPILER))                      { return false; }
-    if (self->boost != twin->boost)                      { return false; }
-    if (!Query_Equals(self->parent, (Obj*)twin->parent)) { return false; }
-    if (!Sim_Equals(self->sim, (Obj*)twin->sim))         { return false; }
+    if ((Compiler*)other == self)                          { return true; }
+    if (!Obj_Is_A(other, COMPILER))                        { return false; }
+    CompilerIVARS *const ivars = Compiler_IVARS(self);
+    CompilerIVARS *const ovars = Compiler_IVARS((Compiler*)other);
+    if (ivars->boost != ovars->boost)                      { return false; }
+    if (!Query_Equals(ivars->parent, (Obj*)ovars->parent)) { return false; }
+    if (!Sim_Equals(ivars->sim, (Obj*)ovars->sim))         { return false; }
     return true;
 }
 
 void
 Compiler_serialize(Compiler *self, OutStream *outstream) {
+    CompilerIVARS *const ivars = Compiler_IVARS(self);
     ABSTRACT_CLASS_CHECK(self, COMPILER);
-    OutStream_Write_F32(outstream, self->boost);
-    FREEZE(self->parent, outstream);
-    FREEZE(self->sim, outstream);
+    OutStream_Write_F32(outstream, ivars->boost);
+    FREEZE(ivars->parent, outstream);
+    FREEZE(ivars->sim, outstream);
 }
 
 Compiler*
 Compiler_deserialize(Compiler *self, InStream *instream) {
-    self->boost  = InStream_Read_F32(instream);
-    self->parent = (Query*)THAW(instream);
-    self->sim    = (Similarity*)THAW(instream);
+    CompilerIVARS *const ivars = Compiler_IVARS(self);
+    ivars->boost  = InStream_Read_F32(instream);
+    ivars->parent = (Query*)THAW(instream);
+    ivars->sim    = (Similarity*)THAW(instream);
     return self;
 }
 

@@ -27,33 +27,37 @@ BitVecMatcher_new(BitVector *bit_vector) {
 
 BitVecMatcher*
 BitVecMatcher_init(BitVecMatcher *self, BitVector *bit_vector) {
+    BitVecMatcherIVARS *const ivars = BitVecMatcher_IVARS(self);
     Matcher_init((Matcher*)self);
-    self->bit_vec = (BitVector*)INCREF(bit_vector);
-    self->doc_id = 0;
+    ivars->bit_vec = (BitVector*)INCREF(bit_vector);
+    ivars->doc_id = 0;
     return self;
 }
 
 void
 BitVecMatcher_destroy(BitVecMatcher *self) {
-    DECREF(self->bit_vec);
+    BitVecMatcherIVARS *const ivars = BitVecMatcher_IVARS(self);
+    DECREF(ivars->bit_vec);
     SUPER_DESTROY(self, BITVECMATCHER);
 }
 
 int32_t
 BitVecMatcher_next(BitVecMatcher *self) {
-    self->doc_id = BitVec_Next_Hit(self->bit_vec, self->doc_id + 1);
-    return self->doc_id == -1 ? 0 : self->doc_id;
+    BitVecMatcherIVARS *const ivars = BitVecMatcher_IVARS(self);
+    ivars->doc_id = BitVec_Next_Hit(ivars->bit_vec, ivars->doc_id + 1);
+    return ivars->doc_id == -1 ? 0 : ivars->doc_id;
 }
 
 int32_t
 BitVecMatcher_advance(BitVecMatcher *self, int32_t target) {
-    self->doc_id = BitVec_Next_Hit(self->bit_vec, target);
-    return self->doc_id == -1 ? 0 : self->doc_id;
+    BitVecMatcherIVARS *const ivars = BitVecMatcher_IVARS(self);
+    ivars->doc_id = BitVec_Next_Hit(ivars->bit_vec, target);
+    return ivars->doc_id == -1 ? 0 : ivars->doc_id;
 }
 
 int32_t
 BitVecMatcher_get_doc_id(BitVecMatcher *self) {
-    return self->doc_id;
+    return BitVecMatcher_IVARS(self)->doc_id;
 }
 
 

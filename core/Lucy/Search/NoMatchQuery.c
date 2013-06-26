@@ -35,17 +35,19 @@ NoMatchQuery_new() {
 
 NoMatchQuery*
 NoMatchQuery_init(NoMatchQuery *self) {
+    NoMatchQueryIVARS *const ivars = NoMatchQuery_IVARS(self);
     Query_init((Query*)self, 0.0f);
-    self->fails_to_match = true;
+    ivars->fails_to_match = true;
     return self;
 }
 
 bool
 NoMatchQuery_equals(NoMatchQuery *self, Obj *other) {
-    NoMatchQuery *twin = (NoMatchQuery*)other;
-    if (!Obj_Is_A(other, NOMATCHQUERY))                   { return false; }
-    if (self->boost != twin->boost)                       { return false; }
-    if (!!self->fails_to_match != !!twin->fails_to_match) { return false; }
+    if (!Obj_Is_A(other, NOMATCHQUERY))                     { return false; }
+    NoMatchQueryIVARS *const ivars = NoMatchQuery_IVARS(self);
+    NoMatchQueryIVARS *const ovars = NoMatchQuery_IVARS((NoMatchQuery*)other);
+    if (ivars->boost != ovars->boost)                       { return false; }
+    if (!!ivars->fails_to_match != !!ovars->fails_to_match) { return false; }
     return true;
 }
 
@@ -67,21 +69,22 @@ NoMatchQuery_make_compiler(NoMatchQuery *self, Searcher *searcher,
 
 void
 NoMatchQuery_set_fails_to_match(NoMatchQuery *self, bool fails_to_match) {
-    self->fails_to_match = fails_to_match;
+    NoMatchQuery_IVARS(self)->fails_to_match = fails_to_match;
 }
 
 bool
 NoMatchQuery_get_fails_to_match(NoMatchQuery *self) {
-    return self->fails_to_match;
+    return NoMatchQuery_IVARS(self)->fails_to_match;
 }
 
 Obj*
 NoMatchQuery_dump(NoMatchQuery *self) {
+    NoMatchQueryIVARS *const ivars = NoMatchQuery_IVARS(self);
     NoMatchQuery_Dump_t super_dump
         = SUPER_METHOD_PTR(NOMATCHQUERY, Lucy_NoMatchQuery_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
     Hash_Store_Str(dump, "fails_to_match", 14,
-                   (Obj*)Bool_singleton(self->fails_to_match));
+                   (Obj*)Bool_singleton(ivars->fails_to_match));
     return (Obj*)dump;
 }
 
@@ -92,19 +95,21 @@ NoMatchQuery_load(NoMatchQuery *self, Obj *dump) {
         = SUPER_METHOD_PTR(NOMATCHQUERY, Lucy_NoMatchQuery_Load);
     NoMatchQuery *loaded = super_load(self, dump);
     Obj *fails = Cfish_Hash_Fetch_Str(source, "fails_to_match", 14);
-    loaded->fails_to_match = fails ? Obj_To_Bool(fails) : true;
+    NoMatchQuery_IVARS(loaded)->fails_to_match
+        = fails ? Obj_To_Bool(fails) : true;
     return loaded;
 }
 
 void
 NoMatchQuery_serialize(NoMatchQuery *self, OutStream *outstream) {
-    OutStream_Write_I8(outstream, !!self->fails_to_match);
+    NoMatchQueryIVARS *const ivars = NoMatchQuery_IVARS(self);
+    OutStream_Write_I8(outstream, !!ivars->fails_to_match);
 }
 
 NoMatchQuery*
 NoMatchQuery_deserialize(NoMatchQuery *self, InStream *instream) {
     NoMatchQuery_init(self);
-    self->fails_to_match = !!InStream_Read_I8(instream);
+    NoMatchQuery_IVARS(self)->fails_to_match = !!InStream_Read_I8(instream);
     return self;
 }
 

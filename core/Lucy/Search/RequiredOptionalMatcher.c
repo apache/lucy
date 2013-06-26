@@ -36,13 +36,14 @@ ReqOptMatcher_init(RequiredOptionalMatcher *self, Similarity *similarity,
     VA_Push(children, INCREF(required_matcher));
     VA_Push(children, INCREF(optional_matcher));
     PolyMatcher_init((PolyMatcher*)self, children, similarity);
+    RequiredOptionalMatcherIVARS *const ivars = ReqOptMatcher_IVARS(self);
 
     // Assign.
-    self->req_matcher       = (Matcher*)INCREF(required_matcher);
-    self->opt_matcher       = (Matcher*)INCREF(optional_matcher);
+    ivars->req_matcher      = (Matcher*)INCREF(required_matcher);
+    ivars->opt_matcher      = (Matcher*)INCREF(optional_matcher);
 
     // Init.
-    self->opt_matcher_first_time = true;
+    ivars->opt_matcher_first_time = true;
 
     DECREF(children);
     return self;
@@ -50,63 +51,68 @@ ReqOptMatcher_init(RequiredOptionalMatcher *self, Similarity *similarity,
 
 void
 ReqOptMatcher_destroy(RequiredOptionalMatcher *self) {
-    DECREF(self->req_matcher);
-    DECREF(self->opt_matcher);
+    RequiredOptionalMatcherIVARS *const ivars = ReqOptMatcher_IVARS(self);
+    DECREF(ivars->req_matcher);
+    DECREF(ivars->opt_matcher);
     SUPER_DESTROY(self, REQUIREDOPTIONALMATCHER);
 }
 
 int32_t
 ReqOptMatcher_next(RequiredOptionalMatcher *self) {
-    return Matcher_Next(self->req_matcher);
+    RequiredOptionalMatcherIVARS *const ivars = ReqOptMatcher_IVARS(self);
+    return Matcher_Next(ivars->req_matcher);
 }
 
 int32_t
 ReqOptMatcher_advance(RequiredOptionalMatcher *self, int32_t target) {
-    return Matcher_Advance(self->req_matcher, target);
+    RequiredOptionalMatcherIVARS *const ivars = ReqOptMatcher_IVARS(self);
+    return Matcher_Advance(ivars->req_matcher, target);
 }
 
 int32_t
 ReqOptMatcher_get_doc_id(RequiredOptionalMatcher *self) {
-    return Matcher_Get_Doc_ID(self->req_matcher);
+    RequiredOptionalMatcherIVARS *const ivars = ReqOptMatcher_IVARS(self);
+    return Matcher_Get_Doc_ID(ivars->req_matcher);
 }
 
 float
 ReqOptMatcher_score(RequiredOptionalMatcher *self) {
-    int32_t const current_doc = Matcher_Get_Doc_ID(self->req_matcher);
+    RequiredOptionalMatcherIVARS *const ivars = ReqOptMatcher_IVARS(self);
+    int32_t const current_doc = Matcher_Get_Doc_ID(ivars->req_matcher);
 
-    if (self->opt_matcher_first_time) {
-        self->opt_matcher_first_time = false;
-        if (self->opt_matcher != NULL
-            && !Matcher_Advance(self->opt_matcher, current_doc)) {
-            DECREF(self->opt_matcher);
-            self->opt_matcher = NULL;
+    if (ivars->opt_matcher_first_time) {
+        ivars->opt_matcher_first_time = false;
+        if (ivars->opt_matcher != NULL
+            && !Matcher_Advance(ivars->opt_matcher, current_doc)) {
+            DECREF(ivars->opt_matcher);
+            ivars->opt_matcher = NULL;
         }
     }
 
-    if (self->opt_matcher == NULL) {
-        return Matcher_Score(self->req_matcher) * self->coord_factors[1];
+    if (ivars->opt_matcher == NULL) {
+        return Matcher_Score(ivars->req_matcher) * ivars->coord_factors[1];
     }
     else {
-        int32_t opt_matcher_doc = Matcher_Get_Doc_ID(self->opt_matcher);
+        int32_t opt_matcher_doc = Matcher_Get_Doc_ID(ivars->opt_matcher);
 
         if (opt_matcher_doc < current_doc) {
-            opt_matcher_doc = Matcher_Advance(self->opt_matcher, current_doc);
+            opt_matcher_doc = Matcher_Advance(ivars->opt_matcher, current_doc);
             if (!opt_matcher_doc) {
-                DECREF(self->opt_matcher);
-                self->opt_matcher = NULL;
-                float req_score = Matcher_Score(self->req_matcher);
-                return req_score * self->coord_factors[1];
+                DECREF(ivars->opt_matcher);
+                ivars->opt_matcher = NULL;
+                float req_score = Matcher_Score(ivars->req_matcher);
+                return req_score * ivars->coord_factors[1];
             }
         }
 
         if (opt_matcher_doc == current_doc) {
-            float score = Matcher_Score(self->req_matcher)
-                          + Matcher_Score(self->opt_matcher);
-            score *= self->coord_factors[2];
+            float score = Matcher_Score(ivars->req_matcher)
+                          + Matcher_Score(ivars->opt_matcher);
+            score *= ivars->coord_factors[2];
             return score;
         }
         else {
-            return Matcher_Score(self->req_matcher) * self->coord_factors[1];
+            return Matcher_Score(ivars->req_matcher) * ivars->coord_factors[1];
         }
     }
 }

@@ -28,38 +28,40 @@ MatchAllMatcher_new(float score, int32_t doc_max) {
 
 MatchAllMatcher*
 MatchAllMatcher_init(MatchAllMatcher *self, float score, int32_t doc_max) {
+    MatchAllMatcherIVARS *const ivars = MatchAllMatcher_IVARS(self);
     Matcher_init((Matcher*)self);
-    self->doc_id        = 0;
-    self->score         = score;
-    self->doc_max       = doc_max;
+    ivars->doc_id        = 0;
+    ivars->score         = score;
+    ivars->doc_max       = doc_max;
     return self;
 }
 
 int32_t
 MatchAllMatcher_next(MatchAllMatcher* self) {
-    if (++self->doc_id <= self->doc_max) {
-        return self->doc_id;
+    MatchAllMatcherIVARS *const ivars = MatchAllMatcher_IVARS(self);
+    if (++ivars->doc_id <= ivars->doc_max) {
+        return ivars->doc_id;
     }
     else {
-        self->doc_id--;
+        ivars->doc_id--;
         return 0;
     }
 }
 
 int32_t
 MatchAllMatcher_advance(MatchAllMatcher* self, int32_t target) {
-    self->doc_id = target - 1;
+    MatchAllMatcher_IVARS(self)->doc_id = target - 1;
     return MatchAllMatcher_next(self);
 }
 
 float
 MatchAllMatcher_score(MatchAllMatcher* self) {
-    return self->score;
+    return MatchAllMatcher_IVARS(self)->score;
 }
 
 int32_t
 MatchAllMatcher_get_doc_id(MatchAllMatcher* self) {
-    return self->doc_id;
+    return MatchAllMatcher_IVARS(self)->doc_id;
 }
 
 

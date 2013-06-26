@@ -29,17 +29,18 @@ NOTMatcher_new(Matcher *negated_matcher, int32_t doc_max) {
 
 NOTMatcher*
 NOTMatcher_init(NOTMatcher *self, Matcher *negated_matcher, int32_t doc_max) {
+    NOTMatcherIVARS *const ivars = NOTMatcher_IVARS(self);
     VArray *children = VA_new(1);
     VA_Push(children, INCREF(negated_matcher));
     PolyMatcher_init((PolyMatcher*)self, children, NULL);
 
     // Init.
-    self->doc_id           = 0;
-    self->next_negation    = 0;
+    ivars->doc_id           = 0;
+    ivars->next_negation    = 0;
 
     // Assign.
-    self->negated_matcher  = (Matcher*)INCREF(negated_matcher);
-    self->doc_max          = doc_max;
+    ivars->negated_matcher  = (Matcher*)INCREF(negated_matcher);
+    ivars->doc_max          = doc_max;
 
     DECREF(children);
 
@@ -48,46 +49,48 @@ NOTMatcher_init(NOTMatcher *self, Matcher *negated_matcher, int32_t doc_max) {
 
 void
 NOTMatcher_destroy(NOTMatcher *self) {
-    DECREF(self->negated_matcher);
+    NOTMatcherIVARS *const ivars = NOTMatcher_IVARS(self);
+    DECREF(ivars->negated_matcher);
     SUPER_DESTROY(self, NOTMATCHER);
 }
 
 int32_t
 NOTMatcher_next(NOTMatcher *self) {
+    NOTMatcherIVARS *const ivars = NOTMatcher_IVARS(self);
     while (1) {
-        self->doc_id++;
+        ivars->doc_id++;
 
         // Get next negated doc id.
-        if (self->next_negation < self->doc_id) {
-            self->next_negation
-                = Matcher_Advance(self->negated_matcher, self->doc_id);
-            if (self->next_negation == 0) {
-                DECREF(self->negated_matcher);
-                self->negated_matcher = NULL;
-                self->next_negation = self->doc_max + 1;
+        if (ivars->next_negation < ivars->doc_id) {
+            ivars->next_negation
+                = Matcher_Advance(ivars->negated_matcher, ivars->doc_id);
+            if (ivars->next_negation == 0) {
+                DECREF(ivars->negated_matcher);
+                ivars->negated_matcher = NULL;
+                ivars->next_negation = ivars->doc_max + 1;
             }
         }
 
-        if (self->doc_id > self->doc_max) {
-            self->doc_id = self->doc_max; // halt advance
+        if (ivars->doc_id > ivars->doc_max) {
+            ivars->doc_id = ivars->doc_max; // halt advance
             return 0;
         }
-        else if (self->doc_id != self->next_negation) {
+        else if (ivars->doc_id != ivars->next_negation) {
             // Success!
-            return self->doc_id;
+            return ivars->doc_id;
         }
     }
 }
 
 int32_t
 NOTMatcher_advance(NOTMatcher *self, int32_t target) {
-    self->doc_id = target - 1;
+    NOTMatcher_IVARS(self)->doc_id = target - 1;
     return NOTMatcher_next(self);
 }
 
 int32_t
 NOTMatcher_get_doc_id(NOTMatcher *self) {
-    return self->doc_id;
+    return NOTMatcher_IVARS(self)->doc_id;
 }
 
 float

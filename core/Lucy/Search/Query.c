@@ -25,24 +25,24 @@
 
 Query*
 Query_init(Query *self, float boost) {
-    self->boost = boost;
+    Query_IVARS(self)->boost = boost;
     ABSTRACT_CLASS_CHECK(self, QUERY);
     return self;
 }
 
 void
 Query_set_boost(Query *self, float boost) {
-    self->boost = boost;
+    Query_IVARS(self)->boost = boost;
 }
 
 float
 Query_get_boost(Query *self) {
-    return self->boost;
+    return Query_IVARS(self)->boost;
 }
 
 void
 Query_serialize(Query *self, OutStream *outstream) {
-    OutStream_Write_F32(outstream, self->boost);
+    OutStream_Write_F32(outstream, Query_IVARS(self)->boost);
 }
 
 Query*

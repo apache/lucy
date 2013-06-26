@@ -36,56 +36,59 @@ PhraseMatcher*
 PhraseMatcher_init(PhraseMatcher *self, Similarity *similarity, VArray *plists,
                    Compiler *compiler) {
     Matcher_init((Matcher*)self);
+    PhraseMatcherIVARS *const ivars = PhraseMatcher_IVARS(self);
 
     // Init.
-    self->anchor_set       = BB_new(0);
-    self->phrase_freq      = 0.0;
-    self->phrase_boost     = 0.0;
-    self->first_time       = true;
-    self->more             = true;
+    ivars->anchor_set       = BB_new(0);
+    ivars->phrase_freq      = 0.0;
+    ivars->phrase_boost     = 0.0;
+    ivars->first_time       = true;
+    ivars->more             = true;
 
     // Extract PostingLists out of VArray into local C array for quick access.
-    self->num_elements = VA_Get_Size(plists);
-    self->plists = (PostingList**)MALLOCATE(
-                       self->num_elements * sizeof(PostingList*));
-    for (size_t i = 0; i < self->num_elements; i++) {
+    ivars->num_elements = VA_Get_Size(plists);
+    ivars->plists = (PostingList**)MALLOCATE(
+                       ivars->num_elements * sizeof(PostingList*));
+    for (size_t i = 0; i < ivars->num_elements; i++) {
         PostingList *const plist
             = (PostingList*)CERTIFY(VA_Fetch(plists, i), POSTINGLIST);
         if (plist == NULL) {
             THROW(ERR, "Missing element %u32", i);
         }
-        self->plists[i] = (PostingList*)INCREF(plist);
+        ivars->plists[i] = (PostingList*)INCREF(plist);
     }
 
     // Assign.
-    self->sim       = (Similarity*)INCREF(similarity);
-    self->compiler  = (Compiler*)INCREF(compiler);
-    self->weight    = Compiler_Get_Weight(compiler);
+    ivars->sim       = (Similarity*)INCREF(similarity);
+    ivars->compiler  = (Compiler*)INCREF(compiler);
+    ivars->weight    = Compiler_Get_Weight(compiler);
 
     return self;
 }
 
 void
 PhraseMatcher_destroy(PhraseMatcher *self) {
-    if (self->plists) {
-        for (size_t i = 0; i < self->num_elements; i++) {
-            DECREF(self->plists[i]);
+    PhraseMatcherIVARS *const ivars = PhraseMatcher_IVARS(self);
+    if (ivars->plists) {
+        for (size_t i = 0; i < ivars->num_elements; i++) {
+            DECREF(ivars->plists[i]);
         }
-        FREEMEM(self->plists);
+        FREEMEM(ivars->plists);
     }
-    DECREF(self->sim);
-    DECREF(self->anchor_set);
-    DECREF(self->compiler);
+    DECREF(ivars->sim);
+    DECREF(ivars->anchor_set);
+    DECREF(ivars->compiler);
     SUPER_DESTROY(self, PHRASEMATCHER);
 }
 
 int32_t
 PhraseMatcher_next(PhraseMatcher *self) {
-    if (self->first_time) {
+    PhraseMatcherIVARS *const ivars = PhraseMatcher_IVARS(self);
+    if (ivars->first_time) {
         return PhraseMatcher_Advance(self, 1);
     }
-    else if (self->more) {
-        const int32_t target = PList_Get_Doc_ID(self->plists[0]) + 1;
+    else if (ivars->more) {
+        const int32_t target = PList_Get_Doc_ID(ivars->plists[0]) + 1;
         return PhraseMatcher_Advance(self, target);
     }
     else {
@@ -95,25 +98,26 @@ PhraseMatcher_next(PhraseMatcher *self) {
 
 int32_t
 PhraseMatcher_advance(PhraseMatcher *self, int32_t target) {
-    PostingList **const plists       = self->plists;
-    const uint32_t      num_elements = self->num_elements;
+    PhraseMatcherIVARS *const ivars  = PhraseMatcher_IVARS(self);
+    PostingList **const plists       = ivars->plists;
+    const uint32_t      num_elements = ivars->num_elements;
     int32_t             highest      = 0;
 
     // Reset match variables to indicate no match.  New values will be
     // assigned if a match succeeds.
-    self->phrase_freq = 0.0;
-    self->doc_id      = 0;
+    ivars->phrase_freq = 0.0;
+    ivars->doc_id      = 0;
 
     // Find the lowest possible matching doc ID greater than the current doc
     // ID.  If any one of the PostingLists is exhausted, we're done.
-    if (self->first_time) {
-        self->first_time = false;
+    if (ivars->first_time) {
+        ivars->first_time = false;
 
         // On the first call to Advance(), advance all PostingLists.
-        for (size_t i = 0, max = self->num_elements; i < max; i++) {
+        for (size_t i = 0, max = ivars->num_elements; i < max; i++) {
             int32_t candidate = PList_Advance(plists[i], target);
             if (!candidate) {
-                self->more = false;
+                ivars->more = false;
                 return 0;
             }
             else if (candidate > highest) {
@@ -127,7 +131,7 @@ PhraseMatcher_advance(PhraseMatcher *self, int32_t target) {
         // becomes the minimum target which all the others must move up to.
         highest = PList_Advance(plists[0], target);
         if (highest == 0) {
-            self->more = false;
+            ivars->more = false;
             return 0;
         }
     }
@@ -152,7 +156,7 @@ PhraseMatcher_advance(PhraseMatcher *self, int32_t target) {
 
                 // If this PostingList is exhausted, we're done.
                 if (candidate == 0) {
-                    self->more = false;
+                    ivars->more = false;
                     return 0;
                 }
 
@@ -174,14 +178,14 @@ PhraseMatcher_advance(PhraseMatcher *self, int32_t target) {
         // If we've found a doc with all terms in it, see if they form a
         // phrase.
         if (agreement && highest >= target) {
-            self->phrase_freq = PhraseMatcher_Calc_Phrase_Freq(self);
-            if (self->phrase_freq == 0.0) {
+            ivars->phrase_freq = PhraseMatcher_Calc_Phrase_Freq(self);
+            if (ivars->phrase_freq == 0.0) {
                 // No phrase.  Move on to another doc.
                 target += 1;
             }
             else {
                 // Success!
-                self->doc_id = highest;
+                ivars->doc_id = highest;
                 return highest;
             }
         }
@@ -241,7 +245,8 @@ DONE:
 
 float
 PhraseMatcher_calc_phrase_freq(PhraseMatcher *self) {
-    PostingList **const plists = self->plists;
+    PhraseMatcherIVARS *const ivars = PhraseMatcher_IVARS(self);
+    PostingList **const plists = ivars->plists;
 
     /* Create a overwriteable "anchor set" from the first posting.
      *
@@ -263,21 +268,23 @@ PhraseMatcher_calc_phrase_freq(PhraseMatcher *self) {
      * is our phrase freq.
      */
     ScorePosting *posting = (ScorePosting*)PList_Get_Posting(plists[0]);
-    uint32_t anchors_remaining = posting->freq;
+    ScorePostingIVARS *const post_ivars = ScorePost_IVARS(posting);
+    uint32_t anchors_remaining = post_ivars->freq;
     if (!anchors_remaining) { return 0.0f; }
 
     size_t    amount        = anchors_remaining * sizeof(uint32_t);
-    uint32_t *anchors_start = (uint32_t*)BB_Grow(self->anchor_set, amount);
+    uint32_t *anchors_start = (uint32_t*)BB_Grow(ivars->anchor_set, amount);
     uint32_t *anchors_end   = anchors_start + anchors_remaining;
-    memcpy(anchors_start, posting->prox, amount);
+    memcpy(anchors_start, post_ivars->prox, amount);
 
     // Match the positions of other terms against the anchor set.
-    for (uint32_t i = 1, max = self->num_elements; i < max; i++) {
+    for (uint32_t i = 1, max = ivars->num_elements; i < max; i++) {
         // Get the array of positions for the next term.  Unlike the anchor
         // set (which is a copy), these won't be overwritten.
-        ScorePosting *posting = (ScorePosting*)PList_Get_Posting(plists[i]);
-        uint32_t *candidates_start = posting->prox;
-        uint32_t *candidates_end   = candidates_start + posting->freq;
+        ScorePosting *next_post = (ScorePosting*)PList_Get_Posting(plists[i]);
+        ScorePostingIVARS *const next_post_ivars = ScorePost_IVARS(next_post);
+        uint32_t *candidates_start = next_post_ivars->prox;
+        uint32_t *candidates_end   = candidates_start + next_post_ivars->freq;
 
         // Splice out anchors that don't match the next term.  Bail out if
         // we've eliminated all possible anchors.
@@ -296,15 +303,16 @@ PhraseMatcher_calc_phrase_freq(PhraseMatcher *self) {
 
 int32_t
 PhraseMatcher_get_doc_id(PhraseMatcher *self) {
-    return self->doc_id;
+    return PhraseMatcher_IVARS(self)->doc_id;
 }
 
 float
 PhraseMatcher_score(PhraseMatcher *self) {
-    ScorePosting *posting = (ScorePosting*)PList_Get_Posting(self->plists[0]);
-    float score = Sim_TF(self->sim, self->phrase_freq)
-                  * self->weight
-                  * posting->weight;
+    PhraseMatcherIVARS *const ivars = PhraseMatcher_IVARS(self);
+    ScorePosting *posting = (ScorePosting*)PList_Get_Posting(ivars->plists[0]);
+    float score = Sim_TF(ivars->sim, ivars->phrase_freq)
+                  * ivars->weight
+                  * ScorePost_IVARS(posting)->weight;
     return score;
 }
 

@@ -33,25 +33,28 @@ Hits_new(Searcher *searcher, TopDocs *top_docs, uint32_t offset) {
 
 Hits*
 Hits_init(Hits *self, Searcher *searcher, TopDocs *top_docs, uint32_t offset) {
-    self->searcher   = (Searcher*)INCREF(searcher);
-    self->top_docs   = (TopDocs*)INCREF(top_docs);
-    self->match_docs = (VArray*)INCREF(TopDocs_Get_Match_Docs(top_docs));
-    self->offset     = offset;
+    HitsIVARS *const ivars = Hits_IVARS(self);
+    ivars->searcher   = (Searcher*)INCREF(searcher);
+    ivars->top_docs   = (TopDocs*)INCREF(top_docs);
+    ivars->match_docs = (VArray*)INCREF(TopDocs_Get_Match_Docs(top_docs));
+    ivars->offset     = offset;
     return self;
 }
 
 void
 Hits_destroy(Hits *self) {
-    DECREF(self->searcher);
-    DECREF(self->top_docs);
-    DECREF(self->match_docs);
+    HitsIVARS *const ivars = Hits_IVARS(self);
+    DECREF(ivars->searcher);
+    DECREF(ivars->top_docs);
+    DECREF(ivars->match_docs);
     SUPER_DESTROY(self, HITS);
 }
 
 HitDoc*
 Hits_next(Hits *self) {
-    MatchDoc *match_doc = (MatchDoc*)VA_Fetch(self->match_docs, self->offset);
-    self->offset++;
+    HitsIVARS *const ivars = Hits_IVARS(self);
+    MatchDoc *match_doc = (MatchDoc*)VA_Fetch(ivars->match_docs, ivars->offset);
+    ivars->offset++;
 
     if (!match_doc) {
         /** Bail if there aren't any more *captured* hits. (There may be more
@@ -60,16 +63,18 @@ Hits_next(Hits *self) {
     }
     else {
         // Lazily fetch HitDoc, set score.
-        HitDoc *hit_doc = Searcher_Fetch_Doc(self->searcher,
-                                             match_doc->doc_id);
-        HitDoc_Set_Score(hit_doc, match_doc->score);
+        MatchDocIVARS *match_doc_ivars = MatchDoc_IVARS(match_doc);
+        HitDoc *hit_doc = Searcher_Fetch_Doc(ivars->searcher,
+                                             match_doc_ivars->doc_id);
+        HitDoc_Set_Score(hit_doc, match_doc_ivars->score);
         return hit_doc;
     }
 }
 
 uint32_t
 Hits_total_hits(Hits *self) {
-    return TopDocs_Get_Total_Hits(self->top_docs);
+    HitsIVARS *const ivars = Hits_IVARS(self);
+    return TopDocs_Get_Total_Hits(ivars->top_docs);
 }
 
 

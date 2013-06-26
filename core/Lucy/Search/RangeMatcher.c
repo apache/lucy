@@ -32,15 +32,16 @@ RangeMatcher*
 RangeMatcher_init(RangeMatcher *self, int32_t lower_bound, int32_t upper_bound,
                   SortCache *sort_cache, int32_t doc_max) {
     Matcher_init((Matcher*)self);
+    RangeMatcherIVARS *const ivars = RangeMatcher_IVARS(self);
 
     // Init.
-    self->doc_id       = 0;
+    ivars->doc_id       = 0;
 
     // Assign.
-    self->lower_bound  = lower_bound;
-    self->upper_bound  = upper_bound;
-    self->sort_cache   = (SortCache*)INCREF(sort_cache);
-    self->doc_max      = doc_max;
+    ivars->lower_bound  = lower_bound;
+    ivars->upper_bound  = upper_bound;
+    ivars->sort_cache   = (SortCache*)INCREF(sort_cache);
+    ivars->doc_max      = doc_max;
 
     // Derive.
 
@@ -49,15 +50,17 @@ RangeMatcher_init(RangeMatcher *self, int32_t lower_bound, int32_t upper_bound,
 
 void
 RangeMatcher_destroy(RangeMatcher *self) {
-    DECREF(self->sort_cache);
+    RangeMatcherIVARS *const ivars = RangeMatcher_IVARS(self);
+    DECREF(ivars->sort_cache);
     SUPER_DESTROY(self, RANGEMATCHER);
 }
 
 int32_t
 RangeMatcher_next(RangeMatcher* self) {
+    RangeMatcherIVARS *const ivars = RangeMatcher_IVARS(self);
     while (1) {
-        if (++self->doc_id > self->doc_max) {
-            self->doc_id--;
+        if (++ivars->doc_id > ivars->doc_max) {
+            ivars->doc_id--;
             return 0;
         }
         else {
@@ -65,18 +68,18 @@ RangeMatcher_next(RangeMatcher* self) {
             // TODO: Unroll? i.e. use SortCache_Get_Ords at constructor time
             // and save ourselves some method call overhead.
             const int32_t ord
-                = SortCache_Ordinal(self->sort_cache, self->doc_id);
-            if (ord >= self->lower_bound && ord <= self->upper_bound) {
+                = SortCache_Ordinal(ivars->sort_cache, ivars->doc_id);
+            if (ord >= ivars->lower_bound && ord <= ivars->upper_bound) {
                 break;
             }
         }
     }
-    return self->doc_id;
+    return ivars->doc_id;
 }
 
 int32_t
 RangeMatcher_advance(RangeMatcher* self, int32_t target) {
-    self->doc_id = target - 1;
+    RangeMatcher_IVARS(self)->doc_id = target - 1;
     return RangeMatcher_next(self);
 }
 
@@ -88,7 +91,7 @@ RangeMatcher_score(RangeMatcher* self) {
 
 int32_t
 RangeMatcher_get_doc_id(RangeMatcher* self) {
-    return self->doc_id;
+    return RangeMatcher_IVARS(self)->doc_id;
 }
 
 

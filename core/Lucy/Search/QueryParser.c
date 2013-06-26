@@ -104,48 +104,49 @@ QParser_new(Schema *schema, Analyzer *analyzer, const CharBuf *default_boolop,
 QueryParser*
 QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
              const CharBuf *default_boolop, VArray *fields) {
+    QueryParserIVARS *const ivars = QParser_IVARS(self);
     // Init.
-    self->heed_colons = false;
-    self->lexer       = QueryLexer_new();
+    ivars->heed_colons = false;
+    ivars->lexer       = QueryLexer_new();
 
     // Assign.
-    self->schema         = (Schema*)INCREF(schema);
-    self->analyzer       = (Analyzer*)INCREF(analyzer);
-    self->default_boolop = default_boolop
+    ivars->schema         = (Schema*)INCREF(schema);
+    ivars->analyzer       = (Analyzer*)INCREF(analyzer);
+    ivars->default_boolop = default_boolop
                            ? CB_Clone(default_boolop)
                            : CB_new_from_trusted_utf8("OR", 2);
 
     if (fields) {
-        self->fields = VA_Shallow_Copy(fields);
+        ivars->fields = VA_Shallow_Copy(fields);
         for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
             CERTIFY(VA_Fetch(fields, i), CHARBUF);
         }
-        VA_Sort(self->fields, NULL, NULL);
+        VA_Sort(ivars->fields, NULL, NULL);
     }
     else {
         VArray *all_fields = Schema_All_Fields(schema);
         uint32_t num_fields = VA_Get_Size(all_fields);
-        self->fields = VA_new(num_fields);
+        ivars->fields = VA_new(num_fields);
         for (uint32_t i = 0; i < num_fields; i++) {
             CharBuf *field = (CharBuf*)VA_Fetch(all_fields, i);
             FieldType *type = Schema_Fetch_Type(schema, field);
             if (type && FType_Indexed(type)) {
-                VA_Push(self->fields, INCREF(field));
+                VA_Push(ivars->fields, INCREF(field));
             }
         }
         DECREF(all_fields);
     }
-    VA_Sort(self->fields, NULL, NULL);
+    VA_Sort(ivars->fields, NULL, NULL);
 
     // Derive default "occur" from default boolean operator.
-    if (CB_Equals_Str(self->default_boolop, "OR", 2)) {
-        self->default_occur = SHOULD;
+    if (CB_Equals_Str(ivars->default_boolop, "OR", 2)) {
+        ivars->default_occur = SHOULD;
     }
-    else if (CB_Equals_Str(self->default_boolop, "AND", 3)) {
-        self->default_occur = MUST;
+    else if (CB_Equals_Str(ivars->default_boolop, "AND", 3)) {
+        ivars->default_occur = MUST;
     }
     else {
-        THROW(ERR, "Invalid value for default_boolop: %o", self->default_boolop);
+        THROW(ERR, "Invalid value for default_boolop: %o", ivars->default_boolop);
     }
 
     return self;
@@ -153,43 +154,45 @@ QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
 
 void
 QParser_destroy(QueryParser *self) {
-    DECREF(self->schema);
-    DECREF(self->analyzer);
-    DECREF(self->default_boolop);
-    DECREF(self->fields);
-    DECREF(self->lexer);
+    QueryParserIVARS *const ivars = QParser_IVARS(self);
+    DECREF(ivars->schema);
+    DECREF(ivars->analyzer);
+    DECREF(ivars->default_boolop);
+    DECREF(ivars->fields);
+    DECREF(ivars->lexer);
     SUPER_DESTROY(self, QUERYPARSER);
 }
 
 Analyzer*
 QParser_get_analyzer(QueryParser *self) {
-    return self->analyzer;
+    return QParser_IVARS(self)->analyzer;
 }
 
 Schema*
 QParser_get_schema(QueryParser *self) {
-    return self->schema;
+    return QParser_IVARS(self)->schema;
 }
 
 CharBuf*
 QParser_get_default_boolop(QueryParser *self) {
-    return self->default_boolop;
+    return QParser_IVARS(self)->default_boolop;
 }
 
 VArray*
 QParser_get_fields(QueryParser *self) {
-    return self->fields;
+    return QParser_IVARS(self)->fields;
 }
 
 bool
 QParser_heed_colons(QueryParser *self) {
-    return self->heed_colons;
+    return QParser_IVARS(self)->heed_colons;
 }
 
 void
 QParser_set_heed_colons(QueryParser *self, bool heed_colons) {
-    self->heed_colons = heed_colons;
-    QueryLexer_Set_Heed_Colons(self->lexer, heed_colons);
+    QueryParserIVARS *const ivars = QParser_IVARS(self);
+    ivars->heed_colons = heed_colons;
+    QueryLexer_Set_Heed_Colons(ivars->lexer, heed_colons);
 }
 
 
@@ -209,7 +212,8 @@ QParser_parse(QueryParser *self, const CharBuf *query_string) {
 
 Query*
 QParser_tree(QueryParser *self, const CharBuf *query_string) {
-    VArray *elems = QueryLexer_Tokenize(self->lexer, query_string);
+    QueryParserIVARS *const ivars = QParser_IVARS(self);
+    VArray *elems = QueryLexer_Tokenize(ivars->lexer, query_string);
     S_balance_parens(self, elems);
     S_parse_subqueries(self, elems);
     Query *query = S_parse_subquery(self, elems, NULL, false);
@@ -219,6 +223,7 @@ QParser_tree(QueryParser *self, const CharBuf *query_string) {
 
 static void
 S_parse_subqueries(QueryParser *self, VArray *elems) {
+    const int32_t default_occur = QParser_IVARS(self)->default_occur;
     while (1) {
         // Work from the inside out, starting with the leftmost innermost
         // paren group.
@@ -254,7 +259,7 @@ S_parse_subqueries(QueryParser *self, VArray *elems) {
         VArray *sub_elems = VA_Slice(elems, left + 1, right - left - 1);
         Query *subquery = S_parse_subquery(self, sub_elems, field, true);
         ParserElem *new_elem = ParserElem_new(TOKEN_QUERY, (Obj*)subquery);
-        if (self->default_occur == MUST) {
+        if (default_occur == MUST) {
             ParserElem_Require(new_elem);
         }
         DECREF(sub_elems);
@@ -351,6 +356,8 @@ S_balance_parens(QueryParser *self, VArray *elems) {
 static void
 S_compose_inner_queries(QueryParser *self, VArray *elems,
                         CharBuf *default_field) {
+    const int32_t default_occur = QParser_IVARS(self)->default_occur;
+
     // Generate all queries.  Apply any fields.
     for (uint32_t i = VA_Get_Size(elems); i--;) {
         CharBuf *field = default_field;
@@ -371,7 +378,7 @@ S_compose_inner_queries(QueryParser *self, VArray *elems,
             LeafQuery *query = LeafQuery_new(field, text);
             ParserElem *new_elem
                 = ParserElem_new(TOKEN_QUERY, (Obj*)query);
-            if (self->default_occur == MUST) {
+            if (default_occur == MUST) {
                 ParserElem_Require(new_elem);
             }
             VA_Store(elems, i, (Obj*)new_elem);
@@ -445,6 +452,8 @@ S_winnow_boolops(QueryParser *self, VArray *elems) {
 // Apply AND.
 static void
 S_compose_and_queries(QueryParser *self, VArray *elems) {
+    const int32_t default_occur = QParser_IVARS(self)->default_occur;
+
     for (uint32_t i = 0; i + 2 < VA_Get_Size(elems); i++) {
         ParserElem *elem = (ParserElem*)VA_Fetch(elems, i + 1);
         if (ParserElem_Get_Type(elem) == TOKEN_AND) {
@@ -477,7 +486,7 @@ S_compose_and_queries(QueryParser *self, VArray *elems) {
             }
             Query *and_query = QParser_Make_AND_Query(self, children);
             ParserElem_Set_Value(preceding, (Obj*)and_query);
-            if (self->default_occur == MUST) {
+            if (default_occur == MUST) {
                 ParserElem_Require(preceding);
             }
             DECREF(and_query);
@@ -490,6 +499,8 @@ S_compose_and_queries(QueryParser *self, VArray *elems) {
 
 static void
 S_compose_or_queries(QueryParser *self, VArray *elems) {
+    const int32_t default_occur = QParser_IVARS(self)->default_occur;
+
     for (uint32_t i = 0; i + 2 < VA_Get_Size(elems); i++) {
         ParserElem *elem = (ParserElem*)VA_Fetch(elems, i + 1);
         if (ParserElem_Get_Type(elem) == TOKEN_OR) {
@@ -522,7 +533,7 @@ S_compose_or_queries(QueryParser *self, VArray *elems) {
             }
             Query *or_query = QParser_Make_OR_Query(self, children);
             ParserElem_Set_Value(preceding, (Obj*)or_query);
-            if (self->default_occur == MUST) {
+            if (default_occur == MUST) {
                 ParserElem_Require(preceding);
             }
             DECREF(or_query);
@@ -535,13 +546,14 @@ S_compose_or_queries(QueryParser *self, VArray *elems) {
 
 static Query*
 S_compose_subquery(QueryParser *self, VArray *elems, bool enclosed) {
+    const int32_t default_occur = QParser_IVARS(self)->default_occur;
     Query *retval;
 
     if (VA_Get_Size(elems) == 0) {
         // No elems means no query. Maybe the search string was something
         // like 'NOT AND'
         if (enclosed) {
-            retval = self->default_occur == SHOULD
+            retval = default_occur == SHOULD
                      ? QParser_Make_OR_Query(self, NULL)
                      : QParser_Make_AND_Query(self, NULL);
         }
@@ -843,8 +855,9 @@ S_unescape(QueryParser *self, CharBuf *orig, CharBuf *target) {
 
 Query*
 QParser_expand_leaf(QueryParser *self, Query *query) {
+    QueryParserIVARS *const ivars = QParser_IVARS(self);
     LeafQuery     *leaf_query  = (LeafQuery*)query;
-    Schema        *schema      = self->schema;
+    Schema        *schema      = ivars->schema;
     ZombieCharBuf *source_text = ZCB_BLANK();
     bool           is_phrase   = false;
     bool           ambiguous   = false;
@@ -873,15 +886,15 @@ QParser_expand_leaf(QueryParser *self, Query *query) {
         VA_Push(fields, INCREF(LeafQuery_Get_Field(leaf_query)));
     }
     else {
-        fields = (VArray*)INCREF(self->fields);
+        fields = (VArray*)INCREF(ivars->fields);
     }
 
     CharBuf *unescaped = CB_new(ZCB_Get_Size(source_text));
     VArray  *queries   = VA_new(VA_Get_Size(fields));
     for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
         CharBuf  *field    = (CharBuf*)VA_Fetch(fields, i);
-        Analyzer *analyzer = self->analyzer
-                             ? self->analyzer
+        Analyzer *analyzer = ivars->analyzer
+                             ? ivars->analyzer
                              : Schema_Fetch_Analyzer(schema, field);
 
         if (!analyzer) {
