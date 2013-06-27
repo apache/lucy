@@ -86,8 +86,9 @@ StandardTokenizer_transform(StandardTokenizer *self, Inversion *inversion) {
     Token *token;
 
     while (NULL != (token = Inversion_Next(inversion))) {
-        StandardTokenizer_Tokenize_Str(self, token->text, token->len,
-                                       new_inversion);
+        TokenIVARS *const token_ivars = Token_IVARS(token);
+        StandardTokenizer_Tokenize_Str(self, token_ivars->text,
+                                       token_ivars->len, new_inversion);
     }
 
     return new_inversion;
@@ -293,8 +294,7 @@ S_skip_extend_format(const char *text, size_t len, lucy_StringIter *iter) {
 
 bool
 StandardTokenizer_equals(StandardTokenizer *self, Obj *other) {
-    StandardTokenizer *const twin = (StandardTokenizer*)other;
-    if (twin == self)                        { return true; }
+    if ((StandardTokenizer*)other == self)   { return true; }
     if (!Obj_Is_A(other, STANDARDTOKENIZER)) { return false; }
     return true;
 }

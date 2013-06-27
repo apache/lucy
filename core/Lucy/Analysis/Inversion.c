@@ -24,20 +24,21 @@
 
 // After inversion, record how many like tokens occur in each group.
 static void
-S_count_clusters(Inversion *self);
+S_count_clusters(Inversion *self, InversionIVARS *ivars);
 
 Inversion*
 Inversion_new(Token *seed_token) {
     Inversion *self = (Inversion*)VTable_Make_Obj(INVERSION);
+    InversionIVARS *const ivars = Inversion_IVARS(self);
 
     // Init.
-    self->cap                 = 16;
-    self->size                = 0;
-    self->tokens              = (Token**)CALLOCATE(self->cap, sizeof(Token*));
-    self->cur                 = 0;
-    self->inverted            = false;
-    self->cluster_counts      = NULL;
-    self->cluster_counts_size = 0;
+    ivars->cap                 = 16;
+    ivars->size                = 0;
+    ivars->tokens              = (Token**)CALLOCATE(ivars->cap, sizeof(Token*));
+    ivars->cur                 = 0;
+    ivars->inverted            = false;
+    ivars->cluster_counts      = NULL;
+    ivars->cluster_counts_size = 0;
 
     // Process the seed token.
     if (seed_token != NULL) {
@@ -49,138 +50,145 @@ Inversion_new(Token *seed_token) {
 
 void
 Inversion_destroy(Inversion *self) {
-    if (self->tokens) {
-        Token **tokens       = self->tokens;
-        Token **const limit  = tokens + self->size;
+    InversionIVARS *const ivars = Inversion_IVARS(self);
+    if (ivars->tokens) {
+        Token **tokens       = ivars->tokens;
+        Token **const limit  = tokens + ivars->size;
         for (; tokens < limit; tokens++) {
             DECREF(*tokens);
         }
-        FREEMEM(self->tokens);
+        FREEMEM(ivars->tokens);
     }
-    FREEMEM(self->cluster_counts);
+    FREEMEM(ivars->cluster_counts);
     SUPER_DESTROY(self, INVERSION);
 }
 
 uint32_t
 Inversion_get_size(Inversion *self) {
-    return self->size;
+    return Inversion_IVARS(self)->size;
 }
 
 Token*
 Inversion_next(Inversion *self) {
+    InversionIVARS *const ivars = Inversion_IVARS(self);
     // Kill the iteration if we're out of tokens.
-    if (self->cur == self->size) {
+    if (ivars->cur == ivars->size) {
         return NULL;
     }
-    return self->tokens[self->cur++];
+    return ivars->tokens[ivars->cur++];
 }
 
 void
 Inversion_reset(Inversion *self) {
-    self->cur = 0;
+    Inversion_IVARS(self)->cur = 0;
 }
 
 static void
 S_grow(Inversion *self, size_t size) {
-    if (size > self->cap) {
+    InversionIVARS *const ivars = Inversion_IVARS(self);
+    if (size > ivars->cap) {
         uint64_t amount = size * sizeof(Token*);
         // Clip rather than wrap.
         if (amount > SIZE_MAX || amount < size) { amount = SIZE_MAX; }
-        self->tokens = (Token**)REALLOCATE(self->tokens, (size_t)amount);
-        self->cap    = size;
-        memset(self->tokens + self->size, 0,
-               (size - self->size) * sizeof(Token*));
+        ivars->tokens = (Token**)REALLOCATE(ivars->tokens, (size_t)amount);
+        ivars->cap    = size;
+        memset(ivars->tokens + ivars->size, 0,
+               (size - ivars->size) * sizeof(Token*));
     }
 }
 
 void
 Inversion_append(Inversion *self, Token *token) {
-    if (self->inverted) {
+    InversionIVARS *const ivars = Inversion_IVARS(self);
+    if (ivars->inverted) {
         THROW(ERR, "Can't append tokens after inversion");
     }
-    if (self->size >= self->cap) {
-        size_t new_capacity = Memory_oversize(self->size + 1, sizeof(Token*));
+    if (ivars->size >= ivars->cap) {
+        size_t new_capacity = Memory_oversize(ivars->size + 1, sizeof(Token*));
         S_grow(self, new_capacity);
     }
-    self->tokens[self->size] = token;
-    self->size++;
+    ivars->tokens[ivars->size] = token;
+    ivars->size++;
 }
 
 Token**
 Inversion_next_cluster(Inversion *self, uint32_t *count) {
-    Token **cluster = self->tokens + self->cur;
+    InversionIVARS *const ivars = Inversion_IVARS(self);
+    Token **cluster = ivars->tokens + ivars->cur;
 
-    if (self->cur == self->size) {
+    if (ivars->cur == ivars->size) {
         *count = 0;
         return NULL;
     }
 
     // Don't read past the end of the cluster counts array.
-    if (!self->inverted) {
+    if (!ivars->inverted) {
         THROW(ERR, "Inversion not yet inverted");
     }
-    if (self->cur > self->cluster_counts_size) {
+    if (ivars->cur > ivars->cluster_counts_size) {
         THROW(ERR, "Tokens were added after inversion");
     }
 
     // Place cluster count in passed-in var, advance bookmark.
-    *count = self->cluster_counts[self->cur];
-    self->cur += *count;
+    *count = ivars->cluster_counts[ivars->cur];
+    ivars->cur += *count;
 
     return cluster;
 }
 
 void
 Inversion_invert(Inversion *self) {
-    Token   **tokens = self->tokens;
-    Token   **limit  = tokens + self->size;
+    InversionIVARS *const ivars = Inversion_IVARS(self);
+    Token   **tokens = ivars->tokens;
+    Token   **limit  = tokens + ivars->size;
     int32_t   token_pos = 0;
 
     // Thwart future attempts to append.
-    if (self->inverted) {
+    if (ivars->inverted) {
         THROW(ERR, "Inversion has already been inverted");
     }
-    self->inverted = true;
+    ivars->inverted = true;
 
     // Assign token positions.
     for (; tokens < limit; tokens++) {
-        Token *const cur_token = *tokens;
-        cur_token->pos = token_pos;
-        token_pos = (int32_t)((uint32_t)token_pos + (uint32_t)cur_token->pos_inc);
-        if (token_pos < cur_token->pos) {
+        TokenIVARS *const cur_token_ivars = Token_IVARS(*tokens);
+        cur_token_ivars->pos = token_pos;
+        token_pos = (int32_t)((uint32_t)token_pos
+                              + (uint32_t)cur_token_ivars->pos_inc);
+        if (token_pos < cur_token_ivars->pos) {
             THROW(ERR, "Token positions out of order: %i32 %i32",
-                  cur_token->pos, token_pos);
+                  cur_token_ivars->pos, token_pos);
         }
     }
 
     // Sort the tokens lexically, and hand off to cluster counting routine.
-    Sort_quicksort(self->tokens, self->size, sizeof(Token*), Token_compare,
+    Sort_quicksort(ivars->tokens, ivars->size, sizeof(Token*), Token_compare,
                    NULL);
-    S_count_clusters(self);
+    S_count_clusters(self, ivars);
 }
 
 static void
-S_count_clusters(Inversion *self) {
-    Token **tokens = self->tokens;
+S_count_clusters(Inversion *self, InversionIVARS *ivars) {
+    UNUSED_VAR(self);
+    Token **tokens = ivars->tokens;
     uint32_t *counts
-        = (uint32_t*)CALLOCATE(self->size + 1, sizeof(uint32_t));
+        = (uint32_t*)CALLOCATE(ivars->size + 1, sizeof(uint32_t));
 
     // Save the cluster counts.
-    self->cluster_counts_size = self->size;
-    self->cluster_counts = counts;
+    ivars->cluster_counts_size = ivars->size;
+    ivars->cluster_counts = counts;
 
-    for (uint32_t i = 0; i < self->size;) {
-        Token *const base_token = tokens[i];
-        char  *const base_text  = base_token->text;
-        const size_t base_len   = base_token->len;
+    for (uint32_t i = 0; i < ivars->size;) {
+        TokenIVARS *const base_token_ivars = Token_IVARS(tokens[i]);
+        char  *const base_text  = base_token_ivars->text;
+        const size_t base_len   = base_token_ivars->len;
         uint32_t     j          = i + 1;
 
         // Iterate through tokens until text doesn't match.
-        while (j < self->size) {
-            Token *const candidate = tokens[j];
-
-            if ((candidate->len == base_len)
-                && (memcmp(candidate->text, base_text, base_len) == 0)
+        while (j < ivars->size) {
+            TokenIVARS *const candidate_ivars = Token_IVARS(tokens[j]);
+            if ((candidate_ivars->len == base_len)
+                && (memcmp(candidate_ivars->text, base_text, base_len) == 0)
                ) {
                 j++;
             }

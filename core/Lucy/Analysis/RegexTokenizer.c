@@ -34,7 +34,8 @@ RegexTokenizer_transform(RegexTokenizer *self, Inversion *inversion) {
     Token *token;
 
     while (NULL != (token = Inversion_Next(inversion))) {
-        RegexTokenizer_Tokenize_Str(self, token->text, token->len,
+        TokenIVARS *const token_ivars = Token_IVARS(token);
+        RegexTokenizer_Tokenize_Str(self, token_ivars->text, token_ivars->len,
                                     new_inversion);
     }
 
@@ -51,10 +52,11 @@ RegexTokenizer_transform_text(RegexTokenizer *self, CharBuf *text) {
 
 Obj*
 RegexTokenizer_dump(RegexTokenizer *self) {
+    RegexTokenizerIVARS *const ivars = RegexTokenizer_IVARS(self);
     RegexTokenizer_Dump_t super_dump
         = SUPER_METHOD_PTR(REGEXTOKENIZER, Lucy_RegexTokenizer_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
-    Hash_Store_Str(dump, "pattern", 7, CB_Dump(self->pattern));
+    Hash_Store_Str(dump, "pattern", 7, CB_Dump(ivars->pattern));
     return (Obj*)dump;
 }
 
@@ -71,10 +73,11 @@ RegexTokenizer_load(RegexTokenizer *self, Obj *dump) {
 
 bool
 RegexTokenizer_equals(RegexTokenizer *self, Obj *other) {
-    RegexTokenizer *const twin = (RegexTokenizer*)other;
-    if (twin == self)                                   { return true; }
-    if (!Obj_Is_A(other, REGEXTOKENIZER))               { return false; }
-    if (!CB_Equals(twin->pattern, (Obj*)self->pattern)) { return false; }
+    if ((RegexTokenizer*)other == self)                   { return true; }
+    if (!Obj_Is_A(other, REGEXTOKENIZER))                 { return false; }
+    RegexTokenizerIVARS *ivars = RegexTokenizer_IVARS(self);
+    RegexTokenizerIVARS *ovars = RegexTokenizer_IVARS((RegexTokenizer*)other);
+    if (!CB_Equals(ivars->pattern, (Obj*)ovars->pattern)) { return false; }
     return true;
 }
 

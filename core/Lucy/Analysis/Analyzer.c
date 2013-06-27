@@ -47,7 +47,10 @@ Analyzer_split(Analyzer *self, CharBuf *text) {
     Token      *token;
 
     while ((token = Inversion_Next(inversion)) != NULL) {
-        VA_Push(out, (Obj*)CB_new_from_trusted_utf8(token->text, token->len));
+        TokenIVARS *const token_ivars = Token_IVARS(token);
+        CharBuf *string
+            = CB_new_from_trusted_utf8(token_ivars->text, token_ivars->len);
+        VA_Push(out, (Obj*)string);
     }
 
     DECREF(inversion);

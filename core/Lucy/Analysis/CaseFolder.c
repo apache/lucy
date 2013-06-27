@@ -30,31 +30,33 @@ CaseFolder_new() {
 CaseFolder*
 CaseFolder_init(CaseFolder *self) {
     Analyzer_init((Analyzer*)self);
-    self->normalizer = Normalizer_new(NULL, true, false);
+    CaseFolderIVARS *const ivars = CaseFolder_IVARS(self);
+    ivars->normalizer = Normalizer_new(NULL, true, false);
     return self;
 }
 
 void
 CaseFolder_destroy(CaseFolder *self) {
-    DECREF(self->normalizer);
+    CaseFolderIVARS *const ivars = CaseFolder_IVARS(self);
+    DECREF(ivars->normalizer);
     SUPER_DESTROY(self, CASEFOLDER);
 }
 
 Inversion*
 CaseFolder_transform(CaseFolder *self, Inversion *inversion) {
-    return Normalizer_Transform(self->normalizer, inversion);
+    CaseFolderIVARS *const ivars = CaseFolder_IVARS(self);
+    return Normalizer_Transform(ivars->normalizer, inversion);
 }
 
 Inversion*
 CaseFolder_transform_text(CaseFolder *self, CharBuf *text) {
-    return Normalizer_Transform_Text(self->normalizer, text);
+    CaseFolderIVARS *const ivars = CaseFolder_IVARS(self);
+    return Normalizer_Transform_Text(ivars->normalizer, text);
 }
 
 bool
 CaseFolder_equals(CaseFolder *self, Obj *other) {
-    CaseFolder *const twin = (CaseFolder*)other;
-    if (twin == self)                 { return true; }
-    UNUSED_VAR(self);
+    if ((CaseFolder*)other == self)   { return true; }
     if (!Obj_Is_A(other, CASEFOLDER)) { return false; }
     return true;
 }

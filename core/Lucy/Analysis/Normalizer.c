@@ -37,6 +37,7 @@ Normalizer*
 Normalizer_init(Normalizer *self, const CharBuf *form, bool case_fold,
                 bool strip_accents) {
     int options = UTF8PROC_STABLE;
+    NormalizerIVARS *const ivars = Normalizer_IVARS(self);
 
     if (form == NULL
         || CB_Equals_Str(form, "NFKC", 4) || CB_Equals_Str(form, "nfkc", 4)
@@ -59,7 +60,7 @@ Normalizer_init(Normalizer *self, const CharBuf *form, bool case_fold,
     if (case_fold)     { options |= UTF8PROC_CASEFOLD; }
     if (strip_accents) { options |= UTF8PROC_STRIPMARK; }
 
-    self->options = options;
+    ivars->options = options;
 
     return self;
 }
@@ -72,10 +73,14 @@ Normalizer_transform(Normalizer *self, Inversion *inversion) {
     int32_t *buffer = static_buffer;
     ssize_t bufsize = INITIAL_BUFSIZE;
     Token *token;
+    NormalizerIVARS *const ivars = Normalizer_IVARS(self);
 
     while (NULL != (token = Inversion_Next(inversion))) {
-        ssize_t len = utf8proc_decompose((uint8_t*)token->text, token->len,
-                                         buffer, bufsize, self->options);
+        TokenIVARS *const token_ivars = Token_IVARS(token);
+        ssize_t len
+            = utf8proc_decompose((uint8_t*)token_ivars->text,
+                                 token_ivars->len, buffer, bufsize,
+                                 ivars->options);
 
         if (len > bufsize) {
             // buffer too small, (re)allocate
@@ -85,22 +90,23 @@ Normalizer_transform(Normalizer *self, Inversion *inversion) {
             // allocate additional INITIAL_BUFSIZE items
             bufsize = len + INITIAL_BUFSIZE;
             buffer = (int32_t*)MALLOCATE((bufsize + 1) * sizeof(int32_t));
-            len = utf8proc_decompose((uint8_t*)token->text, token->len,
-                                     buffer, bufsize, self->options);
+            len = utf8proc_decompose((uint8_t*)token_ivars->text,
+                                     token_ivars->len, buffer, bufsize,
+                                     ivars->options);
         }
         if (len < 0) {
             continue;
         }
 
-        len = utf8proc_reencode(buffer, len, self->options);
+        len = utf8proc_reencode(buffer, len, ivars->options);
 
         if (len >= 0) {
-            if (len > (ssize_t)token->len) {
-                FREEMEM(token->text);
-                token->text = (char*)MALLOCATE(len + 1);
+            if (len > (ssize_t)token_ivars->len) {
+                FREEMEM(token_ivars->text);
+                token_ivars->text = (char*)MALLOCATE(len + 1);
             }
-            memcpy(token->text, buffer, len + 1);
-            token->len = len;
+            memcpy(token_ivars->text, buffer, len + 1);
+            token_ivars->len = len;
         }
     }
 
@@ -117,7 +123,7 @@ Normalizer_dump(Normalizer *self) {
     Normalizer_Dump_t super_dump
         = SUPER_METHOD_PTR(NORMALIZER, Lucy_Normalizer_Dump);
     Hash *dump = super_dump(self);
-    int options = self->options;
+    int options = Normalizer_IVARS(self)->options;
 
     CharBuf *form = options & UTF8PROC_COMPOSE ?
                     options & UTF8PROC_COMPAT ?
@@ -157,10 +163,11 @@ Normalizer_load(Normalizer *self, Obj *dump) {
 
 bool
 Normalizer_equals(Normalizer *self, Obj *other) {
-    Normalizer *const twin = (Normalizer*)other;
-    if (twin == self)                   { return true; }
-    if (!Obj_Is_A(other, NORMALIZER))   { return false; }
-    if (twin->options != self->options) { return false; }
+    if ((Normalizer*)other == self)       { return true; }
+    if (!Obj_Is_A(other, NORMALIZER))     { return false; }
+    NormalizerIVARS *const ivars = Normalizer_IVARS(self);
+    NormalizerIVARS *const ovars = Normalizer_IVARS((Normalizer*)other);
+    if (ovars->options != ivars->options) { return false; }
     return true;
 }
 

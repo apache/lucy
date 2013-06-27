@@ -34,17 +34,19 @@ PolyAnalyzer*
 PolyAnalyzer_init(PolyAnalyzer *self, const CharBuf *language,
                   VArray *analyzers) {
     Analyzer_init((Analyzer*)self);
+    PolyAnalyzerIVARS *const ivars = PolyAnalyzer_IVARS(self);
+
     if (analyzers) {
         for (uint32_t i = 0, max = VA_Get_Size(analyzers); i < max; i++) {
             CERTIFY(VA_Fetch(analyzers, i), ANALYZER);
         }
-        self->analyzers = (VArray*)INCREF(analyzers);
+        ivars->analyzers = (VArray*)INCREF(analyzers);
     }
     else if (language) {
-        self->analyzers = VA_new(3);
-        VA_Push(self->analyzers, (Obj*)CaseFolder_new());
-        VA_Push(self->analyzers, (Obj*)RegexTokenizer_new(NULL));
-        VA_Push(self->analyzers, (Obj*)SnowStemmer_new(language));
+        ivars->analyzers = VA_new(3);
+        VA_Push(ivars->analyzers, (Obj*)CaseFolder_new());
+        VA_Push(ivars->analyzers, (Obj*)RegexTokenizer_new(NULL));
+        VA_Push(ivars->analyzers, (Obj*)SnowStemmer_new(language));
     }
     else {
         THROW(ERR, "Must specify either 'language' or 'analyzers'");
@@ -55,18 +57,19 @@ PolyAnalyzer_init(PolyAnalyzer *self, const CharBuf *language,
 
 void
 PolyAnalyzer_destroy(PolyAnalyzer *self) {
-    DECREF(self->analyzers);
+    PolyAnalyzerIVARS *const ivars = PolyAnalyzer_IVARS(self);
+    DECREF(ivars->analyzers);
     SUPER_DESTROY(self, POLYANALYZER);
 }
 
 VArray*
 PolyAnalyzer_get_analyzers(PolyAnalyzer *self) {
-    return self->analyzers;
+    return PolyAnalyzer_IVARS(self)->analyzers;
 }
 
 Inversion*
 PolyAnalyzer_transform(PolyAnalyzer *self, Inversion *inversion) {
-    VArray *const analyzers = self->analyzers;
+    VArray *const analyzers = PolyAnalyzer_IVARS(self)->analyzers;
     (void)INCREF(inversion);
 
     // Iterate through each of the analyzers in order.
@@ -82,7 +85,7 @@ PolyAnalyzer_transform(PolyAnalyzer *self, Inversion *inversion) {
 
 Inversion*
 PolyAnalyzer_transform_text(PolyAnalyzer *self, CharBuf *text) {
-    VArray *const   analyzers     = self->analyzers;
+    VArray *const   analyzers     = PolyAnalyzer_IVARS(self)->analyzers;
     const uint32_t  num_analyzers = VA_Get_Size(analyzers);
     Inversion      *retval;
 
@@ -109,10 +112,11 @@ PolyAnalyzer_transform_text(PolyAnalyzer *self, CharBuf *text) {
 
 bool
 PolyAnalyzer_equals(PolyAnalyzer *self, Obj *other) {
-    PolyAnalyzer *const twin = (PolyAnalyzer*)other;
-    if (twin == self)                                       { return true; }
-    if (!Obj_Is_A(other, POLYANALYZER))                     { return false; }
-    if (!VA_Equals(twin->analyzers, (Obj*)self->analyzers)) { return false; }
+    if ((PolyAnalyzer*)other == self)                         { return true; }
+    if (!Obj_Is_A(other, POLYANALYZER))                       { return false; }
+    PolyAnalyzerIVARS *const ivars = PolyAnalyzer_IVARS(self);
+    PolyAnalyzerIVARS *const ovars = PolyAnalyzer_IVARS((PolyAnalyzer*)other);
+    if (!VA_Equals(ovars->analyzers, (Obj*)ivars->analyzers)) { return false; }
     return true;
 }
 

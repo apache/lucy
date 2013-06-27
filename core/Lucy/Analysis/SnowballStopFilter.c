@@ -33,14 +33,15 @@ SnowballStopFilter*
 SnowStop_init(SnowballStopFilter *self, const CharBuf *language,
               Hash *stoplist) {
     Analyzer_init((Analyzer*)self);
+    SnowballStopFilterIVARS *const ivars = SnowStop_IVARS(self);
 
     if (stoplist) {
         if (language) { THROW(ERR, "Can't have both stoplist and language"); }
-        self->stoplist = (Hash*)INCREF(stoplist);
+        ivars->stoplist = (Hash*)INCREF(stoplist);
     }
     else if (language) {
-        self->stoplist = SnowStop_gen_stoplist(language);
-        if (!self->stoplist) {
+        ivars->stoplist = SnowStop_gen_stoplist(language);
+        if (!ivars->stoplist) {
             THROW(ERR, "Can't get a stoplist for '%o'", language);
         }
     }
@@ -53,7 +54,8 @@ SnowStop_init(SnowballStopFilter *self, const CharBuf *language,
 
 void
 SnowStop_destroy(SnowballStopFilter *self) {
-    DECREF(self->stoplist);
+    SnowballStopFilterIVARS *const ivars = SnowStop_IVARS(self);
+    DECREF(ivars->stoplist);
     SUPER_DESTROY(self, SNOWBALLSTOPFILTER);
 }
 
@@ -61,10 +63,12 @@ Inversion*
 SnowStop_transform(SnowballStopFilter *self, Inversion *inversion) {
     Token *token;
     Inversion *new_inversion = Inversion_new(NULL);
-    Hash *const stoplist  = self->stoplist;
+    SnowballStopFilterIVARS *const ivars = SnowStop_IVARS(self);
+    Hash *const stoplist  = ivars->stoplist;
 
     while (NULL != (token = Inversion_Next(inversion))) {
-        if (!Hash_Fetch_Str(stoplist, token->text, token->len)) {
+        TokenIVARS *const token_ivars = Token_IVARS(token);
+        if (!Hash_Fetch_Str(stoplist, token_ivars->text, token_ivars->len)) {
             Inversion_Append(new_inversion, (Token*)INCREF(token));
         }
     }
@@ -74,10 +78,12 @@ SnowStop_transform(SnowballStopFilter *self, Inversion *inversion) {
 
 bool
 SnowStop_equals(SnowballStopFilter *self, Obj *other) {
-    SnowballStopFilter *const twin = (SnowballStopFilter*)other;
-    if (twin == self)                         { return true; }
+    if ((SnowballStopFilter*)other == self)   { return true; }
     if (!Obj_Is_A(other, SNOWBALLSTOPFILTER)) { return false; }
-    if (!Hash_Equals(twin->stoplist, (Obj*)self->stoplist)) {
+    SnowballStopFilterIVARS *const ivars = SnowStop_IVARS(self);
+    SnowballStopFilterIVARS *const ovars
+        = SnowStop_IVARS((SnowballStopFilter*)other);
+    if (!Hash_Equals(ivars->stoplist, (Obj*)ovars->stoplist)) {
         return false;
     }
     return true;

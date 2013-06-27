@@ -32,48 +32,53 @@ EasyAnalyzer_new(const CharBuf *language) {
 EasyAnalyzer*
 EasyAnalyzer_init(EasyAnalyzer *self, const CharBuf *language) {
     Analyzer_init((Analyzer*)self);
-    self->language   = CB_Clone(language);
-    self->tokenizer  = StandardTokenizer_new();
-    self->normalizer = Normalizer_new(NULL, true, false);
-    self->stemmer    = SnowStemmer_new(language);
+    EasyAnalyzerIVARS *const ivars = EasyAnalyzer_IVARS(self);
+    ivars->language   = CB_Clone(language);
+    ivars->tokenizer  = StandardTokenizer_new();
+    ivars->normalizer = Normalizer_new(NULL, true, false);
+    ivars->stemmer    = SnowStemmer_new(language);
     return self;
 }
 
 void
 EasyAnalyzer_destroy(EasyAnalyzer *self) {
-    DECREF(self->language);
-    DECREF(self->tokenizer);
-    DECREF(self->normalizer);
-    DECREF(self->stemmer);
+    EasyAnalyzerIVARS *const ivars = EasyAnalyzer_IVARS(self);
+    DECREF(ivars->language);
+    DECREF(ivars->tokenizer);
+    DECREF(ivars->normalizer);
+    DECREF(ivars->stemmer);
     SUPER_DESTROY(self, EASYANALYZER);
 }
 
 Inversion*
 EasyAnalyzer_transform(EasyAnalyzer *self, Inversion *inversion) {
-    Inversion *inv1 = StandardTokenizer_Transform(self->tokenizer, inversion);
-    Inversion *inv2 = Normalizer_Transform(self->normalizer, inv1);
+    EasyAnalyzerIVARS *const ivars = EasyAnalyzer_IVARS(self);
+    Inversion *inv1 = StandardTokenizer_Transform(ivars->tokenizer, inversion);
+    Inversion *inv2 = Normalizer_Transform(ivars->normalizer, inv1);
     DECREF(inv1);
-    inv1 = SnowStemmer_Transform(self->stemmer, inv2);
+    inv1 = SnowStemmer_Transform(ivars->stemmer, inv2);
     DECREF(inv2);
     return inv1;
 }
 
 Inversion*
 EasyAnalyzer_transform_text(EasyAnalyzer *self, CharBuf *text) {
-    Inversion *inv1 = StandardTokenizer_Transform_Text(self->tokenizer, text);
-    Inversion *inv2 = Normalizer_Transform(self->normalizer, inv1);
+    EasyAnalyzerIVARS *const ivars = EasyAnalyzer_IVARS(self);
+    Inversion *inv1 = StandardTokenizer_Transform_Text(ivars->tokenizer, text);
+    Inversion *inv2 = Normalizer_Transform(ivars->normalizer, inv1);
     DECREF(inv1);
-    inv1 = SnowStemmer_Transform(self->stemmer, inv2);
+    inv1 = SnowStemmer_Transform(ivars->stemmer, inv2);
     DECREF(inv2);
     return inv1;
 }
 
 Hash*
 EasyAnalyzer_dump(EasyAnalyzer *self) {
+    EasyAnalyzerIVARS *const ivars = EasyAnalyzer_IVARS(self);
     EasyAnalyzer_Dump_t super_dump
         = SUPER_METHOD_PTR(EASYANALYZER, Lucy_EasyAnalyzer_Dump);
     Hash *dump = super_dump(self);
-    Hash_Store_Str(dump, "language", 8, (Obj*)CB_Clone(self->language));
+    Hash_Store_Str(dump, "language", 8, (Obj*)CB_Clone(ivars->language));
     return dump;
 }
 
@@ -90,10 +95,11 @@ EasyAnalyzer_load(EasyAnalyzer *self, Obj *dump) {
 
 bool
 EasyAnalyzer_equals(EasyAnalyzer *self, Obj *other) {
-    EasyAnalyzer *const twin = (EasyAnalyzer*)other;
-    if (twin == self)                                     { return true; }
-    if (!Obj_Is_A(other, EASYANALYZER))                   { return false; }
-    if (!CB_Equals(twin->language, (Obj*)self->language)) { return false; }
+    if ((EasyAnalyzer*)other == self)                       { return true; }
+    if (!Obj_Is_A(other, EASYANALYZER))                     { return false; }
+    EasyAnalyzerIVARS *const ivars = EasyAnalyzer_IVARS(self);
+    EasyAnalyzerIVARS *const ovars = EasyAnalyzer_IVARS((EasyAnalyzer*)other);
+    if (!CB_Equals(ovars->language, (Obj*)ivars->language)) { return false; }
     return true;
 }
 

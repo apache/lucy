@@ -35,14 +35,15 @@ SnowballStemmer*
 SnowStemmer_init(SnowballStemmer *self, const CharBuf *language) {
     char lang_buf[3];
     Analyzer_init((Analyzer*)self);
-    self->language = CB_Clone(language);
+    SnowballStemmerIVARS *const ivars = SnowStemmer_IVARS(self);
+    ivars->language = CB_Clone(language);
 
     // Get a Snowball stemmer.  Be case-insensitive.
     lang_buf[0] = tolower(CB_Code_Point_At(language, 0));
     lang_buf[1] = tolower(CB_Code_Point_At(language, 1));
     lang_buf[2] = '\0';
-    self->snowstemmer = sb_stemmer_new(lang_buf, "UTF_8");
-    if (!self->snowstemmer) {
+    ivars->snowstemmer = sb_stemmer_new(lang_buf, "UTF_8");
+    if (!ivars->snowstemmer) {
         THROW(ERR, "Can't find a Snowball stemmer for %o", language);
     }
 
@@ -51,29 +52,33 @@ SnowStemmer_init(SnowballStemmer *self, const CharBuf *language) {
 
 void
 SnowStemmer_destroy(SnowballStemmer *self) {
-    if (self->snowstemmer) {
-        sb_stemmer_delete((struct sb_stemmer*)self->snowstemmer);
+    SnowballStemmerIVARS *const ivars = SnowStemmer_IVARS(self);
+    if (ivars->snowstemmer) {
+        sb_stemmer_delete((struct sb_stemmer*)ivars->snowstemmer);
     }
-    DECREF(self->language);
+    DECREF(ivars->language);
     SUPER_DESTROY(self, SNOWBALLSTEMMER);
 }
 
 Inversion*
 SnowStemmer_transform(SnowballStemmer *self, Inversion *inversion) {
     Token *token;
+    SnowballStemmerIVARS *const ivars = SnowStemmer_IVARS(self);
     struct sb_stemmer *const snowstemmer
-        = (struct sb_stemmer*)self->snowstemmer;
+        = (struct sb_stemmer*)ivars->snowstemmer;
 
     while (NULL != (token = Inversion_Next(inversion))) {
+        TokenIVARS *const token_ivars = Token_IVARS(token);
         const sb_symbol *stemmed_text 
-            = sb_stemmer_stem(snowstemmer, (sb_symbol*)token->text, token->len);
+            = sb_stemmer_stem(snowstemmer, (sb_symbol*)token_ivars->text,
+                              token_ivars->len);
         size_t len = sb_stemmer_length(snowstemmer);
-        if (len > token->len) {
-            FREEMEM(token->text);
-            token->text = (char*)MALLOCATE(len + 1);
+        if (len > token_ivars->len) {
+            FREEMEM(token_ivars->text);
+            token_ivars->text = (char*)MALLOCATE(len + 1);
         }
-        memcpy(token->text, stemmed_text, len + 1);
-        token->len = len;
+        memcpy(token_ivars->text, stemmed_text, len + 1);
+        token_ivars->len = len;
     }
     Inversion_Reset(inversion);
     return (Inversion*)INCREF(inversion);
@@ -81,10 +86,11 @@ SnowStemmer_transform(SnowballStemmer *self, Inversion *inversion) {
 
 Hash*
 SnowStemmer_dump(SnowballStemmer *self) {
+    SnowballStemmerIVARS *const ivars = SnowStemmer_IVARS(self);
     SnowStemmer_Dump_t super_dump
         = SUPER_METHOD_PTR(SNOWBALLSTEMMER, Lucy_SnowStemmer_Dump);
     Hash *dump = super_dump(self);
-    Hash_Store_Str(dump, "language", 8, (Obj*)CB_Clone(self->language));
+    Hash_Store_Str(dump, "language", 8, (Obj*)CB_Clone(ivars->language));
     return dump;
 }
 
@@ -101,10 +107,11 @@ SnowStemmer_load(SnowballStemmer *self, Obj *dump) {
 
 bool
 SnowStemmer_equals(SnowballStemmer *self, Obj *other) {
-    SnowballStemmer *const twin = (SnowballStemmer*)other;
-    if (twin == self)                                     { return true; }
-    if (!Obj_Is_A(other, SNOWBALLSTEMMER))                { return false; }
-    if (!CB_Equals(twin->language, (Obj*)self->language)) { return false; }
+    if ((SnowballStemmer*)other == self)                    { return true; }
+    if (!Obj_Is_A(other, SNOWBALLSTEMMER))                  { return false; }
+    SnowballStemmerIVARS *ivars = SnowStemmer_IVARS(self);
+    SnowballStemmerIVARS *ovars = SnowStemmer_IVARS((SnowballStemmer*)other);
+    if (!CB_Equals(ovars->language, (Obj*)ivars->language)) { return false; }
     return true;
 }
 
