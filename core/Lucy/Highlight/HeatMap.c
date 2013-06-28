@@ -29,17 +29,18 @@ HeatMap_new(VArray *spans, uint32_t window) {
 
 HeatMap*
 HeatMap_init(HeatMap *self, VArray *spans, uint32_t window) {
+    HeatMapIVARS *const ivars = HeatMap_IVARS(self);
     VArray *spans_copy = VA_Shallow_Copy(spans);
     VArray *spans_plus_boosts;
 
-    self->spans  = NULL;
-    self->window = window;
+    ivars->spans  = NULL;
+    ivars->window = window;
 
     VA_Sort(spans_copy, NULL, NULL);
     spans_plus_boosts = HeatMap_Generate_Proximity_Boosts(self, spans_copy);
     VA_Push_VArray(spans_plus_boosts, spans_copy);
     VA_Sort(spans_plus_boosts, NULL, NULL);
-    self->spans = HeatMap_Flatten_Spans(self, spans_plus_boosts);
+    ivars->spans = HeatMap_Flatten_Spans(self, spans_plus_boosts);
 
     DECREF(spans_plus_boosts);
     DECREF(spans_copy);
@@ -49,7 +50,8 @@ HeatMap_init(HeatMap *self, VArray *spans, uint32_t window) {
 
 void
 HeatMap_destroy(HeatMap *self) {
-    DECREF(self->spans);
+    HeatMapIVARS *const ivars = HeatMap_IVARS(self);
+    DECREF(ivars->spans);
     SUPER_DESTROY(self, HEATMAP);
 }
 
@@ -155,6 +157,7 @@ HeatMap_flatten_spans(HeatMap *self, VArray *spans) {
 
 float
 HeatMap_calc_proximity_boost(HeatMap *self, Span *span1, Span *span2) {
+    HeatMapIVARS *const ivars = HeatMap_IVARS(self);
     int32_t comparison = Span_Compare_To(span1, (Obj*)span2);
     Span *lower = comparison <= 0 ? span1 : span2;
     Span *upper = comparison >= 0 ? span1 : span2;
@@ -164,11 +167,11 @@ HeatMap_calc_proximity_boost(HeatMap *self, Span *span1, Span *span2) {
     // If spans overlap, set distance to 0.
     if (distance < 0) { distance = 0; }
 
-    if (distance > (int32_t)self->window) {
+    if (distance > (int32_t)ivars->window) {
         return 0.0f;
     }
     else {
-        float factor = (self->window - distance) / (float)self->window;
+        float factor = (ivars->window - distance) / (float)ivars->window;
         // Damp boost with greater distance.
         factor *= factor;
         return factor * (Span_Get_Weight(lower) + Span_Get_Weight(upper));
@@ -208,7 +211,7 @@ HeatMap_generate_proximity_boosts(HeatMap *self, VArray *spans) {
 
 VArray*
 HeatMap_get_spans(HeatMap *self) {
-    return self->spans;
+    return HeatMap_IVARS(self)->spans;
 }
 
 
