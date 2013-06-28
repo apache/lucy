@@ -20,7 +20,7 @@
 #include "Lucy/Util/MemoryPool.h"
 
 static void
-S_init_arena(MemoryPool *self, size_t amount);
+S_init_arena(MemoryPool *self, MemoryPoolIVARS *ivars, size_t amount);
 
 #define DEFAULT_BUF_SIZE 0x100000 // 1 MiB
 
@@ -42,32 +42,35 @@ MemPool_new(uint32_t arena_size) {
 
 MemoryPool*
 MemPool_init(MemoryPool *self, uint32_t arena_size) {
-    self->arena_size = arena_size == 0 ? DEFAULT_BUF_SIZE : arena_size;
-    self->arenas     = VA_new(16);
-    self->tick       = -1;
-    self->buf        = NULL;
-    self->limit      = NULL;
-    self->consumed   = 0;
+    MemoryPoolIVARS *const ivars = MemPool_IVARS(self);
+    ivars->arena_size = arena_size == 0 ? DEFAULT_BUF_SIZE : arena_size;
+    ivars->arenas     = VA_new(16);
+    ivars->tick       = -1;
+    ivars->buf        = NULL;
+    ivars->limit      = NULL;
+    ivars->consumed   = 0;
 
     return self;
 }
 
 void
 MemPool_destroy(MemoryPool *self) {
-    DECREF(self->arenas);
+    MemoryPoolIVARS *const ivars = MemPool_IVARS(self);
+    DECREF(ivars->arenas);
     SUPER_DESTROY(self, MEMORYPOOL);
 }
 
 static void
-S_init_arena(MemoryPool *self, size_t amount) {
+S_init_arena(MemoryPool *self, MemoryPoolIVARS *ivars, size_t amount) {
+    UNUSED_VAR(self);
     ByteBuf *bb;
 
     // Indicate which arena we're using at present.
-    self->tick++;
+    ivars->tick++;
 
-    if (self->tick < (int32_t)VA_Get_Size(self->arenas)) {
+    if (ivars->tick < (int32_t)VA_Get_Size(ivars->arenas)) {
         // In recycle mode, use previously acquired memory.
-        bb = (ByteBuf*)VA_Fetch(self->arenas, self->tick);
+        bb = (ByteBuf*)VA_Fetch(ivars->arenas, ivars->tick);
         if (amount >= BB_Get_Size(bb)) {
             BB_Grow(bb, amount);
             BB_Set_Size(bb, amount);
@@ -75,63 +78,65 @@ S_init_arena(MemoryPool *self, size_t amount) {
     }
     else {
         // In add mode, get more mem from system.
-        size_t buf_size = (amount + 1) > self->arena_size
+        size_t buf_size = (amount + 1) > ivars->arena_size
                           ? (amount + 1)
-                          : self->arena_size;
+                          : ivars->arena_size;
         char *ptr = (char*)MALLOCATE(buf_size);
         bb = BB_new_steal_bytes(ptr, buf_size - 1, buf_size);
-        VA_Push(self->arenas, (Obj*)bb);
+        VA_Push(ivars->arenas, (Obj*)bb);
     }
 
     // Recalculate consumption to take into account blocked off space.
-    self->consumed = 0;
-    for (int32_t i = 0; i < self->tick; i++) {
-        ByteBuf *bb = (ByteBuf*)VA_Fetch(self->arenas, i);
-        self->consumed += BB_Get_Size(bb);
+    ivars->consumed = 0;
+    for (int32_t i = 0; i < ivars->tick; i++) {
+        ByteBuf *bb = (ByteBuf*)VA_Fetch(ivars->arenas, i);
+        ivars->consumed += BB_Get_Size(bb);
     }
 
-    self->buf   = BB_Get_Buf(bb);
-    self->limit = self->buf + BB_Get_Size(bb);
+    ivars->buf   = BB_Get_Buf(bb);
+    ivars->limit = ivars->buf + BB_Get_Size(bb);
 }
 
 size_t
 MemPool_get_consumed(MemoryPool *self) {
-    return self->consumed;
+    return MemPool_IVARS(self)->consumed;
 }
 
 void*
 MemPool_grab(MemoryPool *self, size_t amount) {
+    MemoryPoolIVARS *const ivars = MemPool_IVARS(self);
     INCREASE_TO_WORD_MULTIPLE(amount);
-    self->last_buf = self->buf;
+    ivars->last_buf = ivars->buf;
 
     // Verify that we have enough stocked up, otherwise get more.
-    self->buf += amount;
-    if (self->buf >= self->limit) {
+    ivars->buf += amount;
+    if (ivars->buf >= ivars->limit) {
         // Get enough mem from system or die trying.
-        S_init_arena(self, amount);
-        self->last_buf = self->buf;
-        self->buf += amount;
+        S_init_arena(self, ivars, amount);
+        ivars->last_buf = ivars->buf;
+        ivars->buf += amount;
     }
 
     // Track bytes we've allocated from this pool.
-    self->consumed += amount;
+    ivars->consumed += amount;
 
-    return self->last_buf;
+    return ivars->last_buf;
 }
 
 void
 MemPool_resize(MemoryPool *self, void *ptr, size_t new_amount) {
-    const size_t last_amount = self->buf - self->last_buf;
+    MemoryPoolIVARS *const ivars = MemPool_IVARS(self);
+    const size_t last_amount = ivars->buf - ivars->last_buf;
     INCREASE_TO_WORD_MULTIPLE(new_amount);
 
-    if (ptr != self->last_buf) {
+    if (ptr != ivars->last_buf) {
         THROW(ERR, "Not the last pointer allocated.");
     }
     else {
         if (new_amount <= last_amount) {
             const size_t difference = last_amount - new_amount;
-            self->buf      -= difference;
-            self->consumed -= difference;
+            ivars->buf      -= difference;
+            ivars->consumed -= difference;
         }
         else {
             THROW(ERR, "Can't resize to greater amount: %u64 > %u64",
@@ -142,28 +147,31 @@ MemPool_resize(MemoryPool *self, void *ptr, size_t new_amount) {
 
 void
 MemPool_release_all(MemoryPool *self) {
-    self->tick     = -1;
-    self->buf      = NULL;
-    self->last_buf = NULL;
-    self->limit    = NULL;
+    MemoryPoolIVARS *const ivars = MemPool_IVARS(self);
+    ivars->tick     = -1;
+    ivars->buf      = NULL;
+    ivars->last_buf = NULL;
+    ivars->limit    = NULL;
 }
 
 void
 MemPool_eat(MemoryPool *self, MemoryPool *other) {
-    if (self->buf != NULL) {
+    MemoryPoolIVARS *const ivars = MemPool_IVARS(self);
+    MemoryPoolIVARS *const ovars = MemPool_IVARS(other);
+    if (ivars->buf != NULL) {
         THROW(ERR, "Memory pool is not empty");
     }
 
     // Move active arenas from other to self.
-    for (int32_t i = 0; i <= other->tick; i++) {
-        ByteBuf *arena = (ByteBuf*)VA_Shift(other->arenas);
+    for (int32_t i = 0; i <= ovars->tick; i++) {
+        ByteBuf *arena = (ByteBuf*)VA_Shift(ovars->arenas);
         // Maybe displace existing arena.
-        VA_Store(self->arenas, i, (Obj*)arena);
+        VA_Store(ivars->arenas, i, (Obj*)arena);
     }
-    self->tick     = other->tick;
-    self->last_buf = other->last_buf;
-    self->buf      = other->buf;
-    self->limit    = other->limit;
+    ivars->tick     = ovars->tick;
+    ivars->last_buf = ovars->last_buf;
+    ivars->buf      = ovars->buf;
+    ivars->limit    = ovars->limit;
 }
 
 
