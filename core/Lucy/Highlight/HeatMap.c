@@ -15,7 +15,6 @@
  */
 
 #define C_LUCY_HEATMAP
-#define C_LUCY_SPAN
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Highlight/HeatMap.h"
@@ -70,8 +69,8 @@ S_flattened_but_empty_spans(VArray *spans) {
     // Assemble a list of all unique start/end boundaries.
     for (uint32_t i = 0; i < num_spans; i++) {
         Span *span            = (Span*)VA_Fetch(spans, i);
-        bounds[i]             = span->offset;
-        bounds[i + num_spans] = span->offset + span->length;
+        bounds[i]             = Span_Get_Offset(span);
+        bounds[i + num_spans] = Span_Get_Offset(span) + Span_Get_Length(span);
     }
     Sort_quicksort(bounds, num_spans * 2, sizeof(uint32_t),
                    S_compare_i32, NULL);
@@ -113,14 +112,15 @@ HeatMap_flatten_spans(HeatMap *self, VArray *spans) {
         uint32_t dest_tick = 0;
         for (uint32_t i = 0; i < num_spans; i++) {
             Span *source_span = (Span*)VA_Fetch(spans, i);
-            int32_t source_span_end
-                = source_span->offset + source_span->length;
+            int32_t source_span_offset = Span_Get_Offset(source_span);
+            int32_t source_span_len    = Span_Get_Length(source_span);
+            int32_t source_span_end    = source_span_offset + source_span_len;
 
             // Get the location of the flattened span that shares the source
             // span's offset.
             for (; dest_tick < num_raw_flattened; dest_tick++) {
                 Span *dest_span = (Span*)VA_Fetch(flattened, dest_tick);
-                if (dest_span->offset == source_span->offset) {
+                if (Span_Get_Offset(dest_span) == source_span_offset) {
                     break;
                 }
             }
@@ -128,11 +128,13 @@ HeatMap_flatten_spans(HeatMap *self, VArray *spans) {
             // Fill in scores.
             for (uint32_t j = dest_tick; j < num_raw_flattened; j++) {
                 Span *dest_span = (Span*)VA_Fetch(flattened, j);
-                if (dest_span->offset == source_span_end) {
+                if (Span_Get_Offset(dest_span) == source_span_end) {
                     break;
                 }
                 else {
-                    dest_span->weight += source_span->weight;
+                    float new_weight = Span_Get_Weight(dest_span)
+                                       + Span_Get_Weight(source_span);
+                    Span_Set_Weight(dest_span, new_weight);
                 }
             }
         }
@@ -141,7 +143,7 @@ HeatMap_flatten_spans(HeatMap *self, VArray *spans) {
         dest_tick = 0;
         for (uint32_t i = 0; i < num_raw_flattened; i++) {
             Span *span = (Span*)VA_Fetch(flattened, i);
-            if (span->weight) {
+            if (Span_Get_Weight(span)) {
                 VA_Store(flattened, dest_tick++, INCREF(span));
             }
         }
@@ -156,8 +158,8 @@ HeatMap_calc_proximity_boost(HeatMap *self, Span *span1, Span *span2) {
     int32_t comparison = Span_Compare_To(span1, (Obj*)span2);
     Span *lower = comparison <= 0 ? span1 : span2;
     Span *upper = comparison >= 0 ? span1 : span2;
-    int32_t lower_end_offset = lower->offset + lower->length;
-    int32_t distance = upper->offset - lower_end_offset;
+    int32_t lower_end_offset = Span_Get_Offset(lower) + Span_Get_Length(lower);
+    int32_t distance = Span_Get_Offset(upper) - lower_end_offset;
 
     // If spans overlap, set distance to 0.
     if (distance < 0) { distance = 0; }
@@ -169,7 +171,7 @@ HeatMap_calc_proximity_boost(HeatMap *self, Span *span1, Span *span2) {
         float factor = (self->window - distance) / (float)self->window;
         // Damp boost with greater distance.
         factor *= factor;
-        return factor * (lower->weight + upper->weight);
+        return factor * (Span_Get_Weight(lower) + Span_Get_Weight(upper));
     }
 }
 
@@ -190,10 +192,12 @@ HeatMap_generate_proximity_boosts(HeatMap *self, VArray *spans) {
                     break;
                 }
                 else {
-                    int32_t length = (span2->offset - span1->offset)
-                                     + span2->length;
+                    int32_t length = Span_Get_Offset(span2)
+                                     - Span_Get_Offset(span1)
+                                     + Span_Get_Length(span2);
                     VA_Push(boosts,
-                            (Obj*)Span_new(span1->offset, length, prox_score));
+                            (Obj*)Span_new(Span_Get_Offset(span1), length,
+                                           prox_score));
                 }
             }
         }

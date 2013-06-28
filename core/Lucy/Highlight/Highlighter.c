@@ -15,7 +15,6 @@
  */
 
 #define C_LUCY_HIGHLIGHTER
-#define C_LUCY_SPAN
 #include <ctype.h>
 #include "Lucy/Util/ToolSet.h"
 
@@ -198,9 +197,9 @@ S_hottest(HeatMap *heat_map) {
     VArray *spans = HeatMap_Get_Spans(heat_map);
     for (uint32_t i = VA_Get_Size(spans); i--;) {
         Span *span = (Span*)VA_Fetch(spans, i);
-        if (span->weight >= max_score) {
-            retval = span->offset;
-            max_score = span->weight;
+        if (Span_Get_Weight(span) >= max_score) {
+            retval = Span_Get_Offset(span);
+            max_score = Span_Get_Weight(span);
         }
     }
     return retval;
@@ -269,8 +268,8 @@ S_has_heat(HeatMap *heat_map, int32_t offset, int32_t length) {
 
     for (uint32_t i = 0; i < num_spans; i++) {
         Span *span  = (Span*)VA_Fetch(spans, i);
-        int32_t span_start = span->offset;
-        int32_t span_end   = span_start + span->length;
+        int32_t span_start = Span_Get_Offset(span);
+        int32_t span_end   = span_start + Span_Get_Length(span);;
         if (offset >= span_start && offset <  span_end) { return true; }
         if (end    >  span_start && end    <= span_end) { return true; }
         if (offset <= span_start && end    >= span_end) { return true; }
@@ -298,7 +297,7 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
     if (num_sentences) {
         for (uint32_t i = 0; i < num_sentences; i++) {
             Span *sentence = (Span*)VA_Fetch(sentences, i);
-            int32_t candidate = sentence->offset;
+            int32_t candidate = Span_Get_Offset(sentence);;
 
             if (candidate > top + (int32_t)self->window_width) {
                 break;
@@ -328,7 +327,8 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
 
         for (uint32_t i = num_sentences; i--;) {
             Span    *sentence  = (Span*)VA_Fetch(sentences, i);
-            int32_t  last_edge = sentence->offset + sentence->length;
+            int32_t  last_edge = Span_Get_Offset(sentence)
+                                 + Span_Get_Length(sentence);
 
             if (last_edge <= start) {
                 break;
@@ -491,15 +491,16 @@ Highlighter_highlight_excerpt(Highlighter *self, VArray *spans,
 
     for (uint32_t i = 0, max = VA_Get_Size(spans); i < max; i++) {
         Span *span = (Span*)VA_Fetch(spans, i);
-        if (span->offset < top) {
+        int32_t offset = Span_Get_Offset(span);
+        if (offset < top) {
             continue;
         }
-        else if (span->offset >= raw_excerpt_end) {
+        else if (offset >= raw_excerpt_end) {
             break;
         }
         else {
-            int32_t relative_start = span->offset - top;
-            int32_t relative_end   = relative_start + span->length;
+            int32_t relative_start = offset - top;
+            int32_t relative_end   = relative_start + Span_Get_Length(span);
 
             if (relative_start <= hl_end) {
                 if (relative_end > hl_end) {
