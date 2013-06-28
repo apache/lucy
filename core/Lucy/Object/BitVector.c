@@ -56,29 +56,33 @@ BitVec_new(uint32_t capacity) {
 
 BitVector*
 BitVec_init(BitVector *self, uint32_t capacity) {
+    BitVectorIVARS *const ivars = BitVec_IVARS(self);
     const uint32_t byte_size = (uint32_t)ceil(capacity / 8.0);
 
     // Derive.
-    self->bits = capacity
+    ivars->bits = capacity
                  ? (uint8_t*)CALLOCATE(byte_size, sizeof(uint8_t))
                  : NULL;
 
     // Assign.
-    self->cap = byte_size * 8;
+    ivars->cap = byte_size * 8;
 
     return self;
 }
 
 void
 BitVec_destroy(BitVector* self) {
-    FREEMEM(self->bits);
+    BitVectorIVARS *const ivars = BitVec_IVARS(self);
+    FREEMEM(ivars->bits);
     SUPER_DESTROY(self, BITVECTOR);
 }
 
 BitVector*
 BitVec_clone(BitVector *self) {
-    BitVector *twin = BitVec_new(self->cap);
-    uint32_t   byte_size = (uint32_t)ceil(self->cap / 8.0);
+    BitVectorIVARS *const ivars = BitVec_IVARS(self);
+    BitVector *other = BitVec_new(ivars->cap);
+    uint32_t   byte_size = (uint32_t)ceil(ivars->cap / 8.0);
+    BitVectorIVARS *const ovars = BitVec_IVARS(other);
 
     // Forbid inheritance.
     if (BitVec_Get_VTable(self) != BITVECTOR) {
@@ -86,78 +90,85 @@ BitVec_clone(BitVector *self) {
               BitVec_Get_Class_Name(self));
     }
 
-    memcpy(twin->bits, self->bits, byte_size * sizeof(uint8_t));
+    memcpy(ovars->bits, ivars->bits, byte_size * sizeof(uint8_t));
 
-    return twin;
+    return other;
 }
 
 uint8_t*
 BitVec_get_raw_bits(BitVector *self) {
-    return self->bits;
+    return BitVec_IVARS(self)->bits;
 }
 
 uint32_t
 BitVec_get_capacity(BitVector *self) {
-    return self->cap;
+    return BitVec_IVARS(self)->cap;
 }
 
 void
 BitVec_mimic(BitVector *self, Obj *other) {
-    BitVector *twin = (BitVector*)CERTIFY(other, BITVECTOR);
-    const uint32_t my_byte_size = (uint32_t)ceil(self->cap / 8.0);
-    const uint32_t twin_byte_size = (uint32_t)ceil(twin->cap / 8.0);
-    if (my_byte_size > twin_byte_size) {
-        uint32_t space = my_byte_size - twin_byte_size;
-        memset(self->bits + twin_byte_size, 0, space);
+    CERTIFY(other, BITVECTOR);
+    BitVectorIVARS *const ivars = BitVec_IVARS(self);
+    BitVectorIVARS *const ovars = BitVec_IVARS((BitVector*)other);
+    const uint32_t my_byte_size = (uint32_t)ceil(ivars->cap / 8.0);
+    const uint32_t other_byte_size = (uint32_t)ceil(ovars->cap / 8.0);
+    if (my_byte_size > other_byte_size) {
+        uint32_t space = my_byte_size - other_byte_size;
+        memset(ivars->bits + other_byte_size, 0, space);
     }
-    else if (my_byte_size < twin_byte_size) {
-        BitVec_Grow(self, twin->cap - 1);
+    else if (my_byte_size < other_byte_size) {
+        BitVec_Grow(self, ovars->cap - 1);
     }
-    memcpy(self->bits, twin->bits, twin_byte_size);
+    memcpy(ivars->bits, ovars->bits, other_byte_size);
 }
 
 void
 BitVec_grow(BitVector *self, uint32_t capacity) {
-    if (capacity > self->cap) {
-        const size_t old_byte_cap  = (size_t)ceil(self->cap / 8.0);
+    BitVectorIVARS *const ivars = BitVec_IVARS(self);
+    if (capacity > ivars->cap) {
+        const size_t old_byte_cap  = (size_t)ceil(ivars->cap / 8.0);
         const size_t new_byte_cap  = (size_t)ceil((capacity + 1) / 8.0);
         const size_t num_new_bytes = new_byte_cap - old_byte_cap;
 
-        self->bits = (uint8_t*)REALLOCATE(self->bits, new_byte_cap);
-        memset(self->bits + old_byte_cap, 0, num_new_bytes);
-        self->cap = new_byte_cap * 8;
+        ivars->bits = (uint8_t*)REALLOCATE(ivars->bits, new_byte_cap);
+        memset(ivars->bits + old_byte_cap, 0, num_new_bytes);
+        ivars->cap = new_byte_cap * 8;
     }
 }
 
 void
 BitVec_set(BitVector *self, uint32_t tick) {
-    if (tick >= self->cap) {
+    BitVectorIVARS *const ivars = BitVec_IVARS(self);
+    if (tick >= ivars->cap) {
         uint32_t new_cap = (uint32_t)Memory_oversize(tick + 1, 0);
         BitVec_Grow(self, new_cap);
     }
-    NumUtil_u1set(self->bits, tick);
+    NumUtil_u1set(ivars->bits, tick);
 }
 
 void
 BitVec_clear(BitVector *self, uint32_t tick) {
-    if (tick >= self->cap) {
+    BitVectorIVARS *const ivars = BitVec_IVARS(self);
+    if (tick >= ivars->cap) {
         return;
     }
-    NumUtil_u1clear(self->bits, tick);
+    NumUtil_u1clear(ivars->bits, tick);
 }
 
 void
 BitVec_clear_all(BitVector *self) {
-    const size_t byte_size = (size_t)ceil(self->cap / 8.0);
-    memset(self->bits, 0, byte_size);
+    BitVectorIVARS *const ivars = BitVec_IVARS(self);
+    const size_t byte_size = (size_t)ceil(ivars->cap / 8.0);
+    memset(ivars->bits, 0, byte_size);
 }
 
 bool
 BitVec_get(BitVector *self, uint32_t tick) {
-    if (tick >= self->cap) {
+    BitVectorIVARS *const ivars = BitVec_IVARS(self);
+    if (tick >= ivars->cap) {
         return false;
     }
-    return NumUtil_u1get(self->bits, tick);
+    return NumUtil_u1get(ivars->bits, tick);
 }
 
 static int32_t
@@ -171,31 +182,32 @@ S_first_bit_in_nonzero_byte(uint8_t num) {
 
 int32_t
 BitVec_next_hit(BitVector *self, uint32_t tick) {
-    size_t byte_size = (size_t)ceil(self->cap / 8.0);
-    uint8_t *const limit = self->bits + byte_size;
-    uint8_t *ptr = self->bits + (tick >> 3);
+    BitVectorIVARS *const ivars = BitVec_IVARS(self);
+    size_t byte_size = (size_t)ceil(ivars->cap / 8.0);
+    uint8_t *const limit = ivars->bits + byte_size;
+    uint8_t *ptr = ivars->bits + (tick >> 3);
 
     if (ptr >= limit) {
         return -1;
     }
     else if (*ptr != 0) {
         // Special case the first byte.
-        const int32_t base = (ptr - self->bits) * 8;
+        const int32_t base = (ptr - ivars->bits) * 8;
         const int32_t min_sub_tick = tick & 0x7;
         unsigned int byte = *ptr >> min_sub_tick;
         if (byte) {
             const int32_t candidate 
                 = base + min_sub_tick + S_first_bit_in_nonzero_byte(byte);
-            return candidate < (int32_t)self->cap ? candidate : -1;
+            return candidate < (int32_t)ivars->cap ? candidate : -1;
         }
     }
 
     for (ptr++ ; ptr < limit; ptr++) {
         if (*ptr != 0) {
             // There's a non-zero bit in this byte.
-            const int32_t base = (ptr - self->bits) * 8;
+            const int32_t base = (ptr - ivars->bits) * 8;
             const int32_t candidate = base + S_first_bit_in_nonzero_byte(*ptr);
-            return candidate < (int32_t)self->cap ? candidate : -1;
+            return candidate < (int32_t)ivars->cap ? candidate : -1;
         }
     }
 
@@ -204,11 +216,13 @@ BitVec_next_hit(BitVector *self, uint32_t tick) {
 
 void
 BitVec_and(BitVector *self, const BitVector *other) {
-    uint8_t *bits_a = self->bits;
-    uint8_t *bits_b = other->bits;
-    const uint32_t min_cap = self->cap < other->cap
-                             ? self->cap
-                             : other->cap;
+    BitVectorIVARS *const ivars = BitVec_IVARS(self);
+    const BitVectorIVARS *const ovars = BitVec_IVARS((BitVector*)other);
+    uint8_t *bits_a = ivars->bits;
+    uint8_t *bits_b = ovars->bits;
+    const uint32_t min_cap = ivars->cap < ovars->cap
+                             ? ivars->cap
+                             : ovars->cap;
     const size_t byte_size = (size_t)ceil(min_cap / 8.0);
     uint8_t *const limit = bits_a + byte_size;
 
@@ -219,8 +233,8 @@ BitVec_and(BitVector *self, const BitVector *other) {
     }
 
     // Set all remaining to zero.
-    if (self->cap > min_cap) {
-        const size_t self_byte_size = (size_t)ceil(self->cap / 8.0);
+    if (ivars->cap > min_cap) {
+        const size_t self_byte_size = (size_t)ceil(ivars->cap / 8.0);
         memset(bits_a, 0, self_byte_size - byte_size);
     }
 }
@@ -237,27 +251,29 @@ BitVec_xor(BitVector *self, const BitVector *other) {
 
 static void
 S_do_or_or_xor(BitVector *self, const BitVector *other, int operation) {
+    BitVectorIVARS *const ivars = BitVec_IVARS(self);
+    const BitVectorIVARS *const ovars = BitVec_IVARS((BitVector*)other);
     uint8_t *bits_a, *bits_b;
     uint32_t max_cap, min_cap;
     uint8_t *limit;
     double byte_size;
 
     // Sort out what the minimum and maximum caps are.
-    if (self->cap < other->cap) {
-        max_cap = other->cap;
-        min_cap = self->cap;
+    if (ivars->cap < ovars->cap) {
+        max_cap = ovars->cap;
+        min_cap = ivars->cap;
     }
     else {
-        max_cap = self->cap;
-        min_cap = other->cap;
+        max_cap = ivars->cap;
+        min_cap = ovars->cap;
     }
 
     // Grow self if smaller than other, then calc pointers.
-    if (max_cap > self->cap) { BitVec_Grow(self, max_cap); }
-    bits_a        = self->bits;
-    bits_b        = other->bits;
+    if (max_cap > ivars->cap) { BitVec_Grow(self, max_cap); }
+    bits_a        = ivars->bits;
+    bits_b        = ovars->bits;
     byte_size     = ceil(min_cap / 8.0);
-    limit         = self->bits + (size_t)byte_size;
+    limit         = ivars->bits + (size_t)byte_size;
 
     // Perform union of common bits.
     if (operation == DO_OR) {
@@ -277,8 +293,8 @@ S_do_or_or_xor(BitVector *self, const BitVector *other, int operation) {
     }
 
     // Copy remaining bits if other is bigger than self.
-    if (other->cap > min_cap) {
-        const double other_byte_size = ceil(other->cap / 8.0);
+    if (ovars->cap > min_cap) {
+        const double other_byte_size = ceil(ovars->cap / 8.0);
         const size_t bytes_to_copy = (size_t)(other_byte_size - byte_size);
         memcpy(bits_a, bits_b, bytes_to_copy);
     }
@@ -286,11 +302,13 @@ S_do_or_or_xor(BitVector *self, const BitVector *other, int operation) {
 
 void
 BitVec_and_not(BitVector *self, const BitVector *other) {
-    uint8_t *bits_a = self->bits;
-    uint8_t *bits_b = other->bits;
-    const uint32_t min_cap = self->cap < other->cap
-                             ? self->cap
-                             : other->cap;
+    BitVectorIVARS *const ivars = BitVec_IVARS(self);
+    const BitVectorIVARS *const ovars = BitVec_IVARS((BitVector*)other);
+    uint8_t *bits_a = ivars->bits;
+    uint8_t *bits_b = ovars->bits;
+    const uint32_t min_cap = ivars->cap < ovars->cap
+                             ? ivars->cap
+                             : ovars->cap;
     const size_t byte_size = (size_t)ceil(min_cap / 8.0);
     uint8_t *const limit = bits_a + byte_size;
 
@@ -303,47 +321,49 @@ BitVec_and_not(BitVector *self, const BitVector *other) {
 
 void
 BitVec_flip(BitVector *self, uint32_t tick) {
-    if (tick >= self->cap) {
+    BitVectorIVARS *const ivars = BitVec_IVARS(self);
+    if (tick >= ivars->cap) {
         uint32_t new_cap = (uint32_t)Memory_oversize(tick + 1, 0);
         BitVec_Grow(self, new_cap);
     }
-    NumUtil_u1flip(self->bits, tick);
+    NumUtil_u1flip(ivars->bits, tick);
 }
 
 void
 BitVec_flip_block(BitVector *self, uint32_t offset, uint32_t length) {
+    BitVectorIVARS *const ivars = BitVec_IVARS(self);
     uint32_t first = offset;
     uint32_t last  = offset + length - 1;
 
     // Bail if there's nothing to flip.
     if (!length) { return; }
 
-    if (last >= self->cap) { BitVec_Grow(self, last + 1); }
+    if (last >= ivars->cap) { BitVec_Grow(self, last + 1); }
 
     // Flip partial bytes.
     while (last % 8 != 0 && last > first) {
-        NumUtil_u1flip(self->bits, last);
+        NumUtil_u1flip(ivars->bits, last);
         last--;
     }
     while (first % 8 != 0 && first < last) {
-        NumUtil_u1flip(self->bits, first);
+        NumUtil_u1flip(ivars->bits, first);
         first++;
     }
 
     // Are first and last equal?
     if (first == last) {
         // There's only one bit left to flip.
-        NumUtil_u1flip(self->bits, last);
+        NumUtil_u1flip(ivars->bits, last);
     }
     // They must be multiples of 8, then.
     else {
         const uint32_t start_tick = first >> 3;
         const uint32_t limit_tick = last  >> 3;
-        uint8_t *bits  = self->bits + start_tick;
-        uint8_t *limit = self->bits + limit_tick;
+        uint8_t *bits  = ivars->bits + start_tick;
+        uint8_t *limit = ivars->bits + limit_tick;
 
         // Last actually belongs to the following byte (e.g. 8, in byte 2).
-        NumUtil_u1flip(self->bits, last);
+        NumUtil_u1flip(ivars->bits, last);
 
         // Flip whole bytes.
         for (; bits < limit; bits++) {
@@ -354,9 +374,10 @@ BitVec_flip_block(BitVector *self, uint32_t offset, uint32_t length) {
 
 uint32_t
 BitVec_count(BitVector *self) {
+    BitVectorIVARS *const ivars = BitVec_IVARS(self);
     uint32_t count = 0;
-    const size_t byte_size = (size_t)ceil(self->cap / 8.0);
-    uint8_t *ptr = self->bits;
+    const size_t byte_size = (size_t)ceil(ivars->cap / 8.0);
+    uint8_t *ptr = ivars->bits;
     uint8_t *const limit = ptr + byte_size;
 
     for (; ptr < limit; ptr++) {
@@ -368,12 +389,13 @@ BitVec_count(BitVector *self) {
 
 I32Array*
 BitVec_to_array(BitVector *self) {
+    BitVectorIVARS *const ivars = BitVec_IVARS(self);
     uint32_t        count     = BitVec_Count(self);
     uint32_t        num_left  = count;
-    const uint32_t  capacity  = self->cap;
+    const uint32_t  capacity  = ivars->cap;
     uint32_t *const array     = (uint32_t*)CALLOCATE(count, sizeof(uint32_t));
-    const size_t    byte_size = (size_t)ceil(self->cap / 8.0);
-    uint8_t *const  bits      = self->bits;
+    const size_t    byte_size = (size_t)ceil(ivars->cap / 8.0);
+    uint8_t *const  bits      = ivars->bits;
     uint8_t *const  limit     = bits + byte_size;
     uint32_t        num       = 0;
     uint32_t        i         = 0;

@@ -42,36 +42,40 @@ I32Arr_new_steal(int32_t *ints, uint32_t size) {
 
 I32Array*
 I32Arr_init(I32Array *self, int32_t *ints, uint32_t size) {
-    self->ints = ints;
-    self->size = size;
+    I32ArrayIVARS *const ivars = I32Arr_IVARS(self);
+    ivars->ints = ints;
+    ivars->size = size;
     return self;
 }
 
 void
 I32Arr_destroy(I32Array *self) {
-    FREEMEM(self->ints);
+    I32ArrayIVARS *const ivars = I32Arr_IVARS(self);
+    FREEMEM(ivars->ints);
     SUPER_DESTROY(self, I32ARRAY);
 }
 
 void
 I32Arr_set(I32Array *self, uint32_t tick, int32_t value) {
-    if (tick >= self->size) {
-        THROW(ERR, "Out of bounds: %u32 >= %u32", tick, self->size);
+    I32ArrayIVARS *const ivars = I32Arr_IVARS(self);
+    if (tick >= ivars->size) {
+        THROW(ERR, "Out of bounds: %u32 >= %u32", tick, ivars->size);
     }
-    self->ints[tick] = value;
+    ivars->ints[tick] = value;
 }
 
 int32_t
 I32Arr_get(I32Array *self, uint32_t tick) {
-    if (tick >= self->size) {
-        THROW(ERR, "Out of bounds: %u32 >= %u32", tick, self->size);
+    I32ArrayIVARS *const ivars = I32Arr_IVARS(self);
+    if (tick >= ivars->size) {
+        THROW(ERR, "Out of bounds: %u32 >= %u32", tick, ivars->size);
     }
-    return self->ints[tick];
+    return ivars->ints[tick];
 }
 
 uint32_t
 I32Arr_get_size(I32Array *self) {
-    return self->size;
+    return I32Arr_IVARS(self)->size;
 }
 
 
