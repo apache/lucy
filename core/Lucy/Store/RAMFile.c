@@ -27,30 +27,32 @@ RAMFile_new(ByteBuf *contents, bool read_only) {
 
 RAMFile*
 RAMFile_init(RAMFile *self, ByteBuf *contents, bool read_only) {
-    self->contents = contents ? (ByteBuf*)INCREF(contents) : BB_new(0);
-    self->read_only = read_only;
+    RAMFileIVARS *const ivars = RAMFile_IVARS(self);
+    ivars->contents = contents ? (ByteBuf*)INCREF(contents) : BB_new(0);
+    ivars->read_only = read_only;
     return self;
 }
 
 void
 RAMFile_destroy(RAMFile *self) {
-    DECREF(self->contents);
+    RAMFileIVARS *const ivars = RAMFile_IVARS(self);
+    DECREF(ivars->contents);
     SUPER_DESTROY(self, RAMFILE);
 }
 
 ByteBuf*
 RAMFile_get_contents(RAMFile *self) {
-    return self->contents;
+    return RAMFile_IVARS(self)->contents;
 }
 
 bool
 RAMFile_read_only(RAMFile *self) {
-    return self->read_only;
+    return RAMFile_IVARS(self)->read_only;
 }
 
 void
 RAMFile_set_read_only(RAMFile *self, bool read_only) {
-    self->read_only = read_only;
+    RAMFile_IVARS(self)->read_only = read_only;
 }
 
 

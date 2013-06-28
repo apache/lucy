@@ -30,18 +30,20 @@
 
 Folder*
 Folder_init(Folder *self, const CharBuf *path) {
+    FolderIVARS *const ivars = Folder_IVARS(self);
+
     // Init.
-    self->entries = Hash_new(16);
+    ivars->entries = Hash_new(16);
 
     // Copy.
     if (path == NULL) {
-        self->path = CB_new_from_trusted_utf8("", 0);
+        ivars->path = CB_new_from_trusted_utf8("", 0);
     }
     else {
         // Copy path, strip trailing slash or equivalent.
-        self->path = CB_Clone(path);
-        if (CB_Ends_With_Str(self->path, DIR_SEP, strlen(DIR_SEP))) {
-            CB_Chop(self->path, 1);
+        ivars->path = CB_Clone(path);
+        if (CB_Ends_With_Str(ivars->path, DIR_SEP, strlen(DIR_SEP))) {
+            CB_Chop(ivars->path, 1);
         }
     }
 
@@ -51,8 +53,9 @@ Folder_init(Folder *self, const CharBuf *path) {
 
 void
 Folder_destroy(Folder *self) {
-    DECREF(self->path);
-    DECREF(self->entries);
+    FolderIVARS *const ivars = Folder_IVARS(self);
+    DECREF(ivars->path);
+    DECREF(ivars->entries);
     SUPER_DESTROY(self, FOLDER);
 }
 
@@ -382,13 +385,14 @@ Folder_slurp_file(Folder *self, const CharBuf *path) {
 
 CharBuf*
 Folder_get_path(Folder *self) {
-    return self->path;
+    return Folder_IVARS(self)->path;
 }
 
 void
 Folder_set_path(Folder *self, const CharBuf *path) {
-    DECREF(self->path);
-    self->path = CB_Clone(path);
+    FolderIVARS *const ivars = Folder_IVARS(self);
+    DECREF(ivars->path);
+    ivars->path = CB_Clone(path);
 }
 
 void
@@ -409,7 +413,8 @@ Folder_consolidate(Folder *self, const CharBuf *path) {
             ZombieCharBuf *name = IxFileNames_local_part(path, ZCB_BLANK());
             CompoundFileReader *cf_reader = CFReader_open(folder);
             if (!cf_reader) { RETHROW(INCREF(Err_get_error())); }
-            Hash_Store(enclosing_folder->entries, (Obj*)name,
+            Hash *entries = Folder_IVARS(enclosing_folder)->entries;
+            Hash_Store(entries, (Obj*)name,
                        (Obj*)cf_reader);
         }
     }

@@ -35,7 +35,7 @@ SI_read_bytes(InStream *self, char* buf, size_t len);
 
 // Inlined version of InStream_Read_U8.
 static INLINE uint8_t
-SI_read_u8(InStream *self);
+SI_read_u8(InStream *self, InStreamIVARS *const ivars);
 
 // Ensure that the buffer contains exactly the specified amount of data.
 static void
@@ -55,22 +55,24 @@ InStream_open(Obj *file) {
 
 InStream*
 InStream_do_open(InStream *self, Obj *file) {
+    InStreamIVARS *const ivars = InStream_IVARS(self);
+
     // Init.
-    self->buf           = NULL;
-    self->limit         = NULL;
-    self->offset        = 0;
-    self->window        = FileWindow_new();
+    ivars->buf          = NULL;
+    ivars->limit        = NULL;
+    ivars->offset       = 0;
+    ivars->window       = FileWindow_new();
 
     // Obtain a FileHandle.
     if (Obj_Is_A(file, FILEHANDLE)) {
-        self->file_handle = (FileHandle*)INCREF(file);
+        ivars->file_handle = (FileHandle*)INCREF(file);
     }
     else if (Obj_Is_A(file, RAMFILE)) {
-        self->file_handle
+        ivars->file_handle
             = (FileHandle*)RAMFH_open(NULL, FH_READ_ONLY, (RAMFile*)file);
     }
     else if (Obj_Is_A(file, CHARBUF)) {
-        self->file_handle
+        ivars->file_handle
             = (FileHandle*)FSFH_open((CharBuf*)file, FH_READ_ONLY);
     }
     else {
@@ -79,16 +81,16 @@ InStream_do_open(InStream *self, Obj *file) {
         DECREF(self);
         return NULL;
     }
-    if (!self->file_handle) {
+    if (!ivars->file_handle) {
         ERR_ADD_FRAME(Err_get_error());
         DECREF(self);
         return NULL;
     }
 
     // Get length and filename from the FileHandle.
-    self->filename      = CB_Clone(FH_Get_Path(self->file_handle));
-    self->len           = FH_Length(self->file_handle);
-    if (self->len == -1) {
+    ivars->filename     = CB_Clone(FH_Get_Path(ivars->file_handle));
+    ivars->len          = FH_Length(ivars->file_handle);
+    if (ivars->len == -1) {
         ERR_ADD_FRAME(Err_get_error());
         DECREF(self);
         return NULL;
@@ -99,70 +101,79 @@ InStream_do_open(InStream *self, Obj *file) {
 
 void
 InStream_close(InStream *self) {
-    if (self->file_handle) {
-        FH_Release_Window(self->file_handle, self->window);
+    InStreamIVARS *const ivars = InStream_IVARS(self);
+    if (ivars->file_handle) {
+        FH_Release_Window(ivars->file_handle, ivars->window);
         // Note that we don't close the FileHandle, because it's probably
         // shared.
-        DECREF(self->file_handle);
-        self->file_handle = NULL;
+        DECREF(ivars->file_handle);
+        ivars->file_handle = NULL;
     }
 }
 
 void
 InStream_destroy(InStream *self) {
-    if (self->file_handle) {
+    InStreamIVARS *const ivars = InStream_IVARS(self);
+    if (ivars->file_handle) {
         InStream_Close(self);
     }
-    DECREF(self->filename);
-    DECREF(self->window);
+    DECREF(ivars->filename);
+    DECREF(ivars->window);
     SUPER_DESTROY(self, INSTREAM);
 }
 
 InStream*
 InStream_reopen(InStream *self, const CharBuf *filename, int64_t offset,
                 int64_t len) {
-    if (!self->file_handle) {
-        THROW(ERR, "Can't Reopen() closed InStream %o", self->filename);
+    InStreamIVARS *const ivars = InStream_IVARS(self);
+    if (!ivars->file_handle) {
+        THROW(ERR, "Can't Reopen() closed InStream %o", ivars->filename);
     }
-    if (offset + len > FH_Length(self->file_handle)) {
+    if (offset + len > FH_Length(ivars->file_handle)) {
         THROW(ERR, "Offset + length too large (%i64 + %i64 > %i64)",
-              offset, len, FH_Length(self->file_handle));
+              offset, len, FH_Length(ivars->file_handle));
     }
 
-    InStream *twin = (InStream*)VTable_Make_Obj(self->vtable);
-    InStream_do_open(twin, (Obj*)self->file_handle);
-    if (filename != NULL) { CB_Mimic(twin->filename, (Obj*)filename); }
-    twin->offset = offset;
-    twin->len    = len;
-    InStream_Seek(twin, 0);
+    VTable *vtable = InStream_Get_VTable(self);
+    InStream *other = (InStream*)VTable_Make_Obj(vtable);
+    InStreamIVARS *const ovars = InStream_IVARS(other);
+    InStream_do_open(other, (Obj*)ivars->file_handle);
+    if (filename != NULL) { CB_Mimic(ovars->filename, (Obj*)filename); }
+    ovars->offset = offset;
+    ovars->len    = len;
+    InStream_Seek(other, 0);
 
-    return twin;
+    return other;
 }
 
 InStream*
 InStream_clone(InStream *self) {
-    InStream *twin = (InStream*)VTable_Make_Obj(self->vtable);
-    InStream_do_open(twin, (Obj*)self->file_handle);
+    InStreamIVARS *const ivars = InStream_IVARS(self);
+    VTable *vtable = InStream_Get_VTable(self);
+    InStream *twin = (InStream*)VTable_Make_Obj(vtable);
+    InStream_do_open(twin, (Obj*)ivars->file_handle);
     InStream_Seek(twin, SI_tell(self));
     return twin;
 }
 
 CharBuf*
 InStream_get_filename(InStream *self) {
-    return self->filename;
+    return InStream_IVARS(self)->filename;
 }
 
 static int64_t
 S_refill(InStream *self) {
+    InStreamIVARS *const ivars = InStream_IVARS(self);
+
     // Determine the amount to request.
     const int64_t sub_file_pos = SI_tell(self);
-    const int64_t remaining    = self->len - sub_file_pos;
+    const int64_t remaining    = ivars->len - sub_file_pos;
     const int64_t amount       = remaining < IO_STREAM_BUF_SIZE
                                  ? remaining
                                  : IO_STREAM_BUF_SIZE;
     if (!remaining) {
         THROW(ERR, "Read past EOF of '%o' (offset: %i64 len: %i64)",
-              self->filename, self->offset, self->len);
+              ivars->filename, ivars->offset, ivars->len);
     }
 
     // Make the request.
@@ -178,31 +189,32 @@ InStream_refill(InStream *self) {
 
 static void
 S_fill(InStream *self, int64_t amount) {
-    FileWindow *const window     = self->window;
+    InStreamIVARS *const ivars     = InStream_IVARS(self);
+    FileWindow *const window       = ivars->window;
     const int64_t virtual_file_pos = SI_tell(self);
-    const int64_t real_file_pos    = virtual_file_pos + self->offset;
-    const int64_t remaining        = self->len - virtual_file_pos;
+    const int64_t real_file_pos    = virtual_file_pos + ivars->offset;
+    const int64_t remaining        = ivars->len - virtual_file_pos;
 
     // Throw an error if the requested amount would take us beyond EOF.
     if (amount > remaining) {
         THROW(ERR,  "Read past EOF of %o (pos: %u64 len: %u64 request: %u64)",
-              self->filename, virtual_file_pos, self->len, amount);
+              ivars->filename, virtual_file_pos, ivars->len, amount);
     }
 
     // Make the request.
-    if (FH_Window(self->file_handle, window, real_file_pos, amount)) {
+    if (FH_Window(ivars->file_handle, window, real_file_pos, amount)) {
         char *const window_limit = window->buf + window->len;
-        self->buf = window->buf
-                    - window->offset    // theoretical start of real file
-                    + self->offset      // top of virtual file
-                    + virtual_file_pos; // position within virtual file
-        self->limit = window_limit - self->buf > remaining
-                      ? self->buf + remaining
-                      : window_limit;
+        ivars->buf = window->buf
+                     - window->offset     // theoretical start of real file
+                     + ivars->offset      // top of virtual file
+                     + virtual_file_pos;  // position within virtual file
+        ivars->limit = window_limit - ivars->buf > remaining
+                       ? ivars->buf + remaining
+                       : window_limit;
     }
     else {
         Err *error = Err_get_error();
-        CB_catf(Err_Get_Mess(error), " (%o)", self->filename);
+        CB_catf(Err_Get_Mess(error), " (%o)", ivars->filename);
         RETHROW(INCREF(error));
     }
 }
@@ -214,40 +226,42 @@ InStream_fill(InStream *self, int64_t amount) {
 
 void
 InStream_seek(InStream *self, int64_t target) {
-    FileWindow *const window = self->window;
-    int64_t virtual_window_top = window->offset - self->offset;
+    InStreamIVARS *const ivars = InStream_IVARS(self);
+    FileWindow *const window = ivars->window;
+    int64_t virtual_window_top = window->offset - ivars->offset;
     int64_t virtual_window_end = virtual_window_top + window->len;
 
     if (target < 0) {
-        THROW(ERR, "Can't Seek '%o' to negative target %i64", self->filename,
+        THROW(ERR, "Can't Seek '%o' to negative target %i64", ivars->filename,
               target);
     }
     // Seek within window if possible.
     else if (target >= virtual_window_top
              && target <= virtual_window_end
             ) {
-        self->buf = window->buf - window->offset + self->offset + target;
+        ivars->buf = window->buf - window->offset + ivars->offset + target;
     }
-    else if (target > self->len) {
-        THROW(ERR, "Can't Seek '%o' past EOF (%i64 > %i64)", self->filename,
-              target, self->len);
+    else if (target > ivars->len) {
+        THROW(ERR, "Can't Seek '%o' past EOF (%i64 > %i64)", ivars->filename,
+              target, ivars->len);
     }
     else {
         // Target is outside window.  Set all buffer and limit variables to
         // NULL to trigger refill on the next read.  Store the file position
         // in the FileWindow's offset.
-        FH_Release_Window(self->file_handle, window);
-        self->buf   = NULL;
-        self->limit = NULL;
-        FileWindow_Set_Offset(window, self->offset + target);
+        FH_Release_Window(ivars->file_handle, window);
+        ivars->buf   = NULL;
+        ivars->limit = NULL;
+        FileWindow_Set_Offset(window, ivars->offset + target);
     }
 }
 
 static INLINE int64_t
 SI_tell(InStream *self) {
-    FileWindow *const window = self->window;
-    int64_t pos_in_buf = PTR_TO_I64(self->buf) - PTR_TO_I64(window->buf);
-    return pos_in_buf + window->offset - self->offset;
+    InStreamIVARS *const ivars = InStream_IVARS(self);
+    FileWindow *const window = ivars->window;
+    int64_t pos_in_buf = PTR_TO_I64(ivars->buf) - PTR_TO_I64(window->buf);
+    return pos_in_buf + window->offset - ivars->offset;
 }
 
 int64_t
@@ -257,12 +271,13 @@ InStream_tell(InStream *self) {
 
 int64_t
 InStream_length(InStream *self) {
-    return self->len;
+    return InStream_IVARS(self)->len;
 }
 
 char*
 InStream_buf(InStream *self, size_t request) {
-    const int64_t bytes_in_buf = PTR_TO_I64(self->limit) - PTR_TO_I64(self->buf);
+    InStreamIVARS *const ivars = InStream_IVARS(self);
+    const int64_t bytes_in_buf = PTR_TO_I64(ivars->limit) - PTR_TO_I64(ivars->buf);
 
     /* It's common for client code to overestimate how much is needed, because
      * the request has to figure in worst-case for compressed data.  However,
@@ -270,7 +285,7 @@ InStream_buf(InStream *self, size_t request) {
      * bytes, they really need 1 byte, and there's 1k in the buffer), we can
      * skip the following refill block. */
     if ((int64_t)request > bytes_in_buf) {
-        const int64_t remaining_in_file = self->len - SI_tell(self);
+        const int64_t remaining_in_file = ivars->len - SI_tell(self);
         int64_t amount = request;
 
         // Try to bump up small requests.
@@ -286,22 +301,23 @@ InStream_buf(InStream *self, size_t request) {
         }
     }
 
-    return self->buf;
+    return ivars->buf;
 }
 
 void
 InStream_advance_buf(InStream *self, char *buf) {
-    if (buf > self->limit) {
-        int64_t overrun = PTR_TO_I64(buf) - PTR_TO_I64(self->limit);
+    InStreamIVARS *const ivars = InStream_IVARS(self);
+    if (buf > ivars->limit) {
+        int64_t overrun = PTR_TO_I64(buf) - PTR_TO_I64(ivars->limit);
         THROW(ERR, "Supplied value is %i64 bytes beyond end of buffer",
               overrun);
     }
-    else if (buf < self->buf) {
-        int64_t underrun = PTR_TO_I64(self->buf) - PTR_TO_I64(buf);
+    else if (buf < ivars->buf) {
+        int64_t underrun = PTR_TO_I64(ivars->buf) - PTR_TO_I64(buf);
         THROW(ERR, "Can't Advance_Buf backwards: (underrun: %i64))", underrun);
     }
     else {
-        self->buf = buf;
+        ivars->buf = buf;
     }
 }
 
@@ -312,19 +328,20 @@ InStream_read_bytes(InStream *self, char* buf, size_t len) {
 
 static INLINE void
 SI_read_bytes(InStream *self, char* buf, size_t len) {
-    const int64_t available = PTR_TO_I64(self->limit) - PTR_TO_I64(self->buf);
+    InStreamIVARS *const ivars = InStream_IVARS(self);
+    const int64_t available = PTR_TO_I64(ivars->limit) - PTR_TO_I64(ivars->buf);
     if (available >= (int64_t)len) {
         // Request is entirely within buffer, so copy.
-        memcpy(buf, self->buf, len);
-        self->buf += len;
+        memcpy(buf, ivars->buf, len);
+        ivars->buf += len;
     }
     else {
         // Pass along whatever we've got in the buffer.
         if (available > 0) {
-            memcpy(buf, self->buf, (size_t)available);
+            memcpy(buf, ivars->buf, (size_t)available);
             buf += available;
             len -= (size_t)available;
-            self->buf += available;
+            ivars->buf += available;
         }
 
         if (len < IO_STREAM_BUF_SIZE) {
@@ -334,19 +351,19 @@ SI_read_bytes(InStream *self, char* buf, size_t len) {
                 int64_t orig_pos = SI_tell(self) - available;
                 int64_t orig_len = len + available;
                 THROW(ERR,  "Read past EOF of %o (pos: %i64 len: %i64 "
-                      "request: %i64)", self->filename, orig_pos,
-                      self->len, orig_len);
+                      "request: %i64)", ivars->filename, orig_pos,
+                      ivars->len, orig_len);
             }
-            memcpy(buf, self->buf, len);
-            self->buf += len;
+            memcpy(buf, ivars->buf, len);
+            ivars->buf += len;
         }
         else {
             // Too big to handle via the buffer, so resort to a brute-force
             // read.
             const int64_t sub_file_pos  = SI_tell(self);
-            const int64_t real_file_pos = sub_file_pos + self->offset;
+            const int64_t real_file_pos = sub_file_pos + ivars->offset;
             bool success
-                = FH_Read(self->file_handle, buf, real_file_pos, len);
+                = FH_Read(ivars->file_handle, buf, real_file_pos, len);
             if (!success) {
                 RETHROW(INCREF(Err_get_error()));
             }
@@ -357,18 +374,20 @@ SI_read_bytes(InStream *self, char* buf, size_t len) {
 
 int8_t
 InStream_read_i8(InStream *self) {
-    return (int8_t)SI_read_u8(self);
+    InStreamIVARS *const ivars = InStream_IVARS(self);
+    return (int8_t)SI_read_u8(self, ivars);
 }
 
 static INLINE uint8_t
-SI_read_u8(InStream *self) {
-    if (self->buf >= self->limit) { S_refill(self); }
-    return (uint8_t)(*self->buf++);
+SI_read_u8(InStream *self, InStreamIVARS *ivars) {
+    if (ivars->buf >= ivars->limit) { S_refill(self); }
+    return (uint8_t)(*ivars->buf++);
 }
 
 uint8_t
 InStream_read_u8(InStream *self) {
-    return SI_read_u8(self);
+    InStreamIVARS *const ivars = InStream_IVARS(self);
+    return SI_read_u8(self, ivars);
 }
 
 static INLINE uint32_t
@@ -433,9 +452,10 @@ InStream_read_f64(InStream *self) {
 
 uint32_t
 InStream_read_c32(InStream *self) {
+    InStreamIVARS *const ivars = InStream_IVARS(self);
     uint32_t retval = 0;
     while (1) {
-        const uint8_t ubyte = SI_read_u8(self);
+        const uint8_t ubyte = SI_read_u8(self, ivars);
         retval = (retval << 7) | (ubyte & 0x7f);
         if ((ubyte & 0x80) == 0) {
             break;
@@ -446,9 +466,10 @@ InStream_read_c32(InStream *self) {
 
 uint64_t
 InStream_read_c64(InStream *self) {
+    InStreamIVARS *const ivars = InStream_IVARS(self);
     uint64_t retval = 0;
     while (1) {
-        const uint8_t ubyte = SI_read_u8(self);
+        const uint8_t ubyte = SI_read_u8(self, ivars);
         retval = (retval << 7) | (ubyte & 0x7f);
         if ((ubyte & 0x80) == 0) {
             break;
@@ -459,9 +480,10 @@ InStream_read_c64(InStream *self) {
 
 int
 InStream_read_raw_c64(InStream *self, char *buf) {
+    InStreamIVARS *const ivars = InStream_IVARS(self);
     uint8_t *dest = (uint8_t*)buf;
     do {
-        *dest = SI_read_u8(self);
+        *dest = SI_read_u8(self, ivars);
     } while ((*dest++ & 0x80) != 0);
     return dest - (uint8_t*)buf;
 }

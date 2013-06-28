@@ -32,6 +32,8 @@
 Lock*
 Lock_init(Lock *self, Folder *folder, const CharBuf *name,
           const CharBuf *host, int32_t timeout, int32_t interval) {
+    LockIVARS *const ivars = Lock_IVARS(self);
+
     // Validate.
     if (interval <= 0) {
         DECREF(self);
@@ -52,51 +54,53 @@ Lock_init(Lock *self, Folder *folder, const CharBuf *name,
     }
 
     // Assign.
-    self->folder       = (Folder*)INCREF(folder);
-    self->timeout      = timeout;
-    self->name         = CB_Clone(name);
-    self->host         = CB_Clone(host);
-    self->interval     = interval;
+    ivars->folder       = (Folder*)INCREF(folder);
+    ivars->timeout      = timeout;
+    ivars->name         = CB_Clone(name);
+    ivars->host         = CB_Clone(host);
+    ivars->interval     = interval;
 
     // Derive.
-    self->lock_path = CB_newf("locks/%o.lock", name);
+    ivars->lock_path = CB_newf("locks/%o.lock", name);
 
     return self;
 }
 
 void
 Lock_destroy(Lock *self) {
-    DECREF(self->folder);
-    DECREF(self->host);
-    DECREF(self->name);
-    DECREF(self->lock_path);
+    LockIVARS *const ivars = Lock_IVARS(self);
+    DECREF(ivars->folder);
+    DECREF(ivars->host);
+    DECREF(ivars->name);
+    DECREF(ivars->lock_path);
     SUPER_DESTROY(self, LOCK);
 }
 
 CharBuf*
 Lock_get_name(Lock *self) {
-    return self->name;
+    return Lock_IVARS(self)->name;
 }
 
 CharBuf*
 Lock_get_lock_path(Lock *self) {
-    return self->lock_path;
+    return Lock_IVARS(self)->lock_path;
 }
 
 CharBuf*
 Lock_get_host(Lock *self) {
-    return self->host;
+    return Lock_IVARS(self)->host;
 }
 
 bool
 Lock_obtain(Lock *self) {
-    int32_t time_left = self->interval == 0 ? 0 : self->timeout;
+    LockIVARS *const ivars = Lock_IVARS(self);
+    int32_t time_left = ivars->interval == 0 ? 0 : ivars->timeout;
     bool locked = Lock_Request(self);
 
     while (!locked) {
-        time_left -= self->interval;
+        time_left -= ivars->interval;
         if (time_left <= 0) { break; }
-        Sleep_millisleep(self->interval);
+        Sleep_millisleep(ivars->interval);
         locked = Lock_Request(self);
     }
 
@@ -118,7 +122,8 @@ LFLock_init(LockFileLock *self, Folder *folder, const CharBuf *name,
             const CharBuf *host, int32_t timeout, int32_t interval) {
     int pid = PID_getpid();
     Lock_init((Lock*)self, folder, name, host, timeout, interval);
-    self->link_path = CB_newf("%o.%o.%i64", self->lock_path, host, pid);
+    LockFileLockIVARS *const ivars = LFLock_IVARS(self);
+    ivars->link_path = CB_newf("%o.%o.%i64", ivars->lock_path, host, pid);
     return self;
 }
 
@@ -129,26 +134,27 @@ LFLock_shared(LockFileLock *self) {
 
 bool
 LFLock_request(LockFileLock *self) {
+    LockFileLockIVARS *const ivars = LFLock_IVARS(self);
     Hash   *file_data;
     bool wrote_json;
     bool success = false;
     bool deletion_failed = false;
 
-    if (Folder_Exists(self->folder, self->lock_path)) {
+    if (Folder_Exists(ivars->folder, ivars->lock_path)) {
         Err_set_error((Err*)LockErr_new(CB_newf("Can't obtain lock: '%o' exists",
-                                                self->lock_path)));
+                                                ivars->lock_path)));
         return false;
     }
 
     // Create the "locks" subdirectory if necessary.
     CharBuf *lock_dir_name = (CharBuf*)ZCB_WRAP_STR("locks", 5);
-    if (!Folder_Exists(self->folder, lock_dir_name)) {
-        if (!Folder_MkDir(self->folder, lock_dir_name)) {
+    if (!Folder_Exists(ivars->folder, lock_dir_name)) {
+        if (!Folder_MkDir(ivars->folder, lock_dir_name)) {
             Err *mkdir_err = (Err*)CERTIFY(Err_get_error(), ERR);
             LockErr *err = LockErr_new(CB_newf("Can't create 'locks' directory: %o",
                                                Err_Get_Mess(mkdir_err)));
             // Maybe our attempt failed because another process succeeded.
-            if (Folder_Find_Folder(self->folder, lock_dir_name)) {
+            if (Folder_Find_Folder(ivars->folder, lock_dir_name)) {
                 DECREF(err);
             }
             else {
@@ -163,35 +169,35 @@ LFLock_request(LockFileLock *self) {
     file_data = Hash_new(3);
     Hash_Store_Str(file_data, "pid", 3,
                    (Obj*)CB_newf("%i32", (int32_t)PID_getpid()));
-    Hash_Store_Str(file_data, "host", 4, INCREF(self->host));
-    Hash_Store_Str(file_data, "name", 4, INCREF(self->name));
+    Hash_Store_Str(file_data, "host", 4, INCREF(ivars->host));
+    Hash_Store_Str(file_data, "name", 4, INCREF(ivars->name));
 
     // Write to a temporary file, then use the creation of a hard link to
     // ensure atomic but non-destructive creation of the lockfile with its
     // complete contents.
-    wrote_json = Json_spew_json((Obj*)file_data, self->folder, self->link_path);
+    wrote_json = Json_spew_json((Obj*)file_data, ivars->folder, ivars->link_path);
     if (wrote_json) {
-        success = Folder_Hard_Link(self->folder, self->link_path,
-                                   self->lock_path);
+        success = Folder_Hard_Link(ivars->folder, ivars->link_path,
+                                   ivars->lock_path);
         if (!success) {
             Err *hard_link_err = (Err*)CERTIFY(Err_get_error(), ERR);
             Err_set_error((Err*)LockErr_new(CB_newf("Failed to obtain lock at '%o': %o",
-                                                    self->lock_path,
+                                                    ivars->lock_path,
                                                     Err_Get_Mess(hard_link_err))));
         }
-        deletion_failed = !Folder_Delete(self->folder, self->link_path);
+        deletion_failed = !Folder_Delete(ivars->folder, ivars->link_path);
     }
     else {
         Err *spew_json_err = (Err*)CERTIFY(Err_get_error(), ERR);
         Err_set_error((Err*)LockErr_new(CB_newf("Failed to obtain lock at '%o': %o",
-                                                self->lock_path,
+                                                ivars->lock_path,
                                                 Err_Get_Mess(spew_json_err))));
     }
     DECREF(file_data);
 
     // Verify that our temporary file got zapped.
     if (wrote_json && deletion_failed) {
-        CharBuf *mess = MAKE_MESS("Failed to delete '%o'", self->link_path);
+        CharBuf *mess = MAKE_MESS("Failed to delete '%o'", ivars->link_path);
         Err_throw_mess(ERR, mess);
     }
 
@@ -200,25 +206,29 @@ LFLock_request(LockFileLock *self) {
 
 void
 LFLock_release(LockFileLock *self) {
-    if (Folder_Exists(self->folder, self->lock_path)) {
-        LFLock_Maybe_Delete_File(self, self->lock_path, true, false);
+    LockFileLockIVARS *const ivars = LFLock_IVARS(self);
+    if (Folder_Exists(ivars->folder, ivars->lock_path)) {
+        LFLock_Maybe_Delete_File(self, ivars->lock_path, true, false);
     }
 }
 
 bool
 LFLock_is_locked(LockFileLock *self) {
-    return Folder_Exists(self->folder, self->lock_path);
+    LockFileLockIVARS *const ivars = LFLock_IVARS(self);
+    return Folder_Exists(ivars->folder, ivars->lock_path);
 }
 
 void
 LFLock_clear_stale(LockFileLock *self) {
-    LFLock_Maybe_Delete_File(self, self->lock_path, false, true);
+    LockFileLockIVARS *const ivars = LFLock_IVARS(self);
+    LFLock_Maybe_Delete_File(self, ivars->lock_path, false, true);
 }
 
 bool
 LFLock_maybe_delete_file(LockFileLock *self, const CharBuf *path,
                          bool delete_mine, bool delete_other) {
-    Folder *folder  = self->folder;
+    LockFileLockIVARS *const ivars = LFLock_IVARS(self);
+    Folder *folder  = ivars->folder;
     bool    success = false;
     ZombieCharBuf *scratch = ZCB_WRAP(path);
 
@@ -228,7 +238,7 @@ LFLock_maybe_delete_file(LockFileLock *self, const CharBuf *path,
         return false;
     }
     ZCB_Nip(scratch, CB_Get_Size(lock_dir_name) + 1);
-    if (!ZCB_Starts_With(scratch, self->name)) {
+    if (!ZCB_Starts_With(scratch, ivars->name)) {
         return false;
     }
 
@@ -243,9 +253,9 @@ LFLock_maybe_delete_file(LockFileLock *self, const CharBuf *path,
 
             // Match hostname and lock name.
             if (host != NULL
-                && CB_Equals(host, (Obj*)self->host)
+                && CB_Equals(host, (Obj*)ivars->host)
                 && name != NULL
-                && CB_Equals(name, (Obj*)self->name)
+                && CB_Equals(name, (Obj*)ivars->name)
                 && pid_buf != NULL
                ) {
                 // Verify that pid is either mine or dead.
@@ -273,7 +283,8 @@ LFLock_maybe_delete_file(LockFileLock *self, const CharBuf *path,
 
 void
 LFLock_destroy(LockFileLock *self) {
-    DECREF(self->link_path);
+    LockFileLockIVARS *const ivars = LFLock_IVARS(self);
+    DECREF(ivars->link_path);
     SUPER_DESTROY(self, LOCKFILELOCK);
 }
 

@@ -90,8 +90,9 @@ FSFolder_init(FSFolder *self, const CharBuf *path) {
 
 void
 FSFolder_initialize(FSFolder *self) {
-    if (!S_dir_ok(self->path)) {
-        if (!S_create_dir(self->path)) {
+    FSFolderIVARS *const ivars = FSFolder_IVARS(self);
+    if (!S_dir_ok(ivars->path)) {
+        if (!S_create_dir(ivars->path)) {
             RETHROW(INCREF(Err_get_error()));
         }
     }
@@ -99,7 +100,8 @@ FSFolder_initialize(FSFolder *self) {
 
 bool
 FSFolder_check(FSFolder *self) {
-    return S_dir_ok(self->path);
+    FSFolderIVARS *const ivars = FSFolder_IVARS(self);
+    return S_dir_ok(ivars->path);
 }
 
 FileHandle*
@@ -123,14 +125,16 @@ FSFolder_local_mkdir(FSFolder *self, const CharBuf *name) {
 
 DirHandle*
 FSFolder_local_open_dir(FSFolder *self) {
-    DirHandle *dh = (DirHandle*)FSDH_open(self->path);
+    FSFolderIVARS *const ivars = FSFolder_IVARS(self);
+    DirHandle *dh = (DirHandle*)FSDH_open(ivars->path);
     if (!dh) { ERR_ADD_FRAME(Err_get_error()); }
     return dh;
 }
 
 bool
 FSFolder_local_exists(FSFolder *self, const CharBuf *name) {
-    if (Hash_Fetch(self->entries, (Obj*)name)) {
+    FSFolderIVARS *const ivars = FSFolder_IVARS(self);
+    if (Hash_Fetch(ivars->entries, (Obj*)name)) {
         return true;
     }
     else if (!S_is_local_entry(name)) {
@@ -150,8 +154,10 @@ FSFolder_local_exists(FSFolder *self, const CharBuf *name) {
 
 bool
 FSFolder_local_is_directory(FSFolder *self, const CharBuf *name) {
+    FSFolderIVARS *const ivars = FSFolder_IVARS(self);
+
     // Check for a cached object, then fall back to a system call.
-    Obj *elem = Hash_Fetch(self->entries, (Obj*)name);
+    Obj *elem = Hash_Fetch(ivars->entries, (Obj*)name);
     if (elem && Obj_Is_A(elem, FOLDER)) {
         return true;
     }
@@ -191,6 +197,8 @@ FSFolder_hard_link(FSFolder *self, const CharBuf *from,
 
 bool
 FSFolder_local_delete(FSFolder *self, const CharBuf *name) {
+    FSFolderIVARS *const ivars = FSFolder_IVARS(self);
+
     CharBuf *fullpath = S_fullpath(self, name);
     char    *path_ptr = (char*)CB_Get_Ptr8(fullpath);
 #ifdef CHY_REMOVE_ZAPS_DIRS
@@ -198,18 +206,21 @@ FSFolder_local_delete(FSFolder *self, const CharBuf *name) {
 #else
     bool result = !rmdir(path_ptr) || !remove(path_ptr);
 #endif
-    DECREF(Hash_Delete(self->entries, (Obj*)name));
+    DECREF(Hash_Delete(ivars->entries, (Obj*)name));
     DECREF(fullpath);
     return result;
 }
 
 void
 FSFolder_close(FSFolder *self) {
-    Hash_Clear(self->entries);
+    FSFolderIVARS *const ivars = FSFolder_IVARS(self);
+    Hash_Clear(ivars->entries);
 }
 
 Folder*
 FSFolder_local_find_folder(FSFolder *self, const CharBuf *name) {
+    FSFolderIVARS *const ivars = FSFolder_IVARS(self);
+
     Folder *subfolder = NULL;
     if (!name || !CB_Get_Size(name)) {
         // No entity can be identified by NULL or empty string.
@@ -222,7 +233,7 @@ FSFolder_local_find_folder(FSFolder *self, const CharBuf *name) {
         // Don't allow access outside of the main dir.
         return NULL;
     }
-    else if (NULL != (subfolder = (Folder*)Hash_Fetch(self->entries, (Obj*)name))) {
+    else if (NULL != (subfolder = (Folder*)Hash_Fetch(ivars->entries, (Obj*)name))) {
         if (Folder_Is_A(subfolder, FOLDER)) {
             return subfolder;
         }
@@ -248,7 +259,7 @@ FSFolder_local_find_folder(FSFolder *self, const CharBuf *name) {
                 subfolder = (Folder*)cf_reader;
             }
         }
-        Hash_Store(self->entries, (Obj*)name, (Obj*)subfolder);
+        Hash_Store(ivars->entries, (Obj*)name, (Obj*)subfolder);
     }
     DECREF(fullpath);
 
@@ -257,7 +268,8 @@ FSFolder_local_find_folder(FSFolder *self, const CharBuf *name) {
 
 static CharBuf*
 S_fullpath(FSFolder *self, const CharBuf *path) {
-    CharBuf *fullpath = CB_newf("%o%s%o", self->path, DIR_SEP, path);
+    FSFolderIVARS *const ivars = FSFolder_IVARS(self);
+    CharBuf *fullpath = CB_newf("%o%s%o", ivars->path, DIR_SEP, path);
     if (DIR_SEP[0] != '/') {
         CB_Swap_Chars(fullpath, '/', DIR_SEP[0]);
     }

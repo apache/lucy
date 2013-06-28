@@ -23,8 +23,9 @@ int32_t FH_object_count = 0;
 
 FileHandle*
 FH_do_open(FileHandle *self, const CharBuf *path, uint32_t flags) {
-    self->path    = path ? CB_Clone(path) : CB_new(0);
-    self->flags   = flags;
+    FileHandleIVARS *const ivars = FH_IVARS(self);
+    ivars->path    = path ? CB_Clone(path) : CB_new(0);
+    ivars->flags   = flags;
 
     // Track number of live FileHandles released into the wild.
     FH_object_count++;
@@ -35,8 +36,9 @@ FH_do_open(FileHandle *self, const CharBuf *path, uint32_t flags) {
 
 void
 FH_destroy(FileHandle *self) {
+    FileHandleIVARS *const ivars = FH_IVARS(self);
     FH_Close(self);
-    DECREF(self->path);
+    DECREF(ivars->path);
     SUPER_DESTROY(self, FILEHANDLE);
 
     // Decrement count of FileHandle objects in existence.
@@ -52,12 +54,13 @@ FH_grow(FileHandle *self, int64_t length) {
 
 void
 FH_set_path(FileHandle *self, const CharBuf *path) {
-    CB_Mimic(self->path, (Obj*)path);
+    FileHandleIVARS *const ivars = FH_IVARS(self);
+    CB_Mimic(ivars->path, (Obj*)path);
 }
 
 CharBuf*
 FH_get_path(FileHandle *self) {
-    return self->path;
+    return FH_IVARS(self)->path;
 }
 
 

@@ -25,6 +25,7 @@ class Lucy::Store::RAMFileHandle cnick RAMFH
     inherits Lucy::Store::FileHandle {
 
     RAMFile *ram_file;
+    ByteBuf *contents;
     int64_t  len;
 
     inert incremented nullable RAMFileHandle*

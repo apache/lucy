@@ -31,37 +31,40 @@ RAMDH_new(RAMFolder *folder) {
 RAMDirHandle*
 RAMDH_init(RAMDirHandle *self, RAMFolder *folder) {
     DH_init((DirHandle*)self, RAMFolder_Get_Path(folder));
-    self->folder = (RAMFolder*)INCREF(folder);
-    self->elems  = Hash_Keys(self->folder->entries);
-    self->tick   = -1;
+    RAMDirHandleIVARS *const ivars = RAMDH_IVARS(self);
+    ivars->folder = (RAMFolder*)INCREF(folder);
+    ivars->elems  = Hash_Keys(RAMFolder_IVARS(ivars->folder)->entries);
+    ivars->tick   = -1;
     return self;
 }
 
 bool
 RAMDH_close(RAMDirHandle *self) {
-    if (self->elems) {
-        VA_Dec_RefCount(self->elems);
-        self->elems = NULL;
+    RAMDirHandleIVARS *const ivars = RAMDH_IVARS(self);
+    if (ivars->elems) {
+        VA_Dec_RefCount(ivars->elems);
+        ivars->elems = NULL;
     }
-    if (self->folder) {
-        RAMFolder_Dec_RefCount(self->folder);
-        self->folder = NULL;
+    if (ivars->folder) {
+        RAMFolder_Dec_RefCount(ivars->folder);
+        ivars->folder = NULL;
     }
     return true;
 }
 
 bool
 RAMDH_next(RAMDirHandle *self) {
-    if (self->elems) {
-        self->tick++;
-        if (self->tick < (int32_t)VA_Get_Size(self->elems)) {
+    RAMDirHandleIVARS *const ivars = RAMDH_IVARS(self);
+    if (ivars->elems) {
+        ivars->tick++;
+        if (ivars->tick < (int32_t)VA_Get_Size(ivars->elems)) {
             CharBuf *path = (CharBuf*)CERTIFY(
-                                VA_Fetch(self->elems, self->tick), CHARBUF);
-            CB_Mimic(self->entry, (Obj*)path);
+                                VA_Fetch(ivars->elems, ivars->tick), CHARBUF);
+            CB_Mimic(ivars->entry, (Obj*)path);
             return true;
         }
         else {
-            self->tick--;
+            ivars->tick--;
             return false;
         }
     }
@@ -70,10 +73,11 @@ RAMDH_next(RAMDirHandle *self) {
 
 bool
 RAMDH_entry_is_dir(RAMDirHandle *self) {
-    if (self->elems) {
-        CharBuf *name = (CharBuf*)VA_Fetch(self->elems, self->tick);
+    RAMDirHandleIVARS *const ivars = RAMDH_IVARS(self);
+    if (ivars->elems) {
+        CharBuf *name = (CharBuf*)VA_Fetch(ivars->elems, ivars->tick);
         if (name) {
-            return RAMFolder_Local_Is_Directory(self->folder, name);
+            return RAMFolder_Local_Is_Directory(ivars->folder, name);
         }
     }
     return false;

@@ -27,15 +27,16 @@
 
 // Inlined version of OutStream_Write_Bytes.
 static INLINE void
-SI_write_bytes(OutStream *self, const void *bytes, size_t len);
+SI_write_bytes(OutStream *self, OutStreamIVARS *ivars,
+               const void *bytes, size_t len);
 
 // Inlined version of OutStream_Write_C32.
 static INLINE void
-SI_write_c32(OutStream *self, uint32_t value);
+SI_write_c32(OutStream *self, OutStreamIVARS *ivars, uint32_t value);
 
 // Flush content in the buffer to the FileHandle.
 static void
-S_flush(OutStream *self);
+S_flush(OutStream *self, OutStreamIVARS *ivars);
 
 OutStream*
 OutStream_open(Obj *file) {
@@ -45,22 +46,24 @@ OutStream_open(Obj *file) {
 
 OutStream*
 OutStream_do_open(OutStream *self, Obj *file) {
+    OutStreamIVARS *const ivars = OutStream_IVARS(self);
+
     // Init.
-    self->buf         = (char*)MALLOCATE(IO_STREAM_BUF_SIZE);
-    self->buf_start   = 0;
-    self->buf_pos     = 0;
+    ivars->buf         = (char*)MALLOCATE(IO_STREAM_BUF_SIZE);
+    ivars->buf_start   = 0;
+    ivars->buf_pos     = 0;
 
     // Obtain a FileHandle.
     if (Obj_Is_A(file, FILEHANDLE)) {
-        self->file_handle = (FileHandle*)INCREF(file);
+        ivars->file_handle = (FileHandle*)INCREF(file);
     }
     else if (Obj_Is_A(file, RAMFILE)) {
-        self->file_handle
+        ivars->file_handle
             = (FileHandle*)RAMFH_open(NULL, FH_WRITE_ONLY, (RAMFile*)file);
     }
     else if (Obj_Is_A(file, CHARBUF)) {
-        self->file_handle = (FileHandle*)FSFH_open((CharBuf*)file,
-                                                   FH_WRITE_ONLY | FH_CREATE | FH_EXCLUSIVE);
+        ivars->file_handle = (FileHandle*)FSFH_open((CharBuf*)file,
+                                                    FH_WRITE_ONLY | FH_CREATE | FH_EXCLUSIVE);
     }
     else {
         Err_set_error(Err_new(CB_newf("Invalid type for param 'file': '%o'",
@@ -68,39 +71,41 @@ OutStream_do_open(OutStream *self, Obj *file) {
         DECREF(self);
         return NULL;
     }
-    if (!self->file_handle) {
+    if (!ivars->file_handle) {
         ERR_ADD_FRAME(Err_get_error());
         DECREF(self);
         return NULL;
     }
 
     // Derive filepath from FileHandle.
-    self->path = CB_Clone(FH_Get_Path(self->file_handle));
+    ivars->path = CB_Clone(FH_Get_Path(ivars->file_handle));
 
     return self;
 }
 
 void
 OutStream_destroy(OutStream *self) {
-    if (self->file_handle != NULL) {
+    OutStreamIVARS *const ivars = OutStream_IVARS(self);
+    if (ivars->file_handle != NULL) {
         // Inlined flush, ignoring errors.
-        if (self->buf_pos) {
-            FH_Write(self->file_handle, self->buf, self->buf_pos);
+        if (ivars->buf_pos) {
+            FH_Write(ivars->file_handle, ivars->buf, ivars->buf_pos);
         }
-        DECREF(self->file_handle);
+        DECREF(ivars->file_handle);
     }
-    DECREF(self->path);
-    FREEMEM(self->buf);
+    DECREF(ivars->path);
+    FREEMEM(ivars->buf);
     SUPER_DESTROY(self, OUTSTREAM);
 }
 
 CharBuf*
 OutStream_get_path(OutStream *self) {
-    return self->path;
+    return OutStream_IVARS(self)->path;
 }
 
 void
 OutStream_absorb(OutStream *self, InStream *instream) {
+    OutStreamIVARS *const ivars = OutStream_IVARS(self);
     char buf[IO_STREAM_BUF_SIZE];
     int64_t bytes_left = InStream_Length(instream);
 
@@ -115,21 +120,23 @@ OutStream_absorb(OutStream *self, InStream *instream) {
                                        ? (size_t)bytes_left
                                        : IO_STREAM_BUF_SIZE;
         InStream_Read_Bytes(instream, buf, bytes_this_iter);
-        SI_write_bytes(self, buf, bytes_this_iter);
+        SI_write_bytes(self, ivars, buf, bytes_this_iter);
         bytes_left -= bytes_this_iter;
     }
 }
 
 void
 OutStream_grow(OutStream *self, int64_t length) {
-    if (!FH_Grow(self->file_handle, length)) {
+    OutStreamIVARS *const ivars = OutStream_IVARS(self);
+    if (!FH_Grow(ivars->file_handle, length)) {
         RETHROW(INCREF(Err_get_error()));
     }
 }
 
 int64_t
 OutStream_tell(OutStream *self) {
-    return self->buf_start + self->buf_pos;
+    OutStreamIVARS *const ivars = OutStream_IVARS(self);
+    return ivars->buf_start + ivars->buf_pos;
 }
 
 int64_t
@@ -142,19 +149,21 @@ OutStream_align(OutStream *self, int64_t modulus) {
 
 void
 OutStream_flush(OutStream *self) {
-    S_flush(self);
+    OutStreamIVARS *const ivars = OutStream_IVARS(self);
+    S_flush(self, ivars);
 }
 
 static void
-S_flush(OutStream *self) {
-    if (self->file_handle == NULL) {
-        THROW(ERR, "Can't write to a closed OutStream for %o", self->path);
+S_flush(OutStream *self, OutStreamIVARS *ivars) {
+    UNUSED_VAR(self);
+    if (ivars->file_handle == NULL) {
+        THROW(ERR, "Can't write to a closed OutStream for %o", ivars->path);
     }
-    if (!FH_Write(self->file_handle, self->buf, self->buf_pos)) {
+    if (!FH_Write(ivars->file_handle, ivars->buf, ivars->buf_pos)) {
         RETHROW(INCREF(Err_get_error()));
     }
-    self->buf_start += self->buf_pos;
-    self->buf_pos = 0;
+    ivars->buf_start += ivars->buf_pos;
+    ivars->buf_pos = 0;
 }
 
 int64_t
@@ -164,117 +173,122 @@ OutStream_length(OutStream *self) {
 
 void
 OutStream_write_bytes(OutStream *self, const void *bytes, size_t len) {
-    SI_write_bytes(self, bytes, len);
+    SI_write_bytes(self, OutStream_IVARS(self), bytes, len);
 }
 
 static INLINE void
-SI_write_bytes(OutStream *self, const void *bytes, size_t len) {
+SI_write_bytes(OutStream *self, OutStreamIVARS *ivars,
+               const void *bytes, size_t len) {
     // If this data is larger than the buffer size, flush and write.
     if (len >= IO_STREAM_BUF_SIZE) {
-        S_flush(self);
-        if (!FH_Write(self->file_handle, bytes, len)) {
+        S_flush(self, ivars);
+        if (!FH_Write(ivars->file_handle, bytes, len)) {
             RETHROW(INCREF(Err_get_error()));
         }
-        self->buf_start += len;
+        ivars->buf_start += len;
     }
     // If there's not enough room in the buffer, flush then add.
-    else if (self->buf_pos + len >= IO_STREAM_BUF_SIZE) {
-        S_flush(self);
-        memcpy((self->buf + self->buf_pos), bytes, len);
-        self->buf_pos += len;
+    else if (ivars->buf_pos + len >= IO_STREAM_BUF_SIZE) {
+        S_flush(self, ivars);
+        memcpy((ivars->buf + ivars->buf_pos), bytes, len);
+        ivars->buf_pos += len;
     }
     // If there's room, just add these bytes to the buffer.
     else {
-        memcpy((self->buf + self->buf_pos), bytes, len);
-        self->buf_pos += len;
+        memcpy((ivars->buf + ivars->buf_pos), bytes, len);
+        ivars->buf_pos += len;
     }
 }
 
 static INLINE void
-SI_write_u8(OutStream *self, uint8_t value) {
-    if (self->buf_pos >= IO_STREAM_BUF_SIZE) {
-        S_flush(self);
+SI_write_u8(OutStream *self, OutStreamIVARS *ivars, uint8_t value) {
+    if (ivars->buf_pos >= IO_STREAM_BUF_SIZE) {
+        S_flush(self, ivars);
     }
-    self->buf[self->buf_pos++] = (char)value;
+    ivars->buf[ivars->buf_pos++] = (char)value;
 }
 
 void
 OutStream_write_i8(OutStream *self, int8_t value) {
-    SI_write_u8(self, (uint8_t)value);
+    OutStreamIVARS *const ivars = OutStream_IVARS(self);
+    SI_write_u8(self, ivars, (uint8_t)value);
 }
 
 void
 OutStream_write_u8(OutStream *self, uint8_t value) {
-    SI_write_u8(self, value);
+    OutStreamIVARS *const ivars = OutStream_IVARS(self);
+    SI_write_u8(self, ivars, value);
 }
 
 static INLINE void
-SI_write_u32(OutStream *self, uint32_t value) {
+SI_write_u32(OutStream *self, OutStreamIVARS *ivars, uint32_t value) {
 #ifdef BIG_END
-    SI_write_bytes(self, &value, 4);
+    SI_write_bytes(self, ivars, &value, 4);
 #else
     char  buf[4];
     char *buf_copy = buf;
     NumUtil_encode_bigend_u32(value, &buf_copy);
-    SI_write_bytes(self, buf, 4);
+    SI_write_bytes(self, ivars, buf, 4);
 #endif
 }
 
 void
 OutStream_write_i32(OutStream *self, int32_t value) {
-    SI_write_u32(self, (uint32_t)value);
+    SI_write_u32(self, OutStream_IVARS(self), (uint32_t)value);
 }
 
 void
 OutStream_write_u32(OutStream *self, uint32_t value) {
-    SI_write_u32(self, value);
+    SI_write_u32(self, OutStream_IVARS(self), value);
 }
 
 static INLINE void
-SI_write_u64(OutStream *self, uint64_t value) {
+SI_write_u64(OutStream *self, OutStreamIVARS *ivars, uint64_t value) {
 #ifdef BIG_END
-    SI_write_bytes(self, &value, 8);
+    SI_write_bytes(self, ivars, &value, 8);
 #else
     char  buf[sizeof(uint64_t)];
     char *buf_copy = buf;
     NumUtil_encode_bigend_u64(value, &buf_copy);
-    SI_write_bytes(self, buf, sizeof(uint64_t));
+    SI_write_bytes(self, ivars, buf, sizeof(uint64_t));
 #endif
 }
 
 void
 OutStream_write_i64(OutStream *self, int64_t value) {
-    SI_write_u64(self, (uint64_t)value);
+    SI_write_u64(self, OutStream_IVARS(self), (uint64_t)value);
 }
 
 void
 OutStream_write_u64(OutStream *self, uint64_t value) {
-    SI_write_u64(self, value);
+    SI_write_u64(self, OutStream_IVARS(self), value);
 }
 
 void
 OutStream_write_f32(OutStream *self, float value) {
+    OutStreamIVARS *const ivars = OutStream_IVARS(self);
     char  buf[sizeof(float)];
     char *buf_copy = buf;
     NumUtil_encode_bigend_f32(value, &buf_copy);
-    SI_write_bytes(self, buf_copy, sizeof(float));
+    SI_write_bytes(self, ivars, buf_copy, sizeof(float));
 }
 
 void
 OutStream_write_f64(OutStream *self, double value) {
+    OutStreamIVARS *const ivars = OutStream_IVARS(self);
     char  buf[sizeof(double)];
     char *buf_copy = buf;
     NumUtil_encode_bigend_f64(value, &buf_copy);
-    SI_write_bytes(self, buf_copy, sizeof(double));
+    SI_write_bytes(self, ivars, buf_copy, sizeof(double));
 }
 
 void
 OutStream_write_c32(OutStream *self, uint32_t value) {
-    SI_write_c32(self, value);
+    SI_write_c32(self, OutStream_IVARS(self), value);
 }
 
 static INLINE void
-SI_write_c32(OutStream *self, uint32_t value) {
+SI_write_c32(OutStream *self, OutStreamIVARS *ivars, uint32_t value) {
     uint8_t buf[C32_MAX_BYTES];
     uint8_t *ptr = buf + sizeof(buf) - 1;
 
@@ -288,11 +302,12 @@ SI_write_c32(OutStream *self, uint32_t value) {
         value >>= 7;
     }
 
-    SI_write_bytes(self, ptr, (buf + sizeof(buf)) - ptr);
+    SI_write_bytes(self, ivars, ptr, (buf + sizeof(buf)) - ptr);
 }
 
 void
 OutStream_write_c64(OutStream *self, uint64_t value) {
+    OutStreamIVARS *const ivars = OutStream_IVARS(self);
     uint8_t buf[C64_MAX_BYTES];
     uint8_t *ptr = buf + sizeof(buf) - 1;
 
@@ -306,24 +321,26 @@ OutStream_write_c64(OutStream *self, uint64_t value) {
         value >>= 7;
     }
 
-    SI_write_bytes(self, ptr, (buf + sizeof(buf)) - ptr);
+    SI_write_bytes(self, ivars, ptr, (buf + sizeof(buf)) - ptr);
 }
 
 void
 OutStream_write_string(OutStream *self, const char *string, size_t len) {
-    SI_write_c32(self, (uint32_t)len);
-    SI_write_bytes(self, string, len);
+    OutStreamIVARS *const ivars = OutStream_IVARS(self);
+    SI_write_c32(self, ivars, (uint32_t)len);
+    SI_write_bytes(self, ivars, string, len);
 }
 
 void
 OutStream_close(OutStream *self) {
-    if (self->file_handle) {
-        S_flush(self);
-        if (!FH_Close(self->file_handle)) {
+    OutStreamIVARS *const ivars = OutStream_IVARS(self);
+    if (ivars->file_handle) {
+        S_flush(self, ivars);
+        if (!FH_Close(ivars->file_handle)) {
             RETHROW(INCREF(Err_get_error()));
         }
-        DECREF(self->file_handle);
-        self->file_handle = NULL;
+        DECREF(ivars->file_handle);
+        ivars->file_handle = NULL;
     }
 }
 

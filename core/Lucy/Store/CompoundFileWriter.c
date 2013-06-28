@@ -28,11 +28,12 @@ int32_t CFWriter_current_file_format = 2;
 
 // Helper which does the heavy lifting for CFWriter_consolidate.
 static void
-S_do_consolidate(CompoundFileWriter *self);
+S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars);
 
 // Clean up files which may be left over from previous merge attempts.
 static void
-S_clean_up_old_temp_files(CompoundFileWriter *self);
+S_clean_up_old_temp_files(CompoundFileWriter *self,
+                          CompoundFileWriterIVARS *ivars);
 
 CompoundFileWriter*
 CFWriter_new(Folder *folder) {
@@ -43,32 +44,37 @@ CFWriter_new(Folder *folder) {
 
 CompoundFileWriter*
 CFWriter_init(CompoundFileWriter *self, Folder *folder) {
-    self->folder = (Folder*)INCREF(folder);
+    CompoundFileWriterIVARS *const ivars = CFWriter_IVARS(self);
+    ivars->folder = (Folder*)INCREF(folder);
     return self;
 }
 
 void
 CFWriter_destroy(CompoundFileWriter *self) {
-    DECREF(self->folder);
+    CompoundFileWriterIVARS *const ivars = CFWriter_IVARS(self);
+    DECREF(ivars->folder);
     SUPER_DESTROY(self, COMPOUNDFILEWRITER);
 }
 
 void
 CFWriter_consolidate(CompoundFileWriter *self) {
+    CompoundFileWriterIVARS *const ivars = CFWriter_IVARS(self);
     CharBuf *cfmeta_file = (CharBuf*)ZCB_WRAP_STR("cfmeta.json", 11);
-    if (Folder_Exists(self->folder, cfmeta_file)) {
+    if (Folder_Exists(ivars->folder, cfmeta_file)) {
         THROW(ERR, "Merge already performed for %o",
-              Folder_Get_Path(self->folder));
+              Folder_Get_Path(ivars->folder));
     }
     else {
-        S_clean_up_old_temp_files(self);
-        S_do_consolidate(self);
+        S_clean_up_old_temp_files(self, ivars);
+        S_do_consolidate(self, ivars);
     }
 }
 
 static void
-S_clean_up_old_temp_files(CompoundFileWriter *self) {
-    Folder  *folder      = self->folder;
+S_clean_up_old_temp_files(CompoundFileWriter *self,
+                          CompoundFileWriterIVARS *ivars) {
+    UNUSED_VAR(self);
+    Folder  *folder      = ivars->folder;
     CharBuf *cfmeta_temp = (CharBuf*)ZCB_WRAP_STR("cfmeta.json.temp", 16);
     CharBuf *cf_file     = (CharBuf*)ZCB_WRAP_STR("cf.dat", 6);
 
@@ -85,8 +91,9 @@ S_clean_up_old_temp_files(CompoundFileWriter *self) {
 }
 
 static void
-S_do_consolidate(CompoundFileWriter *self) {
-    Folder    *folder       = self->folder;
+S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
+    UNUSED_VAR(self);
+    Folder    *folder       = ivars->folder;
     Hash      *metadata     = Hash_new(0);
     Hash      *sub_files    = Hash_new(0);
     VArray    *files        = Folder_List(folder, NULL);
@@ -143,8 +150,8 @@ S_do_consolidate(CompoundFileWriter *self) {
     // Write metadata to cfmeta file.
     CharBuf *cfmeta_temp = (CharBuf*)ZCB_WRAP_STR("cfmeta.json.temp", 16);
     CharBuf *cfmeta_file = (CharBuf*)ZCB_WRAP_STR("cfmeta.json", 11);
-    Json_spew_json((Obj*)metadata, (Folder*)self->folder, cfmeta_temp);
-    rename_success = Folder_Rename(self->folder, cfmeta_temp, cfmeta_file);
+    Json_spew_json((Obj*)metadata, (Folder*)ivars->folder, cfmeta_temp);
+    rename_success = Folder_Rename(ivars->folder, cfmeta_temp, cfmeta_file);
     if (!rename_success) { RETHROW(INCREF(Err_get_error())); }
 
     // Clean up.
