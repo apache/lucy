@@ -53,28 +53,30 @@ Schema_new() {
 
 Schema*
 Schema_init(Schema *self) {
+    SchemaIVARS *const ivars = Schema_IVARS(self);
     // Init.
-    self->analyzers      = Hash_new(0);
-    self->types          = Hash_new(0);
-    self->sims           = Hash_new(0);
-    self->uniq_analyzers = VA_new(2);
-    VA_Resize(self->uniq_analyzers, 1);
+    ivars->analyzers      = Hash_new(0);
+    ivars->types          = Hash_new(0);
+    ivars->sims           = Hash_new(0);
+    ivars->uniq_analyzers = VA_new(2);
+    VA_Resize(ivars->uniq_analyzers, 1);
 
     // Assign.
-    self->arch = Schema_Architecture(self);
-    self->sim  = Arch_Make_Similarity(self->arch);
+    ivars->arch = Schema_Architecture(self);
+    ivars->sim  = Arch_Make_Similarity(ivars->arch);
 
     return self;
 }
 
 void
 Schema_destroy(Schema *self) {
-    DECREF(self->arch);
-    DECREF(self->analyzers);
-    DECREF(self->uniq_analyzers);
-    DECREF(self->types);
-    DECREF(self->sims);
-    DECREF(self->sim);
+    SchemaIVARS *const ivars = Schema_IVARS(self);
+    DECREF(ivars->arch);
+    DECREF(ivars->analyzers);
+    DECREF(ivars->uniq_analyzers);
+    DECREF(ivars->types);
+    DECREF(ivars->sims);
+    DECREF(ivars->sim);
     SUPER_DESTROY(self, SCHEMA);
 }
 
@@ -94,12 +96,13 @@ S_add_unique(VArray *array, Obj *elem) {
 
 bool
 Schema_equals(Schema *self, Obj *other) {
-    Schema *twin = (Schema*)other;
-    if (twin == self)                                 { return true; }
-    if (!Obj_Is_A(other, SCHEMA))                     { return false; }
-    if (!Arch_Equals(self->arch, (Obj*)twin->arch))   { return false; }
-    if (!Sim_Equals(self->sim, (Obj*)twin->sim))      { return false; }
-    if (!Hash_Equals(self->types, (Obj*)twin->types)) { return false; }
+    if ((Schema*)other == self)                         { return true; }
+    if (!Obj_Is_A(other, SCHEMA))                       { return false; }
+    SchemaIVARS *const ivars = Schema_IVARS(self);
+    SchemaIVARS *const ovars = Schema_IVARS((Schema*)other);
+    if (!Arch_Equals(ivars->arch, (Obj*)ovars->arch))   { return false; }
+    if (!Sim_Equals(ivars->sim, (Obj*)ovars->sim))      { return false; }
+    if (!Hash_Equals(ivars->types, (Obj*)ovars->types)) { return false; }
     return true;
 }
 
@@ -138,82 +141,90 @@ Schema_spec_field(Schema *self, const CharBuf *field, FieldType *type) {
 
 static void
 S_add_text_field(Schema *self, const CharBuf *field, FieldType *type) {
+    SchemaIVARS *const ivars = Schema_IVARS(self);
     FullTextType *fttype    = (FullTextType*)CERTIFY(type, FULLTEXTTYPE);
     Similarity   *sim       = FullTextType_Make_Similarity(fttype);
     Analyzer     *analyzer  = FullTextType_Get_Analyzer(fttype);
 
     // Cache helpers.
-    Hash_Store(self->sims, (Obj*)field, (Obj*)sim);
-    Hash_Store(self->analyzers, (Obj*)field, INCREF(analyzer));
-    S_add_unique(self->uniq_analyzers, (Obj*)analyzer);
+    Hash_Store(ivars->sims, (Obj*)field, (Obj*)sim);
+    Hash_Store(ivars->analyzers, (Obj*)field, INCREF(analyzer));
+    S_add_unique(ivars->uniq_analyzers, (Obj*)analyzer);
 
     // Store FieldType.
-    Hash_Store(self->types, (Obj*)field, INCREF(type));
+    Hash_Store(ivars->types, (Obj*)field, INCREF(type));
 }
 
 static void
 S_add_string_field(Schema *self, const CharBuf *field, FieldType *type) {
+    SchemaIVARS *const ivars = Schema_IVARS(self);
     StringType *string_type = (StringType*)CERTIFY(type, STRINGTYPE);
     Similarity *sim         = StringType_Make_Similarity(string_type);
 
     // Cache helpers.
-    Hash_Store(self->sims, (Obj*)field, (Obj*)sim);
+    Hash_Store(ivars->sims, (Obj*)field, (Obj*)sim);
 
     // Store FieldType.
-    Hash_Store(self->types, (Obj*)field, INCREF(type));
+    Hash_Store(ivars->types, (Obj*)field, INCREF(type));
 }
 
 static void
 S_add_blob_field(Schema *self, const CharBuf *field, FieldType *type) {
+    SchemaIVARS *const ivars = Schema_IVARS(self);
     BlobType *blob_type = (BlobType*)CERTIFY(type, BLOBTYPE);
-    Hash_Store(self->types, (Obj*)field, INCREF(blob_type));
+    Hash_Store(ivars->types, (Obj*)field, INCREF(blob_type));
 }
 
 static void
 S_add_numeric_field(Schema *self, const CharBuf *field, FieldType *type) {
+    SchemaIVARS *const ivars = Schema_IVARS(self);
     NumericType *num_type = (NumericType*)CERTIFY(type, NUMERICTYPE);
-    Hash_Store(self->types, (Obj*)field, INCREF(num_type));
+    Hash_Store(ivars->types, (Obj*)field, INCREF(num_type));
 }
 
 FieldType*
 Schema_fetch_type(Schema *self, const CharBuf *field) {
-    return (FieldType*)Hash_Fetch(self->types, (Obj*)field);
+    SchemaIVARS *const ivars = Schema_IVARS(self);
+    return (FieldType*)Hash_Fetch(ivars->types, (Obj*)field);
 }
 
 Analyzer*
 Schema_fetch_analyzer(Schema *self, const CharBuf *field) {
+    SchemaIVARS *const ivars = Schema_IVARS(self);
     return field
-           ? (Analyzer*)Hash_Fetch(self->analyzers, (Obj*)field)
+           ? (Analyzer*)Hash_Fetch(ivars->analyzers, (Obj*)field)
            : NULL;
 }
 
 Similarity*
 Schema_fetch_sim(Schema *self, const CharBuf *field) {
+    SchemaIVARS *const ivars = Schema_IVARS(self);
     Similarity *sim = NULL;
     if (field != NULL) {
-        sim = (Similarity*)Hash_Fetch(self->sims, (Obj*)field);
+        sim = (Similarity*)Hash_Fetch(ivars->sims, (Obj*)field);
     }
     return sim;
 }
 
 uint32_t
 Schema_num_fields(Schema *self) {
-    return Hash_Get_Size(self->types);
+    SchemaIVARS *const ivars = Schema_IVARS(self);
+    return Hash_Get_Size(ivars->types);
 }
 
 Architecture*
 Schema_get_architecture(Schema *self) {
-    return self->arch;
+    return Schema_IVARS(self)->arch;
 }
 
 Similarity*
 Schema_get_similarity(Schema *self) {
-    return self->sim;
+    return Schema_IVARS(self)->sim;
 }
 
 VArray*
 Schema_all_fields(Schema *self) {
-    return Hash_Keys(self->types);
+    return Hash_Keys(Schema_IVARS(self)->types);
 }
 
 uint32_t
@@ -237,20 +248,21 @@ S_find_in_array(VArray *array, Obj *obj) {
 
 Hash*
 Schema_dump(Schema *self) {
+    SchemaIVARS *const ivars = Schema_IVARS(self);
     Hash *dump = Hash_new(0);
-    Hash *type_dumps = Hash_new(Hash_Get_Size(self->types));
+    Hash *type_dumps = Hash_new(Hash_Get_Size(ivars->types));
     CharBuf *field;
     FieldType *type;
 
     // Record class name, store dumps of unique Analyzers.
     Hash_Store_Str(dump, "_class", 6,
                    (Obj*)CB_Clone(Schema_Get_Class_Name(self)));
-    Hash_Store_Str(dump, "analyzers", 9, (Obj*)VA_Dump(self->uniq_analyzers));
+    Hash_Store_Str(dump, "analyzers", 9, (Obj*)VA_Dump(ivars->uniq_analyzers));
 
     // Dump FieldTypes.
     Hash_Store_Str(dump, "fields", 6, (Obj*)type_dumps);
-    Hash_Iterate(self->types);
-    while (Hash_Next(self->types, (Obj**)&field, (Obj**)&type)) {
+    Hash_Iterate(ivars->types);
+    while (Hash_Next(ivars->types, (Obj**)&field, (Obj**)&type)) {
         VTable *type_vtable = FType_Get_VTable(type);
 
         // Dump known types to simplified format.
@@ -259,7 +271,7 @@ Schema_dump(Schema *self) {
             Hash *type_dump = FullTextType_Dump_For_Schema(fttype);
             Analyzer *analyzer = FullTextType_Get_Analyzer(fttype);
             uint32_t tick
-                = S_find_in_array(self->uniq_analyzers, (Obj*)analyzer);
+                = S_find_in_array(ivars->uniq_analyzers, (Obj*)analyzer);
 
             // Store the tick which references a unique analyzer.
             Hash_Store_Str(type_dump, "analyzer", 8,
@@ -299,7 +311,8 @@ Schema_load(Schema *self, Obj *dump) {
 
     // Start with a blank Schema.
     Schema_init(loaded);
-    VA_Grow(loaded->uniq_analyzers, VA_Get_Size(analyzers));
+    SchemaIVARS *const loaded_ivars = Schema_IVARS(loaded);
+    VA_Grow(loaded_ivars->uniq_analyzers, VA_Get_Size(analyzers));
 
     Hash_Iterate(type_dumps);
     while (Hash_Next(type_dumps, (Obj**)&field, (Obj**)&type_dump)) {
@@ -390,8 +403,9 @@ Schema_eat(Schema *self, Schema *other) {
 
     CharBuf *field;
     FieldType *type;
-    Hash_Iterate(other->types);
-    while (Hash_Next(other->types, (Obj**)&field, (Obj**)&type)) {
+    SchemaIVARS *const ovars = Schema_IVARS(other);
+    Hash_Iterate(ovars->types);
+    while (Hash_Next(ovars->types, (Obj**)&field, (Obj**)&type)) {
         Schema_Spec_Field(self, field, type);
     }
 }

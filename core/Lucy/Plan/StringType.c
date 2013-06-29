@@ -36,37 +36,38 @@ StringType*
 StringType_init2(StringType *self, float boost, bool indexed,
                  bool stored, bool sortable) {
     FType_init((FieldType*)self);
-    self->boost      = boost;
-    self->indexed    = indexed;
-    self->stored     = stored;
-    self->sortable   = sortable;
+    StringTypeIVARS *const ivars = StringType_IVARS(self);
+    ivars->boost      = boost;
+    ivars->indexed    = indexed;
+    ivars->stored     = stored;
+    ivars->sortable   = sortable;
     return self;
 }
 
 bool
 StringType_equals(StringType *self, Obj *other) {
-    StringType *twin = (StringType*)other;
-    if (twin == self)                           { return true; }
+    if ((StringType*)other == self)             { return true; }
     if (!FType_equals((FieldType*)self, other)) { return false; }
     return true;
 }
 
 Hash*
 StringType_dump_for_schema(StringType *self) {
+    StringTypeIVARS *const ivars = StringType_IVARS(self);
     Hash *dump = Hash_new(0);
     Hash_Store_Str(dump, "type", 4, (Obj*)CB_newf("string"));
 
     // Store attributes that override the defaults.
-    if (self->boost != 1.0) {
-        Hash_Store_Str(dump, "boost", 5, (Obj*)CB_newf("%f64", self->boost));
+    if (ivars->boost != 1.0) {
+        Hash_Store_Str(dump, "boost", 5, (Obj*)CB_newf("%f64", ivars->boost));
     }
-    if (!self->indexed) {
+    if (!ivars->indexed) {
         Hash_Store_Str(dump, "indexed", 7, (Obj*)CFISH_FALSE);
     }
-    if (!self->stored) {
+    if (!ivars->stored) {
         Hash_Store_Str(dump, "stored", 6, (Obj*)CFISH_FALSE);
     }
-    if (self->sortable) {
+    if (ivars->sortable) {
         Hash_Store_Str(dump, "sortable", 8, (Obj*)CFISH_TRUE);
     }
 
@@ -97,13 +98,12 @@ StringType_load(StringType *self, Obj *dump) {
     Obj *sortable_dump   = Hash_Fetch_Str(source, "sortable", 8);
     UNUSED_VAR(self);
 
-    StringType_init(loaded);
-    if (boost_dump)    { loaded->boost    = (float)Obj_To_F64(boost_dump); }
-    if (indexed_dump)  { loaded->indexed  = Obj_To_Bool(indexed_dump); }
-    if (stored_dump)   { loaded->stored   = Obj_To_Bool(stored_dump); }
-    if (sortable_dump) { loaded->sortable = Obj_To_Bool(sortable_dump); }
+    float boost    = boost_dump    ? (float)Obj_To_F64(boost_dump) : 1.0f;
+    bool  indexed  = indexed_dump  ? Obj_To_Bool(indexed_dump)     : true;
+    bool  stored   = stored_dump   ? Obj_To_Bool(stored_dump)      : true;
+    bool  sortable = sortable_dump ? Obj_To_Bool(sortable_dump)    : false;
 
-    return loaded;
+    return StringType_init2(loaded, boost, indexed, stored, sortable);
 }
 
 Similarity*

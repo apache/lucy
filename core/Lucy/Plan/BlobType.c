@@ -28,7 +28,8 @@ BlobType_new(bool stored) {
 BlobType*
 BlobType_init(BlobType *self, bool stored) {
     FType_init((FieldType*)self);
-    self->stored = stored;
+    BlobTypeIVARS *const ivars = BlobType_IVARS(self);
+    ivars->stored = stored;
     return self;
 }
 
@@ -58,26 +59,26 @@ BlobType_primitive_id(BlobType *self) {
 
 bool
 BlobType_equals(BlobType *self, Obj *other) {
-    BlobType *twin = (BlobType*)other;
-    if (twin == self)               { return true; }
+    if ((BlobType*)other == self)   { return true; }
     if (!Obj_Is_A(other, BLOBTYPE)) { return false; }
     return FType_equals((FieldType*)self, other);
 }
 
 Hash*
 BlobType_dump_for_schema(BlobType *self) {
+    BlobTypeIVARS *const ivars = BlobType_IVARS(self);
     Hash *dump = Hash_new(0);
     Hash_Store_Str(dump, "type", 4, (Obj*)CB_newf("blob"));
 
     // Store attributes that override the defaults -- even if they're
     // meaningless.
-    if (self->boost != 1.0) {
-        Hash_Store_Str(dump, "boost", 5, (Obj*)CB_newf("%f64", self->boost));
+    if (ivars->boost != 1.0) {
+        Hash_Store_Str(dump, "boost", 5, (Obj*)CB_newf("%f64", ivars->boost));
     }
-    if (self->indexed) {
+    if (ivars->indexed) {
         Hash_Store_Str(dump, "indexed", 7, (Obj*)CFISH_TRUE);
     }
-    if (self->stored) {
+    if (ivars->stored) {
         Hash_Store_Str(dump, "stored", 6, (Obj*)CFISH_TRUE);
     }
 
@@ -108,9 +109,16 @@ BlobType_load(BlobType *self, Obj *dump) {
     UNUSED_VAR(self);
 
     BlobType_init(loaded, false);
-    if (boost_dump)   { loaded->boost   = (float)Obj_To_F64(boost_dump);    }
-    if (indexed_dump) { loaded->indexed = Obj_To_Bool(indexed_dump); }
-    if (stored_dump)  { loaded->stored  = Obj_To_Bool(stored_dump);  }
+    BlobTypeIVARS *const loaded_ivars = BlobType_IVARS(loaded);
+    if (boost_dump) {
+        loaded_ivars->boost = (float)Obj_To_F64(boost_dump);
+    }
+    if (indexed_dump) {
+        loaded_ivars->indexed = Obj_To_Bool(indexed_dump);
+    }
+    if (stored_dump){
+        loaded_ivars->stored = Obj_To_Bool(stored_dump);
+    }
 
     return loaded;
 }

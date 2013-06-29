@@ -53,37 +53,42 @@ TextTermStepper_new() {
 TextTermStepper*
 TextTermStepper_init(TextTermStepper *self) {
     TermStepper_init((TermStepper*)self);
-    self->value = (Obj*)CB_new(0);
+    TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
+    ivars->value = (Obj*)CB_new(0);
     return self;
 }
 
 void
 TextTermStepper_set_value(TextTermStepper *self, Obj *value) {
+    TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
     CERTIFY(value, CHARBUF);
-    DECREF(self->value);
-    self->value = INCREF(value);
+    DECREF(ivars->value);
+    ivars->value = INCREF(value);
 }
 
 void
 TextTermStepper_reset(TextTermStepper *self) {
-    CB_Set_Size((CharBuf*)self->value, 0);
+    TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
+    CB_Set_Size((CharBuf*)ivars->value, 0);
 }
 
 void
 TextTermStepper_write_key_frame(TextTermStepper *self, OutStream *outstream,
                                 Obj *value) {
+    TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
     uint8_t *buf  = CB_Get_Ptr8((CharBuf*)value);
     size_t   size = CB_Get_Size((CharBuf*)value);
     OutStream_Write_C32(outstream, size);
     OutStream_Write_Bytes(outstream, buf, size);
-    Obj_Mimic(self->value, value);
+    Obj_Mimic(ivars->value, value);
 }
 
 void
 TextTermStepper_write_delta(TextTermStepper *self, OutStream *outstream,
                             Obj *value) {
+    TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
     CharBuf *new_value  = (CharBuf*)CERTIFY(value, CHARBUF);
-    CharBuf *last_value = (CharBuf*)self->value;
+    CharBuf *last_value = (CharBuf*)ivars->value;
     char    *new_text  = (char*)CB_Get_Ptr8(new_value);
     size_t   new_size  = CB_Get_Size(new_value);
     char    *last_text = (char*)CB_Get_Ptr8(last_value);
@@ -100,18 +105,19 @@ TextTermStepper_write_delta(TextTermStepper *self, OutStream *outstream,
     OutStream_Write_String(outstream, diff_start_str, diff_len);
 
     // Update value.
-    CB_Mimic((CharBuf*)self->value, value);
+    CB_Mimic((CharBuf*)ivars->value, value);
 }
 
 void
 TextTermStepper_read_key_frame(TextTermStepper *self, InStream *instream) {
+    TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
     const uint32_t text_len = InStream_Read_C32(instream);
 
     // Allocate space.
-    if (self->value == NULL) {
-        self->value = (Obj*)CB_new(text_len);
+    if (ivars->value == NULL) {
+        ivars->value = (Obj*)CB_new(text_len);
     }
-    CharBuf *value = (CharBuf*)self->value;
+    CharBuf *value = (CharBuf*)ivars->value;
     char *ptr      = CB_Grow(value, text_len);
 
     // Set the value text.
@@ -129,15 +135,16 @@ TextTermStepper_read_key_frame(TextTermStepper *self, InStream *instream) {
 
 void
 TextTermStepper_read_delta(TextTermStepper *self, InStream *instream) {
+    TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
     const uint32_t text_overlap     = InStream_Read_C32(instream);
     const uint32_t finish_chars_len = InStream_Read_C32(instream);
     const uint32_t total_text_len   = text_overlap + finish_chars_len;
 
     // Allocate space.
-    if (self->value == NULL) {
-        self->value = (Obj*)CB_new(total_text_len);
+    if (ivars->value == NULL) {
+        ivars->value = (Obj*)CB_new(total_text_len);
     }
-    CharBuf *value = (CharBuf*)self->value;
+    CharBuf *value = (CharBuf*)ivars->value;
     char *ptr      = CB_Grow(value, total_text_len);
 
     // Set the value text.

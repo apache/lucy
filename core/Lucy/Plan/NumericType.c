@@ -28,10 +28,11 @@ NumericType*
 NumType_init2(NumericType *self, float boost, bool indexed, bool stored,
               bool sortable) {
     FType_init((FieldType*)self);
-    self->boost      = boost;
-    self->indexed    = indexed;
-    self->stored     = stored;
-    self->sortable   = sortable;
+    NumericTypeIVARS *const ivars = NumType_IVARS(self);
+    ivars->boost      = boost;
+    ivars->indexed    = indexed;
+    ivars->stored     = stored;
+    ivars->sortable   = sortable;
     return self;
 }
 
@@ -43,20 +44,21 @@ NumType_binary(NumericType *self) {
 
 Hash*
 NumType_dump_for_schema(NumericType *self) {
+    NumericTypeIVARS *const ivars = NumType_IVARS(self);
     Hash *dump = Hash_new(0);
     Hash_Store_Str(dump, "type", 4, (Obj*)NumType_Specifier(self));
 
     // Store attributes that override the defaults.
-    if (self->boost != 1.0) {
-        Hash_Store_Str(dump, "boost", 5, (Obj*)CB_newf("%f64", self->boost));
+    if (ivars->boost != 1.0) {
+        Hash_Store_Str(dump, "boost", 5, (Obj*)CB_newf("%f64", ivars->boost));
     }
-    if (!self->indexed) {
+    if (!ivars->indexed) {
         Hash_Store_Str(dump, "indexed", 7, (Obj*)CFISH_FALSE);
     }
-    if (!self->stored) {
+    if (!ivars->stored) {
         Hash_Store_Str(dump, "stored", 6, (Obj*)CFISH_FALSE);
     }
-    if (self->sortable) {
+    if (ivars->sortable) {
         Hash_Store_Str(dump, "sortable", 8, (Obj*)CFISH_TRUE);
     }
 
