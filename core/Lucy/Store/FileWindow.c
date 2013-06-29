@@ -51,4 +51,18 @@ FileWindow_set_window(FileWindow *self, char *buf, int64_t offset,
     ivars->len    = len;
 }
 
+char*
+FileWindow_get_buf(FileWindow *self) {
+    return FileWindow_IVARS(self)->buf;
+}
+
+int64_t
+FileWindow_get_offset(FileWindow *self) {
+    return FileWindow_IVARS(self)->offset;
+}
+
+int64_t
+FileWindow_get_len(FileWindow *self) {
+    return FileWindow_IVARS(self)->len;
+}
 

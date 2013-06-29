@@ -15,7 +15,6 @@
  */
 
 #define C_LUCY_INSTREAM
-#define C_LUCY_FILEWINDOW
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Store/InStream.h"
@@ -203,9 +202,12 @@ S_fill(InStream *self, int64_t amount) {
 
     // Make the request.
     if (FH_Window(ivars->file_handle, window, real_file_pos, amount)) {
-        char *const window_limit = window->buf + window->len;
-        ivars->buf = window->buf
-                     - window->offset     // theoretical start of real file
+        char    *fw_buf    = FileWindow_Get_Buf(window);
+        int64_t  fw_offset = FileWindow_Get_Offset(window);
+        int64_t  fw_len    = FileWindow_Get_Len(window);
+        char *const window_limit = fw_buf + fw_len;
+        ivars->buf = fw_buf
+                     - fw_offset          // theoretical start of real file
                      + ivars->offset      // top of virtual file
                      + virtual_file_pos;  // position within virtual file
         ivars->limit = window_limit - ivars->buf > remaining
@@ -228,8 +230,11 @@ void
 InStream_seek(InStream *self, int64_t target) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     FileWindow *const window = ivars->window;
-    int64_t virtual_window_top = window->offset - ivars->offset;
-    int64_t virtual_window_end = virtual_window_top + window->len;
+    char    *fw_buf    = FileWindow_Get_Buf(window);
+    int64_t  fw_offset = FileWindow_Get_Offset(window);
+    int64_t  fw_len    = FileWindow_Get_Len(window);
+    int64_t  virtual_window_top = fw_offset - ivars->offset;
+    int64_t  virtual_window_end = virtual_window_top + fw_len;
 
     if (target < 0) {
         THROW(ERR, "Can't Seek '%o' to negative target %i64", ivars->filename,
@@ -239,7 +244,7 @@ InStream_seek(InStream *self, int64_t target) {
     else if (target >= virtual_window_top
              && target <= virtual_window_end
             ) {
-        ivars->buf = window->buf - window->offset + ivars->offset + target;
+        ivars->buf = fw_buf - fw_offset + ivars->offset + target;
     }
     else if (target > ivars->len) {
         THROW(ERR, "Can't Seek '%o' past EOF (%i64 > %i64)", ivars->filename,
@@ -259,9 +264,9 @@ InStream_seek(InStream *self, int64_t target) {
 static INLINE int64_t
 SI_tell(InStream *self) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
-    FileWindow *const window = ivars->window;
-    int64_t pos_in_buf = PTR_TO_I64(ivars->buf) - PTR_TO_I64(window->buf);
-    return pos_in_buf + window->offset - ivars->offset;
+    char *fw_buf = FileWindow_Get_Buf(ivars->window);
+    int64_t pos_in_buf = PTR_TO_I64(ivars->buf) - PTR_TO_I64(fw_buf);
+    return pos_in_buf + FileWindow_Get_Offset(ivars->window) - ivars->offset;
 }
 
 int64_t

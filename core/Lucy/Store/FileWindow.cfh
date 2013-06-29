@@ -35,6 +35,15 @@ class Lucy::Store::FileWindow inherits Clownfish::Obj {
 
     void
     Set_Window(FileWindow *self, char *buf, int64_t offset, int64_t len);
+
+    char*
+    Get_Buf(FileWindow *self);
+
+    int64_t
+    Get_Offset(FileWindow *self);
+
+    int64_t
+    Get_Len(FileWindow *self);
 }
 
 

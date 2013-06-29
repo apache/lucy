@@ -15,7 +15,6 @@
  */
 
 #define C_LUCY_FSFILEHANDLE
-#define C_LUCY_FILEWINDOW
 #include "Lucy/Util/ToolSet.h"
 
 #include <errno.h>
@@ -313,7 +312,9 @@ SI_window(FSFileHandle *self, FSFileHandleIVARS *ivars, FileWindow *window,
 
 bool
 FSFH_release_window(FSFileHandle *self, FileWindow *window) {
-    if (!SI_unmap(self, window->buf, window->len)) { return false; }
+    char *buf = FileWindow_Get_Buf(window);
+    int64_t len = FileWindow_Get_Len(window);
+    if (!SI_unmap(self, buf, len)) { return false; }
     FileWindow_Set_Window(window, NULL, 0, 0);
     return true;
 }
