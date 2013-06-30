@@ -15,7 +15,7 @@
 
 =head1 NAME
 
-Clownfish - Short description.
+Clownfish - Symbiotic object system.
 
 =head1 VERSION
 
@@ -23,11 +23,13 @@ Clownfish - Short description.
 
 =head1 DESCRIPTION
 
-Clownfish is an object system for C designed to easily create bindings for
-dynamic languages, so-called host languages. Classes are declared in Clownfish
-header files with a C<.cfh> extension. The Clownfish headers are used by the
-Clownfish compiler to generate C header files and host language bindings.
-Class methods, functions and variables are defined in normal C source files.
+Clownfish is a "symbiotic" object system for C which is designed to pair
+with a "host" dynamic language environment, facilitating the development
+of high performance host language extensions.  Clownfish classes are
+declared in header files with a C<.cfh> extension.  The Clownfish headers
+are used by the Clownfish compiler to generate C header files and host
+language bindings.  Methods, functions and variables are defined in normal
+C source files.
 
 =head2 Features
 
@@ -140,9 +142,15 @@ For example:
 
 All classes following a parcel specifier will be associated with that parcel.
 
-=head3 Bootstrapping
+=head3 Initialization
 
-TODO
+Every Clownfish parcel must be initialized before it is used. The
+initialization function is named C<{parcel_nick}_bootstrap_parcel> and takes
+no arguments.
+
+Example call:
+
+    pfind_bootstrap_parcel();
 
 =head3 Short names
 
@@ -178,7 +186,7 @@ following form:
                         ("inherits" class-name)?
                         "{" class-contents "}"
     class-exposure-specifier = "public"
-    class-modifier = "inert" | "abstract" | "final"
+    class-modifier = "inert" | "final"
     class-name = identifier | identifier "::" class-name
     class-nickname = identifier
     class-contents = (variable-declaration | function-declaration)*
@@ -226,14 +234,10 @@ neither instance variables nor methods. They must not inherit from another
 class or be inherited from. All other classes (except Clownfish::Obj) must
 inherit from Clownfish::Obj or another class.
 
-=head3 Abstract classes
-
-Only abstract classes may contain abstract methods. They must not be
-instantiated directly.
-
 =head3 Final classes
 
-Final classes must not be inherited from. They must not be abstract.
+For final classes, every method is made final, regardless of the method
+modifier. Final classes must not be inherited from.
 
 =head2 Variables
 
@@ -353,20 +357,28 @@ names. So the implementation will look like:
         /* Implementation */
     }
 
+=head3 Inline functions
+
+TODO
+
 =head3 Methods
 
 Non-inert functions are dynamically dispatched methods. Their name must start
 with an uppercase letter and every underscore must be followed by an uppercase
-letter. For every method, a wrapper for dynamic dispatch is declared in the
-generated C header with the name
+letter. Methods must not be declared inline.
+
+The first parameter of a method must be a pointer to an object of the method's
+class which receives the object on which the method was invoked. By convention,
+this parameter is named C<self>.
+
+For every method, an inline wrapper for dynamic dispatch is defined in
+the generated C header with the name
 C<{Parcel_Nick}_{Class_Nick}_{Method_Name}>. Additionally, an
 implementing function is declared with the name
-C<{parcel_nick}_{Class_Nick}_{method_name}>. The implementing function
-of non-abstract methods must be defined in a C source file. The first parameter
-of a method must be a pointer to an object of the class.
-
-TODO: Method typedefs
-TODO: METHOD_PTR
+C<{parcel_nick}_{Class_Nick}_{method_name}>. The Clownfish compiler also
+generates a typedef for the method's function pointer type named
+C<{Parcel_Nick}_{Class_Nick}_{Method_Name}_t>. Wrappers and typedefs are
+created for all subclasses whether they override a method or not.
 
 Example:
 
@@ -380,15 +392,23 @@ Example:
 This will generate:
 
     /* Wrapper for dynamic dispatch */
-    void
-    Pfind_VisGraph_Add_Node(pfind_VisibilityGraph *self, pfind_Node *node);
+    static inline void
+    Pfind_VisGraph_Add_Node(pfind_VisibilityGraph *self, pfind_Node *node) {
+        /* Inline code for wrapper */
+    }
 
-    /* Implementing function */
+    /* Declaration of implementing function */
     void
     pfind_VisGraph_add_node(pfind_VisibilityGraph *self, pfind_Node *node);
 
-The C source file implementing the method will typically use short names. So
-the implementation will look like:
+    /* Declaration of function pointer type */
+    typedef void
+    (*Pfind_VisGraph_Add_Node_t)(pfind_VisibilityGraph *self,
+                                 pfind_Node *node);
+
+The implementing function of non-abstract methods must be defined in a C source
+file. This file will typically define the short names macro. So the
+implementation will look like:
 
     #define PFIND_USE_SHORT_NAMES
     #include "Pathfinder/Graph/VisibilityGraph.h"
@@ -398,6 +418,19 @@ the implementation will look like:
         /* Implementation */
     }
 
+=head3 Looking up function pointers
+
+Clownfish defines a macro named C<CFISH_METHOD_PTR> that looks up the pointer
+to the implementing function of a method. The first parameter of the macro is
+a pointer to the Clownfish::VTable object of the method's class, the second is
+the unshortened name of the method wrapper. If short names for the Clownfish
+parcel are used, the macro is also available under the name C<METHOD_PTR>.
+
+Example using short names:
+
+    VisGraph_Add_Node_t add_node
+        = METHOD_PTR(PFIND_VISIBILITYGRAPH, Pfind_VisGraph_Add_Node);
+
 =head3 Abstract methods
 
 For abstract methods, the Clownfish compiler generates an implementing function
@@ -406,10 +439,6 @@ which throws an error. They should be overridden in a subclass.
 =head3 Final methods
 
 Final methods must not be overridden. They must not be abstract.
-
-=head3 Inline functions
-
-TODO
 
 =head3 Nullable return type
 
@@ -429,7 +458,7 @@ accessor or a collection object and the caller wants to use the object longer
 than the returning object retains a reference, it must increment the reference
 count itself and decrement when the object is no longer used.
 
-=head3 Decremented return type
+=head3 Decremented parameters
 
 Decremented parameters must be pointers to Clownfish objects. The function
 will either decrement the reference count of the passed-in object or retain a
@@ -443,10 +472,29 @@ reference count after the call.
 
 TODO
 
+=head2 C blocks
+
+Clownfish headers can contain C blocks which start with a line containing the
+string C<__C__> and end on a line containing the string C<__END_C__>. The
+contents of a C block are copied verbatim to the generated C header.
+
+Example:
+
+    __C__
+
+    struct pfind_AuxiliaryStruct {
+        int a;
+        int b;
+    };
+
+    __END_C__
+
 =head2 Memory management
 
 TODO: Reference counting
+
 TODO: INCREF/DECREF macros
+
 TODO: Destroy method
 
 =head2 Constructors
@@ -456,12 +504,13 @@ TODO
 =head2 Inheritance
 
 TODO: init functions
+
 TODO: SUPER_METHOD_PTR, SUPER_DESTROY
 
 =head1 COPYRIGHT
 
-Apache Clownfish is distributed under the Apache License, Version 2.0, as
-described in the file C<LICENSE> included with the distribution.
+Clownfish is distributed under the Apache License, Version 2.0, as described
+in the file C<LICENSE> included with the distribution.
 
 =cut
 
