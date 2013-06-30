@@ -467,12 +467,11 @@ CFCClass_method(CFCClass *self, const char *sym) {
 
 CFCMethod*
 CFCClass_fresh_method(CFCClass *self, const char *sym) {
-    // TODO: Comparing classes by cnick isn't safe with multiple parcels.
     CFCMethod *method = CFCClass_method(self, sym);
     if (method) {
-        const char *cnick = CFCClass_get_cnick(self);
-        const char *meth_cnick = CFCMethod_get_class_cnick(method);
-        if (strcmp(cnick, meth_cnick) == 0) {
+        const char *class_name = CFCClass_get_class_name(self);
+        const char *meth_class_name = CFCMethod_get_class_name(method);
+        if (strcmp(class_name, meth_class_name) == 0) {
             return method;
         }
     }
@@ -655,8 +654,7 @@ CFCClass_tree_to_ladder(CFCClass *self) {
 
 static CFCSymbol**
 S_fresh_syms(CFCClass *self, CFCSymbol **syms) {
-    // TODO: Comparing classes by cnick isn't safe with multiple parcels.
-    const char *cnick = CFCClass_get_cnick(self);
+    const char *class_name = CFCClass_get_class_name(self);
     size_t count = 0;
     while (syms[count] != NULL) { count++; }
     size_t amount = (count + 1) * sizeof(CFCSymbol*);
@@ -664,8 +662,8 @@ S_fresh_syms(CFCClass *self, CFCSymbol **syms) {
     size_t num_fresh = 0;
     for (size_t i = 0; i < count; i++) {
         CFCSymbol *sym = syms[i];
-        const char *sym_cnick = CFCSymbol_get_class_cnick(sym);
-        if (strcmp(sym_cnick, cnick) == 0) {
+        const char *sym_class_name = CFCSymbol_get_class_name(sym);
+        if (strcmp(sym_class_name, class_name) == 0) {
             fresh[num_fresh++] = sym;
         }
     }
