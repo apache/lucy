@@ -188,7 +188,20 @@ CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
     self->is_final    = !!is_final;
     self->is_inert    = !!is_inert;
 
-    // TODO: Check that file_spec->is_included matches parcel->is_included.
+    if (file_spec && CFCFileSpec_included(file_spec)) {
+        if (!CFCParcel_included(parcel)) {
+            CFCUtil_die("Class %s from include dir found in parcel %s from"
+                        " source dir",
+                        class_name, CFCParcel_get_name(parcel));
+        }
+    }
+    else {
+        if (CFCParcel_included(parcel)) {
+            CFCUtil_die("Class %s from source dir found in parcel %s from"
+                        " include dir",
+                        class_name, CFCParcel_get_name(parcel));
+        }
+    }
 
     // Store in registry.
     S_register(self);

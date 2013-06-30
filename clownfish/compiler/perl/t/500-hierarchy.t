@@ -24,7 +24,7 @@ use File::Spec::Functions qw( catdir catfile splitpath );
 use Fcntl;
 use File::Path qw( rmtree mkpath );
 
-my $source = catdir(qw( t cfsource ));
+my $base_dir = catdir(qw( t cfbase ));
 my %args = (
     dest => catdir(qw( t cfdest )),
 );
@@ -48,8 +48,8 @@ is( $hierarchy->get_include_dest, $inc_dest, "get_include_dest" );
 my $src_dest = catfile( $args{dest}, "source" );
 is( $hierarchy->get_source_dest, $src_dest, "get_source_dest" );
 
-$hierarchy->add_source_dir($source);
-is_deeply( $hierarchy->get_source_dirs, [ $source ], "get_source_dirs" );
+$hierarchy->add_source_dir($base_dir);
+is_deeply( $hierarchy->get_source_dirs, [ $base_dir ], "get_source_dirs" );
 
 $hierarchy->build;
 
@@ -89,7 +89,7 @@ for my $file (@files) {
         or die "utime failed for '$h_path': $!";
 }
 
-my $path_to_animal_cf = $animal->cfh_path( $source );
+my $path_to_animal_cf = $animal->cfh_path( $base_dir );
 utime( undef, undef, $path_to_animal_cf )
     or die "utime for '$path_to_animal_cf' failed";    # touch
 

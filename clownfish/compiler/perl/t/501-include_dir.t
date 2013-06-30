@@ -16,31 +16,27 @@
 use strict;
 use warnings;
 
-use Test::More tests => 25;
+use Test::More tests => 21;
 
 use Clownfish::CFC::Model::Hierarchy;
-use Clownfish::CFC::Util qw( a_isa_b );
 use File::Spec::Functions qw( catdir catfile splitpath );
-use Fcntl;
 use File::Path qw( rmtree );
 
-my $source = catdir(qw( t cfsource ));
-my $ext    = catdir(qw( t cfext ));
-my $dest   = catdir(qw( t cfdest ));
-
-my $class_clash = catdir(qw( t cfclash class ));
-my $file_clash  = catdir(qw( t cfclash file ));
+my $base_dir = catdir(qw( t cfbase ));
+my $ext_dir  = catdir(qw( t cfext ));
+my $dest_dir = catdir(qw( t cfdest ));
 
 # One source, one include
 
 {
-    my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(dest => $dest);
+    my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(dest => $dest_dir);
 
-    $hierarchy->add_source_dir($ext);
-    is_deeply( $hierarchy->get_source_dirs, [ $ext ], "get_source_dirs" );
+    $hierarchy->add_source_dir($ext_dir);
+    is_deeply( $hierarchy->get_source_dirs, [ $ext_dir ], "get_source_dirs" );
 
-    $hierarchy->add_include_dir($source);
-    is_deeply( $hierarchy->get_include_dirs, [ $source ], "get_include_dirs" );
+    $hierarchy->add_include_dir($base_dir);
+    is_deeply( $hierarchy->get_include_dirs, [ $base_dir ],
+               "get_include_dirs" );
 
     $hierarchy->build;
 
@@ -48,7 +44,8 @@ my $file_clash  = catdir(qw( t cfclash file ));
     is( scalar @$classes, 4, "all classes" );
     my $num_included = 0;
     for my $class (@$classes) {
-        die "not a Class" unless isa_ok( $class, "Clownfish::CFC::Model::Class" );
+        die "not a Class"
+            unless isa_ok( $class, "Clownfish::CFC::Model::Class" );
 
         my $expect;
 
@@ -75,11 +72,12 @@ my $file_clash  = catdir(qw( t cfclash file ));
 # Two sources
 
 {
-    my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(dest => $dest);
+    my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(dest => $dest_dir);
 
-    $hierarchy->add_source_dir($source);
-    $hierarchy->add_source_dir($ext);
-    is_deeply( $hierarchy->get_source_dirs, [ $source, $ext ], "get_source_dirs" );
+    $hierarchy->add_source_dir($base_dir);
+    $hierarchy->add_source_dir($ext_dir);
+    is_deeply( $hierarchy->get_source_dirs, [ $base_dir, $ext_dir ],
+               "get_source_dirs" );
     is_deeply( $hierarchy->get_include_dirs, [], "get_include_dirs" );
 
     $hierarchy->build;
@@ -99,66 +97,6 @@ my $file_clash  = catdir(qw( t cfclash file ));
     Clownfish::CFC::Model::Parcel->reap_singletons();
 }
 
-# Name clashes
-
-{
-    my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(dest => $dest);
-
-    $hierarchy->add_source_dir($source);
-    $hierarchy->add_source_dir($class_clash);
-
-    eval { $hierarchy->build; };
-
-    like( $@, qr/Conflict with existing class Animal::Dog/, "source/source class name clash" );
-
-    Clownfish::CFC::Model::Class->_clear_registry();
-    Clownfish::CFC::Model::Parcel->reap_singletons();
-}
-
-{
-    my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(dest => $dest);
-
-    $hierarchy->add_source_dir($source);
-    $hierarchy->add_source_dir($file_clash);
-
-    eval { $hierarchy->build; };
-
-    my $filename = catfile(qw( Animal Dog.cfh ));
-    like( $@, qr/File \Q$filename\E already registered/, "source/source filename clash" );
-
-    Clownfish::CFC::Model::Class->_clear_registry();
-    Clownfish::CFC::Model::Parcel->reap_singletons();
-}
-
-{
-    my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(dest => $dest);
-
-    $hierarchy->add_source_dir($source);
-    $hierarchy->add_include_dir($class_clash);
-
-    eval { $hierarchy->build; };
-
-    like( $@, qr/Conflict with existing class Animal::Dog/, "source/include class name clash" );
-
-    Clownfish::CFC::Model::Class->_clear_registry();
-    Clownfish::CFC::Model::Parcel->reap_singletons();
-}
-
-{
-    my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(dest => $dest);
-
-    $hierarchy->add_source_dir($source);
-    $hierarchy->add_include_dir($file_clash);
-
-    $hierarchy->build;
-
-    my $classes = $hierarchy->ordered_classes;
-    is( scalar @$classes, 3, "source/include filename clash" );
-
-    Clownfish::CFC::Model::Class->_clear_registry();
-    Clownfish::CFC::Model::Parcel->reap_singletons();
-}
-
 # Clean up.
-rmtree($dest);
+rmtree($dest_dir);
 

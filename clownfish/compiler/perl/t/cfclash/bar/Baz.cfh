@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-parcel AnimalExtension;
+parcel Foo;
 
-class Animal::Rottweiler inherits Animal::Dog {
-    public inert incremented Rottweiler*
-    new();
-
-    public inert Rottweiler*
-    init(Rottweiler *self);
+public class Baz inherits Clownfish::Obj {
+    int var;
 
     public void
-    Bark(Rottweiler *self);
-
-    public void
-    Bite(Rottweiler *self);
+    Method(Baz *self);
 }
+

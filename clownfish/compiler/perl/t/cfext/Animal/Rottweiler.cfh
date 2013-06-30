@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-parcel Animal;
+parcel AnimalExtension;
 
 class Animal::Rottweiler inherits Animal::Dog {
     public inert incremented Rottweiler*

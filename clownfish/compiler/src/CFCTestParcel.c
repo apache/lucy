@@ -65,7 +65,7 @@ S_run_tests(CFCTest *test) {
     }
 
     {
-        const char *path = "t" CHY_DIR_SEP "cfsource" CHY_DIR_SEP "Animal.cfp";
+        const char *path = "t" CHY_DIR_SEP "cfbase" CHY_DIR_SEP "Animal.cfp";
         CFCParcel *parcel = CFCParcel_new_from_file(path, false);
         OK(test, parcel != NULL, "new_from_file");
         CFCBase_decref((CFCBase*)parcel);

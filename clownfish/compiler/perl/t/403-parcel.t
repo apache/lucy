@@ -66,7 +66,7 @@ isa_ok(
 
 isa_ok(
     Clownfish::CFC::Model::Parcel->new_from_file(
-        path => catfile(qw( t cfsource Animal.cfp )),
+        path => catfile(qw( t cfbase Animal.cfp )),
     ),
     "Clownfish::CFC::Model::Parcel",
     "new_from_file"

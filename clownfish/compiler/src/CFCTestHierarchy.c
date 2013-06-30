@@ -36,7 +36,7 @@
 #include "CFCTest.h"
 #include "CFCUtil.h"
 
-#define T_CFSOURCE        "t" CHY_DIR_SEP "cfsource"
+#define T_CFBASE          "t" CHY_DIR_SEP "cfbase"
 #define T_CFEXT           "t" CHY_DIR_SEP "cfext"
 #define T_CFDEST          "t" CHY_DIR_SEP "cfdest"
 #define T_CFDEST_INCLUDE  T_CFDEST CHY_DIR_SEP "include"
@@ -72,9 +72,9 @@ S_run_basic_tests(CFCTest *test) {
     STR_EQ(test, CFCHierarchy_get_source_dest(hierarchy), T_CFDEST_SOURCE,
            "get_source_dest");
 
-    CFCHierarchy_add_source_dir(hierarchy, T_CFSOURCE);
+    CFCHierarchy_add_source_dir(hierarchy, T_CFBASE);
     const char **source_dirs = CFCHierarchy_get_source_dirs(hierarchy);
-    STR_EQ(test, source_dirs[0], T_CFSOURCE, "source_dirs[0]");
+    STR_EQ(test, source_dirs[0], T_CFBASE, "source_dirs[0]");
     OK(test, source_dirs[1] == NULL, "source_dirs[1]");
 
     CFCHierarchy_build(hierarchy);
@@ -135,7 +135,7 @@ S_run_basic_tests(CFCTest *test) {
         CFCTest_set_file_times(h_path, past_time);
     }
 
-    char *cfh_path = CFCFile_cfh_path(animal, T_CFSOURCE);
+    char *cfh_path = CFCFile_cfh_path(animal, T_CFBASE);
     CFCTest_set_file_times(cfh_path, now);
     FREEMEM(cfh_path);
 
@@ -165,9 +165,9 @@ S_run_include_tests(CFCTest *test) {
     {
         CFCHierarchy *hierarchy = CFCHierarchy_new(T_CFDEST);
         CFCHierarchy_add_source_dir(hierarchy, T_CFEXT);
-        CFCHierarchy_add_include_dir(hierarchy, T_CFSOURCE);
+        CFCHierarchy_add_include_dir(hierarchy, T_CFBASE);
         const char **include_dirs = CFCHierarchy_get_include_dirs(hierarchy);
-        STR_EQ(test, include_dirs[0], T_CFSOURCE, "include_dirs[0]");
+        STR_EQ(test, include_dirs[0], T_CFBASE, "include_dirs[0]");
         OK(test, include_dirs[1] == NULL, "include_dirs[1]");
 
         CFCHierarchy_build(hierarchy);
@@ -201,7 +201,7 @@ S_run_include_tests(CFCTest *test) {
 
     {
         CFCHierarchy *hierarchy = CFCHierarchy_new(T_CFDEST);
-        CFCHierarchy_add_source_dir(hierarchy, T_CFSOURCE);
+        CFCHierarchy_add_source_dir(hierarchy, T_CFBASE);
         CFCHierarchy_add_source_dir(hierarchy, T_CFEXT);
 
         CFCHierarchy_build(hierarchy);
