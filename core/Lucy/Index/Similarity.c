@@ -39,14 +39,16 @@ Sim_new() {
 
 Similarity*
 Sim_init(Similarity *self) {
-    self->norm_decoder = NULL;
+    SimilarityIVARS *const ivars = Sim_IVARS(self);
+    ivars->norm_decoder = NULL;
     return self;
 }
 
 void
 Sim_destroy(Similarity *self) {
-    if (self->norm_decoder) {
-        FREEMEM(self->norm_decoder);
+    SimilarityIVARS *const ivars = Sim_IVARS(self);
+    if (ivars->norm_decoder) {
+        FREEMEM(ivars->norm_decoder);
     }
     SUPER_DESTROY(self, SIMILARITY);
 }
@@ -67,14 +69,15 @@ Sim_make_posting_writer(Similarity *self, Schema *schema, Snapshot *snapshot,
 
 float*
 Sim_get_norm_decoder(Similarity *self) {
-    if (!self->norm_decoder) {
+    SimilarityIVARS *const ivars = Sim_IVARS(self);
+    if (!ivars->norm_decoder) {
         // Cache decoded boost bytes.
-        self->norm_decoder = (float*)MALLOCATE(256 * sizeof(float));
+        ivars->norm_decoder = (float*)MALLOCATE(256 * sizeof(float));
         for (uint32_t i = 0; i < 256; i++) {
-            self->norm_decoder[i] = Sim_Decode_Norm(self, i);
+            ivars->norm_decoder[i] = Sim_Decode_Norm(self, i);
         }
     }
-    return self->norm_decoder;
+    return ivars->norm_decoder;
 }
 
 Obj*

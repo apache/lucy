@@ -30,30 +30,30 @@ BitVecDelDocs_new(Folder *folder, const CharBuf *filename) {
 BitVecDelDocs*
 BitVecDelDocs_init(BitVecDelDocs *self, Folder *folder,
                    const CharBuf *filename) {
-    int32_t len;
-
     BitVec_init((BitVector*)self, 0);
-    self->filename = CB_Clone(filename);
-    self->instream = Folder_Open_In(folder, filename);
-    if (!self->instream) {
+    BitVecDelDocsIVARS *const ivars = BitVecDelDocs_IVARS(self);
+    ivars->filename = CB_Clone(filename);
+    ivars->instream = Folder_Open_In(folder, filename);
+    if (!ivars->instream) {
         Err *error = (Err*)INCREF(Err_get_error());
         DECREF(self);
         RETHROW(error);
     }
-    len            = (int32_t)InStream_Length(self->instream);
-    self->bits     = (uint8_t*)InStream_Buf(self->instream, len);
-    self->cap      = (uint32_t)(len * 8);
+    int32_t len    = (int32_t)InStream_Length(ivars->instream);
+    ivars->bits    = (uint8_t*)InStream_Buf(ivars->instream, len);
+    ivars->cap     = (uint32_t)(len * 8);
     return self;
 }
 
 void
 BitVecDelDocs_destroy(BitVecDelDocs *self) {
-    DECREF(self->filename);
-    if (self->instream) {
-        InStream_Close(self->instream);
-        DECREF(self->instream);
+    BitVecDelDocsIVARS *const ivars = BitVecDelDocs_IVARS(self);
+    DECREF(ivars->filename);
+    if (ivars->instream) {
+        InStream_Close(ivars->instream);
+        DECREF(ivars->instream);
     }
-    self->bits = NULL;
+    ivars->bits = NULL;
     SUPER_DESTROY(self, BITVECDELDOCS);
 }
 

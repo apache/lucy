@@ -24,20 +24,22 @@ SortCache*
 SortCache_init(SortCache *self, const CharBuf *field, FieldType *type,
                void *ords, int32_t cardinality, int32_t doc_max, int32_t null_ord,
                int32_t ord_width) {
+    SortCacheIVARS *const ivars = SortCache_IVARS(self);
+
     // Init.
-    self->native_ords = false;
+    ivars->native_ords = false;
 
     // Assign.
     if (!FType_Sortable(type)) {
         THROW(ERR, "Non-sortable FieldType for %o", field);
     }
-    self->field       = CB_Clone(field);
-    self->type        = (FieldType*)INCREF(type);
-    self->ords        = ords;
-    self->cardinality = cardinality;
-    self->doc_max     = doc_max;
-    self->null_ord    = null_ord;
-    self->ord_width   = ord_width;
+    ivars->field       = CB_Clone(field);
+    ivars->type        = (FieldType*)INCREF(type);
+    ivars->ords        = ords;
+    ivars->cardinality = cardinality;
+    ivars->doc_max     = doc_max;
+    ivars->null_ord    = null_ord;
+    ivars->ord_width   = ord_width;
 
     ABSTRACT_CLASS_CHECK(self, SORTCACHE);
     return self;
@@ -45,56 +47,58 @@ SortCache_init(SortCache *self, const CharBuf *field, FieldType *type,
 
 void
 SortCache_destroy(SortCache *self) {
-    DECREF(self->field);
-    DECREF(self->type);
+    SortCacheIVARS *const ivars = SortCache_IVARS(self);
+    DECREF(ivars->field);
+    DECREF(ivars->type);
     SUPER_DESTROY(self, SORTCACHE);
 }
 
 bool
 SortCache_get_native_ords(SortCache *self) {
-    return self->native_ords;
+    return SortCache_IVARS(self)->native_ords;
 }
 
 void
 SortCache_set_native_ords(SortCache *self, bool native_ords) {
-    self->native_ords = native_ords;
+    SortCache_IVARS(self)->native_ords = native_ords;
 }
 
 int32_t
 SortCache_ordinal(SortCache *self, int32_t doc_id) {
-    if ((uint32_t)doc_id > (uint32_t)self->doc_max) {
-        THROW(ERR, "Out of range: %i32 > %i32", doc_id, self->doc_max);
+    SortCacheIVARS *const ivars = SortCache_IVARS(self);
+    if ((uint32_t)doc_id > (uint32_t)ivars->doc_max) {
+        THROW(ERR, "Out of range: %i32 > %i32", doc_id, ivars->doc_max);
     }
-    switch (self->ord_width) {
-        case 1: return NumUtil_u1get(self->ords, doc_id);
-        case 2: return NumUtil_u2get(self->ords, doc_id);
-        case 4: return NumUtil_u4get(self->ords, doc_id);
+    switch (ivars->ord_width) {
+        case 1: return NumUtil_u1get(ivars->ords, doc_id);
+        case 2: return NumUtil_u2get(ivars->ords, doc_id);
+        case 4: return NumUtil_u4get(ivars->ords, doc_id);
         case 8: {
-                uint8_t *ints = (uint8_t*)self->ords;
+                uint8_t *ints = (uint8_t*)ivars->ords;
                 return ints[doc_id];
             }
         case 16:
-            if (self->native_ords) {
-                uint16_t *ints = (uint16_t*)self->ords;
+            if (ivars->native_ords) {
+                uint16_t *ints = (uint16_t*)ivars->ords;
                 return ints[doc_id];
             }
             else {
-                uint8_t *bytes = (uint8_t*)self->ords;
+                uint8_t *bytes = (uint8_t*)ivars->ords;
                 bytes += doc_id * sizeof(uint16_t);
                 return NumUtil_decode_bigend_u16(bytes);
             }
         case 32:
-            if (self->native_ords) {
-                uint32_t *ints = (uint32_t*)self->ords;
+            if (ivars->native_ords) {
+                uint32_t *ints = (uint32_t*)ivars->ords;
                 return ints[doc_id];
             }
             else {
-                uint8_t *bytes = (uint8_t*)self->ords;
+                uint8_t *bytes = (uint8_t*)ivars->ords;
                 bytes += doc_id * sizeof(uint32_t);
                 return NumUtil_decode_bigend_u32(bytes);
             }
         default: {
-                THROW(ERR, "Invalid ord width: %i32", self->ord_width);
+                THROW(ERR, "Invalid ord width: %i32", ivars->ord_width);
                 UNREACHABLE_RETURN(int32_t);
             }
     }
@@ -102,9 +106,10 @@ SortCache_ordinal(SortCache *self, int32_t doc_id) {
 
 int32_t
 SortCache_find(SortCache *self, Obj *term) {
-    FieldType *const type   = self->type;
+    SortCacheIVARS *const ivars = SortCache_IVARS(self);
+    FieldType *const type   = ivars->type;
     int32_t          lo     = 0;
-    int32_t          hi     = self->cardinality - 1;
+    int32_t          hi     = ivars->cardinality - 1;
     int32_t          result = -100;
     Obj             *blank  = SortCache_Make_Blank(self);
 
@@ -113,7 +118,7 @@ SortCache_find(SortCache *self, Obj *term) {
         && !Obj_Is_A(blank, Obj_Get_VTable(term))
        ) {
         THROW(ERR, "SortCache error for field %o: term is a %o, and not "
-              "comparable to a %o", self->field, Obj_Get_Class_Name(term),
+              "comparable to a %o", ivars->field, Obj_Get_Class_Name(term),
               Obj_Get_Class_Name(blank));
     }
 
@@ -151,22 +156,22 @@ SortCache_find(SortCache *self, Obj *term) {
 
 void*
 SortCache_get_ords(SortCache *self) {
-    return self->ords;
+    return SortCache_IVARS(self)->ords;
 }
 
 int32_t
 SortCache_get_cardinality(SortCache *self) {
-    return self->cardinality;
+    return SortCache_IVARS(self)->cardinality;
 }
 
 int32_t
 SortCache_get_null_ord(SortCache *self) {
-    return self->null_ord;
+    return SortCache_IVARS(self)->null_ord;
 }
 
 int32_t
 SortCache_get_ord_width(SortCache *self) {
-    return self->ord_width;
+    return SortCache_IVARS(self)->ord_width;
 }
 
 

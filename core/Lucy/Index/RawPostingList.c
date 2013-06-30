@@ -36,32 +36,35 @@ RawPostingList*
 RawPList_init(RawPostingList *self, Schema *schema, const CharBuf *field,
               InStream *instream, int64_t start, int64_t end) {
     PList_init((PostingList*)self);
-    self->start     = start;
-    self->end       = end;
-    self->len       = end - start;
-    self->instream  = (InStream*)INCREF(instream);
-    Similarity *sim = Schema_Fetch_Sim(schema, field);
-    self->posting   = Sim_Make_Posting(sim);
-    InStream_Seek(self->instream, self->start);
+    RawPostingListIVARS *const ivars = RawPList_IVARS(self);
+    ivars->start     = start;
+    ivars->end       = end;
+    ivars->len       = end - start;
+    ivars->instream  = (InStream*)INCREF(instream);
+    Similarity *sim  = Schema_Fetch_Sim(schema, field);
+    ivars->posting   = Sim_Make_Posting(sim);
+    InStream_Seek(ivars->instream, ivars->start);
     return self;
 }
 
 void
 RawPList_destroy(RawPostingList *self) {
-    DECREF(self->instream);
-    DECREF(self->posting);
+    RawPostingListIVARS *const ivars = RawPList_IVARS(self);
+    DECREF(ivars->instream);
+    DECREF(ivars->posting);
     SUPER_DESTROY(self, RAWPOSTINGLIST);
 }
 
 Posting*
 RawPList_get_posting(RawPostingList *self) {
-    return self->posting;
+    return RawPList_IVARS(self)->posting;
 }
 
 RawPosting*
 RawPList_read_raw(RawPostingList *self, int32_t last_doc_id, CharBuf *term_text,
                   MemoryPool *mem_pool) {
-    return Post_Read_Raw(self->posting, self->instream,
+    RawPostingListIVARS *const ivars = RawPList_IVARS(self);
+    return Post_Read_Raw(ivars->posting, ivars->instream,
                          last_doc_id, term_text, mem_pool);
 }
 

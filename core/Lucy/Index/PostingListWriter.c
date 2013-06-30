@@ -62,36 +62,38 @@ PListWriter_init(PostingListWriter *self, Schema *schema, Snapshot *snapshot,
                  Segment *segment, PolyReader *polyreader,
                  LexiconWriter *lex_writer) {
     DataWriter_init((DataWriter*)self, schema, snapshot, segment, polyreader);
+    PostingListWriterIVARS *const ivars = PListWriter_IVARS(self);
 
     // Assign.
-    self->lex_writer = (LexiconWriter*)INCREF(lex_writer);
+    ivars->lex_writer = (LexiconWriter*)INCREF(lex_writer);
 
     // Init.
-    self->pools          = VA_new(Schema_Num_Fields(schema));
-    self->mem_thresh     = default_mem_thresh;
-    self->mem_pool       = MemPool_new(0);
-    self->lex_temp_out   = NULL;
-    self->post_temp_out  = NULL;
+    ivars->pools          = VA_new(Schema_Num_Fields(schema));
+    ivars->mem_thresh     = default_mem_thresh;
+    ivars->mem_pool       = MemPool_new(0);
+    ivars->lex_temp_out   = NULL;
+    ivars->post_temp_out  = NULL;
 
     return self;
 }
 
 static void
 S_lazy_init(PostingListWriter *self) {
-    if (!self->lex_temp_out) {
-        Folder  *folder         = self->folder;
-        CharBuf *seg_name       = Seg_Get_Name(self->segment);
+    PostingListWriterIVARS *const ivars = PListWriter_IVARS(self);
+    if (!ivars->lex_temp_out) {
+        Folder  *folder         = ivars->folder;
+        CharBuf *seg_name       = Seg_Get_Name(ivars->segment);
         CharBuf *lex_temp_path  = CB_newf("%o/lextemp", seg_name);
         CharBuf *post_temp_path = CB_newf("%o/ptemp", seg_name);
         CharBuf *skip_path      = CB_newf("%o/postings.skip", seg_name);
 
         // Open temp streams and final skip stream.
-        self->lex_temp_out  = Folder_Open_Out(folder, lex_temp_path);
-        if (!self->lex_temp_out) { RETHROW(INCREF(Err_get_error())); }
-        self->post_temp_out = Folder_Open_Out(folder, post_temp_path);
-        if (!self->post_temp_out) { RETHROW(INCREF(Err_get_error())); }
-        self->skip_out = Folder_Open_Out(folder, skip_path);
-        if (!self->skip_out) { RETHROW(INCREF(Err_get_error())); }
+        ivars->lex_temp_out  = Folder_Open_Out(folder, lex_temp_path);
+        if (!ivars->lex_temp_out) { RETHROW(INCREF(Err_get_error())); }
+        ivars->post_temp_out = Folder_Open_Out(folder, post_temp_path);
+        if (!ivars->post_temp_out) { RETHROW(INCREF(Err_get_error())); }
+        ivars->skip_out = Folder_Open_Out(folder, skip_path);
+        if (!ivars->skip_out) { RETHROW(INCREF(Err_get_error())); }
 
         DECREF(skip_path);
         DECREF(post_temp_path);
@@ -101,26 +103,28 @@ S_lazy_init(PostingListWriter *self) {
 
 static PostingPool*
 S_lazy_init_posting_pool(PostingListWriter *self, int32_t field_num) {
-    PostingPool *pool = (PostingPool*)VA_Fetch(self->pools, field_num);
+    PostingListWriterIVARS *const ivars = PListWriter_IVARS(self);
+    PostingPool *pool = (PostingPool*)VA_Fetch(ivars->pools, field_num);
     if (!pool && field_num != 0) {
-        CharBuf *field = Seg_Field_Name(self->segment, field_num);
-        pool = PostPool_new(self->schema, self->snapshot, self->segment,
-                            self->polyreader, field, self->lex_writer,
-                            self->mem_pool, self->lex_temp_out,
-                            self->post_temp_out, self->skip_out);
-        VA_Store(self->pools, field_num, (Obj*)pool);
+        CharBuf *field = Seg_Field_Name(ivars->segment, field_num);
+        pool = PostPool_new(ivars->schema, ivars->snapshot, ivars->segment,
+                            ivars->polyreader, field, ivars->lex_writer,
+                            ivars->mem_pool, ivars->lex_temp_out,
+                            ivars->post_temp_out, ivars->skip_out);
+        VA_Store(ivars->pools, field_num, (Obj*)pool);
     }
     return pool;
 }
 
 void
 PListWriter_destroy(PostingListWriter *self) {
-    DECREF(self->lex_writer);
-    DECREF(self->mem_pool);
-    DECREF(self->pools);
-    DECREF(self->lex_temp_out);
-    DECREF(self->post_temp_out);
-    DECREF(self->skip_out);
+    PostingListWriterIVARS *const ivars = PListWriter_IVARS(self);
+    DECREF(ivars->lex_writer);
+    DECREF(ivars->mem_pool);
+    DECREF(ivars->pools);
+    DECREF(ivars->lex_temp_out);
+    DECREF(ivars->post_temp_out);
+    DECREF(ivars->skip_out);
     SUPER_DESTROY(self, POSTINGLISTWRITER);
 }
 
@@ -139,6 +143,7 @@ void
 PListWriter_add_inverted_doc(PostingListWriter *self, Inverter *inverter,
                              int32_t doc_id) {
     S_lazy_init(self);
+    PostingListWriterIVARS *const ivars = PListWriter_IVARS(self);
 
     // Iterate over fields in document, adding the content of indexed fields
     // to their respective PostingPools.
@@ -161,21 +166,22 @@ PListWriter_add_inverted_doc(PostingListWriter *self, Inverter *inverter,
     // If our PostingPools have collectively passed the memory threshold,
     // flush all of them, then release all the RawPostings with a single
     // action.
-    if (MemPool_Get_Consumed(self->mem_pool) > self->mem_thresh) {
-        for (uint32_t i = 0, max = VA_Get_Size(self->pools); i < max; i++) {
-            PostingPool *const pool = (PostingPool*)VA_Fetch(self->pools, i);
+    if (MemPool_Get_Consumed(ivars->mem_pool) > ivars->mem_thresh) {
+        for (uint32_t i = 0, max = VA_Get_Size(ivars->pools); i < max; i++) {
+            PostingPool *const pool = (PostingPool*)VA_Fetch(ivars->pools, i);
             if (pool) { PostPool_Flush(pool); }
         }
-        MemPool_Release_All(self->mem_pool);
+        MemPool_Release_All(ivars->mem_pool);
     }
 }
 
 void
 PListWriter_add_segment(PostingListWriter *self, SegReader *reader,
                         I32Array *doc_map) {
+    PostingListWriterIVARS *const ivars = PListWriter_IVARS(self);
     Segment *other_segment = SegReader_Get_Segment(reader);
-    Schema  *schema        = self->schema;
-    Segment *segment       = self->segment;
+    Schema  *schema        = ivars->schema;
+    Segment *segment       = ivars->segment;
     VArray  *all_fields    = Schema_All_Fields(schema);
     S_lazy_init(self);
 
@@ -202,32 +208,34 @@ PListWriter_add_segment(PostingListWriter *self, SegReader *reader,
 
 void
 PListWriter_finish(PostingListWriter *self) {
-    // If S_lazy_init was never called, we have no data, so bail out.
-    if (!self->lex_temp_out) { return; }
+    PostingListWriterIVARS *const ivars = PListWriter_IVARS(self);
 
-    Folder  *folder = self->folder;
-    CharBuf *seg_name = Seg_Get_Name(self->segment);
+    // If S_lazy_init was never called, we have no data, so bail out.
+    if (!ivars->lex_temp_out) { return; }
+
+    Folder  *folder = ivars->folder;
+    CharBuf *seg_name = Seg_Get_Name(ivars->segment);
     CharBuf *lex_temp_path  = CB_newf("%o/lextemp", seg_name);
     CharBuf *post_temp_path = CB_newf("%o/ptemp", seg_name);
 
     // Close temp streams.
-    OutStream_Close(self->lex_temp_out);
-    OutStream_Close(self->post_temp_out);
+    OutStream_Close(ivars->lex_temp_out);
+    OutStream_Close(ivars->post_temp_out);
 
     // Try to free up some memory.
-    for (uint32_t i = 0, max = VA_Get_Size(self->pools); i < max; i++) {
-        PostingPool *pool = (PostingPool*)VA_Fetch(self->pools, i);
+    for (uint32_t i = 0, max = VA_Get_Size(ivars->pools); i < max; i++) {
+        PostingPool *pool = (PostingPool*)VA_Fetch(ivars->pools, i);
         if (pool) { PostPool_Shrink(pool); }
     }
 
     // Write postings for each field.
-    for (uint32_t i = 0, max = VA_Get_Size(self->pools); i < max; i++) {
-        PostingPool *pool = (PostingPool*)VA_Delete(self->pools, i);
+    for (uint32_t i = 0, max = VA_Get_Size(ivars->pools); i < max; i++) {
+        PostingPool *pool = (PostingPool*)VA_Delete(ivars->pools, i);
         if (pool) {
             // Write out content for each PostingPool.  Let each PostingPool
             // use more RAM while finishing.  (This is a little dicy, because if
             // Shrink() was ineffective, we may double the RAM footprint.)
-            PostPool_Set_Mem_Thresh(pool, self->mem_thresh);
+            PostPool_Set_Mem_Thresh(pool, ivars->mem_thresh);
             PostPool_Flip(pool);
             PostPool_Finish(pool);
             DECREF(pool);
@@ -235,24 +243,24 @@ PListWriter_finish(PostingListWriter *self) {
     }
 
     // Store metadata.
-    Seg_Store_Metadata_Str(self->segment, "postings", 8,
+    Seg_Store_Metadata_Str(ivars->segment, "postings", 8,
                            (Obj*)PListWriter_Metadata(self));
 
     // Close down and clean up.
-    OutStream_Close(self->skip_out);
+    OutStream_Close(ivars->skip_out);
     if (!Folder_Delete(folder, lex_temp_path)) {
         THROW(ERR, "Couldn't delete %o", lex_temp_path);
     }
     if (!Folder_Delete(folder, post_temp_path)) {
         THROW(ERR, "Couldn't delete %o", post_temp_path);
     }
-    DECREF(self->skip_out);
-    self->skip_out = NULL;
+    DECREF(ivars->skip_out);
+    ivars->skip_out = NULL;
     DECREF(post_temp_path);
     DECREF(lex_temp_path);
 
     // Dispatch the LexiconWriter.
-    LexWriter_Finish(self->lex_writer);
+    LexWriter_Finish(ivars->lex_writer);
 }
 
 

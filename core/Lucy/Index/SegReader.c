@@ -47,11 +47,12 @@ SegReader_init(SegReader *self, Schema *schema, Folder *folder,
 
     IxReader_init((IndexReader*)self, schema, folder, snapshot, segments,
                   seg_tick, NULL);
+    SegReaderIVARS *const ivars = SegReader_IVARS(self);
     segment = SegReader_Get_Segment(self);
 
-    self->doc_max    = (int32_t)Seg_Get_Count(segment);
-    self->seg_name   = (CharBuf*)INCREF(Seg_Get_Name(segment));
-    self->seg_num    = Seg_Get_Number(segment);
+    ivars->doc_max    = (int32_t)Seg_Get_Count(segment);
+    ivars->seg_name   = (CharBuf*)INCREF(Seg_Get_Name(segment));
+    ivars->seg_num    = Seg_Get_Number(segment);
     Err *error = Err_trap(S_try_init_components, self);
     if (error) {
         // An error occurred, so clean up self and rethrow the exception.
@@ -61,8 +62,8 @@ SegReader_init(SegReader *self, Schema *schema, Folder *folder,
 
     DeletionsReader *del_reader
         = (DeletionsReader*)Hash_Fetch(
-              self->components, (Obj*)VTable_Get_Name(DELETIONSREADER));
-    self->del_count = del_reader ? DelReader_Del_Count(del_reader) : 0;
+              ivars->components, (Obj*)VTable_Get_Name(DELETIONSREADER));
+    ivars->del_count = del_reader ? DelReader_Del_Count(del_reader) : 0;
 
     return self;
 }
@@ -77,43 +78,46 @@ S_try_init_components(void *context) {
 
 void
 SegReader_destroy(SegReader *self) {
-    DECREF(self->seg_name);
+    SegReaderIVARS *const ivars = SegReader_IVARS(self);
+    DECREF(ivars->seg_name);
     SUPER_DESTROY(self, SEGREADER);
 }
 
 void
 SegReader_register(SegReader *self, const CharBuf *api,
                    DataReader *component) {
-    if (Hash_Fetch(self->components, (Obj*)api)) {
+    SegReaderIVARS *const ivars = SegReader_IVARS(self);
+    if (Hash_Fetch(ivars->components, (Obj*)api)) {
         THROW(ERR, "Interface '%o' already registered");
     }
     CERTIFY(component, DATAREADER);
-    Hash_Store(self->components, (Obj*)api, (Obj*)component);
+    Hash_Store(ivars->components, (Obj*)api, (Obj*)component);
 }
 
 CharBuf*
 SegReader_get_seg_name(SegReader *self) {
-    return self->seg_name;
+    return SegReader_IVARS(self)->seg_name;
 }
 
 int64_t
 SegReader_get_seg_num(SegReader *self) {
-    return self->seg_num;
+    return SegReader_IVARS(self)->seg_num;
 }
 
 int32_t
 SegReader_del_count(SegReader *self) {
-    return self->del_count;
+    return SegReader_IVARS(self)->del_count;
 }
 
 int32_t
 SegReader_doc_max(SegReader *self) {
-    return self->doc_max;
+    return SegReader_IVARS(self)->doc_max;
 }
 
 int32_t
 SegReader_doc_count(SegReader *self) {
-    return self->doc_max - self->del_count;
+    SegReaderIVARS *const ivars = SegReader_IVARS(self);
+    return ivars->doc_max - ivars->del_count;
 }
 
 I32Array*

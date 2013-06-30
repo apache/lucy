@@ -64,10 +64,11 @@ DefPListReader_init(DefaultPostingListReader *self, Schema *schema,
                     int32_t seg_tick, LexiconReader *lex_reader) {
     PListReader_init((PostingListReader*)self, schema, folder, snapshot,
                      segments, seg_tick);
+    DefaultPostingListReaderIVARS *const ivars = DefPListReader_IVARS(self);
     Segment *segment = DefPListReader_Get_Segment(self);
 
     // Derive.
-    self->lex_reader = (LexiconReader*)INCREF(lex_reader);
+    ivars->lex_reader = (LexiconReader*)INCREF(lex_reader);
 
     // Check format.
     Hash *my_meta = (Hash*)Seg_Fetch_Metadata_Str(segment, "postings", 8);
@@ -91,23 +92,26 @@ DefPListReader_init(DefaultPostingListReader *self, Schema *schema,
 
 void
 DefPListReader_close(DefaultPostingListReader *self) {
-    if (self->lex_reader) {
-        LexReader_Close(self->lex_reader);
-        DECREF(self->lex_reader);
-        self->lex_reader = NULL;
+    DefaultPostingListReaderIVARS *const ivars = DefPListReader_IVARS(self);
+    if (ivars->lex_reader) {
+        LexReader_Close(ivars->lex_reader);
+        DECREF(ivars->lex_reader);
+        ivars->lex_reader = NULL;
     }
 }
 
 void
 DefPListReader_destroy(DefaultPostingListReader *self) {
-    DECREF(self->lex_reader);
+    DefaultPostingListReaderIVARS *const ivars = DefPListReader_IVARS(self);
+    DECREF(ivars->lex_reader);
     SUPER_DESTROY(self, DEFAULTPOSTINGLISTREADER);
 }
 
 SegPostingList*
 DefPListReader_posting_list(DefaultPostingListReader *self,
                             const CharBuf *field, Obj *target) {
-    FieldType *type = Schema_Fetch_Type(self->schema, field);
+    DefaultPostingListReaderIVARS *const ivars = DefPListReader_IVARS(self);
+    FieldType *type = Schema_Fetch_Type(ivars->schema, field);
 
     // Only return an object if we've got an indexed field.
     if (type != NULL && FType_Indexed(type)) {
@@ -122,6 +126,6 @@ DefPListReader_posting_list(DefaultPostingListReader *self,
 
 LexiconReader*
 DefPListReader_get_lex_reader(DefaultPostingListReader *self) {
-    return self->lex_reader;
+    return DefPListReader_IVARS(self)->lex_reader;
 }
 

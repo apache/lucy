@@ -41,8 +41,9 @@ PolyLex_init(PolyLexicon *self, const CharBuf *field, VArray *sub_readers) {
 
     // Init.
     Lex_init((Lexicon*)self, field);
-    self->term            = NULL;
-    self->lex_q           = SegLexQ_new(num_sub_readers);
+    PolyLexiconIVARS *const ivars = PolyLex_IVARS(self);
+    ivars->term            = NULL;
+    ivars->lex_q           = SegLexQ_new(num_sub_readers);
 
     // Derive.
     for (uint32_t i = 0; i < num_sub_readers; i++) {
@@ -54,7 +55,7 @@ PolyLex_init(PolyLexicon *self, const CharBuf *field, VArray *sub_readers) {
             }
         }
     }
-    self->seg_lexicons  = seg_lexicons;
+    ivars->seg_lexicons  = seg_lexicons;
 
     PolyLex_Reset(self);
 
@@ -63,9 +64,10 @@ PolyLex_init(PolyLexicon *self, const CharBuf *field, VArray *sub_readers) {
 
 void
 PolyLex_destroy(PolyLexicon *self) {
-    DECREF(self->seg_lexicons);
-    DECREF(self->lex_q);
-    DECREF(self->term);
+    PolyLexiconIVARS *const ivars = PolyLex_IVARS(self);
+    DECREF(ivars->seg_lexicons);
+    DECREF(ivars->lex_q);
+    DECREF(ivars->term);
     SUPER_DESTROY(self, POLYLEXICON);
 }
 
@@ -91,9 +93,10 @@ S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target) {
 
 void
 PolyLex_reset(PolyLexicon *self) {
-    VArray *seg_lexicons = self->seg_lexicons;
+    PolyLexiconIVARS *const ivars = PolyLex_IVARS(self);
+    VArray *seg_lexicons = ivars->seg_lexicons;
     uint32_t num_segs = VA_Get_Size(seg_lexicons);
-    SegLexQueue *lex_q = self->lex_q;
+    SegLexQueue *lex_q = ivars->lex_q;
 
     // Empty out the queue.
     while (1) {
@@ -108,30 +111,31 @@ PolyLex_reset(PolyLexicon *self) {
             = (SegLexicon*)VA_Fetch(seg_lexicons, i);
         SegLex_Reset(seg_lexicon);
         if (SegLex_Next(seg_lexicon)) {
-            SegLexQ_Insert(self->lex_q, INCREF(seg_lexicon));
+            SegLexQ_Insert(ivars->lex_q, INCREF(seg_lexicon));
         }
     }
 
-    if (self->term != NULL) {
-        DECREF(self->term);
-        self->term = NULL;
+    if (ivars->term != NULL) {
+        DECREF(ivars->term);
+        ivars->term = NULL;
     }
 }
 
 bool
 PolyLex_next(PolyLexicon *self) {
-    SegLexQueue *lex_q = self->lex_q;
+    PolyLexiconIVARS *const ivars = PolyLex_IVARS(self);
+    SegLexQueue *lex_q = ivars->lex_q;
     SegLexicon *top_seg_lexicon = (SegLexicon*)SegLexQ_Peek(lex_q);
 
     // Churn through queue items with equal terms.
     while (top_seg_lexicon != NULL) {
         Obj *const candidate = SegLex_Get_Term(top_seg_lexicon);
-        if ((candidate && !self->term)
-            || Obj_Compare_To(self->term, candidate) != 0
+        if ((candidate && !ivars->term)
+            || Obj_Compare_To(ivars->term, candidate) != 0
            ) {
             // Succeed if the next item in the queue has a different term.
-            DECREF(self->term);
-            self->term = Obj_Clone(candidate);
+            DECREF(ivars->term);
+            ivars->term = Obj_Clone(candidate);
             return true;
         }
         else {
@@ -145,15 +149,16 @@ PolyLex_next(PolyLexicon *self) {
     }
 
     // If queue is empty, iterator is finished.
-    DECREF(self->term);
-    self->term = NULL;
+    DECREF(ivars->term);
+    ivars->term = NULL;
     return false;
 }
 
 void
 PolyLex_seek(PolyLexicon *self, Obj *target) {
-    VArray *seg_lexicons = self->seg_lexicons;
-    SegLexQueue *lex_q = self->lex_q;
+    PolyLexiconIVARS *const ivars = PolyLex_IVARS(self);
+    VArray *seg_lexicons = ivars->seg_lexicons;
+    SegLexQueue *lex_q = ivars->lex_q;
 
     if (target == NULL) {
         PolyLex_Reset(self);
@@ -163,17 +168,17 @@ PolyLex_seek(PolyLexicon *self, Obj *target) {
     // Refresh the queue, set vars.
     S_refresh_lex_q(lex_q, seg_lexicons, target);
     SegLexicon *least = (SegLexicon*)SegLexQ_Peek(lex_q);
-    DECREF(self->term);
-    self->term = NULL;
+    DECREF(ivars->term);
+    ivars->term = NULL;
     if (least) {
         Obj *least_term = SegLex_Get_Term(least);
-        self->term = least_term ? Obj_Clone(least_term) : NULL;
+        ivars->term = least_term ? Obj_Clone(least_term) : NULL;
     }
 
     // Scan up to the real target.
     do {
-        if (self->term) {
-            const int32_t comparison = Obj_Compare_To(self->term, target);
+        if (ivars->term) {
+            const int32_t comparison = Obj_Compare_To(ivars->term, target);
             if (comparison >= 0) { break; }
         }
     } while (PolyLex_Next(self));
@@ -181,12 +186,13 @@ PolyLex_seek(PolyLexicon *self, Obj *target) {
 
 Obj*
 PolyLex_get_term(PolyLexicon *self) {
-    return self->term;
+    return PolyLex_IVARS(self)->term;
 }
 
 uint32_t
 PolyLex_get_num_seg_lexicons(PolyLexicon *self) {
-    return VA_Get_Size(self->seg_lexicons);
+    PolyLexiconIVARS *const ivars = PolyLex_IVARS(self);
+    return VA_Get_Size(ivars->seg_lexicons);
 }
 
 SegLexQueue*

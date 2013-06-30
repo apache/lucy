@@ -26,31 +26,35 @@
 TermStepper*
 TermStepper_init(TermStepper *self) {
     Stepper_init((Stepper*)self);
-    self->value = NULL;
+    TermStepperIVARS *const ivars = TermStepper_IVARS(self);
+    ivars->value = NULL;
     return self;
 }
 
 void
 TermStepper_destroy(TermStepper *self) {
-    DECREF(self->value);
+    TermStepperIVARS *const ivars = TermStepper_IVARS(self);
+    DECREF(ivars->value);
     SUPER_DESTROY(self, TERMSTEPPER);
 }
 
 void
 TermStepper_reset(TermStepper *self) {
-    DECREF(self->value);
-    self->value = NULL;
+    TermStepperIVARS *const ivars = TermStepper_IVARS(self);
+    DECREF(ivars->value);
+    ivars->value = NULL;
 }
 
 Obj*
 TermStepper_get_value(TermStepper *self) {
-    return self->value;
+    return TermStepper_IVARS(self)->value;
 }
 
 void
 TermStepper_set_value(TermStepper *self, Obj *value) {
-    DECREF(self->value);
-    self->value = value ? INCREF(value) : NULL;
+    TermStepperIVARS *const ivars = TermStepper_IVARS(self);
+    DECREF(ivars->value);
+    ivars->value = value ? INCREF(value) : NULL;
 }
 
 

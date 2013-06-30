@@ -29,48 +29,50 @@
 DataWriter*
 DataWriter_init(DataWriter *self, Schema *schema, Snapshot *snapshot,
                 Segment *segment, PolyReader *polyreader) {
-    self->snapshot   = (Snapshot*)INCREF(snapshot);
-    self->segment    = (Segment*)INCREF(segment);
-    self->polyreader = (PolyReader*)INCREF(polyreader);
-    self->schema     = (Schema*)INCREF(schema);
-    self->folder     = (Folder*)INCREF(PolyReader_Get_Folder(polyreader));
+    DataWriterIVARS *const ivars = DataWriter_IVARS(self);
+    ivars->snapshot   = (Snapshot*)INCREF(snapshot);
+    ivars->segment    = (Segment*)INCREF(segment);
+    ivars->polyreader = (PolyReader*)INCREF(polyreader);
+    ivars->schema     = (Schema*)INCREF(schema);
+    ivars->folder     = (Folder*)INCREF(PolyReader_Get_Folder(polyreader));
     ABSTRACT_CLASS_CHECK(self, DATAWRITER);
     return self;
 }
 
 void
 DataWriter_destroy(DataWriter *self) {
-    DECREF(self->snapshot);
-    DECREF(self->segment);
-    DECREF(self->polyreader);
-    DECREF(self->schema);
-    DECREF(self->folder);
+    DataWriterIVARS *const ivars = DataWriter_IVARS(self);
+    DECREF(ivars->snapshot);
+    DECREF(ivars->segment);
+    DECREF(ivars->polyreader);
+    DECREF(ivars->schema);
+    DECREF(ivars->folder);
     SUPER_DESTROY(self, DATAWRITER);
 }
 
 Snapshot*
 DataWriter_get_snapshot(DataWriter *self) {
-    return self->snapshot;
+    return DataWriter_IVARS(self)->snapshot;
 }
 
 Segment*
 DataWriter_get_segment(DataWriter *self) {
-    return self->segment;
+    return DataWriter_IVARS(self)->segment;
 }
 
 PolyReader*
 DataWriter_get_polyreader(DataWriter *self) {
-    return self->polyreader;
+    return DataWriter_IVARS(self)->polyreader;
 }
 
 Schema*
 DataWriter_get_schema(DataWriter *self) {
-    return self->schema;
+    return DataWriter_IVARS(self)->schema;
 }
 
 Folder*
 DataWriter_get_folder(DataWriter *self) {
-    return self->folder;
+    return DataWriter_IVARS(self)->folder;
 }
 
 void

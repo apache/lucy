@@ -50,41 +50,42 @@ LexIndex_init(LexIndex *self, Schema *schema, Folder *folder,
 
     // Init.
     Lex_init((Lexicon*)self, field);
-    self->tinfo        = TInfo_new(0);
-    self->tick         = 0;
+    LexIndexIVARS *const ivars = LexIndex_IVARS(self);
+    ivars->tinfo        = TInfo_new(0);
+    ivars->tick         = 0;
 
     // Derive
-    self->field_type = Schema_Fetch_Type(schema, field);
-    if (!self->field_type) {
+    ivars->field_type = Schema_Fetch_Type(schema, field);
+    if (!ivars->field_type) {
         CharBuf *mess = MAKE_MESS("Unknown field: '%o'", field);
         DECREF(ix_file);
         DECREF(ixix_file);
         DECREF(self);
         Err_throw_mess(ERR, mess);
     }
-    INCREF(self->field_type);
-    self->term_stepper = FType_Make_Term_Stepper(self->field_type);
-    self->ixix_in = Folder_Open_In(folder, ixix_file);
-    if (!self->ixix_in) {
+    INCREF(ivars->field_type);
+    ivars->term_stepper = FType_Make_Term_Stepper(ivars->field_type);
+    ivars->ixix_in = Folder_Open_In(folder, ixix_file);
+    if (!ivars->ixix_in) {
         Err *error = (Err*)INCREF(Err_get_error());
         DECREF(ix_file);
         DECREF(ixix_file);
         DECREF(self);
         RETHROW(error);
     }
-    self->ix_in = Folder_Open_In(folder, ix_file);
-    if (!self->ix_in) {
+    ivars->ix_in = Folder_Open_In(folder, ix_file);
+    if (!ivars->ix_in) {
         Err *error = (Err*)INCREF(Err_get_error());
         DECREF(ix_file);
         DECREF(ixix_file);
         DECREF(self);
         RETHROW(error);
     }
-    self->index_interval = Arch_Index_Interval(arch);
-    self->skip_interval  = Arch_Skip_Interval(arch);
-    self->size    = (int32_t)(InStream_Length(self->ixix_in) / sizeof(int64_t));
-    self->offsets = (int64_t*)InStream_Buf(self->ixix_in,
-                                           (size_t)InStream_Length(self->ixix_in));
+    ivars->index_interval = Arch_Index_Interval(arch);
+    ivars->skip_interval  = Arch_Skip_Interval(arch);
+    ivars->size    = (int32_t)(InStream_Length(ivars->ixix_in) / sizeof(int64_t));
+    ivars->offsets = (int64_t*)InStream_Buf(ivars->ixix_in,
+                                           (size_t)InStream_Length(ivars->ixix_in));
 
     DECREF(ixix_file);
     DECREF(ix_file);
@@ -94,55 +95,60 @@ LexIndex_init(LexIndex *self, Schema *schema, Folder *folder,
 
 void
 LexIndex_destroy(LexIndex *self) {
-    DECREF(self->field_type);
-    DECREF(self->ixix_in);
-    DECREF(self->ix_in);
-    DECREF(self->term_stepper);
-    DECREF(self->tinfo);
+    LexIndexIVARS *const ivars = LexIndex_IVARS(self);
+    DECREF(ivars->field_type);
+    DECREF(ivars->ixix_in);
+    DECREF(ivars->ix_in);
+    DECREF(ivars->term_stepper);
+    DECREF(ivars->tinfo);
     SUPER_DESTROY(self, LEXINDEX);
 }
 
 int32_t
 LexIndex_get_term_num(LexIndex *self) {
-    return (self->index_interval * self->tick) - 1;
+    LexIndexIVARS *const ivars = LexIndex_IVARS(self);
+    return (ivars->index_interval * ivars->tick) - 1;
 }
 
 Obj*
 LexIndex_get_term(LexIndex *self) {
-    return TermStepper_Get_Value(self->term_stepper);
+    LexIndexIVARS *const ivars = LexIndex_IVARS(self);
+    return TermStepper_Get_Value(ivars->term_stepper);
 }
 
 TermInfo*
 LexIndex_get_term_info(LexIndex *self) {
-    return self->tinfo;
+    return LexIndex_IVARS(self)->tinfo;
 }
 
 static void
 S_read_entry(LexIndex *self) {
-    InStream *ix_in  = self->ix_in;
-    TermInfo *tinfo  = self->tinfo;
-    int64_t offset = (int64_t)NumUtil_decode_bigend_u64(self->offsets + self->tick);
+    LexIndexIVARS *const ivars = LexIndex_IVARS(self);
+    InStream *ix_in  = ivars->ix_in;
+    TermInfoIVARS *const tinfo_ivars = TInfo_IVARS(ivars->tinfo);
+    int64_t offset = (int64_t)NumUtil_decode_bigend_u64(ivars->offsets + ivars->tick);
     InStream_Seek(ix_in, offset);
-    TermStepper_Read_Key_Frame(self->term_stepper, ix_in);
-    tinfo->doc_freq     = InStream_Read_C32(ix_in);
-    tinfo->post_filepos = InStream_Read_C64(ix_in);
-    tinfo->skip_filepos = tinfo->doc_freq >= self->skip_interval
+    TermStepper_Read_Key_Frame(ivars->term_stepper, ix_in);
+    tinfo_ivars->doc_freq     = InStream_Read_C32(ix_in);
+    tinfo_ivars->post_filepos = InStream_Read_C64(ix_in);
+    tinfo_ivars->skip_filepos = tinfo_ivars->doc_freq >= ivars->skip_interval
                           ? InStream_Read_C64(ix_in)
                           : 0;
-    tinfo->lex_filepos  = InStream_Read_C64(ix_in);
+    tinfo_ivars->lex_filepos  = InStream_Read_C64(ix_in);
 }
 
 void
 LexIndex_seek(LexIndex *self, Obj *target) {
-    TermStepper *term_stepper = self->term_stepper;
-    InStream    *ix_in        = self->ix_in;
-    FieldType   *type         = self->field_type;
+    LexIndexIVARS *const ivars = LexIndex_IVARS(self);
+    TermStepper *term_stepper = ivars->term_stepper;
+    InStream    *ix_in        = ivars->ix_in;
+    FieldType   *type         = ivars->field_type;
     int32_t      lo           = 0;
-    int32_t      hi           = self->size - 1;
+    int32_t      hi           = ivars->size - 1;
     int32_t      result       = -100;
 
-    if (target == NULL || self->size == 0) {
-        self->tick = 0;
+    if (target == NULL || ivars->size == 0) {
+        ivars->tick = 0;
         return;
     }
     else {
@@ -163,12 +169,12 @@ LexIndex_seek(LexIndex *self, Obj *target) {
     while (hi >= lo) {
         const int32_t mid = lo + ((hi - lo) / 2);
         const int64_t offset
-            = (int64_t)NumUtil_decode_bigend_u64(self->offsets + mid);
+            = (int64_t)NumUtil_decode_bigend_u64(ivars->offsets + mid);
         InStream_Seek(ix_in, offset);
         TermStepper_Read_Key_Frame(term_stepper, ix_in);
 
         // Compare values.  There is no need for a NULL-check because the term
-        // number is alway between 0 and self->size - 1.
+        // number is alway between 0 and ivars->size - 1.
         Obj *value = TermStepper_Get_Value(term_stepper);
         int32_t comparison = FType_Compare_Values(type, target, value);
 
@@ -185,7 +191,7 @@ LexIndex_seek(LexIndex *self, Obj *target) {
     }
 
     // Record the index of the entry we've seeked to, then read entry.
-    self->tick = hi == -1 // indicating that target lt first entry
+    ivars->tick = hi == -1 // indicating that target lt first entry
                  ? 0
                  : result == -100 // if result is still -100, it wasn't set
                  ? hi

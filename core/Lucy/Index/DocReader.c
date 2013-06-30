@@ -51,37 +51,41 @@ PolyDocReader_new(VArray *readers, I32Array *offsets) {
 PolyDocReader*
 PolyDocReader_init(PolyDocReader *self, VArray *readers, I32Array *offsets) {
     DocReader_init((DocReader*)self, NULL, NULL, NULL, NULL, -1);
+    PolyDocReaderIVARS *const ivars = PolyDocReader_IVARS(self);
     for (uint32_t i = 0, max = VA_Get_Size(readers); i < max; i++) {
         CERTIFY(VA_Fetch(readers, i), DOCREADER);
     }
-    self->readers = (VArray*)INCREF(readers);
-    self->offsets = (I32Array*)INCREF(offsets);
+    ivars->readers = (VArray*)INCREF(readers);
+    ivars->offsets = (I32Array*)INCREF(offsets);
     return self;
 }
 
 void
 PolyDocReader_close(PolyDocReader *self) {
-    if (self->readers) {
-        for (uint32_t i = 0, max = VA_Get_Size(self->readers); i < max; i++) {
-            DocReader *reader = (DocReader*)VA_Fetch(self->readers, i);
+    PolyDocReaderIVARS *const ivars = PolyDocReader_IVARS(self);
+    if (ivars->readers) {
+        for (uint32_t i = 0, max = VA_Get_Size(ivars->readers); i < max; i++) {
+            DocReader *reader = (DocReader*)VA_Fetch(ivars->readers, i);
             if (reader) { DocReader_Close(reader); }
         }
-        VA_Clear(self->readers);
+        VA_Clear(ivars->readers);
     }
 }
 
 void
 PolyDocReader_destroy(PolyDocReader *self) {
-    DECREF(self->readers);
-    DECREF(self->offsets);
+    PolyDocReaderIVARS *const ivars = PolyDocReader_IVARS(self);
+    DECREF(ivars->readers);
+    DECREF(ivars->offsets);
     SUPER_DESTROY(self, POLYDOCREADER);
 }
 
 HitDoc*
 PolyDocReader_fetch_doc(PolyDocReader *self, int32_t doc_id) {
-    uint32_t seg_tick = PolyReader_sub_tick(self->offsets, doc_id);
-    int32_t  offset   = I32Arr_Get(self->offsets, seg_tick);
-    DocReader *doc_reader = (DocReader*)VA_Fetch(self->readers, seg_tick);
+    PolyDocReaderIVARS *const ivars = PolyDocReader_IVARS(self);
+    uint32_t seg_tick = PolyReader_sub_tick(ivars->offsets, doc_id);
+    int32_t  offset   = I32Arr_Get(ivars->offsets, seg_tick);
+    DocReader *doc_reader = (DocReader*)VA_Fetch(ivars->readers, seg_tick);
     HitDoc *hit_doc = NULL;
     if (!doc_reader) {
         THROW(ERR, "Invalid doc_id: %i32", doc_id);
@@ -104,22 +108,24 @@ DefDocReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
 
 void
 DefDocReader_close(DefaultDocReader *self) {
-    if (self->dat_in != NULL) {
-        InStream_Close(self->dat_in);
-        DECREF(self->dat_in);
-        self->dat_in = NULL;
+    DefaultDocReaderIVARS *const ivars = DefDocReader_IVARS(self);
+    if (ivars->dat_in != NULL) {
+        InStream_Close(ivars->dat_in);
+        DECREF(ivars->dat_in);
+        ivars->dat_in = NULL;
     }
-    if (self->ix_in != NULL) {
-        InStream_Close(self->ix_in);
-        DECREF(self->ix_in);
-        self->ix_in = NULL;
+    if (ivars->ix_in != NULL) {
+        InStream_Close(ivars->ix_in);
+        DECREF(ivars->ix_in);
+        ivars->ix_in = NULL;
     }
 }
 
 void
 DefDocReader_destroy(DefaultDocReader *self) {
-    DECREF(self->ix_in);
-    DECREF(self->dat_in);
+    DefaultDocReaderIVARS *const ivars = DefDocReader_IVARS(self);
+    DECREF(ivars->ix_in);
+    DECREF(ivars->dat_in);
     SUPER_DESTROY(self, DEFAULTDOCREADER);
 }
 
@@ -130,6 +136,7 @@ DefDocReader_init(DefaultDocReader *self, Schema *schema, Folder *folder,
     Segment *segment;
     DocReader_init((DocReader*)self, schema, folder, snapshot, segments,
                    seg_tick);
+    DefaultDocReaderIVARS *const ivars = DefDocReader_IVARS(self);
     segment = DefDocReader_Get_Segment(self);
     metadata = (Hash*)Seg_Fetch_Metadata_Str(segment, "documents", 9);
 
@@ -154,16 +161,16 @@ DefDocReader_init(DefaultDocReader *self, Schema *schema, Folder *folder,
 
         // Get streams.
         if (Folder_Exists(folder, ix_file)) {
-            self->ix_in = Folder_Open_In(folder, ix_file);
-            if (!self->ix_in) {
+            ivars->ix_in = Folder_Open_In(folder, ix_file);
+            if (!ivars->ix_in) {
                 Err *error = (Err*)INCREF(Err_get_error());
                 DECREF(ix_file);
                 DECREF(dat_file);
                 DECREF(self);
                 RETHROW(error);
             }
-            self->dat_in = Folder_Open_In(folder, dat_file);
-            if (!self->dat_in) {
+            ivars->dat_in = Folder_Open_In(folder, dat_file);
+            if (!ivars->dat_in) {
                 Err *error = (Err*)INCREF(Err_get_error());
                 DECREF(ix_file);
                 DECREF(dat_file);
@@ -181,16 +188,18 @@ DefDocReader_init(DefaultDocReader *self, Schema *schema, Folder *folder,
 void
 DefDocReader_read_record(DefaultDocReader *self, ByteBuf *buffer,
                          int32_t doc_id) {
+    DefaultDocReaderIVARS *const ivars = DefDocReader_IVARS(self);
+
     // Find start and length of variable length record.
-    InStream_Seek(self->ix_in, (int64_t)doc_id * 8);
-    int64_t start = InStream_Read_I64(self->ix_in);
-    int64_t end   = InStream_Read_I64(self->ix_in);
+    InStream_Seek(ivars->ix_in, (int64_t)doc_id * 8);
+    int64_t start = InStream_Read_I64(ivars->ix_in);
+    int64_t end   = InStream_Read_I64(ivars->ix_in);
     size_t size  = (size_t)(end - start);
 
     // Read in the record.
     char *buf = BB_Grow(buffer, size);
-    InStream_Seek(self->dat_in, start);
-    InStream_Read_Bytes(self->dat_in, buf, size);
+    InStream_Seek(ivars->dat_in, start);
+    InStream_Read_Bytes(ivars->dat_in, buf, size);
     BB_Set_Size(buffer, size);
 }
 

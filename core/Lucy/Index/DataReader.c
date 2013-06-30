@@ -26,11 +26,12 @@
 DataReader*
 DataReader_init(DataReader *self, Schema *schema, Folder *folder,
                 Snapshot *snapshot, VArray *segments, int32_t seg_tick) {
-    self->schema   = (Schema*)INCREF(schema);
-    self->folder   = (Folder*)INCREF(folder);
-    self->snapshot = (Snapshot*)INCREF(snapshot);
-    self->segments = (VArray*)INCREF(segments);
-    self->seg_tick = seg_tick;
+    DataReaderIVARS *const ivars = DataReader_IVARS(self);
+    ivars->schema   = (Schema*)INCREF(schema);
+    ivars->folder   = (Folder*)INCREF(folder);
+    ivars->snapshot = (Snapshot*)INCREF(snapshot);
+    ivars->segments = (VArray*)INCREF(segments);
+    ivars->seg_tick = seg_tick;
     if (seg_tick != -1) {
         if (!segments) {
             THROW(ERR, "No segments array provided, but seg_tick is %i32",
@@ -41,11 +42,11 @@ DataReader_init(DataReader *self, Schema *schema, Folder *folder,
             if (!segment) {
                 THROW(ERR, "No segment at seg_tick %i32", seg_tick);
             }
-            self->segment = (Segment*)INCREF(segment);
+            ivars->segment = (Segment*)INCREF(segment);
         }
     }
     else {
-        self->segment = NULL;
+        ivars->segment = NULL;
     }
 
     ABSTRACT_CLASS_CHECK(self, DATAREADER);
@@ -54,42 +55,43 @@ DataReader_init(DataReader *self, Schema *schema, Folder *folder,
 
 void
 DataReader_destroy(DataReader *self) {
-    DECREF(self->schema);
-    DECREF(self->folder);
-    DECREF(self->snapshot);
-    DECREF(self->segments);
-    DECREF(self->segment);
+    DataReaderIVARS *const ivars = DataReader_IVARS(self);
+    DECREF(ivars->schema);
+    DECREF(ivars->folder);
+    DECREF(ivars->snapshot);
+    DECREF(ivars->segments);
+    DECREF(ivars->segment);
     SUPER_DESTROY(self, DATAREADER);
 }
 
 Schema*
 DataReader_get_schema(DataReader *self) {
-    return self->schema;
+    return DataReader_IVARS(self)->schema;
 }
 
 Folder*
 DataReader_get_folder(DataReader *self) {
-    return self->folder;
+    return DataReader_IVARS(self)->folder;
 }
 
 Snapshot*
 DataReader_get_snapshot(DataReader *self) {
-    return self->snapshot;
+    return DataReader_IVARS(self)->snapshot;
 }
 
 VArray*
 DataReader_get_segments(DataReader *self) {
-    return self->segments;
+    return DataReader_IVARS(self)->segments;
 }
 
 int32_t
 DataReader_get_seg_tick(DataReader *self) {
-    return self->seg_tick;
+    return DataReader_IVARS(self)->seg_tick;
 }
 
 Segment*
 DataReader_get_segment(DataReader *self) {
-    return self->segment;
+    return DataReader_IVARS(self)->segment;
 }
 
 

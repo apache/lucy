@@ -33,18 +33,20 @@ TV_new(const CharBuf *field, const CharBuf *text, I32Array *positions,
 TermVector*
 TV_init(TermVector *self, const CharBuf *field, const CharBuf *text,
         I32Array *positions, I32Array *start_offsets, I32Array *end_offsets) {
-    // Assign.
-    self->field          = CB_Clone(field);
-    self->text           = CB_Clone(text);
-    self->num_pos        = I32Arr_Get_Size(positions);
-    self->positions      = (I32Array*)INCREF(positions);
-    self->start_offsets  = (I32Array*)INCREF(start_offsets);
-    self->end_offsets    = (I32Array*)INCREF(end_offsets);
+    TermVectorIVARS *const ivars = TV_IVARS(self);
 
-    if (I32Arr_Get_Size(start_offsets) != self->num_pos
-        || I32Arr_Get_Size(end_offsets) != self->num_pos
+    // Assign.
+    ivars->field          = CB_Clone(field);
+    ivars->text           = CB_Clone(text);
+    ivars->num_pos        = I32Arr_Get_Size(positions);
+    ivars->positions      = (I32Array*)INCREF(positions);
+    ivars->start_offsets  = (I32Array*)INCREF(start_offsets);
+    ivars->end_offsets    = (I32Array*)INCREF(end_offsets);
+
+    if (I32Arr_Get_Size(start_offsets) != ivars->num_pos
+        || I32Arr_Get_Size(end_offsets) != ivars->num_pos
        ) {
-        THROW(ERR, "Unbalanced arrays: %u32 %u32 %u32", self->num_pos,
+        THROW(ERR, "Unbalanced arrays: %u32 %u32 %u32", ivars->num_pos,
               I32Arr_Get_Size(start_offsets), I32Arr_Get_Size(end_offsets));
     }
 
@@ -53,40 +55,42 @@ TV_init(TermVector *self, const CharBuf *field, const CharBuf *text,
 
 void
 TV_destroy(TermVector *self) {
-    DECREF(self->field);
-    DECREF(self->text);
-    DECREF(self->positions);
-    DECREF(self->start_offsets);
-    DECREF(self->end_offsets);
+    TermVectorIVARS *const ivars = TV_IVARS(self);
+    DECREF(ivars->field);
+    DECREF(ivars->text);
+    DECREF(ivars->positions);
+    DECREF(ivars->start_offsets);
+    DECREF(ivars->end_offsets);
     SUPER_DESTROY(self, TERMVECTOR);
 }
 
 I32Array*
 TV_get_positions(TermVector *self) {
-    return self->positions;
+    return TV_IVARS(self)->positions;
 }
 
 I32Array*
 TV_get_start_offsets(TermVector *self) {
-    return self->start_offsets;
+    return TV_IVARS(self)->start_offsets;
 }
 
 I32Array*
 TV_get_end_offsets(TermVector *self) {
-    return self->end_offsets;
+    return TV_IVARS(self)->end_offsets;
 }
 
 void
 TV_serialize(TermVector *self, OutStream *target) {
-    int32_t *posits = self->positions->ints;
-    int32_t *starts = self->start_offsets->ints;
-    int32_t *ends   = self->start_offsets->ints;
+    TermVectorIVARS *const ivars = TV_IVARS(self);
+    int32_t *posits = I32Arr_IVARS(ivars->positions)->ints;
+    int32_t *starts = I32Arr_IVARS(ivars->start_offsets)->ints;
+    int32_t *ends   = I32Arr_IVARS(ivars->start_offsets)->ints;
 
-    Freezer_serialize_charbuf(self->field, target);
-    Freezer_serialize_charbuf(self->text, target);
-    OutStream_Write_C32(target, self->num_pos);
+    Freezer_serialize_charbuf(ivars->field, target);
+    Freezer_serialize_charbuf(ivars->text, target);
+    OutStream_Write_C32(target, ivars->num_pos);
 
-    for (uint32_t i = 0; i < self->num_pos; i++) {
+    for (uint32_t i = 0; i < ivars->num_pos; i++) {
         OutStream_Write_C32(target, posits[i]);
         OutStream_Write_C32(target, starts[i]);
         OutStream_Write_C32(target, ends[i]);
@@ -125,21 +129,20 @@ TV_deserialize(TermVector *self, InStream *instream) {
 
 bool
 TV_equals(TermVector *self, Obj *other) {
-    TermVector *const twin = (TermVector*)other;
-    int32_t *const posits       = self->positions->ints;
-    int32_t *const starts       = self->start_offsets->ints;
-    int32_t *const ends         = self->start_offsets->ints;
-    int32_t *const other_posits = twin->positions->ints;
-    int32_t *const other_starts = twin->start_offsets->ints;
-    int32_t *const other_ends   = twin->start_offsets->ints;
+    if ((TermVector*)other == self) { return true; }
+    TermVectorIVARS *const ivars = TV_IVARS(self);
+    TermVectorIVARS *const ovars = TV_IVARS((TermVector*)other);
+    if (!CB_Equals(ivars->field, (Obj*)ovars->field)) { return false; }
+    if (!CB_Equals(ivars->text, (Obj*)ovars->text))   { return false; }
+    if (ivars->num_pos != ovars->num_pos)             { return false; }
 
-    if (twin == self) { return true; }
-
-    if (!CB_Equals(self->field, (Obj*)twin->field)) { return false; }
-    if (!CB_Equals(self->text, (Obj*)twin->text))   { return false; }
-    if (self->num_pos != twin->num_pos)             { return false; }
-
-    for (uint32_t i = 0; i < self->num_pos; i++) {
+    int32_t *const posits       = I32Arr_IVARS(ivars->positions)->ints;
+    int32_t *const starts       = I32Arr_IVARS(ivars->start_offsets)->ints;
+    int32_t *const ends         = I32Arr_IVARS(ivars->start_offsets)->ints;
+    int32_t *const other_posits = I32Arr_IVARS(ovars->positions)->ints;
+    int32_t *const other_starts = I32Arr_IVARS(ovars->start_offsets)->ints;
+    int32_t *const other_ends   = I32Arr_IVARS(ovars->start_offsets)->ints;
+    for (uint32_t i = 0; i < ivars->num_pos; i++) {
         if (posits[i] != other_posits[i]) { return false; }
         if (starts[i] != other_starts[i]) { return false; }
         if (ends[i]   != other_ends[i])   { return false; }

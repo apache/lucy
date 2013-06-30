@@ -46,79 +46,85 @@ LexWriter_init(LexiconWriter *self, Schema *schema, Snapshot *snapshot,
     Architecture *arch = Schema_Get_Architecture(schema);
 
     DataWriter_init((DataWriter*)self, schema, snapshot, segment, polyreader);
+    LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
 
     // Assign.
-    self->index_interval = Arch_Index_Interval(arch);
-    self->skip_interval  = Arch_Skip_Interval(arch);
+    ivars->index_interval = Arch_Index_Interval(arch);
+    ivars->skip_interval  = Arch_Skip_Interval(arch);
 
     // Init.
-    self->ix_out             = NULL;
-    self->ixix_out           = NULL;
-    self->dat_out            = NULL;
-    self->count              = 0;
-    self->ix_count           = 0;
-    self->dat_file           = CB_new(30);
-    self->ix_file            = CB_new(30);
-    self->ixix_file          = CB_new(30);
-    self->counts             = Hash_new(0);
-    self->ix_counts          = Hash_new(0);
-    self->temp_mode          = false;
-    self->term_stepper       = NULL;
-    self->tinfo_stepper      = (TermStepper*)MatchTInfoStepper_new(schema);
+    ivars->ix_out             = NULL;
+    ivars->ixix_out           = NULL;
+    ivars->dat_out            = NULL;
+    ivars->count              = 0;
+    ivars->ix_count           = 0;
+    ivars->dat_file           = CB_new(30);
+    ivars->ix_file            = CB_new(30);
+    ivars->ixix_file          = CB_new(30);
+    ivars->counts             = Hash_new(0);
+    ivars->ix_counts          = Hash_new(0);
+    ivars->temp_mode          = false;
+    ivars->term_stepper       = NULL;
+    ivars->tinfo_stepper      = (TermStepper*)MatchTInfoStepper_new(schema);
 
     return self;
 }
 
 void
 LexWriter_destroy(LexiconWriter *self) {
-    DECREF(self->term_stepper);
-    DECREF(self->tinfo_stepper);
-    DECREF(self->dat_file);
-    DECREF(self->ix_file);
-    DECREF(self->ixix_file);
-    DECREF(self->dat_out);
-    DECREF(self->ix_out);
-    DECREF(self->ixix_out);
-    DECREF(self->counts);
-    DECREF(self->ix_counts);
+    LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
+    DECREF(ivars->term_stepper);
+    DECREF(ivars->tinfo_stepper);
+    DECREF(ivars->dat_file);
+    DECREF(ivars->ix_file);
+    DECREF(ivars->ixix_file);
+    DECREF(ivars->dat_out);
+    DECREF(ivars->ix_out);
+    DECREF(ivars->ixix_out);
+    DECREF(ivars->counts);
+    DECREF(ivars->ix_counts);
     SUPER_DESTROY(self, LEXICONWRITER);
 }
 
 static void
 S_add_last_term_to_ix(LexiconWriter *self) {
+    LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
+
     // Write file pointer to index record.
-    OutStream_Write_I64(self->ixix_out, OutStream_Tell(self->ix_out));
+    OutStream_Write_I64(ivars->ixix_out, OutStream_Tell(ivars->ix_out));
 
     // Write term and file pointer to main record.  Track count of terms added
     // to ix.
-    TermStepper_Write_Key_Frame(self->term_stepper,
-                                self->ix_out, TermStepper_Get_Value(self->term_stepper));
-    TermStepper_Write_Key_Frame(self->tinfo_stepper,
-                                self->ix_out, TermStepper_Get_Value(self->tinfo_stepper));
-    OutStream_Write_C64(self->ix_out, OutStream_Tell(self->dat_out));
-    self->ix_count++;
+    TermStepper_Write_Key_Frame(ivars->term_stepper,
+                                ivars->ix_out, TermStepper_Get_Value(ivars->term_stepper));
+    TermStepper_Write_Key_Frame(ivars->tinfo_stepper,
+                                ivars->ix_out, TermStepper_Get_Value(ivars->tinfo_stepper));
+    OutStream_Write_C64(ivars->ix_out, OutStream_Tell(ivars->dat_out));
+    ivars->ix_count++;
 }
 
 void
 LexWriter_add_term(LexiconWriter* self, CharBuf* term_text, TermInfo* tinfo) {
-    OutStream *dat_out = self->dat_out;
+    LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
+    OutStream *dat_out = ivars->dat_out;
 
-    if ((self->count % self->index_interval == 0)
-        && !self->temp_mode
+    if ((ivars->count % ivars->index_interval == 0)
+        && !ivars->temp_mode
        ) {
         // Write a subset of entries to lexicon.ix.
         S_add_last_term_to_ix(self);
     }
 
-    TermStepper_Write_Delta(self->term_stepper, dat_out, (Obj*)term_text);
-    TermStepper_Write_Delta(self->tinfo_stepper, dat_out, (Obj*)tinfo);
+    TermStepper_Write_Delta(ivars->term_stepper, dat_out, (Obj*)term_text);
+    TermStepper_Write_Delta(ivars->tinfo_stepper, dat_out, (Obj*)tinfo);
 
     // Track number of terms.
-    self->count++;
+    ivars->count++;
 }
 
 void
 LexWriter_start_field(LexiconWriter *self, int32_t field_num) {
+    LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
     Segment   *const segment  = LexWriter_Get_Segment(self);
     Folder    *const folder   = LexWriter_Get_Folder(self);
     Schema    *const schema   = LexWriter_Get_Schema(self);
@@ -127,104 +133,110 @@ LexWriter_start_field(LexiconWriter *self, int32_t field_num) {
     FieldType *const type     = Schema_Fetch_Type(schema, field);
 
     // Open outstreams.
-    CB_setf(self->dat_file,  "%o/lexicon-%i32.dat",  seg_name, field_num);
-    CB_setf(self->ix_file,   "%o/lexicon-%i32.ix",   seg_name, field_num);
-    CB_setf(self->ixix_file, "%o/lexicon-%i32.ixix", seg_name, field_num);
-    self->dat_out = Folder_Open_Out(folder, self->dat_file);
-    if (!self->dat_out) { RETHROW(INCREF(Err_get_error())); }
-    self->ix_out = Folder_Open_Out(folder, self->ix_file);
-    if (!self->ix_out) { RETHROW(INCREF(Err_get_error())); }
-    self->ixix_out = Folder_Open_Out(folder, self->ixix_file);
-    if (!self->ixix_out) { RETHROW(INCREF(Err_get_error())); }
+    CB_setf(ivars->dat_file,  "%o/lexicon-%i32.dat",  seg_name, field_num);
+    CB_setf(ivars->ix_file,   "%o/lexicon-%i32.ix",   seg_name, field_num);
+    CB_setf(ivars->ixix_file, "%o/lexicon-%i32.ixix", seg_name, field_num);
+    ivars->dat_out = Folder_Open_Out(folder, ivars->dat_file);
+    if (!ivars->dat_out) { RETHROW(INCREF(Err_get_error())); }
+    ivars->ix_out = Folder_Open_Out(folder, ivars->ix_file);
+    if (!ivars->ix_out) { RETHROW(INCREF(Err_get_error())); }
+    ivars->ixix_out = Folder_Open_Out(folder, ivars->ixix_file);
+    if (!ivars->ixix_out) { RETHROW(INCREF(Err_get_error())); }
 
     // Initialize count and ix_count, term stepper and term info stepper.
-    self->count    = 0;
-    self->ix_count = 0;
-    self->term_stepper = FType_Make_Term_Stepper(type);
-    TermStepper_Reset(self->tinfo_stepper);
+    ivars->count    = 0;
+    ivars->ix_count = 0;
+    ivars->term_stepper = FType_Make_Term_Stepper(type);
+    TermStepper_Reset(ivars->tinfo_stepper);
 }
 
 void
 LexWriter_finish_field(LexiconWriter *self, int32_t field_num) {
-    CharBuf *field = Seg_Field_Name(self->segment, field_num);
+    LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
+    CharBuf *field = Seg_Field_Name(ivars->segment, field_num);
 
     // Store count of terms for this field as metadata.
-    Hash_Store(self->counts, (Obj*)field,
-               (Obj*)CB_newf("%i32", self->count));
-    Hash_Store(self->ix_counts, (Obj*)field,
-               (Obj*)CB_newf("%i32", self->ix_count));
+    Hash_Store(ivars->counts, (Obj*)field,
+               (Obj*)CB_newf("%i32", ivars->count));
+    Hash_Store(ivars->ix_counts, (Obj*)field,
+               (Obj*)CB_newf("%i32", ivars->ix_count));
 
     // Close streams.
-    OutStream_Close(self->dat_out);
-    OutStream_Close(self->ix_out);
-    OutStream_Close(self->ixix_out);
-    DECREF(self->dat_out);
-    DECREF(self->ix_out);
-    DECREF(self->ixix_out);
-    self->dat_out  = NULL;
-    self->ix_out   = NULL;
-    self->ixix_out = NULL;
+    OutStream_Close(ivars->dat_out);
+    OutStream_Close(ivars->ix_out);
+    OutStream_Close(ivars->ixix_out);
+    DECREF(ivars->dat_out);
+    DECREF(ivars->ix_out);
+    DECREF(ivars->ixix_out);
+    ivars->dat_out  = NULL;
+    ivars->ix_out   = NULL;
+    ivars->ixix_out = NULL;
 
     // Close term stepper.
-    DECREF(self->term_stepper);
-    self->term_stepper = NULL;
+    DECREF(ivars->term_stepper);
+    ivars->term_stepper = NULL;
 }
 
 void
 LexWriter_enter_temp_mode(LexiconWriter *self, const CharBuf *field,
                           OutStream *temp_outstream) {
+    LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
     Schema    *schema = LexWriter_Get_Schema(self);
     FieldType *type   = Schema_Fetch_Type(schema, field);
 
     // Assign outstream.
-    if (self->dat_out != NULL) {
-        THROW(ERR, "Can't enter temp mode (filename: %o) ", self->dat_file);
+    if (ivars->dat_out != NULL) {
+        THROW(ERR, "Can't enter temp mode (filename: %o) ", ivars->dat_file);
     }
-    self->dat_out = (OutStream*)INCREF(temp_outstream);
+    ivars->dat_out = (OutStream*)INCREF(temp_outstream);
 
     // Initialize count and ix_count, term stepper and term info stepper.
-    self->count    = 0;
-    self->ix_count = 0;
-    self->term_stepper = FType_Make_Term_Stepper(type);
-    TermStepper_Reset(self->tinfo_stepper);
+    ivars->count    = 0;
+    ivars->ix_count = 0;
+    ivars->term_stepper = FType_Make_Term_Stepper(type);
+    TermStepper_Reset(ivars->tinfo_stepper);
 
     // Remember that we're in temp mode.
-    self->temp_mode = true;
+    ivars->temp_mode = true;
 }
 
 void
 LexWriter_leave_temp_mode(LexiconWriter *self) {
-    DECREF(self->term_stepper);
-    self->term_stepper = NULL;
-    DECREF(self->dat_out);
-    self->dat_out   = NULL;
-    self->temp_mode = false;
+    LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
+    DECREF(ivars->term_stepper);
+    ivars->term_stepper = NULL;
+    DECREF(ivars->dat_out);
+    ivars->dat_out   = NULL;
+    ivars->temp_mode = false;
 }
 
 void
 LexWriter_finish(LexiconWriter *self) {
+    LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
+
     // Ensure that streams were closed (by calling Finish_Field or
     // Leave_Temp_Mode).
-    if (self->dat_out != NULL) {
-        THROW(ERR, "File '%o' never closed", self->dat_file);
+    if (ivars->dat_out != NULL) {
+        THROW(ERR, "File '%o' never closed", ivars->dat_file);
     }
-    else if (self->ix_out != NULL) {
-        THROW(ERR, "File '%o' never closed", self->ix_file);
+    else if (ivars->ix_out != NULL) {
+        THROW(ERR, "File '%o' never closed", ivars->ix_file);
     }
-    else if (self->ix_out != NULL) {
-        THROW(ERR, "File '%o' never closed", self->ix_file);
+    else if (ivars->ix_out != NULL) {
+        THROW(ERR, "File '%o' never closed", ivars->ix_file);
     }
 
     // Store metadata.
-    Seg_Store_Metadata_Str(self->segment, "lexicon", 7,
+    Seg_Store_Metadata_Str(ivars->segment, "lexicon", 7,
                            (Obj*)LexWriter_Metadata(self));
 }
 
 Hash*
 LexWriter_metadata(LexiconWriter *self) {
+    LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
     Hash *const metadata  = DataWriter_metadata((DataWriter*)self);
-    Hash *const counts    = (Hash*)INCREF(self->counts);
-    Hash *const ix_counts = (Hash*)INCREF(self->ix_counts);
+    Hash *const counts    = (Hash*)INCREF(ivars->counts);
+    Hash *const ix_counts = (Hash*)INCREF(ivars->ix_counts);
 
     // Placeholders.
     if (Hash_Get_Size(counts) == 0) {

@@ -33,23 +33,25 @@ Seg_new(int64_t number) {
 
 Segment*
 Seg_init(Segment *self, int64_t number) {
+    SegmentIVARS *const ivars = Seg_IVARS(self);
+
     // Validate.
     if (number < 0) { THROW(ERR, "Segment number %i64 less than 0", number); }
 
     // Init.
-    self->metadata  = Hash_new(0);
-    self->count     = 0;
-    self->by_num    = VA_new(2);
-    self->by_name   = Hash_new(0);
+    ivars->metadata  = Hash_new(0);
+    ivars->count     = 0;
+    ivars->by_num    = VA_new(2);
+    ivars->by_name   = Hash_new(0);
 
     // Start field numbers at 1, not 0.
-    VA_Push(self->by_num, (Obj*)CB_newf(""));
+    VA_Push(ivars->by_num, (Obj*)CB_newf(""));
 
     // Assign.
-    self->number = number;
+    ivars->number = number;
 
     // Derive.
-    self->name = Seg_num_to_name(number);
+    ivars->name = Seg_num_to_name(number);
 
     return self;
 }
@@ -77,16 +79,18 @@ Seg_valid_seg_name(const CharBuf *name) {
 
 void
 Seg_destroy(Segment *self) {
-    DECREF(self->name);
-    DECREF(self->metadata);
-    DECREF(self->by_name);
-    DECREF(self->by_num);
+    SegmentIVARS *const ivars = Seg_IVARS(self);
+    DECREF(ivars->name);
+    DECREF(ivars->metadata);
+    DECREF(ivars->by_name);
+    DECREF(ivars->by_num);
     SUPER_DESTROY(self, SEGMENT);
 }
 
 bool
 Seg_read_file(Segment *self, Folder *folder) {
-    CharBuf *filename = CB_newf("%o/segmeta.json", self->name);
+    SegmentIVARS *const ivars = Seg_IVARS(self);
+    CharBuf *filename = CB_newf("%o/segmeta.json", ivars->name);
     Hash    *metadata = (Hash*)Json_slurp_json(folder, filename);
     Hash    *my_metadata;
 
@@ -96,16 +100,16 @@ Seg_read_file(Segment *self, Folder *folder) {
     CERTIFY(metadata, HASH);
 
     // Grab metadata for the Segment object itself.
-    DECREF(self->metadata);
-    self->metadata = metadata;
+    DECREF(ivars->metadata);
+    ivars->metadata = metadata;
     my_metadata
-        = (Hash*)CERTIFY(Hash_Fetch_Str(self->metadata, "segmeta", 7), HASH);
+        = (Hash*)CERTIFY(Hash_Fetch_Str(ivars->metadata, "segmeta", 7), HASH);
 
     // Assign.
     Obj *count = Hash_Fetch_Str(my_metadata, "count", 5);
     if (!count) { count = Hash_Fetch_Str(my_metadata, "doc_count", 9); }
     if (!count) { THROW(ERR, "Missing 'count'"); }
-    else { self->count = Obj_To_I64(count); }
+    else { ivars->count = Obj_To_I64(count); }
 
     // Get list of field nums.
     VArray *source_by_num = (VArray*)Hash_Fetch_Str(my_metadata,
@@ -116,10 +120,10 @@ Seg_read_file(Segment *self, Folder *folder) {
     }
 
     // Init.
-    DECREF(self->by_num);
-    DECREF(self->by_name);
-    self->by_num  = VA_new(num_fields);
-    self->by_name = Hash_new(num_fields);
+    DECREF(ivars->by_num);
+    DECREF(ivars->by_name);
+    ivars->by_num  = VA_new(num_fields);
+    ivars->by_name = Hash_new(num_fields);
 
     // Copy the list of fields from the source.
     for (uint32_t i = 0; i < num_fields; i++) {
@@ -132,68 +136,72 @@ Seg_read_file(Segment *self, Folder *folder) {
 
 void
 Seg_write_file(Segment *self, Folder *folder) {
+    SegmentIVARS *const ivars = Seg_IVARS(self);
     Hash *my_metadata = Hash_new(16);
 
     // Store metadata specific to this Segment object.
     Hash_Store_Str(my_metadata, "count", 5,
-                   (Obj*)CB_newf("%i64", self->count));
-    Hash_Store_Str(my_metadata, "name", 4, (Obj*)CB_Clone(self->name));
-    Hash_Store_Str(my_metadata, "field_names", 11, INCREF(self->by_num));
+                   (Obj*)CB_newf("%i64", ivars->count));
+    Hash_Store_Str(my_metadata, "name", 4, (Obj*)CB_Clone(ivars->name));
+    Hash_Store_Str(my_metadata, "field_names", 11, INCREF(ivars->by_num));
     Hash_Store_Str(my_metadata, "format", 6, (Obj*)CB_newf("%i32", 1));
-    Hash_Store_Str(self->metadata, "segmeta", 7, (Obj*)my_metadata);
+    Hash_Store_Str(ivars->metadata, "segmeta", 7, (Obj*)my_metadata);
 
-    CharBuf *filename = CB_newf("%o/segmeta.json", self->name);
-    bool result = Json_spew_json((Obj*)self->metadata, folder, filename);
+    CharBuf *filename = CB_newf("%o/segmeta.json", ivars->name);
+    bool result = Json_spew_json((Obj*)ivars->metadata, folder, filename);
     DECREF(filename);
     if (!result) { RETHROW(INCREF(Err_get_error())); }
 }
 
 int32_t
 Seg_add_field(Segment *self, const CharBuf *field) {
-    Integer32 *num = (Integer32*)Hash_Fetch(self->by_name, (Obj*)field);
+    SegmentIVARS *const ivars = Seg_IVARS(self);
+    Integer32 *num = (Integer32*)Hash_Fetch(ivars->by_name, (Obj*)field);
     if (num) {
         return Int32_Get_Value(num);
     }
     else {
-        int32_t field_num = VA_Get_Size(self->by_num);
-        Hash_Store(self->by_name, (Obj*)field, (Obj*)Int32_new(field_num));
-        VA_Push(self->by_num, (Obj*)CB_Clone(field));
+        int32_t field_num = VA_Get_Size(ivars->by_num);
+        Hash_Store(ivars->by_name, (Obj*)field, (Obj*)Int32_new(field_num));
+        VA_Push(ivars->by_num, (Obj*)CB_Clone(field));
         return field_num;
     }
 }
 
 CharBuf*
 Seg_get_name(Segment *self) {
-    return self->name;
+    return Seg_IVARS(self)->name;
 }
 
 int64_t
 Seg_get_number(Segment *self) {
-    return self->number;
+    return Seg_IVARS(self)->number;
 }
 
 void
 Seg_set_count(Segment *self, int64_t count) {
-    self->count = count;
+    Seg_IVARS(self)->count = count;
 }
 
 int64_t
 Seg_get_count(Segment *self) {
-    return self->count;
+    return Seg_IVARS(self)->count;
 }
 
 int64_t
 Seg_increment_count(Segment *self, int64_t increment) {
-    self->count += increment;
-    return self->count;
+    SegmentIVARS *const ivars = Seg_IVARS(self);
+    ivars->count += increment;
+    return ivars->count;
 }
 
 void
 Seg_store_metadata(Segment *self, const CharBuf *key, Obj *value) {
-    if (Hash_Fetch(self->metadata, (Obj*)key)) {
+    SegmentIVARS *const ivars = Seg_IVARS(self);
+    if (Hash_Fetch(ivars->metadata, (Obj*)key)) {
         THROW(ERR, "Metadata key '%o' already registered", key);
     }
-    Hash_Store(self->metadata, (Obj*)key, value);
+    Hash_Store(ivars->metadata, (Obj*)key, value);
 }
 
 void
@@ -205,31 +213,36 @@ Seg_store_metadata_str(Segment *self, const char *key, size_t key_len,
 
 Obj*
 Seg_fetch_metadata(Segment *self, const CharBuf *key) {
-    return Hash_Fetch(self->metadata, (Obj*)key);
+    SegmentIVARS *const ivars = Seg_IVARS(self);
+    return Hash_Fetch(ivars->metadata, (Obj*)key);
 }
 
 Obj*
 Seg_fetch_metadata_str(Segment *self, const char *key, size_t len) {
-    return Hash_Fetch_Str(self->metadata, key, len);
+    SegmentIVARS *const ivars = Seg_IVARS(self);
+    return Hash_Fetch_Str(ivars->metadata, key, len);
 }
 
 Hash*
 Seg_get_metadata(Segment *self) {
-    return self->metadata;
+    return Seg_IVARS(self)->metadata;
 }
 
 int32_t
 Seg_compare_to(Segment *self, Obj *other) {
     Segment *other_seg = (Segment*)CERTIFY(other, SEGMENT);
-    if (self->number <  other_seg->number)      { return -1; }
-    else if (self->number == other_seg->number) { return 0;  }
-    else                                        { return 1;  }
+    SegmentIVARS *const ivars = Seg_IVARS(self);
+    SegmentIVARS *const ovars = Seg_IVARS(other_seg);
+    if (ivars->number < ovars->number)       { return -1; }
+    else if (ivars->number == ovars->number) { return 0;  }
+    else                                     { return 1;  }
 }
 
 CharBuf*
 Seg_field_name(Segment *self, int32_t field_num) {
+    SegmentIVARS *const ivars = Seg_IVARS(self);
     return field_num
-           ? (CharBuf*)VA_Fetch(self->by_num, field_num)
+           ? (CharBuf*)VA_Fetch(ivars->by_num, field_num)
            : NULL;
 }
 
@@ -239,7 +252,8 @@ Seg_field_num(Segment *self, const CharBuf *field) {
         return 0;
     }
     else {
-        Integer32 *num = (Integer32*)Hash_Fetch(self->by_name, (Obj*)field);
+        SegmentIVARS *const ivars = Seg_IVARS(self);
+        Integer32 *num = (Integer32*)Hash_Fetch(ivars->by_name, (Obj*)field);
         return num ? Int32_Get_Value(num) : 0;
     }
 }

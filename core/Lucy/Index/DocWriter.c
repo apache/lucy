@@ -52,39 +52,42 @@ DocWriter_init(DocWriter *self, Schema *schema, Snapshot *snapshot,
 
 void
 DocWriter_destroy(DocWriter *self) {
-    DECREF(self->dat_out);
-    DECREF(self->ix_out);
+    DocWriterIVARS *const ivars = DocWriter_IVARS(self);
+    DECREF(ivars->dat_out);
+    DECREF(ivars->ix_out);
     SUPER_DESTROY(self, DOCWRITER);
 }
 
 static OutStream*
 S_lazy_init(DocWriter *self) {
-    if (!self->dat_out) {
-        Folder  *folder   = self->folder;
-        CharBuf *seg_name = Seg_Get_Name(self->segment);
+    DocWriterIVARS *const ivars = DocWriter_IVARS(self);
+    if (!ivars->dat_out) {
+        Folder  *folder   = ivars->folder;
+        CharBuf *seg_name = Seg_Get_Name(ivars->segment);
 
         // Get streams.
         CharBuf *ix_file = CB_newf("%o/documents.ix", seg_name);
-        self->ix_out = Folder_Open_Out(folder, ix_file);
+        ivars->ix_out = Folder_Open_Out(folder, ix_file);
         DECREF(ix_file);
-        if (!self->ix_out) { RETHROW(INCREF(Err_get_error())); }
+        if (!ivars->ix_out) { RETHROW(INCREF(Err_get_error())); }
         CharBuf *dat_file = CB_newf("%o/documents.dat", seg_name);
-        self->dat_out = Folder_Open_Out(folder, dat_file);
+        ivars->dat_out = Folder_Open_Out(folder, dat_file);
         DECREF(dat_file);
-        if (!self->dat_out) { RETHROW(INCREF(Err_get_error())); }
+        if (!ivars->dat_out) { RETHROW(INCREF(Err_get_error())); }
 
         // Go past non-doc #0.
-        OutStream_Write_I64(self->ix_out, 0);
+        OutStream_Write_I64(ivars->ix_out, 0);
     }
 
-    return self->dat_out;
+    return ivars->dat_out;
 }
 
 void
 DocWriter_add_inverted_doc(DocWriter *self, Inverter *inverter,
                            int32_t doc_id) {
+    DocWriterIVARS *const ivars = DocWriter_IVARS(self);
     OutStream *dat_out    = S_lazy_init(self);
-    OutStream *ix_out     = self->ix_out;
+    OutStream *ix_out     = ivars->ix_out;
     uint32_t   num_stored = 0;
     int64_t    start      = OutStream_Tell(dat_out);
     int64_t    expected   = OutStream_Tell(ix_out) / 8;
@@ -158,6 +161,7 @@ DocWriter_add_inverted_doc(DocWriter *self, Inverter *inverter,
 void
 DocWriter_add_segment(DocWriter *self, SegReader *reader,
                       I32Array *doc_map) {
+    DocWriterIVARS *const ivars = DocWriter_IVARS(self);
     int32_t doc_max = SegReader_Doc_Max(reader);
 
     if (doc_max == 0) {
@@ -166,7 +170,7 @@ DocWriter_add_segment(DocWriter *self, SegReader *reader,
     }
     else {
         OutStream *const dat_out = S_lazy_init(self);
-        OutStream *const ix_out  = self->ix_out;
+        OutStream *const ix_out  = ivars->ix_out;
         ByteBuf   *const buffer  = BB_new(0);
         DefaultDocReader *const doc_reader
             = (DefaultDocReader*)CERTIFY(
@@ -194,16 +198,17 @@ DocWriter_add_segment(DocWriter *self, SegReader *reader,
 
 void
 DocWriter_finish(DocWriter *self) {
-    if (self->dat_out) {
+    DocWriterIVARS *const ivars = DocWriter_IVARS(self);
+    if (ivars->dat_out) {
         // Write one final file pointer, so that we can derive the length of
         // the last record.
-        int64_t end = OutStream_Tell(self->dat_out);
-        OutStream_Write_I64(self->ix_out, end);
+        int64_t end = OutStream_Tell(ivars->dat_out);
+        OutStream_Write_I64(ivars->ix_out, end);
 
         // Close down output streams.
-        OutStream_Close(self->dat_out);
-        OutStream_Close(self->ix_out);
-        Seg_Store_Metadata_Str(self->segment, "documents", 9,
+        OutStream_Close(ivars->dat_out);
+        OutStream_Close(ivars->ix_out);
+        Seg_Store_Metadata_Str(ivars->segment, "documents", 9,
                                (Obj*)DocWriter_Metadata(self));
     }
 }

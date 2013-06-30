@@ -30,18 +30,19 @@
 
 Posting*
 Post_init(Posting *self) {
-    self->doc_id = 0;
+    PostingIVARS *const ivars = Post_IVARS(self);
+    ivars->doc_id = 0;
     return self;
 }
 
 void
 Post_set_doc_id(Posting *self, int32_t doc_id) {
-    self->doc_id = doc_id;
+    Post_IVARS(self)->doc_id = doc_id;
 }
 
 int32_t
 Post_get_doc_id(Posting *self) {
-    return self->doc_id;
+    return Post_IVARS(self)->doc_id;
 }
 
 PostingWriter*
@@ -49,7 +50,8 @@ PostWriter_init(PostingWriter *self, Schema *schema, Snapshot *snapshot,
                 Segment *segment, PolyReader *polyreader, int32_t field_num) {
     DataWriter_init((DataWriter*)self, schema, snapshot, segment,
                     polyreader);
-    self->field_num = field_num;
+    PostingWriterIVARS *const ivars = PostWriter_IVARS(self);
+    ivars->field_num = field_num;
     return self;
 }
 

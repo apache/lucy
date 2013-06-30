@@ -41,62 +41,70 @@ DocVec_new() {
 
 DocVector*
 DocVec_init(DocVector *self) {
-    self->field_bufs    = Hash_new(0);
-    self->field_vectors = Hash_new(0);
+    DocVectorIVARS *const ivars = DocVec_IVARS(self);
+    ivars->field_bufs    = Hash_new(0);
+    ivars->field_vectors = Hash_new(0);
     return self;
 }
 
 void
 DocVec_serialize(DocVector *self, OutStream *outstream) {
-    Freezer_serialize_hash(self->field_bufs, outstream);
-    Freezer_serialize_hash(self->field_vectors, outstream);
+    DocVectorIVARS *const ivars = DocVec_IVARS(self);
+    Freezer_serialize_hash(ivars->field_bufs, outstream);
+    Freezer_serialize_hash(ivars->field_vectors, outstream);
 }
 
 DocVector*
 DocVec_deserialize(DocVector *self, InStream *instream) {
-    self->field_bufs    = Freezer_read_hash(instream);
-    self->field_vectors = Freezer_read_hash(instream);
+    DocVectorIVARS *const ivars = DocVec_IVARS(self);
+    ivars->field_bufs    = Freezer_read_hash(instream);
+    ivars->field_vectors = Freezer_read_hash(instream);
     return self;
 }
 
 void
 DocVec_destroy(DocVector *self) {
-    DECREF(self->field_bufs);
-    DECREF(self->field_vectors);
+    DocVectorIVARS *const ivars = DocVec_IVARS(self);
+    DECREF(ivars->field_bufs);
+    DECREF(ivars->field_vectors);
     SUPER_DESTROY(self, DOCVECTOR);
 }
 
 void
 DocVec_add_field_buf(DocVector *self, const CharBuf *field,
                      ByteBuf *field_buf) {
-    Hash_Store(self->field_bufs, (Obj*)field, INCREF(field_buf));
+    DocVectorIVARS *const ivars = DocVec_IVARS(self);
+    Hash_Store(ivars->field_bufs, (Obj*)field, INCREF(field_buf));
 }
 
 ByteBuf*
 DocVec_field_buf(DocVector *self, const CharBuf *field) {
-    return (ByteBuf*)Hash_Fetch(self->field_bufs, (Obj*)field);
+    DocVectorIVARS *const ivars = DocVec_IVARS(self);
+    return (ByteBuf*)Hash_Fetch(ivars->field_bufs, (Obj*)field);
 }
 
 VArray*
 DocVec_field_names(DocVector *self) {
-    return Hash_Keys(self->field_bufs);
+    DocVectorIVARS *const ivars = DocVec_IVARS(self);
+    return Hash_Keys(ivars->field_bufs);
 }
 
 TermVector*
 DocVec_term_vector(DocVector *self, const CharBuf *field,
                    const CharBuf *term_text) {
-    Hash *field_vector = (Hash*)Hash_Fetch(self->field_vectors, (Obj*)field);
+    DocVectorIVARS *const ivars = DocVec_IVARS(self);
+    Hash *field_vector = (Hash*)Hash_Fetch(ivars->field_vectors, (Obj*)field);
 
     // If no cache hit, try to fill cache.
     if (field_vector == NULL) {
         ByteBuf *field_buf
-            = (ByteBuf*)Hash_Fetch(self->field_bufs, (Obj*)field);
+            = (ByteBuf*)Hash_Fetch(ivars->field_bufs, (Obj*)field);
 
         // Bail if there's no content or the field isn't highlightable.
         if (field_buf == NULL) { return NULL; }
 
         field_vector = S_extract_tv_cache(field_buf);
-        Hash_Store(self->field_vectors, (Obj*)field, (Obj*)field_vector);
+        Hash_Store(ivars->field_vectors, (Obj*)field, (Obj*)field_vector);
     }
 
     // Get a buf for the term text or bail.

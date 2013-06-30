@@ -40,26 +40,28 @@ IxManager_new(const CharBuf *host, LockFactory *lock_factory) {
 IndexManager*
 IxManager_init(IndexManager *self, const CharBuf *host,
                LockFactory *lock_factory) {
-    self->host                = host
+    IndexManagerIVARS *const ivars = IxManager_IVARS(self);
+    ivars->host                = host
                                 ? CB_Clone(host)
                                 : CB_new_from_trusted_utf8("", 0);
-    self->lock_factory        = (LockFactory*)INCREF(lock_factory);
-    self->folder              = NULL;
-    self->write_lock_timeout  = 1000;
-    self->write_lock_interval = 100;
-    self->merge_lock_timeout  = 0;
-    self->merge_lock_interval = 1000;
-    self->deletion_lock_timeout  = 1000;
-    self->deletion_lock_interval = 100;
+    ivars->lock_factory        = (LockFactory*)INCREF(lock_factory);
+    ivars->folder              = NULL;
+    ivars->write_lock_timeout  = 1000;
+    ivars->write_lock_interval = 100;
+    ivars->merge_lock_timeout  = 0;
+    ivars->merge_lock_interval = 1000;
+    ivars->deletion_lock_timeout  = 1000;
+    ivars->deletion_lock_interval = 100;
 
     return self;
 }
 
 void
 IxManager_destroy(IndexManager *self) {
-    DECREF(self->host);
-    DECREF(self->folder);
-    DECREF(self->lock_factory);
+    IndexManagerIVARS *const ivars = IxManager_IVARS(self);
+    DECREF(ivars->host);
+    DECREF(ivars->folder);
+    DECREF(ivars->lock_factory);
     SUPER_DESTROY(self, INDEXMANAGER);
 }
 
@@ -81,7 +83,8 @@ IxManager_highest_seg_num(IndexManager *self, Snapshot *snapshot) {
 
 CharBuf*
 IxManager_make_snapshot_filename(IndexManager *self) {
-    Folder *folder = (Folder*)CERTIFY(self->folder, FOLDER);
+    IndexManagerIVARS *const ivars = IxManager_IVARS(self);
+    Folder *folder = (Folder*)CERTIFY(ivars->folder, FOLDER);
     DirHandle *dh = Folder_Open_Dir(folder, NULL);
     uint64_t max_gen = 0;
 
@@ -216,49 +219,54 @@ IxManager_choose_sparse(IndexManager *self, I32Array *doc_counts) {
 
 static LockFactory*
 S_obtain_lock_factory(IndexManager *self) {
-    if (!self->lock_factory) {
-        if (!self->folder) {
+    IndexManagerIVARS *const ivars = IxManager_IVARS(self);
+    if (!ivars->lock_factory) {
+        if (!ivars->folder) {
             THROW(ERR, "Can't create a LockFactory without a Folder");
         }
-        self->lock_factory = LockFact_new(self->folder, self->host);
+        ivars->lock_factory = LockFact_new(ivars->folder, ivars->host);
     }
-    return self->lock_factory;
+    return ivars->lock_factory;
 }
 
 Lock*
 IxManager_make_write_lock(IndexManager *self) {
+    IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     ZombieCharBuf *write_lock_name = ZCB_WRAP_STR("write", 5);
     LockFactory *lock_factory = S_obtain_lock_factory(self);
     return LockFact_Make_Lock(lock_factory, (CharBuf*)write_lock_name,
-                              self->write_lock_timeout,
-                              self->write_lock_interval);
+                              ivars->write_lock_timeout,
+                              ivars->write_lock_interval);
 }
 
 Lock*
 IxManager_make_deletion_lock(IndexManager *self) {
+    IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     ZombieCharBuf *lock_name = ZCB_WRAP_STR("deletion", 8);
     LockFactory *lock_factory = S_obtain_lock_factory(self);
     return LockFact_Make_Lock(lock_factory, (CharBuf*)lock_name,
-                              self->deletion_lock_timeout,
-                              self->deletion_lock_interval);
+                              ivars->deletion_lock_timeout,
+                              ivars->deletion_lock_interval);
 }
 
 Lock*
 IxManager_make_merge_lock(IndexManager *self) {
+    IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     ZombieCharBuf *merge_lock_name = ZCB_WRAP_STR("merge", 5);
     LockFactory *lock_factory = S_obtain_lock_factory(self);
     return LockFact_Make_Lock(lock_factory, (CharBuf*)merge_lock_name,
-                              self->merge_lock_timeout,
-                              self->merge_lock_interval);
+                              ivars->merge_lock_timeout,
+                              ivars->merge_lock_interval);
 }
 
 void
 IxManager_write_merge_data(IndexManager *self, int64_t cutoff) {
+    IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     ZombieCharBuf *merge_json = ZCB_WRAP_STR("merge.json", 10);
     Hash *data = Hash_new(1);
     bool success;
     Hash_Store_Str(data, "cutoff", 6, (Obj*)CB_newf("%i64", cutoff));
-    success = Json_spew_json((Obj*)data, self->folder, (CharBuf*)merge_json);
+    success = Json_spew_json((Obj*)data, ivars->folder, (CharBuf*)merge_json);
     DECREF(data);
     if (!success) {
         THROW(ERR, "Failed to write to %o", merge_json);
@@ -267,10 +275,11 @@ IxManager_write_merge_data(IndexManager *self, int64_t cutoff) {
 
 Hash*
 IxManager_read_merge_data(IndexManager *self) {
+    IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     ZombieCharBuf *merge_json = ZCB_WRAP_STR("merge.json", 10);
-    if (Folder_Exists(self->folder, (CharBuf*)merge_json)) {
+    if (Folder_Exists(ivars->folder, (CharBuf*)merge_json)) {
         Hash *stuff
-            = (Hash*)Json_slurp_json(self->folder, (CharBuf*)merge_json);
+            = (Hash*)Json_slurp_json(ivars->folder, (CharBuf*)merge_json);
         if (stuff) {
             CERTIFY(stuff, HASH);
             return stuff;
@@ -286,8 +295,9 @@ IxManager_read_merge_data(IndexManager *self) {
 
 bool
 IxManager_remove_merge_data(IndexManager *self) {
+    IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     ZombieCharBuf *merge_json = ZCB_WRAP_STR("merge.json", 10);
-    return Folder_Delete(self->folder, (CharBuf*)merge_json) != 0;
+    return Folder_Delete(ivars->folder, (CharBuf*)merge_json) != 0;
 }
 
 Lock*
@@ -310,78 +320,79 @@ IxManager_make_snapshot_read_lock(IndexManager *self,
 
 void
 IxManager_set_folder(IndexManager *self, Folder *folder) {
-    DECREF(self->folder);
-    self->folder = (Folder*)INCREF(folder);
+    IndexManagerIVARS *const ivars = IxManager_IVARS(self);
+    DECREF(ivars->folder);
+    ivars->folder = (Folder*)INCREF(folder);
 }
 
 Folder*
 IxManager_get_folder(IndexManager *self) {
-    return self->folder;
+    return IxManager_IVARS(self)->folder;
 }
 
 CharBuf*
 IxManager_get_host(IndexManager *self) {
-    return self->host;
+    return IxManager_IVARS(self)->host;
 }
 
 uint32_t
 IxManager_get_write_lock_timeout(IndexManager *self) {
-    return self->write_lock_timeout;
+    return IxManager_IVARS(self)->write_lock_timeout;
 }
 
 uint32_t
 IxManager_get_write_lock_interval(IndexManager *self) {
-    return self->write_lock_interval;
+    return IxManager_IVARS(self)->write_lock_interval;
 }
 
 uint32_t
 IxManager_get_merge_lock_timeout(IndexManager *self) {
-    return self->merge_lock_timeout;
+    return IxManager_IVARS(self)->merge_lock_timeout;
 }
 
 uint32_t
 IxManager_get_merge_lock_interval(IndexManager *self) {
-    return self->merge_lock_interval;
+    return IxManager_IVARS(self)->merge_lock_interval;
 }
 
 uint32_t
 IxManager_get_deletion_lock_timeout(IndexManager *self) {
-    return self->deletion_lock_timeout;
+    return IxManager_IVARS(self)->deletion_lock_timeout;
 }
 
 uint32_t
 IxManager_get_deletion_lock_interval(IndexManager *self) {
-    return self->deletion_lock_interval;
+    return IxManager_IVARS(self)->deletion_lock_interval;
 }
 
 void
 IxManager_set_write_lock_timeout(IndexManager *self, uint32_t timeout) {
-    self->write_lock_timeout = timeout;
+    IxManager_IVARS(self)->write_lock_timeout = timeout;
 }
 
 void
 IxManager_set_write_lock_interval(IndexManager *self, uint32_t interval) {
-    self->write_lock_interval = interval;
+    IxManager_IVARS(self)->write_lock_interval = interval;
 }
 
 void
 IxManager_set_merge_lock_timeout(IndexManager *self, uint32_t timeout) {
-    self->merge_lock_timeout = timeout;
+    IxManager_IVARS(self)->merge_lock_timeout = timeout;
 }
 
 void
 IxManager_set_merge_lock_interval(IndexManager *self, uint32_t interval) {
-    self->merge_lock_interval = interval;
+    IxManager_IVARS(self)->merge_lock_interval = interval;
 }
 
 void
 IxManager_set_deletion_lock_timeout(IndexManager *self, uint32_t timeout) {
-    self->deletion_lock_timeout = timeout;
+    IxManager_IVARS(self)->deletion_lock_timeout = timeout;
 }
 
 void
 IxManager_set_deletion_lock_interval(IndexManager *self, uint32_t interval) {
-    self->deletion_lock_interval = interval;
+    IxManager_IVARS(self)->deletion_lock_interval = interval;
 }
 
 

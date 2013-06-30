@@ -100,23 +100,24 @@ S_first_non_null(VArray *array) {
 
 static void
 S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
+    PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
     uint32_t  num_sub_readers = VA_Get_Size(sub_readers);
     int32_t *starts = (int32_t*)MALLOCATE(num_sub_readers * sizeof(int32_t));
     Hash  *data_readers = Hash_new(0);
 
-    DECREF(self->sub_readers);
-    DECREF(self->offsets);
-    self->sub_readers       = (VArray*)INCREF(sub_readers);
+    DECREF(ivars->sub_readers);
+    DECREF(ivars->offsets);
+    ivars->sub_readers       = (VArray*)INCREF(sub_readers);
 
     // Accumulate doc_max, subreader start offsets, and DataReaders.
-    self->doc_max = 0;
+    ivars->doc_max = 0;
     for (uint32_t i = 0; i < num_sub_readers; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(sub_readers, i);
         Hash *components = SegReader_Get_Components(seg_reader);
         CharBuf *api;
         DataReader *component;
-        starts[i] = self->doc_max;
-        self->doc_max += SegReader_Doc_Max(seg_reader);
+        starts[i] = ivars->doc_max;
+        ivars->doc_max += SegReader_Doc_Max(seg_reader);
         Hash_Iterate(components);
         while (Hash_Next(components, (Obj**)&api, (Obj**)&component)) {
             VArray *readers = (VArray*)Hash_Fetch(data_readers, (Obj*)api);
@@ -127,7 +128,7 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
             VA_Store(readers, i, INCREF(component));
         }
     }
-    self->offsets = I32Arr_new_steal(starts, num_sub_readers);
+    ivars->offsets = I32Arr_new_steal(starts, num_sub_readers);
 
     CharBuf *api;
     VArray  *readers;
@@ -136,26 +137,27 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
         DataReader *datareader
             = (DataReader*)CERTIFY(S_first_non_null(readers), DATAREADER);
         DataReader *aggregator
-            = DataReader_Aggregator(datareader, readers, self->offsets);
+            = DataReader_Aggregator(datareader, readers, ivars->offsets);
         if (aggregator) {
             CERTIFY(aggregator, DATAREADER);
-            Hash_Store(self->components, (Obj*)api, (Obj*)aggregator);
+            Hash_Store(ivars->components, (Obj*)api, (Obj*)aggregator);
         }
     }
     DECREF(data_readers);
 
     DeletionsReader *del_reader
         = (DeletionsReader*)Hash_Fetch(
-              self->components, (Obj*)VTable_Get_Name(DELETIONSREADER));
-    self->del_count = del_reader ? DelReader_Del_Count(del_reader) : 0;
+              ivars->components, (Obj*)VTable_Get_Name(DELETIONSREADER));
+    ivars->del_count = del_reader ? DelReader_Del_Count(del_reader) : 0;
 }
 
 PolyReader*
 PolyReader_init(PolyReader *self, Schema *schema, Folder *folder,
                 Snapshot *snapshot, IndexManager *manager,
                 VArray *sub_readers) {
-    self->doc_max    = 0;
-    self->del_count  = 0;
+    PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
+    ivars->doc_max    = 0;
+    ivars->del_count  = 0;
 
     if (sub_readers) {
         uint32_t num_segs = VA_Get_Size(sub_readers);
@@ -173,8 +175,8 @@ PolyReader_init(PolyReader *self, Schema *schema, Folder *folder,
     else {
         IxReader_init((IndexReader*)self, schema, folder, snapshot,
                       NULL, -1, manager);
-        self->sub_readers = VA_new(0);
-        self->offsets = I32Arr_new_steal(NULL, 0);
+        ivars->sub_readers = VA_new(0);
+        ivars->offsets = I32Arr_new_steal(NULL, 0);
     }
 
     return self;
@@ -182,10 +184,11 @@ PolyReader_init(PolyReader *self, Schema *schema, Folder *folder,
 
 void
 PolyReader_close(PolyReader *self) {
+    PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
     PolyReader_Close_t super_close
         = SUPER_METHOD_PTR(POLYREADER, Lucy_PolyReader_Close);
-    for (uint32_t i = 0, max = VA_Get_Size(self->sub_readers); i < max; i++) {
-        SegReader *seg_reader = (SegReader*)VA_Fetch(self->sub_readers, i);
+    for (uint32_t i = 0, max = VA_Get_Size(ivars->sub_readers); i < max; i++) {
+        SegReader *seg_reader = (SegReader*)VA_Fetch(ivars->sub_readers, i);
         SegReader_Close(seg_reader);
     }
     super_close(self);
@@ -193,8 +196,9 @@ PolyReader_close(PolyReader *self) {
 
 void
 PolyReader_destroy(PolyReader *self) {
-    DECREF(self->sub_readers);
-    DECREF(self->offsets);
+    PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
+    DECREF(ivars->sub_readers);
+    DECREF(ivars->offsets);
     SUPER_DESTROY(self, POLYREADER);
 }
 
@@ -218,7 +222,8 @@ S_try_open_elements(void *context) {
     struct try_open_elements_context *args
         = (struct try_open_elements_context*)context;
     PolyReader *self              = args->self;
-    VArray     *files             = Snapshot_List(self->snapshot);
+    PolyReaderIVARS *const ivars  = PolyReader_IVARS(self);
+    VArray     *files             = Snapshot_List(ivars->snapshot);
     Folder     *folder            = PolyReader_Get_Folder(self);
     uint32_t    num_segs          = 0;
     uint64_t    latest_schema_gen = 0;
@@ -251,8 +256,8 @@ S_try_open_elements(void *context) {
     else {
         Hash *dump = (Hash*)Json_slurp_json(folder, schema_file);
         if (dump) { // read file successfully
-            DECREF(self->schema);
-            self->schema = (Schema*)CERTIFY(
+            DECREF(ivars->schema);
+            ivars->schema = (Schema*)CERTIFY(
                                VTable_Load_Obj(SCHEMA, (Obj*)dump), SCHEMA);
             DECREF(dump);
             DECREF(schema_file);
@@ -329,6 +334,7 @@ int32_t  PolyReader_debug1_num_passes     = 0;
 PolyReader*
 PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
                    IndexManager *manager) {
+    PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
     Folder   *folder   = S_derive_folder(index);
     uint64_t  last_gen = 0;
 
@@ -391,7 +397,7 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
         // If that's not the case, we must read the file we just picked.
         if (!snapshot) {
             struct try_read_snapshot_context context;
-            context.snapshot = self->snapshot;
+            context.snapshot = ivars->snapshot;
             context.folder   = folder;
             context.path     = target_snap_file;
             Err *error = Err_trap(S_try_read_snapshot, &context);
@@ -463,11 +469,12 @@ S_derive_folder(Obj *index) {
 
 static bool 
 S_obtain_deletion_lock(PolyReader *self) {
-    self->deletion_lock = IxManager_Make_Deletion_Lock(self->manager);
-    Lock_Clear_Stale(self->deletion_lock);
-    if (!Lock_Obtain(self->deletion_lock)) {
-        DECREF(self->deletion_lock);
-        self->deletion_lock = NULL;
+    PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
+    ivars->deletion_lock = IxManager_Make_Deletion_Lock(ivars->manager);
+    Lock_Clear_Stale(ivars->deletion_lock);
+    if (!Lock_Obtain(ivars->deletion_lock)) {
+        DECREF(ivars->deletion_lock);
+        ivars->deletion_lock = NULL;
         return false;
     }
     return true;
@@ -475,13 +482,14 @@ S_obtain_deletion_lock(PolyReader *self) {
 
 static bool
 S_obtain_read_lock(PolyReader *self, const CharBuf *snapshot_file_name) {
-    self->read_lock = IxManager_Make_Snapshot_Read_Lock(self->manager,
-                                                        snapshot_file_name);
+    PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
+    ivars->read_lock = IxManager_Make_Snapshot_Read_Lock(ivars->manager,
+                                                         snapshot_file_name);
 
-    Lock_Clear_Stale(self->read_lock);
-    if (!Lock_Obtain(self->read_lock)) {
-        DECREF(self->read_lock);
-        self->read_lock = NULL;
+    Lock_Clear_Stale(ivars->read_lock);
+    if (!Lock_Obtain(ivars->read_lock)) {
+        DECREF(ivars->read_lock);
+        ivars->read_lock = NULL;
         return false;
     }
     return true;
@@ -489,50 +497,55 @@ S_obtain_read_lock(PolyReader *self, const CharBuf *snapshot_file_name) {
 
 static void
 S_release_read_lock(PolyReader *self) {
-    if (self->read_lock) {
-        Lock_Release(self->read_lock);
-        DECREF(self->read_lock);
-        self->read_lock = NULL;
+    PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
+    if (ivars->read_lock) {
+        Lock_Release(ivars->read_lock);
+        DECREF(ivars->read_lock);
+        ivars->read_lock = NULL;
     }
 }
 
 static void
 S_release_deletion_lock(PolyReader *self) {
-    if (self->deletion_lock) {
-        Lock_Release(self->deletion_lock);
-        DECREF(self->deletion_lock);
-        self->deletion_lock = NULL;
+    PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
+    if (ivars->deletion_lock) {
+        Lock_Release(ivars->deletion_lock);
+        DECREF(ivars->deletion_lock);
+        ivars->deletion_lock = NULL;
     }
 }
 
 int32_t
 PolyReader_doc_max(PolyReader *self) {
-    return self->doc_max;
+    return PolyReader_IVARS(self)->doc_max;
 }
 
 int32_t
 PolyReader_doc_count(PolyReader *self) {
-    return self->doc_max - self->del_count;
+    PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
+    return ivars->doc_max - ivars->del_count;
 }
 
 int32_t
 PolyReader_del_count(PolyReader *self) {
-    return self->del_count;
+    return PolyReader_IVARS(self)->del_count;
 }
 
 I32Array*
 PolyReader_offsets(PolyReader *self) {
-    return (I32Array*)INCREF(self->offsets);
+    PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
+    return (I32Array*)INCREF(ivars->offsets);
 }
 
 VArray*
 PolyReader_seg_readers(PolyReader *self) {
-    return (VArray*)VA_Shallow_Copy(self->sub_readers);
+    PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
+    return (VArray*)VA_Shallow_Copy(ivars->sub_readers);
 }
 
 VArray*
 PolyReader_get_seg_readers(PolyReader *self) {
-    return self->sub_readers;
+    return PolyReader_IVARS(self)->sub_readers;
 }
 
 uint32_t

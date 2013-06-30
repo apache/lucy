@@ -58,42 +58,46 @@ PolyHighlightReader*
 PolyHLReader_init(PolyHighlightReader *self, VArray *readers,
                   I32Array *offsets) {
     HLReader_init((HighlightReader*)self, NULL, NULL, NULL, NULL, -1);
+    PolyHighlightReaderIVARS *const ivars = PolyHLReader_IVARS(self);
     for (uint32_t i = 0, max = VA_Get_Size(readers); i < max; i++) {
         CERTIFY(VA_Fetch(readers, i), HIGHLIGHTREADER);
     }
-    self->readers = (VArray*)INCREF(readers);
-    self->offsets = (I32Array*)INCREF(offsets);
+    ivars->readers = (VArray*)INCREF(readers);
+    ivars->offsets = (I32Array*)INCREF(offsets);
     return self;
 }
 
 void
 PolyHLReader_close(PolyHighlightReader *self) {
-    if (self->readers) {
-        for (uint32_t i = 0, max = VA_Get_Size(self->readers); i < max; i++) {
+    PolyHighlightReaderIVARS *const ivars = PolyHLReader_IVARS(self);
+    if (ivars->readers) {
+        for (uint32_t i = 0, max = VA_Get_Size(ivars->readers); i < max; i++) {
             HighlightReader *sub_reader
-                = (HighlightReader*)VA_Fetch(self->readers, i);
+                = (HighlightReader*)VA_Fetch(ivars->readers, i);
             if (sub_reader) { HLReader_Close(sub_reader); }
         }
-        DECREF(self->readers);
-        DECREF(self->offsets);
-        self->readers = NULL;
-        self->offsets = NULL;
+        DECREF(ivars->readers);
+        DECREF(ivars->offsets);
+        ivars->readers = NULL;
+        ivars->offsets = NULL;
     }
 }
 
 void
 PolyHLReader_destroy(PolyHighlightReader *self) {
-    DECREF(self->readers);
-    DECREF(self->offsets);
+    PolyHighlightReaderIVARS *const ivars = PolyHLReader_IVARS(self);
+    DECREF(ivars->readers);
+    DECREF(ivars->offsets);
     SUPER_DESTROY(self, POLYHIGHLIGHTREADER);
 }
 
 DocVector*
 PolyHLReader_fetch_doc_vec(PolyHighlightReader *self, int32_t doc_id) {
-    uint32_t seg_tick = PolyReader_sub_tick(self->offsets, doc_id);
-    int32_t  offset   = I32Arr_Get(self->offsets, seg_tick);
+    PolyHighlightReaderIVARS *const ivars = PolyHLReader_IVARS(self);
+    uint32_t seg_tick = PolyReader_sub_tick(ivars->offsets, doc_id);
+    int32_t  offset   = I32Arr_Get(ivars->offsets, seg_tick);
     HighlightReader *sub_reader
-        = (HighlightReader*)VA_Fetch(self->readers, seg_tick);
+        = (HighlightReader*)VA_Fetch(ivars->readers, seg_tick);
     if (!sub_reader) { THROW(ERR, "Invalid doc_id: %i32", doc_id); }
     return HLReader_Fetch_Doc_Vec(sub_reader, doc_id - offset);
 }
@@ -113,6 +117,7 @@ DefHLReader_init(DefaultHighlightReader *self, Schema *schema,
                  int32_t seg_tick) {
     HLReader_init((HighlightReader*)self, schema, folder, snapshot,
                   segments, seg_tick);
+    DefaultHighlightReaderIVARS *const ivars = DefHLReader_IVARS(self);
     Segment *segment    = DefHLReader_Get_Segment(self);
     Hash *metadata      = (Hash*)Seg_Fetch_Metadata_Str(segment, "highlight", 9);
     if (!metadata) {
@@ -136,16 +141,16 @@ DefHLReader_init(DefaultHighlightReader *self, Schema *schema,
     CharBuf *ix_file  = CB_newf("%o/highlight.ix", seg_name);
     CharBuf *dat_file = CB_newf("%o/highlight.dat", seg_name);
     if (Folder_Exists(folder, ix_file)) {
-        self->ix_in = Folder_Open_In(folder, ix_file);
-        if (!self->ix_in) {
+        ivars->ix_in = Folder_Open_In(folder, ix_file);
+        if (!ivars->ix_in) {
             Err *error = (Err*)INCREF(Err_get_error());
             DECREF(ix_file);
             DECREF(dat_file);
             DECREF(self);
             RETHROW(error);
         }
-        self->dat_in = Folder_Open_In(folder, dat_file);
-        if (!self->dat_in) {
+        ivars->dat_in = Folder_Open_In(folder, dat_file);
+        if (!ivars->dat_in) {
             Err *error = (Err*)INCREF(Err_get_error());
             DECREF(ix_file);
             DECREF(dat_file);
@@ -161,29 +166,32 @@ DefHLReader_init(DefaultHighlightReader *self, Schema *schema,
 
 void
 DefHLReader_close(DefaultHighlightReader *self) {
-    if (self->dat_in != NULL) {
-        InStream_Close(self->dat_in);
-        DECREF(self->dat_in);
-        self->dat_in = NULL;
+    DefaultHighlightReaderIVARS *const ivars = DefHLReader_IVARS(self);
+    if (ivars->dat_in != NULL) {
+        InStream_Close(ivars->dat_in);
+        DECREF(ivars->dat_in);
+        ivars->dat_in = NULL;
     }
-    if (self->ix_in != NULL) {
-        InStream_Close(self->ix_in);
-        DECREF(self->ix_in);
-        self->ix_in = NULL;
+    if (ivars->ix_in != NULL) {
+        InStream_Close(ivars->ix_in);
+        DECREF(ivars->ix_in);
+        ivars->ix_in = NULL;
     }
 }
 
 void
 DefHLReader_destroy(DefaultHighlightReader *self) {
-    DECREF(self->ix_in);
-    DECREF(self->dat_in);
+    DefaultHighlightReaderIVARS *const ivars = DefHLReader_IVARS(self);
+    DECREF(ivars->ix_in);
+    DECREF(ivars->dat_in);
     SUPER_DESTROY(self, DEFAULTHIGHLIGHTREADER);
 }
 
 DocVector*
 DefHLReader_fetch_doc_vec(DefaultHighlightReader *self, int32_t doc_id) {
-    InStream *const ix_in  = self->ix_in;
-    InStream *const dat_in = self->dat_in;
+    DefaultHighlightReaderIVARS *const ivars = DefHLReader_IVARS(self);
+    InStream *const ix_in  = ivars->ix_in;
+    InStream *const dat_in = ivars->dat_in;
     DocVector *doc_vec = DocVec_new();
 
     InStream_Seek(ix_in, doc_id * 8);
@@ -205,8 +213,9 @@ DefHLReader_fetch_doc_vec(DefaultHighlightReader *self, int32_t doc_id) {
 void
 DefHLReader_read_record(DefaultHighlightReader *self, int32_t doc_id,
                         ByteBuf *target) {
-    InStream *dat_in = self->dat_in;
-    InStream *ix_in  = self->ix_in;
+    DefaultHighlightReaderIVARS *const ivars = DefHLReader_IVARS(self);
+    InStream *dat_in = ivars->dat_in;
+    InStream *ix_in  = ivars->ix_in;
 
     InStream_Seek(ix_in, doc_id * 8);
 

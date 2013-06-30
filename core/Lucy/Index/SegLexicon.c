@@ -58,6 +58,7 @@ SegLex_init(SegLexicon *self, Schema *schema, Folder *folder,
     CharBuf *filename = CB_newf("%o/lexicon-%i32.dat", seg_name, field_num);
 
     Lex_init((Lexicon*)self, field);
+    SegLexiconIVARS *const ivars = SegLex_IVARS(self);
 
     // Check format.
     if (!format) { THROW(ERR, "Missing 'format'"); }
@@ -72,19 +73,19 @@ SegLex_init(SegLexicon *self, Schema *schema, Folder *folder,
     if (!counts) { THROW(ERR, "Failed to extract 'counts'"); }
     else {
         Obj *count = CERTIFY(Hash_Fetch(counts, (Obj*)field), OBJ);
-        self->size = (int32_t)Obj_To_I64(count);
+        ivars->size = (int32_t)Obj_To_I64(count);
     }
 
     // Assign.
-    self->segment        = (Segment*)INCREF(segment);
+    ivars->segment        = (Segment*)INCREF(segment);
 
     // Derive.
-    self->lex_index      = LexIndex_new(schema, folder, segment, field);
-    self->field_num      = field_num;
-    self->index_interval = Arch_Index_Interval(arch);
-    self->skip_interval  = Arch_Skip_Interval(arch);
-    self->instream       = Folder_Open_In(folder, filename);
-    if (!self->instream) {
+    ivars->lex_index      = LexIndex_new(schema, folder, segment, field);
+    ivars->field_num      = field_num;
+    ivars->index_interval = Arch_Index_Interval(arch);
+    ivars->skip_interval  = Arch_Skip_Interval(arch);
+    ivars->instream       = Folder_Open_In(folder, filename);
+    if (!ivars->instream) {
         Err *error = (Err*)INCREF(Err_get_error());
         DECREF(filename);
         DECREF(self);
@@ -93,28 +94,30 @@ SegLex_init(SegLexicon *self, Schema *schema, Folder *folder,
     DECREF(filename);
 
     // Define the term_num as "not yet started".
-    self->term_num = -1;
+    ivars->term_num = -1;
 
     // Get steppers.
-    self->term_stepper  = FType_Make_Term_Stepper(type);
-    self->tinfo_stepper = (TermStepper*)MatchTInfoStepper_new(schema);
+    ivars->term_stepper  = FType_Make_Term_Stepper(type);
+    ivars->tinfo_stepper = (TermStepper*)MatchTInfoStepper_new(schema);
 
     return self;
 }
 
 void
 SegLex_destroy(SegLexicon *self) {
-    DECREF(self->segment);
-    DECREF(self->term_stepper);
-    DECREF(self->tinfo_stepper);
-    DECREF(self->lex_index);
-    DECREF(self->instream);
+    SegLexiconIVARS *const ivars = SegLex_IVARS(self);
+    DECREF(ivars->segment);
+    DECREF(ivars->term_stepper);
+    DECREF(ivars->tinfo_stepper);
+    DECREF(ivars->lex_index);
+    DECREF(ivars->instream);
     SUPER_DESTROY(self, SEGLEXICON);
 }
 
 void
 SegLex_seek(SegLexicon *self, Obj *target) {
-    LexIndex *const lex_index = self->lex_index;
+    SegLexiconIVARS *const ivars = SegLex_IVARS(self);
+    LexIndex *const lex_index = ivars->lex_index;
 
     // Reset upon null term.
     if (target == NULL) {
@@ -126,13 +129,13 @@ SegLex_seek(SegLexicon *self, Obj *target) {
     LexIndex_Seek(lex_index, target);
     TermInfo *target_tinfo = LexIndex_Get_Term_Info(lex_index);
     TermInfo *my_tinfo
-        = (TermInfo*)TermStepper_Get_Value(self->tinfo_stepper);
+        = (TermInfo*)TermStepper_Get_Value(ivars->tinfo_stepper);
     Obj *lex_index_term = Obj_Clone(LexIndex_Get_Term(lex_index));
     TInfo_Mimic(my_tinfo, (Obj*)target_tinfo);
-    TermStepper_Set_Value(self->term_stepper, lex_index_term);
+    TermStepper_Set_Value(ivars->term_stepper, lex_index_term);
     DECREF(lex_index_term);
-    InStream_Seek(self->instream, TInfo_Get_Lex_FilePos(target_tinfo));
-    self->term_num = LexIndex_Get_Term_Num(lex_index);
+    InStream_Seek(ivars->instream, TInfo_Get_Lex_FilePos(target_tinfo));
+    ivars->term_num = LexIndex_Get_Term_Num(lex_index);
 
     // Scan to the precise location.
     S_scan_to(self, target);
@@ -140,59 +143,67 @@ SegLex_seek(SegLexicon *self, Obj *target) {
 
 void
 SegLex_reset(SegLexicon* self) {
-    self->term_num = -1;
-    InStream_Seek(self->instream, 0);
-    TermStepper_Reset(self->term_stepper);
-    TermStepper_Reset(self->tinfo_stepper);
+    SegLexiconIVARS *const ivars = SegLex_IVARS(self);
+    ivars->term_num = -1;
+    InStream_Seek(ivars->instream, 0);
+    TermStepper_Reset(ivars->term_stepper);
+    TermStepper_Reset(ivars->tinfo_stepper);
 }
 
 int32_t
 SegLex_get_field_num(SegLexicon *self) {
-    return self->field_num;
+    return SegLex_IVARS(self)->field_num;
 }
 
 Obj*
 SegLex_get_term(SegLexicon *self) {
-    return TermStepper_Get_Value(self->term_stepper);
+    SegLexiconIVARS *const ivars = SegLex_IVARS(self);
+    return TermStepper_Get_Value(ivars->term_stepper);
 }
 
 int32_t
 SegLex_doc_freq(SegLexicon *self) {
-    TermInfo *tinfo = (TermInfo*)TermStepper_Get_Value(self->tinfo_stepper);
+    SegLexiconIVARS *const ivars = SegLex_IVARS(self);
+    TermInfo *tinfo = (TermInfo*)TermStepper_Get_Value(ivars->tinfo_stepper);
     return tinfo ? TInfo_Get_Doc_Freq(tinfo) : 0;
 }
 
 TermInfo*
 SegLex_get_term_info(SegLexicon *self) {
-    return (TermInfo*)TermStepper_Get_Value(self->tinfo_stepper);
+    SegLexiconIVARS *const ivars = SegLex_IVARS(self);
+    return (TermInfo*)TermStepper_Get_Value(ivars->tinfo_stepper);
 }
 
 Segment*
 SegLex_get_segment(SegLexicon *self) {
-    return self->segment;
+    return SegLex_IVARS(self)->segment;
 }
 
 bool
 SegLex_next(SegLexicon *self) {
+    SegLexiconIVARS *const ivars = SegLex_IVARS(self);
+
     // If we've run out of terms, null out and return.
-    if (++self->term_num >= self->size) {
-        self->term_num = self->size; // don't keep growing
-        TermStepper_Reset(self->term_stepper);
-        TermStepper_Reset(self->tinfo_stepper);
+    if (++ivars->term_num >= ivars->size) {
+        ivars->term_num = ivars->size; // don't keep growing
+        TermStepper_Reset(ivars->term_stepper);
+        TermStepper_Reset(ivars->tinfo_stepper);
         return false;
     }
 
     // Read next term/terminfo.
-    TermStepper_Read_Delta(self->term_stepper, self->instream);
-    TermStepper_Read_Delta(self->tinfo_stepper, self->instream);
+    TermStepper_Read_Delta(ivars->term_stepper, ivars->instream);
+    TermStepper_Read_Delta(ivars->tinfo_stepper, ivars->instream);
 
     return true;
 }
 
 static void
 S_scan_to(SegLexicon *self, Obj *target) {
+    SegLexiconIVARS *const ivars = SegLex_IVARS(self);
+
     // (mildly evil encapsulation violation, since value can be null)
-    Obj *current = TermStepper_Get_Value(self->term_stepper);
+    Obj *current = TermStepper_Get_Value(ivars->term_stepper);
     if (!Obj_Is_A(target, Obj_Get_VTable(current))) {
         THROW(ERR, "Target is a %o, and not comparable to a %o",
               Obj_Get_Class_Name(target), Obj_Get_Class_Name(current));
@@ -201,7 +212,7 @@ S_scan_to(SegLexicon *self, Obj *target) {
     // Keep looping until the term text is ge target.
     do {
         const int32_t comparison = Obj_Compare_To(current, target);
-        if (comparison >= 0 &&  self->term_num != -1) { break; }
+        if (comparison >= 0 && ivars->term_num != -1) { break; }
     } while (SegLex_Next(self));
 }
 
