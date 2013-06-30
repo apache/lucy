@@ -99,6 +99,11 @@ Token_get_pos_inc(Token *self) {
     return Token_IVARS(self)->pos_inc;
 }
 
+int32_t
+Token_get_pos(Token *self) {
+    return Token_IVARS(self)->pos;
+}
+
 char*
 Token_get_text(Token *self) {
     return Token_IVARS(self)->text;
