@@ -15,7 +15,6 @@
  */
 
 #define C_LUCY_LEXINDEX
-#define C_LUCY_TERMINFO
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Index/LexIndex.h"
@@ -125,16 +124,18 @@ static void
 S_read_entry(LexIndex *self) {
     LexIndexIVARS *const ivars = LexIndex_IVARS(self);
     InStream *ix_in  = ivars->ix_in;
-    TermInfoIVARS *const tinfo_ivars = TInfo_IVARS(ivars->tinfo);
+    TermInfo *const tinfo = ivars->tinfo;
     int64_t offset = (int64_t)NumUtil_decode_bigend_u64(ivars->offsets + ivars->tick);
     InStream_Seek(ix_in, offset);
     TermStepper_Read_Key_Frame(ivars->term_stepper, ix_in);
-    tinfo_ivars->doc_freq     = InStream_Read_C32(ix_in);
-    tinfo_ivars->post_filepos = InStream_Read_C64(ix_in);
-    tinfo_ivars->skip_filepos = tinfo_ivars->doc_freq >= ivars->skip_interval
-                          ? InStream_Read_C64(ix_in)
-                          : 0;
-    tinfo_ivars->lex_filepos  = InStream_Read_C64(ix_in);
+    int32_t doc_freq = InStream_Read_C32(ix_in);
+    TInfo_Set_Doc_Freq(tinfo, doc_freq);
+    TInfo_Set_Post_FilePos(tinfo, InStream_Read_C64(ix_in));
+    int64_t skip_filepos = doc_freq >= ivars->skip_interval
+                           ? InStream_Read_C64(ix_in)
+                           : 0;
+    TInfo_Set_Skip_FilePos(tinfo, skip_filepos);
+    TInfo_Set_Lex_FilePos(tinfo, InStream_Read_C64(ix_in));
 }
 
 void
