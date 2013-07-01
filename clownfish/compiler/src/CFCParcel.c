@@ -94,10 +94,20 @@ CFCParcel_fetch(const char *name) {
 
 void
 CFCParcel_register(CFCParcel *self) {
-    CFCParcel *existing = CFCParcel_fetch(self->name);
-    if (existing) {
-        CFCUtil_die("Parcel '%s' already registered", self->name);
+    const char *name  = self->name;
+    const char *cnick = self->cnick;
+
+    for (size_t i = 0; i < num_registered ; i++) {
+        CFCParcel *other = registry[i];
+
+        if (strcmp(other->name, name) == 0) {
+            CFCUtil_die("Parcel '%s' already registered", name);
+        }
+        if (strcmp(other->cnick, cnick) == 0) {
+            CFCUtil_die("Parcel with nickname '%s' already registered", cnick);
+        }
     }
+
     if (!num_registered) {
         // Init default parcel as first.
         registry = (CFCParcel**)CALLOCATE(3, sizeof(CFCParcel*));
@@ -105,6 +115,7 @@ CFCParcel_register(CFCParcel *self) {
         registry[0] = (CFCParcel*)CFCBase_incref((CFCBase*)def);
         num_registered++;
     }
+
     size_t size = (num_registered + 2) * sizeof(CFCParcel*);
     registry = (CFCParcel**)REALLOCATE(registry, size);
     registry[num_registered++] = (CFCParcel*)CFCBase_incref((CFCBase*)self);

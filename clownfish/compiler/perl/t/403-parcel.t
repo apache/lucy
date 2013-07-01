@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More tests => 18;
 use File::Spec::Functions qw( catfile );
 
 BEGIN { use_ok('Clownfish::CFC::Model::Parcel') }
@@ -25,6 +25,19 @@ my $foo = Clownfish::CFC::Model::Parcel->new( name => "Foo" );
 isa_ok( $foo, "Clownfish::CFC::Model::Parcel", "new" );
 ok( !$foo->included, "not included" );
 $foo->register;
+
+my $same_name = Clownfish::CFC::Model::Parcel->new( name => "Foo" );
+eval { $same_name->register; };
+like( $@, qr/parcel .* already registered/i,
+      "can't register two parcels with the same name" );
+
+my $same_nick = Clownfish::CFC::Model::Parcel->new(
+    name  => "OtherFoo",
+    cnick => "Foo",
+);
+eval { $same_nick->register; };
+like( $@, qr/parcel with nickname .* already registered/i,
+      "can't register two parcels with the same nickname" );
 
 my $included_foo = Clownfish::CFC::Model::Parcel->new(
     name        => "IncludedFoo",
