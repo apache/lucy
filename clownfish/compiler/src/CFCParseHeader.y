@@ -34,14 +34,18 @@
 
 static CFCClass*
 S_start_class(CFCParser *state, CFCDocuComment *docucomment, char *exposure,
-              char *declaration_modifier_list, char *class_name,
-              char *class_cnick, char *inheritance) {
+              char *modifiers, char *class_name, char *class_cnick,
+              char *inheritance) {
     CFCFileSpec *file_spec = CFCParser_get_file_spec(state);
     int is_final = false;
     int is_inert = false;
-    if (declaration_modifier_list) {
-        is_final = !!strstr(declaration_modifier_list, "final");
-        is_inert = !!strstr(declaration_modifier_list, "inert");
+    if (modifiers) {
+        /* TODO: Decide how to handle abstract classes. */
+        if (strstr(modifiers, "inline")) {
+            CFCUtil_die("Illegal class modifiers: '%s'", modifiers);
+        }
+        is_final = !!strstr(modifiers, "final");
+        is_inert = !!strstr(modifiers, "inert");
     }
     CFCParser_set_class_name(state, class_name);
     CFCParser_set_class_cnick(state, class_cnick);
@@ -83,8 +87,8 @@ S_new_var(CFCParser *state, char *exposure, char *modifiers, CFCType *type,
 
 static CFCBase*
 S_new_sub(CFCParser *state, CFCDocuComment *docucomment, 
-          char *exposure, char *declaration_modifier_list,
-          CFCType *type, char *name, CFCParamList *param_list) {
+          char *exposure, char *modifiers, CFCType *type, char *name,
+          CFCParamList *param_list) {
     CFCParcel  *parcel      = CFCParser_get_parcel(state);
     const char *class_name  = CFCParser_get_class_name(state);
     const char *class_cnick = CFCParser_get_class_cnick(state);
@@ -94,21 +98,30 @@ S_new_sub(CFCParser *state, CFCDocuComment *docucomment,
     int is_final    = false;
     int is_inline   = false;
     int is_inert    = false;
-    if (declaration_modifier_list) {
-        is_abstract = !!strstr(declaration_modifier_list, "abstract");
-        is_final    = !!strstr(declaration_modifier_list, "final");
-        is_inline   = !!strstr(declaration_modifier_list, "inline");
-        is_inert    = !!strstr(declaration_modifier_list, "inert");
+    if (modifiers) {
+        is_abstract = !!strstr(modifiers, "abstract");
+        is_final    = !!strstr(modifiers, "final");
+        is_inline   = !!strstr(modifiers, "inline");
+        is_inert    = !!strstr(modifiers, "inert");
     }
 
     /* If "inert", it's a function, otherwise it's a method. */
     CFCBase *sub;
     if (is_inert) {
+        if (is_abstract) {
+            CFCUtil_die("Inert functions must not be abstract");
+        }
+        if (is_final) {
+            CFCUtil_die("Inert functions must not be final");
+        }
         sub = (CFCBase*)CFCFunction_new(parcel, exposure, class_name,
                                          class_cnick, name, type, param_list,
                                          docucomment, is_inline);
     }
     else {
+        if (is_inline) {
+            CFCUtil_die("Methods must not be inline");
+        }
         sub = (CFCBase*)CFCMethod_new(parcel, exposure, class_name,
                                        class_cnick, name, type, param_list,
                                        docucomment, is_final, is_abstract);
