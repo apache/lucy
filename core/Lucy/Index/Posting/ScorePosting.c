@@ -35,8 +35,8 @@
 
 #define FIELD_BOOST_LEN  1
 #define FREQ_MAX_LEN     C32_MAX_BYTES
-#define MAX_RAW_POSTING_LEN(_text_len, _freq) \
-    (              sizeof(RawPosting) \
+#define MAX_RAW_POSTING_LEN(_raw_post_size, _text_len, _freq) \
+    (              _raw_post_size \
                    + _text_len                /* term text content */ \
                    + FIELD_BOOST_LEN          /* field boost byte */ \
                    + FREQ_MAX_LEN             /* freq c32 */ \
@@ -52,23 +52,25 @@ ScorePost_new(Similarity *sim) {
 ScorePosting*
 ScorePost_init(ScorePosting *self, Similarity *sim) {
     MatchPost_init((MatchPosting*)self, sim);
-    self->norm_decoder = Sim_Get_Norm_Decoder(sim);
-    self->freq         = 0;
-    self->weight       = 0.0;
-    self->prox         = NULL;
-    self->prox_cap     = 0;
+    ScorePostingIVARS *const ivars = ScorePost_IVARS(self);
+    ivars->norm_decoder = Sim_Get_Norm_Decoder(sim);
+    ivars->freq         = 0;
+    ivars->weight       = 0.0;
+    ivars->prox         = NULL;
+    ivars->prox_cap     = 0;
     return self;
 }
 
 void
 ScorePost_destroy(ScorePosting *self) {
-    FREEMEM(self->prox);
+    ScorePostingIVARS *const ivars = ScorePost_IVARS(self);
+    FREEMEM(ivars->prox);
     SUPER_DESTROY(self, SCOREPOSTING);
 }
 
 uint32_t*
 ScorePost_get_prox(ScorePosting *self) {
-    return self->prox;
+    return ScorePost_IVARS(self)->prox;
 }
 
 void
@@ -76,21 +78,25 @@ ScorePost_add_inversion_to_pool(ScorePosting *self, PostingPool *post_pool,
                                 Inversion *inversion, FieldType *type,
                                 int32_t doc_id, float doc_boost,
                                 float length_norm) {
+    ScorePostingIVARS *const ivars = ScorePost_IVARS(self);
     MemoryPool     *mem_pool = PostPool_Get_Mem_Pool(post_pool);
-    Similarity     *sim = self->sim;
+    Similarity     *sim = ivars->sim;
     float           field_boost = doc_boost * FType_Get_Boost(type) * length_norm;
     const uint8_t   field_boost_byte  = Sim_Encode_Norm(sim, field_boost);
+    const size_t    base_size = VTable_Get_Obj_Alloc_Size(RAWPOSTING);
     Token         **tokens;
     uint32_t        freq;
 
     Inversion_Reset(inversion);
     while ((tokens = Inversion_Next_Cluster(inversion, &freq)) != NULL) {
-        Token   *token          = *tokens;
-        uint32_t raw_post_bytes = MAX_RAW_POSTING_LEN(token->len, freq);
+        TokenIVARS *const token_ivars = Token_IVARS(*tokens);
+        uint32_t raw_post_bytes
+            = MAX_RAW_POSTING_LEN(base_size, token_ivars->len, freq);
         RawPosting *raw_posting
             = RawPost_new(MemPool_Grab(mem_pool, raw_post_bytes), doc_id,
-                          freq, token->text, token->len);
-        char *const start  = raw_posting->blob + token->len;
+                          freq, token_ivars->text, token_ivars->len);
+        RawPostingIVARS *const raw_post_ivars = RawPost_IVARS(raw_posting);
+        char *const start  = raw_post_ivars->blob + token_ivars->len;
         char *dest         = start;
         uint32_t last_prox = 0;
 
@@ -100,14 +106,14 @@ ScorePost_add_inversion_to_pool(ScorePosting *self, PostingPool *post_pool,
 
         // Positions.
         for (uint32_t i = 0; i < freq; i++) {
-            Token *const t = tokens[i];
-            const uint32_t prox_delta = t->pos - last_prox;
+            TokenIVARS *const t_ivars = Token_IVARS(tokens[i]);
+            const uint32_t prox_delta = t_ivars->pos - last_prox;
             NumUtil_encode_c32(prox_delta, &dest);
-            last_prox = t->pos;
+            last_prox = t_ivars->pos;
         }
 
         // Resize raw posting memory allocation.
-        raw_posting->aux_len = dest - start;
+        raw_post_ivars->aux_len = dest - start;
         raw_post_bytes = dest - (char*)raw_posting;
         MemPool_Resize(mem_pool, raw_posting, raw_post_bytes);
         PostPool_Feed(post_pool, &raw_posting);
@@ -116,13 +122,15 @@ ScorePost_add_inversion_to_pool(ScorePosting *self, PostingPool *post_pool,
 
 void
 ScorePost_reset(ScorePosting *self) {
-    self->doc_id = 0;
-    self->freq   = 0;
-    self->weight = 0.0;
+    ScorePostingIVARS *const ivars = ScorePost_IVARS(self);
+    ivars->doc_id = 0;
+    ivars->freq   = 0;
+    ivars->weight = 0.0;
 }
 
 void
 ScorePost_read_record(ScorePosting *self, InStream *instream) {
+    ScorePostingIVARS *const ivars = ScorePost_IVARS(self);
     uint32_t  position = 0;
     const size_t max_start_bytes = (C32_MAX_BYTES * 2) + 1;
     char *buf = InStream_Buf(instream, max_start_bytes);
@@ -130,26 +138,26 @@ ScorePost_read_record(ScorePosting *self, InStream *instream) {
     const uint32_t doc_delta = doc_code >> 1;
 
     // Apply delta doc and retrieve freq.
-    self->doc_id   += doc_delta;
+    ivars->doc_id   += doc_delta;
     if (doc_code & 1) {
-        self->freq = 1;
+        ivars->freq = 1;
     }
     else {
-        self->freq = NumUtil_decode_c32(&buf);
+        ivars->freq = NumUtil_decode_c32(&buf);
     }
 
     // Decode boost/norm byte.
-    self->weight = self->norm_decoder[*(uint8_t*)buf];
+    ivars->weight = ivars->norm_decoder[*(uint8_t*)buf];
     buf++;
 
     // Read positions.
-    uint32_t num_prox = self->freq;
-    if (num_prox > self->prox_cap) {
-        self->prox = (uint32_t*)REALLOCATE(
-                         self->prox, num_prox * sizeof(uint32_t));
-        self->prox_cap = num_prox;
+    uint32_t num_prox = ivars->freq;
+    if (num_prox > ivars->prox_cap) {
+        ivars->prox = (uint32_t*)REALLOCATE(
+                         ivars->prox, num_prox * sizeof(uint32_t));
+        ivars->prox_cap = num_prox;
     }
-    uint32_t *positions = self->prox;
+    uint32_t *positions = ivars->prox;
 
     InStream_Advance_Buf(instream, buf);
     buf = InStream_Buf(instream, num_prox * C32_MAX_BYTES);
@@ -173,12 +181,14 @@ ScorePost_read_raw(ScorePosting *self, InStream *instream,
     const uint32_t freq           = (doc_code & 1)
                                     ? 1
                                     : InStream_Read_C32(instream);
-    size_t raw_post_bytes         = MAX_RAW_POSTING_LEN(text_size, freq);
+    const size_t base_size        = VTable_Get_Obj_Alloc_Size(RAWPOSTING);
+    size_t raw_post_bytes         = MAX_RAW_POSTING_LEN(base_size, text_size, freq);
     void *const allocation        = MemPool_Grab(mem_pool, raw_post_bytes);
     RawPosting *const raw_posting
         = RawPost_new(allocation, doc_id, freq, text_buf, text_size);
+    RawPostingIVARS *const raw_post_ivars = RawPost_IVARS(raw_posting);
     uint32_t num_prox = freq;
-    char *const start = raw_posting->blob + text_size;
+    char *const start = raw_post_ivars->blob + text_size;
     char *dest        = start;
     UNUSED_VAR(self);
 
@@ -192,7 +202,7 @@ ScorePost_read_raw(ScorePosting *self, InStream *instream,
     }
 
     // Resize raw posting memory allocation.
-    raw_posting->aux_len = dest - start;
+    raw_post_ivars->aux_len = dest - start;
     raw_post_bytes       = dest - (char*)raw_posting;
     MemPool_Resize(mem_pool, raw_posting, raw_post_bytes);
 
@@ -215,11 +225,12 @@ ScorePostMatcher_init(ScorePostingMatcher *self, Similarity *sim,
                       PostingList *plist, Compiler *compiler) {
     // Init.
     TermMatcher_init((TermMatcher*)self, sim, plist, compiler);
+    ScorePostingMatcherIVARS *const ivars = ScorePostMatcher_IVARS(self);
 
     // Fill score cache.
-    self->score_cache = (float*)MALLOCATE(TERMMATCHER_SCORE_CACHE_SIZE * sizeof(float));
+    ivars->score_cache = (float*)MALLOCATE(TERMMATCHER_SCORE_CACHE_SIZE * sizeof(float));
     for (uint32_t i = 0; i < TERMMATCHER_SCORE_CACHE_SIZE; i++) {
-        self->score_cache[i] = Sim_TF(sim, (float)i) * self->weight;
+        ivars->score_cache[i] = Sim_TF(sim, (float)i) * ivars->weight;
     }
 
     return self;
@@ -227,23 +238,26 @@ ScorePostMatcher_init(ScorePostingMatcher *self, Similarity *sim,
 
 float
 ScorePostMatcher_score(ScorePostingMatcher* self) {
-    ScorePosting *const posting = (ScorePosting*)self->posting;
-    const uint32_t freq = posting->freq;
+    ScorePostingMatcherIVARS *const ivars = ScorePostMatcher_IVARS(self);
+    ScorePostingIVARS *const posting_ivars
+        = ScorePost_IVARS((ScorePosting*)ivars->posting);
+    const uint32_t freq = posting_ivars->freq;
 
     // Calculate initial score based on frequency of term.
     float score = (freq < TERMMATCHER_SCORE_CACHE_SIZE)
-                  ? self->score_cache[freq] // cache hit
-                  : Sim_TF(self->sim, (float)freq) * self->weight;
+                  ? ivars->score_cache[freq] // cache hit
+                  : Sim_TF(ivars->sim, (float)freq) * ivars->weight;
 
     // Factor in field-length normalization and doc/field/prox boost.
-    score *= posting->weight;
+    score *= posting_ivars->weight;
 
     return score;
 }
 
 void
 ScorePostMatcher_destroy(ScorePostingMatcher *self) {
-    FREEMEM(self->score_cache);
+    ScorePostingMatcherIVARS *const ivars = ScorePostMatcher_IVARS(self);
+    FREEMEM(ivars->score_cache);
     SUPER_DESTROY(self, SCOREPOSTINGMATCHER);
 }
 
