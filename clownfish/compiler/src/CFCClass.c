@@ -254,10 +254,6 @@ CFCClass_destroy(CFCClass *self) {
 
 static void
 S_register(CFCClass *self) {
-    /*
-     * TODO: Verify that there isn't a class with the same class_name in
-     * another parcel. Verify that cnick is unique within this parcel.
-     */
     if (registry_size == registry_cap) {
         size_t new_cap = registry_cap + 10;
         registry = (CFCClassRegEntry*)REALLOCATE(
@@ -269,15 +265,35 @@ S_register(CFCClass *self) {
         }
         registry_cap = new_cap;
     }
-    CFCParcel *parcel = CFCClass_get_parcel(self);
+
+    CFCParcel  *parcel     = CFCClass_get_parcel(self);
+    const char *prefix     = CFCParcel_get_prefix(parcel);
     const char *class_name = CFCClass_get_class_name(self);
-    CFCClass *existing = CFCClass_fetch_singleton(parcel, class_name);
-    const char *key = self->full_struct_sym;
-    if (existing) {
-        CFCBase_decref((CFCBase*)self);
-        CFCUtil_die("Conflict with existing class %s",
-                    CFCClass_get_class_name(existing));
+    const char *cnick      = CFCClass_get_cnick(self);
+    const char *key        = self->full_struct_sym;
+
+    for (size_t i = 0; i < registry_size; i++) {
+        CFCClass   *other            = registry[i].klass;
+        CFCParcel  *other_parcel     = CFCClass_get_parcel(other);
+        const char *other_prefix     = CFCParcel_get_prefix(other_parcel);
+        const char *other_class_name = CFCClass_get_class_name(other);
+        const char *other_cnick      = CFCClass_get_cnick(other);
+
+        if (strcmp(class_name, other_class_name) == 0) {
+            CFCUtil_die("Two classes with name %s", class_name);
+        }
+        if (strcmp(registry[i].key, key) == 0) {
+            CFCUtil_die("Class name conflict between %s and %s",
+                        class_name, other_class_name);
+        }
+        if (strcmp(prefix, other_prefix) == 0
+            && strcmp(cnick, other_cnick) == 0
+           ) {
+            CFCUtil_die("Class nickname conflict between %s and %s",
+                        class_name, other_class_name);
+        }
     }
+
     registry[registry_size].key   = CFCUtil_strdup(key);
     registry[registry_size].klass = (CFCClass*)CFCBase_incref((CFCBase*)self);
     registry_size++;

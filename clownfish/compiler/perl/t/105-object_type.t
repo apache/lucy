@@ -86,7 +86,7 @@ ok( !$foo_type->equals($bar_type), "different specifier spoils equals" );
 
 my $foreign_foo_class = Clownfish::CFC::Model::Class->create(
     parcel     => 'Foreign',
-    class_name => 'Foo',
+    class_name => 'Foreign::Foo',
 );
 my $foreign_foo = Clownfish::CFC::Model::Type->new_object(
     specifier => 'Foo',
@@ -117,14 +117,11 @@ ok( !$foo_type->equals($decremented_foo),
     "different decremented spoils equals"
 );
 
-my $foo_class = Clownfish::CFC::Model::Class->create(
-    class_name => 'Foo',
-);
 my $const_foo = Clownfish::CFC::Model::Type->new_object(
     specifier => 'Foo',
     const     => 1,
 );
-$const_foo->resolve([ $foo_class ]);
+$const_foo->resolve(\@classes);
 ok( !$foo_type->equals($const_foo), "different const spoils equals" );
 like( $const_foo->to_c, qr/const/, "const included in C representation" );
 

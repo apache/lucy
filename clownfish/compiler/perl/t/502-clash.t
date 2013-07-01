@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 5;
 
 use Clownfish::CFC::Model::Hierarchy;
 use File::Spec::Functions qw( catdir catfile splitpath );
@@ -27,21 +27,6 @@ my $ext_dir         = catdir(qw( t cfext ));
 my $dest_dir        = catdir(qw( t cfdest ));
 my $class_clash_dir = catdir(qw( t cfclash class ));
 my $file_clash_dir  = catdir(qw( t cfclash file ));
-
-{
-    my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(dest => $dest_dir);
-
-    $hierarchy->add_source_dir($base_dir);
-    $hierarchy->add_source_dir($class_clash_dir);
-
-    eval { $hierarchy->build; };
-
-    like( $@, qr/Conflict with existing class Animal::Dog/,
-          "source/source class name clash" );
-
-    Clownfish::CFC::Model::Class->_clear_registry();
-    Clownfish::CFC::Model::Parcel->reap_singletons();
-}
 
 {
     my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(dest => $dest_dir);
@@ -62,13 +47,12 @@ my $file_clash_dir  = catdir(qw( t cfclash file ));
 {
     my $hierarchy = Clownfish::CFC::Model::Hierarchy->new(dest => $dest_dir);
 
-    $hierarchy->add_source_dir($base_dir);
-    $hierarchy->add_include_dir($class_clash_dir);
+    $hierarchy->add_source_dir($class_clash_dir);
+    $hierarchy->add_include_dir($base_dir);
 
     eval { $hierarchy->build; };
 
-    like( $@, qr/Class .* from include dir .* parcel .* from source dir/,
-          "source/include class name clash" );
+    like( $@, qr/Two classes with name/, "source/include class name clash" );
 
     Clownfish::CFC::Model::Class->_clear_registry();
     Clownfish::CFC::Model::Parcel->reap_singletons();

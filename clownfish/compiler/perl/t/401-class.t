@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 52;
+use Test::More tests => 54;
 use Clownfish::CFC::Model::Class;
 use Clownfish::CFC::Parser;
 
@@ -49,14 +49,32 @@ my $foo = Clownfish::CFC::Model::Class->create(%foo_create_args);
 $foo->add_function($tread_water);
 $foo->add_member_var($thing);
 $foo->add_inert_var($widget);
-eval { Clownfish::CFC::Model::Class->create(%foo_create_args) };
-like( $@, qr/conflict/i,
-    "Can't call create for the same class more than once" );
 my $should_be_foo = Clownfish::CFC::Model::Class->fetch_singleton(
     parcel     => 'Neato',
     class_name => 'Foo',
 );
 is( $$foo, $$should_be_foo, "fetch_singleton" );
+
+eval { Clownfish::CFC::Model::Class->create(%foo_create_args) };
+like( $@, qr/two classes with name/i,
+      "Can't call create for the same class more than once" );
+eval {
+    Clownfish::CFC::Model::Class->create(
+        parcel     => 'Neato',
+        class_name => 'Other::Foo',
+    );
+};
+like( $@, qr/class name conflict/i,
+      "Can't create classes wth the same final component" );
+eval {
+    Clownfish::CFC::Model::Class->create(
+        parcel     => 'Neato',
+        class_name => 'Bar',
+        cnick      => 'Foo',
+    );
+};
+like( $@, qr/class nickname conflict/i,
+      "Can't create classes wth the same nickname" );
 
 my $foo_jr = Clownfish::CFC::Model::Class->create(
     parcel            => 'Neato',

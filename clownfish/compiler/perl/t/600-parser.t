@@ -156,7 +156,7 @@ SKIP: {
 
 is( $parser->parse(qq|class Foodie$_ cnick $_ { }|)->get_cnick,
     $_, "cnick: $_" )
-    for (qw( Foo FF ));
+    for (qw( Food FF ));
 
 SKIP: {
     skip( "Can't recover from bad cnick under flex/lemon parser", 3 );

@@ -119,6 +119,8 @@ S_run_tests(CFCTest *test) {
         OK(test, blocks[5] == NULL, "blocks[5]");
 
         CFCBase_decref((CFCBase*)file);
+
+        CFCClass_clear_registry();
     }
 
     {
@@ -135,12 +137,13 @@ S_run_tests(CFCTest *test) {
                "file production resets parcel");
 
         CFCBase_decref((CFCBase*)file);
+
+        CFCClass_clear_registry();
     }
 
     CFCBase_decref((CFCBase*)file_spec);
     CFCBase_decref((CFCBase*)parser);
 
-    CFCClass_clear_registry();
     CFCParcel_reap_singletons();
 }
 

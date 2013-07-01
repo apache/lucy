@@ -354,8 +354,8 @@ S_run_object_tests(CFCTest *test) {
         CFCParcel *foreign_parcel
             = CFCParcel_new("Foreign", NULL, NULL, false);
         CFCClass *foreign_foo_class
-            = CFCClass_create(foreign_parcel, NULL, "Foo", NULL, NULL, NULL,
-                              NULL, NULL, false, false);
+            = CFCClass_create(foreign_parcel, NULL, "Foreign::Foo", NULL, NULL,
+                              NULL, NULL, NULL, false, false);
         CFCClass *foreign_class_list[2] = { foreign_foo_class, NULL };
         CFCType *foreign_foo = CFCType_new_object(0, foreign_parcel, "Foo", 1);
         CFCType_resolve(foreign_foo, foreign_class_list);

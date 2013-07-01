@@ -293,7 +293,7 @@ S_run_tests(CFCTest *test) {
     }
 
     {
-        static const char *const cnicks[2] =  { "Foo", "FF" };
+        static const char *const cnicks[2] =  { "Food", "FF" };
         for (int i = 0; i < 2; ++i) {
             const char *cnick = cnicks[i];
             char *class_string

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-parcel Animal;
+parcel AnimalExtension;
 
-class Animal::Dog inherits Animal {
+class Animal::Dog inherits Clownfish::Obj {
     public inert incremented Dog*
     new();
 
