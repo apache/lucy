@@ -30,6 +30,7 @@
 
 Doc*
 Doc_init(Doc *self, void *fields, int32_t doc_id) {
+    DocIVARS *const ivars = Doc_IVARS(self);
     Hash *hash;
 
     if (fields) {
@@ -39,49 +40,52 @@ Doc_init(Doc *self, void *fields, int32_t doc_id) {
     else {
         hash = Hash_new(0);
     }
-    self->fields = hash;
-    self->doc_id = doc_id;
+    ivars->fields = hash;
+    ivars->doc_id = doc_id;
 
     return self;
 }
 
 void
 Doc_set_fields(Doc *self, void *fields) {
-    DECREF(self->fields);
-    self->fields = CERTIFY(fields, HASH);
+    DocIVARS *const ivars = Doc_IVARS(self);
+    DECREF(ivars->fields);
+    ivars->fields = CERTIFY(fields, HASH);
 }
 
 uint32_t
 Doc_get_size(Doc *self) {
-    Hash *hash = (Hash *)self->fields;
+    Hash *hash = (Hash*)Doc_IVARS(self)->fields;
     return Hash_Get_Size(hash);
 }
 
 void
 Doc_store(Doc *self, const CharBuf *field, Obj *value) {
-    Hash *hash = (Hash *)self->fields;
+    Hash *hash = (Hash*)Doc_IVARS(self)->fields;
     Hash_Store(hash, (Obj *)field, value);
     INCREF(value);
 }
 
 void
 Doc_serialize(Doc *self, OutStream *outstream) {
-    Hash *hash = (Hash *)self->fields;
+    DocIVARS *const ivars = Doc_IVARS(self);
+    Hash *hash = (Hash*)ivars->fields;
     Freezer_serialize_hash(hash, outstream);
-    OutStream_Write_C32(outstream, self->doc_id);
+    OutStream_Write_C32(outstream, ivars->doc_id);
 }
 
 Doc*
 Doc_deserialize(Doc *self, InStream *instream) {
-     self->fields = Freezer_read_hash(instream);
-     self->doc_id = InStream_Read_C32(instream);
-     return self;
+    DocIVARS *const ivars = Doc_IVARS(self);
+    ivars->fields = Freezer_read_hash(instream);
+    ivars->doc_id = InStream_Read_C32(instream);
+    return self;
 }
 
 Obj*
 Doc_extract(Doc *self, CharBuf *field,
                  ViewCharBuf *target) {
-    Hash *hash = (Hash *)self->fields;
+    Hash *hash = (Hash*)Doc_IVARS(self)->fields;
     Obj  *obj  = Hash_Fetch(hash, (Obj *)field);
 
     if (target && obj && Obj_Is_A(obj, CHARBUF)) {
@@ -115,17 +119,17 @@ Doc_load(Doc *self, Obj *dump) {
 
 bool
 Doc_equals(Doc *self, Obj *other) {
-    Doc *twin = (Doc*)other;
-
-    if (twin == self)                    { return true;  }
+    if ((Doc*)other == self)   { return true;  }
     if (!Obj_Is_A(other, DOC)) { return false; }
-
-    return Hash_Equals((Hash*)self->fields, (Obj*)twin->fields);
+    DocIVARS *const ivars = Doc_IVARS(self);
+    DocIVARS *const ovars = Doc_IVARS((Doc*)other);
+    return Hash_Equals((Hash*)ivars->fields, (Obj*)ovars->fields);
 }
 
 void
 Doc_destroy(Doc *self) {
-    DECREF(self->fields);
+    DocIVARS *const ivars = Doc_IVARS(self);
+    DECREF(ivars->fields);
     SUPER_DESTROY(self, DOC);
 }
 

@@ -46,15 +46,16 @@ RegexTokenizer_is_available(void) {
 RegexTokenizer*
 RegexTokenizer_init(RegexTokenizer *self, const CharBuf *pattern) {
     Analyzer_init((Analyzer*)self);
+    RegexTokenizerIVARS *const ivars = RegexTokenizer_IVARS(self);
 
     const char *pattern_ptr;
     if (pattern) {
-        self->pattern = CB_Clone(pattern);
-        pattern_ptr = (char*)CB_Get_Ptr8(self->pattern);
+        ivars->pattern = CB_Clone(pattern);
+        pattern_ptr = (char*)CB_Get_Ptr8(ivars->pattern);
     }
     else {
         pattern_ptr = "\\w+(?:['\\x{2019}]\\w+)*";
-        self->pattern
+        ivars->pattern
             = CB_new_from_trusted_utf8(pattern_ptr, strlen(pattern_ptr));
     }
 
@@ -76,7 +77,7 @@ RegexTokenizer_init(RegexTokenizer *self, const CharBuf *pattern) {
 
     // TODO: Check whether pcre_study improves performance
 
-    self->token_re = re;
+    ivars->token_re = re;
 
     return self;
 }
@@ -90,8 +91,9 @@ RegexTokenizer_set_token_re(RegexTokenizer *self, void *token_re) {
 
 void
 RegexTokenizer_destroy(RegexTokenizer *self) {
-    DECREF(self->pattern);
-    pcre *re = (pcre*)self->token_re;
+    RegexTokenizerIVARS *const ivars = RegexTokenizer_IVARS(self);
+    DECREF(ivars->pattern);
+    pcre *re = (pcre*)ivars->token_re;
     if (re) {
         pcre_free(re);
     }
@@ -102,7 +104,8 @@ void
 RegexTokenizer_tokenize_str(RegexTokenizer *self,
                                  const char *string, size_t string_len,
                                  Inversion *inversion) {
-    pcre      *re          = (pcre*)self->token_re;
+    RegexTokenizerIVARS *const ivars = RegexTokenizer_IVARS(self);
+    pcre      *re          = (pcre*)ivars->token_re;
     int        byte_offset = 0;
     uint32_t   cp_offset   = 0; // Code points
     int        options     = PCRE_NO_UTF8_CHECK;

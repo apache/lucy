@@ -34,9 +34,10 @@
 
 HitDoc*
 DefDocReader_fetch_doc(DefaultDocReader *self, int32_t doc_id) {
-    Schema   *const schema = self->schema;
-    InStream *const dat_in = self->dat_in;
-    InStream *const ix_in  = self->ix_in;
+    DefaultDocReaderIVARS *const ivars = DefDocReader_IVARS(self);
+    Schema   *const schema = ivars->schema;
+    InStream *const dat_in = ivars->dat_in;
+    InStream *const ix_in  = ivars->ix_in;
     Hash     *const fields = Hash_new(1);
     int64_t   start;
     uint32_t  num_fields;

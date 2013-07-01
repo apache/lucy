@@ -33,15 +33,15 @@
 #include "Lucy/Plan/Schema.h"
 
 static InverterEntry*
-S_fetch_entry(Inverter *self, CharBuf *field) {
-    Schema *const schema = self->schema;
-    int32_t field_num = Seg_Field_Num(self->segment, field);
+S_fetch_entry(InverterIVARS *ivars, CharBuf *field) {
+    Schema *const schema = ivars->schema;
+    int32_t field_num = Seg_Field_Num(ivars->segment, field);
     if (!field_num) {
         // This field seems not to be in the segment yet.  Try to find it in
         // the Schema.
         if (Schema_Fetch_Type(schema, field)) {
             // The field is in the Schema.  Get a field num from the Segment.
-            field_num = Seg_Add_Field(self->segment, field);
+            field_num = Seg_Add_Field(ivars->segment, field);
         }
         else {
             // We've truly failed to find the field.  The user must
@@ -51,16 +51,17 @@ S_fetch_entry(Inverter *self, CharBuf *field) {
     }
 
     InverterEntry *entry
-        = (InverterEntry*)VA_Fetch(self->entry_pool, field_num);
+        = (InverterEntry*)VA_Fetch(ivars->entry_pool, field_num);
     if (!entry) {
         entry = InvEntry_new(schema, (CharBuf*)field, field_num);
-        VA_Store(self->entry_pool, field_num, (Obj*)entry);
+        VA_Store(ivars->entry_pool, field_num, (Obj*)entry);
     }
     return entry;
 }
 
 void
 Inverter_invert_doc(Inverter *self, Doc *doc) {
+    InverterIVARS *const ivars = Inverter_IVARS(self);
     Hash *const fields = (Hash*)Doc_Get_Fields(doc);
     uint32_t   num_keys     = Hash_Iterate(fields);
 
@@ -72,8 +73,9 @@ Inverter_invert_doc(Inverter *self, Doc *doc) {
         Obj *key, *obj;
         Hash_Next(fields, &key, &obj);
         CharBuf *field = (CharBuf*)CERTIFY(key, CHARBUF);
-        InverterEntry *inv_entry = S_fetch_entry(self, field);
-        FieldType *type = inv_entry->type;
+        InverterEntry *inventry = S_fetch_entry(ivars, field);
+        InverterEntryIVARS *inventry_ivars = InvEntry_IVARS(inventry);
+        FieldType *type = inventry_ivars->type;
 
         // Get the field value.
         switch (FType_Primitive_ID(type) & FType_PRIMITIVE_ID_MASK) {
@@ -81,7 +83,7 @@ Inverter_invert_doc(Inverter *self, Doc *doc) {
                     CharBuf *char_buf
                         = (CharBuf*)CERTIFY(obj, CHARBUF);
                     ViewCharBuf *value
-                        = (ViewCharBuf*)inv_entry->value;
+                        = (ViewCharBuf*)inventry_ivars->value;
                     ViewCB_Assign(value, char_buf);
                     break;
                 }
@@ -89,31 +91,31 @@ Inverter_invert_doc(Inverter *self, Doc *doc) {
                     ByteBuf *byte_buf
                         = (ByteBuf*)CERTIFY(obj, BYTEBUF);
                     ViewByteBuf *value
-                        = (ViewByteBuf*)inv_entry->value;
+                        = (ViewByteBuf*)inventry_ivars->value;
                     ViewBB_Assign(value, byte_buf);
                     break;
                 }
             case FType_INT32: {
                     int32_t int_val = (int32_t)Obj_To_I64(obj);
-                    Integer32* value = (Integer32*)inv_entry->value;
+                    Integer32* value = (Integer32*)inventry_ivars->value;
                     Int32_Set_Value(value, int_val);
                     break;
                 }
             case FType_INT64: {
                     int64_t int_val = Obj_To_I64(obj);
-                    Integer64* value = (Integer64*)inv_entry->value;
+                    Integer64* value = (Integer64*)inventry_ivars->value;
                     Int64_Set_Value(value, int_val);
                     break;
                 }
             case FType_FLOAT32: {
                     float float_val = (float)Obj_To_F64(obj);
-                    Float32* value = (Float32*)inv_entry->value;
+                    Float32* value = (Float32*)inventry_ivars->value;
                     Float32_Set_Value(value, float_val);
                     break;
                 }
             case FType_FLOAT64: {
                     double float_val = Obj_To_F64(obj);
-                    Float64* value = (Float64*)inv_entry->value;
+                    Float64* value = (Float64*)inventry_ivars->value;
                     Float64_Set_Value(value, float_val);
                     break;
                 }
@@ -121,7 +123,7 @@ Inverter_invert_doc(Inverter *self, Doc *doc) {
                 THROW(ERR, "Unrecognized type: %o", type);
         }
 
-        Inverter_Add_Field(self, inv_entry);
+        Inverter_Add_Field(self, inventry);
     }
 }
 
