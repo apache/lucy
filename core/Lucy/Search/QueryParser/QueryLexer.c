@@ -55,22 +55,24 @@ QueryLexer_new() {
 
 QueryLexer*
 QueryLexer_init(QueryLexer *self) {
-    self->heed_colons = false;
+    QueryLexerIVARS *const ivars = QueryLexer_IVARS(self);
+    ivars->heed_colons = false;
     return self;
 }
 
 bool
 QueryLexer_heed_colons(QueryLexer *self) {
-    return self->heed_colons;
+    return QueryLexer_IVARS(self)->heed_colons;
 }
 
 void
 QueryLexer_set_heed_colons(QueryLexer *self, bool heed_colons) {
-    self->heed_colons = heed_colons;
+    QueryLexer_IVARS(self)->heed_colons = heed_colons;
 }
 
 VArray*
 QueryLexer_tokenize(QueryLexer *self, const CharBuf *query_string) {
+    QueryLexerIVARS *const ivars = QueryLexer_IVARS(self);
     CharBuf *copy = query_string
                     ? CB_Clone(query_string)
                     : CB_new_from_trusted_utf8("", 0);
@@ -86,7 +88,7 @@ QueryLexer_tokenize(QueryLexer *self, const CharBuf *query_string) {
             continue;
         }
 
-        if (self->heed_colons) {
+        if (ivars->heed_colons) {
             ParserElem *elem = S_consume_field(qstring);
             if (elem) {
                 VA_Push(elems, (Obj*)elem);

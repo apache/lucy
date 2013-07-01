@@ -27,93 +27,100 @@ ParserElem_new(uint32_t type, Obj *value) {
 
 ParserElem*
 ParserElem_init(ParserElem *self, uint32_t type, Obj *value) {
-    self->type  = type;
-    self->value = value;
-    self->occur = LUCY_QPARSER_SHOULD;
+    ParserElemIVARS *const ivars = ParserElem_IVARS(self);
+    ivars->type  = type;
+    ivars->value = value;
+    ivars->occur = LUCY_QPARSER_SHOULD;
     return self;
 }
 
 void
 ParserElem_destroy(ParserElem *self) {
-    DECREF(self->value);
+    ParserElemIVARS *const ivars = ParserElem_IVARS(self);
+    DECREF(ivars->value);
     SUPER_DESTROY(self, PARSERELEM);
 }
 
 void
 ParserElem_set_value(ParserElem *self, Obj *value) {
+    ParserElemIVARS *const ivars = ParserElem_IVARS(self);
     INCREF(value);
-    DECREF(self->value);
-    self->value = value;
+    DECREF(ivars->value);
+    ivars->value = value;
 }
 
 Obj*
 ParserElem_as(ParserElem *self, VTable *metaclass) {
-    if (self->value && Obj_Is_A(self->value, metaclass)) {
-        return self->value;
+    ParserElemIVARS *const ivars = ParserElem_IVARS(self);
+    if (ivars->value && Obj_Is_A(ivars->value, metaclass)) {
+        return ivars->value;
     }
     return NULL;
 }
 
 uint32_t
 ParserElem_get_type(ParserElem *self) {
-    return self->type;
+    return ParserElem_IVARS(self)->type;
 }
 
 void
 ParserElem_require(ParserElem *self) {
-    switch (self->occur) {
+    ParserElemIVARS *const ivars = ParserElem_IVARS(self);
+    switch (ivars->occur) {
         case LUCY_QPARSER_SHOULD:
-            self->occur = LUCY_QPARSER_MUST;
+            ivars->occur = LUCY_QPARSER_MUST;
             break;
         case LUCY_QPARSER_MUST_NOT:
         case LUCY_QPARSER_MUST:
             break;
         default:
-            THROW(ERR, "Internal error in value of occur: %u32", self->occur);
+            THROW(ERR, "Internal error in value of occur: %u32", ivars->occur);
     }
 }
 
 void
 ParserElem_unrequire(ParserElem *self) {
-    switch (self->occur) {
+    ParserElemIVARS *const ivars = ParserElem_IVARS(self);
+    switch (ivars->occur) {
         case LUCY_QPARSER_MUST:
-            self->occur = LUCY_QPARSER_SHOULD;
+            ivars->occur = LUCY_QPARSER_SHOULD;
             break;
         case LUCY_QPARSER_MUST_NOT:
         case LUCY_QPARSER_SHOULD:
             break;
         default:
-            THROW(ERR, "Internal error in value of occur: %u32", self->occur);
+            THROW(ERR, "Internal error in value of occur: %u32", ivars->occur);
     }
 }
 
 void
 ParserElem_negate(ParserElem *self) {
-    switch (self->occur) {
+    ParserElemIVARS *const ivars = ParserElem_IVARS(self);
+    switch (ivars->occur) {
         case LUCY_QPARSER_SHOULD:
         case LUCY_QPARSER_MUST:
-            self->occur = LUCY_QPARSER_MUST_NOT;
+            ivars->occur = LUCY_QPARSER_MUST_NOT;
             break;
         case LUCY_QPARSER_MUST_NOT:
-            self->occur = LUCY_QPARSER_MUST; // Apply double negative.
+            ivars->occur = LUCY_QPARSER_MUST; // Apply double negative.
             break;
         default:
-            THROW(ERR, "Internal error in value of occur: %u32", self->occur);
+            THROW(ERR, "Internal error in value of occur: %u32", ivars->occur);
     }
 }
 
 bool
 ParserElem_optional(ParserElem *self) {
-    return self->occur == LUCY_QPARSER_SHOULD;
+    return ParserElem_IVARS(self)->occur == LUCY_QPARSER_SHOULD;
 }
 
 bool
 ParserElem_required(ParserElem *self) {
-    return self->occur == LUCY_QPARSER_MUST;
+    return ParserElem_IVARS(self)->occur == LUCY_QPARSER_MUST;
 }
 
 bool
 ParserElem_negated(ParserElem *self) {
-    return self->occur == LUCY_QPARSER_MUST_NOT;
+    return ParserElem_IVARS(self)->occur == LUCY_QPARSER_MUST_NOT;
 }
 
