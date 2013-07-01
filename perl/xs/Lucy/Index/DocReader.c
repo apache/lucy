@@ -29,9 +29,10 @@
 
 lucy_HitDoc*
 lucy_DefDocReader_fetch_doc(lucy_DefaultDocReader *self, int32_t doc_id) {
-    lucy_Schema   *const schema = self->schema;
-    lucy_InStream *const dat_in = self->dat_in;
-    lucy_InStream *const ix_in  = self->ix_in;
+    lucy_DefaultDocReaderIVARS *const ivars = lucy_DefDocReader_IVARS(self);
+    lucy_Schema   *const schema = ivars->schema;
+    lucy_InStream *const dat_in = ivars->dat_in;
+    lucy_InStream *const ix_in  = ivars->ix_in;
     HV *fields = newHV();
     int64_t start;
     uint32_t num_fields;

@@ -23,32 +23,36 @@
 
 lucy_Doc*
 lucy_Doc_init(lucy_Doc *self, void *fields, int32_t doc_id) {
+    lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     // Assign.
     if (fields) {
         if (SvTYPE((SV*)fields) != SVt_PVHV) { THROW(CFISH_ERR, "Not a hash"); }
-        self->fields = SvREFCNT_inc((SV*)fields);
+        ivars->fields = SvREFCNT_inc((SV*)fields);
     }
     else {
-        self->fields = newHV();
+        ivars->fields = newHV();
     }
-    self->doc_id = doc_id;
+    ivars->doc_id = doc_id;
 
     return self;
 }
 
 void
 lucy_Doc_set_fields(lucy_Doc *self, void *fields) {
-    if (self->fields) { SvREFCNT_dec((SV*)self->fields); }
-    self->fields = SvREFCNT_inc((SV*)fields);
+    lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
+    if (ivars->fields) { SvREFCNT_dec((SV*)ivars->fields); }
+    ivars->fields = SvREFCNT_inc((SV*)fields);
 }
 
 uint32_t
 lucy_Doc_get_size(lucy_Doc *self) {
-    return self->fields ? HvKEYS((HV*)self->fields) : 0;
+    lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
+    return ivars->fields ? HvKEYS((HV*)ivars->fields) : 0;
 }
 
 void
 lucy_Doc_store(lucy_Doc *self, const cfish_CharBuf *field, cfish_Obj *value) {
+    lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     char   *key      = (char*)Cfish_CB_Get_Ptr8(field);
     size_t  key_size = Cfish_CB_Get_Size(field);
     SV *key_sv = newSVpvn(key, key_size);
@@ -58,19 +62,20 @@ lucy_Doc_store(lucy_Doc *self, const cfish_CharBuf *field, cfish_Obj *value) {
                  ? XSBind_cb_to_sv((cfish_CharBuf*)value)
                  : (SV*)Cfish_Obj_To_Host(value);
     SvUTF8_on(key_sv);
-    (void)hv_store_ent((HV*)self->fields, key_sv, val_sv, 0);
+    (void)hv_store_ent((HV*)ivars->fields, key_sv, val_sv, 0);
     // TODO: make this a thread-local instead of creating it every time?
     SvREFCNT_dec(key_sv);
 }
 
 static SV*
 S_nfreeze_fields(lucy_Doc *self) {
+    lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     dSP;
     ENTER;
     SAVETMPS;
     EXTEND(SP, 1);
     PUSHMARK(SP);
-    mPUSHs((SV*)newRV_inc((SV*)self->fields));
+    mPUSHs((SV*)newRV_inc((SV*)ivars->fields));
     PUTBACK;
     call_pv("Storable::nfreeze", G_SCALAR);
     SPAGAIN;
@@ -84,7 +89,8 @@ S_nfreeze_fields(lucy_Doc *self) {
 
 void
 lucy_Doc_serialize(lucy_Doc *self, lucy_OutStream *outstream) {
-    Lucy_OutStream_Write_C32(outstream, self->doc_id);
+    lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
+    Lucy_OutStream_Write_C32(outstream, ivars->doc_id);
     SV *frozen = S_nfreeze_fields(self);
     STRLEN len;
     char *buf = SvPV(frozen, len);
@@ -138,8 +144,9 @@ lucy_Doc_deserialize(lucy_Doc *self, lucy_InStream *instream) {
 cfish_Obj*
 lucy_Doc_extract(lucy_Doc *self, cfish_CharBuf *field,
                  cfish_ViewCharBuf *target) {
+    lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     cfish_Obj *retval = NULL;
-    SV **sv_ptr = hv_fetch((HV*)self->fields, (char*)Cfish_CB_Get_Ptr8(field),
+    SV **sv_ptr = hv_fetch((HV*)ivars->fields, (char*)Cfish_CB_Get_Ptr8(field),
                            Cfish_CB_Get_Size(field), 0);
 
     if (sv_ptr && XSBind_sv_defined(*sv_ptr)) {
@@ -170,13 +177,14 @@ lucy_Doc_to_host(lucy_Doc *self) {
 
 cfish_Hash*
 lucy_Doc_dump(lucy_Doc *self) {
+    lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     cfish_Hash *dump = cfish_Hash_new(0);
     Cfish_Hash_Store_Str(dump, "_class", 6,
                         (cfish_Obj*)Cfish_CB_Clone(Lucy_Doc_Get_Class_Name(self)));
     Cfish_Hash_Store_Str(dump, "doc_id", 7,
-                        (cfish_Obj*)cfish_CB_newf("%i32", self->doc_id));
+                        (cfish_Obj*)cfish_CB_newf("%i32", ivars->doc_id));
     Cfish_Hash_Store_Str(dump, "fields", 6,
-                        XSBind_perl_to_cfish((SV*)self->fields));
+                        XSBind_perl_to_cfish((SV*)ivars->fields));
     return dump;
 }
 
@@ -197,8 +205,9 @@ lucy_Doc_load(lucy_Doc *self, cfish_Obj *dump) {
     SV *fields_sv = XSBind_cfish_to_perl((cfish_Obj*)fields);
     CHY_UNUSED_VAR(self);
 
-    loaded->doc_id = (int32_t)Cfish_Obj_To_I64(doc_id);
-    loaded->fields  = SvREFCNT_inc(SvRV(fields_sv));
+    lucy_DocIVARS *const loaded_ivars = lucy_Doc_IVARS(loaded);
+    loaded_ivars->doc_id = (int32_t)Cfish_Obj_To_I64(doc_id);
+    loaded_ivars->fields  = SvREFCNT_inc(SvRV(fields_sv));
     SvREFCNT_dec(fields_sv);
 
     return loaded;
@@ -206,21 +215,19 @@ lucy_Doc_load(lucy_Doc *self, cfish_Obj *dump) {
 
 bool
 lucy_Doc_equals(lucy_Doc *self, cfish_Obj *other) {
-    lucy_Doc *twin = (lucy_Doc*)other;
-    HV *my_fields;
-    HV *other_fields;
-    I32 num_fields;
-
-    if (twin == self)                    { return true;  }
+    if ((lucy_Doc*)other  == self)        { return true;  }
     if (!Cfish_Obj_Is_A(other, LUCY_DOC)) { return false; }
-    if (!self->doc_id == twin->doc_id)   { return false; }
-    if (!!self->fields ^ !!twin->fields) { return false; }
+    lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
+    lucy_DocIVARS *const ovars = lucy_Doc_IVARS((lucy_Doc*)other);
+
+    if (!ivars->doc_id == ovars->doc_id)   { return false; }
+    if (!!ivars->fields ^ !!ovars->fields) { return false; }
 
     // Verify fields.  Don't allow any deep data structures.
-    my_fields    = (HV*)self->fields;
-    other_fields = (HV*)twin->fields;
+    HV *my_fields    = (HV*)ivars->fields;
+    HV *other_fields = (HV*)ovars->fields;
     if (HvKEYS(my_fields) != HvKEYS(other_fields)) { return false; }
-    num_fields = hv_iterinit(my_fields);
+    I32 num_fields = hv_iterinit(my_fields);
     while (num_fields--) {
         HE *my_entry = hv_iternext(my_fields);
         SV *my_val_sv = HeVAL(my_entry);
@@ -236,7 +243,8 @@ lucy_Doc_equals(lucy_Doc *self, cfish_Obj *other) {
 
 void
 lucy_Doc_destroy(lucy_Doc *self) {
-    if (self->fields) { SvREFCNT_dec((SV*)self->fields); }
+    lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
+    if (ivars->fields) { SvREFCNT_dec((SV*)ivars->fields); }
     CFISH_SUPER_DESTROY(self, LUCY_DOC);
 }
 
