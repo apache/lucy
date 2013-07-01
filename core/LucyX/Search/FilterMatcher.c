@@ -28,37 +28,40 @@ FilterMatcher_new(BitVector *bits, int32_t doc_max) {
 FilterMatcher*
 FilterMatcher_init(FilterMatcher *self, BitVector *bits, int32_t doc_max) {
     Matcher_init((Matcher*)self);
+    FilterMatcherIVARS *const ivars = FilterMatcher_IVARS(self);
 
     // Init.
-    self->doc_id       = 0;
+    ivars->doc_id       = 0;
 
     // Assign.
-    self->bits         = (BitVector*)INCREF(bits);
-    self->doc_max      = doc_max;
+    ivars->bits         = (BitVector*)INCREF(bits);
+    ivars->doc_max      = doc_max;
 
     return self;
 }
 
 void
 FilterMatcher_destroy(FilterMatcher *self) {
-    DECREF(self->bits);
+    FilterMatcherIVARS *const ivars = FilterMatcher_IVARS(self);
+    DECREF(ivars->bits);
     SUPER_DESTROY(self, FILTERMATCHER);
 }
 
 int32_t
 FilterMatcher_next(FilterMatcher* self) {
+    FilterMatcherIVARS *const ivars = FilterMatcher_IVARS(self);
     do {
-        if (++self->doc_id > self->doc_max) {
-            self->doc_id--;
+        if (++ivars->doc_id > ivars->doc_max) {
+            ivars->doc_id--;
             return 0;
         }
-    } while (!BitVec_Get(self->bits, self->doc_id));
-    return self->doc_id;
+    } while (!BitVec_Get(ivars->bits, ivars->doc_id));
+    return ivars->doc_id;
 }
 
 int32_t
 FilterMatcher_skip_to(FilterMatcher* self, int32_t target) {
-    self->doc_id = target - 1;
+    FilterMatcher_IVARS(self)->doc_id = target - 1;
     return FilterMatcher_next(self);
 }
 
@@ -70,7 +73,7 @@ FilterMatcher_score(FilterMatcher* self) {
 
 int32_t
 FilterMatcher_get_doc_id(FilterMatcher* self) {
-    return self->doc_id;
+    return FilterMatcher_IVARS(self)->doc_id;
 }
 
 
