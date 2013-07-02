@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 54;
+use Test::More tests => 56;
 use Clownfish::CFC::Model::Class;
 use Clownfish::CFC::Parser;
 
@@ -250,3 +250,28 @@ $class_content = qq|
     }|;
 $class = $parser->parse($class_content);
 ok( $class->final, "final class_declaration" );
+
+Clownfish::CFC::Model::Class->_clear_registry();
+
+{
+    eval {
+        my $class = Clownfish::CFC::Model::Class->create(%foo_create_args);
+        my $inert = Clownfish::CFC::Model::Class->create(%inert_args);
+        $class->add_child($inert);
+    };
+    like( $@, qr/inert class/i, "inert class can't inherit" );
+
+    Clownfish::CFC::Model::Class->_clear_registry();
+}
+
+{
+    eval {
+        my $class = Clownfish::CFC::Model::Class->create(%foo_create_args);
+        my $inert = Clownfish::CFC::Model::Class->create(%inert_args);
+        $inert->add_child($class);
+    };
+    like( $@, qr/inert class/i, "can't inherit from inert class" );
+
+    Clownfish::CFC::Model::Class->_clear_registry();
+}
+

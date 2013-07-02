@@ -347,7 +347,17 @@ CFCClass_clear_registry(void) {
 void
 CFCClass_add_child(CFCClass *self, CFCClass *child) {
     CFCUTIL_NULL_CHECK(child);
-    if (self->tree_grown) { CFCUtil_die("Can't call add_child after grow_tree"); }
+    if (self->tree_grown) {
+        CFCUtil_die("Can't call add_child after grow_tree");
+    }
+    if (self->is_inert) {
+        CFCUtil_die("Can't inherit from inert class %s",
+                    CFCClass_get_class_name(self));
+    }
+    if (child->is_inert) {
+        CFCUtil_die("Inert class %s can't inherit",
+                    CFCClass_get_class_name(child));
+    }
     self->num_kids++;
     size_t size = (self->num_kids + 1) * sizeof(CFCClass*);
     self->children = (CFCClass**)REALLOCATE(self->children, size);
