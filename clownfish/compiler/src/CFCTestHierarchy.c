@@ -53,7 +53,7 @@ S_run_include_tests(CFCTest *test);
 
 const CFCTestBatch CFCTEST_BATCH_HIERARCHY = {
     "Clownfish::CFC::Model::Hierarchy",
-    36,
+    39,
     S_run_tests
 };
 
@@ -114,7 +114,8 @@ S_run_basic_tests(CFCTest *test) {
         OK(test, ordered_classes[0] != NULL, "ordered_classes[0]");
         OK(test, ordered_classes[1] != NULL, "ordered_classes[1]");
         OK(test, ordered_classes[2] != NULL, "ordered_classes[2]");
-        OK(test, ordered_classes[3] == NULL, "all classes");
+        OK(test, ordered_classes[3] != NULL, "ordered_classes[3]");
+        OK(test, ordered_classes[4] == NULL, "all classes");
         FREEMEM(ordered_classes);
     }
 
@@ -188,7 +189,7 @@ S_run_include_tests(CFCTest *test) {
             INT_EQ(test, CFCClass_included(klass), expect_included,
                    "included");
         }
-        INT_EQ(test, num_classes, 4, "class count");
+        INT_EQ(test, num_classes, 5, "class count");
         INT_EQ(test, num_source_classes, 1, "source class count");
         STR_EQ(test, CFCClass_get_class_name(CFCClass_get_parent(rottweiler)),
                "Animal::Dog", "parent of included class");
@@ -217,7 +218,7 @@ S_run_include_tests(CFCTest *test) {
             }
             OK(test, !CFCClass_included(klass), "not included");
         }
-        INT_EQ(test, num_classes, 4, "class count");
+        INT_EQ(test, num_classes, 5, "class count");
         OK(test, rottweiler != NULL, "found rottweiler");
         STR_EQ(test, CFCClass_get_class_name(CFCClass_get_parent(rottweiler)),
                "Animal::Dog", "parent of class from second source");

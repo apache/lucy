@@ -231,8 +231,8 @@ outside of the parcel and must not contain public variables or functions.
 
 Inert classes must contain only inert variables or inert methods, that is,
 neither instance variables nor methods. They must not inherit from another
-class or be inherited from. All other classes (except Clownfish::Obj) must
-inherit from Clownfish::Obj or another class.
+class or be inherited from. Non-inert classes inherit from Clownfish::Obj by
+default.
 
 =head3 Final classes
 

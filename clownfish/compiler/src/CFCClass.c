@@ -134,6 +134,12 @@ CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
     parcel    = parcel    ? parcel    : CFCParcel_default_parcel();
     CFCSymbol_init((CFCSymbol*)self, parcel, exposure, class_name, cnick,
                    micro_sym);
+    if (!is_inert
+        && !parent_class_name
+        && strcmp(class_name, "Clownfish::Obj") != 0
+       ) {
+        parent_class_name = "Clownfish::Obj";
+    }
     self->parent     = NULL;
     self->tree_grown = false;
     self->autocode   = (char*)CALLOCATE(1, sizeof(char));

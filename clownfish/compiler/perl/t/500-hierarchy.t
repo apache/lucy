@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 20;
+use Test::More tests => 21;
 
 use Clownfish::CFC::Model::Hierarchy;
 use Clownfish::CFC::Util qw( a_isa_b );
@@ -59,9 +59,10 @@ my %files;
 for my $file (@files) {
     die "not a File" unless isa_ok( $file, "Clownfish::CFC::Model::File" );
     ok( !$file->get_modified, "start off not modified" );
-    my ($class)
-        = grep { a_isa_b( $_, "Clownfish::CFC::Model::Class" ) }
-        @{ $file->blocks };
+    my ($class) = grep {
+        a_isa_b( $_, "Clownfish::CFC::Model::Class" )
+        && $_->get_class_name ne 'Clownfish::Obj'
+    } @{ $file->blocks };
     die "no class" unless $class;
     $files{ $class->get_class_name } = $file;
 }
@@ -70,7 +71,7 @@ my $dog    = $files{'Animal::Dog'}  or die "No Dog";
 my $util   = $files{'Animal::Util'} or die "No Util";
 
 my $classes = $hierarchy->ordered_classes;
-is( scalar @$classes, 3, "all classes" );
+is( scalar @$classes, 4, "all classes" );
 for my $class (@$classes) {
     die "not a Class" unless isa_ok( $class, "Clownfish::CFC::Model::Class" );
 }

@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 56;
+use Test::More tests => 57;
 use Clownfish::CFC::Model::Class;
 use Clownfish::CFC::Parser;
 
@@ -166,6 +166,9 @@ ok( $parser->parse("$_ class Iam$_ { }")->$_, "class_modifier: $_" )
 is( $parser->parse("class Fu::$_ inherits $_ { }")->get_parent_class_name,
     $_, "class_inheritance: $_" )
     for ( 'Fooble', 'Foo::FooJr::FooIII' );
+
+is( $parser->parse("class MissingInherits { }")->get_parent_class_name,
+    "Clownfish::Obj", "class inherits from Clownfish::Obj by default" );
 
 my $class_content
     = 'public class Foo::Foodie cnick Foodie inherits Foo { int num; }';

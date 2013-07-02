@@ -67,7 +67,7 @@ my $file_clash_dir  = catdir(qw( t cfclash file ));
     $hierarchy->build;
 
     my $classes = $hierarchy->ordered_classes;
-    is( scalar @$classes, 3, "source/include filename clash" );
+    is( scalar @$classes, 4, "source/include filename clash" );
 
     Clownfish::CFC::Model::Class->_clear_registry();
     Clownfish::CFC::Model::Parcel->reap_singletons();
@@ -83,6 +83,7 @@ my $bar_dir = catdir(qw( t cfclash bar ));
 
     $hierarchy->add_source_dir($foo_dir);
     $hierarchy->add_include_dir($bar_dir);
+    $hierarchy->add_include_dir($base_dir);
 
     eval { $hierarchy->build; };
 
@@ -98,6 +99,7 @@ my $bar_dir = catdir(qw( t cfclash bar ));
 
     $hierarchy->add_source_dir($bar_dir);
     $hierarchy->add_include_dir($foo_dir);
+    $hierarchy->add_include_dir($base_dir);
 
     eval { $hierarchy->build; };
 

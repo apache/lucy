@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::More tests => 24;
 
 use Clownfish::CFC::Model::Hierarchy;
 use File::Spec::Functions qw( catdir catfile splitpath );
@@ -41,7 +41,7 @@ my $dest_dir = catdir(qw( t cfdest ));
     $hierarchy->build;
 
     my $classes = $hierarchy->ordered_classes;
-    is( scalar @$classes, 4, "all classes" );
+    is( scalar @$classes, 5, "all classes" );
     my $num_included = 0;
     for my $class (@$classes) {
         die "not a Class"
@@ -63,7 +63,7 @@ my $dest_dir = catdir(qw( t cfdest ));
 
         is( $included, $expect, "included" );
     }
-    is( $num_included, 3, "included class count" );
+    is( $num_included, 4, "included class count" );
 
     Clownfish::CFC::Model::Class->_clear_registry();
     Clownfish::CFC::Model::Parcel->reap_singletons();
@@ -83,7 +83,7 @@ my $dest_dir = catdir(qw( t cfdest ));
     $hierarchy->build;
 
     my $classes = $hierarchy->ordered_classes;
-    is( scalar @$classes, 4, "all classes" );
+    is( scalar @$classes, 5, "all classes" );
     for my $class (@$classes) {
         die "not a Class" unless isa_ok( $class, "Clownfish::CFC::Model::Class" );
 

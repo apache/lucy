@@ -16,4 +16,6 @@
 
 parcel Animal;
 
+class Clownfish::Obj { }
+
 abstract class Animal { }
