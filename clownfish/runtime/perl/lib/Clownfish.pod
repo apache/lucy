@@ -174,6 +174,12 @@ For object types in Clownfish header files, prefixes of class structs can
 also be omitted unless multiple parcels declare classes with the same last
 component of the class name.
 
+=head3 The "Clownfish" parcel
+
+The Clownfish runtime classes live in a parcel named C<Clownfish> with
+nickname C<Cfish>. Consequently, the short name macro is named
+C<CFISH_USE_SHORT_NAMES>.
+
 =head2 Declaring classes
 
 Classes are declared in Clownfish header files using a declaration of the
@@ -359,7 +365,9 @@ names. So the implementation will look like:
 
 =head3 Inline functions
 
-TODO
+Inert functions can be inline. They should be defined as static inline
+functions in a C block in the Clownfish header file. The macro C<CFISH_INLINE>
+expands to the C compiler's inline keyword and should be used for portability.
 
 =head3 Methods
 
@@ -426,10 +434,16 @@ a pointer to the Clownfish::VTable object of the method's class, the second is
 the unshortened name of the method wrapper. If short names for the Clownfish
 parcel are used, the macro is also available under the name C<METHOD_PTR>.
 
+To lookup methods from a superclass, there's a macro C<CFISH_SUPER_METHOD_PTR>
+with the same parameters.
+
 Example using short names:
 
     VisGraph_Add_Node_t add_node
         = METHOD_PTR(PFIND_VISIBILITYGRAPH, Pfind_VisGraph_Add_Node);
+
+    VisGraph_Add_Node_t super_add_node
+        = SUPER_METHOD_PTR(PFIND_VISIBILITYGRAPH, Pfind_VisGraph_Add_Node);
 
 =head3 Abstract methods
 
@@ -470,7 +484,10 @@ reference count after the call.
 
 =head3 Default parameter values
 
-TODO
+Default parameter values can be given as integer, float, or string literals.
+The values C<true>, C<false>, and C<NULL> are also supported. The default
+values are only used by the host language bindings. They're not supported
+when calling a function from C.
 
 =head2 C blocks
 
@@ -489,23 +506,107 @@ Example:
 
     __END_C__
 
-=head2 Memory management
+=head2 Object life cycle
 
-TODO: Reference counting
+=head3 Object creation
 
-TODO: INCREF/DECREF macros
+Objects are allocated by invoking the C<Make_Obj> method on a class's
+Clownfish::VTable object.
 
-TODO: Destroy method
+Any inert function can be used to construct objects from C. But to support
+inheritance and object creation from the host language, Clownfish classes
+need a separate function to initialize objects. The initializer must take a
+pointer to an object as first argument and return a pointer to the same
+object. If the parent class has an initializer, it should be called first by
+the subclass's initializer.
 
-=head2 Constructors
+By convention, the standard constructor is named C<new>. If a class has an
+inert function named C<init>, it is used as initializer to create a host
+language constructor by default.
 
-TODO
+Example:
 
-=head2 Inheritance
+    /* Clownfish header */
 
-TODO: init functions
+    class Vehicle {
+        double max_speed;
 
-TODO: SUPER_METHOD_PTR, SUPER_DESTROY
+        inert Vehicle*
+        init(Vehicle *self, double max_speed);
+    }
+
+    class Train inherits Vehicle {
+        double track_gauge;
+
+        inert incremented Train*
+        new(double max_speed, double track_gauge);
+
+        inert Train*
+        init(Train *self, double max_speed, double track_gauge);
+    }
+
+    /* Implementation */
+
+    Train*
+    Train_new(double max_speed, double track_gauge) {
+        Train *self = (Train*)VTable_Make_Obj(TRAIN);
+        return Train_init(self, max_speed, track_gauge);
+    }
+
+    Train*
+    Train_init(Train *self, double max_speed, double track_gauge) {
+        Vehicle_init((Vehicle*)self, max_speed);
+        self->track_gauge = track_gauge;
+        return self;
+    }
+
+=head3 Reference counting
+
+Clownfish uses reference counting for memory management. Objects are created
+with a reference count of 1. There are two macros C<CFISH_INCREF> and
+C<CFISH_DECREF> to increment and decrement reference counts. If short names
+for the Clownfish parcel are enabled, the macros can be abbreviated to
+C<INCREF> and C<DECREF>. Both macros take a pointer to an object as argument.
+NULL pointers are allowed. C<CFISH_INCREF> returns a pointer to the object.
+This value might differ from the passed-in pointer in some cases. So if a
+reference is retained, the pointer returned from C<CFISH_INCREF> should be
+used. C<CFISH_DECREF> returns the modified reference count.
+
+Examples:
+
+    self->value = INCREF(arg);
+
+    DECREF(object);
+
+=head3 Object destruction
+
+If an object's reference count reaches 0, its C<Destroy> method is called.
+This public method takes no arguments besides C<self> and has no return value.
+It should release the resources held by the object and finally call the
+C<Destroy> method of the superclass via the C<CFISH_SUPER_DESTROY> macro with
+short name C<SUPER_DESTROY>. This macro takes the C<self> pointer as first
+argument and a pointer to the object's Clownfish::VTable as second argument.
+The C<Destroy> method of the Clownfish::Obj class will eventually free the
+object struct.
+
+Example:
+
+    /* Clownfish header */
+
+    class Path {
+        VArray *nodes;
+
+        public void
+        Destroy(Path *self);
+    }
+
+    /* Implementation */
+
+    void
+    Path_destroy(Path *self) {
+        DECREF(self->nodes);
+        SUPER_DESTROY(self, PATH);
+    }
 
 =head1 COPYRIGHT
 
