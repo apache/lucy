@@ -164,6 +164,8 @@ S_add_dump_method(CFCClass *klass) {
     const char *full_func_sym = CFCMethod_implementing_func_sym(method);
     const char *full_struct   = CFCClass_full_struct_sym(klass);
     const char *vtable_var    = CFCClass_full_vtable_var(klass);
+    const char *prefix        = CFCClass_get_prefix(klass);
+    const char *class_cnick   = CFCClass_get_cnick(klass);
     CFCClass   *parent        = CFCClass_get_parent(klass);
     char buf[BUF_SIZE];
 
@@ -175,10 +177,12 @@ S_add_dump_method(CFCClass *klass) {
             "cfish_Obj*\n"
             "%s(%s *self)\n"
             "{\n"
+            "    %sIVARS *ivars = %s%s_IVARS(self);\n"
             "    %s super_dump = CFISH_SUPER_METHOD_PTR(%s, %s);\n"
             "    cfish_Hash *dump = (cfish_Hash*)super_dump(self);\n";
         char *autocode
             = CFCUtil_sprintf(pattern, full_func_sym, full_struct,
+                              full_struct, prefix, class_cnick,
                               full_typedef, vtable_var, full_meth);
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(full_meth);
@@ -196,10 +200,13 @@ S_add_dump_method(CFCClass *klass) {
             "cfish_Obj*\n"
             "%s(%s *self)\n"
             "{\n"
+            "    %sIVARS *ivars = %s%s_IVARS(self);\n"
             "    cfish_Hash *dump = cfish_Hash_new(0);\n"
             "    Cfish_Hash_Store_Str(dump, \"_class\", 6,\n"
             "        (cfish_Obj*)Cfish_CB_Clone(Cfish_Obj_Get_Class_Name((cfish_Obj*)self)));\n";
-        char *autocode = CFCUtil_sprintf(pattern, full_func_sym, full_struct);
+        char *autocode
+            = CFCUtil_sprintf(pattern, full_func_sym, full_struct,
+                              full_struct, prefix, class_cnick);
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
         CFCVariable **members = CFCClass_member_vars(klass);
@@ -220,6 +227,8 @@ S_add_load_method(CFCClass *klass) {
     const char *full_struct   = CFCClass_full_struct_sym(klass);
     const char *vtable_var    = CFCClass_full_vtable_var(klass);
     CFCClass   *parent        = CFCClass_get_parent(klass);
+    const char *prefix        = CFCClass_get_prefix(klass);
+    const char *class_cnick   = CFCClass_get_cnick(klass);
     char buf[BUF_SIZE];
 
     if (parent && CFCClass_has_attribute(parent, "dumpable")) {
@@ -232,11 +241,12 @@ S_add_load_method(CFCClass *klass) {
             "{\n"
             "    cfish_Hash *source = (cfish_Hash*)CFISH_CERTIFY(dump, CFISH_HASH);\n"
             "    %s super_load = CFISH_SUPER_METHOD_PTR(%s, %s);\n"
-            "    %s *loaded = (%s*)super_load(self, dump);\n";
+            "    %s *loaded = (%s*)super_load(self, dump);\n"
+            "    %sIVARS *ivars = %s%s_IVARS(loaded);\n";
         char *autocode
             = CFCUtil_sprintf(pattern, full_func_sym, full_struct,
                               full_typedef, vtable_var, full_meth, full_struct,
-                              full_struct);
+                              full_struct, full_struct, prefix, class_cnick);
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(full_meth);
         FREEMEM(full_typedef);
@@ -258,10 +268,12 @@ S_add_load_method(CFCClass *klass) {
             "        Cfish_Hash_Fetch_Str(source, \"_class\", 6), CFISH_CHARBUF);\n"
             "    cfish_VTable *vtable = cfish_VTable_singleton(class_name, NULL);\n"
             "    %s *loaded = (%s*)Cfish_VTable_Make_Obj(vtable);\n"
+            "    %sIVARS *ivars = %s%s_IVARS(loaded);\n"
             "    CHY_UNUSED_VAR(self);\n";
         char *autocode
             = CFCUtil_sprintf(pattern, full_func_sym, full_struct, full_struct,
-                              full_struct);
+                              full_struct,
+                              full_struct, prefix, class_cnick);
         CFCClass_append_autocode(klass, autocode);
         FREEMEM(autocode);
         CFCVariable **members = CFCClass_member_vars(klass);
@@ -289,11 +301,11 @@ S_process_dump_member(CFCClass *klass, CFCVariable *member, char *buf,
 
     if (CFCType_is_integer(type) || CFCType_is_floating(type)) {
         char int_pattern[] =
-            "    Cfish_Hash_Store_Str(dump, \"%s\", %u, (cfish_Obj*)cfish_CB_newf(\"%%i64\", (int64_t)self->%s));\n";
+            "    Cfish_Hash_Store_Str(dump, \"%s\", %u, (cfish_Obj*)cfish_CB_newf(\"%%i64\", (int64_t)ivars->%s));\n";
         char float_pattern[] =
-            "    Cfish_Hash_Store_Str(dump, \"%s\", %u, (cfish_Obj*)cfish_CB_newf(\"%%f64\", (double)self->%s));\n";
+            "    Cfish_Hash_Store_Str(dump, \"%s\", %u, (cfish_Obj*)cfish_CB_newf(\"%%f64\", (double)ivars->%s));\n";
         char bool_pattern[] =
-            "    Cfish_Hash_Store_Str(dump, \"%s\", %u, (cfish_Obj*)cfish_Bool_singleton(self->%s));\n";
+            "    Cfish_Hash_Store_Str(dump, \"%s\", %u, (cfish_Obj*)cfish_Bool_singleton(ivars->%s));\n";
         const char *pattern;
         if (strcmp(specifier, "bool") == 0) {
             pattern = bool_pattern;
@@ -313,8 +325,8 @@ S_process_dump_member(CFCClass *klass, CFCVariable *member, char *buf,
     }
     else if (CFCType_is_object(type)) {
         char pattern[] =
-            "    if (self->%s) {\n"
-            "        Cfish_Hash_Store_Str(dump, \"%s\", %u, Cfish_Obj_Dump((cfish_Obj*)self->%s));\n"
+            "    if (ivars->%s) {\n"
+            "        Cfish_Hash_Store_Str(dump, \"%s\", %u, Cfish_Obj_Dump((cfish_Obj*)ivars->%s));\n"
             "    }\n";
 
         size_t needed = strlen(pattern) + name_len * 3 + 20;
@@ -375,7 +387,7 @@ S_process_load_member(CFCClass *klass, CFCVariable *member, char *buf,
     const char *pattern =
         "    {\n"
         "        cfish_Obj *var = Cfish_Hash_Fetch_Str(source, \"%s\", %u);\n"
-        "        if (var) { loaded->%s = %s; }\n"
+        "        if (var) { ivars->%s = %s; }\n"
         "    }\n";
     size_t needed = sizeof(pattern)
                     + (name_len * 2)
