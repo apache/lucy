@@ -16,7 +16,6 @@
 
 #define C_LUCY_HIGHLIGHTWRITER
 #define C_LUCY_DEFAULTHIGHLIGHTWRITER
-#define C_LUCY_TOKEN
 #include "Lucy/Util/ToolSet.h"
 
 #include <stdio.h>
@@ -155,16 +154,18 @@ HLWriter_tv_buf(HighlightWriter *self, Inversion *inversion) {
     Inversion_Reset(inversion);
     while ((tokens = Inversion_Next_Cluster(inversion, &freq)) != NULL) {
         Token *token = *tokens;
-        TokenIVARS *token_ivars = Token_IVARS(token);
-        int32_t overlap = StrHelp_overlap(last_text, token_ivars->text,
-                                          last_len, token_ivars->len);
+        char *const   token_text = Token_Get_Text(token);
+        const int32_t token_len  = Token_Get_Len(token);
+
+        int32_t overlap = StrHelp_overlap(last_text, token_text,
+                                          last_len, token_len);
         char *ptr;
         char *orig;
         size_t old_size = BB_Get_Size(tv_buf);
         size_t new_size = old_size
                           + C32_MAX_BYTES      // overlap
                           + C32_MAX_BYTES      // length of string diff
-                          + (token_ivars->len - overlap) // diff char data
+                          + (token_len - overlap)        // diff char data
                           + C32_MAX_BYTES                // num prox
                           + (C32_MAX_BYTES * freq * 3);  // pos data
 
@@ -178,25 +179,22 @@ HLWriter_tv_buf(HighlightWriter *self, Inversion *inversion) {
 
         // Append the string diff to the tv_buf.
         NumUtil_encode_c32(overlap, &ptr);
-        NumUtil_encode_c32((token_ivars->len - overlap), &ptr);
-        memcpy(ptr, (token_ivars->text + overlap),
-               (token_ivars->len - overlap));
-        ptr += token_ivars->len - overlap;
+        NumUtil_encode_c32((token_len - overlap), &ptr);
+        memcpy(ptr, (token_text + overlap), (token_len - overlap));
+        ptr += token_len - overlap;
 
         // Save text and text_len for comparison next loop.
-        last_text = token_ivars->text;
-        last_len  = token_ivars->len;
+        last_text = token_text;
+        last_len  = token_len;
 
         // Append the number of positions for this term.
         NumUtil_encode_c32(freq, &ptr);
 
         do {
-            token_ivars = Token_IVARS(token);
             // Add position, start_offset, and end_offset to tv_buf.
-            NumUtil_encode_c32(token_ivars->pos, &ptr);
-            NumUtil_encode_c32(token_ivars->start_offset, &ptr);
-            NumUtil_encode_c32(token_ivars->end_offset, &ptr);
-
+            NumUtil_encode_c32(Token_Get_Pos(token), &ptr);
+            NumUtil_encode_c32(Token_Get_Start_Offset(token), &ptr);
+            NumUtil_encode_c32(Token_Get_End_Offset(token), &ptr);
         } while (--freq && (token = *++tokens));
 
         // Set new byte length.
