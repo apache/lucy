@@ -32,7 +32,8 @@ MockFileHandle*
 MockFileHandle_init(MockFileHandle *self, const CharBuf *path,
                     int64_t length) {
     FH_do_open((FileHandle*)self, path, 0);
-    self->len = length;
+    MockFileHandleIVARS *const ivars = MockFileHandle_IVARS(self);
+    ivars->len = length;
     return self;
 }
 
@@ -53,7 +54,7 @@ MockFileHandle_release_window(MockFileHandle *self, FileWindow *window) {
 
 int64_t
 MockFileHandle_length(MockFileHandle *self) {
-    return self->len;
+    return MockFileHandle_IVARS(self)->len;
 }
 
 bool

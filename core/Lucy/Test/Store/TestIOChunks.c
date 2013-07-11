@@ -86,24 +86,25 @@ test_Buf(TestBatchRunner *runner) {
     OutStream_Close(outstream);
 
     instream = InStream_open((Obj*)file);
+    InStreamIVARS *const ivars = InStream_IVARS(instream);
     buf = InStream_Buf(instream, 5);
-    TEST_INT_EQ(runner, instream->limit - buf, IO_STREAM_BUF_SIZE,
+    TEST_INT_EQ(runner, ivars->limit - buf, IO_STREAM_BUF_SIZE,
                 "Small request bumped up");
 
     buf += IO_STREAM_BUF_SIZE - 10; // 10 bytes left in buffer.
     InStream_Advance_Buf(instream, buf);
 
     buf = InStream_Buf(instream, 10);
-    TEST_INT_EQ(runner, instream->limit - buf, 10,
+    TEST_INT_EQ(runner, ivars->limit - buf, 10,
                 "Exact request doesn't trigger refill");
 
     buf = InStream_Buf(instream, 11);
-    TEST_INT_EQ(runner, instream->limit - buf, IO_STREAM_BUF_SIZE,
+    TEST_INT_EQ(runner, ivars->limit - buf, IO_STREAM_BUF_SIZE,
                 "Requesting over limit triggers refill");
 
     int64_t  expected = InStream_Length(instream) - InStream_Tell(instream);
     char    *buff     = InStream_Buf(instream, 100000);
-    int64_t  got      = PTR_TO_I64(instream->limit) - PTR_TO_I64(buff);
+    int64_t  got      = PTR_TO_I64(ivars->limit) - PTR_TO_I64(buff);
     TEST_TRUE(runner, got == expected,
               "Requests greater than file size get pared down");
 

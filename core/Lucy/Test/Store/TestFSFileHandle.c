@@ -180,14 +180,14 @@ test_Close(TestBatchRunner *runner) {
     SKIP(runner, "LUCY-155");
     SKIP(runner, "LUCY-155");
 #else
-    int saved_fd = fh->fd;
-    fh->fd = -1;
+    int saved_fd = FSFH_IVARS(fh)->fd;
+    FSFH_IVARS(fh)->fd = -1;
     Err_set_error(NULL);
     bool result = FSFH_Close(fh);
     TEST_FALSE(runner, result, "Failed Close() returns false");
     TEST_TRUE(runner, Err_get_error() != NULL,
               "Failed Close() sets Err_error");
-    fh->fd = saved_fd;
+    FSFH_IVARS(fh)->fd = saved_fd;
 #endif /* _MSC_VER */
     DECREF(fh);
 
@@ -203,6 +203,7 @@ test_Window(TestBatchRunner *runner) {
     CharBuf *test_filename = (CharBuf*)ZCB_WRAP_STR("_fstest", 7);
     FSFileHandle *fh;
     FileWindow *window = FileWindow_new();
+    FileWindowIVARS *const window_ivars = FileWindow_IVARS(window);
     uint32_t i;
 
     remove((char*)CB_Get_Ptr8(test_filename));
@@ -233,14 +234,14 @@ test_Window(TestBatchRunner *runner) {
     TEST_TRUE(runner, FSFH_Window(fh, window, 1021, 2),
               "Window() returns true");
     TEST_TRUE(runner,
-              strncmp(window->buf - window->offset + 1021, "oo", 2) == 0,
+              strncmp(window_ivars->buf - window_ivars->offset + 1021, "oo", 2) == 0,
               "Window()");
 
     TEST_TRUE(runner, FSFH_Release_Window(fh, window),
               "Release_Window() returns true");
-    TEST_TRUE(runner, window->buf == NULL, "Release_Window() resets buf");
-    TEST_TRUE(runner, window->offset == 0, "Release_Window() resets offset");
-    TEST_TRUE(runner, window->len == 0, "Release_Window() resets len");
+    TEST_TRUE(runner, window_ivars->buf == NULL, "Release_Window() resets buf");
+    TEST_TRUE(runner, window_ivars->offset == 0, "Release_Window() resets offset");
+    TEST_TRUE(runner, window_ivars->len == 0, "Release_Window() resets len");
 
     DECREF(window);
     DECREF(fh);

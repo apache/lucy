@@ -35,6 +35,8 @@ TestMemPool_run(TestMemoryPool *self, TestBatchRunner *runner) {
 
     MemoryPool *mem_pool = MemPool_new(0);
     MemoryPool *other    = MemPool_new(0);
+    MemoryPoolIVARS *const ivars = MemPool_IVARS(mem_pool);
+    MemoryPoolIVARS *const ovars = MemPool_IVARS(other);
     char *ptr_a, *ptr_b;
 
     ptr_a = (char*)MemPool_Grab(mem_pool, 10);
@@ -44,15 +46,15 @@ TestMemPool_run(TestMemoryPool *self, TestBatchRunner *runner) {
     ptr_b = (char*)MemPool_Grab(mem_pool, 10);
     TEST_STR_EQ(runner, ptr_b, "foo", "Recycle RAM on Release_All");
 
-    ptr_a = mem_pool->buf;
+    ptr_a = ivars->buf;
     MemPool_Resize(mem_pool, ptr_b, 6);
-    TEST_TRUE(runner, mem_pool->buf < ptr_a, "Resize");
+    TEST_TRUE(runner, ivars->buf < ptr_a, "Resize");
 
     ptr_a = (char*)MemPool_Grab(other, 20);
     MemPool_Release_All(other);
     MemPool_Eat(other, mem_pool);
-    TEST_TRUE(runner, other->buf == mem_pool->buf, "Eat");
-    TEST_TRUE(runner, other->buf != NULL, "Eat");
+    TEST_TRUE(runner, ovars->buf == ivars->buf, "Eat");
+    TEST_TRUE(runner, ovars->buf != NULL, "Eat");
 
     DECREF(mem_pool);
     DECREF(other);

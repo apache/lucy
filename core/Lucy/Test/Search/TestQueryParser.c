@@ -40,39 +40,41 @@ TestQP_new(const char *query_string, Query *tree, Query *expanded,
 TestQueryParser*
 TestQP_init(TestQueryParser *self, const char *query_string, Query *tree,
             Query *expanded, uint32_t num_hits) {
-    self->query_string = query_string ? TestUtils_get_cb(query_string) : NULL;
-    self->tree         = tree     ? tree     : NULL;
-    self->expanded     = expanded ? expanded : NULL;
-    self->num_hits     = num_hits;
+    TestQueryParserIVARS *const ivars = TestQP_IVARS(self);
+    ivars->query_string = query_string ? TestUtils_get_cb(query_string) : NULL;
+    ivars->tree         = tree     ? tree     : NULL;
+    ivars->expanded     = expanded ? expanded : NULL;
+    ivars->num_hits     = num_hits;
     return self;
 }
 
 void
 TestQP_destroy(TestQueryParser *self) {
-    DECREF(self->query_string);
-    DECREF(self->tree);
-    DECREF(self->expanded);
+    TestQueryParserIVARS *const ivars = TestQP_IVARS(self);
+    DECREF(ivars->query_string);
+    DECREF(ivars->tree);
+    DECREF(ivars->expanded);
     SUPER_DESTROY(self, TESTQUERYPARSER);
 }
 
 CharBuf*
 TestQP_get_query_string(TestQueryParser *self) {
-    return self->query_string;
+    return TestQP_IVARS(self)->query_string;
 }
 
 Query*
 TestQP_get_tree(TestQueryParser *self) {
-    return self->tree;
+    return TestQP_IVARS(self)->tree;
 }
 
 Query*
 TestQP_get_expanded(TestQueryParser *self) {
-    return self->expanded;
+    return TestQP_IVARS(self)->expanded;
 }
 
 uint32_t
 TestQP_get_num_hits(TestQueryParser *self) {
-    return self->num_hits;
+    return TestQP_IVARS(self)->num_hits;
 }
 
 

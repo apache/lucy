@@ -398,17 +398,18 @@ test_query_parser_syntax(TestBatchRunner *runner) {
     for (uint32_t i = 0; leaf_test_funcs[i] != NULL; i++) {
         Lucy_TestQPSyntax_Test_t test_func = leaf_test_funcs[i];
         TestQueryParser *test_case = test_func();
-        Query *tree     = QParser_Tree(qparser, test_case->query_string);
-        Query *expanded = QParser_Expand_Leaf(qparser, test_case->tree);
-        Query *parsed   = QParser_Parse(qparser, test_case->query_string);
+        TestQueryParserIVARS *ivars = TestQP_IVARS(test_case);
+        Query *tree     = QParser_Tree(qparser, ivars->query_string);
+        Query *expanded = QParser_Expand_Leaf(qparser, ivars->tree);
+        Query *parsed   = QParser_Parse(qparser, ivars->query_string);
         Hits  *hits     = IxSearcher_Hits(searcher, (Obj*)parsed, 0, 10, NULL);
 
-        TEST_TRUE(runner, Query_Equals(tree, (Obj*)test_case->tree),
-                  "tree()    %s", (char*)CB_Get_Ptr8(test_case->query_string));
-        TEST_TRUE(runner, Query_Equals(expanded, (Obj*)test_case->expanded),
-                  "expand_leaf()    %s", (char*)CB_Get_Ptr8(test_case->query_string));
-        TEST_INT_EQ(runner, Hits_Total_Hits(hits), test_case->num_hits,
-                    "hits:    %s", (char*)CB_Get_Ptr8(test_case->query_string));
+        TEST_TRUE(runner, Query_Equals(tree, (Obj*)ivars->tree),
+                  "tree()    %s", (char*)CB_Get_Ptr8(ivars->query_string));
+        TEST_TRUE(runner, Query_Equals(expanded, (Obj*)ivars->expanded),
+                  "expand_leaf()    %s", (char*)CB_Get_Ptr8(ivars->query_string));
+        TEST_INT_EQ(runner, Hits_Total_Hits(hits), ivars->num_hits,
+                    "hits:    %s", (char*)CB_Get_Ptr8(ivars->query_string));
         DECREF(hits);
         DECREF(parsed);
         DECREF(expanded);
@@ -419,14 +420,15 @@ test_query_parser_syntax(TestBatchRunner *runner) {
     for (uint32_t i = 0; syntax_test_funcs[i] != NULL; i++) {
         Lucy_TestQPSyntax_Test_t test_func = syntax_test_funcs[i];
         TestQueryParser *test_case = test_func();
-        Query *tree   = QParser_Tree(qparser, test_case->query_string);
-        Query *parsed = QParser_Parse(qparser, test_case->query_string);
+        TestQueryParserIVARS *ivars = TestQP_IVARS(test_case);
+        Query *tree   = QParser_Tree(qparser, ivars->query_string);
+        Query *parsed = QParser_Parse(qparser, ivars->query_string);
         Hits  *hits   = IxSearcher_Hits(searcher, (Obj*)parsed, 0, 10, NULL);
 
-        TEST_TRUE(runner, Query_Equals(tree, (Obj*)test_case->tree),
-                  "tree()    %s", (char*)CB_Get_Ptr8(test_case->query_string));
-        TEST_INT_EQ(runner, Hits_Total_Hits(hits), test_case->num_hits,
-                    "hits:    %s", (char*)CB_Get_Ptr8(test_case->query_string));
+        TEST_TRUE(runner, Query_Equals(tree, (Obj*)ivars->tree),
+                  "tree()    %s", (char*)CB_Get_Ptr8(ivars->query_string));
+        TEST_INT_EQ(runner, Hits_Total_Hits(hits), ivars->num_hits,
+                    "hits:    %s", (char*)CB_Get_Ptr8(ivars->query_string));
         DECREF(hits);
         DECREF(parsed);
         DECREF(tree);

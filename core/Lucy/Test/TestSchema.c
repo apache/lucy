@@ -73,8 +73,8 @@ test_Equals(TestBatchRunner *runner) {
     TEST_FALSE(runner, TestSchema_Equals(schema, (Obj*)spec_differs),
                "Equals spoiled by differing FieldType");
 
-    DECREF(arch_differs->arch);
-    arch_differs->arch = Arch_new();
+    DECREF(TestSchema_IVARS(arch_differs)->arch);
+    TestSchema_IVARS(arch_differs)->arch = Arch_new();
     TEST_FALSE(runner, TestSchema_Equals(schema, (Obj*)arch_differs),
                "Equals spoiled by differing Architecture");
 

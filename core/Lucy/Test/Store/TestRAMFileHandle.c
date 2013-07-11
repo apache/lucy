@@ -126,6 +126,7 @@ test_Window(TestBatchRunner *runner) {
     RAMFile *file = RAMFile_new(NULL, false);
     RAMFileHandle *fh = RAMFH_open(NULL, FH_WRITE_ONLY, file);
     FileWindow *window = FileWindow_new();
+    FileWindowIVARS *const window_ivars = FileWindow_IVARS(window);
 
     for (uint32_t i = 0; i < 1024; i++) {
         RAMFH_Write(fh, "foo ", 4);
@@ -150,13 +151,13 @@ test_Window(TestBatchRunner *runner) {
 
     TEST_TRUE(runner, RAMFH_Window(fh, window, 1021, 2),
               "Window() returns true");
-    TEST_TRUE(runner, strncmp(window->buf, "oo", 2) == 0, "Window()");
+    TEST_TRUE(runner, strncmp(window_ivars->buf, "oo", 2) == 0, "Window()");
 
     TEST_TRUE(runner, RAMFH_Release_Window(fh, window),
               "Release_Window() returns true");
-    TEST_TRUE(runner, window->buf == NULL, "Release_Window() resets buf");
-    TEST_TRUE(runner, window->offset == 0, "Release_Window() resets offset");
-    TEST_TRUE(runner, window->len == 0, "Release_Window() resets len");
+    TEST_TRUE(runner, window_ivars->buf == NULL, "Release_Window() resets buf");
+    TEST_TRUE(runner, window_ivars->offset == 0, "Release_Window() resets offset");
+    TEST_TRUE(runner, window_ivars->len == 0, "Release_Window() resets len");
 
     DECREF(window);
     DECREF(fh);
