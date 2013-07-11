@@ -157,6 +157,7 @@ S_ivars_hack(CFCBindClass *self) {
     const char *full_ivars  = CFCClass_full_ivars_name(self->client);
     const char *short_ivars = CFCClass_short_ivars_name(self->client);
     const char *prefix      = CFCClass_get_prefix(self->client);
+    const char *PREFIX      = CFCClass_get_PREFIX(self->client);
     const char *class_cnick = CFCClass_get_cnick(self->client);
     char pattern[] =
         "typedef struct %s %s;\n"
@@ -169,8 +170,8 @@ S_ivars_hack(CFCBindClass *self) {
         "  #define %s_IVARS %s%s_IVARS\n"
         "#endif\n";
     char *content
-        = CFCUtil_sprintf(pattern, full_struct, full_ivars, full_ivars, prefix,
-                          class_cnick, full_struct, full_ivars, prefix,
+        = CFCUtil_sprintf(pattern, full_ivars, full_ivars, full_ivars, prefix,
+                          class_cnick, full_struct, full_ivars, PREFIX,
                           short_ivars, full_ivars, class_cnick, prefix,
                           class_cnick);
     return content;
@@ -360,7 +361,15 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
 // Create the definition for the instantiable object struct.
 static char*
 S_struct_definition(CFCBindClass *self) {
-    const char *struct_sym = CFCClass_full_struct_sym(self->client);
+    const char *struct_sym;
+    const char *prefix = CFCClass_get_prefix(self->client);
+    if (strcmp(prefix, "cfish_") == 0) {
+        struct_sym = CFCClass_full_struct_sym(self->client);
+    }
+    else {
+        struct_sym = CFCClass_full_ivars_name(self->client);
+    }
+
     CFCVariable **member_vars = CFCClass_member_vars(self->client);
     char *member_decs = CFCUtil_strdup("");
 
@@ -410,18 +419,24 @@ CFCBindClass_spec_def(CFCBindClass *self) {
     FREEMEM(fresh_methods);
     const char *ms_var = num_fresh ? self->method_specs_var : "NULL";
 
+    // Hack to get size of object.  TODO: This will have to be replaced by
+    // dynamic initialization.
+    char *ivars_or_not = strcmp(CFCClass_get_prefix(client), "cfish_") == 0
+                         ? "" : "IVARS";
+
     char pattern[] =
         "    {\n"
         "        &%s, /* vtable */\n"
         "        %s, /* parent */\n"
         "        \"%s\", /* name */\n"
-        "        sizeof(%s), /* obj_alloc_size */\n"
+        "        sizeof(%s%s), /* obj_alloc_size */\n"
         "        %d, /* num_fresh */\n"
         "        %d, /* num_novel */\n"
         "        %s /* method_specs */\n"
         "    }";
     char *code = CFCUtil_sprintf(pattern, vt_var, parent_ref, class_name,
-                                 struct_sym, num_fresh, num_novel, ms_var);
+                                 struct_sym, ivars_or_not,
+                                 num_fresh, num_novel, ms_var);
 
     FREEMEM(parent_ref);
     return code;
