@@ -152,28 +152,37 @@ S_to_c_header_inert(CFCBindClass *self) {
 }
 
 static char*
-S_ivars_hack(CFCBindClass *self) {
-    const char *full_struct = CFCClass_full_struct_sym(self->client);
-    const char *full_ivars  = CFCClass_full_ivars_struct(self->client);
-    const char *short_ivars = CFCClass_short_ivars_struct(self->client);
-    const char *prefix      = CFCClass_get_prefix(self->client);
-    const char *PREFIX      = CFCClass_get_PREFIX(self->client);
-    const char *class_cnick = CFCClass_get_cnick(self->client);
+S_ivars_func(CFCBindClass *self) {
+    CFCClass *client = self->client;
+    const char *full_type    = CFCClass_full_struct_sym(client);
+    const char *full_func    = CFCClass_full_ivars_func(client);
+    const char *short_func   = CFCClass_short_ivars_func(client);
+    const char *full_struct  = CFCClass_full_ivars_struct(client);
+    const char *short_struct = CFCClass_short_ivars_struct(client);
+    const char *full_offset  = CFCClass_full_ivars_offset(client);
+    const char *PREFIX       = CFCClass_get_PREFIX(client);
     char pattern[] =
+        "extern size_t %s;\n"
         "typedef struct %s %s;\n"
         "static CHY_INLINE %s*\n"
-        "%s%s_IVARS(%s *self) {\n"
-        "   return (%s*)self;\n"
+        "%s(%s *self) {\n"
+        "   char *ptr = (char*)self + %s;\n"
+        "   return (%s*)ptr;\n"
         "}\n"
         "#ifdef %sUSE_SHORT_NAMES\n"
         "  #define %s %s\n"
-        "  #define %s_IVARS %s%s_IVARS\n"
+        "  #define %s %s\n"
         "#endif\n";
-    char *content
-        = CFCUtil_sprintf(pattern, full_ivars, full_ivars, full_ivars, prefix,
-                          class_cnick, full_struct, full_ivars, PREFIX,
-                          short_ivars, full_ivars, class_cnick, prefix,
-                          class_cnick);
+    char *content = CFCUtil_sprintf(pattern,
+                                    full_offset,
+                                    full_struct, full_struct,
+                                    full_struct,
+                                    full_func, full_type,
+                                    full_offset,
+                                    full_struct,
+                                    PREFIX,
+                                    short_struct, full_struct,
+                                    short_func, full_func);
     return content;
 }
 
@@ -183,7 +192,7 @@ S_to_c_header_dynamic(CFCBindClass *self) {
     const char *vt_var          = CFCClass_full_vtable_var(self->client);
     const char *prefix          = CFCClass_get_prefix(self->client);
     const char *PREFIX          = CFCClass_get_PREFIX(self->client);
-    char *ivars                 = S_ivars_hack(self);
+    char *ivars                 = S_ivars_func(self);
     char *struct_def            = S_struct_definition(self);
     char *parent_include        = S_parent_include(self);
     char *sub_declarations      = S_sub_declarations(self);
@@ -265,6 +274,8 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
         return CFCUtil_strdup(CFCClass_get_autocode(client));
     }
 
+    const char *ivars_offset = CFCClass_full_ivars_offset(client);
+
     const char *autocode  = CFCClass_get_autocode(client);
     const char *vt_var    = CFCClass_full_vtable_var(client);
 
@@ -321,6 +332,12 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
     }
 
     const char pattern[] =
+        "/* Offset from the top of the object at which the IVARS struct\n"
+        " * can be found.\n"
+        " */\n"
+        "\n"
+        "size_t %s;\n"
+        "\n"
         "/* Offsets for method pointers, measured in bytes, from the top\n"
         " * of this class's vtable.\n"
         " */\n"
@@ -348,8 +365,8 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
         "\n"
         "%s\n"
         "\n";
-    char *code = CFCUtil_sprintf(pattern, offsets, method_defs, ms_var, vt_var,
-                                 autocode);
+    char *code = CFCUtil_sprintf(pattern, ivars_offset, offsets, method_defs,
+                                 ms_var, vt_var, autocode);
 
     FREEMEM(fresh_methods);
     FREEMEM(offsets);
