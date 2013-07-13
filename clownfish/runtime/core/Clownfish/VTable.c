@@ -46,19 +46,41 @@ S_scrunch_charbuf(CharBuf *source, CharBuf *target);
 static Method*
 S_find_method(VTable *self, const char *meth_name);
 
+static int32_t
+S_claim_parcel_id(void);
+
 LockFreeRegistry *VTable_registry = NULL;
 
 void
 VTable_bootstrap(VTableSpec *specs, size_t num_specs)
 {
+    int32_t parcel_id = S_claim_parcel_id();
+
     /* Pass 1:
+     * - Initialize IVARS_OFFSET.
      * - Allocate memory.
      * - Initialize parent, flags, obj_alloc_size, vt_alloc_size.
+     * - Assign parcel_id.
      * - Initialize method pointers.
      */
     for (size_t i = 0; i < num_specs; ++i) {
         VTableSpec *spec   = &specs[i];
         VTable     *parent = spec->parent ? *spec->parent : NULL;
+
+        size_t ivars_offset = 0;
+        if (spec->ivars_offset_ptr != NULL) {
+            if (parent) {
+                VTable *ancestor = parent;
+                while (ancestor && ancestor->parcel_id == parcel_id) {
+                    ancestor = ancestor->parent;
+                }
+                ivars_offset = ancestor ? ancestor->obj_alloc_size : 0;
+                *spec->ivars_offset_ptr = ivars_offset;
+            }
+            else {
+                *spec->ivars_offset_ptr = 0;
+            }
+        }
 
         size_t vt_alloc_size = parent
                                ? parent->vt_alloc_size
@@ -67,8 +89,9 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
         VTable *vtable = (VTable*)Memory_wrapped_calloc(vt_alloc_size, 1);
 
         vtable->parent         = parent;
+        vtable->parcel_id      = parcel_id;
         vtable->flags          = 0;
-        vtable->obj_alloc_size = spec->obj_alloc_size;
+        vtable->obj_alloc_size = ivars_offset + spec->ivars_size;
         vtable->vt_alloc_size  = vt_alloc_size;
 
         if (parent) {
@@ -392,4 +415,22 @@ S_find_method(VTable *self, const char *name) {
     return NULL;
 }
 
+static size_t parcel_count;
+
+static int32_t
+S_claim_parcel_id(void) {
+    // TODO: use ordinary cas rather than cas_ptr.
+    union { size_t num; void *ptr; } old_value;
+    union { size_t num; void *ptr; } new_value;
+
+    bool succeeded = false;
+    do {
+        old_value.num = parcel_count;
+        new_value.num = old_value.num + 1;
+        succeeded = Atomic_cas_ptr((void*volatile*)&parcel_count,
+                                   old_value.ptr, new_value.ptr);
+    } while (!succeeded);
+
+    return new_value.num;
+}
 

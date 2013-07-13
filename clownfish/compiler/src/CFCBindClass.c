@@ -26,6 +26,7 @@
 #include "CFCFunction.h"
 #include "CFCMethod.h"
 #include "CFCParamList.h"
+#include "CFCParcel.h"
 #include "CFCType.h"
 #include "CFCVariable.h"
 #include "CFCUtil.h"
@@ -378,19 +379,32 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
 // Create the definition for the instantiable object struct.
 static char*
 S_struct_definition(CFCBindClass *self) {
+    CFCClass *const client = self->client;
     const char *struct_sym;
-    const char *prefix = CFCClass_get_prefix(self->client);
+    const char *prefix = CFCClass_get_prefix(client);
     if (strcmp(prefix, "cfish_") == 0) {
-        struct_sym = CFCClass_full_struct_sym(self->client);
+        struct_sym = CFCClass_full_struct_sym(client);
     }
     else {
-        struct_sym = CFCClass_full_ivars_struct(self->client);
+        struct_sym = CFCClass_full_ivars_struct(client);
     }
 
-    CFCVariable **member_vars = CFCClass_member_vars(self->client);
-    char *member_decs = CFCUtil_strdup("");
+    // Count the number of member variables declared in ancestor classes
+    // outside this package so that we can skip over them.
+    int num_non_package_members = 0;
+    CFCParcel *parcel = CFCClass_get_parcel(client);
+    CFCClass *ancestor = CFCClass_get_parent(client);
+    while (ancestor && CFCClass_get_parcel(ancestor) == parcel) {
+        ancestor = CFCClass_get_parent(ancestor);
+    }
+    if (ancestor) {
+        num_non_package_members = CFCClass_num_member_vars(ancestor);
+    }
 
-    for (int i = 0; member_vars[i] != NULL; i++) {
+    // Add all member variables declared by classes in this package.
+    CFCVariable **member_vars = CFCClass_member_vars(client);
+    char *member_decs = CFCUtil_strdup("");
+    for (int i = num_non_package_members; member_vars[i] != NULL; i++) {
         const char *member_dec = CFCVariable_local_declaration(member_vars[i]);
         size_t needed = strlen(member_decs) + strlen(member_dec) + 10;
         member_decs = (char*)REALLOCATE(member_decs, needed);
@@ -410,10 +424,12 @@ char*
 CFCBindClass_spec_def(CFCBindClass *self) {
     CFCClass *client = self->client;
 
-    CFCClass    *parent     = CFCClass_get_parent(client);
-    const char  *class_name = CFCClass_get_class_name(client);
-    const char  *vt_var     = CFCClass_full_vtable_var(client);
-    const char  *struct_sym = CFCClass_full_struct_sym(client);
+    CFCClass   *parent       = CFCClass_get_parent(client);
+    const char *class_name   = CFCClass_get_class_name(client);
+    const char *vt_var       = CFCClass_full_vtable_var(client);
+    const char *struct_sym   = CFCClass_full_struct_sym(client);
+    const char *ivars_struct = CFCClass_full_ivars_struct(client);
+    const char *prefix       = CFCClass_get_prefix(client);
 
     // Create a pointer to the parent class's vtable.
     char *parent_ref;
@@ -436,23 +452,23 @@ CFCBindClass_spec_def(CFCBindClass *self) {
     FREEMEM(fresh_methods);
     const char *ms_var = num_fresh ? self->method_specs_var : "NULL";
 
-    // Hack to get size of object.  TODO: This will have to be replaced by
-    // dynamic initialization.
-    char *ivars_or_not = strcmp(CFCClass_get_prefix(client), "cfish_") == 0
-                         ? "" : "IVARS";
+    const char *ivars_or_not = strcmp(prefix, "cfish_") == 0
+                               ? struct_sym : ivars_struct;
+    const char *ivars_offset_name = CFCClass_full_ivars_offset(client);
 
     char pattern[] =
         "    {\n"
         "        &%s, /* vtable */\n"
         "        %s, /* parent */\n"
         "        \"%s\", /* name */\n"
-        "        sizeof(%s%s), /* obj_alloc_size */\n"
+        "        sizeof(%s), /* ivars_size */\n"
+        "        &%s, /* ivars_offset_ptr */\n"
         "        %d, /* num_fresh */\n"
         "        %d, /* num_novel */\n"
         "        %s /* method_specs */\n"
         "    }";
     char *code = CFCUtil_sprintf(pattern, vt_var, parent_ref, class_name,
-                                 struct_sym, ivars_or_not,
+                                 ivars_or_not, ivars_offset_name,
                                  num_fresh, num_novel, ms_var);
 
     FREEMEM(parent_ref);

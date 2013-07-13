@@ -199,6 +199,9 @@ CFCClass_num_methods(CFCClass *self);
 struct CFCVariable**
 CFCClass_member_vars(CFCClass *self);
 
+size_t
+CFCClass_num_member_vars(CFCClass *self);
+
 /** Return an array of all inert (shared, class) variables.
  */
 struct CFCVariable**

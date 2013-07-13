@@ -769,6 +769,11 @@ CFCClass_member_vars(CFCClass *self) {
     return self->member_vars;
 }
 
+size_t
+CFCClass_num_member_vars(CFCClass *self) {
+    return self->num_member_vars;
+}
+
 CFCVariable**
 CFCClass_inert_vars(CFCClass *self) {
     return self->inert_vars;

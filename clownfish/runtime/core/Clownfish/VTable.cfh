@@ -28,6 +28,7 @@ class Clownfish::VTable inherits Clownfish::Obj {
     VTable            *parent;
     CharBuf           *name;
     uint32_t           flags;
+    int32_t            parcel_id;
     size_t             obj_alloc_size;
     size_t             vt_alloc_size;
     VArray            *methods;
