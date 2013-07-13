@@ -23,11 +23,13 @@ parcel TestLucy;
  */
 
 class Lucy::Test::TestSchema inherits Lucy::Plan::Schema {
+    bool use_alt_arch;
+
     inert incremented TestSchema*
-    new();
+    new(bool use_alt_arch = false);
 
     inert TestSchema*
-    init(TestSchema *self);
+    init(TestSchema *self, bool use_alt_arch = false);
 
     public incremented Architecture*
     Architecture(TestSchema *self);

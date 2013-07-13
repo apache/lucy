@@ -858,7 +858,7 @@ static Lucy_TestQPLogic_Prune_Test_t prune_test_funcs[] = {
 
 static Folder*
 S_create_index() {
-    Schema     *schema  = (Schema*)TestSchema_new();
+    Schema     *schema  = (Schema*)TestSchema_new(false);
     RAMFolder  *folder  = RAMFolder_new(NULL);
     VArray     *doc_set = TestUtils_doc_set();
     Indexer    *indexer = Indexer_new(schema, (Obj*)folder, NULL, 0);

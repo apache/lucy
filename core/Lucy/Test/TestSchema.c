@@ -27,15 +27,17 @@
 #include "Lucy/Plan/Architecture.h"
 
 TestSchema*
-TestSchema_new() {
+TestSchema_new(bool use_alt_arch) {
     TestSchema *self = (TestSchema*)VTable_Make_Obj(TESTSCHEMA);
-    return TestSchema_init(self);
+    return TestSchema_init(self, use_alt_arch);
 }
 
 TestSchema*
-TestSchema_init(TestSchema *self) {
+TestSchema_init(TestSchema *self, bool use_alt_arch) {
     StandardTokenizer *tokenizer = StandardTokenizer_new();
     FullTextType *type = FullTextType_new((Analyzer*)tokenizer);
+
+    TestSchema_IVARS(self)->use_alt_arch = use_alt_arch;
 
     Schema_init((Schema*)self);
     FullTextType_Set_Highlightable(type, true);
@@ -49,8 +51,12 @@ TestSchema_init(TestSchema *self) {
 
 Architecture*
 TestSchema_architecture(TestSchema *self) {
-    UNUSED_VAR(self);
-    return (Architecture*)TestArch_new();
+    if (TestSchema_IVARS(self)->use_alt_arch) {
+        return Arch_new();
+    }
+    else {
+        return (Architecture*)TestArch_new();
+    }
 }
 
 TestBatchSchema*
@@ -60,9 +66,9 @@ TestBatchSchema_new() {
 
 static void
 test_Equals(TestBatchRunner *runner) {
-    TestSchema *schema = TestSchema_new();
-    TestSchema *arch_differs = TestSchema_new();
-    TestSchema *spec_differs = TestSchema_new();
+    TestSchema *schema = TestSchema_new(false);
+    TestSchema *arch_differs = TestSchema_new(true);
+    TestSchema *spec_differs = TestSchema_new(false);
     CharBuf    *content      = (CharBuf*)ZCB_WRAP_STR("content", 7);
     FullTextType *type = (FullTextType*)TestSchema_Fetch_Type(spec_differs,
                                                               content);
@@ -73,8 +79,6 @@ test_Equals(TestBatchRunner *runner) {
     TEST_FALSE(runner, TestSchema_Equals(schema, (Obj*)spec_differs),
                "Equals spoiled by differing FieldType");
 
-    DECREF(TestSchema_IVARS(arch_differs)->arch);
-    TestSchema_IVARS(arch_differs)->arch = Arch_new();
     TEST_FALSE(runner, TestSchema_Equals(schema, (Obj*)arch_differs),
                "Equals spoiled by differing Architecture");
 
@@ -85,7 +89,7 @@ test_Equals(TestBatchRunner *runner) {
 
 static void
 test_Dump_and_Load(TestBatchRunner *runner) {
-    TestSchema *schema = TestSchema_new();
+    TestSchema *schema = TestSchema_new(false);
     Obj        *dump   = (Obj*)TestSchema_Dump(schema);
     TestSchema *loaded = (TestSchema*)Obj_Load(dump, dump);
 

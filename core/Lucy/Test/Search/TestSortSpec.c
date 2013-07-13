@@ -153,12 +153,7 @@ TestReverseType_init(TestReverseType *self) {
 TestReverseType*
 TestReverseType_init2(TestReverseType *self, float boost, bool indexed,
                       bool stored, bool sortable) {
-    FType_init((FieldType*)self);
-    TestReverseTypeIVARS *const ivars = TestReverseType_IVARS(self);
-    ivars->boost      = boost;
-    ivars->indexed    = indexed;
-    ivars->stored     = stored;
-    ivars->sortable   = sortable;
+    Int32Type_init2((Int32Type*)self, boost, indexed, stored, sortable);
     return self;
 }
 
