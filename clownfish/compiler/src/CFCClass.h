@@ -246,11 +246,32 @@ CFCClass_get_struct_sym(CFCClass *self);
 const char*
 CFCClass_full_struct_sym(CFCClass *self);
 
+/** IVARS struct name, not including parcel prefix.
+ */
 const char*
-CFCClass_short_ivars_name(CFCClass *self);
+CFCClass_short_ivars_struct(CFCClass *self);
 
+/** Fully qualified IVARS struct name including parcel prefix.
+ */
 const char*
-CFCClass_full_ivars_name(CFCClass *self);
+CFCClass_full_ivars_struct(CFCClass *self);
+
+/** Name of the function used to access IVARS, not including parcel prefix.
+ */
+const char*
+CFCClass_short_ivars_func(CFCClass *self);
+
+/** Fully qualified name of the function used to access IVARS including parcel
+ * prefix.
+ */
+const char*
+CFCClass_full_ivars_func(CFCClass *self);
+
+/** Fully qualified name of the offset variable at which the IVARS may be
+ * found, including parcel prefix.
+ */
+const char*
+CFCClass_full_ivars_offset(CFCClass *self);
 
 /** The short name of the global VTable object for this class.
  */

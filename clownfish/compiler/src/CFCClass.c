@@ -77,8 +77,11 @@ struct CFCClass {
     int is_inert;
     char *struct_sym;
     char *full_struct_sym;
-    char *ivars_name;
-    char *full_ivars_name;
+    char *ivars_struct;
+    char *full_ivars_struct;
+    char *ivars_func;
+    char *full_ivars_func;
+    char *full_ivars_offset;
     char *short_vtable_var;
     char *full_vtable_var;
     char *privacy_symbol;
@@ -175,9 +178,13 @@ CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
         self->short_vtable_var[i] = toupper(self->struct_sym[i]);
     }
     self->short_vtable_var[struct_sym_len] = '\0';
-    self->full_struct_sym = CFCUtil_sprintf("%s%s", prefix, self->struct_sym);
-    self->ivars_name      = CFCUtil_sprintf("%sIVARS", self->struct_sym);
-    self->full_ivars_name = CFCUtil_sprintf("%sIVARS", self->full_struct_sym);
+    self->full_struct_sym   = CFCUtil_sprintf("%s%s", prefix, self->struct_sym);
+    self->ivars_struct      = CFCUtil_sprintf("%sIVARS", self->struct_sym);
+    self->full_ivars_struct = CFCUtil_sprintf("%sIVARS", self->full_struct_sym);
+    self->ivars_func        = CFCUtil_sprintf("%s_IVARS", CFCClass_get_cnick(self));
+    self->full_ivars_func   = CFCUtil_sprintf("%s%s_IVARS", prefix,
+                                              CFCClass_get_cnick(self));
+    self->full_ivars_offset = CFCUtil_sprintf("%s_OFFSET", self->full_ivars_func);
     size_t full_struct_sym_len = strlen(self->full_struct_sym);
     self->full_vtable_var = (char*)MALLOCATE(full_struct_sym_len + 1);
     for (i = 0; self->full_struct_sym[i] != '\0'; i++) {
@@ -254,8 +261,11 @@ CFCClass_destroy(CFCClass *self) {
     FREEMEM(self->autocode);
     FREEMEM(self->parent_class_name);
     FREEMEM(self->struct_sym);
-    FREEMEM(self->ivars_name);
-    FREEMEM(self->full_ivars_name);
+    FREEMEM(self->ivars_struct);
+    FREEMEM(self->full_ivars_struct);
+    FREEMEM(self->ivars_func);
+    FREEMEM(self->full_ivars_func);
+    FREEMEM(self->full_ivars_offset);
     FREEMEM(self->short_vtable_var);
     FREEMEM(self->full_struct_sym);
     FREEMEM(self->full_vtable_var);
@@ -829,13 +839,28 @@ CFCClass_full_struct_sym(CFCClass *self) {
 }
 
 const char*
-CFCClass_short_ivars_name(CFCClass *self) {
-    return self->ivars_name;
+CFCClass_short_ivars_struct(CFCClass *self) {
+    return self->ivars_struct;
 }
 
 const char*
-CFCClass_full_ivars_name(CFCClass *self) {
-    return self->full_ivars_name;
+CFCClass_full_ivars_struct(CFCClass *self) {
+    return self->full_ivars_struct;
+}
+
+const char*
+CFCClass_short_ivars_func(CFCClass *self) {
+    return self->ivars_func;
+}
+
+const char*
+CFCClass_full_ivars_func(CFCClass *self) {
+    return self->full_ivars_func;
+}
+
+const char*
+CFCClass_full_ivars_offset(CFCClass *self) {
+    return self->full_ivars_offset;
 }
 
 const char*

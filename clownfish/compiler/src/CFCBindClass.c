@@ -154,8 +154,8 @@ S_to_c_header_inert(CFCBindClass *self) {
 static char*
 S_ivars_hack(CFCBindClass *self) {
     const char *full_struct = CFCClass_full_struct_sym(self->client);
-    const char *full_ivars  = CFCClass_full_ivars_name(self->client);
-    const char *short_ivars = CFCClass_short_ivars_name(self->client);
+    const char *full_ivars  = CFCClass_full_ivars_struct(self->client);
+    const char *short_ivars = CFCClass_short_ivars_struct(self->client);
     const char *prefix      = CFCClass_get_prefix(self->client);
     const char *PREFIX      = CFCClass_get_PREFIX(self->client);
     const char *class_cnick = CFCClass_get_cnick(self->client);
@@ -367,7 +367,7 @@ S_struct_definition(CFCBindClass *self) {
         struct_sym = CFCClass_full_struct_sym(self->client);
     }
     else {
-        struct_sym = CFCClass_full_ivars_name(self->client);
+        struct_sym = CFCClass_full_ivars_struct(self->client);
     }
 
     CFCVariable **member_vars = CFCClass_member_vars(self->client);
