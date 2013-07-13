@@ -24,7 +24,7 @@ use Clownfish qw( to_perl );
 
 my $letters = Clownfish::VArray->new( capacity => 26 );
 $letters->push( Clownfish::ByteBuf->new($_) ) for 'a' .. 'z';
-my $run = Lucy::Test::Util::BBSortEx->new( external => $letters );
+my $run = Lucy::Util::BBSortEx->new( external => $letters );
 $run->set_mem_thresh(5);
 
 my $num_in_cache = $run->refill;

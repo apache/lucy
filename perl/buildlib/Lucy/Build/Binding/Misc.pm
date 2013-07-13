@@ -25,7 +25,6 @@ sub bind_all {
     $class->bind_lucy;
     $class->bind_test;
     $class->bind_testschema;
-    $class->bind_bbsortex;
 }
 
 sub inherit_metadata {
@@ -213,65 +212,6 @@ sub bind_testschema {
         parcel     => "TestLucy",
         class_name => "Lucy::Test::TestSchema",
     );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_bbsortex {
-    my @hand_rolled = qw(
-        Fetch
-        Peek
-        Feed
-    );
-    my $xs_code = <<'END_XS_CODE';
-MODULE = Lucy    PACKAGE = Lucy::Test::Util::BBSortEx
-
-SV*
-fetch(self)
-    testlucy_BBSortEx *self;
-CODE:
-{
-    void *address = TestLucy_BBSortEx_Fetch(self);
-    if (address) {
-        RETVAL = XSBind_cfish_to_perl(*(cfish_Obj**)address);
-        CFISH_DECREF(*(cfish_Obj**)address);
-    }
-    else {
-        RETVAL = newSV(0);
-    }
-}
-OUTPUT: RETVAL
-
-SV*
-peek(self)
-    testlucy_BBSortEx *self;
-CODE:
-{
-    void *address = TestLucy_BBSortEx_Peek(self);
-    if (address) {
-        RETVAL = XSBind_cfish_to_perl(*(cfish_Obj**)address);
-    }
-    else {
-        RETVAL = newSV(0);
-    }
-}
-OUTPUT: RETVAL
-
-void
-feed(self, bb)
-    testlucy_BBSortEx *self;
-    cfish_ByteBuf *bb;
-CODE:
-    CFISH_INCREF(bb);
-    TestLucy_BBSortEx_Feed(self, &bb);
-
-END_XS_CODE
-
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "TestLucy",
-        class_name => "Lucy::Test::Util::BBSortEx",
-    );
-    $binding->append_xs($xs_code);
-
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

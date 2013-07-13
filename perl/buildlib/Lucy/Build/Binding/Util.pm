@@ -21,6 +21,7 @@ $VERSION = eval $VERSION;
 
 sub bind_all {
     my $class = shift;
+    $class->bind_bbsortex;
     $class->bind_debug;
     $class->bind_freezer;
     $class->bind_indexfilenames;
@@ -28,6 +29,65 @@ sub bind_all {
     $class->bind_priorityqueue;
     $class->bind_sortexternal;
     $class->bind_stepper;
+}
+
+sub bind_bbsortex {
+    my @hand_rolled = qw(
+        Fetch
+        Peek
+        Feed
+    );
+    my $xs_code = <<'END_XS_CODE';
+MODULE = Lucy    PACKAGE = Lucy::Util::BBSortEx
+
+SV*
+fetch(self)
+    lucy_BBSortEx *self;
+CODE:
+{
+    void *address = Lucy_BBSortEx_Fetch(self);
+    if (address) {
+        RETVAL = XSBind_cfish_to_perl(*(cfish_Obj**)address);
+        CFISH_DECREF(*(cfish_Obj**)address);
+    }
+    else {
+        RETVAL = newSV(0);
+    }
+}
+OUTPUT: RETVAL
+
+SV*
+peek(self)
+    lucy_BBSortEx *self;
+CODE:
+{
+    void *address = Lucy_BBSortEx_Peek(self);
+    if (address) {
+        RETVAL = XSBind_cfish_to_perl(*(cfish_Obj**)address);
+    }
+    else {
+        RETVAL = newSV(0);
+    }
+}
+OUTPUT: RETVAL
+
+void
+feed(self, bb)
+    lucy_BBSortEx *self;
+    cfish_ByteBuf *bb;
+CODE:
+    CFISH_INCREF(bb);
+    Lucy_BBSortEx_Feed(self, &bb);
+
+END_XS_CODE
+
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Lucy",
+        class_name => "Lucy::Util::BBSortEx",
+    );
+    $binding->append_xs($xs_code);
+
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_debug {

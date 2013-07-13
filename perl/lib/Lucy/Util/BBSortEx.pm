@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package Lucy::Test::Util::BBSortEx;
+package Lucy::Util::BBSortEx;
 use Lucy;
 our $VERSION = '0.003000';
 $VERSION = eval $VERSION;

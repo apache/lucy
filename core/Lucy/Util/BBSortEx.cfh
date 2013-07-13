@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-parcel TestLucy;
+parcel Lucy;
 
 /** SortExternal for ByteBufs.
  */
 
-class Lucy::Test::Util::BBSortEx
+class Lucy::Util::BBSortEx
     inherits Lucy::Util::SortExternal {
 
     VArray   *external;
