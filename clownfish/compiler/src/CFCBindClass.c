@@ -34,7 +34,6 @@
 struct CFCBindClass {
     CFCBase base;
     CFCClass *client;
-    char *method_specs_var;
     char *short_names_macro;
 };
 
@@ -91,9 +90,7 @@ CFCBindClass_init(CFCBindClass *self, CFCClass *client) {
     CFCUTIL_NULL_CHECK(client);
     self->client = (CFCClass*)CFCBase_incref((CFCBase*)client);
 
-    const char *full_vtable_var = CFCClass_full_vtable_var(client);
     const char *PREFIX = CFCClass_get_PREFIX(client);
-    self->method_specs_var  = CFCUtil_sprintf("%s_METHODS", full_vtable_var);
     self->short_names_macro = CFCUtil_sprintf("%sUSE_SHORT_NAMES", PREFIX);
 
     return self;
@@ -101,7 +98,6 @@ CFCBindClass_init(CFCBindClass *self, CFCClass *client) {
 
 void
 CFCBindClass_destroy(CFCBindClass *self) {
-    FREEMEM(self->method_specs_var);
     FREEMEM(self->short_names_macro);
     CFCBase_decref((CFCBase*)self->client);
     CFCBase_destroy((CFCBase*)self);
@@ -270,6 +266,7 @@ S_to_c_header_dynamic(CFCBindClass *self) {
 char*
 CFCBindClass_to_c_data(CFCBindClass *self) {
     CFCClass *client = self->client;
+    const char *class_name = CFCClass_get_class_name(client);
 
     if (CFCClass_inert(client)) {
         return CFCUtil_strdup(CFCClass_get_autocode(client));
@@ -281,55 +278,92 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
     const char *vt_var    = CFCClass_full_vtable_var(client);
 
     CFCMethod **methods  = CFCClass_methods(client);
-    CFCMethod **fresh_methods = CFCClass_fresh_methods(client);
 
-    char *offsets     = CFCUtil_strdup("");
-    char *method_defs = CFCUtil_strdup("");
-    char *ms_var      = CFCUtil_strdup("");
+    char *offsets           = CFCUtil_strdup("");
+    char *method_defs       = CFCUtil_strdup("");
+    char *novel_ms_var      = CFCUtil_strdup("");
+    char *overridden_ms_var = CFCUtil_strdup("");
+    char *inherited_ms_var  = CFCUtil_strdup("");
 
     for (int meth_num = 0; methods[meth_num] != NULL; meth_num++) {
         CFCMethod *method = methods[meth_num];
+
+        // Define method offset variable.
         char *full_offset_sym = CFCMethod_full_offset_sym(method, client);
-        // Create offset in bytes for the method from the top of the VTable
-        // object.
-        const char pattern[] =
-            "size_t %s = offsetof(cfish_VTable, method_ptrs)"
-            " + %d * sizeof(cfish_method_t);\n";
-        char *offset = CFCUtil_sprintf(pattern, full_offset_sym, meth_num);
-        offsets = CFCUtil_cat(offsets, offset, NULL);
+        offsets = CFCUtil_cat(offsets, "size_t ", full_offset_sym, ";\n",
+                              NULL);
         FREEMEM(full_offset_sym);
-        FREEMEM(offset);
-    }
 
-    if (fresh_methods[0] != NULL) {
-        /* Start an array of cfish_MethodSpec structs.  Since C89 doesn't allow 
-         * us to initialize a pointer to an anonymous array inside a global
-         * struct, we have to give it a real symbol and then store a pointer to
-         * that symbol inside the VTableSpec struct. */
-        ms_var = CFCUtil_cat(ms_var, "static cfish_MethodSpec ",
-                             self->method_specs_var, "[] = {\n", NULL);
+        const char *meth_class_name = CFCMethod_get_class_name(method);
+        int is_fresh = strcmp(class_name, meth_class_name) == 0;
 
-        for (int meth_num = 0; fresh_methods[meth_num] != NULL; meth_num++) {
-            CFCMethod *method = fresh_methods[meth_num];
-
-            // Create a default implementation for abstract methods.
-            if (CFCMethod_abstract(method)) {
-                char *method_def = CFCBindMeth_abstract_method_def(method);
-                method_defs = CFCUtil_cat(method_defs, method_def, "\n", NULL);
-                FREEMEM(method_def);
-            }
-
-            // Define MethodSpec struct.
-            if (meth_num != 0) {
-                ms_var = CFCUtil_cat(ms_var, ",\n", NULL);
-            }
-            char *ms_def = CFCBindMeth_spec_def(method);
-            ms_var = CFCUtil_cat(ms_var, ms_def, NULL);
-            FREEMEM(ms_def);
+        // Create a default implementation for abstract methods.
+        if (is_fresh && CFCMethod_abstract(method)) {
+            char *method_def = CFCBindMeth_abstract_method_def(method);
+            method_defs = CFCUtil_cat(method_defs, method_def, "\n", NULL);
+            FREEMEM(method_def);
         }
 
-        // Close MethodSpec array definition.
-        ms_var =  CFCUtil_cat(ms_var, "\n};\n", NULL);
+        if (is_fresh && CFCMethod_novel(method)) {
+            if (novel_ms_var[0] == '\0') {
+                // Start an array of cfish_NovelMethSpec structs.  Since C89
+                // doesn't allow us to initialize a pointer to an anonymous
+                // array inside a global struct, we have to give it a real
+                // symbol and then store a pointer to that symbol inside the
+                // VTableSpec struct.
+                novel_ms_var
+                    = CFCUtil_cat(novel_ms_var, "static cfish_NovelMethSpec ",
+                                  vt_var, "_NOVEL_METHS[] = {\n", NULL);
+            }
+            else {
+                novel_ms_var = CFCUtil_cat(novel_ms_var, ",\n", NULL);
+            }
+            char *ms_def = CFCBindMeth_novel_spec_def(method);
+            novel_ms_var = CFCUtil_cat(novel_ms_var, ms_def, NULL);
+            FREEMEM(ms_def);
+        }
+        else if (is_fresh) {
+            if (overridden_ms_var[0] == '\0') {
+                // Start an array of cfish_OverriddenMethSpec structs.
+                overridden_ms_var
+                    = CFCUtil_cat(overridden_ms_var,
+                                  "static cfish_OverriddenMethSpec ", vt_var,
+                                  "_OVERRIDDEN_METHS[] = {\n", NULL);
+            }
+            else {
+                overridden_ms_var
+                    = CFCUtil_cat(overridden_ms_var, ",\n", NULL);
+            }
+            char *ms_def = CFCBindMeth_overridden_spec_def(method, client);
+            overridden_ms_var = CFCUtil_cat(overridden_ms_var, ms_def, NULL);
+            FREEMEM(ms_def);
+        }
+        else {
+            if (inherited_ms_var[0] == '\0') {
+                // Start an array of cfish_InheritedMethSpec structs.
+                inherited_ms_var
+                    = CFCUtil_cat(inherited_ms_var,
+                                  "static cfish_InheritedMethSpec ", vt_var,
+                                  "_INHERITED_METHS[] = {\n", NULL);
+            }
+            else {
+                inherited_ms_var = CFCUtil_cat(inherited_ms_var, ",\n", NULL);
+            }
+            char *ms_def = CFCBindMeth_inherited_spec_def(method, client);
+            inherited_ms_var = CFCUtil_cat(inherited_ms_var, ms_def, NULL);
+            FREEMEM(ms_def);
+        }
+    }
+
+    // Close MethSpec array definitions.
+    if (novel_ms_var[0] != '\0') {
+        novel_ms_var = CFCUtil_cat(novel_ms_var, "\n};\n\n", NULL);
+    }
+    if (overridden_ms_var[0] != '\0') {
+        overridden_ms_var = CFCUtil_cat(overridden_ms_var, "\n};\n\n", NULL);
+    }
+    if (inherited_ms_var[0] != '\0') {
+        inherited_ms_var = CFCUtil_cat(inherited_ms_var, "\n};\n\n", NULL);
     }
 
     const char pattern[] =
@@ -350,12 +384,12 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
         "\n"
         "%s\n"
         "\n"
-        "/* Define the cfish_MethodSpec structs used during VTable\n"
-        " * initialization.\n"
+        "/* Define the MethSpec structs used during VTable initialization.\n"
         " */\n"
         "\n"
-        "%s\n"
-        "\n"
+        "%s"
+        "%s"
+        "%s"
         "/* Define this class's VTable.\n"
         " */\n"
         "\n"
@@ -366,13 +400,16 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
         "\n"
         "%s\n"
         "\n";
-    char *code = CFCUtil_sprintf(pattern, ivars_offset, offsets, method_defs,
-                                 ms_var, vt_var, autocode);
+    char *code
+        = CFCUtil_sprintf(pattern, ivars_offset, offsets, method_defs,
+                          novel_ms_var, overridden_ms_var, inherited_ms_var,
+                          vt_var, autocode);
 
-    FREEMEM(fresh_methods);
     FREEMEM(offsets);
     FREEMEM(method_defs);
-    FREEMEM(ms_var);
+    FREEMEM(novel_ms_var);
+    FREEMEM(overridden_ms_var);
+    FREEMEM(inherited_ms_var);
     return code;
 }
 
@@ -441,16 +478,37 @@ CFCBindClass_spec_def(CFCBindClass *self) {
         parent_ref = CFCUtil_strdup("NULL");
     }
 
-    int num_fresh = 0;
-    int num_novel = 0;
-    CFCMethod **fresh_methods = CFCClass_fresh_methods(client);
-    for (int meth_num = 0; fresh_methods[meth_num] != NULL; meth_num++) {
-        CFCMethod *method = fresh_methods[meth_num];
-        ++num_fresh;
-        if (CFCMethod_novel(method)) { ++num_novel; }
+    int num_novel      = 0;
+    int num_overridden = 0;
+    int num_inherited  = 0;
+    CFCMethod **methods = CFCClass_methods(client);
+
+    for (int meth_num = 0; methods[meth_num] != NULL; meth_num++) {
+        CFCMethod *method = methods[meth_num];
+        const char *meth_class_name = CFCMethod_get_class_name(method);
+
+        if (strcmp(class_name, meth_class_name) == 0) {
+            if (CFCMethod_novel(method)) {
+                ++num_novel;
+            }
+            else {
+                ++num_overridden;
+            }
+        }
+        else {
+            ++num_inherited;
+        }
     }
-    FREEMEM(fresh_methods);
-    const char *ms_var = num_fresh ? self->method_specs_var : "NULL";
+
+    char *novel_ms_var      = num_novel
+                              ? CFCUtil_sprintf("%s_NOVEL_METHS", vt_var)
+                              : CFCUtil_strdup("NULL");
+    char *overridden_ms_var = num_overridden
+                              ? CFCUtil_sprintf("%s_OVERRIDDEN_METHS", vt_var)
+                              : CFCUtil_strdup("NULL");
+    char *inherited_ms_var  = num_inherited
+                              ? CFCUtil_sprintf("%s_INHERITED_METHS", vt_var)
+                              : CFCUtil_strdup("NULL");
 
     const char *ivars_or_not = strcmp(prefix, "cfish_") == 0
                                ? struct_sym : ivars_struct;
@@ -463,15 +521,23 @@ CFCBindClass_spec_def(CFCBindClass *self) {
         "        \"%s\", /* name */\n"
         "        sizeof(%s), /* ivars_size */\n"
         "        &%s, /* ivars_offset_ptr */\n"
-        "        %d, /* num_fresh */\n"
         "        %d, /* num_novel */\n"
-        "        %s /* method_specs */\n"
+        "        %d, /* num_overridden */\n"
+        "        %d, /* num_inherited */\n"
+        "        %s, /* novel_meth_specs */\n"
+        "        %s, /* overridden_meth_specs */\n"
+        "        %s /* inherited_meth_specs */\n"
         "    }";
-    char *code = CFCUtil_sprintf(pattern, vt_var, parent_ref, class_name,
-                                 ivars_or_not, ivars_offset_name,
-                                 num_fresh, num_novel, ms_var);
+    char *code
+        = CFCUtil_sprintf(pattern, vt_var, parent_ref, class_name,
+                          ivars_or_not, ivars_offset_name, num_novel,
+                          num_overridden, num_inherited, novel_ms_var,
+                          overridden_ms_var, inherited_ms_var);
 
     FREEMEM(parent_ref);
+    FREEMEM(novel_ms_var);
+    FREEMEM(overridden_ms_var);
+    FREEMEM(inherited_ms_var);
     return code;
 }
 

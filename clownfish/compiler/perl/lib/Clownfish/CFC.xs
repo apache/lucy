@@ -1971,10 +1971,26 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-_spec_def(meth)
+_novel_spec_def(meth)
     CFCMethod *meth;
 CODE:
-    RETVAL = S_sv_eat_c_string(CFCBindMeth_spec_def(meth));
+    RETVAL = S_sv_eat_c_string(CFCBindMeth_novel_spec_def(meth));
+OUTPUT: RETVAL
+
+SV*
+_overridden_spec_def(meth, klass)
+    CFCMethod *meth;
+    CFCClass  *klass;
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCBindMeth_overridden_spec_def(meth, klass));
+OUTPUT: RETVAL
+
+SV*
+_inherited_spec_def(meth, klass)
+    CFCMethod *meth;
+    CFCClass  *klass;
+CODE:
+    RETVAL = S_sv_eat_c_string(CFCBindMeth_inherited_spec_def(meth, klass));
 OUTPUT: RETVAL
 
 MODULE = Clownfish::CFC  PACKAGE = Clownfish::CFC::Binding::Core::Aliases

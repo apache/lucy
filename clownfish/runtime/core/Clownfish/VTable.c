@@ -82,10 +82,12 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
             }
         }
 
-        size_t vt_alloc_size = parent
-                               ? parent->vt_alloc_size
-                               : offsetof(VTable, method_ptrs);
-        vt_alloc_size += spec->num_novel * sizeof(cfish_method_t);
+        size_t novel_offset = parent
+                              ? parent->vt_alloc_size
+                              : offsetof(VTable, method_ptrs);
+        size_t vt_alloc_size = novel_offset
+                               + spec->num_novel_meths
+                                 * sizeof(cfish_method_t);
         VTable *vtable = (VTable*)Memory_wrapped_calloc(vt_alloc_size, 1);
 
         vtable->parent         = parent;
@@ -100,8 +102,21 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
             memcpy(vtable->method_ptrs, parent->method_ptrs, parent_ptrs_size);
         }
 
-        for (size_t i = 0; i < spec->num_fresh; ++i) {
-            MethodSpec *mspec = &spec->method_specs[i];
+        for (size_t i = 0; i < spec->num_inherited_meths; ++i) {
+            InheritedMethSpec *mspec = &spec->inherited_meth_specs[i];
+            *mspec->offset = *mspec->parent_offset;
+        }
+
+        for (size_t i = 0; i < spec->num_overridden_meths; ++i) {
+            OverriddenMethSpec *mspec = &spec->overridden_meth_specs[i];
+            *mspec->offset = *mspec->parent_offset;
+            VTable_override(vtable, mspec->func, *mspec->offset);
+        }
+
+        for (size_t i = 0; i < spec->num_novel_meths; ++i) {
+            NovelMethSpec *mspec = &spec->novel_meth_specs[i];
+            *mspec->offset = novel_offset;
+            novel_offset += sizeof(cfish_method_t);
             VTable_override(vtable, mspec->func, *mspec->offset);
         }
 
@@ -132,15 +147,13 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
         vtable->name    = CB_newf("%s", spec->name);
         vtable->methods = VA_new(0);
 
-        for (size_t i = 0; i < spec->num_fresh; ++i) {
-            MethodSpec *mspec = &spec->method_specs[i];
-            if (mspec->is_novel) {
-                CharBuf *name = CB_newf("%s", mspec->name);
-                Method *method = Method_new(name, mspec->callback_func,
-                                            *mspec->offset);
-                VA_Push(vtable->methods, (Obj*)method);
-                DECREF(name);
-            }
+        for (size_t i = 0; i < spec->num_novel_meths; ++i) {
+            NovelMethSpec *mspec = &spec->novel_meth_specs[i];
+            CharBuf *name = CB_newf("%s", mspec->name);
+            Method *method = Method_new(name, mspec->callback_func,
+                                        *mspec->offset);
+            VA_Push(vtable->methods, (Obj*)method);
+            DECREF(name);
         }
 
         VTable_add_to_registry(vtable);

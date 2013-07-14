@@ -146,13 +146,12 @@ CFCBindMeth_typedef_dec(struct CFCMethod *method, CFCClass *klass) {
 }
 
 char*
-CFCBindMeth_spec_def(CFCMethod *method) {
-    const char *macro_sym   = CFCMethod_get_macro_sym(method);
-    const char *impl_sym    = CFCMethod_implementing_func_sym(method);
-    int         is_novel    = CFCMethod_novel(method);
+CFCBindMeth_novel_spec_def(CFCMethod *method) {
+    const char *macro_sym = CFCMethod_get_macro_sym(method);
+    const char *impl_sym  = CFCMethod_implementing_func_sym(method);
 
     const char *full_override_sym = "NULL";
-    if (is_novel && !CFCMethod_final(method)) {
+    if (!CFCMethod_final(method)) {
         full_override_sym = CFCMethod_full_override_sym(method);
     }
 
@@ -160,17 +159,59 @@ CFCBindMeth_spec_def(CFCMethod *method) {
 
     char pattern[] =
         "    {\n"
-        "        %d, /* is_novel */\n"
+        "        &%s, /* offset */\n"
         "        \"%s\", /* name */\n"
         "        (cfish_method_t)%s, /* func */\n"
-        "        (cfish_method_t)%s, /* callback_func */\n"
-        "        &%s /* offset */\n"
+        "        (cfish_method_t)%s /* callback_func */\n"
         "    }";
     char *def
-        = CFCUtil_sprintf(pattern, is_novel, macro_sym, impl_sym,
-                          full_override_sym, full_offset_sym);
+        = CFCUtil_sprintf(pattern, full_offset_sym, macro_sym, impl_sym,
+                          full_override_sym);
 
     FREEMEM(full_offset_sym);
+    return def;
+}
+
+char*
+CFCBindMeth_overridden_spec_def(CFCMethod *method, CFCClass *klass) {
+    const char *impl_sym  = CFCMethod_implementing_func_sym(method);
+
+    char *full_offset_sym = CFCMethod_full_offset_sym(method, NULL);
+
+    CFCClass *parent = CFCClass_get_parent(klass);
+    char *parent_offset_sym = CFCMethod_full_offset_sym(method, parent);
+
+    char pattern[] =
+        "    {\n"
+        "        &%s, /* offset */\n"
+        "        &%s, /* parent_offset */\n"
+        "        (cfish_method_t)%s /* func */\n"
+        "    }";
+    char *def
+        = CFCUtil_sprintf(pattern, full_offset_sym, parent_offset_sym,
+                          impl_sym);
+
+    FREEMEM(full_offset_sym);
+    FREEMEM(parent_offset_sym);
+    return def;
+}
+
+char*
+CFCBindMeth_inherited_spec_def(CFCMethod *method, CFCClass *klass) {
+    char *full_offset_sym = CFCMethod_full_offset_sym(method, klass);
+
+    CFCClass *parent = CFCClass_get_parent(klass);
+    char *parent_offset_sym = CFCMethod_full_offset_sym(method, parent);
+
+    char pattern[] =
+        "    {\n"
+        "        &%s, /* offset */\n"
+        "        &%s /* parent_offset */\n"
+        "    }";
+    char *def = CFCUtil_sprintf(pattern, full_offset_sym, parent_offset_sym);
+
+    FREEMEM(full_offset_sym);
+    FREEMEM(parent_offset_sym);
     return def;
 }
 

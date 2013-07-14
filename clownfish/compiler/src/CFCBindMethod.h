@@ -44,11 +44,25 @@ CFCBindMeth_method_def(struct CFCMethod *method, struct CFCClass *klass);
 char*
 CFCBindMeth_typedef_dec(struct CFCMethod *method, struct CFCClass *klass);
 
-/** Return C code defining the MethodSpec object for this method, which
+/** Return C code defining the MethSpec object for a novel method, which
  * is used during VTable initialization.
  */
 char*
-CFCBindMeth_spec_def(struct CFCMethod *method);
+CFCBindMeth_novel_spec_def(struct CFCMethod *method);
+
+/** Return C code defining the MethSpec object for an overridden method,
+ * which is used during VTable initialization.
+ */
+char*
+CFCBindMeth_overridden_spec_def(struct CFCMethod *method,
+                                struct CFCClass *klass);
+
+/** Return C code defining the MethSpec object for an inherited method,
+ * which is used during VTable initialization.
+ */
+char*
+CFCBindMeth_inherited_spec_def(struct CFCMethod *method,
+                               struct CFCClass *klass);
 
 /** Return C code implementing a version of the method which throws an
  * "abstract method" error at runtime, for methods which are declared as
