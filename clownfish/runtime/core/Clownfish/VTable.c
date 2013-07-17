@@ -52,7 +52,7 @@ S_claim_parcel_id(void);
 LockFreeRegistry *VTable_registry = NULL;
 
 void
-VTable_bootstrap(VTableSpec *specs, size_t num_specs)
+VTable_bootstrap(const VTableSpec *specs, size_t num_specs)
 {
     int32_t parcel_id = S_claim_parcel_id();
 
@@ -64,8 +64,8 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
      * - Initialize method pointers.
      */
     for (size_t i = 0; i < num_specs; ++i) {
-        VTableSpec *spec   = &specs[i];
-        VTable     *parent = spec->parent ? *spec->parent : NULL;
+        const VTableSpec *spec = &specs[i];
+        VTable *parent = spec->parent ? *spec->parent : NULL;
 
         size_t ivars_offset = 0;
         if (spec->ivars_offset_ptr != NULL) {
@@ -103,18 +103,18 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
         }
 
         for (size_t i = 0; i < spec->num_inherited_meths; ++i) {
-            InheritedMethSpec *mspec = &spec->inherited_meth_specs[i];
+            const InheritedMethSpec *mspec = &spec->inherited_meth_specs[i];
             *mspec->offset = *mspec->parent_offset;
         }
 
         for (size_t i = 0; i < spec->num_overridden_meths; ++i) {
-            OverriddenMethSpec *mspec = &spec->overridden_meth_specs[i];
+            const OverriddenMethSpec *mspec = &spec->overridden_meth_specs[i];
             *mspec->offset = *mspec->parent_offset;
             VTable_override(vtable, mspec->func, *mspec->offset);
         }
 
         for (size_t i = 0; i < spec->num_novel_meths; ++i) {
-            NovelMethSpec *mspec = &spec->novel_meth_specs[i];
+            const NovelMethSpec *mspec = &spec->novel_meth_specs[i];
             *mspec->offset = novel_offset;
             novel_offset += sizeof(cfish_method_t);
             VTable_override(vtable, mspec->func, *mspec->offset);
@@ -128,8 +128,8 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
      * - Initialize refcount.
      */
     for (size_t i = 0; i < num_specs; ++i) {
-        VTableSpec *spec   = &specs[i];
-        VTable     *vtable = *spec->vtable;
+        const VTableSpec *spec = &specs[i];
+        VTable *vtable = *spec->vtable;
 
         VTable_init_obj(VTABLE, vtable);
     }
@@ -141,14 +141,14 @@ VTable_bootstrap(VTableSpec *specs, size_t num_specs)
      * - Register vtable.
      */
     for (size_t i = 0; i < num_specs; ++i) {
-        VTableSpec *spec   = &specs[i];
-        VTable     *vtable = *spec->vtable;
+        const VTableSpec *spec = &specs[i];
+        VTable *vtable = *spec->vtable;
 
         vtable->name    = CB_newf("%s", spec->name);
         vtable->methods = VA_new(0);
 
         for (size_t i = 0; i < spec->num_novel_meths; ++i) {
-            NovelMethSpec *mspec = &spec->novel_meth_specs[i];
+            const NovelMethSpec *mspec = &spec->novel_meth_specs[i];
             CharBuf *name = CB_newf("%s", mspec->name);
             Method *method = Method_new(name, mspec->callback_func,
                                         *mspec->offset);

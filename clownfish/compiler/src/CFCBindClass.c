@@ -312,7 +312,8 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
                 // symbol and then store a pointer to that symbol inside the
                 // VTableSpec struct.
                 novel_ms_var
-                    = CFCUtil_cat(novel_ms_var, "static cfish_NovelMethSpec ",
+                    = CFCUtil_cat(novel_ms_var,
+                                  "static const cfish_NovelMethSpec ",
                                   vt_var, "_NOVEL_METHS[] = {\n", NULL);
             }
             else {
@@ -327,8 +328,8 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
                 // Start an array of cfish_OverriddenMethSpec structs.
                 overridden_ms_var
                     = CFCUtil_cat(overridden_ms_var,
-                                  "static cfish_OverriddenMethSpec ", vt_var,
-                                  "_OVERRIDDEN_METHS[] = {\n", NULL);
+                                  "static const cfish_OverriddenMethSpec ",
+                                  vt_var, "_OVERRIDDEN_METHS[] = {\n", NULL);
             }
             else {
                 overridden_ms_var
@@ -343,8 +344,8 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
                 // Start an array of cfish_InheritedMethSpec structs.
                 inherited_ms_var
                     = CFCUtil_cat(inherited_ms_var,
-                                  "static cfish_InheritedMethSpec ", vt_var,
-                                  "_INHERITED_METHS[] = {\n", NULL);
+                                  "static const cfish_InheritedMethSpec ",
+                                  vt_var, "_INHERITED_METHS[] = {\n", NULL);
             }
             else {
                 inherited_ms_var = CFCUtil_cat(inherited_ms_var, ",\n", NULL);

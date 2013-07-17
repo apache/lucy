@@ -250,9 +250,9 @@ S_write_parcel_h(CFCBindCore *self, CFCParcel *parcel) {
         "    uint32_t       num_novel_meths;\n"
         "    uint32_t       num_overridden_meths;\n"
         "    uint32_t       num_inherited_meths;\n"
-        "    cfish_NovelMethSpec      *novel_meth_specs;\n"
-        "    cfish_OverriddenMethSpec *overridden_meth_specs;\n"
-        "    cfish_InheritedMethSpec  *inherited_meth_specs;\n"
+        "    const cfish_NovelMethSpec      *novel_meth_specs;\n"
+        "    const cfish_OverriddenMethSpec *overridden_meth_specs;\n"
+        "    const cfish_InheritedMethSpec  *inherited_meth_specs;\n"
         "} cfish_VTableSpec;\n"
         "\n"
         "#ifdef CFISH_USE_SHORT_NAMES\n"
@@ -355,7 +355,7 @@ S_write_parcel_c(CFCBindCore *self, CFCParcel *parcel) {
     char *includes     = CFCUtil_strdup("");
     char *c_data       = CFCUtil_strdup("");
     char *vt_specs = CFCUtil_strdup(
-        "static cfish_VTableSpec vtable_specs[] = {\n");
+        "static const cfish_VTableSpec vtable_specs[] = {\n");
     int num_specs = 0;
     CFCClass **ordered  = CFCHierarchy_ordered_classes(hierarchy);
     for (int i = 0; ordered[i] != NULL; i++) {
