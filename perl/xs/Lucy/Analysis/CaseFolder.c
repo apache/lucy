@@ -38,12 +38,7 @@ S_lc_to_work_buf(lucy_CaseFolder *self, uint8_t *source, size_t len,
 
     while (source < end) {
         STRLEN buf_utf8_len;
-        #if (PERL_VERSION == 15 && PERL_SUBVERSION >= 6)
-        Perl__to_utf8_lower_flags(aTHX_ source, utf8_buf, &buf_utf8_len,
-                                  0, NULL);
-        #else
-        Perl_to_utf8_lower(aTHX_ source, utf8_buf, &buf_utf8_len);
-        #endif
+        to_utf8_lower(source, utf8_buf, &buf_utf8_len);
 
         // Grow if necessary.
         if (((STRLEN)(*limit - dest)) < buf_utf8_len) {
