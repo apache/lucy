@@ -158,7 +158,7 @@ S_ivars_func(CFCBindClass *self) {
     char pattern[] =
         "extern size_t %s;\n"
         "typedef struct %s %s;\n"
-        "static CHY_INLINE %s*\n"
+        "static CFISH_INLINE %s*\n"
         "%s(%s *self) {\n"
         "   char *ptr = (char*)self + %s;\n"
         "   return (%s*)ptr;\n"
