@@ -17,7 +17,10 @@ use strict;
 use warnings;
 
 package Lucy::Build;
-use base qw( Clownfish::CFC::Perl::Build );
+use base qw(
+    Clownfish::CFC::Perl::Build
+    Clownfish::CFC::Perl::Build::Charmonic
+);
 
 our $VERSION = '0.003000';
 $VERSION = eval $VERSION;
@@ -84,8 +87,6 @@ sub ACTION_lemon {
 
 sub ACTION_copy_clownfish_includes {
     my $self = shift;
-
-    $self->depends_on('charmony');
 
     $self->SUPER::ACTION_copy_clownfish_includes;
 
@@ -233,7 +234,20 @@ sub ACTION_parsers {
 sub ACTION_compile_custom_xs {
     my $self = shift;
 
-    $self->depends_on('parsers');
+    $self->depends_on(qw( parsers charmony ));
+
+    # Add extra compiler flags from Charmonizer.
+    my $charm_cflags = $self->charmony('EXTRA_CFLAGS');
+    if ($charm_cflags) {
+        my $cf_cflags = $self->clownfish_params('cflags');
+        if ($cf_cflags) {
+            $cf_cflags .= " $charm_cflags";
+        }
+        else {
+            $cf_cflags = $charm_cflags;
+        }
+        $self->clownfish_params( cflags => $cf_cflags );
+    }
 
     $self->SUPER::ACTION_compile_custom_xs;
 }
