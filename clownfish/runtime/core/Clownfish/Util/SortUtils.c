@@ -41,7 +41,7 @@ static void
 S_msort_any(void *velems, void *vscratch, uint32_t left, uint32_t right,
             Cfish_Sort_Compare_t compare, void *context, size_t width);
 
-static INLINE void
+static CFISH_INLINE void
 SI_merge(void *left_vptr,  uint32_t left_size,
          void *right_vptr, uint32_t right_size,
          void *vdest, size_t width, Cfish_Sort_Compare_t compare, void *context);
@@ -152,7 +152,7 @@ S_msort_any(void *velems, void *vscratch, uint32_t left, uint32_t right,
     }
 }
 
-static INLINE void
+static CFISH_INLINE void
 SI_merge(void *left_vptr,  uint32_t left_size,
          void *right_vptr, uint32_t right_size,
          void *vdest, size_t width, Cfish_Sort_Compare_t compare,
@@ -194,9 +194,9 @@ S_qsort8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
          Cfish_Sort_Compare_t compare, void *context);
 
 // Swap two elements.
-static INLINE void
+static CFISH_INLINE void
 SI_exchange4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right);
-static INLINE void
+static CFISH_INLINE void
 SI_exchange8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right);
 
 /* Select a pivot by choosing the median of three values, guarding against
@@ -219,10 +219,10 @@ SI_exchange8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right);
  *   abb => abb => abb => abb
  *   aaa => aaa => aaa => aaa
  */
-static INLINE FOUR_BYTE_TYPE*
+static CFISH_INLINE FOUR_BYTE_TYPE*
 SI_choose_pivot4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
                  Cfish_Sort_Compare_t compare, void *context);
-static INLINE EIGHT_BYTE_TYPE*
+static CFISH_INLINE EIGHT_BYTE_TYPE*
 SI_choose_pivot8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
                  Cfish_Sort_Compare_t compare, void *context);
 
@@ -251,14 +251,14 @@ Sort_quicksort(void *elems, size_t num_elems, size_t width,
 
 /************************* quicksort 4 byte *********************************/
 
-static INLINE void
+static CFISH_INLINE void
 SI_exchange4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right) {
     FOUR_BYTE_TYPE saved = elems[left];
     elems[left]  = elems[right];
     elems[right] = saved;
 }
 
-static INLINE FOUR_BYTE_TYPE*
+static CFISH_INLINE FOUR_BYTE_TYPE*
 SI_choose_pivot4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
                  Cfish_Sort_Compare_t compare, void *context) {
     if (right - left > 1) {
@@ -356,14 +356,14 @@ S_qsort4(FOUR_BYTE_TYPE *elems, int32_t left, int32_t right,
 
 /************************* quicksort 8 byte *********************************/
 
-static INLINE void
+static CFISH_INLINE void
 SI_exchange8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right) {
     EIGHT_BYTE_TYPE saved = elems[left];
     elems[left]  = elems[right];
     elems[right] = saved;
 }
 
-static INLINE EIGHT_BYTE_TYPE*
+static CFISH_INLINE EIGHT_BYTE_TYPE*
 SI_choose_pivot8(EIGHT_BYTE_TYPE *elems, int32_t left, int32_t right,
                  Cfish_Sort_Compare_t compare, void *context) {
     if (right - left > 1) {

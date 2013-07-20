@@ -25,15 +25,15 @@
 #include "Lucy/Store/RAMFileHandle.h"
 
 // Inlined version of InStream_Tell.
-static INLINE int64_t
+static CFISH_INLINE int64_t
 SI_tell(InStream *self);
 
 // Inlined version of InStream_Read_Bytes.
-static INLINE void
+static CFISH_INLINE void
 SI_read_bytes(InStream *self, char* buf, size_t len);
 
 // Inlined version of InStream_Read_U8.
-static INLINE uint8_t
+static CFISH_INLINE uint8_t
 SI_read_u8(InStream *self, InStreamIVARS *const ivars);
 
 // Ensure that the buffer contains exactly the specified amount of data.
@@ -261,7 +261,7 @@ InStream_seek(InStream *self, int64_t target) {
     }
 }
 
-static INLINE int64_t
+static CFISH_INLINE int64_t
 SI_tell(InStream *self) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     char *fw_buf = FileWindow_Get_Buf(ivars->window);
@@ -331,7 +331,7 @@ InStream_read_bytes(InStream *self, char* buf, size_t len) {
     SI_read_bytes(self, buf, len);
 }
 
-static INLINE void
+static CFISH_INLINE void
 SI_read_bytes(InStream *self, char* buf, size_t len) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     const int64_t available = PTR_TO_I64(ivars->limit) - PTR_TO_I64(ivars->buf);
@@ -383,7 +383,7 @@ InStream_read_i8(InStream *self) {
     return (int8_t)SI_read_u8(self, ivars);
 }
 
-static INLINE uint8_t
+static CFISH_INLINE uint8_t
 SI_read_u8(InStream *self, InStreamIVARS *ivars) {
     if (ivars->buf >= ivars->limit) { S_refill(self); }
     return (uint8_t)(*ivars->buf++);
@@ -395,7 +395,7 @@ InStream_read_u8(InStream *self) {
     return SI_read_u8(self, ivars);
 }
 
-static INLINE uint32_t
+static CFISH_INLINE uint32_t
 SI_read_u32(InStream *self) {
     uint32_t retval;
     SI_read_bytes(self, (char*)&retval, 4);
@@ -415,7 +415,7 @@ InStream_read_i32(InStream *self) {
     return (int32_t)SI_read_u32(self);
 }
 
-static INLINE uint64_t
+static CFISH_INLINE uint64_t
 SI_read_u64(InStream *self) {
     uint64_t retval;
     SI_read_bytes(self, (char*)&retval, 8);

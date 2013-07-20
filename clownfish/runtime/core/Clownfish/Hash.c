@@ -41,15 +41,15 @@ typedef struct HashEntry {
 } HashEntry;
 
 // Reset the iterator.  Hash_Iterate must be called to restart iteration.
-static INLINE void
+static CFISH_INLINE void
 SI_kill_iter(Hash *self);
 
 // Return the entry associated with the key, if any.
-static INLINE HashEntry*
+static CFISH_INLINE HashEntry*
 SI_fetch_entry(Hash *self, const Obj *key, int32_t hash_sum);
 
 // Double the number of buckets and redistribute all entries.
-static INLINE HashEntry*
+static CFISH_INLINE HashEntry*
 SI_rebuild_hash(Hash *self);
 
 void
@@ -176,7 +176,7 @@ Hash_fetch_str(Hash *self, const char *key, size_t key_len) {
     return Hash_fetch(self, (Obj*)key_buf);
 }
 
-static INLINE HashEntry*
+static CFISH_INLINE HashEntry*
 SI_fetch_entry(Hash *self, const Obj *key, int32_t hash_sum) {
     uint32_t tick = hash_sum;
     HashEntry *const entries = (HashEntry*)self->entries;
@@ -234,7 +234,7 @@ Hash_iterate(Hash *self) {
     return self->size;
 }
 
-static INLINE void
+static CFISH_INLINE void
 SI_kill_iter(Hash *self) {
     self->iter_tick = -1;
 }
@@ -319,7 +319,7 @@ Hash_get_size(Hash *self) {
     return self->size;
 }
 
-static INLINE HashEntry*
+static CFISH_INLINE HashEntry*
 SI_rebuild_hash(Hash *self) {
     HashEntry *old_entries = (HashEntry*)self->entries;
     HashEntry *entry       = old_entries;

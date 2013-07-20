@@ -131,7 +131,7 @@ HitQ_jostle(HitQueue *self, Obj *element) {
     return super_jostle(self, element);
 }
 
-static INLINE int32_t
+static CFISH_INLINE int32_t
 SI_compare_by_value(HitQueueIVARS *ivars, uint32_t tick,
                     MatchDocIVARS *a_ivars, MatchDocIVARS *b_ivars) {
     Obj *a_val = VA_Fetch(a_ivars->values, tick);

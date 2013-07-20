@@ -107,7 +107,7 @@ BB_get_capacity(ByteBuf *self) {
     return self->cap;
 }
 
-static INLINE bool
+static CFISH_INLINE bool
 SI_equals_bytes(ByteBuf *self, const void *bytes, size_t size) {
     if (self->size != size) { return false; }
     return (memcmp(self->buf, bytes, self->size) == 0);
@@ -138,7 +138,7 @@ BB_hash_sum(ByteBuf *self) {
     return (int32_t)sum;
 }
 
-static INLINE void
+static CFISH_INLINE void
 SI_mimic_bytes(ByteBuf *self, const void *bytes, size_t size) {
     if (size > self->cap) { S_grow(self, size); }
     memmove(self->buf, bytes, size);
@@ -156,7 +156,7 @@ BB_mimic(ByteBuf *self, Obj *other) {
     SI_mimic_bytes(self, twin->buf, twin->size);
 }
 
-static INLINE void
+static CFISH_INLINE void
 SI_cat_bytes(ByteBuf *self, const void *bytes, size_t size) {
     const size_t new_size = self->size + size;
     if (new_size > self->cap) {

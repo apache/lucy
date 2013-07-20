@@ -62,7 +62,7 @@ static int8_t
 S_derive_action(SortRule *rule, SortCache *sort_cache);
 
 // Decide whether a doc should be inserted into the HitQueue.
-static INLINE bool
+static CFISH_INLINE bool
 SI_competitive(SortCollectorIVARS *ivars, int32_t doc_id);
 
 SortCollector*
@@ -337,7 +337,7 @@ SortColl_collect(SortCollector *self, int32_t doc_id) {
     }
 }
 
-static INLINE int32_t
+static CFISH_INLINE int32_t
 SI_compare_by_ord1(SortCollectorIVARS *ivars, uint32_t tick,
                    int32_t a, int32_t b) {
     void *const ords = ivars->ord_arrays[tick];
@@ -345,7 +345,7 @@ SI_compare_by_ord1(SortCollectorIVARS *ivars, uint32_t tick,
     int32_t b_ord = NumUtil_u1get(ords, b);
     return a_ord - b_ord;
 }
-static INLINE int32_t
+static CFISH_INLINE int32_t
 SI_compare_by_ord2(SortCollectorIVARS *ivars, uint32_t tick,
                    int32_t a, int32_t b) {
     void *const ords = ivars->ord_arrays[tick];
@@ -353,7 +353,7 @@ SI_compare_by_ord2(SortCollectorIVARS *ivars, uint32_t tick,
     int32_t b_ord = NumUtil_u2get(ords, b);
     return a_ord - b_ord;
 }
-static INLINE int32_t
+static CFISH_INLINE int32_t
 SI_compare_by_ord4(SortCollectorIVARS *ivars, uint32_t tick,
                    int32_t a, int32_t b) {
     void *const ords = ivars->ord_arrays[tick];
@@ -361,7 +361,7 @@ SI_compare_by_ord4(SortCollectorIVARS *ivars, uint32_t tick,
     int32_t b_ord = NumUtil_u4get(ords, b);
     return a_ord - b_ord;
 }
-static INLINE int32_t
+static CFISH_INLINE int32_t
 SI_compare_by_ord8(SortCollectorIVARS *ivars, uint32_t tick,
                    int32_t a, int32_t b) {
     uint8_t *ords = (uint8_t*)ivars->ord_arrays[tick];
@@ -369,7 +369,7 @@ SI_compare_by_ord8(SortCollectorIVARS *ivars, uint32_t tick,
     int32_t b_ord = ords[b];
     return a_ord - b_ord;
 }
-static INLINE int32_t
+static CFISH_INLINE int32_t
 SI_compare_by_ord16(SortCollectorIVARS *ivars, uint32_t tick,
                     int32_t a, int32_t b) {
     uint8_t *ord_bytes = (uint8_t*)ivars->ord_arrays[tick];
@@ -379,7 +379,7 @@ SI_compare_by_ord16(SortCollectorIVARS *ivars, uint32_t tick,
     int32_t  ord_b = NumUtil_decode_bigend_u16(address_b);
     return ord_a - ord_b;
 }
-static INLINE int32_t
+static CFISH_INLINE int32_t
 SI_compare_by_ord32(SortCollectorIVARS *ivars, uint32_t tick,
                     int32_t a, int32_t b) {
     uint8_t *ord_bytes = (uint8_t*)ivars->ord_arrays[tick];
@@ -389,7 +389,7 @@ SI_compare_by_ord32(SortCollectorIVARS *ivars, uint32_t tick,
     int32_t  ord_b = NumUtil_decode_bigend_u32(address_b);
     return ord_a - ord_b;
 }
-static INLINE int32_t
+static CFISH_INLINE int32_t
 SI_compare_by_native_ord16(SortCollectorIVARS *ivars, uint32_t tick,
                            int32_t a, int32_t b) {
     uint16_t *ords = (uint16_t*)ivars->ord_arrays[tick];
@@ -397,7 +397,7 @@ SI_compare_by_native_ord16(SortCollectorIVARS *ivars, uint32_t tick,
     int32_t b_ord = ords[b];
     return a_ord - b_ord;
 }
-static INLINE int32_t
+static CFISH_INLINE int32_t
 SI_compare_by_native_ord32(SortCollectorIVARS *ivars, uint32_t tick,
                            int32_t a, int32_t b) {
     int32_t *ords = (int32_t*)ivars->ord_arrays[tick];
@@ -406,7 +406,7 @@ SI_compare_by_native_ord32(SortCollectorIVARS *ivars, uint32_t tick,
 
 // Bounds checking for doc id against the segment doc_max.  We assume that any
 // sort cache ord arrays can accomodate lookups up to this number.
-static INLINE int32_t
+static CFISH_INLINE int32_t
 SI_validate_doc_id(SortCollectorIVARS *ivars, int32_t doc_id) {
     // Check as uint32_t since we're using these doc ids as array indexes.
     if ((uint32_t)doc_id > (uint32_t)ivars->seg_doc_max) {
@@ -416,7 +416,7 @@ SI_validate_doc_id(SortCollectorIVARS *ivars, int32_t doc_id) {
     return doc_id;
 }
 
-static INLINE bool
+static CFISH_INLINE bool
 SI_competitive(SortCollectorIVARS *ivars, int32_t doc_id) {
     /* Ordinarily, we would cache local copies of more member variables in
      * const automatic variables in order to improve code clarity and provide

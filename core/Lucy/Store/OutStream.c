@@ -26,12 +26,12 @@
 #include "Lucy/Store/RAMFileHandle.h"
 
 // Inlined version of OutStream_Write_Bytes.
-static INLINE void
+static CFISH_INLINE void
 SI_write_bytes(OutStream *self, OutStreamIVARS *ivars,
                const void *bytes, size_t len);
 
 // Inlined version of OutStream_Write_C32.
-static INLINE void
+static CFISH_INLINE void
 SI_write_c32(OutStream *self, OutStreamIVARS *ivars, uint32_t value);
 
 // Flush content in the buffer to the FileHandle.
@@ -176,7 +176,7 @@ OutStream_write_bytes(OutStream *self, const void *bytes, size_t len) {
     SI_write_bytes(self, OutStream_IVARS(self), bytes, len);
 }
 
-static INLINE void
+static CFISH_INLINE void
 SI_write_bytes(OutStream *self, OutStreamIVARS *ivars,
                const void *bytes, size_t len) {
     // If this data is larger than the buffer size, flush and write.
@@ -200,7 +200,7 @@ SI_write_bytes(OutStream *self, OutStreamIVARS *ivars,
     }
 }
 
-static INLINE void
+static CFISH_INLINE void
 SI_write_u8(OutStream *self, OutStreamIVARS *ivars, uint8_t value) {
     if (ivars->buf_pos >= IO_STREAM_BUF_SIZE) {
         S_flush(self, ivars);
@@ -220,7 +220,7 @@ OutStream_write_u8(OutStream *self, uint8_t value) {
     SI_write_u8(self, ivars, value);
 }
 
-static INLINE void
+static CFISH_INLINE void
 SI_write_u32(OutStream *self, OutStreamIVARS *ivars, uint32_t value) {
 #ifdef BIG_END
     SI_write_bytes(self, ivars, &value, 4);
@@ -242,7 +242,7 @@ OutStream_write_u32(OutStream *self, uint32_t value) {
     SI_write_u32(self, OutStream_IVARS(self), value);
 }
 
-static INLINE void
+static CFISH_INLINE void
 SI_write_u64(OutStream *self, OutStreamIVARS *ivars, uint64_t value) {
 #ifdef BIG_END
     SI_write_bytes(self, ivars, &value, 8);
@@ -287,7 +287,7 @@ OutStream_write_c32(OutStream *self, uint32_t value) {
     SI_write_c32(self, OutStream_IVARS(self), value);
 }
 
-static INLINE void
+static CFISH_INLINE void
 SI_write_c32(OutStream *self, OutStreamIVARS *ivars, uint32_t value) {
     uint8_t buf[C32_MAX_BYTES];
     uint8_t *ptr = buf + sizeof(buf) - 1;

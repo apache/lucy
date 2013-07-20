@@ -45,7 +45,7 @@ FSDH_destroy(FSDirHandle *self) {
     SUPER_DESTROY(self, FSDIRHANDLE);
 }
 
-static INLINE bool
+static CFISH_INLINE bool
 SI_is_updir(const char *name, size_t len) {
     if (len == 2 && strncmp(name, "..", 2) == 0) {
         return true;

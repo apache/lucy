@@ -98,7 +98,7 @@ SortEx_feed(SortExternal *self, void *data) {
     ivars->cache_max++;
 }
 
-static INLINE void*
+static CFISH_INLINE void*
 SI_peek(SortExternal *self, SortExternalIVARS *ivars) {
     if (ivars->cache_tick >= ivars->cache_max) {
         S_refill_cache(self, ivars);

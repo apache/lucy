@@ -38,7 +38,7 @@
 #include "Lucy/Store/FileWindow.h"
 
 // Convert FileHandle flags to POSIX flags.
-static INLINE int
+static CFISH_INLINE int
 SI_posix_flags(uint32_t fh_flags) {
     int posix_flags = 0;
     if (fh_flags & FH_WRITE_ONLY) { posix_flags |= O_WRONLY; }
@@ -59,26 +59,26 @@ SI_posix_flags(uint32_t fh_flags) {
 // Memory map a region of the file with shared (read-only) permissions.  If
 // the requested length is 0, return NULL.  If an error occurs, return NULL
 // and set Err_error.
-static INLINE void*
+static CFISH_INLINE void*
 SI_map(FSFileHandle *self, FSFileHandleIVARS *ivars, int64_t offset,
        int64_t len);
 
 // Release a memory mapped region assigned by SI_map.
-static INLINE bool
+static CFISH_INLINE bool
 SI_unmap(FSFileHandle *self, char *ptr, int64_t len);
 
 // 32-bit or 64-bit inlined helpers for FSFH_window.
-static INLINE bool
+static CFISH_INLINE bool
 SI_window(FSFileHandle *self, FSFileHandleIVARS *ivars, FileWindow *window,
           int64_t offset, int64_t len);
 
 // Architecture- and OS- specific initialization for a read-only FSFileHandle.
-static INLINE bool
+static CFISH_INLINE bool
 SI_init_read_only(FSFileHandle *self, FSFileHandleIVARS *ivars);
 
 // Windows-specific routine needed for closing read-only handles.
 #ifdef CHY_HAS_WINDOWS_H
-static INLINE bool
+static CFISH_INLINE bool
 SI_close_win_handles(FSFileHandle *self);
 #endif
 
@@ -244,7 +244,7 @@ FSFH_window(FSFileHandle *self, FileWindow *window, int64_t offset,
 
 #if IS_64_BIT
 
-static INLINE bool
+static CFISH_INLINE bool
 SI_window(FSFileHandle *self, FSFileHandleIVARS *ivars, FileWindow *window,
           int64_t offset, int64_t len) {
     UNUSED_VAR(self);
@@ -286,7 +286,7 @@ FSFH_read(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
 
 #else
 
-static INLINE bool
+static CFISH_INLINE bool
 SI_window(FSFileHandle *self, FSFileHandleIVARS *ivars, FileWindow *window,
           int64_t offset, int64_t len) {
     // Release the previously mmap'd region, if any.
@@ -325,7 +325,7 @@ FSFH_release_window(FSFileHandle *self, FileWindow *window) {
 
 #ifdef CHY_HAS_SYS_MMAN_H
 
-static INLINE bool
+static CFISH_INLINE bool
 SI_init_read_only(FSFileHandle *self, FSFileHandleIVARS *ivars) {
     UNUSED_VAR(self);
 
@@ -367,7 +367,7 @@ SI_init_read_only(FSFileHandle *self, FSFileHandleIVARS *ivars) {
     return true;
 }
 
-static INLINE void*
+static CFISH_INLINE void*
 SI_map(FSFileHandle *self, FSFileHandleIVARS *ivars, int64_t offset,
        int64_t len) {
     UNUSED_VAR(self);
@@ -388,7 +388,7 @@ SI_map(FSFileHandle *self, FSFileHandleIVARS *ivars, int64_t offset,
     return buf;
 }
 
-static INLINE bool
+static CFISH_INLINE bool
 SI_unmap(FSFileHandle *self, char *buf, int64_t len) {
     if (buf != NULL) {
         if (munmap(buf, len)) {
@@ -436,7 +436,7 @@ FSFH_read(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
 
 #elif defined(CHY_HAS_WINDOWS_H)
 
-static INLINE bool
+static CFISH_INLINE bool
 SI_init_read_only(FSFileHandle *self, FSFileHandleIVARS *ivars) {
     char *filepath = (char*)CB_Get_Ptr8(ivars->path);
     SYSTEM_INFO sys_info;
@@ -490,7 +490,7 @@ SI_init_read_only(FSFileHandle *self, FSFileHandleIVARS *ivars) {
     return true;
 }
 
-static INLINE void*
+static CFISH_INLINE void*
 SI_map(FSFileHandle *self, FSFileHandleIVARS *ivars, int64_t offset,
        int64_t len) {
     void *buf = NULL;
@@ -514,7 +514,7 @@ SI_map(FSFileHandle *self, FSFileHandleIVARS *ivars, int64_t offset,
     return buf;
 }
 
-static INLINE bool
+static CFISH_INLINE bool
 SI_unmap(FSFileHandle *self, char *ptr, int64_t len) {
     if (buf != NULL) {
         if (!UnmapViewOfFile(buf)) {
@@ -529,7 +529,7 @@ SI_unmap(FSFileHandle *self, char *ptr, int64_t len) {
     return true;
 }
 
-static INLINE bool
+static CFISH_INLINE bool
 SI_close_win_handles(FSFileHandle *self) {
     FSFileHandleIVARS *ivars = FSFH_IVARS(self);
     // Close both standard handle and mapping handle.

@@ -33,12 +33,12 @@ S_clear(ORMatcher *self, ORMatcherIVARS *ivars);
 
 // Call Matcher_Next() on the top queue element and adjust the queue,
 // removing the element if Matcher_Next() returns false.
-static INLINE int32_t
+static CFISH_INLINE int32_t
 SI_top_next(ORMatcher *self, ORMatcherIVARS *ivars);
 
 // Call Matcher_Advance() on the top queue element and adjust the queue,
 // removing the element if Matcher_Advance() returns false.
-static INLINE int32_t
+static CFISH_INLINE int32_t
 SI_top_advance(ORMatcher *self, ORMatcherIVARS *ivars, int32_t target);
 
 /* React to a change in the top element, or "root" -- presumably the update of
@@ -173,14 +173,14 @@ S_clear(ORMatcher *self, ORMatcherIVARS *ivars) {
     }
 }
 
-static INLINE int32_t
+static CFISH_INLINE int32_t
 SI_top_next(ORMatcher *self, ORMatcherIVARS *ivars) {
     HeapedMatcherDoc *const top_hmd = ivars->top_hmd;
     top_hmd->doc = Matcher_Next(top_hmd->matcher);
     return S_adjust_root(self, ivars);
 }
 
-static INLINE int32_t
+static CFISH_INLINE int32_t
 SI_top_advance(ORMatcher *self, ORMatcherIVARS *ivars, int32_t target) {
     HeapedMatcherDoc *const top_hmd = ivars->top_hmd;
     top_hmd->doc = Matcher_Advance(top_hmd->matcher, target);

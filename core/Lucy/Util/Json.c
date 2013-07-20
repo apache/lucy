@@ -67,7 +67,7 @@ S_unescape_text(char *const top, char *const end);
 // Check that the supplied text begins with the specified keyword, which must
 // then end on a word boundary (i.e. match "null" but not the first four
 // letters of "nullify").
-static INLINE bool
+static CFISH_INLINE bool
 SI_check_keyword(char *json, char* end, const char *keyword, size_t len);
 
 // Make it possible to be loosen constraints during testing.
@@ -651,7 +651,7 @@ S_unescape_text(char *const top, char *const end) {
     return CB_new_steal_from_trusted_str(target_buf, target_size, cap);
 }
 
-static INLINE bool
+static CFISH_INLINE bool
 SI_check_keyword(char *json, char* end, const char *keyword, size_t len) {
     if ((size_t)(end - json) > len
         && strncmp(json, keyword, len) == 0

@@ -197,7 +197,7 @@ ProximityMatcher_advance(ProximityMatcher *self, int32_t target) {
 }
 
 
-static INLINE uint32_t
+static CFISH_INLINE uint32_t
 SI_winnow_anchors(uint32_t *anchors_start, const uint32_t *const anchors_end,
                   const uint32_t *candidates, const uint32_t *const candidates_end,
                   uint32_t offset, uint32_t within) {
