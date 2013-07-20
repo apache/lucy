@@ -418,7 +418,7 @@ S_write_parcel_c(CFCBindCore *self, CFCParcel *parcel) {
     char pattern[] =
         "%s\n"
         "\n"
-        "#define C_CFISH_VTABLE\n"          // Needed for method_ptrs offset.
+        "#define C_CFISH_VTABLE\n"          // Needed for abstract methods.
         "#include <stdio.h>\n"
         "#include <stdlib.h>\n"
         "%s\n"
@@ -428,7 +428,7 @@ S_write_parcel_c(CFCBindCore *self, CFCParcel *parcel) {
         "#include \"Clownfish/Err.h\"\n"     // Needed for dump/load.
         "#include \"Clownfish/Num.h\"\n"     // Needed for dump/load.
         "#include \"Clownfish/VArray.h\"\n"  // Needed for dump/load.
-        "#include \"Clownfish/VTable.h\"\n"  // Needed for method_ptrs offset.
+        "#include \"Clownfish/VTable.h\"\n"  // Needed for bootstrap.
         "%s\n"
         "\n"
         "%s\n"
