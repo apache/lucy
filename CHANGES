@@ -1,5 +1,15 @@
 Revision history for Lucy
 
+0.3.3  2013-07-22
+
+  Bugfixes:
+
+    * [LUCY-239] - Simplify JSON Parser Y File
+    * [LUCY-243] - Trap remove errno and warn
+    * [LUCY-245] - Charmonizer fails to detect syntax for 64-bit integer
+      literals
+    * [LUCY-259] - Compensate for Perl export flakiness of to_utf8_lower
+
 0.3.2  2012-07-05
 
   Bugfixes:
