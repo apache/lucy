@@ -15,7 +15,7 @@
 
 package Lucy::Test;
 use Lucy;
-our $VERSION = '0.003002';
+our $VERSION = '0.003003';
 $VERSION = eval $VERSION;
 
 # Set the default memory threshold for PostingListWriter to a low number so
@@ -23,7 +23,7 @@ $VERSION = eval $VERSION;
 Lucy::Index::PostingListWriter::set_default_mem_thresh(0x1000);
 
 package Lucy::Test::TestCharmonizer;
-our $VERSION = '0.003002';
+our $VERSION = '0.003003';
 $VERSION = eval $VERSION;
 use Config;
 use File::Spec::Functions qw( catfile updir );

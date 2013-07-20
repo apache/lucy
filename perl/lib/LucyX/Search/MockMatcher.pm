@@ -18,7 +18,7 @@ use warnings;
 
 package LucyX::Search::MockMatcher;
 use Lucy;
-our $VERSION = '0.003002';
+our $VERSION = '0.003003';
 $VERSION = eval $VERSION;
 
 sub new {

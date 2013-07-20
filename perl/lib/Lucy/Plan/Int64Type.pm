@@ -15,7 +15,7 @@
 
 package Lucy::Plan::Int64Type;
 use Lucy;
-our $VERSION = '0.003002';
+our $VERSION = '0.003003';
 $VERSION = eval $VERSION;
 
 1;

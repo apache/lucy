@@ -24,7 +24,7 @@ use lib 'clownfish/perl/blib/lib';
 package Lucy::Build::CBuilder;
 BEGIN { our @ISA = "ExtUtils::CBuilder"; }
 use Config;
-our $VERSION = '0.003002';
+our $VERSION = '0.003003';
 $VERSION = eval $VERSION;
 
 my %cc;
@@ -65,7 +65,7 @@ sub link_executable {
 
 package Lucy::Build;
 use base qw( Module::Build );
-our $VERSION = '0.003002';
+our $VERSION = '0.003003';
 $VERSION = eval $VERSION;
 
 use File::Spec::Functions

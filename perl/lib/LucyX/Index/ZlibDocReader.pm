@@ -18,7 +18,7 @@ use warnings;
 
 package LucyX::Index::ZlibDocReader;
 use base qw( Lucy::Index::DocReader );
-our $VERSION = '0.003002';
+our $VERSION = '0.003003';
 $VERSION = eval $VERSION;
 use Lucy::Util::StringHelper qw( utf8_valid utf8_flag_on );
 use Compress::Zlib qw( uncompress );

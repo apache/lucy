@@ -15,7 +15,7 @@
 
 package Lucy::Util::IndexFileNames;
 use Lucy;
-our $VERSION = '0.003002';
+our $VERSION = '0.003003';
 $VERSION = eval $VERSION;
 
 1;

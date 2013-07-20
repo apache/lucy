@@ -25,7 +25,7 @@ use Lucy qw( to_perl );
 use bytes;
 no bytes;
 
-our $VERSION = '0.003002';
+our $VERSION = '0.003003';
 $VERSION = eval $VERSION;
 
 # Inside-out member vars.
