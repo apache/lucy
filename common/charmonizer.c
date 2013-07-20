@@ -7082,16 +7082,6 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
         }
     }
 
-    /* When compiling for Perl bindings, define HAS_BOOL so that the Perl
-     * headers don't redefine 'bool' in conflict with C++.
-     *
-     * TODO: Compile all files that #include Perl headers separately and
-     * remove this directive.
-     */
-    if (args->charmony_pm) {
-        chaz_CFlags_add_define(extra_cflags, "HAS_BOOL", NULL);
-    }
-
     chaz_CFlags_add_define(extra_cflags, "CFP_LUCY", NULL);
     chaz_CFlags_add_define(extra_cflags, "CFP_TESTLUCY", NULL);
 }
