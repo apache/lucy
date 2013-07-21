@@ -251,7 +251,7 @@ S_xsub_def_labeled_params(CFCPerlMethod *self) {
         "XS(%s);\n"
         "XS(%s) {\n"
         "    dXSARGS;\n"
-        "    CHY_UNUSED_VAR(cv);\n"
+        "    CFISH_UNUSED_VAR(cv);\n"
         "    if (items < 1) { CFISH_THROW(CFISH_ERR, \"Usage: %%s(%s, ...)\",  GvNAME(CvGV(cv))); }\n"
         "    SP -= items;\n"
         "\n"
@@ -360,7 +360,7 @@ S_xsub_def_positional_args(CFCPerlMethod *self) {
         "XS(%s);\n"
         "XS(%s) {\n"
         "    dXSARGS;\n"
-        "    CHY_UNUSED_VAR(cv);\n"
+        "    CFISH_UNUSED_VAR(cv);\n"
         "    SP -= items;\n"
         "    %s;\n"
         "\n"
@@ -422,7 +422,7 @@ S_build_unused_vars(CFCVariable **vars) {
         const char *var_name = CFCVariable_micro_sym(vars[i]);
         size_t size = strlen(unused) + strlen(var_name) + 80;
         unused = (char*)REALLOCATE(unused, size);
-        strcat(unused, "\n    CHY_UNUSED_VAR(");
+        strcat(unused, "\n    CFISH_UNUSED_VAR(");
         strcat(unused, var_name);
         strcat(unused, ");");
     }
@@ -438,7 +438,7 @@ S_maybe_unreachable(CFCType *return_type) {
     }
     else {
         const char *ret_type_str = CFCType_to_c(return_type);
-        char pattern[] = "\n    CHY_UNREACHABLE_RETURN(%s);";
+        char pattern[] = "\n    CFISH_UNREACHABLE_RETURN(%s);";
         return_statement = CFCUtil_sprintf(pattern, ret_type_str);
     }
     return return_statement;

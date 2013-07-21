@@ -154,7 +154,7 @@ CFCPerlTypeMap_to_perl(CFCType *type, const char *cf_var) {
         else if (strcmp(specifier, "uint64_t") == 0) {
             char pattern[] =
                 "sizeof(UV) == 8 ? "
-                "newSVuv((UV)%s) : newSVnv((NV)CHY_U64_TO_DOUBLE(%s))";
+                "newSVuv((UV)%s) : newSVnv((NV)CFISH_U64_TO_DOUBLE(%s))";
             result = CFCUtil_sprintf(pattern, cf_var, cf_var);
         }
         else if (strcmp(specifier, "uint32_t") == 0) {
@@ -202,15 +202,15 @@ static const char typemap_start[] =
     "# Auto-generated file.\n"
     "\n"
     "TYPEMAP\n"
-    "bool\tCHY_BOOL\n"
-    "int8_t\tCHY_SIGNED_INT\n"
-    "int16_t\tCHY_SIGNED_INT\n"
-    "int32_t\tCHY_SIGNED_INT\n"
-    "int64_t\tCHY_BIG_SIGNED_INT\n"
-    "uint8_t\tCHY_UNSIGNED_INT\n"
-    "uint16_t\tCHY_UNSIGNED_INT\n"
-    "uint32_t\tCHY_UNSIGNED_INT\n"
-    "uint64_t\tCHY_BIG_UNSIGNED_INT\n"
+    "bool\tCFISH_BOOL\n"
+    "int8_t\tCFISH_SIGNED_INT\n"
+    "int16_t\tCFISH_SIGNED_INT\n"
+    "int32_t\tCFISH_SIGNED_INT\n"
+    "int64_t\tCFISH_BIG_SIGNED_INT\n"
+    "uint8_t\tCFISH_UNSIGNED_INT\n"
+    "uint16_t\tCFISH_UNSIGNED_INT\n"
+    "uint32_t\tCFISH_UNSIGNED_INT\n"
+    "uint64_t\tCFISH_BIG_UNSIGNED_INT\n"
     "\n"
     "const cfish_CharBuf*\tCONST_CHARBUF\n";
 
@@ -218,19 +218,19 @@ static const char typemap_start[] =
 static const char typemap_input[] =
     "INPUT\n"
     "\n"
-    "CHY_BOOL\n"
+    "CFISH_BOOL\n"
     "    $var = ($type)SvTRUE($arg);\n"
     "\n"
-    "CHY_SIGNED_INT \n"
+    "CFISH_SIGNED_INT \n"
     "    $var = ($type)SvIV($arg);\n"
     "\n"
-    "CHY_UNSIGNED_INT\n"
+    "CFISH_UNSIGNED_INT\n"
     "    $var = ($type)SvUV($arg);\n"
     "\n"
-    "CHY_BIG_SIGNED_INT \n"
+    "CFISH_BIG_SIGNED_INT \n"
     "    $var = (sizeof(IV) == 8) ? ($type)SvIV($arg) : ($type)SvNV($arg);\n"
     "\n"
-    "CHY_BIG_UNSIGNED_INT \n"
+    "CFISH_BIG_UNSIGNED_INT \n"
     "    $var = (sizeof(UV) == 8) ? ($type)SvUV($arg) : ($type)SvNV($arg);\n"
     "\n"
     "CONST_CHARBUF\n"
@@ -240,23 +240,23 @@ static const char typemap_input[] =
 static const char typemap_output[] =
     "OUTPUT\n"
     "\n"
-    "CHY_BOOL\n"
+    "CFISH_BOOL\n"
     "    sv_setiv($arg, (IV)$var);\n"
     "\n"
-    "CHY_SIGNED_INT\n"
+    "CFISH_SIGNED_INT\n"
     "    sv_setiv($arg, (IV)$var);\n"
     "\n"
-    "CHY_UNSIGNED_INT\n"
+    "CFISH_UNSIGNED_INT\n"
     "    sv_setuv($arg, (UV)$var);\n"
     "\n"
-    "CHY_BIG_SIGNED_INT\n"
+    "CFISH_BIG_SIGNED_INT\n"
     "    if (sizeof(IV) == 8) { sv_setiv($arg, (IV)$var); }\n"
     "    else                 { sv_setnv($arg, (NV)$var); }\n"
     "\n"
-    "CHY_BIG_UNSIGNED_INT\n"
+    "CFISH_BIG_UNSIGNED_INT\n"
     "    if (sizeof(UV) == 8) { sv_setuv($arg, (UV)$var); }\n"
     "    else {\n"
-    "        sv_setnv($arg, (NV)CHY_U64_TO_DOUBLE($var));\n"
+    "        sv_setnv($arg, (NV)CFISH_U64_TO_DOUBLE($var));\n"
     "    }\n"
     "\n";
 

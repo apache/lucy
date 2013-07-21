@@ -115,7 +115,7 @@ CFCPerlConstructor_xsub_def(CFCPerlConstructor *self) {
         "XS(%s);\n"
         "XS(%s) {\n"
         "    dXSARGS;\n"
-        "    CHY_UNUSED_VAR(cv);\n"
+        "    CFISH_UNUSED_VAR(cv);\n"
         "    if (items < 1) { CFISH_THROW(CFISH_ERR, \"Usage: %%s(class_name, ...)\",  GvNAME(CvGV(cv))); }\n"
         "    SP -= items;\n"
         "\n"
