@@ -311,7 +311,6 @@ S_write_parcel_h(CFCBindCore *self, CFCParcel *parcel) {
         "%s" // Extra includes.
         "\n"
         "#ifdef %s\n"
-        "  #include \"charmony.h\"\n"
         "  #define %sVISIBLE CFISH_EXPORT\n"
         "#else\n"
         "  #define %sVISIBLE CFISH_IMPORT\n"

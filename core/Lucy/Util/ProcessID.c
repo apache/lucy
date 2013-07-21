@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include "charmony.h"
+
 #include "Lucy/Util/ProcessID.h"
 
 /********************************* WINDOWS ********************************/

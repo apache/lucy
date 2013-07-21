@@ -19,6 +19,8 @@
 #define C_CFISH_OBJ
 #define C_CFISH_VTABLE
 
+#include "charmony.h"
+
 #include "Clownfish/VTable.h"
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"

@@ -19,6 +19,8 @@
 #define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
 
+#include "charmony.h"
+
 #include "Lucy/Document/Doc.h"
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"

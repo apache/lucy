@@ -20,6 +20,8 @@
 #define CFISH_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
+#include "charmony.h"
+
 #include "Clownfish/Util/StringHelper.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Util/Memory.h"

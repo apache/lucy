@@ -18,6 +18,8 @@
 #define CFISH_USE_SHORT_NAMES
 #define TESTCFISH_USE_SHORT_NAMES
 
+#include "charmony.h"
+
 #include "Clownfish/Test/Util/TestMemory.h"
 
 #include "Clownfish/Test.h"

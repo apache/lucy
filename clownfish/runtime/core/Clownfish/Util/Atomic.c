@@ -16,6 +16,9 @@
 
 #define C_CFISH_ATOMIC
 #define CFISH_USE_SHORT_NAMES
+
+#include "charmony.h"
+
 #include "Clownfish/Util/Atomic.h"
 
 /********************************** Windows ********************************/

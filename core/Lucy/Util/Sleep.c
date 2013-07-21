@@ -15,6 +15,9 @@
  */
 
 #define C_LUCY_SLEEP
+
+#include "charmony.h"
+
 #include "Lucy/Util/Sleep.h"
 
 /********************************* WINDOWS ********************************/

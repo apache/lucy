@@ -21,6 +21,8 @@
 #define CFISH_USE_SHORT_NAMES
 #define TESTCFISH_USE_SHORT_NAMES
 
+#include "charmony.h"
+
 #include "Clownfish/TestHarness/TestSuite.h"
 
 #include "Clownfish/CharBuf.h"

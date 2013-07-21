@@ -21,6 +21,8 @@
 #define CFISH_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
+#include "charmony.h"
+
 #include "Clownfish/VTable.h"
 #include "Clownfish/VArray.h"
 #include "Clownfish/Err.h"

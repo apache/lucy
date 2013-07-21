@@ -18,6 +18,8 @@
 #define CHY_USE_SHORT_NAMES
 #define CFISH_USE_SHORT_NAMES
 
+#include "charmony.h"
+
 #include "Clownfish/Obj.h"
 #include "Clownfish/Err.h"
 
