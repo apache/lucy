@@ -173,8 +173,8 @@ public class Clownfish::Err inherits Clownfish::Obj {
 }
 
 __C__
-#ifdef CHY_HAS_FUNC_MACRO
- #define CFISH_ERR_FUNC_MACRO CHY_FUNC_MACRO
+#ifdef CFISH_HAS_FUNC_MACRO
+ #define CFISH_ERR_FUNC_MACRO CFISH_FUNC_MACRO
 #else
  #define CFISH_ERR_FUNC_MACRO NULL
 #endif
@@ -190,8 +190,8 @@ __C__
 /** Macro version of cfish_Err_throw_at which inserts contextual information
  * automatically, provided that the compiler supports the necessary features.
  */
-#ifdef CHY_HAS_VARIADIC_MACROS
- #ifdef CHY_HAS_ISO_VARIADIC_MACROS
+#ifdef CFISH_HAS_VARIADIC_MACROS
+ #ifdef CFISH_HAS_ISO_VARIADIC_MACROS
   #define CFISH_THROW(_vtable, ...) \
     cfish_Err_throw_at(_vtable, __FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, \
                        __VA_ARGS__)
@@ -200,7 +200,7 @@ __C__
   #define CFISH_MAKE_MESS(...) \
     cfish_Err_make_mess(__FILE__, __LINE__, CFISH_ERR_FUNC_MACRO, \
                         __VA_ARGS__)
- #elif defined(CHY_HAS_GNUC_VARIADIC_MACROS)
+ #elif defined(CFISH_HAS_GNUC_VARIADIC_MACROS)
   #define CFISH_THROW(_vtable, args...) \
     cfish_Err_throw_at(_vtable, __FILE__, __LINE__, \
                        CFISH_ERR_FUNC_MACRO, ##args)

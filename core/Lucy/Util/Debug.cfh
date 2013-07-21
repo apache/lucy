@@ -108,7 +108,7 @@ __C__
         }                                                              \
     } while (0)
 
-#elif defined(CHY_HAS_GNUC_VARIADIC_MACROS) // not LUCY_DEBUG
+#elif defined(CFISH_HAS_GNUC_VARIADIC_MACROS) // not LUCY_DEBUG
 
 #undef LUCY_DEBUG
 #define LUCY_DEBUG_ENABLED 0

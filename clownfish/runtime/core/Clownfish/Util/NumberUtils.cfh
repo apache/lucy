@@ -183,19 +183,19 @@ __C__
 static CFISH_INLINE void
 cfish_NumUtil_encode_bigend_u16(uint16_t value, void *dest_ptr) {
     uint8_t *dest = *(uint8_t**)dest_ptr;
-#ifdef CHY_BIG_END
+#ifdef CFISH_BIG_END
     memcpy(dest, &value, sizeof(uint16_t));
 #else // little endian
     uint8_t *source = (uint8_t*)&value;
     dest[0] = source[1];
     dest[1] = source[0];
-#endif // CHY_BIG_END (and little endian)
+#endif // CFISH_BIG_END (and little endian)
 }
 
 static CFISH_INLINE void
 cfish_NumUtil_encode_bigend_u32(uint32_t value, void *dest_ptr) {
     uint8_t *dest = *(uint8_t**)dest_ptr;
-#ifdef CHY_BIG_END
+#ifdef CFISH_BIG_END
     memcpy(dest, &value, sizeof(uint32_t));
 #else // little endian
     uint8_t *source = (uint8_t*)&value;
@@ -203,13 +203,13 @@ cfish_NumUtil_encode_bigend_u32(uint32_t value, void *dest_ptr) {
     dest[1] = source[2];
     dest[2] = source[1];
     dest[3] = source[0];
-#endif // CHY_BIG_END (and little endian)
+#endif // CFISH_BIG_END (and little endian)
 }
 
 static CFISH_INLINE void
 cfish_NumUtil_encode_bigend_u64(uint64_t value, void *dest_ptr) {
     uint8_t *dest = *(uint8_t**)dest_ptr;
-#ifdef CHY_BIG_END
+#ifdef CFISH_BIG_END
     memcpy(dest, &value, sizeof(uint64_t));
 #else // little endian
     uint8_t *source = (uint8_t*)&value;
@@ -221,7 +221,7 @@ cfish_NumUtil_encode_bigend_u64(uint64_t value, void *dest_ptr) {
     dest[5] = source[2];
     dest[6] = source[1];
     dest[7] = source[0];
-#endif // CHY_BIG_END (and little endian)
+#endif // CFISH_BIG_END (and little endian)
 }
 
 static CFISH_INLINE uint16_t
@@ -259,7 +259,7 @@ cfish_NumUtil_decode_bigend_u64(void *source) {
 static CFISH_INLINE void
 cfish_NumUtil_encode_bigend_f32(float value, void *dest_ptr) {
     uint8_t *dest = *(uint8_t**)dest_ptr;
-#ifdef CHY_BIG_END
+#ifdef CFISH_BIG_END
     memcpy(dest, &value, sizeof(float));
 #else
     union { float f; uint32_t u32; } duo;
@@ -271,7 +271,7 @@ cfish_NumUtil_encode_bigend_f32(float value, void *dest_ptr) {
 static CFISH_INLINE void
 cfish_NumUtil_encode_bigend_f64(double value, void *dest_ptr) {
     uint8_t *dest = *(uint8_t**)dest_ptr;
-#ifdef CHY_BIG_END
+#ifdef CFISH_BIG_END
     memcpy(dest, &value, sizeof(double));
 #else
     union { double d; uint64_t u64; } duo;
@@ -284,7 +284,7 @@ static CFISH_INLINE float
 cfish_NumUtil_decode_bigend_f32(void *source) {
     union { float f; uint32_t u32; } duo;
     memcpy(&duo, source, sizeof(float));
-#ifdef CHY_LITTLE_END
+#ifdef CFISH_LITTLE_END
     duo.u32 = cfish_NumUtil_decode_bigend_u32(&duo.u32);
 #endif
     return duo.f;
@@ -294,7 +294,7 @@ static CFISH_INLINE double
 cfish_NumUtil_decode_bigend_f64(void *source) {
     union { double d; uint64_t u64; } duo;
     memcpy(&duo, source, sizeof(double));
-#ifdef CHY_LITTLE_END
+#ifdef CFISH_LITTLE_END
     duo.u64 = cfish_NumUtil_decode_bigend_u64(&duo.u64);
 #endif
     return duo.d;

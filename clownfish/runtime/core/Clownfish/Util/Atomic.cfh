@@ -44,7 +44,7 @@ cfish_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
 }
 
 /************************** Mac OS X 10.4 and later ***********************/
-#elif defined(CHY_HAS_OSATOMIC_CAS_PTR)
+#elif defined(CFISH_HAS_OSATOMIC_CAS_PTR)
 #include <libkern/OSAtomic.h>
 
 static CFISH_INLINE bool
@@ -53,7 +53,7 @@ cfish_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
 }
 
 /********************************** Windows *******************************/
-#elif defined(CHY_HAS_WINDOWS_H)
+#elif defined(CFISH_HAS_WINDOWS_H)
 
 bool
 cfish_Atomic_wrapped_cas_ptr(void *volatile *target, void *old_value,
@@ -65,7 +65,7 @@ cfish_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
 }
 
 /**************************** Solaris 10 and later ************************/
-#elif defined(CHY_HAS_SYS_ATOMIC_H)
+#elif defined(CFISH_HAS_SYS_ATOMIC_H)
 #include <sys/atomic.h>
 
 static CFISH_INLINE bool
@@ -74,7 +74,7 @@ cfish_Atomic_cas_ptr(void *volatile *target, void *old_value, void *new_value) {
 }
 
 /************************ Fall back to pthread.h. **************************/
-#elif defined(CHY_HAS_PTHREAD_H)
+#elif defined(CFISH_HAS_PTHREAD_H)
 #include <pthread.h>
 
 extern pthread_mutex_t cfish_Atomic_mutex;
