@@ -7114,8 +7114,8 @@ int main(int argc, const char **argv) {
         "#define CHY_EMPLOY_INTEGERFORMATSTRINGS\n\n"
     );
 
-    /* Run probe modules. DirManip and LargeFiles are only needed for the
-     * Charmonizer tests.
+    /* Run probe modules. Booleans, DirManip and LargeFiles are only needed for
+     * the Charmonizer tests.
      */
     chaz_BuildEnv_run();
     chaz_DirManip_run();
@@ -7127,7 +7127,6 @@ int main(int argc, const char **argv) {
     chaz_Floats_run();
     chaz_LargeFiles_run();
     chaz_Memory_run();
-    chaz_SymbolVisibility_run();
     chaz_UnusedVars_run();
     chaz_VariadicMacros_run();
 

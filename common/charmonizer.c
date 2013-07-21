@@ -7214,19 +7214,16 @@ int main(int argc, const char **argv) {
         "#define CHY_EMPLOY_INTEGERFORMATSTRINGS\n\n"
     );
 
-    /* Run probe modules. */
+    /* Run probe modules. Booleans is only needed for the Charmonizer tests. */
     chaz_BuildEnv_run();
     chaz_DirManip_run();
     chaz_Headers_run();
-    chaz_AtomicOps_run();
-    chaz_FuncMacro_run();
     chaz_Booleans_run();
     chaz_Integers_run();
     chaz_Floats_run();
     chaz_LargeFiles_run();
     chaz_Memory_run();
     chaz_RegularExpressions_run();
-    chaz_SymbolVisibility_run();
     chaz_UnusedVars_run();
     chaz_VariadicMacros_run();
 
