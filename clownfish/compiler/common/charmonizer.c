@@ -936,6 +936,37 @@ chaz_Probe_msvc_version_num(void);
 
 /***************************************************************************/
 
+#line 21 "src/Charmonizer/Probe/AtomicOps.h"
+/* Charmonizer/Probe/AtomicOps.h
+ */
+
+#ifndef H_CHAZ_ATOMICOPS
+#define H_CHAZ_ATOMICOPS
+
+#include <stdio.h>
+
+/* Run the AtomicOps module.
+ *
+ * These following symbols will be defined if the associated headers are
+ * available:
+ *
+ * HAS_LIBKERN_OSATOMIC_H  <libkern/OSAtomic.h> (Mac OS X)
+ * HAS_SYS_ATOMIC_H        <sys/atomic.h>       (Solaris)
+ * HAS_INTRIN_H            <intrin.h>           (Windows)
+ *
+ * This symbol is defined if OSAtomicCompareAndSwapPtr is available:
+ *
+ * HAS_OSATOMIC_CAS_PTR
+ */
+void chaz_AtomicOps_run(void);
+
+#endif /* H_CHAZ_ATOMICOPS */
+
+
+
+
+/***************************************************************************/
+
 #line 21 "src/Charmonizer/Probe/Booleans.h"
 /* Charmonizer/Probe/Booleans.h -- bool type.
  *
@@ -1037,6 +1068,43 @@ void chaz_BuildEnv_run(void);
 void chaz_DirManip_run(void);
 
 #endif /* H_CHAZ_DIR_SEP */
+
+
+
+
+/***************************************************************************/
+
+#line 21 "src/Charmonizer/Probe/Floats.h"
+/* Charmonizer/Probe/Floats.h -- floating point types.
+ *
+ * The following symbols will be created if the platform supports IEEE 754
+ * floating point types:
+ *
+ * F32_NAN
+ * F32_INF
+ * F32_NEGINF
+ * F64_NAN
+ * F64_INF
+ * F64_NEGINF
+ *
+ * TODO: Actually test to see whether IEEE 754 is supported, rather than just
+ * lying about it.
+ */
+
+#ifndef H_CHAZ_FLOATS
+#define H_CHAZ_FLOATS
+
+/* Run the Floats module.
+ */
+void
+chaz_Floats_run(void);
+
+/* Return the name of the math library to link against or NULL.
+ */
+const char*
+chaz_Floats_math_library(void);
+
+#endif /* H_CHAZ_FLOATS */
 
 
 
@@ -1260,6 +1328,100 @@ void chaz_Integers_run(void);
 
 /***************************************************************************/
 
+#line 21 "src/Charmonizer/Probe/LargeFiles.h"
+/* Charmonizer/Probe/LargeFiles.h
+ */
+
+#ifndef H_CHAZ_LARGE_FILES
+#define H_CHAZ_LARGE_FILES
+
+#include <stdio.h>
+
+/* The LargeFiles module attempts to detect these symbols or alias them to
+ * synonyms:
+ *
+ * off64_t
+ * fopen64
+ * ftello64
+ * fseeko64
+ * lseek64
+ * pread64
+ *
+ * If off64_t or its equivalent is available, this will be defined:
+ *
+ * HAS_64BIT_OFFSET_TYPE
+ *
+ * If 64-bit variants of fopen, ftell, and fseek are available, this will be
+ * defined:
+ *
+ * HAS_64BIT_STDIO
+ *
+ * If 64-bit variants of pread and lseek are available, then corresponding
+ * symbols will be defined:
+ *
+ * HAS_64BIT_PREAD
+ * HAS_64BIT_LSEEK
+ *
+ * Use of the off64_t symbol may require sys/types.h.
+ */
+void chaz_LargeFiles_run(void);
+
+#endif /* H_CHAZ_LARGE_FILES */
+
+
+
+/***************************************************************************/
+
+#line 21 "src/Charmonizer/Probe/Memory.h"
+/* Charmonizer/Probe/Memory.h
+ */
+
+#ifndef H_CHAZ_MEMORY
+#define H_CHAZ_MEMORY
+
+/* The Memory module attempts to detect these symbols or alias them to
+ * synonyms:
+ *
+ * alloca
+ *
+ * These following symbols will be defined if the associated headers are
+ * available:
+ *
+ * HAS_SYS_MMAN_H          <sys/mman.h>
+ * HAS_ALLOCA_H            <alloca.h>
+ * HAS_MALLOC_H            <malloc.h>
+ *
+ * Defined if alloca() is available via stdlib.h:
+ *
+ * ALLOCA_IN_STDLIB_H
+ */
+void chaz_Memory_run(void);
+
+#endif /* H_CHAZ_MEMORY */
+
+
+
+
+/***************************************************************************/
+
+#line 21 "src/Charmonizer/Probe/RegularExpressions.h"
+/* Charmonizer/Probe/RegularExpressions.h -- regular expressions.
+ */
+
+#ifndef H_CHAZ_REGULAREXPRESSIONS
+#define H_CHAZ_REGULAREXPRESSIONS
+
+/* Run the RegularExpressions module.
+ */
+void chaz_RegularExpressions_run(void);
+
+#endif /* H_CHAZ_REGULAREXPRESSIONS */
+
+
+
+
+/***************************************************************************/
+
 #line 21 "src/Charmonizer/Probe/Strings.h"
 /* Charmonizer/Probe/Strings.h
  */
@@ -1315,6 +1477,38 @@ void chaz_SymbolVisibility_run(void);
 void chaz_UnusedVars_run(void);
 
 #endif /* H_CHAZ_UNUSED_VARS */
+
+
+
+
+/***************************************************************************/
+
+#line 21 "src/Charmonizer/Probe/VariadicMacros.h"
+/* Charmonizer/Probe/VariadicMacros.h
+ */
+
+#ifndef H_CHAZ_VARIADIC_MACROS
+#define H_CHAZ_VARIADIC_MACROS
+
+#include <stdio.h>
+
+/* Run the VariadicMacros module.
+ *
+ * If your compiler supports ISO-style variadic macros, this will be defined:
+ *
+ * HAS_ISO_VARIADIC_MACROS
+ *
+ * If your compiler supports GNU-style variadic macros, this will be defined:
+ *
+ * HAS_GNUC_VARIADIC_MACROS
+ *
+ * If you have at least one of the above, this will be defined:
+ *
+ * HAS_VARIADIC_MACROS
+ */
+void chaz_VariadicMacros_run(void);
+
+#endif /* H_CHAZ_VARIADIC_MACROS */
 
 
 
@@ -4609,6 +4803,62 @@ chaz_Probe_msvc_version_num(void) {
 
 /***************************************************************************/
 
+#line 17 "src/Charmonizer/Probe/AtomicOps.c"
+/* #include "Charmonizer/Core/Compiler.h" */
+/* #include "Charmonizer/Core/HeaderChecker.h" */
+/* #include "Charmonizer/Core/ConfWriter.h" */
+/* #include "Charmonizer/Core/Util.h" */
+/* #include "Charmonizer/Probe/AtomicOps.h" */
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+
+static int
+chaz_AtomicOps_osatomic_cas_ptr(void) {
+    static const char osatomic_casptr_code[] =
+        CHAZ_QUOTE(  #include <libkern/OSAtomic.h>                                  )
+        CHAZ_QUOTE(  #include <libkern/OSAtomic.h>                                  )
+        CHAZ_QUOTE(  int main() {                                                   )
+        CHAZ_QUOTE(      int  foo = 1;                                              )
+        CHAZ_QUOTE(      int *foo_ptr = &foo;                                       )
+        CHAZ_QUOTE(      int *target = NULL;                                        )
+        CHAZ_QUOTE(      OSAtomicCompareAndSwapPtr(NULL, foo_ptr, (void**)&target); )
+        CHAZ_QUOTE(      return 0;                                                  )
+        CHAZ_QUOTE(  }                                                              );
+     return chaz_CC_test_compile(osatomic_casptr_code);
+}
+
+void
+chaz_AtomicOps_run(void) {
+    chaz_ConfWriter_start_module("AtomicOps");
+
+    if (chaz_HeadCheck_check_header("libkern/OSAtomic.h")) {
+        chaz_ConfWriter_add_def("HAS_LIBKERN_OSATOMIC_H", NULL);
+
+        /* Check for OSAtomicCompareAndSwapPtr, introduced in later versions
+         * of OSAtomic.h. */
+        if (chaz_AtomicOps_osatomic_cas_ptr()) {
+            chaz_ConfWriter_add_def("HAS_OSATOMIC_CAS_PTR", NULL);
+        }
+    }
+    if (chaz_HeadCheck_check_header("sys/atomic.h")) {
+        chaz_ConfWriter_add_def("HAS_SYS_ATOMIC_H", NULL);
+    }
+    if (chaz_HeadCheck_check_header("windows.h")
+        && chaz_HeadCheck_check_header("intrin.h")
+       ) {
+        chaz_ConfWriter_add_def("HAS_INTRIN_H", NULL);
+    }
+
+    chaz_ConfWriter_end_module();
+}
+
+
+
+
+/***************************************************************************/
+
 #line 17 "src/Charmonizer/Probe/Booleans.c"
 /* #include "Charmonizer/Core/HeaderChecker.h" */
 /* #include "Charmonizer/Core/ConfWriter.h" */
@@ -4854,6 +5104,97 @@ chaz_DirManip_run(void) {
     chaz_ConfWriter_end_module();
 }
 
+
+
+
+/***************************************************************************/
+
+#line 17 "src/Charmonizer/Probe/Floats.c"
+/* #include "Charmonizer/Core/HeaderChecker.h" */
+/* #include "Charmonizer/Core/ConfWriter.h" */
+/* #include "Charmonizer/Core/Util.h" */
+/* #include "Charmonizer/Probe/Floats.h" */
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+void
+chaz_Floats_run(void) {
+    chaz_ConfWriter_start_module("Floats");
+
+    chaz_ConfWriter_append_conf(
+        "typedef union { unsigned char c[4]; float f; } chy_floatu32;\n"
+        "typedef union { unsigned char c[8]; double d; } chy_floatu64;\n"
+        "#ifdef CHY_BIG_END\n"
+        "static const chy_floatu32 chy_f32inf\n"
+        "    = { { 0x7F, 0x80, 0, 0 } };\n"
+        "static const chy_floatu32 chy_f32neginf\n"
+        "    = { { 0xFF, 0x80, 0, 0 } };\n"
+        "static const chy_floatu32 chy_f32nan\n"
+        "    = { { 0x7F, 0xC0, 0, 0 } };\n"
+        "static const chy_floatu64 chy_f64inf\n"
+        "    = { { 0x7F, 0xF0, 0, 0, 0, 0, 0, 0 } };\n"
+        "static const chy_floatu64 chy_f64neginf\n"
+        "    = { { 0xFF, 0xF0, 0, 0, 0, 0, 0, 0 } };\n"
+        "static const chy_floatu64 chy_f64nan\n"
+        "    = { { 0x7F, 0xF8, 0, 0, 0, 0, 0, 0 } };\n"
+        "#else /* BIG_END */\n"
+        "static const chy_floatu32 chy_f32inf\n"
+        "    = { { 0, 0, 0x80, 0x7F } };\n"
+        "static const chy_floatu32 chy_f32neginf\n"
+        "    = { { 0, 0, 0x80, 0xFF } };\n"
+        "static const chy_floatu32 chy_f32nan\n"
+        "    = { { 0, 0, 0xC0, 0x7F } };\n"
+        "static const chy_floatu64 chy_f64inf\n"
+        "    = { { 0, 0, 0, 0, 0, 0, 0xF0, 0x7F } };\n"
+        "static const chy_floatu64 chy_f64neginf\n"
+        "    = { { 0, 0, 0, 0, 0, 0, 0xF0, 0xFF } };\n"
+        "static const chy_floatu64 chy_f64nan\n"
+        "    = { { 0, 0, 0, 0, 0, 0, 0xF8, 0x7F } };\n"
+        "#endif /* BIG_END */\n"
+    );
+    chaz_ConfWriter_add_def("F32_INF", "(chy_f32inf.f)");
+    chaz_ConfWriter_add_def("F32_NEGINF", "(chy_f32neginf.f)");
+    chaz_ConfWriter_add_def("F32_NAN", "(chy_f32nan.f)");
+    chaz_ConfWriter_add_def("F64_INF", "(chy_f64inf.d)");
+    chaz_ConfWriter_add_def("F64_NEGINF", "(chy_f64neginf.d)");
+    chaz_ConfWriter_add_def("F64_NAN", "(chy_f64nan.d)");
+
+    chaz_ConfWriter_end_module();
+}
+
+const char*
+chaz_Floats_math_library(void) {
+    static const char sqrt_code[] =
+        CHAZ_QUOTE(  #include <math.h>                              )
+        CHAZ_QUOTE(  #include <stdio.h>                             )
+        CHAZ_QUOTE(  typedef double (*sqrt_t)(double);              )
+        CHAZ_QUOTE(  int main(void) {                               )
+        CHAZ_QUOTE(      printf("%p\n", (sqrt_t)sqrt);              )
+        CHAZ_QUOTE(      return 0;                                  )
+        CHAZ_QUOTE(  }                                              );
+    chaz_CFlags *temp_cflags = chaz_CC_get_temp_cflags();
+    char        *output = NULL;
+    size_t       output_len;
+
+    output = chaz_CC_capture_output(sqrt_code, &output_len);
+    if (output != NULL) {
+        /* Linking against libm not needed. */
+        free(output);
+        return NULL;
+    }
+
+    chaz_CFlags_add_external_library(temp_cflags, "m");
+    output = chaz_CC_capture_output(sqrt_code, &output_len);
+    chaz_CFlags_clear(temp_cflags);
+
+    if (output == NULL) {
+        chaz_Util_die("Don't know how to use math library.");
+    }
+
+    free(output);
+    return "m";
+}
 
 
 
@@ -5696,6 +6037,472 @@ chaz_Integers_machine_is_big_endian(void) {
 
 /***************************************************************************/
 
+#line 17 "src/Charmonizer/Probe/LargeFiles.c"
+/* #include "Charmonizer/Core/HeaderChecker.h" */
+/* #include "Charmonizer/Core/Compiler.h" */
+/* #include "Charmonizer/Core/ConfWriter.h" */
+/* #include "Charmonizer/Core/Util.h" */
+/* #include "Charmonizer/Probe/LargeFiles.h" */
+#include <errno.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+/* Module vars. */
+static struct {
+    char off64_type[10];
+} chaz_LargeFiles = { "" };
+
+/* Sets of symbols which might provide large file support for stdio. */
+typedef struct chaz_LargeFiles_stdio64_combo {
+    const char *includes;
+    const char *fopen_command;
+    const char *ftell_command;
+    const char *fseek_command;
+} chaz_LargeFiles_stdio64_combo;
+
+/* Sets of symbols which might provide large file support for unbuffered i/o.
+ */
+typedef struct chaz_LargeFiles_unbuff_combo {
+    const char *includes;
+    const char *lseek_command;
+    const char *pread64_command;
+} chaz_LargeFiles_unbuff_combo;
+
+/* Check for a 64-bit file pointer type.
+ */
+static int
+chaz_LargeFiles_probe_off64(void);
+
+/* Check what name 64-bit ftell, fseek go by.
+ */
+static void
+chaz_LargeFiles_probe_stdio64(void);
+static int
+chaz_LargeFiles_try_stdio64(chaz_LargeFiles_stdio64_combo *combo);
+
+/* Probe for 64-bit unbuffered i/o.
+ */
+static void
+chaz_LargeFiles_probe_unbuff(void);
+
+/* Check for a 64-bit lseek.
+ */
+static int
+chaz_LargeFiles_probe_lseek(chaz_LargeFiles_unbuff_combo *combo);
+
+/* Check for a 64-bit pread.
+ */
+static int
+chaz_LargeFiles_probe_pread64(chaz_LargeFiles_unbuff_combo *combo);
+
+void
+chaz_LargeFiles_run(void) {
+    int found_off64_t = false;
+    const char *stat_includes = "#include <stdio.h>\n#include <sys/stat.h>";
+
+    chaz_ConfWriter_start_module("LargeFiles");
+
+    /* Find off64_t or equivalent. */
+    found_off64_t = chaz_LargeFiles_probe_off64();
+    if (found_off64_t) {
+        chaz_ConfWriter_add_def("HAS_64BIT_OFFSET_TYPE", NULL);
+        chaz_ConfWriter_add_def("off64_t",  chaz_LargeFiles.off64_type);
+    }
+
+    /* See if stdio variants with 64-bit support exist. */
+    chaz_LargeFiles_probe_stdio64();
+
+    /* Probe for 64-bit versions of lseek and pread (if we have an off64_t). */
+    if (found_off64_t) {
+        chaz_LargeFiles_probe_unbuff();
+    }
+
+    /* Make checks needed for testing. */
+    if (chaz_HeadCheck_check_header("sys/stat.h")) {
+        chaz_ConfWriter_append_conf("#define CHAZ_HAS_SYS_STAT_H\n");
+    }
+    if (chaz_HeadCheck_check_header("io.h")) {
+        chaz_ConfWriter_append_conf("#define CHAZ_HAS_IO_H\n");
+    }
+    if (chaz_HeadCheck_check_header("fcntl.h")) {
+        chaz_ConfWriter_append_conf("#define CHAZ_HAS_FCNTL_H\n");
+    }
+    if (chaz_HeadCheck_contains_member("struct stat", "st_size", stat_includes)) {
+        chaz_ConfWriter_append_conf("#define CHAZ_HAS_STAT_ST_SIZE\n");
+    }
+    if (chaz_HeadCheck_contains_member("struct stat", "st_blocks", stat_includes)) {
+        chaz_ConfWriter_append_conf("#define CHAZ_HAS_STAT_ST_BLOCKS\n");
+    }
+
+    chaz_ConfWriter_end_module();
+}
+
+static int
+chaz_LargeFiles_probe_off64(void) {
+    static const char off64_code[] =
+        CHAZ_QUOTE(  %s                                        )
+        CHAZ_QUOTE(  #include <stdio.h>                        )
+        CHAZ_QUOTE(  int main()                                )
+        CHAZ_QUOTE(  {                                         )
+        CHAZ_QUOTE(      printf("%%d", (int)sizeof(%s));       )
+        CHAZ_QUOTE(      return 0;                             )
+        CHAZ_QUOTE(  }                                         );
+    char code_buf[sizeof(off64_code) + 100];
+    int i;
+    int success = false;
+    static const char* off64_options[] = {
+        "off64_t",
+        "off_t",
+        "__int64",
+        "long"
+    };
+    int num_off64_options = sizeof(off64_options) / sizeof(off64_options[0]);
+
+    for (i = 0; i < num_off64_options; i++) {
+        const char *candidate = off64_options[i];
+        char *output;
+        size_t output_len;
+        int has_sys_types_h = chaz_HeadCheck_check_header("sys/types.h");
+        const char *sys_types_include = has_sys_types_h
+                                        ? "#include <sys/types.h>"
+                                        : "";
+
+        /* Execute the probe. */
+        sprintf(code_buf, off64_code, sys_types_include, candidate);
+        output = chaz_CC_capture_output(code_buf, &output_len);
+        if (output != NULL) {
+            long sizeof_candidate = strtol(output, NULL, 10);
+            free(output);
+            if (sizeof_candidate == 8) {
+                strcpy(chaz_LargeFiles.off64_type, candidate);
+                success = true;
+                break;
+            }
+        }
+    }
+    return success;
+}
+
+static int
+chaz_LargeFiles_try_stdio64(chaz_LargeFiles_stdio64_combo *combo) {
+    static const char stdio64_code[] =
+        CHAZ_QUOTE(  %s                                         )
+        CHAZ_QUOTE(  #include <stdio.h>                         )
+        CHAZ_QUOTE(  int main() {                               )
+        CHAZ_QUOTE(      %s pos;                                )
+        CHAZ_QUOTE(      FILE *f;                               )
+        CHAZ_QUOTE(      f = %s("_charm_stdio64", "w");         )
+        CHAZ_QUOTE(      if (f == NULL) return -1;              )
+        CHAZ_QUOTE(      printf("%%d", (int)sizeof(%s));        )
+        CHAZ_QUOTE(      pos = %s(stdout);                      )
+        CHAZ_QUOTE(      %s(stdout, 0, SEEK_SET);               )
+        CHAZ_QUOTE(      return 0;                              )
+        CHAZ_QUOTE(  }                                          );
+    char *output = NULL;
+    size_t output_len;
+    char code_buf[sizeof(stdio64_code) + 200];
+    int success = false;
+
+    /* Prepare the source code. */
+    sprintf(code_buf, stdio64_code, combo->includes,
+            chaz_LargeFiles.off64_type, combo->fopen_command,
+            chaz_LargeFiles.off64_type, combo->ftell_command,
+            combo->fseek_command);
+
+    /* Verify compilation and that the offset type has 8 bytes. */
+    output = chaz_CC_capture_output(code_buf, &output_len);
+    if (output != NULL) {
+        long size = strtol(output, NULL, 10);
+        if (size == 8) {
+            success = true;
+        }
+        free(output);
+    }
+
+    if (!chaz_Util_remove_and_verify("_charm_stdio64")) {
+        chaz_Util_die("Failed to remove '_charm_stdio64'");
+    }
+
+    return success;
+}
+
+static void
+chaz_LargeFiles_probe_stdio64(void) {
+    int i;
+    static chaz_LargeFiles_stdio64_combo stdio64_combos[] = {
+        { "#include <sys/types.h>\n", "fopen64",   "ftello64",  "fseeko64"  },
+        { "#include <sys/types.h>\n", "fopen",     "ftello64",  "fseeko64"  },
+        { "#include <sys/types.h>\n", "fopen",     "ftello",    "fseeko"    },
+        { "",                         "fopen",     "ftell",     "fseek"     },
+        { "",                         "fopen",     "_ftelli64", "_fseeki64" },
+        { "",                         "fopen",     "ftell",     "fseek"     },
+        { NULL, NULL, NULL, NULL }
+    };
+
+    for (i = 0; stdio64_combos[i].includes != NULL; i++) {
+        chaz_LargeFiles_stdio64_combo combo = stdio64_combos[i];
+        if (chaz_LargeFiles_try_stdio64(&combo)) {
+            chaz_ConfWriter_add_def("HAS_64BIT_STDIO", NULL);
+            chaz_ConfWriter_add_def("fopen64",  combo.fopen_command);
+            chaz_ConfWriter_add_def("ftello64", combo.ftell_command);
+            chaz_ConfWriter_add_def("fseeko64", combo.fseek_command);
+            break;
+        }
+    }
+}
+
+static int
+chaz_LargeFiles_probe_lseek(chaz_LargeFiles_unbuff_combo *combo) {
+    static const char lseek_code[] =
+        CHAZ_QUOTE( %s                                                       )
+        CHAZ_QUOTE( #include <stdio.h>                                       )
+        CHAZ_QUOTE( int main() {                                             )
+        CHAZ_QUOTE(     int fd;                                              )
+        CHAZ_QUOTE(     fd = open("_charm_lseek", O_WRONLY | O_CREAT, 0666); )
+        CHAZ_QUOTE(     if (fd == -1) { return -1; }                         )
+        CHAZ_QUOTE(     %s(fd, 0, SEEK_SET);                                 )
+        CHAZ_QUOTE(     printf("%%d", 1);                                    )
+        CHAZ_QUOTE(     if (close(fd)) { return -1; }                        )
+        CHAZ_QUOTE(     return 0;                                            )
+        CHAZ_QUOTE( }                                                        );
+    char code_buf[sizeof(lseek_code) + 100];
+    char *output = NULL;
+    size_t output_len;
+    int success = false;
+
+    /* Verify compilation. */
+    sprintf(code_buf, lseek_code, combo->includes, combo->lseek_command);
+    output = chaz_CC_capture_output(code_buf, &output_len);
+    if (output != NULL) {
+        success = true;
+        free(output);
+    }
+
+    if (!chaz_Util_remove_and_verify("_charm_lseek")) {
+        chaz_Util_die("Failed to remove '_charm_lseek'");
+    }
+
+    return success;
+}
+
+static int
+chaz_LargeFiles_probe_pread64(chaz_LargeFiles_unbuff_combo *combo) {
+    /* Code for checking 64-bit pread.  The pread call will fail, but that's
+     * fine as long as it compiles. */
+    static const char pread64_code[] =
+        CHAZ_QUOTE(  %s                                     )
+        CHAZ_QUOTE(  #include <stdio.h>                     )
+        CHAZ_QUOTE(  int main() {                           )
+        CHAZ_QUOTE(      int fd = 20;                       )
+        CHAZ_QUOTE(      char buf[1];                       )
+        CHAZ_QUOTE(      printf("1");                       )
+        CHAZ_QUOTE(      %s(fd, buf, 1, 1);                 )
+        CHAZ_QUOTE(      return 0;                          )
+        CHAZ_QUOTE(  }                                      );
+    char code_buf[sizeof(pread64_code) + 100];
+    char *output = NULL;
+    size_t output_len;
+    int success = false;
+
+    /* Verify compilation. */
+    sprintf(code_buf, pread64_code, combo->includes, combo->pread64_command);
+    output = chaz_CC_capture_output(code_buf, &output_len);
+    if (output != NULL) {
+        success = true;
+        free(output);
+    }
+
+    return success;
+}
+
+static void
+chaz_LargeFiles_probe_unbuff(void) {
+    static chaz_LargeFiles_unbuff_combo unbuff_combos[] = {
+        { "#include <unistd.h>\n#include <fcntl.h>\n", "lseek64",   "pread64" },
+        { "#include <unistd.h>\n#include <fcntl.h>\n", "lseek",     "pread"      },
+        { "#include <io.h>\n#include <fcntl.h>\n",     "_lseeki64", "NO_PREAD64" },
+        { NULL, NULL, NULL }
+    };
+    int i;
+
+    for (i = 0; unbuff_combos[i].lseek_command != NULL; i++) {
+        chaz_LargeFiles_unbuff_combo combo = unbuff_combos[i];
+        if (chaz_LargeFiles_probe_lseek(&combo)) {
+            chaz_ConfWriter_add_def("HAS_64BIT_LSEEK", NULL);
+            chaz_ConfWriter_add_def("lseek64", combo.lseek_command);
+            break;
+        }
+    }
+    for (i = 0; unbuff_combos[i].pread64_command != NULL; i++) {
+        chaz_LargeFiles_unbuff_combo combo = unbuff_combos[i];
+        if (chaz_LargeFiles_probe_pread64(&combo)) {
+            chaz_ConfWriter_add_def("HAS_64BIT_PREAD", NULL);
+            chaz_ConfWriter_add_def("pread64", combo.pread64_command);
+            break;
+        }
+    }
+};
+
+
+/***************************************************************************/
+
+#line 17 "src/Charmonizer/Probe/Memory.c"
+/* #include "Charmonizer/Probe/Memory.h" */
+/* #include "Charmonizer/Core/Compiler.h" */
+/* #include "Charmonizer/Core/HeaderChecker.h" */
+/* #include "Charmonizer/Core/ConfWriter.h" */
+/* #include "Charmonizer/Core/Util.h" */
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+/* Probe for alloca() or equivalent. */
+static void
+chaz_Memory_probe_alloca(void);
+
+void
+chaz_Memory_run(void) {
+    chaz_ConfWriter_start_module("Memory");
+
+    chaz_Memory_probe_alloca();
+
+    chaz_ConfWriter_end_module();
+}
+
+static void
+chaz_Memory_probe_alloca(void) {
+    static const char alloca_code[] =
+        "#include <%s>\n"
+        CHAZ_QUOTE(  int main() {                   )
+        CHAZ_QUOTE(      void *foo = %s(1);         )
+        CHAZ_QUOTE(      return 0;                  )
+        CHAZ_QUOTE(  }                              );
+    int has_sys_mman_h = false;
+    int has_alloca_h   = false;
+    int has_malloc_h   = false;
+    int need_stdlib_h  = false;
+    int has_alloca     = false;
+    int has_builtin_alloca    = false;
+    int has_underscore_alloca = false;
+    char code_buf[sizeof(alloca_code) + 100];
+
+    {
+        /* OpenBSD needs sys/types.h for sys/mman.h to work and mmap() to be
+         * available. Everybody else that has sys/mman.h should have
+         * sys/types.h as well. */
+        const char *mman_headers[] = {
+            "sys/types.h",
+            "sys/mman.h",
+            NULL
+        };
+        if (chaz_HeadCheck_check_many_headers((const char**)mman_headers)) {
+            has_sys_mman_h = true;
+            chaz_ConfWriter_add_def("HAS_SYS_MMAN_H", NULL);
+        }
+    }
+
+    /* Unixen. */
+    sprintf(code_buf, alloca_code, "alloca.h", "alloca");
+    if (chaz_CC_test_compile(code_buf)) {
+        has_alloca_h = true;
+        has_alloca   = true;
+        chaz_ConfWriter_add_def("HAS_ALLOCA_H", NULL);
+        chaz_ConfWriter_add_def("alloca", "alloca");
+    }
+    if (!has_alloca) {
+        /*
+         * FIXME: Under MinGW, alloca is defined in malloc.h. This probe
+         * produces compiler warnings but works regardless. These warnings
+         * are subsequently repeated during the build.
+         */
+        sprintf(code_buf, alloca_code, "stdlib.h", "alloca");
+        if (chaz_CC_test_compile(code_buf)) {
+            has_alloca    = true;
+            need_stdlib_h = true;
+            chaz_ConfWriter_add_def("ALLOCA_IN_STDLIB_H", NULL);
+            chaz_ConfWriter_add_def("alloca", "alloca");
+        }
+    }
+    if (!has_alloca) {
+        sprintf(code_buf, alloca_code, "stdio.h", /* stdio.h is filler */
+                "__builtin_alloca");
+        if (chaz_CC_test_compile(code_buf)) {
+            has_builtin_alloca = true;
+            chaz_ConfWriter_add_def("alloca", "__builtin_alloca");
+        }
+    }
+
+    /* Windows. */
+    if (!(has_alloca || has_builtin_alloca)) {
+        sprintf(code_buf, alloca_code, "malloc.h", "alloca");
+        if (chaz_CC_test_compile(code_buf)) {
+            has_malloc_h = true;
+            has_alloca   = true;
+            chaz_ConfWriter_add_def("HAS_MALLOC_H", NULL);
+            chaz_ConfWriter_add_def("alloca", "alloca");
+        }
+    }
+    if (!(has_alloca || has_builtin_alloca)) {
+        sprintf(code_buf, alloca_code, "malloc.h", "_alloca");
+        if (chaz_CC_test_compile(code_buf)) {
+            has_malloc_h = true;
+            has_underscore_alloca = true;
+            chaz_ConfWriter_add_def("HAS_MALLOC_H", NULL);
+            chaz_ConfWriter_add_def("chy_alloca", "_alloca");
+        }
+    }
+}
+
+
+
+/***************************************************************************/
+
+#line 17 "src/Charmonizer/Probe/RegularExpressions.c"
+/* #include "Charmonizer/Core/HeaderChecker.h" */
+/* #include "Charmonizer/Core/ConfWriter.h" */
+/* #include "Charmonizer/Probe/RegularExpressions.h" */
+
+void
+chaz_RegularExpressions_run(void) {
+    int has_regex_h     = chaz_HeadCheck_check_header("regex.h");
+    int has_pcre_h      = chaz_HeadCheck_check_header("pcre.h");
+    int has_pcreposix_h = chaz_HeadCheck_check_header("pcreposix.h");
+
+    chaz_ConfWriter_start_module("RegularExpressions");
+
+    /* PCRE headers. */
+    if (has_pcre_h) {
+        chaz_ConfWriter_add_def("HAS_PCRE_H", NULL);
+    }
+    if (has_pcreposix_h) {
+        chaz_ConfWriter_add_def("HAS_PCREPOSIX_H", NULL);
+    }
+
+    /* Check for OS X enhanced regexes. */
+    if (has_regex_h) {
+        const char *reg_enhanced_code =
+            CHAZ_QUOTE(  #include <regex.h>                             )
+            CHAZ_QUOTE(  int main(int argc, char **argv) {              )
+            CHAZ_QUOTE(      regex_t re;                                )
+            CHAZ_QUOTE(      if (regcomp(&re, "^", REG_ENHANCED)) {     )
+            CHAZ_QUOTE(          return 1;                              )
+            CHAZ_QUOTE(      }                                          )
+            CHAZ_QUOTE(      return 0;                                  )
+            CHAZ_QUOTE(  }                                              );
+
+        if (chaz_CC_test_compile(reg_enhanced_code)) {
+            chaz_ConfWriter_add_def("HAS_REG_ENHANCED", NULL);
+        }
+    }
+
+    chaz_ConfWriter_end_module();
+}
+
+
+
+/***************************************************************************/
+
 #line 17 "src/Charmonizer/Probe/Strings.c"
 /* #include "Charmonizer/Core/Compiler.h" */
 /* #include "Charmonizer/Core/ConfWriter.h" */
@@ -5857,6 +6664,74 @@ chaz_UnusedVars_run(void) {
     /* Write the macros (no test, these are the same everywhere). */
     chaz_ConfWriter_add_def("UNUSED_VAR(x)", "((void)x)");
     chaz_ConfWriter_add_def("UNREACHABLE_RETURN(type)", "return (type)0");
+
+    chaz_ConfWriter_end_module();
+}
+
+
+
+
+/***************************************************************************/
+
+#line 17 "src/Charmonizer/Probe/VariadicMacros.c"
+/* #include "Charmonizer/Core/Compiler.h" */
+/* #include "Charmonizer/Core/ConfWriter.h" */
+/* #include "Charmonizer/Core/Util.h" */
+/* #include "Charmonizer/Probe/VariadicMacros.h" */
+#include <string.h>
+#include <stdio.h>
+
+
+/* Code for verifying ISO-style variadic macros. */
+static const char chaz_VariadicMacros_iso_code[] =
+    CHAZ_QUOTE(  #include <stdio.h>                                    )
+    CHAZ_QUOTE(  #define ISO_TEST(fmt, ...) \\                         )
+    "                printf(fmt, __VA_ARGS__)                        \n"
+    CHAZ_QUOTE(  int main() {                                          )
+    CHAZ_QUOTE(      ISO_TEST("%d %d", 1, 1);                          )
+    CHAZ_QUOTE(      return 0;                                         )
+    CHAZ_QUOTE(  }                                                     );
+
+/* Code for verifying GNU-style variadic macros. */
+static const char chaz_VariadicMacros_gnuc_code[] =
+    CHAZ_QUOTE(  #include <stdio.h>                                    )
+    CHAZ_QUOTE(  #define GNU_TEST(fmt, args...) printf(fmt, ##args)    )
+    CHAZ_QUOTE(  int main() {                                          )
+    CHAZ_QUOTE(      GNU_TEST("%d %d", 1, 1);                          )
+    CHAZ_QUOTE(      return 0;                                         )
+    CHAZ_QUOTE(  }                                                     );
+
+void
+chaz_VariadicMacros_run(void) {
+    char *output;
+    size_t output_len;
+    int has_varmacros      = false;
+    int has_iso_varmacros  = false;
+    int has_gnuc_varmacros = false;
+
+    chaz_ConfWriter_start_module("VariadicMacros");
+
+    /* Test for ISO-style variadic macros. */
+    output = chaz_CC_capture_output(chaz_VariadicMacros_iso_code, &output_len);
+    if (output != NULL) {
+        has_varmacros = true;
+        has_iso_varmacros = true;
+        chaz_ConfWriter_add_def("HAS_VARIADIC_MACROS", NULL);
+        chaz_ConfWriter_add_def("HAS_ISO_VARIADIC_MACROS", NULL);
+        free(output);
+    }
+
+    /* Test for GNU-style variadic macros. */
+    output = chaz_CC_capture_output(chaz_VariadicMacros_gnuc_code, &output_len);
+    if (output != NULL) {
+        has_gnuc_varmacros = true;
+        if (has_varmacros == false) {
+            has_varmacros = true;
+            chaz_ConfWriter_add_def("HAS_VARIADIC_MACROS", NULL);
+        }
+        chaz_ConfWriter_add_def("HAS_GNUC_VARIADIC_MACROS", NULL);
+        free(output);
+    }
 
     chaz_ConfWriter_end_module();
 }
@@ -6130,12 +7005,15 @@ int main(int argc, const char **argv) {
     chaz_BuildEnv_run();
     chaz_DirManip_run();
     chaz_Headers_run();
+    chaz_AtomicOps_run();
     chaz_FuncMacro_run();
     chaz_Booleans_run();
     chaz_Integers_run();
     chaz_Strings_run();
+    chaz_Memory_run();
     chaz_SymbolVisibility_run();
     chaz_UnusedVars_run();
+    chaz_VariadicMacros_run();
 
     if (args.write_makefile) {
         S_write_makefile(&args);
