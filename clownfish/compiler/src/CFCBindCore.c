@@ -55,10 +55,19 @@ static char*
 S_charmony_defines();
 
 static char*
+S_charmony_feature_defines();
+
+static char*
+S_charmony_string_defines();
+
+static char*
 S_charmony_stdbool_defines();
 
-char*
+static char*
 S_charmony_stdint_defines();
+
+static char*
+S_charmony_alloca_defines();
 
 static const CFCMeta CFCBINDCORE_META = {
     "Clownfish::CFC::Binding::Core",
@@ -140,8 +149,6 @@ S_write_parcel_h(CFCBindCore *self, CFCParcel *parcel) {
     const char   *PREFIX      = CFCParcel_get_PREFIX(parcel);
     const char   *privacy_sym = CFCParcel_get_privacy_sym(parcel);
 
-    char *charmony_defines = S_charmony_defines();
-
     // Declare object structs for all instantiable classes.
     char *typedefs = CFCUtil_strdup("");
     CFCClass **ordered = CFCHierarchy_ordered_classes(hierarchy);
@@ -158,12 +165,15 @@ S_write_parcel_h(CFCBindCore *self, CFCParcel *parcel) {
     }
     FREEMEM(ordered);
 
-    // Special includes for Clownfish parcel.
+    // Special includes and macros for Clownfish parcel.
     const char *cfish_includes_pattern =
         "#include <stdarg.h>\n"
         "#include <stddef.h>\n"
         "\n"
         "%s"
+        "\n"
+        "#define CFISH_UNUSED_VAR(var) ((void)var)\n"
+        "#define CFISH_UNREACHABLE_RETURN(type) return (type)0\n"
         "\n"
         "#include \"cfish_hostdefs.h\"\n";
 
@@ -270,8 +280,10 @@ S_write_parcel_h(CFCBindCore *self, CFCParcel *parcel) {
     char *extra_includes;
     if (strcmp(prefix, "cfish_") == 0) {
         extra_defs = cfish_defs;
+        char *charmony_defines = S_charmony_defines();
         extra_includes = CFCUtil_sprintf(cfish_includes_pattern,
                                          charmony_defines);
+        FREEMEM(charmony_defines);
     }
     else {
         extra_defs = "";
@@ -339,7 +351,6 @@ S_write_parcel_h(CFCBindCore *self, CFCParcel *parcel) {
     CFCUtil_write_file(filepath, file_content, strlen(file_content));
     FREEMEM(filepath);
 
-    FREEMEM(charmony_defines);
     FREEMEM(typedefs);
     FREEMEM(extra_includes);
     FREEMEM(file_content);
@@ -553,22 +564,87 @@ CFCBindCore_write_callbacks_h(CFCBindCore *self) {
 
 static char*
 S_charmony_defines() {
+    char *feature_defs = S_charmony_feature_defines();
+    char *string_defs  = S_charmony_string_defines();
     char *stdbool_defs = S_charmony_stdbool_defines();
     char *stdint_defs  = S_charmony_stdint_defines();
+    char *alloca_defs  = S_charmony_alloca_defines();
 
+    const char *pattern =
+        "%s"
+        "%s"
+        "\n"
+        "%s"
+        "%s"
+        "\n"
+        "%s";
+    char *defines
+        = CFCUtil_sprintf(pattern, feature_defs, string_defs, stdbool_defs,
+                          stdint_defs, alloca_defs);
+
+    FREEMEM(feature_defs);
+    FREEMEM(string_defs);
+    FREEMEM(stdbool_defs);
+    FREEMEM(stdint_defs);
+    FREEMEM(alloca_defs);
+    return defines;
+}
+
+static char*
+S_charmony_feature_defines() {
+    char *defines = CFCUtil_strdup("");
+
+#ifdef CHY_HAS_WINDOWS_H
+    defines = CFCUtil_cat(defines, "#define CFISH_HAS_WINDOWS_H\n", NULL);
+#endif
+#ifdef CHY_HAS_SYS_ATOMIC_H
+    defines = CFCUtil_cat(defines, "#define CFISH_HAS_SYS_ATOMIC_H\n", NULL);
+#endif
+#ifdef CHY_HAS_PTHREAD_H
+    defines = CFCUtil_cat(defines, "#define CFISH_HAS_PTHREAD_H\n", NULL);
+#endif
+#ifdef CHY_LITTLE_END
+    defines = CFCUtil_cat(defines, "#define CFISH_LITTLE_END\n", NULL);
+#endif
+#ifdef CHY_BIG_END
+    defines = CFCUtil_cat(defines, "#define CFISH_BIG_END\n", NULL);
+#endif
+#ifdef CHY_HAS_FUNC_MACRO
+    defines = CFCUtil_cat(defines, "#define CFISH_HAS_FUNC_MACRO\n", NULL);
+#endif
+#ifdef CHY_HAS_VARIADIC_MACROS
+    defines = CFCUtil_cat(defines, "#define CFISH_HAS_VARIADIC_MACROS\n",
+                          NULL);
+#endif
+#ifdef CHY_HAS_ISO_VARIADIC_MACROS
+    defines = CFCUtil_cat(defines, "#define CFISH_HAS_ISO_VARIADIC_MACROS\n",
+                          NULL);
+#endif
+#ifdef CHY_HAS_GNUC_VARIADIC_MACROS
+    defines = CFCUtil_cat(defines, "#define CFISH_HAS_GNUC_VARIADIC_MACROS\n",
+                          NULL);
+#endif
+#ifdef CHY_HAS_OSATOMIC_CAS_PTR
+    defines = CFCUtil_cat(defines, "#define CFISH_HAS_OSATOMIC_CAS_PTR\n",
+                          NULL);
+#endif
+
+    return defines;
+}
+
+static char*
+S_charmony_string_defines() {
     const char *pattern =
         "#define CFISH_INLINE %s\n"
         "#define CFISH_EXPORT %s\n"
         "#define CFISH_IMPORT %s\n"
-        "\n"
-        "%s"
-        "%s";
+        "#define CFISH_FUNC_MACRO %s\n"
+        "#define CFISH_U64_TO_DOUBLE(x) %s\n";
     char *defines
         = CFCUtil_sprintf(pattern, XSTRING(CHY_INLINE), XSTRING(CHY_EXPORT),
-                          XSTRING(CHY_IMPORT), stdbool_defs, stdint_defs);
+                          XSTRING(CHY_IMPORT), XSTRING(CHY_FUNC_MACRO),
+                          XSTRING(CHY_U64_TO_DOUBLE(x)));
 
-    FREEMEM(stdbool_defs);
-    FREEMEM(stdint_defs);
     return defines;
 }
 
@@ -592,7 +668,7 @@ S_charmony_stdbool_defines() {
     return CFCUtil_strdup(defines);
 }
 
-char*
+static char*
 S_charmony_stdint_defines() {
 #ifdef CHY_HAS_STDINT_H
     return CFCUtil_strdup("#include <stdint.h>\n");
@@ -614,6 +690,24 @@ S_charmony_stdint_defines() {
                            XSTRING(CHY_INT32_T), XSTRING(CHY_UINT32_T),
                            XSTRING(CHY_INT64_T), XSTRING(CHY_UINT64_T));
 #endif
+}
+
+static char*
+S_charmony_alloca_defines() {
+    char *defines = CFCUtil_strdup("");
+
+#if defined(CHY_HAS_ALLOCA_H)
+    defines = CFCUtil_cat(defines, "#include <alloca.h>\n", NULL);
+#elif defined(CHY_HAS_MALLOC_H)
+    defines = CFCUtil_cat(defines, "#include <malloc.h>\n", NULL);
+#elif defined(CHY_ALLOCA_IN_STDLIB_H)
+    defines = CFCUtil_cat(defines, "#include <stdlib.h>\n", NULL);
+#endif
+
+    defines = CFCUtil_cat(defines, "#define cfish_alloca ",
+                          XSTRING(chy_alloca), "\n", NULL);
+
+    return defines;
 }
 
 

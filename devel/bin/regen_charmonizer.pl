@@ -29,15 +29,11 @@ my $MELD_EXE = catfile( $CHAZ_DIR, 'buildbin', 'meld.pl' );
 
 # Clownfish compiler.
 {
-    my $probes = join( ',', qw(
-        Booleans BuildEnv DirManip FuncMacro Headers Integers Strings
-        SymbolVisibility UnusedVars
-    ) );
-    my $main   = catfile(qw( clownfish compiler common charmonizer.main ));
-    my $out    = $main;
+    my $main = catfile(qw( clownfish compiler common charmonizer.main ));
+    my $out  = $main;
     $out =~ s/\.main/.c/ or die "no match";
     unlink $out;
-    system( $MELD_EXE, "--probes=$probes", "--files=$main", "--out=$out" );
+    system( $MELD_EXE, "--probes=", "--files=$main", "--out=$out" );
 }
 
 # Clownfish runtime.
