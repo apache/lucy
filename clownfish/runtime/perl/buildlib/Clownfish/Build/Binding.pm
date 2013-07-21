@@ -190,7 +190,7 @@ CODE:
     char *ptr = SvPVutf8(sv, size);
     cfish_ViewCharBuf *self
         = cfish_ViewCB_new_from_trusted_utf8(ptr, size);
-    CHY_UNUSED_VAR(unused);
+    CFISH_UNUSED_VAR(unused);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
@@ -592,7 +592,7 @@ fetch_vtable(unused_sv, class_name_sv)
     SV *class_name_sv;
 CODE:
 {
-    CHY_UNUSED_VAR(unused_sv);
+    CFISH_UNUSED_VAR(unused_sv);
     STRLEN size;
     char *ptr = SvPVutf8(class_name_sv, size);
     cfish_ZombieCharBuf *class_name = CFISH_ZCB_WRAP_STR(ptr, size);
@@ -607,7 +607,7 @@ singleton(unused_sv, ...)
     SV *unused_sv;
 CODE:
 {
-    CHY_UNUSED_VAR(unused_sv);
+    CFISH_UNUSED_VAR(unused_sv);
     cfish_CharBuf *class_name = NULL;
     cfish_VTable  *parent     = NULL;
     bool args_ok

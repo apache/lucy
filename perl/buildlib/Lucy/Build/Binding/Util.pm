@@ -123,7 +123,7 @@ void
 track_globals(...)
 PPCODE:
 {
-    CHY_UNUSED_VAR(items);
+    CFISH_UNUSED_VAR(items);
     LUCY_IFDEF_DEBUG(lucy_Debug_num_globals++;);
 }
 

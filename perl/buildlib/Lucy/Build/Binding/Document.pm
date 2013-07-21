@@ -89,7 +89,7 @@ SV*
 get_fields(self, ...)
     lucy_Doc *self;
 CODE:
-    CHY_UNUSED_VAR(items);
+    CFISH_UNUSED_VAR(items);
     RETVAL = newRV_inc((SV*)Lucy_Doc_Get_Fields(self));
 OUTPUT: RETVAL
 

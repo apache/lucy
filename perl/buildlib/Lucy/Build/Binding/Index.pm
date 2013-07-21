@@ -446,14 +446,14 @@ MODULE = Lucy  PACKAGE = Lucy::Index::Indexer
 int32_t
 CREATE(...)
 CODE:
-    CHY_UNUSED_VAR(items);
+    CFISH_UNUSED_VAR(items);
     RETVAL = lucy_Indexer_CREATE;
 OUTPUT: RETVAL
 
 int32_t
 TRUNCATE(...)
 CODE:
-    CHY_UNUSED_VAR(items);
+    CFISH_UNUSED_VAR(items);
     RETVAL = lucy_Indexer_TRUNCATE;
 OUTPUT: RETVAL
 

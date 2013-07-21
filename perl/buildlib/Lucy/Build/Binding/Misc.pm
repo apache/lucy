@@ -98,7 +98,7 @@ STORABLE_freeze(self, ...)
     cfish_Obj *self;
 PPCODE:
 {
-    CHY_UNUSED_VAR(self);
+    CFISH_UNUSED_VAR(self);
     if (items < 2 || !SvTRUE(ST(1))) {
         SV *retval;
         cfish_ByteBuf *serialized_bb;
@@ -154,7 +154,7 @@ PPCODE:
     cfish_Obj *self = Cfish_VTable_Foster_Obj(vtable, blank_obj);
     cfish_Obj *deserialized = lucy_Freezer_deserialize(self, instream);
 
-    CHY_UNUSED_VAR(cloning);
+    CFISH_UNUSED_VAR(cloning);
     CFISH_DECREF(contents);
     CFISH_DECREF(ram_file);
     CFISH_DECREF(file_handle);
