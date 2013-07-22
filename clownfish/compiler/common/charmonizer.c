@@ -5583,6 +5583,7 @@ static const char chaz_Integers_sizes_code[] =
     CHAZ_QUOTE(      printf("%d ", (int)sizeof(int));      )
     CHAZ_QUOTE(      printf("%d ", (int)sizeof(long));     )
     CHAZ_QUOTE(      printf("%d ", (int)sizeof(void*));    )
+    CHAZ_QUOTE(      printf("%d ", (int)sizeof(size_t));   )
     CHAZ_QUOTE(      return 0;                             )
     CHAZ_QUOTE(  }                                         );
 
@@ -5626,6 +5627,7 @@ chaz_Integers_run(void) {
     int sizeof_long       = -1;
     int sizeof_long_long  = -1;
     int sizeof___int64    = -1;
+    int sizeof_size_t     = -1;
     int has_8             = false;
     int has_16            = false;
     int has_32            = false;
@@ -5660,15 +5662,17 @@ chaz_Integers_run(void) {
         char *ptr     = output;
         char *end_ptr = output;
 
-        sizeof_char  = strtol(ptr, &end_ptr, 10);
-        ptr          = end_ptr;
-        sizeof_short = strtol(ptr, &end_ptr, 10);
-        ptr          = end_ptr;
-        sizeof_int   = strtol(ptr, &end_ptr, 10);
-        ptr          = end_ptr;
-        sizeof_long  = strtol(ptr, &end_ptr, 10);
-        ptr          = end_ptr;
-        sizeof_ptr   = strtol(ptr, &end_ptr, 10);
+        sizeof_char   = strtol(ptr, &end_ptr, 10);
+        ptr           = end_ptr;
+        sizeof_short  = strtol(ptr, &end_ptr, 10);
+        ptr           = end_ptr;
+        sizeof_int    = strtol(ptr, &end_ptr, 10);
+        ptr           = end_ptr;
+        sizeof_long   = strtol(ptr, &end_ptr, 10);
+        ptr           = end_ptr;
+        sizeof_ptr    = strtol(ptr, &end_ptr, 10);
+        ptr           = end_ptr;
+        sizeof_size_t = strtol(ptr, &end_ptr, 10);
 
         free(output);
     }
@@ -5790,6 +5794,8 @@ chaz_Integers_run(void) {
     chaz_ConfWriter_add_def("SIZEOF_LONG", scratch);
     sprintf(scratch, "%d", sizeof_ptr);
     chaz_ConfWriter_add_def("SIZEOF_PTR", scratch);
+    sprintf(scratch, "%d", sizeof_size_t);
+    chaz_ConfWriter_add_def("SIZEOF_SIZE_T", scratch);
     if (has_long_long) {
         sprintf(scratch, "%d", sizeof_long_long);
         chaz_ConfWriter_add_def("SIZEOF_LONG_LONG", scratch);
