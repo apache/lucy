@@ -637,11 +637,24 @@ S_charmony_string_defines() {
         "#define CFISH_INLINE %s\n"
         "#define CFISH_EXPORT %s\n"
         "#define CFISH_IMPORT %s\n"
+        "#define CFISH_SIZEOF_CHAR %s\n"
+        "#define CFISH_SIZEOF_SHORT %s\n"
+        "#define CFISH_SIZEOF_INT %s\n"
+        "#define CFISH_SIZEOF_LONG %s\n"
+        "#define CFISH_SIZEOF_SIZE_T %s\n"
         "#define CFISH_FUNC_MACRO %s\n"
         "#define CFISH_U64_TO_DOUBLE(x) %s\n";
     char *defines
-        = CFCUtil_sprintf(pattern, XSTRING(CHY_INLINE), XSTRING(CHY_EXPORT),
-                          XSTRING(CHY_IMPORT), XSTRING(CHY_FUNC_MACRO),
+        = CFCUtil_sprintf(pattern,
+                          XSTRING(CHY_INLINE),
+                          XSTRING(CHY_EXPORT),
+                          XSTRING(CHY_IMPORT),
+                          XSTRING(CHY_SIZEOF_CHAR),
+                          XSTRING(CHY_SIZEOF_SHORT),
+                          XSTRING(CHY_SIZEOF_INT),
+                          XSTRING(CHY_SIZEOF_LONG),
+                          XSTRING(CHY_SIZEOF_SIZE_T),
+                          XSTRING(CHY_FUNC_MACRO),
                           XSTRING(CHY_U64_TO_DOUBLE(x)));
 
     return defines;
