@@ -84,6 +84,7 @@ esac
 mkdir -p $prefix/include
 cp autogen/include/cfish_hostdefs.h $prefix/include
 cp autogen/include/cfish_parcel.h $prefix/include
+cp autogen/include/cfish_platform.h $prefix/include
 cp -R autogen/include/Clownfish $prefix/include
 
 cp -R autogen/man $prefix
