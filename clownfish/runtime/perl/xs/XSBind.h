@@ -20,7 +20,6 @@
 #ifndef H_CFISH_XSBIND
 #define H_CFISH_XSBIND 1
 
-#include "charmony.h"
 #include "Clownfish/Obj.h"
 #include "Clownfish/ByteBuf.h"
 #include "Clownfish/CharBuf.h"
@@ -226,34 +225,40 @@ cfish_XSBind_allot_params(SV** stack, int32_t start,
 #define XSBIND_WANT_OBJ      0xC
 #define XSBIND_WANT_SV       0xD
 
-#if (CHY_SIZEOF_CHAR == 1)
+#if (CFISH_SIZEOF_CHAR == 1)
   #define XSBIND_WANT_CHAR XSBIND_WANT_I8
 #else
   #error "Can't build unless sizeof(char) == 1"
 #endif
 
-#if (CHY_SIZEOF_SHORT == 2)
+#if (CFISH_SIZEOF_SHORT == 2)
   #define XSBIND_WANT_SHORT XSBIND_WANT_I16
 #else
   #error "Can't build unless sizeof(short) == 2"
 #endif
 
-#if (CHY_SIZEOF_INT == 4)
+#if (CFISH_SIZEOF_INT == 4)
   #define XSBIND_WANT_INT XSBIND_WANT_I32
-#else // sizeof(int) == 8
+#elif (CFISH_SIZEOF_INT == 8)
   #define XSBIND_WANT_INT XSBIND_WANT_I64
+#else
+  #error "Can't build unless sizeof(int) == 4 or sizeof(int) == 8"
 #endif
 
-#if (CHY_SIZEOF_LONG == 4)
+#if (CFISH_SIZEOF_LONG == 4)
   #define XSBIND_WANT_LONG XSBIND_WANT_I32
-#else // sizeof(long) == 8
+#elif (CFISH_SIZEOF_LONG == 8)
   #define XSBIND_WANT_LONG XSBIND_WANT_I64
+#else
+  #error "Can't build unless sizeof(long) == 4 or sizeof(long) == 8"
 #endif
 
-#if (CHY_SIZEOF_SIZE_T == 4)
+#if (CFISH_SIZEOF_SIZE_T == 4)
   #define XSBIND_WANT_SIZE_T XSBIND_WANT_U32
-#else // sizeof(long) == 8
+#elif (CFISH_SIZEOF_SIZE_T == 8)
   #define XSBIND_WANT_SIZE_T XSBIND_WANT_U64
+#else
+  #error "Can't build unless sizeof(size_t) == 4 or sizeof(size_t) == 8"
 #endif
 
 #define XSBIND_ALLOT_I8(ptr, key, keylen, required) \

@@ -18,6 +18,7 @@
 #define C_CFISH_VTABLE
 #define C_CFISH_LOCKFREEREGISTRY
 #define NEED_newRV_noinc
+#include "charmony.h"
 #include "XSBind.h"
 #include "Clownfish/LockFreeRegistry.h"
 #include "Clownfish/Util/StringHelper.h"
