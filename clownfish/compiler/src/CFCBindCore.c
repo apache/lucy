@@ -51,8 +51,11 @@ S_write_parcel_h(CFCBindCore *self, CFCParcel *parcel);
 static void
 S_write_parcel_c(CFCBindCore *self, CFCParcel *parcel);
 
-static char*
-S_charmony_defines();
+/* Write the "cfish_platform.h" header file, which contains platform-specific
+ * definitions.
+ */
+static void
+S_write_platform_h(CFCBindCore *self);
 
 static char*
 S_charmony_feature_defines();
@@ -124,6 +127,8 @@ CFCBindCore_write_all_modified(CFCBindCore *self, int modified) {
     // If any class definition has changed, rewrite the parcel.h and parcel.c
     // files.
     if (modified) {
+        S_write_platform_h(self);
+
         CFCParcel **parcels = CFCParcel_all_parcels();
         for (size_t i = 0; parcels[i]; ++i) {
             CFCParcel *parcel = parcels[i];
@@ -166,19 +171,18 @@ S_write_parcel_h(CFCBindCore *self, CFCParcel *parcel) {
     FREEMEM(ordered);
 
     // Special includes and macros for Clownfish parcel.
-    const char *cfish_includes_pattern =
+    const char *cfish_includes =
         "#include <stdarg.h>\n"
         "#include <stddef.h>\n"
         "\n"
-        "%s"
-        "\n"
-        "#define CFISH_UNUSED_VAR(var) ((void)var)\n"
-        "#define CFISH_UNREACHABLE_RETURN(type) return (type)0\n"
-        "\n"
+        "#include \"cfish_platform.h\"\n"
         "#include \"cfish_hostdefs.h\"\n";
 
     // Special definitions for Clownfish parcel.
     const char *cfish_defs =
+        "#define CFISH_UNUSED_VAR(var) ((void)var)\n"
+        "#define CFISH_UNREACHABLE_RETURN(type) return (type)0\n"
+        "\n"
         "/* Generic method pointer.\n"
         " */\n"
         "typedef void\n"
@@ -280,10 +284,7 @@ S_write_parcel_h(CFCBindCore *self, CFCParcel *parcel) {
     char *extra_includes;
     if (strcmp(prefix, "cfish_") == 0) {
         extra_defs = cfish_defs;
-        char *charmony_defines = S_charmony_defines();
-        extra_includes = CFCUtil_sprintf(cfish_includes_pattern,
-                                         charmony_defines);
-        FREEMEM(charmony_defines);
+        extra_includes = CFCUtil_strdup(cfish_includes);
     }
     else {
         extra_defs = "";
@@ -561,32 +562,62 @@ CFCBindCore_write_callbacks_h(CFCBindCore *self) {
     FREEMEM(file_content);
 }
 
-static char*
-S_charmony_defines() {
+/* Write the "cfish_platform.h" header file, which contains platform-specific
+ * definitions.
+ */
+static void
+S_write_platform_h(CFCBindCore *self) {
     char *feature_defs = S_charmony_feature_defines();
     char *string_defs  = S_charmony_string_defines();
     char *stdbool_defs = S_charmony_stdbool_defines();
     char *stdint_defs  = S_charmony_stdint_defines();
     char *alloca_defs  = S_charmony_alloca_defines();
 
-    const char *pattern =
+    const char pattern[] =
         "%s"
-        "%s"
+        "\n"
+        "#ifndef CFISH_PLATFORM_H\n"
+        "#define CFISH_PLATFORM_H 1\n"
+        "\n"
+        "#ifdef __cplusplus\n"
+        "extern \"C\" {\n"
+        "#endif\n"
         "\n"
         "%s"
         "%s"
         "\n"
-        "%s";
-    char *defines
-        = CFCUtil_sprintf(pattern, feature_defs, string_defs, stdbool_defs,
-                          stdint_defs, alloca_defs);
+        "%s"
+        "%s"
+        "\n"
+        "%s"
+        "\n"
+        "#ifdef __cplusplus\n"
+        "}\n"
+        "#endif\n"
+        "\n"
+        "#endif /* CFISH_PLATFORM_H */\n"
+        "\n"
+        "%s"
+        "\n";
+    char *file_content
+        = CFCUtil_sprintf(pattern, self->header, feature_defs, string_defs,
+                          stdbool_defs, stdint_defs, alloca_defs,
+                          self->footer);
+
+    // Unlink then write file.
+    const char *inc_dest = CFCHierarchy_get_include_dest(self->hierarchy);
+    char *filepath = CFCUtil_sprintf("%s" CHY_DIR_SEP "cfish_platform.h",
+                                     inc_dest);
+    remove(filepath);
+    CFCUtil_write_file(filepath, file_content, strlen(file_content));
+    FREEMEM(filepath);
 
     FREEMEM(feature_defs);
     FREEMEM(string_defs);
     FREEMEM(stdbool_defs);
     FREEMEM(stdint_defs);
     FREEMEM(alloca_defs);
-    return defines;
+    FREEMEM(file_content);
 }
 
 static char*
