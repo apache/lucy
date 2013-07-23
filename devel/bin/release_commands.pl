@@ -48,6 +48,18 @@ say qq|# If your code signing key is not already available from pgp.mit.edu|;
 say qq|# and <http://www.apache.org/dist/lucy/KEYS>, publish it.|;
 say qq|[...]\n|;
 
+say qq|# chdir to the top level of your local copy of the Lucy repository.|;
+say qq|[...]\n|;
+
+if ( $micro == 0 && $rc < 2 ) {
+    say qq|# Check out the master branch.|;
+    say qq|git checkout master\n|;
+}
+else {
+    say qq|# Check out the $major.$minor branch.|;
+    say qq|git checkout $major.$minor\n|;
+}
+
 if ( $rc < 2 ) {
     say qq|# Since this is the first RC, run update_version.|;
     say qq|./devel/bin/update_version $x_y_z_version\n|;
@@ -55,40 +67,38 @@ if ( $rc < 2 ) {
     say qq|# $x_y_z_version with today's date.|;
     say qq|[...]\n|;
     say qq|# Commit version bump and CHANGES.|;
-    say qq|svn commit -m "Updating CHANGES and version number |
+    say qq|git commit -m "Updating CHANGES and version number |
         . qq|for release $x_y_z_version."\n|;
 }
 
 if ( $micro == 0 && $rc < 2 ) {
     say qq|# Since this is the first release in a series (i.e. X.Y.0),|;
     say qq|# create a branch.|;
-    say qq|svn copy https://svn.apache.org/repos/asf/lucy/trunk |
-        . qq|https://svn.apache.org/repos/asf/lucy/branches/$major.$minor |
-        . qq|-m "Branching for $x_y_z_version release"\n|;
+    say qq|git checkout -b $major.$minor|;
 }
 
 say qq|# Create a tag for the release candidate.|;
-say qq|svn copy |
-    . qq|https://svn.apache.org/repos/asf/lucy/branches/$major.$minor |
-    . qq|https://svn.apache.org/repos/asf/lucy/tags/apache-lucy-$full_rc_version |
+say qq|git tag apache-lucy-$full_rc_version |
     . qq|-m "Tagging release candidate $rc for $x_y_z_version."\n|;
-
-say qq|# Create an RC directory in our dev area on dist.apache.org.|;
-say qq|svn mkdir -m "Create RC dir for apache-lucy-$full_rc_version" |
-    . qq|https://dist.apache.org/repos/dist/dev/lucy/apache-lucy-$full_rc_version|;
-say qq|svn co |
-    . qq|https://dist.apache.org/repos/dist/dev/lucy/apache-lucy-$full_rc_version|;
-say qq|cd apache-lucy-$full_rc_version\n|;
 
 say qq|# Export a pristine copy of the source from the release candidate|;
 say qq|# tag.|;
-say qq|svn export |
-    . qq|https://svn.apache.org/repos/asf/lucy/tags/apache-lucy-$full_rc_version |
-    . qq|apache-lucy-$x_y_z_version\n|;
+say qq|git archive --prefix=apache-lucy-$x_y_z_version/ |
+    . qq|--output=apache-lucy-$x_y_z_version.tar.gz |
+    . qq|apache-lucy-$full_rc_version\n|;
 
-say qq|# Tar and gzip the export.|;
-say qq|tar -czf |
-    . qq|apache-lucy-$x_y_z_version.tar.gz apache-lucy-$x_y_z_version\n|;
+say qq|# Create an RC directory in our dev area on dist.apache.org|;
+say qq|# and check out a copy.|;
+say qq|svn mkdir -m "Create RC dir for apache-lucy-$full_rc_version" |
+    . qq|https://dist.apache.org/repos/dist/dev/lucy/apache-lucy-$full_rc_version|;
+say qq|svn co |
+    . qq|https://dist.apache.org/repos/dist/dev/lucy/apache-lucy-$full_rc_version\n|;
+
+say qq|# Move the tarball and a copy of the CHANGES file into the RC dir,|;
+say qq|# then chdir into it.|;
+say qq|mv apache-lucy-$x_y_z_version.tar.gz apache-lucy-$full_rc_version|;
+say qq|cp -p CHANGES apache-lucy-$full_rc_version/CHANGES-$x_y_z_version.txt|;
+say qq|cd apache-lucy-$full_rc_version\n|;
 
 say qq|# Generate checksums.|;
 say qq|perl -MDigest -e '\$d = Digest->new("MD5"); open \$fh, |
@@ -106,9 +116,6 @@ say qq|# Sign the release.|;
 say qq|gpg --armor --output apache-lucy-$x_y_z_version.tar.gz.asc |
     . qq|--detach-sig apache-lucy-$x_y_z_version.tar.gz\n|;
 
-say qq|# Break out CHANGES as a separate file.|;
-say qq|cp -p apache-lucy-$x_y_z_version/CHANGES CHANGES-$x_y_z_version.txt\n|;
-
 say qq|# Add the artifacts and commit to the dev area on dist.apache.org.|;
 say qq|svn add |
     . qq|apache-lucy-$x_y_z_version.tar.gz |
@@ -121,6 +128,10 @@ say qq|svn ci -m "Add apache-lucy-$x_y_z_version artifacts"\n|;
 say qq|# Perform whatever QC seems prudent on the tarball, installing it|;
 say qq|# on test systems, etc.|;
 say qq|[...]\n|;
+
+say qq|# Push your branch and the tag for the RC.|;
+say qq|git push origin $major.$minor|;
+say qq|git push origin apache-lucy-$full_rc_version\n|;
 
 say qq|###############################################################|;
 say qq|# Voting|;
@@ -136,10 +147,7 @@ say qq|# After the vote has passed...|;
 say qq|###############################################################\n|;
 
 say qq|# Tag the release.|;
-say qq|svn copy |
-    . qq|https://svn.apache.org/repos/asf/lucy/tags/apache-lucy-$full_rc_version |
-    . qq|https://svn.apache.org/repos/asf/lucy/tags/apache-lucy-$x_y_z_version |
-    . qq|-m "Tagging release $x_y_z_version."\n|;
+say qq|git tag apache-lucy-$x_y_z_version apache-lucy-$full_rc_version\n|;
 
 say qq|# Copy release artifacts to the production dist directory and|;
 say qq|# remove the RC dir.  The "svnmucc" app, which ships with Subversion|;
@@ -217,7 +225,7 @@ Hello,
 Release candidate $rc for Apache Lucy version $x_y_z_version can be
 found at:
 
-    http://dist.apache.org/repos/dist/dev/lucy/apache-lucy-$full_rc_version/
+    https://dist.apache.org/repos/dist/dev/lucy/apache-lucy-$full_rc_version/
 
 See the CHANGES file at the top level of the archive for information
 about the content of this release.
@@ -226,9 +234,9 @@ This candidate was assembled according to the process documented at:
 
     http://wiki.apache.org/lucy/ReleaseGuide
 
-It was cut from an "svn export" of the tag at:
+It was cut using "git archive" from the tag at:
 
-    https://svn.apache.org/repos/asf/lucy/tags/apache-lucy-$full_rc_version
+    https://git-wip-us.apache.org/repos/asf?p=lucy.git;a=tag;h=refs/tags/apache-lucy-$full_rc_version
 
 Please vote on releasing this candidate as Apache Lucy version
 $x_y_z_version.  The vote will be held open for at least the next 72
