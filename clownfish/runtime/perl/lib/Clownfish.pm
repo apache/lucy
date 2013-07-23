@@ -132,6 +132,14 @@ sub error {$Clownfish::Err::error}
 }
 
 {
+    package Clownfish::Method;
+    our $VERSION = '0.003000';
+    $VERSION = eval $VERSION;
+    no warnings 'redefine';
+    sub DESTROY { }    # leak all
+}
+
+{
     package Clownfish::ViewByteBuf;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
