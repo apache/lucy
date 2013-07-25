@@ -23,7 +23,7 @@ parcel Lucy;
  * which matches against another part of the query will be ranked higher than
  * a document which matches only via the MatchAllQuery.
  */
-public abstract class Lucy::Search::MatchAllQuery
+public class Lucy::Search::MatchAllQuery
     inherits Lucy::Search::Query : dumpable {
 
     inert incremented MatchAllQuery*
