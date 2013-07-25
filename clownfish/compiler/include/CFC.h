@@ -18,7 +18,6 @@
 #include "CFCCBlock.h"
 #include "CFCClass.h"
 #include "CFCDocuComment.h"
-#include "CFCDumpable.h"
 #include "CFCFile.h"
 #include "CFCFileSpec.h"
 #include "CFCFunction.h"

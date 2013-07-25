@@ -44,7 +44,7 @@ S_has_symbol(CFCSymbol **symbols, const char *micro_sym);
 
 const CFCTestBatch CFCTEST_BATCH_CLASS = {
     "Clownfish::CFC::Model::Class",
-    87,
+    86,
     S_run_tests
 };
 
@@ -199,11 +199,6 @@ S_run_tests(CFCTest *test) {
         CFCMethod **fresh_methods = CFCClass_fresh_methods(final_foo);
         OK(test, fresh_methods[0] == NULL, "fresh_methods[0]");
         FREEMEM(fresh_methods);
-    }
-
-    {
-        const char *autocode = CFCClass_get_autocode(foo_jr);
-        OK(test, strstr(autocode, "load") != NULL, "autogenerate Dump/Load");
     }
 
     {

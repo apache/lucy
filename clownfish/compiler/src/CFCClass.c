@@ -26,7 +26,6 @@
 #define CFC_NEED_SYMBOL_STRUCT_DEF
 #include "CFCSymbol.h"
 #include "CFCClass.h"
-#include "CFCDumpable.h"
 #include "CFCFunction.h"
 #include "CFCMethod.h"
 #include "CFCParcel.h"
@@ -95,15 +94,6 @@ S_establish_ancestry(CFCClass *self);
 // Pass down member vars to from parent to children.
 static void
 S_bequeath_member_vars(CFCClass *self);
-
-// Create auto-generated methods.  This must be called after member vars are
-// passed down but before methods are passed down.
-static void
-S_generate_automethods(CFCClass *self);
-
-// Create dumpable functions unless hand coded versions were supplied.
-static void
-S_create_dumpables(CFCClass *self);
 
 // Pass down methods to from parent to children.
 static void
@@ -651,15 +641,6 @@ S_family_tree_size(CFCClass *self) {
     return count;
 }
 
-static void
-S_create_dumpables(CFCClass *self) {
-    if (CFCClass_has_attribute(self, "dumpable")) {
-        CFCDumpable *dumpable = CFCDumpable_new();
-        CFCDumpable_add_dumpables(dumpable, self);
-        CFCBase_decref((CFCBase*)dumpable);
-    }
-}
-
 void
 CFCClass_grow_tree(CFCClass *self) {
     if (self->tree_grown) {
@@ -667,17 +648,8 @@ CFCClass_grow_tree(CFCClass *self) {
     }
     S_establish_ancestry(self);
     S_bequeath_member_vars(self);
-    S_generate_automethods(self);
     S_bequeath_methods(self);
     self->tree_grown = 1;
-}
-
-static void
-S_generate_automethods(CFCClass *self) {
-    S_create_dumpables(self);
-    for (size_t i = 0; i < self->num_kids; i++) {
-        S_generate_automethods(self->children[i]);
-    }
 }
 
 // Return value is valid only so long as object persists (elements are not

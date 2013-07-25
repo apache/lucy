@@ -167,11 +167,6 @@ BEGIN { XSLoader::load( 'Clownfish::CFC', '0.01' ) }
 }
 
 {
-    package Clownfish::CFC::Dumpable;
-    BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
-}
-
-{
     package Clownfish::CFC::Model::File;
     BEGIN { push our @ISA, 'Clownfish::CFC::Base' }
     use Clownfish::CFC::Util qw( verify_args );

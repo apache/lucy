@@ -512,27 +512,6 @@ PPCODE:
     END_SET_OR_GET_SWITCH
 }
 
-MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Dumpable
-
-SV*
-new(klass)
-    const char *klass;
-CODE:
-    if (strcmp(klass, "Clownfish::CFC::Dumpable")) {
-        croak("No subclassing allowed");
-    }
-    CFCDumpable *self = CFCDumpable_new();
-    RETVAL = S_cfcbase_to_perlref(self);
-    CFCBase_decref((CFCBase*)self);
-OUTPUT: RETVAL
-
-void
-add_dumpables(self, klass)
-    CFCDumpable *self;
-    CFCClass *klass;
-PPCODE:
-    CFCDumpable_add_dumpables(self, klass);
-
 
 MODULE = Clownfish::CFC   PACKAGE = Clownfish::CFC::Model::File
 
