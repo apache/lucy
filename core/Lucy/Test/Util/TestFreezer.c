@@ -52,6 +52,20 @@ S_freeze_thaw(Obj *object) {
     }
 }
 
+// Return the result of round-tripping the object through dump() and load().
+static Obj*
+S_dump_load(Obj *object) {
+    if (object) {
+        Obj *dump = Freezer_dump(object);
+        Obj *loaded = Freezer_load(dump);
+        DECREF(dump);
+        return loaded;
+    }
+    else {
+        return NULL;
+    }
+}
+
 static void
 test_bytebuf(TestBatchRunner *runner) {
     ByteBuf *wanted = BB_new_bytes("foobar", 6);
@@ -75,7 +89,6 @@ test_charbuf(TestBatchRunner *runner) {
 static void
 test_hash(TestBatchRunner *runner) {
     Hash  *wanted = Hash_new(0);
-    Hash  *got;
 
     for (uint32_t i = 0; i < 10; i++) {
         CharBuf *cb = TestUtils_random_string(rand() % 1200);
@@ -84,11 +97,20 @@ test_hash(TestBatchRunner *runner) {
         Hash_Store(wanted, (Obj*)num, (Obj*)cb);
     }
 
-    got = (Hash*)S_freeze_thaw((Obj*)wanted);
-    TEST_TRUE(runner, got && Hash_Equals(wanted, (Obj*)got),
-              "Round trip through serialization.");
+    {
+        Hash *got = (Hash*)S_freeze_thaw((Obj*)wanted);
+        TEST_TRUE(runner, got && Hash_Equals(wanted, (Obj*)got),
+                  "Round trip through serialization.");
+        DECREF(got);
+    }
 
-    DECREF(got);
+    {
+        Obj *got = S_dump_load((Obj*)wanted);
+        TEST_TRUE(runner, Hash_Equals(wanted, got),
+                  "Dump => Load round trip");
+        DECREF(got);
+    }
+
     DECREF(wanted);
 }
 
@@ -128,19 +150,29 @@ test_num(TestBatchRunner *runner) {
 static void
 test_varray(TestBatchRunner *runner) {
     VArray *array = VA_new(0);
-    VArray *dupe;
     VA_Store(array, 1, (Obj*)CB_newf("foo"));
     VA_Store(array, 3, (Obj*)CB_newf("bar"));
-    dupe = (VArray*)S_freeze_thaw((Obj*)array);
-    TEST_TRUE(runner, dupe && VA_Equals(array, (Obj*)dupe),
-              "Round trip through FREEZE/THAW");
-    DECREF(dupe);
+
+    {
+        Obj *got = S_freeze_thaw((Obj*)array);
+        TEST_TRUE(runner, got && VA_Equals(array, got),
+                  "Round trip through FREEZE/THAW");
+        DECREF(got);
+    }
+
+    {
+        Obj *got = S_dump_load((Obj*)array);
+        TEST_TRUE(runner, got && VA_Equals(array, got),
+                  "Dump => Load round trip");
+        DECREF(got);
+    }
+
     DECREF(array);
 }
 
 void
 TestFreezer_run(TestFreezer *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 9);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 10);
     test_bytebuf(runner);
     test_charbuf(runner);
     test_hash(runner);

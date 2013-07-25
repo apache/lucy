@@ -40,6 +40,21 @@ inert class Lucy::Util::Freezer {
     inert incremented Obj*
     deserialize(Obj *obj, InStream *instream);
 
+    /** Return a representation of the object using only scalars, hashes, and
+     * arrays.  Some classes support JSON serialization via dump() and its
+     * companion, load(); for others, dump() is only a debugging aid.
+     * The default simply calls To_String().
+     */
+    inert incremented Obj*
+    dump(Obj *obj);
+
+    /** Create an object from the output of a call to dump().
+     *
+     * @param dump The output of dump().
+     */
+    inert incremented Obj*
+    load(Obj *dump);
+
     inert void
     serialize_charbuf(CharBuf *charbuf, OutStream *outstream);
 

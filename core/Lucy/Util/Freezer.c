@@ -20,10 +20,13 @@
 #include "Lucy/Util/Freezer.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Analysis/Analyzer.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Index/Similarity.h"
 #include "Lucy/Index/DocVector.h"
 #include "Lucy/Index/TermVector.h"
+#include "Lucy/Plan/FieldType.h"
+#include "Lucy/Plan/Schema.h"
 #include "Lucy/Search/Query.h"
 #include "Lucy/Search/SortRule.h"
 #include "Lucy/Search/SortSpec.h"
@@ -356,5 +359,170 @@ Hash*
 Freezer_read_hash(InStream *instream) {
     Hash *hash = (Hash*)VTable_Make_Obj(HASH);
     return Freezer_deserialize_hash(hash, instream);
+}
+
+static Obj*
+S_dump_array(VArray *array) {
+    VArray *dump = VA_new(VA_Get_Size(array));
+    for (uint32_t i = 0, max = VA_Get_Size(array); i < max; i++) {
+        Obj *elem = VA_Fetch(array, i);
+        if (elem) {
+            VA_Store(dump, i, Freezer_dump(elem));
+        }
+    }
+    return (Obj*)dump;
+}
+
+Obj*
+S_dump_hash(Hash *hash) {
+    Hash *dump = Hash_new(Hash_Get_Size(hash));
+    Obj *key;
+    Obj *value;
+
+    Hash_Iterate(hash);
+    while (Hash_Next(hash, &key, &value)) {
+        // Since JSON only supports text hash keys, dump() can only support
+        // text hash keys.
+        CERTIFY(key, CHARBUF);
+        Hash_Store(dump, key, Obj_Dump(value));
+    }
+
+    return (Obj*)dump;
+}
+
+Obj*
+Freezer_dump(Obj *obj) {
+    if (Obj_Is_A(obj, CHARBUF)) {
+        return (Obj*)Obj_To_String(obj);
+    }
+    else if (Obj_Is_A(obj, VARRAY)) {
+        return S_dump_array((VArray*)obj);
+    }
+    else if (Obj_Is_A(obj, HASH)) {
+        return S_dump_hash((Hash*)obj);
+    }
+    else if (Obj_Is_A(obj, ANALYZER)) {
+        return Analyzer_Dump((Analyzer*)obj);
+    }
+    else if (Obj_Is_A(obj, DOC)) {
+        return (Obj*)Doc_Dump((Doc*)obj);
+    }
+    else if (Obj_Is_A(obj, SIMILARITY)) {
+        return Sim_Dump((Similarity*)obj);
+    }
+    else if (Obj_Is_A(obj, FIELDTYPE)) {
+        return FType_Dump((FieldType*)obj);
+    }
+    else if (Obj_Is_A(obj, SCHEMA)) {
+        return (Obj*)Schema_Dump((Schema*)obj);
+    }
+    else if (Obj_Is_A(obj, QUERY)) {
+        return Query_Dump((Query*)obj);
+    }
+    else {
+        return (Obj*)Obj_To_String(obj);
+    }
+}
+
+static Obj*
+S_load_via_load_method(VTable *vtable, Obj *dump) {
+    Obj *dummy = VTable_Make_Obj(vtable);
+    Obj *loaded = NULL;
+    if (Obj_Is_A(dummy, ANALYZER)) {
+        loaded = Analyzer_Load((Analyzer*)dummy, dump);
+    }
+    else if (Obj_Is_A(dummy, DOC)) {
+        loaded = (Obj*)Doc_Load((Doc*)dummy, dump);
+    }
+    else if (Obj_Is_A(dummy, SIMILARITY)) {
+        loaded = (Obj*)Sim_Load((Similarity*)dummy, dump);
+    }
+    else if (Obj_Is_A(dummy, FIELDTYPE)) {
+        loaded = FType_Load((FieldType*)dummy, dump);
+    }
+    else if (Obj_Is_A(dummy, SCHEMA)) {
+        loaded = (Obj*)Schema_Load((Schema*)dummy, dump);
+    }
+    else if (Obj_Is_A(dummy, QUERY)) {
+        loaded = Query_Load((Query*)dummy, dump);
+    }
+    else {
+        DECREF(dummy);
+        THROW(ERR, "Don't know how to load '%o'", VTable_Get_Name(vtable));
+    }
+
+    DECREF(dummy);
+    return loaded;
+}
+
+static Obj*
+S_load_from_hash(Hash *dump) {
+    CharBuf *class_name = (CharBuf*)Hash_Fetch_Str(dump, "_class", 6);
+
+    // Assume that the presence of the "_class" key paired with a valid class
+    // name indicates the output of a dump() rather than an ordinary Hash.
+    if (class_name && CB_Is_A(class_name, CHARBUF)) {
+        VTable *vtable = VTable_fetch_vtable(class_name);
+
+        if (!vtable) {
+            CharBuf *parent_class = VTable_find_parent_class(class_name);
+            if (parent_class) {
+                VTable *parent = VTable_singleton(parent_class, NULL);
+                vtable = VTable_singleton(class_name, parent);
+                DECREF(parent_class);
+            }
+            else {
+                // TODO: Fix load() so that it works with ordinary hash keys
+                // named "_class".
+                THROW(ERR, "Can't find class '%o'", class_name);
+            }
+        }
+
+        // Dispatch to an alternate Load() method.
+        if (vtable) {
+            return S_load_via_load_method(vtable, (Obj*)dump);
+        }
+
+    }
+
+    // It's an ordinary Hash.
+    Hash *loaded = Hash_new(Hash_Get_Size(dump));
+    Obj *key;
+    Obj *value;
+    Hash_Iterate(dump);
+    while (Hash_Next(dump, &key, &value)) {
+        Hash_Store(loaded, key, Freezer_load(value));
+    }
+
+    return (Obj*)loaded;
+
+}
+
+
+Obj*
+S_load_from_array(VArray *dump) {
+    VArray *loaded = VA_new(VA_Get_Size(dump));
+
+    for (uint32_t i = 0, max = VA_Get_Size(dump); i < max; i++) {
+        Obj *elem_dump = VA_Fetch(dump, i);
+        if (elem_dump) {
+            VA_Store(loaded, i, Freezer_load(elem_dump));
+        }
+    }
+
+    return (Obj*)loaded;
+}
+
+Obj*
+Freezer_load(Obj *obj) {
+    if (Obj_Is_A(obj, HASH)) {
+        return S_load_from_hash((Hash*)obj);
+    }
+    else if (Obj_Is_A(obj, VARRAY)) {
+        return S_load_from_array((VArray*)obj);
+    }
+    else {
+        return Obj_Clone(obj);
+    }
 }
 
