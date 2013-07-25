@@ -76,6 +76,12 @@ public class Lucy::Search::Query inherits Clownfish::Obj : dumpable {
 
     public incremented Query*
     Deserialize(decremented Query *self, InStream *instream);
+
+    public incremented Obj*
+    Dump(Query *self);
+
+    public incremented Obj*
+    Load(Query *self, Obj *dump);
 }
 
 

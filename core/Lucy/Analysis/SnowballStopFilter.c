@@ -89,6 +89,34 @@ SnowStop_equals(SnowballStopFilter *self, Obj *other) {
     return true;
 }
 
+Obj*
+SnowStop_dump(SnowballStopFilter *self)
+{
+    SnowballStopFilterIVARS *ivars = SnowStop_IVARS(self);
+    SnowStop_Dump_t super_dump
+        = SUPER_METHOD_PTR(SNOWBALLSTOPFILTER, Lucy_SnowStop_Dump);
+    Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
+    if (ivars->stoplist) {
+        Hash_Store_Str(dump, "stoplist", 8, Obj_Dump((Obj*)ivars->stoplist));
+    }
+    return (Obj*)dump;
+}
+
+Obj*
+SnowStop_load(SnowballStopFilter *self, Obj *dump)
+{
+    Hash *source = (Hash*)CERTIFY(dump, HASH);
+    SnowStop_Load_t super_load
+        = SUPER_METHOD_PTR(SNOWBALLSTOPFILTER, Lucy_SnowStop_Load);
+    SnowballStopFilter *loaded = (SnowballStopFilter*)super_load(self, dump);
+    Obj *stoplist = Hash_Fetch_Str(source, "stoplist", 8);
+    if (stoplist) {
+        SnowStop_IVARS(loaded)->stoplist
+            = (Hash*)CERTIFY(Obj_Load(stoplist, stoplist), HASH);
+    }
+    return (Obj*)loaded;
+}
+
 Hash*
 SnowStop_gen_stoplist(const CharBuf *language) {
     CharBuf *lang = CB_new(3);

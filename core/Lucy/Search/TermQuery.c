@@ -74,6 +74,33 @@ TermQuery_deserialize(TermQuery *self, InStream *instream) {
     return self;
 }
 
+Obj*
+TermQuery_dump(TermQuery *self)
+{
+    TermQueryIVARS *ivars = TermQuery_IVARS(self);
+    TermQuery_Dump_t super_dump
+        = SUPER_METHOD_PTR(TERMQUERY, Lucy_TermQuery_Dump);
+    Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
+    Hash_Store_Str(dump, "field", 5, Obj_Dump((Obj*)ivars->field));
+    Hash_Store_Str(dump, "term", 4, Obj_Dump(ivars->term));
+    return (Obj*)dump;
+}
+
+Obj*
+TermQuery_load(TermQuery *self, Obj *dump)
+{
+    Hash *source = (Hash*)CERTIFY(dump, HASH);
+    TermQuery_Load_t super_load
+        = SUPER_METHOD_PTR(TERMQUERY, Lucy_TermQuery_Load);
+    TermQuery *loaded = (TermQuery*)super_load(self, dump);
+    TermQueryIVARS *loaded_ivars = TermQuery_IVARS(loaded);
+    Obj *field = CERTIFY(Hash_Fetch_Str(source, "field", 5), OBJ);
+    loaded_ivars->field = (CharBuf*)CERTIFY(Obj_Load(field, field), CHARBUF);
+    Obj *term = CERTIFY(Hash_Fetch_Str(source, "term", 4), OBJ);
+    loaded_ivars->term = (Obj*)CERTIFY(Obj_Load(term, term), OBJ);
+    return (Obj*)loaded;
+}
+
 CharBuf*
 TermQuery_get_field(TermQuery *self) {
     return TermQuery_IVARS(self)->field;

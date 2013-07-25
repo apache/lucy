@@ -70,6 +70,12 @@ public class LucyX::Search::ProximityQuery inherits Lucy::Search::Query
     public incremented ProximityQuery*
     Deserialize(decremented ProximityQuery *self, InStream *instream);
 
+    public incremented Obj*
+    Dump(ProximityQuery *self);
+
+    public incremented Obj*
+    Load(ProximityQuery *self, Obj *dump);
+
     public void
     Destroy(ProximityQuery *self);
 }

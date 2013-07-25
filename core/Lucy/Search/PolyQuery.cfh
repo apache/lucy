@@ -54,6 +54,12 @@ public abstract class Lucy::Search::PolyQuery
     public incremented PolyQuery*
     Deserialize(decremented PolyQuery *self, InStream *instream);
 
+    public incremented Obj*
+    Dump(PolyQuery *self);
+
+    public incremented Obj*
+    Load(PolyQuery *self, Obj *dump);
+
     public bool
     Equals(PolyQuery *self, Obj *other);
 

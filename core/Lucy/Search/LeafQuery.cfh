@@ -63,6 +63,12 @@ public class Lucy::Search::LeafQuery inherits Lucy::Search::Query
     public incremented LeafQuery*
     Deserialize(decremented LeafQuery *self, InStream *instream);
 
+    public incremented Obj*
+    Dump(LeafQuery *self);
+
+    public incremented Obj*
+    Load(LeafQuery *self, Obj *dump);
+
     /** Throws an error.
      */
     public incremented Compiler*

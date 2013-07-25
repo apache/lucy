@@ -70,6 +70,12 @@ public class Lucy::Search::RangeQuery inherits Lucy::Search::Query
     public incremented RangeQuery*
     Deserialize(decremented RangeQuery *self, InStream *instream);
 
+    public incremented Obj*
+    Dump(RangeQuery *self);
+
+    public incremented Obj*
+    Load(RangeQuery *self, Obj *dump);
+
     public void
     Destroy(RangeQuery *self);
 }

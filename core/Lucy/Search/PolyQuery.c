@@ -92,6 +92,30 @@ PolyQuery_deserialize(PolyQuery *self, InStream *instream) {
     return self;
 }
 
+Obj*
+PolyQuery_dump(PolyQuery *self)
+{
+    PolyQueryIVARS *ivars = PolyQuery_IVARS(self);
+    PolyQuery_Dump_t super_dump
+        = SUPER_METHOD_PTR(POLYQUERY, Lucy_PolyQuery_Dump);
+    Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
+    Hash_Store_Str(dump, "children", 8, Obj_Dump((Obj*)ivars->children));
+    return (Obj*)dump;
+}
+
+Obj*
+PolyQuery_load(PolyQuery *self, Obj *dump)
+{
+    Hash *source = (Hash*)CERTIFY(dump, HASH);
+    PolyQuery_Load_t super_load
+        = SUPER_METHOD_PTR(POLYQUERY, Lucy_PolyQuery_Load);
+    PolyQuery *loaded = (PolyQuery*)super_load(self, dump);
+    Obj *children = CERTIFY(Hash_Fetch_Str(source, "children", 8), OBJ);
+    PolyQuery_IVARS(loaded)->children
+        = (VArray*)CERTIFY(Obj_Load(children, children), VARRAY);
+    return (Obj*)loaded;
+}
+
 bool
 PolyQuery_equals(PolyQuery *self, Obj *other) {
     if ((PolyQuery*)other == self)                          { return true; }

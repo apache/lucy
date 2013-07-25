@@ -83,6 +83,9 @@ public class Lucy::Analysis::PolyAnalyzer
     public bool
     Equals(PolyAnalyzer *self, Obj *other);
 
+    public incremented Obj*
+    Dump(PolyAnalyzer *self);
+
     public incremented PolyAnalyzer*
     Load(PolyAnalyzer *self, Obj *dump);
 

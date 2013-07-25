@@ -62,6 +62,12 @@ public class Lucy::Search::TermQuery inherits Lucy::Search::Query
     public incremented TermQuery*
     Deserialize(decremented TermQuery *self, InStream *instream);
 
+    public incremented Obj*
+    Dump(TermQuery *self);
+
+    public incremented Obj*
+    Load(TermQuery *self, Obj *dump);
+
     public bool
     Equals(TermQuery *self, Obj *other);
 

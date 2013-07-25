@@ -64,6 +64,12 @@ public class Lucy::Search::PhraseQuery inherits Lucy::Search::Query
     public incremented PhraseQuery*
     Deserialize(decremented PhraseQuery *self, InStream *instream);
 
+    public incremented Obj*
+    Dump(PhraseQuery *self);
+
+    public incremented Obj*
+    Load(PhraseQuery *self, Obj *dump);
+
     public void
     Destroy(PhraseQuery *self);
 }

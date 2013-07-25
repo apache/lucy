@@ -49,6 +49,12 @@ public abstract class Lucy::Analysis::Analyzer
      */
     public incremented VArray*
     Split(Analyzer *self, CharBuf *text);
+
+    public incremented Obj*
+    Dump(Analyzer *self);
+
+    public incremented Obj*
+    Load(Analyzer *self, Obj *dump);
 }
 
 

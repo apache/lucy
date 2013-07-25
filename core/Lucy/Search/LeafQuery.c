@@ -111,6 +111,38 @@ LeafQuery_deserialize(LeafQuery *self, InStream *instream) {
     return self;
 }
 
+Obj*
+LeafQuery_dump(LeafQuery *self)
+{
+    LeafQueryIVARS *ivars = LeafQuery_IVARS(self);
+    LeafQuery_Dump_t super_dump
+        = SUPER_METHOD_PTR(LEAFQUERY, Lucy_LeafQuery_Dump);
+    Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
+    if (ivars->field) {
+        Hash_Store_Str(dump, "field", 5, Obj_Dump((Obj*)ivars->field));
+    }
+    Hash_Store_Str(dump, "text", 4, Obj_Dump((Obj*)ivars->text));
+    return (Obj*)dump;
+}
+
+Obj*
+LeafQuery_load(LeafQuery *self, Obj *dump)
+{
+    Hash *source = (Hash*)CERTIFY(dump, HASH);
+    LeafQuery_Load_t super_load
+        = SUPER_METHOD_PTR(LEAFQUERY, Lucy_LeafQuery_Load);
+    LeafQuery *loaded = (LeafQuery*)super_load(self, dump);
+    LeafQueryIVARS *loaded_ivars = LeafQuery_IVARS(loaded);
+    Obj *field = Hash_Fetch_Str(source, "field", 5);
+    if (field) {
+        loaded_ivars->field
+            = (CharBuf*)CERTIFY(Obj_Load(field, field), CHARBUF);
+    }
+    Obj *text = CERTIFY(Hash_Fetch_Str(source, "text", 4), OBJ);
+    loaded_ivars->text = (CharBuf*)CERTIFY(Obj_Load(text, text), CHARBUF);
+    return (Obj*)loaded;
+}
+
 Compiler*
 LeafQuery_make_compiler(LeafQuery *self, Searcher *searcher, float boost,
                         bool subordinate) {

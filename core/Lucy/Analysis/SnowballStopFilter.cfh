@@ -95,6 +95,12 @@ public class Lucy::Analysis::SnowballStopFilter cnick SnowStop
     public bool
     Equals(SnowballStopFilter *self, Obj *other);
 
+    public incremented Obj*
+    Dump(SnowballStopFilter *self);
+
+    public incremented Obj*
+    Load(SnowballStopFilter *self, Obj *dump);
+
     public void
     Destroy(SnowballStopFilter *self);
 }

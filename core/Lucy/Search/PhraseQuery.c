@@ -90,6 +90,35 @@ PhraseQuery_deserialize(PhraseQuery *self, InStream *instream) {
     return S_do_init(self, field, terms, boost);
 }
 
+Obj*
+PhraseQuery_dump(PhraseQuery *self)
+{
+    PhraseQueryIVARS *ivars = PhraseQuery_IVARS(self);
+    PhraseQuery_Dump_t super_dump
+        = SUPER_METHOD_PTR(PHRASEQUERY, Lucy_PhraseQuery_Dump);
+    Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
+    Hash_Store_Str(dump, "field", 5, Obj_Dump((Obj*)ivars->field));
+    Hash_Store_Str(dump, "terms", 5, Obj_Dump((Obj*)ivars->terms));
+    return (Obj*)dump;
+}
+
+Obj*
+PhraseQuery_load(PhraseQuery *self, Obj *dump)
+{
+    Hash *source = (Hash*)CERTIFY(dump, HASH);
+    PhraseQuery_Load_t super_load
+        = SUPER_METHOD_PTR(PHRASEQUERY, Lucy_PhraseQuery_Load);
+    PhraseQuery *loaded = (PhraseQuery*)super_load(self, dump);
+    PhraseQueryIVARS *loaded_ivars = PhraseQuery_IVARS(loaded);
+    Obj *field = CERTIFY(Hash_Fetch_Str(source, "field", 5), OBJ);
+    loaded_ivars->field
+        = (CharBuf*)CERTIFY(Obj_Load(field, field), CHARBUF);
+    Obj *terms = CERTIFY(Hash_Fetch_Str(source, "terms", 5), OBJ);
+    loaded_ivars->terms
+        = (VArray*)CERTIFY(Obj_Load(terms, terms), VARRAY);
+    return (Obj*)loaded;
+}
+
 bool
 PhraseQuery_equals(PhraseQuery *self, Obj *other) {
     if ((PhraseQuery*)other == self)   { return true; }

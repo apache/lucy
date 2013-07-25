@@ -120,6 +120,19 @@ PolyAnalyzer_equals(PolyAnalyzer *self, Obj *other) {
     return true;
 }
 
+Obj*
+PolyAnalyzer_dump(PolyAnalyzer *self)
+{
+    PolyAnalyzerIVARS *const ivars = PolyAnalyzer_IVARS(self);
+    PolyAnalyzer_Dump_t super_dump
+        = SUPER_METHOD_PTR(POLYANALYZER, Lucy_PolyAnalyzer_Dump);
+    Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
+    if (ivars->analyzers) {
+        Hash_Store_Str(dump, "analyzers", 9, Obj_Dump((Obj*)ivars->analyzers));
+    }
+    return (Obj*)dump;
+}
+
 PolyAnalyzer*
 PolyAnalyzer_load(PolyAnalyzer *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
