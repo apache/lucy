@@ -218,14 +218,6 @@ CFCClass_set_parent(CFCClass *self, CFCClass *parent);
 CFCClass*
 CFCClass_get_parent(CFCClass *self);
 
-/** Append auxiliary C code.
- */
-void
-CFCClass_append_autocode(CFCClass *self, const char *autocode);
-
-const char*
-CFCClass_get_autocode(CFCClass *self);
-
 const char*
 CFCClass_get_path_part(CFCClass *self);
 

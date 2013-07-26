@@ -263,12 +263,11 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
     const char *class_name = CFCClass_get_class_name(client);
 
     if (CFCClass_inert(client)) {
-        return CFCUtil_strdup(CFCClass_get_autocode(client));
+        return CFCUtil_strdup("");
     }
 
     const char *ivars_offset = CFCClass_full_ivars_offset(client);
 
-    const char *autocode  = CFCClass_get_autocode(client);
     const char *vt_var    = CFCClass_full_vtable_var(client);
 
     CFCMethod **methods  = CFCClass_methods(client);
@@ -389,16 +388,11 @@ CFCBindClass_to_c_data(CFCBindClass *self) {
         " */\n"
         "\n"
         "cfish_VTable *%s;\n"
-        "\n"
-        "/* Include auxilary automatically generated code for this class.\n"
-        " */\n"
-        "\n"
-        "%s\n"
         "\n";
     char *code
         = CFCUtil_sprintf(pattern, ivars_offset, offsets, method_defs,
                           novel_ms_var, overridden_ms_var, inherited_ms_var,
-                          vt_var, autocode);
+                          vt_var);
 
     FREEMEM(offsets);
     FREEMEM(method_defs);

@@ -200,13 +200,6 @@ PPCODE:
     CFCClass_clear_registry();
 
 void
-append_autocode(self, autocode)
-    CFCClass *self;
-    const char *autocode;
-PPCODE:
-    CFCClass_append_autocode(self, autocode);
-
-void
 add_child(self, child)
     CFCClass *self;
     CFCClass *child;
@@ -309,7 +302,6 @@ ALIAS:
     get_cnick             = 2
     set_parent            = 5
     get_parent            = 6
-    get_autocode          = 8
     get_path_part         = 10
     get_parent_class_name = 12
     final                 = 14
@@ -354,11 +346,6 @@ PPCODE:
                 retval = S_cfcbase_to_perlref(parent);
                 break;
             }
-        case 8: {
-                const char *value = CFCClass_get_autocode(self);
-                retval = newSVpvn(value, strlen(value));
-            }
-            break;
         case 10: {
                 const char *value = CFCClass_get_path_part(self);
                 retval = value ? newSVpvn(value, strlen(value)) : newSV(0);

@@ -70,7 +70,6 @@ struct CFCClass {
     CFCClassAttribute **attributes;
     size_t num_attributes;
     CFCFileSpec *file_spec;
-    char *autocode;
     char *parent_class_name;
     int is_final;
     int is_inert;
@@ -137,7 +136,6 @@ CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
     }
     self->parent     = NULL;
     self->tree_grown = false;
-    self->autocode   = (char*)CALLOCATE(1, sizeof(char));
     self->children        = (CFCClass**)CALLOCATE(1, sizeof(CFCClass*));
     self->num_kids        = 0;
     self->functions       = (CFCFunction**)CALLOCATE(1, sizeof(CFCFunction*));
@@ -248,7 +246,6 @@ CFCClass_destroy(CFCClass *self) {
     FREEMEM(self->member_vars);
     FREEMEM(self->inert_vars);
     FREEMEM(self->attributes);
-    FREEMEM(self->autocode);
     FREEMEM(self->parent_class_name);
     FREEMEM(self->struct_sym);
     FREEMEM(self->ivars_struct);
@@ -766,18 +763,6 @@ CFCClass_set_parent(CFCClass *self, CFCClass *parent) {
 CFCClass*
 CFCClass_get_parent(CFCClass *self) {
     return self->parent;
-}
-
-void
-CFCClass_append_autocode(CFCClass *self, const char *autocode) {
-    size_t size = strlen(self->autocode) + strlen(autocode) + 1;
-    self->autocode = (char*)REALLOCATE(self->autocode, size);
-    strcat(self->autocode, autocode);
-}
-
-const char*
-CFCClass_get_autocode(CFCClass *self) {
-    return self->autocode;
 }
 
 const char*
