@@ -243,40 +243,31 @@ S_can_be_bound(CFCParamList *param_list, CFCType *return_type) {
 }
 
 CFCPerlMethod**
-CFCPerlClass_method_bindings(CFCPerlClass *self) {
-    CFCClass       *client     = self->client;
-    CFCClass       *parent     = CFCClass_get_parent(client);
-    size_t          num_bound  = 0;
-    CFCMethod     **fresh_methods = CFCClass_fresh_methods(client);
-    CFCClass      **descendants   = CFCClass_tree_to_ladder(client);
+CFCPerlClass_method_bindings(CFCClass *klass) {
+    CFCClass       *parent        = CFCClass_get_parent(klass);
+    size_t          num_bound     = 0;
+    CFCMethod     **fresh_methods = CFCClass_fresh_methods(klass);
     CFCPerlMethod **bound 
         = (CFCPerlMethod**)CALLOCATE(1, sizeof(CFCPerlMethod*));
 
      // Iterate over the class's fresh methods.
     for (size_t i = 0; fresh_methods[i] != NULL; i++) {
-        CFCMethod  *method    = fresh_methods[i];
-        const char *meth_name = CFCMethod_get_macro_sym(method);
-        CFCMethod  *novel_method;
+        CFCMethod *method = fresh_methods[i];
 
-        // Only deal with methods when they are novel (i.e. first declared)
-        // or the parent's definition is from an included parcel (i.e. they
-        // are first declared in this parcel).
+        // Skip private methods.
+        if (CFCSymbol_private((CFCSymbol*)method)) { continue; }
+
+        CFCMethod *novel_method;
         if (CFCMethod_novel(method)) {
             novel_method = method;
         }
         else {
-            CFCMethod *parent_method = CFCClass_method(parent, meth_name);
-            CFCParcel *parcel = CFCMethod_get_parcel(parent_method);
-            if (!CFCParcel_included(parcel)) { continue; }
-
+            const char *meth_name = CFCMethod_get_macro_sym(method);
             novel_method = CFCClass_find_novel_method(parent, meth_name);
             if (!novel_method) {
                 CFCUtil_die("Novel method not found");
             }
         }
-
-        // Skip private methods.
-        if (CFCSymbol_private((CFCSymbol*)method)) { continue; }
 
         // Skip methods which have been explicitly excluded.
         if (CFCMethod_excluded_from_host(novel_method)) {
@@ -296,30 +287,23 @@ CFCPerlClass_method_bindings(CFCPerlClass *self) {
             alias = CFCMethod_micro_sym(method);
         }
 
-        /* Create an XSub binding for each override.  Each of these directly
-         * calls the implementing function, rather than invokes the method on
-         * the object using VTable method dispatch.  Doing things this way
-         * allows SUPER:: invocations from Perl-space to work properly.
+        /* Create the binding, add it to the array.
+         *
+         * Also create an XSub binding for each override.  Each of these
+         * directly calls the implementing function, rather than invokes the
+         * method on the object using VTable method dispatch.  Doing things
+         * this way allows SUPER:: invocations from Perl-space to work
+         * properly.
          */
-        for (size_t j = 0; descendants[j] != NULL; j++) {
-            CFCClass *descendant = descendants[j];
-            CFCMethod *real_method
-                = CFCClass_fresh_method(descendant, meth_name);
-            if (!real_method) { continue; }
-
-            // Create the binding, add it to the array.
-            CFCPerlMethod *meth_binding = CFCPerlMethod_new(real_method, alias);
-            size_t size = (num_bound + 2) * sizeof(CFCPerlMethod*);
-            bound = (CFCPerlMethod**)REALLOCATE(bound, size);
-            bound[num_bound] = meth_binding;
-            num_bound++;
-            bound[num_bound] = NULL;
-        }
-
+        CFCPerlMethod *meth_binding = CFCPerlMethod_new(method, alias);
+        size_t size = (num_bound + 2) * sizeof(CFCPerlMethod*);
+        bound = (CFCPerlMethod**)REALLOCATE(bound, size);
+        bound[num_bound] = meth_binding;
+        num_bound++;
+        bound[num_bound] = NULL;
     }
 
     FREEMEM(fresh_methods);
-    FREEMEM(descendants);
 
     return bound;
 }

@@ -103,7 +103,7 @@ CFCPerlClass_exclude_constructor(CFCPerlClass *self);
  * representing all bound methods.
  */
 struct CFCPerlMethod**
-CFCPerlClass_method_bindings(CFCPerlClass *self);
+CFCPerlClass_method_bindings(struct CFCClass *klass);
 
 /** Return an array of Clownfish::CFC::Binding::Perl::Constructor objects
  * representing all bound constructors.

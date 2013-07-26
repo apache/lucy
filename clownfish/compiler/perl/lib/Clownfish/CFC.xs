@@ -2286,10 +2286,11 @@ PPCODE:
     CFCPerlClass_append_xs(self, xs);
 
 SV*
-method_bindings(self)
-    CFCPerlClass *self;
+method_bindings(unused, klass)
+    SV *unused;
+    CFCClass *klass;
 CODE:
-    CFCPerlMethod **bound = CFCPerlClass_method_bindings(self);
+    CFCPerlMethod **bound = CFCPerlClass_method_bindings(klass);
     RETVAL = S_array_of_cfcbase_to_av((CFCBase**)bound);
     FREEMEM(bound);
 OUTPUT: RETVAL
