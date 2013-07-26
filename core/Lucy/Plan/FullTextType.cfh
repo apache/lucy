@@ -28,8 +28,7 @@ parcel Lucy;
  * For an exact-match, single value field type using character data, see
  * L<StringType|Lucy::Plan::StringType>.
  */
-public class Lucy::Plan::FullTextType
-    inherits Lucy::Plan::TextType : dumpable {
+public class Lucy::Plan::FullTextType inherits Lucy::Plan::TextType {
 
     bool        highlightable;
     Analyzer   *analyzer;

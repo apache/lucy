@@ -23,8 +23,7 @@ parcel Lucy;
  * individual terms in a specific field.
  */
 
-public class Lucy::Search::TermQuery inherits Lucy::Search::Query
-    : dumpable {
+public class Lucy::Search::TermQuery inherits Lucy::Search::Query {
 
     CharBuf *field;
     Obj     *term;

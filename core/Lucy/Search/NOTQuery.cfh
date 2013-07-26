@@ -27,8 +27,7 @@ parcel Lucy;
  * semantics.
  */
 
-public class Lucy::Search::NOTQuery inherits Lucy::Search::PolyQuery
-    : dumpable {
+public class Lucy::Search::NOTQuery inherits Lucy::Search::PolyQuery {
 
     /**
      * @param negated_query The Query to be inverted.

@@ -24,8 +24,7 @@ parcel Lucy;
  * child Queries.
  */
 
-public class Lucy::Search::ORQuery inherits Lucy::Search::PolyQuery
-    : dumpable {
+public class Lucy::Search::ORQuery inherits Lucy::Search::PolyQuery {
 
     inert incremented ORQuery*
     new(VArray *children = NULL);

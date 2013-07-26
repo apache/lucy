@@ -34,7 +34,7 @@ parcel Lucy;
  * can actually match and score documents.
  */
 
-public class Lucy::Search::Query inherits Clownfish::Obj : dumpable {
+public class Lucy::Search::Query inherits Clownfish::Obj {
 
     float boost;
 

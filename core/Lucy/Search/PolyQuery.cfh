@@ -26,8 +26,7 @@ parcel Lucy;
  * these classes may serve as nodes in composite Query with a tree structure
  * which may be walked.
  */
-public abstract class Lucy::Search::PolyQuery
-    inherits Lucy::Search::Query : dumpable {
+public abstract class Lucy::Search::PolyQuery inherits Lucy::Search::Query {
 
     VArray    *children;
 

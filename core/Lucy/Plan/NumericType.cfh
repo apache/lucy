@@ -16,8 +16,7 @@
 
 parcel Lucy;
 
-class Lucy::Plan::NumericType cnick NumType
-    inherits Lucy::Plan::FieldType : dumpable {
+class Lucy::Plan::NumericType cnick NumType inherits Lucy::Plan::FieldType {
 
     public inert NumericType*
     init(NumericType *self);
@@ -47,11 +46,9 @@ class Lucy::Plan::NumericType cnick NumType
     Load(NumericType *self, Obj *dump);
 }
 
-abstract class Lucy::Plan::FloatType
-    inherits Lucy::Plan::NumericType : dumpable { }
+abstract class Lucy::Plan::FloatType inherits Lucy::Plan::NumericType { }
 
-class Lucy::Plan::Float64Type
-    inherits Lucy::Plan::FloatType : dumpable {
+class Lucy::Plan::Float64Type inherits Lucy::Plan::FloatType {
 
     public inert Float64Type*
     new();
@@ -73,8 +70,7 @@ class Lucy::Plan::Float64Type
     Equals(Float64Type *self, Obj *other);
 }
 
-class Lucy::Plan::Float32Type
-    inherits Lucy::Plan::FloatType : dumpable {
+class Lucy::Plan::Float32Type inherits Lucy::Plan::FloatType {
 
     public inert Float32Type*
     new();
@@ -96,11 +92,9 @@ class Lucy::Plan::Float32Type
     Equals(Float32Type *self, Obj *other);
 }
 
-abstract class Lucy::Plan::IntType
-    inherits Lucy::Plan::NumericType : dumpable { }
+abstract class Lucy::Plan::IntType inherits Lucy::Plan::NumericType { }
 
-class Lucy::Plan::Int32Type
-    inherits Lucy::Plan::IntType : dumpable {
+class Lucy::Plan::Int32Type inherits Lucy::Plan::IntType {
 
     public inert Int32Type*
     new();
@@ -122,8 +116,7 @@ class Lucy::Plan::Int32Type
     Equals(Int32Type *self, Obj *other);
 }
 
-class Lucy::Plan::Int64Type
-    inherits Lucy::Plan::IntType : dumpable {
+class Lucy::Plan::Int64Type inherits Lucy::Plan::IntType {
 
     public inert Int64Type*
     new();

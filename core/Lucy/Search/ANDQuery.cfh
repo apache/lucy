@@ -22,8 +22,7 @@ parcel Lucy;
  * only when all of its children match, so its result set is the intersection
  * of their result sets.  Documents which match receive a summed score.
  */
-public class Lucy::Search::ANDQuery inherits Lucy::Search::PolyQuery
-    : dumpable {
+public class Lucy::Search::ANDQuery inherits Lucy::Search::PolyQuery {
 
     inert incremented ANDQuery*
     new(VArray *children = NULL);

@@ -22,8 +22,7 @@ parcel Lucy;
  * within a given range.
  */
 
-public class Lucy::Search::RangeQuery inherits Lucy::Search::Query
-    : dumpable {
+public class Lucy::Search::RangeQuery inherits Lucy::Search::Query {
 
     CharBuf  *field;
     Obj      *lower_term;

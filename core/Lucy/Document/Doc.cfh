@@ -22,8 +22,7 @@ parcel Lucy;
  * or more fields, each of which has a value.
  */
 
-public class Lucy::Document::Doc inherits Clownfish::Obj
-    : dumpable {
+public class Lucy::Document::Doc inherits Clownfish::Obj {
 
     void        *fields;
     int32_t      doc_id;

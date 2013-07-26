@@ -26,7 +26,7 @@ parcel Lucy;
  * associated with a single Snapshot.
  */
 
-public class Lucy::Index::Snapshot inherits Clownfish::Obj : dumpable {
+public class Lucy::Index::Snapshot inherits Clownfish::Obj {
 
     Hash        *entries;
     CharBuf     *path;
