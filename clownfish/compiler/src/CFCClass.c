@@ -34,11 +34,6 @@
 #include "CFCVariable.h"
 #include "CFCFileSpec.h"
 
-typedef struct CFCClassAttribute {
-    char *name;
-    char *value;
-} CFCClassAttribute;
-
 typedef struct CFCClassRegEntry {
     char *key;
     struct CFCClass *klass;
@@ -67,8 +62,6 @@ struct CFCClass {
     size_t num_member_vars;
     CFCVariable **inert_vars;
     size_t num_inert_vars;
-    CFCClassAttribute **attributes;
-    size_t num_attributes;
     CFCFileSpec *file_spec;
     char *parent_class_name;
     int is_final;
@@ -146,8 +139,6 @@ CFCClass_do_create(CFCClass *self, struct CFCParcel *parcel,
     self->num_member_vars = 0;
     self->inert_vars      = (CFCVariable**)CALLOCATE(1, sizeof(CFCVariable*));
     self->num_inert_vars  = 0;
-    self->attributes      = (CFCClassAttribute**)CALLOCATE(1, sizeof(CFCClassAttribute*));
-    self->num_attributes  = 0;
     self->parent_class_name = CFCUtil_strdup(parent_class_name);
     self->docucomment
         = (CFCDocuComment*)CFCBase_incref((CFCBase*)docucomment);
@@ -233,19 +224,12 @@ CFCClass_destroy(CFCClass *self) {
     for (size_t i = 0; self->inert_vars[i] != NULL; i++) {
         CFCBase_decref((CFCBase*)self->inert_vars[i]);
     }
-    for (size_t i = 0; self->attributes[i] != NULL; i++) {
-        CFCClassAttribute *attribute = self->attributes[i];
-        FREEMEM(attribute->name);
-        FREEMEM(attribute->value);
-        FREEMEM(attribute);
-    }
     CFCBase_decref((CFCBase*)self->file_spec);
     FREEMEM(self->children);
     FREEMEM(self->functions);
     FREEMEM(self->methods);
     FREEMEM(self->member_vars);
     FREEMEM(self->inert_vars);
-    FREEMEM(self->attributes);
     FREEMEM(self->parent_class_name);
     FREEMEM(self->struct_sym);
     FREEMEM(self->ivars_struct);
@@ -437,34 +421,6 @@ CFCClass_add_inert_var(CFCClass *self, CFCVariable *var) {
     self->inert_vars[self->num_inert_vars - 1]
         = (CFCVariable*)CFCBase_incref((CFCBase*)var);
     self->inert_vars[self->num_inert_vars] = NULL;
-}
-
-void
-CFCClass_add_attribute(CFCClass *self, const char *name, const char *value) {
-    if (!name || !strlen(name)) { CFCUtil_die("'name' is required"); }
-    if (CFCClass_has_attribute(self, name)) {
-        CFCUtil_die("Attribute '%s' already registered", name);
-    }
-    CFCClassAttribute *attribute
-        = (CFCClassAttribute*)MALLOCATE(sizeof(CFCClassAttribute));
-    attribute->name  = CFCUtil_strdup(name);
-    attribute->value = CFCUtil_strdup(value);
-    self->num_attributes++;
-    size_t size = (self->num_attributes + 1) * sizeof(CFCClassAttribute*);
-    self->attributes = (CFCClassAttribute**)REALLOCATE(self->attributes, size);
-    self->attributes[self->num_attributes - 1] = attribute;
-    self->attributes[self->num_attributes] = NULL;
-}
-
-int
-CFCClass_has_attribute(CFCClass *self, const char *name) {
-    CFCUTIL_NULL_CHECK(name);
-    for (size_t i = 0; i < self->num_attributes; i++) {
-        if (strcmp(name, self->attributes[i]->name) == 0) {
-            return true;
-        }
-    }
-    return false;
 }
 
 #define MAX_FUNC_LEN 128

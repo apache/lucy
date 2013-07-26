@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 56;
+use Test::More tests => 53;
 use Clownfish::CFC::Model::Class;
 use Clownfish::CFC::Parser;
 
@@ -81,9 +81,7 @@ my $foo_jr = Clownfish::CFC::Model::Class->create(
     class_name        => 'Foo::FooJr',
     parent_class_name => 'Foo',
 );
-$foo_jr->add_attribute( dumpable => 1 );
 
-ok( $foo_jr->has_attribute('dumpable'), 'has_attribute' );
 is( $foo_jr->get_struct_sym,  'FooJr',       "struct_sym" );
 is( $foo_jr->full_struct_sym, 'neato_FooJr', "full_struct_sym" );
 
@@ -98,7 +96,6 @@ my $final_foo = Clownfish::CFC::Model::Class->create(
     file_spec         => $file_spec,
     final             => 1,
 );
-$final_foo->add_attribute( dumpable => 1 );
 ok( $final_foo->final, "final" );
 is( $final_foo->include_h, 'Foo/FooJr.h', "inlude_h uses path_part" );
 is( $final_foo->get_parent_class_name, 'Foo::FooJr',
@@ -182,7 +179,7 @@ $class_content = q|
      *
      * Wow wow wow.
      */
-    public class Animal::Dog inherits Animal : lovable : drooly {
+    public class Animal::Dog inherits Animal {
         public inert Dog* init(Dog *self, CharBuf *name, CharBuf *fave_food);
         inert uint32_t count();
         inert uint64_t num_dogs;
@@ -233,8 +230,6 @@ for my $method ( @{ $class->methods } ) {
 }
 is( ( scalar grep { $_->public } @{ $class->methods } ),
     6, "pass acl to Method constructor" );
-ok( $class->has_attribute('lovable'), "parsed class attribute" );
-ok( $class->has_attribute('drooly'),  "parsed second class attribute" );
 
 $class_content = qq|
     inert class Rigor::Mortis cnick Mort {

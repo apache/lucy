@@ -117,17 +117,6 @@ CFCClass_add_member_var(CFCClass *self, struct CFCVariable *var);
 void
 CFCClass_add_inert_var(CFCClass *self, struct CFCVariable *var);
 
-/** Add an arbitrary attribute to the class.
- */
-void
-CFCClass_add_attribute(CFCClass *self, const char *name, const char *value);
-
-/** Returns true if the Class object has the supplied attribute, false
- * otherwise.
- */
-int
-CFCClass_has_attribute(CFCClass *self, const char *name);
-
 /* Return the inert Function object for the supplied sym, if any.
  */
 struct CFCFunction*

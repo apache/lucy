@@ -377,8 +377,8 @@ static void yy_fatal_error (yyconst char msg[]  );
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
 
-#define YY_NUM_RULES 28
-#define YY_END_OF_BUFFER 29
+#define YY_NUM_RULES 27
+#define YY_END_OF_BUFFER 28
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -388,14 +388,14 @@ struct yy_trans_info
 	};
 static yyconst flex_int16_t yy_accept[76] =
     {   0,
-        0,    0,    0,    0,   29,   27,   26,   26,   27,    7,
-        8,    2,   10,   27,   27,   27,   16,   16,   12,   11,
-       13,   18,    5,    6,   18,    3,    4,   22,   22,   23,
-        0,   17,    0,   16,   16,    0,    0,    0,    0,    1,
-       18,   18,   22,   23,    9,    0,    0,   15,   14,   18,
-        0,   23,    0,    0,    0,   25,   18,    0,   25,    0,
-        0,   24,    0,    0,   18,    0,   24,   24,   19,    0,
-        0,    0,   21,   20,    0
+        0,    0,    0,    0,   28,   26,   25,   25,   26,    7,
+        8,    2,   10,   26,   26,   26,   15,   15,   26,   11,
+       12,   17,    5,    6,   17,    3,    4,   21,   21,   22,
+        0,   16,    0,   15,   15,    0,    0,    0,    0,    1,
+       17,   17,   21,   22,    9,    0,    0,   14,   13,   17,
+        0,   22,    0,    0,    0,   24,   17,    0,   24,    0,
+        0,   23,    0,    0,   17,    0,   23,   23,   18,    0,
+        0,    0,   20,   19,    0
     } ;
 
 static yyconst flex_int32_t yy_ec[256] =
@@ -508,10 +508,10 @@ static yyconst flex_int16_t yy_chk[162] =
     } ;
 
 /* Table of booleans, true if rule could match eol. */
-static yyconst flex_int32_t yy_rule_can_match_eol[29] =
+static yyconst flex_int32_t yy_rule_can_match_eol[28] =
     {   0,
-0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 
-    0, 1, 1, 0, 1, 1, 1, 0, 0,     };
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 
+    1, 1, 0, 1, 1, 1, 0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -941,49 +941,50 @@ YY_RULE_SETUP
 case 12:
 YY_RULE_SETUP
 #line 111 "../src/CFCLexHeader.l"
-{ PARSE(CFC_TOKENTYPE_COLON); }
+{ PARSE(CFC_TOKENTYPE_EQUALS); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 112 "../src/CFCLexHeader.l"
-{ PARSE(CFC_TOKENTYPE_EQUALS); }
+#line 113 "../src/CFCLexHeader.l"
+{ PARSE(CFC_TOKENTYPE_HEX_LITERAL); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
 #line 114 "../src/CFCLexHeader.l"
-{ PARSE(CFC_TOKENTYPE_HEX_LITERAL); }
+{ PARSE(CFC_TOKENTYPE_FLOAT_LITERAL); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
 #line 115 "../src/CFCLexHeader.l"
-{ PARSE(CFC_TOKENTYPE_FLOAT_LITERAL); }
-	YY_BREAK
-case 16:
-YY_RULE_SETUP
-#line 116 "../src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_INTEGER_LITERAL); }
 	YY_BREAK
-case 17:
-/* rule 17 can match eol */
+case 16:
+/* rule 16 can match eol */
 YY_RULE_SETUP
-#line 117 "../src/CFCLexHeader.l"
+#line 116 "../src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_STRING_LITERAL); }
 	YY_BREAK
-case 18:
+case 17:
 YY_RULE_SETUP
-#line 119 "../src/CFCLexHeader.l"
+#line 118 "../src/CFCLexHeader.l"
 { PARSE(S_identifier_or_keyword(yytext)); }
 	YY_BREAK
-case 19:
-/* rule 19 can match eol */
+case 18:
+/* rule 18 can match eol */
 YY_RULE_SETUP
-#line 121 "../src/CFCLexHeader.l"
+#line 120 "../src/CFCLexHeader.l"
 { BEGIN(CBLOCK);  PARSE(CFC_TOKENTYPE_CBLOCK_START); }
 	YY_BREAK
+case 19:
+YY_RULE_SETUP
+#line 121 "../src/CFCLexHeader.l"
+{ BEGIN(INITIAL); PARSE(CFC_TOKENTYPE_CBLOCK_CLOSE); }
+	YY_BREAK
 case 20:
+/* rule 20 can match eol */
 YY_RULE_SETUP
 #line 122 "../src/CFCLexHeader.l"
-{ BEGIN(INITIAL); PARSE(CFC_TOKENTYPE_CBLOCK_CLOSE); }
+{ PARSE(CFC_TOKENTYPE_BLOB); }
 	YY_BREAK
 case 21:
 /* rule 21 can match eol */
@@ -992,38 +993,32 @@ YY_RULE_SETUP
 { PARSE(CFC_TOKENTYPE_BLOB); }
 	YY_BREAK
 case 22:
-/* rule 22 can match eol */
 YY_RULE_SETUP
 #line 124 "../src/CFCLexHeader.l"
 { PARSE(CFC_TOKENTYPE_BLOB); }
 	YY_BREAK
-case 23:
-YY_RULE_SETUP
-#line 125 "../src/CFCLexHeader.l"
-{ PARSE(CFC_TOKENTYPE_BLOB); }
-	YY_BREAK
 /* Parse docucomments, but skip ordinary comments */
+case 23:
+/* rule 23 can match eol */
+YY_RULE_SETUP
+#line 127 "../src/CFCLexHeader.l"
+{ PARSE(CFC_TOKENTYPE_DOCUCOMMENT); }
+	YY_BREAK
 case 24:
 /* rule 24 can match eol */
 YY_RULE_SETUP
 #line 128 "../src/CFCLexHeader.l"
-{ PARSE(CFC_TOKENTYPE_DOCUCOMMENT); }
+
 	YY_BREAK
 case 25:
 /* rule 25 can match eol */
 YY_RULE_SETUP
-#line 129 "../src/CFCLexHeader.l"
-
-	YY_BREAK
-case 26:
-/* rule 26 can match eol */
-YY_RULE_SETUP
-#line 131 "../src/CFCLexHeader.l"
+#line 130 "../src/CFCLexHeader.l"
 /* Skip whitespace. */
 	YY_BREAK
-case 27:
+case 26:
 YY_RULE_SETUP
-#line 132 "../src/CFCLexHeader.l"
+#line 131 "../src/CFCLexHeader.l"
 { 
                 printf("Bad input character '%s' at line %d\n", yytext, yylineno);
                 yyterminate();
@@ -1031,15 +1026,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(CBLOCK):
-#line 136 "../src/CFCLexHeader.l"
+#line 135 "../src/CFCLexHeader.l"
 { yyterminate(); }
 	YY_BREAK
-case 28:
+case 27:
 YY_RULE_SETUP
-#line 137 "../src/CFCLexHeader.l"
+#line 136 "../src/CFCLexHeader.l"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 1043 "../src/CFCLexHeader.c"
+#line 1038 "../src/CFCLexHeader.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2043,7 +2038,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 137 "../src/CFCLexHeader.l"
+#line 136 "../src/CFCLexHeader.l"
 
 
 

@@ -381,12 +381,6 @@ class_head(A) ::=                exposure_specifier(C)                          
 class_head(A) ::= docucomment(B)                                                    CLASS qualified_id(E)                              .  { A = S_start_class(state, B,    NULL, NULL, E,    NULL, NULL ); }
 class_head(A) ::=                                                                   CLASS qualified_id(E)                              .  { A = S_start_class(state, NULL, NULL, NULL, E,    NULL, NULL ); }
 
-class_head(A) ::= class_head(B) COLON IDENTIFIER(C).
-{
-    A = B;
-    CFCClass_add_attribute(A, C, "1");
-}
-
 class_defs(A) ::= class_head(B) LEFT_CURLY_BRACE.
 {
     A = B;

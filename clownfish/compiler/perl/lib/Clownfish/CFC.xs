@@ -228,23 +228,6 @@ PPCODE:
     CFCClass_add_method(self, method);
 
 void
-add_attribute(self, name, value_sv)
-    CFCClass *self;
-    const char *name;
-    SV *value_sv;
-PPCODE:
-    char *value = SvOK(value_sv) ? SvPV_nolen(value_sv) : NULL;
-    CFCClass_add_attribute(self, name, value);
-
-int
-has_attribute(self, name)
-    CFCClass *self;
-    const char *name;
-CODE:
-    RETVAL = CFCClass_has_attribute(self, name);
-OUTPUT: RETVAL
-
-void
 grow_tree(self)
     CFCClass *self;
 PPCODE:

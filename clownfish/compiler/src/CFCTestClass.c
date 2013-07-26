@@ -44,7 +44,7 @@ S_has_symbol(CFCSymbol **symbols, const char *micro_sym);
 
 const CFCTestBatch CFCTEST_BATCH_CLASS = {
     "Clownfish::CFC::Model::Class",
-    86,
+    83,
     S_run_tests
 };
 
@@ -100,8 +100,6 @@ S_run_tests(CFCTest *test) {
     CFCClass *foo_jr
         = CFCClass_create(neato, NULL, "Foo::FooJr", NULL, NULL, NULL, NULL,
                           "Foo", 0, 0);
-    CFCClass_add_attribute(foo_jr, "dumpable", "1");
-    OK(test, CFCClass_has_attribute(foo_jr, "dumpable"), "has_attribute");
     STR_EQ(test, CFCClass_get_struct_sym(foo_jr), "FooJr",
            "get_struct_sym");
     STR_EQ(test, CFCClass_full_struct_sym(foo_jr), "neato_FooJr",
@@ -110,7 +108,6 @@ S_run_tests(CFCTest *test) {
     CFCClass *final_foo
         = CFCClass_create(neato, NULL, "Foo::FooJr::FinalFoo", NULL, NULL, NULL,
                           file_spec, "Foo::FooJr", 1, 0);
-    CFCClass_add_attribute(final_foo, "dumpable", "1");
     OK(test, CFCClass_final(final_foo), "final");
     STR_EQ(test, CFCClass_include_h(final_foo), "Foo/FooJr.h",
            "include_h uses path_part");
@@ -256,7 +253,7 @@ S_run_tests(CFCTest *test) {
             " *\n"
             " * Wow wow wow.\n"
             " */\n"
-            "public class Animal::Dog inherits Animal : lovable : drooly {\n"
+            "public class Animal::Dog inherits Animal {\n"
             "    public inert Dog* init(Dog *self, CharBuf *name,\n"
             "                           CharBuf *fave_food);\n"
             "    inert uint32_t count();\n"
@@ -305,11 +302,6 @@ S_run_tests(CFCTest *test) {
             if (CFCSymbol_public(methods[i])) { ++num_public_methods; }
         }
         INT_EQ(test, num_public_methods, 6, "pass acl to Method constructor");
-
-        OK(test, CFCClass_has_attribute(klass, "lovable"),
-           "parsed class attribute");
-        OK(test, CFCClass_has_attribute(klass, "drooly"),
-           "parsed second class attribute");
 
         CFCBase_decref((CFCBase*)klass);
     }
