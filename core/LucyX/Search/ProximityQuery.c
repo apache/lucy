@@ -103,8 +103,8 @@ ProximityQuery_dump(ProximityQuery *self)
     ProximityQuery_Dump_t super_dump
         = SUPER_METHOD_PTR(PROXIMITYQUERY, Lucy_ProximityQuery_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
-    Hash_Store_Str(dump, "field", 5, Obj_Dump((Obj*)ivars->field));
-    Hash_Store_Str(dump, "terms", 5, Obj_Dump((Obj*)ivars->terms));
+    Hash_Store_Str(dump, "field", 5, Freezer_dump((Obj*)ivars->field));
+    Hash_Store_Str(dump, "terms", 5, Freezer_dump((Obj*)ivars->terms));
     Hash_Store_Str(dump, "within", 6,
                    (Obj*)CB_newf("%i64", (int64_t)ivars->within));
     return (Obj*)dump;
@@ -119,9 +119,9 @@ ProximityQuery_load(ProximityQuery *self, Obj *dump)
     ProximityQuery *loaded = (ProximityQuery*)super_load(self, dump);
     ProximityQueryIVARS *loaded_ivars = ProximityQuery_IVARS(loaded);
     Obj *field = CERTIFY(Hash_Fetch_Str(source, "field", 5), OBJ);
-    loaded_ivars->field = (CharBuf*)CERTIFY(Obj_Load(field, field), CHARBUF);
+    loaded_ivars->field = (CharBuf*)CERTIFY(Freezer_load(field), CHARBUF);
     Obj *terms = CERTIFY(Hash_Fetch_Str(source, "terms", 5), OBJ);
-    loaded_ivars->terms = (VArray*)CERTIFY(Obj_Load(terms, terms), VARRAY);
+    loaded_ivars->terms = (VArray*)CERTIFY(Freezer_load(terms), VARRAY);
     Obj *within = CERTIFY(Hash_Fetch_Str(source, "within", 6), OBJ);
     loaded_ivars->within = (uint32_t)Obj_To_I64(within);
     return (Obj*)loaded;

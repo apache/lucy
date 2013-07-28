@@ -27,6 +27,7 @@
 #include "Lucy/Search/ORQuery.h"
 #include "Lucy/Search/PolyQuery.h"
 #include "Lucy/Search/LeafQuery.h"
+#include "Lucy/Util/Freezer.h"
 
 TestANDQuery*
 TestANDQuery_new() {
@@ -55,7 +56,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner, uint32_t boolop) {
         = (PolyQuery*)TestUtils_make_poly_query(boolop, INCREF(a_leaf),
                                                 INCREF(b_leaf), NULL);
     Obj *dump = (Obj*)PolyQuery_Dump(query);
-    PolyQuery *clone = (PolyQuery*)Obj_Load(dump, dump);
+    PolyQuery *clone = (PolyQuery*)Freezer_load(dump);
 
     TEST_FALSE(runner, PolyQuery_Equals(query, (Obj*)kids_differ),
                "Different kids spoil Equals");

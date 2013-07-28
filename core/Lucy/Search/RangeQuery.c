@@ -167,14 +167,14 @@ RangeQuery_dump(RangeQuery *self)
     RangeQuery_Dump_t super_dump
         = SUPER_METHOD_PTR(RANGEQUERY, Lucy_RangeQuery_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
-    Hash_Store_Str(dump, "field", 5, Obj_Dump((Obj*)ivars->field));
+    Hash_Store_Str(dump, "field", 5, Freezer_dump((Obj*)ivars->field));
     if (ivars->lower_term) {
         Hash_Store_Str(dump, "lower_term", 10,
-                       Obj_Dump((Obj*)ivars->lower_term));
+                       Freezer_dump((Obj*)ivars->lower_term));
     }
     if (ivars->upper_term) {
         Hash_Store_Str(dump, "upper_term", 10,
-                       Obj_Dump((Obj*)ivars->upper_term));
+                       Freezer_dump((Obj*)ivars->upper_term));
     }
     Hash_Store_Str(dump, "include_lower", 13,
                    (Obj*)Bool_singleton(ivars->include_lower));
@@ -192,16 +192,16 @@ RangeQuery_load(RangeQuery *self, Obj *dump)
     RangeQuery *loaded = (RangeQuery*)super_load(self, dump);
     RangeQueryIVARS *loaded_ivars = RangeQuery_IVARS(loaded);
     Obj *field = CERTIFY(Hash_Fetch_Str(source, "field", 5), OBJ);
-    loaded_ivars->field = (CharBuf*)CERTIFY(Obj_Load(field, field), CHARBUF);
+    loaded_ivars->field = (CharBuf*)CERTIFY(Freezer_load(field), CHARBUF);
     Obj *lower_term = Hash_Fetch_Str(source, "lower_term", 10);
     if (lower_term) {
         loaded_ivars->lower_term
-            = (Obj*)CERTIFY(Obj_Load(lower_term, lower_term), OBJ);
+            = (Obj*)CERTIFY(Freezer_load(lower_term), OBJ);
     }
     Obj *upper_term = Hash_Fetch_Str(source, "upper_term", 10);
     if (upper_term) {
         loaded_ivars->upper_term
-            = (Obj*)CERTIFY(Obj_Load(upper_term, upper_term), OBJ);
+            = (Obj*)CERTIFY(Freezer_load(upper_term), OBJ);
     }
     Obj *include_lower
         = CERTIFY(Hash_Fetch_Str(source, "include_lower", 13), OBJ);

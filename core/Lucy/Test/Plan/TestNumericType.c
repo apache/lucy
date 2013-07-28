@@ -24,6 +24,7 @@
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Plan/BlobType.h"
 #include "Lucy/Plan/NumericType.h"
+#include "Lucy/Util/Freezer.h"
 
 TestNumericType*
 TestNumericType_new() {
@@ -59,7 +60,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 
     {
         Obj *dump = (Obj*)Int32Type_Dump(i32);
-        Obj *other = Obj_Load(dump, dump);
+        Obj *other = Freezer_load(dump);
         TEST_TRUE(runner, Int32Type_Equals(i32, other),
                   "Dump => Load round trip for Int32Type");
         DECREF(dump);
@@ -68,7 +69,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 
     {
         Obj *dump = (Obj*)Int64Type_Dump(i64);
-        Obj *other = Obj_Load(dump, dump);
+        Obj *other = Freezer_load(dump);
         TEST_TRUE(runner, Int64Type_Equals(i64, other),
                   "Dump => Load round trip for Int64Type");
         DECREF(dump);
@@ -77,7 +78,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 
     {
         Obj *dump = (Obj*)Float32Type_Dump(f32);
-        Obj *other = Obj_Load(dump, dump);
+        Obj *other = Freezer_load(dump);
         TEST_TRUE(runner, Float32Type_Equals(f32, other),
                   "Dump => Load round trip for Float32Type");
         DECREF(dump);
@@ -86,7 +87,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 
     {
         Obj *dump = (Obj*)Float64Type_Dump(f64);
-        Obj *other = Obj_Load(dump, dump);
+        Obj *other = Freezer_load(dump);
         TEST_TRUE(runner, Float64Type_Equals(f64, other),
                   "Dump => Load round trip for Float64Type");
         DECREF(dump);

@@ -21,6 +21,7 @@
 #include "Lucy/Analysis/Analyzer.h"
 #include "Lucy/Index/Posting/ScorePosting.h"
 #include "Lucy/Index/Similarity.h"
+#include "Lucy/Util/Freezer.h"
 
 FullTextType*
 FullTextType_new(Analyzer *analyzer) {
@@ -146,7 +147,7 @@ FullTextType_load(FullTextType *self, Obj *dump) {
             analyzer = (Analyzer*)INCREF(analyzer_dump);
         }
         else if (Obj_Is_A((Obj*)analyzer_dump, HASH)) {
-            analyzer = (Analyzer*)Obj_Load(analyzer_dump, analyzer_dump);
+            analyzer = (Analyzer*)Freezer_load(analyzer_dump);
         }
     }
     CERTIFY(analyzer, ANALYZER);

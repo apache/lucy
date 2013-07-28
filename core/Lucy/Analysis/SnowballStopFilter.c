@@ -22,6 +22,7 @@
 #include "Lucy/Analysis/SnowballStopFilter.h"
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
+#include "Lucy/Util/Freezer.h"
 
 SnowballStopFilter*
 SnowStop_new(const CharBuf *language, Hash *stoplist) {
@@ -97,7 +98,8 @@ SnowStop_dump(SnowballStopFilter *self)
         = SUPER_METHOD_PTR(SNOWBALLSTOPFILTER, Lucy_SnowStop_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
     if (ivars->stoplist) {
-        Hash_Store_Str(dump, "stoplist", 8, Obj_Dump((Obj*)ivars->stoplist));
+        Hash_Store_Str(dump, "stoplist", 8,
+                       Freezer_dump((Obj*)ivars->stoplist));
     }
     return (Obj*)dump;
 }
@@ -112,7 +114,7 @@ SnowStop_load(SnowballStopFilter *self, Obj *dump)
     Obj *stoplist = Hash_Fetch_Str(source, "stoplist", 8);
     if (stoplist) {
         SnowStop_IVARS(loaded)->stoplist
-            = (Hash*)CERTIFY(Obj_Load(stoplist, stoplist), HASH);
+            = (Hash*)CERTIFY(Freezer_load(stoplist), HASH);
     }
     return (Obj*)loaded;
 }

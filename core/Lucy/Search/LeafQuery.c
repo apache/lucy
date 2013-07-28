@@ -119,9 +119,9 @@ LeafQuery_dump(LeafQuery *self)
         = SUPER_METHOD_PTR(LEAFQUERY, Lucy_LeafQuery_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
     if (ivars->field) {
-        Hash_Store_Str(dump, "field", 5, Obj_Dump((Obj*)ivars->field));
+        Hash_Store_Str(dump, "field", 5, Freezer_dump((Obj*)ivars->field));
     }
-    Hash_Store_Str(dump, "text", 4, Obj_Dump((Obj*)ivars->text));
+    Hash_Store_Str(dump, "text", 4, Freezer_dump((Obj*)ivars->text));
     return (Obj*)dump;
 }
 
@@ -136,10 +136,10 @@ LeafQuery_load(LeafQuery *self, Obj *dump)
     Obj *field = Hash_Fetch_Str(source, "field", 5);
     if (field) {
         loaded_ivars->field
-            = (CharBuf*)CERTIFY(Obj_Load(field, field), CHARBUF);
+            = (CharBuf*)CERTIFY(Freezer_load(field), CHARBUF);
     }
     Obj *text = CERTIFY(Hash_Fetch_Str(source, "text", 4), OBJ);
-    loaded_ivars->text = (CharBuf*)CERTIFY(Obj_Load(text, text), CHARBUF);
+    loaded_ivars->text = (CharBuf*)CERTIFY(Freezer_load(text), CHARBUF);
     return (Obj*)loaded;
 }
 

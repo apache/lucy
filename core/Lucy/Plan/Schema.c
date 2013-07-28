@@ -257,7 +257,8 @@ Schema_dump(Schema *self) {
     // Record class name, store dumps of unique Analyzers.
     Hash_Store_Str(dump, "_class", 6,
                    (Obj*)CB_Clone(Schema_Get_Class_Name(self)));
-    Hash_Store_Str(dump, "analyzers", 9, (Obj*)VA_Dump(ivars->uniq_analyzers));
+    Hash_Store_Str(dump, "analyzers", 9,
+                   Freezer_dump((Obj*)ivars->uniq_analyzers));
 
     // Dump FieldTypes.
     Hash_Store_Str(dump, "fields", 6, (Obj*)type_dumps);
@@ -304,7 +305,7 @@ Schema_load(Schema *self, Obj *dump) {
     VArray *analyzer_dumps
         = (VArray*)CERTIFY(Hash_Fetch_Str(source, "analyzers", 9), VARRAY);
     VArray *analyzers
-        = (VArray*)VA_Load(analyzer_dumps, (Obj*)analyzer_dumps);
+        = (VArray*)Freezer_load((Obj*)analyzer_dumps);
     CharBuf *field;
     Hash    *type_dump;
     UNUSED_VAR(self);
@@ -381,9 +382,9 @@ Schema_load(Schema *self, Obj *dump) {
             }
         }
         else {
-            FieldType *type = (FieldType*)CERTIFY(
-                                  Hash_Load(type_dump, (Obj*)type_dump),
-                                  FIELDTYPE);
+            FieldType *type
+                = (FieldType*)CERTIFY(Freezer_load((Obj*)type_dump),
+                                      FIELDTYPE);
             Schema_Spec_Field(loaded, field, type);
             DECREF(type);
         }

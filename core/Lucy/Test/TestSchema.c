@@ -25,6 +25,7 @@
 #include "Lucy/Analysis/StandardTokenizer.h"
 #include "Lucy/Plan/FullTextType.h"
 #include "Lucy/Plan/Architecture.h"
+#include "Lucy/Util/Freezer.h"
 
 TestSchema*
 TestSchema_new(bool use_alt_arch) {
@@ -91,7 +92,7 @@ static void
 test_Dump_and_Load(TestBatchRunner *runner) {
     TestSchema *schema = TestSchema_new(false);
     Obj        *dump   = (Obj*)TestSchema_Dump(schema);
-    TestSchema *loaded = (TestSchema*)Obj_Load(dump, dump);
+    TestSchema *loaded = (TestSchema*)Freezer_load(dump);
 
     TEST_FALSE(runner, TestSchema_Equals(schema, (Obj*)loaded),
                "Dump => Load round trip");

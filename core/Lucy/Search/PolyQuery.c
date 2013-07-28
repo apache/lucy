@@ -99,7 +99,7 @@ PolyQuery_dump(PolyQuery *self)
     PolyQuery_Dump_t super_dump
         = SUPER_METHOD_PTR(POLYQUERY, Lucy_PolyQuery_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
-    Hash_Store_Str(dump, "children", 8, Obj_Dump((Obj*)ivars->children));
+    Hash_Store_Str(dump, "children", 8, Freezer_dump((Obj*)ivars->children));
     return (Obj*)dump;
 }
 
@@ -112,7 +112,7 @@ PolyQuery_load(PolyQuery *self, Obj *dump)
     PolyQuery *loaded = (PolyQuery*)super_load(self, dump);
     Obj *children = CERTIFY(Hash_Fetch_Str(source, "children", 8), OBJ);
     PolyQuery_IVARS(loaded)->children
-        = (VArray*)CERTIFY(Obj_Load(children, children), VARRAY);
+        = (VArray*)CERTIFY(Freezer_load(children), VARRAY);
     return (Obj*)loaded;
 }
 

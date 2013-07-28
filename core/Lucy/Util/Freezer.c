@@ -384,7 +384,7 @@ S_dump_hash(Hash *hash) {
         // Since JSON only supports text hash keys, dump() can only support
         // text hash keys.
         CERTIFY(key, CHARBUF);
-        Hash_Store(dump, key, Obj_Dump(value));
+        Hash_Store(dump, key, Freezer_dump(value));
     }
 
     return (Obj*)dump;

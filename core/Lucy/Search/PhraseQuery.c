@@ -97,8 +97,8 @@ PhraseQuery_dump(PhraseQuery *self)
     PhraseQuery_Dump_t super_dump
         = SUPER_METHOD_PTR(PHRASEQUERY, Lucy_PhraseQuery_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
-    Hash_Store_Str(dump, "field", 5, Obj_Dump((Obj*)ivars->field));
-    Hash_Store_Str(dump, "terms", 5, Obj_Dump((Obj*)ivars->terms));
+    Hash_Store_Str(dump, "field", 5, Freezer_dump((Obj*)ivars->field));
+    Hash_Store_Str(dump, "terms", 5, Freezer_dump((Obj*)ivars->terms));
     return (Obj*)dump;
 }
 
@@ -112,10 +112,10 @@ PhraseQuery_load(PhraseQuery *self, Obj *dump)
     PhraseQueryIVARS *loaded_ivars = PhraseQuery_IVARS(loaded);
     Obj *field = CERTIFY(Hash_Fetch_Str(source, "field", 5), OBJ);
     loaded_ivars->field
-        = (CharBuf*)CERTIFY(Obj_Load(field, field), CHARBUF);
+        = (CharBuf*)CERTIFY(Freezer_load(field), CHARBUF);
     Obj *terms = CERTIFY(Hash_Fetch_Str(source, "terms", 5), OBJ);
     loaded_ivars->terms
-        = (VArray*)CERTIFY(Obj_Load(terms, terms), VARRAY);
+        = (VArray*)CERTIFY(Freezer_load(terms), VARRAY);
     return (Obj*)loaded;
 }
 

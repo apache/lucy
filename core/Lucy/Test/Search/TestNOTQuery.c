@@ -25,6 +25,7 @@
 #include "Lucy/Test/Search/TestNOTQuery.h"
 #include "Lucy/Search/NOTQuery.h"
 #include "Lucy/Search/LeafQuery.h"
+#include "Lucy/Util/Freezer.h"
 
 TestNOTQuery*
 TestNOTQuery_new() {
@@ -39,7 +40,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     NOTQuery *kids_differ   = NOTQuery_new(b_leaf);
     NOTQuery *boost_differs = NOTQuery_new(a_leaf);
     Obj      *dump          = (Obj*)NOTQuery_Dump(query);
-    NOTQuery *clone         = (NOTQuery*)Obj_Load(dump, dump);
+    NOTQuery *clone         = (NOTQuery*)Freezer_load(dump);
 
     TEST_FALSE(runner, NOTQuery_Equals(query, (Obj*)kids_differ),
                "Different kids spoil Equals");

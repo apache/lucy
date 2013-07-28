@@ -25,6 +25,7 @@
 #include "Lucy/Plan/FullTextType.h"
 #include "Lucy/Analysis/Normalizer.h"
 #include "Lucy/Analysis/StandardTokenizer.h"
+#include "Lucy/Util/Freezer.h"
 
 TestFullTextType*
 TestFullTextType_new() {
@@ -42,7 +43,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     FullTextType      *not_stored    = FullTextType_new((Analyzer*)tokenizer);
     FullTextType      *highlightable = FullTextType_new((Analyzer*)tokenizer);
     Obj               *dump          = (Obj*)FullTextType_Dump(type);
-    Obj               *clone         = Obj_Load(dump, dump);
+    Obj               *clone         = Freezer_load(dump);
     Obj               *another_dump  = (Obj*)FullTextType_Dump_For_Schema(type);
 
     FullTextType_Set_Boost(boost_differs, 1.5);

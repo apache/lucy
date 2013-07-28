@@ -24,6 +24,7 @@
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Search/TestPhraseQuery.h"
 #include "Lucy/Search/PhraseQuery.h"
+#include "Lucy/Util/Freezer.h"
 
 TestPhraseQuery*
 TestPhraseQuery_new() {
@@ -35,7 +36,7 @@ test_Dump_And_Load(TestBatchRunner *runner) {
     PhraseQuery *query
         = TestUtils_make_phrase_query("content", "a", "b", "c", NULL);
     Obj         *dump  = (Obj*)PhraseQuery_Dump(query);
-    PhraseQuery *twin = (PhraseQuery*)Obj_Load(dump, dump);
+    PhraseQuery *twin = (PhraseQuery*)Freezer_load(dump);
     TEST_TRUE(runner, PhraseQuery_Equals(query, (Obj*)twin),
               "Dump => Load round trip");
     DECREF(query);

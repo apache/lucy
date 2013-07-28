@@ -23,6 +23,7 @@
 #include "Lucy/Analysis/Inversion.h"
 #include "Lucy/Analysis/SnowballStemmer.h"
 #include "Lucy/Analysis/RegexTokenizer.h"
+#include "Lucy/Util/Freezer.h"
 
 PolyAnalyzer*
 PolyAnalyzer_new(const CharBuf *language, VArray *analyzers) {
@@ -128,7 +129,8 @@ PolyAnalyzer_dump(PolyAnalyzer *self)
         = SUPER_METHOD_PTR(POLYANALYZER, Lucy_PolyAnalyzer_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
     if (ivars->analyzers) {
-        Hash_Store_Str(dump, "analyzers", 9, Obj_Dump((Obj*)ivars->analyzers));
+        Hash_Store_Str(dump, "analyzers", 9,
+                       Freezer_dump((Obj*)ivars->analyzers));
     }
     return (Obj*)dump;
 }
@@ -139,12 +141,10 @@ PolyAnalyzer_load(PolyAnalyzer *self, Obj *dump) {
     PolyAnalyzer_Load_t super_load 
         = SUPER_METHOD_PTR(POLYANALYZER, Lucy_PolyAnalyzer_Load);
     PolyAnalyzer *loaded = super_load(self, dump);
-    VArray *analyzer_dumps = (VArray*)CERTIFY(
-                                 Hash_Fetch_Str(source, "analyzers", 9),
-                                 VARRAY);
-    VArray *analyzers = (VArray*)CERTIFY(
-                            VA_Load(analyzer_dumps, (Obj*)analyzer_dumps),
-                            VARRAY);
+    VArray *analyzer_dumps
+        = (VArray*)CERTIFY(Hash_Fetch_Str(source, "analyzers", 9), VARRAY);
+    VArray *analyzers
+        = (VArray*)CERTIFY(Freezer_load((Obj*)analyzer_dumps), VARRAY);
     PolyAnalyzer_init(loaded, NULL, analyzers);
     DECREF(analyzers);
     return loaded;

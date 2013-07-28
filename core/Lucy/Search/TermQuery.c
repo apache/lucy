@@ -81,8 +81,8 @@ TermQuery_dump(TermQuery *self)
     TermQuery_Dump_t super_dump
         = SUPER_METHOD_PTR(TERMQUERY, Lucy_TermQuery_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
-    Hash_Store_Str(dump, "field", 5, Obj_Dump((Obj*)ivars->field));
-    Hash_Store_Str(dump, "term", 4, Obj_Dump(ivars->term));
+    Hash_Store_Str(dump, "field", 5, Freezer_dump((Obj*)ivars->field));
+    Hash_Store_Str(dump, "term", 4, Freezer_dump(ivars->term));
     return (Obj*)dump;
 }
 
@@ -95,9 +95,9 @@ TermQuery_load(TermQuery *self, Obj *dump)
     TermQuery *loaded = (TermQuery*)super_load(self, dump);
     TermQueryIVARS *loaded_ivars = TermQuery_IVARS(loaded);
     Obj *field = CERTIFY(Hash_Fetch_Str(source, "field", 5), OBJ);
-    loaded_ivars->field = (CharBuf*)CERTIFY(Obj_Load(field, field), CHARBUF);
+    loaded_ivars->field = (CharBuf*)CERTIFY(Freezer_load(field), CHARBUF);
     Obj *term = CERTIFY(Hash_Fetch_Str(source, "term", 4), OBJ);
-    loaded_ivars->term = (Obj*)CERTIFY(Obj_Load(term, term), OBJ);
+    loaded_ivars->term = (Obj*)CERTIFY(Freezer_load(term), OBJ);
     return (Obj*)loaded;
 }
 

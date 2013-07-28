@@ -23,6 +23,7 @@
 #include "Lucy/Test/Plan/TestBlobType.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Plan/BlobType.h"
+#include "Lucy/Util/Freezer.h"
 
 TestBlobType*
 TestBlobType_new() {
@@ -33,7 +34,7 @@ static void
 test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     BlobType *type            = BlobType_new(true);
     Obj      *dump            = (Obj*)BlobType_Dump(type);
-    Obj      *clone           = Obj_Load(dump, dump);
+    Obj      *clone           = Freezer_load(dump);
     Obj      *another_dump    = (Obj*)BlobType_Dump_For_Schema(type);
     BlobType *another_clone   = BlobType_Load(type, another_dump);
 

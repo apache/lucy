@@ -25,6 +25,7 @@
 #include "Lucy/Test/Search/TestReqOptQuery.h"
 #include "Lucy/Search/RequiredOptionalQuery.h"
 #include "Lucy/Search/LeafQuery.h"
+#include "Lucy/Util/Freezer.h"
 
 TestReqOptQuery*
 TestReqOptQuery_new() {
@@ -41,7 +42,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     RequiredOptionalQuery *boost_differs = ReqOptQuery_new(a_leaf, b_leaf);
     Obj *dump = (Obj*)ReqOptQuery_Dump(query);
     RequiredOptionalQuery *clone
-        = (RequiredOptionalQuery*)Obj_Load(dump, dump);
+        = (RequiredOptionalQuery*)Freezer_load(dump);
 
     TEST_FALSE(runner, ReqOptQuery_Equals(query, (Obj*)kids_differ),
                "Different kids spoil Equals");

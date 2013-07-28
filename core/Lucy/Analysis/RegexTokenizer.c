@@ -56,7 +56,7 @@ RegexTokenizer_dump(RegexTokenizer *self) {
     RegexTokenizer_Dump_t super_dump
         = SUPER_METHOD_PTR(REGEXTOKENIZER, Lucy_RegexTokenizer_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
-    Hash_Store_Str(dump, "pattern", 7, CB_Dump(ivars->pattern));
+    Hash_Store_Str(dump, "pattern", 7, (Obj*)CB_Clone(ivars->pattern));
     return (Obj*)dump;
 }
 
