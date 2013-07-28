@@ -29,6 +29,7 @@
 #include "Lucy/Plan/FullTextType.h"
 #include "Lucy/Plan/Architecture.h"
 #include "Lucy/Store/Folder.h"
+#include "Lucy/Util/Freezer.h"
 #include "Lucy/Util/Json.h"
 
 // Scan the array to see if an object testing as Equal is present.  If not,
@@ -293,6 +294,14 @@ Schema_dump(Schema *self) {
     return dump;
 }
 
+static FieldType*
+S_load_type(VTable *vtable, Obj *type_dump) {
+    FieldType *dummy = (FieldType*)VTable_Make_Obj(vtable);
+    FieldType *loaded = (FieldType*)FType_Load(dummy, type_dump);
+    DECREF(dummy);
+    return loaded;
+}
+
 Schema*
 Schema_load(Schema *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
@@ -333,47 +342,44 @@ Schema_load(Schema *self, Obj *dump) {
                 }
                 Hash_Store_Str(type_dump, "analyzer", 8, INCREF(analyzer));
                 FullTextType *type
-                    = (FullTextType*)VTable_Load_Obj(FULLTEXTTYPE,
-                                                     (Obj*)type_dump);
+                    = (FullTextType*)S_load_type(FULLTEXTTYPE,
+                                                 (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
             else if (CB_Equals_Str(type_str, "string", 6)) {
                 StringType *type
-                    = (StringType*)VTable_Load_Obj(STRINGTYPE,
-                                                   (Obj*)type_dump);
+                    = (StringType*)S_load_type(STRINGTYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
             else if (CB_Equals_Str(type_str, "blob", 4)) {
                 BlobType *type
-                    = (BlobType*)VTable_Load_Obj(BLOBTYPE, (Obj*)type_dump);
+                    = (BlobType*)S_load_type(BLOBTYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
             else if (CB_Equals_Str(type_str, "i32_t", 5)) {
                 Int32Type *type
-                    = (Int32Type*)VTable_Load_Obj(INT32TYPE, (Obj*)type_dump);
+                    = (Int32Type*)S_load_type(INT32TYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
             else if (CB_Equals_Str(type_str, "i64_t", 5)) {
                 Int64Type *type
-                    = (Int64Type*)VTable_Load_Obj(INT64TYPE, (Obj*)type_dump);
+                    = (Int64Type*)S_load_type(INT64TYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
             else if (CB_Equals_Str(type_str, "f32_t", 5)) {
                 Float32Type *type
-                    = (Float32Type*)VTable_Load_Obj(FLOAT32TYPE,
-                                                    (Obj*)type_dump);
+                    = (Float32Type*)S_load_type(FLOAT32TYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
             else if (CB_Equals_Str(type_str, "f64_t", 5)) {
                 Float64Type *type
-                    = (Float64Type*)VTable_Load_Obj(FLOAT64TYPE,
-                                                    (Obj*)type_dump);
+                    = (Float64Type*)S_load_type(FLOAT64TYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }

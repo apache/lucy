@@ -30,6 +30,7 @@
 #include "Lucy/Store/FSFolder.h"
 #include "Lucy/Store/Lock.h"
 #include "Lucy/Util/Json.h"
+#include "Lucy/Util/Freezer.h"
 #include "Lucy/Util/IndexFileNames.h"
 #include "Clownfish/Util/StringHelper.h"
 
@@ -254,11 +255,10 @@ S_try_open_elements(void *context) {
         THROW(ERR, "Can't find a schema file.");
     }
     else {
-        Hash *dump = (Hash*)Json_slurp_json(folder, schema_file);
+        Obj *dump = Json_slurp_json(folder, schema_file);
         if (dump) { // read file successfully
             DECREF(ivars->schema);
-            ivars->schema = (Schema*)CERTIFY(
-                               VTable_Load_Obj(SCHEMA, (Obj*)dump), SCHEMA);
+            ivars->schema = (Schema*)CERTIFY(Freezer_load(dump), SCHEMA);
             DECREF(dump);
             DECREF(schema_file);
             schema_file = NULL;

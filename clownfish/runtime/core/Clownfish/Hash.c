@@ -147,7 +147,10 @@ Hash_load(Hash *self, Obj *dump) {
                       VTable_Get_Name(vtable));
             }
             else if (load != (Obj_Load_t)Hash_load) { // stop inf loop
-                return VTable_Load_Obj(vtable, dump);
+                Obj *dummy = VTable_Make_Obj(vtable);
+                Obj *loaded = Obj_Load(dummy, dump);
+                DECREF(dummy);
+                return loaded;
             }
         }
     }

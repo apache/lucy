@@ -322,18 +322,6 @@ VTable_singleton(const CharBuf *class_name, VTable *parent) {
     return singleton;
 }
 
-Obj*
-VTable_load_obj(VTable *self, Obj *dump) {
-    Obj_Load_t load = METHOD_PTR(self, Cfish_Obj_Load);
-    if (load == Obj_load) {
-        THROW(ERR, "Abstract method Load() not defined for %o", self->name);
-    }
-    Obj *invoker = VTable_Make_Obj(self);
-    Obj *loaded = load(invoker, dump);
-    DECREF(invoker);
-    return loaded;
-}
-
 static void
 S_scrunch_charbuf(CharBuf *source, CharBuf *target) {
     ZombieCharBuf *iterator = ZCB_WRAP(source);

@@ -38,6 +38,7 @@
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/FSFolder.h"
 #include "Lucy/Store/Lock.h"
+#include "Lucy/Util/Freezer.h"
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/Json.h"
 
@@ -122,11 +123,9 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
         }
         else {
             CharBuf *schema_file = S_find_schema_file(latest_snapshot);
-            Hash *dump = (Hash*)Json_slurp_json(folder, schema_file);
+            Obj *dump = Json_slurp_json(folder, schema_file);
             if (dump) { // read file successfully
-                ivars->schema = (Schema*)CERTIFY(
-                                   VTable_Load_Obj(SCHEMA, (Obj*)dump),
-                                   SCHEMA);
+                ivars->schema = (Schema*)CERTIFY(Freezer_load(dump), SCHEMA);
                 schema = ivars->schema;
                 DECREF(dump);
                 schema_file = NULL;

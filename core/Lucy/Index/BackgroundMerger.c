@@ -33,6 +33,7 @@
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/FSFolder.h"
 #include "Lucy/Store/Lock.h"
+#include "Lucy/Util/Freezer.h"
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/Json.h"
 
@@ -116,9 +117,8 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager) {
     ivars->polyreader = PolyReader_open((Obj*)folder, NULL, ivars->manager);
 
     // Clone the PolyReader's schema.
-    Hash *dump = Schema_Dump(PolyReader_Get_Schema(ivars->polyreader));
-    ivars->schema = (Schema*)CERTIFY(VTable_Load_Obj(SCHEMA, (Obj*)dump),
-                                    SCHEMA);
+    Obj *dump = (Obj*)Schema_Dump(PolyReader_Get_Schema(ivars->polyreader));
+    ivars->schema = (Schema*)CERTIFY(Freezer_load(dump), SCHEMA);
     DECREF(dump);
 
     // Create new Segment.
