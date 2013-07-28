@@ -47,7 +47,6 @@ Freezer_thaw(InStream *instream) {
 
 void
 Freezer_serialize(Obj *obj, OutStream *outstream) {
-    VTable *vtable = Obj_Get_VTable(obj);
     if (Obj_Is_A(obj, CHARBUF)) {
         Freezer_serialize_charbuf((CharBuf*)obj, outstream);
     }
@@ -121,7 +120,6 @@ Freezer_serialize(Obj *obj, OutStream *outstream) {
 
 Obj*
 Freezer_deserialize(Obj *obj, InStream *instream) {
-    VTable *vtable = Obj_Get_VTable(obj);
     if (Obj_Is_A(obj, CHARBUF)) {
         obj = (Obj*)Freezer_deserialize_charbuf((CharBuf*)obj, instream);
     }
@@ -144,7 +142,7 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
                         = SUPER_METHOD_PTR(BOOLNUM, Cfish_Bool_Dec_RefCount);
                     super_decref(self);
                 }
-                obj = value ? CFISH_TRUE : CFISH_FALSE;
+                obj = value ? (Obj*)CFISH_TRUE : (Obj*)CFISH_FALSE;
             }
             else if (Obj_Is_A(obj, INTEGER32)) {
                 int32_t value = (int32_t)InStream_Read_C32(instream);
