@@ -416,14 +416,13 @@ CFCPerl_write_bindings(CFCPerl *self) {
     }
     generated_xs = CFCUtil_cat(generated_xs, "\n", NULL);
 
-    // Constructors.
-    for (size_t i = 0; registry[i] != NULL; i++) {
-        CFCPerlClass *class_binding = registry[i];
-        CFCClass *client = CFCPerlClass_get_client(class_binding);
-        if (!client) { continue; }
+    for (size_t i = 0; ordered[i] != NULL; i++) {
+        CFCClass *klass = ordered[i];
+        if (CFCClass_included(klass)) { continue; }
 
+        // Constructors.
         CFCPerlConstructor **constructors
-            = CFCPerlClass_constructor_bindings(class_binding);
+            = CFCPerlClass_constructor_bindings(klass);
         for (size_t j = 0; constructors[j] != NULL; j++) {
             CFCPerlSub *xsub = (CFCPerlSub*)constructors[j];
 
@@ -437,13 +436,8 @@ CFCPerl_write_bindings(CFCPerl *self) {
             xs_init = S_add_xs_init(xs_init, xsub);
         }
         FREEMEM(constructors);
-    }
 
-    // Methods.
-    for (size_t i = 0; ordered[i] != NULL; i++) {
-        CFCClass *klass = ordered[i];
-        if (CFCClass_included(klass)) { continue; }
-
+        // Methods.
         CFCPerlMethod **methods = CFCPerlClass_method_bindings(klass);
         for (size_t j = 0; methods[j] != NULL; j++) {
             CFCPerlSub *xsub = (CFCPerlSub*)methods[j];

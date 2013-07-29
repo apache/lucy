@@ -311,10 +311,11 @@ CFCPerlClass_method_bindings(CFCClass *klass) {
 static const char NEW[] = "new";
 
 CFCPerlConstructor**
-CFCPerlClass_constructor_bindings(CFCPerlClass *self) {
-    CFCClass     *client    = self->client;
-    CFCFunction **functions = CFCClass_functions(self->client);
-    size_t        num_bound = 0;
+CFCPerlClass_constructor_bindings(CFCClass *klass) {
+    const char    *class_name = CFCClass_get_class_name(klass);
+    CFCPerlClass  *perl_class = CFCPerlClass_singleton(class_name);
+    CFCFunction  **functions  = CFCClass_functions(klass);
+    size_t         num_bound  = 0;
     CFCPerlConstructor **bound 
         = (CFCPerlConstructor**)CALLOCATE(1, sizeof(CFCPerlConstructor*));
 
@@ -327,31 +328,42 @@ CFCPerlClass_constructor_bindings(CFCPerlClass *self) {
         const char   *alias       = NULL;
 
         // Find user-specified alias.
-        for (size_t j = 0; j < self->num_cons; j++) {
-            if (strcmp(micro_sym, self->cons_inits[j]) == 0) {
-                alias = self->cons_aliases[j];
-                if (!S_can_be_bound(param_list, return_type)) {
-                    CFCUtil_die("Can't bind %s as %s -- types can't be mapped",
-                                micro_sym, alias);
-                }
-                break;
+        if (perl_class == NULL) {
+            // Bind init() to new() when possible.
+            if (strcmp(micro_sym, "init") == 0
+                && S_can_be_bound(param_list, return_type)
+               ) {
+                alias = NEW;
             }
         }
-
-        // Automatically bind init() to new() when possible.
-        if (!alias
-            && !self->exclude_cons
-            && strcmp(micro_sym, "init") == 0
-            && S_can_be_bound(param_list, return_type)
-           ) {
-            int saw_new = 0;
-            for (size_t j = 0; j < self->num_cons; j++) {
-                if (strcmp(self->cons_aliases[j], "new") == 0) {
-                    saw_new = 1;
+        else {
+            for (size_t j = 0; j < perl_class->num_cons; j++) {
+                if (strcmp(micro_sym, perl_class->cons_inits[j]) == 0) {
+                    alias = perl_class->cons_aliases[j];
+                    if (!S_can_be_bound(param_list, return_type)) {
+                        CFCUtil_die("Can't bind %s as %s"
+                                    " -- types can't be mapped",
+                                    micro_sym, alias);
+                    }
+                    break;
                 }
             }
-            if (!saw_new) {
-                alias = NEW;
+
+            // Automatically bind init() to new() when possible.
+            if (!alias
+                && !perl_class->exclude_cons
+                && strcmp(micro_sym, "init") == 0
+                && S_can_be_bound(param_list, return_type)
+               ) {
+                int saw_new = 0;
+                for (size_t j = 0; j < perl_class->num_cons; j++) {
+                    if (strcmp(perl_class->cons_aliases[j], "new") == 0) {
+                        saw_new = 1;
+                    }
+                }
+                if (!saw_new) {
+                    alias = NEW;
+                }
             }
         }
 
@@ -361,7 +373,7 @@ CFCPerlClass_constructor_bindings(CFCPerlClass *self) {
 
         // Create the binding, add it to the array.
         CFCPerlConstructor *cons_binding
-            = CFCPerlConstructor_new(client, alias, micro_sym);
+            = CFCPerlConstructor_new(klass, alias, micro_sym);
         size_t size = (num_bound + 2) * sizeof(CFCPerlConstructor*);
         bound = (CFCPerlConstructor**)REALLOCATE(bound, size);
         bound[num_bound] = cons_binding;

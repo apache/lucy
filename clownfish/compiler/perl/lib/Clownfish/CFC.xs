@@ -2296,10 +2296,11 @@ CODE:
 OUTPUT: RETVAL
 
 SV*
-constructor_bindings(self)
-    CFCPerlClass *self;
+constructor_bindings(unused, klass)
+    SV *unused;
+    CFCClass *klass;
 CODE:
-    CFCPerlConstructor **bound = CFCPerlClass_constructor_bindings(self);
+    CFCPerlConstructor **bound = CFCPerlClass_constructor_bindings(klass);
     RETVAL = S_array_of_cfcbase_to_av((CFCBase**)bound);
     FREEMEM(bound);
 OUTPUT: RETVAL

@@ -109,7 +109,7 @@ CFCPerlClass_method_bindings(struct CFCClass *klass);
  * representing all bound constructors.
  */
 struct CFCPerlConstructor**
-CFCPerlClass_constructor_bindings(CFCPerlClass *self);
+CFCPerlClass_constructor_bindings(struct CFCClass *klass);
 
 /** Auto-generate POD according to the spec supplied via set_pod_spec().  If
  * no spec was supplied, return NULL.
