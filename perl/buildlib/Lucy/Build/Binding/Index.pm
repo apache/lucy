@@ -24,49 +24,25 @@ sub bind_all {
     $class->bind_backgroundmerger;
     $class->bind_datareader;
     $class->bind_datawriter;
-    $class->bind_deletionsreader;
-    $class->bind_defaultdeletionsreader;
     $class->bind_deletionswriter;
-    $class->bind_defaultdeletionswriter;
     $class->bind_docreader;
-    $class->bind_defaultdocreader;
-    $class->bind_docvector;
-    $class->bind_docwriter;
-    $class->bind_filepurger;
-    $class->bind_highlightreader;
-    $class->bind_defaulthighlightreader;
-    $class->bind_highlightwriter;
     $class->bind_indexmanager;
     $class->bind_indexreader;
     $class->bind_indexer;
-    $class->bind_inverter;
     $class->bind_lexicon;
     $class->bind_lexiconreader;
-    $class->bind_defaultlexiconreader;
-    $class->bind_lexiconwriter;
-    $class->bind_polylexicon;
     $class->bind_polyreader;
-    $class->bind_posting;
-    $class->bind_matchposting;
-    $class->bind_richposting;
     $class->bind_scoreposting;
     $class->bind_postinglist;
     $class->bind_postinglistreader;
-    $class->bind_defaultpostinglistreader;
     $class->bind_postinglistwriter;
-    $class->bind_seglexicon;
-    $class->bind_segpostinglist;
     $class->bind_segreader;
     $class->bind_segwriter;
     $class->bind_segment;
     $class->bind_similarity;
     $class->bind_snapshot;
     $class->bind_sortcache;
-    $class->bind_sortreader;
-    $class->bind_defaultsortreader;
     $class->bind_sortwriter;
-    $class->bind_terminfo;
-    $class->bind_termvector;
 }
 
 sub bind_backgroundmerger {
@@ -175,22 +151,6 @@ END_CONSTRUCTOR
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
-sub bind_deletionsreader {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::DeletionsReader",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_defaultdeletionsreader {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::DefaultDeletionsReader",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
 sub bind_deletionswriter {
     my @exposed = qw(
         Delete_By_Term
@@ -220,14 +180,6 @@ END_SYNOPSIS
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
-sub bind_defaultdeletionswriter {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::DefaultDeletionsWriter",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
 sub bind_docreader {
     my @exposed = qw( Fetch_Doc Aggregator );
 
@@ -245,62 +197,6 @@ END_SYNOPSIS
     );
     $binding->set_pod_spec($pod_spec);
 
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_defaultdocreader {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::DefaultDocReader",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_docvector {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::DocVector",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_docwriter {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::DocWriter",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_filepurger {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::FilePurger",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_highlightreader {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::HighlightReader",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_defaulthighlightreader {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::DefaultHighlightReader",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_highlightwriter {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::HighlightWriter",
-    );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -622,14 +518,6 @@ END_XS_CODE
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
-sub bind_inverter {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::Inverter",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
 sub bind_lexicon {
     my @exposed = qw(
         Seek
@@ -678,30 +566,6 @@ END_SYNOPSIS
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
-sub bind_defaultlexiconreader {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::DefaultLexiconReader",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_lexiconwriter {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::LexiconWriter",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_polylexicon {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::PolyLexicon",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
 sub bind_polyreader {
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -737,30 +601,6 @@ END_XS_CODE
     $binding->append_xs($xs_code);
     $binding->set_pod_spec($pod_spec);
 
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_posting {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::Posting",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_matchposting {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::Posting::MatchPosting",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_richposting {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::Posting::RichPosting",
-    );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -856,14 +696,6 @@ END_SYNOPSIS
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
-sub bind_defaultpostinglistreader {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::DefaultPostingListReader",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
 sub bind_postinglistwriter {
     my $xs_code = <<'END_XS';
 MODULE = Lucy    PACKAGE = Lucy::Index::PostingListWriter
@@ -881,22 +713,6 @@ END_XS
     );
     $binding->append_xs($xs_code);
 
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_seglexicon {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::SegLexicon",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_segpostinglist {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::SegPostingList",
-    );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -1135,22 +951,6 @@ END_XS_CODE
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
-sub bind_sortreader {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::SortReader",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_defaultsortreader {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::DefaultSortReader",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
 sub bind_sortwriter {
     my $xs_code = <<'END_XS';
 MODULE = Lucy    PACKAGE = Lucy::Index::SortWriter
@@ -1168,22 +968,6 @@ END_XS
     );
     $binding->append_xs($xs_code);
 
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_terminfo {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::TermInfo",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_termvector {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Index::TermVector",
-    );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

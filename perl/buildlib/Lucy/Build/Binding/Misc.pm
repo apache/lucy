@@ -24,7 +24,6 @@ sub bind_all {
     $class->inherit_metadata($hierarchy);
     $class->bind_lucy;
     $class->bind_test;
-    $class->bind_testschema;
 }
 
 sub inherit_metadata {
@@ -204,14 +203,6 @@ END_XS_CODE
     );
     $binding->append_xs($xs_code);
 
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_testschema {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "TestLucy",
-        class_name => "Lucy::Test::TestSchema",
-    );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

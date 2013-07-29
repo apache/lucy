@@ -27,12 +27,9 @@ sub bind_all {
     $class->bind_folder;
     $class->bind_instream;
     $class->bind_lock;
-    $class->bind_lockfilelock;
-    $class->bind_sharedlock;
     $class->bind_lockerr;
     $class->bind_lockfactory;
     $class->bind_outstream;
-    $class->bind_ramfile;
     $class->bind_ramfilehandle;
     $class->bind_ramfolder;
 }
@@ -257,22 +254,6 @@ END_CONSTRUCTOR
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
-sub bind_lockfilelock {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Store::LockFileLock",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_sharedlock {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Store::SharedLock",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
 sub bind_lockerr {
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -380,14 +361,6 @@ END_XS_CODE
     $binding->bind_constructor( alias => 'open', initializer => 'do_open' );
     $binding->append_xs($xs_code);
 
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_ramfile {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Store::RAMFile",
-    );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 

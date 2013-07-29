@@ -25,10 +25,7 @@ sub bind_all {
     $class->bind_debug;
     $class->bind_freezer;
     $class->bind_indexfilenames;
-    $class->bind_memorypool;
-    $class->bind_priorityqueue;
     $class->bind_sortexternal;
-    $class->bind_stepper;
 }
 
 sub bind_bbsortex {
@@ -232,22 +229,6 @@ END_XS_CODE
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
-sub bind_memorypool {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Util::MemoryPool",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_priorityqueue {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Util::PriorityQueue",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
 sub bind_sortexternal {
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy    PACKAGE = Lucy::Util::SortExternal
@@ -264,15 +245,6 @@ END_XS_CODE
         class_name => "Lucy::Util::SortExternal",
     );
     $binding->append_xs($xs_code);
-
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_stepper {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Util::Stepper",
-    );
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }

@@ -27,13 +27,11 @@ sub bind_all {
     $class->bind_charbuf;
     $class->bind_err;
     $class->bind_hash;
-    $class->bind_lockfreeregistry;
     $class->bind_float32;
     $class->bind_float64;
     $class->bind_obj;
     $class->bind_varray;
     $class->bind_vtable;
-    $class->bind_method;
     $class->bind_stringhelper;
 }
 
@@ -313,14 +311,6 @@ END_XS_CODE
     $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);
 
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_lockfreeregistry {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Clownfish",
-        class_name => "Clownfish::LockFreeRegistry",
-    );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
@@ -654,14 +644,6 @@ END_XS_CODE
     $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);
 
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_method {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Clownfish",
-        class_name => "Clownfish::Method",
-    );
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
