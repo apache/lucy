@@ -24,6 +24,7 @@
 #include "CFCFile.h"
 #include "CFCClass.h"
 #include "CFCCBlock.h"
+#include "CFCParcel.h"
 #include "CFCUtil.h"
 
 void
@@ -62,7 +63,10 @@ CFCBindFile_write_h(CFCFile *file, const char *dest, const char *header,
         const char *cfc_class = CFCBase_get_cfc_class(blocks[i]);
 
         if (strcmp(cfc_class, "Clownfish::CFC::Model::Parcel") == 0) {
-            ;
+            CFCParcel *parcel = (CFCParcel*)blocks[i];
+            const char *prefix = CFCParcel_get_prefix(parcel);
+            content = CFCUtil_cat(content, "#include \"", prefix,
+                                  "parcel.h\"\n\n", NULL);
         }
         else if (strcmp(cfc_class, "Clownfish::CFC::Model::Class") == 0) {
             CFCBindClass *class_binding

@@ -116,14 +116,11 @@ CFCBindClass_to_c_header(CFCBindClass *self) {
 
 static char*
 S_to_c_header_inert(CFCBindClass *self) {
-    const char *prefix    = CFCClass_get_prefix(self->client);
     char *inert_func_decs = S_sub_declarations(self);
     char *inert_var_defs  = S_inert_var_declarations(self);
     char *short_names     = S_short_names(self);
 
     char pattern[] =
-        "#include \"%sparcel.h\"\n"
-        "\n"
         "/* Declare this class's inert variables.\n"
         " */\n"
         "\n"
@@ -139,8 +136,8 @@ S_to_c_header_inert(CFCBindClass *self) {
         "\n"
         "%s\n"
         "\n";
-    char *content = CFCUtil_sprintf(pattern, prefix, inert_var_defs,
-                                    inert_func_decs, short_names);
+    char *content = CFCUtil_sprintf(pattern, inert_var_defs, inert_func_decs,
+                                    short_names);
 
     FREEMEM(inert_var_defs);
     FREEMEM(inert_func_decs);
@@ -187,7 +184,6 @@ static char*
 S_to_c_header_dynamic(CFCBindClass *self) {
     const char *privacy_symbol  = CFCClass_privacy_symbol(self->client);
     const char *vt_var          = CFCClass_full_vtable_var(self->client);
-    const char *prefix          = CFCClass_get_prefix(self->client);
     const char *PREFIX          = CFCClass_get_PREFIX(self->client);
     char *ivars                 = S_ivars_func(self);
     char *struct_def            = S_struct_definition(self);
@@ -199,8 +195,6 @@ S_to_c_header_dynamic(CFCBindClass *self) {
     char *short_names           = S_short_names(self);
 
     char pattern[] =
-        "#include \"%sparcel.h\"\n"
-        "\n"
         "/* Include the header for this class's parent. \n"
         " */\n"
         "\n"
@@ -247,8 +241,8 @@ S_to_c_header_dynamic(CFCBindClass *self) {
         "%s\n"
         "\n";
     char *content
-        = CFCUtil_sprintf(pattern, prefix, parent_include, privacy_symbol,
-                          ivars, struct_def, privacy_symbol, inert_var_defs,
+        = CFCUtil_sprintf(pattern, parent_include, privacy_symbol, ivars,
+                          struct_def, privacy_symbol, inert_var_defs,
                           sub_declarations, method_typedefs, method_defs,
                           PREFIX, vt_var, short_names);
 
