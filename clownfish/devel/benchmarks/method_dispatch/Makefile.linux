@@ -1,0 +1,16 @@
+CFLAGS = -std=gnu99 -Wextra -O2 -fomit-frame-pointer
+
+all : bench
+
+dso.so : dso.c dso.h oo.h
+	gcc $(CFLAGS) -shared -fPIC dso.c -o $@
+
+exe : exe.c dso.h oo.h dso.so
+	gcc $(CFLAGS) -fPIE exe.c dso.so -o $@
+
+bench : exe
+	LD_LIBRARY_PATH=. ./exe
+
+clean :
+	rm -f dso.so exe
+

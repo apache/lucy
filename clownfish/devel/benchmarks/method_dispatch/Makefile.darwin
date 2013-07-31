@@ -1,0 +1,16 @@
+CFLAGS = -std=gnu99 -Wextra -O2 -fomit-frame-pointer -DHAS_ALIAS
+
+all : bench
+
+dso.dylib : dso.c dso.h oo.h
+		gcc $(CFLAGS) -Wl,-alias,_thunk3,_Obj_Hello_THUNK -shared dso.c -o $@
+
+exe : exe.c dso.h oo.h dso.dylib
+		gcc $(CFLAGS) exe.c dso.dylib -o $@
+
+bench : exe
+		./exe
+
+clean :
+		rm -f dso.dylib exe
+
