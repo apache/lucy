@@ -29,7 +29,12 @@ BEGIN {
     our @EXPORT_OK = qw(
         STORABLE_freeze
         STORABLE_thaw
+        load
         );
+}
+
+sub load {
+    return $_[0]->_load( to_clownfish( $_[1] ) );
 }
 
 # On most UNIX variants, this flag makes DynaLoader pass RTLD_GLOBAL to
@@ -65,6 +70,13 @@ BEGIN {
 }
 
 {
+    package Lucy::Analysis::Analyzer;
+    our $VERSION = '0.003000';
+    $VERSION = eval $VERSION;
+    use Lucy qw( load );
+}
+
+{
     package Lucy::Analysis::RegexTokenizer;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
@@ -84,7 +96,7 @@ BEGIN {
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     use Storable ();  # Needed by serialize/deserialize.
-    use Lucy qw( STORABLE_freeze STORABLE_thaw );
+    use Lucy qw( STORABLE_freeze STORABLE_thaw load );
 
     use overload
         fallback => 1,
@@ -166,7 +178,7 @@ BEGIN {
     package Lucy::Index::Similarity;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
-    use Lucy qw( STORABLE_freeze STORABLE_thaw );
+    use Lucy qw( STORABLE_freeze STORABLE_thaw load );
 }
 
 {
@@ -196,6 +208,20 @@ BEGIN {
 }
 
 {
+    package Lucy::Plan::FieldType;
+    our $VERSION = '0.003000';
+    $VERSION = eval $VERSION;
+    use Lucy qw( load );
+}
+
+{
+    package Lucy::Plan::Schema;
+    our $VERSION = '0.003000';
+    $VERSION = eval $VERSION;
+    use Lucy qw( load );
+}
+
+{
     package Lucy::Search::MatchDoc;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
@@ -206,7 +232,7 @@ BEGIN {
     package Lucy::Search::Query;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
-    use Lucy qw( STORABLE_freeze STORABLE_thaw );
+    use Lucy qw( STORABLE_freeze STORABLE_thaw load );
 
     sub make_compiler {
         my ( $self, %args ) = @_;

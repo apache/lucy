@@ -870,6 +870,10 @@ END_XS_CODE
         parcel     => "Lucy",
         class_name => "Lucy::Index::Similarity",
     );
+    $binding->bind_method(
+        alias  => '_load',
+        method => 'Load',
+    );
     $binding->exclude_method($_) for @hand_rolled;
     $binding->append_xs($xs_code);
     $binding->set_pod_spec($pod_spec);

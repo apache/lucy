@@ -87,11 +87,6 @@ Obj_to_bool(Obj *self) {
     return !!Obj_To_I64(self);
 }
 
-Obj*
-Obj_dump(Obj *self) {
-    return (Obj*)Obj_To_String(self);
-}
-
 VTable*
 Obj_get_vtable(Obj *self) {
     return self->vtable;

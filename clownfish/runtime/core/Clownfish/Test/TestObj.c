@@ -76,18 +76,6 @@ test_To_String(TestBatchRunner *runner) {
 }
 
 static void
-test_Dump(TestBatchRunner *runner) {
-    Obj *testobj = S_new_testobj();
-    CharBuf *string = Obj_To_String(testobj);
-    Obj *dump = Obj_Dump(testobj);
-    TEST_TRUE(runner, Obj_Equals(dump, (Obj*)string),
-              "Default Dump returns To_String");
-    DECREF(dump);
-    DECREF(string);
-    DECREF(testobj);
-}
-
-static void
 test_Equals(TestBatchRunner *runner) {
     Obj *testobj = S_new_testobj();
     Obj *other   = S_new_testobj();
@@ -157,11 +145,6 @@ S_attempt_To_F64(void *context) {
 }
 
 static void
-S_attempt_Load(void *context) {
-    Obj_Load((Obj*)context, (Obj*)context);
-}
-
-static void
 S_attempt_Mimic(void *context) {
     Obj_Mimic((Obj*)context, (Obj*)context);
 }
@@ -190,17 +173,15 @@ test_abstract_routines(TestBatchRunner *runner) {
     S_verify_abstract_error(runner, S_attempt_Compare_To, obj, "Compare_To");
     S_verify_abstract_error(runner, S_attempt_To_I64,     obj, "To_I64");
     S_verify_abstract_error(runner, S_attempt_To_F64,     obj, "To_F64");
-    S_verify_abstract_error(runner, S_attempt_Load,       obj, "Load");
     S_verify_abstract_error(runner, S_attempt_Mimic,      obj, "Mimic");
     DECREF(obj);
 }
 
 void
 TestObj_run(TestObj *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 20);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 18);
     test_refcounts(runner);
     test_To_String(runner);
-    test_Dump(runner);
     test_Equals(runner);
     test_Hash_Sum(runner);
     test_Is_A(runner);

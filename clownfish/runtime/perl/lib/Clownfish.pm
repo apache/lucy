@@ -86,7 +86,6 @@ sub error {$Clownfish::Err::error}
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     use Clownfish qw( to_clownfish to_perl );
-    sub load { return $_[0]->_load( to_clownfish( $_[1] ) ) }
 }
 
 {

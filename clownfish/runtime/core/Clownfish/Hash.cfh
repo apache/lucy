@@ -133,12 +133,6 @@ class Clownfish::Hash inherits Clownfish::Obj {
     public bool
     Equals(Hash *self, Obj *other);
 
-    public incremented Hash*
-    Dump(Hash *self);
-
-    public incremented Obj*
-    Load(Hash *self, Obj *dump);
-
     public void
     Destroy(Hash *self);
 }

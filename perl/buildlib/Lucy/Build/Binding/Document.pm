@@ -106,6 +106,10 @@ END_XS_CODE
         class_name => "Lucy::Document::Doc",
     );
     $binding->append_xs($xs_code);
+    $binding->bind_method(
+        alias  => '_load',
+        method => 'Load',
+    );
     $binding->exclude_method($_) for @hand_rolled;
     $binding->exclude_constructor;
     $binding->set_pod_spec($pod_spec);

@@ -445,13 +445,6 @@ CB_clone(CharBuf *self) {
     return CB_new_from_trusted_utf8(self->ptr, self->size);
 }
 
-CharBuf*
-CB_load(CharBuf *self, Obj *dump) {
-    CharBuf *source = (CharBuf*)CERTIFY(dump, CHARBUF);
-    UNUSED_VAR(self);
-    return CB_Clone(source);
-}
-
 void
 CB_mimic_str(CharBuf *self, const char* ptr, size_t size) {
     if (!StrHelp_utf8_valid(ptr, size)) {

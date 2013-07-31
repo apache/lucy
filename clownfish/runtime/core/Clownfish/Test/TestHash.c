@@ -183,38 +183,6 @@ test_Keys_Values_Iter(TestBatchRunner *runner) {
 }
 
 static void
-test_Dump_and_Load(TestBatchRunner *runner) {
-    Hash *hash = Hash_new(0);
-    Obj  *dump;
-    Hash *loaded;
-
-    Hash_Store_Str(hash, "foo", 3,
-                   (Obj*)CB_new_from_trusted_utf8("foo", 3));
-    dump = (Obj*)Hash_Dump(hash);
-    loaded = (Hash*)Obj_Load(dump, dump);
-    TEST_TRUE(runner, Hash_Equals(hash, (Obj*)loaded),
-              "Dump => Load round trip");
-    DECREF(dump);
-    DECREF(loaded);
-
-    /* TODO: Fix Hash_Load().
-
-    Hash_Store_Str(hash, "_class", 6,
-        (Obj*)CB_new_from_trusted_utf8("not_a_class", 11));
-    dump = (Obj*)Hash_Dump(hash);
-    loaded = (Hash*)Obj_Load(dump, dump);
-
-    TEST_TRUE(runner, Hash_Equals(hash, (Obj*)loaded),
-              "Load still works with _class if it's not a real class");
-    DECREF(dump);
-    DECREF(loaded);
-
-    */
-
-    DECREF(hash);
-}
-
-static void
 test_stress(TestBatchRunner *runner) {
     Hash     *hash     = Hash_new(0); // trigger multiple rebuilds.
     VArray   *expected = VA_new(1000);
@@ -254,12 +222,11 @@ test_stress(TestBatchRunner *runner) {
 
 void
 TestHash_run(TestHash *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 28);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 27);
     srand((unsigned int)time((time_t*)NULL));
     test_Equals(runner);
     test_Store_and_Fetch(runner);
     test_Keys_Values_Iter(runner);
-    test_Dump_and_Load(runner);
     test_stress(runner);
 }
 

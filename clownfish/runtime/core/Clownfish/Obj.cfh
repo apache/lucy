@@ -152,21 +152,6 @@ public class Clownfish::Obj {
     public bool
     To_Bool(Obj *self);
 
-    /** Return a representation of the object using only scalars, hashes, and
-     * arrays.  Some implementations support JSON serialization via Dump() and
-     * its companion method, Load(); for others, Dump() is only a debugging
-     * aid.  The default simply calls To_String().
-     */
-    public incremented Obj*
-    Dump(Obj *self);
-
-    /** Create an object from the output of a call to Dump().
-     *
-     * @param dump The output of Dump().
-     */
-    public abstract incremented Obj*
-    Load(Obj *self, Obj *dump);
-
     /** Update the internal state of the object to mimic that of
      * <code>other</code>.
      */

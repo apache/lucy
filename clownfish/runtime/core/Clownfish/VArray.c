@@ -62,32 +62,6 @@ VA_destroy(VArray *self) {
 }
 
 VArray*
-VA_dump(VArray *self) {
-    VArray *dump = VA_new(self->size);
-    for (uint32_t i = 0, max = self->size; i < max; i++) {
-        Obj *elem = VA_Fetch(self, i);
-        if (elem) { VA_Store(dump, i, Obj_Dump(elem)); }
-    }
-    return dump;
-}
-
-VArray*
-VA_load(VArray *self, Obj *dump) {
-    VArray *source = (VArray*)CERTIFY(dump, VARRAY);
-    VArray *loaded = VA_new(source->size);
-    UNUSED_VAR(self);
-
-    for (uint32_t i = 0, max = source->size; i < max; i++) {
-        Obj *elem_dump = VA_Fetch(source, i);
-        if (elem_dump) {
-            VA_Store(loaded, i, Obj_Load(elem_dump, elem_dump));
-        }
-    }
-
-    return loaded;
-}
-
-VArray*
 VA_clone(VArray *self) {
     VArray *twin = VA_new(self->size);
 

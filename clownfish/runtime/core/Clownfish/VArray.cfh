@@ -162,12 +162,6 @@ class Clownfish::VArray cnick VA inherits Clownfish::Obj {
     public bool
     Equals(VArray *self, Obj *other);
 
-    public incremented VArray*
-    Dump(VArray *self);
-
-    public incremented VArray*
-    Load(VArray *self, Obj *dump);
-
     public void
     Destroy(VArray *self);
 }

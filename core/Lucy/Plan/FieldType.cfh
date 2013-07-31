@@ -159,6 +159,12 @@ public abstract class Lucy::Plan::FieldType cnick FType
     abstract incremented Hash*
     Dump_For_Schema(FieldType *self);
 
+    public abstract incremented Obj*
+    Dump(FieldType *self);
+
+    public abstract incremented Obj*
+    Load(FieldType *self, Obj *dump);
+
     /** Compares all common properties.
      */
     public bool

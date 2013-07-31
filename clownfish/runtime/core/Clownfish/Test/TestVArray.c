@@ -35,11 +35,6 @@ TestVArray_new() {
     return (TestVArray*)VTable_Make_Obj(TESTVARRAY);
 }
 
-static CharBuf*
-S_new_cb(const char *text) {
-    return CB_new_from_utf8(text, strlen(text));
-}
-
 static void
 test_Equals(TestBatchRunner *runner) {
     VArray *array = VA_new(0);
@@ -298,26 +293,9 @@ test_Clone_and_Shallow_Copy(TestBatchRunner *runner) {
     DECREF(twin);
 }
 
-static void
-test_Dump_and_Load(TestBatchRunner *runner) {
-    VArray *array = VA_new(0);
-    Obj    *dump;
-    VArray *loaded;
-
-    VA_Push(array, (Obj*)S_new_cb("foo"));
-    dump = (Obj*)VA_Dump(array);
-    loaded = (VArray*)Obj_Load(dump, dump);
-    TEST_TRUE(runner, VA_Equals(array, (Obj*)loaded),
-              "Dump => Load round trip");
-
-    DECREF(array);
-    DECREF(dump);
-    DECREF(loaded);
-}
-
 void
 TestVArray_run(TestVArray *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 44);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 43);
     test_Equals(runner);
     test_Store_Fetch(runner);
     test_Push_Pop_Shift_Unshift(runner);
@@ -327,7 +305,6 @@ TestVArray_run(TestVArray *self, TestBatchRunner *runner) {
     test_Push_VArray(runner);
     test_Slice(runner);
     test_Clone_and_Shallow_Copy(runner);
-    test_Dump_and_Load(runner);
 }
 
 
