@@ -169,30 +169,12 @@ CFCSymbol_init(CFCSymbol *self, struct CFCParcel *parcel,
     self->class_cnick = CFCUtil_strdup(real_cnick);
     self->micro_sym   = CFCUtil_strdup(micro_sym);
 
-    // Derive short_sym.
-    size_t class_cnick_len = self->class_cnick
-                             ? strlen(self->class_cnick)
-                             : 0;
-    size_t short_sym_len = class_cnick_len
-                           + strlen("_")
-                           + strlen(self->micro_sym);
-    self->short_sym = (char*)MALLOCATE(short_sym_len + 1);
-    if (self->class_cnick) {
-        memcpy((void*)self->short_sym, self->class_cnick, class_cnick_len);
-    }
-    self->short_sym[class_cnick_len] = '_';
-    memcpy(&self->short_sym[class_cnick_len + 1],
-           self->micro_sym, strlen(micro_sym));
-    self->short_sym[short_sym_len] = '\0';
-
-    // Derive full_sym;
-    const char *prefix       = CFCParcel_get_prefix(self->parcel);
-    size_t      prefix_len   = strlen(prefix);
-    size_t      full_sym_len = prefix_len + short_sym_len;
-    self->full_sym = (char*)MALLOCATE(full_sym_len + 1);
-    memcpy(self->full_sym, prefix, prefix_len);
-    memcpy(&self->full_sym[prefix_len], self->short_sym, short_sym_len);
-    self->full_sym[full_sym_len] = '\0';
+    // Derive short_sym and full_sym.
+    char *cnick = self->class_cnick ? self->class_cnick : "";
+    self->short_sym = CFCUtil_sprintf("%s_%s", cnick, micro_sym);
+    self->full_sym
+        = CFCUtil_sprintf("%s%s", CFCParcel_get_prefix(self->parcel),
+                          self->short_sym);
 
     return self;
 }
