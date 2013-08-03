@@ -14,7 +14,7 @@
 # limitations under the License.
 
 # Ignore the .git directory.
-.git/*
+.git/**
 
 # CHANGES and MANIFEST files do not require license headers.
 CHANGES
