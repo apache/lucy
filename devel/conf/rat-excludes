@@ -68,6 +68,7 @@ modules/unicode/utf8proc/tests.json
 # and utf8proc.c.
 modules/unicode/utf8proc/utf8proc.h
 modules/unicode/utf8proc/utf8proc.c
+modules/unicode/utf8proc/utf8proc_data.h
 
 # The text of the US constitution is in the public domain.
 perl/sample/us_constitution/*.txt
