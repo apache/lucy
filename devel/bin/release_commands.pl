@@ -156,11 +156,16 @@ say qq|# people.apache.org and run the commands from there.|;
 say qq|ssh $apache_id\@people.apache.org|;
 say qq|svnmucc -m "Publish Apache Lucy $x_y_z_version" |
     . qq|-U https://dist.apache.org/repos/dist/ |
-    . qq|mv dev/lucy/apache-lucy-$full_rc_version/apache-lucy-$x_y_z_version.tar.gz release/lucy/ |
-    . qq|mv dev/lucy/apache-lucy-$full_rc_version/apache-lucy-$x_y_z_version.tar.gz.md5 release/lucy/ |
-    . qq|mv dev/lucy/apache-lucy-$full_rc_version/apache-lucy-$x_y_z_version.tar.gz.sha release/lucy/ |
-    . qq|mv dev/lucy/apache-lucy-$full_rc_version/apache-lucy-$x_y_z_version.tar.gz.asc release/lucy/ |
-    . qq|mv dev/lucy/apache-lucy-$full_rc_version/CHANGES-$x_y_z_version.txt release/lucy/ |
+    . qq|mv dev/lucy/apache-lucy-$full_rc_version/apache-lucy-$x_y_z_version.tar.gz |
+    . qq|release/lucy/apache-lucy-$x_y_z_version.tar.gz |
+    . qq|mv dev/lucy/apache-lucy-$full_rc_version/apache-lucy-$x_y_z_version.tar.gz.md5 |
+    . qq|release/lucy/apache-lucy-$x_y_z_version.tar.gz.md5 |
+    . qq|mv dev/lucy/apache-lucy-$full_rc_version/apache-lucy-$x_y_z_version.tar.gz.sha |
+    . qq|release/lucy/apache-lucy-$x_y_z_version.tar.gz.sha |
+    . qq|mv dev/lucy/apache-lucy-$full_rc_version/apache-lucy-$x_y_z_version.tar.gz.asc |
+    . qq|release/lucy/apache-lucy-$x_y_z_version.tar.gz.asc |
+    . qq|mv dev/lucy/apache-lucy-$full_rc_version/CHANGES-$x_y_z_version.txt |
+    . qq|release/lucy/CHANGES-$x_y_z_version.txt |
     . qq|rm dev/lucy/apache-lucy-$full_rc_version\n|;
 
 say qq|# Carefully remove the artifacts for any previous releases superseded|;
