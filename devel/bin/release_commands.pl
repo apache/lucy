@@ -146,8 +146,15 @@ say qq|###############################################################|;
 say qq|# After the vote has passed...|;
 say qq|###############################################################\n|;
 
-say qq|# Tag the release.|;
-say qq|git tag apache-lucy-$x_y_z_version apache-lucy-$full_rc_version\n|;
+say qq|# Tag the release and delete the RC tags.|;
+say qq|git tag apache-lucy-$x_y_z_version apache-lucy-$full_rc_version|;
+say qq|git push origin apache-lucy-$x_y_z_version|;
+for ( 1 .. $rc ) {
+    my $rc_tag = qq|apache-lucy-$major.$minor.$micro-rc$_|;
+    say qq|git tag -d $rc_tag|;
+    say qq|git push origin :$rc_tag|;
+}
+say "";
 
 say qq|# Copy release artifacts to the production dist directory and|;
 say qq|# remove the RC dir.  The "svnmucc" app, which ships with Subversion|;
