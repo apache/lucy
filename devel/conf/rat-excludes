@@ -93,6 +93,7 @@ clownfish/.gitignore
 clownfish/compiler/.gitignore
 clownfish/compiler/c/.gitignore
 clownfish/compiler/perl/.gitignore
+clownfish/devel/benchmarks/method_dispatch/.gitignore
 clownfish/runtime/c/.gitignore
 clownfish/runtime/perl/.gitignore
 core/Lucy/Util/Json/.gitignore
