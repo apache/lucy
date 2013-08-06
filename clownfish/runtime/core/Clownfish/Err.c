@@ -44,24 +44,24 @@ Err_init(Err *self, CharBuf *mess) {
 }
 
 void
-Err_destroy(Err *self) {
+Err_Destroy_IMP(Err *self) {
     DECREF(self->mess);
     SUPER_DESTROY(self, ERR);
 }
 
 Err*
-Err_make(Err *self) {
+Err_Make_IMP(Err *self) {
     UNUSED_VAR(self);
     return Err_new(CB_new(0));
 }
 
 CharBuf*
-Err_to_string(Err *self) {
+Err_To_String_IMP(Err *self) {
     return (CharBuf*)INCREF(self->mess);
 }
 
 void
-Err_cat_mess(Err *self, const CharBuf *mess) {
+Err_Cat_Mess_IMP(Err *self, const CharBuf *mess) {
     CB_Cat(self->mess, mess);
 }
 
@@ -146,12 +146,12 @@ Err_warn_at(const char *file, int line, const char *func,
 }
 
 CharBuf*
-Err_get_mess(Err *self) {
+Err_Get_Mess_IMP(Err *self) {
     return self->mess;
 }
 
 void
-Err_add_frame(Err *self, const char *file, int line, const char *func) {
+Err_Add_Frame_IMP(Err *self, const char *file, int line, const char *func) {
     if (CB_Ends_With_Str(self->mess, "\n", 1)) { CB_Chop(self->mess, 1); }
 
     if (func != NULL) {

@@ -128,13 +128,13 @@ CB_newf(const char *pattern, ...) {
 }
 
 void
-CB_destroy(CharBuf *self) {
+CB_Destroy_IMP(CharBuf *self) {
     FREEMEM(self->ptr);
     SUPER_DESTROY(self, CHARBUF);
 }
 
 int32_t
-CB_hash_sum(CharBuf *self) {
+CB_Hash_Sum_IMP(CharBuf *self) {
     uint32_t hashvalue = 5381;
     ZombieCharBuf *iterator = ZCB_WRAP(self);
 
@@ -155,7 +155,7 @@ S_grow(CharBuf *self, size_t size) {
 }
 
 char*
-CB_grow(CharBuf *self, size_t size) {
+CB_Grow_IMP(CharBuf *self, size_t size) {
     if (size >= self->cap) {
         self->cap = size + 1;
         self->ptr = (char*)REALLOCATE(self->ptr, self->cap);
@@ -200,7 +200,7 @@ CB_catf(CharBuf *self, const char *pattern, ...) {
 }
 
 void
-CB_vcatf(CharBuf *self, const char *pattern, va_list args) {
+CB_VCatF_IMP(CharBuf *self, const char *pattern, va_list args) {
     size_t      pattern_len   = strlen(pattern);
     const char *pattern_start = pattern;
     const char *pattern_end   = pattern + pattern_len;
@@ -337,12 +337,12 @@ CB_vcatf(CharBuf *self, const char *pattern, va_list args) {
 }
 
 CharBuf*
-CB_to_string(CharBuf *self) {
+CB_To_String_IMP(CharBuf *self) {
     return CB_new_from_trusted_utf8(self->ptr, self->size);
 }
 
 void
-CB_cat_char(CharBuf *self, uint32_t code_point) {
+CB_Cat_Char_IMP(CharBuf *self, uint32_t code_point) {
     const size_t MAX_UTF8_BYTES = 4;
     if (self->size + MAX_UTF8_BYTES >= self->cap) {
         S_grow(self, Memory_oversize(self->size + MAX_UTF8_BYTES,
@@ -355,7 +355,7 @@ CB_cat_char(CharBuf *self, uint32_t code_point) {
 }
 
 int32_t
-CB_swap_chars(CharBuf *self, uint32_t match, uint32_t replacement) {
+CB_Swap_Chars_IMP(CharBuf *self, uint32_t match, uint32_t replacement) {
     int32_t num_swapped = 0;
 
     if (match > 127) {
@@ -379,12 +379,12 @@ CB_swap_chars(CharBuf *self, uint32_t match, uint32_t replacement) {
 }
 
 int64_t
-CB_to_i64(CharBuf *self) {
+CB_To_I64_IMP(CharBuf *self) {
     return CB_BaseX_To_I64(self, 10);
 }
 
 int64_t
-CB_basex_to_i64(CharBuf *self, uint32_t base) {
+CB_BaseX_To_I64_IMP(CharBuf *self, uint32_t base) {
     ZombieCharBuf *iterator = ZCB_WRAP(self);
     int64_t retval = 0;
     bool is_negative = false;
@@ -427,7 +427,7 @@ S_safe_to_f64(CharBuf *self) {
 }
 
 double
-CB_to_f64(CharBuf *self) {
+CB_To_F64_IMP(CharBuf *self) {
     char   *end;
     double  value    = strtod(self->ptr, &end);
     size_t  consumed = end - self->ptr;
@@ -438,17 +438,17 @@ CB_to_f64(CharBuf *self) {
 }
 
 CharBuf*
-CB_to_cb8(CharBuf *self) {
+CB_To_CB8_IMP(CharBuf *self) {
     return CB_new_from_trusted_utf8(self->ptr, self->size);
 }
 
 CharBuf*
-CB_clone(CharBuf *self) {
+CB_Clone_IMP(CharBuf *self) {
     return CB_new_from_trusted_utf8(self->ptr, self->size);
 }
 
 void
-CB_mimic_str(CharBuf *self, const char* ptr, size_t size) {
+CB_Mimic_Str_IMP(CharBuf *self, const char* ptr, size_t size) {
     if (!StrHelp_utf8_valid(ptr, size)) {
         DIE_INVALID_UTF8(ptr, size);
     }
@@ -459,7 +459,7 @@ CB_mimic_str(CharBuf *self, const char* ptr, size_t size) {
 }
 
 void
-CB_mimic(CharBuf *self, Obj *other) {
+CB_Mimic_IMP(CharBuf *self, Obj *other) {
     CharBuf *twin = (CharBuf*)CERTIFY(other, CHARBUF);
     if (twin->size >= self->cap) { S_grow(self, twin->size); }
     memmove(self->ptr, twin->ptr, twin->size);
@@ -468,7 +468,7 @@ CB_mimic(CharBuf *self, Obj *other) {
 }
 
 void
-CB_cat_str(CharBuf *self, const char* ptr, size_t size) {
+CB_Cat_Str_IMP(CharBuf *self, const char* ptr, size_t size) {
     if (!StrHelp_utf8_valid(ptr, size)) {
         DIE_INVALID_UTF8(ptr, size);
     }
@@ -476,7 +476,7 @@ CB_cat_str(CharBuf *self, const char* ptr, size_t size) {
 }
 
 void
-CB_cat_trusted_str(CharBuf *self, const char* ptr, size_t size) {
+CB_Cat_Trusted_Str_IMP(CharBuf *self, const char* ptr, size_t size) {
     const size_t new_size = self->size + size;
     if (new_size >= self->cap) {
         size_t amount = Memory_oversize(new_size, sizeof(char));
@@ -488,7 +488,7 @@ CB_cat_trusted_str(CharBuf *self, const char* ptr, size_t size) {
 }
 
 void
-CB_cat(CharBuf *self, const CharBuf *other) {
+CB_Cat_IMP(CharBuf *self, const CharBuf *other) {
     const size_t new_size = self->size + other->size;
     if (new_size >= self->cap) {
         size_t amount = Memory_oversize(new_size, sizeof(char));
@@ -500,12 +500,12 @@ CB_cat(CharBuf *self, const CharBuf *other) {
 }
 
 bool
-CB_starts_with(CharBuf *self, const CharBuf *prefix) {
+CB_Starts_With_IMP(CharBuf *self, const CharBuf *prefix) {
     return CB_starts_with_str(self, prefix->ptr, prefix->size);
 }
 
 bool
-CB_starts_with_str(CharBuf *self, const char *prefix, size_t size) {
+CB_Starts_With_Str_IMP(CharBuf *self, const char *prefix, size_t size) {
     if (size <= self->size
         && (memcmp(self->ptr, prefix, size) == 0)
        ) {
@@ -517,7 +517,7 @@ CB_starts_with_str(CharBuf *self, const char *prefix, size_t size) {
 }
 
 bool
-CB_equals(CharBuf *self, Obj *other) {
+CB_Equals_IMP(CharBuf *self, Obj *other) {
     CharBuf *const twin = (CharBuf*)other;
     if (twin == self)              { return true; }
     if (!Obj_Is_A(other, CHARBUF)) { return false; }
@@ -525,13 +525,13 @@ CB_equals(CharBuf *self, Obj *other) {
 }
 
 int32_t
-CB_compare_to(CharBuf *self, Obj *other) {
+CB_Compare_To_IMP(CharBuf *self, Obj *other) {
     CERTIFY(other, CHARBUF);
     return CB_compare(&self, &other);
 }
 
 bool
-CB_equals_str(CharBuf *self, const char *ptr, size_t size) {
+CB_Equals_Str_IMP(CharBuf *self, const char *ptr, size_t size) {
     if (self->size != size) {
         return false;
     }
@@ -539,12 +539,12 @@ CB_equals_str(CharBuf *self, const char *ptr, size_t size) {
 }
 
 bool
-CB_ends_with(CharBuf *self, const CharBuf *postfix) {
+CB_Ends_With_IMP(CharBuf *self, const CharBuf *postfix) {
     return CB_ends_with_str(self, postfix->ptr, postfix->size);
 }
 
 bool
-CB_ends_with_str(CharBuf *self, const char *postfix, size_t postfix_len) {
+CB_Ends_With_Str_IMP(CharBuf *self, const char *postfix, size_t postfix_len) {
     if (postfix_len <= self->size) {
         char *start = self->ptr + self->size - postfix_len;
         if (memcmp(start, postfix, postfix_len) == 0) {
@@ -556,12 +556,12 @@ CB_ends_with_str(CharBuf *self, const char *postfix, size_t postfix_len) {
 }
 
 int64_t
-CB_find(CharBuf *self, const CharBuf *substring) {
+CB_Find_IMP(CharBuf *self, const CharBuf *substring) {
     return CB_Find_Str(self, substring->ptr, substring->size);
 }
 
 int64_t
-CB_find_str(CharBuf *self, const char *ptr, size_t size) {
+CB_Find_Str_IMP(CharBuf *self, const char *ptr, size_t size) {
     ZombieCharBuf *iterator = ZCB_WRAP(self);
     int64_t location = 0;
 
@@ -577,12 +577,12 @@ CB_find_str(CharBuf *self, const char *ptr, size_t size) {
 }
 
 uint32_t
-CB_trim(CharBuf *self) {
+CB_Trim_IMP(CharBuf *self) {
     return CB_Trim_Top(self) + CB_Trim_Tail(self);
 }
 
 uint32_t
-CB_trim_top(CharBuf *self) {
+CB_Trim_Top_IMP(CharBuf *self) {
     char     *ptr   = self->ptr;
     char     *end   = ptr + self->size;
     uint32_t  count = 0;
@@ -607,7 +607,7 @@ CB_trim_top(CharBuf *self) {
 }
 
 uint32_t
-CB_trim_tail(CharBuf *self) {
+CB_Trim_Tail_IMP(CharBuf *self) {
     uint32_t      count    = 0;
     char *const   top      = self->ptr;
     const char   *ptr      = top + self->size;
@@ -625,7 +625,7 @@ CB_trim_tail(CharBuf *self) {
 }
 
 size_t
-CB_nip(CharBuf *self, size_t count) {
+CB_Nip_IMP(CharBuf *self, size_t count) {
     size_t       num_nipped = 0;
     char        *ptr        = self->ptr;
     char *const  end        = ptr + self->size;
@@ -641,7 +641,7 @@ CB_nip(CharBuf *self, size_t count) {
 }
 
 int32_t
-CB_nip_one(CharBuf *self) {
+CB_Nip_One_IMP(CharBuf *self) {
     if (self->size == 0) {
         return 0;
     }
@@ -659,7 +659,7 @@ CB_nip_one(CharBuf *self) {
 }
 
 size_t
-CB_chop(CharBuf *self, size_t count) {
+CB_Chop_IMP(CharBuf *self, size_t count) {
     size_t      num_chopped = 0;
     char       *top         = self->ptr;
     const char *ptr         = top + self->size;
@@ -672,7 +672,7 @@ CB_chop(CharBuf *self, size_t count) {
 }
 
 size_t
-CB_length(CharBuf *self) {
+CB_Length_IMP(CharBuf *self) {
     size_t  len  = 0;
     char   *ptr  = self->ptr;
     char   *end  = ptr + self->size;
@@ -687,7 +687,7 @@ CB_length(CharBuf *self) {
 }
 
 size_t
-CB_truncate(CharBuf *self, size_t count) {
+CB_Truncate_IMP(CharBuf *self, size_t count) {
     uint32_t num_code_points;
     ZombieCharBuf *iterator = ZCB_WRAP(self);
     num_code_points = ZCB_Nip(iterator, count);
@@ -696,7 +696,7 @@ CB_truncate(CharBuf *self, size_t count) {
 }
 
 uint32_t
-CB_code_point_at(CharBuf *self, size_t tick) {
+CB_Code_Point_At_IMP(CharBuf *self, size_t tick) {
     size_t count = 0;
     char *ptr = self->ptr;
     char *const end = ptr + self->size;
@@ -715,7 +715,7 @@ CB_code_point_at(CharBuf *self, size_t tick) {
 }
 
 uint32_t
-CB_code_point_from(CharBuf *self, size_t tick) {
+CB_Code_Point_From_IMP(CharBuf *self, size_t tick) {
     size_t      count = 0;
     char       *top   = self->ptr;
     const char *ptr   = top + self->size;
@@ -727,7 +727,7 @@ CB_code_point_from(CharBuf *self, size_t tick) {
 }
 
 CharBuf*
-CB_substring(CharBuf *self, size_t offset, size_t len) {
+CB_SubString_IMP(CharBuf *self, size_t offset, size_t len) {
     ZombieCharBuf *iterator = ZCB_WRAP(self);
     char *sub_start;
     size_t byte_len;
@@ -764,17 +764,17 @@ CB_less_than(const void *va, const void *vb) {
 }
 
 void
-CB_set_size(CharBuf *self, size_t size) {
+CB_Set_Size_IMP(CharBuf *self, size_t size) {
     self->size = size;
 }
 
 size_t
-CB_get_size(CharBuf *self) {
+CB_Get_Size_IMP(CharBuf *self) {
     return self->size;
 }
 
 uint8_t*
-CB_get_ptr8(CharBuf *self) {
+CB_Get_Ptr8_IMP(CharBuf *self) {
     return (uint8_t*)self->ptr;
 }
 
@@ -803,20 +803,20 @@ ViewCB_init(ViewCharBuf *self, const char *utf8, size_t size) {
 }
 
 void
-ViewCB_destroy(ViewCharBuf *self) {
+ViewCB_Destroy_IMP(ViewCharBuf *self) {
     // Note that we do not free self->ptr, and that we invoke the
     // SUPER_DESTROY with CHARBUF instead of VIEWCHARBUF.
     SUPER_DESTROY(self, CHARBUF);
 }
 
 void
-ViewCB_assign(ViewCharBuf *self, const CharBuf *other) {
+ViewCB_Assign_IMP(ViewCharBuf *self, const CharBuf *other) {
     self->ptr  = other->ptr;
     self->size = other->size;
 }
 
 void
-ViewCB_assign_str(ViewCharBuf *self, const char *utf8, size_t size) {
+ViewCB_Assign_Str_IMP(ViewCharBuf *self, const char *utf8, size_t size) {
     if (!StrHelp_utf8_valid(utf8, size)) {
         DIE_INVALID_UTF8(utf8, size);
     }
@@ -825,13 +825,13 @@ ViewCB_assign_str(ViewCharBuf *self, const char *utf8, size_t size) {
 }
 
 void
-ViewCB_assign_trusted_str(ViewCharBuf *self, const char *utf8, size_t size) {
+ViewCB_Assign_Trusted_Str_IMP(ViewCharBuf *self, const char *utf8, size_t size) {
     self->ptr  = (char*)utf8;
     self->size = size;
 }
 
 uint32_t
-ViewCB_trim_top(ViewCharBuf *self) {
+ViewCB_Trim_Top_IMP(ViewCharBuf *self) {
     uint32_t  count = 0;
     char     *ptr   = self->ptr;
     char     *end   = ptr + self->size;
@@ -855,7 +855,7 @@ ViewCB_trim_top(ViewCharBuf *self) {
 }
 
 size_t
-ViewCB_nip(ViewCharBuf *self, size_t count) {
+ViewCB_Nip_IMP(ViewCharBuf *self, size_t count) {
     size_t  num_nipped;
     char   *ptr = self->ptr;
     char   *end = ptr + self->size;
@@ -874,7 +874,7 @@ ViewCB_nip(ViewCharBuf *self, size_t count) {
 }
 
 int32_t
-ViewCB_nip_one(ViewCharBuf *self) {
+ViewCB_Nip_One_IMP(ViewCharBuf *self) {
     if (self->size == 0) {
         return 0;
     }
@@ -891,7 +891,7 @@ ViewCB_nip_one(ViewCharBuf *self) {
 }
 
 char*
-ViewCB_grow(ViewCharBuf *self, size_t size) {
+ViewCB_Grow_IMP(ViewCharBuf *self, size_t size) {
     UNUSED_VAR(size);
     THROW(ERR, "Can't grow a ViewCharBuf ('%o')", self);
     UNREACHABLE_RETURN(char*);
@@ -947,7 +947,7 @@ ZCB_size() {
 }
 
 void
-ZCB_destroy(ZombieCharBuf *self) {
+ZCB_Destroy_IMP(ZombieCharBuf *self) {
     THROW(ERR, "Can't destroy a ZombieCharBuf ('%o')", self);
 }
 

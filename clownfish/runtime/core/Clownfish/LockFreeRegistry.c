@@ -47,7 +47,7 @@ LFReg_init(LockFreeRegistry *self, size_t capacity) {
 }
 
 bool
-LFReg_register(LockFreeRegistry *self, Obj *key, Obj *value) {
+LFReg_Register_IMP(LockFreeRegistry *self, Obj *key, Obj *value) {
     LFRegEntry  *new_entry = NULL;
     int32_t      hash_sum  = Obj_Hash_Sum(key);
     size_t       bucket    = (uint32_t)hash_sum  % self->capacity;
@@ -89,7 +89,7 @@ FIND_END_OF_LINKED_LIST:
 }
 
 Obj*
-LFReg_fetch(LockFreeRegistry *self, Obj *key) {
+LFReg_Fetch_IMP(LockFreeRegistry *self, Obj *key) {
     int32_t      hash_sum  = Obj_Hash_Sum(key);
     size_t       bucket    = (uint32_t)hash_sum  % self->capacity;
     LFRegEntry **entries   = (LFRegEntry**)self->entries;
@@ -108,7 +108,7 @@ LFReg_fetch(LockFreeRegistry *self, Obj *key) {
 }
 
 void
-LFReg_destroy(LockFreeRegistry *self) {
+LFReg_Destroy_IMP(LockFreeRegistry *self) {
     LFRegEntry **entries = (LFRegEntry**)self->entries;
 
     for (size_t i = 0; i < self->capacity; i++) {

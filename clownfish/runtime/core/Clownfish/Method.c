@@ -43,40 +43,40 @@ Method_init(Method *self, const CharBuf *name, cfish_method_t callback_func,
 }
 
 void
-Method_destroy(Method *self) {
+Method_Destroy_IMP(Method *self) {
     THROW(ERR, "Insane attempt to destroy Method '%o'", self->name);
 }
 
 Obj*
-Method_inc_refcount(Method *self) {
+Method_Inc_RefCount_IMP(Method *self) {
     return (Obj*)self;
 }
 
 uint32_t
-Method_dec_refcount(Method *self) {
+Method_Dec_RefCount_IMP(Method *self) {
     UNUSED_VAR(self);
     return 1;
 }
 
 uint32_t
-Method_get_refcount(Method *self) {
+Method_Get_RefCount_IMP(Method *self) {
     UNUSED_VAR(self);
     // See comments in VTable.c
     return 1;
 }
 
 CharBuf*
-Method_get_name(Method *self) {
+Method_Get_Name_IMP(Method *self) {
     return self->name;
 }
 
 CharBuf*
-Method_get_host_alias(Method *self) {
+Method_Get_Host_Alias_IMP(Method *self) {
     return self->host_alias;
 }
 
 bool
-Method_is_excluded_from_host(Method *self) {
+Method_Is_Excluded_From_Host_IMP(Method *self) {
     return self->is_excluded;
 }
 

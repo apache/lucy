@@ -91,7 +91,7 @@ Hash_init(Hash *self, uint32_t capacity) {
 }
 
 void
-Hash_destroy(Hash *self) {
+Hash_Destroy_IMP(Hash *self) {
     if (self->entries) {
         Hash_Clear(self);
         FREEMEM(self->entries);
@@ -100,7 +100,7 @@ Hash_destroy(Hash *self) {
 }
 
 void
-Hash_clear(Hash *self) {
+Hash_Clear_IMP(Hash *self) {
     HashEntry *entry       = (HashEntry*)self->entries;
     HashEntry *const limit = entry + self->capacity;
 
@@ -154,26 +154,26 @@ Hash_do_store(Hash *self, Obj *key, Obj *value,
 }
 
 void
-Hash_store(Hash *self, Obj *key, Obj *value) {
+Hash_Store_IMP(Hash *self, Obj *key, Obj *value) {
     Hash_do_store(self, key, value, Obj_Hash_Sum(key), false);
 }
 
 void
-Hash_store_str(Hash *self, const char *key, size_t key_len, Obj *value) {
+Hash_Store_Str_IMP(Hash *self, const char *key, size_t key_len, Obj *value) {
     ZombieCharBuf *key_buf = ZCB_WRAP_STR((char*)key, key_len);
     Hash_do_store(self, (Obj*)key_buf, value,
                   ZCB_Hash_Sum(key_buf), false);
 }
 
 Obj*
-Hash_make_key(Hash *self, Obj *key, int32_t hash_sum) {
+Hash_Make_Key_IMP(Hash *self, Obj *key, int32_t hash_sum) {
     UNUSED_VAR(self);
     UNUSED_VAR(hash_sum);
     return Obj_Clone(key);
 }
 
 Obj*
-Hash_fetch_str(Hash *self, const char *key, size_t key_len) {
+Hash_Fetch_Str_IMP(Hash *self, const char *key, size_t key_len) {
     ZombieCharBuf *key_buf = ZCB_WRAP_STR(key, key_len);
     return Hash_fetch(self, (Obj*)key_buf);
 }
@@ -201,13 +201,13 @@ SI_fetch_entry(Hash *self, const Obj *key, int32_t hash_sum) {
 }
 
 Obj*
-Hash_fetch(Hash *self, const Obj *key) {
+Hash_Fetch_IMP(Hash *self, const Obj *key) {
     HashEntry *entry = SI_fetch_entry(self, key, Obj_Hash_Sum(key));
     return entry ? entry->value : NULL;
 }
 
 Obj*
-Hash_delete(Hash *self, const Obj *key) {
+Hash_Delete_IMP(Hash *self, const Obj *key) {
     HashEntry *entry = SI_fetch_entry(self, key, Obj_Hash_Sum(key));
     if (entry) {
         Obj *value = entry->value;
@@ -225,13 +225,13 @@ Hash_delete(Hash *self, const Obj *key) {
 }
 
 Obj*
-Hash_delete_str(Hash *self, const char *key, size_t key_len) {
+Hash_Delete_Str_IMP(Hash *self, const char *key, size_t key_len) {
     ZombieCharBuf *key_buf = ZCB_WRAP_STR(key, key_len);
     return Hash_delete(self, (Obj*)key_buf);
 }
 
 uint32_t
-Hash_iterate(Hash *self) {
+Hash_Iterate_IMP(Hash *self) {
     SI_kill_iter(self);
     return self->size;
 }
@@ -242,7 +242,7 @@ SI_kill_iter(Hash *self) {
 }
 
 bool
-Hash_next(Hash *self, Obj **key, Obj **value) {
+Hash_Next_IMP(Hash *self, Obj **key, Obj **value) {
     while (1) {
         if (++self->iter_tick >= (int32_t)self->capacity) {
             // Bail since we've completed the iteration.
@@ -265,13 +265,13 @@ Hash_next(Hash *self, Obj **key, Obj **value) {
 }
 
 Obj*
-Hash_find_key(Hash *self, const Obj *key, int32_t hash_sum) {
+Hash_Find_Key_IMP(Hash *self, const Obj *key, int32_t hash_sum) {
     HashEntry *entry = SI_fetch_entry(self, key, hash_sum);
     return entry ? entry->key : NULL;
 }
 
 VArray*
-Hash_keys(Hash *self) {
+Hash_Keys_IMP(Hash *self) {
     Obj *key;
     Obj *val;
     VArray *keys = VA_new(self->size);
@@ -283,7 +283,7 @@ Hash_keys(Hash *self) {
 }
 
 VArray*
-Hash_values(Hash *self) {
+Hash_Values_IMP(Hash *self) {
     Obj *key;
     Obj *val;
     VArray *values = VA_new(self->size);
@@ -293,7 +293,7 @@ Hash_values(Hash *self) {
 }
 
 bool
-Hash_equals(Hash *self, Obj *other) {
+Hash_Equals_IMP(Hash *self, Obj *other) {
     Hash    *twin = (Hash*)other;
     Obj     *key;
     Obj     *val;
@@ -312,12 +312,12 @@ Hash_equals(Hash *self, Obj *other) {
 }
 
 uint32_t
-Hash_get_capacity(Hash *self) {
+Hash_Get_Capacity_IMP(Hash *self) {
     return self->capacity;
 }
 
 uint32_t
-Hash_get_size(Hash *self) {
+Hash_Get_Size_IMP(Hash *self) {
     return self->size;
 }
 
@@ -349,18 +349,18 @@ SI_rebuild_hash(Hash *self) {
 /***************************************************************************/
 
 uint32_t
-HashTombStone_get_refcount(HashTombStone* self) {
+HashTombStone_Get_RefCount_IMP(HashTombStone* self) {
     CHY_UNUSED_VAR(self);
     return 1;
 }
 
 HashTombStone*
-HashTombStone_inc_refcount(HashTombStone* self) {
+HashTombStone_Inc_RefCount_IMP(HashTombStone* self) {
     return self;
 }
 
 uint32_t
-HashTombStone_dec_refcount(HashTombStone* self) {
+HashTombStone_Dec_RefCount_IMP(HashTombStone* self) {
     UNUSED_VAR(self);
     return 1;
 }

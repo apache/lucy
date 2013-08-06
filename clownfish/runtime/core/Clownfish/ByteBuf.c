@@ -73,18 +73,18 @@ BB_init_steal_bytes(ByteBuf *self, void *bytes, size_t size,
 }
 
 void
-BB_destroy(ByteBuf *self) {
+BB_Destroy_IMP(ByteBuf *self) {
     FREEMEM(self->buf);
     SUPER_DESTROY(self, BYTEBUF);
 }
 
 ByteBuf*
-BB_clone(ByteBuf *self) {
+BB_Clone_IMP(ByteBuf *self) {
     return BB_new_bytes(self->buf, self->size);
 }
 
 void
-BB_set_size(ByteBuf *self, size_t size) {
+BB_Set_Size_IMP(ByteBuf *self, size_t size) {
     if (size > self->cap) {
         THROW(ERR, "Can't set size to %u64 (greater than capacity of %u64)",
               (uint64_t)size, (uint64_t)self->cap);
@@ -93,17 +93,17 @@ BB_set_size(ByteBuf *self, size_t size) {
 }
 
 char*
-BB_get_buf(ByteBuf *self) {
+BB_Get_Buf_IMP(ByteBuf *self) {
     return self->buf;
 }
 
 size_t
-BB_get_size(ByteBuf *self) {
+BB_Get_Size_IMP(ByteBuf *self) {
     return self->size;
 }
 
 size_t
-BB_get_capacity(ByteBuf *self) {
+BB_Get_Capacity_IMP(ByteBuf *self) {
     return self->cap;
 }
 
@@ -114,7 +114,7 @@ SI_equals_bytes(ByteBuf *self, const void *bytes, size_t size) {
 }
 
 bool
-BB_equals(ByteBuf *self, Obj *other) {
+BB_Equals_IMP(ByteBuf *self, Obj *other) {
     ByteBuf *const twin = (ByteBuf*)other;
     if (twin == self)              { return true; }
     if (!Obj_Is_A(other, BYTEBUF)) { return false; }
@@ -122,12 +122,12 @@ BB_equals(ByteBuf *self, Obj *other) {
 }
 
 bool
-BB_equals_bytes(ByteBuf *self, const void *bytes, size_t size) {
+BB_Equals_Bytes_IMP(ByteBuf *self, const void *bytes, size_t size) {
     return SI_equals_bytes(self, bytes, size);
 }
 
 int32_t
-BB_hash_sum(ByteBuf *self) {
+BB_Hash_Sum_IMP(ByteBuf *self) {
     uint32_t       sum = 5381;
     uint8_t *const buf = (uint8_t*)self->buf;
 
@@ -146,12 +146,12 @@ SI_mimic_bytes(ByteBuf *self, const void *bytes, size_t size) {
 }
 
 void
-BB_mimic_bytes(ByteBuf *self, const void *bytes, size_t size) {
+BB_Mimic_Bytes_IMP(ByteBuf *self, const void *bytes, size_t size) {
     SI_mimic_bytes(self, bytes, size);
 }
 
 void
-BB_mimic(ByteBuf *self, Obj *other) {
+BB_Mimic_IMP(ByteBuf *self, Obj *other) {
     ByteBuf *twin = (ByteBuf*)CERTIFY(other, BYTEBUF);
     SI_mimic_bytes(self, twin->buf, twin->size);
 }
@@ -167,12 +167,12 @@ SI_cat_bytes(ByteBuf *self, const void *bytes, size_t size) {
 }
 
 void
-BB_cat_bytes(ByteBuf *self, const void *bytes, size_t size) {
+BB_Cat_Bytes_IMP(ByteBuf *self, const void *bytes, size_t size) {
     SI_cat_bytes(self, bytes, size);
 }
 
 void
-BB_cat(ByteBuf *self, const ByteBuf *other) {
+BB_Cat_IMP(ByteBuf *self, const ByteBuf *other) {
     SI_cat_bytes(self, other->buf, other->size);
 }
 
@@ -191,7 +191,7 @@ S_grow(ByteBuf *self, size_t size) {
 }
 
 char*
-BB_grow(ByteBuf *self, size_t size) {
+BB_Grow_IMP(ByteBuf *self, size_t size) {
     if (size > self->cap) { S_grow(self, size); }
     return self->buf;
 }
@@ -212,7 +212,7 @@ BB_compare(const void *va, const void *vb) {
 }
 
 int32_t
-BB_compare_to(ByteBuf *self, Obj *other) {
+BB_Compare_To_IMP(ByteBuf *self, Obj *other) {
     CERTIFY(other, BYTEBUF);
     return BB_compare(&self, &other);
 }
@@ -234,18 +234,18 @@ ViewBB_init(ViewByteBuf *self, char *buf, size_t size) {
 }
 
 void
-ViewBB_destroy(ViewByteBuf *self) {
+ViewBB_Destroy_IMP(ViewByteBuf *self) {
     Obj_destroy((Obj*)self);
 }
 
 void
-ViewBB_assign_bytes(ViewByteBuf *self, char*buf, size_t size) {
+ViewBB_Assign_Bytes_IMP(ViewByteBuf *self, char*buf, size_t size) {
     self->buf  = buf;
     self->size = size;
 }
 
 void
-ViewBB_assign(ViewByteBuf *self, const ByteBuf *other) {
+ViewBB_Assign_IMP(ViewByteBuf *self, const ByteBuf *other) {
     self->buf  = other->buf;
     self->size = other->size;
 }

@@ -39,18 +39,18 @@ Obj_init(Obj *self) {
 }
 
 void
-Obj_destroy(Obj *self) {
+Obj_Destroy_IMP(Obj *self) {
     FREEMEM(self);
 }
 
 int32_t
-Obj_hash_sum(Obj *self) {
+Obj_Hash_Sum_IMP(Obj *self) {
     int64_t hash_sum = PTR_TO_I64(self);
     return (int32_t)hash_sum;
 }
 
 bool
-Obj_is_a(Obj *self, VTable *ancestor) {
+Obj_Is_A_IMP(Obj *self, VTable *ancestor) {
     VTable *vtable = self ? self->vtable : NULL;
 
     while (vtable != NULL) {
@@ -64,12 +64,12 @@ Obj_is_a(Obj *self, VTable *ancestor) {
 }
 
 bool
-Obj_equals(Obj *self, Obj *other) {
+Obj_Equals_IMP(Obj *self, Obj *other) {
     return (self == other);
 }
 
 CharBuf*
-Obj_to_string(Obj *self) {
+Obj_To_String_IMP(Obj *self) {
 #if (SIZEOF_PTR == 4)
     return CB_newf("%o@0x%x32", Obj_Get_Class_Name(self), self);
 #elif (SIZEOF_PTR == 8)
@@ -85,17 +85,17 @@ Obj_to_string(Obj *self) {
 }
 
 bool
-Obj_to_bool(Obj *self) {
+Obj_To_Bool_IMP(Obj *self) {
     return !!Obj_To_I64(self);
 }
 
 VTable*
-Obj_get_vtable(Obj *self) {
+Obj_Get_VTable_IMP(Obj *self) {
     return self->vtable;
 }
 
 CharBuf*
-Obj_get_class_name(Obj *self) {
+Obj_Get_Class_Name_IMP(Obj *self) {
     return VTable_Get_Name(self->vtable);
 }
 

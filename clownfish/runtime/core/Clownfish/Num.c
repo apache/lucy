@@ -40,7 +40,7 @@ Num_init(Num *self) {
 }
 
 bool
-Num_equals(Num *self, Obj *other) {
+Num_Equals_IMP(Num *self, Obj *other) {
     Num *twin = (Num*)other;
     if (twin == self) { return true; }
     if (!Obj_Is_A(other, NUM)) { return false; }
@@ -58,7 +58,7 @@ FloatNum_init(FloatNum *self) {
 }
 
 int32_t
-FloatNum_compare_to(FloatNum *self, Obj *other) {
+FloatNum_Compare_To_IMP(FloatNum *self, Obj *other) {
     Num *twin = (Num*)CERTIFY(other, NUM);
     double f64_diff = FloatNum_To_F64(self) - Num_To_F64(twin);
     if (f64_diff < 0)      { return -1; }
@@ -67,7 +67,7 @@ FloatNum_compare_to(FloatNum *self, Obj *other) {
 }
 
 CharBuf*
-FloatNum_to_string(FloatNum *self) {
+FloatNum_To_String_IMP(FloatNum *self) {
     return CB_newf("%f64", FloatNum_To_F64(self));
 }
 
@@ -80,7 +80,7 @@ IntNum_init(IntNum *self) {
 }
 
 int32_t
-IntNum_compare_to(IntNum *self, Obj *other) {
+IntNum_Compare_To_IMP(IntNum *self, Obj *other) {
     if (!Obj_Is_A(other, INTNUM)) {
         return -Obj_Compare_To(other, (Obj*)self);
     }
@@ -92,7 +92,7 @@ IntNum_compare_to(IntNum *self, Obj *other) {
 }
 
 CharBuf*
-IntNum_to_string(IntNum *self) {
+IntNum_To_String_IMP(IntNum *self) {
     return CB_newf("%i64", IntNum_To_I64(self));
 }
 
@@ -111,37 +111,37 @@ Float32_init(Float32 *self, float value) {
 }
 
 float
-Float32_get_value(Float32 *self) {
+Float32_Get_Value_IMP(Float32 *self) {
     return self->value;
 }
 
 void
-Float32_set_value(Float32 *self, float value) {
+Float32_Set_Value_IMP(Float32 *self, float value) {
     self->value = value;
 }
 
 double
-Float32_to_f64(Float32 *self) {
+Float32_To_F64_IMP(Float32 *self) {
     return self->value;
 }
 
 int64_t
-Float32_to_i64(Float32 *self) {
+Float32_To_I64_IMP(Float32 *self) {
     return (int64_t)self->value;
 }
 
 int32_t
-Float32_hash_sum(Float32 *self) {
+Float32_Hash_Sum_IMP(Float32 *self) {
     return *(int32_t*)&self->value;
 }
 
 Float32*
-Float32_clone(Float32 *self) {
+Float32_Clone_IMP(Float32 *self) {
     return Float32_new(self->value);
 }
 
 void
-Float32_mimic(Float32 *self, Obj *other) {
+Float32_Mimic_IMP(Float32 *self, Obj *other) {
     Float32 *twin = (Float32*)CERTIFY(other, FLOAT32);
     self->value = twin->value;
 }
@@ -161,38 +161,38 @@ Float64_init(Float64 *self, double value) {
 }
 
 double
-Float64_get_value(Float64 *self) {
+Float64_Get_Value_IMP(Float64 *self) {
     return self->value;
 }
 
 void
-Float64_set_value(Float64 *self, double value) {
+Float64_Set_Value_IMP(Float64 *self, double value) {
     self->value = value;
 }
 
 double
-Float64_to_f64(Float64 *self) {
+Float64_To_F64_IMP(Float64 *self) {
     return self->value;
 }
 
 int64_t
-Float64_to_i64(Float64 *self) {
+Float64_To_I64_IMP(Float64 *self) {
     return (int64_t)self->value;
 }
 
 Float64*
-Float64_clone(Float64 *self) {
+Float64_Clone_IMP(Float64 *self) {
     return Float64_new(self->value);
 }
 
 void
-Float64_mimic(Float64 *self, Obj *other) {
+Float64_Mimic_IMP(Float64 *self, Obj *other) {
     Float64 *twin = (Float64*)CERTIFY(other, FLOAT64);
     self->value = twin->value;
 }
 
 int32_t
-Float64_hash_sum(Float64 *self) {
+Float64_Hash_Sum_IMP(Float64 *self) {
     int32_t *ints = (int32_t*)&self->value;
     return ints[0] ^ ints[1];
 }
@@ -212,38 +212,38 @@ Int32_init(Integer32 *self, int32_t value) {
 }
 
 int32_t
-Int32_get_value(Integer32 *self) {
+Int32_Get_Value_IMP(Integer32 *self) {
     return self->value;
 }
 
 void
-Int32_set_value(Integer32 *self, int32_t value) {
+Int32_Set_Value_IMP(Integer32 *self, int32_t value) {
     self->value = value;
 }
 
 double
-Int32_to_f64(Integer32 *self) {
+Int32_To_F64_IMP(Integer32 *self) {
     return self->value;
 }
 
 int64_t
-Int32_to_i64(Integer32 *self) {
+Int32_To_I64_IMP(Integer32 *self) {
     return self->value;
 }
 
 Integer32*
-Int32_clone(Integer32 *self) {
+Int32_Clone_IMP(Integer32 *self) {
     return Int32_new(self->value);
 }
 
 void
-Int32_mimic(Integer32 *self, Obj *other) {
+Int32_Mimic_IMP(Integer32 *self, Obj *other) {
     Integer32 *twin = (Integer32*)CERTIFY(other, INTEGER32);
     self->value = twin->value;
 }
 
 int32_t
-Int32_hash_sum(Integer32 *self) {
+Int32_Hash_Sum_IMP(Integer32 *self) {
     return self->value;
 }
 
@@ -262,44 +262,44 @@ Int64_init(Integer64 *self, int64_t value) {
 }
 
 int64_t
-Int64_get_value(Integer64 *self) {
+Int64_Get_Value_IMP(Integer64 *self) {
     return self->value;
 }
 
 void
-Int64_set_value(Integer64 *self, int64_t value) {
+Int64_Set_Value_IMP(Integer64 *self, int64_t value) {
     self->value = value;
 }
 
 double
-Int64_to_f64(Integer64 *self) {
+Int64_To_F64_IMP(Integer64 *self) {
     return (double)self->value;
 }
 
 int64_t
-Int64_to_i64(Integer64 *self) {
+Int64_To_I64_IMP(Integer64 *self) {
     return self->value;
 }
 
 Integer64*
-Int64_clone(Integer64 *self) {
+Int64_Clone_IMP(Integer64 *self) {
     return Int64_new(self->value);
 }
 
 void
-Int64_mimic(Integer64 *self, Obj *other) {
+Int64_Mimic_IMP(Integer64 *self, Obj *other) {
     Integer64 *twin = (Integer64*)CERTIFY(other, INTEGER64);
     self->value = twin->value;
 }
 
 int32_t
-Int64_hash_sum(Integer64 *self) {
+Int64_Hash_Sum_IMP(Integer64 *self) {
     int32_t *ints = (int32_t*)&self->value;
     return ints[0] ^ ints[1];
 }
 
 bool
-Int64_equals(Integer64 *self, Obj *other) {
+Int64_Equals_IMP(Integer64 *self, Obj *other) {
     Num *twin = (Num*)other;
     if (twin == (Num*)self)         { return true; }
     if (!Obj_Is_A(other, NUM)) { return false; }
@@ -337,60 +337,60 @@ Bool_singleton(bool value) {
 }
 
 void
-Bool_destroy(BoolNum *self) {
+Bool_Destroy_IMP(BoolNum *self) {
     if (self && self != CFISH_TRUE && self != CFISH_FALSE) {
         SUPER_DESTROY(self, BOOLNUM);
     }
 }
 
 bool
-Bool_get_value(BoolNum *self) {
+Bool_Get_Value_IMP(BoolNum *self) {
     return self->value;
 }
 
 double
-Bool_to_f64(BoolNum *self) {
+Bool_To_F64_IMP(BoolNum *self) {
     return (double)self->value;
 }
 
 int64_t
-Bool_to_i64(BoolNum *self) {
+Bool_To_I64_IMP(BoolNum *self) {
     return self->value;
 }
 
 bool
-Bool_to_bool(BoolNum *self) {
+Bool_To_Bool_IMP(BoolNum *self) {
     return self->value;
 }
 
 BoolNum*
-Bool_clone(BoolNum *self) {
+Bool_Clone_IMP(BoolNum *self) {
     return self;
 }
 
 int32_t
-Bool_hash_sum(BoolNum *self) {
+Bool_Hash_Sum_IMP(BoolNum *self) {
     int64_t hash_sum = PTR_TO_I64(self) + self->value;
     return (int32_t)hash_sum;
 }
 
 CharBuf*
-Bool_to_string(BoolNum *self) {
+Bool_To_String_IMP(BoolNum *self) {
     return (CharBuf*)CB_Inc_RefCount(self->string);
 }
 
 bool
-Bool_equals(BoolNum *self, Obj *other) {
+Bool_Equals_IMP(BoolNum *self, Obj *other) {
     return self == (BoolNum*)other;
 }
 
 BoolNum*
-Bool_inc_refcount(BoolNum *self) {
+Bool_Inc_RefCount_IMP(BoolNum *self) {
     return self;
 }
 
 uint32_t
-Bool_dec_refcount(BoolNum *self) {
+Bool_Dec_RefCount_IMP(BoolNum *self) {
     UNUSED_VAR(self);
     return 1;
 }

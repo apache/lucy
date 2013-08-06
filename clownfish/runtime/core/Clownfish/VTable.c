@@ -163,12 +163,12 @@ VTable_bootstrap(const VTableSpec *specs, size_t num_specs)
 }
 
 void
-VTable_destroy(VTable *self) {
+VTable_Destroy_IMP(VTable *self) {
     THROW(ERR, "Insane attempt to destroy VTable for class '%o'", self->name);
 }
 
 VTable*
-VTable_clone(VTable *self) {
+VTable_Clone_IMP(VTable *self) {
     VTable *twin
         = (VTable*)Memory_wrapped_calloc(self->vt_alloc_size, 1);
 
@@ -180,18 +180,18 @@ VTable_clone(VTable *self) {
 }
 
 Obj*
-VTable_inc_refcount(VTable *self) {
+VTable_Inc_RefCount_IMP(VTable *self) {
     return (Obj*)self;
 }
 
 uint32_t
-VTable_dec_refcount(VTable *self) {
+VTable_Dec_RefCount_IMP(VTable *self) {
     UNUSED_VAR(self);
     return 1;
 }
 
 uint32_t
-VTable_get_refcount(VTable *self) {
+VTable_Get_RefCount_IMP(VTable *self) {
     UNUSED_VAR(self);
     /* VTable_Get_RefCount() lies to other Clownfish code about the refcount
      * because we don't want to have to synchronize access to the cached host
@@ -209,29 +209,29 @@ VTable_get_refcount(VTable *self) {
 }
 
 void
-VTable_override(VTable *self, cfish_method_t method, size_t offset) {
+VTable_Override_IMP(VTable *self, cfish_method_t method, size_t offset) {
     union { char *char_ptr; cfish_method_t *func_ptr; } pointer;
     pointer.char_ptr = ((char*)self) + offset;
     pointer.func_ptr[0] = method;
 }
 
 CharBuf*
-VTable_get_name(VTable *self) {
+VTable_Get_Name_IMP(VTable *self) {
     return self->name;
 }
 
 VTable*
-VTable_get_parent(VTable *self) {
+VTable_Get_Parent_IMP(VTable *self) {
     return self->parent;
 }
 
 size_t
-VTable_get_obj_alloc_size(VTable *self) {
+VTable_Get_Obj_Alloc_Size_IMP(VTable *self) {
     return self->obj_alloc_size;
 }
 
 VArray*
-VTable_get_methods(VTable *self) {
+VTable_Get_Methods_IMP(VTable *self) {
     return self->methods;
 }
 
@@ -383,7 +383,7 @@ VTable_fetch_vtable(const CharBuf *class_name) {
 }
 
 void
-VTable_add_host_method_alias(VTable *self, const char *alias,
+VTable_Add_Host_Method_Alias_IMP(VTable *self, const char *alias,
                              const char *meth_name) {
     Method *method = S_find_method(self, meth_name);
     if (!method) {
@@ -394,7 +394,7 @@ VTable_add_host_method_alias(VTable *self, const char *alias,
 }
 
 void
-VTable_exclude_host_method(VTable *self, const char *meth_name) {
+VTable_Exclude_Host_Method_IMP(VTable *self, const char *meth_name) {
     Method *method = S_find_method(self, meth_name);
     if (!method) {
         fprintf(stderr, "Method %s not found\n", meth_name);

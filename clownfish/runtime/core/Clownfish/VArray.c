@@ -51,7 +51,7 @@ VA_init(VArray *self, uint32_t capacity) {
 }
 
 void
-VA_destroy(VArray *self) {
+VA_Destroy_IMP(VArray *self) {
     if (self->elems) {
         Obj **elems        = self->elems;
         Obj **const limit  = elems + self->size;
@@ -64,7 +64,7 @@ VA_destroy(VArray *self) {
 }
 
 VArray*
-VA_clone(VArray *self) {
+VA_Clone_IMP(VArray *self) {
     VArray *twin = VA_new(self->size);
 
     // Clone each element.
@@ -82,7 +82,7 @@ VA_clone(VArray *self) {
 }
 
 VArray*
-VA_shallow_copy(VArray *self) {
+VA_Shallow_Copy_IMP(VArray *self) {
     // Dupe, then increment refcounts.
     VArray *twin = VA_new(self->size);
     Obj **elems = twin->elems;
@@ -98,7 +98,7 @@ VA_shallow_copy(VArray *self) {
 }
 
 void
-VA_push(VArray *self, Obj *element) {
+VA_Push_IMP(VArray *self, Obj *element) {
     if (self->size == self->cap) {
         VA_Grow(self, Memory_oversize(self->size + 1, sizeof(Obj*)));
     }
@@ -107,7 +107,7 @@ VA_push(VArray *self, Obj *element) {
 }
 
 void
-VA_push_varray(VArray *self, VArray *other) {
+VA_Push_VArray_IMP(VArray *self, VArray *other) {
     uint32_t tick = self->size;
     uint32_t new_size = self->size + other->size;
     if (new_size > self->cap) {
@@ -123,7 +123,7 @@ VA_push_varray(VArray *self, VArray *other) {
 }
 
 Obj*
-VA_pop(VArray *self) {
+VA_Pop_IMP(VArray *self) {
     if (!self->size) {
         return NULL;
     }
@@ -132,7 +132,7 @@ VA_pop(VArray *self) {
 }
 
 void
-VA_unshift(VArray *self, Obj *elem) {
+VA_Unshift_IMP(VArray *self, Obj *elem) {
     if (self->size == self->cap) {
         VA_Grow(self, Memory_oversize(self->size + 1, sizeof(Obj*)));
     }
@@ -142,7 +142,7 @@ VA_unshift(VArray *self, Obj *elem) {
 }
 
 Obj*
-VA_shift(VArray *self) {
+VA_Shift_IMP(VArray *self) {
     if (!self->size) {
         return NULL;
     }
@@ -158,7 +158,7 @@ VA_shift(VArray *self) {
 }
 
 Obj*
-VA_fetch(VArray *self, uint32_t num) {
+VA_Fetch_IMP(VArray *self, uint32_t num) {
     if (num >= self->size) {
         return NULL;
     }
@@ -167,7 +167,7 @@ VA_fetch(VArray *self, uint32_t num) {
 }
 
 void
-VA_store(VArray *self, uint32_t tick, Obj *elem) {
+VA_Store_IMP(VArray *self, uint32_t tick, Obj *elem) {
     if (tick >= self->cap) {
         VA_Grow(self, Memory_oversize(tick + 1, sizeof(Obj*)));
     }
@@ -177,7 +177,7 @@ VA_store(VArray *self, uint32_t tick, Obj *elem) {
 }
 
 void
-VA_grow(VArray *self, uint32_t capacity) {
+VA_Grow_IMP(VArray *self, uint32_t capacity) {
     if (capacity > self->cap) {
         self->elems = (Obj**)REALLOCATE(self->elems, capacity * sizeof(Obj*));
         self->cap   = capacity;
@@ -187,7 +187,7 @@ VA_grow(VArray *self, uint32_t capacity) {
 }
 
 Obj*
-VA_delete(VArray *self, uint32_t num) {
+VA_Delete_IMP(VArray *self, uint32_t num) {
     Obj *elem = NULL;
     if (num < self->size) {
         elem = self->elems[num];
@@ -197,7 +197,7 @@ VA_delete(VArray *self, uint32_t num) {
 }
 
 void
-VA_excise(VArray *self, uint32_t offset, uint32_t length) {
+VA_Excise_IMP(VArray *self, uint32_t offset, uint32_t length) {
     if (self->size <= offset)              { return; }
     else if (self->size < offset + length) { length = self->size - offset; }
 
@@ -212,12 +212,12 @@ VA_excise(VArray *self, uint32_t offset, uint32_t length) {
 }
 
 void
-VA_clear(VArray *self) {
+VA_Clear_IMP(VArray *self) {
     VA_excise(self, 0, self->size);
 }
 
 void
-VA_resize(VArray *self, uint32_t size) {
+VA_Resize_IMP(VArray *self, uint32_t size) {
     if (size < self->size) {
         VA_Excise(self, size, self->size - size);
     }
@@ -228,12 +228,12 @@ VA_resize(VArray *self, uint32_t size) {
 }
 
 uint32_t
-VA_get_size(VArray *self) {
+VA_Get_Size_IMP(VArray *self) {
     return self->size;
 }
 
 uint32_t
-VA_get_capacity(VArray *self) {
+VA_Get_Capacity_IMP(VArray *self) {
     return self->cap;
 }
 
@@ -249,13 +249,13 @@ S_default_compare(void *context, const void *va, const void *vb) {
 }
 
 void
-VA_sort(VArray *self, Cfish_Sort_Compare_t compare, void *context) {
+VA_Sort_IMP(VArray *self, Cfish_Sort_Compare_t compare, void *context) {
     if (!compare) { compare = S_default_compare; }
     Sort_quicksort(self->elems, self->size, sizeof(void*), compare, context);
 }
 
 bool
-VA_equals(VArray *self, Obj *other) {
+VA_Equals_IMP(VArray *self, Obj *other) {
     VArray *twin = (VArray*)other;
     if (twin == self)             { return true; }
     if (!Obj_Is_A(other, VARRAY)) { return false; }
@@ -274,7 +274,7 @@ VA_equals(VArray *self, Obj *other) {
 }
 
 VArray*
-VA_gather(VArray *self, VA_Gather_Test_t test, void *data) {
+VA_Gather_IMP(VArray *self, VA_Gather_Test_t test, void *data) {
     VArray *gathered = VA_new(self->size);
     for (uint32_t i = 0, max = self->size; i < max; i++) {
         if (test(self, i, data)) {
@@ -286,7 +286,7 @@ VA_gather(VArray *self, VA_Gather_Test_t test, void *data) {
 }
 
 VArray*
-VA_slice(VArray *self, uint32_t offset, uint32_t length) {
+VA_Slice_IMP(VArray *self, uint32_t offset, uint32_t length) {
     // Adjust ranges if necessary.
     if (offset >= self->size) {
         offset = 0;
