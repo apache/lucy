@@ -63,7 +63,7 @@ CFCBindMeth_method_def(CFCMethod *method, CFCClass *klass) {
 static char*
 S_final_method_def(CFCMethod *method, CFCClass *klass) {
     const char *self_type = CFCType_to_c(CFCMethod_self_type(method));
-    const char *full_func_sym = CFCMethod_implementing_func_sym(method);
+    const char *full_func_sym = CFCMethod_imp_func(method);
     const char *arg_names 
         = CFCParamList_name_list(CFCMethod_get_param_list(method));
 
@@ -148,7 +148,7 @@ CFCBindMeth_typedef_dec(struct CFCMethod *method, CFCClass *klass) {
 char*
 CFCBindMeth_novel_spec_def(CFCMethod *method) {
     const char *macro_sym = CFCMethod_get_macro_sym(method);
-    const char *impl_sym  = CFCMethod_implementing_func_sym(method);
+    const char *imp_func  = CFCMethod_imp_func(method);
 
     const char *full_override_sym = "NULL";
     if (!CFCMethod_final(method)) {
@@ -165,7 +165,7 @@ CFCBindMeth_novel_spec_def(CFCMethod *method) {
         "        (cfish_method_t)%s /* callback_func */\n"
         "    }";
     char *def
-        = CFCUtil_sprintf(pattern, full_offset_sym, macro_sym, impl_sym,
+        = CFCUtil_sprintf(pattern, full_offset_sym, macro_sym, imp_func,
                           full_override_sym);
 
     FREEMEM(full_offset_sym);
@@ -174,7 +174,7 @@ CFCBindMeth_novel_spec_def(CFCMethod *method) {
 
 char*
 CFCBindMeth_overridden_spec_def(CFCMethod *method, CFCClass *klass) {
-    const char *impl_sym  = CFCMethod_implementing_func_sym(method);
+    const char *imp_func  = CFCMethod_imp_func(method);
 
     char *full_offset_sym = CFCMethod_full_offset_sym(method, NULL);
 
@@ -189,7 +189,7 @@ CFCBindMeth_overridden_spec_def(CFCMethod *method, CFCClass *klass) {
         "    }";
     char *def
         = CFCUtil_sprintf(pattern, full_offset_sym, parent_offset_sym,
-                          impl_sym);
+                          imp_func);
 
     FREEMEM(full_offset_sym);
     FREEMEM(parent_offset_sym);
@@ -249,7 +249,7 @@ char*
 CFCBindMeth_abstract_method_def(CFCMethod *method) {
     CFCParamList *param_list = CFCMethod_get_param_list(method);
     const char *params = CFCParamList_to_c(param_list);
-    const char *full_func_sym = CFCMethod_implementing_func_sym(method);
+    const char *full_func_sym = CFCMethod_imp_func(method);
     const char *vtable_var
         = CFCType_get_vtable_var(CFCMethod_self_type(method));
     CFCType    *return_type  = CFCMethod_get_return_type(method);
@@ -290,5 +290,17 @@ CFCBindMeth_callback_dec(CFCMethod *method) {
         = CFCUtil_sprintf(pattern, ret_type_str, override_sym, params);
 
     return callback_dec;
+}
+
+char*
+CFCBindMeth_imp_declaration(CFCMethod *method) {
+    CFCType      *return_type    = CFCMethod_get_return_type(method);
+    CFCParamList *param_list     = CFCMethod_get_param_list(method);
+    const char   *ret_type_str   = CFCType_to_c(return_type);
+    const char   *full_imp_sym   = CFCMethod_imp_func(method);
+    const char   *param_list_str = CFCParamList_to_c(param_list);
+    char *buf = CFCUtil_sprintf("%s\n%s(%s);", ret_type_str,
+                                full_imp_sym, param_list_str);
+    return buf;
 }
 

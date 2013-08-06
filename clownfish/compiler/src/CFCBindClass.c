@@ -597,11 +597,15 @@ S_sub_declarations(CFCBindClass *self) {
     }
     for (int i = 0; fresh_methods[i] != NULL; i++) {
         CFCMethod *method = fresh_methods[i];
-        char *dec = CFCBindFunc_func_declaration((CFCFunction*)method);
+        char *dec = CFCBindMeth_imp_declaration(method);
         if (CFCMethod_final(method)) {
             declarations = CFCUtil_cat(declarations, PREFIX, "VISIBLE ", NULL);
         }
         declarations = CFCUtil_cat(declarations, dec, "\n\n", NULL);
+        const char *func  = CFCMethod_imp_func(method);
+        const char *alias = CFCMethod_imp_func_alias(method);
+        declarations = CFCUtil_cat(declarations, "#define ", alias, " ", func,
+                                   "\n", NULL);
         FREEMEM(dec);
     }
     FREEMEM(fresh_methods);
@@ -679,10 +683,14 @@ S_short_names(CFCBindClass *self) {
             CFCMethod *meth = fresh_methods[i];
 
             // Implementing functions.
-            const char *short_func = CFCMethod_short_implementing_func_sym(meth);
-            const char *full_func  = CFCMethod_implementing_func_sym(meth);
-            short_names = CFCUtil_cat(short_names, "  #define ", short_func,
-                                      " ", full_func, "\n", NULL);
+            const char *short_imp  = CFCMethod_short_imp_func(meth);
+            const char *full_imp   = CFCMethod_imp_func(meth);
+            short_names = CFCUtil_cat(short_names, "  #define ", short_imp,
+                                      " ", full_imp, "\n", NULL);
+            const char *short_alias = CFCMethod_short_imp_func_alias(meth);
+            const char *full_alias  = CFCMethod_imp_func_alias(meth);
+            short_names = CFCUtil_cat(short_names, "  #define ", short_alias,
+                                      " ", full_alias, "\n", NULL);
         }
         FREEMEM(fresh_methods);
 

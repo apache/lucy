@@ -76,6 +76,11 @@ CFCBindMeth_abstract_method_def(struct CFCMethod *method);
 char*
 CFCBindMeth_callback_dec(struct CFCMethod *method);
 
+/** Return C code declaring the function which implements a method.
+ */
+char*
+CFCBindMeth_imp_declaration(struct CFCMethod *method);
+
 #ifdef __cplusplus
 }
 #endif

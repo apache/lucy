@@ -228,10 +228,16 @@ struct CFCParamList*
 CFCMethod_get_param_list(CFCMethod *self);
 
 const char*
-CFCMethod_implementing_func_sym(CFCMethod *self);
+CFCMethod_imp_func_alias(CFCMethod *self);
 
 const char*
-CFCMethod_short_implementing_func_sym(CFCMethod *self);
+CFCMethod_short_imp_func_alias(CFCMethod *self);
+
+const char*
+CFCMethod_imp_func(CFCMethod *self);
+
+const char*
+CFCMethod_short_imp_func(CFCMethod *self);
 
 #ifdef __cplusplus
 }

@@ -39,6 +39,8 @@ struct CFCMethod {
     char *macro_sym;
     char *full_override_sym;
     char *host_alias;
+    char *short_imp_func;
+    char *imp_func;
     int is_final;
     int is_abstract;
     int is_novel;
@@ -132,6 +134,13 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     self->is_abstract       = is_abstract;
     self->is_excluded       = false;
 
+    // Derive name of implementing function.
+    self->short_imp_func
+        = CFCUtil_sprintf("%s_%s_IMP", CFCMethod_get_class_cnick(self),
+                          self->macro_sym);
+    self->imp_func = CFCUtil_sprintf("%s%s", CFCMethod_get_prefix(self),
+                                     self->short_imp_func);
+
     // Assume that this method is novel until we discover when applying
     // inheritance that it overrides another.
     self->is_novel = true;
@@ -149,6 +158,8 @@ CFCMethod_destroy(CFCMethod *self) {
     FREEMEM(self->macro_sym);
     FREEMEM(self->full_override_sym);
     FREEMEM(self->host_alias);
+    FREEMEM(self->short_imp_func);
+    FREEMEM(self->imp_func);
     CFCFunction_destroy((CFCFunction*)self);
 }
 
@@ -208,8 +219,8 @@ CFCMethod_override(CFCMethod *self, CFCMethod *orig) {
                     orig->macro_sym, orig_class, my_class);
     }
     if (!CFCMethod_compatible(self, orig)) {
-        const char *func      = CFCMethod_implementing_func_sym(self);
-        const char *orig_func = CFCMethod_implementing_func_sym(orig);
+        const char *func      = CFCMethod_imp_func(self);
+        const char *orig_func = CFCMethod_imp_func(orig);
         CFCUtil_die("Non-matching signatures for %s and %s", func, orig_func);
     }
 
@@ -336,7 +347,7 @@ CFCMethod_full_typedef(CFCMethod *self, CFCClass *invoker) {
 const char*
 CFCMethod_full_override_sym(CFCMethod *self) {
     if (!self->full_override_sym) {
-        const char *full_func_sym = CFCMethod_implementing_func_sym(self);
+        const char *full_func_sym = CFCMethod_imp_func_alias(self);
         self->full_override_sym
             = CFCUtil_sprintf("%s_OVERRIDE", full_func_sym);
     }
@@ -410,12 +421,22 @@ CFCMethod_get_param_list(CFCMethod *self) {
 }
 
 const char*
-CFCMethod_implementing_func_sym(CFCMethod *self) {
+CFCMethod_imp_func_alias(CFCMethod *self) {
     return CFCFunction_full_func_sym((CFCFunction*)self);
 }
 
 const char*
-CFCMethod_short_implementing_func_sym(CFCMethod *self) {
+CFCMethod_short_imp_func_alias(CFCMethod *self) {
     return CFCFunction_short_func_sym((CFCFunction*)self);
+}
+
+const char*
+CFCMethod_imp_func(CFCMethod *self) {
+    return self->imp_func;
+}
+
+const char*
+CFCMethod_short_imp_func(CFCMethod *self) {
+    return self->short_imp_func;
 }
 
