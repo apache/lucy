@@ -383,7 +383,7 @@ For every method, an inline wrapper for dynamic dispatch is defined in
 the generated C header with the name
 C<{Parcel_Nick}_{Class_Nick}_{Method_Name}>. Additionally, an
 implementing function is declared with the name
-C<{parcel_nick}_{Class_Nick}_{method_name}>. The Clownfish compiler also
+C<{Parcel_Nick}_{Class_Nick}_{Method_Name}_IMP>. The Clownfish compiler also
 generates a typedef for the method's function pointer type named
 C<{Parcel_Nick}_{Class_Nick}_{Method_Name}_t>. Wrappers and typedefs are
 created for all subclasses whether they override a method or not.
@@ -407,7 +407,8 @@ This will generate:
 
     /* Declaration of implementing function */
     void
-    pfind_VisGraph_add_node(pfind_VisibilityGraph *self, pfind_Node *node);
+    Pfind_VisGraph_Add_Node_IMP(pfind_VisibilityGraph *self,
+                                pfind_Node *node);
 
     /* Declaration of function pointer type */
     typedef void
@@ -422,7 +423,7 @@ implementation will look like:
     #include "Pathfinder/Graph/VisibilityGraph.h"
 
     void
-    VisGraph_add_node(VisibilityGraph *self, Node *node) {
+    VisGraph_Add_Node_IMP(VisibilityGraph *self, Node *node) {
         /* Implementation */
     }
 
@@ -603,7 +604,7 @@ Example:
     /* Implementation */
 
     void
-    Path_destroy(Path *self) {
+    Path_Destroy_IMP(Path *self) {
         DECREF(self->nodes);
         SUPER_DESTROY(self, PATH);
     }
