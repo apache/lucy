@@ -347,9 +347,11 @@ CFCMethod_full_typedef(CFCMethod *self, CFCClass *invoker) {
 const char*
 CFCMethod_full_override_sym(CFCMethod *self) {
     if (!self->full_override_sym) {
-        const char *full_func_sym = CFCMethod_imp_func_alias(self);
+        const char *Prefix = CFCMethod_get_Prefix(self);
+        const char *cnick  = CFCMethod_get_class_cnick(self);
         self->full_override_sym
-            = CFCUtil_sprintf("%s_OVERRIDE", full_func_sym);
+            = CFCUtil_sprintf("%s%s_%s_OVERRIDE", Prefix, cnick,
+                              self->macro_sym);
     }
     return self->full_override_sym;
 }
