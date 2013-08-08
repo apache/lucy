@@ -110,7 +110,7 @@ test_oversize__rounding(TestBatchRunner *runner) {
 }
 
 void
-TestMemory_run(TestMemory *self, TestBatchRunner *runner) {
+TestMemory_Run_IMP(TestMemory *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 30);
     test_oversize__growth_rate(runner);
     test_oversize__ceiling(runner);

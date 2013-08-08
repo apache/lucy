@@ -143,7 +143,7 @@ test_Cat(TestBatchRunner *runner) {
 }
 
 void
-TestBB_run(TestByteBuf *self, TestBatchRunner *runner) {
+TestBB_Run_IMP(TestByteBuf *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 21);
     test_Equals(runner);
     test_Grow(runner);

@@ -397,7 +397,7 @@ test_vcatf_x32(TestBatchRunner *runner) {
 }
 
 void
-TestCB_run(TestCharBuf *self, TestBatchRunner *runner) {
+TestCB_Run_IMP(TestCharBuf *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 54);
     test_vcatf_s(runner);
     test_vcatf_null_string(runner);

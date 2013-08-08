@@ -286,7 +286,7 @@ test_back_utf8_char(TestBatchRunner *runner) {
 }
 
 void
-TestStrHelp_run(TestStringHelper *self, TestBatchRunner *runner) {
+TestStrHelp_Run_IMP(TestStringHelper *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 40);
     test_overlap(runner);
     test_to_base36(runner);

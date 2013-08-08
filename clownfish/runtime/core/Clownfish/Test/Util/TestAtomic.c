@@ -57,7 +57,7 @@ test_cas_ptr(TestBatchRunner *runner) {
 }
 
 void
-TestAtomic_run(TestAtomic *self, TestBatchRunner *runner) {
+TestAtomic_Run_IMP(TestAtomic *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 6);
     test_cas_ptr(runner);
 }

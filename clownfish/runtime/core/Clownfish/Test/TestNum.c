@@ -273,7 +273,7 @@ test_Mimic(TestBatchRunner *runner) {
 }
 
 void
-TestNum_run(TestNum *self, TestBatchRunner *runner) {
+TestNum_Run_IMP(TestNum *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 53);
     test_To_String(runner);
     test_accessors(runner);

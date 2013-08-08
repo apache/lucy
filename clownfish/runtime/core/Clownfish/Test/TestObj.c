@@ -180,7 +180,7 @@ test_abstract_routines(TestBatchRunner *runner) {
 }
 
 void
-TestObj_run(TestObj *self, TestBatchRunner *runner) {
+TestObj_Run_IMP(TestObj *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 18);
     test_refcounts(runner);
     test_To_String(runner);

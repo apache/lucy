@@ -221,7 +221,7 @@ test_stress(TestBatchRunner *runner) {
 }
 
 void
-TestHash_run(TestHash *self, TestBatchRunner *runner) {
+TestHash_Run_IMP(TestHash *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 27);
     srand((unsigned int)time((time_t*)NULL));
     test_Equals(runner);

@@ -42,7 +42,7 @@ test_To_String(TestBatchRunner *runner) {
 }
 
 void
-TestErr_run(TestErr *self, TestBatchRunner *runner) {
+TestErr_Run_IMP(TestErr *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 1);
     test_To_String(runner);
 }

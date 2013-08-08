@@ -358,7 +358,7 @@ test_bigend_f64(TestBatchRunner *runner) {
 }
 
 void
-TestNumUtil_run(TestNumberUtils *self, TestBatchRunner *runner) {
+TestNumUtil_Run_IMP(TestNumberUtils *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 1196);
     srand((unsigned int)time((time_t*)NULL));
     test_u1(runner);

@@ -296,7 +296,7 @@ test_Clone_and_Shallow_Copy(TestBatchRunner *runner) {
 }
 
 void
-TestVArray_run(TestVArray *self, TestBatchRunner *runner) {
+TestVArray_Run_IMP(TestVArray *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 43);
     test_Equals(runner);
     test_Store_Fetch(runner);
