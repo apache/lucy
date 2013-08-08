@@ -74,17 +74,17 @@ TestFormatterCF_init(TestFormatterCF *self) {
 }
 
 void
-TestFormatterCF_batch_prologue(TestFormatterCF *self, TestBatch *batch,
-                               uint32_t num_planned) {
+TestFormatterCF_Batch_Prologue_IMP(TestFormatterCF *self, TestBatch *batch,
+                                   uint32_t num_planned) {
     UNUSED_VAR(self);
     CharBuf *class_name = TestBatch_Get_Class_Name(batch);
     printf("Running %s...\n", CB_Get_Ptr8(class_name));
 }
 
 void
-TestFormatterCF_vtest_result(TestFormatterCF *self, bool pass,
-                             uint32_t test_num, const char *fmt,
-                             va_list args) {
+TestFormatterCF_VTest_Result_IMP(TestFormatterCF *self, bool pass,
+                                 uint32_t test_num, const char *fmt,
+                                 va_list args) {
     UNUSED_VAR(self);
     if (!pass) {
         printf("  Failed test %u: ", test_num);
@@ -94,23 +94,23 @@ TestFormatterCF_vtest_result(TestFormatterCF *self, bool pass,
 }
 
 void
-TestFormatterCF_vtest_comment(TestFormatterCF *self, const char *fmt,
-                              va_list args) {
+TestFormatterCF_VTest_Comment_IMP(TestFormatterCF *self, const char *fmt,
+                                  va_list args) {
     UNUSED_VAR(self);
     printf("    ");
     vprintf(fmt, args);
 }
 
 void
-TestFormatterCF_vbatch_comment(TestFormatterCF *self, const char *fmt,
-                               va_list args) {
+TestFormatterCF_VBatch_Comment_IMP(TestFormatterCF *self, const char *fmt,
+                                   va_list args) {
     UNUSED_VAR(self);
     printf("  ");
     vprintf(fmt, args);
 }
 
 void
-TestFormatterCF_summary(TestFormatterCF *self, TestSuiteRunner *runner) {
+TestFormatterCF_Summary_IMP(TestFormatterCF *self, TestSuiteRunner *runner) {
     UNUSED_VAR(self);
     uint32_t num_batches = TestSuiteRunner_Get_Num_Batches(runner);
     uint32_t num_batches_failed
@@ -146,16 +146,16 @@ TestFormatterTAP_init(TestFormatterTAP *self) {
 }
 
 void
-TestFormatterTAP_batch_prologue(TestFormatterTAP *self, TestBatch *batch,
+TestFormatterTAP_Batch_Prologue_IMP(TestFormatterTAP *self, TestBatch *batch,
                                 uint32_t num_planned) {
     UNUSED_VAR(self);
     printf("1..%u\n", num_planned);
 }
 
 void
-TestFormatterTAP_vtest_result(TestFormatterTAP *self, bool pass,
-                              uint32_t test_num, const char *fmt,
-                              va_list args) {
+TestFormatterTAP_VTest_Result_IMP(TestFormatterTAP *self, bool pass,
+                                  uint32_t test_num, const char *fmt,
+                                  va_list args) {
     UNUSED_VAR(self);
     const char *result = pass ? "ok" : "not ok";
     printf("%s %u - ", result, test_num);
@@ -164,23 +164,23 @@ TestFormatterTAP_vtest_result(TestFormatterTAP *self, bool pass,
 }
 
 void
-TestFormatterTAP_vtest_comment(TestFormatterTAP *self, const char *fmt,
-                               va_list args) {
+TestFormatterTAP_VTest_Comment_IMP(TestFormatterTAP *self, const char *fmt,
+                                   va_list args) {
     UNUSED_VAR(self);
     printf("#   ");
     vprintf(fmt, args);
 }
 
 void
-TestFormatterTAP_vbatch_comment(TestFormatterTAP *self, const char *fmt,
-                                va_list args) {
+TestFormatterTAP_VBatch_Comment_IMP(TestFormatterTAP *self, const char *fmt,
+                                    va_list args) {
     UNUSED_VAR(self);
     printf("# ");
     vprintf(fmt, args);
 }
 
 void
-TestFormatterTAP_summary(TestFormatterTAP *self, TestSuiteRunner *runner) {
+TestFormatterTAP_Summary_IMP(TestFormatterTAP *self, TestSuiteRunner *runner) {
     UNUSED_VAR(self);
     UNUSED_VAR(runner);
 }

@@ -44,13 +44,13 @@ TestSuiteRunner_init(TestSuiteRunner *self, TestFormatter *formatter) {
 }
 
 void
-TestSuiteRunner_destroy(TestSuiteRunner *self) {
+TestSuiteRunner_Destroy_IMP(TestSuiteRunner *self) {
     DECREF(self->formatter);
     SUPER_DESTROY(self, TESTSUITERUNNER);
 }
 
 bool
-TestSuiteRunner_run_batch(TestSuiteRunner *self, TestBatch *batch) {
+TestSuiteRunner_Run_Batch_IMP(TestSuiteRunner *self, TestBatch *batch) {
     TestBatchRunner *batch_runner = TestBatchRunner_new(self->formatter);
     bool success = TestBatchRunner_Run_Batch(batch_runner, batch);
 
@@ -67,29 +67,29 @@ TestSuiteRunner_run_batch(TestSuiteRunner *self, TestBatch *batch) {
 }
 
 bool
-TestSuiteRunner_finish(TestSuiteRunner *self) {
+TestSuiteRunner_Finish_IMP(TestSuiteRunner *self) {
     TestFormatter_Summary(self->formatter, self);
 
     return self->num_batches != 0 && self->num_batches_failed == 0;
 }
 
 uint32_t
-TestSuiteRunner_get_num_tests(TestSuiteRunner *self) {
+TestSuiteRunner_Get_Num_Tests_IMP(TestSuiteRunner *self) {
     return self->num_tests;
 }
 
 uint32_t
-TestSuiteRunner_get_num_tests_failed(TestSuiteRunner *self) {
+TestSuiteRunner_Get_Num_Tests_Failed_IMP(TestSuiteRunner *self) {
     return self->num_tests_failed;
 }
 
 uint32_t
-TestSuiteRunner_get_num_batches(TestSuiteRunner *self) {
+TestSuiteRunner_Get_Num_Batches_IMP(TestSuiteRunner *self) {
     return self->num_batches;
 }
 
 uint32_t
-TestSuiteRunner_get_num_batches_failed(TestSuiteRunner *self) {
+TestSuiteRunner_Get_Num_Batches_Failed_IMP(TestSuiteRunner *self) {
     return self->num_batches_failed;
 }
 

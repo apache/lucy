@@ -64,13 +64,13 @@ TestBatchRunner_init(TestBatchRunner *self, TestFormatter *formatter) {
 }
 
 void
-TestBatchRunner_destroy(TestBatchRunner *self) {
+TestBatchRunner_Destroy_IMP(TestBatchRunner *self) {
     DECREF(self->formatter);
     SUPER_DESTROY(self, TESTBATCHRUNNER);
 }
 
 bool
-TestBatchRunner_run_batch(TestBatchRunner *self, TestBatch *batch) {
+TestBatchRunner_Run_Batch_IMP(TestBatchRunner *self, TestBatch *batch) {
     struct try_run_tests_context args;
     args.runner = self;
     args.batch  = batch;
@@ -107,24 +107,24 @@ S_try_run_tests(void *context) {
 }
 
 void
-TestBatchRunner_plan(TestBatchRunner *self, TestBatch *batch,
-                     uint32_t num_planned) {
+TestBatchRunner_Plan_IMP(TestBatchRunner *self, TestBatch *batch,
+                         uint32_t num_planned) {
     self->num_planned = num_planned;
     TestFormatter_Batch_Prologue(self->formatter, batch, num_planned);
 }
 
 uint32_t
-TestBatchRunner_get_num_planned(TestBatchRunner *self) {
+TestBatchRunner_Get_Num_Planned_IMP(TestBatchRunner *self) {
     return self->num_planned;
 }
 
 uint32_t
-TestBatchRunner_get_num_tests(TestBatchRunner *self) {
+TestBatchRunner_Get_Num_Tests_IMP(TestBatchRunner *self) {
     return self->test_num;
 }
 
 uint32_t
-TestBatchRunner_get_num_failed(TestBatchRunner *self) {
+TestBatchRunner_Get_Num_Failed_IMP(TestBatchRunner *self) {
     return self->num_failed;
 }
 
@@ -209,21 +209,21 @@ TestBatchRunner_skip(TestBatchRunner *self, const char *pattern, ...) {
 }
 
 bool
-TestBatchRunner_vtest_true(TestBatchRunner *self, bool condition,
-                           const char *pattern, va_list args) {
+TestBatchRunner_VTest_True_IMP(TestBatchRunner *self, bool condition,
+                               const char *pattern, va_list args) {
     return S_vtest_true(self, condition, pattern, args);
 }
 
 bool
-TestBatchRunner_vtest_false(TestBatchRunner *self, bool condition,
-                            const char *pattern, va_list args) {
+TestBatchRunner_VTest_False_IMP(TestBatchRunner *self, bool condition,
+                                const char *pattern, va_list args) {
     return S_vtest_true(self, !condition, pattern, args);
 }
 
 bool
-TestBatchRunner_vtest_int_equals(TestBatchRunner *self, long got,
-                                 long expected, const char *pattern,
-                                 va_list args) {
+TestBatchRunner_VTest_Int_Equals_IMP(TestBatchRunner *self, long got,
+                                     long expected, const char *pattern,
+                                     va_list args) {
     bool pass = (got == expected);
     S_vtest_true(self, pass, pattern, args);
     if (!pass) {
@@ -235,9 +235,9 @@ TestBatchRunner_vtest_int_equals(TestBatchRunner *self, long got,
 }
 
 bool
-TestBatchRunner_vtest_float_equals(TestBatchRunner *self, double got,
-                                   double expected, const char *pattern,
-                                   va_list args) {
+TestBatchRunner_VTest_Float_Equals_IMP(TestBatchRunner *self, double got,
+                                       double expected, const char *pattern,
+                                       va_list args) {
     double relative_error = got / expected - 1.0;
     bool   pass           = (fabs(relative_error) < 1e-6);
     S_vtest_true(self, pass, pattern, args);
@@ -250,9 +250,9 @@ TestBatchRunner_vtest_float_equals(TestBatchRunner *self, double got,
 }
 
 bool
-TestBatchRunner_vtest_string_equals(TestBatchRunner *self, const char *got,
-                                    const char *expected, const char *pattern,
-                                    va_list args) {
+TestBatchRunner_VTest_String_Equals_IMP(TestBatchRunner *self, const char *got,
+                                        const char *expected,
+                                        const char *pattern, va_list args) {
     bool pass = (strcmp(got, expected) == 0);
     S_vtest_true(self, pass, pattern, args);
     if (!pass) {
@@ -264,20 +264,20 @@ TestBatchRunner_vtest_string_equals(TestBatchRunner *self, const char *got,
 }
 
 bool
-TestBatchRunner_vpass(TestBatchRunner *self, const char *pattern,
-                      va_list args) {
+TestBatchRunner_VPass_IMP(TestBatchRunner *self, const char *pattern,
+                          va_list args) {
     return S_vtest_true(self, true, pattern, args);
 }
 
 bool
-TestBatchRunner_vfail(TestBatchRunner *self, const char *pattern,
-                      va_list args) {
+TestBatchRunner_VFail_IMP(TestBatchRunner *self, const char *pattern,
+                          va_list args) {
     return S_vtest_true(self, false, pattern, args);
 }
 
 void
-TestBatchRunner_vskip(TestBatchRunner *self, const char *pattern,
-                      va_list args) {
+TestBatchRunner_VSkip_IMP(TestBatchRunner *self, const char *pattern,
+                          va_list args) {
     self->test_num++;
     // TODO: Add a VTest_Skip method to TestFormatter
     TestFormatter_VTest_Result(self->formatter, true, self->test_num,

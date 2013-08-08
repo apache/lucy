@@ -50,18 +50,18 @@ TestSuite_init(TestSuite *self) {
 }
 
 void
-TestSuite_destroy(TestSuite *self) {
+TestSuite_Destroy_IMP(TestSuite *self) {
     DECREF(self->batches);
     SUPER_DESTROY(self, TESTSUITE);
 }
 
 void
-TestSuite_add_batch(TestSuite *self, TestBatch *batch) {
+TestSuite_Add_Batch_IMP(TestSuite *self, TestBatch *batch) {
     VA_Push(self->batches, (Obj*)batch);
 }
 
 bool
-TestSuite_run_batch(TestSuite *self, CharBuf *class_name,
+TestSuite_Run_Batch_IMP(TestSuite *self, CharBuf *class_name,
                     TestFormatter *formatter) {
     S_unbuffer_stdout();
 
@@ -83,7 +83,7 @@ TestSuite_run_batch(TestSuite *self, CharBuf *class_name,
 }
 
 bool
-TestSuite_run_all_batches(TestSuite *self, TestFormatter *formatter) {
+TestSuite_Run_All_Batches_IMP(TestSuite *self, TestFormatter *formatter) {
     S_unbuffer_stdout();
 
     TestSuiteRunner *runner = TestSuiteRunner_new(formatter);
