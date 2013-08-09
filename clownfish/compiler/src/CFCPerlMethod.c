@@ -41,8 +41,7 @@ S_xsub_body(CFCPerlMethod *self);
 
 // Create an assignment statement for extracting $self from the Perl stack.
 static char*
-S_self_assign_statement(CFCPerlMethod *self, CFCType *type,
-                        const char *method_name);
+S_self_assign_statement(CFCPerlMethod *self, CFCType *type);
 
 // Return code for an xsub which uses labeled params.
 static char*
@@ -220,8 +219,7 @@ S_xsub_body(CFCPerlMethod *self) {
 
 // Create an assignment statement for extracting $self from the Perl stack.
 static char*
-S_self_assign_statement(CFCPerlMethod *self, CFCType *type,
-                        const char *method_name) {
+S_self_assign_statement(CFCPerlMethod *self, CFCType *type) {
     (void)self; // unused
     const char *type_c = CFCType_to_c(type);
     if (!CFCType_is_object(type)) {
@@ -242,8 +240,7 @@ S_xsub_def_labeled_params(CFCPerlMethod *self) {
     CFCVariable *self_var    = arg_vars[0];
     CFCType     *self_type   = CFCVariable_get_type(self_var);
     const char  *self_micro_sym = CFCVariable_micro_sym(self_var);
-    const char  *micro_sym   = CFCMethod_micro_sym(self->method);
-    char *self_assign = S_self_assign_statement(self, self_type, micro_sym);
+    char *self_assign = S_self_assign_statement(self, self_type);
     char *allot_params = CFCPerlSub_build_allot_params((CFCPerlSub*)self);
     char *body = S_xsub_body(self);
 
@@ -323,9 +320,7 @@ S_xsub_def_positional_args(CFCPerlMethod *self) {
         const char  *type_c   = CFCType_to_c(var_type);
 
         if (i == 0) {    // self
-            const char *meth_micro_sym = CFCMethod_micro_sym(self->method);
-            char *statement
-                = S_self_assign_statement(self, var_type, meth_micro_sym);
+            char *statement = S_self_assign_statement(self, var_type);
             var_assignments = CFCUtil_cat(var_assignments, statement, NULL);
             FREEMEM(statement);
         }

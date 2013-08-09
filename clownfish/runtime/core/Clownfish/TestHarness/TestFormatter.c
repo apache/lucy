@@ -77,6 +77,7 @@ void
 TestFormatterCF_Batch_Prologue_IMP(TestFormatterCF *self, TestBatch *batch,
                                    uint32_t num_planned) {
     UNUSED_VAR(self);
+    UNUSED_VAR(num_planned);
     CharBuf *class_name = TestBatch_Get_Class_Name(batch);
     printf("Running %s...\n", CB_Get_Ptr8(class_name));
 }
@@ -149,6 +150,7 @@ void
 TestFormatterTAP_Batch_Prologue_IMP(TestFormatterTAP *self, TestBatch *batch,
                                 uint32_t num_planned) {
     UNUSED_VAR(self);
+    UNUSED_VAR(batch);
     printf("1..%u\n", num_planned);
 }
 
