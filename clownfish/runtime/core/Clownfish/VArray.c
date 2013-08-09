@@ -213,7 +213,7 @@ VA_Excise_IMP(VArray *self, uint32_t offset, uint32_t length) {
 
 void
 VA_Clear_IMP(VArray *self) {
-    VA_excise(self, 0, self->size);
+    VA_Excise_IMP(self, 0, self->size);
 }
 
 void

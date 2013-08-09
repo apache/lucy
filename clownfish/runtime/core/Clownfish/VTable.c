@@ -112,14 +112,14 @@ VTable_bootstrap(const VTableSpec *specs, size_t num_specs)
         for (size_t i = 0; i < spec->num_overridden_meths; ++i) {
             const OverriddenMethSpec *mspec = &spec->overridden_meth_specs[i];
             *mspec->offset = *mspec->parent_offset;
-            VTable_override(vtable, mspec->func, *mspec->offset);
+            VTable_Override_IMP(vtable, mspec->func, *mspec->offset);
         }
 
         for (size_t i = 0; i < spec->num_novel_meths; ++i) {
             const NovelMethSpec *mspec = &spec->novel_meth_specs[i];
             *mspec->offset = novel_offset;
             novel_offset += sizeof(cfish_method_t);
-            VTable_override(vtable, mspec->func, *mspec->offset);
+            VTable_Override_IMP(vtable, mspec->func, *mspec->offset);
         }
 
         *spec->vtable = vtable;
@@ -133,7 +133,7 @@ VTable_bootstrap(const VTableSpec *specs, size_t num_specs)
         const VTableSpec *spec = &specs[i];
         VTable *vtable = *spec->vtable;
 
-        VTable_init_obj(VTABLE, vtable);
+        VTable_Init_Obj_IMP(VTABLE, vtable);
     }
 
     /* Now it's safe to call methods.
@@ -284,7 +284,7 @@ VTable_singleton(const CharBuf *class_name, VTable *parent) {
             Hash *meths = Hash_new(num_fresh);
             CharBuf *scrunched = CB_new(0);
             for (uint32_t i = 0; i < num_fresh; i++) {
-                CharBuf *meth = (CharBuf*)VA_fetch(fresh_host_methods, i);
+                CharBuf *meth = (CharBuf*)VA_Fetch(fresh_host_methods, i);
                 S_scrunch_charbuf(meth, scrunched);
                 Hash_Store(meths, (Obj*)scrunched, (Obj*)CFISH_TRUE);
             }

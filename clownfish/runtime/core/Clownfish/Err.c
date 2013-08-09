@@ -165,7 +165,7 @@ Err_Add_Frame_IMP(Err *self, const char *file, int line, const char *func) {
 
 void
 Err_rethrow(Err *self, const char *file, int line, const char *func) {
-    Err_add_frame(self, file, line, func);
+    Err_Add_Frame_IMP(self, file, line, func);
     Err_do_throw(self);
 }
 

@@ -235,7 +235,8 @@ ViewBB_init(ViewByteBuf *self, char *buf, size_t size) {
 
 void
 ViewBB_Destroy_IMP(ViewByteBuf *self) {
-    Obj_destroy((Obj*)self);
+    Obj_Destroy_t super_duper_destroy = METHOD_PTR(OBJ, Cfish_Obj_Destroy);
+    super_duper_destroy((Obj*)self);
 }
 
 void

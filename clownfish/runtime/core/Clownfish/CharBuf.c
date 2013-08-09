@@ -472,7 +472,7 @@ CB_Cat_Str_IMP(CharBuf *self, const char* ptr, size_t size) {
     if (!StrHelp_utf8_valid(ptr, size)) {
         DIE_INVALID_UTF8(ptr, size);
     }
-    CB_cat_trusted_str(self, ptr, size);
+    CB_Cat_Trusted_Str_IMP(self, ptr, size);
 }
 
 void
@@ -501,7 +501,7 @@ CB_Cat_IMP(CharBuf *self, const CharBuf *other) {
 
 bool
 CB_Starts_With_IMP(CharBuf *self, const CharBuf *prefix) {
-    return CB_starts_with_str(self, prefix->ptr, prefix->size);
+    return CB_Starts_With_Str_IMP(self, prefix->ptr, prefix->size);
 }
 
 bool
@@ -521,7 +521,7 @@ CB_Equals_IMP(CharBuf *self, Obj *other) {
     CharBuf *const twin = (CharBuf*)other;
     if (twin == self)              { return true; }
     if (!Obj_Is_A(other, CHARBUF)) { return false; }
-    return CB_equals_str(self, twin->ptr, twin->size);
+    return CB_Equals_Str_IMP(self, twin->ptr, twin->size);
 }
 
 int32_t
@@ -540,7 +540,7 @@ CB_Equals_Str_IMP(CharBuf *self, const char *ptr, size_t size) {
 
 bool
 CB_Ends_With_IMP(CharBuf *self, const CharBuf *postfix) {
-    return CB_ends_with_str(self, postfix->ptr, postfix->size);
+    return CB_Ends_With_Str_IMP(self, postfix->ptr, postfix->size);
 }
 
 bool
