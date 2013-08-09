@@ -41,14 +41,14 @@ FilterMatcher_init(FilterMatcher *self, BitVector *bits, int32_t doc_max) {
 }
 
 void
-FilterMatcher_destroy(FilterMatcher *self) {
+FilterMatcher_Destroy_IMP(FilterMatcher *self) {
     FilterMatcherIVARS *const ivars = FilterMatcher_IVARS(self);
     DECREF(ivars->bits);
     SUPER_DESTROY(self, FILTERMATCHER);
 }
 
 int32_t
-FilterMatcher_next(FilterMatcher* self) {
+FilterMatcher_Next_IMP(FilterMatcher* self) {
     FilterMatcherIVARS *const ivars = FilterMatcher_IVARS(self);
     do {
         if (++ivars->doc_id > ivars->doc_max) {
@@ -60,19 +60,19 @@ FilterMatcher_next(FilterMatcher* self) {
 }
 
 int32_t
-FilterMatcher_skip_to(FilterMatcher* self, int32_t target) {
+FilterMatcher_Skip_To_IMP(FilterMatcher* self, int32_t target) {
     FilterMatcher_IVARS(self)->doc_id = target - 1;
     return FilterMatcher_next(self);
 }
 
 float
-FilterMatcher_score(FilterMatcher* self) {
+FilterMatcher_Score_IMP(FilterMatcher* self) {
     UNUSED_VAR(self);
     return 0.0f;
 }
 
 int32_t
-FilterMatcher_get_doc_id(FilterMatcher* self) {
+FilterMatcher_Get_Doc_ID_IMP(FilterMatcher* self) {
     return FilterMatcher_IVARS(self)->doc_id;
 }
 

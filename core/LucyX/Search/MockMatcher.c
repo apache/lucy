@@ -37,7 +37,7 @@ MockMatcher_init(MockMatcher *self, I32Array *doc_ids, ByteBuf *scores) {
 }
 
 void
-MockMatcher_destroy(MockMatcher *self) {
+MockMatcher_Destroy_IMP(MockMatcher *self) {
     MockMatcherIVARS *const ivars = MockMatcher_IVARS(self);
     DECREF(ivars->doc_ids);
     DECREF(ivars->scores);
@@ -45,7 +45,7 @@ MockMatcher_destroy(MockMatcher *self) {
 }
 
 int32_t
-MockMatcher_next(MockMatcher* self) {
+MockMatcher_Next_IMP(MockMatcher* self) {
     MockMatcherIVARS *const ivars = MockMatcher_IVARS(self);
     if (++ivars->tick >= (int32_t)ivars->size) {
         ivars->tick--;
@@ -55,7 +55,7 @@ MockMatcher_next(MockMatcher* self) {
 }
 
 float
-MockMatcher_score(MockMatcher* self) {
+MockMatcher_Score_IMP(MockMatcher* self) {
     MockMatcherIVARS *const ivars = MockMatcher_IVARS(self);
     if (!ivars->scores) {
         THROW(ERR, "Can't call Score() unless scores supplied");
@@ -65,7 +65,7 @@ MockMatcher_score(MockMatcher* self) {
 }
 
 int32_t
-MockMatcher_get_doc_id(MockMatcher* self) {
+MockMatcher_Get_Doc_ID_IMP(MockMatcher* self) {
     MockMatcherIVARS *const ivars = MockMatcher_IVARS(self);
     return I32Arr_Get(ivars->doc_ids, ivars->tick);
 }

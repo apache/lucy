@@ -71,7 +71,7 @@ ProximityMatcher_init(ProximityMatcher *self, Similarity *similarity,
 }
 
 void
-ProximityMatcher_destroy(ProximityMatcher *self) {
+ProximityMatcher_Destroy_IMP(ProximityMatcher *self) {
     ProximityMatcherIVARS *const ivars = ProximityMatcher_IVARS(self);
     if (ivars->plists) {
         for (size_t i = 0; i < ivars->num_elements; i++) {
@@ -86,7 +86,7 @@ ProximityMatcher_destroy(ProximityMatcher *self) {
 }
 
 int32_t
-ProximityMatcher_next(ProximityMatcher *self) {
+ProximityMatcher_Next_IMP(ProximityMatcher *self) {
     ProximityMatcherIVARS *const ivars = ProximityMatcher_IVARS(self);
     if (ivars->first_time) {
         return ProximityMatcher_Advance(self, 1);
@@ -101,7 +101,7 @@ ProximityMatcher_next(ProximityMatcher *self) {
 }
 
 int32_t
-ProximityMatcher_advance(ProximityMatcher *self, int32_t target) {
+ProximityMatcher_Advance_IMP(ProximityMatcher *self, int32_t target) {
     ProximityMatcherIVARS *const ivars = ProximityMatcher_IVARS(self);
     PostingList **const plists       = ivars->plists;
     const uint32_t      num_elements = ivars->num_elements;
@@ -249,7 +249,7 @@ DONE:
 }
 
 float
-ProximityMatcher_calc_proximity_freq(ProximityMatcher *self) {
+ProximityMatcher_Calc_Proximity_Freq_IMP(ProximityMatcher *self) {
     ProximityMatcherIVARS *const ivars = ProximityMatcher_IVARS(self);
     PostingList **const plists = ivars->plists;
 
@@ -315,12 +315,12 @@ ProximityMatcher_calc_proximity_freq(ProximityMatcher *self) {
 }
 
 int32_t
-ProximityMatcher_get_doc_id(ProximityMatcher *self) {
+ProximityMatcher_Get_Doc_ID_IMP(ProximityMatcher *self) {
     return ProximityMatcher_IVARS(self)->doc_id;
 }
 
 float
-ProximityMatcher_score(ProximityMatcher *self) {
+ProximityMatcher_Score_IMP(ProximityMatcher *self) {
     ProximityMatcherIVARS *const ivars = ProximityMatcher_IVARS(self);
     ScorePosting *posting = (ScorePosting*)PList_Get_Posting(ivars->plists[0]);
     float score = Sim_TF(ivars->sim, ivars->proximity_freq)
