@@ -168,7 +168,7 @@ SV*
 _clone(self)
     cfish_CharBuf *self;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(cfish_CB_clone(self));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(Cfish_CB_Clone_IMP(self));
 OUTPUT: RETVAL
 
 SV*
@@ -268,7 +268,7 @@ _fetch(self, key)
     cfish_Hash *self;
     const cfish_CharBuf *key;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV(cfish_Hash_fetch(self, (cfish_Obj*)key));
+    RETVAL = CFISH_OBJ_TO_SV(Cfish_Hash_Fetch_IMP(self, (cfish_Obj*)key));
 OUTPUT: RETVAL
 
 void
@@ -279,7 +279,7 @@ store(self, key, value);
 PPCODE:
 {
     if (value) { CFISH_INCREF(value); }
-    cfish_Hash_store(self, (cfish_Obj*)key, value);
+    Cfish_Hash_Store_IMP(self, (cfish_Obj*)key, value);
 }
 
 void
@@ -549,7 +549,7 @@ store(self, tick, value);
 PPCODE:
 {
     if (value) { CFISH_INCREF(value); }
-    cfish_VA_store(self, tick, value);
+    Cfish_VA_Store_IMP(self, tick, value);
 }
 
 SV*

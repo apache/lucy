@@ -621,14 +621,14 @@ S_lazy_init_host_obj(cfish_Obj *self) {
 }
 
 uint32_t
-cfish_Obj_get_refcount(cfish_Obj *self) {
+Cfish_Obj_Get_RefCount_IMP(cfish_Obj *self) {
     return self->ref.count & XSBIND_REFCOUNT_FLAG
            ? self->ref.count >> XSBIND_REFCOUNT_SHIFT
            : SvREFCNT((SV*)self->ref.host_obj);
 }
 
 cfish_Obj*
-cfish_Obj_inc_refcount(cfish_Obj *self) {
+Cfish_Obj_Inc_RefCount_IMP(cfish_Obj *self) {
     if (self->ref.count & XSBIND_REFCOUNT_FLAG) {
         if (self->ref.count == XSBIND_REFCOUNT_FLAG) {
             CFISH_THROW(CFISH_ERR, "Illegal refcount of 0");
@@ -642,7 +642,7 @@ cfish_Obj_inc_refcount(cfish_Obj *self) {
 }
 
 uint32_t
-cfish_Obj_dec_refcount(cfish_Obj *self) {
+Cfish_Obj_Dec_RefCount_IMP(cfish_Obj *self) {
     uint32_t modified_refcount = I32_MAX;
     if (self->ref.count & XSBIND_REFCOUNT_FLAG) {
         if (self->ref.count == XSBIND_REFCOUNT_FLAG) {
@@ -668,7 +668,7 @@ cfish_Obj_dec_refcount(cfish_Obj *self) {
 }
 
 void*
-cfish_Obj_to_host(cfish_Obj *self) {
+Cfish_Obj_To_Host_IMP(cfish_Obj *self) {
     if (self->ref.count & XSBIND_REFCOUNT_FLAG) { S_lazy_init_host_obj(self); }
     return newRV_inc((SV*)self->ref.host_obj);
 }
@@ -676,7 +676,7 @@ cfish_Obj_to_host(cfish_Obj *self) {
 /*************************** Clownfish::VTable ******************************/
 
 cfish_Obj*
-cfish_VTable_make_obj(cfish_VTable *self) {
+Cfish_VTable_Make_Obj_IMP(cfish_VTable *self) {
     cfish_Obj *obj
         = (cfish_Obj*)cfish_Memory_wrapped_calloc(self->obj_alloc_size, 1);
     obj->vtable = self;
@@ -685,7 +685,7 @@ cfish_VTable_make_obj(cfish_VTable *self) {
 }
 
 cfish_Obj*
-cfish_VTable_init_obj(cfish_VTable *self, void *allocation) {
+Cfish_VTable_Init_Obj_IMP(cfish_VTable *self, void *allocation) {
     cfish_Obj *obj = (cfish_Obj*)allocation;
     obj->vtable = self;
     obj->ref.count = (1 << XSBIND_REFCOUNT_SHIFT) | XSBIND_REFCOUNT_FLAG;
@@ -693,7 +693,7 @@ cfish_VTable_init_obj(cfish_VTable *self, void *allocation) {
 }
 
 cfish_Obj*
-cfish_VTable_foster_obj(cfish_VTable *self, void *host_obj) {
+Cfish_VTable_Foster_Obj_IMP(cfish_VTable *self, void *host_obj) {
     cfish_Obj *obj
         = (cfish_Obj*)cfish_Memory_wrapped_calloc(self->obj_alloc_size, 1);
     SV *inner_obj = SvRV((SV*)host_obj);
@@ -757,7 +757,7 @@ cfish_VTable_find_parent_class(const cfish_CharBuf *class_name) {
 }
 
 void*
-cfish_VTable_to_host(cfish_VTable *self) {
+Cfish_VTable_To_Host_IMP(cfish_VTable *self) {
     bool first_time = self->ref.count & XSBIND_REFCOUNT_FLAG ? true : false;
     Cfish_VTable_To_Host_t to_host
         = CFISH_SUPER_METHOD_PTR(CFISH_VTABLE, Cfish_VTable_To_Host);
@@ -848,7 +848,7 @@ cfish_Err_do_throw(cfish_Err *err) {
 }
 
 void*
-cfish_Err_to_host(cfish_Err *self) {
+Cfish_Err_To_Host_IMP(cfish_Err *self) {
     Cfish_Err_To_Host_t super_to_host
         = CFISH_SUPER_METHOD_PTR(CFISH_ERR, Cfish_Err_To_Host);
     SV *perl_obj = (SV*)super_to_host(self);
@@ -922,7 +922,7 @@ cfish_Err_trap(Cfish_Err_Attempt_t routine, void *context) {
 /*********************** Clownfish::LockFreeRegistry ************************/
 
 void*
-cfish_LFReg_to_host(cfish_LockFreeRegistry *self) {
+Cfish_LFReg_To_Host_IMP(cfish_LockFreeRegistry *self) {
     bool first_time = self->ref.count & XSBIND_REFCOUNT_FLAG ? true : false;
     Cfish_LFReg_To_Host_t to_host
         = CFISH_SUPER_METHOD_PTR(CFISH_LOCKFREEREGISTRY, Cfish_LFReg_To_Host);
