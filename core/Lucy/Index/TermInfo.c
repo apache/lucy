@@ -37,7 +37,7 @@ TInfo_init(TermInfo *self, int32_t doc_freq) {
 }
 
 TermInfo*
-TInfo_clone(TermInfo *self) {
+TInfo_Clone_IMP(TermInfo *self) {
     TermInfoIVARS *const ivars = TInfo_IVARS(self);
     TermInfo *twin = TInfo_new(ivars->doc_freq);
     TermInfoIVARS *const twin_ivars = TInfo_IVARS(twin);
@@ -48,49 +48,49 @@ TInfo_clone(TermInfo *self) {
 }
 
 int32_t
-TInfo_get_doc_freq(TermInfo *self) {
+TInfo_Get_Doc_Freq_IMP(TermInfo *self) {
     return TInfo_IVARS(self)->doc_freq;
 }
 
 int64_t
-TInfo_get_lex_filepos(TermInfo *self) {
+TInfo_Get_Lex_FilePos_IMP(TermInfo *self) {
     return TInfo_IVARS(self)->lex_filepos;
 }
 
 int64_t
-TInfo_get_post_filepos(TermInfo *self) {
+TInfo_Get_Post_FilePos_IMP(TermInfo *self) {
     return TInfo_IVARS(self)->post_filepos;
 }
 
 int64_t
-TInfo_get_skip_filepos(TermInfo *self) {
+TInfo_Get_Skip_FilePos_IMP(TermInfo *self) {
     return TInfo_IVARS(self)->skip_filepos;
 }
 
 void
-TInfo_set_doc_freq(TermInfo *self, int32_t doc_freq) {
+TInfo_Set_Doc_Freq_IMP(TermInfo *self, int32_t doc_freq) {
     TInfo_IVARS(self)->doc_freq = doc_freq;
 }
 
 void
-TInfo_set_lex_filepos(TermInfo *self, int64_t filepos) {
+TInfo_Set_Lex_FilePos_IMP(TermInfo *self, int64_t filepos) {
     TInfo_IVARS(self)->lex_filepos = filepos;
 }
 
 void
-TInfo_set_post_filepos(TermInfo *self, int64_t filepos) {
+TInfo_Set_Post_FilePos_IMP(TermInfo *self, int64_t filepos) {
     TInfo_IVARS(self)->post_filepos = filepos;
 }
 
 void
-TInfo_set_skip_filepos(TermInfo *self, int64_t filepos) {
+TInfo_Set_Skip_FilePos_IMP(TermInfo *self, int64_t filepos) {
     TInfo_IVARS(self)->skip_filepos = filepos;
 }
 
 // TODO: this should probably be some sort of Dump variant rather than
 // To_String.
 CharBuf*
-TInfo_to_string(TermInfo *self) {
+TInfo_To_String_IMP(TermInfo *self) {
     TermInfoIVARS *const ivars = TInfo_IVARS(self);
     return CB_newf(
                "doc freq:      %i32\n"
@@ -103,7 +103,7 @@ TInfo_to_string(TermInfo *self) {
 }
 
 void
-TInfo_mimic(TermInfo *self, Obj *other) {
+TInfo_Mimic_IMP(TermInfo *self, Obj *other) {
     CERTIFY(other, TERMINFO);
     TermInfoIVARS *const ivars = TInfo_IVARS(self);
     TermInfoIVARS *const ovars = TInfo_IVARS((TermInfo*)other);
@@ -114,7 +114,7 @@ TInfo_mimic(TermInfo *self, Obj *other) {
 }
 
 void
-TInfo_reset(TermInfo *self) {
+TInfo_Reset_IMP(TermInfo *self) {
     TermInfoIVARS *const ivars = TInfo_IVARS(self);
     ivars->doc_freq      = 0;
     ivars->post_filepos  = 0;

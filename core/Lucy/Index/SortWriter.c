@@ -70,7 +70,7 @@ SortWriter_init(SortWriter *self, Schema *schema, Snapshot *snapshot,
 }
 
 void
-SortWriter_destroy(SortWriter *self) {
+SortWriter_Destroy_IMP(SortWriter *self) {
     SortWriterIVARS *const ivars = SortWriter_IVARS(self);
     DECREF(ivars->field_writers);
     DECREF(ivars->counts);
@@ -133,8 +133,8 @@ S_lazy_init_field_writer(SortWriter *self, int32_t field_num) {
 }
 
 void
-SortWriter_add_inverted_doc(SortWriter *self, Inverter *inverter,
-                            int32_t doc_id) {
+SortWriter_Add_Inverted_Doc_IMP(SortWriter *self, Inverter *inverter,
+                                int32_t doc_id) {
     SortWriterIVARS *const ivars = SortWriter_IVARS(self);
     int32_t field_num;
 
@@ -163,8 +163,8 @@ SortWriter_add_inverted_doc(SortWriter *self, Inverter *inverter,
 }
 
 void
-SortWriter_add_segment(SortWriter *self, SegReader *reader,
-                       I32Array *doc_map) {
+SortWriter_Add_Segment_IMP(SortWriter *self, SegReader *reader,
+                           I32Array *doc_map) {
     SortWriterIVARS *const ivars = SortWriter_IVARS(self);
     VArray *fields = Schema_All_Fields(ivars->schema);
 
@@ -189,7 +189,7 @@ SortWriter_add_segment(SortWriter *self, SegReader *reader,
 }
 
 void
-SortWriter_finish(SortWriter *self) {
+SortWriter_Finish_IMP(SortWriter *self) {
     SortWriterIVARS *const ivars = SortWriter_IVARS(self);
     VArray *const field_writers = ivars->field_writers;
 
@@ -253,7 +253,7 @@ SortWriter_finish(SortWriter *self) {
 }
 
 Hash*
-SortWriter_metadata(SortWriter *self) {
+SortWriter_Metadata_IMP(SortWriter *self) {
     SortWriterIVARS *const ivars = SortWriter_IVARS(self);
     Hash *const metadata  = DataWriter_metadata((DataWriter*)self);
     Hash_Store_Str(metadata, "counts", 6, INCREF(ivars->counts));
@@ -263,7 +263,7 @@ SortWriter_metadata(SortWriter *self) {
 }
 
 int32_t
-SortWriter_format(SortWriter *self) {
+SortWriter_Format_IMP(SortWriter *self) {
     UNUSED_VAR(self);
     return SortWriter_current_file_format;
 }

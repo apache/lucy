@@ -113,7 +113,7 @@ PostPool_init(PostingPool *self, Schema *schema, Snapshot *snapshot,
 }
 
 void
-PostPool_destroy(PostingPool *self) {
+PostPool_Destroy_IMP(PostingPool *self) {
     PostingPoolIVARS *const ivars = PostPool_IVARS(self);
     DECREF(ivars->schema);
     DECREF(ivars->snapshot);
@@ -137,7 +137,7 @@ PostPool_destroy(PostingPool *self) {
 }
 
 int
-PostPool_compare(PostingPool *self, void *va, void *vb) {
+PostPool_Compare_IMP(PostingPool *self, void *va, void *vb) {
     RawPostingIVARS *const a     = RawPost_IVARS(*(RawPosting**)va);
     RawPostingIVARS *const b     = RawPost_IVARS(*(RawPosting**)vb);
     const size_t      a_len = a->content_len;
@@ -160,12 +160,12 @@ PostPool_compare(PostingPool *self, void *va, void *vb) {
 }
 
 MemoryPool*
-PostPool_get_mem_pool(PostingPool *self) {
+PostPool_Get_Mem_Pool_IMP(PostingPool *self) {
     return PostPool_IVARS(self)->mem_pool;
 }
 
 void
-PostPool_flip(PostingPool *self) {
+PostPool_Flip_IMP(PostingPool *self) {
     PostingPoolIVARS *const ivars = PostPool_IVARS(self);
     uint32_t num_runs   = VA_Get_Size(ivars->runs);
     uint32_t sub_thresh = num_runs > 0
@@ -224,8 +224,8 @@ PostPool_flip(PostingPool *self) {
 }
 
 void
-PostPool_add_segment(PostingPool *self, SegReader *reader, I32Array *doc_map,
-                     int32_t doc_base) {
+PostPool_Add_Segment_IMP(PostingPool *self, SegReader *reader,
+                         I32Array *doc_map, int32_t doc_base) {
     PostingPoolIVARS *const ivars = PostPool_IVARS(self);
     LexiconReader *lex_reader = (LexiconReader*)SegReader_Fetch(
                                     reader, VTable_Get_Name(LEXICONREADER));
@@ -259,7 +259,7 @@ PostPool_add_segment(PostingPool *self, SegReader *reader, I32Array *doc_map,
 }
 
 void
-PostPool_shrink(PostingPool *self) {
+PostPool_Shrink_IMP(PostingPool *self) {
     PostingPoolIVARS *const ivars = PostPool_IVARS(self);
     if (ivars->cache_max - ivars->cache_tick > 0) {
         size_t cache_count = PostPool_Cache_Count(self);
@@ -289,7 +289,7 @@ PostPool_shrink(PostingPool *self) {
 }
 
 void
-PostPool_flush(PostingPool *self) {
+PostPool_Flush_IMP(PostingPool *self) {
     PostingPoolIVARS *const ivars = PostPool_IVARS(self);
 
     // Don't add a run unless we have data to put in it.
@@ -338,7 +338,7 @@ PostPool_flush(PostingPool *self) {
 }
 
 void
-PostPool_finish(PostingPool *self) {
+PostPool_Finish_IMP(PostingPool *self) {
     PostingPoolIVARS *const ivars = PostPool_IVARS(self);
 
     // Bail if there's no data.
@@ -478,7 +478,7 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
 }
 
 uint32_t
-PostPool_refill(PostingPool *self) {
+PostPool_Refill_IMP(PostingPool *self) {
     PostingPoolIVARS *const ivars = PostPool_IVARS(self);
     Lexicon *const     lexicon     = ivars->lexicon;
     PostingList *const plist       = ivars->plist;
@@ -565,8 +565,9 @@ PostPool_refill(PostingPool *self) {
 }
 
 void
-PostPool_add_inversion(PostingPool *self, Inversion *inversion, int32_t doc_id,
-                       float doc_boost, float length_norm) {
+PostPool_Add_Inversion_IMP(PostingPool *self, Inversion *inversion,
+                           int32_t doc_id, float doc_boost,
+                           float length_norm) {
     PostingPoolIVARS *const ivars = PostPool_IVARS(self);
     Post_Add_Inversion_To_Pool(ivars->posting, self, inversion, ivars->type,
                                doc_id, doc_boost, length_norm);

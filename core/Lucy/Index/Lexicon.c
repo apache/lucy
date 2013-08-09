@@ -28,12 +28,12 @@ Lex_init(Lexicon *self, const CharBuf *field) {
 }
 
 CharBuf*
-Lex_get_field(Lexicon *self) {
+Lex_Get_Field_IMP(Lexicon *self) {
     return Lex_IVARS(self)->field;
 }
 
 void
-Lex_destroy(Lexicon *self) {
+Lex_Destroy_IMP(Lexicon *self) {
     LexiconIVARS *const ivars = Lex_IVARS(self);
     DECREF(ivars->field);
     SUPER_DESTROY(self, LEXICON);

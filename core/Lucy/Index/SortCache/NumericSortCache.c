@@ -66,7 +66,7 @@ NumSortCache_init(NumericSortCache *self, const CharBuf *field,
 }
 
 void
-NumSortCache_destroy(NumericSortCache *self) {
+NumSortCache_Destroy_IMP(NumericSortCache *self) {
     NumericSortCacheIVARS *const ivars = NumSortCache_IVARS(self);
     if (ivars->ord_in) {
         InStream_Close(ivars->ord_in);
@@ -102,7 +102,7 @@ F64SortCache_init(Float64SortCache *self, const CharBuf *field,
 }
 
 Obj*
-F64SortCache_value(Float64SortCache *self, int32_t ord, Obj *blank) {
+F64SortCache_Value_IMP(Float64SortCache *self, int32_t ord, Obj *blank) {
     Float64SortCacheIVARS *const ivars = F64SortCache_IVARS(self);
     if (ord == ivars->null_ord) {
         return NULL;
@@ -119,7 +119,7 @@ F64SortCache_value(Float64SortCache *self, int32_t ord, Obj *blank) {
 }
 
 Float64*
-F64SortCache_make_blank(Float64SortCache *self) {
+F64SortCache_Make_Blank_IMP(Float64SortCache *self) {
     UNUSED_VAR(self);
     return Float64_new(0.0);
 }
@@ -147,7 +147,7 @@ F32SortCache_init(Float32SortCache *self, const CharBuf *field,
 }
 
 Obj*
-F32SortCache_value(Float32SortCache *self, int32_t ord, Obj *blank) {
+F32SortCache_Value_IMP(Float32SortCache *self, int32_t ord, Obj *blank) {
     Float32SortCacheIVARS *const ivars = F32SortCache_IVARS(self);
     if (ord == ivars->null_ord) {
         return NULL;
@@ -164,7 +164,7 @@ F32SortCache_value(Float32SortCache *self, int32_t ord, Obj *blank) {
 }
 
 Float32*
-F32SortCache_make_blank(Float32SortCache *self) {
+F32SortCache_Make_Blank_IMP(Float32SortCache *self) {
     UNUSED_VAR(self);
     return Float32_new(0.0f);
 }
@@ -192,7 +192,7 @@ I32SortCache_init(Int32SortCache *self, const CharBuf *field,
 }
 
 Obj*
-I32SortCache_value(Int32SortCache *self, int32_t ord, Obj *blank) {
+I32SortCache_Value_IMP(Int32SortCache *self, int32_t ord, Obj *blank) {
     Int32SortCacheIVARS *const ivars = I32SortCache_IVARS(self);
     if (ord == ivars->null_ord) {
         return NULL;
@@ -209,7 +209,7 @@ I32SortCache_value(Int32SortCache *self, int32_t ord, Obj *blank) {
 }
 
 Integer32*
-I32SortCache_make_blank(Int32SortCache *self) {
+I32SortCache_Make_Blank_IMP(Int32SortCache *self) {
     UNUSED_VAR(self);
     return Int32_new(0);
 }
@@ -237,7 +237,7 @@ I64SortCache_init(Int64SortCache *self, const CharBuf *field,
 }
 
 Obj*
-I64SortCache_value(Int64SortCache *self, int32_t ord, Obj *blank) {
+I64SortCache_Value_IMP(Int64SortCache *self, int32_t ord, Obj *blank) {
     Int64SortCacheIVARS *const ivars = I64SortCache_IVARS(self);
     if (ord == ivars->null_ord) {
         return NULL;
@@ -254,7 +254,7 @@ I64SortCache_value(Int64SortCache *self, int32_t ord, Obj *blank) {
 }
 
 Integer64*
-I64SortCache_make_blank(Int64SortCache *self) {
+I64SortCache_Make_Blank_IMP(Int64SortCache *self) {
     UNUSED_VAR(self);
     return Int64_new(0);
 }

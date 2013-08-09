@@ -41,21 +41,21 @@ TopDocs_init(TopDocs *self, VArray *match_docs, uint32_t total_hits) {
 }
 
 void
-TopDocs_destroy(TopDocs *self) {
+TopDocs_Destroy_IMP(TopDocs *self) {
     TopDocsIVARS *const ivars = TopDocs_IVARS(self);
     DECREF(ivars->match_docs);
     SUPER_DESTROY(self, TOPDOCS);
 }
 
 void
-TopDocs_serialize(TopDocs *self, OutStream *outstream) {
+TopDocs_Serialize_IMP(TopDocs *self, OutStream *outstream) {
     TopDocsIVARS *const ivars = TopDocs_IVARS(self);
     Freezer_serialize_varray(ivars->match_docs, outstream);
     OutStream_Write_C32(outstream, ivars->total_hits);
 }
 
 TopDocs*
-TopDocs_deserialize(TopDocs *self, InStream *instream) {
+TopDocs_Deserialize_IMP(TopDocs *self, InStream *instream) {
     TopDocsIVARS *const ivars = TopDocs_IVARS(self);
     ivars->match_docs = Freezer_read_varray(instream);
     ivars->total_hits = InStream_Read_C32(instream);
@@ -63,23 +63,23 @@ TopDocs_deserialize(TopDocs *self, InStream *instream) {
 }
 
 VArray*
-TopDocs_get_match_docs(TopDocs *self) {
+TopDocs_Get_Match_Docs_IMP(TopDocs *self) {
     return TopDocs_IVARS(self)->match_docs;
 }
 
 uint32_t
-TopDocs_get_total_hits(TopDocs *self) {
+TopDocs_Get_Total_Hits_IMP(TopDocs *self) {
     return TopDocs_IVARS(self)->total_hits;
 }
 
 void
-TopDocs_set_match_docs(TopDocs *self, VArray *match_docs) {
+TopDocs_Set_Match_Docs_IMP(TopDocs *self, VArray *match_docs) {
     TopDocsIVARS *const ivars = TopDocs_IVARS(self);
     DECREF(ivars->match_docs);
     ivars->match_docs = (VArray*)INCREF(match_docs);
 }
 void
-TopDocs_set_total_hits(TopDocs *self, uint32_t total_hits) {
+TopDocs_Set_Total_Hits_IMP(TopDocs *self, uint32_t total_hits) {
     TopDocs_IVARS(self)->total_hits = total_hits;
 }
 

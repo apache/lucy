@@ -51,7 +51,7 @@ Arch_init(Architecture *self) {
 }
 
 bool
-Arch_equals(Architecture *self, Obj *other) {
+Arch_Equals_IMP(Architecture *self, Obj *other) {
     Architecture *twin = (Architecture*)other;
     if (twin == self)                   { return true; }
     if (!Obj_Is_A(other, ARCHITECTURE)) { return false; }
@@ -59,7 +59,7 @@ Arch_equals(Architecture *self, Obj *other) {
 }
 
 void
-Arch_init_seg_writer(Architecture *self, SegWriter *writer) {
+Arch_Init_Seg_Writer_IMP(Architecture *self, SegWriter *writer) {
     Arch_Register_Lexicon_Writer(self, writer);
     Arch_Register_Posting_List_Writer(self, writer);
     Arch_Register_Sort_Writer(self, writer);
@@ -69,7 +69,7 @@ Arch_init_seg_writer(Architecture *self, SegWriter *writer) {
 }
 
 void
-Arch_register_lexicon_writer(Architecture *self, SegWriter *writer) {
+Arch_Register_Lexicon_Writer_IMP(Architecture *self, SegWriter *writer) {
     Schema        *schema     = SegWriter_Get_Schema(writer);
     Snapshot      *snapshot   = SegWriter_Get_Snapshot(writer);
     Segment       *segment    = SegWriter_Get_Segment(writer);
@@ -82,7 +82,7 @@ Arch_register_lexicon_writer(Architecture *self, SegWriter *writer) {
 }
 
 void
-Arch_register_posting_list_writer(Architecture *self, SegWriter *writer) {
+Arch_Register_Posting_List_Writer_IMP(Architecture *self, SegWriter *writer) {
     Schema        *schema     = SegWriter_Get_Schema(writer);
     Snapshot      *snapshot   = SegWriter_Get_Snapshot(writer);
     Segment       *segment    = SegWriter_Get_Segment(writer);
@@ -104,7 +104,7 @@ Arch_register_posting_list_writer(Architecture *self, SegWriter *writer) {
 }
 
 void
-Arch_register_doc_writer(Architecture *self, SegWriter *writer) {
+Arch_Register_Doc_Writer_IMP(Architecture *self, SegWriter *writer) {
     Schema     *schema     = SegWriter_Get_Schema(writer);
     Snapshot   *snapshot   = SegWriter_Get_Snapshot(writer);
     Segment    *segment    = SegWriter_Get_Segment(writer);
@@ -118,7 +118,7 @@ Arch_register_doc_writer(Architecture *self, SegWriter *writer) {
 }
 
 void
-Arch_register_sort_writer(Architecture *self, SegWriter *writer) {
+Arch_Register_Sort_Writer_IMP(Architecture *self, SegWriter *writer) {
     Schema     *schema     = SegWriter_Get_Schema(writer);
     Snapshot   *snapshot   = SegWriter_Get_Snapshot(writer);
     Segment    *segment    = SegWriter_Get_Segment(writer);
@@ -132,7 +132,7 @@ Arch_register_sort_writer(Architecture *self, SegWriter *writer) {
 }
 
 void
-Arch_register_highlight_writer(Architecture *self, SegWriter *writer) {
+Arch_Register_Highlight_Writer_IMP(Architecture *self, SegWriter *writer) {
     Schema     *schema     = SegWriter_Get_Schema(writer);
     Snapshot   *snapshot   = SegWriter_Get_Snapshot(writer);
     Segment    *segment    = SegWriter_Get_Segment(writer);
@@ -146,7 +146,7 @@ Arch_register_highlight_writer(Architecture *self, SegWriter *writer) {
 }
 
 void
-Arch_register_deletions_writer(Architecture *self, SegWriter *writer) {
+Arch_Register_Deletions_Writer_IMP(Architecture *self, SegWriter *writer) {
     Schema     *schema     = SegWriter_Get_Schema(writer);
     Snapshot   *snapshot   = SegWriter_Get_Snapshot(writer);
     Segment    *segment    = SegWriter_Get_Segment(writer);
@@ -160,7 +160,7 @@ Arch_register_deletions_writer(Architecture *self, SegWriter *writer) {
 }
 
 void
-Arch_init_seg_reader(Architecture *self, SegReader *reader) {
+Arch_Init_Seg_Reader_IMP(Architecture *self, SegReader *reader) {
     Arch_Register_Doc_Reader(self, reader);
     Arch_Register_Lexicon_Reader(self, reader);
     Arch_Register_Posting_List_Reader(self, reader);
@@ -170,7 +170,7 @@ Arch_init_seg_reader(Architecture *self, SegReader *reader) {
 }
 
 void
-Arch_register_doc_reader(Architecture *self, SegReader *reader) {
+Arch_Register_Doc_Reader_IMP(Architecture *self, SegReader *reader) {
     Schema     *schema   = SegReader_Get_Schema(reader);
     Folder     *folder   = SegReader_Get_Folder(reader);
     VArray     *segments = SegReader_Get_Segments(reader);
@@ -184,7 +184,7 @@ Arch_register_doc_reader(Architecture *self, SegReader *reader) {
 }
 
 void
-Arch_register_posting_list_reader(Architecture *self, SegReader *reader) {
+Arch_Register_Posting_List_Reader_IMP(Architecture *self, SegReader *reader) {
     Schema    *schema   = SegReader_Get_Schema(reader);
     Folder    *folder   = SegReader_Get_Folder(reader);
     VArray    *segments = SegReader_Get_Segments(reader);
@@ -201,7 +201,7 @@ Arch_register_posting_list_reader(Architecture *self, SegReader *reader) {
 }
 
 void
-Arch_register_lexicon_reader(Architecture *self, SegReader *reader) {
+Arch_Register_Lexicon_Reader_IMP(Architecture *self, SegReader *reader) {
     Schema    *schema   = SegReader_Get_Schema(reader);
     Folder    *folder   = SegReader_Get_Folder(reader);
     VArray    *segments = SegReader_Get_Segments(reader);
@@ -215,7 +215,7 @@ Arch_register_lexicon_reader(Architecture *self, SegReader *reader) {
 }
 
 void
-Arch_register_sort_reader(Architecture *self, SegReader *reader) {
+Arch_Register_Sort_Reader_IMP(Architecture *self, SegReader *reader) {
     Schema     *schema   = SegReader_Get_Schema(reader);
     Folder     *folder   = SegReader_Get_Folder(reader);
     VArray     *segments = SegReader_Get_Segments(reader);
@@ -229,7 +229,7 @@ Arch_register_sort_reader(Architecture *self, SegReader *reader) {
 }
 
 void
-Arch_register_highlight_reader(Architecture *self, SegReader *reader) {
+Arch_Register_Highlight_Reader_IMP(Architecture *self, SegReader *reader) {
     Schema     *schema   = SegReader_Get_Schema(reader);
     Folder     *folder   = SegReader_Get_Folder(reader);
     VArray     *segments = SegReader_Get_Segments(reader);
@@ -243,7 +243,7 @@ Arch_register_highlight_reader(Architecture *self, SegReader *reader) {
 }
 
 void
-Arch_register_deletions_reader(Architecture *self, SegReader *reader) {
+Arch_Register_Deletions_Reader_IMP(Architecture *self, SegReader *reader) {
     Schema     *schema   = SegReader_Get_Schema(reader);
     Folder     *folder   = SegReader_Get_Folder(reader);
     VArray     *segments = SegReader_Get_Segments(reader);
@@ -257,19 +257,19 @@ Arch_register_deletions_reader(Architecture *self, SegReader *reader) {
 }
 
 Similarity*
-Arch_make_similarity(Architecture *self) {
+Arch_Make_Similarity_IMP(Architecture *self) {
     UNUSED_VAR(self);
     return Sim_new();
 }
 
 int32_t
-Arch_index_interval(Architecture *self) {
+Arch_Index_Interval_IMP(Architecture *self) {
     UNUSED_VAR(self);
     return 128;
 }
 
 int32_t
-Arch_skip_interval(Architecture *self) {
+Arch_Skip_Interval_IMP(Architecture *self) {
     UNUSED_VAR(self);
     return 16;
 }

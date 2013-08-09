@@ -74,7 +74,7 @@ Highlighter_init(Highlighter *self, Searcher *searcher, Obj *query,
 }
 
 void
-Highlighter_destroy(Highlighter *self) {
+Highlighter_Destroy_IMP(Highlighter *self) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
     DECREF(ivars->searcher);
     DECREF(ivars->query);
@@ -86,7 +86,7 @@ Highlighter_destroy(Highlighter *self) {
 }
 
 CharBuf*
-Highlighter_highlight(Highlighter *self, const CharBuf *text) {
+Highlighter_Highlight_IMP(Highlighter *self, const CharBuf *text) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
     size_t size = CB_Get_Size(text)
                   + CB_Get_Size(ivars->pre_tag)
@@ -99,54 +99,54 @@ Highlighter_highlight(Highlighter *self, const CharBuf *text) {
 }
 
 void
-Highlighter_set_pre_tag(Highlighter *self, const CharBuf *pre_tag) {
+Highlighter_Set_Pre_Tag_IMP(Highlighter *self, const CharBuf *pre_tag) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
     CB_Mimic(ivars->pre_tag, (Obj*)pre_tag);
 }
 
 void
-Highlighter_set_post_tag(Highlighter *self, const CharBuf *post_tag) {
+Highlighter_Set_Post_Tag_IMP(Highlighter *self, const CharBuf *post_tag) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
     CB_Mimic(ivars->post_tag, (Obj*)post_tag);
 }
 
 CharBuf*
-Highlighter_get_pre_tag(Highlighter *self) {
+Highlighter_Get_Pre_Tag_IMP(Highlighter *self) {
     return Highlighter_IVARS(self)->pre_tag;
 }
 
 CharBuf*
-Highlighter_get_post_tag(Highlighter *self) {
+Highlighter_Get_Post_Tag_IMP(Highlighter *self) {
     return Highlighter_IVARS(self)->post_tag;
 }
 
 CharBuf*
-Highlighter_get_field(Highlighter *self) {
+Highlighter_Get_Field_IMP(Highlighter *self) {
     return Highlighter_IVARS(self)->field;
 }
 
 Query*
-Highlighter_get_query(Highlighter *self) {
+Highlighter_Get_Query_IMP(Highlighter *self) {
     return Highlighter_IVARS(self)->query;
 }
 
 Searcher*
-Highlighter_get_searcher(Highlighter *self) {
+Highlighter_Get_Searcher_IMP(Highlighter *self) {
     return Highlighter_IVARS(self)->searcher;
 }
 
 Compiler*
-Highlighter_get_compiler(Highlighter *self) {
+Highlighter_Get_Compiler_IMP(Highlighter *self) {
     return Highlighter_IVARS(self)->compiler;
 }
 
 uint32_t
-Highlighter_get_excerpt_length(Highlighter *self) {
+Highlighter_Get_Excerpt_Length_IMP(Highlighter *self) {
     return Highlighter_IVARS(self)->excerpt_length;
 }
 
 CharBuf*
-Highlighter_create_excerpt(Highlighter *self, HitDoc *hit_doc) {
+Highlighter_Create_Excerpt_IMP(Highlighter *self, HitDoc *hit_doc) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
     ZombieCharBuf *field_val
         = (ZombieCharBuf*)HitDoc_Extract(hit_doc, ivars->field,
@@ -212,8 +212,9 @@ S_hottest(HeatMap *heat_map) {
 }
 
 int32_t
-Highlighter_find_best_fragment(Highlighter *self, const CharBuf *field_val,
-                               ViewCharBuf *fragment, HeatMap *heat_map) {
+Highlighter_Find_Best_Fragment_IMP(Highlighter *self,
+                                   const CharBuf *field_val,
+                                   ViewCharBuf *fragment, HeatMap *heat_map) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
 
     // Window is 1.66 * excerpt_length, with the loc in the middle.
@@ -288,9 +289,10 @@ S_has_heat(HeatMap *heat_map, int32_t offset, int32_t length) {
 }
 
 int32_t
-Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
-                        const CharBuf *fragment, CharBuf *raw_excerpt,
-                        int32_t top, HeatMap *heat_map, VArray *sentences) {
+Highlighter_Raw_Excerpt_IMP(Highlighter *self, const CharBuf *field_val,
+                            const CharBuf *fragment, CharBuf *raw_excerpt,
+                            int32_t top, HeatMap *heat_map,
+                            VArray *sentences) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
     bool     found_starting_edge = false;
     bool     found_ending_edge   = false;
@@ -489,9 +491,9 @@ Highlighter_raw_excerpt(Highlighter *self, const CharBuf *field_val,
 }
 
 void
-Highlighter_highlight_excerpt(Highlighter *self, VArray *spans,
-                              CharBuf *raw_excerpt, CharBuf *highlighted,
-                              int32_t top) {
+Highlighter_Highlight_Excerpt_IMP(Highlighter *self, VArray *spans,
+                                  CharBuf *raw_excerpt, CharBuf *highlighted,
+                                  int32_t top) {
     int32_t        hl_start        = 0;
     int32_t        hl_end          = 0;
     ZombieCharBuf *temp            = ZCB_WRAP(raw_excerpt);
@@ -589,8 +591,8 @@ S_close_sentence(VArray *sentences, Span **sentence_ptr,
 }
 
 VArray*
-Highlighter_find_sentences(Highlighter *self, CharBuf *text, int32_t offset,
-                           int32_t length) {
+Highlighter_Find_Sentences_IMP(Highlighter *self, CharBuf *text,
+                               int32_t offset, int32_t length) {
     /* When [sentence] is NULL, that means a sentence start has not yet been
      * found.  When it is a Span object, we have a start, but we haven't found
      * an end.  Once we find the end, we add the sentence to the [sentences]
@@ -670,7 +672,7 @@ Highlighter_find_sentences(Highlighter *self, CharBuf *text, int32_t offset,
 }
 
 CharBuf*
-Highlighter_encode(Highlighter *self, CharBuf *text) {
+Highlighter_Encode_IMP(Highlighter *self, CharBuf *text) {
     CharBuf *encoded = CB_new(0);
     UNUSED_VAR(self);
     return S_encode_entities(text, encoded);

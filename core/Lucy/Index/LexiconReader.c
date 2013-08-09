@@ -39,7 +39,8 @@ LexReader_init(LexiconReader *self, Schema *schema, Folder *folder,
 }
 
 LexiconReader*
-LexReader_aggregator(LexiconReader *self, VArray *readers, I32Array *offsets) {
+LexReader_Aggregator_IMP(LexiconReader *self, VArray *readers,
+                         I32Array *offsets) {
     UNUSED_VAR(self);
     return (LexiconReader*)PolyLexReader_new(readers, offsets);
 }
@@ -68,7 +69,7 @@ PolyLexReader_init(PolyLexiconReader *self, VArray *readers,
 }
 
 void
-PolyLexReader_close(PolyLexiconReader *self) {
+PolyLexReader_Close_IMP(PolyLexiconReader *self) {
     PolyLexiconReaderIVARS *const ivars = PolyLexReader_IVARS(self);
     if (ivars->readers) {
         for (uint32_t i = 0, max = VA_Get_Size(ivars->readers); i < max; i++) {
@@ -81,7 +82,7 @@ PolyLexReader_close(PolyLexiconReader *self) {
 }
 
 void
-PolyLexReader_destroy(PolyLexiconReader *self) {
+PolyLexReader_Destroy_IMP(PolyLexiconReader *self) {
     PolyLexiconReaderIVARS *const ivars = PolyLexReader_IVARS(self);
     DECREF(ivars->readers);
     DECREF(ivars->offsets);
@@ -89,8 +90,8 @@ PolyLexReader_destroy(PolyLexiconReader *self) {
 }
 
 Lexicon*
-PolyLexReader_lexicon(PolyLexiconReader *self, const CharBuf *field,
-                      Obj *term) {
+PolyLexReader_Lexicon_IMP(PolyLexiconReader *self, const CharBuf *field,
+                          Obj *term) {
     PolyLexicon *lexicon = NULL;
 
     if (field != NULL) {
@@ -111,8 +112,8 @@ PolyLexReader_lexicon(PolyLexiconReader *self, const CharBuf *field,
 }
 
 uint32_t
-PolyLexReader_doc_freq(PolyLexiconReader *self, const CharBuf *field,
-                       Obj *term) {
+PolyLexReader_Doc_Freq_IMP(PolyLexiconReader *self, const CharBuf *field,
+                           Obj *term) {
     PolyLexiconReaderIVARS *const ivars = PolyLexReader_IVARS(self);
     uint32_t doc_freq = 0;
     for (uint32_t i = 0, max = VA_Get_Size(ivars->readers); i < max; i++) {
@@ -179,22 +180,22 @@ DefLexReader_init(DefaultLexiconReader *self, Schema *schema, Folder *folder,
 }
 
 void
-DefLexReader_close(DefaultLexiconReader *self) {
+DefLexReader_Close_IMP(DefaultLexiconReader *self) {
     DefaultLexiconReaderIVARS *const ivars = DefLexReader_IVARS(self);
     DECREF(ivars->lexicons);
     ivars->lexicons = NULL;
 }
 
 void
-DefLexReader_destroy(DefaultLexiconReader *self) {
+DefLexReader_Destroy_IMP(DefaultLexiconReader *self) {
     DefaultLexiconReaderIVARS *const ivars = DefLexReader_IVARS(self);
     DECREF(ivars->lexicons);
     SUPER_DESTROY(self, DEFAULTLEXICONREADER);
 }
 
 Lexicon*
-DefLexReader_lexicon(DefaultLexiconReader *self, const CharBuf *field,
-                     Obj *term) {
+DefLexReader_Lexicon_IMP(DefaultLexiconReader *self, const CharBuf *field,
+                         Obj *term) {
     DefaultLexiconReaderIVARS *const ivars = DefLexReader_IVARS(self);
     int32_t     field_num = Seg_Field_Num(ivars->segment, field);
     SegLexicon *orig      = (SegLexicon*)VA_Fetch(ivars->lexicons, field_num);
@@ -232,15 +233,15 @@ S_find_tinfo(DefaultLexiconReader *self, const CharBuf *field, Obj *target) {
 }
 
 TermInfo*
-DefLexReader_fetch_term_info(DefaultLexiconReader *self,
-                             const CharBuf *field, Obj *target) {
+DefLexReader_Fetch_Term_Info_IMP(DefaultLexiconReader *self,
+                                 const CharBuf *field, Obj *target) {
     TermInfo *tinfo = S_find_tinfo(self, field, target);
     return tinfo ? TInfo_Clone(tinfo) : NULL;
 }
 
 uint32_t
-DefLexReader_doc_freq(DefaultLexiconReader *self, const CharBuf *field,
-                      Obj *term) {
+DefLexReader_Doc_Freq_IMP(DefaultLexiconReader *self, const CharBuf *field,
+                          Obj *term) {
     TermInfo *tinfo = S_find_tinfo(self, field, term);
     return tinfo ? TInfo_Get_Doc_Freq(tinfo) : 0;
 }

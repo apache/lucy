@@ -46,7 +46,7 @@ BitVecDelDocs_init(BitVecDelDocs *self, Folder *folder,
 }
 
 void
-BitVecDelDocs_destroy(BitVecDelDocs *self) {
+BitVecDelDocs_Destroy_IMP(BitVecDelDocs *self) {
     BitVecDelDocsIVARS *const ivars = BitVecDelDocs_IVARS(self);
     DECREF(ivars->filename);
     if (ivars->instream) {

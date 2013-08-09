@@ -54,7 +54,7 @@ TV_init(TermVector *self, const CharBuf *field, const CharBuf *text,
 }
 
 void
-TV_destroy(TermVector *self) {
+TV_Destroy_IMP(TermVector *self) {
     TermVectorIVARS *const ivars = TV_IVARS(self);
     DECREF(ivars->field);
     DECREF(ivars->text);
@@ -65,22 +65,22 @@ TV_destroy(TermVector *self) {
 }
 
 I32Array*
-TV_get_positions(TermVector *self) {
+TV_Get_Positions_IMP(TermVector *self) {
     return TV_IVARS(self)->positions;
 }
 
 I32Array*
-TV_get_start_offsets(TermVector *self) {
+TV_Get_Start_Offsets_IMP(TermVector *self) {
     return TV_IVARS(self)->start_offsets;
 }
 
 I32Array*
-TV_get_end_offsets(TermVector *self) {
+TV_Get_End_Offsets_IMP(TermVector *self) {
     return TV_IVARS(self)->end_offsets;
 }
 
 void
-TV_serialize(TermVector *self, OutStream *target) {
+TV_Serialize_IMP(TermVector *self, OutStream *target) {
     TermVectorIVARS *const ivars = TV_IVARS(self);
     int32_t *posits = I32Arr_IVARS(ivars->positions)->ints;
     int32_t *starts = I32Arr_IVARS(ivars->start_offsets)->ints;
@@ -98,7 +98,7 @@ TV_serialize(TermVector *self, OutStream *target) {
 }
 
 TermVector*
-TV_deserialize(TermVector *self, InStream *instream) {
+TV_Deserialize_IMP(TermVector *self, InStream *instream) {
     CharBuf *field = Freezer_read_charbuf(instream);
     CharBuf *text  = Freezer_read_charbuf(instream);
     uint32_t num_pos = InStream_Read_C32(instream);
@@ -128,7 +128,7 @@ TV_deserialize(TermVector *self, InStream *instream) {
 }
 
 bool
-TV_equals(TermVector *self, Obj *other) {
+TV_Equals_IMP(TermVector *self, Obj *other) {
     if ((TermVector*)other == self) { return true; }
     TermVectorIVARS *const ivars = TV_IVARS(self);
     TermVectorIVARS *const ovars = TV_IVARS((TermVector*)other);

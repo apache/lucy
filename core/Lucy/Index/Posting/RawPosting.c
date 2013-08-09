@@ -46,24 +46,24 @@ RawPost_new(void *pre_allocated_memory, int32_t doc_id, uint32_t freq,
 }
 
 void
-RawPost_destroy(RawPosting *self) {
+RawPost_Destroy_IMP(RawPosting *self) {
     UNUSED_VAR(self);
     THROW(ERR, "Illegal attempt to destroy RawPosting object");
 }
 
 uint32_t
-RawPost_get_refcount(RawPosting* self) {
+RawPost_Get_RefCount_IMP(RawPosting* self) {
     UNUSED_VAR(self);
     return 1;
 }
 
 RawPosting*
-RawPost_inc_refcount(RawPosting* self) {
+RawPost_Inc_RefCount_IMP(RawPosting* self) {
     return self;
 }
 
 uint32_t
-RawPost_dec_refcount(RawPosting* self) {
+RawPost_Dec_RefCount_IMP(RawPosting* self) {
     UNUSED_VAR(self);
     return 1;
 }
@@ -93,7 +93,7 @@ RawPostWriter_init(RawPostingWriter *self, Schema *schema,
 }
 
 void
-RawPostWriter_start_term(RawPostingWriter *self, TermInfo *tinfo) {
+RawPostWriter_Start_Term_IMP(RawPostingWriter *self, TermInfo *tinfo) {
     RawPostingWriterIVARS *const ivars = RawPostWriter_IVARS(self);
     ivars->last_doc_id   = 0;
     TermInfoIVARS *const tinfo_ivars = TInfo_IVARS(tinfo);
@@ -101,21 +101,21 @@ RawPostWriter_start_term(RawPostingWriter *self, TermInfo *tinfo) {
 }
 
 void
-RawPostWriter_update_skip_info(RawPostingWriter *self, TermInfo *tinfo) {
+RawPostWriter_Update_Skip_Info_IMP(RawPostingWriter *self, TermInfo *tinfo) {
     RawPostingWriterIVARS *const ivars = RawPostWriter_IVARS(self);
     TermInfoIVARS *const tinfo_ivars = TInfo_IVARS(tinfo);
     tinfo_ivars->post_filepos = OutStream_Tell(ivars->outstream);
 }
 
 void
-RawPostWriter_destroy(RawPostingWriter *self) {
+RawPostWriter_Destroy_IMP(RawPostingWriter *self) {
     RawPostingWriterIVARS *const ivars = RawPostWriter_IVARS(self);
     DECREF(ivars->outstream);
     SUPER_DESTROY(self, RAWPOSTINGWRITER);
 }
 
 void
-RawPostWriter_write_posting(RawPostingWriter *self, RawPosting *posting) {
+RawPostWriter_Write_Posting_IMP(RawPostingWriter *self, RawPosting *posting) {
     RawPostingWriterIVARS *const ivars = RawPostWriter_IVARS(self);
     RawPostingIVARS *const posting_ivars = RawPost_IVARS(posting);
     OutStream *const outstream   = ivars->outstream;

@@ -184,7 +184,7 @@ PolyReader_init(PolyReader *self, Schema *schema, Folder *folder,
 }
 
 void
-PolyReader_close(PolyReader *self) {
+PolyReader_Close_IMP(PolyReader *self) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
     PolyReader_Close_t super_close
         = SUPER_METHOD_PTR(POLYREADER, Lucy_PolyReader_Close);
@@ -196,7 +196,7 @@ PolyReader_close(PolyReader *self) {
 }
 
 void
-PolyReader_destroy(PolyReader *self) {
+PolyReader_Destroy_IMP(PolyReader *self) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
     DECREF(ivars->sub_readers);
     DECREF(ivars->offsets);
@@ -516,35 +516,35 @@ S_release_deletion_lock(PolyReader *self) {
 }
 
 int32_t
-PolyReader_doc_max(PolyReader *self) {
+PolyReader_Doc_Max_IMP(PolyReader *self) {
     return PolyReader_IVARS(self)->doc_max;
 }
 
 int32_t
-PolyReader_doc_count(PolyReader *self) {
+PolyReader_Doc_Count_IMP(PolyReader *self) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
     return ivars->doc_max - ivars->del_count;
 }
 
 int32_t
-PolyReader_del_count(PolyReader *self) {
+PolyReader_Del_Count_IMP(PolyReader *self) {
     return PolyReader_IVARS(self)->del_count;
 }
 
 I32Array*
-PolyReader_offsets(PolyReader *self) {
+PolyReader_Offsets_IMP(PolyReader *self) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
     return (I32Array*)INCREF(ivars->offsets);
 }
 
 VArray*
-PolyReader_seg_readers(PolyReader *self) {
+PolyReader_Seg_Readers_IMP(PolyReader *self) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
     return (VArray*)VA_Shallow_Copy(ivars->sub_readers);
 }
 
 VArray*
-PolyReader_get_seg_readers(PolyReader *self) {
+PolyReader_Get_Seg_Readers_IMP(PolyReader *self) {
     return PolyReader_IVARS(self)->sub_readers;
 }
 

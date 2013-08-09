@@ -40,7 +40,7 @@ LeafQuery_init(LeafQuery *self, const CharBuf *field, const CharBuf *text) {
 }
 
 void
-LeafQuery_destroy(LeafQuery *self) {
+LeafQuery_Destroy_IMP(LeafQuery *self) {
     LeafQueryIVARS *const ivars = LeafQuery_IVARS(self);
     DECREF(ivars->field);
     DECREF(ivars->text);
@@ -48,17 +48,17 @@ LeafQuery_destroy(LeafQuery *self) {
 }
 
 CharBuf*
-LeafQuery_get_field(LeafQuery *self) {
+LeafQuery_Get_Field_IMP(LeafQuery *self) {
     return LeafQuery_IVARS(self)->field;
 }
 
 CharBuf*
-LeafQuery_get_text(LeafQuery *self) {
+LeafQuery_Get_Text_IMP(LeafQuery *self) {
     return LeafQuery_IVARS(self)->text;
 }
 
 bool
-LeafQuery_equals(LeafQuery *self, Obj *other) {
+LeafQuery_Equals_IMP(LeafQuery *self, Obj *other) {
     if ((LeafQuery*)other == self)     { return true; }
     if (!Obj_Is_A(other, LEAFQUERY))   { return false; }
     LeafQueryIVARS *const ivars = LeafQuery_IVARS(self);
@@ -73,7 +73,7 @@ LeafQuery_equals(LeafQuery *self, Obj *other) {
 }
 
 CharBuf*
-LeafQuery_to_string(LeafQuery *self) {
+LeafQuery_To_String_IMP(LeafQuery *self) {
     LeafQueryIVARS *const ivars = LeafQuery_IVARS(self);
     if (ivars->field) {
         return CB_newf("%o:%o", ivars->field, ivars->text);
@@ -84,7 +84,7 @@ LeafQuery_to_string(LeafQuery *self) {
 }
 
 void
-LeafQuery_serialize(LeafQuery *self, OutStream *outstream) {
+LeafQuery_Serialize_IMP(LeafQuery *self, OutStream *outstream) {
     LeafQueryIVARS *const ivars = LeafQuery_IVARS(self);
     if (ivars->field) {
         OutStream_Write_U8(outstream, true);
@@ -98,7 +98,7 @@ LeafQuery_serialize(LeafQuery *self, OutStream *outstream) {
 }
 
 LeafQuery*
-LeafQuery_deserialize(LeafQuery *self, InStream *instream) {
+LeafQuery_Deserialize_IMP(LeafQuery *self, InStream *instream) {
     LeafQueryIVARS *const ivars = LeafQuery_IVARS(self);
     if (InStream_Read_U8(instream)) {
         ivars->field = Freezer_read_charbuf(instream);
@@ -112,8 +112,7 @@ LeafQuery_deserialize(LeafQuery *self, InStream *instream) {
 }
 
 Obj*
-LeafQuery_dump(LeafQuery *self)
-{
+LeafQuery_Dump_IMP(LeafQuery *self) {
     LeafQueryIVARS *ivars = LeafQuery_IVARS(self);
     LeafQuery_Dump_t super_dump
         = SUPER_METHOD_PTR(LEAFQUERY, Lucy_LeafQuery_Dump);
@@ -126,8 +125,7 @@ LeafQuery_dump(LeafQuery *self)
 }
 
 Obj*
-LeafQuery_load(LeafQuery *self, Obj *dump)
-{
+LeafQuery_Load_IMP(LeafQuery *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     LeafQuery_Load_t super_load
         = SUPER_METHOD_PTR(LEAFQUERY, Lucy_LeafQuery_Load);
@@ -144,8 +142,8 @@ LeafQuery_load(LeafQuery *self, Obj *dump)
 }
 
 Compiler*
-LeafQuery_make_compiler(LeafQuery *self, Searcher *searcher, float boost,
-                        bool subordinate) {
+LeafQuery_Make_Compiler_IMP(LeafQuery *self, Searcher *searcher, float boost,
+                            bool subordinate) {
     UNUSED_VAR(self);
     UNUSED_VAR(searcher);
     UNUSED_VAR(boost);

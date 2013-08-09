@@ -61,17 +61,17 @@ QueryLexer_init(QueryLexer *self) {
 }
 
 bool
-QueryLexer_heed_colons(QueryLexer *self) {
+QueryLexer_Heed_Colons_IMP(QueryLexer *self) {
     return QueryLexer_IVARS(self)->heed_colons;
 }
 
 void
-QueryLexer_set_heed_colons(QueryLexer *self, bool heed_colons) {
+QueryLexer_Set_Heed_Colons_IMP(QueryLexer *self, bool heed_colons) {
     QueryLexer_IVARS(self)->heed_colons = heed_colons;
 }
 
 VArray*
-QueryLexer_tokenize(QueryLexer *self, const CharBuf *query_string) {
+QueryLexer_Tokenize_IMP(QueryLexer *self, const CharBuf *query_string) {
     QueryLexerIVARS *const ivars = QueryLexer_IVARS(self);
     CharBuf *copy = query_string
                     ? CB_Clone(query_string)

@@ -60,7 +60,7 @@ PriQ_init(PriorityQueue *self, uint32_t max_size) {
 }
 
 void
-PriQ_destroy(PriorityQueue *self) {
+PriQ_Destroy_IMP(PriorityQueue *self) {
     PriorityQueueIVARS *const ivars = PriQ_IVARS(self);
     if (ivars->heap) {
         S_clear(self, ivars);
@@ -70,7 +70,7 @@ PriQ_destroy(PriorityQueue *self) {
 }
 
 uint32_t
-PriQ_get_size(PriorityQueue *self) {
+PriQ_Get_Size_IMP(PriorityQueue *self) {
     return PriQ_IVARS(self)->size;
 }
 
@@ -91,7 +91,7 @@ S_put(PriorityQueue *self, PriorityQueueIVARS *ivars, Obj *element) {
 }
 
 bool
-PriQ_insert(PriorityQueue *self, Obj *element) {
+PriQ_Insert_IMP(PriorityQueue *self, Obj *element) {
     Obj *least = PriQ_Jostle(self, element);
     DECREF(least);
     if (element == least) { return false; }
@@ -99,7 +99,7 @@ PriQ_insert(PriorityQueue *self, Obj *element) {
 }
 
 Obj*
-PriQ_jostle(PriorityQueue *self, Obj *element) {
+PriQ_Jostle_IMP(PriorityQueue *self, Obj *element) {
     PriorityQueueIVARS *const ivars = PriQ_IVARS(self);
 
     // Absorb element if there's a vacancy.
@@ -127,7 +127,7 @@ PriQ_jostle(PriorityQueue *self, Obj *element) {
 }
 
 Obj*
-PriQ_pop(PriorityQueue *self) {
+PriQ_Pop_IMP(PriorityQueue *self) {
     PriorityQueueIVARS *const ivars = PriQ_IVARS(self);
     if (ivars->size > 0) {
         // Save the first value.
@@ -148,7 +148,7 @@ PriQ_pop(PriorityQueue *self) {
 }
 
 VArray*
-PriQ_pop_all(PriorityQueue *self) {
+PriQ_Pop_All_IMP(PriorityQueue *self) {
     PriorityQueueIVARS *const ivars = PriQ_IVARS(self);
     VArray *retval = VA_new(ivars->size);
 
@@ -164,7 +164,7 @@ PriQ_pop_all(PriorityQueue *self) {
 }
 
 Obj*
-PriQ_peek(PriorityQueue *self) {
+PriQ_Peek_IMP(PriorityQueue *self) {
     PriorityQueueIVARS *const ivars = PriQ_IVARS(self);
     if (ivars->size > 0) {
         return ivars->heap[1];

@@ -52,7 +52,7 @@ Folder_init(Folder *self, const CharBuf *path) {
 }
 
 void
-Folder_destroy(Folder *self) {
+Folder_Destroy_IMP(Folder *self) {
     FolderIVARS *const ivars = Folder_IVARS(self);
     DECREF(ivars->path);
     DECREF(ivars->entries);
@@ -60,7 +60,7 @@ Folder_destroy(Folder *self) {
 }
 
 InStream*
-Folder_open_in(Folder *self, const CharBuf *path) {
+Folder_Open_In_IMP(Folder *self, const CharBuf *path) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     InStream *instream = NULL;
 
@@ -82,7 +82,7 @@ Folder_open_in(Folder *self, const CharBuf *path) {
  * necessary because calling CFReader_Local_Open_FileHandle() won't find
  * virtual files.  No other class should need to override it. */
 InStream*
-Folder_local_open_in(Folder *self, const CharBuf *name) {
+Folder_Local_Open_In_IMP(Folder *self, const CharBuf *name) {
     FileHandle *fh = Folder_Local_Open_FileHandle(self, name, FH_READ_ONLY);
     InStream *instream = NULL;
     if (fh) {
@@ -99,7 +99,7 @@ Folder_local_open_in(Folder *self, const CharBuf *name) {
 }
 
 OutStream*
-Folder_open_out(Folder *self, const CharBuf *path) {
+Folder_Open_Out_IMP(Folder *self, const CharBuf *path) {
     const uint32_t flags = FH_WRITE_ONLY | FH_CREATE | FH_EXCLUSIVE;
     FileHandle *fh = Folder_Open_FileHandle(self, path, flags);
     OutStream *outstream = NULL;
@@ -117,7 +117,8 @@ Folder_open_out(Folder *self, const CharBuf *path) {
 }
 
 FileHandle*
-Folder_open_filehandle(Folder *self, const CharBuf *path, uint32_t flags) {
+Folder_Open_FileHandle_IMP(Folder *self, const CharBuf *path,
+                           uint32_t flags) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     FileHandle *fh = NULL;
 
@@ -137,7 +138,7 @@ Folder_open_filehandle(Folder *self, const CharBuf *path, uint32_t flags) {
 }
 
 bool
-Folder_delete(Folder *self, const CharBuf *path) {
+Folder_Delete_IMP(Folder *self, const CharBuf *path) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     if (enclosing_folder) {
         ZombieCharBuf *name = IxFileNames_local_part(path, ZCB_BLANK());
@@ -150,7 +151,7 @@ Folder_delete(Folder *self, const CharBuf *path) {
 }
 
 bool
-Folder_delete_tree(Folder *self, const CharBuf *path) {
+Folder_Delete_Tree_IMP(Folder *self, const CharBuf *path) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
 
     // Don't allow Folder to delete itself.
@@ -247,7 +248,7 @@ S_add_to_file_list(Folder *self, VArray *list, CharBuf *dir, CharBuf *prefix) {
 }
 
 DirHandle*
-Folder_open_dir(Folder *self, const CharBuf *path) {
+Folder_Open_Dir_IMP(Folder *self, const CharBuf *path) {
     DirHandle *dh = NULL;
     Folder *folder;
     if (path) {
@@ -270,7 +271,7 @@ Folder_open_dir(Folder *self, const CharBuf *path) {
 }
 
 bool
-Folder_mkdir(Folder *self, const CharBuf *path) {
+Folder_MkDir_IMP(Folder *self, const CharBuf *path) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     bool result = false;
 
@@ -293,7 +294,7 @@ Folder_mkdir(Folder *self, const CharBuf *path) {
 }
 
 bool
-Folder_exists(Folder *self, const CharBuf *path) {
+Folder_Exists_IMP(Folder *self, const CharBuf *path) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     bool retval = false;
     if (enclosing_folder) {
@@ -306,7 +307,7 @@ Folder_exists(Folder *self, const CharBuf *path) {
 }
 
 bool
-Folder_is_directory(Folder *self, const CharBuf *path) {
+Folder_Is_Directory_IMP(Folder *self, const CharBuf *path) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     bool retval = false;
     if (enclosing_folder) {
@@ -319,7 +320,7 @@ Folder_is_directory(Folder *self, const CharBuf *path) {
 }
 
 VArray*
-Folder_list(Folder *self, const CharBuf *path) {
+Folder_List_IMP(Folder *self, const CharBuf *path) {
     Folder *local_folder = Folder_Find_Folder(self, path);
     VArray *list = NULL;
     DirHandle *dh = Folder_Local_Open_Dir(local_folder);
@@ -336,7 +337,7 @@ Folder_list(Folder *self, const CharBuf *path) {
 }
 
 VArray*
-Folder_list_r(Folder *self, const CharBuf *path) {
+Folder_List_R_IMP(Folder *self, const CharBuf *path) {
     Folder *local_folder = Folder_Find_Folder(self, path);
     VArray *list =  VA_new(0);
     if (local_folder) {
@@ -353,7 +354,7 @@ Folder_list_r(Folder *self, const CharBuf *path) {
 }
 
 ByteBuf*
-Folder_slurp_file(Folder *self, const CharBuf *path) {
+Folder_Slurp_File_IMP(Folder *self, const CharBuf *path) {
     InStream *instream = Folder_Open_In(self, path);
     ByteBuf  *retval   = NULL;
 
@@ -384,19 +385,19 @@ Folder_slurp_file(Folder *self, const CharBuf *path) {
 }
 
 CharBuf*
-Folder_get_path(Folder *self) {
+Folder_Get_Path_IMP(Folder *self) {
     return Folder_IVARS(self)->path;
 }
 
 void
-Folder_set_path(Folder *self, const CharBuf *path) {
+Folder_Set_Path_IMP(Folder *self, const CharBuf *path) {
     FolderIVARS *const ivars = Folder_IVARS(self);
     DECREF(ivars->path);
     ivars->path = CB_Clone(path);
 }
 
 void
-Folder_consolidate(Folder *self, const CharBuf *path) {
+Folder_Consolidate_IMP(Folder *self, const CharBuf *path) {
     Folder *folder = Folder_Find_Folder(self, path);
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     if (!folder) {
@@ -458,13 +459,13 @@ S_enclosing_folder(Folder *self, ZombieCharBuf *path) {
 }
 
 Folder*
-Folder_enclosing_folder(Folder *self, const CharBuf *path) {
+Folder_Enclosing_Folder_IMP(Folder *self, const CharBuf *path) {
     ZombieCharBuf *scratch = ZCB_WRAP(path);
     return S_enclosing_folder(self, scratch);
 }
 
 Folder*
-Folder_find_folder(Folder *self, const CharBuf *path) {
+Folder_Find_Folder_IMP(Folder *self, const CharBuf *path) {
     if (!path || !CB_Get_Size(path)) {
         return self;
     }

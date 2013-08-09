@@ -38,14 +38,14 @@ MatchDoc_init(MatchDoc *self, int32_t doc_id, float score, VArray *values) {
 }
 
 void
-MatchDoc_destroy(MatchDoc *self) {
+MatchDoc_Destroy_IMP(MatchDoc *self) {
     MatchDocIVARS *const ivars = MatchDoc_IVARS(self);
     DECREF(ivars->values);
     SUPER_DESTROY(self, MATCHDOC);
 }
 
 void
-MatchDoc_serialize(MatchDoc *self, OutStream *outstream) {
+MatchDoc_Serialize_IMP(MatchDoc *self, OutStream *outstream) {
     MatchDocIVARS *const ivars = MatchDoc_IVARS(self);
     OutStream_Write_C32(outstream, ivars->doc_id);
     OutStream_Write_F32(outstream, ivars->score);
@@ -54,7 +54,7 @@ MatchDoc_serialize(MatchDoc *self, OutStream *outstream) {
 }
 
 MatchDoc*
-MatchDoc_deserialize(MatchDoc *self, InStream *instream) {
+MatchDoc_Deserialize_IMP(MatchDoc *self, InStream *instream) {
     MatchDocIVARS *const ivars = MatchDoc_IVARS(self);
     ivars->doc_id = InStream_Read_C32(instream);
     ivars->score  = InStream_Read_F32(instream);
@@ -65,32 +65,32 @@ MatchDoc_deserialize(MatchDoc *self, InStream *instream) {
 }
 
 int32_t
-MatchDoc_get_doc_id(MatchDoc *self) {
+MatchDoc_Get_Doc_ID_IMP(MatchDoc *self) {
     return MatchDoc_IVARS(self)->doc_id;
 }
 
 float
-MatchDoc_get_score(MatchDoc *self) {
+MatchDoc_Get_Score_IMP(MatchDoc *self) {
     return MatchDoc_IVARS(self)->score;
 }
 
 VArray*
-MatchDoc_get_values(MatchDoc *self) {
+MatchDoc_Get_Values_IMP(MatchDoc *self) {
     return MatchDoc_IVARS(self)->values;
 }
 
 void
-MatchDoc_set_doc_id(MatchDoc *self, int32_t doc_id) {
+MatchDoc_Set_Doc_ID_IMP(MatchDoc *self, int32_t doc_id) {
     MatchDoc_IVARS(self)->doc_id = doc_id;
 }
 
 void
-MatchDoc_set_score(MatchDoc *self, float score) {
+MatchDoc_Set_Score_IMP(MatchDoc *self, float score) {
     MatchDoc_IVARS(self)->score = score;
 }
 
 void
-MatchDoc_set_values(MatchDoc *self, VArray *values) {
+MatchDoc_Set_Values_IMP(MatchDoc *self, VArray *values) {
     MatchDocIVARS *const ivars = MatchDoc_IVARS(self);
     DECREF(ivars->values);
     ivars->values = (VArray*)INCREF(values);

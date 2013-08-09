@@ -106,7 +106,7 @@ HitQ_init(HitQueue *self, Schema *schema, SortSpec *sort_spec,
 }
 
 void
-HitQ_destroy(HitQueue *self) {
+HitQ_Destroy_IMP(HitQueue *self) {
     HitQueueIVARS *const ivars = HitQ_IVARS(self);
     FieldType **types = ivars->field_types;
     FieldType **const limit = types + ivars->num_actions - 1;
@@ -119,7 +119,7 @@ HitQ_destroy(HitQueue *self) {
 }
 
 Obj*
-HitQ_jostle(HitQueue *self, Obj *element) {
+HitQ_Jostle_IMP(HitQueue *self, Obj *element) {
     HitQueueIVARS *const ivars = HitQ_IVARS(self);
     MatchDoc *match_doc = (MatchDoc*)CERTIFY(element, MATCHDOC);
     HitQ_Jostle_t super_jostle
@@ -141,7 +141,7 @@ SI_compare_by_value(HitQueueIVARS *ivars, uint32_t tick,
 }
 
 bool
-HitQ_less_than(HitQueue *self, Obj *obj_a, Obj *obj_b) {
+HitQ_Less_Than_IMP(HitQueue *self, Obj *obj_a, Obj *obj_b) {
     HitQueueIVARS *const ivars = HitQ_IVARS(self);
     MatchDoc *const a = (MatchDoc*)obj_a;
     MatchDoc *const b = (MatchDoc*)obj_b;

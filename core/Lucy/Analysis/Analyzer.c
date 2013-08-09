@@ -29,7 +29,7 @@ Analyzer_init(Analyzer *self) {
 }
 
 Inversion*
-Analyzer_transform_text(Analyzer *self, CharBuf *text) {
+Analyzer_Transform_Text_IMP(Analyzer *self, CharBuf *text) {
     size_t token_len = CB_Get_Size(text);
     Token *seed = Token_new((char*)CB_Get_Ptr8(text), token_len, 0,
                             token_len, 1.0, 1);
@@ -41,7 +41,7 @@ Analyzer_transform_text(Analyzer *self, CharBuf *text) {
 }
 
 VArray*
-Analyzer_split(Analyzer *self, CharBuf *text) {
+Analyzer_Split_IMP(Analyzer *self, CharBuf *text) {
     Inversion  *inversion = Analyzer_Transform_Text(self, text);
     VArray     *out       = VA_new(0);
     Token      *token;
@@ -59,8 +59,7 @@ Analyzer_split(Analyzer *self, CharBuf *text) {
 }
 
 Obj*
-Analyzer_dump(Analyzer *self)
-{
+Analyzer_Dump_IMP(Analyzer *self) {
     Hash *dump = Hash_new(0);
     Hash_Store_Str(dump, "_class", 6,
                    (Obj*)CB_Clone(Obj_Get_Class_Name((Obj*)self)));
@@ -68,8 +67,7 @@ Analyzer_dump(Analyzer *self)
 }
 
 Obj*
-Analyzer_load(Analyzer *self, Obj *dump)
-{
+Analyzer_Load_IMP(Analyzer *self, Obj *dump) {
     CHY_UNUSED_VAR(self);
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     CharBuf *class_name

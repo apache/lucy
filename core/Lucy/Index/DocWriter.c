@@ -51,7 +51,7 @@ DocWriter_init(DocWriter *self, Schema *schema, Snapshot *snapshot,
 }
 
 void
-DocWriter_destroy(DocWriter *self) {
+DocWriter_Destroy_IMP(DocWriter *self) {
     DocWriterIVARS *const ivars = DocWriter_IVARS(self);
     DECREF(ivars->dat_out);
     DECREF(ivars->ix_out);
@@ -83,8 +83,8 @@ S_lazy_init(DocWriter *self) {
 }
 
 void
-DocWriter_add_inverted_doc(DocWriter *self, Inverter *inverter,
-                           int32_t doc_id) {
+DocWriter_Add_Inverted_Doc_IMP(DocWriter *self, Inverter *inverter,
+                               int32_t doc_id) {
     DocWriterIVARS *const ivars = DocWriter_IVARS(self);
     OutStream *dat_out    = S_lazy_init(self);
     OutStream *ix_out     = ivars->ix_out;
@@ -159,8 +159,8 @@ DocWriter_add_inverted_doc(DocWriter *self, Inverter *inverter,
 }
 
 void
-DocWriter_add_segment(DocWriter *self, SegReader *reader,
-                      I32Array *doc_map) {
+DocWriter_Add_Segment_IMP(DocWriter *self, SegReader *reader,
+                          I32Array *doc_map) {
     DocWriterIVARS *const ivars = DocWriter_IVARS(self);
     int32_t doc_max = SegReader_Doc_Max(reader);
 
@@ -197,7 +197,7 @@ DocWriter_add_segment(DocWriter *self, SegReader *reader,
 }
 
 void
-DocWriter_finish(DocWriter *self) {
+DocWriter_Finish_IMP(DocWriter *self) {
     DocWriterIVARS *const ivars = DocWriter_IVARS(self);
     if (ivars->dat_out) {
         // Write one final file pointer, so that we can derive the length of
@@ -214,7 +214,7 @@ DocWriter_finish(DocWriter *self) {
 }
 
 int32_t
-DocWriter_format(DocWriter *self) {
+DocWriter_Format_IMP(DocWriter *self) {
     UNUSED_VAR(self);
     return DocWriter_current_file_format;
 }

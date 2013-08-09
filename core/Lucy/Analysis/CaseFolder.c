@@ -36,40 +36,40 @@ CaseFolder_init(CaseFolder *self) {
 }
 
 void
-CaseFolder_destroy(CaseFolder *self) {
+CaseFolder_Destroy_IMP(CaseFolder *self) {
     CaseFolderIVARS *const ivars = CaseFolder_IVARS(self);
     DECREF(ivars->normalizer);
     SUPER_DESTROY(self, CASEFOLDER);
 }
 
 Inversion*
-CaseFolder_transform(CaseFolder *self, Inversion *inversion) {
+CaseFolder_Transform_IMP(CaseFolder *self, Inversion *inversion) {
     CaseFolderIVARS *const ivars = CaseFolder_IVARS(self);
     return Normalizer_Transform(ivars->normalizer, inversion);
 }
 
 Inversion*
-CaseFolder_transform_text(CaseFolder *self, CharBuf *text) {
+CaseFolder_Transform_Text_IMP(CaseFolder *self, CharBuf *text) {
     CaseFolderIVARS *const ivars = CaseFolder_IVARS(self);
     return Normalizer_Transform_Text(ivars->normalizer, text);
 }
 
 bool
-CaseFolder_equals(CaseFolder *self, Obj *other) {
+CaseFolder_Equals_IMP(CaseFolder *self, Obj *other) {
     if ((CaseFolder*)other == self)   { return true; }
     if (!Obj_Is_A(other, CASEFOLDER)) { return false; }
     return true;
 }
 
 Hash*
-CaseFolder_dump(CaseFolder *self) {
+CaseFolder_Dump_IMP(CaseFolder *self) {
     CaseFolder_Dump_t super_dump
         = SUPER_METHOD_PTR(CASEFOLDER, Lucy_CaseFolder_Dump);
     return super_dump(self);
 }
 
 CaseFolder*
-CaseFolder_load(CaseFolder *self, Obj *dump) {
+CaseFolder_Load_IMP(CaseFolder *self, Obj *dump) {
     CaseFolder_Load_t super_load
         = SUPER_METHOD_PTR(CASEFOLDER, Lucy_CaseFolder_Load);
     CaseFolder *loaded = super_load(self, dump);

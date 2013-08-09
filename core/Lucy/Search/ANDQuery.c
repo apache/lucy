@@ -42,7 +42,7 @@ ANDQuery_init(ANDQuery *self, VArray *children) {
 }
 
 CharBuf*
-ANDQuery_to_string(ANDQuery *self) {
+ANDQuery_To_String_IMP(ANDQuery *self) {
     ANDQueryIVARS *const ivars = ANDQuery_IVARS(self);
     uint32_t num_kids = VA_Get_Size(ivars->children);
     if (!num_kids) { return CB_new_from_trusted_utf8("()", 2); }
@@ -65,15 +65,15 @@ ANDQuery_to_string(ANDQuery *self) {
 
 
 bool
-ANDQuery_equals(ANDQuery *self, Obj *other) {
+ANDQuery_Equals_IMP(ANDQuery *self, Obj *other) {
     if ((ANDQuery*)other == self)   { return true; }
     if (!Obj_Is_A(other, ANDQUERY)) { return false; }
     return PolyQuery_equals((PolyQuery*)self, other);
 }
 
 Compiler*
-ANDQuery_make_compiler(ANDQuery *self, Searcher *searcher, float boost,
-                       bool subordinate) {
+ANDQuery_Make_Compiler_IMP(ANDQuery *self, Searcher *searcher, float boost,
+                           bool subordinate) {
     ANDCompiler *compiler = ANDCompiler_new(self, searcher, boost);
     if (!subordinate) {
         ANDCompiler_Normalize(compiler);
@@ -98,8 +98,8 @@ ANDCompiler_init(ANDCompiler *self, ANDQuery *parent, Searcher *searcher,
 }
 
 Matcher*
-ANDCompiler_make_matcher(ANDCompiler *self, SegReader *reader,
-                         bool need_score) {
+ANDCompiler_Make_Matcher_IMP(ANDCompiler *self, SegReader *reader,
+                             bool need_score) {
     ANDCompilerIVARS *const ivars = ANDCompiler_IVARS(self);
     uint32_t num_kids = VA_Get_Size(ivars->children);
 

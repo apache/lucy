@@ -93,7 +93,7 @@ LexIndex_init(LexIndex *self, Schema *schema, Folder *folder,
 }
 
 void
-LexIndex_destroy(LexIndex *self) {
+LexIndex_Destroy_IMP(LexIndex *self) {
     LexIndexIVARS *const ivars = LexIndex_IVARS(self);
     DECREF(ivars->field_type);
     DECREF(ivars->ixix_in);
@@ -104,19 +104,19 @@ LexIndex_destroy(LexIndex *self) {
 }
 
 int32_t
-LexIndex_get_term_num(LexIndex *self) {
+LexIndex_Get_Term_Num_IMP(LexIndex *self) {
     LexIndexIVARS *const ivars = LexIndex_IVARS(self);
     return (ivars->index_interval * ivars->tick) - 1;
 }
 
 Obj*
-LexIndex_get_term(LexIndex *self) {
+LexIndex_Get_Term_IMP(LexIndex *self) {
     LexIndexIVARS *const ivars = LexIndex_IVARS(self);
     return TermStepper_Get_Value(ivars->term_stepper);
 }
 
 TermInfo*
-LexIndex_get_term_info(LexIndex *self) {
+LexIndex_Get_Term_Info_IMP(LexIndex *self) {
     return LexIndex_IVARS(self)->tinfo;
 }
 
@@ -139,7 +139,7 @@ S_read_entry(LexIndex *self) {
 }
 
 void
-LexIndex_seek(LexIndex *self, Obj *target) {
+LexIndex_Seek_IMP(LexIndex *self, Obj *target) {
     LexIndexIVARS *const ivars = LexIndex_IVARS(self);
     TermStepper *term_stepper = ivars->term_stepper;
     InStream    *ix_in        = ivars->ix_in;

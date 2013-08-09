@@ -43,7 +43,7 @@ PolyMatcher_init(PolyMatcher *self, VArray *children, Similarity *similarity) {
 }
 
 void
-PolyMatcher_destroy(PolyMatcher *self) {
+PolyMatcher_Destroy_IMP(PolyMatcher *self) {
     PolyMatcherIVARS *const ivars = PolyMatcher_IVARS(self);
     DECREF(ivars->children);
     DECREF(ivars->sim);

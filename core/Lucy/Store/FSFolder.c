@@ -89,7 +89,7 @@ FSFolder_init(FSFolder *self, const CharBuf *path) {
 }
 
 void
-FSFolder_initialize(FSFolder *self) {
+FSFolder_Initialize_IMP(FSFolder *self) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
     if (!S_dir_ok(ivars->path)) {
         if (!S_create_dir(ivars->path)) {
@@ -99,14 +99,14 @@ FSFolder_initialize(FSFolder *self) {
 }
 
 bool
-FSFolder_check(FSFolder *self) {
+FSFolder_Check_IMP(FSFolder *self) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
     return S_dir_ok(ivars->path);
 }
 
 FileHandle*
-FSFolder_local_open_filehandle(FSFolder *self, const CharBuf *name,
-                               uint32_t flags) {
+FSFolder_Local_Open_FileHandle_IMP(FSFolder *self, const CharBuf *name,
+                                   uint32_t flags) {
     CharBuf      *fullpath = S_fullpath(self, name);
     FSFileHandle *fh = FSFH_open(fullpath, flags);
     if (!fh) { ERR_ADD_FRAME(Err_get_error()); }
@@ -115,7 +115,7 @@ FSFolder_local_open_filehandle(FSFolder *self, const CharBuf *name,
 }
 
 bool
-FSFolder_local_mkdir(FSFolder *self, const CharBuf *name) {
+FSFolder_Local_MkDir_IMP(FSFolder *self, const CharBuf *name) {
     CharBuf *dir = S_fullpath(self, name);
     bool result = S_create_dir(dir);
     if (!result) { ERR_ADD_FRAME(Err_get_error()); }
@@ -124,7 +124,7 @@ FSFolder_local_mkdir(FSFolder *self, const CharBuf *name) {
 }
 
 DirHandle*
-FSFolder_local_open_dir(FSFolder *self) {
+FSFolder_Local_Open_Dir_IMP(FSFolder *self) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
     DirHandle *dh = (DirHandle*)FSDH_open(ivars->path);
     if (!dh) { ERR_ADD_FRAME(Err_get_error()); }
@@ -132,7 +132,7 @@ FSFolder_local_open_dir(FSFolder *self) {
 }
 
 bool
-FSFolder_local_exists(FSFolder *self, const CharBuf *name) {
+FSFolder_Local_Exists_IMP(FSFolder *self, const CharBuf *name) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
     if (Hash_Fetch(ivars->entries, (Obj*)name)) {
         return true;
@@ -153,7 +153,7 @@ FSFolder_local_exists(FSFolder *self, const CharBuf *name) {
 }
 
 bool
-FSFolder_local_is_directory(FSFolder *self, const CharBuf *name) {
+FSFolder_Local_Is_Directory_IMP(FSFolder *self, const CharBuf *name) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
 
     // Check for a cached object, then fall back to a system call.
@@ -170,7 +170,7 @@ FSFolder_local_is_directory(FSFolder *self, const CharBuf *name) {
 }
 
 bool
-FSFolder_rename(FSFolder *self, const CharBuf* from, const CharBuf *to) {
+FSFolder_Rename_IMP(FSFolder *self, const CharBuf* from, const CharBuf *to) {
     CharBuf *from_path = S_fullpath(self, from);
     CharBuf *to_path   = S_fullpath(self, to);
     bool     retval    = !rename((char*)CB_Get_Ptr8(from_path),
@@ -185,8 +185,8 @@ FSFolder_rename(FSFolder *self, const CharBuf* from, const CharBuf *to) {
 }
 
 bool
-FSFolder_hard_link(FSFolder *self, const CharBuf *from,
-                   const CharBuf *to) {
+FSFolder_Hard_Link_IMP(FSFolder *self, const CharBuf *from,
+                       const CharBuf *to) {
     CharBuf *from_path = S_fullpath(self, from);
     CharBuf *to_path   = S_fullpath(self, to);
     bool     retval    = S_hard_link(from_path, to_path);
@@ -196,7 +196,7 @@ FSFolder_hard_link(FSFolder *self, const CharBuf *from,
 }
 
 bool
-FSFolder_local_delete(FSFolder *self, const CharBuf *name) {
+FSFolder_Local_Delete_IMP(FSFolder *self, const CharBuf *name) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
 
     CharBuf *fullpath = S_fullpath(self, name);
@@ -212,13 +212,13 @@ FSFolder_local_delete(FSFolder *self, const CharBuf *name) {
 }
 
 void
-FSFolder_close(FSFolder *self) {
+FSFolder_Close_IMP(FSFolder *self) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
     Hash_Clear(ivars->entries);
 }
 
 Folder*
-FSFolder_local_find_folder(FSFolder *self, const CharBuf *name) {
+FSFolder_Local_Find_Folder_IMP(FSFolder *self, const CharBuf *name) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
 
     Folder *subfolder = NULL;

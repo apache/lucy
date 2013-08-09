@@ -43,33 +43,33 @@ ReqOptQuery_init(RequiredOptionalQuery *self, Query *required_query,
 }
 
 Query*
-ReqOptQuery_get_required_query(RequiredOptionalQuery *self) {
+ReqOptQuery_Get_Required_Query_IMP(RequiredOptionalQuery *self) {
     RequiredOptionalQueryIVARS *const ivars = ReqOptQuery_IVARS(self);
     return (Query*)VA_Fetch(ivars->children, 0);
 }
 
 void
-ReqOptQuery_set_required_query(RequiredOptionalQuery *self,
-                               Query *required_query) {
+ReqOptQuery_Set_Required_Query_IMP(RequiredOptionalQuery *self,
+                                   Query *required_query) {
     RequiredOptionalQueryIVARS *const ivars = ReqOptQuery_IVARS(self);
     VA_Store(ivars->children, 0, INCREF(required_query));
 }
 
 Query*
-ReqOptQuery_get_optional_query(RequiredOptionalQuery *self) {
+ReqOptQuery_Get_Optional_Query_IMP(RequiredOptionalQuery *self) {
     RequiredOptionalQueryIVARS *const ivars = ReqOptQuery_IVARS(self);
     return (Query*)VA_Fetch(ivars->children, 1);
 }
 
 void
-ReqOptQuery_set_optional_query(RequiredOptionalQuery *self,
-                               Query *optional_query) {
+ReqOptQuery_Set_Optional_Query_IMP(RequiredOptionalQuery *self,
+                                   Query *optional_query) {
     RequiredOptionalQueryIVARS *const ivars = ReqOptQuery_IVARS(self);
     VA_Store(ivars->children, 1, INCREF(optional_query));
 }
 
 CharBuf*
-ReqOptQuery_to_string(RequiredOptionalQuery *self) {
+ReqOptQuery_To_String_IMP(RequiredOptionalQuery *self) {
     RequiredOptionalQueryIVARS *const ivars = ReqOptQuery_IVARS(self);
     CharBuf *req_string = Obj_To_String(VA_Fetch(ivars->children, 0));
     CharBuf *opt_string = Obj_To_String(VA_Fetch(ivars->children, 1));
@@ -80,15 +80,15 @@ ReqOptQuery_to_string(RequiredOptionalQuery *self) {
 }
 
 bool
-ReqOptQuery_equals(RequiredOptionalQuery *self, Obj *other) {
+ReqOptQuery_Equals_IMP(RequiredOptionalQuery *self, Obj *other) {
     if ((RequiredOptionalQuery*)other == self)   { return true;  }
     if (!Obj_Is_A(other, REQUIREDOPTIONALQUERY)) { return false; }
     return PolyQuery_equals((PolyQuery*)self, other);
 }
 
 Compiler*
-ReqOptQuery_make_compiler(RequiredOptionalQuery *self, Searcher *searcher,
-                          float boost, bool subordinate) {
+ReqOptQuery_Make_Compiler_IMP(RequiredOptionalQuery *self, Searcher *searcher,
+                              float boost, bool subordinate) {
     RequiredOptionalCompiler *compiler
         = ReqOptCompiler_new(self, searcher, boost);
     if (!subordinate) {
@@ -118,8 +118,8 @@ ReqOptCompiler_init(RequiredOptionalCompiler *self,
 }
 
 Matcher*
-ReqOptCompiler_make_matcher(RequiredOptionalCompiler *self, SegReader *reader,
-                            bool need_score) {
+ReqOptCompiler_Make_Matcher_IMP(RequiredOptionalCompiler *self,
+                                SegReader *reader, bool need_score) {
     RequiredOptionalCompilerIVARS *const ivars = ReqOptCompiler_IVARS(self);
     Schema     *schema       = SegReader_Get_Schema(reader);
     Similarity *sim          = Schema_Get_Similarity(schema);

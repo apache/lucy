@@ -104,7 +104,7 @@ SegLex_init(SegLexicon *self, Schema *schema, Folder *folder,
 }
 
 void
-SegLex_destroy(SegLexicon *self) {
+SegLex_Destroy_IMP(SegLexicon *self) {
     SegLexiconIVARS *const ivars = SegLex_IVARS(self);
     DECREF(ivars->segment);
     DECREF(ivars->term_stepper);
@@ -115,7 +115,7 @@ SegLex_destroy(SegLexicon *self) {
 }
 
 void
-SegLex_seek(SegLexicon *self, Obj *target) {
+SegLex_Seek_IMP(SegLexicon *self, Obj *target) {
     SegLexiconIVARS *const ivars = SegLex_IVARS(self);
     LexIndex *const lex_index = ivars->lex_index;
 
@@ -142,7 +142,7 @@ SegLex_seek(SegLexicon *self, Obj *target) {
 }
 
 void
-SegLex_reset(SegLexicon* self) {
+SegLex_Reset_IMP(SegLexicon* self) {
     SegLexiconIVARS *const ivars = SegLex_IVARS(self);
     ivars->term_num = -1;
     InStream_Seek(ivars->instream, 0);
@@ -151,36 +151,36 @@ SegLex_reset(SegLexicon* self) {
 }
 
 int32_t
-SegLex_get_field_num(SegLexicon *self) {
+SegLex_Get_Field_Num_IMP(SegLexicon *self) {
     return SegLex_IVARS(self)->field_num;
 }
 
 Obj*
-SegLex_get_term(SegLexicon *self) {
+SegLex_Get_Term_IMP(SegLexicon *self) {
     SegLexiconIVARS *const ivars = SegLex_IVARS(self);
     return TermStepper_Get_Value(ivars->term_stepper);
 }
 
 int32_t
-SegLex_doc_freq(SegLexicon *self) {
+SegLex_Doc_Freq_IMP(SegLexicon *self) {
     SegLexiconIVARS *const ivars = SegLex_IVARS(self);
     TermInfo *tinfo = (TermInfo*)TermStepper_Get_Value(ivars->tinfo_stepper);
     return tinfo ? TInfo_Get_Doc_Freq(tinfo) : 0;
 }
 
 TermInfo*
-SegLex_get_term_info(SegLexicon *self) {
+SegLex_Get_Term_Info_IMP(SegLexicon *self) {
     SegLexiconIVARS *const ivars = SegLex_IVARS(self);
     return (TermInfo*)TermStepper_Get_Value(ivars->tinfo_stepper);
 }
 
 Segment*
-SegLex_get_segment(SegLexicon *self) {
+SegLex_Get_Segment_IMP(SegLexicon *self) {
     return SegLex_IVARS(self)->segment;
 }
 
 bool
-SegLex_next(SegLexicon *self) {
+SegLex_Next_IMP(SegLexicon *self) {
     SegLexiconIVARS *const ivars = SegLex_IVARS(self);
 
     // If we've run out of terms, null out and return.

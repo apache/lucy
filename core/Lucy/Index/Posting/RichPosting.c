@@ -56,14 +56,14 @@ RichPost_init(RichPosting *self, Similarity *sim) {
 }
 
 void
-RichPost_destroy(RichPosting *self) {
+RichPost_Destroy_IMP(RichPosting *self) {
     RichPostingIVARS *const ivars = RichPost_IVARS(self);
     FREEMEM(ivars->prox_boosts);
     SUPER_DESTROY(self, RICHPOSTING);
 }
 
 void
-RichPost_read_record(RichPosting *self, InStream *instream) {
+RichPost_Read_Record_IMP(RichPosting *self, InStream *instream) {
     RichPostingIVARS *const ivars = RichPost_IVARS(self);
     float *const norm_decoder = ivars->norm_decoder;
     uint32_t  num_prox = 0;
@@ -105,10 +105,10 @@ RichPost_read_record(RichPosting *self, InStream *instream) {
 }
 
 void
-RichPost_add_inversion_to_pool(RichPosting *self, PostingPool *post_pool,
-                               Inversion *inversion, FieldType *type,
-                               int32_t doc_id, float doc_boost,
-                               float length_norm) {
+RichPost_Add_Inversion_To_Pool_IMP(RichPosting *self, PostingPool *post_pool,
+                                   Inversion *inversion, FieldType *type,
+                                   int32_t doc_id, float doc_boost,
+                                   float length_norm) {
     RichPostingIVARS *const ivars = RichPost_IVARS(self);
     MemoryPool *mem_pool = PostPool_Get_Mem_Pool(post_pool);
     Similarity *sim = ivars->sim;
@@ -152,8 +152,9 @@ RichPost_add_inversion_to_pool(RichPosting *self, PostingPool *post_pool,
 }
 
 RawPosting*
-RichPost_read_raw(RichPosting *self, InStream *instream, int32_t last_doc_id,
-                  CharBuf *term_text, MemoryPool *mem_pool) {
+RichPost_Read_Raw_IMP(RichPosting *self, InStream *instream,
+                      int32_t last_doc_id, CharBuf *term_text,
+                      MemoryPool *mem_pool) {
     char *const    text_buf       = (char*)CB_Get_Ptr8(term_text);
     const size_t   text_size      = CB_Get_Size(term_text);
     const uint32_t doc_code       = InStream_Read_C32(instream);
@@ -189,9 +190,9 @@ RichPost_read_raw(RichPosting *self, InStream *instream, int32_t last_doc_id,
 }
 
 RichPostingMatcher*
-RichPost_make_matcher(RichPosting *self, Similarity *sim,
-                      PostingList *plist, Compiler *compiler,
-                      bool need_score) {
+RichPost_Make_Matcher_IMP(RichPosting *self, Similarity *sim,
+                          PostingList *plist, Compiler *compiler,
+                          bool need_score) {
     RichPostingMatcher* matcher
         = (RichPostingMatcher*)VTable_Make_Obj(RICHPOSTINGMATCHER);
     UNUSED_VAR(self);

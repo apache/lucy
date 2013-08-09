@@ -40,7 +40,7 @@ Searcher_init(Searcher *self, Schema *schema) {
 }
 
 void
-Searcher_destroy(Searcher *self) {
+Searcher_Destroy_IMP(Searcher *self) {
     SearcherIVARS *const ivars = Searcher_IVARS(self);
     DECREF(ivars->schema);
     DECREF(ivars->qparser);
@@ -48,8 +48,8 @@ Searcher_destroy(Searcher *self) {
 }
 
 Hits*
-Searcher_hits(Searcher *self, Obj *query, uint32_t offset, uint32_t num_wanted,
-              SortSpec *sort_spec) {
+Searcher_Hits_IMP(Searcher *self, Obj *query, uint32_t offset,
+                  uint32_t num_wanted, SortSpec *sort_spec) {
     Query   *real_query = Searcher_Glean_Query(self, query);
     uint32_t doc_max    = Searcher_Doc_Max(self);
     uint32_t wanted     = offset + num_wanted > doc_max
@@ -64,7 +64,7 @@ Searcher_hits(Searcher *self, Obj *query, uint32_t offset, uint32_t num_wanted,
 }
 
 Query*
-Searcher_glean_query(Searcher *self, Obj *query) {
+Searcher_Glean_Query_IMP(Searcher *self, Obj *query) {
     SearcherIVARS *const ivars = Searcher_IVARS(self);
     Query *real_query = NULL;
 
@@ -89,12 +89,12 @@ Searcher_glean_query(Searcher *self, Obj *query) {
 }
 
 Schema*
-Searcher_get_schema(Searcher *self) {
+Searcher_Get_Schema_IMP(Searcher *self) {
     return Searcher_IVARS(self)->schema;
 }
 
 void
-Searcher_close(Searcher *self) {
+Searcher_Close_IMP(Searcher *self) {
     UNUSED_VAR(self);
 }
 

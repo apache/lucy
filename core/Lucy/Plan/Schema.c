@@ -70,7 +70,7 @@ Schema_init(Schema *self) {
 }
 
 void
-Schema_destroy(Schema *self) {
+Schema_Destroy_IMP(Schema *self) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     DECREF(ivars->arch);
     DECREF(ivars->analyzers);
@@ -96,7 +96,7 @@ S_add_unique(VArray *array, Obj *elem) {
 }
 
 bool
-Schema_equals(Schema *self, Obj *other) {
+Schema_Equals_IMP(Schema *self, Obj *other) {
     if ((Schema*)other == self)                         { return true; }
     if (!Obj_Is_A(other, SCHEMA))                       { return false; }
     SchemaIVARS *const ivars = Schema_IVARS(self);
@@ -108,13 +108,13 @@ Schema_equals(Schema *self, Obj *other) {
 }
 
 Architecture*
-Schema_architecture(Schema *self) {
+Schema_Architecture_IMP(Schema *self) {
     UNUSED_VAR(self);
     return Arch_new();
 }
 
 void
-Schema_spec_field(Schema *self, const CharBuf *field, FieldType *type) {
+Schema_Spec_Field_IMP(Schema *self, const CharBuf *field, FieldType *type) {
     FieldType *existing  = Schema_Fetch_Type(self, field);
 
     // If the field already has an association, verify pairing and return.
@@ -184,13 +184,13 @@ S_add_numeric_field(Schema *self, const CharBuf *field, FieldType *type) {
 }
 
 FieldType*
-Schema_fetch_type(Schema *self, const CharBuf *field) {
+Schema_Fetch_Type_IMP(Schema *self, const CharBuf *field) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     return (FieldType*)Hash_Fetch(ivars->types, (Obj*)field);
 }
 
 Analyzer*
-Schema_fetch_analyzer(Schema *self, const CharBuf *field) {
+Schema_Fetch_Analyzer_IMP(Schema *self, const CharBuf *field) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     return field
            ? (Analyzer*)Hash_Fetch(ivars->analyzers, (Obj*)field)
@@ -198,7 +198,7 @@ Schema_fetch_analyzer(Schema *self, const CharBuf *field) {
 }
 
 Similarity*
-Schema_fetch_sim(Schema *self, const CharBuf *field) {
+Schema_Fetch_Sim_IMP(Schema *self, const CharBuf *field) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     Similarity *sim = NULL;
     if (field != NULL) {
@@ -208,23 +208,23 @@ Schema_fetch_sim(Schema *self, const CharBuf *field) {
 }
 
 uint32_t
-Schema_num_fields(Schema *self) {
+Schema_Num_Fields_IMP(Schema *self) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     return Hash_Get_Size(ivars->types);
 }
 
 Architecture*
-Schema_get_architecture(Schema *self) {
+Schema_Get_Architecture_IMP(Schema *self) {
     return Schema_IVARS(self)->arch;
 }
 
 Similarity*
-Schema_get_similarity(Schema *self) {
+Schema_Get_Similarity_IMP(Schema *self) {
     return Schema_IVARS(self)->sim;
 }
 
 VArray*
-Schema_all_fields(Schema *self) {
+Schema_All_Fields_IMP(Schema *self) {
     return Hash_Keys(Schema_IVARS(self)->types);
 }
 
@@ -248,7 +248,7 @@ S_find_in_array(VArray *array, Obj *obj) {
 }
 
 Hash*
-Schema_dump(Schema *self) {
+Schema_Dump_IMP(Schema *self) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     Hash *dump = Hash_new(0);
     Hash *type_dumps = Hash_new(Hash_Get_Size(ivars->types));
@@ -303,7 +303,7 @@ S_load_type(VTable *vtable, Obj *type_dump) {
 }
 
 Schema*
-Schema_load(Schema *self, Obj *dump) {
+Schema_Load_IMP(Schema *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     CharBuf *class_name
         = (CharBuf*)CERTIFY(Hash_Fetch_Str(source, "_class", 6), CHARBUF);
@@ -402,7 +402,7 @@ Schema_load(Schema *self, Obj *dump) {
 }
 
 void
-Schema_eat(Schema *self, Schema *other) {
+Schema_Eat_IMP(Schema *self, Schema *other) {
     if (!Schema_Is_A(self, Schema_Get_VTable(other))) {
         THROW(ERR, "%o not a descendent of %o",
               Schema_Get_Class_Name(self), Schema_Get_Class_Name(other));
@@ -418,7 +418,7 @@ Schema_eat(Schema *self, Schema *other) {
 }
 
 void
-Schema_write(Schema *self, Folder *folder, const CharBuf *filename) {
+Schema_Write_IMP(Schema *self, Folder *folder, const CharBuf *filename) {
     Hash *dump = Schema_Dump(self);
     ZombieCharBuf *schema_temp = ZCB_WRAP_STR("schema.temp", 11);
     bool success;

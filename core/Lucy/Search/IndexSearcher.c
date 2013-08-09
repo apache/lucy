@@ -72,7 +72,7 @@ IxSearcher_init(IndexSearcher *self, Obj *index) {
 }
 
 void
-IxSearcher_destroy(IndexSearcher *self) {
+IxSearcher_Destroy_IMP(IndexSearcher *self) {
     IndexSearcherIVARS *const ivars = IxSearcher_IVARS(self);
     DECREF(ivars->reader);
     DECREF(ivars->doc_reader);
@@ -83,27 +83,27 @@ IxSearcher_destroy(IndexSearcher *self) {
 }
 
 HitDoc*
-IxSearcher_fetch_doc(IndexSearcher *self, int32_t doc_id) {
+IxSearcher_Fetch_Doc_IMP(IndexSearcher *self, int32_t doc_id) {
     IndexSearcherIVARS *const ivars = IxSearcher_IVARS(self);
     if (!ivars->doc_reader) { THROW(ERR, "No DocReader"); }
     return DocReader_Fetch_Doc(ivars->doc_reader, doc_id);
 }
 
 DocVector*
-IxSearcher_fetch_doc_vec(IndexSearcher *self, int32_t doc_id) {
+IxSearcher_Fetch_Doc_Vec_IMP(IndexSearcher *self, int32_t doc_id) {
     IndexSearcherIVARS *const ivars = IxSearcher_IVARS(self);
     if (!ivars->hl_reader) { THROW(ERR, "No HighlightReader"); }
     return HLReader_Fetch_Doc_Vec(ivars->hl_reader, doc_id);
 }
 
 int32_t
-IxSearcher_doc_max(IndexSearcher *self) {
+IxSearcher_Doc_Max_IMP(IndexSearcher *self) {
     IndexSearcherIVARS *const ivars = IxSearcher_IVARS(self);
     return IxReader_Doc_Max(ivars->reader);
 }
 
 uint32_t
-IxSearcher_doc_freq(IndexSearcher *self, const CharBuf *field, Obj *term) {
+IxSearcher_Doc_Freq_IMP(IndexSearcher *self, const CharBuf *field, Obj *term) {
     IndexSearcherIVARS *const ivars = IxSearcher_IVARS(self);
     LexiconReader *lex_reader
         = (LexiconReader*)IxReader_Fetch(ivars->reader,
@@ -112,8 +112,8 @@ IxSearcher_doc_freq(IndexSearcher *self, const CharBuf *field, Obj *term) {
 }
 
 TopDocs*
-IxSearcher_top_docs(IndexSearcher *self, Query *query, uint32_t num_wanted,
-                    SortSpec *sort_spec) {
+IxSearcher_Top_Docs_IMP(IndexSearcher *self, Query *query, uint32_t num_wanted,
+                        SortSpec *sort_spec) {
     Schema        *schema    = IxSearcher_Get_Schema(self);
     uint32_t       doc_max   = IxSearcher_Doc_Max(self);
     uint32_t       wanted    = num_wanted > doc_max ? doc_max : num_wanted;
@@ -128,7 +128,7 @@ IxSearcher_top_docs(IndexSearcher *self, Query *query, uint32_t num_wanted,
 }
 
 void
-IxSearcher_collect(IndexSearcher *self, Query *query, Collector *collector) {
+IxSearcher_Collect_IMP(IndexSearcher *self, Query *query, Collector *collector) {
     IndexSearcherIVARS *const ivars = IxSearcher_IVARS(self);
     VArray   *const seg_readers = ivars->seg_readers;
     I32Array *const seg_starts  = ivars->seg_starts;
@@ -162,12 +162,12 @@ IxSearcher_collect(IndexSearcher *self, Query *query, Collector *collector) {
 }
 
 IndexReader*
-IxSearcher_get_reader(IndexSearcher *self) {
+IxSearcher_Get_Reader_IMP(IndexSearcher *self) {
     return IxSearcher_IVARS(self)->reader;
 }
 
 void
-IxSearcher_close(IndexSearcher *self) {
+IxSearcher_Close_IMP(IndexSearcher *self) {
     UNUSED_VAR(self);
 }
 

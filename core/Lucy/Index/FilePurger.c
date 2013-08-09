@@ -66,7 +66,7 @@ FilePurger_init(FilePurger *self, Folder *folder, Snapshot *snapshot,
 }
 
 void
-FilePurger_destroy(FilePurger *self) {
+FilePurger_Destroy_IMP(FilePurger *self) {
     FilePurgerIVARS *const ivars = FilePurger_IVARS(self);
     DECREF(ivars->folder);
     DECREF(ivars->snapshot);
@@ -76,7 +76,7 @@ FilePurger_destroy(FilePurger *self) {
 }
 
 void
-FilePurger_purge(FilePurger *self) {
+FilePurger_Purge_IMP(FilePurger *self) {
     FilePurgerIVARS *const ivars = FilePurger_IVARS(self);
     Lock *deletion_lock = IxManager_Make_Deletion_Lock(ivars->manager);
 

@@ -153,7 +153,7 @@ QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
 }
 
 void
-QParser_destroy(QueryParser *self) {
+QParser_Destroy_IMP(QueryParser *self) {
     QueryParserIVARS *const ivars = QParser_IVARS(self);
     DECREF(ivars->schema);
     DECREF(ivars->analyzer);
@@ -164,32 +164,32 @@ QParser_destroy(QueryParser *self) {
 }
 
 Analyzer*
-QParser_get_analyzer(QueryParser *self) {
+QParser_Get_Analyzer_IMP(QueryParser *self) {
     return QParser_IVARS(self)->analyzer;
 }
 
 Schema*
-QParser_get_schema(QueryParser *self) {
+QParser_Get_Schema_IMP(QueryParser *self) {
     return QParser_IVARS(self)->schema;
 }
 
 CharBuf*
-QParser_get_default_boolop(QueryParser *self) {
+QParser_Get_Default_BoolOp_IMP(QueryParser *self) {
     return QParser_IVARS(self)->default_boolop;
 }
 
 VArray*
-QParser_get_fields(QueryParser *self) {
+QParser_Get_Fields_IMP(QueryParser *self) {
     return QParser_IVARS(self)->fields;
 }
 
 bool
-QParser_heed_colons(QueryParser *self) {
+QParser_Heed_Colons_IMP(QueryParser *self) {
     return QParser_IVARS(self)->heed_colons;
 }
 
 void
-QParser_set_heed_colons(QueryParser *self, bool heed_colons) {
+QParser_Set_Heed_Colons_IMP(QueryParser *self, bool heed_colons) {
     QueryParserIVARS *const ivars = QParser_IVARS(self);
     ivars->heed_colons = heed_colons;
     QueryLexer_Set_Heed_Colons(ivars->lexer, heed_colons);
@@ -197,7 +197,7 @@ QParser_set_heed_colons(QueryParser *self, bool heed_colons) {
 
 
 Query*
-QParser_parse(QueryParser *self, const CharBuf *query_string) {
+QParser_Parse_IMP(QueryParser *self, const CharBuf *query_string) {
     CharBuf *qstring = query_string
                        ? CB_Clone(query_string)
                        : CB_new_from_trusted_utf8("", 0);
@@ -211,7 +211,7 @@ QParser_parse(QueryParser *self, const CharBuf *query_string) {
 }
 
 Query*
-QParser_tree(QueryParser *self, const CharBuf *query_string) {
+QParser_Tree_IMP(QueryParser *self, const CharBuf *query_string) {
     QueryParserIVARS *const ivars = QParser_IVARS(self);
     VArray *elems = QueryLexer_Tokenize(ivars->lexer, query_string);
     S_balance_parens(self, elems);
@@ -724,7 +724,7 @@ S_do_prune(QueryParser *self, Query *query) {
 }
 
 Query*
-QParser_prune(QueryParser *self, Query *query) {
+QParser_Prune_IMP(QueryParser *self, Query *query) {
     if (!query
         || Query_Is_A(query, NOTQUERY)
         || Query_Is_A(query, MATCHALLQUERY)
@@ -738,7 +738,7 @@ QParser_prune(QueryParser *self, Query *query) {
 }
 
 Query*
-QParser_expand(QueryParser *self, Query *query) {
+QParser_Expand_IMP(QueryParser *self, Query *query) {
     Query *retval = NULL;
 
     if (Query_Is_A(query, LEAFQUERY)) {
@@ -854,7 +854,7 @@ S_unescape(QueryParser *self, CharBuf *orig, CharBuf *target) {
 }
 
 Query*
-QParser_expand_leaf(QueryParser *self, Query *query) {
+QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
     QueryParserIVARS *const ivars = QParser_IVARS(self);
     LeafQuery     *leaf_query  = (LeafQuery*)query;
     Schema        *schema      = ivars->schema;
@@ -961,39 +961,40 @@ QParser_expand_leaf(QueryParser *self, Query *query) {
 }
 
 Query*
-QParser_make_term_query(QueryParser *self, const CharBuf *field, Obj *term) {
+QParser_Make_Term_Query_IMP(QueryParser *self, const CharBuf *field,
+                            Obj *term) {
     UNUSED_VAR(self);
     return (Query*)TermQuery_new(field, term);
 }
 
 Query*
-QParser_make_phrase_query(QueryParser *self, const CharBuf *field,
-                          VArray *terms) {
+QParser_Make_Phrase_Query_IMP(QueryParser *self, const CharBuf *field,
+                              VArray *terms) {
     UNUSED_VAR(self);
     return (Query*)PhraseQuery_new(field, terms);
 }
 
 Query*
-QParser_make_or_query(QueryParser *self, VArray *children) {
+QParser_Make_OR_Query_IMP(QueryParser *self, VArray *children) {
     UNUSED_VAR(self);
     return (Query*)ORQuery_new(children);
 }
 
 Query*
-QParser_make_and_query(QueryParser *self, VArray *children) {
+QParser_Make_AND_Query_IMP(QueryParser *self, VArray *children) {
     UNUSED_VAR(self);
     return (Query*)ANDQuery_new(children);
 }
 
 Query*
-QParser_make_not_query(QueryParser *self, Query *negated_query) {
+QParser_Make_NOT_Query_IMP(QueryParser *self, Query *negated_query) {
     UNUSED_VAR(self);
     return (Query*)NOTQuery_new(negated_query);
 }
 
 Query*
-QParser_make_req_opt_query(QueryParser *self, Query *required_query,
-                           Query *optional_query) {
+QParser_Make_Req_Opt_Query_IMP(QueryParser *self, Query *required_query,
+                               Query *optional_query) {
     UNUSED_VAR(self);
     return (Query*)ReqOptQuery_new(required_query, optional_query);
 }

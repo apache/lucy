@@ -36,37 +36,37 @@ Span_init(Span *self, int32_t offset, int32_t length,
 }
 
 int32_t
-Span_get_offset(Span *self) {
+Span_Get_Offset_IMP(Span *self) {
     return Span_IVARS(self)->offset;
 }
 
 int32_t
-Span_get_length(Span *self) {
+Span_Get_Length_IMP(Span *self) {
     return Span_IVARS(self)->length;
 }
 
 float
-Span_get_weight(Span *self) {
+Span_Get_Weight_IMP(Span *self) {
     return Span_IVARS(self)->weight;
 }
 
 void
-Span_set_offset(Span *self, int32_t offset) {
+Span_Set_Offset_IMP(Span *self, int32_t offset) {
     Span_IVARS(self)->offset = offset;
 }
 
 void
-Span_set_length(Span *self, int32_t length) {
+Span_Set_Length_IMP(Span *self, int32_t length) {
     Span_IVARS(self)->length = length;
 }
 
 void
-Span_set_weight(Span *self, float weight) {
+Span_Set_Weight_IMP(Span *self, float weight) {
     Span_IVARS(self)->weight = weight;
 }
 
 bool
-Span_equals(Span *self, Obj *other) {
+Span_Equals_IMP(Span *self, Obj *other) {
     if (self == (Span*)other)         { return true; }
     if (!Obj_Is_A(other, SPAN))       { return false; }
     SpanIVARS *const ivars = Span_IVARS(self);
@@ -78,7 +78,7 @@ Span_equals(Span *self, Obj *other) {
 }
 
 int32_t
-Span_compare_to(Span *self, Obj *other) {
+Span_Compare_To_IMP(Span *self, Obj *other) {
     CERTIFY(other, SPAN);
     SpanIVARS *const ivars = Span_IVARS(self);
     SpanIVARS *const ovars = Span_IVARS((Span*)other);

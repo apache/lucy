@@ -35,7 +35,7 @@ FH_do_open(FileHandle *self, const CharBuf *path, uint32_t flags) {
 }
 
 void
-FH_destroy(FileHandle *self) {
+FH_Destroy_IMP(FileHandle *self) {
     FileHandleIVARS *const ivars = FH_IVARS(self);
     FH_Close(self);
     DECREF(ivars->path);
@@ -46,20 +46,20 @@ FH_destroy(FileHandle *self) {
 }
 
 bool
-FH_grow(FileHandle *self, int64_t length) {
+FH_Grow_IMP(FileHandle *self, int64_t length) {
     UNUSED_VAR(self);
     UNUSED_VAR(length);
     return true;
 }
 
 void
-FH_set_path(FileHandle *self, const CharBuf *path) {
+FH_Set_Path_IMP(FileHandle *self, const CharBuf *path) {
     FileHandleIVARS *const ivars = FH_IVARS(self);
     CB_Mimic(ivars->path, (Obj*)path);
 }
 
 CharBuf*
-FH_get_path(FileHandle *self) {
+FH_Get_Path_IMP(FileHandle *self) {
     return FH_IVARS(self)->path;
 }
 

@@ -70,7 +70,7 @@ RAMFH_do_open(RAMFileHandle *self, const CharBuf *path, uint32_t flags,
 }
 
 void
-RAMFH_destroy(RAMFileHandle *self) {
+RAMFH_Destroy_IMP(RAMFileHandle *self) {
     RAMFileHandleIVARS *const ivars = RAMFH_IVARS(self);
     DECREF(ivars->ram_file);
     DECREF(ivars->contents);
@@ -78,8 +78,8 @@ RAMFH_destroy(RAMFileHandle *self) {
 }
 
 bool
-RAMFH_window(RAMFileHandle *self, FileWindow *window, int64_t offset,
-             int64_t len) {
+RAMFH_Window_IMP(RAMFileHandle *self, FileWindow *window, int64_t offset,
+                 int64_t len) {
     RAMFileHandleIVARS *const ivars = RAMFH_IVARS(self);
     int64_t end = offset + len;
     if (!(ivars->flags & FH_READ_ONLY)) {
@@ -104,14 +104,14 @@ RAMFH_window(RAMFileHandle *self, FileWindow *window, int64_t offset,
 }
 
 bool
-RAMFH_release_window(RAMFileHandle *self, FileWindow *window) {
+RAMFH_Release_Window_IMP(RAMFileHandle *self, FileWindow *window) {
     UNUSED_VAR(self);
     FileWindow_Set_Window(window, NULL, 0, 0);
     return true;
 }
 
 bool
-RAMFH_read(RAMFileHandle *self, char *dest, int64_t offset, size_t len) {
+RAMFH_Read_IMP(RAMFileHandle *self, char *dest, int64_t offset, size_t len) {
     RAMFileHandleIVARS *const ivars = RAMFH_IVARS(self);
     int64_t end = offset + len;
     if (!(ivars->flags & FH_READ_ONLY)) {
@@ -136,7 +136,7 @@ RAMFH_read(RAMFileHandle *self, char *dest, int64_t offset, size_t len) {
 }
 
 bool
-RAMFH_write(RAMFileHandle *self, const void *data, size_t len) {
+RAMFH_Write_IMP(RAMFileHandle *self, const void *data, size_t len) {
     RAMFileHandleIVARS *const ivars = RAMFH_IVARS(self);
     if (ivars->flags & FH_READ_ONLY) {
         Err_set_error(Err_new(CB_newf("Attempt to write to read-only RAMFile")));
@@ -148,7 +148,7 @@ RAMFH_write(RAMFileHandle *self, const void *data, size_t len) {
 }
 
 bool
-RAMFH_grow(RAMFileHandle *self, int64_t len) {
+RAMFH_Grow_IMP(RAMFileHandle *self, int64_t len) {
     RAMFileHandleIVARS *const ivars = RAMFH_IVARS(self);
     if (len > INT32_MAX) {
         Err_set_error(Err_new(CB_newf("Can't support RAM files of size %i64 (> %i32)",
@@ -167,17 +167,17 @@ RAMFH_grow(RAMFileHandle *self, int64_t len) {
 }
 
 RAMFile*
-RAMFH_get_file(RAMFileHandle *self) {
+RAMFH_Get_File_IMP(RAMFileHandle *self) {
     return RAMFH_IVARS(self)->ram_file;
 }
 
 int64_t
-RAMFH_length(RAMFileHandle *self) {
+RAMFH_Length_IMP(RAMFileHandle *self) {
     return RAMFH_IVARS(self)->len;
 }
 
 bool
-RAMFH_close(RAMFileHandle *self) {
+RAMFH_Close_IMP(RAMFileHandle *self) {
     UNUSED_VAR(self);
     return true;
 }

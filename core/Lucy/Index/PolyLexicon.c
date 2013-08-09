@@ -63,7 +63,7 @@ PolyLex_init(PolyLexicon *self, const CharBuf *field, VArray *sub_readers) {
 }
 
 void
-PolyLex_destroy(PolyLexicon *self) {
+PolyLex_Destroy_IMP(PolyLexicon *self) {
     PolyLexiconIVARS *const ivars = PolyLex_IVARS(self);
     DECREF(ivars->seg_lexicons);
     DECREF(ivars->lex_q);
@@ -92,7 +92,7 @@ S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target) {
 }
 
 void
-PolyLex_reset(PolyLexicon *self) {
+PolyLex_Reset_IMP(PolyLexicon *self) {
     PolyLexiconIVARS *const ivars = PolyLex_IVARS(self);
     VArray *seg_lexicons = ivars->seg_lexicons;
     uint32_t num_segs = VA_Get_Size(seg_lexicons);
@@ -122,7 +122,7 @@ PolyLex_reset(PolyLexicon *self) {
 }
 
 bool
-PolyLex_next(PolyLexicon *self) {
+PolyLex_Next_IMP(PolyLexicon *self) {
     PolyLexiconIVARS *const ivars = PolyLex_IVARS(self);
     SegLexQueue *lex_q = ivars->lex_q;
     SegLexicon *top_seg_lexicon = (SegLexicon*)SegLexQ_Peek(lex_q);
@@ -155,7 +155,7 @@ PolyLex_next(PolyLexicon *self) {
 }
 
 void
-PolyLex_seek(PolyLexicon *self, Obj *target) {
+PolyLex_Seek_IMP(PolyLexicon *self, Obj *target) {
     PolyLexiconIVARS *const ivars = PolyLex_IVARS(self);
     VArray *seg_lexicons = ivars->seg_lexicons;
     SegLexQueue *lex_q = ivars->lex_q;
@@ -185,12 +185,12 @@ PolyLex_seek(PolyLexicon *self, Obj *target) {
 }
 
 Obj*
-PolyLex_get_term(PolyLexicon *self) {
+PolyLex_Get_Term_IMP(PolyLexicon *self) {
     return PolyLex_IVARS(self)->term;
 }
 
 uint32_t
-PolyLex_get_num_seg_lexicons(PolyLexicon *self) {
+PolyLex_Get_Num_Seg_Lexicons_IMP(PolyLexicon *self) {
     PolyLexiconIVARS *const ivars = PolyLex_IVARS(self);
     return VA_Get_Size(ivars->seg_lexicons);
 }
@@ -202,7 +202,7 @@ SegLexQ_new(uint32_t max_size) {
 }
 
 bool
-SegLexQ_less_than(SegLexQueue *self, Obj *a, Obj *b) {
+SegLexQ_Less_Than_IMP(SegLexQueue *self, Obj *a, Obj *b) {
     SegLexicon *const lex_a  = (SegLexicon*)a;
     SegLexicon *const lex_b  = (SegLexicon*)b;
     Obj *const term_a = SegLex_Get_Term(lex_a);

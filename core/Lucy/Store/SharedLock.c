@@ -47,13 +47,13 @@ ShLock_init(SharedLock *self, Folder *folder, const CharBuf *name,
 }
 
 bool
-ShLock_shared(SharedLock *self) {
+ShLock_Shared_IMP(SharedLock *self) {
     UNUSED_VAR(self);
     return true;
 }
 
 bool
-ShLock_request(SharedLock *self) {
+ShLock_Request_IMP(SharedLock *self) {
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
     uint32_t i = 0;
     ShLock_Request_t super_request
@@ -82,7 +82,7 @@ ShLock_request(SharedLock *self) {
 }
 
 void
-ShLock_release(SharedLock *self) {
+ShLock_Release_IMP(SharedLock *self) {
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
     if (ivars->lock_path && !CB_Equals_Str(ivars->lock_path, "", 0)) {
         ShLock_Release_t super_release
@@ -97,7 +97,7 @@ ShLock_release(SharedLock *self) {
 
 
 void
-ShLock_clear_stale(SharedLock *self) {
+ShLock_Clear_Stale_IMP(SharedLock *self) {
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
     DirHandle *dh;
     CharBuf   *entry;
@@ -129,7 +129,7 @@ ShLock_clear_stale(SharedLock *self) {
 }
 
 bool
-ShLock_is_locked(SharedLock *self) {
+ShLock_Is_Locked_IMP(SharedLock *self) {
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
     DirHandle *dh;
     CharBuf   *entry;

@@ -50,14 +50,14 @@ CFWriter_init(CompoundFileWriter *self, Folder *folder) {
 }
 
 void
-CFWriter_destroy(CompoundFileWriter *self) {
+CFWriter_Destroy_IMP(CompoundFileWriter *self) {
     CompoundFileWriterIVARS *const ivars = CFWriter_IVARS(self);
     DECREF(ivars->folder);
     SUPER_DESTROY(self, COMPOUNDFILEWRITER);
 }
 
 void
-CFWriter_consolidate(CompoundFileWriter *self) {
+CFWriter_Consolidate_IMP(CompoundFileWriter *self) {
     CompoundFileWriterIVARS *const ivars = CFWriter_IVARS(self);
     CharBuf *cfmeta_file = (CharBuf*)ZCB_WRAP_STR("cfmeta.json", 11);
     if (Folder_Exists(ivars->folder, cfmeta_file)) {

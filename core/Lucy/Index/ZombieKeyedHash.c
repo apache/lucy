@@ -33,14 +33,14 @@ ZKHash_new(MemoryPool *memory_pool, uint8_t primitive_id) {
 }
 
 void
-ZKHash_destroy(ZombieKeyedHash *self) {
+ZKHash_Destroy_IMP(ZombieKeyedHash *self) {
     ZombieKeyedHashIVARS *const ivars = ZKHash_IVARS(self);
     DECREF(ivars->mem_pool);
     SUPER_DESTROY(self, ZOMBIEKEYEDHASH);
 }
 
 Obj*
-ZKHash_make_key(ZombieKeyedHash *self, Obj *key, int32_t hash_sum) {
+ZKHash_Make_Key_IMP(ZombieKeyedHash *self, Obj *key, int32_t hash_sum) {
     ZombieKeyedHashIVARS *const ivars = ZKHash_IVARS(self);
     UNUSED_VAR(hash_sum);
     Obj *retval = NULL;

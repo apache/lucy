@@ -48,14 +48,14 @@ NOTMatcher_init(NOTMatcher *self, Matcher *negated_matcher, int32_t doc_max) {
 }
 
 void
-NOTMatcher_destroy(NOTMatcher *self) {
+NOTMatcher_Destroy_IMP(NOTMatcher *self) {
     NOTMatcherIVARS *const ivars = NOTMatcher_IVARS(self);
     DECREF(ivars->negated_matcher);
     SUPER_DESTROY(self, NOTMATCHER);
 }
 
 int32_t
-NOTMatcher_next(NOTMatcher *self) {
+NOTMatcher_Next_IMP(NOTMatcher *self) {
     NOTMatcherIVARS *const ivars = NOTMatcher_IVARS(self);
     while (1) {
         ivars->doc_id++;
@@ -83,18 +83,18 @@ NOTMatcher_next(NOTMatcher *self) {
 }
 
 int32_t
-NOTMatcher_advance(NOTMatcher *self, int32_t target) {
+NOTMatcher_Advance_IMP(NOTMatcher *self, int32_t target) {
     NOTMatcher_IVARS(self)->doc_id = target - 1;
     return NOTMatcher_next(self);
 }
 
 int32_t
-NOTMatcher_get_doc_id(NOTMatcher *self) {
+NOTMatcher_Get_Doc_ID_IMP(NOTMatcher *self) {
     return NOTMatcher_IVARS(self)->doc_id;
 }
 
 float
-NOTMatcher_score(NOTMatcher *self) {
+NOTMatcher_Score_IMP(NOTMatcher *self) {
     UNUSED_VAR(self);
     return 0.0f;
 }

@@ -54,14 +54,14 @@ SnowStop_init(SnowballStopFilter *self, const CharBuf *language,
 }
 
 void
-SnowStop_destroy(SnowballStopFilter *self) {
+SnowStop_Destroy_IMP(SnowballStopFilter *self) {
     SnowballStopFilterIVARS *const ivars = SnowStop_IVARS(self);
     DECREF(ivars->stoplist);
     SUPER_DESTROY(self, SNOWBALLSTOPFILTER);
 }
 
 Inversion*
-SnowStop_transform(SnowballStopFilter *self, Inversion *inversion) {
+SnowStop_Transform_IMP(SnowballStopFilter *self, Inversion *inversion) {
     Token *token;
     Inversion *new_inversion = Inversion_new(NULL);
     SnowballStopFilterIVARS *const ivars = SnowStop_IVARS(self);
@@ -78,7 +78,7 @@ SnowStop_transform(SnowballStopFilter *self, Inversion *inversion) {
 }
 
 bool
-SnowStop_equals(SnowballStopFilter *self, Obj *other) {
+SnowStop_Equals_IMP(SnowballStopFilter *self, Obj *other) {
     if ((SnowballStopFilter*)other == self)   { return true; }
     if (!Obj_Is_A(other, SNOWBALLSTOPFILTER)) { return false; }
     SnowballStopFilterIVARS *const ivars = SnowStop_IVARS(self);
@@ -91,8 +91,7 @@ SnowStop_equals(SnowballStopFilter *self, Obj *other) {
 }
 
 Obj*
-SnowStop_dump(SnowballStopFilter *self)
-{
+SnowStop_Dump_IMP(SnowballStopFilter *self) {
     SnowballStopFilterIVARS *ivars = SnowStop_IVARS(self);
     SnowStop_Dump_t super_dump
         = SUPER_METHOD_PTR(SNOWBALLSTOPFILTER, Lucy_SnowStop_Dump);
@@ -105,8 +104,7 @@ SnowStop_dump(SnowballStopFilter *self)
 }
 
 Obj*
-SnowStop_load(SnowballStopFilter *self, Obj *dump)
-{
+SnowStop_Load_IMP(SnowballStopFilter *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     SnowStop_Load_t super_load
         = SUPER_METHOD_PTR(SNOWBALLSTOPFILTER, Lucy_SnowStop_Load);
@@ -169,7 +167,7 @@ NoCloneHash_init(NoCloneHash *self, uint32_t capacity) {
 }
 
 Obj*
-NoCloneHash_make_key(NoCloneHash *self, Obj *key, int32_t hash_sum) {
+NoCloneHash_Make_Key_IMP(NoCloneHash *self, Obj *key, int32_t hash_sum) {
     UNUSED_VAR(self);
     UNUSED_VAR(hash_sum);
     return INCREF(key);

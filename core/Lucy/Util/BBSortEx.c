@@ -43,14 +43,14 @@ BBSortEx_init(BBSortEx *self, uint32_t mem_threshold, VArray *external) {
 }
 
 void
-BBSortEx_destroy(BBSortEx *self) {
+BBSortEx_Destroy_IMP(BBSortEx *self) {
     BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
     DECREF(ivars->external);
     SUPER_DESTROY(self, BBSORTEX);
 }
 
 void
-BBSortEx_clear_cache(BBSortEx *self) {
+BBSortEx_Clear_Cache_IMP(BBSortEx *self) {
     BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
     Obj **const cache = (Obj**)ivars->cache;
     for (uint32_t i = ivars->cache_tick, max = ivars->cache_max; i < max; i++) {
@@ -63,7 +63,7 @@ BBSortEx_clear_cache(BBSortEx *self) {
 }
 
 void
-BBSortEx_feed(BBSortEx *self, void *data) {
+BBSortEx_Feed_IMP(BBSortEx *self, void *data) {
     BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
     BBSortEx_Feed_t super_feed
         = SUPER_METHOD_PTR(BBSORTEX, Lucy_BBSortEx_Feed);
@@ -78,7 +78,7 @@ BBSortEx_feed(BBSortEx *self, void *data) {
 }
 
 void
-BBSortEx_flush(BBSortEx *self) {
+BBSortEx_Flush_IMP(BBSortEx *self) {
     BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
     uint32_t     cache_count = ivars->cache_max - ivars->cache_tick;
     Obj        **cache = (Obj**)ivars->cache;
@@ -102,7 +102,7 @@ BBSortEx_flush(BBSortEx *self) {
 }
 
 uint32_t
-BBSortEx_refill(BBSortEx *self) {
+BBSortEx_Refill_IMP(BBSortEx *self) {
     BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
 
     // Make sure cache is empty, then set cache tick vars.
@@ -143,7 +143,7 @@ BBSortEx_refill(BBSortEx *self) {
 }
 
 void
-BBSortEx_flip(BBSortEx *self) {
+BBSortEx_Flip_IMP(BBSortEx *self) {
     BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
     uint32_t run_mem_thresh = 65536;
 
@@ -168,7 +168,7 @@ BBSortEx_flip(BBSortEx *self) {
 }
 
 int
-BBSortEx_compare(BBSortEx *self, void *va, void *vb) {
+BBSortEx_Compare_IMP(BBSortEx *self, void *va, void *vb) {
     UNUSED_VAR(self);
     return BB_compare((ByteBuf**)va, (ByteBuf**)vb);
 }

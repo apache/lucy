@@ -57,19 +57,19 @@ PolyAnalyzer_init(PolyAnalyzer *self, const CharBuf *language,
 }
 
 void
-PolyAnalyzer_destroy(PolyAnalyzer *self) {
+PolyAnalyzer_Destroy_IMP(PolyAnalyzer *self) {
     PolyAnalyzerIVARS *const ivars = PolyAnalyzer_IVARS(self);
     DECREF(ivars->analyzers);
     SUPER_DESTROY(self, POLYANALYZER);
 }
 
 VArray*
-PolyAnalyzer_get_analyzers(PolyAnalyzer *self) {
+PolyAnalyzer_Get_Analyzers_IMP(PolyAnalyzer *self) {
     return PolyAnalyzer_IVARS(self)->analyzers;
 }
 
 Inversion*
-PolyAnalyzer_transform(PolyAnalyzer *self, Inversion *inversion) {
+PolyAnalyzer_Transform_IMP(PolyAnalyzer *self, Inversion *inversion) {
     VArray *const analyzers = PolyAnalyzer_IVARS(self)->analyzers;
     (void)INCREF(inversion);
 
@@ -85,7 +85,7 @@ PolyAnalyzer_transform(PolyAnalyzer *self, Inversion *inversion) {
 }
 
 Inversion*
-PolyAnalyzer_transform_text(PolyAnalyzer *self, CharBuf *text) {
+PolyAnalyzer_Transform_Text_IMP(PolyAnalyzer *self, CharBuf *text) {
     VArray *const   analyzers     = PolyAnalyzer_IVARS(self)->analyzers;
     const uint32_t  num_analyzers = VA_Get_Size(analyzers);
     Inversion      *retval;
@@ -112,7 +112,7 @@ PolyAnalyzer_transform_text(PolyAnalyzer *self, CharBuf *text) {
 }
 
 bool
-PolyAnalyzer_equals(PolyAnalyzer *self, Obj *other) {
+PolyAnalyzer_Equals_IMP(PolyAnalyzer *self, Obj *other) {
     if ((PolyAnalyzer*)other == self)                         { return true; }
     if (!Obj_Is_A(other, POLYANALYZER))                       { return false; }
     PolyAnalyzerIVARS *const ivars = PolyAnalyzer_IVARS(self);
@@ -122,8 +122,7 @@ PolyAnalyzer_equals(PolyAnalyzer *self, Obj *other) {
 }
 
 Obj*
-PolyAnalyzer_dump(PolyAnalyzer *self)
-{
+PolyAnalyzer_Dump_IMP(PolyAnalyzer *self) {
     PolyAnalyzerIVARS *const ivars = PolyAnalyzer_IVARS(self);
     PolyAnalyzer_Dump_t super_dump
         = SUPER_METHOD_PTR(POLYANALYZER, Lucy_PolyAnalyzer_Dump);
@@ -136,7 +135,7 @@ PolyAnalyzer_dump(PolyAnalyzer *self)
 }
 
 PolyAnalyzer*
-PolyAnalyzer_load(PolyAnalyzer *self, Obj *dump) {
+PolyAnalyzer_Load_IMP(PolyAnalyzer *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     PolyAnalyzer_Load_t super_load 
         = SUPER_METHOD_PTR(POLYANALYZER, Lucy_PolyAnalyzer_Load);

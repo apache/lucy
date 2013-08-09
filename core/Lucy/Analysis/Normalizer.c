@@ -66,7 +66,7 @@ Normalizer_init(Normalizer *self, const CharBuf *form, bool case_fold,
 }
 
 Inversion*
-Normalizer_transform(Normalizer *self, Inversion *inversion) {
+Normalizer_Transform_IMP(Normalizer *self, Inversion *inversion) {
     // allocate additional space because utf8proc_reencode adds a
     // terminating null char
     int32_t static_buffer[INITIAL_BUFSIZE + 1];
@@ -119,7 +119,7 @@ Normalizer_transform(Normalizer *self, Inversion *inversion) {
 }
 
 Hash*
-Normalizer_dump(Normalizer *self) {
+Normalizer_Dump_IMP(Normalizer *self) {
     Normalizer_Dump_t super_dump
         = SUPER_METHOD_PTR(NORMALIZER, Lucy_Normalizer_Dump);
     Hash *dump = super_dump(self);
@@ -145,7 +145,7 @@ Normalizer_dump(Normalizer *self) {
 }
 
 Normalizer*
-Normalizer_load(Normalizer *self, Obj *dump) {
+Normalizer_Load_IMP(Normalizer *self, Obj *dump) {
     Normalizer_Load_t super_load
         = SUPER_METHOD_PTR(NORMALIZER, Lucy_Normalizer_Load);
     Normalizer *loaded = super_load(self, dump);
@@ -162,7 +162,7 @@ Normalizer_load(Normalizer *self, Obj *dump) {
 }
 
 bool
-Normalizer_equals(Normalizer *self, Obj *other) {
+Normalizer_Equals_IMP(Normalizer *self, Obj *other) {
     if ((Normalizer*)other == self)       { return true; }
     if (!Obj_Is_A(other, NORMALIZER))     { return false; }
     NormalizerIVARS *const ivars = Normalizer_IVARS(self);

@@ -54,7 +54,7 @@ DataReader_init(DataReader *self, Schema *schema, Folder *folder,
 }
 
 void
-DataReader_destroy(DataReader *self) {
+DataReader_Destroy_IMP(DataReader *self) {
     DataReaderIVARS *const ivars = DataReader_IVARS(self);
     DECREF(ivars->schema);
     DECREF(ivars->folder);
@@ -65,32 +65,32 @@ DataReader_destroy(DataReader *self) {
 }
 
 Schema*
-DataReader_get_schema(DataReader *self) {
+DataReader_Get_Schema_IMP(DataReader *self) {
     return DataReader_IVARS(self)->schema;
 }
 
 Folder*
-DataReader_get_folder(DataReader *self) {
+DataReader_Get_Folder_IMP(DataReader *self) {
     return DataReader_IVARS(self)->folder;
 }
 
 Snapshot*
-DataReader_get_snapshot(DataReader *self) {
+DataReader_Get_Snapshot_IMP(DataReader *self) {
     return DataReader_IVARS(self)->snapshot;
 }
 
 VArray*
-DataReader_get_segments(DataReader *self) {
+DataReader_Get_Segments_IMP(DataReader *self) {
     return DataReader_IVARS(self)->segments;
 }
 
 int32_t
-DataReader_get_seg_tick(DataReader *self) {
+DataReader_Get_Seg_Tick_IMP(DataReader *self) {
     return DataReader_IVARS(self)->seg_tick;
 }
 
 Segment*
-DataReader_get_segment(DataReader *self) {
+DataReader_Get_Segment_IMP(DataReader *self) {
     return DataReader_IVARS(self)->segment;
 }
 

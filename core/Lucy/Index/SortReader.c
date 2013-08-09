@@ -39,7 +39,8 @@ SortReader_init(SortReader *self, Schema *schema, Folder *folder,
 }
 
 DataReader*
-SortReader_aggregator(SortReader *self, VArray *readers, I32Array *offsets) {
+SortReader_Aggregator_IMP(SortReader *self, VArray *readers,
+                          I32Array *offsets) {
     UNUSED_VAR(self);
     UNUSED_VAR(readers);
     UNUSED_VAR(offsets);
@@ -114,7 +115,7 @@ DefSortReader_init(DefaultSortReader *self, Schema *schema, Folder *folder,
 }
 
 void
-DefSortReader_close(DefaultSortReader *self) {
+DefSortReader_Close_IMP(DefaultSortReader *self) {
     DefaultSortReaderIVARS *const ivars = DefSortReader_IVARS(self);
     if (ivars->caches) {
         Hash_Dec_RefCount(ivars->caches);
@@ -135,7 +136,7 @@ DefSortReader_close(DefaultSortReader *self) {
 }
 
 void
-DefSortReader_destroy(DefaultSortReader *self) {
+DefSortReader_Destroy_IMP(DefaultSortReader *self) {
     DefaultSortReaderIVARS *const ivars = DefSortReader_IVARS(self);
     DECREF(ivars->caches);
     DECREF(ivars->counts);
@@ -258,7 +259,8 @@ S_lazy_init_sort_cache(DefaultSortReader *self, const CharBuf *field) {
 }
 
 SortCache*
-DefSortReader_fetch_sort_cache(DefaultSortReader *self, const CharBuf *field) {
+DefSortReader_Fetch_Sort_Cache_IMP(DefaultSortReader *self,
+                                   const CharBuf *field) {
     SortCache *cache = NULL;
 
     if (field) {

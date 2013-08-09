@@ -163,7 +163,7 @@ SortColl_init(SortCollector *self, Schema *schema, SortSpec *sort_spec,
 }
 
 void
-SortColl_destroy(SortCollector *self) {
+SortColl_Destroy_IMP(SortCollector *self) {
     SortCollectorIVARS *const ivars = SortColl_IVARS(self);
     DECREF(ivars->hit_q);
     DECREF(ivars->rules);
@@ -222,7 +222,7 @@ S_derive_action(SortRule *rule, SortCache *cache) {
 }
 
 void
-SortColl_set_reader(SortCollector *self, SegReader *reader) {
+SortColl_Set_Reader_IMP(SortCollector *self, SegReader *reader) {
     SortCollectorIVARS *const ivars = SortColl_IVARS(self);
     SortReader *sort_reader
         = (SortReader*)SegReader_Fetch(reader, VTable_Get_Name(SORTREADER));
@@ -254,23 +254,23 @@ SortColl_set_reader(SortCollector *self, SegReader *reader) {
 }
 
 VArray*
-SortColl_pop_match_docs(SortCollector *self) {
+SortColl_Pop_Match_Docs_IMP(SortCollector *self) {
     SortCollectorIVARS *const ivars = SortColl_IVARS(self);
     return HitQ_Pop_All(ivars->hit_q);
 }
 
 uint32_t
-SortColl_get_total_hits(SortCollector *self) {
+SortColl_Get_Total_Hits_IMP(SortCollector *self) {
     return SortColl_IVARS(self)->total_hits;
 }
 
 bool
-SortColl_need_score(SortCollector *self) {
+SortColl_Need_Score_IMP(SortCollector *self) {
     return SortColl_IVARS(self)->need_score;
 }
 
 void
-SortColl_collect(SortCollector *self, int32_t doc_id) {
+SortColl_Collect_IMP(SortCollector *self, int32_t doc_id) {
     SortCollectorIVARS *const ivars = SortColl_IVARS(self);
 
     // Add to the total number of hits.

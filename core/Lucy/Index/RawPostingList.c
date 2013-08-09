@@ -48,7 +48,7 @@ RawPList_init(RawPostingList *self, Schema *schema, const CharBuf *field,
 }
 
 void
-RawPList_destroy(RawPostingList *self) {
+RawPList_Destroy_IMP(RawPostingList *self) {
     RawPostingListIVARS *const ivars = RawPList_IVARS(self);
     DECREF(ivars->instream);
     DECREF(ivars->posting);
@@ -56,13 +56,13 @@ RawPList_destroy(RawPostingList *self) {
 }
 
 Posting*
-RawPList_get_posting(RawPostingList *self) {
+RawPList_Get_Posting_IMP(RawPostingList *self) {
     return RawPList_IVARS(self)->posting;
 }
 
 RawPosting*
-RawPList_read_raw(RawPostingList *self, int32_t last_doc_id, CharBuf *term_text,
-                  MemoryPool *mem_pool) {
+RawPList_Read_Raw_IMP(RawPostingList *self, int32_t last_doc_id,
+                      CharBuf *term_text, MemoryPool *mem_pool) {
     RawPostingListIVARS *const ivars = RawPList_IVARS(self);
     return Post_Read_Raw(ivars->posting, ivars->instream,
                          last_doc_id, term_text, mem_pool);

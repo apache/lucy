@@ -84,7 +84,7 @@ OutStream_do_open(OutStream *self, Obj *file) {
 }
 
 void
-OutStream_destroy(OutStream *self) {
+OutStream_Destroy_IMP(OutStream *self) {
     OutStreamIVARS *const ivars = OutStream_IVARS(self);
     if (ivars->file_handle != NULL) {
         // Inlined flush, ignoring errors.
@@ -99,12 +99,12 @@ OutStream_destroy(OutStream *self) {
 }
 
 CharBuf*
-OutStream_get_path(OutStream *self) {
+OutStream_Get_Path_IMP(OutStream *self) {
     return OutStream_IVARS(self)->path;
 }
 
 void
-OutStream_absorb(OutStream *self, InStream *instream) {
+OutStream_Absorb_IMP(OutStream *self, InStream *instream) {
     OutStreamIVARS *const ivars = OutStream_IVARS(self);
     char buf[IO_STREAM_BUF_SIZE];
     int64_t bytes_left = InStream_Length(instream);
@@ -126,7 +126,7 @@ OutStream_absorb(OutStream *self, InStream *instream) {
 }
 
 void
-OutStream_grow(OutStream *self, int64_t length) {
+OutStream_Grow_IMP(OutStream *self, int64_t length) {
     OutStreamIVARS *const ivars = OutStream_IVARS(self);
     if (!FH_Grow(ivars->file_handle, length)) {
         RETHROW(INCREF(Err_get_error()));
@@ -134,13 +134,13 @@ OutStream_grow(OutStream *self, int64_t length) {
 }
 
 int64_t
-OutStream_tell(OutStream *self) {
+OutStream_Tell_IMP(OutStream *self) {
     OutStreamIVARS *const ivars = OutStream_IVARS(self);
     return ivars->buf_start + ivars->buf_pos;
 }
 
 int64_t
-OutStream_align(OutStream *self, int64_t modulus) {
+OutStream_Align_IMP(OutStream *self, int64_t modulus) {
     int64_t len = OutStream_Tell(self);
     int64_t filler_bytes = (modulus - (len % modulus)) % modulus;
     while (filler_bytes--) { OutStream_Write_U8(self, 0); }
@@ -148,7 +148,7 @@ OutStream_align(OutStream *self, int64_t modulus) {
 }
 
 void
-OutStream_flush(OutStream *self) {
+OutStream_Flush_IMP(OutStream *self) {
     OutStreamIVARS *const ivars = OutStream_IVARS(self);
     S_flush(self, ivars);
 }
@@ -167,12 +167,12 @@ S_flush(OutStream *self, OutStreamIVARS *ivars) {
 }
 
 int64_t
-OutStream_length(OutStream *self) {
+OutStream_Length_IMP(OutStream *self) {
     return OutStream_tell(self);
 }
 
 void
-OutStream_write_bytes(OutStream *self, const void *bytes, size_t len) {
+OutStream_Write_Bytes_IMP(OutStream *self, const void *bytes, size_t len) {
     SI_write_bytes(self, OutStream_IVARS(self), bytes, len);
 }
 
@@ -209,13 +209,13 @@ SI_write_u8(OutStream *self, OutStreamIVARS *ivars, uint8_t value) {
 }
 
 void
-OutStream_write_i8(OutStream *self, int8_t value) {
+OutStream_Write_I8_IMP(OutStream *self, int8_t value) {
     OutStreamIVARS *const ivars = OutStream_IVARS(self);
     SI_write_u8(self, ivars, (uint8_t)value);
 }
 
 void
-OutStream_write_u8(OutStream *self, uint8_t value) {
+OutStream_Write_U8_IMP(OutStream *self, uint8_t value) {
     OutStreamIVARS *const ivars = OutStream_IVARS(self);
     SI_write_u8(self, ivars, value);
 }
@@ -233,12 +233,12 @@ SI_write_u32(OutStream *self, OutStreamIVARS *ivars, uint32_t value) {
 }
 
 void
-OutStream_write_i32(OutStream *self, int32_t value) {
+OutStream_Write_I32_IMP(OutStream *self, int32_t value) {
     SI_write_u32(self, OutStream_IVARS(self), (uint32_t)value);
 }
 
 void
-OutStream_write_u32(OutStream *self, uint32_t value) {
+OutStream_Write_U32_IMP(OutStream *self, uint32_t value) {
     SI_write_u32(self, OutStream_IVARS(self), value);
 }
 
@@ -255,17 +255,17 @@ SI_write_u64(OutStream *self, OutStreamIVARS *ivars, uint64_t value) {
 }
 
 void
-OutStream_write_i64(OutStream *self, int64_t value) {
+OutStream_Write_I64_IMP(OutStream *self, int64_t value) {
     SI_write_u64(self, OutStream_IVARS(self), (uint64_t)value);
 }
 
 void
-OutStream_write_u64(OutStream *self, uint64_t value) {
+OutStream_Write_U64_IMP(OutStream *self, uint64_t value) {
     SI_write_u64(self, OutStream_IVARS(self), value);
 }
 
 void
-OutStream_write_f32(OutStream *self, float value) {
+OutStream_Write_F32_IMP(OutStream *self, float value) {
     OutStreamIVARS *const ivars = OutStream_IVARS(self);
     char  buf[sizeof(float)];
     char *buf_copy = buf;
@@ -274,7 +274,7 @@ OutStream_write_f32(OutStream *self, float value) {
 }
 
 void
-OutStream_write_f64(OutStream *self, double value) {
+OutStream_Write_F64_IMP(OutStream *self, double value) {
     OutStreamIVARS *const ivars = OutStream_IVARS(self);
     char  buf[sizeof(double)];
     char *buf_copy = buf;
@@ -283,7 +283,7 @@ OutStream_write_f64(OutStream *self, double value) {
 }
 
 void
-OutStream_write_c32(OutStream *self, uint32_t value) {
+OutStream_Write_C32_IMP(OutStream *self, uint32_t value) {
     SI_write_c32(self, OutStream_IVARS(self), value);
 }
 
@@ -306,7 +306,7 @@ SI_write_c32(OutStream *self, OutStreamIVARS *ivars, uint32_t value) {
 }
 
 void
-OutStream_write_c64(OutStream *self, uint64_t value) {
+OutStream_Write_C64_IMP(OutStream *self, uint64_t value) {
     OutStreamIVARS *const ivars = OutStream_IVARS(self);
     uint8_t buf[C64_MAX_BYTES];
     uint8_t *ptr = buf + sizeof(buf) - 1;
@@ -325,14 +325,14 @@ OutStream_write_c64(OutStream *self, uint64_t value) {
 }
 
 void
-OutStream_write_string(OutStream *self, const char *string, size_t len) {
+OutStream_Write_String_IMP(OutStream *self, const char *string, size_t len) {
     OutStreamIVARS *const ivars = OutStream_IVARS(self);
     SI_write_c32(self, ivars, (uint32_t)len);
     SI_write_bytes(self, ivars, string, len);
 }
 
 void
-OutStream_close(OutStream *self) {
+OutStream_Close_IMP(OutStream *self) {
     OutStreamIVARS *const ivars = OutStream_IVARS(self);
     if (ivars->file_handle) {
         S_flush(self, ivars);

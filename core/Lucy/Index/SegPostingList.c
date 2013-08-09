@@ -112,7 +112,7 @@ SegPList_init(SegPostingList *self, PostingListReader *plist_reader,
 }
 
 void
-SegPList_destroy(SegPostingList *self) {
+SegPList_Destroy_IMP(SegPostingList *self) {
     SegPostingListIVARS *const ivars = SegPList_IVARS(self);
     DECREF(ivars->plist_reader);
     DECREF(ivars->posting);
@@ -130,33 +130,33 @@ SegPList_destroy(SegPostingList *self) {
 }
 
 Posting*
-SegPList_get_posting(SegPostingList *self) {
+SegPList_Get_Posting_IMP(SegPostingList *self) {
     return SegPList_IVARS(self)->posting;
 }
 
 uint32_t
-SegPList_get_doc_freq(SegPostingList *self) {
+SegPList_Get_Doc_Freq_IMP(SegPostingList *self) {
     return SegPList_IVARS(self)->doc_freq;
 }
 
 int32_t
-SegPList_get_doc_id(SegPostingList *self) {
+SegPList_Get_Doc_ID_IMP(SegPostingList *self) {
     SegPostingListIVARS *const ivars = SegPList_IVARS(self);
     return Post_IVARS(ivars->posting)->doc_id;
 }
 
 uint32_t
-SegPList_get_count(SegPostingList *self) {
+SegPList_Get_Count_IMP(SegPostingList *self) {
     return SegPList_IVARS(self)->count;
 }
 
 InStream*
-SegPList_get_post_stream(SegPostingList *self) {
+SegPList_Get_Post_Stream_IMP(SegPostingList *self) {
     return SegPList_IVARS(self)->post_stream;
 }
 
 int32_t
-SegPList_next(SegPostingList *self) {
+SegPList_Next_IMP(SegPostingList *self) {
     SegPostingListIVARS *const ivars = SegPList_IVARS(self);
     InStream *const post_stream = ivars->post_stream;
     Posting  *const posting     = ivars->posting;
@@ -174,7 +174,7 @@ SegPList_next(SegPostingList *self) {
 }
 
 int32_t
-SegPList_advance(SegPostingList *self, int32_t target) {
+SegPList_Advance_IMP(SegPostingList *self, int32_t target) {
     SegPostingListIVARS *const ivars = SegPList_IVARS(self);
     PostingIVARS *const posting_ivars = Post_IVARS(ivars->posting);
     const uint32_t skip_interval = ivars->skip_interval;
@@ -243,7 +243,7 @@ SegPList_advance(SegPostingList *self, int32_t target) {
 }
 
 void
-SegPList_seek(SegPostingList *self, Obj *target) {
+SegPList_Seek_IMP(SegPostingList *self, Obj *target) {
     SegPostingListIVARS *const ivars = SegPList_IVARS(self);
     LexiconReader *lex_reader = PListReader_Get_Lex_Reader(ivars->plist_reader);
     TermInfo      *tinfo      = LexReader_Fetch_Term_Info(lex_reader,
@@ -253,7 +253,7 @@ SegPList_seek(SegPostingList *self, Obj *target) {
 }
 
 void
-SegPList_seek_lex(SegPostingList *self, Lexicon *lexicon) {
+SegPList_Seek_Lex_IMP(SegPostingList *self, Lexicon *lexicon) {
     SegPostingListIVARS *const ivars = SegPList_IVARS(self);
 
     // Maybe true, maybe not.
@@ -301,16 +301,16 @@ S_seek_tinfo(SegPostingList *self, TermInfo *tinfo) {
 }
 
 Matcher*
-SegPList_make_matcher(SegPostingList *self, Similarity *sim,
-                      Compiler *compiler, bool need_score) {
+SegPList_Make_Matcher_IMP(SegPostingList *self, Similarity *sim,
+                          Compiler *compiler, bool need_score) {
     SegPostingListIVARS *const ivars = SegPList_IVARS(self);
     return Post_Make_Matcher(ivars->posting, sim, (PostingList*)self, compiler,
                              need_score);
 }
 
 RawPosting*
-SegPList_read_raw(SegPostingList *self, int32_t last_doc_id, CharBuf *term_text,
-                  MemoryPool *mem_pool) {
+SegPList_Read_Raw_IMP(SegPostingList *self, int32_t last_doc_id,
+                      CharBuf *term_text, MemoryPool *mem_pool) {
     SegPostingListIVARS *const ivars = SegPList_IVARS(self);
     return Post_Read_Raw(ivars->posting, ivars->post_stream,
                          last_doc_id, term_text, mem_pool);

@@ -67,7 +67,7 @@ IxReader_init(IndexReader *self, Schema *schema, Folder *folder,
 }
 
 void
-IxReader_close(IndexReader *self) {
+IxReader_Close_IMP(IndexReader *self) {
     IndexReaderIVARS *const ivars = IxReader_IVARS(self);
     if (ivars->components) {
         CharBuf *key;
@@ -90,7 +90,7 @@ IxReader_close(IndexReader *self) {
 }
 
 void
-IxReader_destroy(IndexReader *self) {
+IxReader_Destroy_IMP(IndexReader *self) {
     IndexReaderIVARS *const ivars = IxReader_IVARS(self);
     DECREF(ivars->components);
     if (ivars->read_lock) {
@@ -103,12 +103,12 @@ IxReader_destroy(IndexReader *self) {
 }
 
 Hash*
-IxReader_get_components(IndexReader *self) {
+IxReader_Get_Components_IMP(IndexReader *self) {
     return IxReader_IVARS(self)->components;
 }
 
 DataReader*
-IxReader_obtain(IndexReader *self, const CharBuf *api) {
+IxReader_Obtain_IMP(IndexReader *self, const CharBuf *api) {
     IndexReaderIVARS *const ivars = IxReader_IVARS(self);
     DataReader *component
         = (DataReader*)Hash_Fetch(ivars->components, (Obj*)api);
@@ -119,7 +119,7 @@ IxReader_obtain(IndexReader *self, const CharBuf *api) {
 }
 
 DataReader*
-IxReader_fetch(IndexReader *self, const CharBuf *api) {
+IxReader_Fetch_IMP(IndexReader *self, const CharBuf *api) {
     IndexReaderIVARS *const ivars = IxReader_IVARS(self);
     return (DataReader*)Hash_Fetch(ivars->components, (Obj*)api);
 }

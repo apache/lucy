@@ -61,7 +61,7 @@ Inverter_init(Inverter *self, Schema *schema, Segment *segment) {
 }
 
 void
-Inverter_destroy(Inverter *self) {
+Inverter_Destroy_IMP(Inverter *self) {
     InverterIVARS *const ivars = Inverter_IVARS(self);
     Inverter_Clear(self);
     DECREF(ivars->blank);
@@ -73,7 +73,7 @@ Inverter_destroy(Inverter *self) {
 }
 
 uint32_t
-Inverter_iterate(Inverter *self) {
+Inverter_Iterate_IMP(Inverter *self) {
     InverterIVARS *const ivars = Inverter_IVARS(self);
     ivars->tick = -1;
     if (!ivars->sorted) {
@@ -84,7 +84,7 @@ Inverter_iterate(Inverter *self) {
 }
 
 int32_t
-Inverter_next(Inverter *self) {
+Inverter_Next_IMP(Inverter *self) {
     InverterIVARS *const ivars = Inverter_IVARS(self);
     ivars->current = (InverterEntry*)VA_Fetch(ivars->entries, ++ivars->tick);
     if (!ivars->current) { ivars->current = ivars->blank; } // Exhausted.
@@ -92,66 +92,66 @@ Inverter_next(Inverter *self) {
 }
 
 void
-Inverter_set_doc(Inverter *self, Doc *doc) {
+Inverter_Set_Doc_IMP(Inverter *self, Doc *doc) {
     InverterIVARS *const ivars = Inverter_IVARS(self);
     Inverter_Clear(self); // Zap all cached field values and Inversions.
     ivars->doc = (Doc*)INCREF(doc);
 }
 
 void
-Inverter_set_boost(Inverter *self, float boost) {
+Inverter_Set_Boost_IMP(Inverter *self, float boost) {
     Inverter_IVARS(self)->boost = boost;
 }
 
 float
-Inverter_get_boost(Inverter *self) {
+Inverter_Get_Boost_IMP(Inverter *self) {
     return Inverter_IVARS(self)->boost;
 }
 
 Doc*
-Inverter_get_doc(Inverter *self) {
+Inverter_Get_Doc_IMP(Inverter *self) {
     return Inverter_IVARS(self)->doc;
 }
 
 CharBuf*
-Inverter_get_field_name(Inverter *self) {
+Inverter_Get_Field_Name_IMP(Inverter *self) {
     InverterEntry *current = Inverter_IVARS(self)->current;
     return InvEntry_IVARS(current)->field;
 }
 
 Obj*
-Inverter_get_value(Inverter *self) {
+Inverter_Get_Value_IMP(Inverter *self) {
     InverterEntry *current = Inverter_IVARS(self)->current;
     return InvEntry_IVARS(current)->value;
 }
 
 FieldType*
-Inverter_get_type(Inverter *self) {
+Inverter_Get_Type_IMP(Inverter *self) {
     InverterEntry *current = Inverter_IVARS(self)->current;
     return InvEntry_IVARS(current)->type;
 }
 
 Analyzer*
-Inverter_get_analyzer(Inverter *self) {
+Inverter_Get_Analyzer_IMP(Inverter *self) {
     InverterEntry *current = Inverter_IVARS(self)->current;
     return InvEntry_IVARS(current)->analyzer;
 }
 
 Similarity*
-Inverter_get_similarity(Inverter *self) {
+Inverter_Get_Similarity_IMP(Inverter *self) {
     InverterEntry *current = Inverter_IVARS(self)->current;
     return InvEntry_IVARS(current)->sim;
 }
 
 Inversion*
-Inverter_get_inversion(Inverter *self) {
+Inverter_Get_Inversion_IMP(Inverter *self) {
     InverterEntry *current = Inverter_IVARS(self)->current;
     return InvEntry_IVARS(current)->inversion;
 }
 
 
 void
-Inverter_add_field(Inverter *self, InverterEntry *entry) {
+Inverter_Add_Field_IMP(Inverter *self, InverterEntry *entry) {
     InverterIVARS *const ivars = Inverter_IVARS(self);
     InverterEntryIVARS *const entry_ivars = InvEntry_IVARS(entry);
 
@@ -180,7 +180,7 @@ Inverter_add_field(Inverter *self, InverterEntry *entry) {
 }
 
 void
-Inverter_clear(Inverter *self) {
+Inverter_Clear_IMP(Inverter *self) {
     InverterIVARS *const ivars = Inverter_IVARS(self);
     for (uint32_t i = 0, max = VA_Get_Size(ivars->entries); i < max; i++) {
         InvEntry_Clear(VA_Fetch(ivars->entries, i));
@@ -250,7 +250,7 @@ InvEntry_init(InverterEntry *self, Schema *schema, const CharBuf *field,
 }
 
 void
-InvEntry_destroy(InverterEntry *self) {
+InvEntry_Destroy_IMP(InverterEntry *self) {
     InverterEntryIVARS *const ivars = InvEntry_IVARS(self);
     DECREF(ivars->field);
     DECREF(ivars->value);
@@ -262,14 +262,14 @@ InvEntry_destroy(InverterEntry *self) {
 }
 
 void
-InvEntry_clear(InverterEntry *self) {
+InvEntry_Clear_IMP(InverterEntry *self) {
     InverterEntryIVARS *const ivars = InvEntry_IVARS(self);
     DECREF(ivars->inversion);
     ivars->inversion = NULL;
 }
 
 int32_t
-InvEntry_compare_to(InverterEntry *self, Obj *other) {
+InvEntry_Compare_To_IMP(InverterEntry *self, Obj *other) {
     CERTIFY(other, INVERTERENTRY);
     InverterEntryIVARS *const ivars = InvEntry_IVARS(self);
     InverterEntryIVARS *const ovars = InvEntry_IVARS((InverterEntry*)other);

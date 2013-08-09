@@ -41,7 +41,7 @@ EasyAnalyzer_init(EasyAnalyzer *self, const CharBuf *language) {
 }
 
 void
-EasyAnalyzer_destroy(EasyAnalyzer *self) {
+EasyAnalyzer_Destroy_IMP(EasyAnalyzer *self) {
     EasyAnalyzerIVARS *const ivars = EasyAnalyzer_IVARS(self);
     DECREF(ivars->language);
     DECREF(ivars->tokenizer);
@@ -51,7 +51,7 @@ EasyAnalyzer_destroy(EasyAnalyzer *self) {
 }
 
 Inversion*
-EasyAnalyzer_transform(EasyAnalyzer *self, Inversion *inversion) {
+EasyAnalyzer_Transform_IMP(EasyAnalyzer *self, Inversion *inversion) {
     EasyAnalyzerIVARS *const ivars = EasyAnalyzer_IVARS(self);
     Inversion *inv1 = StandardTokenizer_Transform(ivars->tokenizer, inversion);
     Inversion *inv2 = Normalizer_Transform(ivars->normalizer, inv1);
@@ -62,7 +62,7 @@ EasyAnalyzer_transform(EasyAnalyzer *self, Inversion *inversion) {
 }
 
 Inversion*
-EasyAnalyzer_transform_text(EasyAnalyzer *self, CharBuf *text) {
+EasyAnalyzer_Transform_Text_IMP(EasyAnalyzer *self, CharBuf *text) {
     EasyAnalyzerIVARS *const ivars = EasyAnalyzer_IVARS(self);
     Inversion *inv1 = StandardTokenizer_Transform_Text(ivars->tokenizer, text);
     Inversion *inv2 = Normalizer_Transform(ivars->normalizer, inv1);
@@ -73,7 +73,7 @@ EasyAnalyzer_transform_text(EasyAnalyzer *self, CharBuf *text) {
 }
 
 Hash*
-EasyAnalyzer_dump(EasyAnalyzer *self) {
+EasyAnalyzer_Dump_IMP(EasyAnalyzer *self) {
     EasyAnalyzerIVARS *const ivars = EasyAnalyzer_IVARS(self);
     EasyAnalyzer_Dump_t super_dump
         = SUPER_METHOD_PTR(EASYANALYZER, Lucy_EasyAnalyzer_Dump);
@@ -83,7 +83,7 @@ EasyAnalyzer_dump(EasyAnalyzer *self) {
 }
 
 EasyAnalyzer*
-EasyAnalyzer_load(EasyAnalyzer *self, Obj *dump) {
+EasyAnalyzer_Load_IMP(EasyAnalyzer *self, Obj *dump) {
     EasyAnalyzer_Load_t super_load
         = SUPER_METHOD_PTR(EASYANALYZER, Lucy_EasyAnalyzer_Load);
     EasyAnalyzer *loaded = super_load(self, dump);
@@ -94,7 +94,7 @@ EasyAnalyzer_load(EasyAnalyzer *self, Obj *dump) {
 }
 
 bool
-EasyAnalyzer_equals(EasyAnalyzer *self, Obj *other) {
+EasyAnalyzer_Equals_IMP(EasyAnalyzer *self, Obj *other) {
     if ((EasyAnalyzer*)other == self)                       { return true; }
     if (!Obj_Is_A(other, EASYANALYZER))                     { return false; }
     EasyAnalyzerIVARS *const ivars = EasyAnalyzer_IVARS(self);

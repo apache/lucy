@@ -42,7 +42,7 @@ Hits_init(Hits *self, Searcher *searcher, TopDocs *top_docs, uint32_t offset) {
 }
 
 void
-Hits_destroy(Hits *self) {
+Hits_Destroy_IMP(Hits *self) {
     HitsIVARS *const ivars = Hits_IVARS(self);
     DECREF(ivars->searcher);
     DECREF(ivars->top_docs);
@@ -51,7 +51,7 @@ Hits_destroy(Hits *self) {
 }
 
 HitDoc*
-Hits_next(Hits *self) {
+Hits_Next_IMP(Hits *self) {
     HitsIVARS *const ivars = Hits_IVARS(self);
     MatchDoc *match_doc = (MatchDoc*)VA_Fetch(ivars->match_docs, ivars->offset);
     ivars->offset++;
@@ -72,7 +72,7 @@ Hits_next(Hits *self) {
 }
 
 uint32_t
-Hits_total_hits(Hits *self) {
+Hits_Total_Hits_IMP(Hits *self) {
     HitsIVARS *const ivars = Hits_IVARS(self);
     return TopDocs_Get_Total_Hits(ivars->top_docs);
 }

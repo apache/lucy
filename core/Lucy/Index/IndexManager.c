@@ -57,7 +57,7 @@ IxManager_init(IndexManager *self, const CharBuf *host,
 }
 
 void
-IxManager_destroy(IndexManager *self) {
+IxManager_Destroy_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     DECREF(ivars->host);
     DECREF(ivars->folder);
@@ -66,7 +66,7 @@ IxManager_destroy(IndexManager *self) {
 }
 
 int64_t
-IxManager_highest_seg_num(IndexManager *self, Snapshot *snapshot) {
+IxManager_Highest_Seg_Num_IMP(IndexManager *self, Snapshot *snapshot) {
     VArray *files = Snapshot_List(snapshot);
     uint64_t highest_seg_num = 0;
     UNUSED_VAR(self);
@@ -82,7 +82,7 @@ IxManager_highest_seg_num(IndexManager *self, Snapshot *snapshot) {
 }
 
 CharBuf*
-IxManager_make_snapshot_filename(IndexManager *self) {
+IxManager_Make_Snapshot_Filename_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     Folder *folder = (Folder*)CERTIFY(ivars->folder, FOLDER);
     DirHandle *dh = Folder_Open_Dir(folder, NULL);
@@ -137,9 +137,9 @@ S_fibonacci(uint32_t n) {
 }
 
 VArray*
-IxManager_recycle(IndexManager *self, PolyReader *reader,
-                  DeletionsWriter *del_writer, int64_t cutoff,
-                  bool optimize) {
+IxManager_Recycle_IMP(IndexManager *self, PolyReader *reader,
+                      DeletionsWriter *del_writer, int64_t cutoff,
+                      bool optimize) {
     VArray *seg_readers = PolyReader_Get_Seg_Readers(reader);
     VArray *candidates  = VA_Gather(seg_readers, S_check_cutoff, &cutoff);
     VArray *recyclables = VA_new(VA_Get_Size(candidates));
@@ -187,7 +187,7 @@ IxManager_recycle(IndexManager *self, PolyReader *reader,
 }
 
 uint32_t
-IxManager_choose_sparse(IndexManager *self, I32Array *doc_counts) {
+IxManager_Choose_Sparse_IMP(IndexManager *self, I32Array *doc_counts) {
     UNUSED_VAR(self);
     uint32_t threshold  = 0;
     uint32_t total_docs = 0;
@@ -230,7 +230,7 @@ S_obtain_lock_factory(IndexManager *self) {
 }
 
 Lock*
-IxManager_make_write_lock(IndexManager *self) {
+IxManager_Make_Write_Lock_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     ZombieCharBuf *write_lock_name = ZCB_WRAP_STR("write", 5);
     LockFactory *lock_factory = S_obtain_lock_factory(self);
@@ -240,7 +240,7 @@ IxManager_make_write_lock(IndexManager *self) {
 }
 
 Lock*
-IxManager_make_deletion_lock(IndexManager *self) {
+IxManager_Make_Deletion_Lock_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     ZombieCharBuf *lock_name = ZCB_WRAP_STR("deletion", 8);
     LockFactory *lock_factory = S_obtain_lock_factory(self);
@@ -250,7 +250,7 @@ IxManager_make_deletion_lock(IndexManager *self) {
 }
 
 Lock*
-IxManager_make_merge_lock(IndexManager *self) {
+IxManager_Make_Merge_Lock_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     ZombieCharBuf *merge_lock_name = ZCB_WRAP_STR("merge", 5);
     LockFactory *lock_factory = S_obtain_lock_factory(self);
@@ -260,7 +260,7 @@ IxManager_make_merge_lock(IndexManager *self) {
 }
 
 void
-IxManager_write_merge_data(IndexManager *self, int64_t cutoff) {
+IxManager_Write_Merge_Data_IMP(IndexManager *self, int64_t cutoff) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     ZombieCharBuf *merge_json = ZCB_WRAP_STR("merge.json", 10);
     Hash *data = Hash_new(1);
@@ -274,7 +274,7 @@ IxManager_write_merge_data(IndexManager *self, int64_t cutoff) {
 }
 
 Hash*
-IxManager_read_merge_data(IndexManager *self) {
+IxManager_Read_Merge_Data_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     ZombieCharBuf *merge_json = ZCB_WRAP_STR("merge.json", 10);
     if (Folder_Exists(ivars->folder, (CharBuf*)merge_json)) {
@@ -294,15 +294,15 @@ IxManager_read_merge_data(IndexManager *self) {
 }
 
 bool
-IxManager_remove_merge_data(IndexManager *self) {
+IxManager_Remove_Merge_Data_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     ZombieCharBuf *merge_json = ZCB_WRAP_STR("merge.json", 10);
     return Folder_Delete(ivars->folder, (CharBuf*)merge_json) != 0;
 }
 
 Lock*
-IxManager_make_snapshot_read_lock(IndexManager *self,
-                                  const CharBuf *filename) {
+IxManager_Make_Snapshot_Read_Lock_IMP(IndexManager *self,
+                                      const CharBuf *filename) {
     ZombieCharBuf *lock_name = ZCB_WRAP(filename);
     LockFactory *lock_factory = S_obtain_lock_factory(self);
 
@@ -319,79 +319,81 @@ IxManager_make_snapshot_read_lock(IndexManager *self,
 }
 
 void
-IxManager_set_folder(IndexManager *self, Folder *folder) {
+IxManager_Set_Folder_IMP(IndexManager *self, Folder *folder) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     DECREF(ivars->folder);
     ivars->folder = (Folder*)INCREF(folder);
 }
 
 Folder*
-IxManager_get_folder(IndexManager *self) {
+IxManager_Get_Folder_IMP(IndexManager *self) {
     return IxManager_IVARS(self)->folder;
 }
 
 CharBuf*
-IxManager_get_host(IndexManager *self) {
+IxManager_Get_Host_IMP(IndexManager *self) {
     return IxManager_IVARS(self)->host;
 }
 
 uint32_t
-IxManager_get_write_lock_timeout(IndexManager *self) {
+IxManager_Get_Write_Lock_Timeout_IMP(IndexManager *self) {
     return IxManager_IVARS(self)->write_lock_timeout;
 }
 
 uint32_t
-IxManager_get_write_lock_interval(IndexManager *self) {
+IxManager_Get_Write_Lock_Interval_IMP(IndexManager *self) {
     return IxManager_IVARS(self)->write_lock_interval;
 }
 
 uint32_t
-IxManager_get_merge_lock_timeout(IndexManager *self) {
+IxManager_Get_Merge_Lock_Timeout_IMP(IndexManager *self) {
     return IxManager_IVARS(self)->merge_lock_timeout;
 }
 
 uint32_t
-IxManager_get_merge_lock_interval(IndexManager *self) {
+IxManager_Get_Merge_Lock_Interval_IMP(IndexManager *self) {
     return IxManager_IVARS(self)->merge_lock_interval;
 }
 
 uint32_t
-IxManager_get_deletion_lock_timeout(IndexManager *self) {
+IxManager_Get_Deletion_Lock_Timeout_IMP(IndexManager *self) {
     return IxManager_IVARS(self)->deletion_lock_timeout;
 }
 
 uint32_t
-IxManager_get_deletion_lock_interval(IndexManager *self) {
+IxManager_Get_Deletion_Lock_Interval_IMP(IndexManager *self) {
     return IxManager_IVARS(self)->deletion_lock_interval;
 }
 
 void
-IxManager_set_write_lock_timeout(IndexManager *self, uint32_t timeout) {
+IxManager_Set_Write_Lock_Timeout_IMP(IndexManager *self, uint32_t timeout) {
     IxManager_IVARS(self)->write_lock_timeout = timeout;
 }
 
 void
-IxManager_set_write_lock_interval(IndexManager *self, uint32_t interval) {
+IxManager_Set_Write_Lock_Interval_IMP(IndexManager *self, uint32_t interval) {
     IxManager_IVARS(self)->write_lock_interval = interval;
 }
 
 void
-IxManager_set_merge_lock_timeout(IndexManager *self, uint32_t timeout) {
+IxManager_Set_Merge_Lock_Timeout_IMP(IndexManager *self, uint32_t timeout) {
     IxManager_IVARS(self)->merge_lock_timeout = timeout;
 }
 
 void
-IxManager_set_merge_lock_interval(IndexManager *self, uint32_t interval) {
+IxManager_Set_Merge_Lock_Interval_IMP(IndexManager *self, uint32_t interval) {
     IxManager_IVARS(self)->merge_lock_interval = interval;
 }
 
 void
-IxManager_set_deletion_lock_timeout(IndexManager *self, uint32_t timeout) {
+IxManager_Set_Deletion_Lock_Timeout_IMP(IndexManager *self,
+                                        uint32_t timeout) {
     IxManager_IVARS(self)->deletion_lock_timeout = timeout;
 }
 
 void
-IxManager_set_deletion_lock_interval(IndexManager *self, uint32_t interval) {
+IxManager_Set_Deletion_Lock_Interval_IMP(IndexManager *self,
+                                         uint32_t interval) {
     IxManager_IVARS(self)->deletion_lock_interval = interval;
 }
 

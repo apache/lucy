@@ -111,7 +111,7 @@ ORMatcher_init(ORMatcher *self, VArray *children) {
 }
 
 void
-ORMatcher_destroy(ORMatcher *self) {
+ORMatcher_Destroy_IMP(ORMatcher *self) {
     ORMatcherIVARS *const ivars = ORMatcher_IVARS(self);
     if (ivars->blob) { S_clear(self, ivars); }
     FREEMEM(ivars->blob);
@@ -121,7 +121,7 @@ ORMatcher_destroy(ORMatcher *self) {
 }
 
 int32_t
-ORMatcher_next(ORMatcher *self) {
+ORMatcher_Next_IMP(ORMatcher *self) {
     ORMatcherIVARS *const ivars = ORMatcher_IVARS(self);
     if (ivars->size == 0) {
         return 0;
@@ -139,7 +139,7 @@ ORMatcher_next(ORMatcher *self) {
 }
 
 int32_t
-ORMatcher_advance(ORMatcher *self, int32_t target) {
+ORMatcher_Advance_IMP(ORMatcher *self, int32_t target) {
     ORMatcherIVARS *const ivars = ORMatcher_IVARS(self);
     if (!ivars->size) { return 0; }
     do {
@@ -152,7 +152,7 @@ ORMatcher_advance(ORMatcher *self, int32_t target) {
 }
 
 int32_t
-ORMatcher_get_doc_id(ORMatcher *self) {
+ORMatcher_Get_Doc_ID_IMP(ORMatcher *self) {
     return ORMatcher_IVARS(self)->top_hmd->doc;
 }
 
@@ -313,14 +313,14 @@ ORScorer_init(ORScorer *self, VArray *children, Similarity *sim) {
 }
 
 void
-ORScorer_destroy(ORScorer *self) {
+ORScorer_Destroy_IMP(ORScorer *self) {
     ORScorerIVARS *const ivars = ORScorer_IVARS(self);
     FREEMEM(ivars->scores);
     SUPER_DESTROY(self, ORSCORER);
 }
 
 int32_t
-ORScorer_next(ORScorer *self) {
+ORScorer_Next_IMP(ORScorer *self) {
     ORScorerIVARS *const ivars = ORScorer_IVARS(self);
     return S_advance_after_current(self, ivars);
 }
@@ -365,7 +365,7 @@ S_advance_after_current(ORScorer *self, ORScorerIVARS *ivars) {
 }
 
 int32_t
-ORScorer_advance(ORScorer *self, int32_t target) {
+ORScorer_Advance_IMP(ORScorer *self, int32_t target) {
     ORScorerIVARS *const ivars = ORScorer_IVARS(self);
 
     // Return sentinel once exhausted.
@@ -390,12 +390,12 @@ ORScorer_advance(ORScorer *self, int32_t target) {
 }
 
 int32_t
-ORScorer_get_doc_id(ORScorer *self) {
+ORScorer_Get_Doc_ID_IMP(ORScorer *self) {
     return ORScorer_IVARS(self)->doc_id;
 }
 
 float
-ORScorer_score(ORScorer *self) {
+ORScorer_Score_IMP(ORScorer *self) {
     ORScorerIVARS *const ivars = ORScorer_IVARS(self);
     float *const scores = ivars->scores;
     float score = 0.0f;

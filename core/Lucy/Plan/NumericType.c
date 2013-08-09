@@ -37,13 +37,13 @@ NumType_init2(NumericType *self, float boost, bool indexed, bool stored,
 }
 
 bool
-NumType_binary(NumericType *self) {
+NumType_Binary_IMP(NumericType *self) {
     UNUSED_VAR(self);
     return true;
 }
 
 Hash*
-NumType_dump_for_schema(NumericType *self) {
+NumType_Dump_For_Schema_IMP(NumericType *self) {
     NumericTypeIVARS *const ivars = NumType_IVARS(self);
     Hash *dump = Hash_new(0);
     Hash_Store_Str(dump, "type", 4, (Obj*)NumType_Specifier(self));
@@ -66,7 +66,7 @@ NumType_dump_for_schema(NumericType *self) {
 }
 
 Hash*
-NumType_dump(NumericType *self) {
+NumType_Dump_IMP(NumericType *self) {
     Hash *dump = NumType_Dump_For_Schema(self);
     Hash_Store_Str(dump, "_class", 6,
                    (Obj*)CB_Clone(NumType_Get_Class_Name(self)));
@@ -75,7 +75,7 @@ NumType_dump(NumericType *self) {
 }
 
 NumericType*
-NumType_load(NumericType *self, Obj *dump) {
+NumType_Load_IMP(NumericType *self, Obj *dump) {
     UNUSED_VAR(self);
     Hash *source = (Hash*)CERTIFY(dump, HASH);
 
@@ -142,19 +142,19 @@ Float64Type_init2(Float64Type *self, float boost, bool indexed,
 }
 
 CharBuf*
-Float64Type_specifier(Float64Type *self) {
+Float64Type_Specifier_IMP(Float64Type *self) {
     UNUSED_VAR(self);
     return CB_newf("f64_t");
 }
 
 int8_t
-Float64Type_primitive_id(Float64Type *self) {
+Float64Type_Primitive_ID_IMP(Float64Type *self) {
     UNUSED_VAR(self);
     return FType_FLOAT64;
 }
 
 bool
-Float64Type_equals(Float64Type *self, Obj *other) {
+Float64Type_Equals_IMP(Float64Type *self, Obj *other) {
     if (self == (Float64Type*)other) { return true; }
     if (!other) { return false; }
     if (!Obj_Is_A(other, FLOAT64TYPE)) { return false; }
@@ -184,19 +184,19 @@ Float32Type_init2(Float32Type *self, float boost, bool indexed,
 }
 
 CharBuf*
-Float32Type_specifier(Float32Type *self) {
+Float32Type_Specifier_IMP(Float32Type *self) {
     UNUSED_VAR(self);
     return CB_newf("f32_t");
 }
 
 int8_t
-Float32Type_primitive_id(Float32Type *self) {
+Float32Type_Primitive_ID_IMP(Float32Type *self) {
     UNUSED_VAR(self);
     return FType_FLOAT32;
 }
 
 bool
-Float32Type_equals(Float32Type *self, Obj *other) {
+Float32Type_Equals_IMP(Float32Type *self, Obj *other) {
     if (self == (Float32Type*)other) { return true; }
     if (!other) { return false; }
     if (!Obj_Is_A(other, FLOAT32TYPE)) { return false; }
@@ -226,19 +226,19 @@ Int32Type_init2(Int32Type *self, float boost, bool indexed,
 }
 
 CharBuf*
-Int32Type_specifier(Int32Type *self) {
+Int32Type_Specifier_IMP(Int32Type *self) {
     UNUSED_VAR(self);
     return CB_newf("i32_t");
 }
 
 int8_t
-Int32Type_primitive_id(Int32Type *self) {
+Int32Type_Primitive_ID_IMP(Int32Type *self) {
     UNUSED_VAR(self);
     return FType_INT32;
 }
 
 bool
-Int32Type_equals(Int32Type *self, Obj *other) {
+Int32Type_Equals_IMP(Int32Type *self, Obj *other) {
     if (self == (Int32Type*)other) { return true; }
     if (!other) { return false; }
     if (!Obj_Is_A(other, INT32TYPE)) { return false; }
@@ -268,19 +268,19 @@ Int64Type_init2(Int64Type *self, float boost, bool indexed,
 }
 
 CharBuf*
-Int64Type_specifier(Int64Type *self) {
+Int64Type_Specifier_IMP(Int64Type *self) {
     UNUSED_VAR(self);
     return CB_newf("i64_t");
 }
 
 int8_t
-Int64Type_primitive_id(Int64Type *self) {
+Int64Type_Primitive_ID_IMP(Int64Type *self) {
     UNUSED_VAR(self);
     return FType_INT64;
 }
 
 bool
-Int64Type_equals(Int64Type *self, Obj *other) {
+Int64Type_Equals_IMP(Int64Type *self, Obj *other) {
     if (self == (Int64Type*)other) { return true; }
     if (!other) { return false; }
     if (!Obj_Is_A(other, INT64TYPE)) { return false; }

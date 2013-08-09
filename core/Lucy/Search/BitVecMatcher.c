@@ -35,28 +35,28 @@ BitVecMatcher_init(BitVecMatcher *self, BitVector *bit_vector) {
 }
 
 void
-BitVecMatcher_destroy(BitVecMatcher *self) {
+BitVecMatcher_Destroy_IMP(BitVecMatcher *self) {
     BitVecMatcherIVARS *const ivars = BitVecMatcher_IVARS(self);
     DECREF(ivars->bit_vec);
     SUPER_DESTROY(self, BITVECMATCHER);
 }
 
 int32_t
-BitVecMatcher_next(BitVecMatcher *self) {
+BitVecMatcher_Next_IMP(BitVecMatcher *self) {
     BitVecMatcherIVARS *const ivars = BitVecMatcher_IVARS(self);
     ivars->doc_id = BitVec_Next_Hit(ivars->bit_vec, ivars->doc_id + 1);
     return ivars->doc_id == -1 ? 0 : ivars->doc_id;
 }
 
 int32_t
-BitVecMatcher_advance(BitVecMatcher *self, int32_t target) {
+BitVecMatcher_Advance_IMP(BitVecMatcher *self, int32_t target) {
     BitVecMatcherIVARS *const ivars = BitVecMatcher_IVARS(self);
     ivars->doc_id = BitVec_Next_Hit(ivars->bit_vec, target);
     return ivars->doc_id == -1 ? 0 : ivars->doc_id;
 }
 
 int32_t
-BitVecMatcher_get_doc_id(BitVecMatcher *self) {
+BitVecMatcher_Get_Doc_ID_IMP(BitVecMatcher *self) {
     return BitVecMatcher_IVARS(self)->doc_id;
 }
 

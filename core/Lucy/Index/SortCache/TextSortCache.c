@@ -69,7 +69,7 @@ TextSortCache_init(TextSortCache *self, const CharBuf *field,
 }
 
 void
-TextSortCache_destroy(TextSortCache *self) {
+TextSortCache_Destroy_IMP(TextSortCache *self) {
     TextSortCacheIVARS *const ivars = TextSortCache_IVARS(self);
     if (ivars->ord_in) {
         InStream_Close(ivars->ord_in);
@@ -89,7 +89,7 @@ TextSortCache_destroy(TextSortCache *self) {
 #define NULL_SENTINEL -1
 
 Obj*
-TextSortCache_value(TextSortCache *self, int32_t ord, Obj *blank) {
+TextSortCache_Value_IMP(TextSortCache *self, int32_t ord, Obj *blank) {
     TextSortCacheIVARS *const ivars = TextSortCache_IVARS(self);
     if (ord == ivars->null_ord) {
         return NULL;
@@ -127,7 +127,7 @@ TextSortCache_value(TextSortCache *self, int32_t ord, Obj *blank) {
 }
 
 CharBuf*
-TextSortCache_make_blank(TextSortCache *self) {
+TextSortCache_Make_Blank_IMP(TextSortCache *self) {
     UNUSED_VAR(self);
     return CB_new_from_trusted_utf8("", 0);
 }

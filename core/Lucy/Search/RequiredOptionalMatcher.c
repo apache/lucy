@@ -50,7 +50,7 @@ ReqOptMatcher_init(RequiredOptionalMatcher *self, Similarity *similarity,
 }
 
 void
-ReqOptMatcher_destroy(RequiredOptionalMatcher *self) {
+ReqOptMatcher_Destroy_IMP(RequiredOptionalMatcher *self) {
     RequiredOptionalMatcherIVARS *const ivars = ReqOptMatcher_IVARS(self);
     DECREF(ivars->req_matcher);
     DECREF(ivars->opt_matcher);
@@ -58,25 +58,25 @@ ReqOptMatcher_destroy(RequiredOptionalMatcher *self) {
 }
 
 int32_t
-ReqOptMatcher_next(RequiredOptionalMatcher *self) {
+ReqOptMatcher_Next_IMP(RequiredOptionalMatcher *self) {
     RequiredOptionalMatcherIVARS *const ivars = ReqOptMatcher_IVARS(self);
     return Matcher_Next(ivars->req_matcher);
 }
 
 int32_t
-ReqOptMatcher_advance(RequiredOptionalMatcher *self, int32_t target) {
+ReqOptMatcher_Advance_IMP(RequiredOptionalMatcher *self, int32_t target) {
     RequiredOptionalMatcherIVARS *const ivars = ReqOptMatcher_IVARS(self);
     return Matcher_Advance(ivars->req_matcher, target);
 }
 
 int32_t
-ReqOptMatcher_get_doc_id(RequiredOptionalMatcher *self) {
+ReqOptMatcher_Get_Doc_ID_IMP(RequiredOptionalMatcher *self) {
     RequiredOptionalMatcherIVARS *const ivars = ReqOptMatcher_IVARS(self);
     return Matcher_Get_Doc_ID(ivars->req_matcher);
 }
 
 float
-ReqOptMatcher_score(RequiredOptionalMatcher *self) {
+ReqOptMatcher_Score_IMP(RequiredOptionalMatcher *self) {
     RequiredOptionalMatcherIVARS *const ivars = ReqOptMatcher_IVARS(self);
     int32_t const current_doc = Matcher_Get_Doc_ID(ivars->req_matcher);
 

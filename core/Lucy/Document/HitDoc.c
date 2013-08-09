@@ -36,17 +36,17 @@ HitDoc_init(HitDoc *self, void *fields, int32_t doc_id, float score) {
 }
 
 void
-HitDoc_set_score(HitDoc *self, float score) {
+HitDoc_Set_Score_IMP(HitDoc *self, float score) {
     HitDoc_IVARS(self)->score = score;
 }
 
 float
-HitDoc_get_score(HitDoc *self) {
+HitDoc_Get_Score_IMP(HitDoc *self) {
     return HitDoc_IVARS(self)->score;
 }
 
 void
-HitDoc_serialize(HitDoc *self, OutStream *outstream) {
+HitDoc_Serialize_IMP(HitDoc *self, OutStream *outstream) {
     HitDocIVARS *const ivars = HitDoc_IVARS(self);
     HitDoc_Serialize_t super_serialize
         = SUPER_METHOD_PTR(HITDOC, Lucy_HitDoc_Serialize);
@@ -55,7 +55,7 @@ HitDoc_serialize(HitDoc *self, OutStream *outstream) {
 }
 
 HitDoc*
-HitDoc_deserialize(HitDoc *self, InStream *instream) {
+HitDoc_Deserialize_IMP(HitDoc *self, InStream *instream) {
     HitDoc_Deserialize_t super_deserialize
         = SUPER_METHOD_PTR(HITDOC, Lucy_HitDoc_Deserialize);
     self = super_deserialize(self, instream);
@@ -65,7 +65,7 @@ HitDoc_deserialize(HitDoc *self, InStream *instream) {
 }
 
 Hash*
-HitDoc_dump(HitDoc *self) {
+HitDoc_Dump_IMP(HitDoc *self) {
     HitDocIVARS *const ivars = HitDoc_IVARS(self);
     HitDoc_Dump_t super_dump
         = SUPER_METHOD_PTR(HITDOC, Lucy_HitDoc_Dump);
@@ -75,7 +75,7 @@ HitDoc_dump(HitDoc *self) {
 }
 
 HitDoc*
-HitDoc_load(HitDoc *self, Obj *dump) {
+HitDoc_Load_IMP(HitDoc *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     HitDoc_Load_t super_load
         = SUPER_METHOD_PTR(HITDOC, Lucy_HitDoc_Load);
@@ -87,7 +87,7 @@ HitDoc_load(HitDoc *self, Obj *dump) {
 }
 
 bool
-HitDoc_equals(HitDoc *self, Obj *other) {
+HitDoc_Equals_IMP(HitDoc *self, Obj *other) {
     if ((HitDoc*)other == self)           { return true;  }
     if (!Obj_Is_A(other, HITDOC))         { return false; }
     if (!Doc_equals((Doc*)self, other))   { return false; }

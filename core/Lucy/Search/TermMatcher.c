@@ -42,7 +42,7 @@ TermMatcher_init(TermMatcher *self, Similarity *similarity, PostingList *plist,
 }
 
 void
-TermMatcher_destroy(TermMatcher *self) {
+TermMatcher_Destroy_IMP(TermMatcher *self) {
     TermMatcherIVARS *const ivars = TermMatcher_IVARS(self);
     DECREF(ivars->sim);
     DECREF(ivars->plist);
@@ -51,7 +51,7 @@ TermMatcher_destroy(TermMatcher *self) {
 }
 
 int32_t
-TermMatcher_next(TermMatcher* self) {
+TermMatcher_Next_IMP(TermMatcher* self) {
     TermMatcherIVARS *const ivars = TermMatcher_IVARS(self);
     PostingList *const plist = ivars->plist;
     if (plist) {
@@ -71,7 +71,7 @@ TermMatcher_next(TermMatcher* self) {
 }
 
 int32_t
-TermMatcher_advance(TermMatcher *self, int32_t target) {
+TermMatcher_Advance_IMP(TermMatcher *self, int32_t target) {
     TermMatcherIVARS *const ivars = TermMatcher_IVARS(self);
     PostingList *const plist = ivars->plist;
     if (plist) {
@@ -91,7 +91,7 @@ TermMatcher_advance(TermMatcher *self, int32_t target) {
 }
 
 int32_t
-TermMatcher_get_doc_id(TermMatcher* self) {
+TermMatcher_Get_Doc_ID_IMP(TermMatcher* self) {
     TermMatcherIVARS *const ivars = TermMatcher_IVARS(self);
     return Post_Get_Doc_ID(ivars->posting);
 }

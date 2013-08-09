@@ -58,7 +58,7 @@ HLWriter_init(HighlightWriter *self, Schema *schema, Snapshot *snapshot,
 }
 
 void
-HLWriter_destroy(HighlightWriter *self) {
+HLWriter_Destroy_IMP(HighlightWriter *self) {
     HighlightWriterIVARS *const ivars = HLWriter_IVARS(self);
     DECREF(ivars->dat_out);
     DECREF(ivars->ix_out);
@@ -92,8 +92,8 @@ S_lazy_init(HighlightWriter *self) {
 }
 
 void
-HLWriter_add_inverted_doc(HighlightWriter *self, Inverter *inverter,
-                          int32_t doc_id) {
+HLWriter_Add_Inverted_Doc_IMP(HighlightWriter *self, Inverter *inverter,
+                              int32_t doc_id) {
     HighlightWriterIVARS *const ivars = HLWriter_IVARS(self);
     OutStream *dat_out = S_lazy_init(self);
     OutStream *ix_out  = ivars->ix_out;
@@ -138,7 +138,7 @@ HLWriter_add_inverted_doc(HighlightWriter *self, Inverter *inverter,
 }
 
 ByteBuf*
-HLWriter_tv_buf(HighlightWriter *self, Inversion *inversion) {
+HLWriter_TV_Buf_IMP(HighlightWriter *self, Inversion *inversion) {
     const char *last_text = "";
     size_t      last_len = 0;
     ByteBuf    *tv_buf = BB_new(20 + Inversion_Get_Size(inversion) * 8);
@@ -209,8 +209,8 @@ HLWriter_tv_buf(HighlightWriter *self, Inversion *inversion) {
 }
 
 void
-HLWriter_add_segment(HighlightWriter *self, SegReader *reader,
-                     I32Array *doc_map) {
+HLWriter_Add_Segment_IMP(HighlightWriter *self, SegReader *reader,
+                         I32Array *doc_map) {
     HighlightWriterIVARS *const ivars = HLWriter_IVARS(self);
     int32_t doc_max = SegReader_Doc_Max(reader);
 
@@ -248,7 +248,7 @@ HLWriter_add_segment(HighlightWriter *self, SegReader *reader,
 }
 
 void
-HLWriter_finish(HighlightWriter *self) {
+HLWriter_Finish_IMP(HighlightWriter *self) {
     HighlightWriterIVARS *const ivars = HLWriter_IVARS(self);
     if (ivars->dat_out) {
         // Write one final file pointer, so that we can derive the length of
@@ -265,7 +265,7 @@ HLWriter_finish(HighlightWriter *self) {
 }
 
 int32_t
-HLWriter_format(HighlightWriter *self) {
+HLWriter_Format_IMP(HighlightWriter *self) {
     UNUSED_VAR(self);
     return HLWriter_current_file_format;
 }

@@ -38,8 +38,8 @@ ORQuery_init(ORQuery *self, VArray *children) {
 }
 
 Compiler*
-ORQuery_make_compiler(ORQuery *self, Searcher *searcher, float boost,
-                      bool subordinate) {
+ORQuery_Make_Compiler_IMP(ORQuery *self, Searcher *searcher, float boost,
+                          bool subordinate) {
     ORCompiler *compiler = ORCompiler_new(self, searcher, boost);
     if (!subordinate) {
         ORCompiler_Normalize(compiler);
@@ -48,14 +48,14 @@ ORQuery_make_compiler(ORQuery *self, Searcher *searcher, float boost,
 }
 
 bool
-ORQuery_equals(ORQuery *self, Obj *other) {
+ORQuery_Equals_IMP(ORQuery *self, Obj *other) {
     if ((ORQuery*)other == self)   { return true;  }
     if (!Obj_Is_A(other, ORQUERY)) { return false; }
     return PolyQuery_equals((PolyQuery*)self, other);
 }
 
 CharBuf*
-ORQuery_to_string(ORQuery *self) {
+ORQuery_To_String_IMP(ORQuery *self) {
     ORQueryIVARS *const ivars = ORQuery_IVARS(self);
     uint32_t num_kids = VA_Get_Size(ivars->children);
     if (!num_kids) { return CB_new_from_trusted_utf8("()", 2); }
@@ -94,8 +94,8 @@ ORCompiler_init(ORCompiler *self, ORQuery *parent, Searcher *searcher,
 }
 
 Matcher*
-ORCompiler_make_matcher(ORCompiler *self, SegReader *reader,
-                        bool need_score) {
+ORCompiler_Make_Matcher_IMP(ORCompiler *self, SegReader *reader,
+                            bool need_score) {
     ORCompilerIVARS *const ivars = ORCompiler_IVARS(self);
     uint32_t num_kids = VA_Get_Size(ivars->children);
 

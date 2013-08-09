@@ -41,7 +41,7 @@ LockFact_init(LockFactory *self, Folder *folder, const CharBuf *host) {
 }
 
 void
-LockFact_destroy(LockFactory *self) {
+LockFact_Destroy_IMP(LockFactory *self) {
     LockFactoryIVARS *const ivars = LockFact_IVARS(self);
     DECREF(ivars->folder);
     DECREF(ivars->host);
@@ -49,16 +49,16 @@ LockFact_destroy(LockFactory *self) {
 }
 
 Lock*
-LockFact_make_lock(LockFactory *self, const CharBuf *name, int32_t timeout,
-                   int32_t interval) {
+LockFact_Make_Lock_IMP(LockFactory *self, const CharBuf *name,
+                       int32_t timeout, int32_t interval) {
     LockFactoryIVARS *const ivars = LockFact_IVARS(self);
     return (Lock*)LFLock_new(ivars->folder, name, ivars->host, timeout,
                              interval);
 }
 
 Lock*
-LockFact_make_shared_lock(LockFactory *self, const CharBuf *name,
-                          int32_t timeout, int32_t interval) {
+LockFact_Make_Shared_Lock_IMP(LockFactory *self, const CharBuf *name,
+                              int32_t timeout, int32_t interval) {
     LockFactoryIVARS *const ivars = LockFact_IVARS(self);
     return (Lock*)ShLock_new(ivars->folder, name, ivars->host, timeout,
                              interval);

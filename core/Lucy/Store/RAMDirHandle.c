@@ -39,7 +39,7 @@ RAMDH_init(RAMDirHandle *self, RAMFolder *folder) {
 }
 
 bool
-RAMDH_close(RAMDirHandle *self) {
+RAMDH_Close_IMP(RAMDirHandle *self) {
     RAMDirHandleIVARS *const ivars = RAMDH_IVARS(self);
     if (ivars->elems) {
         VA_Dec_RefCount(ivars->elems);
@@ -53,7 +53,7 @@ RAMDH_close(RAMDirHandle *self) {
 }
 
 bool
-RAMDH_next(RAMDirHandle *self) {
+RAMDH_Next_IMP(RAMDirHandle *self) {
     RAMDirHandleIVARS *const ivars = RAMDH_IVARS(self);
     if (ivars->elems) {
         ivars->tick++;
@@ -72,7 +72,7 @@ RAMDH_next(RAMDirHandle *self) {
 }
 
 bool
-RAMDH_entry_is_dir(RAMDirHandle *self) {
+RAMDH_Entry_Is_Dir_IMP(RAMDirHandle *self) {
     RAMDirHandleIVARS *const ivars = RAMDH_IVARS(self);
     if (ivars->elems) {
         CharBuf *name = (CharBuf*)VA_Fetch(ivars->elems, ivars->tick);
@@ -84,7 +84,7 @@ RAMDH_entry_is_dir(RAMDirHandle *self) {
 }
 
 bool
-RAMDH_entry_is_symlink(RAMDirHandle *self) {
+RAMDH_Entry_Is_Symlink_IMP(RAMDirHandle *self) {
     UNUSED_VAR(self);
     return false;
 }

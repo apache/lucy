@@ -41,7 +41,7 @@ MatchAllQuery_init(MatchAllQuery *self) {
 }
 
 bool
-MatchAllQuery_equals(MatchAllQuery *self, Obj *other) {
+MatchAllQuery_Equals_IMP(MatchAllQuery *self, Obj *other) {
     if (!Obj_Is_A(other, MATCHALLQUERY)) { return false; }
     MatchAllQueryIVARS *const ivars = MatchAllQuery_IVARS(self);
     MatchAllQueryIVARS *const ovars = MatchAllQuery_IVARS((MatchAllQuery*)other);
@@ -50,14 +50,14 @@ MatchAllQuery_equals(MatchAllQuery *self, Obj *other) {
 }
 
 CharBuf*
-MatchAllQuery_to_string(MatchAllQuery *self) {
+MatchAllQuery_To_String_IMP(MatchAllQuery *self) {
     UNUSED_VAR(self);
     return CB_new_from_trusted_utf8("[MATCHALL]", 10);
 }
 
 Compiler*
-MatchAllQuery_make_compiler(MatchAllQuery *self, Searcher *searcher,
-                            float boost, bool subordinate) {
+MatchAllQuery_Make_Compiler_IMP(MatchAllQuery *self, Searcher *searcher,
+                                float boost, bool subordinate) {
     MatchAllCompiler *compiler = MatchAllCompiler_new(self, searcher, boost);
     if (!subordinate) {
         MatchAllCompiler_Normalize(compiler);
@@ -83,8 +83,8 @@ MatchAllCompiler_init(MatchAllCompiler *self, MatchAllQuery *parent,
 }
 
 Matcher*
-MatchAllCompiler_make_matcher(MatchAllCompiler *self, SegReader *reader,
-                              bool need_score) {
+MatchAllCompiler_Make_Matcher_IMP(MatchAllCompiler *self, SegReader *reader,
+                                  bool need_score) {
     float weight = MatchAllCompiler_Get_Weight(self);
     UNUSED_VAR(need_score);
     return (Matcher*)MatchAllMatcher_new(weight, SegReader_Doc_Max(reader));

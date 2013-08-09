@@ -37,7 +37,7 @@ MatchAllMatcher_init(MatchAllMatcher *self, float score, int32_t doc_max) {
 }
 
 int32_t
-MatchAllMatcher_next(MatchAllMatcher* self) {
+MatchAllMatcher_Next_IMP(MatchAllMatcher* self) {
     MatchAllMatcherIVARS *const ivars = MatchAllMatcher_IVARS(self);
     if (++ivars->doc_id <= ivars->doc_max) {
         return ivars->doc_id;
@@ -49,18 +49,18 @@ MatchAllMatcher_next(MatchAllMatcher* self) {
 }
 
 int32_t
-MatchAllMatcher_advance(MatchAllMatcher* self, int32_t target) {
+MatchAllMatcher_Advance_IMP(MatchAllMatcher* self, int32_t target) {
     MatchAllMatcher_IVARS(self)->doc_id = target - 1;
     return MatchAllMatcher_next(self);
 }
 
 float
-MatchAllMatcher_score(MatchAllMatcher* self) {
+MatchAllMatcher_Score_IMP(MatchAllMatcher* self) {
     return MatchAllMatcher_IVARS(self)->score;
 }
 
 int32_t
-MatchAllMatcher_get_doc_id(MatchAllMatcher* self) {
+MatchAllMatcher_Get_Doc_ID_IMP(MatchAllMatcher* self) {
     return MatchAllMatcher_IVARS(self)->doc_id;
 }
 

@@ -31,7 +31,7 @@ Matcher_init(Matcher *self) {
 }
 
 int32_t
-Matcher_advance(Matcher *self, int32_t target) {
+Matcher_Advance_IMP(Matcher *self, int32_t target) {
     while (1) {
         int32_t doc_id = Matcher_Next(self);
         if (doc_id == 0 || doc_id >= target) {
@@ -41,7 +41,7 @@ Matcher_advance(Matcher *self, int32_t target) {
 }
 
 void
-Matcher_collect(Matcher *self, Collector *collector, Matcher *deletions) {
+Matcher_Collect_IMP(Matcher *self, Collector *collector, Matcher *deletions) {
     int32_t doc_id        = 0;
     int32_t next_deletion = deletions ? 0 : INT32_MAX;
 

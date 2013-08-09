@@ -56,7 +56,7 @@ RawLex_init(RawLexicon *self, Schema *schema, const CharBuf *field,
 }
 
 void
-RawLex_destroy(RawLexicon *self) {
+RawLex_Destroy_IMP(RawLexicon *self) {
     RawLexiconIVARS *const ivars = RawLex_IVARS(self);
     DECREF(ivars->instream);
     DECREF(ivars->term_stepper);
@@ -65,7 +65,7 @@ RawLex_destroy(RawLexicon *self) {
 }
 
 bool
-RawLex_next(RawLexicon *self) {
+RawLex_Next_IMP(RawLexicon *self) {
     RawLexiconIVARS *const ivars = RawLex_IVARS(self);
     if (InStream_Tell(ivars->instream) >= ivars->len) { return false; }
     TermStepper_Read_Delta(ivars->term_stepper, ivars->instream);
@@ -74,13 +74,13 @@ RawLex_next(RawLexicon *self) {
 }
 
 Obj*
-RawLex_get_term(RawLexicon *self) {
+RawLex_Get_Term_IMP(RawLexicon *self) {
     RawLexiconIVARS *const ivars = RawLex_IVARS(self);
     return TermStepper_Get_Value(ivars->term_stepper);
 }
 
 int32_t
-RawLex_doc_freq(RawLexicon *self) {
+RawLex_Doc_Freq_IMP(RawLexicon *self) {
     RawLexiconIVARS *const ivars = RawLex_IVARS(self);
     TermInfo *tinfo = (TermInfo*)TermStepper_Get_Value(ivars->tinfo_stepper);
     return tinfo ? TInfo_Get_Doc_Freq(tinfo) : 0;

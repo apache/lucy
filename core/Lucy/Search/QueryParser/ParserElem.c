@@ -35,14 +35,14 @@ ParserElem_init(ParserElem *self, uint32_t type, Obj *value) {
 }
 
 void
-ParserElem_destroy(ParserElem *self) {
+ParserElem_Destroy_IMP(ParserElem *self) {
     ParserElemIVARS *const ivars = ParserElem_IVARS(self);
     DECREF(ivars->value);
     SUPER_DESTROY(self, PARSERELEM);
 }
 
 void
-ParserElem_set_value(ParserElem *self, Obj *value) {
+ParserElem_Set_Value_IMP(ParserElem *self, Obj *value) {
     ParserElemIVARS *const ivars = ParserElem_IVARS(self);
     INCREF(value);
     DECREF(ivars->value);
@@ -50,7 +50,7 @@ ParserElem_set_value(ParserElem *self, Obj *value) {
 }
 
 Obj*
-ParserElem_as(ParserElem *self, VTable *metaclass) {
+ParserElem_As_IMP(ParserElem *self, VTable *metaclass) {
     ParserElemIVARS *const ivars = ParserElem_IVARS(self);
     if (ivars->value && Obj_Is_A(ivars->value, metaclass)) {
         return ivars->value;
@@ -59,12 +59,12 @@ ParserElem_as(ParserElem *self, VTable *metaclass) {
 }
 
 uint32_t
-ParserElem_get_type(ParserElem *self) {
+ParserElem_Get_Type_IMP(ParserElem *self) {
     return ParserElem_IVARS(self)->type;
 }
 
 void
-ParserElem_require(ParserElem *self) {
+ParserElem_Require_IMP(ParserElem *self) {
     ParserElemIVARS *const ivars = ParserElem_IVARS(self);
     switch (ivars->occur) {
         case LUCY_QPARSER_SHOULD:
@@ -79,7 +79,7 @@ ParserElem_require(ParserElem *self) {
 }
 
 void
-ParserElem_unrequire(ParserElem *self) {
+ParserElem_Unrequire_IMP(ParserElem *self) {
     ParserElemIVARS *const ivars = ParserElem_IVARS(self);
     switch (ivars->occur) {
         case LUCY_QPARSER_MUST:
@@ -94,7 +94,7 @@ ParserElem_unrequire(ParserElem *self) {
 }
 
 void
-ParserElem_negate(ParserElem *self) {
+ParserElem_Negate_IMP(ParserElem *self) {
     ParserElemIVARS *const ivars = ParserElem_IVARS(self);
     switch (ivars->occur) {
         case LUCY_QPARSER_SHOULD:
@@ -110,17 +110,17 @@ ParserElem_negate(ParserElem *self) {
 }
 
 bool
-ParserElem_optional(ParserElem *self) {
+ParserElem_Optional_IMP(ParserElem *self) {
     return ParserElem_IVARS(self)->occur == LUCY_QPARSER_SHOULD;
 }
 
 bool
-ParserElem_required(ParserElem *self) {
+ParserElem_Required_IMP(ParserElem *self) {
     return ParserElem_IVARS(self)->occur == LUCY_QPARSER_MUST;
 }
 
 bool
-ParserElem_negated(ParserElem *self) {
+ParserElem_Negated_IMP(ParserElem *self) {
     return ParserElem_IVARS(self)->occur == LUCY_QPARSER_MUST_NOT;
 }
 

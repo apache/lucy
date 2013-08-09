@@ -59,7 +59,7 @@ TextTermStepper_init(TextTermStepper *self) {
 }
 
 void
-TextTermStepper_set_value(TextTermStepper *self, Obj *value) {
+TextTermStepper_Set_Value_IMP(TextTermStepper *self, Obj *value) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
     CERTIFY(value, CHARBUF);
     DECREF(ivars->value);
@@ -67,14 +67,14 @@ TextTermStepper_set_value(TextTermStepper *self, Obj *value) {
 }
 
 void
-TextTermStepper_reset(TextTermStepper *self) {
+TextTermStepper_Reset_IMP(TextTermStepper *self) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
     CB_Set_Size((CharBuf*)ivars->value, 0);
 }
 
 void
-TextTermStepper_write_key_frame(TextTermStepper *self, OutStream *outstream,
-                                Obj *value) {
+TextTermStepper_Write_Key_Frame_IMP(TextTermStepper *self,
+                                    OutStream *outstream, Obj *value) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
     uint8_t *buf  = CB_Get_Ptr8((CharBuf*)value);
     size_t   size = CB_Get_Size((CharBuf*)value);
@@ -84,8 +84,8 @@ TextTermStepper_write_key_frame(TextTermStepper *self, OutStream *outstream,
 }
 
 void
-TextTermStepper_write_delta(TextTermStepper *self, OutStream *outstream,
-                            Obj *value) {
+TextTermStepper_Write_Delta_IMP(TextTermStepper *self, OutStream *outstream,
+                                Obj *value) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
     CharBuf *new_value  = (CharBuf*)CERTIFY(value, CHARBUF);
     CharBuf *last_value = (CharBuf*)ivars->value;
@@ -109,7 +109,8 @@ TextTermStepper_write_delta(TextTermStepper *self, OutStream *outstream,
 }
 
 void
-TextTermStepper_read_key_frame(TextTermStepper *self, InStream *instream) {
+TextTermStepper_Read_Key_Frame_IMP(TextTermStepper *self,
+                                   InStream *instream) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
     const uint32_t text_len = InStream_Read_C32(instream);
 
@@ -134,7 +135,7 @@ TextTermStepper_read_key_frame(TextTermStepper *self, InStream *instream) {
 }
 
 void
-TextTermStepper_read_delta(TextTermStepper *self, InStream *instream) {
+TextTermStepper_Read_Delta_IMP(TextTermStepper *self, InStream *instream) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
     const uint32_t text_overlap     = InStream_Read_C32(instream);
     const uint32_t finish_chars_len = InStream_Read_C32(instream);

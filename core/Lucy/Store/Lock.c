@@ -67,7 +67,7 @@ Lock_init(Lock *self, Folder *folder, const CharBuf *name,
 }
 
 void
-Lock_destroy(Lock *self) {
+Lock_Destroy_IMP(Lock *self) {
     LockIVARS *const ivars = Lock_IVARS(self);
     DECREF(ivars->folder);
     DECREF(ivars->host);
@@ -77,22 +77,22 @@ Lock_destroy(Lock *self) {
 }
 
 CharBuf*
-Lock_get_name(Lock *self) {
+Lock_Get_Name_IMP(Lock *self) {
     return Lock_IVARS(self)->name;
 }
 
 CharBuf*
-Lock_get_lock_path(Lock *self) {
+Lock_Get_Lock_Path_IMP(Lock *self) {
     return Lock_IVARS(self)->lock_path;
 }
 
 CharBuf*
-Lock_get_host(Lock *self) {
+Lock_Get_Host_IMP(Lock *self) {
     return Lock_IVARS(self)->host;
 }
 
 bool
-Lock_obtain(Lock *self) {
+Lock_Obtain_IMP(Lock *self) {
     LockIVARS *const ivars = Lock_IVARS(self);
     int32_t time_left = ivars->interval == 0 ? 0 : ivars->timeout;
     bool locked = Lock_Request(self);
@@ -128,12 +128,12 @@ LFLock_init(LockFileLock *self, Folder *folder, const CharBuf *name,
 }
 
 bool
-LFLock_shared(LockFileLock *self) {
+LFLock_Shared_IMP(LockFileLock *self) {
     UNUSED_VAR(self); return false;
 }
 
 bool
-LFLock_request(LockFileLock *self) {
+LFLock_Request_IMP(LockFileLock *self) {
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
     Hash   *file_data;
     bool wrote_json;
@@ -205,7 +205,7 @@ LFLock_request(LockFileLock *self) {
 }
 
 void
-LFLock_release(LockFileLock *self) {
+LFLock_Release_IMP(LockFileLock *self) {
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
     if (Folder_Exists(ivars->folder, ivars->lock_path)) {
         LFLock_Maybe_Delete_File(self, ivars->lock_path, true, false);
@@ -213,20 +213,20 @@ LFLock_release(LockFileLock *self) {
 }
 
 bool
-LFLock_is_locked(LockFileLock *self) {
+LFLock_Is_Locked_IMP(LockFileLock *self) {
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
     return Folder_Exists(ivars->folder, ivars->lock_path);
 }
 
 void
-LFLock_clear_stale(LockFileLock *self) {
+LFLock_Clear_Stale_IMP(LockFileLock *self) {
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
     LFLock_Maybe_Delete_File(self, ivars->lock_path, false, true);
 }
 
 bool
-LFLock_maybe_delete_file(LockFileLock *self, const CharBuf *path,
-                         bool delete_mine, bool delete_other) {
+LFLock_Maybe_Delete_File_IMP(LockFileLock *self, const CharBuf *path,
+                             bool delete_mine, bool delete_other) {
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
     Folder *folder  = ivars->folder;
     bool    success = false;
@@ -282,7 +282,7 @@ LFLock_maybe_delete_file(LockFileLock *self, const CharBuf *path,
 }
 
 void
-LFLock_destroy(LockFileLock *self) {
+LFLock_Destroy_IMP(LockFileLock *self) {
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
     DECREF(ivars->link_path);
     SUPER_DESTROY(self, LOCKFILELOCK);
@@ -303,7 +303,7 @@ LockErr_init(LockErr *self, CharBuf *message) {
 }
 
 LockErr*
-LockErr_make(LockErr *self) {
+LockErr_Make_IMP(LockErr *self) {
     UNUSED_VAR(self);
     return LockErr_new(CB_new(0));
 }

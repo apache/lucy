@@ -26,17 +26,17 @@ Doc_new(void *fields, int32_t doc_id) {
 }
 
 void
-Doc_set_doc_id(Doc *self, int32_t doc_id) {
+Doc_Set_Doc_ID_IMP(Doc *self, int32_t doc_id) {
     Doc_IVARS(self)->doc_id = doc_id;
 }
 
 int32_t
-Doc_get_doc_id(Doc *self) {
+Doc_Get_Doc_ID_IMP(Doc *self) {
     return Doc_IVARS(self)->doc_id;
 }
 
 void*
-Doc_get_fields(Doc *self) {
+Doc_Get_Fields_IMP(Doc *self) {
     return Doc_IVARS(self)->fields;
 }
 

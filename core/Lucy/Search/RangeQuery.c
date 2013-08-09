@@ -67,7 +67,7 @@ RangeQuery_init(RangeQuery *self, const CharBuf *field, Obj *lower_term,
 }
 
 void
-RangeQuery_destroy(RangeQuery *self) {
+RangeQuery_Destroy_IMP(RangeQuery *self) {
     RangeQueryIVARS *const ivars = RangeQuery_IVARS(self);
     DECREF(ivars->field);
     DECREF(ivars->lower_term);
@@ -76,7 +76,7 @@ RangeQuery_destroy(RangeQuery *self) {
 }
 
 bool
-RangeQuery_equals(RangeQuery *self, Obj *other) {
+RangeQuery_Equals_IMP(RangeQuery *self, Obj *other) {
     if ((RangeQuery*)other == self)                   { return true; }
     if (!Obj_Is_A(other, RANGEQUERY))                 { return false; }
     RangeQueryIVARS *const ivars = RangeQuery_IVARS(self);
@@ -97,7 +97,7 @@ RangeQuery_equals(RangeQuery *self, Obj *other) {
 }
 
 CharBuf*
-RangeQuery_to_string(RangeQuery *self) {
+RangeQuery_To_String_IMP(RangeQuery *self) {
     RangeQueryIVARS *const ivars = RangeQuery_IVARS(self);
     CharBuf *lower_term_str = ivars->lower_term
                               ? Obj_To_String(ivars->lower_term)
@@ -117,7 +117,7 @@ RangeQuery_to_string(RangeQuery *self) {
 }
 
 void
-RangeQuery_serialize(RangeQuery *self, OutStream *outstream) {
+RangeQuery_Serialize_IMP(RangeQuery *self, OutStream *outstream) {
     RangeQueryIVARS *const ivars = RangeQuery_IVARS(self);
     OutStream_Write_F32(outstream, ivars->boost);
     Freezer_serialize_charbuf(ivars->field, outstream);
@@ -140,7 +140,7 @@ RangeQuery_serialize(RangeQuery *self, OutStream *outstream) {
 }
 
 RangeQuery*
-RangeQuery_deserialize(RangeQuery *self, InStream *instream) {
+RangeQuery_Deserialize_IMP(RangeQuery *self, InStream *instream) {
     // Deserialize components.
     float boost = InStream_Read_F32(instream);
     CharBuf *field = Freezer_read_charbuf(instream);
@@ -161,8 +161,7 @@ RangeQuery_deserialize(RangeQuery *self, InStream *instream) {
 }
 
 Obj*
-RangeQuery_dump(RangeQuery *self)
-{
+RangeQuery_Dump_IMP(RangeQuery *self) {
     RangeQueryIVARS *ivars = RangeQuery_IVARS(self);
     RangeQuery_Dump_t super_dump
         = SUPER_METHOD_PTR(RANGEQUERY, Lucy_RangeQuery_Dump);
@@ -184,8 +183,7 @@ RangeQuery_dump(RangeQuery *self)
 }
 
 Obj*
-RangeQuery_load(RangeQuery *self, Obj *dump)
-{
+RangeQuery_Load_IMP(RangeQuery *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     RangeQuery_Load_t super_load
         = SUPER_METHOD_PTR(RANGEQUERY, Lucy_RangeQuery_Load);
@@ -213,8 +211,8 @@ RangeQuery_load(RangeQuery *self, Obj *dump)
 }
 
 RangeCompiler*
-RangeQuery_make_compiler(RangeQuery *self, Searcher *searcher,
-                         float boost, bool subordinate) {
+RangeQuery_Make_Compiler_IMP(RangeQuery *self, Searcher *searcher,
+                             float boost, bool subordinate) {
     RangeCompiler *compiler = RangeCompiler_new(self, searcher, boost);
     if (!subordinate) {
         RangeCompiler_Normalize(compiler);
@@ -239,8 +237,8 @@ RangeCompiler_init(RangeCompiler *self, RangeQuery *parent,
 }
 
 Matcher*
-RangeCompiler_make_matcher(RangeCompiler *self, SegReader *reader,
-                           bool need_score) {
+RangeCompiler_Make_Matcher_IMP(RangeCompiler *self, SegReader *reader,
+                               bool need_score) {
     RangeQuery *parent = (RangeQuery*)RangeCompiler_IVARS(self)->parent;
     const CharBuf *field = RangeQuery_IVARS(parent)->field;
     SortReader *sort_reader

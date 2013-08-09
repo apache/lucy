@@ -36,12 +36,12 @@ Post_init(Posting *self) {
 }
 
 void
-Post_set_doc_id(Posting *self, int32_t doc_id) {
+Post_Set_Doc_ID_IMP(Posting *self, int32_t doc_id) {
     Post_IVARS(self)->doc_id = doc_id;
 }
 
 int32_t
-Post_get_doc_id(Posting *self) {
+Post_Get_Doc_ID_IMP(Posting *self) {
     return Post_IVARS(self)->doc_id;
 }
 

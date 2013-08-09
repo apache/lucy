@@ -40,8 +40,8 @@ PListReader_init(PostingListReader *self, Schema *schema, Folder *folder,
 }
 
 PostingListReader*
-PListReader_aggregator(PostingListReader *self, VArray *readers,
-                       I32Array *offsets) {
+PListReader_Aggregator_IMP(PostingListReader *self, VArray *readers,
+                           I32Array *offsets) {
     UNUSED_VAR(self);
     UNUSED_VAR(readers);
     UNUSED_VAR(offsets);
@@ -91,7 +91,7 @@ DefPListReader_init(DefaultPostingListReader *self, Schema *schema,
 }
 
 void
-DefPListReader_close(DefaultPostingListReader *self) {
+DefPListReader_Close_IMP(DefaultPostingListReader *self) {
     DefaultPostingListReaderIVARS *const ivars = DefPListReader_IVARS(self);
     if (ivars->lex_reader) {
         LexReader_Close(ivars->lex_reader);
@@ -101,15 +101,15 @@ DefPListReader_close(DefaultPostingListReader *self) {
 }
 
 void
-DefPListReader_destroy(DefaultPostingListReader *self) {
+DefPListReader_Destroy_IMP(DefaultPostingListReader *self) {
     DefaultPostingListReaderIVARS *const ivars = DefPListReader_IVARS(self);
     DECREF(ivars->lex_reader);
     SUPER_DESTROY(self, DEFAULTPOSTINGLISTREADER);
 }
 
 SegPostingList*
-DefPListReader_posting_list(DefaultPostingListReader *self,
-                            const CharBuf *field, Obj *target) {
+DefPListReader_Posting_List_IMP(DefaultPostingListReader *self,
+                                const CharBuf *field, Obj *target) {
     DefaultPostingListReaderIVARS *const ivars = DefPListReader_IVARS(self);
     FieldType *type = Schema_Fetch_Type(ivars->schema, field);
 
@@ -125,7 +125,7 @@ DefPListReader_posting_list(DefaultPostingListReader *self,
 }
 
 LexiconReader*
-DefPListReader_get_lex_reader(DefaultPostingListReader *self) {
+DefPListReader_Get_Lex_Reader_IMP(DefaultPostingListReader *self) {
     return DefPListReader_IVARS(self)->lex_reader;
 }
 

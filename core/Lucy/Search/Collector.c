@@ -34,7 +34,7 @@ Coll_init(Collector *self) {
 }
 
 void
-Coll_destroy(Collector *self) {
+Coll_Destroy_IMP(Collector *self) {
     CollectorIVARS *const ivars = Coll_IVARS(self);
     DECREF(ivars->reader);
     DECREF(ivars->matcher);
@@ -42,21 +42,21 @@ Coll_destroy(Collector *self) {
 }
 
 void
-Coll_set_reader(Collector *self, SegReader *reader) {
+Coll_Set_Reader_IMP(Collector *self, SegReader *reader) {
     CollectorIVARS *const ivars = Coll_IVARS(self);
     DECREF(ivars->reader);
     ivars->reader = (SegReader*)INCREF(reader);
 }
 
 void
-Coll_set_matcher(Collector *self, Matcher *matcher) {
+Coll_Set_Matcher_IMP(Collector *self, Matcher *matcher) {
     CollectorIVARS *const ivars = Coll_IVARS(self);
     DECREF(ivars->matcher);
     ivars->matcher = (Matcher*)INCREF(matcher);
 }
 
 void
-Coll_set_base(Collector *self, int32_t base) {
+Coll_Set_Base_IMP(Collector *self, int32_t base) {
     Coll_IVARS(self)->base = base;
 }
 
@@ -75,14 +75,14 @@ BitColl_init(BitCollector *self, BitVector *bit_vec) {
 }
 
 void
-BitColl_destroy(BitCollector *self) {
+BitColl_Destroy_IMP(BitCollector *self) {
     BitCollectorIVARS *const ivars = BitColl_IVARS(self);
     DECREF(ivars->bit_vec);
     SUPER_DESTROY(self, BITCOLLECTOR);
 }
 
 void
-BitColl_collect(BitCollector *self, int32_t doc_id) {
+BitColl_Collect_IMP(BitCollector *self, int32_t doc_id) {
     BitCollectorIVARS *const ivars = BitColl_IVARS(self);
 
     // Add the doc_id to the BitVector.
@@ -90,7 +90,7 @@ BitColl_collect(BitCollector *self, int32_t doc_id) {
 }
 
 bool
-BitColl_need_score(BitCollector *self) {
+BitColl_Need_Score_IMP(BitCollector *self) {
     UNUSED_VAR(self);
     return false;
 }
@@ -112,38 +112,38 @@ OffsetColl_init(OffsetCollector *self, Collector *inner_coll, int32_t offset) {
 }
 
 void
-OffsetColl_destroy(OffsetCollector *self) {
+OffsetColl_Destroy_IMP(OffsetCollector *self) {
     OffsetCollectorIVARS *const ivars = OffsetColl_IVARS(self);
     DECREF(ivars->inner_coll);
     SUPER_DESTROY(self, OFFSETCOLLECTOR);
 }
 
 void
-OffsetColl_set_reader(OffsetCollector *self, SegReader *reader) {
+OffsetColl_Set_Reader_IMP(OffsetCollector *self, SegReader *reader) {
     OffsetCollectorIVARS *const ivars = OffsetColl_IVARS(self);
     Coll_Set_Reader(ivars->inner_coll, reader);
 }
 
 void
-OffsetColl_set_base(OffsetCollector *self, int32_t base) {
+OffsetColl_Set_Base_IMP(OffsetCollector *self, int32_t base) {
     OffsetCollectorIVARS *const ivars = OffsetColl_IVARS(self);
     Coll_Set_Base(ivars->inner_coll, base);
 }
 
 void
-OffsetColl_set_matcher(OffsetCollector *self, Matcher *matcher) {
+OffsetColl_Set_Matcher_IMP(OffsetCollector *self, Matcher *matcher) {
     OffsetCollectorIVARS *const ivars = OffsetColl_IVARS(self);
     Coll_Set_Matcher(ivars->inner_coll, matcher);
 }
 
 void
-OffsetColl_collect(OffsetCollector *self, int32_t doc_id) {
+OffsetColl_Collect_IMP(OffsetCollector *self, int32_t doc_id) {
     OffsetCollectorIVARS *const ivars = OffsetColl_IVARS(self);
     Coll_Collect(ivars->inner_coll, (doc_id + ivars->offset));
 }
 
 bool
-OffsetColl_need_score(OffsetCollector *self) {
+OffsetColl_Need_Score_IMP(OffsetCollector *self) {
     OffsetCollectorIVARS *const ivars = OffsetColl_IVARS(self);
     return Coll_Need_Score(ivars->inner_coll);
 }

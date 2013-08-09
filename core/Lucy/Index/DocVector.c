@@ -48,14 +48,14 @@ DocVec_init(DocVector *self) {
 }
 
 void
-DocVec_serialize(DocVector *self, OutStream *outstream) {
+DocVec_Serialize_IMP(DocVector *self, OutStream *outstream) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
     Freezer_serialize_hash(ivars->field_bufs, outstream);
     Freezer_serialize_hash(ivars->field_vectors, outstream);
 }
 
 DocVector*
-DocVec_deserialize(DocVector *self, InStream *instream) {
+DocVec_Deserialize_IMP(DocVector *self, InStream *instream) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
     ivars->field_bufs    = Freezer_read_hash(instream);
     ivars->field_vectors = Freezer_read_hash(instream);
@@ -63,7 +63,7 @@ DocVec_deserialize(DocVector *self, InStream *instream) {
 }
 
 void
-DocVec_destroy(DocVector *self) {
+DocVec_Destroy_IMP(DocVector *self) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
     DECREF(ivars->field_bufs);
     DECREF(ivars->field_vectors);
@@ -71,27 +71,27 @@ DocVec_destroy(DocVector *self) {
 }
 
 void
-DocVec_add_field_buf(DocVector *self, const CharBuf *field,
-                     ByteBuf *field_buf) {
+DocVec_Add_Field_Buf_IMP(DocVector *self, const CharBuf *field,
+                         ByteBuf *field_buf) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
     Hash_Store(ivars->field_bufs, (Obj*)field, INCREF(field_buf));
 }
 
 ByteBuf*
-DocVec_field_buf(DocVector *self, const CharBuf *field) {
+DocVec_Field_Buf_IMP(DocVector *self, const CharBuf *field) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
     return (ByteBuf*)Hash_Fetch(ivars->field_bufs, (Obj*)field);
 }
 
 VArray*
-DocVec_field_names(DocVector *self) {
+DocVec_Field_Names_IMP(DocVector *self) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
     return Hash_Keys(ivars->field_bufs);
 }
 
 TermVector*
-DocVec_term_vector(DocVector *self, const CharBuf *field,
-                   const CharBuf *term_text) {
+DocVec_Term_Vector_IMP(DocVector *self, const CharBuf *field,
+                       const CharBuf *term_text) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
     Hash *field_vector = (Hash*)Hash_Fetch(ivars->field_vectors, (Obj*)field);
 

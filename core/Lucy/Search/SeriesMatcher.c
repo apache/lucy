@@ -48,7 +48,7 @@ SeriesMatcher_init(SeriesMatcher *self, VArray *matchers, I32Array *offsets) {
 }
 
 void
-SeriesMatcher_destroy(SeriesMatcher *self) {
+SeriesMatcher_Destroy_IMP(SeriesMatcher *self) {
     SeriesMatcherIVARS *const ivars = SeriesMatcher_IVARS(self);
     DECREF(ivars->matchers);
     DECREF(ivars->offsets);
@@ -56,13 +56,13 @@ SeriesMatcher_destroy(SeriesMatcher *self) {
 }
 
 int32_t
-SeriesMatcher_next(SeriesMatcher *self) {
+SeriesMatcher_Next_IMP(SeriesMatcher *self) {
     SeriesMatcherIVARS *const ivars = SeriesMatcher_IVARS(self);
     return SeriesMatcher_advance(self, ivars->doc_id + 1);
 }
 
 int32_t
-SeriesMatcher_advance(SeriesMatcher *self, int32_t target) {
+SeriesMatcher_Advance_IMP(SeriesMatcher *self, int32_t target) {
     SeriesMatcherIVARS *const ivars = SeriesMatcher_IVARS(self);
     if (target >= ivars->next_offset) {
         // Proceed to next matcher or bail.
@@ -108,7 +108,7 @@ SeriesMatcher_advance(SeriesMatcher *self, int32_t target) {
 }
 
 int32_t
-SeriesMatcher_get_doc_id(SeriesMatcher *self) {
+SeriesMatcher_Get_Doc_ID_IMP(SeriesMatcher *self) {
     return SeriesMatcher_IVARS(self)->doc_id;
 }
 

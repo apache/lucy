@@ -49,7 +49,7 @@ Inversion_new(Token *seed_token) {
 }
 
 void
-Inversion_destroy(Inversion *self) {
+Inversion_Destroy_IMP(Inversion *self) {
     InversionIVARS *const ivars = Inversion_IVARS(self);
     if (ivars->tokens) {
         Token **tokens       = ivars->tokens;
@@ -64,12 +64,12 @@ Inversion_destroy(Inversion *self) {
 }
 
 uint32_t
-Inversion_get_size(Inversion *self) {
+Inversion_Get_Size_IMP(Inversion *self) {
     return Inversion_IVARS(self)->size;
 }
 
 Token*
-Inversion_next(Inversion *self) {
+Inversion_Next_IMP(Inversion *self) {
     InversionIVARS *const ivars = Inversion_IVARS(self);
     // Kill the iteration if we're out of tokens.
     if (ivars->cur == ivars->size) {
@@ -79,7 +79,7 @@ Inversion_next(Inversion *self) {
 }
 
 void
-Inversion_reset(Inversion *self) {
+Inversion_Reset_IMP(Inversion *self) {
     Inversion_IVARS(self)->cur = 0;
 }
 
@@ -98,7 +98,7 @@ S_grow(Inversion *self, size_t size) {
 }
 
 void
-Inversion_append(Inversion *self, Token *token) {
+Inversion_Append_IMP(Inversion *self, Token *token) {
     InversionIVARS *const ivars = Inversion_IVARS(self);
     if (ivars->inverted) {
         THROW(ERR, "Can't append tokens after inversion");
@@ -112,7 +112,7 @@ Inversion_append(Inversion *self, Token *token) {
 }
 
 Token**
-Inversion_next_cluster(Inversion *self, uint32_t *count) {
+Inversion_Next_Cluster_IMP(Inversion *self, uint32_t *count) {
     InversionIVARS *const ivars = Inversion_IVARS(self);
     Token **cluster = ivars->tokens + ivars->cur;
 
@@ -137,7 +137,7 @@ Inversion_next_cluster(Inversion *self, uint32_t *count) {
 }
 
 void
-Inversion_invert(Inversion *self) {
+Inversion_Invert_IMP(Inversion *self) {
     InversionIVARS *const ivars = Inversion_IVARS(self);
     Token   **tokens = ivars->tokens;
     Token   **limit  = tokens + ivars->size;

@@ -45,7 +45,7 @@ Compiler_init(Compiler *self, Query *parent, Searcher *searcher,
 }
 
 void
-Compiler_destroy(Compiler *self) {
+Compiler_Destroy_IMP(Compiler *self) {
     CompilerIVARS *const ivars = Compiler_IVARS(self);
     DECREF(ivars->parent);
     DECREF(ivars->sim);
@@ -53,34 +53,34 @@ Compiler_destroy(Compiler *self) {
 }
 
 float
-Compiler_get_weight(Compiler *self) {
+Compiler_Get_Weight_IMP(Compiler *self) {
     return Compiler_Get_Boost(self);
 }
 
 Similarity*
-Compiler_get_similarity(Compiler *self) {
+Compiler_Get_Similarity_IMP(Compiler *self) {
     return Compiler_IVARS(self)->sim;
 }
 
 Query*
-Compiler_get_parent(Compiler *self) {
+Compiler_Get_Parent_IMP(Compiler *self) {
     return Compiler_IVARS(self)->parent;
 }
 
 float
-Compiler_sum_of_squared_weights(Compiler *self) {
+Compiler_Sum_Of_Squared_Weights_IMP(Compiler *self) {
     UNUSED_VAR(self);
     return 1.0f;
 }
 
 void
-Compiler_apply_norm_factor(Compiler *self, float factor) {
+Compiler_Apply_Norm_Factor_IMP(Compiler *self, float factor) {
     UNUSED_VAR(self);
     UNUSED_VAR(factor);
 }
 
 void
-Compiler_normalize(Compiler *self) {
+Compiler_Normalize_IMP(Compiler *self) {
     CompilerIVARS *const ivars = Compiler_IVARS(self);
 
     // factor = (tf_q * idf_t)
@@ -94,8 +94,8 @@ Compiler_normalize(Compiler *self) {
 }
 
 VArray*
-Compiler_highlight_spans(Compiler *self, Searcher *searcher,
-                         DocVector *doc_vec, const CharBuf *field) {
+Compiler_Highlight_Spans_IMP(Compiler *self, Searcher *searcher,
+                             DocVector *doc_vec, const CharBuf *field) {
     UNUSED_VAR(self);
     UNUSED_VAR(searcher);
     UNUSED_VAR(doc_vec);
@@ -104,7 +104,7 @@ Compiler_highlight_spans(Compiler *self, Searcher *searcher,
 }
 
 CharBuf*
-Compiler_to_string(Compiler *self) {
+Compiler_To_String_IMP(Compiler *self) {
     CompilerIVARS *const ivars = Compiler_IVARS(self);
     CharBuf *stringified_query = Query_To_String(ivars->parent);
     CharBuf *string = CB_new_from_trusted_utf8("compiler(", 9);
@@ -115,7 +115,7 @@ Compiler_to_string(Compiler *self) {
 }
 
 bool
-Compiler_equals(Compiler *self, Obj *other) {
+Compiler_Equals_IMP(Compiler *self, Obj *other) {
     if ((Compiler*)other == self)                          { return true; }
     if (!Obj_Is_A(other, COMPILER))                        { return false; }
     CompilerIVARS *const ivars = Compiler_IVARS(self);
@@ -127,7 +127,7 @@ Compiler_equals(Compiler *self, Obj *other) {
 }
 
 void
-Compiler_serialize(Compiler *self, OutStream *outstream) {
+Compiler_Serialize_IMP(Compiler *self, OutStream *outstream) {
     CompilerIVARS *const ivars = Compiler_IVARS(self);
     ABSTRACT_CLASS_CHECK(self, COMPILER);
     OutStream_Write_F32(outstream, ivars->boost);
@@ -136,7 +136,7 @@ Compiler_serialize(Compiler *self, OutStream *outstream) {
 }
 
 Compiler*
-Compiler_deserialize(Compiler *self, InStream *instream) {
+Compiler_Deserialize_IMP(Compiler *self, InStream *instream) {
     CompilerIVARS *const ivars = Compiler_IVARS(self);
     ivars->boost  = InStream_Read_F32(instream);
     ivars->parent = (Query*)THAW(instream);

@@ -77,15 +77,15 @@ S_try_init_components(void *context) {
 }
 
 void
-SegReader_destroy(SegReader *self) {
+SegReader_Destroy_IMP(SegReader *self) {
     SegReaderIVARS *const ivars = SegReader_IVARS(self);
     DECREF(ivars->seg_name);
     SUPER_DESTROY(self, SEGREADER);
 }
 
 void
-SegReader_register(SegReader *self, const CharBuf *api,
-                   DataReader *component) {
+SegReader_Register_IMP(SegReader *self, const CharBuf *api,
+                       DataReader *component) {
     SegReaderIVARS *const ivars = SegReader_IVARS(self);
     if (Hash_Fetch(ivars->components, (Obj*)api)) {
         THROW(ERR, "Interface '%o' already registered");
@@ -95,40 +95,40 @@ SegReader_register(SegReader *self, const CharBuf *api,
 }
 
 CharBuf*
-SegReader_get_seg_name(SegReader *self) {
+SegReader_Get_Seg_Name_IMP(SegReader *self) {
     return SegReader_IVARS(self)->seg_name;
 }
 
 int64_t
-SegReader_get_seg_num(SegReader *self) {
+SegReader_Get_Seg_Num_IMP(SegReader *self) {
     return SegReader_IVARS(self)->seg_num;
 }
 
 int32_t
-SegReader_del_count(SegReader *self) {
+SegReader_Del_Count_IMP(SegReader *self) {
     return SegReader_IVARS(self)->del_count;
 }
 
 int32_t
-SegReader_doc_max(SegReader *self) {
+SegReader_Doc_Max_IMP(SegReader *self) {
     return SegReader_IVARS(self)->doc_max;
 }
 
 int32_t
-SegReader_doc_count(SegReader *self) {
+SegReader_Doc_Count_IMP(SegReader *self) {
     SegReaderIVARS *const ivars = SegReader_IVARS(self);
     return ivars->doc_max - ivars->del_count;
 }
 
 I32Array*
-SegReader_offsets(SegReader *self) {
+SegReader_Offsets_IMP(SegReader *self) {
     int32_t *ints = (int32_t*)CALLOCATE(1, sizeof(int32_t));
     UNUSED_VAR(self);
     return I32Arr_new_steal(ints, 1);
 }
 
 VArray*
-SegReader_seg_readers(SegReader *self) {
+SegReader_Seg_Readers_IMP(SegReader *self) {
     VArray *seg_readers = VA_new(1);
     VA_Push(seg_readers, INCREF(self));
     return seg_readers;

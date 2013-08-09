@@ -220,7 +220,7 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
 }
 
 void
-Indexer_destroy(Indexer *self) {
+Indexer_Destroy_IMP(Indexer *self) {
     IndexerIVARS *const ivars = Indexer_IVARS(self);
     S_release_merge_lock(self);
     S_release_write_lock(self);
@@ -268,13 +268,13 @@ S_init_folder(Obj *index, bool create) {
 }
 
 void
-Indexer_add_doc(Indexer *self, Doc *doc, float boost) {
+Indexer_Add_Doc_IMP(Indexer *self, Doc *doc, float boost) {
     IndexerIVARS *const ivars = Indexer_IVARS(self);
     SegWriter_Add_Doc(ivars->seg_writer, doc, boost);
 }
 
 void
-Indexer_delete_by_term(Indexer *self, CharBuf *field, Obj *term) {
+Indexer_Delete_By_Term_IMP(Indexer *self, CharBuf *field, Obj *term) {
     IndexerIVARS *const ivars = Indexer_IVARS(self);
     Schema    *schema = ivars->schema;
     FieldType *type   = Schema_Fetch_Type(schema, field);
@@ -302,19 +302,19 @@ Indexer_delete_by_term(Indexer *self, CharBuf *field, Obj *term) {
 }
 
 void
-Indexer_delete_by_query(Indexer *self, Query *query) {
+Indexer_Delete_By_Query_IMP(Indexer *self, Query *query) {
     IndexerIVARS *const ivars = Indexer_IVARS(self);
     DelWriter_Delete_By_Query(ivars->del_writer, query);
 }
 
 void
-Indexer_delete_by_doc_id(Indexer *self, int32_t doc_id) {
+Indexer_Delete_By_Doc_ID_IMP(Indexer *self, int32_t doc_id) {
     IndexerIVARS *const ivars = Indexer_IVARS(self);
     DelWriter_Delete_By_Doc_ID(ivars->del_writer, doc_id);
 }
 
 void
-Indexer_add_index(Indexer *self, Obj *index) {
+Indexer_Add_Index_IMP(Indexer *self, Obj *index) {
     IndexerIVARS *const ivars = Indexer_IVARS(self);
     Folder *other_folder = NULL;
     IndexReader *reader  = NULL;
@@ -374,7 +374,7 @@ Indexer_add_index(Indexer *self, Obj *index) {
 }
 
 void
-Indexer_optimize(Indexer *self) {
+Indexer_Optimize_IMP(Indexer *self) {
     Indexer_IVARS(self)->optimize = true;
 }
 
@@ -480,7 +480,7 @@ S_maybe_merge(Indexer *self, VArray *seg_readers) {
 }
 
 void
-Indexer_prepare_commit(Indexer *self) {
+Indexer_Prepare_Commit_IMP(Indexer *self) {
     IndexerIVARS *const ivars = Indexer_IVARS(self);
     VArray   *seg_readers     = PolyReader_Get_Seg_Readers(ivars->polyreader);
     uint32_t  num_seg_readers = VA_Get_Size(seg_readers);
@@ -538,7 +538,7 @@ Indexer_prepare_commit(Indexer *self) {
 }
 
 void
-Indexer_commit(Indexer *self) {
+Indexer_Commit_IMP(Indexer *self) {
     IndexerIVARS *const ivars = Indexer_IVARS(self);
 
     // Safety check.
@@ -571,17 +571,17 @@ Indexer_commit(Indexer *self) {
 }
 
 Schema*
-Indexer_get_schema(Indexer *self) {
+Indexer_Get_Schema_IMP(Indexer *self) {
     return Indexer_IVARS(self)->schema;
 }
 
 SegWriter*
-Indexer_get_seg_writer(Indexer *self) {
+Indexer_Get_Seg_Writer_IMP(Indexer *self) {
     return Indexer_IVARS(self)->seg_writer;
 }
 
 Doc*
-Indexer_get_stock_doc(Indexer *self) {
+Indexer_Get_Stock_Doc_IMP(Indexer *self) {
     return Indexer_IVARS(self)->stock_doc;
 }
 

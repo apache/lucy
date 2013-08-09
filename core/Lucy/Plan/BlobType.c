@@ -34,38 +34,38 @@ BlobType_init(BlobType *self, bool stored) {
 }
 
 bool
-BlobType_binary(BlobType *self) {
+BlobType_Binary_IMP(BlobType *self) {
     UNUSED_VAR(self);
     return true;
 }
 
 void
-BlobType_set_sortable(BlobType *self, bool sortable) {
+BlobType_Set_Sortable_IMP(BlobType *self, bool sortable) {
     UNUSED_VAR(self);
     if (sortable) { THROW(ERR, "BlobType fields can't be sortable"); }
 }
 
 ViewByteBuf*
-BlobType_make_blank(BlobType *self) {
+BlobType_Make_Blank_IMP(BlobType *self) {
     UNUSED_VAR(self);
     return ViewBB_new(NULL, 0);
 }
 
 int8_t
-BlobType_primitive_id(BlobType *self) {
+BlobType_Primitive_ID_IMP(BlobType *self) {
     UNUSED_VAR(self);
     return FType_BLOB;
 }
 
 bool
-BlobType_equals(BlobType *self, Obj *other) {
+BlobType_Equals_IMP(BlobType *self, Obj *other) {
     if ((BlobType*)other == self)   { return true; }
     if (!Obj_Is_A(other, BLOBTYPE)) { return false; }
     return FType_equals((FieldType*)self, other);
 }
 
 Hash*
-BlobType_dump_for_schema(BlobType *self) {
+BlobType_Dump_For_Schema_IMP(BlobType *self) {
     BlobTypeIVARS *const ivars = BlobType_IVARS(self);
     Hash *dump = Hash_new(0);
     Hash_Store_Str(dump, "type", 4, (Obj*)CB_newf("blob"));
@@ -86,7 +86,7 @@ BlobType_dump_for_schema(BlobType *self) {
 }
 
 Hash*
-BlobType_dump(BlobType *self) {
+BlobType_Dump_IMP(BlobType *self) {
     Hash *dump = BlobType_Dump_For_Schema(self);
     Hash_Store_Str(dump, "_class", 6,
                    (Obj*)CB_Clone(BlobType_Get_Class_Name(self)));
@@ -95,7 +95,7 @@ BlobType_dump(BlobType *self) {
 }
 
 BlobType*
-BlobType_load(BlobType *self, Obj *dump) {
+BlobType_Load_IMP(BlobType *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     CharBuf *class_name = (CharBuf*)Hash_Fetch_Str(source, "_class", 6);
     VTable *vtable

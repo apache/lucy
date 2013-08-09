@@ -31,29 +31,28 @@ Query_init(Query *self, float boost) {
 }
 
 void
-Query_set_boost(Query *self, float boost) {
+Query_Set_Boost_IMP(Query *self, float boost) {
     Query_IVARS(self)->boost = boost;
 }
 
 float
-Query_get_boost(Query *self) {
+Query_Get_Boost_IMP(Query *self) {
     return Query_IVARS(self)->boost;
 }
 
 void
-Query_serialize(Query *self, OutStream *outstream) {
+Query_Serialize_IMP(Query *self, OutStream *outstream) {
     OutStream_Write_F32(outstream, Query_IVARS(self)->boost);
 }
 
 Query*
-Query_deserialize(Query *self, InStream *instream) {
+Query_Deserialize_IMP(Query *self, InStream *instream) {
     float boost = InStream_Read_F32(instream);
     return Query_init(self, boost);
 }
 
 Obj*
-Query_dump(Query *self)
-{
+Query_Dump_IMP(Query *self) {
     QueryIVARS *ivars = Query_IVARS(self);
     Hash *dump = Hash_new(0);
     Hash_Store_Str(dump, "_class", 6,
@@ -64,8 +63,7 @@ Query_dump(Query *self)
 }
 
 Obj*
-Query_load(Query *self, Obj *dump)
-{
+Query_Load_IMP(Query *self, Obj *dump) {
     CHY_UNUSED_VAR(self);
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     CharBuf *class_name

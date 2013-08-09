@@ -45,14 +45,14 @@ SortSpec_init(SortSpec *self, VArray *rules) {
 }
 
 void
-SortSpec_destroy(SortSpec *self) {
+SortSpec_Destroy_IMP(SortSpec *self) {
     SortSpecIVARS *const ivars = SortSpec_IVARS(self);
     DECREF(ivars->rules);
     SUPER_DESTROY(self, SORTSPEC);
 }
 
 SortSpec*
-SortSpec_deserialize(SortSpec *self, InStream *instream) {
+SortSpec_Deserialize_IMP(SortSpec *self, InStream *instream) {
     uint32_t num_rules = InStream_Read_C32(instream);
     VArray *rules = VA_new(num_rules);
 
@@ -68,12 +68,12 @@ SortSpec_deserialize(SortSpec *self, InStream *instream) {
 }
 
 VArray*
-SortSpec_get_rules(SortSpec *self) {
+SortSpec_Get_Rules_IMP(SortSpec *self) {
     return SortSpec_IVARS(self)->rules;
 }
 
 void
-SortSpec_serialize(SortSpec *self, OutStream *target) {
+SortSpec_Serialize_IMP(SortSpec *self, OutStream *target) {
     SortSpecIVARS *const ivars = SortSpec_IVARS(self);
     uint32_t num_rules = VA_Get_Size(ivars->rules);
     OutStream_Write_C32(target, num_rules);

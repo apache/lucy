@@ -45,14 +45,14 @@ StringType_init2(StringType *self, float boost, bool indexed,
 }
 
 bool
-StringType_equals(StringType *self, Obj *other) {
+StringType_Equals_IMP(StringType *self, Obj *other) {
     if ((StringType*)other == self)             { return true; }
     if (!FType_equals((FieldType*)self, other)) { return false; }
     return true;
 }
 
 Hash*
-StringType_dump_for_schema(StringType *self) {
+StringType_Dump_For_Schema_IMP(StringType *self) {
     StringTypeIVARS *const ivars = StringType_IVARS(self);
     Hash *dump = Hash_new(0);
     Hash_Store_Str(dump, "type", 4, (Obj*)CB_newf("string"));
@@ -75,7 +75,7 @@ StringType_dump_for_schema(StringType *self) {
 }
 
 Hash*
-StringType_dump(StringType *self) {
+StringType_Dump_IMP(StringType *self) {
     Hash *dump = StringType_Dump_For_Schema(self);
     Hash_Store_Str(dump, "_class", 6,
                    (Obj*)CB_Clone(StringType_Get_Class_Name(self)));
@@ -84,7 +84,7 @@ StringType_dump(StringType *self) {
 }
 
 StringType*
-StringType_load(StringType *self, Obj *dump) {
+StringType_Load_IMP(StringType *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     CharBuf *class_name = (CharBuf*)Hash_Fetch_Str(source, "_class", 6);
     VTable *vtable
@@ -107,13 +107,13 @@ StringType_load(StringType *self, Obj *dump) {
 }
 
 Similarity*
-StringType_make_similarity(StringType *self) {
+StringType_Make_Similarity_IMP(StringType *self) {
     UNUSED_VAR(self);
     return Sim_new();
 }
 
 Posting*
-StringType_make_posting(StringType *self, Similarity *similarity) {
+StringType_Make_Posting_IMP(StringType *self, Similarity *similarity) {
     if (similarity) {
         return (Posting*)ScorePost_new(similarity);
     }

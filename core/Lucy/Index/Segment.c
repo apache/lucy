@@ -78,7 +78,7 @@ Seg_valid_seg_name(const CharBuf *name) {
 }
 
 void
-Seg_destroy(Segment *self) {
+Seg_Destroy_IMP(Segment *self) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
     DECREF(ivars->name);
     DECREF(ivars->metadata);
@@ -88,7 +88,7 @@ Seg_destroy(Segment *self) {
 }
 
 bool
-Seg_read_file(Segment *self, Folder *folder) {
+Seg_Read_File_IMP(Segment *self, Folder *folder) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
     CharBuf *filename = CB_newf("%o/segmeta.json", ivars->name);
     Hash    *metadata = (Hash*)Json_slurp_json(folder, filename);
@@ -135,7 +135,7 @@ Seg_read_file(Segment *self, Folder *folder) {
 }
 
 void
-Seg_write_file(Segment *self, Folder *folder) {
+Seg_Write_File_IMP(Segment *self, Folder *folder) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
     Hash *my_metadata = Hash_new(16);
 
@@ -154,7 +154,7 @@ Seg_write_file(Segment *self, Folder *folder) {
 }
 
 int32_t
-Seg_add_field(Segment *self, const CharBuf *field) {
+Seg_Add_Field_IMP(Segment *self, const CharBuf *field) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
     Integer32 *num = (Integer32*)Hash_Fetch(ivars->by_name, (Obj*)field);
     if (num) {
@@ -169,34 +169,34 @@ Seg_add_field(Segment *self, const CharBuf *field) {
 }
 
 CharBuf*
-Seg_get_name(Segment *self) {
+Seg_Get_Name_IMP(Segment *self) {
     return Seg_IVARS(self)->name;
 }
 
 int64_t
-Seg_get_number(Segment *self) {
+Seg_Get_Number_IMP(Segment *self) {
     return Seg_IVARS(self)->number;
 }
 
 void
-Seg_set_count(Segment *self, int64_t count) {
+Seg_Set_Count_IMP(Segment *self, int64_t count) {
     Seg_IVARS(self)->count = count;
 }
 
 int64_t
-Seg_get_count(Segment *self) {
+Seg_Get_Count_IMP(Segment *self) {
     return Seg_IVARS(self)->count;
 }
 
 int64_t
-Seg_increment_count(Segment *self, int64_t increment) {
+Seg_Increment_Count_IMP(Segment *self, int64_t increment) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
     ivars->count += increment;
     return ivars->count;
 }
 
 void
-Seg_store_metadata(Segment *self, const CharBuf *key, Obj *value) {
+Seg_Store_Metadata_IMP(Segment *self, const CharBuf *key, Obj *value) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
     if (Hash_Fetch(ivars->metadata, (Obj*)key)) {
         THROW(ERR, "Metadata key '%o' already registered", key);
@@ -205,31 +205,31 @@ Seg_store_metadata(Segment *self, const CharBuf *key, Obj *value) {
 }
 
 void
-Seg_store_metadata_str(Segment *self, const char *key, size_t key_len,
-                       Obj *value) {
+Seg_Store_Metadata_Str_IMP(Segment *self, const char *key, size_t key_len,
+                           Obj *value) {
     ZombieCharBuf *k = ZCB_WRAP_STR((char*)key, key_len);
     Seg_Store_Metadata(self, (CharBuf*)k, value);
 }
 
 Obj*
-Seg_fetch_metadata(Segment *self, const CharBuf *key) {
+Seg_Fetch_Metadata_IMP(Segment *self, const CharBuf *key) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
     return Hash_Fetch(ivars->metadata, (Obj*)key);
 }
 
 Obj*
-Seg_fetch_metadata_str(Segment *self, const char *key, size_t len) {
+Seg_Fetch_Metadata_Str_IMP(Segment *self, const char *key, size_t len) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
     return Hash_Fetch_Str(ivars->metadata, key, len);
 }
 
 Hash*
-Seg_get_metadata(Segment *self) {
+Seg_Get_Metadata_IMP(Segment *self) {
     return Seg_IVARS(self)->metadata;
 }
 
 int32_t
-Seg_compare_to(Segment *self, Obj *other) {
+Seg_Compare_To_IMP(Segment *self, Obj *other) {
     Segment *other_seg = (Segment*)CERTIFY(other, SEGMENT);
     SegmentIVARS *const ivars = Seg_IVARS(self);
     SegmentIVARS *const ovars = Seg_IVARS(other_seg);
@@ -239,7 +239,7 @@ Seg_compare_to(Segment *self, Obj *other) {
 }
 
 CharBuf*
-Seg_field_name(Segment *self, int32_t field_num) {
+Seg_Field_Name_IMP(Segment *self, int32_t field_num) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
     return field_num
            ? (CharBuf*)VA_Fetch(ivars->by_num, field_num)
@@ -247,7 +247,7 @@ Seg_field_name(Segment *self, int32_t field_num) {
 }
 
 int32_t
-Seg_field_num(Segment *self, const CharBuf *field) {
+Seg_Field_Num_IMP(Segment *self, const CharBuf *field) {
     if (field == NULL) {
         return 0;
     }

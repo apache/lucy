@@ -50,14 +50,14 @@ ANDMatcher_init(ANDMatcher *self, VArray *children, Similarity *sim) {
 }
 
 void
-ANDMatcher_destroy(ANDMatcher *self) {
+ANDMatcher_Destroy_IMP(ANDMatcher *self) {
     ANDMatcherIVARS *const ivars = ANDMatcher_IVARS(self);
     FREEMEM(ivars->kids);
     SUPER_DESTROY(self, ANDMATCHER);
 }
 
 int32_t
-ANDMatcher_next(ANDMatcher *self) {
+ANDMatcher_Next_IMP(ANDMatcher *self) {
     ANDMatcherIVARS *const ivars = ANDMatcher_IVARS(self);
     if (ivars->first_time) {
         return ANDMatcher_Advance(self, 1);
@@ -72,7 +72,7 @@ ANDMatcher_next(ANDMatcher *self) {
 }
 
 int32_t
-ANDMatcher_advance(ANDMatcher *self, int32_t target) {
+ANDMatcher_Advance_IMP(ANDMatcher *self, int32_t target) {
     ANDMatcherIVARS *const ivars = ANDMatcher_IVARS(self);
     Matcher **const kids     = ivars->kids;
     const uint32_t  num_kids = ivars->num_kids;
@@ -144,12 +144,12 @@ ANDMatcher_advance(ANDMatcher *self, int32_t target) {
 }
 
 int32_t
-ANDMatcher_get_doc_id(ANDMatcher *self) {
+ANDMatcher_Get_Doc_ID_IMP(ANDMatcher *self) {
     return Matcher_Get_Doc_ID(ANDMatcher_IVARS(self)->kids[0]);
 }
 
 float
-ANDMatcher_score(ANDMatcher *self) {
+ANDMatcher_Score_IMP(ANDMatcher *self) {
     ANDMatcherIVARS *const ivars = ANDMatcher_IVARS(self);
     Matcher **const kids = ivars->kids;
     float score = 0.0f;

@@ -34,24 +34,24 @@ RAMFile_init(RAMFile *self, ByteBuf *contents, bool read_only) {
 }
 
 void
-RAMFile_destroy(RAMFile *self) {
+RAMFile_Destroy_IMP(RAMFile *self) {
     RAMFileIVARS *const ivars = RAMFile_IVARS(self);
     DECREF(ivars->contents);
     SUPER_DESTROY(self, RAMFILE);
 }
 
 ByteBuf*
-RAMFile_get_contents(RAMFile *self) {
+RAMFile_Get_Contents_IMP(RAMFile *self) {
     return RAMFile_IVARS(self)->contents;
 }
 
 bool
-RAMFile_read_only(RAMFile *self) {
+RAMFile_Read_Only_IMP(RAMFile *self) {
     return RAMFile_IVARS(self)->read_only;
 }
 
 void
-RAMFile_set_read_only(RAMFile *self, bool read_only) {
+RAMFile_Set_Read_Only_IMP(RAMFile *self, bool read_only) {
     RAMFile_IVARS(self)->read_only = read_only;
 }
 

@@ -29,7 +29,7 @@ RegexTokenizer_new(const CharBuf *pattern) {
 }
 
 Inversion*
-RegexTokenizer_transform(RegexTokenizer *self, Inversion *inversion) {
+RegexTokenizer_Transform_IMP(RegexTokenizer *self, Inversion *inversion) {
     Inversion *new_inversion = Inversion_new(NULL);
     Token *token;
 
@@ -43,7 +43,7 @@ RegexTokenizer_transform(RegexTokenizer *self, Inversion *inversion) {
 }
 
 Inversion*
-RegexTokenizer_transform_text(RegexTokenizer *self, CharBuf *text) {
+RegexTokenizer_Transform_Text_IMP(RegexTokenizer *self, CharBuf *text) {
     Inversion *new_inversion = Inversion_new(NULL);
     RegexTokenizer_Tokenize_Str(self, (char*)CB_Get_Ptr8(text),
                                 CB_Get_Size(text), new_inversion);
@@ -51,7 +51,7 @@ RegexTokenizer_transform_text(RegexTokenizer *self, CharBuf *text) {
 }
 
 Obj*
-RegexTokenizer_dump(RegexTokenizer *self) {
+RegexTokenizer_Dump_IMP(RegexTokenizer *self) {
     RegexTokenizerIVARS *const ivars = RegexTokenizer_IVARS(self);
     RegexTokenizer_Dump_t super_dump
         = SUPER_METHOD_PTR(REGEXTOKENIZER, Lucy_RegexTokenizer_Dump);
@@ -61,7 +61,7 @@ RegexTokenizer_dump(RegexTokenizer *self) {
 }
 
 RegexTokenizer*
-RegexTokenizer_load(RegexTokenizer *self, Obj *dump) {
+RegexTokenizer_Load_IMP(RegexTokenizer *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     RegexTokenizer_Load_t super_load
         = SUPER_METHOD_PTR(REGEXTOKENIZER, Lucy_RegexTokenizer_Load);
@@ -72,7 +72,7 @@ RegexTokenizer_load(RegexTokenizer *self, Obj *dump) {
 }
 
 bool
-RegexTokenizer_equals(RegexTokenizer *self, Obj *other) {
+RegexTokenizer_Equals_IMP(RegexTokenizer *self, Obj *other) {
     if ((RegexTokenizer*)other == self)                   { return true; }
     if (!Obj_Is_A(other, REGEXTOKENIZER))                 { return false; }
     RegexTokenizerIVARS *ivars = RegexTokenizer_IVARS(self);

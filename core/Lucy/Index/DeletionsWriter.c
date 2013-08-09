@@ -47,8 +47,8 @@ DelWriter_init(DeletionsWriter *self, Schema *schema, Snapshot *snapshot,
 }
 
 I32Array*
-DelWriter_generate_doc_map(DeletionsWriter *self, Matcher *deletions,
-                           int32_t doc_max, int32_t offset) {
+DelWriter_Generate_Doc_Map_IMP(DeletionsWriter *self, Matcher *deletions,
+                               int32_t doc_max, int32_t offset) {
     int32_t *doc_map = (int32_t*)CALLOCATE(doc_max + 1, sizeof(int32_t));
     int32_t  next_deletion = deletions ? Matcher_Next(deletions) : INT32_MAX;
     UNUSED_VAR(self);
@@ -119,7 +119,7 @@ DefDelWriter_init(DefaultDeletionsWriter *self, Schema *schema,
 }
 
 void
-DefDelWriter_destroy(DefaultDeletionsWriter *self) {
+DefDelWriter_Destroy_IMP(DefaultDeletionsWriter *self) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     DECREF(ivars->seg_readers);
     DECREF(ivars->seg_starts);
@@ -139,7 +139,7 @@ S_del_filename(DefaultDeletionsWriter *self, SegReader *target_reader) {
 }
 
 void
-DefDelWriter_finish(DefaultDeletionsWriter *self) {
+DefDelWriter_Finish_IMP(DefaultDeletionsWriter *self) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     Folder *const folder = ivars->folder;
 
@@ -173,7 +173,7 @@ DefDelWriter_finish(DefaultDeletionsWriter *self) {
 }
 
 Hash*
-DefDelWriter_metadata(DefaultDeletionsWriter *self) {
+DefDelWriter_Metadata_IMP(DefaultDeletionsWriter *self) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     Hash    *const metadata = DataWriter_metadata((DataWriter*)self);
     Hash    *const files    = Hash_new(0);
@@ -197,14 +197,14 @@ DefDelWriter_metadata(DefaultDeletionsWriter *self) {
 }
 
 int32_t
-DefDelWriter_format(DefaultDeletionsWriter *self) {
+DefDelWriter_Format_IMP(DefaultDeletionsWriter *self) {
     UNUSED_VAR(self);
     return DefDelWriter_current_file_format;
 }
 
 Matcher*
-DefDelWriter_seg_deletions(DefaultDeletionsWriter *self,
-                           SegReader *seg_reader) {
+DefDelWriter_Seg_Deletions_IMP(DefaultDeletionsWriter *self,
+                               SegReader *seg_reader) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     Matcher *deletions    = NULL;
     Segment *segment      = SegReader_Get_Segment(seg_reader);
@@ -233,8 +233,8 @@ DefDelWriter_seg_deletions(DefaultDeletionsWriter *self,
 }
 
 int32_t
-DefDelWriter_seg_del_count(DefaultDeletionsWriter *self,
-                           const CharBuf *seg_name) {
+DefDelWriter_Seg_Del_Count_IMP(DefaultDeletionsWriter *self,
+                               const CharBuf *seg_name) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     Integer32 *tick
         = (Integer32*)Hash_Fetch(ivars->name_to_tick, (Obj*)seg_name);
@@ -245,8 +245,8 @@ DefDelWriter_seg_del_count(DefaultDeletionsWriter *self,
 }
 
 void
-DefDelWriter_delete_by_term(DefaultDeletionsWriter *self,
-                            const CharBuf *field, Obj *term) {
+DefDelWriter_Delete_By_Term_IMP(DefaultDeletionsWriter *self,
+                                const CharBuf *field, Obj *term) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     for (uint32_t i = 0, max = VA_Get_Size(ivars->seg_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(ivars->seg_readers, i);
@@ -273,7 +273,7 @@ DefDelWriter_delete_by_term(DefaultDeletionsWriter *self,
 }
 
 void
-DefDelWriter_delete_by_query(DefaultDeletionsWriter *self, Query *query) {
+DefDelWriter_Delete_By_Query_IMP(DefaultDeletionsWriter *self, Query *query) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     Compiler *compiler = Query_Make_Compiler(query, (Searcher*)ivars->searcher,
                                              Query_Get_Boost(query), false);
@@ -302,7 +302,7 @@ DefDelWriter_delete_by_query(DefaultDeletionsWriter *self, Query *query) {
 }
 
 void
-DefDelWriter_delete_by_doc_id(DefaultDeletionsWriter *self, int32_t doc_id) {
+DefDelWriter_Delete_By_Doc_ID_IMP(DefaultDeletionsWriter *self, int32_t doc_id) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     uint32_t   sub_tick   = PolyReader_sub_tick(ivars->seg_starts, doc_id);
     BitVector *bit_vec    = (BitVector*)VA_Fetch(ivars->bit_vecs, sub_tick);
@@ -316,7 +316,7 @@ DefDelWriter_delete_by_doc_id(DefaultDeletionsWriter *self, int32_t doc_id) {
 }
 
 bool
-DefDelWriter_updated(DefaultDeletionsWriter *self) {
+DefDelWriter_Updated_IMP(DefaultDeletionsWriter *self) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     for (uint32_t i = 0, max = VA_Get_Size(ivars->seg_readers); i < max; i++) {
         if (ivars->updated[i]) { return true; }
@@ -325,8 +325,8 @@ DefDelWriter_updated(DefaultDeletionsWriter *self) {
 }
 
 void
-DefDelWriter_add_segment(DefaultDeletionsWriter *self, SegReader *reader,
-                         I32Array *doc_map) {
+DefDelWriter_Add_Segment_IMP(DefaultDeletionsWriter *self, SegReader *reader,
+                             I32Array *doc_map) {
     // This method is a no-op, because the only reason it would be called is
     // if we are adding an entire index.  If that's the case, all deletes are
     // already being applied.
@@ -336,8 +336,8 @@ DefDelWriter_add_segment(DefaultDeletionsWriter *self, SegReader *reader,
 }
 
 void
-DefDelWriter_merge_segment(DefaultDeletionsWriter *self, SegReader *reader,
-                           I32Array *doc_map) {
+DefDelWriter_Merge_Segment_IMP(DefaultDeletionsWriter *self,
+                               SegReader *reader, I32Array *doc_map) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     UNUSED_VAR(doc_map);
     Segment *segment = SegReader_Get_Segment(reader);

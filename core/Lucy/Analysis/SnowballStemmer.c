@@ -51,7 +51,7 @@ SnowStemmer_init(SnowballStemmer *self, const CharBuf *language) {
 }
 
 void
-SnowStemmer_destroy(SnowballStemmer *self) {
+SnowStemmer_Destroy_IMP(SnowballStemmer *self) {
     SnowballStemmerIVARS *const ivars = SnowStemmer_IVARS(self);
     if (ivars->snowstemmer) {
         sb_stemmer_delete((struct sb_stemmer*)ivars->snowstemmer);
@@ -61,7 +61,7 @@ SnowStemmer_destroy(SnowballStemmer *self) {
 }
 
 Inversion*
-SnowStemmer_transform(SnowballStemmer *self, Inversion *inversion) {
+SnowStemmer_Transform_IMP(SnowballStemmer *self, Inversion *inversion) {
     Token *token;
     SnowballStemmerIVARS *const ivars = SnowStemmer_IVARS(self);
     struct sb_stemmer *const snowstemmer
@@ -85,7 +85,7 @@ SnowStemmer_transform(SnowballStemmer *self, Inversion *inversion) {
 }
 
 Hash*
-SnowStemmer_dump(SnowballStemmer *self) {
+SnowStemmer_Dump_IMP(SnowballStemmer *self) {
     SnowballStemmerIVARS *const ivars = SnowStemmer_IVARS(self);
     SnowStemmer_Dump_t super_dump
         = SUPER_METHOD_PTR(SNOWBALLSTEMMER, Lucy_SnowStemmer_Dump);
@@ -95,7 +95,7 @@ SnowStemmer_dump(SnowballStemmer *self) {
 }
 
 SnowballStemmer*
-SnowStemmer_load(SnowballStemmer *self, Obj *dump) {
+SnowStemmer_Load_IMP(SnowballStemmer *self, Obj *dump) {
     SnowStemmer_Load_t super_load
         = SUPER_METHOD_PTR(SNOWBALLSTEMMER, Lucy_SnowStemmer_Load);
     SnowballStemmer *loaded = super_load(self, dump);
@@ -106,7 +106,7 @@ SnowStemmer_load(SnowballStemmer *self, Obj *dump) {
 }
 
 bool
-SnowStemmer_equals(SnowballStemmer *self, Obj *other) {
+SnowStemmer_Equals_IMP(SnowballStemmer *self, Obj *other) {
     if ((SnowballStemmer*)other == self)                    { return true; }
     if (!Obj_Is_A(other, SNOWBALLSTEMMER))                  { return false; }
     SnowballStemmerIVARS *ivars = SnowStemmer_IVARS(self);

@@ -40,7 +40,7 @@ DataWriter_init(DataWriter *self, Schema *schema, Snapshot *snapshot,
 }
 
 void
-DataWriter_destroy(DataWriter *self) {
+DataWriter_Destroy_IMP(DataWriter *self) {
     DataWriterIVARS *const ivars = DataWriter_IVARS(self);
     DECREF(ivars->snapshot);
     DECREF(ivars->segment);
@@ -51,45 +51,45 @@ DataWriter_destroy(DataWriter *self) {
 }
 
 Snapshot*
-DataWriter_get_snapshot(DataWriter *self) {
+DataWriter_Get_Snapshot_IMP(DataWriter *self) {
     return DataWriter_IVARS(self)->snapshot;
 }
 
 Segment*
-DataWriter_get_segment(DataWriter *self) {
+DataWriter_Get_Segment_IMP(DataWriter *self) {
     return DataWriter_IVARS(self)->segment;
 }
 
 PolyReader*
-DataWriter_get_polyreader(DataWriter *self) {
+DataWriter_Get_PolyReader_IMP(DataWriter *self) {
     return DataWriter_IVARS(self)->polyreader;
 }
 
 Schema*
-DataWriter_get_schema(DataWriter *self) {
+DataWriter_Get_Schema_IMP(DataWriter *self) {
     return DataWriter_IVARS(self)->schema;
 }
 
 Folder*
-DataWriter_get_folder(DataWriter *self) {
+DataWriter_Get_Folder_IMP(DataWriter *self) {
     return DataWriter_IVARS(self)->folder;
 }
 
 void
-DataWriter_delete_segment(DataWriter *self, SegReader *reader) {
+DataWriter_Delete_Segment_IMP(DataWriter *self, SegReader *reader) {
     UNUSED_VAR(self);
     UNUSED_VAR(reader);
 }
 
 void
-DataWriter_merge_segment(DataWriter *self, SegReader *reader,
-                         I32Array *doc_map) {
+DataWriter_Merge_Segment_IMP(DataWriter *self, SegReader *reader,
+                             I32Array *doc_map) {
     DataWriter_Add_Segment(self, reader, doc_map);
     DataWriter_Delete_Segment(self, reader);
 }
 
 Hash*
-DataWriter_metadata(DataWriter *self) {
+DataWriter_Metadata_IMP(DataWriter *self) {
     Hash *metadata = Hash_new(0);
     Hash_Store_Str(metadata, "format", 6,
                    (Obj*)CB_newf("%i32", DataWriter_Format(self)));

@@ -117,7 +117,7 @@ S_lazy_init_posting_pool(PostingListWriter *self, int32_t field_num) {
 }
 
 void
-PListWriter_destroy(PostingListWriter *self) {
+PListWriter_Destroy_IMP(PostingListWriter *self) {
     PostingListWriterIVARS *const ivars = PListWriter_IVARS(self);
     DECREF(ivars->lex_writer);
     DECREF(ivars->mem_pool);
@@ -134,14 +134,14 @@ PListWriter_set_default_mem_thresh(size_t mem_thresh) {
 }
 
 int32_t
-PListWriter_format(PostingListWriter *self) {
+PListWriter_Format_IMP(PostingListWriter *self) {
     UNUSED_VAR(self);
     return PListWriter_current_file_format;
 }
 
 void
-PListWriter_add_inverted_doc(PostingListWriter *self, Inverter *inverter,
-                             int32_t doc_id) {
+PListWriter_Add_Inverted_Doc_IMP(PostingListWriter *self, Inverter *inverter,
+                                 int32_t doc_id) {
     S_lazy_init(self);
     PostingListWriterIVARS *const ivars = PListWriter_IVARS(self);
 
@@ -176,8 +176,8 @@ PListWriter_add_inverted_doc(PostingListWriter *self, Inverter *inverter,
 }
 
 void
-PListWriter_add_segment(PostingListWriter *self, SegReader *reader,
-                        I32Array *doc_map) {
+PListWriter_Add_Segment_IMP(PostingListWriter *self, SegReader *reader,
+                            I32Array *doc_map) {
     PostingListWriterIVARS *const ivars = PListWriter_IVARS(self);
     Segment *other_segment = SegReader_Get_Segment(reader);
     Schema  *schema        = ivars->schema;
@@ -207,7 +207,7 @@ PListWriter_add_segment(PostingListWriter *self, SegReader *reader,
 }
 
 void
-PListWriter_finish(PostingListWriter *self) {
+PListWriter_Finish_IMP(PostingListWriter *self) {
     PostingListWriterIVARS *const ivars = PListWriter_IVARS(self);
 
     // If S_lazy_init was never called, we have no data, so bail out.

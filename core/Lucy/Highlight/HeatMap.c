@@ -49,7 +49,7 @@ HeatMap_init(HeatMap *self, VArray *spans, uint32_t window) {
 }
 
 void
-HeatMap_destroy(HeatMap *self) {
+HeatMap_Destroy_IMP(HeatMap *self) {
     HeatMapIVARS *const ivars = HeatMap_IVARS(self);
     DECREF(ivars->spans);
     SUPER_DESTROY(self, HEATMAP);
@@ -98,7 +98,7 @@ S_flattened_but_empty_spans(VArray *spans) {
 }
 
 VArray*
-HeatMap_flatten_spans(HeatMap *self, VArray *spans) {
+HeatMap_Flatten_Spans_IMP(HeatMap *self, VArray *spans) {
     const uint32_t num_spans = VA_Get_Size(spans);
     UNUSED_VAR(self);
 
@@ -156,7 +156,7 @@ HeatMap_flatten_spans(HeatMap *self, VArray *spans) {
 }
 
 float
-HeatMap_calc_proximity_boost(HeatMap *self, Span *span1, Span *span2) {
+HeatMap_Calc_Proximity_Boost_IMP(HeatMap *self, Span *span1, Span *span2) {
     HeatMapIVARS *const ivars = HeatMap_IVARS(self);
     int32_t comparison = Span_Compare_To(span1, (Obj*)span2);
     Span *lower = comparison <= 0 ? span1 : span2;
@@ -179,7 +179,7 @@ HeatMap_calc_proximity_boost(HeatMap *self, Span *span1, Span *span2) {
 }
 
 VArray*
-HeatMap_generate_proximity_boosts(HeatMap *self, VArray *spans) {
+HeatMap_Generate_Proximity_Boosts_IMP(HeatMap *self, VArray *spans) {
     VArray *boosts = VA_new(0);
     const uint32_t num_spans = VA_Get_Size(spans);
 
@@ -210,7 +210,7 @@ HeatMap_generate_proximity_boosts(HeatMap *self, VArray *spans) {
 }
 
 VArray*
-HeatMap_get_spans(HeatMap *self) {
+HeatMap_Get_Spans_IMP(HeatMap *self) {
     return HeatMap_IVARS(self)->spans;
 }
 

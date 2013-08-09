@@ -50,7 +50,7 @@ TermQuery_init(TermQuery *self, const CharBuf *field, const Obj *term) {
 }
 
 void
-TermQuery_destroy(TermQuery *self) {
+TermQuery_Destroy_IMP(TermQuery *self) {
     TermQueryIVARS *const ivars = TermQuery_IVARS(self);
     DECREF(ivars->field);
     DECREF(ivars->term);
@@ -58,7 +58,7 @@ TermQuery_destroy(TermQuery *self) {
 }
 
 void
-TermQuery_serialize(TermQuery *self, OutStream *outstream) {
+TermQuery_Serialize_IMP(TermQuery *self, OutStream *outstream) {
     TermQueryIVARS *const ivars = TermQuery_IVARS(self);
     Freezer_serialize_charbuf(ivars->field, outstream);
     FREEZE(ivars->term, outstream);
@@ -66,7 +66,7 @@ TermQuery_serialize(TermQuery *self, OutStream *outstream) {
 }
 
 TermQuery*
-TermQuery_deserialize(TermQuery *self, InStream *instream) {
+TermQuery_Deserialize_IMP(TermQuery *self, InStream *instream) {
     TermQueryIVARS *const ivars = TermQuery_IVARS(self);
     ivars->field = Freezer_read_charbuf(instream);
     ivars->term  = (Obj*)THAW(instream);
@@ -75,8 +75,7 @@ TermQuery_deserialize(TermQuery *self, InStream *instream) {
 }
 
 Obj*
-TermQuery_dump(TermQuery *self)
-{
+TermQuery_Dump_IMP(TermQuery *self) {
     TermQueryIVARS *ivars = TermQuery_IVARS(self);
     TermQuery_Dump_t super_dump
         = SUPER_METHOD_PTR(TERMQUERY, Lucy_TermQuery_Dump);
@@ -87,8 +86,7 @@ TermQuery_dump(TermQuery *self)
 }
 
 Obj*
-TermQuery_load(TermQuery *self, Obj *dump)
-{
+TermQuery_Load_IMP(TermQuery *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     TermQuery_Load_t super_load
         = SUPER_METHOD_PTR(TERMQUERY, Lucy_TermQuery_Load);
@@ -102,17 +100,17 @@ TermQuery_load(TermQuery *self, Obj *dump)
 }
 
 CharBuf*
-TermQuery_get_field(TermQuery *self) {
+TermQuery_Get_Field_IMP(TermQuery *self) {
     return TermQuery_IVARS(self)->field;
 }
 
 Obj*
-TermQuery_get_term(TermQuery *self) {
+TermQuery_Get_Term_IMP(TermQuery *self) {
     return TermQuery_IVARS(self)->term;
 }
 
 bool
-TermQuery_equals(TermQuery *self, Obj *other) {
+TermQuery_Equals_IMP(TermQuery *self, Obj *other) {
     if ((TermQuery*)other == self)                    { return true; }
     if (!Obj_Is_A(other, TERMQUERY))                  { return false; }
     TermQueryIVARS *const ivars = TermQuery_IVARS(self);
@@ -124,7 +122,7 @@ TermQuery_equals(TermQuery *self, Obj *other) {
 }
 
 CharBuf*
-TermQuery_to_string(TermQuery *self) {
+TermQuery_To_String_IMP(TermQuery *self) {
     TermQueryIVARS *const ivars = TermQuery_IVARS(self);
     CharBuf *term_str = Obj_To_String(ivars->term);
     CharBuf *retval = CB_newf("%o:%o", ivars->field, term_str);
@@ -133,8 +131,8 @@ TermQuery_to_string(TermQuery *self) {
 }
 
 Compiler*
-TermQuery_make_compiler(TermQuery *self, Searcher *searcher, float boost,
-                        bool subordinate) {
+TermQuery_Make_Compiler_IMP(TermQuery *self, Searcher *searcher, float boost,
+                            bool subordinate) {
     TermCompiler *compiler = TermCompiler_new((Query*)self, searcher, boost);
     if (!subordinate) {
         TermCompiler_Normalize(compiler);
@@ -190,7 +188,7 @@ TermCompiler_init(TermCompiler *self, Query *parent, Searcher *searcher,
 }
 
 bool
-TermCompiler_equals(TermCompiler *self, Obj *other) {
+TermCompiler_Equals_IMP(TermCompiler *self, Obj *other) {
     if (!Compiler_equals((Compiler*)self, other))             { return false; }
     if (!Obj_Is_A(other, TERMCOMPILER))                       { return false; }
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
@@ -203,7 +201,7 @@ TermCompiler_equals(TermCompiler *self, Obj *other) {
 }
 
 void
-TermCompiler_serialize(TermCompiler *self, OutStream *outstream) {
+TermCompiler_Serialize_IMP(TermCompiler *self, OutStream *outstream) {
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
     TermCompiler_Serialize_t super_serialize
         = SUPER_METHOD_PTR(TERMCOMPILER, Lucy_TermCompiler_Serialize);
@@ -215,7 +213,7 @@ TermCompiler_serialize(TermCompiler *self, OutStream *outstream) {
 }
 
 TermCompiler*
-TermCompiler_deserialize(TermCompiler *self, InStream *instream) {
+TermCompiler_Deserialize_IMP(TermCompiler *self, InStream *instream) {
     TermCompiler_Deserialize_t super_deserialize
         = SUPER_METHOD_PTR(TERMCOMPILER, Lucy_TermCompiler_Deserialize);
     self = super_deserialize(self, instream);
@@ -228,13 +226,14 @@ TermCompiler_deserialize(TermCompiler *self, InStream *instream) {
 }
 
 float
-TermCompiler_sum_of_squared_weights(TermCompiler *self) {
+TermCompiler_Sum_Of_Squared_Weights_IMP(TermCompiler *self) {
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
     return ivars->raw_weight * ivars->raw_weight;
 }
 
 void
-TermCompiler_apply_norm_factor(TermCompiler *self, float query_norm_factor) {
+TermCompiler_Apply_Norm_Factor_IMP(TermCompiler *self,
+                                   float query_norm_factor) {
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
     ivars->query_norm_factor = query_norm_factor;
 
@@ -249,13 +248,13 @@ TermCompiler_apply_norm_factor(TermCompiler *self, float query_norm_factor) {
 }
 
 float
-TermCompiler_get_weight(TermCompiler *self) {
+TermCompiler_Get_Weight_IMP(TermCompiler *self) {
     return TermCompiler_IVARS(self)->normalized_weight;
 }
 
 Matcher*
-TermCompiler_make_matcher(TermCompiler *self, SegReader *reader,
-                          bool need_score) {
+TermCompiler_Make_Matcher_IMP(TermCompiler *self, SegReader *reader,
+                              bool need_score) {
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
     TermQueryIVARS *const parent_ivars
         = TermQuery_IVARS((TermQuery*)ivars->parent);
@@ -281,8 +280,8 @@ TermCompiler_make_matcher(TermCompiler *self, SegReader *reader,
 }
 
 VArray*
-TermCompiler_highlight_spans(TermCompiler *self, Searcher *searcher,
-                             DocVector *doc_vec, const CharBuf *field) {
+TermCompiler_Highlight_Spans_IMP(TermCompiler *self, Searcher *searcher,
+                                 DocVector *doc_vec, const CharBuf *field) {
 
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
     TermQueryIVARS *const parent_ivars

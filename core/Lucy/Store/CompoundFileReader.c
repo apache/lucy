@@ -109,7 +109,7 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder) {
 }
 
 void
-CFReader_destroy(CompoundFileReader *self) {
+CFReader_Destroy_IMP(CompoundFileReader *self) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     DECREF(ivars->real_folder);
     DECREF(ivars->instream);
@@ -118,20 +118,20 @@ CFReader_destroy(CompoundFileReader *self) {
 }
 
 Folder*
-CFReader_get_real_folder(CompoundFileReader *self) {
+CFReader_Get_Real_Folder_IMP(CompoundFileReader *self) {
     return CFReader_IVARS(self)->real_folder;
 }
 
 void
-CFReader_set_path(CompoundFileReader *self, const CharBuf *path) {
+CFReader_Set_Path_IMP(CompoundFileReader *self, const CharBuf *path) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     Folder_Set_Path(ivars->real_folder, path);
     Folder_set_path((Folder*)self, path);
 }
 
 FileHandle*
-CFReader_local_open_filehandle(CompoundFileReader *self,
-                               const CharBuf *name, uint32_t flags) {
+CFReader_Local_Open_FileHandle_IMP(CompoundFileReader *self,
+                                   const CharBuf *name, uint32_t flags) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     Hash *entry = (Hash*)Hash_Fetch(ivars->records, (Obj*)name);
     FileHandle *fh = NULL;
@@ -151,7 +151,7 @@ CFReader_local_open_filehandle(CompoundFileReader *self,
 }
 
 bool
-CFReader_local_delete(CompoundFileReader *self, const CharBuf *name) {
+CFReader_Local_Delete_IMP(CompoundFileReader *self, const CharBuf *name) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     Hash *record = (Hash*)Hash_Delete(ivars->records, (Obj*)name);
     DECREF(record);
@@ -178,7 +178,7 @@ CFReader_local_delete(CompoundFileReader *self, const CharBuf *name) {
 }
 
 InStream*
-CFReader_local_open_in(CompoundFileReader *self, const CharBuf *name) {
+CFReader_Local_Open_In_IMP(CompoundFileReader *self, const CharBuf *name) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     Hash *entry = (Hash*)Hash_Fetch(ivars->records, (Obj*)name);
 
@@ -212,7 +212,7 @@ CFReader_local_open_in(CompoundFileReader *self, const CharBuf *name) {
 }
 
 bool
-CFReader_local_exists(CompoundFileReader *self, const CharBuf *name) {
+CFReader_Local_Exists_IMP(CompoundFileReader *self, const CharBuf *name) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     if (Hash_Fetch(ivars->records, (Obj*)name))        { return true; }
     if (Folder_Local_Exists(ivars->real_folder, name)) { return true; }
@@ -220,7 +220,8 @@ CFReader_local_exists(CompoundFileReader *self, const CharBuf *name) {
 }
 
 bool
-CFReader_local_is_directory(CompoundFileReader *self, const CharBuf *name) {
+CFReader_Local_Is_Directory_IMP(CompoundFileReader *self,
+                                const CharBuf *name) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     if (Hash_Fetch(ivars->records, (Obj*)name))              { return false; }
     if (Folder_Local_Is_Directory(ivars->real_folder, name)) { return true; }
@@ -228,13 +229,13 @@ CFReader_local_is_directory(CompoundFileReader *self, const CharBuf *name) {
 }
 
 void
-CFReader_close(CompoundFileReader *self) {
+CFReader_Close_IMP(CompoundFileReader *self) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     InStream_Close(ivars->instream);
 }
 
 bool
-CFReader_local_mkdir(CompoundFileReader *self, const CharBuf *name) {
+CFReader_Local_MkDir_IMP(CompoundFileReader *self, const CharBuf *name) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     if (Hash_Fetch(ivars->records, (Obj*)name)) {
         Err_set_error(Err_new(CB_newf("Can't MkDir: '%o' exists", name)));
@@ -248,14 +249,15 @@ CFReader_local_mkdir(CompoundFileReader *self, const CharBuf *name) {
 }
 
 Folder*
-CFReader_local_find_folder(CompoundFileReader *self, const CharBuf *name) {
+CFReader_Local_Find_Folder_IMP(CompoundFileReader *self,
+                               const CharBuf *name) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     if (Hash_Fetch(ivars->records, (Obj*)name)) { return false; }
     return Folder_Local_Find_Folder(ivars->real_folder, name);
 }
 
 DirHandle*
-CFReader_local_open_dir(CompoundFileReader *self) {
+CFReader_Local_Open_Dir_IMP(CompoundFileReader *self) {
     return (DirHandle*)CFReaderDH_new(self);
 }
 
@@ -289,7 +291,7 @@ CFReaderDH_init(CFReaderDirHandle *self, CompoundFileReader *cf_reader) {
 }
 
 bool
-CFReaderDH_close(CFReaderDirHandle *self) {
+CFReaderDH_Close_IMP(CFReaderDirHandle *self) {
     CFReaderDirHandleIVARS *const ivars = CFReaderDH_IVARS(self);
     if (ivars->elems) {
         VA_Dec_RefCount(ivars->elems);
@@ -303,7 +305,7 @@ CFReaderDH_close(CFReaderDirHandle *self) {
 }
 
 bool
-CFReaderDH_next(CFReaderDirHandle *self) {
+CFReaderDH_Next_IMP(CFReaderDirHandle *self) {
     CFReaderDirHandleIVARS *const ivars = CFReaderDH_IVARS(self);
     if (ivars->elems) {
         ivars->tick++;
@@ -322,7 +324,7 @@ CFReaderDH_next(CFReaderDirHandle *self) {
 }
 
 bool
-CFReaderDH_entry_is_dir(CFReaderDirHandle *self) {
+CFReaderDH_Entry_Is_Dir_IMP(CFReaderDirHandle *self) {
     CFReaderDirHandleIVARS *const ivars = CFReaderDH_IVARS(self);
     if (ivars->elems) {
         CharBuf *name = (CharBuf*)VA_Fetch(ivars->elems, ivars->tick);

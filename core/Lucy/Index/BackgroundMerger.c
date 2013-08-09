@@ -155,7 +155,7 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager) {
 }
 
 void
-BGMerger_destroy(BackgroundMerger *self) {
+BGMerger_Destroy_IMP(BackgroundMerger *self) {
     BackgroundMergerIVARS *const ivars = BGMerger_IVARS(self);
     S_release_merge_lock(self);
     S_release_write_lock(self);
@@ -198,7 +198,7 @@ S_init_folder(Obj *index) {
 }
 
 void
-BGMerger_optimize(BackgroundMerger *self) {
+BGMerger_Optimize_IMP(BackgroundMerger *self) {
     BGMerger_IVARS(self)->optimize = true;
 }
 
@@ -368,7 +368,7 @@ S_merge_updated_deletions(BackgroundMerger *self) {
 }
 
 void
-BGMerger_prepare_commit(BackgroundMerger *self) {
+BGMerger_Prepare_Commit_IMP(BackgroundMerger *self) {
     BackgroundMergerIVARS *const ivars = BGMerger_IVARS(self);
     VArray   *seg_readers     = PolyReader_Get_Seg_Readers(ivars->polyreader);
     uint32_t  num_seg_readers = VA_Get_Size(seg_readers);
@@ -469,7 +469,7 @@ BGMerger_prepare_commit(BackgroundMerger *self) {
 }
 
 void
-BGMerger_commit(BackgroundMerger *self) {
+BGMerger_Commit_IMP(BackgroundMerger *self) {
     BackgroundMergerIVARS *const ivars = BGMerger_IVARS(self);
 
     // Safety check.

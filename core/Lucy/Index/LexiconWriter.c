@@ -71,7 +71,7 @@ LexWriter_init(LexiconWriter *self, Schema *schema, Snapshot *snapshot,
 }
 
 void
-LexWriter_destroy(LexiconWriter *self) {
+LexWriter_Destroy_IMP(LexiconWriter *self) {
     LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
     DECREF(ivars->term_stepper);
     DECREF(ivars->tinfo_stepper);
@@ -104,7 +104,7 @@ S_add_last_term_to_ix(LexiconWriter *self) {
 }
 
 void
-LexWriter_add_term(LexiconWriter* self, CharBuf* term_text, TermInfo* tinfo) {
+LexWriter_Add_Term_IMP(LexiconWriter* self, CharBuf* term_text, TermInfo* tinfo) {
     LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
     OutStream *dat_out = ivars->dat_out;
 
@@ -123,7 +123,7 @@ LexWriter_add_term(LexiconWriter* self, CharBuf* term_text, TermInfo* tinfo) {
 }
 
 void
-LexWriter_start_field(LexiconWriter *self, int32_t field_num) {
+LexWriter_Start_Field_IMP(LexiconWriter *self, int32_t field_num) {
     LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
     Segment   *const segment  = LexWriter_Get_Segment(self);
     Folder    *const folder   = LexWriter_Get_Folder(self);
@@ -151,7 +151,7 @@ LexWriter_start_field(LexiconWriter *self, int32_t field_num) {
 }
 
 void
-LexWriter_finish_field(LexiconWriter *self, int32_t field_num) {
+LexWriter_Finish_Field_IMP(LexiconWriter *self, int32_t field_num) {
     LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
     CharBuf *field = Seg_Field_Name(ivars->segment, field_num);
 
@@ -178,8 +178,8 @@ LexWriter_finish_field(LexiconWriter *self, int32_t field_num) {
 }
 
 void
-LexWriter_enter_temp_mode(LexiconWriter *self, const CharBuf *field,
-                          OutStream *temp_outstream) {
+LexWriter_Enter_Temp_Mode_IMP(LexiconWriter *self, const CharBuf *field,
+                              OutStream *temp_outstream) {
     LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
     Schema    *schema = LexWriter_Get_Schema(self);
     FieldType *type   = Schema_Fetch_Type(schema, field);
@@ -201,7 +201,7 @@ LexWriter_enter_temp_mode(LexiconWriter *self, const CharBuf *field,
 }
 
 void
-LexWriter_leave_temp_mode(LexiconWriter *self) {
+LexWriter_Leave_Temp_Mode_IMP(LexiconWriter *self) {
     LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
     DECREF(ivars->term_stepper);
     ivars->term_stepper = NULL;
@@ -211,7 +211,7 @@ LexWriter_leave_temp_mode(LexiconWriter *self) {
 }
 
 void
-LexWriter_finish(LexiconWriter *self) {
+LexWriter_Finish_IMP(LexiconWriter *self) {
     LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
 
     // Ensure that streams were closed (by calling Finish_Field or
@@ -232,7 +232,7 @@ LexWriter_finish(LexiconWriter *self) {
 }
 
 Hash*
-LexWriter_metadata(LexiconWriter *self) {
+LexWriter_Metadata_IMP(LexiconWriter *self) {
     LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
     Hash *const metadata  = DataWriter_metadata((DataWriter*)self);
     Hash *const counts    = (Hash*)INCREF(ivars->counts);
@@ -252,8 +252,8 @@ LexWriter_metadata(LexiconWriter *self) {
 }
 
 void
-LexWriter_add_segment(LexiconWriter *self, SegReader *reader,
-                      I32Array *doc_map) {
+LexWriter_Add_Segment_IMP(LexiconWriter *self, SegReader *reader,
+                          I32Array *doc_map) {
     // No-op, since the data gets added via PostingListWriter.
     UNUSED_VAR(self);
     UNUSED_VAR(reader);
@@ -261,7 +261,7 @@ LexWriter_add_segment(LexiconWriter *self, SegReader *reader,
 }
 
 int32_t
-LexWriter_format(LexiconWriter *self) {
+LexWriter_Format_IMP(LexiconWriter *self) {
     UNUSED_VAR(self);
     return LexWriter_current_file_format;
 }

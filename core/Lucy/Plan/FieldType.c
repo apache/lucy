@@ -40,65 +40,65 @@ FType_init2(FieldType *self, float boost, bool indexed, bool stored,
 }
 
 void
-FType_set_boost(FieldType *self, float boost) {
+FType_Set_Boost_IMP(FieldType *self, float boost) {
     FType_IVARS(self)->boost = boost;
 }
 
 void
-FType_set_indexed(FieldType *self, bool indexed) {
+FType_Set_Indexed_IMP(FieldType *self, bool indexed) {
     FType_IVARS(self)->indexed = !!indexed;
 }
 
 void
-FType_set_stored(FieldType *self, bool stored) {
+FType_Set_Stored_IMP(FieldType *self, bool stored) {
     FType_IVARS(self)->stored = !!stored;
 }
 
 void
-FType_set_sortable(FieldType *self, bool sortable) {
+FType_Set_Sortable_IMP(FieldType *self, bool sortable) {
     FType_IVARS(self)->sortable = !!sortable;
 }
 
 float
-FType_get_boost(FieldType *self) {
+FType_Get_Boost_IMP(FieldType *self) {
     return FType_IVARS(self)->boost;
 }
 
 bool
-FType_indexed(FieldType *self) {
+FType_Indexed_IMP(FieldType *self) {
     return FType_IVARS(self)->indexed;
 }
 
 bool
-FType_stored(FieldType *self) {
+FType_Stored_IMP(FieldType *self) {
     return FType_IVARS(self)->stored;
 }
 
 bool
-FType_sortable(FieldType *self) {
+FType_Sortable_IMP(FieldType *self) {
     return FType_IVARS(self)->sortable;
 }
 
 bool
-FType_binary(FieldType *self) {
+FType_Binary_IMP(FieldType *self) {
     UNUSED_VAR(self);
     return false;
 }
 
 Similarity*
-FType_similarity(FieldType *self) {
+FType_Similarity_IMP(FieldType *self) {
     UNUSED_VAR(self);
     return NULL;
 }
 
 int32_t
-FType_compare_values(FieldType *self, Obj *a, Obj *b) {
+FType_Compare_Values_IMP(FieldType *self, Obj *a, Obj *b) {
     UNUSED_VAR(self);
     return Obj_Compare_To(a, b);
 }
 
 bool
-FType_equals(FieldType *self, Obj *other) {
+FType_Equals_IMP(FieldType *self, Obj *other) {
     if ((FieldType*)other == self)                       { return true; }
     if (FType_Get_VTable(self) != Obj_Get_VTable(other)) { return false; }
     FieldTypeIVARS *const ivars = FType_IVARS(self);

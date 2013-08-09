@@ -81,7 +81,7 @@ StandardTokenizer_init(StandardTokenizer *self) {
 }
 
 Inversion*
-StandardTokenizer_transform(StandardTokenizer *self, Inversion *inversion) {
+StandardTokenizer_Transform_IMP(StandardTokenizer *self, Inversion *inversion) {
     Inversion *new_inversion = Inversion_new(NULL);
     Token *token;
 
@@ -95,7 +95,7 @@ StandardTokenizer_transform(StandardTokenizer *self, Inversion *inversion) {
 }
 
 Inversion*
-StandardTokenizer_transform_text(StandardTokenizer *self, CharBuf *text) {
+StandardTokenizer_Transform_Text_IMP(StandardTokenizer *self, CharBuf *text) {
     Inversion *new_inversion = Inversion_new(NULL);
     StandardTokenizer_Tokenize_Str(self, (char*)CB_Get_Ptr8(text),
                                    CB_Get_Size(text), new_inversion);
@@ -103,8 +103,8 @@ StandardTokenizer_transform_text(StandardTokenizer *self, CharBuf *text) {
 }
 
 void
-StandardTokenizer_tokenize_str(StandardTokenizer *self, const char *text,
-                               size_t len, Inversion *inversion) {
+StandardTokenizer_Tokenize_Str_IMP(StandardTokenizer *self, const char *text,
+                                   size_t len, Inversion *inversion) {
     UNUSED_VAR(self);
     if ((len >= 1 && (uint8_t)text[len - 1] >= 0xC0)
         ||  (len >= 2 && (uint8_t)text[len - 2] >= 0xE0)
@@ -293,7 +293,7 @@ S_skip_extend_format(const char *text, size_t len, lucy_StringIter *iter) {
 }
 
 bool
-StandardTokenizer_equals(StandardTokenizer *self, Obj *other) {
+StandardTokenizer_Equals_IMP(StandardTokenizer *self, Obj *other) {
     if ((StandardTokenizer*)other == self)   { return true; }
     if (!Obj_Is_A(other, STANDARDTOKENIZER)) { return false; }
     return true;

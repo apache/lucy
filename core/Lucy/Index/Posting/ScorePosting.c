@@ -62,22 +62,23 @@ ScorePost_init(ScorePosting *self, Similarity *sim) {
 }
 
 void
-ScorePost_destroy(ScorePosting *self) {
+ScorePost_Destroy_IMP(ScorePosting *self) {
     ScorePostingIVARS *const ivars = ScorePost_IVARS(self);
     FREEMEM(ivars->prox);
     SUPER_DESTROY(self, SCOREPOSTING);
 }
 
 uint32_t*
-ScorePost_get_prox(ScorePosting *self) {
+ScorePost_Get_Prox_IMP(ScorePosting *self) {
     return ScorePost_IVARS(self)->prox;
 }
 
 void
-ScorePost_add_inversion_to_pool(ScorePosting *self, PostingPool *post_pool,
-                                Inversion *inversion, FieldType *type,
-                                int32_t doc_id, float doc_boost,
-                                float length_norm) {
+ScorePost_Add_Inversion_To_Pool_IMP(ScorePosting *self,
+                                    PostingPool *post_pool,
+                                    Inversion *inversion, FieldType *type,
+                                    int32_t doc_id, float doc_boost,
+                                    float length_norm) {
     ScorePostingIVARS *const ivars = ScorePost_IVARS(self);
     MemoryPool     *mem_pool = PostPool_Get_Mem_Pool(post_pool);
     Similarity     *sim = ivars->sim;
@@ -121,7 +122,7 @@ ScorePost_add_inversion_to_pool(ScorePosting *self, PostingPool *post_pool,
 }
 
 void
-ScorePost_reset(ScorePosting *self) {
+ScorePost_Reset_IMP(ScorePosting *self) {
     ScorePostingIVARS *const ivars = ScorePost_IVARS(self);
     ivars->doc_id = 0;
     ivars->freq   = 0;
@@ -129,7 +130,7 @@ ScorePost_reset(ScorePosting *self) {
 }
 
 void
-ScorePost_read_record(ScorePosting *self, InStream *instream) {
+ScorePost_Read_Record_IMP(ScorePosting *self, InStream *instream) {
     ScorePostingIVARS *const ivars = ScorePost_IVARS(self);
     uint32_t  position = 0;
     const size_t max_start_bytes = (C32_MAX_BYTES * 2) + 1;
@@ -170,9 +171,9 @@ ScorePost_read_record(ScorePosting *self, InStream *instream) {
 }
 
 RawPosting*
-ScorePost_read_raw(ScorePosting *self, InStream *instream,
-                   int32_t last_doc_id, CharBuf *term_text,
-                   MemoryPool *mem_pool) {
+ScorePost_Read_Raw_IMP(ScorePosting *self, InStream *instream,
+                       int32_t last_doc_id, CharBuf *term_text,
+                       MemoryPool *mem_pool) {
     char *const    text_buf       = (char*)CB_Get_Ptr8(term_text);
     const size_t   text_size      = CB_Get_Size(term_text);
     const uint32_t doc_code       = InStream_Read_C32(instream);
@@ -210,9 +211,9 @@ ScorePost_read_raw(ScorePosting *self, InStream *instream,
 }
 
 ScorePostingMatcher*
-ScorePost_make_matcher(ScorePosting *self, Similarity *sim,
-                       PostingList *plist, Compiler *compiler,
-                       bool need_score) {
+ScorePost_Make_Matcher_IMP(ScorePosting *self, Similarity *sim,
+                           PostingList *plist, Compiler *compiler,
+                           bool need_score) {
     ScorePostingMatcher *matcher
         = (ScorePostingMatcher*)VTable_Make_Obj(SCOREPOSTINGMATCHER);
     UNUSED_VAR(self);
@@ -237,7 +238,7 @@ ScorePostMatcher_init(ScorePostingMatcher *self, Similarity *sim,
 }
 
 float
-ScorePostMatcher_score(ScorePostingMatcher* self) {
+ScorePostMatcher_Score_IMP(ScorePostingMatcher* self) {
     ScorePostingMatcherIVARS *const ivars = ScorePostMatcher_IVARS(self);
     ScorePostingIVARS *const posting_ivars
         = ScorePost_IVARS((ScorePosting*)ivars->posting);
@@ -255,7 +256,7 @@ ScorePostMatcher_score(ScorePostingMatcher* self) {
 }
 
 void
-ScorePostMatcher_destroy(ScorePostingMatcher *self) {
+ScorePostMatcher_Destroy_IMP(ScorePostingMatcher *self) {
     ScorePostingMatcherIVARS *const ivars = ScorePostMatcher_IVARS(self);
     FREEMEM(ivars->score_cache);
     SUPER_DESTROY(self, SCOREPOSTINGMATCHER);

@@ -31,7 +31,7 @@ FileWindow_init(FileWindow *self) {
 }
 
 void
-FileWindow_set_offset(FileWindow *self, int64_t offset) {
+FileWindow_Set_Offset_IMP(FileWindow *self, int64_t offset) {
     FileWindowIVARS *const ivars = FileWindow_IVARS(self);
     if (ivars->buf != NULL) {
         if (offset != ivars->offset) {
@@ -43,8 +43,8 @@ FileWindow_set_offset(FileWindow *self, int64_t offset) {
 }
 
 void
-FileWindow_set_window(FileWindow *self, char *buf, int64_t offset,
-                      int64_t len) {
+FileWindow_Set_Window_IMP(FileWindow *self, char *buf, int64_t offset,
+                          int64_t len) {
     FileWindowIVARS *const ivars = FileWindow_IVARS(self);
     ivars->buf    = buf;
     ivars->offset = offset;
@@ -52,17 +52,17 @@ FileWindow_set_window(FileWindow *self, char *buf, int64_t offset,
 }
 
 char*
-FileWindow_get_buf(FileWindow *self) {
+FileWindow_Get_Buf_IMP(FileWindow *self) {
     return FileWindow_IVARS(self)->buf;
 }
 
 int64_t
-FileWindow_get_offset(FileWindow *self) {
+FileWindow_Get_Offset_IMP(FileWindow *self) {
     return FileWindow_IVARS(self)->offset;
 }
 
 int64_t
-FileWindow_get_len(FileWindow *self) {
+FileWindow_Get_Len_IMP(FileWindow *self) {
     return FileWindow_IVARS(self)->len;
 }
 

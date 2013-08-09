@@ -99,7 +99,7 @@ InStream_do_open(InStream *self, Obj *file) {
 }
 
 void
-InStream_close(InStream *self) {
+InStream_Close_IMP(InStream *self) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     if (ivars->file_handle) {
         FH_Release_Window(ivars->file_handle, ivars->window);
@@ -111,7 +111,7 @@ InStream_close(InStream *self) {
 }
 
 void
-InStream_destroy(InStream *self) {
+InStream_Destroy_IMP(InStream *self) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     if (ivars->file_handle) {
         InStream_Close(self);
@@ -122,8 +122,8 @@ InStream_destroy(InStream *self) {
 }
 
 InStream*
-InStream_reopen(InStream *self, const CharBuf *filename, int64_t offset,
-                int64_t len) {
+InStream_Reopen_IMP(InStream *self, const CharBuf *filename, int64_t offset,
+                    int64_t len) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     if (!ivars->file_handle) {
         THROW(ERR, "Can't Reopen() closed InStream %o", ivars->filename);
@@ -146,7 +146,7 @@ InStream_reopen(InStream *self, const CharBuf *filename, int64_t offset,
 }
 
 InStream*
-InStream_clone(InStream *self) {
+InStream_Clone_IMP(InStream *self) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     VTable *vtable = InStream_Get_VTable(self);
     InStream *twin = (InStream*)VTable_Make_Obj(vtable);
@@ -156,7 +156,7 @@ InStream_clone(InStream *self) {
 }
 
 CharBuf*
-InStream_get_filename(InStream *self) {
+InStream_Get_Filename_IMP(InStream *self) {
     return InStream_IVARS(self)->filename;
 }
 
@@ -182,7 +182,7 @@ S_refill(InStream *self) {
 }
 
 void
-InStream_refill(InStream *self) {
+InStream_Refill_IMP(InStream *self) {
     S_refill(self);
 }
 
@@ -222,12 +222,12 @@ S_fill(InStream *self, int64_t amount) {
 }
 
 void
-InStream_fill(InStream *self, int64_t amount) {
+InStream_Fill_IMP(InStream *self, int64_t amount) {
     S_fill(self, amount);
 }
 
 void
-InStream_seek(InStream *self, int64_t target) {
+InStream_Seek_IMP(InStream *self, int64_t target) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     FileWindow *const window = ivars->window;
     char    *fw_buf    = FileWindow_Get_Buf(window);
@@ -270,17 +270,17 @@ SI_tell(InStream *self) {
 }
 
 int64_t
-InStream_tell(InStream *self) {
+InStream_Tell_IMP(InStream *self) {
     return SI_tell(self);
 }
 
 int64_t
-InStream_length(InStream *self) {
+InStream_Length_IMP(InStream *self) {
     return InStream_IVARS(self)->len;
 }
 
 char*
-InStream_buf(InStream *self, size_t request) {
+InStream_Buf_IMP(InStream *self, size_t request) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     const int64_t bytes_in_buf = PTR_TO_I64(ivars->limit) - PTR_TO_I64(ivars->buf);
 
@@ -310,7 +310,7 @@ InStream_buf(InStream *self, size_t request) {
 }
 
 void
-InStream_advance_buf(InStream *self, char *buf) {
+InStream_Advance_Buf_IMP(InStream *self, char *buf) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     if (buf > ivars->limit) {
         int64_t overrun = PTR_TO_I64(buf) - PTR_TO_I64(ivars->limit);
@@ -327,7 +327,7 @@ InStream_advance_buf(InStream *self, char *buf) {
 }
 
 void
-InStream_read_bytes(InStream *self, char* buf, size_t len) {
+InStream_Read_Bytes_IMP(InStream *self, char* buf, size_t len) {
     SI_read_bytes(self, buf, len);
 }
 
@@ -378,7 +378,7 @@ SI_read_bytes(InStream *self, char* buf, size_t len) {
 }
 
 int8_t
-InStream_read_i8(InStream *self) {
+InStream_Read_I8_IMP(InStream *self) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     return (int8_t)SI_read_u8(self, ivars);
 }
@@ -390,7 +390,7 @@ SI_read_u8(InStream *self, InStreamIVARS *ivars) {
 }
 
 uint8_t
-InStream_read_u8(InStream *self) {
+InStream_Read_U8_IMP(InStream *self) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     return SI_read_u8(self, ivars);
 }
@@ -406,12 +406,12 @@ SI_read_u32(InStream *self) {
 }
 
 uint32_t
-InStream_read_u32(InStream *self) {
+InStream_Read_U32_IMP(InStream *self) {
     return SI_read_u32(self);
 }
 
 int32_t
-InStream_read_i32(InStream *self) {
+InStream_Read_I32_IMP(InStream *self) {
     return (int32_t)SI_read_u32(self);
 }
 
@@ -426,17 +426,17 @@ SI_read_u64(InStream *self) {
 }
 
 uint64_t
-InStream_read_u64(InStream *self) {
+InStream_Read_U64_IMP(InStream *self) {
     return SI_read_u64(self);
 }
 
 int64_t
-InStream_read_i64(InStream *self) {
+InStream_Read_I64_IMP(InStream *self) {
     return (int64_t)SI_read_u64(self);
 }
 
 float
-InStream_read_f32(InStream *self) {
+InStream_Read_F32_IMP(InStream *self) {
     union { float f; uint32_t u32; } duo;
     SI_read_bytes(self, (char*)&duo, sizeof(float));
 #ifdef LITTLE_END
@@ -446,7 +446,7 @@ InStream_read_f32(InStream *self) {
 }
 
 double
-InStream_read_f64(InStream *self) {
+InStream_Read_F64_IMP(InStream *self) {
     union { double d; uint64_t u64; } duo;
     SI_read_bytes(self, (char*)&duo, sizeof(double));
 #ifdef LITTLE_END
@@ -456,7 +456,7 @@ InStream_read_f64(InStream *self) {
 }
 
 uint32_t
-InStream_read_c32(InStream *self) {
+InStream_Read_C32_IMP(InStream *self) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     uint32_t retval = 0;
     while (1) {
@@ -470,7 +470,7 @@ InStream_read_c32(InStream *self) {
 }
 
 uint64_t
-InStream_read_c64(InStream *self) {
+InStream_Read_C64_IMP(InStream *self) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     uint64_t retval = 0;
     while (1) {
@@ -484,7 +484,7 @@ InStream_read_c64(InStream *self) {
 }
 
 int
-InStream_read_raw_c64(InStream *self, char *buf) {
+InStream_Read_Raw_C64_IMP(InStream *self, char *buf) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     uint8_t *dest = (uint8_t*)buf;
     do {

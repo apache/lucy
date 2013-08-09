@@ -160,7 +160,7 @@ FSFH_do_open(FSFileHandle *self, const CharBuf *path, uint32_t flags) {
 }
 
 bool
-FSFH_close(FSFileHandle *self) {
+FSFH_Close_IMP(FSFileHandle *self) {
     FSFileHandleIVARS *const ivars = FSFH_IVARS(self);
 
     // On 64-bit systems, cancel the whole-file mapping.
@@ -188,7 +188,7 @@ FSFH_close(FSFileHandle *self) {
 }
 
 bool
-FSFH_write(FSFileHandle *self, const void *data, size_t len) {
+FSFH_Write_IMP(FSFileHandle *self, const void *data, size_t len) {
     FSFileHandleIVARS *const ivars = FSFH_IVARS(self);
 
     if (len) {
@@ -212,13 +212,13 @@ FSFH_write(FSFileHandle *self, const void *data, size_t len) {
 }
 
 int64_t
-FSFH_length(FSFileHandle *self) {
+FSFH_Length_IMP(FSFileHandle *self) {
     return FSFH_IVARS(self)->len;
 }
 
 bool
-FSFH_window(FSFileHandle *self, FileWindow *window, int64_t offset,
-            int64_t len) {
+FSFH_Window_IMP(FSFileHandle *self, FileWindow *window, int64_t offset,
+                int64_t len) {
     FSFileHandleIVARS *const ivars = FSFH_IVARS(self);
     const int64_t end = offset + len;
     if (!(ivars->flags & FH_READ_ONLY)) {
@@ -253,14 +253,14 @@ SI_window(FSFileHandle *self, FSFileHandleIVARS *ivars, FileWindow *window,
 }
 
 bool
-FSFH_release_window(FSFileHandle *self, FileWindow *window) {
+FSFH_Release_Window_IMP(FSFileHandle *self, FileWindow *window) {
     UNUSED_VAR(self);
     FileWindow_Set_Window(window, NULL, 0, 0);
     return true;
 }
 
 bool
-FSFH_read(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
+FSFH_Read_IMP(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
     FSFileHandleIVARS *const ivars = FSFH_IVARS(self);
     const int64_t end = offset + len;
 
@@ -311,7 +311,7 @@ SI_window(FSFileHandle *self, FSFileHandleIVARS *ivars, FileWindow *window,
 }
 
 bool
-FSFH_release_window(FSFileHandle *self, FileWindow *window) {
+FSFH_Release_Window_IMP(FSFileHandle *self, FileWindow *window) {
     char *buf = FileWindow_Get_Buf(window);
     int64_t len = FileWindow_Get_Len(window);
     if (!SI_unmap(self, buf, len)) { return false; }
@@ -403,7 +403,7 @@ SI_unmap(FSFileHandle *self, char *buf, int64_t len) {
 
 #if !IS_64_BIT
 bool
-FSFH_read(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
+FSFH_Read_IMP(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
     FSFileHandleIVARS *const ivars = FSFH_IVARS(self);
     int64_t check_val;
 
@@ -559,7 +559,7 @@ SI_close_win_handles(FSFileHandle *self) {
 
 #if !IS_64_BIT
 bool
-FSFH_read(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
+FSFH_Read_IMP(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
     FSFileHandleIVARS *const ivars = FSFH_IVARS(self);
     BOOL check_val;
     DWORD got;

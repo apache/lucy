@@ -37,7 +37,8 @@ DocReader_init(DocReader *self, Schema *schema, Folder *folder,
 }
 
 DocReader*
-DocReader_aggregator(DocReader *self, VArray *readers, I32Array *offsets) {
+DocReader_Aggregator_IMP(DocReader *self, VArray *readers,
+                         I32Array *offsets) {
     UNUSED_VAR(self);
     return (DocReader*)PolyDocReader_new(readers, offsets);
 }
@@ -61,7 +62,7 @@ PolyDocReader_init(PolyDocReader *self, VArray *readers, I32Array *offsets) {
 }
 
 void
-PolyDocReader_close(PolyDocReader *self) {
+PolyDocReader_Close_IMP(PolyDocReader *self) {
     PolyDocReaderIVARS *const ivars = PolyDocReader_IVARS(self);
     if (ivars->readers) {
         for (uint32_t i = 0, max = VA_Get_Size(ivars->readers); i < max; i++) {
@@ -73,7 +74,7 @@ PolyDocReader_close(PolyDocReader *self) {
 }
 
 void
-PolyDocReader_destroy(PolyDocReader *self) {
+PolyDocReader_Destroy_IMP(PolyDocReader *self) {
     PolyDocReaderIVARS *const ivars = PolyDocReader_IVARS(self);
     DECREF(ivars->readers);
     DECREF(ivars->offsets);
@@ -81,7 +82,7 @@ PolyDocReader_destroy(PolyDocReader *self) {
 }
 
 HitDoc*
-PolyDocReader_fetch_doc(PolyDocReader *self, int32_t doc_id) {
+PolyDocReader_Fetch_Doc_IMP(PolyDocReader *self, int32_t doc_id) {
     PolyDocReaderIVARS *const ivars = PolyDocReader_IVARS(self);
     uint32_t seg_tick = PolyReader_sub_tick(ivars->offsets, doc_id);
     int32_t  offset   = I32Arr_Get(ivars->offsets, seg_tick);
@@ -107,7 +108,7 @@ DefDocReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
 }
 
 void
-DefDocReader_close(DefaultDocReader *self) {
+DefDocReader_Close_IMP(DefaultDocReader *self) {
     DefaultDocReaderIVARS *const ivars = DefDocReader_IVARS(self);
     if (ivars->dat_in != NULL) {
         InStream_Close(ivars->dat_in);
@@ -122,7 +123,7 @@ DefDocReader_close(DefaultDocReader *self) {
 }
 
 void
-DefDocReader_destroy(DefaultDocReader *self) {
+DefDocReader_Destroy_IMP(DefaultDocReader *self) {
     DefaultDocReaderIVARS *const ivars = DefDocReader_IVARS(self);
     DECREF(ivars->ix_in);
     DECREF(ivars->dat_in);
@@ -186,8 +187,8 @@ DefDocReader_init(DefaultDocReader *self, Schema *schema, Folder *folder,
 }
 
 void
-DefDocReader_read_record(DefaultDocReader *self, ByteBuf *buffer,
-                         int32_t doc_id) {
+DefDocReader_Read_Record_IMP(DefaultDocReader *self, ByteBuf *buffer,
+                             int32_t doc_id) {
     DefaultDocReaderIVARS *const ivars = DefDocReader_IVARS(self);
 
     // Find start and length of variable length record.

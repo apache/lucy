@@ -37,7 +37,7 @@ FSDH_open(const CharBuf *dir) {
 }
 
 void
-FSDH_destroy(FSDirHandle *self) {
+FSDH_Destroy_IMP(FSDirHandle *self) {
     // Throw away saved error -- it's too late to call Close() now.
     FSDirHandleIVARS *const ivars = FSDH_IVARS(self);
     DECREF(ivars->saved_error);
@@ -108,7 +108,7 @@ FSDH_do_open(FSDirHandle *self, const CharBuf *dir) {
 }
 
 bool
-FSDH_entry_is_dir(FSDirHandle *self) {
+FSDH_Entry_Is_Dir_IMP(FSDirHandle *self) {
     FSDirHandleIVARS *const ivars = FSDH_IVARS(self);
     WIN32_FIND_DATA *find_data = (WIN32_FIND_DATA*)ivars->sys_dir_entry;
     if (find_data) {
@@ -120,7 +120,7 @@ FSDH_entry_is_dir(FSDirHandle *self) {
 }
 
 bool
-FSDH_entry_is_symlink(FSDirHandle *self) {
+FSDH_Entry_Is_Symlink_IMP(FSDirHandle *self) {
     FSDirHandleIVARS *const ivars = FSDH_IVARS(self);
     WIN32_FIND_DATA *find_data = (WIN32_FIND_DATA*)ivars->sys_dir_entry;
     if (find_data) {
@@ -132,7 +132,7 @@ FSDH_entry_is_symlink(FSDirHandle *self) {
 }
 
 bool
-FSDH_close(FSDirHandle *self) {
+FSDH_Close_IMP(FSDirHandle *self) {
     FSDirHandleIVARS *const ivars = FSDH_IVARS(self);
     if (ivars->sys_dirhandle && ivars->sys_dirhandle != INVALID_HANDLE_VALUE) {
         HANDLE dirhandle = (HANDLE)ivars->sys_dirhandle;
@@ -163,7 +163,7 @@ FSDH_close(FSDirHandle *self) {
 }
 
 bool
-FSDH_next(FSDirHandle *self) {
+FSDH_Next_IMP(FSDirHandle *self) {
     FSDirHandleIVARS *const ivars = FSDH_IVARS(self);
     HANDLE           dirhandle = (HANDLE)ivars->sys_dirhandle;
     WIN32_FIND_DATA *find_data = (WIN32_FIND_DATA*)ivars->sys_dir_entry;
@@ -224,7 +224,7 @@ FSDH_do_open(FSDirHandle *self, const CharBuf *dir) {
 }
 
 bool
-FSDH_next(FSDirHandle *self) {
+FSDH_Next_IMP(FSDirHandle *self) {
     FSDirHandleIVARS *const ivars = FSDH_IVARS(self);
     ivars->sys_dir_entry = (struct dirent*)readdir((DIR*)ivars->sys_dirhandle);
     if (!ivars->sys_dir_entry) {
@@ -249,7 +249,7 @@ FSDH_next(FSDirHandle *self) {
 }
 
 bool
-FSDH_entry_is_dir(FSDirHandle *self) {
+FSDH_Entry_Is_Dir_IMP(FSDirHandle *self) {
     FSDirHandleIVARS *const ivars = FSDH_IVARS(self);
     struct dirent *sys_dir_entry = (struct dirent*)ivars->sys_dir_entry;
     if (!sys_dir_entry) { return false; }
@@ -278,7 +278,7 @@ FSDH_entry_is_dir(FSDirHandle *self) {
 }
 
 bool
-FSDH_entry_is_symlink(FSDirHandle *self) {
+FSDH_Entry_Is_Symlink_IMP(FSDirHandle *self) {
     FSDirHandleIVARS *const ivars = FSDH_IVARS(self);
     struct dirent *sys_dir_entry = (struct dirent*)ivars->sys_dir_entry;
     if (!sys_dir_entry) { return false; }
@@ -302,7 +302,7 @@ FSDH_entry_is_symlink(FSDirHandle *self) {
 }
 
 bool
-FSDH_close(FSDirHandle *self) {
+FSDH_Close_IMP(FSDirHandle *self) {
     FSDirHandleIVARS *const ivars = FSDH_IVARS(self);
     if (ivars->fullpath) {
         CB_Dec_RefCount(ivars->fullpath);

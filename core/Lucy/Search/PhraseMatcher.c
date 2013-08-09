@@ -67,7 +67,7 @@ PhraseMatcher_init(PhraseMatcher *self, Similarity *similarity, VArray *plists,
 }
 
 void
-PhraseMatcher_destroy(PhraseMatcher *self) {
+PhraseMatcher_Destroy_IMP(PhraseMatcher *self) {
     PhraseMatcherIVARS *const ivars = PhraseMatcher_IVARS(self);
     if (ivars->plists) {
         for (size_t i = 0; i < ivars->num_elements; i++) {
@@ -82,7 +82,7 @@ PhraseMatcher_destroy(PhraseMatcher *self) {
 }
 
 int32_t
-PhraseMatcher_next(PhraseMatcher *self) {
+PhraseMatcher_Next_IMP(PhraseMatcher *self) {
     PhraseMatcherIVARS *const ivars = PhraseMatcher_IVARS(self);
     if (ivars->first_time) {
         return PhraseMatcher_Advance(self, 1);
@@ -97,7 +97,7 @@ PhraseMatcher_next(PhraseMatcher *self) {
 }
 
 int32_t
-PhraseMatcher_advance(PhraseMatcher *self, int32_t target) {
+PhraseMatcher_Advance_IMP(PhraseMatcher *self, int32_t target) {
     PhraseMatcherIVARS *const ivars  = PhraseMatcher_IVARS(self);
     PostingList **const plists       = ivars->plists;
     const uint32_t      num_elements = ivars->num_elements;
@@ -244,7 +244,7 @@ DONE:
 }
 
 float
-PhraseMatcher_calc_phrase_freq(PhraseMatcher *self) {
+PhraseMatcher_Calc_Phrase_Freq_IMP(PhraseMatcher *self) {
     PhraseMatcherIVARS *const ivars = PhraseMatcher_IVARS(self);
     PostingList **const plists = ivars->plists;
 
@@ -302,12 +302,12 @@ PhraseMatcher_calc_phrase_freq(PhraseMatcher *self) {
 }
 
 int32_t
-PhraseMatcher_get_doc_id(PhraseMatcher *self) {
+PhraseMatcher_Get_Doc_ID_IMP(PhraseMatcher *self) {
     return PhraseMatcher_IVARS(self)->doc_id;
 }
 
 float
-PhraseMatcher_score(PhraseMatcher *self) {
+PhraseMatcher_Score_IMP(PhraseMatcher *self) {
     PhraseMatcherIVARS *const ivars = PhraseMatcher_IVARS(self);
     ScorePosting *posting = (ScorePosting*)PList_Get_Posting(ivars->plists[0]);
     float score = Sim_TF(ivars->sim, ivars->phrase_freq)

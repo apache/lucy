@@ -49,14 +49,14 @@ RangeMatcher_init(RangeMatcher *self, int32_t lower_bound, int32_t upper_bound,
 }
 
 void
-RangeMatcher_destroy(RangeMatcher *self) {
+RangeMatcher_Destroy_IMP(RangeMatcher *self) {
     RangeMatcherIVARS *const ivars = RangeMatcher_IVARS(self);
     DECREF(ivars->sort_cache);
     SUPER_DESTROY(self, RANGEMATCHER);
 }
 
 int32_t
-RangeMatcher_next(RangeMatcher* self) {
+RangeMatcher_Next_IMP(RangeMatcher* self) {
     RangeMatcherIVARS *const ivars = RangeMatcher_IVARS(self);
     while (1) {
         if (++ivars->doc_id > ivars->doc_max) {
@@ -78,19 +78,19 @@ RangeMatcher_next(RangeMatcher* self) {
 }
 
 int32_t
-RangeMatcher_advance(RangeMatcher* self, int32_t target) {
+RangeMatcher_Advance_IMP(RangeMatcher* self, int32_t target) {
     RangeMatcher_IVARS(self)->doc_id = target - 1;
     return RangeMatcher_next(self);
 }
 
 float
-RangeMatcher_score(RangeMatcher* self) {
+RangeMatcher_Score_IMP(RangeMatcher* self) {
     UNUSED_VAR(self);
     return 0.0f;
 }
 
 int32_t
-RangeMatcher_get_doc_id(RangeMatcher* self) {
+RangeMatcher_Get_Doc_ID_IMP(RangeMatcher* self) {
     return RangeMatcher_IVARS(self)->doc_id;
 }
 

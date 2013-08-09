@@ -42,19 +42,19 @@ NOTQuery_init(NOTQuery *self, Query *negated_query) {
 }
 
 Query*
-NOTQuery_get_negated_query(NOTQuery *self) {
+NOTQuery_Get_Negated_Query_IMP(NOTQuery *self) {
     NOTQueryIVARS *const ivars = NOTQuery_IVARS(self);
     return (Query*)VA_Fetch(ivars->children, 0);
 }
 
 void
-NOTQuery_set_negated_query(NOTQuery *self, Query *negated_query) {
+NOTQuery_Set_Negated_Query_IMP(NOTQuery *self, Query *negated_query) {
     NOTQueryIVARS *const ivars = NOTQuery_IVARS(self);
     VA_Store(ivars->children, 0, INCREF(negated_query));
 }
 
 CharBuf*
-NOTQuery_to_string(NOTQuery *self) {
+NOTQuery_To_String_IMP(NOTQuery *self) {
     NOTQueryIVARS *const ivars = NOTQuery_IVARS(self);
     CharBuf *neg_string = Obj_To_String(VA_Fetch(ivars->children, 0));
     CharBuf *retval = CB_newf("-%o", neg_string);
@@ -63,15 +63,15 @@ NOTQuery_to_string(NOTQuery *self) {
 }
 
 bool
-NOTQuery_equals(NOTQuery *self, Obj *other) {
+NOTQuery_Equals_IMP(NOTQuery *self, Obj *other) {
     if ((NOTQuery*)other == self)   { return true; }
     if (!Obj_Is_A(other, NOTQUERY)) { return false; }
     return PolyQuery_equals((PolyQuery*)self, other);
 }
 
 Compiler*
-NOTQuery_make_compiler(NOTQuery *self, Searcher *searcher, float boost,
-                       bool subordinate) {
+NOTQuery_Make_Compiler_IMP(NOTQuery *self, Searcher *searcher, float boost,
+                           bool subordinate) {
     NOTCompiler *compiler = NOTCompiler_new(self, searcher, boost);
     if (!subordinate) {
         NOTCompiler_Normalize(compiler);
@@ -96,14 +96,14 @@ NOTCompiler_init(NOTCompiler *self, NOTQuery *parent, Searcher *searcher,
 }
 
 float
-NOTCompiler_sum_of_squared_weights(NOTCompiler *self) {
+NOTCompiler_Sum_Of_Squared_Weights_IMP(NOTCompiler *self) {
     UNUSED_VAR(self);
     return 0.0f;
 }
 
 VArray*
-NOTCompiler_highlight_spans(NOTCompiler *self, Searcher *searcher,
-                            DocVector *doc_vec, const CharBuf *field) {
+NOTCompiler_Highlight_Spans_IMP(NOTCompiler *self, Searcher *searcher,
+                                DocVector *doc_vec, const CharBuf *field) {
     UNUSED_VAR(self);
     UNUSED_VAR(searcher);
     UNUSED_VAR(doc_vec);
@@ -112,8 +112,8 @@ NOTCompiler_highlight_spans(NOTCompiler *self, Searcher *searcher,
 }
 
 Matcher*
-NOTCompiler_make_matcher(NOTCompiler *self, SegReader *reader,
-                         bool need_score) {
+NOTCompiler_Make_Matcher_IMP(NOTCompiler *self, SegReader *reader,
+                             bool need_score) {
     NOTCompilerIVARS *const ivars = NOTCompiler_IVARS(self);
     Compiler *negated_compiler
         = (Compiler*)CERTIFY(VA_Fetch(ivars->children, 0), COMPILER);

@@ -54,7 +54,7 @@ MemPool_init(MemoryPool *self, uint32_t arena_size) {
 }
 
 void
-MemPool_destroy(MemoryPool *self) {
+MemPool_Destroy_IMP(MemoryPool *self) {
     MemoryPoolIVARS *const ivars = MemPool_IVARS(self);
     DECREF(ivars->arenas);
     SUPER_DESTROY(self, MEMORYPOOL);
@@ -98,12 +98,12 @@ S_init_arena(MemoryPool *self, MemoryPoolIVARS *ivars, size_t amount) {
 }
 
 size_t
-MemPool_get_consumed(MemoryPool *self) {
+MemPool_Get_Consumed_IMP(MemoryPool *self) {
     return MemPool_IVARS(self)->consumed;
 }
 
 void*
-MemPool_grab(MemoryPool *self, size_t amount) {
+MemPool_Grab_IMP(MemoryPool *self, size_t amount) {
     MemoryPoolIVARS *const ivars = MemPool_IVARS(self);
     INCREASE_TO_WORD_MULTIPLE(amount);
     ivars->last_buf = ivars->buf;
@@ -124,7 +124,7 @@ MemPool_grab(MemoryPool *self, size_t amount) {
 }
 
 void
-MemPool_resize(MemoryPool *self, void *ptr, size_t new_amount) {
+MemPool_Resize_IMP(MemoryPool *self, void *ptr, size_t new_amount) {
     MemoryPoolIVARS *const ivars = MemPool_IVARS(self);
     const size_t last_amount = ivars->buf - ivars->last_buf;
     INCREASE_TO_WORD_MULTIPLE(new_amount);
@@ -146,7 +146,7 @@ MemPool_resize(MemoryPool *self, void *ptr, size_t new_amount) {
 }
 
 void
-MemPool_release_all(MemoryPool *self) {
+MemPool_Release_All_IMP(MemoryPool *self) {
     MemoryPoolIVARS *const ivars = MemPool_IVARS(self);
     ivars->tick     = -1;
     ivars->buf      = NULL;
@@ -155,7 +155,7 @@ MemPool_release_all(MemoryPool *self) {
 }
 
 void
-MemPool_eat(MemoryPool *self, MemoryPool *other) {
+MemPool_Eat_IMP(MemoryPool *self, MemoryPool *other) {
     MemoryPoolIVARS *const ivars = MemPool_IVARS(self);
     MemoryPoolIVARS *const ovars = MemPool_IVARS(other);
     if (ivars->buf != NULL) {

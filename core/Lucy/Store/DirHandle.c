@@ -28,7 +28,7 @@ DH_init(DirHandle *self, const CharBuf *dir) {
 }
 
 void
-DH_destroy(DirHandle *self) {
+DH_Destroy_IMP(DirHandle *self) {
     DirHandleIVARS *const ivars = DH_IVARS(self);
     DH_Close(self);
     DECREF(ivars->dir);
@@ -37,12 +37,12 @@ DH_destroy(DirHandle *self) {
 }
 
 CharBuf*
-DH_get_dir(DirHandle *self) {
+DH_Get_Dir_IMP(DirHandle *self) {
     return DH_IVARS(self)->dir;
 }
 
 CharBuf*
-DH_get_entry(DirHandle *self) {
+DH_Get_Entry_IMP(DirHandle *self) {
     return DH_IVARS(self)->entry;
 }
 

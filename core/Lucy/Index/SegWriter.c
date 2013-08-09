@@ -51,7 +51,7 @@ SegWriter_init(SegWriter *self, Schema *schema, Snapshot *snapshot,
 }
 
 void
-SegWriter_destroy(SegWriter *self) {
+SegWriter_Destroy_IMP(SegWriter *self) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     DECREF(ivars->inverter);
     DECREF(ivars->writers);
@@ -61,8 +61,8 @@ SegWriter_destroy(SegWriter *self) {
 }
 
 void
-SegWriter_register(SegWriter *self, const CharBuf *api,
-                   DataWriter *component) {
+SegWriter_Register_IMP(SegWriter *self, const CharBuf *api,
+                       DataWriter *component) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     CERTIFY(component, DATAWRITER);
     if (Hash_Fetch(ivars->by_api, (Obj*)api)) {
@@ -72,19 +72,19 @@ SegWriter_register(SegWriter *self, const CharBuf *api,
 }
 
 Obj*
-SegWriter_fetch(SegWriter *self, const CharBuf *api) {
+SegWriter_Fetch_IMP(SegWriter *self, const CharBuf *api) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     return Hash_Fetch(ivars->by_api, (Obj*)api);
 }
 
 void
-SegWriter_add_writer(SegWriter *self, DataWriter *writer) {
+SegWriter_Add_Writer_IMP(SegWriter *self, DataWriter *writer) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     VA_Push(ivars->writers, (Obj*)writer);
 }
 
 void
-SegWriter_prep_seg_dir(SegWriter *self) {
+SegWriter_Prep_Seg_Dir_IMP(SegWriter *self) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     Folder  *folder   = SegWriter_Get_Folder(self);
     CharBuf *seg_name = Seg_Get_Name(ivars->segment);
@@ -103,7 +103,7 @@ SegWriter_prep_seg_dir(SegWriter *self) {
 }
 
 void
-SegWriter_add_doc(SegWriter *self, Doc *doc, float boost) {
+SegWriter_Add_Doc_IMP(SegWriter *self, Doc *doc, float boost) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     int32_t doc_id = (int32_t)Seg_Increment_Count(ivars->segment, 1);
     Inverter_Invert_Doc(ivars->inverter, doc);
@@ -112,8 +112,8 @@ SegWriter_add_doc(SegWriter *self, Doc *doc, float boost) {
 }
 
 void
-SegWriter_add_inverted_doc(SegWriter *self, Inverter *inverter,
-                           int32_t doc_id) {
+SegWriter_Add_Inverted_Doc_IMP(SegWriter *self, Inverter *inverter,
+                               int32_t doc_id) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     for (uint32_t i = 0, max = VA_Get_Size(ivars->writers); i < max; i++) {
         DataWriter *writer = (DataWriter*)VA_Fetch(ivars->writers, i);
@@ -135,7 +135,8 @@ S_adjust_doc_id(SegWriter *self, SegReader *reader, I32Array *doc_map) {
 }
 
 void
-SegWriter_add_segment(SegWriter *self, SegReader *reader, I32Array *doc_map) {
+SegWriter_Add_Segment_IMP(SegWriter *self, SegReader *reader,
+                          I32Array *doc_map) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
 
     // Bulk add the slab of documents to the various writers.
@@ -153,8 +154,8 @@ SegWriter_add_segment(SegWriter *self, SegReader *reader, I32Array *doc_map) {
 }
 
 void
-SegWriter_merge_segment(SegWriter *self, SegReader *reader,
-                        I32Array *doc_map) {
+SegWriter_Merge_Segment_IMP(SegWriter *self, SegReader *reader,
+                            I32Array *doc_map) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     Snapshot *snapshot = SegWriter_Get_Snapshot(self);
     CharBuf  *seg_name = Seg_Get_Name(SegReader_Get_Segment(reader));
@@ -174,7 +175,7 @@ SegWriter_merge_segment(SegWriter *self, SegReader *reader,
 }
 
 void
-SegWriter_delete_segment(SegWriter *self, SegReader *reader) {
+SegWriter_Delete_Segment_IMP(SegWriter *self, SegReader *reader) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     Snapshot *snapshot = SegWriter_Get_Snapshot(self);
     CharBuf  *seg_name = Seg_Get_Name(SegReader_Get_Segment(reader));
@@ -191,7 +192,7 @@ SegWriter_delete_segment(SegWriter *self, SegReader *reader) {
 }
 
 void
-SegWriter_finish(SegWriter *self) {
+SegWriter_Finish_IMP(SegWriter *self) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     CharBuf *seg_name = Seg_Get_Name(ivars->segment);
 
@@ -213,20 +214,20 @@ SegWriter_finish(SegWriter *self) {
 }
 
 void
-SegWriter_add_data_writer(SegWriter *self, DataWriter *writer) {
+SegWriter_Add_Data_Writer_IMP(SegWriter *self, DataWriter *writer) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     VA_Push(ivars->writers, (Obj*)writer);
 }
 
 void
-SegWriter_set_del_writer(SegWriter *self, DeletionsWriter *del_writer) {
+SegWriter_Set_Del_Writer_IMP(SegWriter *self, DeletionsWriter *del_writer) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     DECREF(ivars->del_writer);
     ivars->del_writer = (DeletionsWriter*)INCREF(del_writer);
 }
 
 DeletionsWriter*
-SegWriter_get_del_writer(SegWriter *self) {
+SegWriter_Get_Del_Writer_IMP(SegWriter *self) {
     return SegWriter_IVARS(self)->del_writer;
 }
 

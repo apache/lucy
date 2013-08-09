@@ -52,7 +52,7 @@ Snapshot_init(Snapshot *self) {
 }
 
 void
-Snapshot_destroy(Snapshot *self) {
+Snapshot_Destroy_IMP(Snapshot *self) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
     DECREF(ivars->entries);
     DECREF(ivars->path);
@@ -60,13 +60,13 @@ Snapshot_destroy(Snapshot *self) {
 }
 
 void
-Snapshot_add_entry(Snapshot *self, const CharBuf *entry) {
+Snapshot_Add_Entry_IMP(Snapshot *self, const CharBuf *entry) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
     Hash_Store(ivars->entries, (Obj*)entry, (Obj*)CFISH_TRUE);
 }
 
 bool
-Snapshot_delete_entry(Snapshot *self, const CharBuf *entry) {
+Snapshot_Delete_Entry_IMP(Snapshot *self, const CharBuf *entry) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
     Obj *val = Hash_Delete(ivars->entries, (Obj*)entry);
     if (val) {
@@ -79,31 +79,31 @@ Snapshot_delete_entry(Snapshot *self, const CharBuf *entry) {
 }
 
 VArray*
-Snapshot_list(Snapshot *self) {
+Snapshot_List_IMP(Snapshot *self) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
     return Hash_Keys(ivars->entries);
 }
 
 uint32_t
-Snapshot_num_entries(Snapshot *self) {
+Snapshot_Num_Entries_IMP(Snapshot *self) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
     return Hash_Get_Size(ivars->entries);
 }
 
 void
-Snapshot_set_path(Snapshot *self, const CharBuf *path) {
+Snapshot_Set_Path_IMP(Snapshot *self, const CharBuf *path) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
     DECREF(ivars->path);
     ivars->path = path ? CB_Clone(path) : NULL;
 }
 
 CharBuf*
-Snapshot_get_path(Snapshot *self) {
+Snapshot_Get_Path_IMP(Snapshot *self) {
     return Snapshot_IVARS(self)->path;
 }
 
 Snapshot*
-Snapshot_read_file(Snapshot *self, Folder *folder, const CharBuf *path) {
+Snapshot_Read_File_IMP(Snapshot *self, Folder *folder, const CharBuf *path) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
 
     // Eliminate all prior data. Pick a snapshot file.
@@ -171,7 +171,7 @@ S_clean_segment_contents(VArray *orig) {
 
 
 void
-Snapshot_write_file(Snapshot *self, Folder *folder, const CharBuf *path) {
+Snapshot_Write_File_IMP(Snapshot *self, Folder *folder, const CharBuf *path) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
     Hash   *all_data = Hash_new(0);
     VArray *list     = Snapshot_List(self);

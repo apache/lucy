@@ -125,7 +125,7 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
 }
 
 void
-SortFieldWriter_clear_cache(SortFieldWriter *self) {
+SortFieldWriter_Clear_Cache_IMP(SortFieldWriter *self) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
     if (ivars->uniq_vals) {
         Hash_Clear(ivars->uniq_vals);
@@ -136,7 +136,7 @@ SortFieldWriter_clear_cache(SortFieldWriter *self) {
 }
 
 void
-SortFieldWriter_destroy(SortFieldWriter *self) {
+SortFieldWriter_Destroy_IMP(SortFieldWriter *self) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
     DECREF(ivars->uniq_vals);
     ivars->uniq_vals = NULL;
@@ -160,12 +160,12 @@ SortFieldWriter_destroy(SortFieldWriter *self) {
 }
 
 int32_t
-SortFieldWriter_get_null_ord(SortFieldWriter *self) {
+SortFieldWriter_Get_Null_Ord_IMP(SortFieldWriter *self) {
     return SortFieldWriter_IVARS(self)->null_ord;
 }
 
 int32_t
-SortFieldWriter_get_ord_width(SortFieldWriter *self) {
+SortFieldWriter_Get_Ord_Width_IMP(SortFieldWriter *self) {
     return SortFieldWriter_IVARS(self)->ord_width;
 }
 
@@ -181,7 +181,7 @@ S_find_unique_value(Hash *uniq_vals, Obj *val) {
 }
 
 void
-SortFieldWriter_add(SortFieldWriter *self, int32_t doc_id, Obj *value) {
+SortFieldWriter_Add_IMP(SortFieldWriter *self, int32_t doc_id, Obj *value) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
 
     // Uniq-ify the value, and record it for this document.
@@ -193,8 +193,8 @@ SortFieldWriter_add(SortFieldWriter *self, int32_t doc_id, Obj *value) {
 }
 
 void
-SortFieldWriter_add_segment(SortFieldWriter *self, SegReader *reader,
-                            I32Array *doc_map, SortCache *sort_cache) {
+SortFieldWriter_Add_Segment_IMP(SortFieldWriter *self, SegReader *reader,
+                                I32Array *doc_map, SortCache *sort_cache) {
     if (!sort_cache) { return; }
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
     SortFieldWriter *run
@@ -328,7 +328,7 @@ S_write_val(Obj *val, int8_t prim_id, OutStream *ix_out, OutStream *dat_out,
 }
 
 int
-SortFieldWriter_compare(SortFieldWriter *self, void *va, void *vb) {
+SortFieldWriter_Compare_IMP(SortFieldWriter *self, void *va, void *vb) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
     SFWriterElem *a = (SFWriterElem*)va;
     SFWriterElem *b = (SFWriterElem*)vb;
@@ -363,7 +363,7 @@ S_lazy_init_sorted_ids(SortFieldWriter *self) {
 }
 
 void
-SortFieldWriter_flush(SortFieldWriter *self) {
+SortFieldWriter_Flush_IMP(SortFieldWriter *self) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
 
     // Don't add a run unless we have data to put in it.
@@ -418,7 +418,7 @@ SortFieldWriter_flush(SortFieldWriter *self) {
 }
 
 uint32_t
-SortFieldWriter_refill(SortFieldWriter *self) {
+SortFieldWriter_Refill_IMP(SortFieldWriter *self) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
     if (!ivars->sort_cache) { return 0; }
 
@@ -480,7 +480,7 @@ SortFieldWriter_refill(SortFieldWriter *self) {
 }
 
 void
-SortFieldWriter_flip(SortFieldWriter *self) {
+SortFieldWriter_Flip_IMP(SortFieldWriter *self) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
     uint32_t num_items = SortFieldWriter_Cache_Count(self);
     uint32_t num_runs = VA_Get_Size(ivars->runs);
@@ -604,7 +604,7 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
 }
 
 int32_t
-SortFieldWriter_finish(SortFieldWriter *self) {
+SortFieldWriter_Finish_IMP(SortFieldWriter *self) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
 
     // Bail if there's no data.

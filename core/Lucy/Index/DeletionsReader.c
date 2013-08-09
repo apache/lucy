@@ -41,8 +41,8 @@ DelReader_init(DeletionsReader *self, Schema *schema, Folder *folder,
 }
 
 DeletionsReader*
-DelReader_aggregator(DeletionsReader *self, VArray *readers,
-                     I32Array *offsets) {
+DelReader_Aggregator_IMP(DeletionsReader *self, VArray *readers,
+                         I32Array *offsets) {
     UNUSED_VAR(self);
     return (DeletionsReader*)PolyDelReader_new(readers, offsets);
 }
@@ -71,7 +71,7 @@ PolyDelReader_init(PolyDeletionsReader *self, VArray *readers,
 }
 
 void
-PolyDelReader_close(PolyDeletionsReader *self) {
+PolyDelReader_Close_IMP(PolyDeletionsReader *self) {
     PolyDeletionsReaderIVARS *const ivars = PolyDelReader_IVARS(self);
     if (ivars->readers) {
         for (uint32_t i = 0, max = VA_Get_Size(ivars->readers); i < max; i++) {
@@ -84,7 +84,7 @@ PolyDelReader_close(PolyDeletionsReader *self) {
 }
 
 void
-PolyDelReader_destroy(PolyDeletionsReader *self) {
+PolyDelReader_Destroy_IMP(PolyDeletionsReader *self) {
     PolyDeletionsReaderIVARS *const ivars = PolyDelReader_IVARS(self);
     DECREF(ivars->readers);
     DECREF(ivars->offsets);
@@ -92,12 +92,12 @@ PolyDelReader_destroy(PolyDeletionsReader *self) {
 }
 
 int32_t
-PolyDelReader_del_count(PolyDeletionsReader *self) {
+PolyDelReader_Del_Count_IMP(PolyDeletionsReader *self) {
     return PolyDelReader_IVARS(self)->del_count;
 }
 
 Matcher*
-PolyDelReader_iterator(PolyDeletionsReader *self) {
+PolyDelReader_Iterator_IMP(PolyDeletionsReader *self) {
     PolyDeletionsReaderIVARS *const ivars = PolyDelReader_IVARS(self);
     SeriesMatcher *deletions = NULL;
     if (ivars->del_count) {
@@ -140,21 +140,21 @@ DefDelReader_init(DefaultDeletionsReader *self, Schema *schema,
 }
 
 void
-DefDelReader_close(DefaultDeletionsReader *self) {
+DefDelReader_Close_IMP(DefaultDeletionsReader *self) {
     DefaultDeletionsReaderIVARS *const ivars = DefDelReader_IVARS(self);
     DECREF(ivars->deldocs);
     ivars->deldocs = NULL;
 }
 
 void
-DefDelReader_destroy(DefaultDeletionsReader *self) {
+DefDelReader_Destroy_IMP(DefaultDeletionsReader *self) {
     DefaultDeletionsReaderIVARS *const ivars = DefDelReader_IVARS(self);
     DECREF(ivars->deldocs);
     SUPER_DESTROY(self, DEFAULTDELETIONSREADER);
 }
 
 BitVector*
-DefDelReader_read_deletions(DefaultDeletionsReader *self) {
+DefDelReader_Read_Deletions_IMP(DefaultDeletionsReader *self) {
     DefaultDeletionsReaderIVARS *const ivars = DefDelReader_IVARS(self);
     VArray  *segments    = DefDelReader_Get_Segments(self);
     Segment *segment     = DefDelReader_Get_Segment(self);
@@ -201,13 +201,13 @@ DefDelReader_read_deletions(DefaultDeletionsReader *self) {
 }
 
 Matcher*
-DefDelReader_iterator(DefaultDeletionsReader *self) {
+DefDelReader_Iterator_IMP(DefaultDeletionsReader *self) {
     DefaultDeletionsReaderIVARS *const ivars = DefDelReader_IVARS(self);
     return (Matcher*)BitVecMatcher_new(ivars->deldocs);
 }
 
 int32_t
-DefDelReader_del_count(DefaultDeletionsReader *self) {
+DefDelReader_Del_Count_IMP(DefaultDeletionsReader *self) {
     return DefDelReader_IVARS(self)->del_count;
 }
 

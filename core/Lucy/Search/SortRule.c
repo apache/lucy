@@ -54,14 +54,14 @@ SortRule_init(SortRule *self, int32_t type, const CharBuf *field,
 }
 
 void
-SortRule_destroy(SortRule *self) {
+SortRule_Destroy_IMP(SortRule *self) {
     SortRuleIVARS *ivars = SortRule_IVARS(self);
     DECREF(ivars->field);
     SUPER_DESTROY(self, SORTRULE);
 }
 
 SortRule*
-SortRule_deserialize(SortRule *self, InStream *instream) {
+SortRule_Deserialize_IMP(SortRule *self, InStream *instream) {
     SortRuleIVARS *ivars = SortRule_IVARS(self);
     ivars->type = InStream_Read_C32(instream);
     if (ivars->type == SortRule_FIELD) {
@@ -72,7 +72,7 @@ SortRule_deserialize(SortRule *self, InStream *instream) {
 }
 
 void
-SortRule_serialize(SortRule *self, OutStream *target) {
+SortRule_Serialize_IMP(SortRule *self, OutStream *target) {
     SortRuleIVARS *ivars = SortRule_IVARS(self);
     OutStream_Write_C32(target, ivars->type);
     if (ivars->type == SortRule_FIELD) {
@@ -82,17 +82,17 @@ SortRule_serialize(SortRule *self, OutStream *target) {
 }
 
 CharBuf*
-SortRule_get_field(SortRule *self) {
+SortRule_Get_Field_IMP(SortRule *self) {
     return SortRule_IVARS(self)->field;
 }
 
 int32_t
-SortRule_get_type(SortRule *self) {
+SortRule_Get_Type_IMP(SortRule *self) {
     return SortRule_IVARS(self)->type;
 }
 
 bool
-SortRule_get_reverse(SortRule *self) {
+SortRule_Get_Reverse_IMP(SortRule *self) {
     return SortRule_IVARS(self)->reverse;
 }
 

@@ -46,7 +46,7 @@ SortCache_init(SortCache *self, const CharBuf *field, FieldType *type,
 }
 
 void
-SortCache_destroy(SortCache *self) {
+SortCache_Destroy_IMP(SortCache *self) {
     SortCacheIVARS *const ivars = SortCache_IVARS(self);
     DECREF(ivars->field);
     DECREF(ivars->type);
@@ -54,17 +54,17 @@ SortCache_destroy(SortCache *self) {
 }
 
 bool
-SortCache_get_native_ords(SortCache *self) {
+SortCache_Get_Native_Ords_IMP(SortCache *self) {
     return SortCache_IVARS(self)->native_ords;
 }
 
 void
-SortCache_set_native_ords(SortCache *self, bool native_ords) {
+SortCache_Set_Native_Ords_IMP(SortCache *self, bool native_ords) {
     SortCache_IVARS(self)->native_ords = native_ords;
 }
 
 int32_t
-SortCache_ordinal(SortCache *self, int32_t doc_id) {
+SortCache_Ordinal_IMP(SortCache *self, int32_t doc_id) {
     SortCacheIVARS *const ivars = SortCache_IVARS(self);
     if ((uint32_t)doc_id > (uint32_t)ivars->doc_max) {
         THROW(ERR, "Out of range: %i32 > %i32", doc_id, ivars->doc_max);
@@ -105,7 +105,7 @@ SortCache_ordinal(SortCache *self, int32_t doc_id) {
 }
 
 int32_t
-SortCache_find(SortCache *self, Obj *term) {
+SortCache_Find_IMP(SortCache *self, Obj *term) {
     SortCacheIVARS *const ivars = SortCache_IVARS(self);
     FieldType *const type   = ivars->type;
     int32_t          lo     = 0;
@@ -155,22 +155,22 @@ SortCache_find(SortCache *self, Obj *term) {
 }
 
 void*
-SortCache_get_ords(SortCache *self) {
+SortCache_Get_Ords_IMP(SortCache *self) {
     return SortCache_IVARS(self)->ords;
 }
 
 int32_t
-SortCache_get_cardinality(SortCache *self) {
+SortCache_Get_Cardinality_IMP(SortCache *self) {
     return SortCache_IVARS(self)->cardinality;
 }
 
 int32_t
-SortCache_get_null_ord(SortCache *self) {
+SortCache_Get_Null_Ord_IMP(SortCache *self) {
     return SortCache_IVARS(self)->null_ord;
 }
 
 int32_t
-SortCache_get_ord_width(SortCache *self) {
+SortCache_Get_Ord_Width_IMP(SortCache *self) {
     return SortCache_IVARS(self)->ord_width;
 }
 

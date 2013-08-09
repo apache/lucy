@@ -53,14 +53,14 @@ FullTextType_init2(FullTextType *self, Analyzer *analyzer, float boost,
 }
 
 void
-FullTextType_destroy(FullTextType *self) {
+FullTextType_Destroy_IMP(FullTextType *self) {
     FullTextTypeIVARS *const ivars = FullTextType_IVARS(self);
     DECREF(ivars->analyzer);
     SUPER_DESTROY(self, FULLTEXTTYPE);
 }
 
 bool
-FullTextType_equals(FullTextType *self, Obj *other) {
+FullTextType_Equals_IMP(FullTextType *self, Obj *other) {
     if ((FullTextType*)other == self)                     { return true; }
     if (!Obj_Is_A(other, FULLTEXTTYPE))                   { return false; }
     FullTextTypeIVARS *const ivars = FullTextType_IVARS(self);
@@ -75,7 +75,7 @@ FullTextType_equals(FullTextType *self, Obj *other) {
 }
 
 Hash*
-FullTextType_dump_for_schema(FullTextType *self) {
+FullTextType_Dump_For_Schema_IMP(FullTextType *self) {
     FullTextTypeIVARS *const ivars = FullTextType_IVARS(self);
     Hash *dump = Hash_new(0);
     Hash_Store_Str(dump, "type", 4, (Obj*)CB_newf("fulltext"));
@@ -101,7 +101,7 @@ FullTextType_dump_for_schema(FullTextType *self) {
 }
 
 Hash*
-FullTextType_dump(FullTextType *self) {
+FullTextType_Dump_IMP(FullTextType *self) {
     FullTextTypeIVARS *const ivars = FullTextType_IVARS(self);
     Hash *dump = FullTextType_Dump_For_Schema(self);
     Hash_Store_Str(dump, "_class", 6,
@@ -114,7 +114,7 @@ FullTextType_dump(FullTextType *self) {
 }
 
 FullTextType*
-FullTextType_load(FullTextType *self, Obj *dump) {
+FullTextType_Load_IMP(FullTextType *self, Obj *dump) {
     UNUSED_VAR(self);
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     CharBuf *class_name = (CharBuf*)Hash_Fetch_Str(source, "_class", 6);
@@ -159,22 +159,22 @@ FullTextType_load(FullTextType *self, Obj *dump) {
 }
 
 void
-FullTextType_set_highlightable(FullTextType *self, bool highlightable) {
+FullTextType_Set_Highlightable_IMP(FullTextType *self, bool highlightable) {
     FullTextType_IVARS(self)->highlightable = highlightable;
 }
 
 Analyzer*
-FullTextType_get_analyzer(FullTextType *self) {
+FullTextType_Get_Analyzer_IMP(FullTextType *self) {
     return FullTextType_IVARS(self)->analyzer;
 }
 
 bool
-FullTextType_highlightable(FullTextType *self) {
+FullTextType_Highlightable_IMP(FullTextType *self) {
     return FullTextType_IVARS(self)->highlightable;
 }
 
 Similarity*
-FullTextType_make_similarity(FullTextType *self) {
+FullTextType_Make_Similarity_IMP(FullTextType *self) {
     UNUSED_VAR(self);
     return Sim_new();
 }
