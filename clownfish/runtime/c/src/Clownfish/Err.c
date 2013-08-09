@@ -56,14 +56,14 @@ Err_do_throw(Err *error) {
         longjmp(*current_env, 1);
     }
     else {
-        CharBuf *message = Err_get_mess(error);
+        CharBuf *message = Err_Get_Mess(error);
         fprintf(stderr, "%s", CB_Get_Ptr8(message));
         exit(EXIT_FAILURE);
     }
 }
 
 void*
-Err_to_host(Err *self) {
+Err_To_Host_IMP(Err *self) {
     UNUSED_VAR(self);
     THROW(ERR, "TODO");
     UNREACHABLE_RETURN(void*);

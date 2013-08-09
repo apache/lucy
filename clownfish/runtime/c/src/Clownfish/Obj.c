@@ -24,18 +24,18 @@
 #include "Clownfish/Err.h"
 
 uint32_t
-Obj_get_refcount(Obj *self) {
+Obj_Get_RefCount_IMP(Obj *self) {
     return self->refcount;
 }
 
 Obj*
-Obj_inc_refcount(Obj *self) {
+Obj_Inc_RefCount_IMP(Obj *self) {
     self->refcount++;
     return self;
 }
 
 uint32_t
-Obj_dec_refcount(Obj *self) {
+Obj_Dec_RefCount_IMP(Obj *self) {
     uint32_t modified_refcount = INT32_MAX;
     switch (self->refcount) {
         case 0:
@@ -53,7 +53,7 @@ Obj_dec_refcount(Obj *self) {
 }
 
 void*
-Obj_to_host(Obj *self) {
+Obj_To_Host_IMP(Obj *self) {
     UNUSED_VAR(self);
     THROW(ERR, "TODO");
     UNREACHABLE_RETURN(void*);

@@ -24,7 +24,7 @@
 #include "Clownfish/Err.h"
 
 void*
-LFReg_to_host(LockFreeRegistry *self) {
+LFReg_To_Host_IMP(LockFreeRegistry *self) {
     UNUSED_VAR(self);
     THROW(ERR, "TODO");
     UNREACHABLE_RETURN(void*);
