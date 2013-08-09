@@ -138,7 +138,7 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     self->short_imp_func
         = CFCUtil_sprintf("%s_%s_IMP", CFCMethod_get_class_cnick(self),
                           self->macro_sym);
-    self->imp_func = CFCUtil_sprintf("%s%s", CFCMethod_get_prefix(self),
+    self->imp_func = CFCUtil_sprintf("%s%s", CFCMethod_get_Prefix(self),
                                      self->short_imp_func);
 
     // Assume that this method is novel until we discover when applying
