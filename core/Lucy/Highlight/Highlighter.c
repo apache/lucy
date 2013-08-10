@@ -680,8 +680,14 @@ Highlighter_Encode_IMP(Highlighter *self, CharBuf *text) {
 
 static CharBuf*
 S_do_encode(Highlighter *self, CharBuf *text, CharBuf **encode_buf) {
-    if (OVERRIDDEN(self, Lucy_Highlighter_Encode, lucy_Highlighter_encode)) {
-        return Highlighter_Encode(self, text);
+    VTable *vtable = Highlighter_Get_VTable(self);
+    Highlighter_Encode_t my_meth
+        = (Highlighter_Encode_t)METHOD_PTR(vtable, Lucy_Highlighter_Encode);
+    Highlighter_Encode_t orig_meth
+        = (Highlighter_Encode_t)METHOD_PTR(HIGHLIGHTER, Lucy_Highlighter_Encode);
+
+    if (my_meth != orig_meth) {
+        return my_meth(self, text);
     }
     else {
         if (*encode_buf == NULL) { *encode_buf = CB_new(0); }
