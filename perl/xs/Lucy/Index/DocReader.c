@@ -28,7 +28,7 @@
 #include "Lucy/Store/InStream.h"
 
 lucy_HitDoc*
-lucy_DefDocReader_fetch_doc(lucy_DefaultDocReader *self, int32_t doc_id) {
+Lucy_DefDocReader_Fetch_Doc_IMP(lucy_DefaultDocReader *self, int32_t doc_id) {
     lucy_DefaultDocReaderIVARS *const ivars = lucy_DefDocReader_IVARS(self);
     lucy_Schema   *const schema = ivars->schema;
     lucy_InStream *const dat_in = ivars->dat_in;

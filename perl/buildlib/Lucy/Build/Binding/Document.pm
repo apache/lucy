@@ -98,7 +98,7 @@ set_fields(self, fields)
     lucy_Doc *self;
     HV *fields;
 PPCODE:
-    lucy_Doc_set_fields(self, fields);
+    Lucy_Doc_Set_Fields_IMP(self, fields);
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(

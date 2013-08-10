@@ -78,7 +78,7 @@ S_fetch_entry(lucy_Inverter *self, HE *hash_entry) {
 }
 
 void
-lucy_Inverter_invert_doc(lucy_Inverter *self, lucy_Doc *doc) {
+Lucy_Inverter_Invert_Doc_IMP(lucy_Inverter *self, lucy_Doc *doc) {
     HV  *const fields = (HV*)Lucy_Doc_Get_Fields(doc);
     I32  num_keys     = hv_iterinit(fields);
 

@@ -120,14 +120,15 @@ S_set_pattern_from_token_re(lucy_RegexTokenizer *self, void *token_re) {
 }
 
 void
-lucy_RegexTokenizer_set_token_re(lucy_RegexTokenizer *self, void *token_re) {
+Lucy_RegexTokenizer_Set_Token_RE_IMP(lucy_RegexTokenizer *self,
+                                     void *token_re) {
     S_set_token_re_but_not_pattern(self, token_re);
     // Set pattern as a side effect.
     S_set_pattern_from_token_re(self, token_re);
 }
 
 void
-lucy_RegexTokenizer_destroy(lucy_RegexTokenizer *self) {
+Lucy_RegexTokenizer_Destroy_IMP(lucy_RegexTokenizer *self) {
     lucy_RegexTokenizerIVARS *const ivars = lucy_RegexTokenizer_IVARS(self);
     CFISH_DECREF(ivars->pattern);
     ReREFCNT_dec(((REGEXP*)ivars->token_re));
@@ -135,9 +136,9 @@ lucy_RegexTokenizer_destroy(lucy_RegexTokenizer *self) {
 }
 
 void
-lucy_RegexTokenizer_tokenize_str(lucy_RegexTokenizer *self,
-                                 const char *string, size_t string_len,
-                                 lucy_Inversion *inversion) {
+Lucy_RegexTokenizer_Tokenize_Str_IMP(lucy_RegexTokenizer *self,
+                                     const char *string, size_t string_len,
+                                     lucy_Inversion *inversion) {
     lucy_RegexTokenizerIVARS *const ivars = lucy_RegexTokenizer_IVARS(self);
     uint32_t   num_code_points = 0;
     SV        *wrapper    = sv_newmortal();
