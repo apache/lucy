@@ -250,7 +250,10 @@ SortColl_Set_Reader_IMP(SortCollector *self, SegReader *reader) {
         }
     }
     ivars->seg_doc_max = reader ? SegReader_Doc_Max(reader) : 0;
-    Coll_set_reader((Collector*)self, reader);
+    SortColl_Set_Reader_t super_set_reader
+        = (SortColl_Set_Reader_t)SUPER_METHOD_PTR(SORTCOLLECTOR,
+                                                  Lucy_SortColl_Set_Reader);
+    super_set_reader(self, reader);
 }
 
 VArray*

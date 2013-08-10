@@ -234,7 +234,10 @@ LexWriter_Finish_IMP(LexiconWriter *self) {
 Hash*
 LexWriter_Metadata_IMP(LexiconWriter *self) {
     LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
-    Hash *const metadata  = DataWriter_metadata((DataWriter*)self);
+    LexWriter_Metadata_t super_meta
+        = (LexWriter_Metadata_t)SUPER_METHOD_PTR(LEXICONWRITER,
+                                                 Lucy_LexWriter_Metadata);
+    Hash *const metadata  = super_meta(self);
     Hash *const counts    = (Hash*)INCREF(ivars->counts);
     Hash *const ix_counts = (Hash*)INCREF(ivars->ix_counts);
 

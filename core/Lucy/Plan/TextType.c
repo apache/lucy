@@ -24,19 +24,19 @@
 #include "Clownfish/Util/StringHelper.h"
 
 CharBuf*
-TextType_make_blank(TextType *self) {
+TextType_Make_Blank_IMP(TextType *self) {
     UNUSED_VAR(self);
     return CB_new(0);
 }
 
 TermStepper*
-TextType_make_term_stepper(TextType *self) {
+TextType_Make_Term_Stepper_IMP(TextType *self) {
     UNUSED_VAR(self);
     return (TermStepper*)TextTermStepper_new();
 }
 
 int8_t
-TextType_primitive_id(TextType *self) {
+TextType_Primitive_ID_IMP(TextType *self) {
     UNUSED_VAR(self);
     return FType_TEXT;
 }

@@ -62,7 +62,7 @@ FilterMatcher_Next_IMP(FilterMatcher* self) {
 int32_t
 FilterMatcher_Skip_To_IMP(FilterMatcher* self, int32_t target) {
     FilterMatcher_IVARS(self)->doc_id = target - 1;
-    return FilterMatcher_next(self);
+    return FilterMatcher_Next_IMP(self);
 }
 
 float

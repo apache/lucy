@@ -80,7 +80,7 @@ RangeMatcher_Next_IMP(RangeMatcher* self) {
 int32_t
 RangeMatcher_Advance_IMP(RangeMatcher* self, int32_t target) {
     RangeMatcher_IVARS(self)->doc_id = target - 1;
-    return RangeMatcher_next(self);
+    return RangeMatcher_Next_IMP(self);
 }
 
 float

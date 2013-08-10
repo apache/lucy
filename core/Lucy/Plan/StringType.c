@@ -46,8 +46,11 @@ StringType_init2(StringType *self, float boost, bool indexed,
 
 bool
 StringType_Equals_IMP(StringType *self, Obj *other) {
-    if ((StringType*)other == self)             { return true; }
-    if (!FType_equals((FieldType*)self, other)) { return false; }
+    if ((StringType*)other == self) { return true; }
+    StringType_Equals_t super_equals
+        = (StringType_Equals_t)SUPER_METHOD_PTR(STRINGTYPE,
+                                                Lucy_StringType_Equals);
+    if (!super_equals(self, other)) { return false; }
     return true;
 }
 

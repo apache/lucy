@@ -51,7 +51,9 @@ bool
 ORQuery_Equals_IMP(ORQuery *self, Obj *other) {
     if ((ORQuery*)other == self)   { return true;  }
     if (!Obj_Is_A(other, ORQUERY)) { return false; }
-    return PolyQuery_equals((PolyQuery*)self, other);
+    ORQuery_Equals_t super_equals
+        = (ORQuery_Equals_t)SUPER_METHOD_PTR(ORQUERY, Lucy_ORQuery_Equals);
+    return super_equals(self, other);
 }
 
 CharBuf*

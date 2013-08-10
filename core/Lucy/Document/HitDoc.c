@@ -90,7 +90,9 @@ bool
 HitDoc_Equals_IMP(HitDoc *self, Obj *other) {
     if ((HitDoc*)other == self)           { return true;  }
     if (!Obj_Is_A(other, HITDOC))         { return false; }
-    if (!Doc_equals((Doc*)self, other))   { return false; }
+    HitDoc_Equals_t super_equals
+        = (HitDoc_Equals_t)SUPER_METHOD_PTR(HITDOC, Lucy_HitDoc_Equals);
+    if (!super_equals(self, other))       { return false; }
     HitDocIVARS *const ivars = HitDoc_IVARS(self);
     HitDocIVARS *const ovars = HitDoc_IVARS((HitDoc*)other);
     if (ivars->score != ovars->score)     { return false; }

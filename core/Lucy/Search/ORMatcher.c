@@ -307,7 +307,7 @@ ORScorer_init(ORScorer *self, VArray *children, Similarity *sim) {
 
     // Establish the state of all child matchers being past the current doc
     // id, by invoking ORMatcher's Next() method.
-    ORMatcher_next((ORMatcher*)self);
+    ORMatcher_Next_IMP((ORMatcher*)self);
 
     return self;
 }

@@ -37,7 +37,7 @@ NOTQuery*
 NOTQuery_init(NOTQuery *self, Query *negated_query) {
     self = (NOTQuery*)PolyQuery_init((PolyQuery*)self, NULL);
     NOTQuery_Set_Boost(self, 0.0f);
-    PolyQuery_add_child((PolyQuery*)self, negated_query);
+    NOTQuery_Add_Child(self, negated_query);
     return self;
 }
 
@@ -66,7 +66,9 @@ bool
 NOTQuery_Equals_IMP(NOTQuery *self, Obj *other) {
     if ((NOTQuery*)other == self)   { return true; }
     if (!Obj_Is_A(other, NOTQUERY)) { return false; }
-    return PolyQuery_equals((PolyQuery*)self, other);
+    NOTQuery_Equals_t super_equals
+        = (NOTQuery_Equals_t)SUPER_METHOD_PTR(NOTQUERY, Lucy_NOTQuery_Equals);
+    return super_equals(self, other);
 }
 
 Compiler*

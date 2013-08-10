@@ -280,7 +280,10 @@ bool
 ProximityCompiler_Equals_IMP(ProximityCompiler *self, Obj *other) {
     if ((ProximityCompiler*)other == self)        { return true; }
     if (!Obj_Is_A(other, PROXIMITYCOMPILER))      { return false; }
-    if (!Compiler_equals((Compiler*)self, other)) { return false; }
+    ProximityCompiler_Equals_t super_equals
+        = (ProximityCompiler_Equals_t)SUPER_METHOD_PTR(PROXIMITYCOMPILER,
+                                                       Lucy_ProximityCompiler_Equals);
+    if (!super_equals(self, other)) { return false; }
     ProximityCompilerIVARS *const ivars = ProximityCompiler_IVARS(self);
     ProximityCompilerIVARS *const ovars
         = ProximityCompiler_IVARS((ProximityCompiler*)other);

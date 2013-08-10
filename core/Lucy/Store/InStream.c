@@ -372,7 +372,7 @@ SI_read_bytes(InStream *self, char* buf, size_t len) {
             if (!success) {
                 RETHROW(INCREF(Err_get_error()));
             }
-            InStream_seek(self, sub_file_pos + len);
+            InStream_Seek_IMP(self, sub_file_pos + len);
         }
     }
 }

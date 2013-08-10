@@ -229,7 +229,10 @@ PhraseCompiler_init(PhraseCompiler *self, PhraseQuery *parent,
 void
 PhraseCompiler_Serialize_IMP(PhraseCompiler *self, OutStream *outstream) {
     PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
-    Compiler_serialize((Compiler*)self, outstream);
+    PhraseCompiler_Serialize_t super_serialize
+        = (PhraseCompiler_Serialize_t)SUPER_METHOD_PTR(PHRASECOMPILER,
+                                                       Lucy_PhraseCompiler_Serialize);
+    super_serialize(self, outstream);
     OutStream_Write_F32(outstream, ivars->idf);
     OutStream_Write_F32(outstream, ivars->raw_weight);
     OutStream_Write_F32(outstream, ivars->query_norm_factor);
@@ -252,7 +255,10 @@ PhraseCompiler_Deserialize_IMP(PhraseCompiler *self, InStream *instream) {
 bool
 PhraseCompiler_Equals_IMP(PhraseCompiler *self, Obj *other) {
     if (!Obj_Is_A(other, PHRASECOMPILER))                     { return false; }
-    if (!Compiler_equals((Compiler*)self, other))             { return false; }
+    PhraseCompiler_Equals_t super_equals
+        = (PhraseCompiler_Equals_t)SUPER_METHOD_PTR(PHRASECOMPILER,
+                                                    Lucy_PhraseCompiler_Equals);
+    if (!super_equals(self, other))                           { return false; }
     PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
     PhraseCompilerIVARS *const ovars
         = PhraseCompiler_IVARS((PhraseCompiler*)other);

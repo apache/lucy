@@ -83,7 +83,10 @@ bool
 ReqOptQuery_Equals_IMP(RequiredOptionalQuery *self, Obj *other) {
     if ((RequiredOptionalQuery*)other == self)   { return true;  }
     if (!Obj_Is_A(other, REQUIREDOPTIONALQUERY)) { return false; }
-    return PolyQuery_equals((PolyQuery*)self, other);
+    ReqOptQuery_Equals_t super_equals
+        = (ReqOptQuery_Equals_t)SUPER_METHOD_PTR(REQUIREDOPTIONALQUERY,
+                                                 Lucy_ReqOptQuery_Equals);
+    return super_equals(self, other);
 }
 
 Compiler*

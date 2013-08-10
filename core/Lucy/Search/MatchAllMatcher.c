@@ -51,7 +51,7 @@ MatchAllMatcher_Next_IMP(MatchAllMatcher* self) {
 int32_t
 MatchAllMatcher_Advance_IMP(MatchAllMatcher* self, int32_t target) {
     MatchAllMatcher_IVARS(self)->doc_id = target - 1;
-    return MatchAllMatcher_next(self);
+    return MatchAllMatcher_Next_IMP(self);
 }
 
 float

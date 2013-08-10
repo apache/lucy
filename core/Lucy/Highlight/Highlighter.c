@@ -183,7 +183,7 @@ Highlighter_Create_Excerpt_IMP(Highlighter *self, HitDoc *hit_doc) {
         top = Highlighter_Raw_Excerpt(self, (CharBuf*)field_val,
                                       (CharBuf*)fragment, raw_excerpt, top,
                                       heat_map, sentences);
-        Highlighter_highlight_excerpt(self, score_spans, raw_excerpt,
+        Highlighter_Highlight_Excerpt(self, score_spans, raw_excerpt,
                                       highlighted, top);
 
         DECREF(sentences);

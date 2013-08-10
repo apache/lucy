@@ -65,7 +65,10 @@ FullTextType_Equals_IMP(FullTextType *self, Obj *other) {
     if (!Obj_Is_A(other, FULLTEXTTYPE))                   { return false; }
     FullTextTypeIVARS *const ivars = FullTextType_IVARS(self);
     FullTextTypeIVARS *const ovars = FullTextType_IVARS((FullTextType*)other);
-    if (!FType_equals((FieldType*)self, other))           { return false; }
+    FullTextType_Equals_t super_equals
+        = (FullTextType_Equals_t)SUPER_METHOD_PTR(FULLTEXTTYPE,
+                                                  Lucy_FullTextType_Equals);
+    if (!super_equals(self, other))                       { return false; }
     if (!!ivars->sortable      != !!ovars->sortable)      { return false; }
     if (!!ivars->highlightable != !!ovars->highlightable) { return false; }
     if (!Analyzer_Equals(ivars->analyzer, (Obj*)ovars->analyzer)) {

@@ -189,7 +189,10 @@ TermCompiler_init(TermCompiler *self, Query *parent, Searcher *searcher,
 
 bool
 TermCompiler_Equals_IMP(TermCompiler *self, Obj *other) {
-    if (!Compiler_equals((Compiler*)self, other))             { return false; }
+    TermCompiler_Equals_t super_equals
+        = (TermCompiler_Equals_t)SUPER_METHOD_PTR(TERMCOMPILER,
+                                                  Lucy_TermCompiler_Equals);
+    if (!super_equals(self, other))                           { return false; }
     if (!Obj_Is_A(other, TERMCOMPILER))                       { return false; }
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
     TermCompilerIVARS *const ovars = TermCompiler_IVARS((TermCompiler*)other);

@@ -255,7 +255,10 @@ SortWriter_Finish_IMP(SortWriter *self) {
 Hash*
 SortWriter_Metadata_IMP(SortWriter *self) {
     SortWriterIVARS *const ivars = SortWriter_IVARS(self);
-    Hash *const metadata  = DataWriter_metadata((DataWriter*)self);
+    SortWriter_Metadata_t super_meta
+        = (SortWriter_Metadata_t)SUPER_METHOD_PTR(SORTWRITER,
+                                                  Lucy_SortWriter_Metadata);
+    Hash *const metadata = super_meta(self);
     Hash_Store_Str(metadata, "counts", 6, INCREF(ivars->counts));
     Hash_Store_Str(metadata, "null_ords", 9, INCREF(ivars->null_ords));
     Hash_Store_Str(metadata, "ord_widths", 10, INCREF(ivars->ord_widths));

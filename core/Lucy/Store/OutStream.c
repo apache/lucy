@@ -168,7 +168,7 @@ S_flush(OutStream *self, OutStreamIVARS *ivars) {
 
 int64_t
 OutStream_Length_IMP(OutStream *self) {
-    return OutStream_tell(self);
+    return OutStream_Tell_IMP(self);
 }
 
 void

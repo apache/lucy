@@ -42,7 +42,7 @@ Inversion_new(Token *seed_token) {
 
     // Process the seed token.
     if (seed_token != NULL) {
-        Inversion_append(self, (Token*)INCREF(seed_token));
+        Inversion_Append(self, (Token*)INCREF(seed_token));
     }
 
     return self;

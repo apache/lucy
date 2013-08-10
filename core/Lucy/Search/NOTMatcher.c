@@ -85,7 +85,7 @@ NOTMatcher_Next_IMP(NOTMatcher *self) {
 int32_t
 NOTMatcher_Advance_IMP(NOTMatcher *self, int32_t target) {
     NOTMatcher_IVARS(self)->doc_id = target - 1;
-    return NOTMatcher_next(self);
+    return NOTMatcher_Next_IMP(self);
 }
 
 int32_t

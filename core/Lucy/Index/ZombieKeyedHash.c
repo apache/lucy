@@ -48,14 +48,14 @@ ZKHash_Make_Key_IMP(ZombieKeyedHash *self, Obj *key, int32_t hash_sum) {
         case FType_TEXT: {
                 CharBuf *source = (CharBuf*)key;
                 size_t size = ZCB_size() + CB_Get_Size(source) + 1;
-                void *allocation = MemPool_grab(ivars->mem_pool, size);
+                void *allocation = MemPool_Grab(ivars->mem_pool, size);
                 retval = (Obj*)ZCB_newf(allocation, size, "%o", source);
             }
             break;
         case FType_INT32: {
                 size_t size = VTable_Get_Obj_Alloc_Size(INTEGER32);
                 Integer32 *copy
-                    = (Integer32*)MemPool_grab(ivars->mem_pool, size);
+                    = (Integer32*)MemPool_Grab(ivars->mem_pool, size);
                 VTable_Init_Obj(INTEGER32, copy);
                 Int32_init(copy, 0);
                 Int32_Mimic(copy, key);

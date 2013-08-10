@@ -58,7 +58,7 @@ SeriesMatcher_Destroy_IMP(SeriesMatcher *self) {
 int32_t
 SeriesMatcher_Next_IMP(SeriesMatcher *self) {
     SeriesMatcherIVARS *const ivars = SeriesMatcher_IVARS(self);
-    return SeriesMatcher_advance(self, ivars->doc_id + 1);
+    return SeriesMatcher_Advance_IMP(self, ivars->doc_id + 1);
 }
 
 int32_t
@@ -84,7 +84,7 @@ SeriesMatcher_Advance_IMP(SeriesMatcher *self, int32_t target) {
                     break;
                 }
             }
-            return SeriesMatcher_advance(self, target); // Recurse.
+            return SeriesMatcher_Advance(self, target); // Recurse.
         }
         else {
             // We're done.
@@ -102,7 +102,7 @@ SeriesMatcher_Advance_IMP(SeriesMatcher *self, int32_t target) {
         }
         else {
             // Recurse.
-            return SeriesMatcher_advance(self, ivars->next_offset);
+            return SeriesMatcher_Advance(self, ivars->next_offset);
         }
     }
 }
