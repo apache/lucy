@@ -519,7 +519,7 @@ test_Slurp_File(TestBatchRunner *runner) {
 }
 
 void
-TestFolder_run(TestFolder *self, TestBatchRunner *runner) {
+TestFolder_Run_IMP(TestFolder *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 79);
     S_init_strings();
     test_Exists(runner);

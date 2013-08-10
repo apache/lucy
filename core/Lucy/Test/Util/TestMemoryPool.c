@@ -30,7 +30,7 @@ TestMemPool_new() {
 }
 
 void
-TestMemPool_run(TestMemoryPool *self, TestBatchRunner *runner) {
+TestMemPool_Run_IMP(TestMemoryPool *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
 
     MemoryPool *mem_pool = MemPool_new(0);

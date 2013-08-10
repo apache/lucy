@@ -102,7 +102,7 @@ test_Read_File_and_Write_File(TestBatchRunner *runner) {
 }
 
 void
-TestSnapshot_run(TestSnapshot *self, TestBatchRunner *runner) {
+TestSnapshot_Run_IMP(TestSnapshot *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 9);
     test_Add_and_Delete(runner);
     test_path_handling(runner);

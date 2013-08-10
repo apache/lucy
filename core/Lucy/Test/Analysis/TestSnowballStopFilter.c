@@ -77,7 +77,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 }
 
 void
-TestSnowStop_run(TestSnowballStopFilter *self, TestBatchRunner *runner) {
+TestSnowStop_Run_IMP(TestSnowballStopFilter *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 3);
     test_Dump_Load_and_Equals(runner);
 }

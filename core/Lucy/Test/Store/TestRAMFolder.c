@@ -501,7 +501,7 @@ test_Close(TestBatchRunner *runner) {
 }
 
 void
-TestRAMFolder_run(TestRAMFolder *self, TestBatchRunner *runner) {
+TestRAMFolder_Run_IMP(TestRAMFolder *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 98);
     S_init_strings();
     test_Initialize_and_Check(runner);

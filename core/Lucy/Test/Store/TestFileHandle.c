@@ -50,7 +50,7 @@ S_new_filehandle() {
 }
 
 void
-TestFH_run(TestFileHandle *self, TestBatchRunner *runner) {
+TestFH_Run_IMP(TestFileHandle *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 2);
 
     FileHandle    *fh    = S_new_filehandle();

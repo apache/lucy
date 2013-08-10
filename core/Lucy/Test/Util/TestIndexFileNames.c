@@ -79,7 +79,7 @@ test_extract_gen(TestBatchRunner *runner) {
 }
 
 void
-TestIxFileNames_run(TestIndexFileNames *self, TestBatchRunner *runner) {
+TestIxFileNames_Run_IMP(TestIndexFileNames *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 10);
     test_local_part(runner);
     test_extract_gen(runner);

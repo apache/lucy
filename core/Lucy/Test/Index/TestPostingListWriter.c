@@ -28,7 +28,7 @@ TestPListWriter_new() {
 }
 
 void
-TestPListWriter_run(TestPostingListWriter *self, TestBatchRunner *runner) {
+TestPListWriter_Run_IMP(TestPostingListWriter *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 1);
     PASS(runner, "Placeholder");
 }

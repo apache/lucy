@@ -58,7 +58,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 }
 
 void
-TestTermQuery_run(TestTermQuery *self, TestBatchRunner *runner) {
+TestTermQuery_Run_IMP(TestTermQuery *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
     test_Dump_Load_and_Equals(runner);
 }

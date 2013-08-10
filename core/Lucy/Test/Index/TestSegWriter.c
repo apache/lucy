@@ -29,7 +29,7 @@ TestSegWriter_new() {
 }
 
 void
-TestSegWriter_run(TestSegWriter *self, TestBatchRunner *runner) {
+TestSegWriter_Run_IMP(TestSegWriter *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 1);
     PASS(runner, "placeholder");
 }

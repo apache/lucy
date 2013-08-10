@@ -36,13 +36,13 @@ TestArch_init(TestArchitecture *self) {
 }
 
 int32_t
-TestArch_index_interval(TestArchitecture *self) {
+TestArch_Index_Interval_IMP(TestArchitecture *self) {
     UNUSED_VAR(self);
     return 5;
 }
 
 int32_t
-TestArch_skip_interval(TestArchitecture *self) {
+TestArch_Skip_Interval_IMP(TestArchitecture *self) {
     UNUSED_VAR(self);
     return 3;
 }

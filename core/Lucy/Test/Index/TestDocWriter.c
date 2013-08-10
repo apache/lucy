@@ -29,7 +29,7 @@ TestDocWriter_new() {
 }
 
 void
-TestDocWriter_run(TestDocWriter *self, TestBatchRunner *runner) {
+TestDocWriter_Run_IMP(TestDocWriter *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 1);
     PASS(runner, "placeholder");
 }

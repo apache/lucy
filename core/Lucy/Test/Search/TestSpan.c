@@ -47,7 +47,7 @@ test_span_init_values(TestBatchRunner *runner) {
 }
 
 void
-TestSpan_run(TestSpan *self, TestBatchRunner *runner) {
+TestSpan_Run_IMP(TestSpan *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 6);
     test_span_init_values(runner);
 }

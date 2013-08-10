@@ -70,7 +70,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 }
 
 void
-TestRegexTokenizer_run(TestRegexTokenizer *self, TestBatchRunner *runner) {
+TestRegexTokenizer_Run_IMP(TestRegexTokenizer *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 3);
     test_Dump_Load_and_Equals(runner);
 }

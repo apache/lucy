@@ -418,7 +418,7 @@ test_f64(TestBatchRunner *runner) {
 }
 
 void
-TestIOPrimitives_run(TestIOPrimitives *self, TestBatchRunner *runner) {
+TestIOPrimitives_Run_IMP(TestIOPrimitives *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 11);
     srand((unsigned int)time((time_t*)NULL));
     test_i8(runner);

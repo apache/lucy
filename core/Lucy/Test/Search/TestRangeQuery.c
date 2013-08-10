@@ -67,7 +67,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 
 
 void
-TestRangeQuery_run(TestRangeQuery *self, TestBatchRunner *runner) {
+TestRangeQuery_Run_IMP(TestRangeQuery *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 5);
     test_Dump_Load_and_Equals(runner);
 }

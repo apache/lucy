@@ -62,7 +62,7 @@ test_analysis(TestBatchRunner *runner) {
 }
 
 void
-TestCaseFolder_run(TestCaseFolder *self, TestBatchRunner *runner) {
+TestCaseFolder_Run_IMP(TestCaseFolder *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 6);
     test_Dump_Load_and_Equals(runner);
     test_analysis(runner);

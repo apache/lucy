@@ -36,7 +36,7 @@ NumPriQ_new(uint32_t max_size) {
 }
 
 bool
-NumPriQ_less_than(NumPriorityQueue *self, Obj *a, Obj *b) {
+NumPriQ_Less_Than_IMP(NumPriorityQueue *self, Obj *a, Obj *b) {
     Float64 *num_a = (Float64*)a;
     Float64 *num_b = (Float64*)b;
     UNUSED_VAR(self);
@@ -152,7 +152,7 @@ test_random_insertion(TestBatchRunner *runner) {
 }
 
 void
-TestPriQ_run(TestPriorityQueue *self, TestBatchRunner *runner) {
+TestPriQ_Run_IMP(TestPriorityQueue *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 17);
     test_Peek_and_Pop_All(runner);
     test_Insert_and_Pop(runner);

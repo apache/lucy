@@ -169,7 +169,7 @@ test_utf8proc_normalization(TestBatchRunner *runner) {
 }
 
 void
-TestNormalizer_run(TestNormalizer *self, TestBatchRunner *runner) {
+TestNormalizer_Run_IMP(TestNormalizer *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 21);
     test_Dump_Load_and_Equals(runner);
     test_normalization(runner);

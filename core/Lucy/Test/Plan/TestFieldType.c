@@ -100,7 +100,7 @@ test_Compare_Values(TestBatchRunner *runner) {
 }
 
 void
-TestFType_run(TestFieldType *self, TestBatchRunner *runner) {
+TestFType_Run_IMP(TestFieldType *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 9);
     test_Dump_Load_and_Equals(runner);
     test_Compare_Values(runner);

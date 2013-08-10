@@ -38,27 +38,27 @@ MockFileHandle_init(MockFileHandle *self, const CharBuf *path,
 }
 
 bool
-MockFileHandle_window(MockFileHandle *self, FileWindow *window,
-                      int64_t offset, int64_t len) {
+MockFileHandle_Window_IMP(MockFileHandle *self, FileWindow *window,
+                          int64_t offset, int64_t len) {
     UNUSED_VAR(self);
     FileWindow_Set_Window(window, NULL, offset, len);
     return true;
 }
 
 bool
-MockFileHandle_release_window(MockFileHandle *self, FileWindow *window) {
+MockFileHandle_Release_Window_IMP(MockFileHandle *self, FileWindow *window) {
     UNUSED_VAR(self);
     FileWindow_Set_Window(window, NULL, 0, 0);
     return true;
 }
 
 int64_t
-MockFileHandle_length(MockFileHandle *self) {
+MockFileHandle_Length_IMP(MockFileHandle *self) {
     return MockFileHandle_IVARS(self)->len;
 }
 
 bool
-MockFileHandle_close(MockFileHandle *self) {
+MockFileHandle_Close_IMP(MockFileHandle *self) {
     UNUSED_VAR(self);
     return true;
 }

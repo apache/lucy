@@ -101,7 +101,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 }
 
 void
-TestNumericType_run(TestNumericType *self, TestBatchRunner *runner) {
+TestNumericType_Run_IMP(TestNumericType *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 12);
     test_Dump_Load_and_Equals(runner);
 }

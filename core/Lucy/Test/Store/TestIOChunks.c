@@ -114,7 +114,7 @@ test_Buf(TestBatchRunner *runner) {
 }
 
 void
-TestIOChunks_run(TestIOChunks *self, TestBatchRunner *runner) {
+TestIOChunks_Run_IMP(TestIOChunks *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 36);
     srand((unsigned int)time((time_t*)NULL));
     test_Align(runner);

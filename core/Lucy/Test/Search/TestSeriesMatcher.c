@@ -130,7 +130,7 @@ test_matrix(TestBatchRunner *runner) {
 }
 
 void
-TestSeriesMatcher_run(TestSeriesMatcher *self, TestBatchRunner *runner) {
+TestSeriesMatcher_Run_IMP(TestSeriesMatcher *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 135);
     test_matrix(runner);
 }

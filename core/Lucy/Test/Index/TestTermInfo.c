@@ -62,7 +62,7 @@ test_freqfilepos(TestBatchRunner *runner) {
 }
 
 void
-TestTermInfo_run(TestTermInfo *self, TestBatchRunner *runner) {
+TestTermInfo_Run_IMP(TestTermInfo *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 11);
     test_freqfilepos(runner);
 }

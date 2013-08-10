@@ -882,7 +882,7 @@ S_create_index() {
 }
 
 void
-TestQPLogic_run(TestQueryParserLogic *self, TestBatchRunner *runner) {
+TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 258);
 
     uint32_t i;

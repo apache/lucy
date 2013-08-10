@@ -82,7 +82,7 @@ test_all(TestBatchRunner *runner) {
 }
 
 void
-TestRAMDH_run(TestRAMDirHandle *self, TestBatchRunner *runner) {
+TestRAMDH_Run_IMP(TestRAMDirHandle *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 6);
     test_all(runner);
 }

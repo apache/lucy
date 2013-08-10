@@ -144,7 +144,7 @@ test_offsets(TestBatchRunner *runner) {
 }
 
 void
-TestCFWriter_run(TestCompoundFileWriter *self, TestBatchRunner *runner) {
+TestCFWriter_Run_IMP(TestCompoundFileWriter *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 7);
     S_init_strings();
     test_Consolidate(runner);

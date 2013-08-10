@@ -46,7 +46,7 @@ test_sub_tick(TestBatchRunner *runner) {
 }
 
 void
-TestPolyReader_run(TestPolyReader *self, TestBatchRunner *runner) {
+TestPolyReader_Run_IMP(TestPolyReader *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 1);
     test_sub_tick(runner);
 }

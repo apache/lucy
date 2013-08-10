@@ -45,7 +45,7 @@ test_Dump_And_Load(TestBatchRunner *runner) {
 }
 
 void
-TestPhraseQuery_run(TestPhraseQuery *self, TestBatchRunner *runner) {
+TestPhraseQuery_Run_IMP(TestPhraseQuery *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 1);
     test_Dump_And_Load(runner);
 }

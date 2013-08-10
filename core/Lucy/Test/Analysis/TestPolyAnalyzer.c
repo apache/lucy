@@ -172,7 +172,7 @@ test_Get_Analyzers(TestBatchRunner *runner) {
 }
 
 void
-TestPolyAnalyzer_run(TestPolyAnalyzer *self, TestBatchRunner *runner) {
+TestPolyAnalyzer_Run_IMP(TestPolyAnalyzer *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 19);
     test_Dump_Load_and_Equals(runner);
     test_analysis(runner);

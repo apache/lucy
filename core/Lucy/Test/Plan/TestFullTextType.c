@@ -106,7 +106,7 @@ test_Compare_Values(TestBatchRunner *runner) {
 }
 
 void
-TestFullTextType_run(TestFullTextType *self, TestBatchRunner *runner) {
+TestFullTextType_Run_IMP(TestFullTextType *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 10);
     test_Dump_Load_and_Equals(runner);
     test_Compare_Values(runner);

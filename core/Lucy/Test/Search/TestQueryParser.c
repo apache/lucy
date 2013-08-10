@@ -49,7 +49,7 @@ TestQP_init(TestQueryParser *self, const char *query_string, Query *tree,
 }
 
 void
-TestQP_destroy(TestQueryParser *self) {
+TestQP_Destroy_IMP(TestQueryParser *self) {
     TestQueryParserIVARS *const ivars = TestQP_IVARS(self);
     DECREF(ivars->query_string);
     DECREF(ivars->tree);
@@ -58,22 +58,22 @@ TestQP_destroy(TestQueryParser *self) {
 }
 
 CharBuf*
-TestQP_get_query_string(TestQueryParser *self) {
+TestQP_Get_Query_String_IMP(TestQueryParser *self) {
     return TestQP_IVARS(self)->query_string;
 }
 
 Query*
-TestQP_get_tree(TestQueryParser *self) {
+TestQP_Get_Tree_IMP(TestQueryParser *self) {
     return TestQP_IVARS(self)->tree;
 }
 
 Query*
-TestQP_get_expanded(TestQueryParser *self) {
+TestQP_Get_Expanded_IMP(TestQueryParser *self) {
     return TestQP_IVARS(self)->expanded;
 }
 
 uint32_t
-TestQP_get_num_hits(TestQueryParser *self) {
+TestQP_Get_Num_Hits_IMP(TestQueryParser *self) {
     return TestQP_IVARS(self)->num_hits;
 }
 

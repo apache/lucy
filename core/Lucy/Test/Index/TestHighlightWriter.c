@@ -29,7 +29,7 @@ TestHLWriter_new() {
 }
 
 void
-TestHLWriter_run(TestHighlightWriter *self, TestBatchRunner *runner) {
+TestHLWriter_Run_IMP(TestHighlightWriter *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 1);
     PASS(runner, "Placeholder");
 }

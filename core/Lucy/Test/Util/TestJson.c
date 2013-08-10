@@ -353,7 +353,7 @@ test_illegal_keys(TestBatchRunner *runner) {
 }
 
 void
-TestJson_run(TestJson *self, TestBatchRunner *runner) {
+TestJson_Run_IMP(TestJson *self, TestBatchRunner *runner) {
     uint32_t num_tests = 107;
 #ifndef LUCY_VALGRIND
     num_tests += 28; // FIXME: syntax errors leak memory.

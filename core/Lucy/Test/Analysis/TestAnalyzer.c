@@ -41,7 +41,7 @@ DummyAnalyzer_init(DummyAnalyzer *self) {
 }
 
 Inversion*
-DummyAnalyzer_transform(DummyAnalyzer *self, Inversion *inversion) {
+DummyAnalyzer_Transform_IMP(DummyAnalyzer *self, Inversion *inversion) {
     UNUSED_VAR(self);
     return (Inversion*)INCREF(inversion);
 }
@@ -60,7 +60,7 @@ test_analysis(TestBatchRunner *runner) {
 }
 
 void
-TestAnalyzer_run(TestAnalyzer *self, TestBatchRunner *runner) {
+TestAnalyzer_Run_IMP(TestAnalyzer *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 3);
     test_analysis(runner);
 }

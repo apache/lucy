@@ -62,7 +62,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 }
 
 void
-TestNOTQuery_run(TestNOTQuery *self, TestBatchRunner *runner) {
+TestNOTQuery_Run_IMP(TestNOTQuery *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
     test_Dump_Load_and_Equals(runner);
 }

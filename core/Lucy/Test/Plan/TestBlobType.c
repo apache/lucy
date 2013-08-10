@@ -51,7 +51,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 }
 
 void
-TestBlobType_run(TestBlobType *self, TestBatchRunner *runner) {
+TestBlobType_Run_IMP(TestBlobType *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 2);
     test_Dump_Load_and_Equals(runner);
 }

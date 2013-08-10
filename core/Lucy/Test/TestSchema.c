@@ -51,7 +51,7 @@ TestSchema_init(TestSchema *self, bool use_alt_arch) {
 }
 
 Architecture*
-TestSchema_architecture(TestSchema *self) {
+TestSchema_Architecture_IMP(TestSchema *self) {
     if (TestSchema_IVARS(self)->use_alt_arch) {
         return Arch_new();
     }
@@ -103,7 +103,7 @@ test_Dump_and_Load(TestBatchRunner *runner) {
 }
 
 void
-TestBatchSchema_run(TestBatchSchema *self, TestBatchRunner *runner) {
+TestBatchSchema_Run_IMP(TestBatchSchema *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
     test_Equals(runner);
     test_Dump_and_Load(runner);

@@ -48,7 +48,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 
 
 void
-TestMatchAllQuery_run(TestMatchAllQuery *self, TestBatchRunner *runner) {
+TestMatchAllQuery_Run_IMP(TestMatchAllQuery *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 2);
     test_Dump_Load_and_Equals(runner);
 }

@@ -215,7 +215,7 @@ test_Seek_and_Tell(TestBatchRunner *runner) {
 }
 
 void
-TestInStream_run(TestInStream *self, TestBatchRunner *runner) {
+TestInStream_Run_IMP(TestInStream *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 37);
     test_refill(runner);
     test_Clone_and_Reopen(runner);

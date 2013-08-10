@@ -156,7 +156,7 @@ test_Write_File_and_Read_File(TestBatchRunner *runner) {
 }
 
 void
-TestSeg_run(TestSegment *self, TestBatchRunner *runner) {
+TestSeg_Run_IMP(TestSegment *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 21);
     test_fields(runner);
     test_metadata_storage(runner);

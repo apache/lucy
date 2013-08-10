@@ -62,7 +62,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 }
 
 void
-TestLeafQuery_run(TestLeafQuery *self, TestBatchRunner *runner) {
+TestLeafQuery_Run_IMP(TestLeafQuery *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 5);
     test_Dump_Load_and_Equals(runner);
 }

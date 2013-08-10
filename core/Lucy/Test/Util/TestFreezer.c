@@ -171,7 +171,7 @@ test_varray(TestBatchRunner *runner) {
 }
 
 void
-TestFreezer_run(TestFreezer *self, TestBatchRunner *runner) {
+TestFreezer_Run_IMP(TestFreezer *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 10);
     test_bytebuf(runner);
     test_charbuf(runner);

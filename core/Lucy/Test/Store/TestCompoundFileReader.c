@@ -360,7 +360,7 @@ test_Close(TestBatchRunner *runner) {
 }
 
 void
-TestCFReader_run(TestCompoundFileReader *self, TestBatchRunner *runner) {
+TestCFReader_Run_IMP(TestCompoundFileReader *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 48);
     S_init_strings();
     test_open(runner);

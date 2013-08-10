@@ -158,7 +158,7 @@ TestReverseType_init2(TestReverseType *self, float boost, bool indexed,
 }
 
 int32_t
-TestReverseType_compare_values(TestReverseType *self, Obj *a, Obj *b) {
+TestReverseType_Compare_Values_IMP(TestReverseType *self, Obj *a, Obj *b) {
     UNUSED_VAR(self);
     return Obj_Compare_To(b, a);
 }
@@ -627,7 +627,7 @@ test_sort_spec(TestBatchRunner *runner) {
 }
 
 void
-TestSortSpec_run(TestSortSpec *self, TestBatchRunner *runner) {
+TestSortSpec_Run_IMP(TestSortSpec *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 18);
     S_init_strings();
     test_sort_spec(runner);

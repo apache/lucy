@@ -65,7 +65,7 @@ test_all(TestBatchRunner *runner) {
 }
 
 void
-TestI32Arr_run(TestI32Array *self, TestBatchRunner *runner) {
+TestI32Arr_Run_IMP(TestI32Array *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
     test_all(runner);
 }

@@ -249,7 +249,7 @@ test_Window(TestBatchRunner *runner) {
 }
 
 void
-TestFSFH_run(TestFSFileHandle *self, TestBatchRunner *runner) {
+TestFSFH_Run_IMP(TestFSFileHandle *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 46);
     test_open(runner);
     test_Read_Write(runner);

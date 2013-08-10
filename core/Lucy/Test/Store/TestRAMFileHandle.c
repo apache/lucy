@@ -165,7 +165,7 @@ test_Window(TestBatchRunner *runner) {
 }
 
 void
-TestRAMFH_run(TestRAMFileHandle *self, TestBatchRunner *runner) {
+TestRAMFH_Run_IMP(TestRAMFileHandle *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 32);
     test_open(runner);
     test_Read_Write(runner);

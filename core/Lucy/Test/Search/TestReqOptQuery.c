@@ -65,7 +65,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 }
 
 void
-TestReqOptQuery_run(TestReqOptQuery *self, TestBatchRunner *runner) {
+TestReqOptQuery_Run_IMP(TestReqOptQuery *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
     test_Dump_Load_and_Equals(runner);
 }

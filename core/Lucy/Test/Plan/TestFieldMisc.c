@@ -236,7 +236,7 @@ test_many_fields(TestBatchRunner *runner) {
 }
 
 void
-TestFieldMisc_run(TestFieldMisc *self, TestBatchRunner *runner) {
+TestFieldMisc_Run_IMP(TestFieldMisc *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 20);
     S_init_strings();
     test_spec_field(runner);

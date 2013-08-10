@@ -103,7 +103,7 @@ test_stemming(TestBatchRunner *runner) {
 }
 
 void
-TestSnowStemmer_run(TestSnowballStemmer *self, TestBatchRunner *runner) {
+TestSnowStemmer_Run_IMP(TestSnowballStemmer *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 153);
     test_Dump_Load_and_Equals(runner);
     test_stemming(runner);

@@ -441,7 +441,7 @@ test_off_by_one_error() {
 }
 
 void
-TestBitVector_run(TestBitVector *self, TestBatchRunner *runner) {
+TestBitVector_Run_IMP(TestBitVector *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 1029);
     test_Set_and_Get(runner);
     test_Flip(runner);

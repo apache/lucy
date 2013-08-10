@@ -578,7 +578,7 @@ test_hl_selection(TestBatchRunner *runner) {
 }
 
 void
-TestHighlighter_run(TestHighlighter *self, TestBatchRunner *runner) {
+TestHighlighter_Run_IMP(TestHighlighter *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 35);
     test_highlighting(runner);
     test_hl_selection(runner);

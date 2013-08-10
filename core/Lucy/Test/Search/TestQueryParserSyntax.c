@@ -441,7 +441,7 @@ test_query_parser_syntax(TestBatchRunner *runner) {
 }
 
 void
-TestQPSyntax_run(TestQueryParserSyntax *self, TestBatchRunner *runner) {
+TestQPSyntax_Run_IMP(TestQueryParserSyntax *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 68);
     test_query_parser_syntax(runner);
 }

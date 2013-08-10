@@ -79,13 +79,13 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner, uint32_t boolop) {
 }
 
 void
-TestANDQuery_run(TestANDQuery *self, TestBatchRunner *runner) {
+TestANDQuery_Run_IMP(TestANDQuery *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
     test_Dump_Load_and_Equals(runner, BOOLOP_AND);
 }
 
 void
-TestORQuery_run(TestORQuery *self, TestBatchRunner *runner) {
+TestORQuery_Run_IMP(TestORQuery *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
     test_Dump_Load_and_Equals(runner, BOOLOP_OR);
 }

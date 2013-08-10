@@ -56,7 +56,7 @@ test_Choose_Sparse(TestBatchRunner *runner) {
 }
 
 void
-TestIxManager_run(TestIndexManager *self, TestBatchRunner *runner) {
+TestIxManager_Run_IMP(TestIndexManager *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 34);
     test_Choose_Sparse(runner);
 }

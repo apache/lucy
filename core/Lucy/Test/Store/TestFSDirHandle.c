@@ -95,7 +95,7 @@ test_all(TestBatchRunner *runner) {
 }
 
 void
-TestFSDH_run(TestFSDirHandle *self, TestBatchRunner *runner) {
+TestFSDH_Run_IMP(TestFSDirHandle *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 5);
     test_all(runner);
 }

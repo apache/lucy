@@ -171,7 +171,7 @@ test_disallow_updir(TestBatchRunner *runner) {
 }
 
 void
-TestFSFolder_run(TestFSFolder *self, TestBatchRunner *runner) {
+TestFSFolder_Run_IMP(TestFSFolder *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self,
                           TestFolderCommon_num_tests() + 9);
     test_Initialize_and_Check(runner);
