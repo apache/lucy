@@ -60,7 +60,7 @@ S_fetch_entry(InverterIVARS *ivars, CharBuf *field) {
 }
 
 void
-Inverter_invert_doc(Inverter *self, Doc *doc) {
+Inverter_Invert_Doc_IMP(Inverter *self, Doc *doc) {
     InverterIVARS *const ivars = Inverter_IVARS(self);
     Hash *const fields = (Hash*)Doc_Get_Fields(doc);
     uint32_t   num_keys     = Hash_Iterate(fields);

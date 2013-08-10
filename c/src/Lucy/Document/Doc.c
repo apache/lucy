@@ -49,27 +49,27 @@ Doc_init(Doc *self, void *fields, int32_t doc_id) {
 }
 
 void
-Doc_set_fields(Doc *self, void *fields) {
+Doc_Set_Fields_IMP(Doc *self, void *fields) {
     DocIVARS *const ivars = Doc_IVARS(self);
     DECREF(ivars->fields);
     ivars->fields = CERTIFY(fields, HASH);
 }
 
 uint32_t
-Doc_get_size(Doc *self) {
+Doc_Get_Size_IMP(Doc *self) {
     Hash *hash = (Hash*)Doc_IVARS(self)->fields;
     return Hash_Get_Size(hash);
 }
 
 void
-Doc_store(Doc *self, const CharBuf *field, Obj *value) {
+Doc_Store_IMP(Doc *self, const CharBuf *field, Obj *value) {
     Hash *hash = (Hash*)Doc_IVARS(self)->fields;
     Hash_Store(hash, (Obj *)field, value);
     INCREF(value);
 }
 
 void
-Doc_serialize(Doc *self, OutStream *outstream) {
+Doc_Serialize_IMP(Doc *self, OutStream *outstream) {
     DocIVARS *const ivars = Doc_IVARS(self);
     Hash *hash = (Hash*)ivars->fields;
     Freezer_serialize_hash(hash, outstream);
@@ -77,7 +77,7 @@ Doc_serialize(Doc *self, OutStream *outstream) {
 }
 
 Doc*
-Doc_deserialize(Doc *self, InStream *instream) {
+Doc_Deserialize_IMP(Doc *self, InStream *instream) {
     DocIVARS *const ivars = Doc_IVARS(self);
     ivars->fields = Freezer_read_hash(instream);
     ivars->doc_id = InStream_Read_C32(instream);
@@ -85,8 +85,7 @@ Doc_deserialize(Doc *self, InStream *instream) {
 }
 
 Obj*
-Doc_extract(Doc *self, CharBuf *field,
-                 ViewCharBuf *target) {
+Doc_Extract_IMP(Doc *self, CharBuf *field, ViewCharBuf *target) {
     Hash *hash = (Hash*)Doc_IVARS(self)->fields;
     Obj  *obj  = Hash_Fetch(hash, (Obj *)field);
 
@@ -98,21 +97,21 @@ Doc_extract(Doc *self, CharBuf *field,
 }
 
 void*
-Doc_to_host(Doc *self) {
+Doc_To_Host_IMP(Doc *self) {
     UNUSED_VAR(self);
     THROW(ERR, "TODO");
     UNREACHABLE_RETURN(void*);
 }
 
 Hash*
-Doc_dump(Doc *self) {
+Doc_Dump_IMP(Doc *self) {
     UNUSED_VAR(self);
     THROW(ERR, "TODO");
     UNREACHABLE_RETURN(Hash*);
 }
 
 Doc*
-Doc_load(Doc *self, Obj *dump) {
+Doc_Load_IMP(Doc *self, Obj *dump) {
     UNUSED_VAR(self);
     UNUSED_VAR(dump);
     THROW(ERR, "TODO");
@@ -120,7 +119,7 @@ Doc_load(Doc *self, Obj *dump) {
 }
 
 bool
-Doc_equals(Doc *self, Obj *other) {
+Doc_Equals_IMP(Doc *self, Obj *other) {
     if ((Doc*)other == self)   { return true;  }
     if (!Obj_Is_A(other, DOC)) { return false; }
     DocIVARS *const ivars = Doc_IVARS(self);
@@ -129,7 +128,7 @@ Doc_equals(Doc *self, Obj *other) {
 }
 
 void
-Doc_destroy(Doc *self) {
+Doc_Destroy_IMP(Doc *self) {
     DocIVARS *const ivars = Doc_IVARS(self);
     DECREF(ivars->fields);
     SUPER_DESTROY(self, DOC);
