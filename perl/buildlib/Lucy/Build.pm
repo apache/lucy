@@ -85,7 +85,7 @@ sub ACTION_lemon {
 sub ACTION_copy_clownfish_includes {
     my $self = shift;
 
-    $self->dispatch('charmony');
+    $self->depends_on('charmony');
 
     $self->SUPER::ACTION_copy_clownfish_includes;
 
@@ -95,7 +95,7 @@ sub ACTION_copy_clownfish_includes {
 sub ACTION_clownfish {
     my $self = shift;
 
-    $self->dispatch('charmony');
+    $self->depends_on('charmony');
 
     $self->SUPER::ACTION_clownfish;
 }
@@ -162,8 +162,7 @@ sub ACTION_test_valgrind {
     if ( !$ENV{LUCY_VALGRIND} ) {
         warn "\$ENV{LUCY_VALGRIND} not true -- possible false positives";
     }
-    $self->dispatch('code');
-    $self->dispatch('suppressions');
+    $self->depends_on(qw( code suppressions ));
 
     # Unbuffer STDOUT, grab test file names and suppressions files.
     $|++;
@@ -218,7 +217,7 @@ sub ACTION_test_valgrind {
 # Run all .y files through lemon.
 sub ACTION_parsers {
     my $self = shift;
-    $self->dispatch('lemon');
+    $self->depends_on('lemon');
     my $y_files = $self->rscan_dir( $CORE_SOURCE_DIR, qr/\.y$/ );
     for my $y_file (@$y_files) {
         my $c_file = $y_file;
@@ -234,7 +233,7 @@ sub ACTION_parsers {
 sub ACTION_compile_custom_xs {
     my $self = shift;
 
-    $self->dispatch('parsers');
+    $self->depends_on('parsers');
 
     $self->SUPER::ACTION_compile_custom_xs;
 }
@@ -285,7 +284,7 @@ sub ACTION_dist {
     _check_module_build_for_dist;
 
     # Create POD but make sure not to include build artifacts.
-    $self->dispatch('pod');
+    $self->depends_on('pod');
     _clean_prereq_builds($self);
 
     # We build our Perl release tarball from $REPOS_ROOT/perl, rather than
@@ -312,7 +311,7 @@ sub ACTION_dist {
         system("cp -R ../$item $item");
     }
 
-    $self->dispatch('manifest');
+    $self->depends_on('manifest');
     my $no_index = $self->_gen_pause_exclusion_list;
     my $meta_add = $self->meta_add || {};
     $meta_add->{no_index} = $no_index;
