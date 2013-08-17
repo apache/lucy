@@ -86,6 +86,8 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
 
     chaz_CFlags_add_define(extra_cflags, "CFP_LUCY", NULL);
     chaz_CFlags_add_define(extra_cflags, "CFP_TESTLUCY", NULL);
+
+    chaz_CFlags_hide_symbols(extra_cflags);
 }
 
 static int
@@ -204,7 +206,6 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     chaz_CFlags_enable_debugging(makefile_cflags);
     chaz_CFlags_disable_strict_aliasing(makefile_cflags);
     chaz_CFlags_compile_shared_library(makefile_cflags);
-    chaz_CFlags_hide_symbols(makefile_cflags);
     if (chaz_args->code_coverage) {
         chaz_CFlags_enable_code_coverage(makefile_cflags);
     }
