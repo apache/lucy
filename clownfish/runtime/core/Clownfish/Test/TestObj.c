@@ -127,11 +127,6 @@ S_attempt_Clone(void *context) {
 }
 
 static void
-S_attempt_Make(void *context) {
-    Obj_Make((Obj*)context);
-}
-
-static void
 S_attempt_Compare_To(void *context) {
     Obj_Compare_To((Obj*)context, (Obj*)context);
 }
@@ -171,7 +166,6 @@ test_abstract_routines(TestBatchRunner *runner) {
 
     Obj *obj = S_new_testobj();
     S_verify_abstract_error(runner, S_attempt_Clone,      obj, "Clone");
-    S_verify_abstract_error(runner, S_attempt_Make,       obj, "Make");
     S_verify_abstract_error(runner, S_attempt_Compare_To, obj, "Compare_To");
     S_verify_abstract_error(runner, S_attempt_To_I64,     obj, "To_I64");
     S_verify_abstract_error(runner, S_attempt_To_F64,     obj, "To_F64");
@@ -181,7 +175,7 @@ test_abstract_routines(TestBatchRunner *runner) {
 
 void
 TestObj_Run_IMP(TestObj *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 18);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 17);
     test_refcounts(runner);
     test_To_String(runner);
     test_Equals(runner);

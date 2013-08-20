@@ -302,10 +302,3 @@ LockErr_init(LockErr *self, CharBuf *message) {
     return self;
 }
 
-LockErr*
-LockErr_Make_IMP(LockErr *self) {
-    UNUSED_VAR(self);
-    return LockErr_new(CB_new(0));
-}
-
-

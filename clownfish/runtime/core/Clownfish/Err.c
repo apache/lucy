@@ -49,12 +49,6 @@ Err_Destroy_IMP(Err *self) {
     SUPER_DESTROY(self, ERR);
 }
 
-Err*
-Err_Make_IMP(Err *self) {
-    UNUSED_VAR(self);
-    return Err_new(CB_new(0));
-}
-
 CharBuf*
 Err_To_String_IMP(Err *self) {
     return (CharBuf*)INCREF(self->mess);
@@ -70,12 +64,11 @@ Err_Cat_Mess_IMP(Err *self, const CharBuf *mess) {
 void
 THROW(VTable *vtable, char *pattern, ...) {
     va_list args;
-    Err_Make_t make = METHOD_PTR(CERTIFY(vtable, VTABLE), Cfish_Err_Make);
-    Err *err = (Err*)CERTIFY(make(NULL), ERR);
-    CharBuf *mess = Err_Get_Mess(err);
+    Err *err = (Err*)VTable_Make_Obj(vtable);
+    err = Err_init(err, CB_new(0));
 
     va_start(args, pattern);
-    CB_VCatF(mess, pattern, args);
+    CB_VCatF(err->mess, pattern, args);
     va_end(args);
 
     Err_do_throw(err);
@@ -173,12 +166,11 @@ void
 Err_throw_at(VTable *vtable, const char *file, int line,
              const char *func, const char *pattern, ...) {
     va_list args;
-    Err_Make_t make = METHOD_PTR(CERTIFY(vtable, VTABLE), Cfish_Err_Make);
-    Err *err = (Err*)CERTIFY(make(NULL), ERR);
-    CharBuf *mess = Err_Get_Mess(err);
+    Err *err = (Err*)VTable_Make_Obj(vtable);
+    err = Err_init(err, CB_new(0));
 
     va_start(args, pattern);
-    S_vcat_mess(mess, file, line, func, pattern, args);
+    S_vcat_mess(err->mess, file, line, func, pattern, args);
     va_end(args);
 
     Err_do_throw(err);

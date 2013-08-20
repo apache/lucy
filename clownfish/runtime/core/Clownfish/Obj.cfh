@@ -28,11 +28,6 @@ public class Clownfish::Obj {
     public inert Obj*
     init(Obj* self);
 
-    /** Zero argument factory constructor.
-     */
-    public abstract incremented Obj*
-    Make(Obj *self);
-
     /** Return an object's refcount.
      */
     uint32_t

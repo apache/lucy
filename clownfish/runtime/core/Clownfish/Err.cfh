@@ -71,9 +71,6 @@ public class Clownfish::Err inherits Clownfish::Obj {
     void
     Add_Frame(Err *self, const char *file, int line, const char *func);
 
-    public incremented Err*
-    Make(Err *self);
-
     /** Set the value of "error", a per-thread Err shared variable.
      */
     public inert void

@@ -16,6 +16,7 @@
 
 #define CHY_USE_SHORT_NAMES
 #define CFISH_USE_SHORT_NAMES
+#define C_CFISH_ERR
 
 #include "charmony.h"
 
@@ -71,9 +72,8 @@ Err_To_Host_IMP(Err *self) {
 
 void
 Err_throw_mess(VTable *vtable, CharBuf *message) {
-    Err_Make_t make
-        = METHOD_PTR(CERTIFY(vtable, VTABLE), Cfish_Err_Make);
-    Err *err = (Err*)CERTIFY(make(NULL), ERR);
+    Err *err = (Err*)VTable_Make_Obj(vtable);
+    Err_init(err, CB_new(0));
     Err_Cat_Mess(err, message);
     DECREF(message);
     Err_do_throw(err);

@@ -167,9 +167,6 @@ public class Lucy::Store::LockErr inherits Clownfish::Err {
 
     public inert LockErr*
     init(LockErr *self, CharBuf *message);
-
-    public incremented LockErr*
-    Make(LockErr *self);
 }
 
 
