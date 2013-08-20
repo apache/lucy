@@ -299,7 +299,7 @@ static bool
 S_is_local_entry(const CharBuf *path) {
     ZombieCharBuf *scratch = ZCB_WRAP(path);
     uint32_t code_point;
-    while (0 != (code_point = ZCB_Nip_One(scratch))) {
+    while (0 != (code_point = ZCB_Nibble(scratch))) {
         if (code_point == '/') { return false; }
     }
     return true;

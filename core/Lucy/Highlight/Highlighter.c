@@ -404,7 +404,7 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const CharBuf *field_val,
         }
 
         do {
-            uint32_t code_point = ZCB_Nip_One(temp);
+            uint32_t code_point = ZCB_Nibble(temp);
             start++;
             this_excerpt_len--;
 
@@ -704,7 +704,7 @@ S_encode_entities(CharBuf *text, CharBuf *encoded) {
 
     // Scan first so that we only allocate once.
     uint32_t code_point;
-    while (0 != (code_point = ZCB_Nip_One(temp))) {
+    while (0 != (code_point = ZCB_Nibble(temp))) {
         if (code_point > 127
             || (!isgraph(code_point) && !isspace(code_point))
             || code_point == '<'
@@ -722,7 +722,7 @@ S_encode_entities(CharBuf *text, CharBuf *encoded) {
     CB_Grow(encoded, space);
     CB_Set_Size(encoded, 0);
     ZCB_Assign(temp, text);
-    while (0 != (code_point = ZCB_Nip_One(temp))) {
+    while (0 != (code_point = ZCB_Nibble(temp))) {
         if (code_point > 127
             || (!isgraph(code_point) && !isspace(code_point))
            ) {

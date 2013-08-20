@@ -41,7 +41,7 @@ Lock_init(Lock *self, Folder *folder, const CharBuf *name,
     }
     ZombieCharBuf *scratch = ZCB_WRAP(name);
     uint32_t code_point;
-    while (0 != (code_point = ZCB_Nip_One(scratch))) {
+    while (0 != (code_point = ZCB_Nibble(scratch))) {
         if (isalnum(code_point)
             || code_point == '.'
             || code_point == '-'

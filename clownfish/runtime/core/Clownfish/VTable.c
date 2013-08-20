@@ -329,7 +329,7 @@ S_scrunch_charbuf(CharBuf *source, CharBuf *target) {
     ZombieCharBuf *iterator = ZCB_WRAP(source);
     CB_Set_Size(target, 0);
     while (ZCB_Get_Size(iterator)) {
-        uint32_t code_point = ZCB_Nip_One(iterator);
+        uint32_t code_point = ZCB_Nibble(iterator);
         if (code_point > 127) {
             THROW(ERR, "Can't fold case for %o", source);
         }

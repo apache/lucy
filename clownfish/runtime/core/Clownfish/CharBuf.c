@@ -138,9 +138,9 @@ CB_Hash_Sum_IMP(CharBuf *self) {
     uint32_t hashvalue = 5381;
     ZombieCharBuf *iterator = ZCB_WRAP(self);
 
-    const CB_Nip_One_t nip_one = METHOD_PTR(iterator->vtable, Cfish_CB_Nip_One);
+    const CB_Nibble_t nibble = METHOD_PTR(iterator->vtable, Cfish_CB_Nibble);
     while (iterator->size) {
-        uint32_t code_point = (uint32_t)nip_one((CharBuf*)iterator);
+        uint32_t code_point = (uint32_t)nibble((CharBuf*)iterator);
         hashvalue = ((hashvalue << 5) + hashvalue) ^ code_point;
     }
 
@@ -391,13 +391,13 @@ CB_BaseX_To_I64_IMP(CharBuf *self, uint32_t base) {
 
     // Advance past minus sign.
     if (ZCB_Code_Point_At(iterator, 0) == '-') {
-        ZCB_Nip_One(iterator);
+        ZCB_Nibble(iterator);
         is_negative = true;
     }
 
     // Accumulate.
     while (iterator->size) {
-        int32_t code_point = ZCB_Nip_One(iterator);
+        int32_t code_point = ZCB_Nibble(iterator);
         if (isalnum(code_point)) {
             int32_t addend = isdigit(code_point)
                              ? code_point - '0'
@@ -641,7 +641,7 @@ CB_Nip_IMP(CharBuf *self, size_t count) {
 }
 
 int32_t
-CB_Nip_One_IMP(CharBuf *self) {
+CB_Nibble_IMP(CharBuf *self) {
     if (self->size == 0) {
         return 0;
     }
@@ -747,8 +747,8 @@ CB_compare(const void *va, const void *vb) {
     ZombieCharBuf *iterator_a = ZCB_WRAP(a);
     ZombieCharBuf *iterator_b = ZCB_WRAP(b);
     while (iterator_a->size && iterator_b->size) {
-        int32_t code_point_a = ZCB_Nip_One(iterator_a);
-        int32_t code_point_b = ZCB_Nip_One(iterator_b);
+        int32_t code_point_a = ZCB_Nibble(iterator_a);
+        int32_t code_point_b = ZCB_Nibble(iterator_b);
         const int32_t comparison = code_point_a - code_point_b;
         if (comparison != 0) { return comparison; }
     }
@@ -874,7 +874,7 @@ ViewCB_Nip_IMP(ViewCharBuf *self, size_t count) {
 }
 
 int32_t
-ViewCB_Nip_One_IMP(ViewCharBuf *self) {
+ViewCB_Nibble_IMP(ViewCharBuf *self) {
     if (self->size == 0) {
         return 0;
     }

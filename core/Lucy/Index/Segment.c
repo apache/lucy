@@ -69,7 +69,7 @@ Seg_valid_seg_name(const CharBuf *name) {
         ZombieCharBuf *scratch = ZCB_WRAP(name);
         ZCB_Nip(scratch, 4);
         uint32_t code_point;
-        while (0 != (code_point = ZCB_Nip_One(scratch))) {
+        while (0 != (code_point = ZCB_Nibble(scratch))) {
             if (!isalnum(code_point)) { return false; }
         }
         if (ZCB_Get_Size(scratch) == 0) { return true; } // Success!

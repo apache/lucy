@@ -179,7 +179,7 @@ S_append_json_string(Obj *dump, CharBuf *json) {
     // Process string data.
     ZombieCharBuf *iterator = ZCB_WRAP((CharBuf*)dump);
     while (ZCB_Get_Size(iterator)) {
-        uint32_t code_point = ZCB_Nip_One(iterator);
+        uint32_t code_point = ZCB_Nibble(iterator);
         if (code_point > 127) {
             // There is no need to escape any high characters, including those
             // above the BMP, as we assume that the destination channel can

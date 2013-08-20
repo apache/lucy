@@ -831,9 +831,9 @@ S_unescape(QueryParser *self, CharBuf *orig, CharBuf *target) {
     CB_Set_Size(target, 0);
     CB_Grow(target, CB_Get_Size(orig) + 4);
 
-    while (0 != (code_point = ZCB_Nip_One(source))) {
+    while (0 != (code_point = ZCB_Nibble(source))) {
         if (code_point == '\\') {
-            uint32_t next_code_point = ZCB_Nip_One(source);
+            uint32_t next_code_point = ZCB_Nibble(source);
             if (next_code_point == ':'
                 || next_code_point == '"'
                 || next_code_point == '\\'

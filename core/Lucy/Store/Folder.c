@@ -432,7 +432,7 @@ S_enclosing_folder(Folder *self, ZombieCharBuf *path) {
     // Find first component of the file path.
     ZombieCharBuf *scratch        = ZCB_WRAP((CharBuf*)path);
     ZombieCharBuf *path_component = ZCB_WRAP((CharBuf*)path);
-    while (0 != (code_point = ZCB_Nip_One(scratch))) {
+    while (0 != (code_point = ZCB_Nibble(scratch))) {
         if (code_point == '/') {
             ZCB_Truncate(path_component, path_component_len);
             ZCB_Nip(path, path_component_len + 1);

@@ -264,7 +264,7 @@ class Clownfish::CharBuf cnick CB
      * point, or 0 if the string was empty.
      */
     int32_t
-    Nip_One(CharBuf *self);
+    Nibble(CharBuf *self);
 
     /** Remove characters (measured in code points) from the end of the
      * CharBuf.  Returns the number chopped.
@@ -339,7 +339,7 @@ class Clownfish::ViewCharBuf cnick ViewCB
     Nip(ViewCharBuf *self, size_t count);
 
     int32_t
-    Nip_One(ViewCharBuf *self);
+    Nibble(ViewCharBuf *self);
 
     /** Throws an error. */
     char*

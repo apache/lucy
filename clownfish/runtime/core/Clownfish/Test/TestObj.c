@@ -70,7 +70,7 @@ test_To_String(TestBatchRunner *runner) {
     ZombieCharBuf *temp = ZCB_WRAP(string);
     while (ZCB_Get_Size(temp)) {
         if (ZCB_Starts_With_Str(temp, "TestObj", 7)) { break; }
-        ZCB_Nip_One(temp);
+        ZCB_Nibble(temp);
     }
     TEST_TRUE(runner, ZCB_Starts_With_Str(temp, "TestObj", 7), "To_String");
     DECREF(string);

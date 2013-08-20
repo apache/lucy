@@ -235,9 +235,9 @@ S_consume_text(ZombieCharBuf *qstring) {
     ZombieCharBuf *text  = ZCB_WRAP((CharBuf*)qstring);
     size_t tick = 0;
     while (1) {
-        uint32_t code_point = ZCB_Nip_One(qstring);
+        uint32_t code_point = ZCB_Nibble(qstring);
         if (code_point == '\\') {
-            code_point = ZCB_Nip_One(qstring);
+            code_point = ZCB_Nibble(qstring);
             tick++;
             if (code_point == 0) {
                 break;
@@ -261,13 +261,13 @@ S_consume_text(ZombieCharBuf *qstring) {
 static ParserElem*
 S_consume_quoted_string(ZombieCharBuf *qstring) {
     ZombieCharBuf *text = ZCB_WRAP((CharBuf*)qstring);
-    if (ZCB_Nip_One(qstring) != '"') {
+    if (ZCB_Nibble(qstring) != '"') {
         THROW(ERR, "Internal error: expected a quote");
     }
 
     size_t tick = 1;
     while (1) {
-        uint32_t code_point = ZCB_Nip_One(qstring);
+        uint32_t code_point = ZCB_Nibble(qstring);
         if (code_point == '"') {
             tick += 1;
             break;
@@ -276,7 +276,7 @@ S_consume_quoted_string(ZombieCharBuf *qstring) {
             break;
         }
         else if (code_point == '\\') {
-            ZCB_Nip_One(qstring);
+            ZCB_Nibble(qstring);
             tick += 2;
         }
         else {
