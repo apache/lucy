@@ -83,7 +83,7 @@ RegexTokenizer_init(RegexTokenizer *self, const CharBuf *pattern) {
 }
 
 void
-RegexTokenizer_Set_Token_RE(RegexTokenizer *self, void *token_re) {
+RegexTokenizer_Set_Token_RE_IMP(RegexTokenizer *self, void *token_re) {
     UNUSED_VAR(self);
     UNUSED_VAR(token_re);
     THROW(ERR, "TODO");
