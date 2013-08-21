@@ -210,6 +210,9 @@ const char*
 CFCMethod_get_Prefix(CFCMethod *self);
 
 const char*
+CFCMethod_get_PREFIX(CFCMethod *self);
+
+const char*
 CFCMethod_get_exposure(CFCMethod *self);
 
 const char*

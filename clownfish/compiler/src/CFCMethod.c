@@ -138,7 +138,7 @@ CFCMethod_init(CFCMethod *self, CFCParcel *parcel, const char *exposure,
     self->short_imp_func
         = CFCUtil_sprintf("%s_%s_IMP", CFCMethod_get_class_cnick(self),
                           self->macro_sym);
-    self->imp_func = CFCUtil_sprintf("%s%s", CFCMethod_get_Prefix(self),
+    self->imp_func = CFCUtil_sprintf("%s%s", CFCMethod_get_PREFIX(self),
                                      self->short_imp_func);
 
     // Assume that this method is novel until we discover when applying
@@ -295,17 +295,17 @@ S_short_method_sym(CFCMethod *self, CFCClass *invoker, const char *postfix) {
 
 static char*
 S_full_method_sym(CFCMethod *self, CFCClass *invoker, const char *postfix) {
-    const char *Prefix;
+    const char *PREFIX;
     const char *cnick;
     if (invoker) {
-        Prefix = CFCClass_get_Prefix(invoker);
+        PREFIX = CFCClass_get_PREFIX(invoker);
         cnick  = CFCClass_get_cnick(invoker);
     }
     else {
-        Prefix = CFCMethod_get_Prefix(self);
+        PREFIX = CFCMethod_get_PREFIX(self);
         cnick  = CFCMethod_get_class_cnick(self);
     }
-    return CFCUtil_sprintf("%s%s_%s%s", Prefix, cnick, self->macro_sym,
+    return CFCUtil_sprintf("%s%s_%s%s", PREFIX, cnick, self->macro_sym,
                            postfix);
 }
 
@@ -390,6 +390,11 @@ CFCMethod_get_prefix(CFCMethod *self) {
 const char*
 CFCMethod_get_Prefix(CFCMethod *self) {
     return CFCSymbol_get_Prefix((CFCSymbol*)self);
+}
+
+const char*
+CFCMethod_get_PREFIX(CFCMethod *self) {
+    return CFCSymbol_get_PREFIX((CFCSymbol*)self);
 }
 
 const char*
