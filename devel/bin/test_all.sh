@@ -23,34 +23,25 @@ fi
 
 # C
 cd clownfish/compiler/c
-./configure
-make -j
-make -j test
+./configure && make -j && make -j test
 C_CFC_RESULT=$?
 cd ../../runtime/c
-./configure
-make -j
-make -j test
+./configure && make -j && make -j test
 C_CFISH_RUNTIME_RESULT=$?
 cd ../../../c
-./configure
-make -j
-make -j test
+./configure && make -j && make -j test
 C_LUCY_RESULT=$?
 make distclean
 
 # Perl
 cd ../clownfish/compiler/perl
-perl Build.PL
-./Build test
+perl Build.PL && ./Build test
 PERL_CFC_RESULT=$?
 cd ../../runtime/perl
-perl Build.PL
-./Build test
+perl Build.PL && ./Build test
 PERL_CFISH_RUNTIME_RESULT=$?
 cd ../../../perl
-perl Build.PL
-./Build test
+perl Build.PL && ./Build test
 PERL_LUCY_RESULT=$?
 ./Build realclean
 
