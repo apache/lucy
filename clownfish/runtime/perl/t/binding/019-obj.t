@@ -89,7 +89,7 @@ SKIP: {
     # non-`nullable` return values correctly, by ensuring that the Perl
     # callback wrapper for inc_refcount() checks the return value and throws
     # an exception if a Perl-space implementation returns undef.
-    my $array = Clownfish::VArray->new( capacity => 3 );
+    my $array = Clownfish::VArray->new;
     eval { $array->store( 1, BadRefCount->new ); };
     like( $@, qr/NULL/,
         "Don't allow methods without nullable return values to return NULL" );

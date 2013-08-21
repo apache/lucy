@@ -21,7 +21,7 @@ use Lucy::Test;
 
 my ( $varray, $twin );
 
-$varray = Clownfish::VArray->new( capacity => 5 );
+$varray = Clownfish::VArray->new;
 $varray->push( Clownfish::CharBuf->new($_) ) for 1 .. 5;
 $varray->delete(3);
 $twin = $varray->_clone;

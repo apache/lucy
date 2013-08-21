@@ -36,14 +36,14 @@ class Clownfish::VArray cnick VA inherits Clownfish::Obj {
     uint32_t   cap;
 
     inert incremented VArray*
-    new(uint32_t capacity);
+    new(uint32_t capacity = 0);
 
     /**
      * @param capacity Initial number of elements that the object will be able
      * to hold before reallocation.
      */
     inert VArray*
-    init(VArray *self, uint32_t capacity);
+    init(VArray *self, uint32_t capacity = 0);
 
     /** Push an item onto the end of a VArray.
      */

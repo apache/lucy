@@ -22,7 +22,7 @@ use Test::More skip_all => 'Disabled until test ported to C';
 use Lucy::Test;
 use Clownfish qw( to_perl );
 
-my $letters = Clownfish::VArray->new( capacity => 26 );
+my $letters = Clownfish::VArray->new;
 $letters->push( Clownfish::ByteBuf->new($_) ) for 'a' .. 'z';
 my $run = Lucy::Util::BBSortEx->new( external => $letters );
 $run->set_mem_thresh(5);
