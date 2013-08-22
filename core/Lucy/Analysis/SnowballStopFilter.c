@@ -94,7 +94,7 @@ Obj*
 SnowStop_Dump_IMP(SnowballStopFilter *self) {
     SnowballStopFilterIVARS *ivars = SnowStop_IVARS(self);
     SnowStop_Dump_t super_dump
-        = SUPER_METHOD_PTR(SNOWBALLSTOPFILTER, Lucy_SnowStop_Dump);
+        = SUPER_METHOD_PTR(SNOWBALLSTOPFILTER, LUCY_SnowStop_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
     if (ivars->stoplist) {
         Hash_Store_Str(dump, "stoplist", 8,
@@ -107,7 +107,7 @@ Obj*
 SnowStop_Load_IMP(SnowballStopFilter *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     SnowStop_Load_t super_load
-        = SUPER_METHOD_PTR(SNOWBALLSTOPFILTER, Lucy_SnowStop_Load);
+        = SUPER_METHOD_PTR(SNOWBALLSTOPFILTER, LUCY_SnowStop_Load);
     SnowballStopFilter *loaded = (SnowballStopFilter*)super_load(self, dump);
     Obj *stoplist = Hash_Fetch_Str(source, "stoplist", 8);
     if (stoplist) {

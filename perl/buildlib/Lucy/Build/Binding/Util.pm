@@ -42,7 +42,7 @@ fetch(self)
     lucy_BBSortEx *self;
 CODE:
 {
-    void *address = Lucy_BBSortEx_Fetch(self);
+    void *address = LUCY_BBSortEx_Fetch(self);
     if (address) {
         RETVAL = XSBind_cfish_to_perl(*(cfish_Obj**)address);
         CFISH_DECREF(*(cfish_Obj**)address);
@@ -58,7 +58,7 @@ peek(self)
     lucy_BBSortEx *self;
 CODE:
 {
-    void *address = Lucy_BBSortEx_Peek(self);
+    void *address = LUCY_BBSortEx_Peek(self);
     if (address) {
         RETVAL = XSBind_cfish_to_perl(*(cfish_Obj**)address);
     }
@@ -74,7 +74,7 @@ feed(self, bb)
     cfish_ByteBuf *bb;
 CODE:
     CFISH_INCREF(bb);
-    Lucy_BBSortEx_Feed(self, &bb);
+    LUCY_BBSortEx_Feed(self, &bb);
 
 END_XS_CODE
 

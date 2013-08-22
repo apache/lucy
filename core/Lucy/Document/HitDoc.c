@@ -49,7 +49,7 @@ void
 HitDoc_Serialize_IMP(HitDoc *self, OutStream *outstream) {
     HitDocIVARS *const ivars = HitDoc_IVARS(self);
     HitDoc_Serialize_t super_serialize
-        = SUPER_METHOD_PTR(HITDOC, Lucy_HitDoc_Serialize);
+        = SUPER_METHOD_PTR(HITDOC, LUCY_HitDoc_Serialize);
     super_serialize(self, outstream);
     OutStream_Write_F32(outstream, ivars->score);
 }
@@ -57,7 +57,7 @@ HitDoc_Serialize_IMP(HitDoc *self, OutStream *outstream) {
 HitDoc*
 HitDoc_Deserialize_IMP(HitDoc *self, InStream *instream) {
     HitDoc_Deserialize_t super_deserialize
-        = SUPER_METHOD_PTR(HITDOC, Lucy_HitDoc_Deserialize);
+        = SUPER_METHOD_PTR(HITDOC, LUCY_HitDoc_Deserialize);
     self = super_deserialize(self, instream);
     HitDocIVARS *const ivars = HitDoc_IVARS(self);
     ivars->score = InStream_Read_F32(instream);
@@ -68,7 +68,7 @@ Hash*
 HitDoc_Dump_IMP(HitDoc *self) {
     HitDocIVARS *const ivars = HitDoc_IVARS(self);
     HitDoc_Dump_t super_dump
-        = SUPER_METHOD_PTR(HITDOC, Lucy_HitDoc_Dump);
+        = SUPER_METHOD_PTR(HITDOC, LUCY_HitDoc_Dump);
     Hash *dump = super_dump(self);
     Hash_Store_Str(dump, "score", 5, (Obj*)CB_newf("%f64", ivars->score));
     return dump;
@@ -78,7 +78,7 @@ HitDoc*
 HitDoc_Load_IMP(HitDoc *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     HitDoc_Load_t super_load
-        = SUPER_METHOD_PTR(HITDOC, Lucy_HitDoc_Load);
+        = SUPER_METHOD_PTR(HITDOC, LUCY_HitDoc_Load);
     HitDoc *loaded = super_load(self, dump);
     HitDocIVARS *const loaded_ivars = HitDoc_IVARS(loaded);
     Obj *score = CERTIFY(Hash_Fetch_Str(source, "score", 5), OBJ);
@@ -91,7 +91,7 @@ HitDoc_Equals_IMP(HitDoc *self, Obj *other) {
     if ((HitDoc*)other == self)           { return true;  }
     if (!Obj_Is_A(other, HITDOC))         { return false; }
     HitDoc_Equals_t super_equals
-        = (HitDoc_Equals_t)SUPER_METHOD_PTR(HITDOC, Lucy_HitDoc_Equals);
+        = (HitDoc_Equals_t)SUPER_METHOD_PTR(HITDOC, LUCY_HitDoc_Equals);
     if (!super_equals(self, other))       { return false; }
     HitDocIVARS *const ivars = HitDoc_IVARS(self);
     HitDocIVARS *const ovars = HitDoc_IVARS((HitDoc*)other);

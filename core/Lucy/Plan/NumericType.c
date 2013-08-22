@@ -159,7 +159,7 @@ Float64Type_Equals_IMP(Float64Type *self, Obj *other) {
     if (!other) { return false; }
     if (!Obj_Is_A(other, FLOAT64TYPE)) { return false; }
     Float64Type_Equals_t super_equals
-        = SUPER_METHOD_PTR(FLOAT64TYPE, Lucy_Float64Type_Equals);
+        = SUPER_METHOD_PTR(FLOAT64TYPE, LUCY_Float64Type_Equals);
     return super_equals(self, other);
 }
 
@@ -201,7 +201,7 @@ Float32Type_Equals_IMP(Float32Type *self, Obj *other) {
     if (!other) { return false; }
     if (!Obj_Is_A(other, FLOAT32TYPE)) { return false; }
     Float32Type_Equals_t super_equals
-        = SUPER_METHOD_PTR(FLOAT32TYPE, Lucy_Float32Type_Equals);
+        = SUPER_METHOD_PTR(FLOAT32TYPE, LUCY_Float32Type_Equals);
     return super_equals(self, other);
 }
 
@@ -243,7 +243,7 @@ Int32Type_Equals_IMP(Int32Type *self, Obj *other) {
     if (!other) { return false; }
     if (!Obj_Is_A(other, INT32TYPE)) { return false; }
     Int32Type_Equals_t super_equals
-        = SUPER_METHOD_PTR(INT32TYPE, Lucy_Int32Type_Equals);
+        = SUPER_METHOD_PTR(INT32TYPE, LUCY_Int32Type_Equals);
     return super_equals(self, other);
 }
 
@@ -285,7 +285,7 @@ Int64Type_Equals_IMP(Int64Type *self, Obj *other) {
     if (!other) { return false; }
     if (!Obj_Is_A(other, INT64TYPE)) { return false; }
     Int64Type_Equals_t super_equals
-        = SUPER_METHOD_PTR(INT64TYPE, Lucy_Int64Type_Equals);
+        = SUPER_METHOD_PTR(INT64TYPE, LUCY_Int64Type_Equals);
     return super_equals(self, other);
 }
 

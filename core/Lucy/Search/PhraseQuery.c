@@ -94,7 +94,7 @@ Obj*
 PhraseQuery_Dump_IMP(PhraseQuery *self) {
     PhraseQueryIVARS *ivars = PhraseQuery_IVARS(self);
     PhraseQuery_Dump_t super_dump
-        = SUPER_METHOD_PTR(PHRASEQUERY, Lucy_PhraseQuery_Dump);
+        = SUPER_METHOD_PTR(PHRASEQUERY, LUCY_PhraseQuery_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
     Hash_Store_Str(dump, "field", 5, Freezer_dump((Obj*)ivars->field));
     Hash_Store_Str(dump, "terms", 5, Freezer_dump((Obj*)ivars->terms));
@@ -105,7 +105,7 @@ Obj*
 PhraseQuery_Load_IMP(PhraseQuery *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     PhraseQuery_Load_t super_load
-        = SUPER_METHOD_PTR(PHRASEQUERY, Lucy_PhraseQuery_Load);
+        = SUPER_METHOD_PTR(PHRASEQUERY, LUCY_PhraseQuery_Load);
     PhraseQuery *loaded = (PhraseQuery*)super_load(self, dump);
     PhraseQueryIVARS *loaded_ivars = PhraseQuery_IVARS(loaded);
     Obj *field = CERTIFY(Hash_Fetch_Str(source, "field", 5), OBJ);
@@ -231,7 +231,7 @@ PhraseCompiler_Serialize_IMP(PhraseCompiler *self, OutStream *outstream) {
     PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
     PhraseCompiler_Serialize_t super_serialize
         = (PhraseCompiler_Serialize_t)SUPER_METHOD_PTR(PHRASECOMPILER,
-                                                       Lucy_PhraseCompiler_Serialize);
+                                                       LUCY_PhraseCompiler_Serialize);
     super_serialize(self, outstream);
     OutStream_Write_F32(outstream, ivars->idf);
     OutStream_Write_F32(outstream, ivars->raw_weight);
@@ -242,7 +242,7 @@ PhraseCompiler_Serialize_IMP(PhraseCompiler *self, OutStream *outstream) {
 PhraseCompiler*
 PhraseCompiler_Deserialize_IMP(PhraseCompiler *self, InStream *instream) {
     PhraseCompiler_Deserialize_t super_deserialize
-        = SUPER_METHOD_PTR(PHRASECOMPILER, Lucy_PhraseCompiler_Deserialize);
+        = SUPER_METHOD_PTR(PHRASECOMPILER, LUCY_PhraseCompiler_Deserialize);
     self = super_deserialize(self, instream);
     PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
     ivars->idf               = InStream_Read_F32(instream);
@@ -257,7 +257,7 @@ PhraseCompiler_Equals_IMP(PhraseCompiler *self, Obj *other) {
     if (!Obj_Is_A(other, PHRASECOMPILER))                     { return false; }
     PhraseCompiler_Equals_t super_equals
         = (PhraseCompiler_Equals_t)SUPER_METHOD_PTR(PHRASECOMPILER,
-                                                    Lucy_PhraseCompiler_Equals);
+                                                    LUCY_PhraseCompiler_Equals);
     if (!super_equals(self, other))                           { return false; }
     PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
     PhraseCompilerIVARS *const ovars

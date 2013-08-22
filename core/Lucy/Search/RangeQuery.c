@@ -164,7 +164,7 @@ Obj*
 RangeQuery_Dump_IMP(RangeQuery *self) {
     RangeQueryIVARS *ivars = RangeQuery_IVARS(self);
     RangeQuery_Dump_t super_dump
-        = SUPER_METHOD_PTR(RANGEQUERY, Lucy_RangeQuery_Dump);
+        = SUPER_METHOD_PTR(RANGEQUERY, LUCY_RangeQuery_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
     Hash_Store_Str(dump, "field", 5, Freezer_dump((Obj*)ivars->field));
     if (ivars->lower_term) {
@@ -186,7 +186,7 @@ Obj*
 RangeQuery_Load_IMP(RangeQuery *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     RangeQuery_Load_t super_load
-        = SUPER_METHOD_PTR(RANGEQUERY, Lucy_RangeQuery_Load);
+        = SUPER_METHOD_PTR(RANGEQUERY, LUCY_RangeQuery_Load);
     RangeQuery *loaded = (RangeQuery*)super_load(self, dump);
     RangeQueryIVARS *loaded_ivars = RangeQuery_IVARS(loaded);
     Obj *field = CERTIFY(Hash_Fetch_Str(source, "field", 5), OBJ);

@@ -775,9 +775,9 @@ prune_test_not_and_not() {
 /***************************************************************************/
 
 typedef TestQueryParser*
-(*Lucy_TestQPLogic_Logical_Test_t)(uint32_t boolop_sym);
+(*LUCY_TestQPLogic_Logical_Test_t)(uint32_t boolop_sym);
 
-static Lucy_TestQPLogic_Logical_Test_t logical_test_funcs[] = {
+static LUCY_TestQPLogic_Logical_Test_t logical_test_funcs[] = {
     logical_test_empty_phrase,
     logical_test_empty_parens,
     logical_test_nested_empty_parens,
@@ -843,9 +843,9 @@ static Lucy_TestQPLogic_Logical_Test_t logical_test_funcs[] = {
 };
 
 typedef TestQueryParser*
-(*Lucy_TestQPLogic_Prune_Test_t)();
+(*LUCY_TestQPLogic_Prune_Test_t)();
 
-static Lucy_TestQPLogic_Prune_Test_t prune_test_funcs[] = {
+static LUCY_TestQPLogic_Prune_Test_t prune_test_funcs[] = {
     prune_test_null_querystring,
     prune_test_matchall,
     prune_test_nomatch,
@@ -898,7 +898,7 @@ TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
 
     // Run logical tests with default boolop of OR.
     for (i = 0; logical_test_funcs[i] != NULL; i++) {
-        Lucy_TestQPLogic_Logical_Test_t test_func = logical_test_funcs[i];
+        LUCY_TestQPLogic_Logical_Test_t test_func = logical_test_funcs[i];
         TestQueryParser *test_case_obj = test_func(BOOLOP_OR);
         TestQueryParserIVARS *test_case = TestQP_IVARS(test_case_obj);
         Query *tree     = QParser_Tree(or_parser, test_case->query_string);
@@ -917,7 +917,7 @@ TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
 
     // Run logical tests with default boolop of AND.
     for (i = 0; logical_test_funcs[i] != NULL; i++) {
-        Lucy_TestQPLogic_Logical_Test_t test_func = logical_test_funcs[i];
+        LUCY_TestQPLogic_Logical_Test_t test_func = logical_test_funcs[i];
         TestQueryParser *test_case_obj = test_func(BOOLOP_AND);
         TestQueryParserIVARS *test_case = TestQP_IVARS(test_case_obj);
         Query *tree     = QParser_Tree(and_parser, test_case->query_string);
@@ -936,7 +936,7 @@ TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
 
     // Run tests for QParser_Prune().
     for (i = 0; prune_test_funcs[i] != NULL; i++) {
-        Lucy_TestQPLogic_Prune_Test_t test_func = prune_test_funcs[i];
+        LUCY_TestQPLogic_Prune_Test_t test_func = prune_test_funcs[i];
         TestQueryParser *test_case_obj = test_func();
         TestQueryParserIVARS *test_case = TestQP_IVARS(test_case_obj);
         CharBuf *qstring = test_case->tree

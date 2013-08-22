@@ -78,7 +78,7 @@ Obj*
 TermQuery_Dump_IMP(TermQuery *self) {
     TermQueryIVARS *ivars = TermQuery_IVARS(self);
     TermQuery_Dump_t super_dump
-        = SUPER_METHOD_PTR(TERMQUERY, Lucy_TermQuery_Dump);
+        = SUPER_METHOD_PTR(TERMQUERY, LUCY_TermQuery_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
     Hash_Store_Str(dump, "field", 5, Freezer_dump((Obj*)ivars->field));
     Hash_Store_Str(dump, "term", 4, Freezer_dump(ivars->term));
@@ -89,7 +89,7 @@ Obj*
 TermQuery_Load_IMP(TermQuery *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     TermQuery_Load_t super_load
-        = SUPER_METHOD_PTR(TERMQUERY, Lucy_TermQuery_Load);
+        = SUPER_METHOD_PTR(TERMQUERY, LUCY_TermQuery_Load);
     TermQuery *loaded = (TermQuery*)super_load(self, dump);
     TermQueryIVARS *loaded_ivars = TermQuery_IVARS(loaded);
     Obj *field = CERTIFY(Hash_Fetch_Str(source, "field", 5), OBJ);
@@ -191,7 +191,7 @@ bool
 TermCompiler_Equals_IMP(TermCompiler *self, Obj *other) {
     TermCompiler_Equals_t super_equals
         = (TermCompiler_Equals_t)SUPER_METHOD_PTR(TERMCOMPILER,
-                                                  Lucy_TermCompiler_Equals);
+                                                  LUCY_TermCompiler_Equals);
     if (!super_equals(self, other))                           { return false; }
     if (!Obj_Is_A(other, TERMCOMPILER))                       { return false; }
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
@@ -207,7 +207,7 @@ void
 TermCompiler_Serialize_IMP(TermCompiler *self, OutStream *outstream) {
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
     TermCompiler_Serialize_t super_serialize
-        = SUPER_METHOD_PTR(TERMCOMPILER, Lucy_TermCompiler_Serialize);
+        = SUPER_METHOD_PTR(TERMCOMPILER, LUCY_TermCompiler_Serialize);
     super_serialize(self, outstream);
     OutStream_Write_F32(outstream, ivars->idf);
     OutStream_Write_F32(outstream, ivars->raw_weight);
@@ -218,7 +218,7 @@ TermCompiler_Serialize_IMP(TermCompiler *self, OutStream *outstream) {
 TermCompiler*
 TermCompiler_Deserialize_IMP(TermCompiler *self, InStream *instream) {
     TermCompiler_Deserialize_t super_deserialize
-        = SUPER_METHOD_PTR(TERMCOMPILER, Lucy_TermCompiler_Deserialize);
+        = SUPER_METHOD_PTR(TERMCOMPILER, LUCY_TermCompiler_Deserialize);
     self = super_deserialize(self, instream);
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
     ivars->idf               = InStream_Read_F32(instream);

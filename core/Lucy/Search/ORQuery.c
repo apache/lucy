@@ -52,7 +52,7 @@ ORQuery_Equals_IMP(ORQuery *self, Obj *other) {
     if ((ORQuery*)other == self)   { return true;  }
     if (!Obj_Is_A(other, ORQUERY)) { return false; }
     ORQuery_Equals_t super_equals
-        = (ORQuery_Equals_t)SUPER_METHOD_PTR(ORQUERY, Lucy_ORQuery_Equals);
+        = (ORQuery_Equals_t)SUPER_METHOD_PTR(ORQUERY, LUCY_ORQuery_Equals);
     return super_equals(self, other);
 }
 

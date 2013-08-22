@@ -52,13 +52,13 @@ S_fetch_entry(lucy_Inverter *self, HE *hash_entry) {
 
     cfish_ZombieCharBuf *field = CFISH_ZCB_WRAP_STR(key, key_len);
     int32_t field_num
-        = Lucy_Seg_Field_Num(ivars->segment, (cfish_CharBuf*)field);
+        = LUCY_Seg_Field_Num(ivars->segment, (cfish_CharBuf*)field);
     if (!field_num) {
         // This field seems not to be in the segment yet.  Try to find it in
         // the Schema.
-        if (Lucy_Schema_Fetch_Type(schema, (cfish_CharBuf*)field)) {
+        if (LUCY_Schema_Fetch_Type(schema, (cfish_CharBuf*)field)) {
             // The field is in the Schema.  Get a field num from the Segment.
-            field_num = Lucy_Seg_Add_Field(ivars->segment,
+            field_num = LUCY_Seg_Add_Field(ivars->segment,
                                            (cfish_CharBuf*)field);
         }
         else {
@@ -78,12 +78,12 @@ S_fetch_entry(lucy_Inverter *self, HE *hash_entry) {
 }
 
 void
-Lucy_Inverter_Invert_Doc_IMP(lucy_Inverter *self, lucy_Doc *doc) {
-    HV  *const fields = (HV*)Lucy_Doc_Get_Fields(doc);
+LUCY_Inverter_Invert_Doc_IMP(lucy_Inverter *self, lucy_Doc *doc) {
+    HV  *const fields = (HV*)LUCY_Doc_Get_Fields(doc);
     I32  num_keys     = hv_iterinit(fields);
 
     // Prepare for the new doc.
-    Lucy_Inverter_Set_Doc(self, doc);
+    LUCY_Inverter_Set_Doc(self, doc);
 
     // Extract and invert the doc's fields.
     while (num_keys--) {
@@ -95,7 +95,7 @@ Lucy_Inverter_Invert_Doc_IMP(lucy_Inverter *self, lucy_Doc *doc) {
         lucy_FieldType *type = entry_ivars->type;
 
         // Get the field value, forcing text fields to UTF-8.
-        switch (Lucy_FType_Primitive_ID(type) & lucy_FType_PRIMITIVE_ID_MASK) {
+        switch (LUCY_FType_Primitive_ID(type) & lucy_FType_PRIMITIVE_ID_MASK) {
             case lucy_FType_TEXT: {
                     STRLEN val_len;
                     char *val_ptr = SvPVutf8(value_sv, val_len);
@@ -139,7 +139,7 @@ Lucy_Inverter_Invert_Doc_IMP(lucy_Inverter *self, lucy_Doc *doc) {
                 THROW(CFISH_ERR, "Unrecognized type: %o", type);
         }
 
-        Lucy_Inverter_Add_Field(self, inv_entry);
+        LUCY_Inverter_Add_Field(self, inv_entry);
     }
 }
 

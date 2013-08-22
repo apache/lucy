@@ -108,9 +108,9 @@ PPCODE:
 
         lucy_Freezer_serialize(self, target);
 
-        Lucy_OutStream_Close(target);
+        LUCY_OutStream_Close(target);
         serialized_bb
-            = Lucy_RAMFile_Get_Contents(Lucy_RAMFH_Get_File(file_handle));
+            = LUCY_RAMFile_Get_Contents(LUCY_RAMFH_Get_File(file_handle));
         retval = XSBind_bb_to_sv(serialized_bb);
         CFISH_DECREF(file_handle);
         CFISH_DECREF(target);

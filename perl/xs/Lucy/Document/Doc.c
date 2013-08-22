@@ -39,20 +39,20 @@ lucy_Doc_init(lucy_Doc *self, void *fields, int32_t doc_id) {
 }
 
 void
-Lucy_Doc_Set_Fields_IMP(lucy_Doc *self, void *fields) {
+LUCY_Doc_Set_Fields_IMP(lucy_Doc *self, void *fields) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     if (ivars->fields) { SvREFCNT_dec((SV*)ivars->fields); }
     ivars->fields = SvREFCNT_inc((SV*)fields);
 }
 
 uint32_t
-Lucy_Doc_Get_Size_IMP(lucy_Doc *self) {
+LUCY_Doc_Get_Size_IMP(lucy_Doc *self) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     return ivars->fields ? HvKEYS((HV*)ivars->fields) : 0;
 }
 
 void
-Lucy_Doc_Store_IMP(lucy_Doc *self, const cfish_CharBuf *field, cfish_Obj *value) {
+LUCY_Doc_Store_IMP(lucy_Doc *self, const cfish_CharBuf *field, cfish_Obj *value) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     char   *key      = (char*)CFISH_CB_Get_Ptr8(field);
     size_t  key_size = CFISH_CB_Get_Size(field);
@@ -89,26 +89,26 @@ S_nfreeze_fields(lucy_Doc *self) {
 }
 
 void
-Lucy_Doc_Serialize_IMP(lucy_Doc *self, lucy_OutStream *outstream) {
+LUCY_Doc_Serialize_IMP(lucy_Doc *self, lucy_OutStream *outstream) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
-    Lucy_OutStream_Write_C32(outstream, ivars->doc_id);
+    LUCY_OutStream_Write_C32(outstream, ivars->doc_id);
     SV *frozen = S_nfreeze_fields(self);
     STRLEN len;
     char *buf = SvPV(frozen, len);
-    Lucy_OutStream_Write_C64(outstream, len);
-    Lucy_OutStream_Write_Bytes(outstream, buf, len);
+    LUCY_OutStream_Write_C64(outstream, len);
+    LUCY_OutStream_Write_Bytes(outstream, buf, len);
     SvREFCNT_dec(frozen);
 }
 
 static HV*
 S_thaw_fields(lucy_InStream *instream) {
     // Read frozen data into an SV buffer.
-    size_t len = (size_t)Lucy_InStream_Read_C64(instream);
+    size_t len = (size_t)LUCY_InStream_Read_C64(instream);
     SV *buf_sv = newSV(len + 1);
     SvPOK_on(buf_sv);
     SvCUR_set(buf_sv, len);
     char *buf = SvPVX(buf_sv);
-    Lucy_InStream_Read_Bytes(instream, buf, len);
+    LUCY_InStream_Read_Bytes(instream, buf, len);
 
     // Call back to Storable to thaw the frozen hash.
     dSP;
@@ -134,8 +134,8 @@ S_thaw_fields(lucy_InStream *instream) {
 }
 
 lucy_Doc*
-Lucy_Doc_Deserialize_IMP(lucy_Doc *self, lucy_InStream *instream) {
-    int32_t doc_id = (int32_t)Lucy_InStream_Read_C32(instream);
+LUCY_Doc_Deserialize_IMP(lucy_Doc *self, lucy_InStream *instream) {
+    int32_t doc_id = (int32_t)LUCY_InStream_Read_C32(instream);
     HV *fields = S_thaw_fields(instream);
     lucy_Doc_init(self, fields, doc_id);
     SvREFCNT_dec(fields);
@@ -143,7 +143,7 @@ Lucy_Doc_Deserialize_IMP(lucy_Doc *self, lucy_InStream *instream) {
 }
 
 cfish_Obj*
-Lucy_Doc_Extract_IMP(lucy_Doc *self, cfish_CharBuf *field,
+LUCY_Doc_Extract_IMP(lucy_Doc *self, cfish_CharBuf *field,
                      cfish_ViewCharBuf *target) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     cfish_Obj *retval = NULL;
@@ -168,20 +168,20 @@ Lucy_Doc_Extract_IMP(lucy_Doc *self, cfish_CharBuf *field,
 }
 
 void*
-Lucy_Doc_To_Host_IMP(lucy_Doc *self) {
-    Lucy_Doc_To_Host_t super_to_host
-        = CFISH_SUPER_METHOD_PTR(LUCY_DOC, Lucy_Doc_To_Host);
+LUCY_Doc_To_Host_IMP(lucy_Doc *self) {
+    LUCY_Doc_To_Host_t super_to_host
+        = CFISH_SUPER_METHOD_PTR(LUCY_DOC, LUCY_Doc_To_Host);
     SV *perl_obj = (SV*)super_to_host(self);
     XSBind_enable_overload(perl_obj);
     return perl_obj;
 }
 
 cfish_Hash*
-Lucy_Doc_Dump_IMP(lucy_Doc *self) {
+LUCY_Doc_Dump_IMP(lucy_Doc *self) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     cfish_Hash *dump = cfish_Hash_new(0);
     CFISH_Hash_Store_Str(dump, "_class", 6,
-                        (cfish_Obj*)CFISH_CB_Clone(Lucy_Doc_Get_Class_Name(self)));
+                        (cfish_Obj*)CFISH_CB_Clone(LUCY_Doc_Get_Class_Name(self)));
     CFISH_Hash_Store_Str(dump, "doc_id", 7,
                         (cfish_Obj*)cfish_CB_newf("%i32", ivars->doc_id));
     CFISH_Hash_Store_Str(dump, "fields", 6,
@@ -190,7 +190,7 @@ Lucy_Doc_Dump_IMP(lucy_Doc *self) {
 }
 
 lucy_Doc*
-Lucy_Doc_Load_IMP(lucy_Doc *self, cfish_Obj *dump) {
+LUCY_Doc_Load_IMP(lucy_Doc *self, cfish_Obj *dump) {
     cfish_Hash *source = (cfish_Hash*)CFISH_CERTIFY(dump, CFISH_HASH);
     cfish_CharBuf *class_name = (cfish_CharBuf*)CFISH_CERTIFY(
                                    CFISH_Hash_Fetch_Str(source, "_class", 6),
@@ -215,7 +215,7 @@ Lucy_Doc_Load_IMP(lucy_Doc *self, cfish_Obj *dump) {
 }
 
 bool
-Lucy_Doc_Equals_IMP(lucy_Doc *self, cfish_Obj *other) {
+LUCY_Doc_Equals_IMP(lucy_Doc *self, cfish_Obj *other) {
     if ((lucy_Doc*)other  == self)        { return true;  }
     if (!CFISH_Obj_Is_A(other, LUCY_DOC)) { return false; }
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
@@ -243,7 +243,7 @@ Lucy_Doc_Equals_IMP(lucy_Doc *self, cfish_Obj *other) {
 }
 
 void
-Lucy_Doc_Destroy_IMP(lucy_Doc *self) {
+LUCY_Doc_Destroy_IMP(lucy_Doc *self) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     if (ivars->fields) { SvREFCNT_dec((SV*)ivars->fields); }
     CFISH_SUPER_DESTROY(self, LUCY_DOC);

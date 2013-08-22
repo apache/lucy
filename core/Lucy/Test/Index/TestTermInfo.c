@@ -37,7 +37,7 @@ test_freqfilepos(TestBatchRunner *runner) {
 
     TermInfo* cloned_tinfo = TInfo_Clone(tinfo);
 
-    TEST_FALSE(runner, Lucy_TInfo_Equals(tinfo, (Obj*)cloned_tinfo),"the clone should be a separate C struct");
+    TEST_FALSE(runner, LUCY_TInfo_Equals(tinfo, (Obj*)cloned_tinfo),"the clone should be a separate C struct");
     TEST_INT_EQ(runner, TInfo_Get_Doc_Freq(tinfo), 10, "new sets doc_freq correctly" );
     TEST_INT_EQ(runner, TInfo_Get_Doc_Freq(tinfo), 10, "... doc_freq cloned" );
     TEST_INT_EQ(runner, TInfo_Get_Post_FilePos(tinfo), 20, "... post_filepos cloned" );

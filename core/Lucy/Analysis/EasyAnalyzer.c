@@ -76,7 +76,7 @@ Hash*
 EasyAnalyzer_Dump_IMP(EasyAnalyzer *self) {
     EasyAnalyzerIVARS *const ivars = EasyAnalyzer_IVARS(self);
     EasyAnalyzer_Dump_t super_dump
-        = SUPER_METHOD_PTR(EASYANALYZER, Lucy_EasyAnalyzer_Dump);
+        = SUPER_METHOD_PTR(EASYANALYZER, LUCY_EasyAnalyzer_Dump);
     Hash *dump = super_dump(self);
     Hash_Store_Str(dump, "language", 8, (Obj*)CB_Clone(ivars->language));
     return dump;
@@ -85,7 +85,7 @@ EasyAnalyzer_Dump_IMP(EasyAnalyzer *self) {
 EasyAnalyzer*
 EasyAnalyzer_Load_IMP(EasyAnalyzer *self, Obj *dump) {
     EasyAnalyzer_Load_t super_load
-        = SUPER_METHOD_PTR(EASYANALYZER, Lucy_EasyAnalyzer_Load);
+        = SUPER_METHOD_PTR(EASYANALYZER, LUCY_EasyAnalyzer_Load);
     EasyAnalyzer *loaded = super_load(self, dump);
     Hash    *source = (Hash*)CERTIFY(dump, HASH);
     CharBuf *language

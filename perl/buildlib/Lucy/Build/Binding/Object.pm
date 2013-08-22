@@ -123,11 +123,11 @@ CODE:
 {
     AV *out_av = newAV();
     uint32_t i;
-    uint32_t size = Lucy_I32Arr_Get_Size(self);
+    uint32_t size = LUCY_I32Arr_Get_Size(self);
 
     av_extend(out_av, size);
     for (i = 0; i < size; i++) {
-        int32_t result = Lucy_I32Arr_Get(self, i);
+        int32_t result = LUCY_I32Arr_Get(self, i);
         SV* result_sv = result == -1 ? newSV(0) : newSViv(result);
         av_push(out_av, result_sv);
     }

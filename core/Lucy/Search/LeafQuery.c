@@ -115,7 +115,7 @@ Obj*
 LeafQuery_Dump_IMP(LeafQuery *self) {
     LeafQueryIVARS *ivars = LeafQuery_IVARS(self);
     LeafQuery_Dump_t super_dump
-        = SUPER_METHOD_PTR(LEAFQUERY, Lucy_LeafQuery_Dump);
+        = SUPER_METHOD_PTR(LEAFQUERY, LUCY_LeafQuery_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
     if (ivars->field) {
         Hash_Store_Str(dump, "field", 5, Freezer_dump((Obj*)ivars->field));
@@ -128,7 +128,7 @@ Obj*
 LeafQuery_Load_IMP(LeafQuery *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     LeafQuery_Load_t super_load
-        = SUPER_METHOD_PTR(LEAFQUERY, Lucy_LeafQuery_Load);
+        = SUPER_METHOD_PTR(LEAFQUERY, LUCY_LeafQuery_Load);
     LeafQuery *loaded = (LeafQuery*)super_load(self, dump);
     LeafQueryIVARS *loaded_ivars = LeafQuery_IVARS(loaded);
     Obj *field = Hash_Fetch_Str(source, "field", 5);

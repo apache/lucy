@@ -682,9 +682,9 @@ static CharBuf*
 S_do_encode(Highlighter *self, CharBuf *text, CharBuf **encode_buf) {
     VTable *vtable = Highlighter_Get_VTable(self);
     Highlighter_Encode_t my_meth
-        = (Highlighter_Encode_t)METHOD_PTR(vtable, Lucy_Highlighter_Encode);
+        = (Highlighter_Encode_t)METHOD_PTR(vtable, LUCY_Highlighter_Encode);
     Highlighter_Encode_t orig_meth
-        = (Highlighter_Encode_t)METHOD_PTR(HIGHLIGHTER, Lucy_Highlighter_Encode);
+        = (Highlighter_Encode_t)METHOD_PTR(HIGHLIGHTER, LUCY_Highlighter_Encode);
 
     if (my_meth != orig_meth) {
         return my_meth(self, text);

@@ -187,7 +187,7 @@ void
 PolyReader_Close_IMP(PolyReader *self) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
     PolyReader_Close_t super_close
-        = SUPER_METHOD_PTR(POLYREADER, Lucy_PolyReader_Close);
+        = SUPER_METHOD_PTR(POLYREADER, LUCY_PolyReader_Close);
     for (uint32_t i = 0, max = VA_Get_Size(ivars->sub_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(ivars->sub_readers, i);
         SegReader_Close(seg_reader);

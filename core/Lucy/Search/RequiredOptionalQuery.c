@@ -85,7 +85,7 @@ ReqOptQuery_Equals_IMP(RequiredOptionalQuery *self, Obj *other) {
     if (!Obj_Is_A(other, REQUIREDOPTIONALQUERY)) { return false; }
     ReqOptQuery_Equals_t super_equals
         = (ReqOptQuery_Equals_t)SUPER_METHOD_PTR(REQUIREDOPTIONALQUERY,
-                                                 Lucy_ReqOptQuery_Equals);
+                                                 LUCY_ReqOptQuery_Equals);
     return super_equals(self, other);
 }
 

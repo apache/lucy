@@ -493,8 +493,8 @@ PPCODE:
     else if (XSBind_sv_defined(doc_sv) && SvROK(doc_sv)) {
         HV *maybe_fields = (HV*)SvRV(doc_sv);
         if (SvTYPE((SV*)maybe_fields) == SVt_PVHV) {
-            doc = Lucy_Indexer_Get_Stock_Doc(self);
-            Lucy_Doc_Set_Fields(doc, maybe_fields);
+            doc = LUCY_Indexer_Get_Stock_Doc(self);
+            LUCY_Doc_Set_Fields(doc, maybe_fields);
         }
     }
     if (!doc) {
@@ -502,7 +502,7 @@ PPCODE:
               CFISH_VTable_Get_Name(LUCY_DOC));
     }
 
-    Lucy_Indexer_Add_Doc(self, doc, boost);
+    LUCY_Indexer_Add_Doc(self, doc, boost);
 }
 END_XS_CODE
 
@@ -616,10 +616,10 @@ get_prox(self)
 CODE:
 {
     AV *out_av            = newAV();
-    uint32_t *positions  = Lucy_ScorePost_Get_Prox(self);
+    uint32_t *positions  = LUCY_ScorePost_Get_Prox(self);
     uint32_t i, max;
 
-    for (i = 0, max = Lucy_ScorePost_Get_Freq(self); i < max; i++) {
+    for (i = 0, max = LUCY_ScorePost_Get_Freq(self); i < max; i++) {
         SV *pos_sv = newSVuv(positions[i]);
         av_push(out_av, pos_sv);
     }
@@ -861,7 +861,7 @@ SV*
 get_norm_decoder(self)
     lucy_Similarity *self;
 CODE:
-    RETVAL = newSVpvn((char*)Lucy_Sim_Get_Norm_Decoder(self),
+    RETVAL = newSVpvn((char*)LUCY_Sim_Get_Norm_Decoder(self),
                       (256 * sizeof(float)));
 OUTPUT: RETVAL
 END_XS_CODE
@@ -936,8 +936,8 @@ CODE:
         CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
     }
     {
-        cfish_Obj *blank = Lucy_SortCache_Make_Blank(self);
-        cfish_Obj *value = Lucy_SortCache_Value(self, ord, blank);
+        cfish_Obj *blank = LUCY_SortCache_Make_Blank(self);
+        cfish_Obj *value = LUCY_SortCache_Value(self, ord, blank);
         RETVAL = XSBind_cfish_to_perl(value);
         CFISH_DECREF(blank);
     }

@@ -58,7 +58,7 @@ BBSortEx_Clear_Cache_IMP(BBSortEx *self) {
     }
     ivars->mem_consumed = 0;
     BBSortEx_Clear_Cache_t super_clear_cache
-        = SUPER_METHOD_PTR(BBSORTEX, Lucy_BBSortEx_Clear_Cache);
+        = SUPER_METHOD_PTR(BBSORTEX, LUCY_BBSortEx_Clear_Cache);
     super_clear_cache(self);
 }
 
@@ -66,7 +66,7 @@ void
 BBSortEx_Feed_IMP(BBSortEx *self, void *data) {
     BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
     BBSortEx_Feed_t super_feed
-        = SUPER_METHOD_PTR(BBSORTEX, Lucy_BBSortEx_Feed);
+        = SUPER_METHOD_PTR(BBSORTEX, LUCY_BBSortEx_Feed);
     super_feed(self, data);
 
     // Flush() if necessary.

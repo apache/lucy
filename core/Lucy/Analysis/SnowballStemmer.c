@@ -88,7 +88,7 @@ Hash*
 SnowStemmer_Dump_IMP(SnowballStemmer *self) {
     SnowballStemmerIVARS *const ivars = SnowStemmer_IVARS(self);
     SnowStemmer_Dump_t super_dump
-        = SUPER_METHOD_PTR(SNOWBALLSTEMMER, Lucy_SnowStemmer_Dump);
+        = SUPER_METHOD_PTR(SNOWBALLSTEMMER, LUCY_SnowStemmer_Dump);
     Hash *dump = super_dump(self);
     Hash_Store_Str(dump, "language", 8, (Obj*)CB_Clone(ivars->language));
     return dump;
@@ -97,7 +97,7 @@ SnowStemmer_Dump_IMP(SnowballStemmer *self) {
 SnowballStemmer*
 SnowStemmer_Load_IMP(SnowballStemmer *self, Obj *dump) {
     SnowStemmer_Load_t super_load
-        = SUPER_METHOD_PTR(SNOWBALLSTEMMER, Lucy_SnowStemmer_Load);
+        = SUPER_METHOD_PTR(SNOWBALLSTEMMER, LUCY_SnowStemmer_Load);
     SnowballStemmer *loaded = super_load(self, dump);
     Hash    *source = (Hash*)CERTIFY(dump, HASH);
     CharBuf *language 

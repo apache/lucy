@@ -67,7 +67,7 @@ NOTQuery_Equals_IMP(NOTQuery *self, Obj *other) {
     if ((NOTQuery*)other == self)   { return true; }
     if (!Obj_Is_A(other, NOTQUERY)) { return false; }
     NOTQuery_Equals_t super_equals
-        = (NOTQuery_Equals_t)SUPER_METHOD_PTR(NOTQUERY, Lucy_NOTQuery_Equals);
+        = (NOTQuery_Equals_t)SUPER_METHOD_PTR(NOTQUERY, LUCY_NOTQuery_Equals);
     return super_equals(self, other);
 }
 

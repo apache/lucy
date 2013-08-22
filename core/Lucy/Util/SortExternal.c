@@ -135,7 +135,7 @@ SortEx_Sort_Cache_IMP(SortExternal *self) {
     if (ivars->cache_max != 0) {
         VTable *vtable = SortEx_Get_VTable(self);
         CFISH_Sort_Compare_t compare
-            = (CFISH_Sort_Compare_t)METHOD_PTR(vtable, Lucy_SortEx_Compare);
+            = (CFISH_Sort_Compare_t)METHOD_PTR(vtable, LUCY_SortEx_Compare);
         if (ivars->scratch_cap < ivars->cache_cap) {
             ivars->scratch_cap = ivars->cache_cap;
             ivars->scratch
@@ -232,7 +232,7 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
     uint32_t   *slice_sizes  = ivars->slice_sizes;
     VTable     *vtable       = SortEx_Get_VTable(self);
     CFISH_Sort_Compare_t compare
-        = (CFISH_Sort_Compare_t)METHOD_PTR(vtable, Lucy_SortEx_Compare);
+        = (CFISH_Sort_Compare_t)METHOD_PTR(vtable, LUCY_SortEx_Compare);
 
     if (ivars->cache_max != 0) { THROW(ERR, "Can't refill unless empty"); }
 
@@ -325,7 +325,7 @@ S_find_slice_size(SortExternal *self, SortExternalIVARS *ivars,
     uint8_t *const   cache   = ivars->cache;
     const size_t     width   = ivars->width;
     SortEx_Compare_t compare
-        = METHOD_PTR(SortEx_Get_VTable(self), Lucy_SortEx_Compare);
+        = METHOD_PTR(SortEx_Get_VTable(self), LUCY_SortEx_Compare);
 
     // Binary search.
     while (hi - lo > 1) {

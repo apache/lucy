@@ -161,7 +161,7 @@ PPCODE:
     (void)SvUPGRADE(buffer_sv, SVt_PV);
     if (!SvPOK(buffer_sv)) { SvCUR_set(buffer_sv, 0); }
     ptr = SvGROW(buffer_sv, total_len + 1);
-    Lucy_InStream_Read_Bytes(self, ptr + offset, len);
+    LUCY_InStream_Read_Bytes(self, ptr + offset, len);
     SvPOK_on(buffer_sv);
     if (SvCUR(buffer_sv) < total_len) {
         SvCUR_set(buffer_sv, total_len);
@@ -175,14 +175,14 @@ read_string(self)
 CODE:
 {
     char *ptr;
-    size_t len = Lucy_InStream_Read_C32(self);
+    size_t len = LUCY_InStream_Read_C32(self);
     RETVAL = newSV(len + 1);
     SvCUR_set(RETVAL, len);
     SvPOK_on(RETVAL);
     SvUTF8_on(RETVAL); // Trust source.  Reconsider if API goes public.
     *SvEND(RETVAL) = '\0';
     ptr = SvPVX(RETVAL);
-    Lucy_InStream_Read_Bytes(self, ptr, len);
+    LUCY_InStream_Read_Bytes(self, ptr, len);
 }
 OUTPUT: RETVAL
 
@@ -195,7 +195,7 @@ CODE:
     char *ptr;
     (void)SvUPGRADE(buffer_sv, SVt_PV);
     ptr = SvGROW(buffer_sv, 10 + 1);
-    RETVAL = Lucy_InStream_Read_Raw_C64(self, ptr);
+    RETVAL = LUCY_InStream_Read_Raw_C64(self, ptr);
     SvPOK_on(buffer_sv);
     SvCUR_set(buffer_sv, RETVAL);
 }
@@ -337,7 +337,7 @@ PPCODE:
     for (i = 1; i < items; i++) {
         STRLEN len;
         char *ptr = SvPV(ST(i), len);
-        Lucy_OutStream_Write_Bytes(self, ptr, len);
+        LUCY_OutStream_Write_Bytes(self, ptr, len);
     }
 }
 
@@ -349,8 +349,8 @@ PPCODE:
 {
     STRLEN len = 0;
     char *ptr = SvPVutf8(aSV, len);
-    Lucy_OutStream_Write_C32(self, len);
-    Lucy_OutStream_Write_Bytes(self, ptr, len);
+    LUCY_OutStream_Write_C32(self, len);
+    LUCY_OutStream_Write_Bytes(self, ptr, len);
 }
 END_XS_CODE
 

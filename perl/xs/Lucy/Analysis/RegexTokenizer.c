@@ -120,7 +120,7 @@ S_set_pattern_from_token_re(lucy_RegexTokenizer *self, void *token_re) {
 }
 
 void
-Lucy_RegexTokenizer_Set_Token_RE_IMP(lucy_RegexTokenizer *self,
+LUCY_RegexTokenizer_Set_Token_RE_IMP(lucy_RegexTokenizer *self,
                                      void *token_re) {
     S_set_token_re_but_not_pattern(self, token_re);
     // Set pattern as a side effect.
@@ -128,7 +128,7 @@ Lucy_RegexTokenizer_Set_Token_RE_IMP(lucy_RegexTokenizer *self,
 }
 
 void
-Lucy_RegexTokenizer_Destroy_IMP(lucy_RegexTokenizer *self) {
+LUCY_RegexTokenizer_Destroy_IMP(lucy_RegexTokenizer *self) {
     lucy_RegexTokenizerIVARS *const ivars = lucy_RegexTokenizer_IVARS(self);
     CFISH_DECREF(ivars->pattern);
     ReREFCNT_dec(((REGEXP*)ivars->token_re));
@@ -136,7 +136,7 @@ Lucy_RegexTokenizer_Destroy_IMP(lucy_RegexTokenizer *self) {
 }
 
 void
-Lucy_RegexTokenizer_Tokenize_Str_IMP(lucy_RegexTokenizer *self,
+LUCY_RegexTokenizer_Tokenize_Str_IMP(lucy_RegexTokenizer *self,
                                      const char *string, size_t string_len,
                                      lucy_Inversion *inversion) {
     lucy_RegexTokenizerIVARS *const ivars = lucy_RegexTokenizer_IVARS(self);
@@ -192,7 +192,7 @@ Lucy_RegexTokenizer_Tokenize_Str_IMP(lucy_RegexTokenizer *self,
         end = num_code_points;
 
         // Add a token to the new inversion.
-        Lucy_Inversion_Append(inversion,
+        LUCY_Inversion_Append(inversion,
                               lucy_Token_new(
                                   start_ptr,
                                   (end_ptr - start_ptr),

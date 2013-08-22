@@ -184,7 +184,7 @@ lucy_FType_null_back_compare_values(lucy_FieldType *self,
         return -1;
     }
     else {
-        return Lucy_FType_Compare_Values(self, a, b);
+        return LUCY_FType_Compare_Values(self, a, b);
     }
 }
 

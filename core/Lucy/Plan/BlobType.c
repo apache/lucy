@@ -62,7 +62,7 @@ BlobType_Equals_IMP(BlobType *self, Obj *other) {
     if ((BlobType*)other == self)   { return true; }
     if (!Obj_Is_A(other, BLOBTYPE)) { return false; }
     BlobType_Equals_t super_equals
-        = (BlobType_Equals_t)SUPER_METHOD_PTR(BLOBTYPE, Lucy_BlobType_Equals);
+        = (BlobType_Equals_t)SUPER_METHOD_PTR(BLOBTYPE, LUCY_BlobType_Equals);
     return super_equals(self, other);
 }
 

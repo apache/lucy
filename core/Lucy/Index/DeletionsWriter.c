@@ -177,7 +177,7 @@ DefDelWriter_Metadata_IMP(DefaultDeletionsWriter *self) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     DefDelWriter_Metadata_t super_meta
         = (DefDelWriter_Metadata_t)SUPER_METHOD_PTR(DEFAULTDELETIONSWRITER,
-                                                    Lucy_DefDelWriter_Metadata);
+                                                    LUCY_DefDelWriter_Metadata);
     Hash    *const metadata = super_meta(self);
     Hash    *const files    = Hash_new(0);
 

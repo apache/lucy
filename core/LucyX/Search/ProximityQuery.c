@@ -100,7 +100,7 @@ Obj*
 ProximityQuery_Dump_IMP(ProximityQuery *self) {
     ProximityQueryIVARS *ivars = ProximityQuery_IVARS(self);
     ProximityQuery_Dump_t super_dump
-        = SUPER_METHOD_PTR(PROXIMITYQUERY, Lucy_ProximityQuery_Dump);
+        = SUPER_METHOD_PTR(PROXIMITYQUERY, LUCY_ProximityQuery_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
     Hash_Store_Str(dump, "field", 5, Freezer_dump((Obj*)ivars->field));
     Hash_Store_Str(dump, "terms", 5, Freezer_dump((Obj*)ivars->terms));
@@ -113,7 +113,7 @@ Obj*
 ProximityQuery_Load_IMP(ProximityQuery *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     ProximityQuery_Load_t super_load
-        = SUPER_METHOD_PTR(PROXIMITYQUERY, Lucy_ProximityQuery_Load);
+        = SUPER_METHOD_PTR(PROXIMITYQUERY, LUCY_ProximityQuery_Load);
     ProximityQuery *loaded = (ProximityQuery*)super_load(self, dump);
     ProximityQueryIVARS *loaded_ivars = ProximityQuery_IVARS(loaded);
     Obj *field = CERTIFY(Hash_Fetch_Str(source, "field", 5), OBJ);
@@ -251,7 +251,7 @@ void
 ProximityCompiler_Serialize_IMP(ProximityCompiler *self,
                                 OutStream *outstream) {
     ProximityCompiler_Serialize_t super_serialize
-            = SUPER_METHOD_PTR(PROXIMITYCOMPILER, Lucy_ProximityCompiler_Serialize);
+            = SUPER_METHOD_PTR(PROXIMITYCOMPILER, LUCY_ProximityCompiler_Serialize);
     super_serialize(self, outstream);
     ProximityCompilerIVARS *const ivars = ProximityCompiler_IVARS(self);
     OutStream_Write_F32(outstream, ivars->idf);
@@ -265,7 +265,7 @@ ProximityCompiler*
 ProximityCompiler_Deserialize_IMP(ProximityCompiler *self,
                                   InStream *instream) {
     ProximityCompiler_Deserialize_t super_deserialize
-            = SUPER_METHOD_PTR(PROXIMITYCOMPILER, Lucy_ProximityCompiler_Deserialize);
+            = SUPER_METHOD_PTR(PROXIMITYCOMPILER, LUCY_ProximityCompiler_Deserialize);
     self = super_deserialize(self, instream);
     ProximityCompilerIVARS *const ivars = ProximityCompiler_IVARS(self);
     ivars->idf               = InStream_Read_F32(instream);
@@ -282,7 +282,7 @@ ProximityCompiler_Equals_IMP(ProximityCompiler *self, Obj *other) {
     if (!Obj_Is_A(other, PROXIMITYCOMPILER))      { return false; }
     ProximityCompiler_Equals_t super_equals
         = (ProximityCompiler_Equals_t)SUPER_METHOD_PTR(PROXIMITYCOMPILER,
-                                                       Lucy_ProximityCompiler_Equals);
+                                                       LUCY_ProximityCompiler_Equals);
     if (!super_equals(self, other)) { return false; }
     ProximityCompilerIVARS *const ivars = ProximityCompiler_IVARS(self);
     ProximityCompilerIVARS *const ovars

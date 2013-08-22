@@ -90,7 +90,7 @@ get_fields(self, ...)
     lucy_Doc *self;
 CODE:
     CFISH_UNUSED_VAR(items);
-    RETVAL = newRV_inc((SV*)Lucy_Doc_Get_Fields(self));
+    RETVAL = newRV_inc((SV*)LUCY_Doc_Get_Fields(self));
 OUTPUT: RETVAL
 
 void
@@ -98,7 +98,7 @@ set_fields(self, fields)
     lucy_Doc *self;
     HV *fields;
 PPCODE:
-    Lucy_Doc_Set_Fields_IMP(self, fields);
+    LUCY_Doc_Set_Fields_IMP(self, fields);
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(

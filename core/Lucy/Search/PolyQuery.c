@@ -96,7 +96,7 @@ Obj*
 PolyQuery_Dump_IMP(PolyQuery *self) {
     PolyQueryIVARS *ivars = PolyQuery_IVARS(self);
     PolyQuery_Dump_t super_dump
-        = SUPER_METHOD_PTR(POLYQUERY, Lucy_PolyQuery_Dump);
+        = SUPER_METHOD_PTR(POLYQUERY, LUCY_PolyQuery_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
     Hash_Store_Str(dump, "children", 8, Freezer_dump((Obj*)ivars->children));
     return (Obj*)dump;
@@ -106,7 +106,7 @@ Obj*
 PolyQuery_Load_IMP(PolyQuery *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     PolyQuery_Load_t super_load
-        = SUPER_METHOD_PTR(POLYQUERY, Lucy_PolyQuery_Load);
+        = SUPER_METHOD_PTR(POLYQUERY, LUCY_PolyQuery_Load);
     PolyQuery *loaded = (PolyQuery*)super_load(self, dump);
     Obj *children = CERTIFY(Hash_Fetch_Str(source, "children", 8), OBJ);
     PolyQuery_IVARS(loaded)->children
@@ -206,7 +206,7 @@ PolyCompiler_Serialize_IMP(PolyCompiler *self, OutStream *outstream) {
     Freezer_serialize_charbuf(PolyCompiler_Get_Class_Name(self), outstream);
     Freezer_serialize_varray(ivars->children, outstream);
     PolyCompiler_Serialize_t super_serialize
-        = SUPER_METHOD_PTR(POLYCOMPILER, Lucy_PolyCompiler_Serialize);
+        = SUPER_METHOD_PTR(POLYCOMPILER, LUCY_PolyCompiler_Serialize);
     super_serialize(self, outstream);
 }
 
@@ -217,7 +217,7 @@ PolyCompiler_Deserialize_IMP(PolyCompiler *self, InStream *instream) {
     DECREF(class_name); // TODO Don't serialize class name.
     ivars->children = Freezer_read_varray(instream);
     PolyCompiler_Deserialize_t super_deserialize
-        = SUPER_METHOD_PTR(POLYCOMPILER, Lucy_PolyCompiler_Deserialize);
+        = SUPER_METHOD_PTR(POLYCOMPILER, LUCY_PolyCompiler_Deserialize);
     return super_deserialize(self, instream);
 }
 

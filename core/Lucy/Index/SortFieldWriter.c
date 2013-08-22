@@ -131,7 +131,7 @@ SortFieldWriter_Clear_Cache_IMP(SortFieldWriter *self) {
         Hash_Clear(ivars->uniq_vals);
     }
     SortFieldWriter_Clear_Cache_t super_clear_cache
-        = SUPER_METHOD_PTR(SORTFIELDWRITER, Lucy_SortFieldWriter_Clear_Cache);
+        = SUPER_METHOD_PTR(SORTFIELDWRITER, LUCY_SortFieldWriter_Clear_Cache);
     super_clear_cache(self);
 }
 

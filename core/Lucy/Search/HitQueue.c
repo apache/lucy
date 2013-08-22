@@ -123,7 +123,7 @@ HitQ_Jostle_IMP(HitQueue *self, Obj *element) {
     HitQueueIVARS *const ivars = HitQ_IVARS(self);
     MatchDoc *match_doc = (MatchDoc*)CERTIFY(element, MATCHDOC);
     HitQ_Jostle_t super_jostle
-        = SUPER_METHOD_PTR(HITQUEUE, Lucy_HitQ_Jostle);
+        = SUPER_METHOD_PTR(HITQUEUE, LUCY_HitQ_Jostle);
     if (ivars->need_values) {
         MatchDocIVARS *const match_doc_ivars = MatchDoc_IVARS(match_doc);
         CERTIFY(match_doc_ivars->values, VARRAY);

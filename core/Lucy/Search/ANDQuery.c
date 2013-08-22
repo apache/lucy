@@ -69,7 +69,7 @@ ANDQuery_Equals_IMP(ANDQuery *self, Obj *other) {
     if ((ANDQuery*)other == self)   { return true; }
     if (!Obj_Is_A(other, ANDQUERY)) { return false; }
     ANDQuery_Equals_t super_equals
-        = (ANDQuery_Equals_t)SUPER_METHOD_PTR(ANDQUERY, Lucy_ANDQuery_Equals);
+        = (ANDQuery_Equals_t)SUPER_METHOD_PTR(ANDQUERY, LUCY_ANDQuery_Equals);
     return super_equals(self, other);
 }
 

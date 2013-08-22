@@ -378,7 +378,7 @@ SV*
 get_text(self)
     lucy_Token *self;
 CODE:
-    RETVAL = newSVpvn(Lucy_Token_Get_Text(self), Lucy_Token_Get_Len(self));
+    RETVAL = newSVpvn(LUCY_Token_Get_Text(self), LUCY_Token_Get_Len(self));
     SvUTF8_on(RETVAL);
 OUTPUT: RETVAL
 
@@ -390,7 +390,7 @@ PPCODE:
 {
     STRLEN len;
     char *ptr = SvPVutf8(sv, len);
-    Lucy_Token_Set_Text(self, ptr, len);
+    LUCY_Token_Set_Text(self, ptr, len);
 }
 END_XS
 

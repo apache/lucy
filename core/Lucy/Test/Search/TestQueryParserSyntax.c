@@ -335,9 +335,9 @@ syntax_test_double_colon() {
 /***************************************************************************/
 
 typedef TestQueryParser*
-(*Lucy_TestQPSyntax_Test_t)();
+(*LUCY_TestQPSyntax_Test_t)();
 
-static Lucy_TestQPSyntax_Test_t leaf_test_funcs[] = {
+static LUCY_TestQPSyntax_Test_t leaf_test_funcs[] = {
     leaf_test_simple_term,
     leaf_test_simple_phrase,
     leaf_test_unclosed_quote,
@@ -355,7 +355,7 @@ static Lucy_TestQPSyntax_Test_t leaf_test_funcs[] = {
     NULL
 };
 
-static Lucy_TestQPSyntax_Test_t syntax_test_funcs[] = {
+static LUCY_TestQPSyntax_Test_t syntax_test_funcs[] = {
     syntax_test_minus_plus,
     syntax_test_plus_minus,
     syntax_test_minus_minus,
@@ -396,7 +396,7 @@ test_query_parser_syntax(TestBatchRunner *runner) {
     QParser_Set_Heed_Colons(qparser, true);
 
     for (uint32_t i = 0; leaf_test_funcs[i] != NULL; i++) {
-        Lucy_TestQPSyntax_Test_t test_func = leaf_test_funcs[i];
+        LUCY_TestQPSyntax_Test_t test_func = leaf_test_funcs[i];
         TestQueryParser *test_case = test_func();
         TestQueryParserIVARS *ivars = TestQP_IVARS(test_case);
         Query *tree     = QParser_Tree(qparser, ivars->query_string);
@@ -418,7 +418,7 @@ test_query_parser_syntax(TestBatchRunner *runner) {
     }
 
     for (uint32_t i = 0; syntax_test_funcs[i] != NULL; i++) {
-        Lucy_TestQPSyntax_Test_t test_func = syntax_test_funcs[i];
+        LUCY_TestQPSyntax_Test_t test_func = syntax_test_funcs[i];
         TestQueryParser *test_case = test_func();
         TestQueryParserIVARS *ivars = TestQP_IVARS(test_case);
         Query *tree   = QParser_Tree(qparser, ivars->query_string);

@@ -28,7 +28,7 @@
 #include "Lucy/Store/InStream.h"
 
 lucy_HitDoc*
-Lucy_DefDocReader_Fetch_Doc_IMP(lucy_DefaultDocReader *self, int32_t doc_id) {
+LUCY_DefDocReader_Fetch_Doc_IMP(lucy_DefaultDocReader *self, int32_t doc_id) {
     lucy_DefaultDocReaderIVARS *const ivars = lucy_DefDocReader_IVARS(self);
     lucy_Schema   *const schema = ivars->schema;
     lucy_InStream *const dat_in = ivars->dat_in;
@@ -39,10 +39,10 @@ Lucy_DefDocReader_Fetch_Doc_IMP(lucy_DefaultDocReader *self, int32_t doc_id) {
     SV *field_name_sv = newSV(1);
 
     // Get data file pointer from index, read number of fields.
-    Lucy_InStream_Seek(ix_in, (int64_t)doc_id * 8);
-    start = Lucy_InStream_Read_U64(ix_in);
-    Lucy_InStream_Seek(dat_in, start);
-    num_fields = Lucy_InStream_Read_C32(dat_in);
+    LUCY_InStream_Seek(ix_in, (int64_t)doc_id * 8);
+    start = LUCY_InStream_Read_U64(ix_in);
+    LUCY_InStream_Seek(dat_in, start);
+    num_fields = LUCY_InStream_Read_C32(dat_in);
 
     // Decode stored data and build up the doc field by field.
     while (num_fields--) {
@@ -52,9 +52,9 @@ Lucy_DefDocReader_Fetch_Doc_IMP(lucy_DefaultDocReader *self, int32_t doc_id) {
         lucy_FieldType *type;
 
         // Read field name.
-        field_name_len = Lucy_InStream_Read_C32(dat_in);
+        field_name_len = LUCY_InStream_Read_C32(dat_in);
         field_name_ptr = SvGROW(field_name_sv, field_name_len + 1);
-        Lucy_InStream_Read_Bytes(dat_in, field_name_ptr, field_name_len);
+        LUCY_InStream_Read_Bytes(dat_in, field_name_ptr, field_name_len);
         SvPOK_on(field_name_sv);
         SvCUR_set(field_name_sv, field_name_len);
         SvUTF8_on(field_name_sv);
@@ -64,14 +64,14 @@ Lucy_DefDocReader_Fetch_Doc_IMP(lucy_DefaultDocReader *self, int32_t doc_id) {
         cfish_ZombieCharBuf *field_name_zcb
             = CFISH_ZCB_WRAP_STR(field_name_ptr, field_name_len);
         CFISH_ZCB_Assign_Str(field_name_zcb, field_name_ptr, field_name_len);
-        type = Lucy_Schema_Fetch_Type(schema, (cfish_CharBuf*)field_name_zcb);
+        type = LUCY_Schema_Fetch_Type(schema, (cfish_CharBuf*)field_name_zcb);
 
         // Read the field value.
-        switch (Lucy_FType_Primitive_ID(type) & lucy_FType_PRIMITIVE_ID_MASK) {
+        switch (LUCY_FType_Primitive_ID(type) & lucy_FType_PRIMITIVE_ID_MASK) {
             case lucy_FType_TEXT: {
-                    STRLEN value_len = Lucy_InStream_Read_C32(dat_in);
+                    STRLEN value_len = LUCY_InStream_Read_C32(dat_in);
                     value_sv = newSV((value_len ? value_len : 1));
-                    Lucy_InStream_Read_Bytes(dat_in, SvPVX(value_sv), value_len);
+                    LUCY_InStream_Read_Bytes(dat_in, SvPVX(value_sv), value_len);
                     SvCUR_set(value_sv, value_len);
                     *SvEND(value_sv) = '\0';
                     SvPOK_on(value_sv);
@@ -79,30 +79,30 @@ Lucy_DefDocReader_Fetch_Doc_IMP(lucy_DefaultDocReader *self, int32_t doc_id) {
                     break;
                 }
             case lucy_FType_BLOB: {
-                    STRLEN value_len = Lucy_InStream_Read_C32(dat_in);
+                    STRLEN value_len = LUCY_InStream_Read_C32(dat_in);
                     value_sv = newSV((value_len ? value_len : 1));
-                    Lucy_InStream_Read_Bytes(dat_in, SvPVX(value_sv), value_len);
+                    LUCY_InStream_Read_Bytes(dat_in, SvPVX(value_sv), value_len);
                     SvCUR_set(value_sv, value_len);
                     *SvEND(value_sv) = '\0';
                     SvPOK_on(value_sv);
                     break;
                 }
             case lucy_FType_FLOAT32:
-                value_sv = newSVnv(Lucy_InStream_Read_F32(dat_in));
+                value_sv = newSVnv(LUCY_InStream_Read_F32(dat_in));
                 break;
             case lucy_FType_FLOAT64:
-                value_sv = newSVnv(Lucy_InStream_Read_F64(dat_in));
+                value_sv = newSVnv(LUCY_InStream_Read_F64(dat_in));
                 break;
             case lucy_FType_INT32:
-                value_sv = newSViv((int32_t)Lucy_InStream_Read_C32(dat_in));
+                value_sv = newSViv((int32_t)LUCY_InStream_Read_C32(dat_in));
                 break;
             case lucy_FType_INT64:
                 if (sizeof(IV) == 8) {
-                    int64_t val = (int64_t)Lucy_InStream_Read_C64(dat_in);
+                    int64_t val = (int64_t)LUCY_InStream_Read_C64(dat_in);
                     value_sv = newSViv((IV)val);
                 }
                 else { // (lossy)
-                    int64_t val = (int64_t)Lucy_InStream_Read_C64(dat_in);
+                    int64_t val = (int64_t)LUCY_InStream_Read_C64(dat_in);
                     value_sv = newSVnv((double)val);
                 }
                 break;

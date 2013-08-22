@@ -54,7 +54,7 @@ Obj*
 RegexTokenizer_Dump_IMP(RegexTokenizer *self) {
     RegexTokenizerIVARS *const ivars = RegexTokenizer_IVARS(self);
     RegexTokenizer_Dump_t super_dump
-        = SUPER_METHOD_PTR(REGEXTOKENIZER, Lucy_RegexTokenizer_Dump);
+        = SUPER_METHOD_PTR(REGEXTOKENIZER, LUCY_RegexTokenizer_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
     Hash_Store_Str(dump, "pattern", 7, (Obj*)CB_Clone(ivars->pattern));
     return (Obj*)dump;
@@ -64,7 +64,7 @@ RegexTokenizer*
 RegexTokenizer_Load_IMP(RegexTokenizer *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     RegexTokenizer_Load_t super_load
-        = SUPER_METHOD_PTR(REGEXTOKENIZER, Lucy_RegexTokenizer_Load);
+        = SUPER_METHOD_PTR(REGEXTOKENIZER, LUCY_RegexTokenizer_Load);
     RegexTokenizer *loaded = super_load(self, dump);
     CharBuf *pattern 
         = (CharBuf*)CERTIFY(Hash_Fetch_Str(source, "pattern", 7), CHARBUF);

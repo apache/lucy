@@ -128,7 +128,7 @@ CFReader_Set_Path_IMP(CompoundFileReader *self, const CharBuf *path) {
     Folder_Set_Path(ivars->real_folder, path);
     CFReader_Set_Path_t super_set_path
         = (CFReader_Set_Path_t)SUPER_METHOD_PTR(COMPOUNDFILEREADER,
-                                                Lucy_CFReader_Set_Path);
+                                                LUCY_CFReader_Set_Path);
     super_set_path(self, path);
 }
 

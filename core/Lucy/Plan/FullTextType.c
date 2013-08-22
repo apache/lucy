@@ -67,7 +67,7 @@ FullTextType_Equals_IMP(FullTextType *self, Obj *other) {
     FullTextTypeIVARS *const ovars = FullTextType_IVARS((FullTextType*)other);
     FullTextType_Equals_t super_equals
         = (FullTextType_Equals_t)SUPER_METHOD_PTR(FULLTEXTTYPE,
-                                                  Lucy_FullTextType_Equals);
+                                                  LUCY_FullTextType_Equals);
     if (!super_equals(self, other))                       { return false; }
     if (!!ivars->sortable      != !!ovars->sortable)      { return false; }
     if (!!ivars->highlightable != !!ovars->highlightable) { return false; }

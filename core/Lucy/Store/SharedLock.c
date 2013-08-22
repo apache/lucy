@@ -57,7 +57,7 @@ ShLock_Request_IMP(SharedLock *self) {
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
     uint32_t i = 0;
     ShLock_Request_t super_request
-        = SUPER_METHOD_PTR(SHAREDLOCK, Lucy_ShLock_Request);
+        = SUPER_METHOD_PTR(SHAREDLOCK, LUCY_ShLock_Request);
 
     // Empty lock_path indicates whether this particular instance is locked.
     if (ivars->lock_path
@@ -86,7 +86,7 @@ ShLock_Release_IMP(SharedLock *self) {
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
     if (ivars->lock_path && !CB_Equals_Str(ivars->lock_path, "", 0)) {
         ShLock_Release_t super_release
-            = SUPER_METHOD_PTR(SHAREDLOCK, Lucy_ShLock_Release);
+            = SUPER_METHOD_PTR(SHAREDLOCK, LUCY_ShLock_Release);
         super_release(self);
 
         // Empty out lock_path.
