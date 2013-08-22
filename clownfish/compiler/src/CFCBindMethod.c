@@ -26,34 +26,6 @@
 #include "CFCSymbol.h"
 #include "CFCClass.h"
 
-/* Provided temporary compatibility for old-style method names with mixed-case
- * prefixes.
- */
-char*
-S_old_method_compat(CFCMethod *method, CFCClass *klass) {
-    char *short_meth_sym = CFCMethod_short_method_sym(method, klass);
-    char *short_typedef  = CFCMethod_short_typedef(method, klass);
-    const char *Prefix = CFCClass_get_Prefix(klass);
-    const char *PREFIX = CFCClass_get_PREFIX(klass);
-    char pattern[]
-        = "#define %s%s %s%s\n"
-          "#define %s%s %s%s\n"
-          "#define %s%s_OFFSET %s%s_OFFSET\n"
-          "#define %s%s_IMP %s%s_IMP\n";
-    char *result = CFCUtil_sprintf(pattern,
-                                   Prefix, short_meth_sym,
-                                   PREFIX, short_meth_sym,
-                                   Prefix, short_typedef,
-                                   PREFIX, short_typedef,
-                                   Prefix, short_meth_sym,
-                                   PREFIX, short_meth_sym,
-                                   Prefix, short_meth_sym,
-                                   PREFIX, short_meth_sym);
-    FREEMEM(short_meth_sym);
-    FREEMEM(short_typedef);
-    return result;
-}
-
 /* Create a macro definition that aliases to a function name directly, since
  * this method may not be overridden. */
 static char*
@@ -97,18 +69,15 @@ S_final_method_def(CFCMethod *method, CFCClass *klass) {
 
     char *full_meth_sym   = CFCMethod_full_method_sym(method, klass);
     char *full_offset_sym = CFCMethod_full_offset_sym(method, klass);
-    char *compat = S_old_method_compat(method, klass);
 
     const char pattern[] =
-        "%s\n"
         "extern size_t %s;\n"
         "#define %s(%s) \\\n"
         "    %s((%s)%s)\n";
     char *method_def
-        = CFCUtil_sprintf(pattern, compat, full_offset_sym, full_meth_sym, arg_names,
+        = CFCUtil_sprintf(pattern, full_offset_sym, full_meth_sym, arg_names,
                           full_func_sym, self_type, arg_names);
 
-    FREEMEM(compat);
     FREEMEM(full_offset_sym);
     FREEMEM(full_meth_sym);
     return method_def;
@@ -145,9 +114,7 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
     const char *ret_type_str = CFCType_to_c(return_type);
     const char *maybe_return = CFCType_is_void(return_type) ? "" : "return ";
 
-    char *compat = S_old_method_compat(method, klass);
     const char pattern[] =
-        "%s\n"
         "extern %sVISIBLE size_t %s;\n"
         "static CFISH_INLINE %s\n"
         "%s(const %s *self%s) {\n"
@@ -155,13 +122,12 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
         "    %smethod((%s*)self%s);\n"
         "}\n";
     char *method_def
-        = CFCUtil_sprintf(pattern, compat, PREFIX, full_offset_sym, ret_type_str,
+        = CFCUtil_sprintf(pattern, PREFIX, full_offset_sym, ret_type_str,
                           full_meth_sym, invoker_struct, params_minus_invoker,
                           full_typedef, full_typedef, full_offset_sym,
                           maybe_return, common_struct,
                           arg_names_minus_invoker);
 
-    FREEMEM(compat);
     FREEMEM(full_offset_sym);
     FREEMEM(full_meth_sym);
     FREEMEM(full_typedef);
