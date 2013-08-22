@@ -138,7 +138,7 @@ CB_Hash_Sum_IMP(CharBuf *self) {
     uint32_t hashvalue = 5381;
     ZombieCharBuf *iterator = ZCB_WRAP(self);
 
-    const CB_Nibble_t nibble = METHOD_PTR(iterator->vtable, Cfish_CB_Nibble);
+    const CB_Nibble_t nibble = METHOD_PTR(iterator->vtable, CFISH_CB_Nibble);
     while (iterator->size) {
         uint32_t code_point = (uint32_t)nibble((CharBuf*)iterator);
         hashvalue = ((hashvalue << 5) + hashvalue) ^ code_point;

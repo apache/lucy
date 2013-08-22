@@ -448,7 +448,7 @@ S_callback_start(CFCMethod *method) {
         "    ENTER;\n"
         "    SAVETMPS;\n"
         "    PUSHMARK(SP);\n"
-        "    mPUSHs((SV*)Cfish_Obj_To_Host((cfish_Obj*)self));\n";
+        "    mPUSHs((SV*)CFISH_Obj_To_Host((cfish_Obj*)self));\n";
     int num_args = (int)CFCParamList_num_vars(param_list) - 1;
     int num_to_extend = num_args == 0 ? 1
                       : num_args == 1 ? 2

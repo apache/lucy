@@ -63,7 +63,7 @@ Lucy_DefDocReader_Fetch_Doc_IMP(lucy_DefaultDocReader *self, int32_t doc_id) {
         // Find the Field's FieldType.
         cfish_ZombieCharBuf *field_name_zcb
             = CFISH_ZCB_WRAP_STR(field_name_ptr, field_name_len);
-        Cfish_ZCB_Assign_Str(field_name_zcb, field_name_ptr, field_name_len);
+        CFISH_ZCB_Assign_Str(field_name_zcb, field_name_ptr, field_name_len);
         type = Lucy_Schema_Fetch_Type(schema, (cfish_CharBuf*)field_name_zcb);
 
         // Read the field value.

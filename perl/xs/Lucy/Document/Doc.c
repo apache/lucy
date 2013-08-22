@@ -54,14 +54,14 @@ Lucy_Doc_Get_Size_IMP(lucy_Doc *self) {
 void
 Lucy_Doc_Store_IMP(lucy_Doc *self, const cfish_CharBuf *field, cfish_Obj *value) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
-    char   *key      = (char*)Cfish_CB_Get_Ptr8(field);
-    size_t  key_size = Cfish_CB_Get_Size(field);
+    char   *key      = (char*)CFISH_CB_Get_Ptr8(field);
+    size_t  key_size = CFISH_CB_Get_Size(field);
     SV *key_sv = newSVpvn(key, key_size);
     SV *val_sv = value == NULL
                  ? newSV(0)
-                 : Cfish_Obj_Is_A(value, CFISH_CHARBUF)
+                 : CFISH_Obj_Is_A(value, CFISH_CHARBUF)
                  ? XSBind_cb_to_sv((cfish_CharBuf*)value)
-                 : (SV*)Cfish_Obj_To_Host(value);
+                 : (SV*)CFISH_Obj_To_Host(value);
     SvUTF8_on(key_sv);
     (void)hv_store_ent((HV*)ivars->fields, key_sv, val_sv, 0);
     // TODO: make this a thread-local instead of creating it every time?
@@ -147,8 +147,8 @@ Lucy_Doc_Extract_IMP(lucy_Doc *self, cfish_CharBuf *field,
                      cfish_ViewCharBuf *target) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     cfish_Obj *retval = NULL;
-    SV **sv_ptr = hv_fetch((HV*)ivars->fields, (char*)Cfish_CB_Get_Ptr8(field),
-                           Cfish_CB_Get_Size(field), 0);
+    SV **sv_ptr = hv_fetch((HV*)ivars->fields, (char*)CFISH_CB_Get_Ptr8(field),
+                           CFISH_CB_Get_Size(field), 0);
 
     if (sv_ptr && XSBind_sv_defined(*sv_ptr)) {
         SV *const sv = *sv_ptr;
@@ -159,7 +159,7 @@ Lucy_Doc_Extract_IMP(lucy_Doc *self, cfish_CharBuf *field,
         else {
             STRLEN size;
             char *ptr = SvPVutf8(sv, size);
-            Cfish_ViewCB_Assign_Str(target, ptr, size);
+            CFISH_ViewCB_Assign_Str(target, ptr, size);
             retval = (cfish_Obj*)target;
         }
     }
@@ -180,11 +180,11 @@ cfish_Hash*
 Lucy_Doc_Dump_IMP(lucy_Doc *self) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     cfish_Hash *dump = cfish_Hash_new(0);
-    Cfish_Hash_Store_Str(dump, "_class", 6,
-                        (cfish_Obj*)Cfish_CB_Clone(Lucy_Doc_Get_Class_Name(self)));
-    Cfish_Hash_Store_Str(dump, "doc_id", 7,
+    CFISH_Hash_Store_Str(dump, "_class", 6,
+                        (cfish_Obj*)CFISH_CB_Clone(Lucy_Doc_Get_Class_Name(self)));
+    CFISH_Hash_Store_Str(dump, "doc_id", 7,
                         (cfish_Obj*)cfish_CB_newf("%i32", ivars->doc_id));
-    Cfish_Hash_Store_Str(dump, "fields", 6,
+    CFISH_Hash_Store_Str(dump, "fields", 6,
                         XSBind_perl_to_cfish((SV*)ivars->fields));
     return dump;
 }
@@ -193,21 +193,21 @@ lucy_Doc*
 Lucy_Doc_Load_IMP(lucy_Doc *self, cfish_Obj *dump) {
     cfish_Hash *source = (cfish_Hash*)CFISH_CERTIFY(dump, CFISH_HASH);
     cfish_CharBuf *class_name = (cfish_CharBuf*)CFISH_CERTIFY(
-                                   Cfish_Hash_Fetch_Str(source, "_class", 6),
+                                   CFISH_Hash_Fetch_Str(source, "_class", 6),
                                    CFISH_CHARBUF);
     cfish_VTable *vtable = cfish_VTable_singleton(class_name, NULL);
-    lucy_Doc *loaded = (lucy_Doc*)Cfish_VTable_Make_Obj(vtable);
+    lucy_Doc *loaded = (lucy_Doc*)CFISH_VTable_Make_Obj(vtable);
     cfish_Obj *doc_id = CFISH_CERTIFY(
-                           Cfish_Hash_Fetch_Str(source, "doc_id", 7),
+                           CFISH_Hash_Fetch_Str(source, "doc_id", 7),
                            CFISH_OBJ);
     cfish_Hash *fields = (cfish_Hash*)CFISH_CERTIFY(
-                            Cfish_Hash_Fetch_Str(source, "fields", 6),
+                            CFISH_Hash_Fetch_Str(source, "fields", 6),
                             CFISH_HASH);
     SV *fields_sv = XSBind_cfish_to_perl((cfish_Obj*)fields);
     CHY_UNUSED_VAR(self);
 
     lucy_DocIVARS *const loaded_ivars = lucy_Doc_IVARS(loaded);
-    loaded_ivars->doc_id = (int32_t)Cfish_Obj_To_I64(doc_id);
+    loaded_ivars->doc_id = (int32_t)CFISH_Obj_To_I64(doc_id);
     loaded_ivars->fields  = SvREFCNT_inc(SvRV(fields_sv));
     SvREFCNT_dec(fields_sv);
 
@@ -217,7 +217,7 @@ Lucy_Doc_Load_IMP(lucy_Doc *self, cfish_Obj *dump) {
 bool
 Lucy_Doc_Equals_IMP(lucy_Doc *self, cfish_Obj *other) {
     if ((lucy_Doc*)other  == self)        { return true;  }
-    if (!Cfish_Obj_Is_A(other, LUCY_DOC)) { return false; }
+    if (!CFISH_Obj_Is_A(other, LUCY_DOC)) { return false; }
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     lucy_DocIVARS *const ovars = lucy_Doc_IVARS((lucy_Doc*)other);
 

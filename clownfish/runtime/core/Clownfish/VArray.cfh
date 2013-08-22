@@ -20,10 +20,10 @@ __C__
 #include "Clownfish/Util/SortUtils.h"
 
 typedef bool
-(*Cfish_VA_Gather_Test_t)(cfish_VArray *self, uint32_t tick, void *data);
+(*CFISH_VA_Gather_Test_t)(cfish_VArray *self, uint32_t tick, void *data);
 
 #ifdef CFISH_USE_SHORT_NAMES
-  #define VA_Gather_Test_t Cfish_VA_Gather_Test_t
+  #define VA_Gather_Test_t CFISH_VA_Gather_Test_t
 #endif
 __END_C__
 
@@ -119,7 +119,7 @@ class Clownfish::VArray cnick VA inherits Clownfish::Obj {
      * @param context Argument supplied to the comparison routine.
      */
     void
-    Sort(VArray *self, Cfish_Sort_Compare_t compare = NULL,
+    Sort(VArray *self, CFISH_Sort_Compare_t compare = NULL,
          void *context = NULL);
 
     /** Set the size for the VArray.  If the new size is larger than the
@@ -147,7 +147,7 @@ class Clownfish::VArray cnick VA inherits Clownfish::Obj {
     /** Return all elements for which <code>test</code> returns true.
      */
     public incremented VArray*
-    Gather(VArray *self, Cfish_VA_Gather_Test_t test, void *data);
+    Gather(VArray *self, CFISH_VA_Gather_Test_t test, void *data);
 
     /** Return a new array consisting of elements from a contiguous slice.  If
      * the specified range is out of bounds, return an array with fewer

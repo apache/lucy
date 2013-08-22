@@ -281,7 +281,7 @@ CFCPerlTypeMap_write_xs_typemap(CFCHierarchy *hierarchy) {
                             ", NULL);\n\n", NULL);
 
         output = CFCUtil_cat(output, vtable_var, "_\n"
-                             "    $arg = (SV*)Cfish_Obj_To_Host((cfish_Obj*)$var);\n"
+                             "    $arg = (SV*)CFISH_Obj_To_Host((cfish_Obj*)$var);\n"
                              "    CFISH_DECREF($var);\n"
                              "\n", NULL);
     }

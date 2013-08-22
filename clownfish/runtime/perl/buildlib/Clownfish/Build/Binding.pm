@@ -97,7 +97,7 @@ CODE:
     cfish_TestFormatter *formatter
         = (cfish_TestFormatter*)cfish_TestFormatterTAP_new();
     cfish_TestSuite *suite = testcfish_Test_create_test_suite();
-    bool result = Cfish_TestSuite_Run_Batch(suite, class_name, formatter);
+    bool result = CFISH_TestSuite_Run_Batch(suite, class_name, formatter);
     CFISH_DECREF(class_name);
     CFISH_DECREF(formatter);
     CFISH_DECREF(suite);
@@ -129,7 +129,7 @@ CODE:
     char *ptr = SvPV(sv, size);
     cfish_ByteBuf *self = (cfish_ByteBuf*)XSBind_new_blank_obj(either_sv);
     cfish_BB_init(self, size);
-    Cfish_BB_Mimic_Bytes(self, ptr, size);
+    CFISH_BB_Mimic_Bytes(self, ptr, size);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
@@ -159,7 +159,7 @@ CODE:
     char *ptr = SvPVutf8(sv, size);
     cfish_CharBuf *self = (cfish_CharBuf*)XSBind_new_blank_obj(either_sv);
     cfish_CB_init(self, size);
-    Cfish_CB_Cat_Trusted_Str(self, ptr, size);
+    CFISH_CB_Cat_Trusted_Str(self, ptr, size);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
@@ -168,7 +168,7 @@ SV*
 _clone(self)
     cfish_CharBuf *self;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(Cfish_CB_Clone_IMP(self));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(CFISH_CB_Clone_IMP(self));
 OUTPUT: RETVAL
 
 SV*
@@ -268,7 +268,7 @@ _fetch(self, key)
     cfish_Hash *self;
     const cfish_CharBuf *key;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV(Cfish_Hash_Fetch_IMP(self, (cfish_Obj*)key));
+    RETVAL = CFISH_OBJ_TO_SV(CFISH_Hash_Fetch_IMP(self, (cfish_Obj*)key));
 OUTPUT: RETVAL
 
 void
@@ -279,7 +279,7 @@ store(self, key, value);
 PPCODE:
 {
     if (value) { CFISH_INCREF(value); }
-    Cfish_Hash_Store_IMP(self, (cfish_Obj*)key, value);
+    CFISH_Hash_Store_IMP(self, (cfish_Obj*)key, value);
 }
 
 void
@@ -290,9 +290,9 @@ PPCODE:
     cfish_Obj *key;
     cfish_Obj *val;
 
-    if (Cfish_Hash_Next(self, &key, &val)) {
-        SV *key_sv = (SV*)Cfish_Obj_To_Host(key);
-        SV *val_sv = (SV*)Cfish_Obj_To_Host(val);
+    if (CFISH_Hash_Next(self, &key, &val)) {
+        SV *key_sv = (SV*)CFISH_Obj_To_Host(key);
+        SV *val_sv = (SV*)CFISH_Obj_To_Host(val);
 
         XPUSHs(sv_2mortal(key_sv));
         XPUSHs(sv_2mortal(val_sv));
@@ -476,7 +476,7 @@ is_a(self, class_name)
 CODE:
 {
     cfish_VTable *target = cfish_VTable_fetch_vtable(class_name);
-    RETVAL = Cfish_Obj_Is_A(self, target);
+    RETVAL = CFISH_Obj_Is_A(self, target);
 }
 OUTPUT: RETVAL
 END_XS_CODE
@@ -509,28 +509,28 @@ SV*
 shallow_copy(self)
     cfish_VArray *self;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(Cfish_VA_Shallow_Copy(self));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(CFISH_VA_Shallow_Copy(self));
 OUTPUT: RETVAL
 
 SV*
 _clone(self)
     cfish_VArray *self;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(Cfish_VA_Clone(self));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(CFISH_VA_Clone(self));
 OUTPUT: RETVAL
 
 SV*
 shift(self)
     cfish_VArray *self;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(Cfish_VA_Shift(self));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(CFISH_VA_Shift(self));
 OUTPUT: RETVAL
 
 SV*
 pop(self)
     cfish_VArray *self;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(Cfish_VA_Pop(self));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(CFISH_VA_Pop(self));
 OUTPUT: RETVAL
 
 SV*
@@ -538,7 +538,7 @@ delete(self, tick)
     cfish_VArray *self;
     uint32_t    tick;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(Cfish_VA_Delete(self, tick));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(CFISH_VA_Delete(self, tick));
 OUTPUT: RETVAL
 
 void
@@ -549,7 +549,7 @@ store(self, tick, value);
 PPCODE:
 {
     if (value) { CFISH_INCREF(value); }
-    Cfish_VA_Store_IMP(self, tick, value);
+    CFISH_VA_Store_IMP(self, tick, value);
 }
 
 SV*
@@ -557,7 +557,7 @@ fetch(self, tick)
     cfish_VArray *self;
     uint32_t     tick;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV(Cfish_VA_Fetch(self, tick));
+    RETVAL = CFISH_OBJ_TO_SV(CFISH_VA_Fetch(self, tick));
 OUTPUT: RETVAL
 END_XS_CODE
 
@@ -583,7 +583,7 @@ CODE:
     if (cfish_VTable_registry == NULL) {
         cfish_VTable_init_registry();
     }
-    RETVAL = (SV*)Cfish_Obj_To_Host((cfish_Obj*)cfish_VTable_registry);
+    RETVAL = (SV*)CFISH_Obj_To_Host((cfish_Obj*)cfish_VTable_registry);
 OUTPUT: RETVAL
 
 SV*
@@ -598,7 +598,7 @@ CODE:
     cfish_ZombieCharBuf *class_name = CFISH_ZCB_WRAP_STR(ptr, size);
     cfish_VTable *vtable
         = cfish_VTable_fetch_vtable((cfish_CharBuf*)class_name);
-    RETVAL = vtable ? (SV*)Cfish_VTable_To_Host(vtable) : &PL_sv_undef;
+    RETVAL = vtable ? (SV*)CFISH_VTable_To_Host(vtable) : &PL_sv_undef;
 }
 OUTPUT: RETVAL
 
@@ -621,7 +621,7 @@ CODE:
         CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
     }
     cfish_VTable *singleton = cfish_VTable_singleton(class_name, parent);
-    RETVAL = (SV*)Cfish_VTable_To_Host(singleton);
+    RETVAL = (SV*)CFISH_VTable_To_Host(singleton);
 }
 OUTPUT: RETVAL
 
@@ -629,7 +629,7 @@ SV*
 make_obj(self)
     cfish_VTable *self;
 CODE:
-    cfish_Obj *blank = Cfish_VTable_Make_Obj(self);
+    cfish_Obj *blank = CFISH_VTable_Make_Obj(self);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(blank);
 OUTPUT: RETVAL
 END_XS_CODE

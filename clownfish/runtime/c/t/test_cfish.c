@@ -30,7 +30,7 @@ main() {
 
     formatter = (cfish_TestFormatter*)cfish_TestFormatterCF_new();
     suite     = testcfish_Test_create_test_suite();
-    success   = Cfish_TestSuite_Run_All_Batches(suite, formatter);
+    success   = CFISH_TestSuite_Run_All_Batches(suite, formatter);
 
     CFISH_DECREF(formatter);
     CFISH_DECREF(suite);

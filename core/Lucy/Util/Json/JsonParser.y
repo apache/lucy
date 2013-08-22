@@ -85,28 +85,28 @@ empty_object(A) ::= LEFT_CURLY_BRACKET RIGHT_CURLY_BRACKET.
 single_pair_object(A) ::= LEFT_CURLY_BRACKET STRING(B) COLON value(C) RIGHT_CURLY_BRACKET.
 {
     A = cfish_Hash_new(1);
-    Cfish_Hash_Store(A, (cfish_Obj*)B, C);
+    CFISH_Hash_Store(A, (cfish_Obj*)B, C);
     CFISH_DECREF(B);
 }
 
 multi_pair_object(A) ::= LEFT_CURLY_BRACKET key_value_pair_list(B) STRING(C) COLON value(D) RIGHT_CURLY_BRACKET.
 {
     A = B;
-    Cfish_Hash_Store(A, (cfish_Obj*)C, D);
+    CFISH_Hash_Store(A, (cfish_Obj*)C, D);
     CFISH_DECREF(C);
 }
 
 key_value_pair_list(A) ::= key_value_pair_list(B) STRING(C) COLON value(D) COMMA.
 { 
     A = B; 
-    Cfish_Hash_Store(A, (cfish_Obj*)C, D);
+    CFISH_Hash_Store(A, (cfish_Obj*)C, D);
     CFISH_DECREF(C);
 }
 
 key_value_pair_list(A) ::= STRING(B) COLON value(C) COMMA.
 {
     A = cfish_Hash_new(0);
-    Cfish_Hash_Store(A, (cfish_Obj*)B, C);
+    CFISH_Hash_Store(A, (cfish_Obj*)B, C);
     CFISH_DECREF(B);
 }
 
@@ -133,24 +133,24 @@ empty_array(A) ::= LEFT_SQUARE_BRACKET RIGHT_SQUARE_BRACKET.
 single_elem_array(A) ::= LEFT_SQUARE_BRACKET value(B) RIGHT_SQUARE_BRACKET.
 {
     A = cfish_VA_new(1);
-    Cfish_VA_Push(A, B);
+    CFISH_VA_Push(A, B);
 }
 
 multi_elem_array(A) ::= LEFT_SQUARE_BRACKET array_elem_list(B) value(C) RIGHT_SQUARE_BRACKET.
 {
     A = B;
-    Cfish_VA_Push(A, C);
+    CFISH_VA_Push(A, C);
 }
 
 array_elem_list(A) ::= array_elem_list(B) value(C) COMMA. 
 { 
     A = B; 
-    Cfish_VA_Push(A, C);
+    CFISH_VA_Push(A, C);
 }
 
 array_elem_list(A) ::= value(B) COMMA.
 {
     A = cfish_VA_new(1);
-    Cfish_VA_Push(A, B);
+    CFISH_VA_Push(A, B);
 }
 

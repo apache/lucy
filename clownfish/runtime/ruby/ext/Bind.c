@@ -21,10 +21,10 @@
 
 VALUE
 Bind_cfish_to_ruby(cfish_Obj *obj) {
-  if (Cfish_Obj_Is_A(obj, CFISH_CHARBUF)) {
+  if (CFISH_Obj_Is_A(obj, CFISH_CHARBUF)) {
       return Bind_cb_to_ruby((cfish_CharBuf*)obj);
   }
-  else if (Cfish_Obj_Is_A(obj, CFISH_VARRAY)) {
+  else if (CFISH_Obj_Is_A(obj, CFISH_VARRAY)) {
       return S_cfish_array_to_ruby_array((cfish_VArray*)obj);
   }
 }
@@ -35,13 +35,13 @@ Bind_cb_to_ruby(const cfish_CharBuf *cb) {
         return rb_str_new2("");
     }
     else {
-        return rb_str_new((char*)Cfish_CB_Get_Ptr8(cb), Cfish_CB_Get_Size(cb));
+        return rb_str_new((char*)CFISH_CB_Get_Ptr8(cb), CFISH_CB_Get_Size(cb));
     }
 }
 
 static VALUE
 S_cfish_array_to_ruby_array(cfish_VArray *varray) {
-    uint32_t num_elems = Cfish_VA_Get_Size(varray);
+    uint32_t num_elems = CFISH_VA_Get_Size(varray);
 
     VALUE ruby_array = rb_ary_new2(num_elems - 1);
 
@@ -49,7 +49,7 @@ S_cfish_array_to_ruby_array(cfish_VArray *varray) {
         //TODO Need to determine why c99 mode is not being honored
         uint32_t i;
         for (uint32_t i = 0; i < num_elems; i++) {
-            cfish_Obj *val = Cfish_VA_Fetch(varray, i);
+            cfish_Obj *val = CFISH_VA_Fetch(varray, i);
             if (val == NULL) {
                 continue;
             }

@@ -45,13 +45,13 @@ lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
     lucy_RegexTokenizerIVARS *const ivars = lucy_RegexTokenizer_IVARS(self);
     #define DEFAULT_PATTERN "\\w+(?:['\\x{2019}]\\w+)*"
     if (pattern) {
-        if (Cfish_CB_Find_Str(pattern, "\\p", 2) != -1
-            || Cfish_CB_Find_Str(pattern, "\\P", 2) != -1
+        if (CFISH_CB_Find_Str(pattern, "\\p", 2) != -1
+            || CFISH_CB_Find_Str(pattern, "\\P", 2) != -1
            ) {
             CFISH_DECREF(self);
             THROW(CFISH_ERR, "\\p and \\P constructs forbidden");
         }
-        ivars->pattern = Cfish_CB_Clone(pattern);
+        ivars->pattern = CFISH_CB_Clone(pattern);
     }
     else {
         ivars->pattern = cfish_CB_new_from_trusted_utf8(
@@ -115,7 +115,7 @@ S_set_pattern_from_token_re(lucy_RegexTokenizer *self, void *token_re) {
     SV *rv = newRV((SV*)token_re);
     STRLEN len = 0;
     char *ptr = SvPVutf8((SV*)rv, len);
-    Cfish_CB_Mimic_Str(ivars->pattern, ptr, len);
+    CFISH_CB_Mimic_Str(ivars->pattern, ptr, len);
     SvREFCNT_dec(rv);
 }
 

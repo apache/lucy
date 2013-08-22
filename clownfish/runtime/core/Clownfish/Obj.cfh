@@ -157,8 +157,8 @@ public class Clownfish::Obj {
 __C__
 static CFISH_INLINE void
 cfish_Obj_super_destroy(cfish_Obj *self, cfish_VTable *vtable) {
-    Cfish_Obj_Destroy_t super_destroy
-        = CFISH_SUPER_METHOD_PTR(vtable, Cfish_Obj_Destroy);
+    CFISH_Obj_Destroy_t super_destroy
+        = CFISH_SUPER_METHOD_PTR(vtable, CFISH_Obj_Destroy);
     super_destroy(self);
 }
 
@@ -167,7 +167,7 @@ cfish_Obj_super_destroy(cfish_Obj *self, cfish_VTable *vtable) {
 
 static CFISH_INLINE cfish_Obj*
 cfish_Obj_incref(cfish_Obj *self) {
-    if (self != NULL) { return Cfish_Obj_Inc_RefCount(self); }
+    if (self != NULL) { return CFISH_Obj_Inc_RefCount(self); }
     else { return NULL; }
 }
 
@@ -175,7 +175,7 @@ cfish_Obj_incref(cfish_Obj *self) {
 
 static CFISH_INLINE uint32_t
 cfish_Obj_decref(cfish_Obj *self) {
-    if (self != NULL) { return Cfish_Obj_Dec_RefCount(self); }
+    if (self != NULL) { return CFISH_Obj_Dec_RefCount(self); }
     else { return 0; }
 }
 

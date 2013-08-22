@@ -151,7 +151,7 @@ PPCODE:
     lucy_RAMFileHandle *file_handle
         = lucy_RAMFH_open(NULL, LUCY_FH_READ_ONLY, ram_file);
     lucy_InStream *instream = lucy_InStream_open((cfish_Obj*)file_handle);
-    cfish_Obj *self = Cfish_VTable_Foster_Obj(vtable, blank_obj);
+    cfish_Obj *self = CFISH_VTable_Foster_Obj(vtable, blank_obj);
     cfish_Obj *deserialized = lucy_Freezer_deserialize(self, instream);
 
     CFISH_UNUSED_VAR(cloning);
@@ -188,7 +188,7 @@ CODE:
     cfish_TestFormatter *formatter
         = (cfish_TestFormatter*)cfish_TestFormatterTAP_new();
     cfish_TestSuite *suite = testlucy_Test_create_test_suite();
-    bool result = Cfish_TestSuite_Run_Batch(suite, class_name, formatter);
+    bool result = CFISH_TestSuite_Run_Batch(suite, class_name, formatter);
     CFISH_DECREF(class_name);
     CFISH_DECREF(formatter);
     CFISH_DECREF(suite);

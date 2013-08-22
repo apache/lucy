@@ -251,7 +251,7 @@ S_write_boot_c(CFCPerl *self) {
                 size_t alias_len  = strlen(alias);
                 const char pattern[] =
                     "%s"
-                    "    Cfish_ZCB_Assign_Str(alias, \"%s\", %u);\n"
+                    "    CFISH_ZCB_Assign_Str(alias, \"%s\", %u);\n"
                     "    cfish_VTable_add_alias_to_registry(%s,\n"
                     "        (cfish_CharBuf*)alias);\n";
                 char *new_alias_adds
@@ -567,7 +567,7 @@ S_write_callbacks_c(CFCPerl *self) {
         "    LEAVE;\n"
         "    if (!nullable && !retval) {\n"
         "        CFISH_THROW(CFISH_ERR, \"%%o#%%s cannot return NULL\",\n"
-        "                    Cfish_Obj_Get_Class_Name((cfish_Obj*)vself),\n"
+        "                    CFISH_Obj_Get_Class_Name((cfish_Obj*)vself),\n"
         "                    meth_name);\n"
         "    }\n"
         "    return retval;\n"

@@ -134,8 +134,8 @@ SortEx_Sort_Cache_IMP(SortExternal *self) {
     }
     if (ivars->cache_max != 0) {
         VTable *vtable = SortEx_Get_VTable(self);
-        Cfish_Sort_Compare_t compare
-            = (Cfish_Sort_Compare_t)METHOD_PTR(vtable, Lucy_SortEx_Compare);
+        CFISH_Sort_Compare_t compare
+            = (CFISH_Sort_Compare_t)METHOD_PTR(vtable, Lucy_SortEx_Compare);
         if (ivars->scratch_cap < ivars->cache_cap) {
             ivars->scratch_cap = ivars->cache_cap;
             ivars->scratch
@@ -231,8 +231,8 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
     uint8_t   **slice_starts = ivars->slice_starts;
     uint32_t   *slice_sizes  = ivars->slice_sizes;
     VTable     *vtable       = SortEx_Get_VTable(self);
-    Cfish_Sort_Compare_t compare
-        = (Cfish_Sort_Compare_t)METHOD_PTR(vtable, Lucy_SortEx_Compare);
+    CFISH_Sort_Compare_t compare
+        = (CFISH_Sort_Compare_t)METHOD_PTR(vtable, Lucy_SortEx_Compare);
 
     if (ivars->cache_max != 0) { THROW(ERR, "Can't refill unless empty"); }
 

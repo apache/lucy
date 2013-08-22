@@ -82,7 +82,7 @@ cfish_XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable,
  */
 static CFISH_INLINE SV*
 cfish_XSBind_cfish_obj_to_sv(cfish_Obj *obj) {
-    return obj ? (SV*)Cfish_Obj_To_Host(obj) : newSV(0);
+    return obj ? (SV*)CFISH_Obj_To_Host(obj) : newSV(0);
 }
 
 /** XSBind_cfish_obj_to_sv, with a cast.
@@ -97,8 +97,8 @@ static CFISH_INLINE SV*
 cfish_XSBind_cfish_obj_to_sv_noinc(cfish_Obj *obj) {
     SV *retval;
     if (obj) {
-        retval = (SV*)Cfish_Obj_To_Host(obj);
-        Cfish_Obj_Dec_RefCount(obj);
+        retval = (SV*)CFISH_Obj_To_Host(obj);
+        CFISH_Obj_Dec_RefCount(obj);
     }
     else {
         retval = newSV(0);

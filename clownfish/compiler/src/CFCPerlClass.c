@@ -565,12 +565,12 @@ CFCPerlClass_method_metadata_code(CFCPerlClass *self) {
         const char *macro_sym = CFCMethod_get_macro_sym(method);
         const char *alias     = CFCMethod_get_host_alias(method);
         if (alias) {
-            code = CFCUtil_cat(code, "    Cfish_VTable_Add_Host_Method_Alias(",
+            code = CFCUtil_cat(code, "    CFISH_VTable_Add_Host_Method_Alias(",
                                vtable_var, ", \"", alias, "\", \"", macro_sym,
                                "\");\n", NULL);
         }
         if (CFCMethod_excluded_from_host(method)) {
-            code = CFCUtil_cat(code, "    Cfish_VTable_Exclude_Host_Method(",
+            code = CFCUtil_cat(code, "    CFISH_VTable_Exclude_Host_Method(",
                                vtable_var, ", \"", macro_sym, "\");\n", NULL);
         }
     }

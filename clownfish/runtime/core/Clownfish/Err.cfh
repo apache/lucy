@@ -18,10 +18,10 @@ parcel Clownfish;
 
 __C__
 typedef void 
-(*Cfish_Err_Attempt_t)(void *context);
+(*CFISH_Err_Attempt_t)(void *context);
 
 #ifdef CFISH_USE_SHORT_NAMES
-  #define Err_Attempt_t Cfish_Err_Attempt_t
+  #define Err_Attempt_t CFISH_Err_Attempt_t
 #endif
 __END_C__
 
@@ -90,7 +90,7 @@ public class Clownfish::Err inherits Clownfish::Obj {
      * @return an Err, or NULL if no exception occurs.
      */
     public inert incremented nullable Err*
-    trap(Cfish_Err_Attempt_t routine, void *context);
+    trap(CFISH_Err_Attempt_t routine, void *context);
 
     /** Print an error message to stderr with some C contextual information.
      * Usually invoked via the WARN(pattern, ...) macro.
@@ -177,7 +177,7 @@ __C__
 #endif
 
 #define CFISH_ERR_ADD_FRAME(_error) \
-    Cfish_Err_Add_Frame(_error, __FILE__, __LINE__, \
+    CFISH_Err_Add_Frame(_error, __FILE__, __LINE__, \
                         CFISH_ERR_FUNC_MACRO)
 
 #define CFISH_RETHROW(_error) \
@@ -229,8 +229,8 @@ cfish_Err_abstract_class_check(cfish_Obj *obj, cfish_VTable *vtable) {
     cfish_VTable *const my_vtable = (cfish_VTable*)((cfish_Dummy*)obj)->vtable;
     if (my_vtable == vtable) {
         cfish_CharBuf *mess = CFISH_MAKE_MESS("%o is an abstract class",
-                                              Cfish_Obj_Get_Class_Name(obj));
-        Cfish_Obj_Dec_RefCount(obj);
+                                              CFISH_Obj_Get_Class_Name(obj));
+        CFISH_Obj_Dec_RefCount(obj);
         cfish_Err_throw_mess(CFISH_ERR, mess);
     }
 }

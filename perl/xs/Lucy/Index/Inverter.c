@@ -69,10 +69,10 @@ S_fetch_entry(lucy_Inverter *self, HE *hash_entry) {
     }
 
     lucy_InverterEntry *entry
-        = (lucy_InverterEntry*)Cfish_VA_Fetch(ivars->entry_pool, field_num);
+        = (lucy_InverterEntry*)CFISH_VA_Fetch(ivars->entry_pool, field_num);
     if (!entry) {
         entry = lucy_InvEntry_new(schema, (cfish_CharBuf*)field, field_num);
-        Cfish_VA_Store(ivars->entry_pool, field_num, (cfish_Obj*)entry);
+        CFISH_VA_Store(ivars->entry_pool, field_num, (cfish_Obj*)entry);
     }
     return entry;
 }
@@ -101,7 +101,7 @@ Lucy_Inverter_Invert_Doc_IMP(lucy_Inverter *self, lucy_Doc *doc) {
                     char *val_ptr = SvPVutf8(value_sv, val_len);
                     cfish_ViewCharBuf *value
                         = (cfish_ViewCharBuf*)entry_ivars->value;
-                    Cfish_ViewCB_Assign_Str(value, val_ptr, val_len);
+                    CFISH_ViewCB_Assign_Str(value, val_ptr, val_len);
                     break;
                 }
             case lucy_FType_BLOB: {
@@ -109,12 +109,12 @@ Lucy_Inverter_Invert_Doc_IMP(lucy_Inverter *self, lucy_Doc *doc) {
                     char *val_ptr = SvPV(value_sv, val_len);
                     cfish_ViewByteBuf *value
                         = (cfish_ViewByteBuf*)entry_ivars->value;
-                    Cfish_ViewBB_Assign_Bytes(value, val_ptr, val_len);
+                    CFISH_ViewBB_Assign_Bytes(value, val_ptr, val_len);
                     break;
                 }
             case lucy_FType_INT32: {
                     cfish_Integer32* value = (cfish_Integer32*)entry_ivars->value;
-                    Cfish_Int32_Set_Value(value, SvIV(value_sv));
+                    CFISH_Int32_Set_Value(value, SvIV(value_sv));
                     break;
                 }
             case lucy_FType_INT64: {
@@ -122,17 +122,17 @@ Lucy_Inverter_Invert_Doc_IMP(lucy_Inverter *self, lucy_Doc *doc) {
                     int64_t val = sizeof(IV) == 8
                                   ? SvIV(value_sv)
                                   : (int64_t)SvNV(value_sv); // lossy
-                    Cfish_Int64_Set_Value(value, val);
+                    CFISH_Int64_Set_Value(value, val);
                     break;
                 }
             case lucy_FType_FLOAT32: {
                     cfish_Float32* value = (cfish_Float32*)entry_ivars->value;
-                    Cfish_Float32_Set_Value(value, (float)SvNV(value_sv));
+                    CFISH_Float32_Set_Value(value, (float)SvNV(value_sv));
                     break;
                 }
             case lucy_FType_FLOAT64: {
                     cfish_Float64* value = (cfish_Float64*)entry_ivars->value;
-                    Cfish_Float64_Set_Value(value, SvNV(value_sv));
+                    CFISH_Float64_Set_Value(value, SvNV(value_sv));
                     break;
                 }
             default:

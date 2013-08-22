@@ -249,7 +249,7 @@ S_default_compare(void *context, const void *va, const void *vb) {
 }
 
 void
-VA_Sort_IMP(VArray *self, Cfish_Sort_Compare_t compare, void *context) {
+VA_Sort_IMP(VArray *self, CFISH_Sort_Compare_t compare, void *context) {
     if (!compare) { compare = S_default_compare; }
     Sort_quicksort(self->elems, self->size, sizeof(void*), compare, context);
 }
