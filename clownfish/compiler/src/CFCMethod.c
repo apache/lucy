@@ -428,16 +428,6 @@ CFCMethod_get_param_list(CFCMethod *self) {
 }
 
 const char*
-CFCMethod_imp_func_alias(CFCMethod *self) {
-    return CFCFunction_full_func_sym((CFCFunction*)self);
-}
-
-const char*
-CFCMethod_short_imp_func_alias(CFCMethod *self) {
-    return CFCFunction_short_func_sym((CFCFunction*)self);
-}
-
-const char*
 CFCMethod_imp_func(CFCMethod *self) {
     return self->imp_func;
 }

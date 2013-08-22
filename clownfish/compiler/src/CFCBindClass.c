@@ -602,10 +602,6 @@ S_sub_declarations(CFCBindClass *self) {
             declarations = CFCUtil_cat(declarations, PREFIX, "VISIBLE ", NULL);
         }
         declarations = CFCUtil_cat(declarations, dec, "\n\n", NULL);
-        const char *func  = CFCMethod_imp_func(method);
-        const char *alias = CFCMethod_imp_func_alias(method);
-        declarations = CFCUtil_cat(declarations, "#define ", alias, " ", func,
-                                   "\n", NULL);
         FREEMEM(dec);
     }
     FREEMEM(fresh_methods);
@@ -687,10 +683,6 @@ S_short_names(CFCBindClass *self) {
             const char *full_imp   = CFCMethod_imp_func(meth);
             short_names = CFCUtil_cat(short_names, "  #define ", short_imp,
                                       " ", full_imp, "\n", NULL);
-            const char *short_alias = CFCMethod_short_imp_func_alias(meth);
-            const char *full_alias  = CFCMethod_imp_func_alias(meth);
-            short_names = CFCUtil_cat(short_names, "  #define ", short_alias,
-                                      " ", full_alias, "\n", NULL);
         }
         FREEMEM(fresh_methods);
 

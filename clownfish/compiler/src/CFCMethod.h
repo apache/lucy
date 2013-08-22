@@ -231,12 +231,6 @@ struct CFCParamList*
 CFCMethod_get_param_list(CFCMethod *self);
 
 const char*
-CFCMethod_imp_func_alias(CFCMethod *self);
-
-const char*
-CFCMethod_short_imp_func_alias(CFCMethod *self);
-
-const char*
 CFCMethod_imp_func(CFCMethod *self);
 
 const char*
