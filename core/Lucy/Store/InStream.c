@@ -137,7 +137,10 @@ InStream_Reopen_IMP(InStream *self, const CharBuf *filename, int64_t offset,
     InStream *other = (InStream*)VTable_Make_Obj(vtable);
     InStreamIVARS *const ovars = InStream_IVARS(other);
     InStream_do_open(other, (Obj*)ivars->file_handle);
-    if (filename != NULL) { CB_Mimic(ovars->filename, (Obj*)filename); }
+    if (filename != NULL) {
+        DECREF(ovars->filename);
+        ovars->filename = CB_Clone(filename);
+    }
     ovars->offset = offset;
     ovars->len    = len;
     InStream_Seek(other, 0);
