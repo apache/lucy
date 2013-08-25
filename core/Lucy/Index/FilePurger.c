@@ -157,21 +157,20 @@ S_zap_dead_merge(FilePurger *self, Hash *candidates) {
             if (Folder_Exists(ivars->folder, cutoff_seg)) {
                 ZombieCharBuf *merge_json = ZCB_WRAP_STR("merge.json", 10);
                 DirHandle *dh = Folder_Open_Dir(ivars->folder, cutoff_seg);
-                CharBuf *entry = dh ? DH_Get_Entry(dh) : NULL;
-                CharBuf *filepath = CB_new(32);
 
                 if (!dh) {
-                    THROW(ERR, "Can't open segment dir '%o'", filepath);
+                    THROW(ERR, "Can't open segment dir '%o'", cutoff_seg);
                 }
 
                 Hash_Store(candidates, (Obj*)cutoff_seg, (Obj*)CFISH_TRUE);
                 Hash_Store(candidates, (Obj*)merge_json, (Obj*)CFISH_TRUE);
+                CharBuf *entry = DH_Get_Entry(dh);
                 while (DH_Next(dh)) {
                     // TODO: recursively delete subdirs within seg dir.
-                    CB_setf(filepath, "%o/%o", cutoff_seg, entry);
+                    CharBuf *filepath = CB_newf("%o/%o", cutoff_seg, entry);
                     Hash_Store(candidates, (Obj*)filepath, (Obj*)CFISH_TRUE);
+                    DECREF(filepath);
                 }
-                DECREF(filepath);
                 DECREF(dh);
             }
             DECREF(cutoff_seg);
