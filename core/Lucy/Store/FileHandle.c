@@ -55,7 +55,8 @@ FH_Grow_IMP(FileHandle *self, int64_t length) {
 void
 FH_Set_Path_IMP(FileHandle *self, const CharBuf *path) {
     FileHandleIVARS *const ivars = FH_IVARS(self);
-    CB_Mimic(ivars->path, (Obj*)path);
+    DECREF(ivars->path);
+    ivars->path = CB_Clone(path);
 }
 
 CharBuf*
