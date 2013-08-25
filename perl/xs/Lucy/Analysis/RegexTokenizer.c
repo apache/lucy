@@ -115,7 +115,8 @@ S_set_pattern_from_token_re(lucy_RegexTokenizer *self, void *token_re) {
     SV *rv = newRV((SV*)token_re);
     STRLEN len = 0;
     char *ptr = SvPVutf8((SV*)rv, len);
-    CFISH_CB_Mimic_Str(ivars->pattern, ptr, len);
+    CFISH_DECREF(ivars->pattern);
+    ivars->pattern = cfish_CB_new_from_trusted_utf8(ptr, len);
     SvREFCNT_dec(rv);
 }
 
