@@ -100,25 +100,24 @@ S_lazy_init_field_writer(SortWriter *self, int32_t field_num) {
         if (!ivars->temp_ord_out) {
             Folder  *folder   = ivars->folder;
             CharBuf *seg_name = Seg_Get_Name(ivars->segment);
-            CharBuf *path     = CB_newf("%o/sort_ord_temp", seg_name);
-            ivars->temp_ord_out = Folder_Open_Out(folder, path);
+            CharBuf *ord_path = CB_newf("%o/sort_ord_temp", seg_name);
+            ivars->temp_ord_out = Folder_Open_Out(folder, ord_path);
+            DECREF(ord_path);
             if (!ivars->temp_ord_out) {
-                DECREF(path);
                 RETHROW(INCREF(Err_get_error()));
             }
-            CB_setf(path, "%o/sort_ix_temp", seg_name);
-            ivars->temp_ix_out = Folder_Open_Out(folder, path);
+            CharBuf *ix_path = CB_newf("%o/sort_ix_temp", seg_name);
+            ivars->temp_ix_out = Folder_Open_Out(folder, ix_path);
+            DECREF(ix_path);
             if (!ivars->temp_ix_out) {
-                DECREF(path);
                 RETHROW(INCREF(Err_get_error()));
             }
-            CB_setf(path, "%o/sort_dat_temp", seg_name);
-            ivars->temp_dat_out = Folder_Open_Out(folder, path);
+            CharBuf *dat_path = CB_newf("%o/sort_dat_temp", seg_name);
+            ivars->temp_dat_out = Folder_Open_Out(folder, dat_path);
+            DECREF(dat_path);
             if (!ivars->temp_dat_out) {
-                DECREF(path);
                 RETHROW(INCREF(Err_get_error()));
             }
-            DECREF(path);
         }
 
         CharBuf *field = Seg_Field_Name(ivars->segment, field_num);
@@ -243,13 +242,15 @@ SortWriter_Finish_IMP(SortWriter *self) {
     // Clean up.
     Folder  *folder   = ivars->folder;
     CharBuf *seg_name = Seg_Get_Name(ivars->segment);
-    CharBuf *path     = CB_newf("%o/sort_ord_temp", seg_name);
-    Folder_Delete(folder, path);
-    CB_setf(path, "%o/sort_ix_temp", seg_name);
-    Folder_Delete(folder, path);
-    CB_setf(path, "%o/sort_dat_temp", seg_name);
-    Folder_Delete(folder, path);
-    DECREF(path);
+    CharBuf *ord_path = CB_newf("%o/sort_ord_temp", seg_name);
+    Folder_Delete(folder, ord_path);
+    DECREF(ord_path);
+    CharBuf *ix_path = CB_newf("%o/sort_ix_temp", seg_name);
+    Folder_Delete(folder, ix_path);
+    DECREF(ix_path);
+    CharBuf *dat_path = CB_newf("%o/sort_dat_temp", seg_name);
+    Folder_Delete(folder, dat_path);
+    DECREF(dat_path);
 }
 
 Hash*
