@@ -438,6 +438,7 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const CharBuf *field_val,
     // If excerpt doesn't end on a sentence boundary, tack on an ellipsis.
     if (found_ending_edge) {
         ZCB_Truncate(substring, end - start);
+        ZCB_Trim_Tail(substring);
     }
     else {
         // Remember original excerpt
@@ -570,7 +571,6 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, VArray *spans,
         CB_Cat(highlighted, encoded);
         DECREF(encoded);
     }
-    CB_Trim_Tail(highlighted);
 
     DECREF(encode_buf);
 }
