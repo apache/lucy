@@ -33,6 +33,7 @@
 #include "Lucy/Search/NOTQuery.h"
 #include "Lucy/Search/ORQuery.h"
 #include "Lucy/Search/RangeQuery.h"
+#include "Lucy/Store/FSFolder.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Store/RAMFile.h"
@@ -165,4 +166,21 @@ TestUtils_test_analyzer(TestBatchRunner *runner, Analyzer *analyzer,
     DECREF(seed);
 }
 
+FSFolder*
+TestUtils_modules_folder() {
+    static const char *const paths[] = { "modules", "../modules" };
+
+    for (int i = 0; i < sizeof(paths) / sizeof(char*); i++) {
+        CharBuf *path = CB_newf(paths[i]);
+        FSFolder *modules_folder = FSFolder_new(path);
+        DECREF(path);
+        if (FSFolder_Check(modules_folder)) {
+            return modules_folder;
+        }
+        DECREF(modules_folder);
+    }
+
+    THROW(ERR, "Can't open modules folder");
+    UNREACHABLE_RETURN(FSFolder*);
+}
 
