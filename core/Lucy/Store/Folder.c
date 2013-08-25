@@ -41,9 +41,11 @@ Folder_init(Folder *self, const CharBuf *path) {
     }
     else {
         // Copy path, strip trailing slash or equivalent.
-        ivars->path = CB_Clone(path);
-        if (CB_Ends_With_Str(ivars->path, DIR_SEP, strlen(DIR_SEP))) {
-            CB_Chop(ivars->path, 1);
+        if (CB_Ends_With_Str(path, DIR_SEP, strlen(DIR_SEP))) {
+            ivars->path = CB_SubString(path, 0, CB_Length(path) - 1);
+        }
+        else {
+            ivars->path = CB_Clone(path);
         }
     }
 
