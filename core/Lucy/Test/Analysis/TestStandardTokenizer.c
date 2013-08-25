@@ -23,6 +23,7 @@
 #include "Lucy/Test/Analysis/TestStandardTokenizer.h"
 #include "Lucy/Analysis/StandardTokenizer.h"
 #include "Lucy/Store/FSFolder.h"
+#include "Lucy/Test/TestUtils.h"
 #include "Lucy/Util/Json.h"
 
 TestStandardTokenizer*
@@ -93,17 +94,8 @@ test_tokenizer(TestBatchRunner *runner) {
               "Token: %s", CB_Get_Ptr8(token));
     DECREF(got);
 
-    CharBuf  *path           = CB_newf("modules");
-    FSFolder *modules_folder = FSFolder_new(path);
-    if (!FSFolder_Check(modules_folder)) {
-        DECREF(modules_folder);
-        CB_setf(path, "../modules");
-        modules_folder = FSFolder_new(path);
-        if (!FSFolder_Check(modules_folder)) {
-            THROW(ERR, "Can't open modules folder");
-        }
-    }
-    CB_setf(path, "unicode/ucd/WordBreakTest.json");
+    FSFolder *modules_folder = TestUtils_modules_folder();
+    CharBuf *path = CB_newf("unicode/ucd/WordBreakTest.json");
     VArray *tests = (VArray*)Json_slurp_json((Folder*)modules_folder, path);
     if (!tests) { RETHROW(Err_get_error()); }
 

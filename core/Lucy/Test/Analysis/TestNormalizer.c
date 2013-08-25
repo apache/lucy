@@ -25,6 +25,7 @@
 #include "Lucy/Test/Analysis/TestNormalizer.h"
 #include "Lucy/Analysis/Normalizer.h"
 #include "Lucy/Store/FSFolder.h"
+#include "Lucy/Test/TestUtils.h"
 #include "Lucy/Util/Json.h"
 #include "utf8proc.h"
 
@@ -71,17 +72,8 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 
 static void
 test_normalization(TestBatchRunner *runner) {
-    CharBuf  *path           = CB_newf("modules");
-    FSFolder *modules_folder = FSFolder_new(path);
-    if (!FSFolder_Check(modules_folder)) {
-        DECREF(modules_folder);
-        CB_setf(path, "../modules");
-        modules_folder = FSFolder_new(path);
-        if (!FSFolder_Check(modules_folder)) {
-            THROW(ERR, "Can't open modules folder");
-        }
-    }
-    CB_setf(path, "unicode/utf8proc/tests.json");
+    FSFolder *modules_folder = TestUtils_modules_folder();
+    CharBuf *path = CB_newf("unicode/utf8proc/tests.json");
     VArray *tests = (VArray*)Json_slurp_json((Folder*)modules_folder, path);
     if (!tests) { RETHROW(Err_get_error()); }
 
