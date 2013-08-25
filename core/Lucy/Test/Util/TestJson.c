@@ -114,17 +114,14 @@ static const char* quote_escapes_json[] = {
 
 static void
 test_escapes(TestBatchRunner *runner) {
-    CharBuf *string      = CB_new(10);
-    CharBuf *json_wanted = CB_new(10);
-
     for (int i = 0; control_escapes[i] != NULL; i++) {
-        CB_Truncate(string, 0);
+        CharBuf *string = CB_new(1);
         CB_Cat_Char(string, i);
         const char *escaped = control_escapes[i];
         CharBuf    *json    = Json_to_json((Obj*)string);
         CharBuf    *decoded = (CharBuf*)Json_from_json(json);
 
-        CB_setf(json_wanted, "\"%s\"", escaped);
+        CharBuf *json_wanted = CB_newf("\"%s\"", escaped);
         CB_Trim(json);
         TEST_TRUE(runner, json != NULL && CB_Equals(json_wanted, (Obj*)json),
                   "encode control escape: %s", escaped);
@@ -132,18 +129,20 @@ test_escapes(TestBatchRunner *runner) {
         TEST_TRUE(runner, decoded != NULL && CB_Equals(string, (Obj*)decoded),
                   "decode control escape: %s", escaped);
 
+        DECREF(string);
         DECREF(json);
         DECREF(decoded);
+        DECREF(json_wanted);
     }
 
     for (int i = 0; quote_escapes_source[i] != NULL; i++) {
         const char *source  = quote_escapes_source[i];
         const char *escaped = quote_escapes_json[i];
-        CB_setf(string, source, strlen(source));
+        CharBuf *string  = CB_new_from_utf8(source, strlen(source));
         CharBuf *json    = Json_to_json((Obj*)string);
         CharBuf *decoded = (CharBuf*)Json_from_json(json);
 
-        CB_setf(json_wanted, "\"%s\"", escaped);
+        CharBuf *json_wanted = CB_newf("\"%s\"", escaped);
         CB_Trim(json);
         TEST_TRUE(runner, json != NULL && CB_Equals(json_wanted, (Obj*)json),
                   "encode quote/backslash escapes: %s", source);
@@ -151,12 +150,11 @@ test_escapes(TestBatchRunner *runner) {
         TEST_TRUE(runner, decoded != NULL && CB_Equals(string, (Obj*)decoded),
                   "decode quote/backslash escapes: %s", source);
 
+        DECREF(string);
         DECREF(json);
         DECREF(decoded);
+        DECREF(json_wanted);
     }
-
-    DECREF(json_wanted);
-    DECREF(string);
 }
 
 static void
