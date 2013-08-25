@@ -175,37 +175,35 @@ S_lazy_init_sort_cache(DefaultSortReader *self, const CharBuf *field) {
     Folder    *folder    = DefSortReader_Get_Folder(self);
     Segment   *segment   = DefSortReader_Get_Segment(self);
     CharBuf   *seg_name  = Seg_Get_Name(segment);
-    CharBuf   *path      = CB_new(40);
     int32_t    field_num = Seg_Field_Num(segment, field);
     int8_t     prim_id   = FType_Primitive_ID(type);
     bool       var_width = (prim_id == FType_TEXT || prim_id == FType_BLOB)
                            ? true
                            : false;
-    CB_setf(path, "%o/sort-%i32.ord", seg_name, field_num);
-    InStream *ord_in = Folder_Open_In(folder, path);
+    CharBuf *ord_path = CB_newf("%o/sort-%i32.ord", seg_name, field_num);
+    InStream *ord_in = Folder_Open_In(folder, ord_path);
+    DECREF(ord_path);
     if (!ord_in) {
-        DECREF(path);
         THROW(ERR, "Error building sort cache for '%o': %o",
               field, Err_get_error());
     }
     InStream *ix_in = NULL;
     if (var_width) {
-        CB_setf(path, "%o/sort-%i32.ix", seg_name, field_num);
-        ix_in = Folder_Open_In(folder, path);
+        CharBuf *ix_path = CB_newf("%o/sort-%i32.ix", seg_name, field_num);
+        ix_in = Folder_Open_In(folder, ix_path);
+        DECREF(ix_path);
         if (!ix_in) {
-            DECREF(path);
             THROW(ERR, "Error building sort cache for '%o': %o",
                   field, Err_get_error());
         }
     }
-    CB_setf(path, "%o/sort-%i32.dat", seg_name, field_num);
-    InStream *dat_in = Folder_Open_In(folder, path);
+    CharBuf *dat_path = CB_newf("%o/sort-%i32.dat", seg_name, field_num);
+    InStream *dat_in = Folder_Open_In(folder, dat_path);
+    DECREF(dat_path);
     if (!dat_in) {
-        DECREF(path);
         THROW(ERR, "Error building sort cache for '%o': %o",
               field, Err_get_error());
     }
-    DECREF(path);
 
     Obj     *null_ord_obj = Hash_Fetch(ivars->null_ords, (Obj*)field);
     int32_t  null_ord = null_ord_obj ? (int32_t)Obj_To_I64(null_ord_obj) : -1;
