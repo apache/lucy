@@ -243,8 +243,7 @@ S_try_open_elements(void *context) {
             uint64_t gen = IxFileNames_extract_gen(entry);
             if (gen > latest_schema_gen) {
                 latest_schema_gen = gen;
-                if (!schema_file) { schema_file = CB_Clone(entry); }
-                else { CB_Mimic(schema_file, (Obj*)entry); }
+                schema_file       = entry;
             }
         }
     }
@@ -260,12 +259,10 @@ S_try_open_elements(void *context) {
             DECREF(ivars->schema);
             ivars->schema = (Schema*)CERTIFY(Freezer_load(dump), SCHEMA);
             DECREF(dump);
-            DECREF(schema_file);
             schema_file = NULL;
         }
         else {
             CharBuf *mess = MAKE_MESS("Failed to parse %o", schema_file);
-            DECREF(schema_file);
             DECREF(files);
             Err_throw_mess(ERR, mess);
         }
