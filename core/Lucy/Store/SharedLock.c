@@ -70,10 +70,9 @@ ShLock_Request_IMP(SharedLock *self) {
         return false;
     }
 
-    DECREF(ivars->lock_path);
-    ivars->lock_path = CB_new(CB_Get_Size(ivars->name) + 10);
     do {
-        CB_setf(ivars->lock_path, "locks/%o-%u32.lock", ivars->name, ++i);
+        DECREF(ivars->lock_path);
+        ivars->lock_path = CB_newf("locks/%o-%u32.lock", ivars->name, ++i);
     } while (Folder_Exists(ivars->folder, ivars->lock_path));
 
     bool success = super_request(self);
@@ -101,7 +100,6 @@ ShLock_Clear_Stale_IMP(SharedLock *self) {
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
     DirHandle *dh;
     CharBuf   *entry;
-    CharBuf   *candidate = NULL;
     CharBuf   *lock_dir_name = (CharBuf*)ZCB_WRAP_STR("locks", 5);
 
     if (Folder_Find_Folder(ivars->folder, lock_dir_name)) {
@@ -118,13 +116,12 @@ ShLock_Clear_Stale_IMP(SharedLock *self) {
         if (CB_Starts_With(entry, ivars->name)
             && CB_Ends_With_Str(entry, ".lock", 5)
            ) {
-            candidate = candidate ? candidate : CB_new(0);
-            CB_setf(candidate, "%o/%o", lock_dir_name, entry);
+            CharBuf *candidate = CB_newf("%o/%o", lock_dir_name, entry);
             ShLock_Maybe_Delete_File(self, candidate, false, true);
+            DECREF(candidate);
         }
     }
 
-    DECREF(candidate);
     DECREF(dh);
 }
 
