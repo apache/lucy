@@ -58,9 +58,9 @@ LexWriter_init(LexiconWriter *self, Schema *schema, Snapshot *snapshot,
     ivars->dat_out            = NULL;
     ivars->count              = 0;
     ivars->ix_count           = 0;
-    ivars->dat_file           = CB_new(30);
-    ivars->ix_file            = CB_new(30);
-    ivars->ixix_file          = CB_new(30);
+    ivars->dat_file           = NULL;
+    ivars->ix_file            = NULL;
+    ivars->ixix_file          = NULL;
     ivars->counts             = Hash_new(0);
     ivars->ix_counts          = Hash_new(0);
     ivars->temp_mode          = false;
@@ -133,9 +133,12 @@ LexWriter_Start_Field_IMP(LexiconWriter *self, int32_t field_num) {
     FieldType *const type     = Schema_Fetch_Type(schema, field);
 
     // Open outstreams.
-    CB_setf(ivars->dat_file,  "%o/lexicon-%i32.dat",  seg_name, field_num);
-    CB_setf(ivars->ix_file,   "%o/lexicon-%i32.ix",   seg_name, field_num);
-    CB_setf(ivars->ixix_file, "%o/lexicon-%i32.ixix", seg_name, field_num);
+    DECREF(ivars->dat_file);
+    DECREF(ivars->ix_file);
+    DECREF(ivars->ixix_file);
+    ivars->dat_file  = CB_newf("%o/lexicon-%i32.dat",  seg_name, field_num);
+    ivars->ix_file   = CB_newf("%o/lexicon-%i32.ix",   seg_name, field_num);
+    ivars->ixix_file = CB_newf("%o/lexicon-%i32.ixix", seg_name, field_num);
     ivars->dat_out = Folder_Open_Out(folder, ivars->dat_file);
     if (!ivars->dat_out) { RETHROW(INCREF(Err_get_error())); }
     ivars->ix_out = Folder_Open_Out(folder, ivars->ix_file);
