@@ -500,18 +500,20 @@ SortFieldWriter_Flip_IMP(SortFieldWriter *self) {
     else if (num_runs) {
         Folder  *folder = PolyReader_Get_Folder(ivars->polyreader);
         CharBuf *seg_name = Seg_Get_Name(ivars->segment);
-        CharBuf *filepath = CB_newf("%o/sort_ord_temp", seg_name);
-        ivars->ord_in = Folder_Open_In(folder, filepath);
+        CharBuf *ord_path = CB_newf("%o/sort_ord_temp", seg_name);
+        ivars->ord_in = Folder_Open_In(folder, ord_path);
+        DECREF(ord_path);
         if (!ivars->ord_in) { RETHROW(INCREF(Err_get_error())); }
         if (ivars->var_width) {
-            CB_setf(filepath, "%o/sort_ix_temp", seg_name);
-            ivars->ix_in = Folder_Open_In(folder, filepath);
+            CharBuf *ix_path = CB_newf("%o/sort_ix_temp", seg_name);
+            ivars->ix_in = Folder_Open_In(folder, ix_path);
+            DECREF(ix_path);
             if (!ivars->ix_in) { RETHROW(INCREF(Err_get_error())); }
         }
-        CB_setf(filepath, "%o/sort_dat_temp", seg_name);
-        ivars->dat_in = Folder_Open_In(folder, filepath);
+        CharBuf *dat_path = CB_newf("%o/sort_dat_temp", seg_name);
+        ivars->dat_in = Folder_Open_In(folder, dat_path);
+        DECREF(dat_path);
         if (!ivars->dat_in) { RETHROW(INCREF(Err_get_error())); }
-        DECREF(filepath);
 
         // Assign streams and a slice of mem_thresh.
         size_t sub_thresh = ivars->mem_thresh / num_runs;
@@ -613,21 +615,23 @@ SortFieldWriter_Finish_IMP(SortFieldWriter *self) {
     int32_t  field_num = ivars->field_num;
     Folder  *folder    = PolyReader_Get_Folder(ivars->polyreader);
     CharBuf *seg_name  = Seg_Get_Name(ivars->segment);
-    CharBuf *path      = CB_newf("%o/sort-%i32.ord", seg_name, field_num);
 
     // Open streams.
-    OutStream *ord_out = Folder_Open_Out(folder, path);
+    CharBuf *ord_path = CB_newf("%o/sort-%i32.ord", seg_name, field_num);
+    OutStream *ord_out = Folder_Open_Out(folder, ord_path);
+    DECREF(ord_path);
     if (!ord_out) { RETHROW(INCREF(Err_get_error())); }
     OutStream *ix_out = NULL;
     if (ivars->var_width) {
-        CB_setf(path, "%o/sort-%i32.ix", seg_name, field_num);
-        ix_out = Folder_Open_Out(folder, path);
+        CharBuf *ix_path = CB_newf("%o/sort-%i32.ix", seg_name, field_num);
+        ix_out = Folder_Open_Out(folder, ix_path);
+        DECREF(ix_path);
         if (!ix_out) { RETHROW(INCREF(Err_get_error())); }
     }
-    CB_setf(path, "%o/sort-%i32.dat", seg_name, field_num);
-    OutStream *dat_out = Folder_Open_Out(folder, path);
+    CharBuf *dat_path = CB_newf("%o/sort-%i32.dat", seg_name, field_num);
+    OutStream *dat_out = Folder_Open_Out(folder, dat_path);
+    DECREF(dat_path);
     if (!dat_out) { RETHROW(INCREF(Err_get_error())); }
-    DECREF(path);
 
     int32_t cardinality = S_write_files(self, ord_out, ix_out, dat_out);
 
@@ -661,23 +665,27 @@ S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in,
     if (run_ivars->sort_cache) { return; }
 
     // Open the temp files for reading.
-    CharBuf *seg_name = Seg_Get_Name(run_ivars->segment);
-    CharBuf *alias    = CB_newf("%o/sort_ord_temp-%i64-to-%i64", seg_name,
-                                run_ivars->ord_start, run_ivars->ord_end);
-    InStream *ord_in_dupe = InStream_Reopen(ord_in, alias, run_ivars->ord_start,
-                                            run_ivars->ord_end - run_ivars->ord_start);
+    CharBuf *seg_name  = Seg_Get_Name(run_ivars->segment);
+    CharBuf *ord_alias = CB_newf("%o/sort_ord_temp-%i64-to-%i64", seg_name,
+                                 run_ivars->ord_start, run_ivars->ord_end);
+    InStream *ord_in_dupe
+        = InStream_Reopen(ord_in, ord_alias, run_ivars->ord_start,
+                          run_ivars->ord_end - run_ivars->ord_start);
+    DECREF(ord_alias);
     InStream *ix_in_dupe = NULL;
     if (run_ivars->var_width) {
-        CB_setf(alias, "%o/sort_ix_temp-%i64-to-%i64", seg_name,
-                run_ivars->ix_start, run_ivars->ix_end);
-        ix_in_dupe = InStream_Reopen(ix_in, alias, run_ivars->ix_start,
+        CharBuf *ix_alias = CB_newf("%o/sort_ix_temp-%i64-to-%i64", seg_name,
+                                    run_ivars->ix_start, run_ivars->ix_end);
+        ix_in_dupe = InStream_Reopen(ix_in, ix_alias, run_ivars->ix_start,
                                      run_ivars->ix_end - run_ivars->ix_start);
+        DECREF(ix_alias);
     }
-    CB_setf(alias, "%o/sort_dat_temp-%i64-to-%i64", seg_name,
-            run_ivars->dat_start, run_ivars->dat_end);
-    InStream *dat_in_dupe = InStream_Reopen(dat_in, alias, run_ivars->dat_start,
-                                            run_ivars->dat_end - run_ivars->dat_start);
-    DECREF(alias);
+    CharBuf *dat_alias = CB_newf("%o/sort_dat_temp-%i64-to-%i64", seg_name,
+                                 run_ivars->dat_start, run_ivars->dat_end);
+    InStream *dat_in_dupe
+        = InStream_Reopen(dat_in, dat_alias, run_ivars->dat_start,
+                          run_ivars->dat_end - run_ivars->dat_start);
+    DECREF(dat_alias);
 
     // Get a SortCache.
     CharBuf *field = Seg_Field_Name(run_ivars->segment, run_ivars->field_num);
