@@ -483,10 +483,16 @@ BGMerger_Commit_IMP(BackgroundMerger *self) {
 
     if (ivars->needs_commit) {
         bool success = false;
-        CharBuf *temp_snapfile = CB_Clone(ivars->snapfile);
+        CharBuf *temp_snapfile = ivars->snapfile;
 
         // Rename temp snapshot file.
-        CB_Chop(ivars->snapfile, sizeof(".temp") - 1);
+        size_t ext_len      = sizeof(".temp") - 1;
+        size_t snapfile_len = CB_Length(temp_snapfile);
+        if (snapfile_len <= ext_len) {
+            THROW(ERR, "Invalid snapfile name: %o", temp_snapfile);
+        }
+        ivars->snapfile = CB_SubString(temp_snapfile, 0,
+                                       snapfile_len - ext_len);
         success = Folder_Hard_Link(ivars->folder, temp_snapfile,
                                    ivars->snapfile);
         Snapshot_Set_Path(ivars->snapshot, ivars->snapfile);

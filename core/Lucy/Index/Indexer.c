@@ -554,8 +554,14 @@ Indexer_Commit_IMP(Indexer *self) {
         bool success;
 
         // Rename temp snapshot file.
-        CharBuf *temp_snapfile = CB_Clone(ivars->snapfile);
-        CB_Chop(ivars->snapfile, sizeof(".temp") - 1);
+        CharBuf *temp_snapfile = ivars->snapfile;
+        size_t ext_len      = sizeof(".temp") - 1;
+        size_t snapfile_len = CB_Length(temp_snapfile);
+        if (snapfile_len <= ext_len) {
+            THROW(ERR, "Invalid snapfile name: %o", temp_snapfile);
+        }
+        ivars->snapfile = CB_SubString(temp_snapfile, 0,
+                                       snapfile_len - ext_len);
         Snapshot_Set_Path(ivars->snapshot, ivars->snapfile);
         success = Folder_Rename(ivars->folder, temp_snapfile, ivars->snapfile);
         DECREF(temp_snapfile);
