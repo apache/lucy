@@ -101,13 +101,15 @@ Highlighter_Highlight_IMP(Highlighter *self, const CharBuf *text) {
 void
 Highlighter_Set_Pre_Tag_IMP(Highlighter *self, const CharBuf *pre_tag) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
-    CB_Mimic(ivars->pre_tag, (Obj*)pre_tag);
+    DECREF(ivars->pre_tag);
+    ivars->pre_tag = CB_Clone(pre_tag);
 }
 
 void
 Highlighter_Set_Post_Tag_IMP(Highlighter *self, const CharBuf *post_tag) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
-    CB_Mimic(ivars->post_tag, (Obj*)post_tag);
+    DECREF(ivars->post_tag);
+    ivars->post_tag = CB_Clone(post_tag);
 }
 
 CharBuf*
