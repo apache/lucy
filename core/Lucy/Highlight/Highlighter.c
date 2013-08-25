@@ -375,15 +375,14 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const CharBuf *field_val,
                                : (int32_t)ivars->excerpt_length;
     if (!this_excerpt_len) { return start; }
 
+    ZombieCharBuf *substring = ZCB_WRAP((CharBuf*)field_val);
+
     if (found_starting_edge) {
-        ZombieCharBuf *temp = ZCB_WRAP((CharBuf*)field_val);
-        ZCB_Nip(temp, start);
-        ZCB_Truncate(temp, this_excerpt_len);
-        CB_Mimic(raw_excerpt, (Obj*)temp);
+        ZCB_Nip(substring, start);
+        ZCB_Truncate(substring, this_excerpt_len);
     }
     // If not starting on a sentence boundary, prepend an ellipsis.
     else {
-        ZombieCharBuf *temp = ZCB_WRAP((CharBuf*)field_val);
         const size_t ELLIPSIS_LEN = 2; // Unicode ellipsis plus a space.
 
         // If the excerpt is already shorter than the spec'd length, we might
@@ -391,7 +390,6 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const CharBuf *field_val,
         this_excerpt_len += ELLIPSIS_LEN;
 
         // Remember original position
-        ZombieCharBuf *orig_temp = ZCB_WRAP((CharBuf*)field_val);
         int32_t orig_start = start;
         int32_t orig_len   = this_excerpt_len;
 
@@ -400,11 +398,11 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const CharBuf *field_val,
         if (start) {
             this_excerpt_len += 1;
             start -= 1;
-            ZCB_Nip(temp, start);
+            ZCB_Nip(substring, start);
         }
 
         do {
-            uint32_t code_point = ZCB_Nibble(temp);
+            uint32_t code_point = ZCB_Nibble(substring);
             start++;
             this_excerpt_len--;
 
@@ -418,47 +416,43 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const CharBuf *field_val,
                     break;
                 }
             }
-        } while (ZCB_Get_Size(temp));
+        } while (ZCB_Get_Size(substring));
 
-        if (ZCB_Get_Size(temp) == 0) {
+        if (ZCB_Get_Size(substring) == 0) {
             // Word is longer than excerpt_length. Reset to original position
             // truncating the word.
-            temp             = orig_temp;
+            ZCB_Assign(substring, (CharBuf*)field_val);
             start            = orig_start;
             this_excerpt_len = orig_len;
             int32_t diff = this_excerpt_len - ivars->excerpt_length;
             if (diff > 0) {
-                ZCB_Nip(temp, diff);
+                ZCB_Nip(substring, diff);
                 start            += diff;
                 this_excerpt_len -= diff;
             }
         }
 
-        ZCB_Truncate(temp, ivars->excerpt_length - ELLIPSIS_LEN);
-        CB_Cat_Char(raw_excerpt, ELLIPSIS_CODE_POINT);
-        CB_Cat_Char(raw_excerpt, ' ');
-        CB_Cat(raw_excerpt, (CharBuf*)temp);
-        start -= ELLIPSIS_LEN;
+        ZCB_Truncate(substring, ivars->excerpt_length - ELLIPSIS_LEN);
     }
 
     // If excerpt doesn't end on a sentence boundary, tack on an ellipsis.
     if (found_ending_edge) {
-        CB_Truncate(raw_excerpt, end - start);
+        ZCB_Truncate(substring, end - start);
     }
     else {
         // Remember original excerpt
-        CharBuf *orig_raw_excerpt = CB_Clone(raw_excerpt);
+        ZombieCharBuf *orig_substring = ZCB_WRAP((CharBuf*)substring);
         // Check for prepended ellipsis
         uint32_t min_size = found_starting_edge ? 0 : 4;
 
         do {
-            uint32_t code_point = CB_Code_Point_From(raw_excerpt, 1);
-            CB_Chop(raw_excerpt, 1);
+            uint32_t code_point = ZCB_Code_Point_From(substring, 1);
+            ZCB_Chop(substring, 1);
             if (StrHelp_is_whitespace(code_point)) {
-                CB_Trim_Tail(raw_excerpt);
+                ZCB_Trim_Tail(substring);
 
                 // Strip punctuation that collides with an ellipsis.
-                code_point = CB_Code_Point_From(raw_excerpt, 1);
+                code_point = ZCB_Code_Point_From(substring, 1);
                 while (code_point == '.'
                        || code_point == ','
                        || code_point == ';'
@@ -467,24 +461,33 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const CharBuf *field_val,
                        || code_point == '?'
                        || code_point == '!'
                       ) {
-                    CB_Chop(raw_excerpt, 1);
-                    code_point = CB_Code_Point_From(raw_excerpt, 1);
+                    ZCB_Chop(substring, 1);
+                    code_point = ZCB_Code_Point_From(substring, 1);
                 }
 
                 break;
             }
-        } while (CB_Get_Size(raw_excerpt) > min_size);
+        } while (ZCB_Get_Size(substring) > min_size);
 
-        if (CB_Get_Size(raw_excerpt) == min_size) {
+        if (ZCB_Get_Size(substring) == min_size) {
             // Word is longer than excerpt_length. Reset to original excerpt
             // truncating the word.
-            CB_Mimic(raw_excerpt, (Obj*)orig_raw_excerpt);
-            CB_Chop(raw_excerpt, 1);
+            ZCB_Assign(substring, (CharBuf*)orig_substring);
+            ZCB_Chop(substring, 1);
         }
+    }
 
+    if (!found_starting_edge) {
         CB_Cat_Char(raw_excerpt, ELLIPSIS_CODE_POINT);
+        CB_Cat_Char(raw_excerpt, ' ');
+        const size_t ELLIPSIS_LEN = 2; // Unicode ellipsis plus a space.
+        start -= ELLIPSIS_LEN;
+    }
 
-        DECREF(orig_raw_excerpt);
+    CB_Cat(raw_excerpt, (CharBuf*)substring);
+
+    if (!found_ending_edge) {
+        CB_Cat_Char(raw_excerpt, ELLIPSIS_CODE_POINT);
     }
 
     return start;
