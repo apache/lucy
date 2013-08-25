@@ -211,8 +211,8 @@ S_is_updir(CharBuf *path) {
 }
 
 static void
-S_add_to_file_list(Folder *self, VArray *list, CharBuf *dir, CharBuf *prefix) {
-    size_t     orig_prefix_size = CB_Get_Size(prefix);
+S_add_to_file_list(Folder *self, VArray *list, CharBuf *dir,
+                   const CharBuf *path) {
     DirHandle *dh = Folder_Open_Dir(self, dir);
     CharBuf   *entry;
 
@@ -223,7 +223,9 @@ S_add_to_file_list(Folder *self, VArray *list, CharBuf *dir, CharBuf *prefix) {
     entry = DH_Get_Entry(dh);
     while (DH_Next(dh)) { // Updates entry
         if (!S_is_updir(entry)) {
-            CharBuf *relpath = CB_newf("%o%o", prefix, entry);
+            CharBuf *relpath = path && CB_Get_Size(path)
+                               ? CB_newf("%o/%o", path, entry)
+                               : CB_Clone(entry);
             if (VA_Get_Size(list) == VA_Get_Capacity(list)) {
                 VA_Grow(list, VA_Get_Size(list) * 2);
             }
@@ -233,9 +235,7 @@ S_add_to_file_list(Folder *self, VArray *list, CharBuf *dir, CharBuf *prefix) {
                 CharBuf *subdir = CB_Get_Size(dir)
                                   ? CB_newf("%o/%o", dir, entry)
                                   : CB_Clone(entry);
-                CB_catf(prefix, "%o/", entry);
-                S_add_to_file_list(self, list, subdir, prefix); // recurse
-                CB_Set_Size(prefix, orig_prefix_size);
+                S_add_to_file_list(self, list, subdir, relpath); // recurse
                 DECREF(subdir);
             }
         }
@@ -342,12 +342,7 @@ Folder_List_R_IMP(Folder *self, const CharBuf *path) {
     VArray *list =  VA_new(0);
     if (local_folder) {
         CharBuf *dir    = CB_new(20);
-        CharBuf *prefix = CB_new(20);
-        if (path && CB_Get_Size(path)) {
-            CB_setf(prefix, "%o/", path);
-        }
-        S_add_to_file_list(local_folder, list, dir, prefix);
-        DECREF(prefix);
+        S_add_to_file_list(local_folder, list, dir, path);
         DECREF(dir);
     }
     return list;
