@@ -145,14 +145,16 @@ Err_Get_Mess_IMP(Err *self) {
 
 void
 Err_Add_Frame_IMP(Err *self, const char *file, int line, const char *func) {
-    if (CB_Ends_With_Str(self->mess, "\n", 1)) { CB_Chop(self->mess, 1); }
+    if (!CB_Ends_With_Str(self->mess, "\n", 1)) {
+        CB_Cat_Char(self->mess, '\n');
+    }
 
     if (func != NULL) {
-        CB_catf(self->mess, "\n\t%s at %s line %i32\n", func, file,
+        CB_catf(self->mess, "\t%s at %s line %i32\n", func, file,
                 (int32_t)line);
     }
     else {
-        CB_catf(self->mess, "\n\tat %s line %i32\n", file, (int32_t)line);
+        CB_catf(self->mess, "\tat %s line %i32\n", file, (int32_t)line);
     }
 }
 
