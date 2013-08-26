@@ -124,11 +124,6 @@ class Clownfish::CharBuf cnick CB
     inert void
     catf(CharBuf *self, const char *pattern, ...);
 
-    /** Replaces the contents of the CharBuf using formatted arguments.
-     */
-    inert void
-    setf(CharBuf *self, const char *pattern, ...);
-
     /** Concatenate one Unicode character onto the end of the CharBuf.
      */
     void
