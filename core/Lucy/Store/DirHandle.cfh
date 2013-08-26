@@ -49,11 +49,10 @@ abstract class Lucy::Store::DirHandle cnick DH
     CharBuf*
     Get_Dir(DirHandle *self);
 
-    /** Return the path of the current entry.  The value is updated by each
-     * call to Next(), and is only valid when Next() has returned
-     * successfully.
+    /** Return the path of the current entry.  The value is only valid when
+     * Next() has returned successfully.
      */
-    CharBuf*
+    incremented CharBuf*
     Get_Entry(DirHandle *self);
 
     /** Returns true if the current entry is a directory, false otherwise.

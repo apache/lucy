@@ -168,12 +168,13 @@ Folder_Delete_Tree_IMP(Folder *self, const CharBuf *path) {
             if (dh) {
                 VArray *files = VA_new(20);
                 VArray *dirs  = VA_new(20);
-                CharBuf *entry = DH_Get_Entry(dh);
                 while (DH_Next(dh)) {
+                    CharBuf *entry = DH_Get_Entry(dh);
                     VA_Push(files, (Obj*)CB_Clone(entry));
                     if (DH_Entry_Is_Dir(dh) && !DH_Entry_Is_Symlink(dh)) {
                         VA_Push(dirs, (Obj*)CB_Clone(entry));
                     }
+                    DECREF(entry);
                 }
                 for (uint32_t i = 0, max = VA_Get_Size(dirs); i < max; i++) {
                     CharBuf *name = (CharBuf*)VA_Fetch(files, i);
@@ -216,14 +217,13 @@ static void
 S_add_to_file_list(Folder *self, VArray *list, CharBuf *dir,
                    const CharBuf *path) {
     DirHandle *dh = Folder_Open_Dir(self, dir);
-    CharBuf   *entry;
 
     if (!dh) {
         RETHROW(INCREF(Err_get_error()));
     }
 
-    entry = DH_Get_Entry(dh);
     while (DH_Next(dh)) { // Updates entry
+        CharBuf *entry = DH_Get_Entry(dh);
         if (!S_is_updir(entry)) {
             CharBuf *relpath = path && CB_Get_Size(path)
                                ? CB_newf("%o/%o", path, entry)
@@ -241,6 +241,7 @@ S_add_to_file_list(Folder *self, VArray *list, CharBuf *dir,
                 DECREF(subdir);
             }
         }
+        DECREF(entry);
     }
 
     if (!DH_Close(dh)) {
@@ -327,9 +328,12 @@ Folder_List_IMP(Folder *self, const CharBuf *path) {
     VArray *list = NULL;
     DirHandle *dh = Folder_Local_Open_Dir(local_folder);
     if (dh) {
-        CharBuf *entry = DH_Get_Entry(dh);
         list = VA_new(32);
-        while (DH_Next(dh)) { VA_Push(list, (Obj*)CB_Clone(entry)); }
+        while (DH_Next(dh)) {
+            CharBuf *entry = DH_Get_Entry(dh);
+            VA_Push(list, (Obj*)CB_Clone(entry));
+            DECREF(entry);
+        }
         DECREF(dh);
     }
     else {

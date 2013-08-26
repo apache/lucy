@@ -89,14 +89,15 @@ IxManager_Make_Snapshot_Filename_IMP(IndexManager *self) {
     uint64_t max_gen = 0;
 
     if (!dh) { RETHROW(INCREF(Err_get_error())); }
-    CharBuf *entry = DH_Get_Entry(dh);
     while (DH_Next(dh)) {
+        CharBuf *entry = DH_Get_Entry(dh);
         if (CB_Starts_With_Str(entry, "snapshot_", 9)
             && CB_Ends_With_Str(entry, ".json", 5)
            ) {
             uint64_t gen = IxFileNames_extract_gen(entry);
             if (gen > max_gen) { max_gen = gen; }
         }
+        DECREF(entry);
     }
     DECREF(dh);
 

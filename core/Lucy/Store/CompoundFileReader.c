@@ -285,9 +285,10 @@ CFReaderDH_init(CFReaderDirHandle *self, CompoundFileReader *cf_reader) {
     // Accumulate entries from real Folder.
     Folder *real_folder = CFReader_Get_Real_Folder(ivars->cf_reader);
     DirHandle *dh = Folder_Local_Open_Dir(real_folder);
-    CharBuf *entry = DH_Get_Entry(dh);
     while (DH_Next(dh)) {
+        CharBuf *entry = DH_Get_Entry(dh);
         VA_Push(ivars->elems, (Obj*)CB_Clone(entry));
+        DECREF(entry);
     }
     DECREF(dh);
     return self;
@@ -315,7 +316,8 @@ CFReaderDH_Next_IMP(CFReaderDirHandle *self) {
         if (ivars->tick < (int32_t)VA_Get_Size(ivars->elems)) {
             CharBuf *path = (CharBuf*)CERTIFY(
                                 VA_Fetch(ivars->elems, ivars->tick), CHARBUF);
-            CB_Mimic(ivars->entry, (Obj*)path);
+            DECREF(ivars->entry);
+            ivars->entry = (CharBuf*)INCREF(path);
             return true;
         }
         else {

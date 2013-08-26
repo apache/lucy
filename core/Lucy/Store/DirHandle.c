@@ -22,7 +22,7 @@ DirHandle*
 DH_init(DirHandle *self, const CharBuf *dir) {
     DirHandleIVARS *const ivars = DH_IVARS(self);
     ivars->dir   = CB_Clone(dir);
-    ivars->entry = CB_new(32);
+    ivars->entry = NULL;
     ABSTRACT_CLASS_CHECK(self, DIRHANDLE);
     return self;
 }
@@ -43,7 +43,8 @@ DH_Get_Dir_IMP(DirHandle *self) {
 
 CharBuf*
 DH_Get_Entry_IMP(DirHandle *self) {
-    return DH_IVARS(self)->entry;
+    CharBuf *entry = DH_IVARS(self)->entry;
+    return (CharBuf*)INCREF(entry);
 }
 
 

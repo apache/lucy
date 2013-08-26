@@ -177,7 +177,8 @@ FSDH_Next_IMP(FSDirHandle *self) {
     }
     else if ((FindNextFile(dirhandle, find_data) == 0)) {
         // Iterator exhausted.  Verify that no errors were encountered.
-        CB_Set_Size(ivars->entry, 0);
+        DECREF(ivars->entry);
+        ivars->entry = NULL;
         if (GetLastError() != ERROR_NO_MORE_FILES) {
             char *win_error = Err_win_error();
             ivars->saved_error
@@ -194,7 +195,8 @@ FSDH_Next_IMP(FSDirHandle *self) {
         return FSDH_Next(self);
     }
     else {
-        CB_Mimic_Str(ivars->entry, find_data->cFileName, len);
+        DECREF(ivars->entry);
+        ivars->entry = CB_new_from_utf8(find_data->cFileName, len);
         return true;
     }
 }
@@ -228,7 +230,8 @@ FSDH_Next_IMP(FSDirHandle *self) {
     FSDirHandleIVARS *const ivars = FSDH_IVARS(self);
     ivars->sys_dir_entry = (struct dirent*)readdir((DIR*)ivars->sys_dirhandle);
     if (!ivars->sys_dir_entry) {
-        CB_Set_Size(ivars->entry, 0);
+        DECREF(ivars->entry);
+        ivars->entry = NULL;
         return false;
     }
     else {
@@ -242,7 +245,8 @@ FSDH_Next_IMP(FSDirHandle *self) {
             return FSDH_Next(self);
         }
         else {
-            CB_Mimic_Str(ivars->entry, sys_dir_entry->d_name, len);
+            DECREF(ivars->entry);
+            ivars->entry = CB_new_from_utf8(sys_dir_entry->d_name, len);
             return true;
         }
     }
