@@ -164,12 +164,13 @@ S_zap_dead_merge(FilePurger *self, Hash *candidates) {
 
                 Hash_Store(candidates, (Obj*)cutoff_seg, (Obj*)CFISH_TRUE);
                 Hash_Store(candidates, (Obj*)merge_json, (Obj*)CFISH_TRUE);
-                CharBuf *entry = DH_Get_Entry(dh);
                 while (DH_Next(dh)) {
                     // TODO: recursively delete subdirs within seg dir.
+                    CharBuf *entry = DH_Get_Entry(dh);
                     CharBuf *filepath = CB_newf("%o/%o", cutoff_seg, entry);
                     Hash_Store(candidates, (Obj*)filepath, (Obj*)CFISH_TRUE);
                     DECREF(filepath);
+                    DECREF(entry);
                 }
                 DECREF(dh);
             }
@@ -205,13 +206,13 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
         if (snapfile) { VA_Push(spared, INCREF(snapfile)); }
     }
 
-    CharBuf *entry      = DH_Get_Entry(dh);
-    Hash    *candidates = Hash_new(64);
+    Hash *candidates = Hash_new(64);
     while (DH_Next(dh)) {
-        if (!CB_Starts_With_Str(entry, "snapshot_", 9))        { continue; }
-        else if (!CB_Ends_With_Str(entry, ".json", 5))         { continue; }
-        else if (snapfile && CB_Equals(entry, (Obj*)snapfile)) { continue; }
-        else {
+        CharBuf *entry = DH_Get_Entry(dh);
+        if (CB_Starts_With_Str(entry, "snapshot_", 9)
+            && CB_Ends_With_Str(entry, ".json", 5)
+            && (!snapfile || !CB_Equals(entry, (Obj*)snapfile))
+        ) {
             Snapshot *snapshot
                 = Snapshot_Read_File(Snapshot_new(), folder, entry);
             Lock *lock
@@ -249,6 +250,7 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
             DECREF(snapshot);
             DECREF(lock);
         }
+        DECREF(entry);
     }
     DECREF(dh);
 

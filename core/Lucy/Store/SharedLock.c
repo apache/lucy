@@ -98,21 +98,18 @@ ShLock_Release_IMP(SharedLock *self) {
 void
 ShLock_Clear_Stale_IMP(SharedLock *self) {
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
-    DirHandle *dh;
-    CharBuf   *entry;
-    CharBuf   *lock_dir_name = (CharBuf*)ZCB_WRAP_STR("locks", 5);
 
-    if (Folder_Find_Folder(ivars->folder, lock_dir_name)) {
-        dh = Folder_Open_Dir(ivars->folder, lock_dir_name);
-        if (!dh) { RETHROW(INCREF(Err_get_error())); }
-        entry = DH_Get_Entry(dh);
-    }
-    else {
+    CharBuf *lock_dir_name = (CharBuf*)ZCB_WRAP_STR("locks", 5);
+    if (!Folder_Find_Folder(ivars->folder, lock_dir_name)) {
         return;
     }
 
+    DirHandle *dh = Folder_Open_Dir(ivars->folder, lock_dir_name);
+    if (!dh) { RETHROW(INCREF(Err_get_error())); }
+
     // Take a stab at any file that begins with our lock name.
     while (DH_Next(dh)) {
+        CharBuf *entry = DH_Get_Entry(dh);
         if (CB_Starts_With(entry, ivars->name)
             && CB_Ends_With_Str(entry, ".lock", 5)
            ) {
@@ -120,6 +117,7 @@ ShLock_Clear_Stale_IMP(SharedLock *self) {
             ShLock_Maybe_Delete_File(self, candidate, false, true);
             DECREF(candidate);
         }
+        DECREF(entry);
     }
 
     DECREF(dh);
@@ -128,20 +126,17 @@ ShLock_Clear_Stale_IMP(SharedLock *self) {
 bool
 ShLock_Is_Locked_IMP(SharedLock *self) {
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
-    DirHandle *dh;
-    CharBuf   *entry;
 
     CharBuf *lock_dir_name = (CharBuf*)ZCB_WRAP_STR("locks", 5);
-    if (Folder_Find_Folder(ivars->folder, lock_dir_name)) {
-        dh = Folder_Open_Dir(ivars->folder, lock_dir_name);
-        if (!dh) { RETHROW(INCREF(Err_get_error())); }
-        entry = DH_Get_Entry(dh);
-    }
-    else {
+    if (!Folder_Find_Folder(ivars->folder, lock_dir_name)) {
         return false;
     }
 
+    DirHandle *dh = Folder_Open_Dir(ivars->folder, lock_dir_name);
+    if (!dh) { RETHROW(INCREF(Err_get_error())); }
+
     while (DH_Next(dh)) {
+        CharBuf *entry = DH_Get_Entry(dh);
         // Translation:  $locked = 1 if $entry =~ /^\Q$name-\d+\.lock$/
         if (CB_Starts_With(entry, ivars->name)
             && CB_Ends_With_Str(entry, ".lock", 5)
@@ -154,11 +149,13 @@ ShLock_Is_Locked_IMP(SharedLock *self) {
             if (ZCB_Code_Point_From(scratch, 1) == '-') {
                 ZCB_Chop(scratch, 1);
                 if (ZCB_Equals(scratch, (Obj*)ivars->name)) {
+                    DECREF(entry);
                     DECREF(dh);
                     return true;
                 }
             }
         }
+        DECREF(entry);
     }
 
     DECREF(dh);

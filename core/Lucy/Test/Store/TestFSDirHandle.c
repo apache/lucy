@@ -65,10 +65,10 @@ test_all(TestBatchRunner *runner) {
     outstream = FSFolder_Open_Out(folder, foo_boffo);
     DECREF(outstream);
 
-    FSDirHandle  *dh    = FSDH_open(test_dir);
-    CharBuf      *entry = FSDH_Get_Entry(dh);
+    FSDirHandle *dh = FSDH_open(test_dir);
     while (FSDH_Next(dh)) {
         count++;
+        CharBuf *entry = FSDH_Get_Entry(dh);
         if (CB_Equals(entry, (Obj*)foo)) {
             saw_foo = true;
             foo_was_dir = FSDH_Entry_Is_Dir(dh);
@@ -77,6 +77,7 @@ test_all(TestBatchRunner *runner) {
             saw_boffo = true;
             boffo_was_dir = FSDH_Entry_Is_Dir(dh);
         }
+        DECREF(entry);
     }
     TEST_INT_EQ(runner, 2, count, "correct number of entries");
     TEST_TRUE(runner, saw_foo, "Directory was iterated over");

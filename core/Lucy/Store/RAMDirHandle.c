@@ -60,7 +60,8 @@ RAMDH_Next_IMP(RAMDirHandle *self) {
         if (ivars->tick < (int32_t)VA_Get_Size(ivars->elems)) {
             CharBuf *path = (CharBuf*)CERTIFY(
                                 VA_Fetch(ivars->elems, ivars->tick), CHARBUF);
-            CB_Mimic(ivars->entry, (Obj*)path);
+            DECREF(ivars->entry);
+            ivars->entry = (CharBuf*)INCREF(path);
             return true;
         }
         else {

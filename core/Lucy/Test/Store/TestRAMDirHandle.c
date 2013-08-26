@@ -51,10 +51,10 @@ test_all(TestBatchRunner *runner) {
                                    FH_CREATE | FH_WRITE_ONLY);
     DECREF(fh);
 
-    RAMDirHandle *dh    = RAMDH_new(folder);
-    CharBuf      *entry = RAMDH_Get_Entry(dh);
+    RAMDirHandle *dh = RAMDH_new(folder);
     while (RAMDH_Next(dh)) {
         count++;
+        CharBuf *entry = RAMDH_Get_Entry(dh);
         if (CB_Equals(entry, (Obj*)foo)) {
             saw_foo = true;
             foo_was_dir = RAMDH_Entry_Is_Dir(dh);
@@ -63,6 +63,7 @@ test_all(TestBatchRunner *runner) {
             saw_boffo = true;
             boffo_was_dir = RAMDH_Entry_Is_Dir(dh);
         }
+        DECREF(entry);
     }
     TEST_INT_EQ(runner, 2, count, "correct number of entries");
     TEST_TRUE(runner, saw_foo, "Directory was iterated over");

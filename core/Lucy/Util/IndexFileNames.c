@@ -25,23 +25,24 @@
 CharBuf*
 IxFileNames_latest_snapshot(Folder *folder) {
     DirHandle *dh = Folder_Open_Dir(folder, NULL);
-    CharBuf   *entry = dh ? DH_Get_Entry(dh) : NULL;
     CharBuf   *retval   = NULL;
     uint64_t   latest_gen = 0;
 
     if (!dh) { RETHROW(INCREF(Err_get_error())); }
 
     while (DH_Next(dh)) {
+        CharBuf *entry = DH_Get_Entry(dh);
         if (CB_Starts_With_Str(entry, "snapshot_", 9)
             && CB_Ends_With_Str(entry, ".json", 5)
            ) {
             uint64_t gen = IxFileNames_extract_gen(entry);
             if (gen > latest_gen) {
                 latest_gen = gen;
-                if (!retval) { retval = CB_Clone(entry); }
-                else         { CB_Mimic(retval, (Obj*)entry); }
+                DECREF(retval);
+                retval = CB_Clone(entry);
             }
         }
+        DECREF(entry);
     }
 
     DECREF(dh);

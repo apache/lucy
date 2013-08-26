@@ -243,17 +243,15 @@ test_Local_Open_Dir(TestBatchRunner *runner) {
 
     Folder *real_folder = S_folder_with_contents();
     CompoundFileReader *cf_reader = CFReader_open(real_folder);
-    DirHandle *dh;
-    CharBuf *entry;
     bool saw_foo       = false;
     bool saw_stuff     = false;
     bool stuff_was_dir = false;
 
     CFReader_MkDir(cf_reader, stuff);
 
-    dh = CFReader_Local_Open_Dir(cf_reader);
-    entry = DH_Get_Entry(dh);
+    DirHandle *dh = CFReader_Local_Open_Dir(cf_reader);
     while (DH_Next(dh)) {
+        CharBuf *entry = DH_Get_Entry(dh);
         if (CB_Equals(entry, (Obj*)foo)) {
             saw_foo = true;
         }
@@ -261,6 +259,7 @@ test_Local_Open_Dir(TestBatchRunner *runner) {
             saw_stuff = true;
             stuff_was_dir = DH_Entry_Is_Dir(dh);
         }
+        DECREF(entry);
     }
 
     TEST_TRUE(runner, saw_foo, "DirHandle iterated over virtual file");
