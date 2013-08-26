@@ -212,8 +212,7 @@ FSDH_do_open(FSDirHandle *self, const CharBuf *dir) {
 
     DH_init((DirHandle*)self, dir);
     FSDirHandleIVARS *const ivars = FSDH_IVARS(self);
-    ivars->sys_dir_entry    = NULL;
-    ivars->fullpath         = NULL;
+    ivars->sys_dir_entry = NULL;
 
     ivars->sys_dirhandle = opendir(dir_path_ptr);
     if (!ivars->sys_dirhandle) {
@@ -269,16 +268,15 @@ FSDH_Entry_Is_Dir_IMP(FSDirHandle *self) {
     }
     #endif
 
+    bool retval = false;
     struct stat stat_buf;
-    if (!ivars->fullpath) {
-        ivars->fullpath = CB_new(CB_Get_Size(ivars->dir) + 20);
+    CharBuf *fullpath = CB_newf("%o%s%o", ivars->dir, CHY_DIR_SEP,
+                                ivars->entry);
+    if (stat((char*)CB_Get_Ptr8(fullpath), &stat_buf) != -1) {
+        if (stat_buf.st_mode & S_IFDIR) { retval = true; }
     }
-    CB_setf(ivars->fullpath, "%o%s%o", ivars->dir, CHY_DIR_SEP,
-            ivars->entry);
-    if (stat((char*)CB_Get_Ptr8(ivars->fullpath), &stat_buf) != -1) {
-        if (stat_buf.st_mode & S_IFDIR) { return true; }
-    }
-    return false;
+    DECREF(fullpath);
+    return retval;
 }
 
 bool
@@ -291,16 +289,15 @@ FSDH_Entry_Is_Symlink_IMP(FSDirHandle *self) {
     return sys_dir_entry->d_type == DT_LNK ? true : false;
     #else
     {
+        bool retval = false;
         struct stat stat_buf;
-        if (!ivars->fullpath) {
-            ivars->fullpath = CB_new(CB_Get_Size(ivars->dir) + 20);
+        CharBuf *fullpath = CB_newf("%o%s%o", ivars->dir, CHY_DIR_SEP,
+                                    ivars->entry);
+        if (stat((char*)CB_Get_Ptr8(fullpath), &stat_buf) != -1) {
+            if (stat_buf.st_mode & S_IFLNK) { retval = true; }
         }
-        CB_setf(ivars->fullpath, "%o%s%o", ivars->dir, CHY_DIR_SEP,
-                ivars->entry);
-        if (stat((char*)CB_Get_Ptr8(ivars->fullpath), &stat_buf) != -1) {
-            if (stat_buf.st_mode & S_IFLNK) { return true; }
-        }
-        return false;
+        DECREF(fullpath);
+        return retval;
     }
     #endif // CHY_HAS_DIRENT_D_TYPE
 }
@@ -308,10 +305,6 @@ FSDH_Entry_Is_Symlink_IMP(FSDirHandle *self) {
 bool
 FSDH_Close_IMP(FSDirHandle *self) {
     FSDirHandleIVARS *const ivars = FSDH_IVARS(self);
-    if (ivars->fullpath) {
-        CB_Dec_RefCount(ivars->fullpath);
-        ivars->fullpath = NULL;
-    }
     if (ivars->sys_dirhandle) {
         DIR *sys_dirhandle = (DIR*)ivars->sys_dirhandle;
         ivars->sys_dirhandle = NULL;
