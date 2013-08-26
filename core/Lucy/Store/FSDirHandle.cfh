@@ -23,7 +23,6 @@ class Lucy::Store::FSDirHandle cnick FSDH
 
     void    *sys_dirhandle;
     void    *sys_dir_entry;
-    CharBuf *fullpath;
     Err     *saved_error;
     bool     delayed_iter;
 
