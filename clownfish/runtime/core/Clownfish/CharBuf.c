@@ -184,15 +184,6 @@ S_die_invalid_pattern(const char *pattern) {
 }
 
 void
-CB_setf(CharBuf *self, const char *pattern, ...) {
-    va_list args;
-    CB_Set_Size(self, 0);
-    va_start(args, pattern);
-    CB_VCatF(self, pattern, args);
-    va_end(args);
-}
-
-void
 CB_catf(CharBuf *self, const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);

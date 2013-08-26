@@ -95,21 +95,28 @@ test_Mimic_and_Clone(TestBatchRunner *runner) {
 
 static void
 test_Find(TestBatchRunner *runner) {
-    CharBuf *string = CB_new(10);
+    CharBuf *string;
     CharBuf *substring = S_get_cb("foo");
 
+    string = S_get_cb("");
     TEST_TRUE(runner, CB_Find(string, substring) == -1, "Not in empty string");
-    CB_setf(string, "foo");
+    DECREF(string);
+
+    string = S_get_cb("foo");
     TEST_TRUE(runner, CB_Find(string, substring) == 0, "Find complete string");
-    CB_setf(string, "afoo");
+    DECREF(string);
+
+    string = S_get_cb("afoo");
     TEST_TRUE(runner, CB_Find(string, substring) == 1, "Find after first");
     CB_Set_Size(string, 3);
     TEST_TRUE(runner, CB_Find(string, substring) == -1, "Don't overrun");
-    CB_setf(string, "afood");
+    DECREF(string);
+
+    string = S_get_cb("afood");
     TEST_TRUE(runner, CB_Find(string, substring) == 1, "Find in middle");
+    DECREF(string);
 
     DECREF(substring);
-    DECREF(string);
 }
 
 static void
@@ -217,31 +224,38 @@ test_Trim(TestBatchRunner *runner) {
 
 static void
 test_To_F64(TestBatchRunner *runner) {
-    CharBuf *charbuf = S_get_cb("1.5");
+    CharBuf *charbuf;
+
+    charbuf = S_get_cb("1.5");
     double difference = 1.5 - CB_To_F64(charbuf);
     if (difference < 0) { difference = 0 - difference; }
     TEST_TRUE(runner, difference < 0.001, "To_F64");
+    DECREF(charbuf);
 
-    CB_setf(charbuf, "-1.5");
+    charbuf = S_get_cb("-1.5");
     difference = 1.5 + CB_To_F64(charbuf);
     if (difference < 0) { difference = 0 - difference; }
     TEST_TRUE(runner, difference < 0.001, "To_F64 negative");
+    DECREF(charbuf);
 
-    CB_setf(charbuf, "1.59");
+    charbuf = S_get_cb("1.59");
     double value_full = CB_To_F64(charbuf);
     CB_Set_Size(charbuf, 3);
     double value_short = CB_To_F64(charbuf);
     TEST_TRUE(runner, value_short < value_full,
               "TO_F64 doesn't run past end of string");
-
     DECREF(charbuf);
 }
 
 static void
 test_To_I64(TestBatchRunner *runner) {
-    CharBuf *charbuf = S_get_cb("10");
+    CharBuf *charbuf;
+
+    charbuf = S_get_cb("10");
     TEST_TRUE(runner, CB_To_I64(charbuf) == 10, "To_I64");
-    CB_setf(charbuf, "-10");
+    DECREF(charbuf);
+
+    charbuf = S_get_cb("-10");
     TEST_TRUE(runner, CB_To_I64(charbuf) == -10, "To_I64 negative");
     DECREF(charbuf);
 }
