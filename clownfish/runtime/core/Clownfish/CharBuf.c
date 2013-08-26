@@ -626,53 +626,6 @@ CB_Trim_Tail_IMP(CharBuf *self) {
 }
 
 size_t
-CB_Nip_IMP(CharBuf *self, size_t count) {
-    size_t       num_nipped = 0;
-    char        *ptr        = self->ptr;
-    char *const  end        = ptr + self->size;
-    for (; ptr < end  && count--; ptr += StrHelp_UTF8_COUNT[*(uint8_t*)ptr]) {
-        num_nipped++;
-    }
-    if (ptr > end) {
-        DIE_INVALID_UTF8(self->ptr, self->size);
-    }
-    self->size = end - ptr;
-    memmove(self->ptr, ptr, self->size);
-    return num_nipped;
-}
-
-int32_t
-CB_Nibble_IMP(CharBuf *self) {
-    if (self->size == 0) {
-        return 0;
-    }
-    else {
-        int32_t retval = (int32_t)StrHelp_decode_utf8_char(self->ptr);
-        size_t consumed = StrHelp_UTF8_COUNT[*(uint8_t*)self->ptr];
-        if (consumed > self->size) {
-            DIE_INVALID_UTF8(self->ptr, self->size);
-        }
-        char *ptr = self->ptr + StrHelp_UTF8_COUNT[*(uint8_t*)self->ptr];
-        self->size -= consumed;
-        memmove(self->ptr, ptr, self->size);
-        return retval;
-    }
-}
-
-size_t
-CB_Chop_IMP(CharBuf *self, size_t count) {
-    size_t      num_chopped = 0;
-    char       *top         = self->ptr;
-    const char *ptr         = top + self->size;
-    for (num_chopped = 0; num_chopped < count; num_chopped++) {
-        const char *end = ptr;
-        if (NULL == (ptr = StrHelp_back_utf8_char(ptr, top))) { break; }
-        self->size -= (end - ptr);
-    }
-    return num_chopped;
-}
-
-size_t
 CB_Length_IMP(CharBuf *self) {
     size_t  len  = 0;
     char   *ptr  = self->ptr;
@@ -889,6 +842,19 @@ ViewCB_Nibble_IMP(ViewCharBuf *self) {
         self->size -= consumed;
         return retval;
     }
+}
+
+size_t
+ViewCB_Chop_IMP(ViewCharBuf *self, size_t count) {
+    size_t      num_chopped = 0;
+    char       *top         = self->ptr;
+    const char *ptr         = top + self->size;
+    for (num_chopped = 0; num_chopped < count; num_chopped++) {
+        const char *end = ptr;
+        if (NULL == (ptr = StrHelp_back_utf8_char(ptr, top))) { break; }
+        self->size -= (end - ptr);
+    }
+    return num_chopped;
 }
 
 char*
