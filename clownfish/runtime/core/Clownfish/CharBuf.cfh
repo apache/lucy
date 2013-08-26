@@ -254,24 +254,6 @@ class Clownfish::CharBuf cnick CB
     uint32_t
     Trim_Tail(CharBuf *self);
 
-    /** Remove characters (measured in code points) from the top of the
-     * CharBuf.  Returns the number nipped.
-     */
-    size_t
-    Nip(CharBuf *self, size_t count);
-
-    /** Remove one character from the top of the CharBuf.  Returns the code
-     * point, or 0 if the string was empty.
-     */
-    int32_t
-    Nibble(CharBuf *self);
-
-    /** Remove characters (measured in code points) from the end of the
-     * CharBuf.  Returns the number chopped.
-     */
-    size_t
-    Chop(CharBuf *self, size_t count);
-
     /** Truncate the CharBuf so that it contains no more than
      * <code>count</code>characters.
      *
@@ -335,11 +317,23 @@ class Clownfish::ViewCharBuf cnick ViewCB
     uint32_t
     Trim_Top(ViewCharBuf *self);
 
+    /** Remove characters (measured in code points) from the top of the
+     * ViewCharBuf.  Returns the number nipped.
+     */
     size_t
     Nip(ViewCharBuf *self, size_t count);
 
+    /** Remove one character from the top of the ViewCharBuf.  Returns the
+     * code point, or 0 if the string was empty.
+     */
     int32_t
     Nibble(ViewCharBuf *self);
+
+    /** Remove characters (measured in code points) from the end of the
+     * ViewCharBuf.  Returns the number chopped.
+     */
+    size_t
+    Chop(ViewCharBuf *self, size_t count);
 
     /** Throws an error. */
     char*
