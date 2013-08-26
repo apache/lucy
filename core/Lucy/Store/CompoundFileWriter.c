@@ -109,8 +109,6 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
     Hash_Store_Str(metadata, "format", 6,
                    (Obj*)CB_newf("%i32", CFWriter_current_file_format));
 
-    CharBuf *infilepath = CB_new(30);
-    size_t base_len = 0;
     VA_Sort(files, NULL, NULL);
     for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
         CharBuf *infilename = (CharBuf*)VA_Fetch(files, i);
@@ -132,9 +130,7 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
                            (Obj*)CB_newf("%i64", offset));
             Hash_Store_Str(file_data, "length", 6,
                            (Obj*)CB_newf("%i64", len));
-            CB_Set_Size(infilepath, base_len);
-            CB_Cat(infilepath, infilename);
-            Hash_Store(sub_files, (Obj*)infilepath, (Obj*)file_data);
+            Hash_Store(sub_files, (Obj*)infilename, (Obj*)file_data);
             VA_Push(merged, INCREF(infilename));
 
             // Add filler NULL bytes so that every sub-file begins on a file
@@ -145,7 +141,6 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
             DECREF(instream);
         }
     }
-    DECREF(infilepath);
 
     // Write metadata to cfmeta file.
     CharBuf *cfmeta_temp = (CharBuf*)ZCB_WRAP_STR("cfmeta.json.temp", 16);
