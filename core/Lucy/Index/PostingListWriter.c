@@ -81,7 +81,7 @@ static void
 S_lazy_init(PostingListWriter *self) {
     PostingListWriterIVARS *const ivars = PListWriter_IVARS(self);
     if (!ivars->lex_temp_out) {
-        Folder  *folder         = ivars->folder;
+        Folder *folder         = ivars->folder;
         String *seg_name       = Seg_Get_Name(ivars->segment);
         String *lex_temp_path  = Str_newf("%o/lextemp", seg_name);
         String *post_temp_path = Str_newf("%o/ptemp", seg_name);

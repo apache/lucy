@@ -135,7 +135,7 @@ S_del_filename(DefaultDeletionsWriter *self, SegReader *target_reader) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     Segment *target_seg = SegReader_Get_Segment(target_reader);
     return Str_newf("%o/deletions-%o.bv", Seg_Get_Name(ivars->segment),
-                   Seg_Get_Name(target_seg));
+                    Seg_Get_Name(target_seg));
 }
 
 void
@@ -211,7 +211,7 @@ DefDelWriter_Seg_Deletions_IMP(DefaultDeletionsWriter *self,
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     Matcher *deletions    = NULL;
     Segment *segment      = SegReader_Get_Segment(seg_reader);
-    String *seg_name     = Seg_Get_Name(segment);
+    String  *seg_name     = Seg_Get_Name(segment);
     Integer32 *tick_obj   = (Integer32*)Hash_Fetch(ivars->name_to_tick,
                                                    (Obj*)seg_name);
     int32_t tick          = tick_obj ? Int32_Get_Value(tick_obj) : 0;

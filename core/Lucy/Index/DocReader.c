@@ -145,7 +145,7 @@ DefDocReader_init(DefaultDocReader *self, Schema *schema, Folder *folder,
         String *seg_name  = Seg_Get_Name(segment);
         String *ix_file   = Str_newf("%o/documents.ix", seg_name);
         String *dat_file  = Str_newf("%o/documents.dat", seg_name);
-        Obj     *format    = Hash_Fetch_Str(metadata, "format", 6);
+        Obj     *format   = Hash_Fetch_Str(metadata, "format", 6);
 
         // Check format.
         if (!format) { THROW(ERR, "Missing 'format' var"); }

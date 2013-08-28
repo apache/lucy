@@ -315,7 +315,7 @@ S_merge_updated_deletions(BackgroundMerger *self) {
         int64_t  merge_seg_num = Seg_Get_Number(ivars->segment);
         uint32_t seg_tick      = INT32_MAX;
         int32_t  offset        = INT32_MAX;
-        String *seg_name      = NULL;
+        String  *seg_name      = NULL;
         Matcher *deletions     = NULL;
 
         SegWriter_Prep_Seg_Dir(seg_writer);

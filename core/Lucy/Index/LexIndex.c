@@ -42,9 +42,9 @@ LexIndex*
 LexIndex_init(LexIndex *self, Schema *schema, Folder *folder,
               Segment *segment, const String *field) {
     int32_t  field_num = Seg_Field_Num(segment, field);
-    String *seg_name  = Seg_Get_Name(segment);
-    String *ixix_file = Str_newf("%o/lexicon-%i32.ixix", seg_name, field_num);
-    String *ix_file   = Str_newf("%o/lexicon-%i32.ix", seg_name, field_num);
+    String  *seg_name  = Seg_Get_Name(segment);
+    String  *ixix_file = Str_newf("%o/lexicon-%i32.ixix", seg_name, field_num);
+    String  *ix_file   = Str_newf("%o/lexicon-%i32.ix", seg_name, field_num);
     Architecture *arch = Schema_Get_Architecture(schema);
 
     // Init.

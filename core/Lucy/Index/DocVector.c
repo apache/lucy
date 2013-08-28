@@ -121,7 +121,7 @@ S_extract_tv_cache(ByteBuf *field_buf) {
     Hash    *tv_cache  = Hash_new(0);
     char    *tv_string = BB_Get_Buf(field_buf);
     int32_t  num_terms = NumUtil_decode_c32(&tv_string);
-    String *text      = Str_new(0);
+    String  *text      = Str_new(0);
 
     // Read the number of highlightable terms in the field.
     for (int32_t i = 0; i < num_terms; i++) {

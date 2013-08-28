@@ -173,11 +173,11 @@ bool
 FSFolder_Rename_IMP(FSFolder *self, const String* from, const String *to) {
     String *from_path = S_fullpath(self, from);
     String *to_path   = S_fullpath(self, to);
-    bool     retval    = !rename((char*)Str_Get_Ptr8(from_path),
+    bool    retval    = !rename((char*)Str_Get_Ptr8(from_path),
                                  (char*)Str_Get_Ptr8(to_path));
     if (!retval) {
         Err_set_error(Err_new(Str_newf("rename from '%o' to '%o' failed: %s",
-                                      from_path, to_path, strerror(errno))));
+                                       from_path, to_path, strerror(errno))));
     }
     DECREF(from_path);
     DECREF(to_path);
@@ -189,7 +189,7 @@ FSFolder_Hard_Link_IMP(FSFolder *self, const String *from,
                        const String *to) {
     String *from_path = S_fullpath(self, from);
     String *to_path   = S_fullpath(self, to);
-    bool     retval    = S_hard_link(from_path, to_path);
+    bool    retval    = S_hard_link(from_path, to_path);
     DECREF(from_path);
     DECREF(to_path);
     return retval;
@@ -200,7 +200,7 @@ FSFolder_Local_Delete_IMP(FSFolder *self, const String *name) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
 
     String *fullpath = S_fullpath(self, name);
-    char    *path_ptr = (char*)Str_Get_Ptr8(fullpath);
+    char   *path_ptr = (char*)Str_Get_Ptr8(fullpath);
 #ifdef CHY_REMOVE_ZAPS_DIRS
     bool result = !remove(path_ptr);
 #else
@@ -289,7 +289,7 @@ static bool
 S_create_dir(const String *path) {
     if (-1 == chy_makedir((char*)Str_Get_Ptr8(path), 0777)) {
         Err_set_error(Err_new(Str_newf("Couldn't create directory '%o': %s",
-                                      path, strerror(errno))));
+                                       path, strerror(errno))));
         return false;
     }
     return true;
@@ -356,7 +356,7 @@ S_hard_link(String *from_path, String *to_path) {
     else {
         char *win_error = Err_win_error();
         Err_set_error(Err_new(Str_newf("CreateHardLink for new file '%o' from '%o' failed: %s",
-                                      to_path, from_path, win_error)));
+                                       to_path, from_path, win_error)));
         FREEMEM(win_error);
         return false;
     }
@@ -388,7 +388,7 @@ S_hard_link(String *from_path, String *to_path) {
 
     if (-1 == link(from8, to8)) {
         Err_set_error(Err_new(Str_newf("hard link for new file '%o' from '%o' failed: %s",
-                                      to_path, from_path, strerror(errno))));
+                                       to_path, from_path, strerror(errno))));
         return false;
     }
     else {

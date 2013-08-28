@@ -58,7 +58,7 @@ RAMFolder_Local_MkDir_IMP(RAMFolder *self, const String *name) {
     RAMFolderIVARS *const ivars = RAMFolder_IVARS(self);
     if (Hash_Fetch(ivars->entries, (Obj*)name)) {
         Err_set_error(Err_new(Str_newf("Can't MkDir, '%o' already exists",
-                                      name)));
+                                       name)));
         return false;
     }
     else {
@@ -155,7 +155,7 @@ S_rename_or_hard_link(RAMFolder *self, const String* from, const String *to,
     }
     if (!to_folder) {
         Err_set_error(Err_new(Str_newf("Invalid file path (can't find dir): '%o'",
-                                      to)));
+                                       to)));
         return false;
     }
 
@@ -176,12 +176,12 @@ S_rename_or_hard_link(RAMFolder *self, const String* from, const String *to,
     }
     if (!RAMFolder_Is_A(inner_from_folder, RAMFOLDER)) {
         Err_set_error(Err_new(Str_newf("Not a RAMFolder, but a '%o'",
-                                      Obj_Get_Class_Name((Obj*)inner_from_folder))));
+                                       Obj_Get_Class_Name((Obj*)inner_from_folder))));
         return false;
     }
     if (!RAMFolder_Is_A(inner_to_folder, RAMFOLDER)) {
         Err_set_error(Err_new(Str_newf("Not a RAMFolder, but a '%o'",
-                                      Obj_Get_Class_Name((Obj*)inner_to_folder))));
+                                       Obj_Get_Class_Name((Obj*)inner_to_folder))));
         return false;
     }
 
@@ -193,7 +193,7 @@ S_rename_or_hard_link(RAMFolder *self, const String* from, const String *to,
             && Folder_Local_Exists(from_folder, (String*)from_name)
            ) {
             Err_set_error(Err_new(Str_newf("Source file '%o' is virtual",
-                                          from)));
+                                           from)));
         }
         else {
             Err_set_error(Err_new(Str_newf("File not found: '%o'", from)));
@@ -228,8 +228,8 @@ S_rename_or_hard_link(RAMFolder *self, const String* from, const String *to,
             }
             if (conflict) {
                 Err_set_error(Err_new(Str_newf("Can't clobber a %o with a %o",
-                                              Obj_Get_Class_Name(existing),
-                                              Obj_Get_Class_Name(elem))));
+                                               Obj_Get_Class_Name(existing),
+                                               Obj_Get_Class_Name(elem))));
                 return false;
             }
         }
@@ -249,7 +249,7 @@ S_rename_or_hard_link(RAMFolder *self, const String* from, const String *to,
     else if (op == OP_HARD_LINK) {
         if (!Obj_Is_A(elem, RAMFILE)) {
             Err_set_error(Err_new(Str_newf("'%o' isn't a file, it's a %o",
-                                          from, Obj_Get_Class_Name(elem))));
+                                           from, Obj_Get_Class_Name(elem))));
             return false;
         }
         else {

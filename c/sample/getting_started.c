@@ -58,7 +58,7 @@ main() {
     // Initialize the library.
     lucy_bootstrap_parcel();
 
-    Schema  *schema = S_create_schema();
+    Schema *schema = S_create_schema();
     String *folder = Str_newf("lucy_index");
 
     S_index_documents(schema, folder);
@@ -166,10 +166,10 @@ S_search(IndexSearcher *searcher, const char *query) {
 
     // Execute search query.
     String *query_cb = Str_new_from_utf8(query, strlen(query));
-    Hits    *hits     = IxSearcher_Hits(searcher, (Obj*)query_cb, 0, 10, NULL);
+    Hits   *hits     = IxSearcher_Hits(searcher, (Obj*)query_cb, 0, 10, NULL);
 
     String *field_cb = Str_newf("title");
-    HitDoc  *hit;
+    HitDoc *hit;
     int i = 1;
 
     // Loop over search results.

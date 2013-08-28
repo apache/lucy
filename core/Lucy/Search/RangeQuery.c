@@ -77,16 +77,16 @@ RangeQuery_Destroy_IMP(RangeQuery *self) {
 
 bool
 RangeQuery_Equals_IMP(RangeQuery *self, Obj *other) {
-    if ((RangeQuery*)other == self)                   { return true; }
-    if (!Obj_Is_A(other, RANGEQUERY))                 { return false; }
+    if ((RangeQuery*)other == self)                    { return true; }
+    if (!Obj_Is_A(other, RANGEQUERY))                  { return false; }
     RangeQueryIVARS *const ivars = RangeQuery_IVARS(self);
     RangeQueryIVARS *const ovars = RangeQuery_IVARS((RangeQuery*)other);
-    if (ivars->boost != ovars->boost)                 { return false; }
+    if (ivars->boost != ovars->boost)                  { return false; }
     if (!Str_Equals(ivars->field, (Obj*)ovars->field)) { return false; }
-    if (ivars->lower_term && !ovars->lower_term)      { return false; }
-    if (ivars->upper_term && !ovars->upper_term)      { return false; }
-    if (!ivars->lower_term && ovars->lower_term)      { return false; }
-    if (!ivars->upper_term && ovars->upper_term)      { return false; }
+    if (ivars->lower_term && !ovars->lower_term)       { return false; }
+    if (ivars->upper_term && !ovars->upper_term)       { return false; }
+    if (!ivars->lower_term && ovars->lower_term)       { return false; }
+    if (!ivars->upper_term && ovars->upper_term)       { return false; }
     if (ivars->lower_term
         && !Obj_Equals(ivars->lower_term, ovars->lower_term)) { return false; }
     if (ivars->upper_term
@@ -100,11 +100,11 @@ String*
 RangeQuery_To_String_IMP(RangeQuery *self) {
     RangeQueryIVARS *const ivars = RangeQuery_IVARS(self);
     String *lower_term_str = ivars->lower_term
-                              ? Obj_To_String(ivars->lower_term)
-                              : Str_new_from_trusted_utf8("*", 1);
+                             ? Obj_To_String(ivars->lower_term)
+                             : Str_new_from_trusted_utf8("*", 1);
     String *upper_term_str = ivars->upper_term
-                              ? Obj_To_String(ivars->upper_term)
-                              : Str_new_from_trusted_utf8("*", 1);
+                             ? Obj_To_String(ivars->upper_term)
+                             : Str_new_from_trusted_utf8("*", 1);
     String *retval = Str_newf("%o:%s%o TO %o%s", ivars->field,
                               ivars->include_lower ? "[" : "{",
                               lower_term_str,

@@ -86,7 +86,7 @@ PhraseQuery*
 PhraseQuery_Deserialize_IMP(PhraseQuery *self, InStream *instream) {
     float boost = InStream_Read_F32(instream);
     String *field = Freezer_read_charbuf(instream);
-    VArray  *terms = Freezer_read_varray(instream);
+    VArray *terms = Freezer_read_varray(instream);
     return S_do_init(self, field, terms, boost);
 }
 

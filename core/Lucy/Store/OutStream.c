@@ -67,7 +67,7 @@ OutStream_do_open(OutStream *self, Obj *file) {
     }
     else {
         Err_set_error(Err_new(Str_newf("Invalid type for param 'file': '%o'",
-                                      Obj_Get_Class_Name(file))));
+                                       Obj_Get_Class_Name(file))));
         DECREF(self);
         return NULL;
     }

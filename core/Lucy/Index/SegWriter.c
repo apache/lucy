@@ -86,7 +86,7 @@ SegWriter_Add_Writer_IMP(SegWriter *self, DataWriter *writer) {
 void
 SegWriter_Prep_Seg_Dir_IMP(SegWriter *self) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
-    Folder  *folder   = SegWriter_Get_Folder(self);
+    Folder *folder   = SegWriter_Get_Folder(self);
     String *seg_name = Seg_Get_Name(ivars->segment);
 
     // Clear stale segment files from crashed indexing sessions.

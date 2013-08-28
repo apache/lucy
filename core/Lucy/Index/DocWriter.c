@@ -62,7 +62,7 @@ static OutStream*
 S_lazy_init(DocWriter *self) {
     DocWriterIVARS *const ivars = DocWriter_IVARS(self);
     if (!ivars->dat_out) {
-        Folder  *folder   = ivars->folder;
+        Folder *folder   = ivars->folder;
         String *seg_name = Seg_Get_Name(ivars->segment);
 
         // Get streams.

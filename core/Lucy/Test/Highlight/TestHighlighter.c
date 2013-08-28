@@ -315,8 +315,8 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     String *excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_TRUE(runner,
               Str_Find_Str(excerpt,
-                          "<strong>&#934;</strong> a b c d <strong>x y z</strong>",
-                          54) >= 0,
+                           "<strong>&#934;</strong> a b c d <strong>x y z</strong>",
+                           54) >= 0,
               "highlighter tagged phrase and single term");
     DECREF(excerpt);
 

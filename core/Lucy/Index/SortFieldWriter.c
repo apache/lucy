@@ -614,7 +614,7 @@ SortFieldWriter_Finish_IMP(SortFieldWriter *self) {
 
     int32_t  field_num = ivars->field_num;
     Folder  *folder    = PolyReader_Get_Folder(ivars->polyreader);
-    String *seg_name  = Seg_Get_Name(ivars->segment);
+    String  *seg_name  = Seg_Get_Name(ivars->segment);
 
     // Open streams.
     String *ord_path = Str_newf("%o/sort-%i32.ord", seg_name, field_num);

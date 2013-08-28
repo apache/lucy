@@ -498,7 +498,7 @@ S_extract_from_sv(SV *value, void *target, const char *label,
     // values.
     if (required && !valid_assignment) {
         cfish_String *mess = CFISH_MAKE_MESS("Missing required param %s",
-                                              label);
+                                             label);
         cfish_Err_set_error(cfish_Err_new(mess));
         return false;
     }
@@ -891,7 +891,7 @@ cfish_Err_trap(CFISH_Err_Attempt_t routine, void *context) {
     if (count != 0) {
         cfish_String *mess
             = cfish_Str_newf("'attempt' returned too many values: %i32",
-                           (int32_t)count);
+                             (int32_t)count);
         error = cfish_Err_new(mess);
     }
     else {

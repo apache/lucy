@@ -78,7 +78,7 @@ Obj_To_String_IMP(Obj *self) {
     uint32_t  address_hi = address >> 32;
     uint32_t  address_lo = address & 0xFFFFFFFF;
     return Str_newf("%o@0x%x32%x32", Obj_Get_Class_Name(self), address_hi,
-                   address_lo);
+                    address_lo);
 #else
   #error "Unexpected pointer size."
 #endif

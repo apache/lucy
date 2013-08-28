@@ -316,7 +316,7 @@ Schema_Load_IMP(Schema *self, Obj *dump) {
     VArray *analyzers
         = (VArray*)Freezer_load((Obj*)analyzer_dumps);
     String *field;
-    Hash    *type_dump;
+    Hash   *type_dump;
     UNUSED_VAR(self);
 
     // Start with a blank Schema.

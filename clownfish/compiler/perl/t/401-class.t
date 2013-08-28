@@ -185,13 +185,13 @@ $class_content = q|
         inert uint64_t num_dogs;
         public inert Dog* top_dog;
 
-        String *name;
+        String  *name;
         bool     likes_to_go_fetch;
         ChewToy *squishy;
         Owner   *mom;
 
         void               Destroy(Dog *self);
-        public String*    Bark(Dog *self);
+        public String*     Bark(Dog *self);
         public void        Eat(Dog *self);
         public void        Bite(Dog *self, Enemy *enemy);
         public Thing      *Fetch(Dog *self, Thing *thing);

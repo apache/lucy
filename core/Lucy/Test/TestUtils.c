@@ -104,8 +104,8 @@ LeafQuery*
 TestUtils_make_leaf_query(const char *field, const char *term) {
     String *term_cb  = (String*)SSTR_WRAP_STR(term, strlen(term));
     String *field_cb = field
-                        ? (String*)SSTR_WRAP_STR(field, strlen(field))
-                        : NULL;
+                       ? (String*)SSTR_WRAP_STR(field, strlen(field))
+                       : NULL;
     return LeafQuery_new(field_cb, term_cb);
 }
 

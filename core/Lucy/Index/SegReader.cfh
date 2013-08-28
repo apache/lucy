@@ -33,7 +33,7 @@ public class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
     int32_t  doc_max;
     int32_t  del_count;
     int64_t  seg_num;
-    String *seg_name;
+    String  *seg_name;
 
     inert incremented SegReader*
     new(Schema *schema, Folder *folder, Snapshot *snapshot = NULL,

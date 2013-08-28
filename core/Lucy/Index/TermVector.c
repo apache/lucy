@@ -134,7 +134,7 @@ TV_Equals_IMP(TermVector *self, Obj *other) {
     TermVectorIVARS *const ovars = TV_IVARS((TermVector*)other);
     if (!Str_Equals(ivars->field, (Obj*)ovars->field)) { return false; }
     if (!Str_Equals(ivars->text, (Obj*)ovars->text))   { return false; }
-    if (ivars->num_pos != ovars->num_pos)             { return false; }
+    if (ivars->num_pos != ovars->num_pos)              { return false; }
 
     int32_t *const posits       = I32Arr_IVARS(ivars->positions)->ints;
     int32_t *const starts       = I32Arr_IVARS(ivars->start_offsets)->ints;
