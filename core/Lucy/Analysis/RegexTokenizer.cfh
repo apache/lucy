@@ -51,7 +51,7 @@ public class Lucy::Analysis::RegexTokenizer
     inherits Lucy::Analysis::Analyzer {
 
     String *pattern;
-    void    *token_re;
+    void   *token_re;
 
     /**
      * @return true if RegexTokenizer is available in this build.

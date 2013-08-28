@@ -66,7 +66,7 @@ ShLock_Request_IMP(SharedLock *self) {
        ) {
         // Don't allow double obtain.
         Err_set_error((Err*)LockErr_new(Str_newf("Lock already obtained via '%o'",
-                                                ivars->lock_path)));
+                                                 ivars->lock_path)));
         return false;
     }
 

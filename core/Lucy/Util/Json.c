@@ -143,7 +143,7 @@ Json_to_json(Obj *dump) {
         if (!tolerant) {
             String *class_name = dump ? Obj_Get_Class_Name(dump) : NULL;
             String *mess = MAKE_MESS("Illegal top-level object type: %o",
-                                      class_name);
+                                     class_name);
             Err_set_error(Err_new(mess));
             return NULL;
         }
@@ -668,7 +668,7 @@ S_set_error(String *mess, char *json, char *limit, int line,
             const char *func) {
     if (func) {
         Str_catf(mess, " at %s %s line %i32 near ", func, __FILE__,
-                (int32_t)line);
+                 (int32_t)line);
     }
     else {
         Str_catf(mess, " at %s line %i32 near ", __FILE__, (int32_t)line);

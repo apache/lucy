@@ -199,8 +199,8 @@ QParser_Set_Heed_Colons_IMP(QueryParser *self, bool heed_colons) {
 Query*
 QParser_Parse_IMP(QueryParser *self, const String *query_string) {
     String *qstring = query_string
-                       ? Str_Clone(query_string)
-                       : Str_new_from_trusted_utf8("", 0);
+                      ? Str_Clone(query_string)
+                      : Str_new_from_trusted_utf8("", 0);
     Query *tree     = QParser_Tree(self, qstring);
     Query *expanded = QParser_Expand(self, tree);
     Query *pruned   = QParser_Prune(self, expanded);
@@ -890,7 +890,7 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
     }
 
     String *unescaped = Str_new(SStr_Get_Size(source_text));
-    VArray  *queries   = VA_new(VA_Get_Size(fields));
+    VArray *queries   = VA_new(VA_Get_Size(fields));
     for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
         String   *field    = (String*)VA_Fetch(fields, i);
         Analyzer *analyzer = ivars->analyzer

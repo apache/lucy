@@ -273,9 +273,9 @@ OUTPUT: RETVAL
 
 void
 store(self, key, value);
-    cfish_Hash          *self;
+    cfish_Hash         *self;
     const cfish_String *key;
-    cfish_Obj           *value;
+    cfish_Obj          *value;
 PPCODE:
 {
     if (value) { CFISH_INCREF(value); }
@@ -609,7 +609,7 @@ CODE:
 {
     CFISH_UNUSED_VAR(unused_sv);
     cfish_String *class_name = NULL;
-    cfish_VTable  *parent     = NULL;
+    cfish_VTable *parent     = NULL;
     bool args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
                               ALLOT_OBJ(&class_name, "class_name", 10, true,

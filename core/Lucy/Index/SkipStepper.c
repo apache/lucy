@@ -55,7 +55,7 @@ String*
 SkipStepper_To_String_IMP(SkipStepper *self) {
     SkipStepperIVARS *const ivars = SkipStepper_IVARS(self);
     return Str_newf("skip doc: %u32 file pointer: %i64", ivars->doc_id,
-                   ivars->filepos);
+                    ivars->filepos);
 }
 
 void

@@ -79,7 +79,7 @@ FSDH_do_open(FSDirHandle *self, const String *dir) {
     if (dir_path_size >= MAX_PATH - 2) {
         // Deal with Windows ceiling on file path lengths.
         Err_set_error(Err_new(Str_newf("Directory path is too long: %o",
-                                      dir)));
+                                       dir)));
         CFISH_DECREF(self);
         return NULL;
     }
@@ -142,7 +142,7 @@ FSDH_Close_IMP(FSDirHandle *self) {
                 char *win_error = Err_win_error();
                 ivars->saved_error
                     = Err_new(Str_newf("Error while closing directory: %s",
-                                      win_error));
+                                       win_error));
                 FREEMEM(win_error);
             }
         }
@@ -183,7 +183,7 @@ FSDH_Next_IMP(FSDirHandle *self) {
             char *win_error = Err_win_error();
             ivars->saved_error
                 = Err_new(Str_newf("Error while traversing directory: %s",
-                                  win_error));
+                                   win_error));
             FREEMEM(win_error);
         }
         return false;
@@ -310,7 +310,7 @@ FSDH_Close_IMP(FSDirHandle *self) {
         ivars->sys_dirhandle = NULL;
         if (closedir(sys_dirhandle) == -1) {
             Err_set_error(Err_new(Str_newf("Error closing dirhandle: %s",
-                                          strerror(errno))));
+                                           strerror(errno))));
             return false;
         }
     }

@@ -226,8 +226,8 @@ S_add_to_file_list(Folder *self, VArray *list, String *dir,
         String *entry = DH_Get_Entry(dh);
         if (!S_is_updir(entry)) {
             String *relpath = path && Str_Get_Size(path)
-                               ? Str_newf("%o/%o", path, entry)
-                               : Str_Clone(entry);
+                              ? Str_newf("%o/%o", path, entry)
+                              : Str_Clone(entry);
             if (VA_Get_Size(list) == VA_Get_Capacity(list)) {
                 VA_Grow(list, VA_Get_Size(list) * 2);
             }
@@ -235,8 +235,8 @@ S_add_to_file_list(Folder *self, VArray *list, String *dir,
 
             if (DH_Entry_Is_Dir(dh) && !DH_Entry_Is_Symlink(dh)) {
                 String *subdir = Str_Get_Size(dir)
-                                  ? Str_newf("%o/%o", dir, entry)
-                                  : Str_Clone(entry);
+                                 ? Str_newf("%o/%o", dir, entry)
+                                 : Str_Clone(entry);
                 S_add_to_file_list(self, list, subdir, relpath); // recurse
                 DECREF(subdir);
             }
@@ -283,7 +283,7 @@ Folder_MkDir_IMP(Folder *self, const String *path) {
     }
     else if (!enclosing_folder) {
         Err_set_error(Err_new(Str_newf("Can't recursively create dir %o",
-                                      path)));
+                                       path)));
     }
     else {
         StackString *name = IxFileNames_local_part(path, SStr_BLANK());

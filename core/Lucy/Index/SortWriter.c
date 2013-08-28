@@ -98,7 +98,7 @@ S_lazy_init_field_writer(SortWriter *self, int32_t field_num) {
 
         // Open temp files.
         if (!ivars->temp_ord_out) {
-            Folder  *folder   = ivars->folder;
+            Folder *folder   = ivars->folder;
             String *seg_name = Seg_Get_Name(ivars->segment);
             String *ord_path = Str_newf("%o/sort_ord_temp", seg_name);
             ivars->temp_ord_out = Folder_Open_Out(folder, ord_path);
@@ -240,7 +240,7 @@ SortWriter_Finish_IMP(SortWriter *self) {
                            (Obj*)SortWriter_Metadata(self));
 
     // Clean up.
-    Folder  *folder   = ivars->folder;
+    Folder *folder   = ivars->folder;
     String *seg_name = Seg_Get_Name(ivars->segment);
     String *ord_path = Str_newf("%o/sort_ord_temp", seg_name);
     Folder_Delete(folder, ord_path);

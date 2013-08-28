@@ -111,13 +111,13 @@ TermQuery_Get_Term_IMP(TermQuery *self) {
 
 bool
 TermQuery_Equals_IMP(TermQuery *self, Obj *other) {
-    if ((TermQuery*)other == self)                    { return true; }
-    if (!Obj_Is_A(other, TERMQUERY))                  { return false; }
+    if ((TermQuery*)other == self)                     { return true; }
+    if (!Obj_Is_A(other, TERMQUERY))                   { return false; }
     TermQueryIVARS *const ivars = TermQuery_IVARS(self);
     TermQueryIVARS *const ovars = TermQuery_IVARS((TermQuery*)other);
-    if (ivars->boost != ovars->boost)                 { return false; }
+    if (ivars->boost != ovars->boost)                  { return false; }
     if (!Str_Equals(ivars->field, (Obj*)ovars->field)) { return false; }
-    if (!Obj_Equals(ivars->term, ovars->term))        { return false; }
+    if (!Obj_Equals(ivars->term, ovars->term))         { return false; }
     return true;
 }
 

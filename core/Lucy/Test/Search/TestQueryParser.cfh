@@ -22,7 +22,7 @@ parcel TestLucy;
 class Lucy::Test::Search::TestQueryParser cnick TestQP
     inherits Clownfish::Obj {
 
-    String *query_string;
+    String  *query_string;
     Query   *tree;
     Query   *expanded;
     uint32_t num_hits;

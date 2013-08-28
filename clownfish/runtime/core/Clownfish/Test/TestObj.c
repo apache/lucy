@@ -104,7 +104,7 @@ test_Hash_Sum(TestBatchRunner *runner) {
 static void
 test_Is_A(TestBatchRunner *runner) {
     String *charbuf   = Str_new(0);
-    VTable  *bb_vtable = Str_Get_VTable(charbuf);
+    VTable *bb_vtable = Str_Get_VTable(charbuf);
     String *klass     = Str_Get_Class_Name(charbuf);
 
     TEST_TRUE(runner, Str_Is_A(charbuf, STRING), "String Is_A String.");

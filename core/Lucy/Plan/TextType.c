@@ -89,10 +89,10 @@ TextTermStepper_Write_Delta_IMP(TextTermStepper *self, OutStream *outstream,
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
     String *new_value  = (String*)CERTIFY(value, STRING);
     String *last_value = (String*)ivars->value;
-    char    *new_text  = (char*)Str_Get_Ptr8(new_value);
-    size_t   new_size  = Str_Get_Size(new_value);
-    char    *last_text = (char*)Str_Get_Ptr8(last_value);
-    size_t   last_size = Str_Get_Size(last_value);
+    char   *new_text   = (char*)Str_Get_Ptr8(new_value);
+    size_t  new_size   = Str_Get_Size(new_value);
+    char   *last_text  = (char*)Str_Get_Ptr8(last_value);
+    size_t  last_size  = Str_Get_Size(last_value);
 
     // Count how many bytes the strings share at the top.
     const int32_t overlap = StrHelp_overlap(last_text, new_text,
@@ -119,7 +119,7 @@ TextTermStepper_Read_Key_Frame_IMP(TextTermStepper *self,
         ivars->value = (Obj*)Str_new(text_len);
     }
     String *value = (String*)ivars->value;
-    char *ptr      = Str_Grow(value, text_len);
+    char   *ptr   = Str_Grow(value, text_len);
 
     // Set the value text.
     InStream_Read_Bytes(instream, ptr, text_len);
@@ -146,7 +146,7 @@ TextTermStepper_Read_Delta_IMP(TextTermStepper *self, InStream *instream) {
         ivars->value = (Obj*)Str_new(total_text_len);
     }
     String *value = (String*)ivars->value;
-    char *ptr      = Str_Grow(value, total_text_len);
+    char   *ptr   = Str_Grow(value, total_text_len);
 
     // Set the value text.
     InStream_Read_Bytes(instream, ptr + text_overlap, finish_chars_len);

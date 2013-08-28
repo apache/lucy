@@ -91,8 +91,8 @@ bool
 Seg_Read_File_IMP(Segment *self, Folder *folder) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
     String *filename = Str_newf("%o/segmeta.json", ivars->name);
-    Hash    *metadata = (Hash*)Json_slurp_json(folder, filename);
-    Hash    *my_metadata;
+    Hash   *metadata = (Hash*)Json_slurp_json(folder, filename);
+    Hash   *my_metadata;
 
     // Bail unless the segmeta file was read successfully.
     DECREF(filename);

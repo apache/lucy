@@ -132,7 +132,7 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
     ivars->offsets = I32Arr_new_steal(starts, num_sub_readers);
 
     String *api;
-    VArray  *readers;
+    VArray *readers;
     Hash_Iterate(data_readers);
     while (Hash_Next(data_readers, (Obj**)&api, (Obj**)&readers)) {
         DataReader *datareader

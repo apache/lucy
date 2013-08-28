@@ -940,8 +940,8 @@ TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
         TestQueryParser *test_case_obj = test_func();
         TestQueryParserIVARS *test_case = TestQP_IVARS(test_case_obj);
         String *qstring = test_case->tree
-                           ? Query_To_String(test_case->tree)
-                           : Str_new_from_trusted_utf8("(NULL)", 6);
+                          ? Query_To_String(test_case->tree)
+                          : Str_new_from_trusted_utf8("(NULL)", 6);
         Query *tree = test_case->tree;
         Query *wanted = test_case->expanded;
         Query *pruned   = QParser_Prune(or_parser, tree);

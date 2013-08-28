@@ -330,7 +330,7 @@ Freezer_deserialize_hash(Hash *hash, InStream *instream) {
     uint32_t size         = InStream_Read_C32(instream);
     uint32_t num_charbufs = InStream_Read_C32(instream);
     uint32_t num_other    = size - num_charbufs;
-    String *key          = num_charbufs ? Str_new(0) : NULL;
+    String *key           = num_charbufs ? Str_new(0) : NULL;
 
     Hash_init(hash, size);
 

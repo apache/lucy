@@ -26,7 +26,7 @@ parcel Lucy;
 public class Lucy::Search::TermQuery inherits Lucy::Search::Query {
 
     String *field;
-    Obj     *term;
+    Obj    *term;
 
     inert incremented TermQuery*
     new(const String *field, const Obj *term);

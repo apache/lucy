@@ -88,12 +88,12 @@ RAMFH_Window_IMP(RAMFileHandle *self, FileWindow *window, int64_t offset,
     }
     else if (offset < 0) {
         Err_set_error(Err_new(Str_newf("Can't read from negative offset %i64",
-                                      offset)));
+                                       offset)));
         return false;
     }
     else if (end > ivars->len) {
         Err_set_error(Err_new(Str_newf("Tried to read past EOF: offset %i64 + request %i64 > len %i64",
-                                      offset, len, ivars->len)));
+                                       offset, len, ivars->len)));
         return false;
     }
     else {
@@ -120,12 +120,12 @@ RAMFH_Read_IMP(RAMFileHandle *self, char *dest, int64_t offset, size_t len) {
     }
     else if (offset < 0) {
         Err_set_error(Err_new(Str_newf("Can't read from a negative offset %i64",
-                                      offset)));
+                                       offset)));
         return false;
     }
     else if (end > ivars->len) {
         Err_set_error(Err_new(Str_newf("Attempt to read %u64 bytes starting at %i64 goes past EOF %u64",
-                                      (uint64_t)len, offset, ivars->len)));
+                                       (uint64_t)len, offset, ivars->len)));
         return false;
     }
     else {
@@ -152,12 +152,12 @@ RAMFH_Grow_IMP(RAMFileHandle *self, int64_t len) {
     RAMFileHandleIVARS *const ivars = RAMFH_IVARS(self);
     if (len > INT32_MAX) {
         Err_set_error(Err_new(Str_newf("Can't support RAM files of size %i64 (> %i32)",
-                                      len, (int32_t)INT32_MAX)));
+                                       len, (int32_t)INT32_MAX)));
         return false;
     }
     else if (ivars->flags & FH_READ_ONLY) {
         Err_set_error(Err_new(Str_newf("Can't grow read-only RAMFile '%o'",
-                                      ivars->path)));
+                                       ivars->path)));
         return false;
     }
     else {

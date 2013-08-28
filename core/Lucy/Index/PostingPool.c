@@ -427,7 +427,7 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
 
             // Remember the term_text so we can write string diffs.
             Str_Mimic_Str(last_term_text, post_ivars->blob,
-                         post_ivars->content_len);
+                          post_ivars->content_len);
             last_text_buf  = (char*)Str_Get_Ptr8(last_term_text);
             last_text_size = Str_Get_Size(last_term_text);
         }

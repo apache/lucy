@@ -45,7 +45,7 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder) {
     // Parse metadata file.
     if (!metadata || !Hash_Is_A(metadata, HASH)) {
         error = Err_new(Str_newf("Can't read '%o' in '%o'", cfmeta_file,
-                                Folder_Get_Path(folder)));
+                                 Folder_Get_Path(folder)));
     }
     else {
         Obj *format = Hash_Fetch_Str(metadata, "format", 6);
@@ -53,16 +53,16 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder) {
         ivars->records = (Hash*)INCREF(Hash_Fetch_Str(metadata, "files", 5));
         if (ivars->format < 1) {
             error = Err_new(Str_newf("Corrupt %o file: Missing or invalid 'format'",
-                                    cfmeta_file));
+                                     cfmeta_file));
         }
         else if (ivars->format > CFWriter_current_file_format) {
             error = Err_new(Str_newf("Unsupported compound file format: %i32 "
-                                    "(current = %i32", ivars->format,
-                                    CFWriter_current_file_format));
+                                     "(current = %i32", ivars->format,
+                                     CFWriter_current_file_format));
         }
         else if (!ivars->records) {
             error = Err_new(Str_newf("Corrupt %o file: missing 'files' key",
-                                    cfmeta_file));
+                                     cfmeta_file));
         }
     }
     DECREF(metadata);
@@ -141,7 +141,7 @@ CFReader_Local_Open_FileHandle_IMP(CompoundFileReader *self,
 
     if (entry) {
         Err_set_error(Err_new(Str_newf("Can't open FileHandle for virtual file %o in '%o'",
-                                      name, ivars->path)));
+                                       name, ivars->path)));
     }
     else {
         fh = Folder_Local_Open_FileHandle(ivars->real_folder, name, flags);
@@ -197,7 +197,7 @@ CFReader_Local_Open_In_IMP(CompoundFileReader *self, const String *name) {
         Obj *offset = Hash_Fetch_Str(entry, "offset", 6);
         if (!len || !offset) {
             Err_set_error(Err_new(Str_newf("Malformed entry for '%o' in '%o'",
-                                          name, Folder_Get_Path(ivars->real_folder))));
+                                           name, Folder_Get_Path(ivars->real_folder))));
             return NULL;
         }
         else if (Str_Get_Size(ivars->path)) {

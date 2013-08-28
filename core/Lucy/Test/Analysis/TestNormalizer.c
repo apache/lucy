@@ -90,7 +90,7 @@ test_normalization(TestBatchRunner *runner) {
         VArray *norms = (VArray*)Hash_Fetch_Str(test, "norms", 5);
         for (uint32_t j = 0, max = VA_Get_Size(words); j < max; j++) {
             String *word = (String*)VA_Fetch(words, j);
-            VArray  *got  = Normalizer_Split(normalizer, word);
+            VArray *got  = Normalizer_Split(normalizer, word);
             String *norm = (String*)VA_Fetch(got, 0);
             TEST_TRUE(runner,
                       norm

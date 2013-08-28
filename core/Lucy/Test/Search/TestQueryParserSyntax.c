@@ -79,7 +79,7 @@ build_index() {
     FullTextType *fancy = FullTextType_new((Analyzer*)fancy_analyzer);
 
     // Schema.
-    Schema  *schema   = Schema_new();
+    Schema *schema   = Schema_new();
     String *plain_cb = Str_newf("plain");
     String *fancy_cb = Str_newf("fancy");
     Schema_Spec_Field(schema, plain_cb, (FieldType*)plain);

@@ -74,8 +74,8 @@ VArray*
 QueryLexer_Tokenize_IMP(QueryLexer *self, const String *query_string) {
     QueryLexerIVARS *const ivars = QueryLexer_IVARS(self);
     String *copy = query_string
-                    ? Str_Clone(query_string)
-                    : Str_new_from_trusted_utf8("", 0);
+                   ? Str_Clone(query_string)
+                   : Str_new_from_trusted_utf8("", 0);
     StackString *qstring = SSTR_WRAP((String*)copy);
     VArray *elems = VA_new(0);
     SStr_Trim(qstring);

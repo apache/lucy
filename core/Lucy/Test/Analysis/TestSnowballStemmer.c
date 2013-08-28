@@ -76,7 +76,7 @@ test_stemming(TestBatchRunner *runner) {
         SnowballStemmer *stemmer = SnowStemmer_new(iso);
         for (uint32_t i = 0, max = VA_Get_Size(words); i < max; i++) {
             String *word  = (String*)VA_Fetch(words, i);
-            VArray  *got   = SnowStemmer_Split(stemmer, word);
+            VArray *got   = SnowStemmer_Split(stemmer, word);
             String *stem  = (String*)VA_Fetch(got, 0);
             TEST_TRUE(runner,
                       stem

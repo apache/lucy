@@ -158,8 +158,8 @@ DefDelReader_Read_Deletions_IMP(DefaultDeletionsReader *self) {
     DefaultDeletionsReaderIVARS *const ivars = DefDelReader_IVARS(self);
     VArray  *segments    = DefDelReader_Get_Segments(self);
     Segment *segment     = DefDelReader_Get_Segment(self);
-    String *my_seg_name = Seg_Get_Name(segment);
-    String *del_file    = NULL;
+    String  *my_seg_name = Seg_Get_Name(segment);
+    String  *del_file    = NULL;
     int32_t  del_count   = 0;
 
     // Start with deletions files in the most recently added segments and work

@@ -74,7 +74,7 @@ static void
 S_clean_up_old_temp_files(CompoundFileWriter *self,
                           CompoundFileWriterIVARS *ivars) {
     UNUSED_VAR(self);
-    Folder  *folder      = ivars->folder;
+    Folder *folder      = ivars->folder;
     String *cfmeta_temp = (String*)SSTR_WRAP_STR("cfmeta.json.temp", 16);
     String *cf_file     = (String*)SSTR_WRAP_STR("cf.dat", 6);
 
@@ -156,7 +156,7 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
     DECREF(metadata);
     /*
     String *merged_file;
-    Obj     *ignore;
+    Obj    *ignore;
     Hash_Iterate(sub_files);
     while (Hash_Next(sub_files, (Obj**)&merged_file, &ignore)) {
         if (!Folder_Delete(folder, merged_file)) {

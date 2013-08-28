@@ -142,7 +142,7 @@ LFLock_Request_IMP(LockFileLock *self) {
 
     if (Folder_Exists(ivars->folder, ivars->lock_path)) {
         Err_set_error((Err*)LockErr_new(Str_newf("Can't obtain lock: '%o' exists",
-                                                ivars->lock_path)));
+                                                 ivars->lock_path)));
         return false;
     }
 
@@ -152,7 +152,7 @@ LFLock_Request_IMP(LockFileLock *self) {
         if (!Folder_MkDir(ivars->folder, lock_dir_name)) {
             Err *mkdir_err = (Err*)CERTIFY(Err_get_error(), ERR);
             LockErr *err = LockErr_new(Str_newf("Can't create 'locks' directory: %o",
-                                               Err_Get_Mess(mkdir_err)));
+                                                Err_Get_Mess(mkdir_err)));
             // Maybe our attempt failed because another process succeeded.
             if (Folder_Find_Folder(ivars->folder, lock_dir_name)) {
                 DECREF(err);
@@ -182,16 +182,16 @@ LFLock_Request_IMP(LockFileLock *self) {
         if (!success) {
             Err *hard_link_err = (Err*)CERTIFY(Err_get_error(), ERR);
             Err_set_error((Err*)LockErr_new(Str_newf("Failed to obtain lock at '%o': %o",
-                                                    ivars->lock_path,
-                                                    Err_Get_Mess(hard_link_err))));
+                                                     ivars->lock_path,
+                                                     Err_Get_Mess(hard_link_err))));
         }
         deletion_failed = !Folder_Delete(ivars->folder, ivars->link_path);
     }
     else {
         Err *spew_json_err = (Err*)CERTIFY(Err_get_error(), ERR);
         Err_set_error((Err*)LockErr_new(Str_newf("Failed to obtain lock at '%o': %o",
-                                                ivars->lock_path,
-                                                Err_Get_Mess(spew_json_err))));
+                                                 ivars->lock_path,
+                                                 Err_Get_Mess(spew_json_err))));
     }
     DECREF(file_data);
 

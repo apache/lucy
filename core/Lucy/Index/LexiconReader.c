@@ -148,8 +148,8 @@ S_has_data(Schema *schema, Folder *folder, Segment *segment, String *field) {
     else {
         // Bail out if there are no terms for this field in this segment.
         int32_t  field_num = Seg_Field_Num(segment, field);
-        String *seg_name  = Seg_Get_Name(segment);
-        String *file = Str_newf("%o/lexicon-%i32.dat", seg_name, field_num);
+        String  *seg_name  = Seg_Get_Name(segment);
+        String  *file = Str_newf("%o/lexicon-%i32.dat", seg_name, field_num);
         bool retval = Folder_Exists(folder, file);
         DECREF(file);
         return retval;
