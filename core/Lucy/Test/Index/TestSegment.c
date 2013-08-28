@@ -32,9 +32,9 @@ TestSeg_new() {
 static void
 test_fields(TestBatchRunner *runner) {
     Segment *segment = Seg_new(1);
-    ZombieCharBuf *foo = ZCB_WRAP_STR("foo", 3);
-    ZombieCharBuf *bar = ZCB_WRAP_STR("bar", 3);
-    ZombieCharBuf *baz = ZCB_WRAP_STR("baz", 3);
+    StackString *foo = SSTR_WRAP_STR("foo", 3);
+    StackString *bar = SSTR_WRAP_STR("bar", 3);
+    StackString *baz = SSTR_WRAP_STR("baz", 3);
     int32_t field_num;
 
     field_num = Seg_Add_Field(segment, (CharBuf*)foo);
@@ -46,7 +46,7 @@ test_fields(TestBatchRunner *runner) {
     TEST_TRUE(runner, field_num == 1,
               "Add_Field returns existing field number if field is already known");
 
-    TEST_TRUE(runner, ZCB_Equals(bar, (Obj*)Seg_Field_Name(segment, 2)),
+    TEST_TRUE(runner, SStr_Equals(bar, (Obj*)Seg_Field_Name(segment, 2)),
               "Field_Name");
     TEST_TRUE(runner, Seg_Field_Name(segment, 3) == NULL,
               "Field_Name returns NULL for unknown field number");
@@ -126,8 +126,8 @@ test_Write_File_and_Read_File(TestBatchRunner *runner) {
     Segment   *segment = Seg_new(100);
     Segment   *got     = Seg_new(100);
     CharBuf   *meta;
-    CharBuf   *flotsam = (CharBuf*)ZCB_WRAP_STR("flotsam", 7);
-    CharBuf   *jetsam  = (CharBuf*)ZCB_WRAP_STR("jetsam", 6);
+    CharBuf   *flotsam = (CharBuf*)SSTR_WRAP_STR("flotsam", 7);
+    CharBuf   *jetsam  = (CharBuf*)SSTR_WRAP_STR("jetsam", 6);
 
     Seg_Set_Count(segment, 111);
     Seg_Store_Metadata_Str(segment, "foo", 3, (Obj*)CB_newf("bar"));

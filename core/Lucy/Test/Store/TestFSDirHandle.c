@@ -41,10 +41,10 @@ TestFSDH_new() {
 
 static void
 test_all(TestBatchRunner *runner) {
-    CharBuf  *foo           = (CharBuf*)ZCB_WRAP_STR("foo", 3);
-    CharBuf  *boffo         = (CharBuf*)ZCB_WRAP_STR("boffo", 5);
-    CharBuf  *foo_boffo     = (CharBuf*)ZCB_WRAP_STR("foo/boffo", 9);
-    CharBuf  *test_dir      = (CharBuf*)ZCB_WRAP_STR("_fsdir_test", 11);
+    CharBuf  *foo           = (CharBuf*)SSTR_WRAP_STR("foo", 3);
+    CharBuf  *boffo         = (CharBuf*)SSTR_WRAP_STR("boffo", 5);
+    CharBuf  *foo_boffo     = (CharBuf*)SSTR_WRAP_STR("foo/boffo", 9);
+    CharBuf  *test_dir      = (CharBuf*)SSTR_WRAP_STR("_fsdir_test", 11);
     FSFolder *folder        = FSFolder_new(test_dir);
     bool      saw_foo       = false;
     bool      saw_boffo     = false;

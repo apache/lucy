@@ -29,51 +29,51 @@ TestIxFileNames_new() {
 
 static void
 test_local_part(TestBatchRunner *runner) {
-    ZombieCharBuf *source = ZCB_BLANK();
-    ZombieCharBuf *got    = ZCB_BLANK();
+    StackString *source = SStr_BLANK();
+    StackString *got    = SStr_BLANK();
 
     got = IxFileNames_local_part((CharBuf*)source, got);
-    TEST_TRUE(runner, ZCB_Equals(got, (Obj*)source), "simple name");
+    TEST_TRUE(runner, SStr_Equals(got, (Obj*)source), "simple name");
 
-    ZCB_Assign_Str(source, "foo.txt", 7);
+    SStr_Assign_Str(source, "foo.txt", 7);
     got = IxFileNames_local_part((CharBuf*)source, got);
-    TEST_TRUE(runner, ZCB_Equals(got, (Obj*)source), "name with extension");
+    TEST_TRUE(runner, SStr_Equals(got, (Obj*)source), "name with extension");
 
-    ZCB_Assign_Str(source, "/foo", 4);
+    SStr_Assign_Str(source, "/foo", 4);
     got = IxFileNames_local_part((CharBuf*)source, got);
-    TEST_TRUE(runner, ZCB_Equals_Str(got, "foo", 3), "strip leading slash");
+    TEST_TRUE(runner, SStr_Equals_Str(got, "foo", 3), "strip leading slash");
 
-    ZCB_Assign_Str(source, "/foo/", 5);
+    SStr_Assign_Str(source, "/foo/", 5);
     got = IxFileNames_local_part((CharBuf*)source, got);
-    TEST_TRUE(runner, ZCB_Equals_Str(got, "foo", 3), "strip trailing slash");
+    TEST_TRUE(runner, SStr_Equals_Str(got, "foo", 3), "strip trailing slash");
 
-    ZCB_Assign_Str(source, "foo/bar\\ ", 9);
+    SStr_Assign_Str(source, "foo/bar\\ ", 9);
     got = IxFileNames_local_part((CharBuf*)source, got);
-    TEST_TRUE(runner, ZCB_Equals_Str(got, "bar\\ ", 5),
+    TEST_TRUE(runner, SStr_Equals_Str(got, "bar\\ ", 5),
               "Include garbage like backslashes and spaces");
 
-    ZCB_Assign_Str(source, "foo/bar/baz.txt", 15);
+    SStr_Assign_Str(source, "foo/bar/baz.txt", 15);
     got = IxFileNames_local_part((CharBuf*)source, got);
-    TEST_TRUE(runner, ZCB_Equals_Str(got, "baz.txt", 7), "find last component");
+    TEST_TRUE(runner, SStr_Equals_Str(got, "baz.txt", 7), "find last component");
 }
 
 static void
 test_extract_gen(TestBatchRunner *runner) {
-    ZombieCharBuf *source = ZCB_WRAP_STR("", 0);
+    StackString *source = SSTR_WRAP_STR("", 0);
 
-    ZCB_Assign_Str(source, "seg_9", 5);
+    SStr_Assign_Str(source, "seg_9", 5);
     TEST_TRUE(runner, IxFileNames_extract_gen((CharBuf*)source) == 9,
               "extract_gen");
 
-    ZCB_Assign_Str(source, "seg_9/", 6);
+    SStr_Assign_Str(source, "seg_9/", 6);
     TEST_TRUE(runner, IxFileNames_extract_gen((CharBuf*)source) == 9,
               "deal with trailing slash");
 
-    ZCB_Assign_Str(source, "seg_9_8", 7);
+    SStr_Assign_Str(source, "seg_9_8", 7);
     TEST_TRUE(runner, IxFileNames_extract_gen((CharBuf*)source) == 9,
               "Only go past first underscore");
 
-    ZCB_Assign_Str(source, "snapshot_5.json", 15);
+    SStr_Assign_Str(source, "snapshot_5.json", 15);
     TEST_TRUE(runner, IxFileNames_extract_gen((CharBuf*)source) == 5,
               "Deal with file suffix");
 }

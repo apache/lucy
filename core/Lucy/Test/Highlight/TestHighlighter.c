@@ -59,15 +59,15 @@ TestHighlighter_new() {
 
 static void
 test_Find_Best_Fragment(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
-    CharBuf *content = (CharBuf*)ZCB_WRAP_STR("content", 7);
+    CharBuf *content = (CharBuf*)SSTR_WRAP_STR("content", 7);
     Highlighter *highlighter = Highlighter_new(searcher, query, content, 3);
-    ViewCharBuf *target = (ViewCharBuf*)ZCB_BLANK();
+    ViewCharBuf *target = (ViewCharBuf*)SStr_BLANK();
 
     VArray *spans = VA_new(1);
     VA_Push(spans, (Obj*)Span_new(2, 1, 1.0f));
     HeatMap *heat_map = HeatMap_new(spans, 133);
     DECREF(spans);
-    CharBuf *field_val = (CharBuf *)ZCB_WRAP_STR("a " PHI " " PHI " b c", 11);
+    CharBuf *field_val = (CharBuf *)SSTR_WRAP_STR("a " PHI " " PHI " b c", 11);
     int32_t top = Highlighter_Find_Best_Fragment(highlighter, field_val,
                                                  target, heat_map);
     TEST_TRUE(runner,
@@ -76,7 +76,7 @@ test_Find_Best_Fragment(TestBatchRunner *runner, Searcher *searcher, Obj *query)
     TEST_TRUE(runner,
               top == 2,
               "correct offset returned by Find_Best_Fragment");
-    field_val = (CharBuf *)ZCB_WRAP_STR("aa" PHI, 4);
+    field_val = (CharBuf *)SSTR_WRAP_STR("aa" PHI, 4);
     top = Highlighter_Find_Best_Fragment(highlighter, field_val,
                                          target, heat_map);
     TEST_TRUE(runner,
@@ -91,7 +91,7 @@ test_Find_Best_Fragment(TestBatchRunner *runner, Searcher *searcher, Obj *query)
     VA_Push(spans, (Obj*)Span_new(6, 2, 1.0f));
     heat_map = HeatMap_new(spans, 133);
     DECREF(spans);
-    field_val = (CharBuf *)ZCB_WRAP_STR("aaaab" PHI PHI, 9);
+    field_val = (CharBuf *)SSTR_WRAP_STR("aaaab" PHI PHI, 9);
     top = Highlighter_Find_Best_Fragment(highlighter, field_val,
                                          target, heat_map);
     TEST_TRUE(runner,
@@ -106,7 +106,7 @@ test_Find_Best_Fragment(TestBatchRunner *runner, Searcher *searcher, Obj *query)
     VA_Push(spans, (Obj*)Span_new(0, 1, 1.0f));
     heat_map = HeatMap_new(spans, 133);
     DECREF(spans);
-    field_val = (CharBuf *)ZCB_WRAP_STR("a" PHI "bcde", 7);
+    field_val = (CharBuf *)SSTR_WRAP_STR("a" PHI "bcde", 7);
     top = Highlighter_Find_Best_Fragment(highlighter, field_val,
                                          target, heat_map);
     TEST_TRUE(runner,
@@ -122,11 +122,11 @@ test_Find_Best_Fragment(TestBatchRunner *runner, Searcher *searcher, Obj *query)
 
 static void
 test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
-    CharBuf *content = (CharBuf*)ZCB_WRAP_STR("content", 7);
+    CharBuf *content = (CharBuf*)SSTR_WRAP_STR("content", 7);
     Highlighter *highlighter = Highlighter_new(searcher, query, content, 6);
 
-    CharBuf *field_val   = (CharBuf *)ZCB_WRAP_STR("Ook.  Urk.  Ick.  ", 18);
-    CharBuf *fragment    = (CharBuf *)ZCB_WRAP_STR("Ook.  Urk.", 10);
+    CharBuf *field_val   = (CharBuf *)SSTR_WRAP_STR("Ook.  Urk.  Ick.  ", 18);
+    CharBuf *fragment    = (CharBuf *)SSTR_WRAP_STR("Ook.  Urk.", 10);
     CharBuf *raw_excerpt = CB_new(0);
     VArray *spans = VA_new(1);
     VA_Push(spans, (Obj*)Span_new(0, 18, 1.0f));
@@ -146,7 +146,7 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
     DECREF(sentences);
     DECREF(raw_excerpt);
 
-    fragment    = (CharBuf *)ZCB_WRAP_STR(".  Urk.  I", 10);
+    fragment    = (CharBuf *)SSTR_WRAP_STR(".  Urk.  I", 10);
     raw_excerpt = CB_new(0);
     sentences   = VA_new(2);
     VA_Push(sentences, (Obj*)Span_new(6, 4, 0.0f));
@@ -163,8 +163,8 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
     DECREF(heat_map);
     DECREF(raw_excerpt);
 
-    field_val   = (CharBuf *)ZCB_WRAP_STR("Ook urk ick i.", 14);
-    fragment    = (CharBuf *)ZCB_WRAP_STR("ick i.", 6);
+    field_val   = (CharBuf *)SSTR_WRAP_STR("Ook urk ick i.", 14);
+    fragment    = (CharBuf *)SSTR_WRAP_STR("ick i.", 6);
     raw_excerpt = CB_new(0);
     spans       = VA_new(1);
     VA_Push(spans, (Obj*)Span_new(0, 14, 1.0f));
@@ -184,8 +184,8 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
     DECREF(heat_map);
     DECREF(raw_excerpt);
 
-    field_val   = (CharBuf *)ZCB_WRAP_STR("Urk.  Iz no good.", 17);
-    fragment    = (CharBuf *)ZCB_WRAP_STR("  Iz no go", 10);
+    field_val   = (CharBuf *)SSTR_WRAP_STR("Urk.  Iz no good.", 17);
+    fragment    = (CharBuf *)SSTR_WRAP_STR("  Iz no go", 10);
     raw_excerpt = CB_new(0);
     spans       = VA_new(1);
     VA_Push(spans, (Obj*)Span_new(0, 17, 1.0f));
@@ -207,7 +207,7 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
 
     // Words longer than excerpt len
 
-    field_val   = (CharBuf *)ZCB_WRAP_STR("abc/def/ghi/jkl/mno", 19);
+    field_val   = (CharBuf *)SSTR_WRAP_STR("abc/def/ghi/jkl/mno", 19);
     sentences = VA_new(1);
     VA_Push(sentences, (Obj*)Span_new(0, 19, 0.0f));
 
@@ -244,12 +244,12 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
 
 static void
 test_Highlight_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
-    CharBuf *content = (CharBuf*)ZCB_WRAP_STR("content", 7);
+    CharBuf *content = (CharBuf*)SSTR_WRAP_STR("content", 7);
     Highlighter *highlighter = Highlighter_new(searcher, query, content, 3);
 
     VArray *spans = VA_new(1);
     VA_Push(spans, (Obj*)Span_new(2, 1, 0.0f));
-    CharBuf *raw_excerpt = (CharBuf *)ZCB_WRAP_STR("a b c", 5);
+    CharBuf *raw_excerpt = (CharBuf *)SSTR_WRAP_STR("a b c", 5);
     CharBuf *highlighted = CB_new(0);
     Highlighter_Highlight_Excerpt(highlighter, spans, raw_excerpt,
                                   highlighted, 0);
@@ -262,7 +262,7 @@ test_Highlight_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) 
     spans = VA_new(2);
     VA_Push(spans, (Obj*)Span_new(0, 1, 1.0f));
     VA_Push(spans, (Obj*)Span_new(10, 10, 1.0f));
-    raw_excerpt = (CharBuf *)ZCB_WRAP_STR(PHI, 2);
+    raw_excerpt = (CharBuf *)SSTR_WRAP_STR(PHI, 2);
     highlighted = CB_new(0);
     Highlighter_Highlight_Excerpt(highlighter, spans, raw_excerpt,
                                   highlighted, 0);
@@ -274,7 +274,7 @@ test_Highlight_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) 
 
     spans = VA_new(1);
     VA_Push(spans, (Obj*)Span_new(3, 1, 1.0f));
-    raw_excerpt = (CharBuf *)ZCB_WRAP_STR(PHI " " PHI " " PHI, 8);
+    raw_excerpt = (CharBuf *)SSTR_WRAP_STR(PHI " " PHI " " PHI, 8);
     highlighted = CB_new(0);
     Highlighter_Highlight_Excerpt(highlighter, spans, raw_excerpt,
                                   highlighted, 1);
@@ -290,7 +290,7 @@ test_Highlight_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) 
     VA_Push(spans, (Obj*)Span_new(2,  4, 1.0f));
     VA_Push(spans, (Obj*)Span_new(8,  9, 1.0f));
     VA_Push(spans, (Obj*)Span_new(8,  4, 1.0f));
-    raw_excerpt = (CharBuf *)ZCB_WRAP_STR(PHI " Oook. Urk. Ick. " PHI, 21);
+    raw_excerpt = (CharBuf *)SSTR_WRAP_STR(PHI " Oook. Urk. Ick. " PHI, 21);
     highlighted = CB_new(0);
     Highlighter_Highlight_Excerpt(highlighter, spans, raw_excerpt,
                                   highlighted, 0);
@@ -308,7 +308,7 @@ test_Highlight_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) 
 static void
 test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
                     Hits *hits) {
-    CharBuf *content = (CharBuf*)ZCB_WRAP_STR("content", 7);
+    CharBuf *content = (CharBuf*)SSTR_WRAP_STR("content", 7);
     Highlighter *highlighter = Highlighter_new(searcher, query, content, 200);
 
     HitDoc *hit = Hits_Next(hits);
@@ -320,9 +320,9 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
               "highlighter tagged phrase and single term");
     DECREF(excerpt);
 
-    CharBuf *pre_tag = (CharBuf*)ZCB_WRAP_STR("\x1B[1m", 4);
+    CharBuf *pre_tag = (CharBuf*)SSTR_WRAP_STR("\x1B[1m", 4);
     Highlighter_Set_Pre_Tag(highlighter, pre_tag);
-    CharBuf *post_tag = (CharBuf*)ZCB_WRAP_STR("\x1B[0m", 4);
+    CharBuf *post_tag = (CharBuf*)SSTR_WRAP_STR("\x1B[0m", 4);
     Highlighter_Set_Post_Tag(highlighter, post_tag);
     excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_TRUE(runner,
@@ -342,7 +342,7 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     DECREF(hit);
     DECREF(highlighter);
 
-    query = (Obj*)ZCB_WRAP_STR("x \"x y z\" AND b", 15);
+    query = (Obj*)SSTR_WRAP_STR("x \"x y z\" AND b", 15);
     hits = Searcher_Hits(searcher, query, 0, 10, NULL);
     highlighter = Highlighter_new(searcher, query, content, 200);
     hit = Hits_Next(hits);
@@ -357,7 +357,7 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     DECREF(highlighter);
     DECREF(hits);
 
-    query = (Obj*)ZCB_WRAP_STR("blind", 5);
+    query = (Obj*)SSTR_WRAP_STR("blind", 5);
     hits = Searcher_Hits(searcher, query, 0, 10, NULL);
     highlighter = Highlighter_new(searcher, query, content, 200);
     hit = Hits_Next(hits);
@@ -370,7 +370,7 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     DECREF(highlighter);
     DECREF(hits);
 
-    query = (Obj*)ZCB_WRAP_STR("why", 3);
+    query = (Obj*)SSTR_WRAP_STR("why", 3);
     hits = Searcher_Hits(searcher, query, 0, 10, NULL);
     highlighter = Highlighter_new(searcher, query, content, 200);
     hit = Hits_Next(hits);
@@ -383,7 +383,7 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     DECREF(highlighter);
     DECREF(hits);
 
-    Obj *term = (Obj*)ZCB_WRAP_STR("x", 1);
+    Obj *term = (Obj*)SSTR_WRAP_STR("x", 1);
     query = (Obj*)TermQuery_new(content, term);
     hits = Searcher_Hits(searcher, query, 0, 10, NULL);
     hit = Hits_Next(hits);
@@ -394,7 +394,7 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
               "specify field highlights correct field...");
     DECREF(excerpt);
     DECREF(highlighter);
-    CharBuf *alt = (CharBuf*)ZCB_WRAP_STR("alt", 3);
+    CharBuf *alt = (CharBuf*)SSTR_WRAP_STR("alt", 3);
     highlighter = Highlighter_new(searcher, query, alt, 200);
     excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_TRUE(runner,
@@ -409,9 +409,9 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
 
 static void
 test_Find_Sentences(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
-    CharBuf *content = (CharBuf*)ZCB_WRAP_STR("content", 7);
+    CharBuf *content = (CharBuf*)SSTR_WRAP_STR("content", 7);
     Highlighter *highlighter = Highlighter_new(searcher, query, content, 200);
-    CharBuf *text = (CharBuf*)ZCB_WRAP_STR(
+    CharBuf *text = (CharBuf*)SSTR_WRAP_STR(
                         "This is a sentence. This is a sentence. This is a sentence. "
                         "This is a sentence. This is a sentence. This is a sentence. "
                         "This is a sentence. This is a sentence. This is a sentence. "
@@ -446,7 +446,7 @@ test_Find_Sentences(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
     DECREF(wanted);
     DECREF(got);
 
-    text = (CharBuf*)ZCB_WRAP_STR(" Foo", 4);
+    text = (CharBuf*)SSTR_WRAP_STR(" Foo", 4);
     got = Highlighter_Find_Sentences(highlighter, text, 0, 0);
     wanted = VA_new(1);
     VA_Push(wanted, (Obj*)Span_new(1, 3, 0.0f));
@@ -468,9 +468,9 @@ test_highlighting(TestBatchRunner *runner) {
     FullTextType *dunked_type = FullTextType_new((Analyzer*)tokenizer);
     FullTextType_Set_Highlightable(dunked_type, true);
     FullTextType_Set_Boost(dunked_type, 0.1f);
-    CharBuf *content = (CharBuf*)ZCB_WRAP_STR("content", 7);
+    CharBuf *content = (CharBuf*)SSTR_WRAP_STR("content", 7);
     Schema_Spec_Field(schema, content, (FieldType*)plain_type);
-    CharBuf *alt = (CharBuf*)ZCB_WRAP_STR("alt", 3);
+    CharBuf *alt = (CharBuf*)SSTR_WRAP_STR("alt", 3);
     Schema_Spec_Field(schema, alt, (FieldType*)dunked_type);
     DECREF(plain_type);
     DECREF(dunked_type);
@@ -480,21 +480,21 @@ test_highlighting(TestBatchRunner *runner) {
     Indexer *indexer = Indexer_new(schema, (Obj*)folder, NULL, 0);
 
     Doc *doc = Doc_new(NULL, 0);
-    CharBuf *string = (CharBuf *)ZCB_WRAP_STR(TEST_STRING, TEST_STRING_LEN);
+    CharBuf *string = (CharBuf *)SSTR_WRAP_STR(TEST_STRING, TEST_STRING_LEN);
     Doc_Store(doc, content, (Obj*)string);
     Indexer_Add_Doc(indexer, doc, 1.0f);
     DECREF(doc);
 
     doc = Doc_new(NULL, 0);
-    string = (CharBuf *)ZCB_WRAP_STR("\"I see,\" said the blind man.", 28);
+    string = (CharBuf *)SSTR_WRAP_STR("\"I see,\" said the blind man.", 28);
     Doc_Store(doc, content, (Obj*)string);
     Indexer_Add_Doc(indexer, doc, 1.0f);
     DECREF(doc);
 
     doc = Doc_new(NULL, 0);
-    string = (CharBuf *)ZCB_WRAP_STR("x but not why or 2ee", 20);
+    string = (CharBuf *)SSTR_WRAP_STR("x but not why or 2ee", 20);
     Doc_Store(doc, content, (Obj*)string);
-    string = (CharBuf *)ZCB_WRAP_STR(TEST_STRING
+    string = (CharBuf *)SSTR_WRAP_STR(TEST_STRING
                                      " and extra stuff so it scores lower",
                                      TEST_STRING_LEN + 35);
     Doc_Store(doc, alt, (Obj*)string);
@@ -505,7 +505,7 @@ test_highlighting(TestBatchRunner *runner) {
     DECREF(indexer);
 
     Searcher *searcher = (Searcher*)IxSearcher_new((Obj*)folder);
-    Obj *query = (Obj*)ZCB_WRAP_STR("\"x y z\" AND " PHI, 14);
+    Obj *query = (Obj*)SSTR_WRAP_STR("\"x y z\" AND " PHI, 14);
     Hits *hits = Searcher_Hits(searcher, query, 0, 10, NULL);
 
     test_Find_Best_Fragment(runner, searcher, query);
@@ -526,7 +526,7 @@ test_hl_selection(TestBatchRunner *runner) {
     StandardTokenizer *tokenizer = StandardTokenizer_new();
     FullTextType *plain_type = FullTextType_new((Analyzer*)tokenizer);
     FullTextType_Set_Highlightable(plain_type, true);
-    CharBuf *content = (CharBuf*)ZCB_WRAP_STR("content", 7);
+    CharBuf *content = (CharBuf*)SSTR_WRAP_STR("content", 7);
     Schema_Spec_Field(schema, content, (FieldType*)plain_type);
     DECREF(plain_type);
     DECREF(tokenizer);
@@ -549,7 +549,7 @@ test_hl_selection(TestBatchRunner *runner) {
         "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla. "
         "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla. ";
     Doc *doc = Doc_new(NULL, 0);
-    CharBuf *string = (CharBuf *)ZCB_WRAP_STR(test_string, strlen(test_string));
+    CharBuf *string = (CharBuf *)SSTR_WRAP_STR(test_string, strlen(test_string));
     Doc_Store(doc, content, (Obj*)string);
     Indexer_Add_Doc(indexer, doc, 1.0f);
     DECREF(doc);
@@ -558,13 +558,13 @@ test_hl_selection(TestBatchRunner *runner) {
     DECREF(indexer);
 
     Searcher *searcher = (Searcher*)IxSearcher_new((Obj*)folder);
-    Obj *query = (Obj*)ZCB_WRAP_STR("NNN MMM", 7);
+    Obj *query = (Obj*)SSTR_WRAP_STR("NNN MMM", 7);
     Highlighter *highlighter = Highlighter_new(searcher, query, content, 200);
     Hits *hits = Searcher_Hits(searcher, query, 0, 10, NULL);
     HitDoc *hit = Hits_Next(hits);
     CharBuf *excerpt = Highlighter_Create_Excerpt(highlighter, hit);
-    CharBuf *mmm = (CharBuf*)ZCB_WRAP_STR("MMM", 3);
-    CharBuf *nnn = (CharBuf*)ZCB_WRAP_STR("NNN", 3);
+    CharBuf *mmm = (CharBuf*)SSTR_WRAP_STR("MMM", 3);
+    CharBuf *nnn = (CharBuf*)SSTR_WRAP_STR("NNN", 3);
     TEST_TRUE(runner, CB_Find(excerpt, mmm) >= 0 || CB_Find(excerpt, nnn) >= 0,
               "Sentence boundary algo doesn't chop terms");
 

@@ -170,11 +170,11 @@ sub error {$Clownfish::Err::error}
 }
 
 {
-    package Clownfish::ZombieCharBuf;
+    package Clownfish::StackString;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     use Carp;
-    sub new { confess "ZombieCharBuf objects can only be created from C." }
+    sub new { confess "StackString objects can only be created from C." }
     no warnings 'redefine';
     sub DESTROY { }
 }

@@ -16,7 +16,7 @@
 
 #define C_CFISH_CHARBUF
 #define C_CFISH_VIEWCHARBUF
-#define C_CFISH_ZOMBIECHARBUF
+#define C_CFISH_STACKSTRING
 #define CFISH_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
@@ -136,7 +136,7 @@ CB_Destroy_IMP(CharBuf *self) {
 int32_t
 CB_Hash_Sum_IMP(CharBuf *self) {
     uint32_t hashvalue = 5381;
-    ZombieCharBuf *iterator = ZCB_WRAP(self);
+    StackString *iterator = SSTR_WRAP(self);
 
     const ViewCB_Nibble_t nibble = METHOD_PTR(iterator->vtable,
                                               CFISH_ViewCB_Nibble);
@@ -377,19 +377,19 @@ CB_To_I64_IMP(CharBuf *self) {
 
 int64_t
 CB_BaseX_To_I64_IMP(CharBuf *self, uint32_t base) {
-    ZombieCharBuf *iterator = ZCB_WRAP(self);
+    StackString *iterator = SSTR_WRAP(self);
     int64_t retval = 0;
     bool is_negative = false;
 
     // Advance past minus sign.
-    if (ZCB_Code_Point_At(iterator, 0) == '-') {
-        ZCB_Nibble(iterator);
+    if (SStr_Code_Point_At(iterator, 0) == '-') {
+        SStr_Nibble(iterator);
         is_negative = true;
     }
 
     // Accumulate.
     while (iterator->size) {
-        int32_t code_point = ZCB_Nibble(iterator);
+        int32_t code_point = SStr_Nibble(iterator);
         if (isalnum(code_point)) {
             int32_t addend = isdigit(code_point)
                              ? code_point - '0'
@@ -554,14 +554,14 @@ CB_Find_IMP(CharBuf *self, const CharBuf *substring) {
 
 int64_t
 CB_Find_Str_IMP(CharBuf *self, const char *ptr, size_t size) {
-    ZombieCharBuf *iterator = ZCB_WRAP(self);
+    StackString *iterator = SSTR_WRAP(self);
     int64_t location = 0;
 
     while (iterator->size) {
-        if (ZCB_Starts_With_Str(iterator, ptr, size)) {
+        if (SStr_Starts_With_Str(iterator, ptr, size)) {
             return location;
         }
-        ZCB_Nip(iterator, 1);
+        SStr_Nip(iterator, 1);
         location++;
     }
 
@@ -634,8 +634,8 @@ CB_Length_IMP(CharBuf *self) {
 size_t
 CB_Truncate_IMP(CharBuf *self, size_t count) {
     uint32_t num_code_points;
-    ZombieCharBuf *iterator = ZCB_WRAP(self);
-    num_code_points = ZCB_Nip(iterator, count);
+    StackString *iterator = SSTR_WRAP(self);
+    num_code_points = SStr_Nip(iterator, count);
     self->size -= iterator->size;
     return num_code_points;
 }
@@ -673,13 +673,13 @@ CB_Code_Point_From_IMP(CharBuf *self, size_t tick) {
 
 CharBuf*
 CB_SubString_IMP(CharBuf *self, size_t offset, size_t len) {
-    ZombieCharBuf *iterator = ZCB_WRAP(self);
+    StackString *iterator = SSTR_WRAP(self);
     char *sub_start;
     size_t byte_len;
 
-    ZCB_Nip(iterator, offset);
+    SStr_Nip(iterator, offset);
     sub_start = iterator->ptr;
-    ZCB_Nip(iterator, len);
+    SStr_Nip(iterator, len);
     byte_len = iterator->ptr - sub_start;
 
     return CB_new_from_trusted_utf8(sub_start, byte_len);
@@ -689,11 +689,11 @@ int
 CB_compare(const void *va, const void *vb) {
     const CharBuf *a = *(const CharBuf**)va;
     const CharBuf *b = *(const CharBuf**)vb;
-    ZombieCharBuf *iterator_a = ZCB_WRAP(a);
-    ZombieCharBuf *iterator_b = ZCB_WRAP(b);
+    StackString *iterator_a = SSTR_WRAP(a);
+    StackString *iterator_b = SSTR_WRAP(b);
     while (iterator_a->size && iterator_b->size) {
-        int32_t code_point_a = ZCB_Nibble(iterator_a);
-        int32_t code_point_b = ZCB_Nibble(iterator_b);
+        int32_t code_point_a = SStr_Nibble(iterator_a);
+        int32_t code_point_b = SStr_Nibble(iterator_b);
         const int32_t comparison = code_point_a - code_point_b;
         if (comparison != 0) { return comparison; }
     }
@@ -857,56 +857,56 @@ ViewCB_Grow_IMP(ViewCharBuf *self, size_t size) {
 
 /*****************************************************************/
 
-ZombieCharBuf*
-ZCB_new(void *allocation) {
+StackString*
+SStr_new(void *allocation) {
     static char empty_string[] = "";
-    ZombieCharBuf *self
-        = (ZombieCharBuf*)VTable_Init_Obj(ZOMBIECHARBUF, allocation);
+    StackString *self
+        = (StackString*)VTable_Init_Obj(STACKSTRING, allocation);
     self->cap  = 0;
     self->size = 0;
     self->ptr  = empty_string;
     return self;
 }
 
-ZombieCharBuf*
-ZCB_newf(void *allocation, size_t alloc_size, const char *pattern, ...) {
-    ZombieCharBuf *self
-        = (ZombieCharBuf*)VTable_Init_Obj(ZOMBIECHARBUF, allocation);
-    self->cap  = alloc_size - sizeof(ZombieCharBuf);
+StackString*
+SStr_newf(void *allocation, size_t alloc_size, const char *pattern, ...) {
+    StackString *self
+        = (StackString*)VTable_Init_Obj(STACKSTRING, allocation);
+    self->cap  = alloc_size - sizeof(StackString);
     self->size = 0;
-    self->ptr  = ((char*)allocation) + sizeof(ZombieCharBuf);
+    self->ptr  = ((char*)allocation) + sizeof(StackString);
 
     va_list args;
     va_start(args, pattern);
-    ZCB_VCatF(self, pattern, args);
+    SStr_VCatF(self, pattern, args);
     va_end(args);
 
     return self;
 }
 
-ZombieCharBuf*
-ZCB_wrap_str(void *allocation, const char *ptr, size_t size) {
-    ZombieCharBuf *self
-        = (ZombieCharBuf*)VTable_Init_Obj(ZOMBIECHARBUF, allocation);
+StackString*
+SStr_wrap_str(void *allocation, const char *ptr, size_t size) {
+    StackString *self
+        = (StackString*)VTable_Init_Obj(STACKSTRING, allocation);
     self->cap  = 0;
     self->size = size;
     self->ptr  = (char*)ptr;
     return self;
 }
 
-ZombieCharBuf*
-ZCB_wrap(void *allocation, const CharBuf *source) {
-    return ZCB_wrap_str(allocation, source->ptr, source->size);
+StackString*
+SStr_wrap(void *allocation, const CharBuf *source) {
+    return SStr_wrap_str(allocation, source->ptr, source->size);
 }
 
 size_t
-ZCB_size() {
-    return sizeof(ZombieCharBuf);
+SStr_size() {
+    return sizeof(StackString);
 }
 
 void
-ZCB_Destroy_IMP(ZombieCharBuf *self) {
-    THROW(ERR, "Can't destroy a ZombieCharBuf ('%o')", self);
+SStr_Destroy_IMP(StackString *self) {
+    THROW(ERR, "Can't destroy a StackString ('%o')", self);
 }
 
 

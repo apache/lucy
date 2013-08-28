@@ -152,20 +152,20 @@ static void
 test_Nip_and_Chop(TestBatchRunner *runner) {
     CharBuf *wanted;
     CharBuf *string;
-    ZombieCharBuf *got;
+    StackString *got;
 
     wanted = CB_newf("%sb%sc", smiley, smiley);
     string = CB_newf("a%s%sb%sc", smiley, smiley, smiley);
-    got    = ZCB_WRAP(string);
-    ZCB_Nip(got, 2);
+    got    = SSTR_WRAP(string);
+    SStr_Nip(got, 2);
     TEST_TRUE(runner, CB_Equals(wanted, (Obj*)got), "Nip");
     DECREF(wanted);
     DECREF(string);
 
     wanted = CB_newf("a%s%s", smiley, smiley);
     string = CB_newf("a%s%sb%sc", smiley, smiley, smiley);
-    got    = ZCB_WRAP(string);
-    ZCB_Chop(got, 3);
+    got    = SSTR_WRAP(string);
+    SStr_Chop(got, 3);
     TEST_TRUE(runner, CB_Equals(wanted, (Obj*)got), "Chop");
     DECREF(wanted);
     DECREF(string);

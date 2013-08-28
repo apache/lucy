@@ -824,16 +824,16 @@ QParser_Expand_IMP(QueryParser *self, Query *query) {
 
 static CharBuf*
 S_unescape(QueryParser *self, CharBuf *orig, CharBuf *target) {
-    ZombieCharBuf *source = ZCB_WRAP(orig);
+    StackString *source = SSTR_WRAP(orig);
     uint32_t code_point;
     UNUSED_VAR(self);
 
     CB_Set_Size(target, 0);
     CB_Grow(target, CB_Get_Size(orig) + 4);
 
-    while (0 != (code_point = ZCB_Nibble(source))) {
+    while (0 != (code_point = SStr_Nibble(source))) {
         if (code_point == '\\') {
-            uint32_t next_code_point = ZCB_Nibble(source);
+            uint32_t next_code_point = SStr_Nibble(source);
             if (next_code_point == ':'
                 || next_code_point == '"'
                 || next_code_point == '\\'
@@ -858,24 +858,24 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
     QueryParserIVARS *const ivars = QParser_IVARS(self);
     LeafQuery     *leaf_query  = (LeafQuery*)query;
     Schema        *schema      = ivars->schema;
-    ZombieCharBuf *source_text = ZCB_BLANK();
+    StackString *source_text = SStr_BLANK();
     bool           is_phrase   = false;
     bool           ambiguous   = false;
 
     // Determine whether we can actually process the input.
     if (!Query_Is_A(query, LEAFQUERY))                { return NULL; }
     if (!CB_Get_Size(LeafQuery_Get_Text(leaf_query))) { return NULL; }
-    ZCB_Assign(source_text, LeafQuery_Get_Text(leaf_query));
+    SStr_Assign(source_text, LeafQuery_Get_Text(leaf_query));
 
     // If quoted, always generate PhraseQuery.
-    ZCB_Trim(source_text);
-    if (ZCB_Code_Point_At(source_text, 0) == '"') {
+    SStr_Trim(source_text);
+    if (SStr_Code_Point_At(source_text, 0) == '"') {
         is_phrase = true;
-        ZCB_Nip(source_text, 1);
-        if (ZCB_Code_Point_From(source_text, 1) == '"'
-            && ZCB_Code_Point_From(source_text, 2) != '\\'
+        SStr_Nip(source_text, 1);
+        if (SStr_Code_Point_From(source_text, 1) == '"'
+            && SStr_Code_Point_From(source_text, 2) != '\\'
            ) {
-            ZCB_Chop(source_text, 1);
+            SStr_Chop(source_text, 1);
         }
     }
 
@@ -889,7 +889,7 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
         fields = (VArray*)INCREF(ivars->fields);
     }
 
-    CharBuf *unescaped = CB_new(ZCB_Get_Size(source_text));
+    CharBuf *unescaped = CB_new(SStr_Get_Size(source_text));
     VArray  *queries   = VA_new(VA_Get_Size(fields));
     for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
         CharBuf  *field    = (CharBuf*)VA_Fetch(fields, i);

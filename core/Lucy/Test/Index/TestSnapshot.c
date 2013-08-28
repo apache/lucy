@@ -31,8 +31,8 @@ TestSnapshot_new() {
 static void
 test_Add_and_Delete(TestBatchRunner *runner) {
     Snapshot *snapshot = Snapshot_new();
-    CharBuf *foo = (CharBuf*)ZCB_WRAP_STR("foo", 3);
-    CharBuf *bar = (CharBuf*)ZCB_WRAP_STR("bar", 3);
+    CharBuf *foo = (CharBuf*)SSTR_WRAP_STR("foo", 3);
+    CharBuf *bar = (CharBuf*)SSTR_WRAP_STR("bar", 3);
 
     Snapshot_Add_Entry(snapshot, foo);
     Snapshot_Add_Entry(snapshot, foo); // redundant
@@ -55,8 +55,8 @@ static void
 test_path_handling(TestBatchRunner *runner) {
     Snapshot *snapshot = Snapshot_new();
     Folder   *folder   = (Folder*)RAMFolder_new(NULL);
-    CharBuf  *snap     = (CharBuf*)ZCB_WRAP_STR("snap", 4);
-    CharBuf  *crackle  = (CharBuf*)ZCB_WRAP_STR("crackle", 7);
+    CharBuf  *snap     = (CharBuf*)SSTR_WRAP_STR("snap", 4);
+    CharBuf  *crackle  = (CharBuf*)SSTR_WRAP_STR("crackle", 7);
 
     Snapshot_Write_File(snapshot, folder, snap);
     TEST_TRUE(runner, CB_Equals(snap, (Obj*)Snapshot_Get_Path(snapshot)),
@@ -79,8 +79,8 @@ static void
 test_Read_File_and_Write_File(TestBatchRunner *runner) {
     Snapshot *snapshot = Snapshot_new();
     Folder   *folder   = (Folder*)RAMFolder_new(NULL);
-    CharBuf  *snap     = (CharBuf*)ZCB_WRAP_STR("snap", 4);
-    CharBuf  *foo      = (CharBuf*)ZCB_WRAP_STR("foo", 3);
+    CharBuf  *snap     = (CharBuf*)SSTR_WRAP_STR("snap", 4);
+    CharBuf  *foo      = (CharBuf*)SSTR_WRAP_STR("foo", 3);
 
     Snapshot_Add_Entry(snapshot, foo);
     Snapshot_Write_File(snapshot, folder, snap);

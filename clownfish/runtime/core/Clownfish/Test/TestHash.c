@@ -40,7 +40,7 @@ static void
 test_Equals(TestBatchRunner *runner) {
     Hash *hash  = Hash_new(0);
     Hash *other = Hash_new(0);
-    ZombieCharBuf *stuff = ZCB_WRAP_STR("stuff", 5);
+    StackString *stuff = SSTR_WRAP_STR("stuff", 5);
 
     TEST_TRUE(runner, Hash_Equals(hash, (Obj*)other),
               "Empty hashes are equal");
@@ -68,9 +68,9 @@ test_Store_and_Fetch(TestBatchRunner *runner) {
     const uint32_t starting_cap = Hash_Get_Capacity(hash);
     VArray        *expected     = VA_new(100);
     VArray        *got          = VA_new(100);
-    ZombieCharBuf *twenty       = ZCB_WRAP_STR("20", 2);
-    ZombieCharBuf *forty        = ZCB_WRAP_STR("40", 2);
-    ZombieCharBuf *foo          = ZCB_WRAP_STR("foo", 3);
+    StackString *twenty       = SSTR_WRAP_STR("20", 2);
+    StackString *forty        = SSTR_WRAP_STR("40", 2);
+    StackString *foo          = SSTR_WRAP_STR("foo", 3);
 
     for (int32_t i = 0; i < 100; i++) {
         CharBuf *cb = CB_newf("%i32", i);
@@ -98,7 +98,7 @@ test_Store_and_Fetch(TestBatchRunner *runner) {
               "Fetch against non-existent key returns NULL");
 
     Hash_Store(hash, (Obj*)forty, INCREF(foo));
-    TEST_TRUE(runner, ZCB_Equals(foo, Hash_Fetch(hash, (Obj*)forty)),
+    TEST_TRUE(runner, SStr_Equals(foo, Hash_Fetch(hash, (Obj*)forty)),
               "Hash_Store replaces existing value");
     TEST_FALSE(runner, Hash_Equals(hash, (Obj*)dupe),
                "replacement value spoils equals");
@@ -167,11 +167,11 @@ test_Keys_Values_Iter(TestBatchRunner *runner) {
     TEST_TRUE(runner, VA_Equals(values, (Obj*)expected), "Values from Iter");
 
     {
-        ZombieCharBuf *forty = ZCB_WRAP_STR("40", 2);
-        ZombieCharBuf *nope  = ZCB_WRAP_STR("nope", 4);
-        Obj *key = Hash_Find_Key(hash, (Obj*)forty, ZCB_Hash_Sum(forty));
+        StackString *forty = SSTR_WRAP_STR("40", 2);
+        StackString *nope  = SSTR_WRAP_STR("nope", 4);
+        Obj *key = Hash_Find_Key(hash, (Obj*)forty, SStr_Hash_Sum(forty));
         TEST_TRUE(runner, Obj_Equals(key, (Obj*)forty), "Find_Key");
-        key = Hash_Find_Key(hash, (Obj*)nope, ZCB_Hash_Sum(nope)),
+        key = Hash_Find_Key(hash, (Obj*)nope, SStr_Hash_Sum(nope)),
         TEST_TRUE(runner, key == NULL,
                   "Find_Key returns NULL for non-existent key");
     }

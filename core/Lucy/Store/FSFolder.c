@@ -251,7 +251,7 @@ FSFolder_Local_Find_Folder_IMP(FSFolder *self, const CharBuf *name) {
         }
         // Try to open a CompoundFileReader. On failure, just use the
         // existing folder.
-        CharBuf *cfmeta_file = (CharBuf*)ZCB_WRAP_STR("cfmeta.json", 11);
+        CharBuf *cfmeta_file = (CharBuf*)SSTR_WRAP_STR("cfmeta.json", 11);
         if (Folder_Local_Exists(subfolder, cfmeta_file)) {
             CompoundFileReader *cf_reader = CFReader_open(subfolder);
             if (cf_reader) {
@@ -297,9 +297,9 @@ S_create_dir(const CharBuf *path) {
 
 static bool
 S_is_local_entry(const CharBuf *path) {
-    ZombieCharBuf *scratch = ZCB_WRAP(path);
+    StackString *scratch = SSTR_WRAP(path);
     uint32_t code_point;
-    while (0 != (code_point = ZCB_Nibble(scratch))) {
+    while (0 != (code_point = SStr_Nibble(scratch))) {
         if (code_point == '/') { return false; }
     }
     return true;

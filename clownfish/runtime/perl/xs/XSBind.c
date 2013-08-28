@@ -64,7 +64,7 @@ XSBind_new_blank_obj(SV *either_sv) {
         // Use the supplied class name string to find a VTable.
         STRLEN len;
         char *ptr = SvPVutf8(either_sv, len);
-        cfish_ZombieCharBuf *klass = CFISH_ZCB_WRAP_STR(ptr, len);
+        cfish_StackString *klass = CFISH_SStr_WRAP_STR(ptr, len);
         vtable = cfish_VTable_singleton((cfish_CharBuf*)klass, NULL);
     }
 
@@ -93,16 +93,16 @@ XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation) {
             retval = INT2PTR(cfish_Obj*, tmp);
         }
         else if (allocation &&
-                 (vtable == CFISH_ZOMBIECHARBUF
+                 (vtable == CFISH_STACKSTRING
                   || vtable == CFISH_VIEWCHARBUF
                   || vtable == CFISH_CHARBUF
                   || vtable == CFISH_OBJ)
                 ) {
             // Wrap the string from an ordinary Perl scalar inside a
-            // ZombieCharBuf.
+            // StackString.
             STRLEN size;
             char *ptr = SvPVutf8(sv, size);
-            retval = (cfish_Obj*)cfish_ZCB_wrap_str(allocation, ptr, size);
+            retval = (cfish_Obj*)cfish_SStr_wrap_str(allocation, ptr, size);
         }
         else if (SvROK(sv)) {
             // Attempt to convert Perl hashes and arrays into their Clownfish
@@ -239,7 +239,7 @@ static cfish_Hash*
 S_perl_hash_to_cfish_hash(HV *phash) {
     uint32_t             num_keys = hv_iterinit(phash);
     cfish_Hash          *retval   = cfish_Hash_new(num_keys);
-    cfish_ZombieCharBuf *key      = CFISH_ZCB_WRAP_STR("", 0);
+    cfish_StackString *key      = CFISH_SStr_WRAP_STR("", 0);
 
     while (num_keys--) {
         HE        *entry    = hv_iternext(phash);
@@ -253,11 +253,11 @@ S_perl_hash_to_cfish_hash(HV *phash) {
             // this.
             SV   *key_sv  = HeKEY_sv(entry);
             char *key_str = SvPVutf8(key_sv, key_len);
-            CFISH_ZCB_Assign_Trusted_Str(key, key_str, key_len);
+            CFISH_SStr_Assign_Trusted_Str(key, key_str, key_len);
             CFISH_Hash_Store(retval, (cfish_Obj*)key, value);
         }
         else if (HeKUTF8(entry)) {
-            CFISH_ZCB_Assign_Trusted_Str(key, HeKEY(entry), key_len);
+            CFISH_SStr_Assign_Trusted_Str(key, HeKEY(entry), key_len);
             CFISH_Hash_Store(retval, (cfish_Obj*)key, value);
         }
         else {
@@ -267,13 +267,13 @@ S_perl_hash_to_cfish_hash(HV *phash) {
                 if ((key_str[i] & 0x80) == 0x80) { pure_ascii = false; }
             }
             if (pure_ascii) {
-                CFISH_ZCB_Assign_Trusted_Str(key, key_str, key_len);
+                CFISH_SStr_Assign_Trusted_Str(key, key_str, key_len);
                 CFISH_Hash_Store(retval, (cfish_Obj*)key, value);
             }
             else {
                 SV *key_sv = HeSVKEY_force(entry);
                 key_str = SvPVutf8(key_sv, key_len);
-                CFISH_ZCB_Assign_Trusted_Str(key, key_str, key_len);
+                CFISH_SStr_Assign_Trusted_Str(key, key_str, key_len);
                 CFISH_Hash_Store(retval, (cfish_Obj*)key, value);
             }
         }

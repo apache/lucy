@@ -33,8 +33,8 @@ TestSnowStemmer_new() {
 
 static void
 test_Dump_Load_and_Equals(TestBatchRunner *runner) {
-    CharBuf *EN = (CharBuf*)ZCB_WRAP_STR("en", 2);
-    CharBuf *ES = (CharBuf*)ZCB_WRAP_STR("es", 2);
+    CharBuf *EN = (CharBuf*)SSTR_WRAP_STR("en", 2);
+    CharBuf *ES = (CharBuf*)SSTR_WRAP_STR("es", 2);
     SnowballStemmer *stemmer = SnowStemmer_new(EN);
     SnowballStemmer *other   = SnowStemmer_new(ES);
     Obj *dump       = (Obj*)SnowStemmer_Dump(stemmer);

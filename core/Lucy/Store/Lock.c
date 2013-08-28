@@ -39,9 +39,9 @@ Lock_init(Lock *self, Folder *folder, const CharBuf *name,
         DECREF(self);
         THROW(ERR, "Invalid value for 'interval': %i32", interval);
     }
-    ZombieCharBuf *scratch = ZCB_WRAP(name);
+    StackString *scratch = SSTR_WRAP(name);
     uint32_t code_point;
-    while (0 != (code_point = ZCB_Nibble(scratch))) {
+    while (0 != (code_point = SStr_Nibble(scratch))) {
         if (isalnum(code_point)
             || code_point == '.'
             || code_point == '-'
@@ -147,7 +147,7 @@ LFLock_Request_IMP(LockFileLock *self) {
     }
 
     // Create the "locks" subdirectory if necessary.
-    CharBuf *lock_dir_name = (CharBuf*)ZCB_WRAP_STR("locks", 5);
+    CharBuf *lock_dir_name = (CharBuf*)SSTR_WRAP_STR("locks", 5);
     if (!Folder_Exists(ivars->folder, lock_dir_name)) {
         if (!Folder_MkDir(ivars->folder, lock_dir_name)) {
             Err *mkdir_err = (Err*)CERTIFY(Err_get_error(), ERR);
@@ -230,15 +230,15 @@ LFLock_Maybe_Delete_File_IMP(LockFileLock *self, const CharBuf *path,
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
     Folder *folder  = ivars->folder;
     bool    success = false;
-    ZombieCharBuf *scratch = ZCB_WRAP(path);
+    StackString *scratch = SSTR_WRAP(path);
 
     // Only delete locks that start with our lock name.
-    CharBuf *lock_dir_name = (CharBuf*)ZCB_WRAP_STR("locks", 5);
-    if (!ZCB_Starts_With(scratch, lock_dir_name)) {
+    CharBuf *lock_dir_name = (CharBuf*)SSTR_WRAP_STR("locks", 5);
+    if (!SStr_Starts_With(scratch, lock_dir_name)) {
         return false;
     }
-    ZCB_Nip(scratch, CB_Get_Size(lock_dir_name) + 1);
-    if (!ZCB_Starts_With(scratch, ivars->name)) {
+    SStr_Nip(scratch, CB_Get_Size(lock_dir_name) + 1);
+    if (!SStr_Starts_With(scratch, ivars->name)) {
         return false;
     }
 

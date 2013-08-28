@@ -241,8 +241,8 @@ S_write_boot_c(CFCPerl *self) {
                     // There's at least one alias, so include the buffer.
                     alias_adds
                         = CFCUtil_cat(alias_adds,
-                                      "    cfish_ZombieCharBuf *alias "
-                                      "= CFISH_ZCB_WRAP_STR(\"\", 0);\n",
+                                      "    cfish_StackString *alias "
+                                      "= CFISH_SStr_WRAP_STR(\"\", 0);\n",
                                       NULL);
                     has_aliases = 1;
                 }
@@ -251,7 +251,7 @@ S_write_boot_c(CFCPerl *self) {
                 size_t alias_len  = strlen(alias);
                 const char pattern[] =
                     "%s"
-                    "    CFISH_ZCB_Assign_Str(alias, \"%s\", %u);\n"
+                    "    CFISH_SStr_Assign_Str(alias, \"%s\", %u);\n"
                     "    cfish_VTable_add_alias_to_registry(%s,\n"
                     "        (cfish_CharBuf*)alias);\n";
                 char *new_alias_adds

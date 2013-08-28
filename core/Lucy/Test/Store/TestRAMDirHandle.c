@@ -33,9 +33,9 @@ TestRAMDH_new() {
 static void
 test_all(TestBatchRunner *runner) {
     RAMFolder *folder        = RAMFolder_new(NULL);
-    CharBuf   *foo           = (CharBuf*)ZCB_WRAP_STR("foo", 3);
-    CharBuf   *boffo         = (CharBuf*)ZCB_WRAP_STR("boffo", 5);
-    CharBuf   *foo_boffo     = (CharBuf*)ZCB_WRAP_STR("foo/boffo", 9);
+    CharBuf   *foo           = (CharBuf*)SSTR_WRAP_STR("foo", 3);
+    CharBuf   *boffo         = (CharBuf*)SSTR_WRAP_STR("boffo", 5);
+    CharBuf   *foo_boffo     = (CharBuf*)SSTR_WRAP_STR("foo/boffo", 9);
     bool       saw_foo       = false;
     bool       saw_boffo     = false;
     bool       foo_was_dir   = false;

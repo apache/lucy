@@ -78,7 +78,7 @@ S_folder_with_contents() {
     OutStream_Close(bar_out);
     DECREF(foo_out);
     DECREF(bar_out);
-    ZombieCharBuf *empty = ZCB_BLANK();
+    StackString *empty = SStr_BLANK();
     RAMFolder_Consolidate(folder, (CharBuf*)empty);
     return (Folder*)folder;
 }

@@ -348,7 +348,7 @@ S_test_sorted_search(IndexSearcher *searcher, CharBuf *query,
     Hits *hits = IxSearcher_Hits(searcher, (Obj*)query, 0, num_wanted, spec);
 
     VArray *results = VA_new(10);
-    ViewCharBuf *name = (ViewCharBuf*)ZCB_BLANK();
+    ViewCharBuf *name = (ViewCharBuf*)SStr_BLANK();
     HitDoc *hit_doc;
     while (NULL != (hit_doc = Hits_Next(hits))) {
         HitDoc_Extract(hit_doc, name_cb, name);
@@ -426,7 +426,7 @@ test_sort_spec(TestBatchRunner *runner) {
     for (int i = 0; i < 100; ++i) {
         char name_buf[3];
         sprintf(name_buf, "%02d", nums[i]);
-        ZombieCharBuf *name = ZCB_WRAP_STR(name_buf, 2);
+        StackString *name = SSTR_WRAP_STR(name_buf, 2);
         S_add_doc(indexer, (Obj*)name, num_cb, NULL);
         if (i % 10 == 0) {
             S_refresh_indexer(&indexer, schema, folder);

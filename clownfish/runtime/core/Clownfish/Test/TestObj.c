@@ -37,7 +37,7 @@ TestObj_new() {
 
 static Obj*
 S_new_testobj() {
-    ZombieCharBuf *klass = ZCB_WRAP_STR("TestObj", 7);
+    StackString *klass = SSTR_WRAP_STR("TestObj", 7);
     Obj *obj;
     VTable *vtable = VTable_fetch_vtable((CharBuf*)klass);
     if (!vtable) {
@@ -67,12 +67,12 @@ static void
 test_To_String(TestBatchRunner *runner) {
     Obj *testobj = S_new_testobj();
     CharBuf *string = Obj_To_String(testobj);
-    ZombieCharBuf *temp = ZCB_WRAP(string);
-    while (ZCB_Get_Size(temp)) {
-        if (ZCB_Starts_With_Str(temp, "TestObj", 7)) { break; }
-        ZCB_Nibble(temp);
+    StackString *temp = SSTR_WRAP(string);
+    while (SStr_Get_Size(temp)) {
+        if (SStr_Starts_With_Str(temp, "TestObj", 7)) { break; }
+        SStr_Nibble(temp);
     }
-    TEST_TRUE(runner, ZCB_Starts_With_Str(temp, "TestObj", 7), "To_String");
+    TEST_TRUE(runner, SStr_Starts_With_Str(temp, "TestObj", 7), "To_String");
     DECREF(string);
     DECREF(testobj);
 }

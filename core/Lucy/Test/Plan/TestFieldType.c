@@ -37,7 +37,7 @@ DummyFieldType_new() {
 
 static FieldType*
 S_alt_field_type() {
-    ZombieCharBuf *name = ZCB_WRAP_STR("DummyFieldType2", 15);
+    StackString *name = SSTR_WRAP_STR("DummyFieldType2", 15);
     VTable *vtable = VTable_singleton((CharBuf*)name, DUMMYFIELDTYPE);
     FieldType *self = (FieldType*)VTable_Make_Obj(vtable);
     return FType_init(self);
@@ -84,8 +84,8 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 static void
 test_Compare_Values(TestBatchRunner *runner) {
     FieldType     *type = (FieldType*)DummyFieldType_new();
-    ZombieCharBuf *a    = ZCB_WRAP_STR("a", 1);
-    ZombieCharBuf *b    = ZCB_WRAP_STR("b", 1);
+    StackString *a    = SSTR_WRAP_STR("a", 1);
+    StackString *b    = SSTR_WRAP_STR("b", 1);
 
     TEST_TRUE(runner,
               FType_Compare_Values(type, (Obj*)a, (Obj*)b) < 0,

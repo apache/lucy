@@ -141,7 +141,7 @@ RAMFolder_Local_Is_Directory_IMP(RAMFolder *self, const CharBuf *name) {
 static bool
 S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
                       Folder *from_folder, Folder *to_folder,
-                      ZombieCharBuf *from_name, ZombieCharBuf *to_name,
+                      StackString *from_name, StackString *to_name,
                       int op) {
     Obj       *elem              = NULL;
     RAMFolder *inner_from_folder = NULL;
@@ -210,7 +210,7 @@ S_rename_or_hard_link(RAMFolder *self, const CharBuf* from, const CharBuf *to,
 
             // Return success fast if file is copied on top of itself.
             if (inner_from_folder == inner_to_folder
-                && ZCB_Equals(from_name, (Obj*)to_name)
+                && SStr_Equals(from_name, (Obj*)to_name)
                ) {
                 return true;
             }
@@ -278,8 +278,8 @@ RAMFolder_Rename_IMP(RAMFolder *self, const CharBuf* from,
                      const CharBuf *to) {
     Folder        *from_folder = RAMFolder_Enclosing_Folder(self, from);
     Folder        *to_folder   = RAMFolder_Enclosing_Folder(self, to);
-    ZombieCharBuf *from_name   = IxFileNames_local_part(from, ZCB_BLANK());
-    ZombieCharBuf *to_name     = IxFileNames_local_part(to, ZCB_BLANK());
+    StackString *from_name   = IxFileNames_local_part(from, SStr_BLANK());
+    StackString *to_name     = IxFileNames_local_part(to, SStr_BLANK());
     bool result = S_rename_or_hard_link(self, from, to, from_folder,
                                           to_folder, from_name, to_name,
                                           OP_RENAME);
@@ -292,8 +292,8 @@ RAMFolder_Hard_Link_IMP(RAMFolder *self, const CharBuf *from,
                         const CharBuf *to) {
     Folder        *from_folder = RAMFolder_Enclosing_Folder(self, from);
     Folder        *to_folder   = RAMFolder_Enclosing_Folder(self, to);
-    ZombieCharBuf *from_name   = IxFileNames_local_part(from, ZCB_BLANK());
-    ZombieCharBuf *to_name     = IxFileNames_local_part(to, ZCB_BLANK());
+    StackString *from_name   = IxFileNames_local_part(from, SStr_BLANK());
+    StackString *to_name     = IxFileNames_local_part(to, SStr_BLANK());
     bool result = S_rename_or_hard_link(self, from, to, from_folder,
                                           to_folder, from_name, to_name,
                                           OP_HARD_LINK);

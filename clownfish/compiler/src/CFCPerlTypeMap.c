@@ -47,7 +47,7 @@ CFCPerlTypeMap_from_perl(CFCType *type, const char *xs_var) {
            ) {
             // Share buffers rather than copy between Perl scalars and
             // Clownfish string types.
-            allocation = "alloca(cfish_ZCB_size())";
+            allocation = "alloca(cfish_SStr_size())";
         }
         else {
             allocation = "NULL";
@@ -234,7 +234,7 @@ static const char typemap_input[] =
     "    $var = (sizeof(UV) == 8) ? ($type)SvUV($arg) : ($type)SvNV($arg);\n"
     "\n"
     "CONST_CHARBUF\n"
-    "    $var = (const cfish_CharBuf*)CFISH_ZCB_WRAP_STR(SvPVutf8_nolen($arg), SvCUR($arg));\n"
+    "    $var = (const cfish_CharBuf*)CFISH_SStr_WRAP_STR(SvPVutf8_nolen($arg), SvCUR($arg));\n"
     "\n";
 
 static const char typemap_output[] =

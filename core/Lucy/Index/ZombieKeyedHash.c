@@ -47,9 +47,9 @@ ZKHash_Make_Key_IMP(ZombieKeyedHash *self, Obj *key, int32_t hash_sum) {
     switch (ivars->prim_id & FType_PRIMITIVE_ID_MASK) {
         case FType_TEXT: {
                 CharBuf *source = (CharBuf*)key;
-                size_t size = ZCB_size() + CB_Get_Size(source) + 1;
+                size_t size = SStr_size() + CB_Get_Size(source) + 1;
                 void *allocation = MemPool_Grab(ivars->mem_pool, size);
-                retval = (Obj*)ZCB_newf(allocation, size, "%o", source);
+                retval = (Obj*)SStr_newf(allocation, size, "%o", source);
             }
             break;
         case FType_INT32: {
