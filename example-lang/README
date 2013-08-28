@@ -37,7 +37,7 @@ search-related.  At some point everything under Lucy::Object will probably
 migrate to a new namespace:
 
     Clownfish::Obj       => Clownfish::Obj
-    Lucy::Object::CharBuf   => Clownfish::CharBuf
+    Lucy::Object::String    => Clownfish::String
     Lucy::Object::VArray    => Clownfish::VArray
     Lucy::Object::Hash      => Clownfish::Hash
     Lucy::Object::BitVector => Clownfish::BitVector

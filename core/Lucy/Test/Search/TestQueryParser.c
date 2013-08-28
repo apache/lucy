@@ -57,7 +57,7 @@ TestQP_Destroy_IMP(TestQueryParser *self) {
     SUPER_DESTROY(self, TESTQUERYPARSER);
 }
 
-CharBuf*
+String*
 TestQP_Get_Query_String_IMP(TestQueryParser *self) {
     return TestQP_IVARS(self)->query_string;
 }

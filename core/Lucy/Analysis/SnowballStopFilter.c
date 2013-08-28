@@ -25,13 +25,13 @@
 #include "Lucy/Util/Freezer.h"
 
 SnowballStopFilter*
-SnowStop_new(const CharBuf *language, Hash *stoplist) {
+SnowStop_new(const String *language, Hash *stoplist) {
     SnowballStopFilter *self = (SnowballStopFilter*)VTable_Make_Obj(SNOWBALLSTOPFILTER);
     return SnowStop_init(self, language, stoplist);
 }
 
 SnowballStopFilter*
-SnowStop_init(SnowballStopFilter *self, const CharBuf *language,
+SnowStop_init(SnowballStopFilter *self, const String *language,
               Hash *stoplist) {
     Analyzer_init((Analyzer*)self);
     SnowballStopFilterIVARS *const ivars = SnowStop_IVARS(self);
@@ -118,24 +118,24 @@ SnowStop_Load_IMP(SnowballStopFilter *self, Obj *dump) {
 }
 
 Hash*
-SnowStop_gen_stoplist(const CharBuf *language) {
-    CharBuf *lang = CB_new(3);
-    CB_Cat_Char(lang, tolower(CB_Code_Point_At(language, 0)));
-    CB_Cat_Char(lang, tolower(CB_Code_Point_At(language, 1)));
+SnowStop_gen_stoplist(const String *language) {
+    String *lang = Str_new(3);
+    Str_Cat_Char(lang, tolower(Str_Code_Point_At(language, 0)));
+    Str_Cat_Char(lang, tolower(Str_Code_Point_At(language, 1)));
     const uint8_t **words = NULL;
-    if (CB_Equals_Str(lang, "da", 2))      { words = SnowStop_snow_da; }
-    else if (CB_Equals_Str(lang, "de", 2)) { words = SnowStop_snow_de; }
-    else if (CB_Equals_Str(lang, "en", 2)) { words = SnowStop_snow_en; }
-    else if (CB_Equals_Str(lang, "es", 2)) { words = SnowStop_snow_es; }
-    else if (CB_Equals_Str(lang, "fi", 2)) { words = SnowStop_snow_fi; }
-    else if (CB_Equals_Str(lang, "fr", 2)) { words = SnowStop_snow_fr; }
-    else if (CB_Equals_Str(lang, "hu", 2)) { words = SnowStop_snow_hu; }
-    else if (CB_Equals_Str(lang, "it", 2)) { words = SnowStop_snow_it; }
-    else if (CB_Equals_Str(lang, "nl", 2)) { words = SnowStop_snow_nl; }
-    else if (CB_Equals_Str(lang, "no", 2)) { words = SnowStop_snow_no; }
-    else if (CB_Equals_Str(lang, "pt", 2)) { words = SnowStop_snow_pt; }
-    else if (CB_Equals_Str(lang, "ru", 2)) { words = SnowStop_snow_ru; }
-    else if (CB_Equals_Str(lang, "sv", 2)) { words = SnowStop_snow_sv; }
+    if (Str_Equals_Str(lang, "da", 2))      { words = SnowStop_snow_da; }
+    else if (Str_Equals_Str(lang, "de", 2)) { words = SnowStop_snow_de; }
+    else if (Str_Equals_Str(lang, "en", 2)) { words = SnowStop_snow_en; }
+    else if (Str_Equals_Str(lang, "es", 2)) { words = SnowStop_snow_es; }
+    else if (Str_Equals_Str(lang, "fi", 2)) { words = SnowStop_snow_fi; }
+    else if (Str_Equals_Str(lang, "fr", 2)) { words = SnowStop_snow_fr; }
+    else if (Str_Equals_Str(lang, "hu", 2)) { words = SnowStop_snow_hu; }
+    else if (Str_Equals_Str(lang, "it", 2)) { words = SnowStop_snow_it; }
+    else if (Str_Equals_Str(lang, "nl", 2)) { words = SnowStop_snow_nl; }
+    else if (Str_Equals_Str(lang, "no", 2)) { words = SnowStop_snow_no; }
+    else if (Str_Equals_Str(lang, "pt", 2)) { words = SnowStop_snow_pt; }
+    else if (Str_Equals_Str(lang, "ru", 2)) { words = SnowStop_snow_ru; }
+    else if (Str_Equals_Str(lang, "sv", 2)) { words = SnowStop_snow_sv; }
     else {
         DECREF(lang);
         return NULL;
@@ -146,7 +146,7 @@ SnowStop_gen_stoplist(const CharBuf *language) {
     for (uint32_t i = 0; words[i] != NULL; i++) {
         char *word = (char*)words[i];
         ViewCharBuf *stop = ViewCB_new_from_trusted_utf8(word, strlen(word));
-        NoCloneHash_Store(stoplist, (Obj*)stop, (Obj*)CB_newf(""));
+        NoCloneHash_Store(stoplist, (Obj*)stop, (Obj*)Str_newf(""));
         DECREF(stop);
     }
     DECREF(lang);

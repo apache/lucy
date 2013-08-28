@@ -26,13 +26,13 @@
 #include "Lucy/Util/Freezer.h"
 
 PolyAnalyzer*
-PolyAnalyzer_new(const CharBuf *language, VArray *analyzers) {
+PolyAnalyzer_new(const String *language, VArray *analyzers) {
     PolyAnalyzer *self = (PolyAnalyzer*)VTable_Make_Obj(POLYANALYZER);
     return PolyAnalyzer_init(self, language, analyzers);
 }
 
 PolyAnalyzer*
-PolyAnalyzer_init(PolyAnalyzer *self, const CharBuf *language,
+PolyAnalyzer_init(PolyAnalyzer *self, const String *language,
                   VArray *analyzers) {
     Analyzer_init((Analyzer*)self);
     PolyAnalyzerIVARS *const ivars = PolyAnalyzer_IVARS(self);
@@ -85,14 +85,14 @@ PolyAnalyzer_Transform_IMP(PolyAnalyzer *self, Inversion *inversion) {
 }
 
 Inversion*
-PolyAnalyzer_Transform_Text_IMP(PolyAnalyzer *self, CharBuf *text) {
+PolyAnalyzer_Transform_Text_IMP(PolyAnalyzer *self, String *text) {
     VArray *const   analyzers     = PolyAnalyzer_IVARS(self)->analyzers;
     const uint32_t  num_analyzers = VA_Get_Size(analyzers);
     Inversion      *retval;
 
     if (num_analyzers == 0) {
-        size_t  token_len = CB_Get_Size(text);
-        char   *buf       = (char*)CB_Get_Ptr8(text);
+        size_t  token_len = Str_Get_Size(text);
+        char   *buf       = (char*)Str_Get_Ptr8(text);
         Token  *seed      = Token_new(buf, token_len, 0, token_len, 1.0f, 1);
         retval = Inversion_new(seed);
         DECREF(seed);

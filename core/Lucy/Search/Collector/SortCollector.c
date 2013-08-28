@@ -128,7 +128,7 @@ SortColl_init(SortCollector *self, Schema *schema, SortSpec *sort_spec,
             ivars->need_score = true;
         }
         else if (rule_type == SortRule_FIELD) {
-            CharBuf *field = SortRule_Get_Field(rule);
+            String *field = SortRule_Get_Field(rule);
             FieldType *type = Schema_Fetch_Type(schema, field);
             if (!type || !FType_Sortable(type)) {
                 THROW(ERR, "'%o' isn't a sortable field", field);
@@ -239,7 +239,7 @@ SortColl_Set_Reader_IMP(SortCollector *self, SegReader *reader) {
     if (ivars->need_values && sort_reader) {
         for (uint32_t i = 0, max = ivars->num_rules; i < max; i++) {
             SortRule  *rule  = (SortRule*)VA_Fetch(ivars->rules, i);
-            CharBuf   *field = SortRule_Get_Field(rule);
+            String    *field = SortRule_Get_Field(rule);
             SortCache *cache = field
                                ? SortReader_Fetch_Sort_Cache(sort_reader, field)
                                : NULL;

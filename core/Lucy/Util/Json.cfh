@@ -25,30 +25,30 @@ class Lucy::Util::Json inherits Clownfish::Obj {
     /** Encode <code>dump</code> as JSON.  Returns NULL and sets Err_error on
      * failure.
      */
-    inert incremented nullable CharBuf*
+    inert incremented nullable String*
     to_json(Obj *dump);
 
     /** Decode the supplied JSON and return a data structure made
-     * of Hashes, VArrays, and CharBufs.  Returns NULL and sets Err_error on
+     * of Hashes, VArrays, and Strings.  Returns NULL and sets Err_error on
      * failure.
      */
     inert incremented nullable Obj*
-    from_json(CharBuf *json);
+    from_json(String *json);
 
     /** Encode <code>dump</code> as JSON and attempt to write to the indicated
      * file.
      * @return true if the write succeeds, false on failure (sets Err_error).
      */
     inert bool
-    spew_json(Obj *dump, Folder *folder, const CharBuf *path);
+    spew_json(Obj *dump, Folder *folder, const String *path);
 
     /** Decode the JSON in the file at <code>path</code> and return a data
-     * structure made of Hashes, VArrays, and CharBufs.  Returns NULL and sets
+     * structure made of Hashes, VArrays, and Strings.  Returns NULL and sets
      * Err_error if the file can't be can't be opened or if the file doesn't
      * contain valid JSON.
      */
     inert incremented nullable Obj*
-    slurp_json(Folder *folder, const CharBuf *path);
+    slurp_json(Folder *folder, const String *path);
 
     /** Allow the encoder to output strings, etc, instead of throwing an error
      * on anything other than a hash or an array.  Testing only.

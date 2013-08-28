@@ -51,9 +51,9 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 static void
 test_analysis(TestBatchRunner *runner) {
     CaseFolder *case_folder = CaseFolder_new();
-    CharBuf *source = CB_newf("caPiTal ofFensE");
+    String *source = Str_newf("caPiTal ofFensE");
     VArray *wanted = VA_new(1);
-    VA_Push(wanted, (Obj*)CB_newf("capital offense"));
+    VA_Push(wanted, (Obj*)Str_newf("capital offense"));
     TestUtils_test_analyzer(runner, (Analyzer*)case_folder, source, wanted,
                             "lowercase plain text");
     DECREF(wanted);

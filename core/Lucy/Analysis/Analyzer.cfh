@@ -42,12 +42,12 @@ public abstract class Lucy::Analysis::Analyzer inherits Clownfish::Obj {
      * provide an optimized implementation which minimizes string copies.
      */
     public incremented Inversion*
-    Transform_Text(Analyzer *self, CharBuf *text);
+    Transform_Text(Analyzer *self, String *text);
 
     /** Analyze text and return an array of token texts.
      */
     public incremented VArray*
-    Split(Analyzer *self, CharBuf *text);
+    Split(Analyzer *self, String *text);
 
     public incremented Obj*
     Dump(Analyzer *self);

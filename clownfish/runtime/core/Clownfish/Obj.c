@@ -26,7 +26,7 @@
 #include <string.h>
 
 #include "Clownfish/Obj.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/VTable.h"
@@ -68,16 +68,16 @@ Obj_Equals_IMP(Obj *self, Obj *other) {
     return (self == other);
 }
 
-CharBuf*
+String*
 Obj_To_String_IMP(Obj *self) {
 #if (SIZEOF_PTR == 4)
-    return CB_newf("%o@0x%x32", Obj_Get_Class_Name(self), self);
+    return Str_newf("%o@0x%x32", Obj_Get_Class_Name(self), self);
 #elif (SIZEOF_PTR == 8)
     int64_t   iaddress   = PTR_TO_I64(self);
     uint64_t  address    = (uint64_t)iaddress;
     uint32_t  address_hi = address >> 32;
     uint32_t  address_lo = address & 0xFFFFFFFF;
-    return CB_newf("%o@0x%x32%x32", Obj_Get_Class_Name(self), address_hi,
+    return Str_newf("%o@0x%x32%x32", Obj_Get_Class_Name(self), address_hi,
                    address_lo);
 #else
   #error "Unexpected pointer size."
@@ -94,7 +94,7 @@ Obj_Get_VTable_IMP(Obj *self) {
     return self->vtable;
 }
 
-CharBuf*
+String*
 Obj_Get_Class_Name_IMP(Obj *self) {
     return VTable_Get_Name(self->vtable);
 }

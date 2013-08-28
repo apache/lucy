@@ -33,7 +33,7 @@ public class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
     int32_t  doc_max;
     int32_t  del_count;
     int64_t  seg_num;
-    CharBuf *seg_name;
+    String *seg_name;
 
     inert incremented SegReader*
     new(Schema *schema, Folder *folder, Snapshot *snapshot = NULL,
@@ -63,12 +63,12 @@ public class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
      * @param component A DataReader.
      */
     public void
-    Register(SegReader *self, const CharBuf *api,
+    Register(SegReader *self, const String *api,
              decremented DataReader *component);
 
     /** Return the name of the segment.
      */
-    public CharBuf*
+    public String*
     Get_Seg_Name(SegReader *self);
 
     /** Return the number of the segment.

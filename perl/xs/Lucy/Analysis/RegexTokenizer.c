@@ -25,7 +25,7 @@
 #include "Clownfish/Util/StringHelper.h"
 
 static SV*
-S_compile_token_re(const cfish_CharBuf *pattern);
+S_compile_token_re(const cfish_String *pattern);
 
 static void
 S_set_token_re_but_not_pattern(lucy_RegexTokenizer *self, void *token_re);
@@ -40,21 +40,21 @@ lucy_RegexTokenizer_is_available(void) {
 
 lucy_RegexTokenizer*
 lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
-                         const cfish_CharBuf *pattern) {
+                         const cfish_String *pattern) {
     lucy_Analyzer_init((lucy_Analyzer*)self);
     lucy_RegexTokenizerIVARS *const ivars = lucy_RegexTokenizer_IVARS(self);
     #define DEFAULT_PATTERN "\\w+(?:['\\x{2019}]\\w+)*"
     if (pattern) {
-        if (CFISH_CB_Find_Str(pattern, "\\p", 2) != -1
-            || CFISH_CB_Find_Str(pattern, "\\P", 2) != -1
+        if (CFISH_Str_Find_Str(pattern, "\\p", 2) != -1
+            || CFISH_Str_Find_Str(pattern, "\\P", 2) != -1
            ) {
             CFISH_DECREF(self);
             THROW(CFISH_ERR, "\\p and \\P constructs forbidden");
         }
-        ivars->pattern = CFISH_CB_Clone(pattern);
+        ivars->pattern = CFISH_Str_Clone(pattern);
     }
     else {
-        ivars->pattern = cfish_CB_new_from_trusted_utf8(
+        ivars->pattern = cfish_Str_new_from_trusted_utf8(
                             DEFAULT_PATTERN, sizeof(DEFAULT_PATTERN) - 1);
     }
 
@@ -67,7 +67,7 @@ lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
 }
 
 static SV*
-S_compile_token_re(const cfish_CharBuf *pattern) {
+S_compile_token_re(const cfish_String *pattern) {
     dSP;
     ENTER;
     SAVETMPS;
@@ -116,7 +116,7 @@ S_set_pattern_from_token_re(lucy_RegexTokenizer *self, void *token_re) {
     STRLEN len = 0;
     char *ptr = SvPVutf8((SV*)rv, len);
     CFISH_DECREF(ivars->pattern);
-    ivars->pattern = cfish_CB_new_from_trusted_utf8(ptr, len);
+    ivars->pattern = cfish_Str_new_from_trusted_utf8(ptr, len);
     SvREFCNT_dec(rv);
 }
 

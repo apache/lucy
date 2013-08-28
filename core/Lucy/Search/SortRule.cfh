@@ -26,7 +26,7 @@ parcel Lucy;
 public class Lucy::Search::SortRule inherits Clownfish::Obj {
 
     int32_t   type;
-    CharBuf  *field;
+    String   *field;
     bool      reverse;
 
     inert int32_t FIELD;
@@ -34,7 +34,7 @@ public class Lucy::Search::SortRule inherits Clownfish::Obj {
     inert int32_t DOC_ID;
 
     public inert incremented SortRule*
-    new(int32_t type = 0, const CharBuf *field = NULL,
+    new(int32_t type = 0, const String *field = NULL,
         bool reverse = false);
 
     /**
@@ -44,12 +44,12 @@ public class Lucy::Search::SortRule inherits Clownfish::Obj {
      * @param reverse If true, reverse the order of the sort for this rule.
      */
     public inert incremented SortRule*
-    init(SortRule *self, int32_t type = 0, const CharBuf *field = NULL,
+    init(SortRule *self, int32_t type = 0, const String *field = NULL,
          bool reverse = false);
 
     /** Accessor for "field" member.
      */
-    public nullable CharBuf*
+    public nullable String*
     Get_Field(SortRule *self);
 
     /** Accessor for "type" member.

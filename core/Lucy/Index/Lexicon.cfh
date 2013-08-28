@@ -33,10 +33,10 @@ parcel Lucy;
 
 public class Lucy::Index::Lexicon cnick Lex inherits Clownfish::Obj {
 
-    CharBuf *field;
+    String *field;
 
     public inert Lexicon*
-    init(Lexicon *self, const CharBuf *field);
+    init(Lexicon *self, const String *field);
 
     public void
     Destroy(Lexicon *self);
@@ -73,7 +73,7 @@ public class Lucy::Index::Lexicon cnick Lex inherits Clownfish::Obj {
     public abstract nullable Obj*
     Get_Term(Lexicon *self);
 
-    public CharBuf*
+    public String*
     Get_Field(Lexicon *self);
 }
 

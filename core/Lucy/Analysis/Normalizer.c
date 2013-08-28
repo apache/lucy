@@ -28,29 +28,29 @@
 #define INITIAL_BUFSIZE 63
 
 Normalizer*
-Normalizer_new(const CharBuf *form, bool case_fold, bool strip_accents) {
+Normalizer_new(const String *form, bool case_fold, bool strip_accents) {
     Normalizer *self = (Normalizer*)VTable_Make_Obj(NORMALIZER);
     return Normalizer_init(self, form, case_fold, strip_accents);
 }
 
 Normalizer*
-Normalizer_init(Normalizer *self, const CharBuf *form, bool case_fold,
+Normalizer_init(Normalizer *self, const String *form, bool case_fold,
                 bool strip_accents) {
     int options = UTF8PROC_STABLE;
     NormalizerIVARS *const ivars = Normalizer_IVARS(self);
 
     if (form == NULL
-        || CB_Equals_Str(form, "NFKC", 4) || CB_Equals_Str(form, "nfkc", 4)
+        || Str_Equals_Str(form, "NFKC", 4) || Str_Equals_Str(form, "nfkc", 4)
        ) {
         options |= UTF8PROC_COMPOSE | UTF8PROC_COMPAT;
     }
-    else if (CB_Equals_Str(form, "NFC", 3) || CB_Equals_Str(form, "nfc", 3)) {
+    else if (Str_Equals_Str(form, "NFC", 3) || Str_Equals_Str(form, "nfc", 3)) {
         options |= UTF8PROC_COMPOSE;
     }
-    else if (CB_Equals_Str(form, "NFKD", 4) || CB_Equals_Str(form, "nfkd", 4)) {
+    else if (Str_Equals_Str(form, "NFKD", 4) || Str_Equals_Str(form, "nfkd", 4)) {
         options |= UTF8PROC_DECOMPOSE | UTF8PROC_COMPAT;
     }
-    else if (CB_Equals_Str(form, "NFD", 3) || CB_Equals_Str(form, "nfd", 3)) {
+    else if (Str_Equals_Str(form, "NFD", 3) || Str_Equals_Str(form, "nfd", 3)) {
         options |= UTF8PROC_DECOMPOSE;
     }
     else {
@@ -125,13 +125,13 @@ Normalizer_Dump_IMP(Normalizer *self) {
     Hash *dump = super_dump(self);
     int options = Normalizer_IVARS(self)->options;
 
-    CharBuf *form = options & UTF8PROC_COMPOSE ?
+    String *form = options & UTF8PROC_COMPOSE ?
                     options & UTF8PROC_COMPAT ?
-                    CB_new_from_trusted_utf8("NFKC", 4) :
-                    CB_new_from_trusted_utf8("NFC", 3) :
+                    Str_new_from_trusted_utf8("NFKC", 4) :
+                    Str_new_from_trusted_utf8("NFC", 3) :
                         options & UTF8PROC_COMPAT ?
-                        CB_new_from_trusted_utf8("NFKD", 4) :
-                        CB_new_from_trusted_utf8("NFD", 3);
+                        Str_new_from_trusted_utf8("NFKD", 4) :
+                        Str_new_from_trusted_utf8("NFD", 3);
 
     Hash_Store_Str(dump, "normalization_form", 18, (Obj*)form);
 
@@ -152,7 +152,7 @@ Normalizer_Load_IMP(Normalizer *self, Obj *dump) {
     Hash    *source = (Hash*)CERTIFY(dump, HASH);
 
     Obj *obj = Hash_Fetch_Str(source, "normalization_form", 18);
-    CharBuf *form = (CharBuf*)CERTIFY(obj, CHARBUF);
+    String *form = (String*)CERTIFY(obj, STRING);
     obj = Hash_Fetch_Str(source, "case_fold", 9);
     bool case_fold = Bool_Get_Value((BoolNum*)CERTIFY(obj, BOOLNUM));
     obj = Hash_Fetch_Str(source, "strip_accents", 13);

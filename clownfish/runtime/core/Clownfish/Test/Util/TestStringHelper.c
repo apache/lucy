@@ -21,7 +21,7 @@
 
 #include "Clownfish/Test/Util/TestStringHelper.h"
 
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Test.h"
 #include "Clownfish/TestHarness/TestBatchRunner.h"

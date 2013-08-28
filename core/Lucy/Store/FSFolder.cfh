@@ -25,7 +25,7 @@ parcel Lucy;
 public class Lucy::Store::FSFolder inherits Lucy::Store::Folder {
 
     inert incremented FSFolder*
-    new(const CharBuf *path);
+    new(const String *path);
 
     /**
      * @param path Location of the index. If the specified directory does
@@ -34,7 +34,7 @@ public class Lucy::Store::FSFolder inherits Lucy::Store::Folder {
      * be necessary to create the directory yourself.
      */
     public inert FSFolder*
-    init(FSFolder *self, const CharBuf *path);
+    init(FSFolder *self, const String *path);
 
     /** Attempt to create the directory specified by <code>path</code>.
      */
@@ -51,32 +51,32 @@ public class Lucy::Store::FSFolder inherits Lucy::Store::Folder {
     Close(FSFolder *self);
 
     incremented nullable FileHandle*
-    Local_Open_FileHandle(FSFolder *self, const CharBuf *name,
+    Local_Open_FileHandle(FSFolder *self, const String *name,
                           uint32_t flags);
 
     incremented nullable DirHandle*
     Local_Open_Dir(FSFolder *self);
 
     bool
-    Local_MkDir(FSFolder *self, const CharBuf *name);
+    Local_MkDir(FSFolder *self, const String *name);
 
     bool
-    Local_Exists(FSFolder *self, const CharBuf *name);
+    Local_Exists(FSFolder *self, const String *name);
 
     bool
-    Local_Is_Directory(FSFolder *self, const CharBuf *name);
+    Local_Is_Directory(FSFolder *self, const String *name);
 
     nullable Folder*
-    Local_Find_Folder(FSFolder *self, const CharBuf *name);
+    Local_Find_Folder(FSFolder *self, const String *name);
 
     bool
-    Local_Delete(FSFolder *self, const CharBuf *name);
+    Local_Delete(FSFolder *self, const String *name);
 
     public bool
-    Rename(FSFolder *self, const CharBuf* from, const CharBuf *to);
+    Rename(FSFolder *self, const String* from, const String *to);
 
     public bool
-    Hard_Link(FSFolder *self, const CharBuf *from, const CharBuf *to);
+    Hard_Link(FSFolder *self, const String *from, const String *to);
 }
 
 

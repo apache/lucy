@@ -50,7 +50,7 @@ sub register_many {
 
     my $succeeded = 0;
     for my $number (@$nums) {
-        my $obj = Clownfish::CharBuf->new($number);
+        my $obj = Clownfish::String->new($number);
         $succeeded += $registry->register( key => $obj, value => $obj );
     }
 

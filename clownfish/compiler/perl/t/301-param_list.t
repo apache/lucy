@@ -28,7 +28,7 @@ isa_ok(
     $parser->parse($_),
     "Clownfish::CFC::Model::Variable",
     "param_variable: $_"
-) for ( 'uint32_t baz', 'CharBuf *stuff', 'float **ptr', );
+) for ( 'uint32_t baz', 'String *stuff', 'float **ptr', );
 
 my $obj_class = $parser->parse("class Obj {}");
 

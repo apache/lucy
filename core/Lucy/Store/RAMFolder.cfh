@@ -25,13 +25,13 @@ parcel Lucy;
 public class Lucy::Store::RAMFolder inherits Lucy::Store::Folder {
 
     inert incremented RAMFolder*
-    new(const CharBuf *path = NULL);
+    new(const String *path = NULL);
 
     /**
      * @param path Relative path, used for subfolders.
      */
     public inert RAMFolder*
-    init(RAMFolder *self, const CharBuf *path = NULL);
+    init(RAMFolder *self, const String *path = NULL);
 
     public void
     Initialize(RAMFolder *self);
@@ -43,31 +43,31 @@ public class Lucy::Store::RAMFolder inherits Lucy::Store::Folder {
     Close(RAMFolder *self);
 
     incremented nullable FileHandle*
-    Local_Open_FileHandle(RAMFolder *self, const CharBuf *name, uint32_t flags);
+    Local_Open_FileHandle(RAMFolder *self, const String *name, uint32_t flags);
 
     incremented nullable DirHandle*
     Local_Open_Dir(RAMFolder *self);
 
     bool
-    Local_MkDir(RAMFolder *self, const CharBuf *name);
+    Local_MkDir(RAMFolder *self, const String *name);
 
     bool
-    Local_Exists(RAMFolder *self, const CharBuf *name);
+    Local_Exists(RAMFolder *self, const String *name);
 
     bool
-    Local_Is_Directory(RAMFolder *self, const CharBuf *name);
+    Local_Is_Directory(RAMFolder *self, const String *name);
 
     nullable Folder*
-    Local_Find_Folder(RAMFolder *self, const CharBuf *name);
+    Local_Find_Folder(RAMFolder *self, const String *name);
 
     bool
-    Local_Delete(RAMFolder *self, const CharBuf *name);
+    Local_Delete(RAMFolder *self, const String *name);
 
     public bool
-    Rename(RAMFolder *self, const CharBuf* from, const CharBuf *to);
+    Rename(RAMFolder *self, const String* from, const String *to);
 
     public bool
-    Hard_Link(RAMFolder *self, const CharBuf *from, const CharBuf *to);
+    Hard_Link(RAMFolder *self, const String *from, const String *to);
 }
 
 

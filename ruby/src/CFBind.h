@@ -27,7 +27,7 @@ extern "C" {
 #include "charmony.h"
 #include "Clownfish/Obj.h"
 #include "Clownfish/ByteBuf.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/Num.h"

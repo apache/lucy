@@ -24,7 +24,7 @@
 
 #include "Clownfish/Test/TestObj.h"
 
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Test.h"
 #include "Clownfish/TestHarness/TestBatchRunner.h"
@@ -39,9 +39,9 @@ static Obj*
 S_new_testobj() {
     StackString *klass = SSTR_WRAP_STR("TestObj", 7);
     Obj *obj;
-    VTable *vtable = VTable_fetch_vtable((CharBuf*)klass);
+    VTable *vtable = VTable_fetch_vtable((String*)klass);
     if (!vtable) {
-        vtable = VTable_singleton((CharBuf*)klass, OBJ);
+        vtable = VTable_singleton((String*)klass, OBJ);
     }
     obj = VTable_Make_Obj(vtable);
     return Obj_init(obj);
@@ -66,7 +66,7 @@ test_refcounts(TestBatchRunner *runner) {
 static void
 test_To_String(TestBatchRunner *runner) {
     Obj *testobj = S_new_testobj();
-    CharBuf *string = Obj_To_String(testobj);
+    String *string = Obj_To_String(testobj);
     StackString *temp = SSTR_WRAP(string);
     while (SStr_Get_Size(temp)) {
         if (SStr_Starts_With_Str(temp, "TestObj", 7)) { break; }
@@ -103,14 +103,14 @@ test_Hash_Sum(TestBatchRunner *runner) {
 
 static void
 test_Is_A(TestBatchRunner *runner) {
-    CharBuf *charbuf   = CB_new(0);
-    VTable  *bb_vtable = CB_Get_VTable(charbuf);
-    CharBuf *klass     = CB_Get_Class_Name(charbuf);
+    String *charbuf   = Str_new(0);
+    VTable  *bb_vtable = Str_Get_VTable(charbuf);
+    String *klass     = Str_Get_Class_Name(charbuf);
 
-    TEST_TRUE(runner, CB_Is_A(charbuf, CHARBUF), "CharBuf Is_A CharBuf.");
-    TEST_TRUE(runner, CB_Is_A(charbuf, OBJ), "CharBuf Is_A Obj.");
-    TEST_TRUE(runner, bb_vtable == CHARBUF, "Get_VTable");
-    TEST_TRUE(runner, CB_Equals(VTable_Get_Name(CHARBUF), (Obj*)klass),
+    TEST_TRUE(runner, Str_Is_A(charbuf, STRING), "String Is_A String.");
+    TEST_TRUE(runner, Str_Is_A(charbuf, OBJ), "String Is_A Obj.");
+    TEST_TRUE(runner, bb_vtable == STRING, "Get_VTable");
+    TEST_TRUE(runner, Str_Equals(VTable_Get_Name(STRING), (Obj*)klass),
               "Get_Class_Name");
 
     DECREF(charbuf);
@@ -154,7 +154,7 @@ S_verify_abstract_error(TestBatchRunner *runner, Err_Attempt_t routine,
     Err *error = Err_trap(routine, context);
     TEST_TRUE(runner, error != NULL
               && Err_Is_A(error, ERR) 
-              && CB_Find_Str(Err_Get_Mess(error), "bstract", 7) != -1,
+              && Str_Find_Str(Err_Get_Mess(error), "bstract", 7) != -1,
               message);
     DECREF(error);
 }

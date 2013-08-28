@@ -71,15 +71,15 @@ S_lazy_init(HighlightWriter *self) {
     if (!ivars->dat_out) {
         Segment  *segment  = ivars->segment;
         Folder   *folder   = ivars->folder;
-        CharBuf  *seg_name = Seg_Get_Name(segment);
+        String   *seg_name = Seg_Get_Name(segment);
 
         // Open outstreams.
-        CharBuf *ix_file = CB_newf("%o/highlight.ix", seg_name);
+        String *ix_file = Str_newf("%o/highlight.ix", seg_name);
         ivars->ix_out = Folder_Open_Out(folder, ix_file);
         DECREF(ix_file);
         if (!ivars->ix_out) { RETHROW(INCREF(Err_get_error())); }
 
-        CharBuf *dat_file = CB_newf("%o/highlight.dat", seg_name);
+        String *dat_file = Str_newf("%o/highlight.dat", seg_name);
         ivars->dat_out = Folder_Open_Out(folder, dat_file);
         DECREF(dat_file);
         if (!ivars->dat_out) { RETHROW(INCREF(Err_get_error())); }
@@ -127,7 +127,7 @@ HLWriter_Add_Inverted_Doc_IMP(HighlightWriter *self, Inverter *inverter,
         if (FType_Is_A(type, FULLTEXTTYPE)
             && FullTextType_Highlightable((FullTextType*)type)
            ) {
-            CharBuf   *field     = Inverter_Get_Field_Name(inverter);
+            String    *field     = Inverter_Get_Field_Name(inverter);
             Inversion *inversion = Inverter_Get_Inversion(inverter);
             ByteBuf   *tv_buf    = HLWriter_TV_Buf(self, inversion);
             Freezer_serialize_charbuf(field, dat_out);

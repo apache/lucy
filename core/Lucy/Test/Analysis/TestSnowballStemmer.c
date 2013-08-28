@@ -33,8 +33,8 @@ TestSnowStemmer_new() {
 
 static void
 test_Dump_Load_and_Equals(TestBatchRunner *runner) {
-    CharBuf *EN = (CharBuf*)SSTR_WRAP_STR("en", 2);
-    CharBuf *ES = (CharBuf*)SSTR_WRAP_STR("es", 2);
+    String *EN = (String*)SSTR_WRAP_STR("en", 2);
+    String *ES = (String*)SSTR_WRAP_STR("es", 2);
     SnowballStemmer *stemmer = SnowStemmer_new(EN);
     SnowballStemmer *other   = SnowStemmer_new(ES);
     Obj *dump       = (Obj*)SnowStemmer_Dump(stemmer);
@@ -63,11 +63,11 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 static void
 test_stemming(TestBatchRunner *runner) {
     FSFolder *modules_folder = TestUtils_modules_folder();
-    CharBuf *path = CB_newf("analysis/snowstem/source/test/tests.json");
+    String *path = Str_newf("analysis/snowstem/source/test/tests.json");
     Hash *tests = (Hash*)Json_slurp_json((Folder*)modules_folder, path);
     if (!tests) { RETHROW(Err_get_error()); }
 
-    CharBuf *iso;
+    String *iso;
     Hash *lang_data;
     Hash_Iterate(tests);
     while (Hash_Next(tests, (Obj**)&iso, (Obj**)&lang_data)) {
@@ -75,14 +75,14 @@ test_stemming(TestBatchRunner *runner) {
         VArray *stems = (VArray*)Hash_Fetch_Str(lang_data, "stems", 5);
         SnowballStemmer *stemmer = SnowStemmer_new(iso);
         for (uint32_t i = 0, max = VA_Get_Size(words); i < max; i++) {
-            CharBuf *word  = (CharBuf*)VA_Fetch(words, i);
+            String *word  = (String*)VA_Fetch(words, i);
             VArray  *got   = SnowStemmer_Split(stemmer, word);
-            CharBuf *stem  = (CharBuf*)VA_Fetch(got, 0);
+            String *stem  = (String*)VA_Fetch(got, 0);
             TEST_TRUE(runner,
                       stem
-                      && CB_Is_A(stem, CHARBUF)
-                      && CB_Equals(stem, VA_Fetch(stems, i)),
-                      "Stem %s: %s", CB_Get_Ptr8(iso), CB_Get_Ptr8(word)
+                      && Str_Is_A(stem, STRING)
+                      && Str_Equals(stem, VA_Fetch(stems, i)),
+                      "Stem %s: %s", Str_Get_Ptr8(iso), Str_Get_Ptr8(word)
                      );
             DECREF(got);
         }

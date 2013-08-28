@@ -38,8 +38,8 @@ static void
 test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     Normalizer *normalizer[4];
 
-    CharBuf *NFC  = (CharBuf*)SSTR_WRAP_STR("NFC",  3);
-    CharBuf *NFKC = (CharBuf*)SSTR_WRAP_STR("NFKC", 4);
+    String *NFC  = (String*)SSTR_WRAP_STR("NFC",  3);
+    String *NFKC = (String*)SSTR_WRAP_STR("NFKC", 4);
 
     normalizer[0] = Normalizer_new(NFKC, true,  false);
     normalizer[1] = Normalizer_new(NFC,  true,  false);
@@ -73,13 +73,13 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 static void
 test_normalization(TestBatchRunner *runner) {
     FSFolder *modules_folder = TestUtils_modules_folder();
-    CharBuf *path = CB_newf("unicode/utf8proc/tests.json");
+    String *path = Str_newf("unicode/utf8proc/tests.json");
     VArray *tests = (VArray*)Json_slurp_json((Folder*)modules_folder, path);
     if (!tests) { RETHROW(Err_get_error()); }
 
     for (uint32_t i = 0, max = VA_Get_Size(tests); i < max; i++) {
         Hash *test = (Hash*)VA_Fetch(tests, i);
-        CharBuf *form = (CharBuf*)Hash_Fetch_Str(
+        String *form = (String*)Hash_Fetch_Str(
                             test, "normalization_form", 18);
         bool case_fold = Bool_Get_Value((BoolNum*)Hash_Fetch_Str(
                                               test, "case_fold", 9));
@@ -89,15 +89,15 @@ test_normalization(TestBatchRunner *runner) {
         VArray *words = (VArray*)Hash_Fetch_Str(test, "words", 5);
         VArray *norms = (VArray*)Hash_Fetch_Str(test, "norms", 5);
         for (uint32_t j = 0, max = VA_Get_Size(words); j < max; j++) {
-            CharBuf *word = (CharBuf*)VA_Fetch(words, j);
+            String *word = (String*)VA_Fetch(words, j);
             VArray  *got  = Normalizer_Split(normalizer, word);
-            CharBuf *norm = (CharBuf*)VA_Fetch(got, 0);
+            String *norm = (String*)VA_Fetch(got, 0);
             TEST_TRUE(runner,
                       norm
-                      && CB_Is_A(norm, CHARBUF)
-                      && CB_Equals(norm, VA_Fetch(norms, j)),
-                      "Normalize %s %d %d: %s", CB_Get_Ptr8(form),
-                      case_fold, strip_accents, CB_Get_Ptr8(word)
+                      && Str_Is_A(norm, STRING)
+                      && Str_Equals(norm, VA_Fetch(norms, j)),
+                      "Normalize %s %d %d: %s", Str_Get_Ptr8(form),
+                      case_fold, strip_accents, Str_Get_Ptr8(word)
                      );
             DECREF(got);
         }
@@ -115,11 +115,11 @@ test_utf8proc_normalization(TestBatchRunner *runner) {
     return;
 
     for (int32_t i = 0; i < 100; i++) {
-        CharBuf *source = TestUtils_random_string(rand() % 40);
+        String *source = TestUtils_random_string(rand() % 40);
 
         // Normalize once.
         uint8_t *normalized;
-        int32_t check = utf8proc_map(CB_Get_Ptr8(source), CB_Get_Size(source),
+        int32_t check = utf8proc_map(Str_Get_Ptr8(source), Str_Get_Size(source),
                                      &normalized,
                                      UTF8PROC_STABLE  |
                                      UTF8PROC_COMPOSE |
@@ -127,11 +127,11 @@ test_utf8proc_normalization(TestBatchRunner *runner) {
                                      UTF8PROC_CASEFOLD);
         if (check < 0) {
             lucy_Json_set_tolerant(1);
-            CharBuf *json = lucy_Json_to_json((Obj*)source);
+            String *json = lucy_Json_to_json((Obj*)source);
             if (!json) {
-                json = CB_newf("[failed to encode]");
+                json = Str_newf("[failed to encode]");
             }
-            FAIL(runner, "Failed to normalize: %s", CB_Get_Ptr8(json));
+            FAIL(runner, "Failed to normalize: %s", Str_Get_Ptr8(json));
             DECREF(json);
             DECREF(source);
             return;

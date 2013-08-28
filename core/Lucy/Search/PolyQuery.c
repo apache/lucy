@@ -185,7 +185,7 @@ PolyCompiler_Apply_Norm_Factor_IMP(PolyCompiler *self, float factor) {
 
 VArray*
 PolyCompiler_Highlight_Spans_IMP(PolyCompiler *self, Searcher *searcher,
-                                 DocVector *doc_vec, const CharBuf *field) {
+                                 DocVector *doc_vec, const String *field) {
     PolyCompilerIVARS *const ivars = PolyCompiler_IVARS(self);
     VArray *spans = VA_new(0);
     for (uint32_t i = 0, max = VA_Get_Size(ivars->children); i < max; i++) {
@@ -213,7 +213,7 @@ PolyCompiler_Serialize_IMP(PolyCompiler *self, OutStream *outstream) {
 PolyCompiler*
 PolyCompiler_Deserialize_IMP(PolyCompiler *self, InStream *instream) {
     PolyCompilerIVARS *const ivars = PolyCompiler_IVARS(self);
-    CharBuf *class_name = Freezer_read_charbuf(instream);
+    String *class_name = Freezer_read_charbuf(instream);
     DECREF(class_name); // TODO Don't serialize class name.
     ivars->children = Freezer_read_varray(instream);
     PolyCompiler_Deserialize_t super_deserialize

@@ -40,7 +40,7 @@ class Lucy::Index::Posting cnick Post inherits Lucy::Util::Stepper {
      */
     abstract incremented RawPosting*
     Read_Raw(Posting *self, InStream *instream, int32_t last_doc_id,
-             CharBuf *term_text, MemoryPool *mem_pool);
+             String *term_text, MemoryPool *mem_pool);
 
     /** Process an Inversion into RawPosting objects and add them all to the
      * supplied PostingPool.

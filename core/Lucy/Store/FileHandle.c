@@ -22,9 +22,9 @@
 int32_t FH_object_count = 0;
 
 FileHandle*
-FH_do_open(FileHandle *self, const CharBuf *path, uint32_t flags) {
+FH_do_open(FileHandle *self, const String *path, uint32_t flags) {
     FileHandleIVARS *const ivars = FH_IVARS(self);
-    ivars->path    = path ? CB_Clone(path) : CB_new(0);
+    ivars->path    = path ? Str_Clone(path) : Str_new(0);
     ivars->flags   = flags;
 
     // Track number of live FileHandles released into the wild.
@@ -53,13 +53,13 @@ FH_Grow_IMP(FileHandle *self, int64_t length) {
 }
 
 void
-FH_Set_Path_IMP(FileHandle *self, const CharBuf *path) {
+FH_Set_Path_IMP(FileHandle *self, const String *path) {
     FileHandleIVARS *const ivars = FH_IVARS(self);
     DECREF(ivars->path);
-    ivars->path = CB_Clone(path);
+    ivars->path = Str_Clone(path);
 }
 
-CharBuf*
+String*
 FH_Get_Path_IMP(FileHandle *self) {
     return FH_IVARS(self)->path;
 }

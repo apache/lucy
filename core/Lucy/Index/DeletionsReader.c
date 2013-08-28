@@ -158,8 +158,8 @@ DefDelReader_Read_Deletions_IMP(DefaultDeletionsReader *self) {
     DefaultDeletionsReaderIVARS *const ivars = DefDelReader_IVARS(self);
     VArray  *segments    = DefDelReader_Get_Segments(self);
     Segment *segment     = DefDelReader_Get_Segment(self);
-    CharBuf *my_seg_name = Seg_Get_Name(segment);
-    CharBuf *del_file    = NULL;
+    String *my_seg_name = Seg_Get_Name(segment);
+    String *del_file    = NULL;
     int32_t  del_count   = 0;
 
     // Start with deletions files in the most recently added segments and work
@@ -179,9 +179,9 @@ DefDelReader_Read_Deletions_IMP(DefaultDeletionsReader *self) {
                                  Hash_Fetch_Str(seg_files_data, "count", 5),
                                  OBJ);
                 del_count = (int32_t)Obj_To_I64(count);
-                del_file  = (CharBuf*)CERTIFY(
+                del_file  = (String*)CERTIFY(
                                 Hash_Fetch_Str(seg_files_data, "filename", 8),
-                                CHARBUF);
+                                STRING);
                 break;
             }
         }

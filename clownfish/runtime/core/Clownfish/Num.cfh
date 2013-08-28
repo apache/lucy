@@ -37,7 +37,7 @@ abstract class Clownfish::FloatNum inherits Clownfish::Num {
     public int32_t
     Compare_To(FloatNum *self, Obj *other);
 
-    public incremented CharBuf*
+    public incremented String*
     To_String(FloatNum *self);
 }
 
@@ -52,7 +52,7 @@ abstract class Clownfish::IntNum inherits Clownfish::Num {
     public int32_t
     Compare_To(IntNum *self, Obj *other);
 
-    public incremented CharBuf*
+    public incremented String*
     To_String(IntNum *self);
 }
 
@@ -219,7 +219,7 @@ class Clownfish::Integer64 cnick Int64
  */
 class Clownfish::BoolNum cnick Bool inherits Clownfish::IntNum {
     bool value;
-    CharBuf *string;
+    String *string;
 
     inert BoolNum *true_singleton;
     inert BoolNum *false_singleton;
@@ -258,7 +258,7 @@ class Clownfish::BoolNum cnick Bool inherits Clownfish::IntNum {
     public bool
     Equals(BoolNum *self, Obj *other);
 
-    public incremented CharBuf*
+    public incremented String*
     To_String(BoolNum *self);
 
     incremented BoolNum*

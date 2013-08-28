@@ -180,18 +180,18 @@ $class_content = q|
      * Wow wow wow.
      */
     public class Animal::Dog inherits Animal {
-        public inert Dog* init(Dog *self, CharBuf *name, CharBuf *fave_food);
+        public inert Dog* init(Dog *self, String *name, String *fave_food);
         inert uint32_t count();
         inert uint64_t num_dogs;
         public inert Dog* top_dog;
 
-        CharBuf *name;
+        String *name;
         bool     likes_to_go_fetch;
         ChewToy *squishy;
         Owner   *mom;
 
         void               Destroy(Dog *self);
-        public CharBuf*    Bark(Dog *self);
+        public String*    Bark(Dog *self);
         public void        Eat(Dog *self);
         public void        Bite(Dog *self, Enemy *enemy);
         public Thing      *Fetch(Dog *self, Thing *thing);

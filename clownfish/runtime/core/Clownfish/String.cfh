@@ -20,66 +20,66 @@ parcel Clownfish;
  * Growable buffer holding Unicode characters.
  */
 
-class Clownfish::CharBuf cnick CB
+class Clownfish::String cnick Str
     inherits Clownfish::Obj {
 
     char    *ptr;
     size_t   size;
     size_t   cap;  /* allocated bytes, including terminating null */
 
-    inert incremented CharBuf*
+    inert incremented String*
     new(size_t size);
 
-    inert CharBuf*
-    init(CharBuf *self, size_t size);
+    inert String*
+    init(String *self, size_t size);
 
-    /** Return a new CharBuf which holds a copy of the passed-in string.
+    /** Return a new String which holds a copy of the passed-in string.
      * Check for UTF-8 validity.
      */
-    inert incremented CharBuf*
+    inert incremented String*
     new_from_utf8(const char *utf8, size_t size);
 
-    /** Return a new CharBuf which holds a copy of the passed-in string.  No
+    /** Return a new String which holds a copy of the passed-in string.  No
      * validity checking is performed.
      */
-    inert incremented CharBuf*
+    inert incremented String*
     new_from_trusted_utf8(const char *utf8, size_t size);
 
-    /** Return a pointer to a new CharBuf which assumes ownership of the
+    /** Return a pointer to a new String which assumes ownership of the
      * passed-in string.  Check validity of supplied UTF-8.
      */
-    inert incremented CharBuf*
+    inert incremented String*
     new_steal_str(char *ptr, size_t size, size_t cap);
 
-    /** Return a pointer to a new CharBuf which assumes ownership of the
+    /** Return a pointer to a new String which assumes ownership of the
      * passed-in string.  Do not check validity of supplied UTF-8.
      */
-    inert incremented CharBuf*
+    inert incremented String*
     new_steal_from_trusted_str(char *ptr, size_t size, size_t cap);
 
-    /** Initialize the CharBuf using the passed-in string.  Do not check
+    /** Initialize the String using the passed-in string.  Do not check
      * validity of supplied UTF-8.
      */
-    public inert CharBuf*
-    init_steal_trusted_str(decremented CharBuf *self, char *ptr,
+    public inert String*
+    init_steal_trusted_str(decremented String *self, char *ptr,
                            size_t size, size_t cap);
 
-    /** Return a pointer to a new CharBuf which contains formatted data
-     * expanded according to CB_VCatF.
+    /** Return a pointer to a new String which contains formatted data
+     * expanded according to Str_VCatF.
      *
      * Note: a user-supplied <code>pattern</code> string is a security hole
      * and must not be allowed.
      */
-    inert incremented CharBuf*
+    inert incremented String*
     newf(const char *pattern, ...);
 
-    /** Perform lexical comparison of two CharBufs, with level of indirection
+    /** Perform lexical comparison of two Strings, with level of indirection
      * set to please qsort and friends.
      */
     inert int
     compare(const void *va, const void *vb);
 
-    /** Perform lexical comparison of two CharBufs, with level of indirection
+    /** Perform lexical comparison of two Strings, with level of indirection
      * set to please qsort and friends, and return true if <code>a</code> is
      * less than <code>b</code>.
      */
@@ -87,21 +87,21 @@ class Clownfish::CharBuf cnick CB
     less_than(const void *va, const void *vb);
 
     public void
-    Mimic(CharBuf *self, Obj *other);
+    Mimic(String *self, Obj *other);
 
     void
-    Mimic_Str(CharBuf *self, const char *ptr, size_t size);
+    Mimic_Str(String *self, const char *ptr, size_t size);
 
-    /** Concatenate the passed-in string onto the end of the CharBuf.
+    /** Concatenate the passed-in string onto the end of the String.
      */
     void
-    Cat_Str(CharBuf *self, const char *ptr, size_t size);
+    Cat_Str(String *self, const char *ptr, size_t size);
 
     /** Concatenate the contents of <code>other</code> onto the end of the
      * caller.
      */
     void
-    Cat(CharBuf *self, const CharBuf *other);
+    Cat(String *self, const String *other);
 
     /** Concatenate formatted arguments.  Similar to the printf family, but
      * only accepts minimal options (just enough for decent error messages).
@@ -112,151 +112,151 @@ class Clownfish::CharBuf cnick CB
      * floats:   %f64
      * hex:      %x32
      *
-     * Note that all Clownfish Objects, including CharBufs, are printed via
+     * Note that all Clownfish Objects, including Strings, are printed via
      * %o (which invokes Obj_To_String()).
      */
     void
-    VCatF(CharBuf *self, const char *pattern, va_list args);
+    VCatF(String *self, const char *pattern, va_list args);
 
-    /** Invokes CB_VCatF to concatenate formatted arguments.  Note that this
+    /** Invokes Str_VCatF to concatenate formatted arguments.  Note that this
      * is only a function and not a method.
      */
     inert void
-    catf(CharBuf *self, const char *pattern, ...);
+    catf(String *self, const char *pattern, ...);
 
-    /** Concatenate one Unicode character onto the end of the CharBuf.
+    /** Concatenate one Unicode character onto the end of the String.
      */
     void
-    Cat_Char(CharBuf *self, uint32_t code_point);
+    Cat_Char(String *self, uint32_t code_point);
 
     /** Replace all instances of one character for the other.  For now, both
      * the source and replacement code points must be ASCII.
      */
     int32_t
-    Swap_Chars(CharBuf *self, uint32_t match, uint32_t replacement);
+    Swap_Chars(String *self, uint32_t match, uint32_t replacement);
 
     public int64_t
-    To_I64(CharBuf *self);
+    To_I64(String *self);
 
     /** Extract a 64-bit integer from a variable-base stringified version.
      */
     int64_t
-    BaseX_To_I64(CharBuf *self, uint32_t base);
+    BaseX_To_I64(String *self, uint32_t base);
 
     public double
-    To_F64(CharBuf *self);
+    To_F64(String *self);
 
-    /** Assign more memory to the CharBuf, if it doesn't already have enough
+    /** Assign more memory to the String, if it doesn't already have enough
      * room to hold a string of <code>size</code> bytes.  Cannot shrink the
      * allocation.
      *
      * @return a pointer to the raw buffer.
      */
     char*
-    Grow(CharBuf *self, size_t size);
+    Grow(String *self, size_t size);
 
-    /** Test whether the CharBuf starts with the content of another.
+    /** Test whether the String starts with the content of another.
      */
     bool
-    Starts_With(CharBuf *self, const CharBuf *prefix);
+    Starts_With(String *self, const String *prefix);
 
-    /** Test whether the CharBuf starts with the passed-in string.
+    /** Test whether the String starts with the passed-in string.
      */
     bool
-    Starts_With_Str(CharBuf *self, const char *prefix, size_t size);
+    Starts_With_Str(String *self, const char *prefix, size_t size);
 
-    /** Test whether the CharBuf ends with the content of another.
+    /** Test whether the String ends with the content of another.
      */
     bool
-    Ends_With(CharBuf *self, const CharBuf *postfix);
+    Ends_With(String *self, const String *postfix);
 
-    /** Test whether the CharBuf ends with the passed-in string.
+    /** Test whether the String ends with the passed-in string.
      */
     bool
-    Ends_With_Str(CharBuf *self, const char *postfix, size_t size);
+    Ends_With_Str(String *self, const char *postfix, size_t size);
 
-    /** Return the location of the substring within the CharBuf (measured in
+    /** Return the location of the substring within the String (measured in
      * code points), or -1 if the substring does not match.
      */
     int64_t
-    Find(CharBuf *self, const CharBuf *substring);
+    Find(String *self, const String *substring);
 
     int64_t
-    Find_Str(CharBuf *self, const char *ptr, size_t size);
+    Find_Str(String *self, const char *ptr, size_t size);
 
-    /** Test whether the CharBuf matches the passed-in string.
+    /** Test whether the String matches the passed-in string.
      */
     bool
-    Equals_Str(CharBuf *self, const char *ptr, size_t size);
+    Equals_Str(String *self, const char *ptr, size_t size);
 
     /** Return the number of Unicode code points in the object's string.
      */
     size_t
-    Length(CharBuf *self);
+    Length(String *self);
 
-    /** Set the CharBuf's <code>size</code> attribute.
+    /** Set the String's <code>size</code> attribute.
      */
     void
-    Set_Size(CharBuf *self, size_t size);
+    Set_Size(String *self, size_t size);
 
-    /** Get the CharBuf's <code>size</code> attribute.
+    /** Get the String's <code>size</code> attribute.
      */
     size_t
-    Get_Size(CharBuf *self);
+    Get_Size(String *self);
 
-    /** Return the internal backing array for the CharBuf if its internal
+    /** Return the internal backing array for the String if its internal
      * encoding is UTF-8.  If it is not encoded as UTF-8 throw an exception.
      */
     uint8_t*
-    Get_Ptr8(CharBuf *self);
+    Get_Ptr8(String *self);
 
-    /** Return a fresh copy of the string data in a CharBuf with an internal
+    /** Return a fresh copy of the string data in a String with an internal
      * encoding of UTF-8.
      */
-    CharBuf*
-    To_CB8(CharBuf *self);
+    String*
+    To_CB8(String *self);
 
-    public incremented CharBuf*
-    Clone(CharBuf *self);
+    public incremented String*
+    Clone(String *self);
 
     public void
-    Destroy(CharBuf *self);
+    Destroy(String *self);
 
     public bool
-    Equals(CharBuf *self, Obj *other);
+    Equals(String *self, Obj *other);
 
     public int32_t
-    Compare_To(CharBuf *self, Obj *other);
+    Compare_To(String *self, Obj *other);
 
     public int32_t
-    Hash_Sum(CharBuf *self);
+    Hash_Sum(String *self);
 
-    public incremented CharBuf*
-    To_String(CharBuf *self);
+    public incremented String*
+    To_String(String *self);
 
     /** Remove Unicode whitespace characters from both top and tail.
      */
     uint32_t
-    Trim(CharBuf *self);
+    Trim(String *self);
 
     /** Remove leading Unicode whitespace.
      */
     uint32_t
-    Trim_Top(CharBuf *self);
+    Trim_Top(String *self);
 
     /** Remove trailing Unicode whitespace.
      */
     uint32_t
-    Trim_Tail(CharBuf *self);
+    Trim_Tail(String *self);
 
-    /** Truncate the CharBuf so that it contains no more than
+    /** Truncate the String so that it contains no more than
      * <code>count</code>characters.
      *
      * @param count Maximum new length, in Unicode code points.
      * @return The number of code points left in the string after truncation.
      */
     size_t
-    Truncate(CharBuf *self, size_t count);
+    Truncate(String *self, size_t count);
 
     /** Return the Unicode code point at the specified number of code points
      * in.  Return 0 if the string length is exceeded.  (XXX It would be
@@ -264,32 +264,32 @@ class Clownfish::CharBuf cnick CB
      * no cached length.)
      */
     uint32_t
-    Code_Point_At(CharBuf *self, size_t tick);
+    Code_Point_At(String *self, size_t tick);
 
     /** Return the Unicode code point at the specified number of code points
      * counted backwards from the end of the string.  Return 0 if outside the
      * string.
      */
     uint32_t
-    Code_Point_From(CharBuf *self, size_t tick);
+    Code_Point_From(String *self, size_t tick);
 
-    /** Return a newly allocated CharBuf containing a copy of the indicated
+    /** Return a newly allocated String containing a copy of the indicated
      * substring.
      * @param offset Offset from the top, in code points.
      * @param len The desired length of the substring, in code points.
      */
-    incremented CharBuf*
-    SubString(CharBuf *self, size_t offset, size_t len);
+    incremented String*
+    SubString(String *self, size_t offset, size_t len);
 
-    /** Concatenate the supplied text onto the end of the CharBuf.  Don't
+    /** Concatenate the supplied text onto the end of the String.  Don't
      * check for UTF-8 validity.
      */
     void
-    Cat_Trusted_Str(CharBuf *self, const char *ptr, size_t size);
+    Cat_Trusted_Str(String *self, const char *ptr, size_t size);
 }
 
 class Clownfish::ViewCharBuf cnick ViewCB
-    inherits Clownfish::CharBuf {
+    inherits Clownfish::String {
 
     inert incremented ViewCharBuf*
     new_from_utf8(const char *utf8, size_t size);
@@ -301,7 +301,7 @@ class Clownfish::ViewCharBuf cnick ViewCB
     init(ViewCharBuf *self, const char *utf8, size_t size);
 
     void
-    Assign(ViewCharBuf *self, const CharBuf *other);
+    Assign(ViewCharBuf *self, const String *other);
 
     void
     Assign_Str(ViewCharBuf *self, const char *utf8, size_t size);
@@ -356,7 +356,7 @@ class Clownfish::StackString cnick SStr
     newf(void *allocation, size_t alloc_size, const char *pattern, ...);
 
     inert incremented StackString*
-    wrap(void *allocation, const CharBuf *source);
+    wrap(void *allocation, const String *source);
 
     inert incremented StackString*
     wrap_str(void *allocation, const char *ptr, size_t size);

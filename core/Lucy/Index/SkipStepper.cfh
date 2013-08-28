@@ -37,7 +37,7 @@ class Lucy::Index::SkipStepper inherits Lucy::Util::Stepper {
     void
     Set_ID_And_Filepos(SkipStepper *self, int32_t doc_id, int64_t filepos);
 
-    public incremented CharBuf*
+    public incremented String*
     To_String(SkipStepper *self);
 }
 

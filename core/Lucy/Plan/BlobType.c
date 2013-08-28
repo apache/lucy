@@ -70,12 +70,12 @@ Hash*
 BlobType_Dump_For_Schema_IMP(BlobType *self) {
     BlobTypeIVARS *const ivars = BlobType_IVARS(self);
     Hash *dump = Hash_new(0);
-    Hash_Store_Str(dump, "type", 4, (Obj*)CB_newf("blob"));
+    Hash_Store_Str(dump, "type", 4, (Obj*)Str_newf("blob"));
 
     // Store attributes that override the defaults -- even if they're
     // meaningless.
     if (ivars->boost != 1.0) {
-        Hash_Store_Str(dump, "boost", 5, (Obj*)CB_newf("%f64", ivars->boost));
+        Hash_Store_Str(dump, "boost", 5, (Obj*)Str_newf("%f64", ivars->boost));
     }
     if (ivars->indexed) {
         Hash_Store_Str(dump, "indexed", 7, (Obj*)CFISH_TRUE);
@@ -91,7 +91,7 @@ Hash*
 BlobType_Dump_IMP(BlobType *self) {
     Hash *dump = BlobType_Dump_For_Schema(self);
     Hash_Store_Str(dump, "_class", 6,
-                   (Obj*)CB_Clone(BlobType_Get_Class_Name(self)));
+                   (Obj*)Str_Clone(BlobType_Get_Class_Name(self)));
     DECREF(Hash_Delete_Str(dump, "type", 4));
     return dump;
 }
@@ -99,9 +99,9 @@ BlobType_Dump_IMP(BlobType *self) {
 BlobType*
 BlobType_Load_IMP(BlobType *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
-    CharBuf *class_name = (CharBuf*)Hash_Fetch_Str(source, "_class", 6);
+    String *class_name = (String*)Hash_Fetch_Str(source, "_class", 6);
     VTable *vtable
-        = (class_name != NULL && Obj_Is_A((Obj*)class_name, CHARBUF))
+        = (class_name != NULL && Obj_Is_A((Obj*)class_name, STRING))
           ? VTable_singleton(class_name, NULL)
           : BLOBTYPE;
     BlobType *loaded     = (BlobType*)VTable_Make_Obj(vtable);

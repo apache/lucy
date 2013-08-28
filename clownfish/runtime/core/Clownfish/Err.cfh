@@ -38,21 +38,21 @@ __END_C__
  */
 public class Clownfish::Err inherits Clownfish::Obj {
 
-    CharBuf *mess;
+    String *mess;
 
     inert void
     init_class();
 
     inert incremented Err*
-    new(decremented CharBuf *mess);
+    new(decremented String *mess);
 
     inert Err*
-    init(Err *self, decremented CharBuf *mess);
+    init(Err *self, decremented String *mess);
 
     public void
     Destroy(Err *self);
 
-    public incremented CharBuf*
+    public incremented String*
     To_String(Err *self);
 
     void*
@@ -61,9 +61,9 @@ public class Clownfish::Err inherits Clownfish::Obj {
     /** Concatenate the supplied argument onto the internal "mess".
      */
     public void
-    Cat_Mess(Err *self, const CharBuf *mess);
+    Cat_Mess(Err *self, const String *mess);
 
-    public CharBuf*
+    public String*
     Get_Mess(Err *self);
 
     /** Add information about the current stack frame onto <code>mess</code>.
@@ -117,7 +117,7 @@ public class Clownfish::Err inherits Clownfish::Obj {
      * @param message Error message, to be output verbatim.
      */
     inert void
-    throw_mess(VTable *vtable, decremented CharBuf *message);
+    throw_mess(VTable *vtable, decremented String *message);
 
     /** Invoke host exception handling.
      */
@@ -130,12 +130,12 @@ public class Clownfish::Err inherits Clownfish::Obj {
      * @param message Error message, to be output verbatim.
      */
     inert void
-    warn_mess(decremented CharBuf *message);
+    warn_mess(decremented String *message);
 
     /** Create a formatted error message.  Ususally invoked via the MAKE_MESS
      * macro.
      */
-    inert CharBuf*
+    inert String*
     make_mess(const char *file, int line, const char *func,
               const char *pattern, ...);
 
@@ -211,7 +211,7 @@ __C__
   CFISH_THROW(cfish_VTable *vtable, char* format, ...);
   void
   CFISH_WARN(char* format, ...);
-  cfish_CharBuf*
+  cfish_String*
   CFISH_MAKE_MESS(char* format, ...);
 #endif
 
@@ -228,7 +228,7 @@ static CFISH_INLINE void
 cfish_Err_abstract_class_check(cfish_Obj *obj, cfish_VTable *vtable) {
     cfish_VTable *const my_vtable = (cfish_VTable*)((cfish_Dummy*)obj)->vtable;
     if (my_vtable == vtable) {
-        cfish_CharBuf *mess = CFISH_MAKE_MESS("%o is an abstract class",
+        cfish_String *mess = CFISH_MAKE_MESS("%o is an abstract class",
                                               CFISH_Obj_Get_Class_Name(obj));
         CFISH_Obj_Dec_RefCount(obj);
         cfish_Err_throw_mess(CFISH_ERR, mess);

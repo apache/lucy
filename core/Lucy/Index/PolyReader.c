@@ -36,7 +36,7 @@
 
 // Obtain/release read locks and commit locks.
 static bool
-S_obtain_read_lock(PolyReader *self, const CharBuf *snapshot_filename);
+S_obtain_read_lock(PolyReader *self, const String *snapshot_filename);
 static bool 
 S_obtain_deletion_lock(PolyReader *self);
 static void
@@ -56,7 +56,7 @@ S_try_open_elements(void *context);
 struct try_read_snapshot_context {
     Snapshot *snapshot;
     Folder   *folder;
-    CharBuf  *path;
+    String   *path;
 };
 static void
 S_try_read_snapshot(void *context);
@@ -115,7 +115,7 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
     for (uint32_t i = 0; i < num_sub_readers; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(sub_readers, i);
         Hash *components = SegReader_Get_Components(seg_reader);
-        CharBuf *api;
+        String *api;
         DataReader *component;
         starts[i] = ivars->doc_max;
         ivars->doc_max += SegReader_Doc_Max(seg_reader);
@@ -131,7 +131,7 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
     }
     ivars->offsets = I32Arr_new_steal(starts, num_sub_readers);
 
-    CharBuf *api;
+    String *api;
     VArray  *readers;
     Hash_Iterate(data_readers);
     while (Hash_Next(data_readers, (Obj**)&api, (Obj**)&readers)) {
@@ -228,17 +228,17 @@ S_try_open_elements(void *context) {
     Folder     *folder            = PolyReader_Get_Folder(self);
     uint32_t    num_segs          = 0;
     uint64_t    latest_schema_gen = 0;
-    CharBuf    *schema_file       = NULL;
+    String     *schema_file       = NULL;
 
     // Find schema file, count segments.
     for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
-        CharBuf *entry = (CharBuf*)VA_Fetch(files, i);
+        String *entry = (String*)VA_Fetch(files, i);
 
         if (Seg_valid_seg_name(entry)) {
             num_segs++;
         }
-        else if (CB_Starts_With_Str(entry, "schema_", 7)
-                 && CB_Ends_With_Str(entry, ".json", 5)
+        else if (Str_Starts_With_Str(entry, "schema_", 7)
+                 && Str_Ends_With_Str(entry, ".json", 5)
                 ) {
             uint64_t gen = IxFileNames_extract_gen(entry);
             if (gen > latest_schema_gen) {
@@ -262,7 +262,7 @@ S_try_open_elements(void *context) {
             schema_file = NULL;
         }
         else {
-            CharBuf *mess = MAKE_MESS("Failed to parse %o", schema_file);
+            String *mess = MAKE_MESS("Failed to parse %o", schema_file);
             DECREF(files);
             Err_throw_mess(ERR, mess);
         }
@@ -270,7 +270,7 @@ S_try_open_elements(void *context) {
 
     VArray *segments = VA_new(num_segs);
     for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
-        CharBuf *entry = (CharBuf*)VA_Fetch(files, i);
+        String *entry = (String*)VA_Fetch(files, i);
 
         // Create a Segment for each segmeta.
         if (Seg_valid_seg_name(entry)) {
@@ -284,7 +284,7 @@ S_try_open_elements(void *context) {
                 VA_Push(segments, (Obj*)segment);
             }
             else {
-                CharBuf *mess = MAKE_MESS("Failed to read %o", entry);
+                String *mess = MAKE_MESS("Failed to read %o", entry);
                 DECREF(segment);
                 DECREF(segments);
                 DECREF(files);
@@ -325,7 +325,7 @@ S_try_open_elements(void *context) {
 }
 
 // For test suite.
-CharBuf* PolyReader_race_condition_debug1 = NULL;
+String* PolyReader_race_condition_debug1 = NULL;
 int32_t  PolyReader_debug1_num_passes     = 0;
 
 PolyReader*
@@ -346,7 +346,7 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
     }
 
     while (1) {
-        CharBuf *target_snap_file;
+        String *target_snap_file;
 
         // If a Snapshot was supplied, use its file.
         if (snapshot) {
@@ -355,7 +355,7 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
                 THROW(ERR, "Supplied snapshot objects must not be empty");
             }
             else {
-                CB_Inc_RefCount(target_snap_file);
+                Str_Inc_RefCount(target_snap_file);
             }
         }
         else {
@@ -382,8 +382,8 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
         // Testing only.
         if (PolyReader_race_condition_debug1) {
             StackString *temp = SSTR_WRAP_STR("temp", 4);
-            if (Folder_Exists(folder, (CharBuf*)temp)) {
-                bool success = Folder_Rename(folder, (CharBuf*)temp,
+            if (Folder_Exists(folder, (String*)temp)) {
+                bool success = Folder_Rename(folder, (String*)temp,
                                                PolyReader_race_condition_debug1);
                 if (!success) { RETHROW(INCREF(Err_get_error())); }
             }
@@ -455,8 +455,8 @@ S_derive_folder(Obj *index) {
     if (Obj_Is_A(index, FOLDER)) {
         folder = (Folder*)INCREF(index);
     }
-    else if (Obj_Is_A(index, CHARBUF)) {
-        folder = (Folder*)FSFolder_new((CharBuf*)index);
+    else if (Obj_Is_A(index, STRING)) {
+        folder = (Folder*)FSFolder_new((String*)index);
     }
     else {
         THROW(ERR, "Invalid type for 'index': %o", Obj_Get_Class_Name(index));
@@ -478,7 +478,7 @@ S_obtain_deletion_lock(PolyReader *self) {
 }
 
 static bool
-S_obtain_read_lock(PolyReader *self, const CharBuf *snapshot_file_name) {
+S_obtain_read_lock(PolyReader *self, const String *snapshot_file_name) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
     ivars->read_lock = IxManager_Make_Snapshot_Read_Lock(ivars->manager,
                                                          snapshot_file_name);

@@ -25,22 +25,22 @@ parcel Lucy;
 
 public class Lucy::Search::TermQuery inherits Lucy::Search::Query {
 
-    CharBuf *field;
+    String *field;
     Obj     *term;
 
     inert incremented TermQuery*
-    new(const CharBuf *field, const Obj *term);
+    new(const String *field, const Obj *term);
 
     /**
      * @param field Field name.
      * @param term Term text.
      */
     public inert TermQuery*
-    init(TermQuery *self, const CharBuf *field, const Obj *term);
+    init(TermQuery *self, const String *field, const Obj *term);
 
     /** Accessor for object's <code>field</code> member.
      */
-    public CharBuf*
+    public String*
     Get_Field(TermQuery *self);
 
     /** Accessor for object's <code>term</code> member.
@@ -52,7 +52,7 @@ public class Lucy::Search::TermQuery inherits Lucy::Search::Query {
     Make_Compiler(TermQuery *self, Searcher *searcher, float boost,
                   bool subordinate = false);
 
-    public incremented CharBuf*
+    public incremented String*
     To_String(TermQuery *self);
 
     public void
@@ -101,7 +101,7 @@ class Lucy::Search::TermCompiler inherits Lucy::Search::Compiler {
 
     public incremented VArray*
     Highlight_Spans(TermCompiler *self, Searcher *searcher,
-                    DocVector *doc_vec, const CharBuf *field);
+                    DocVector *doc_vec, const String *field);
 
     public bool
     Equals(TermCompiler *self, Obj *other);

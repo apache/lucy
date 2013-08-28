@@ -49,10 +49,10 @@ MatchAllQuery_Equals_IMP(MatchAllQuery *self, Obj *other) {
     return true;
 }
 
-CharBuf*
+String*
 MatchAllQuery_To_String_IMP(MatchAllQuery *self) {
     UNUSED_VAR(self);
-    return CB_new_from_trusted_utf8("[MATCHALL]", 10);
+    return Str_new_from_trusted_utf8("[MATCHALL]", 10);
 }
 
 Compiler*

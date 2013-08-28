@@ -22,7 +22,7 @@
 #include "charmony.h"
 
 #include "Clownfish/VTable.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Util/Memory.h"
 #include "Clownfish/VArray.h"
@@ -58,16 +58,16 @@ VTable_register_with_host(VTable *singleton, VTable *parent) {
 }
 
 VArray*
-VTable_fresh_host_methods(const CharBuf *class_name) {
+VTable_fresh_host_methods(const String *class_name) {
     UNUSED_VAR(class_name);
     return VA_new(0);
 }
 
-CharBuf*
-VTable_find_parent_class(const CharBuf *class_name) {
+String*
+VTable_find_parent_class(const String *class_name) {
     UNUSED_VAR(class_name);
     THROW(ERR, "TODO");
-    UNREACHABLE_RETURN(CharBuf*);
+    UNREACHABLE_RETURN(String*);
 }
 
 void*

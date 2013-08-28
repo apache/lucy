@@ -34,14 +34,14 @@
 #include "Lucy/Search/TermQuery.h"
 #include "Lucy/Store/RAMFolder.h"
 
-static CharBuf *analyzed_cb;
-static CharBuf *easy_analyzed_cb;
-static CharBuf *state_cb;
-static CharBuf *states_cb;
-static CharBuf *string_cb;
-static CharBuf *unindexed_but_analyzed_cb;
-static CharBuf *unindexed_unanalyzed_cb;
-static CharBuf *united_states_cb;
+static String *analyzed_cb;
+static String *easy_analyzed_cb;
+static String *state_cb;
+static String *states_cb;
+static String *string_cb;
+static String *unindexed_but_analyzed_cb;
+static String *unindexed_unanalyzed_cb;
+static String *united_states_cb;
 
 TestFieldMisc*
 TestFieldMisc_new() {
@@ -50,14 +50,14 @@ TestFieldMisc_new() {
 
 static void
 S_init_strings() {
-    analyzed_cb               = CB_newf("analyzed");
-    easy_analyzed_cb          = CB_newf("easy_analyzed");
-    state_cb                  = CB_newf("state");
-    states_cb                 = CB_newf("States");
-    string_cb                 = CB_newf("string");
-    unindexed_but_analyzed_cb = CB_newf("unindexed_but_analyzed");
-    unindexed_unanalyzed_cb   = CB_newf("unindexed_unanalyzed");
-    united_states_cb          = CB_newf("United States");
+    analyzed_cb               = Str_newf("analyzed");
+    easy_analyzed_cb          = Str_newf("easy_analyzed");
+    state_cb                  = Str_newf("state");
+    states_cb                 = Str_newf("States");
+    string_cb                 = Str_newf("string");
+    unindexed_but_analyzed_cb = Str_newf("unindexed_but_analyzed");
+    unindexed_unanalyzed_cb   = Str_newf("unindexed_unanalyzed");
+    united_states_cb          = Str_newf("United States");
 }
 
 static void
@@ -77,7 +77,7 @@ S_create_schema() {
     Schema *schema = Schema_new();
 
     StandardTokenizer *tokenizer     = StandardTokenizer_new();
-    CharBuf           *language      = CB_newf("en");
+    String            *language      = Str_newf("en");
     EasyAnalyzer      *easy_analyzer = EasyAnalyzer_new(language);
 
     FullTextType *plain         = FullTextType_new((Analyzer*)tokenizer);
@@ -113,7 +113,7 @@ S_create_schema() {
 }
 
 static void
-S_add_doc(Indexer *indexer, CharBuf *field_name) {
+S_add_doc(Indexer *indexer, String *field_name) {
     Doc *doc = Doc_new(NULL, 0);
     Doc_Store(doc, field_name, (Obj*)united_states_cb);
     Indexer_Add_Doc(indexer, doc, 1.0f);
@@ -121,22 +121,22 @@ S_add_doc(Indexer *indexer, CharBuf *field_name) {
 }
 
 static void
-S_check(TestBatchRunner *runner, RAMFolder *folder, CharBuf *field,
-        CharBuf *query_text, uint32_t expected_num_hits) {
+S_check(TestBatchRunner *runner, RAMFolder *folder, String *field,
+        String *query_text, uint32_t expected_num_hits) {
     TermQuery *query = TermQuery_new(field, (Obj*)query_text);
     IndexSearcher *searcher = IxSearcher_new((Obj*)folder);
     Hits *hits = IxSearcher_Hits(searcher, (Obj*)query, 0, 10, NULL);
 
     TEST_TRUE(runner, Hits_Total_Hits(hits) == expected_num_hits,
-              "%s correct num hits", CB_Get_Ptr8(field));
+              "%s correct num hits", Str_Get_Ptr8(field));
 
     // Don't check the contents of the hit if there aren't any.
     if (expected_num_hits) {
         HitDoc *hit = Hits_Next(hits);
         ViewCharBuf *value = (ViewCharBuf*)SStr_BLANK();
         HitDoc_Extract(hit, field, value);
-        TEST_TRUE(runner, CB_Equals(united_states_cb, (Obj*)value),
-                  "%s correct doc returned", CB_Get_Ptr8(field));
+        TEST_TRUE(runner, Str_Equals(united_states_cb, (Obj*)value),
+                  "%s correct doc returned", Str_Get_Ptr8(field));
         DECREF(hit);
     }
 
@@ -173,10 +173,10 @@ test_spec_field(TestBatchRunner *runner) {
 }
 
 static void
-S_add_many_fields_doc(Indexer *indexer, CharBuf *content, int num_fields) {
+S_add_many_fields_doc(Indexer *indexer, String *content, int num_fields) {
     Doc *doc = Doc_new(NULL, 0);
     for (int32_t i = 1; i <= num_fields; ++i) {
-        CharBuf *field = CB_newf("field%i32", i);
+        String *field = Str_newf("field%i32", i);
         Doc_Store(doc, field, (Obj*)content);
         DECREF(field);
     }
@@ -189,26 +189,26 @@ test_many_fields(TestBatchRunner *runner) {
     Schema            *schema    = Schema_new();
     StandardTokenizer *tokenizer = StandardTokenizer_new();
     FullTextType      *type      = FullTextType_new((Analyzer*)tokenizer);
-    CharBuf           *query     = CB_newf("x");
+    String            *query     = Str_newf("x");
 
     for (int32_t num_fields = 1; num_fields <= 10; ++num_fields) {
         // Build an index with num_fields fields, and the same content in each.
-        CharBuf *field = CB_newf("field%i32", num_fields);
+        String *field = Str_newf("field%i32", num_fields);
         Schema_Spec_Field(schema, field, (FieldType*)type);
 
         RAMFolder *folder  = RAMFolder_new(NULL);
         Indexer   *indexer = Indexer_new(schema, (Obj*)folder, NULL, 0);
 
-        CharBuf *content;
+        String *content;
 
         for (int c = 'a'; c <= 'z'; ++c) {
-            content = CB_new(1);
-            CB_Cat_Char(content, c);
+            content = Str_new(1);
+            Str_Cat_Char(content, c);
             S_add_many_fields_doc(indexer, content, num_fields);
             DECREF(content);
         }
 
-        content = CB_newf("x x y");
+        content = Str_newf("x x y");
         S_add_many_fields_doc(indexer, content, num_fields);
         DECREF(content);
 

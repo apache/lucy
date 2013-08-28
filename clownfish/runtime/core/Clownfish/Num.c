@@ -29,7 +29,7 @@
 #include "charmony.h"
 
 #include "Clownfish/Num.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/VTable.h"
 
@@ -66,9 +66,9 @@ FloatNum_Compare_To_IMP(FloatNum *self, Obj *other) {
     return 0;
 }
 
-CharBuf*
+String*
 FloatNum_To_String_IMP(FloatNum *self) {
-    return CB_newf("%f64", FloatNum_To_F64(self));
+    return Str_newf("%f64", FloatNum_To_F64(self));
 }
 
 /***************************************************************************/
@@ -91,9 +91,9 @@ IntNum_Compare_To_IMP(IntNum *self, Obj *other) {
     return 0;
 }
 
-CharBuf*
+String*
 IntNum_To_String_IMP(IntNum *self) {
-    return CB_newf("%i64", IntNum_To_I64(self));
+    return Str_newf("%i64", IntNum_To_I64(self));
 }
 
 /***************************************************************************/
@@ -325,10 +325,10 @@ void
 Bool_init_class() {
     Bool_true_singleton          = (BoolNum*)VTable_Make_Obj(BOOLNUM);
     Bool_true_singleton->value   = true;
-    Bool_true_singleton->string  = CB_newf("true");
+    Bool_true_singleton->string  = Str_newf("true");
     Bool_false_singleton         = (BoolNum*)VTable_Make_Obj(BOOLNUM);
     Bool_false_singleton->value  = false;
-    Bool_false_singleton->string = CB_newf("false");
+    Bool_false_singleton->string = Str_newf("false");
 }
 
 BoolNum*
@@ -374,9 +374,9 @@ Bool_Hash_Sum_IMP(BoolNum *self) {
     return (int32_t)hash_sum;
 }
 
-CharBuf*
+String*
 Bool_To_String_IMP(BoolNum *self) {
-    return (CharBuf*)CB_Inc_RefCount(self->string);
+    return (String*)Str_Inc_RefCount(self->string);
 }
 
 bool

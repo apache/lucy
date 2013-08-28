@@ -110,22 +110,22 @@ test_Clone_and_Reopen(TestBatchRunner *runner) {
     }
     OutStream_Close(outstream);
 
-    fh = RAMFH_open((CharBuf*)foo, FH_READ_ONLY, file);
+    fh = RAMFH_open((String*)foo, FH_READ_ONLY, file);
     instream = InStream_open((Obj*)fh);
     InStream_Seek(instream, 1);
-    TEST_TRUE(runner, CB_Equals(InStream_Get_Filename(instream), (Obj*)foo),
+    TEST_TRUE(runner, Str_Equals(InStream_Get_Filename(instream), (Obj*)foo),
               "Get_Filename");
 
     clone    = InStream_Clone(instream);
-    TEST_TRUE(runner, CB_Equals(InStream_Get_Filename(clone), (Obj*)foo),
+    TEST_TRUE(runner, Str_Equals(InStream_Get_Filename(clone), (Obj*)foo),
               "Clones have same filename");
     TEST_TRUE(runner, InStream_Length(instream) == InStream_Length(clone),
               "Clones have same length");
     TEST_TRUE(runner, InStream_Read_U8(instream) == InStream_Read_U8(clone),
               "Clones start at same file position");
 
-    reopened = InStream_Reopen(instream, (CharBuf*)bar, 25, 1);
-    TEST_TRUE(runner, CB_Equals(InStream_Get_Filename(reopened), (Obj*)bar),
+    reopened = InStream_Reopen(instream, (String*)bar, 25, 1);
+    TEST_TRUE(runner, Str_Equals(InStream_Get_Filename(reopened), (Obj*)bar),
               "Reopened InStreams take new filename");
     TEST_TRUE(runner, InStream_Read_U8(reopened) == 'z',
               "Reopened stream starts at supplied offset");

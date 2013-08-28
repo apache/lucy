@@ -46,7 +46,7 @@ isa_ok( $resurrected, "MyHash", "subclass name survived Perl destruction" );
 is( $resurrected->to_string, $stringified,
     "It's the same Hash from earlier (though a different Perl object)" );
 
-my $booga = Clownfish::CharBuf->new("booga");
+my $booga = Clownfish::String->new("booga");
 $resurrected->store( "ooga", $booga );
 
 is( $resurrected->fetch("ooga"),

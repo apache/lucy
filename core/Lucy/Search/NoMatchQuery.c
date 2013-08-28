@@ -51,10 +51,10 @@ NoMatchQuery_Equals_IMP(NoMatchQuery *self, Obj *other) {
     return true;
 }
 
-CharBuf*
+String*
 NoMatchQuery_To_String_IMP(NoMatchQuery *self) {
     UNUSED_VAR(self);
-    return CB_new_from_trusted_utf8("[NOMATCH]", 9);
+    return Str_new_from_trusted_utf8("[NOMATCH]", 9);
 }
 
 Compiler*

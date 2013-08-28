@@ -41,7 +41,7 @@ static int32_t
 S_find_upper_bound(RangeCompiler *self, SortCache *sort_cache);
 
 RangeQuery*
-RangeQuery_new(const CharBuf *field, Obj *lower_term, Obj *upper_term,
+RangeQuery_new(const String *field, Obj *lower_term, Obj *upper_term,
                bool include_lower, bool include_upper) {
     RangeQuery *self = (RangeQuery*)VTable_Make_Obj(RANGEQUERY);
     return RangeQuery_init(self, field, lower_term, upper_term,
@@ -49,11 +49,11 @@ RangeQuery_new(const CharBuf *field, Obj *lower_term, Obj *upper_term,
 }
 
 RangeQuery*
-RangeQuery_init(RangeQuery *self, const CharBuf *field, Obj *lower_term,
+RangeQuery_init(RangeQuery *self, const String *field, Obj *lower_term,
                 Obj *upper_term, bool include_lower, bool include_upper) {
     Query_init((Query*)self, 0.0f);
     RangeQueryIVARS *const ivars = RangeQuery_IVARS(self);
-    ivars->field          = CB_Clone(field);
+    ivars->field          = Str_Clone(field);
     ivars->lower_term     = lower_term ? Obj_Clone(lower_term) : NULL;
     ivars->upper_term     = upper_term ? Obj_Clone(upper_term) : NULL;
     ivars->include_lower  = include_lower;
@@ -82,7 +82,7 @@ RangeQuery_Equals_IMP(RangeQuery *self, Obj *other) {
     RangeQueryIVARS *const ivars = RangeQuery_IVARS(self);
     RangeQueryIVARS *const ovars = RangeQuery_IVARS((RangeQuery*)other);
     if (ivars->boost != ovars->boost)                 { return false; }
-    if (!CB_Equals(ivars->field, (Obj*)ovars->field)) { return false; }
+    if (!Str_Equals(ivars->field, (Obj*)ovars->field)) { return false; }
     if (ivars->lower_term && !ovars->lower_term)      { return false; }
     if (ivars->upper_term && !ovars->upper_term)      { return false; }
     if (!ivars->lower_term && ovars->lower_term)      { return false; }
@@ -96,16 +96,16 @@ RangeQuery_Equals_IMP(RangeQuery *self, Obj *other) {
     return true;
 }
 
-CharBuf*
+String*
 RangeQuery_To_String_IMP(RangeQuery *self) {
     RangeQueryIVARS *const ivars = RangeQuery_IVARS(self);
-    CharBuf *lower_term_str = ivars->lower_term
+    String *lower_term_str = ivars->lower_term
                               ? Obj_To_String(ivars->lower_term)
-                              : CB_new_from_trusted_utf8("*", 1);
-    CharBuf *upper_term_str = ivars->upper_term
+                              : Str_new_from_trusted_utf8("*", 1);
+    String *upper_term_str = ivars->upper_term
                               ? Obj_To_String(ivars->upper_term)
-                              : CB_new_from_trusted_utf8("*", 1);
-    CharBuf *retval = CB_newf("%o:%s%o TO %o%s", ivars->field,
+                              : Str_new_from_trusted_utf8("*", 1);
+    String *retval = Str_newf("%o:%s%o TO %o%s", ivars->field,
                               ivars->include_lower ? "[" : "{",
                               lower_term_str,
                               upper_term_str,
@@ -143,7 +143,7 @@ RangeQuery*
 RangeQuery_Deserialize_IMP(RangeQuery *self, InStream *instream) {
     // Deserialize components.
     float boost = InStream_Read_F32(instream);
-    CharBuf *field = Freezer_read_charbuf(instream);
+    String *field = Freezer_read_charbuf(instream);
     Obj *lower_term = InStream_Read_U8(instream) ? THAW(instream) : NULL;
     Obj *upper_term = InStream_Read_U8(instream) ? THAW(instream) : NULL;
     bool include_lower = InStream_Read_U8(instream);
@@ -190,7 +190,7 @@ RangeQuery_Load_IMP(RangeQuery *self, Obj *dump) {
     RangeQuery *loaded = (RangeQuery*)super_load(self, dump);
     RangeQueryIVARS *loaded_ivars = RangeQuery_IVARS(loaded);
     Obj *field = CERTIFY(Hash_Fetch_Str(source, "field", 5), OBJ);
-    loaded_ivars->field = (CharBuf*)CERTIFY(Freezer_load(field), CHARBUF);
+    loaded_ivars->field = (String*)CERTIFY(Freezer_load(field), STRING);
     Obj *lower_term = Hash_Fetch_Str(source, "lower_term", 10);
     if (lower_term) {
         loaded_ivars->lower_term
@@ -240,7 +240,7 @@ Matcher*
 RangeCompiler_Make_Matcher_IMP(RangeCompiler *self, SegReader *reader,
                                bool need_score) {
     RangeQuery *parent = (RangeQuery*)RangeCompiler_IVARS(self)->parent;
-    const CharBuf *field = RangeQuery_IVARS(parent)->field;
+    const String *field = RangeQuery_IVARS(parent)->field;
     SortReader *sort_reader
         = (SortReader*)SegReader_Fetch(reader, VTable_Get_Name(SORTREADER));
     SortCache *sort_cache = sort_reader

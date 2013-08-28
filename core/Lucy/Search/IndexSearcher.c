@@ -103,7 +103,7 @@ IxSearcher_Doc_Max_IMP(IndexSearcher *self) {
 }
 
 uint32_t
-IxSearcher_Doc_Freq_IMP(IndexSearcher *self, const CharBuf *field, Obj *term) {
+IxSearcher_Doc_Freq_IMP(IndexSearcher *self, const String *field, Obj *term) {
     IndexSearcherIVARS *const ivars = IxSearcher_IVARS(self);
     LexiconReader *lex_reader
         = (LexiconReader*)IxReader_Fetch(ivars->reader,

@@ -156,7 +156,7 @@ S_calc_ord_width(int32_t cardinality) {
 }
 
 static SortCache*
-S_lazy_init_sort_cache(DefaultSortReader *self, const CharBuf *field) {
+S_lazy_init_sort_cache(DefaultSortReader *self, const String *field) {
     DefaultSortReaderIVARS *const ivars = DefSortReader_IVARS(self);
 
     // See if we have any values.
@@ -174,13 +174,13 @@ S_lazy_init_sort_cache(DefaultSortReader *self, const CharBuf *field) {
     // Open streams.
     Folder    *folder    = DefSortReader_Get_Folder(self);
     Segment   *segment   = DefSortReader_Get_Segment(self);
-    CharBuf   *seg_name  = Seg_Get_Name(segment);
+    String    *seg_name  = Seg_Get_Name(segment);
     int32_t    field_num = Seg_Field_Num(segment, field);
     int8_t     prim_id   = FType_Primitive_ID(type);
     bool       var_width = (prim_id == FType_TEXT || prim_id == FType_BLOB)
                            ? true
                            : false;
-    CharBuf *ord_path = CB_newf("%o/sort-%i32.ord", seg_name, field_num);
+    String *ord_path = Str_newf("%o/sort-%i32.ord", seg_name, field_num);
     InStream *ord_in = Folder_Open_In(folder, ord_path);
     DECREF(ord_path);
     if (!ord_in) {
@@ -189,7 +189,7 @@ S_lazy_init_sort_cache(DefaultSortReader *self, const CharBuf *field) {
     }
     InStream *ix_in = NULL;
     if (var_width) {
-        CharBuf *ix_path = CB_newf("%o/sort-%i32.ix", seg_name, field_num);
+        String *ix_path = Str_newf("%o/sort-%i32.ix", seg_name, field_num);
         ix_in = Folder_Open_In(folder, ix_path);
         DECREF(ix_path);
         if (!ix_in) {
@@ -197,7 +197,7 @@ S_lazy_init_sort_cache(DefaultSortReader *self, const CharBuf *field) {
                   field, Err_get_error());
         }
     }
-    CharBuf *dat_path = CB_newf("%o/sort-%i32.dat", seg_name, field_num);
+    String *dat_path = Str_newf("%o/sort-%i32.dat", seg_name, field_num);
     InStream *dat_in = Folder_Open_In(folder, dat_path);
     DECREF(dat_path);
     if (!dat_in) {
@@ -258,7 +258,7 @@ S_lazy_init_sort_cache(DefaultSortReader *self, const CharBuf *field) {
 
 SortCache*
 DefSortReader_Fetch_Sort_Cache_IMP(DefaultSortReader *self,
-                                   const CharBuf *field) {
+                                   const String *field) {
     SortCache *cache = NULL;
 
     if (field) {

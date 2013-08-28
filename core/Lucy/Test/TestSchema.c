@@ -42,7 +42,7 @@ TestSchema_init(TestSchema *self, bool use_alt_arch) {
 
     Schema_init((Schema*)self);
     FullTextType_Set_Highlightable(type, true);
-    CharBuf *content = (CharBuf*)SSTR_WRAP_STR("content", 7);
+    String *content = (String*)SSTR_WRAP_STR("content", 7);
     TestSchema_Spec_Field(self, content, (FieldType*)type);
     DECREF(type);
     DECREF(tokenizer);
@@ -70,7 +70,7 @@ test_Equals(TestBatchRunner *runner) {
     TestSchema *schema = TestSchema_new(false);
     TestSchema *arch_differs = TestSchema_new(true);
     TestSchema *spec_differs = TestSchema_new(false);
-    CharBuf    *content      = (CharBuf*)SSTR_WRAP_STR("content", 7);
+    String     *content      = (String*)SSTR_WRAP_STR("content", 7);
     FullTextType *type = (FullTextType*)TestSchema_Fetch_Type(spec_differs,
                                                               content);
 

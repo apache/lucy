@@ -31,19 +31,19 @@ TestJson_new() {
 }
 
 // Create a test data structure including at least one each of Hash, VArray,
-// and CharBuf.
+// and String.
 static Obj*
 S_make_dump() {
     Hash *dump = Hash_new(0);
-    Hash_Store_Str(dump, "foo", 3, (Obj*)CB_newf("foo"));
+    Hash_Store_Str(dump, "foo", 3, (Obj*)Str_newf("foo"));
     Hash_Store_Str(dump, "stuff", 5, (Obj*)VA_new(0));
     return (Obj*)dump;
 }
 
 static void
 test_tolerance(TestBatchRunner *runner) {
-    CharBuf *foo = CB_newf("foo");
-    CharBuf *not_json = Json_to_json((Obj*)foo);
+    String *foo = Str_newf("foo");
+    String *not_json = Json_to_json((Obj*)foo);
     TEST_TRUE(runner, not_json == NULL,
               "to_json returns NULL when fed invalid data type");
     TEST_TRUE(runner, Err_get_error() != NULL,
@@ -115,18 +115,18 @@ static const char* quote_escapes_json[] = {
 static void
 test_escapes(TestBatchRunner *runner) {
     for (int i = 0; control_escapes[i] != NULL; i++) {
-        CharBuf *string = CB_new(1);
-        CB_Cat_Char(string, i);
+        String *string = Str_new(1);
+        Str_Cat_Char(string, i);
         const char *escaped = control_escapes[i];
-        CharBuf    *json    = Json_to_json((Obj*)string);
-        CharBuf    *decoded = (CharBuf*)Json_from_json(json);
+        String     *json    = Json_to_json((Obj*)string);
+        String     *decoded = (String*)Json_from_json(json);
 
-        CharBuf *json_wanted = CB_newf("\"%s\"", escaped);
-        CB_Trim(json);
-        TEST_TRUE(runner, json != NULL && CB_Equals(json_wanted, (Obj*)json),
+        String *json_wanted = Str_newf("\"%s\"", escaped);
+        Str_Trim(json);
+        TEST_TRUE(runner, json != NULL && Str_Equals(json_wanted, (Obj*)json),
                   "encode control escape: %s", escaped);
 
-        TEST_TRUE(runner, decoded != NULL && CB_Equals(string, (Obj*)decoded),
+        TEST_TRUE(runner, decoded != NULL && Str_Equals(string, (Obj*)decoded),
                   "decode control escape: %s", escaped);
 
         DECREF(string);
@@ -138,16 +138,16 @@ test_escapes(TestBatchRunner *runner) {
     for (int i = 0; quote_escapes_source[i] != NULL; i++) {
         const char *source  = quote_escapes_source[i];
         const char *escaped = quote_escapes_json[i];
-        CharBuf *string  = CB_new_from_utf8(source, strlen(source));
-        CharBuf *json    = Json_to_json((Obj*)string);
-        CharBuf *decoded = (CharBuf*)Json_from_json(json);
+        String *string  = Str_new_from_utf8(source, strlen(source));
+        String *json    = Json_to_json((Obj*)string);
+        String *decoded = (String*)Json_from_json(json);
 
-        CharBuf *json_wanted = CB_newf("\"%s\"", escaped);
-        CB_Trim(json);
-        TEST_TRUE(runner, json != NULL && CB_Equals(json_wanted, (Obj*)json),
+        String *json_wanted = Str_newf("\"%s\"", escaped);
+        Str_Trim(json);
+        TEST_TRUE(runner, json != NULL && Str_Equals(json_wanted, (Obj*)json),
                   "encode quote/backslash escapes: %s", source);
 
-        TEST_TRUE(runner, decoded != NULL && CB_Equals(string, (Obj*)decoded),
+        TEST_TRUE(runner, decoded != NULL && Str_Equals(string, (Obj*)decoded),
                   "decode quote/backslash escapes: %s", source);
 
         DECREF(string);
@@ -160,15 +160,15 @@ test_escapes(TestBatchRunner *runner) {
 static void
 test_numbers(TestBatchRunner *runner) {
     Integer64 *i64  = Int64_new(33);
-    CharBuf   *json = Json_to_json((Obj*)i64);
-    CB_Trim(json);
-    TEST_TRUE(runner, json && CB_Equals_Str(json, "33", 2), "Integer");
+    String    *json = Json_to_json((Obj*)i64);
+    Str_Trim(json);
+    TEST_TRUE(runner, json && Str_Equals_Str(json, "33", 2), "Integer");
     DECREF(json);
 
     Float64 *f64 = Float64_new(33.33);
     json = Json_to_json((Obj*)f64);
     if (json) {
-        double value = CB_To_F64(json);
+        double value = Str_To_F64(json);
         double diff = 33.33 - value;
         if (diff < 0.0) { diff = 0.0 - diff; }
         TEST_TRUE(runner, diff < 0.0001, "Float");
@@ -185,7 +185,7 @@ test_numbers(TestBatchRunner *runner) {
 static void
 test_to_and_from(TestBatchRunner *runner) {
     Obj *dump = S_make_dump();
-    CharBuf *json = Json_to_json(dump);
+    String *json = Json_to_json(dump);
     Obj *got = Json_from_json(json);
     TEST_TRUE(runner, got != NULL && Obj_Equals(dump, got),
               "Round trip through to_json and from_json");
@@ -199,7 +199,7 @@ test_spew_and_slurp(TestBatchRunner *runner) {
     Obj *dump = S_make_dump();
     Folder *folder = (Folder*)RAMFolder_new(NULL);
 
-    CharBuf *foo = (CharBuf*)SSTR_WRAP_STR("foo", 3);
+    String *foo = (String*)SSTR_WRAP_STR("foo", 3);
     bool result = Json_spew_json(dump, folder, foo);
     TEST_TRUE(runner, result, "spew_json returns true on success");
     TEST_TRUE(runner, Folder_Exists(folder, foo),
@@ -217,14 +217,14 @@ test_spew_and_slurp(TestBatchRunner *runner) {
               "Failed spew_json sets Err_error");
 
     Err_set_error(NULL);
-    CharBuf *bar = (CharBuf*)SSTR_WRAP_STR("bar", 3);
+    String *bar = (String*)SSTR_WRAP_STR("bar", 3);
     got = Json_slurp_json(folder, bar);
     TEST_TRUE(runner, got == NULL,
               "slurp_json returns NULL when file doesn't exist");
     TEST_TRUE(runner, Err_get_error() != NULL,
               "Failed slurp_json sets Err_error");
 
-    CharBuf *boffo = (CharBuf*)SSTR_WRAP_STR("boffo", 5);
+    String *boffo = (String*)SSTR_WRAP_STR("boffo", 5);
 
     FileHandle *fh
         = Folder_Open_FileHandle(folder, boffo, FH_CREATE | FH_WRITE_ONLY);
@@ -247,7 +247,7 @@ static void
 S_verify_bad_syntax(TestBatchRunner *runner, const char *bad, const char *mess) {
     StackString *has_errors = SSTR_WRAP_STR(bad, strlen(bad));
     Err_set_error(NULL);
-    Obj *not_json = Json_from_json((CharBuf*)has_errors);
+    Obj *not_json = Json_from_json((String*)has_errors);
     TEST_TRUE(runner, not_json == NULL, "from_json returns NULL: %s", mess);
     TEST_TRUE(runner, Err_get_error() != NULL, "from_json sets Err_error: %s",
               mess);
@@ -279,7 +279,7 @@ S_round_trip_integer(TestBatchRunner *runner, int64_t value) {
     Integer64 *num = Int64_new(value);
     VArray *array = VA_new(1);
     VA_Store(array, 0, (Obj*)num);
-    CharBuf *json = Json_to_json((Obj*)array);
+    String *json = Json_to_json((Obj*)array);
     Obj *dump = Json_from_json(json);
     TEST_TRUE(runner, VA_Equals(array, dump), "Round trip integer %ld",
               (long)value);
@@ -301,7 +301,7 @@ S_round_trip_float(TestBatchRunner *runner, double value, double max_diff) {
     Float64 *num = Float64_new(value);
     VArray *array = VA_new(1);
     VA_Store(array, 0, (Obj*)num);
-    CharBuf *json = Json_to_json((Obj*)array);
+    String *json = Json_to_json((Obj*)array);
     Obj *dump = CERTIFY(Json_from_json(json), VARRAY);
     Float64 *got = (Float64*)CERTIFY(VA_Fetch((VArray*)dump, 0), FLOAT64);
     double diff = Float64_Get_Value(num) - Float64_Get_Value(got);
@@ -326,7 +326,7 @@ test_max_depth(TestBatchRunner *runner) {
     Hash *circular = Hash_new(0);
     Hash_Store_Str(circular, "circular", 8, INCREF(circular));
     Err_set_error(NULL);
-    CharBuf *not_json = Json_to_json((Obj*)circular);
+    String *not_json = Json_to_json((Obj*)circular);
     TEST_TRUE(runner, not_json == NULL,
               "to_json returns NULL when fed recursing data");
     TEST_TRUE(runner, Err_get_error() != NULL,
@@ -339,9 +339,9 @@ static void
 test_illegal_keys(TestBatchRunner *runner) {
     Hash *hash = Hash_new(0);
     Float64 *key = Float64_new(1.1);
-    Hash_Store(hash, (Obj*)key, (Obj*)CB_newf("blah"));
+    Hash_Store(hash, (Obj*)key, (Obj*)Str_newf("blah"));
     Err_set_error(NULL);
-    CharBuf *not_json = Json_to_json((Obj*)hash);
+    String *not_json = Json_to_json((Obj*)hash);
     TEST_TRUE(runner, not_json == NULL,
               "to_json returns NULL when fed an illegal key");
     TEST_TRUE(runner, Err_get_error() != NULL,

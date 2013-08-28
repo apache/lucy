@@ -24,16 +24,16 @@
 #include "Lucy/Analysis/SnowballStemmer.h"
 
 EasyAnalyzer*
-EasyAnalyzer_new(const CharBuf *language) {
+EasyAnalyzer_new(const String *language) {
     EasyAnalyzer *self = (EasyAnalyzer*)VTable_Make_Obj(EASYANALYZER);
     return EasyAnalyzer_init(self, language);
 }
 
 EasyAnalyzer*
-EasyAnalyzer_init(EasyAnalyzer *self, const CharBuf *language) {
+EasyAnalyzer_init(EasyAnalyzer *self, const String *language) {
     Analyzer_init((Analyzer*)self);
     EasyAnalyzerIVARS *const ivars = EasyAnalyzer_IVARS(self);
-    ivars->language   = CB_Clone(language);
+    ivars->language   = Str_Clone(language);
     ivars->tokenizer  = StandardTokenizer_new();
     ivars->normalizer = Normalizer_new(NULL, true, false);
     ivars->stemmer    = SnowStemmer_new(language);
@@ -62,7 +62,7 @@ EasyAnalyzer_Transform_IMP(EasyAnalyzer *self, Inversion *inversion) {
 }
 
 Inversion*
-EasyAnalyzer_Transform_Text_IMP(EasyAnalyzer *self, CharBuf *text) {
+EasyAnalyzer_Transform_Text_IMP(EasyAnalyzer *self, String *text) {
     EasyAnalyzerIVARS *const ivars = EasyAnalyzer_IVARS(self);
     Inversion *inv1 = StandardTokenizer_Transform_Text(ivars->tokenizer, text);
     Inversion *inv2 = Normalizer_Transform(ivars->normalizer, inv1);
@@ -78,7 +78,7 @@ EasyAnalyzer_Dump_IMP(EasyAnalyzer *self) {
     EasyAnalyzer_Dump_t super_dump
         = SUPER_METHOD_PTR(EASYANALYZER, LUCY_EasyAnalyzer_Dump);
     Hash *dump = super_dump(self);
-    Hash_Store_Str(dump, "language", 8, (Obj*)CB_Clone(ivars->language));
+    Hash_Store_Str(dump, "language", 8, (Obj*)Str_Clone(ivars->language));
     return dump;
 }
 
@@ -88,8 +88,8 @@ EasyAnalyzer_Load_IMP(EasyAnalyzer *self, Obj *dump) {
         = SUPER_METHOD_PTR(EASYANALYZER, LUCY_EasyAnalyzer_Load);
     EasyAnalyzer *loaded = super_load(self, dump);
     Hash    *source = (Hash*)CERTIFY(dump, HASH);
-    CharBuf *language
-        = (CharBuf*)CERTIFY(Hash_Fetch_Str(source, "language", 8), CHARBUF);
+    String *language
+        = (String*)CERTIFY(Hash_Fetch_Str(source, "language", 8), STRING);
     return EasyAnalyzer_init(loaded, language);
 }
 
@@ -99,7 +99,7 @@ EasyAnalyzer_Equals_IMP(EasyAnalyzer *self, Obj *other) {
     if (!Obj_Is_A(other, EASYANALYZER))                     { return false; }
     EasyAnalyzerIVARS *const ivars = EasyAnalyzer_IVARS(self);
     EasyAnalyzerIVARS *const ovars = EasyAnalyzer_IVARS((EasyAnalyzer*)other);
-    if (!CB_Equals(ovars->language, (Obj*)ivars->language)) { return false; }
+    if (!Str_Equals(ovars->language, (Obj*)ivars->language)) { return false; }
     return true;
 }
 

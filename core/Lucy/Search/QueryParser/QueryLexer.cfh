@@ -32,7 +32,7 @@ class Lucy::Search::QueryParser::QueryLexer inherits Clownfish::Obj {
      * @return an array of ParserElems.
      */
     incremented VArray*
-    Tokenize(QueryLexer *self, const CharBuf *query_string = NULL);
+    Tokenize(QueryLexer *self, const String *query_string = NULL);
 
     bool
     Heed_Colons(QueryLexer *self);

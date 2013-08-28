@@ -56,7 +56,7 @@ public class Lucy::Index::PolyReader inherits Lucy::Index::IndexReader {
          Snapshot *snapshot = NULL, IndexManager *manager = NULL,
          VArray *sub_readers = NULL);
 
-    inert CharBuf* race_condition_debug1;
+    inert String* race_condition_debug1;
     inert int32_t  debug1_num_passes;
 
     /** Determine which sub-reader a document id belongs to.

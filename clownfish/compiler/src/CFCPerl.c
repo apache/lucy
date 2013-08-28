@@ -253,7 +253,7 @@ S_write_boot_c(CFCPerl *self) {
                     "%s"
                     "    CFISH_SStr_Assign_Str(alias, \"%s\", %u);\n"
                     "    cfish_VTable_add_alias_to_registry(%s,\n"
-                    "        (cfish_CharBuf*)alias);\n";
+                    "        (cfish_String*)alias);\n";
                 char *new_alias_adds
                     = CFCUtil_sprintf(pattern, alias_adds, alias,
                                       (unsigned)alias_len, vtable_var);
@@ -287,7 +287,7 @@ S_write_boot_c(CFCPerl *self) {
         "#include \"perl.h\"\n"
         "#include \"XSUB.h\"\n"
         "#include \"boot.h\"\n"
-        "#include \"Clownfish/CharBuf.h\"\n"
+        "#include \"Clownfish/String.h\"\n"
         "#include \"Clownfish/VTable.h\"\n"
         "%s\n"
         "\n"

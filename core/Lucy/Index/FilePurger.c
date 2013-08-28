@@ -95,7 +95,7 @@ FilePurger_Purge_IMP(FilePurger *self) {
         // get deleted after they've been emptied.
         VA_Sort(purgables, NULL, NULL);
         for (uint32_t i = VA_Get_Size(purgables); i--;) {
-            CharBuf *entry = (CharBuf*)VA_Fetch(purgables, i);
+            String *entry = (String*)VA_Fetch(purgables, i);
             if (Hash_Fetch(ivars->disallowed, (Obj*)entry)) { continue; }
             if (!Folder_Delete(folder, entry)) {
                 if (Folder_Exists(folder, entry)) {
@@ -112,7 +112,7 @@ FilePurger_Purge_IMP(FilePurger *self) {
                 // successfully deleted.
                 VArray *entries = Snapshot_List(snapshot);
                 for (uint32_t j = VA_Get_Size(entries); j--;) {
-                    CharBuf *entry = (CharBuf*)VA_Fetch(entries, j);
+                    String *entry = (String*)VA_Fetch(entries, j);
                     if (Hash_Fetch(failures, (Obj*)entry)) {
                         snapshot_has_failures = true;
                         break;
@@ -121,7 +121,7 @@ FilePurger_Purge_IMP(FilePurger *self) {
                 DECREF(entries);
             }
             if (!snapshot_has_failures) {
-                CharBuf *snapfile = Snapshot_Get_Path(snapshot);
+                String *snapfile = Snapshot_Get_Path(snapshot);
                 Folder_Delete(folder, snapfile);
             }
         }
@@ -153,7 +153,7 @@ S_zap_dead_merge(FilePurger *self, Hash *candidates) {
                        : NULL;
 
         if (cutoff) {
-            CharBuf *cutoff_seg = Seg_num_to_name(Obj_To_I64(cutoff));
+            String *cutoff_seg = Seg_num_to_name(Obj_To_I64(cutoff));
             if (Folder_Exists(ivars->folder, cutoff_seg)) {
                 StackString *merge_json = SSTR_WRAP_STR("merge.json", 10);
                 DirHandle *dh = Folder_Open_Dir(ivars->folder, cutoff_seg);
@@ -166,8 +166,8 @@ S_zap_dead_merge(FilePurger *self, Hash *candidates) {
                 Hash_Store(candidates, (Obj*)merge_json, (Obj*)CFISH_TRUE);
                 while (DH_Next(dh)) {
                     // TODO: recursively delete subdirs within seg dir.
-                    CharBuf *entry = DH_Get_Entry(dh);
-                    CharBuf *filepath = CB_newf("%o/%o", cutoff_seg, entry);
+                    String *entry = DH_Get_Entry(dh);
+                    String *filepath = Str_newf("%o/%o", cutoff_seg, entry);
                     Hash_Store(candidates, (Obj*)filepath, (Obj*)CFISH_TRUE);
                     DECREF(filepath);
                     DECREF(entry);
@@ -193,7 +193,7 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
     if (!dh) { RETHROW(INCREF(Err_get_error())); }
     VArray      *spared       = VA_new(1);
     VArray      *snapshots    = VA_new(1);
-    CharBuf     *snapfile     = NULL;
+    String      *snapfile     = NULL;
 
     // Start off with the list of files in the current snapshot.
     if (ivars->snapshot) {
@@ -208,10 +208,10 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
 
     Hash *candidates = Hash_new(64);
     while (DH_Next(dh)) {
-        CharBuf *entry = DH_Get_Entry(dh);
-        if (CB_Starts_With_Str(entry, "snapshot_", 9)
-            && CB_Ends_With_Str(entry, ".json", 5)
-            && (!snapfile || !CB_Equals(entry, (Obj*)snapfile))
+        String *entry = DH_Get_Entry(dh);
+        if (Str_Starts_With_Str(entry, "snapshot_", 9)
+            && Str_Ends_With_Str(entry, ".json", 5)
+            && (!snapfile || !Str_Equals(entry, (Obj*)snapfile))
         ) {
             Snapshot *snapshot
                 = Snapshot_Read_File(Snapshot_new(), folder, entry);
@@ -232,14 +232,14 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
                                     + VA_Get_Size(referenced)
                                     + 1;
                 VA_Grow(spared, new_size);
-                VA_Push(spared, (Obj*)CB_Clone(entry));
+                VA_Push(spared, (Obj*)Str_Clone(entry));
                 VA_Push_VArray(spared, referenced);
             }
             else {
                 // No one's using this snapshot, so all of its entries are
                 // candidates for deletion.
                 for (uint32_t i = 0, max = VA_Get_Size(referenced); i < max; i++) {
-                    CharBuf *file = (CharBuf*)VA_Fetch(referenced, i);
+                    String *file = (String*)VA_Fetch(referenced, i);
                     Hash_Store(candidates, (Obj*)file, (Obj*)CFISH_TRUE);
                 }
                 VA_Push(snapshots, INCREF(snapshot));
@@ -259,7 +259,7 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
 
     // Eliminate any current files from the list of files to be purged.
     for (uint32_t i = 0, max = VA_Get_Size(spared); i < max; i++) {
-        CharBuf *filename = (CharBuf*)VA_Fetch(spared, i);
+        String *filename = (String*)VA_Fetch(spared, i);
         DECREF(Hash_Delete(candidates, (Obj*)filename));
     }
 
@@ -275,12 +275,12 @@ static VArray*
 S_find_all_referenced(Folder *folder, VArray *entries) {
     Hash *uniqued = Hash_new(VA_Get_Size(entries));
     for (uint32_t i = 0, max = VA_Get_Size(entries); i < max; i++) {
-        CharBuf *entry = (CharBuf*)VA_Fetch(entries, i);
+        String *entry = (String*)VA_Fetch(entries, i);
         Hash_Store(uniqued, (Obj*)entry, (Obj*)CFISH_TRUE);
         if (Folder_Is_Directory(folder, entry)) {
             VArray *contents = Folder_List_R(folder, entry);
             for (uint32_t j = VA_Get_Size(contents); j--;) {
-                CharBuf *sub_entry = (CharBuf*)VA_Fetch(contents, j);
+                String *sub_entry = (String*)VA_Fetch(contents, j);
                 Hash_Store(uniqued, (Obj*)sub_entry, (Obj*)CFISH_TRUE);
             }
             DECREF(contents);

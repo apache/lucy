@@ -36,7 +36,7 @@ TestLFReg_new() {
 
 StupidHashCharBuf*
 StupidHashCharBuf_new(const char *text) {
-    return (StupidHashCharBuf*)CB_new_from_utf8(text, strlen(text));
+    return (StupidHashCharBuf*)Str_new_from_utf8(text, strlen(text));
 }
 
 int32_t

@@ -21,8 +21,8 @@
 
 VALUE
 Bind_cfish_to_ruby(cfish_Obj *obj) {
-  if (CFISH_Obj_Is_A(obj, CFISH_CHARBUF)) {
-      return Bind_cb_to_ruby((cfish_CharBuf*)obj);
+  if (CFISH_Obj_Is_A(obj, CFISH_STRING)) {
+      return Bind_cb_to_ruby((cfish_String*)obj);
   }
   else if (CFISH_Obj_Is_A(obj, CFISH_VARRAY)) {
       return S_cfish_array_to_ruby_array((cfish_VArray*)obj);
@@ -30,12 +30,12 @@ Bind_cfish_to_ruby(cfish_Obj *obj) {
 }
 
 VALUE
-Bind_cb_to_ruby(const cfish_CharBuf *cb) {
+Bind_cb_to_ruby(const cfish_String *cb) {
     if (!cb) {
         return rb_str_new2("");
     }
     else {
-        return rb_str_new((char*)CFISH_CB_Get_Ptr8(cb), CFISH_CB_Get_Size(cb));
+        return rb_str_new((char*)CFISH_Str_Get_Ptr8(cb), CFISH_Str_Get_Size(cb));
     }
 }
 

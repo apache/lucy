@@ -33,7 +33,7 @@ class Lucy::Store::OutStream inherits Clownfish::Obj {
     int64_t        buf_start;
     size_t         buf_pos;
     FileHandle    *file_handle;
-    CharBuf       *path;
+    String        *path;
 
     inert incremented nullable OutStream*
     open(Obj *file);
@@ -45,7 +45,7 @@ class Lucy::Store::OutStream inherits Clownfish::Obj {
 
     /** Accessor for <code>path</code> member.
      */
-    CharBuf*
+    String*
     Get_Path(OutStream *self);
 
     /** Return the current file position.

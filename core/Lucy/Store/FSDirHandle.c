@@ -31,7 +31,7 @@
 #endif
 
 FSDirHandle*
-FSDH_open(const CharBuf *dir) {
+FSDH_open(const String *dir) {
     FSDirHandle *self = (FSDirHandle*)VTable_Make_Obj(FSDIRHANDLE);
     return FSDH_do_open(self, dir);
 }
@@ -64,9 +64,9 @@ SI_is_updir(const char *name, size_t len) {
 #include <windows.h>
 
 FSDirHandle*
-FSDH_do_open(FSDirHandle *self, const CharBuf *dir) {
-    size_t  dir_path_size = CB_Get_Size(dir);
-    char   *dir_path_ptr  = (char*)CB_Get_Ptr8(dir);
+FSDH_do_open(FSDirHandle *self, const String *dir) {
+    size_t  dir_path_size = Str_Get_Size(dir);
+    char   *dir_path_ptr  = (char*)Str_Get_Ptr8(dir);
     char    search_string[MAX_PATH + 1];
     char   *path_ptr = search_string;
 
@@ -78,7 +78,7 @@ FSDH_do_open(FSDirHandle *self, const CharBuf *dir) {
 
     if (dir_path_size >= MAX_PATH - 2) {
         // Deal with Windows ceiling on file path lengths.
-        Err_set_error(Err_new(CB_newf("Directory path is too long: %o",
+        Err_set_error(Err_new(Str_newf("Directory path is too long: %o",
                                       dir)));
         CFISH_DECREF(self);
         return NULL;
@@ -93,7 +93,7 @@ FSDH_do_open(FSDirHandle *self, const CharBuf *dir) {
         = FindFirstFile(search_string, (WIN32_FIND_DATA*)ivars->sys_dir_entry);
     if (INVALID_HANDLE_VALUE == ivars->sys_dirhandle) {
         // Directory inaccessible or doesn't exist.
-        Err_set_error(Err_new(CB_newf("Failed to open dir '%o'", dir)));
+        Err_set_error(Err_new(Str_newf("Failed to open dir '%o'", dir)));
         CFISH_DECREF(self);
         return NULL;
     }
@@ -141,7 +141,7 @@ FSDH_Close_IMP(FSDirHandle *self) {
             if (!ivars->saved_error) {
                 char *win_error = Err_win_error();
                 ivars->saved_error
-                    = Err_new(CB_newf("Error while closing directory: %s",
+                    = Err_new(Str_newf("Error while closing directory: %s",
                                       win_error));
                 FREEMEM(win_error);
             }
@@ -182,7 +182,7 @@ FSDH_Next_IMP(FSDirHandle *self) {
         if (GetLastError() != ERROR_NO_MORE_FILES) {
             char *win_error = Err_win_error();
             ivars->saved_error
-                = Err_new(CB_newf("Error while traversing directory: %s",
+                = Err_new(Str_newf("Error while traversing directory: %s",
                                   win_error));
             FREEMEM(win_error);
         }
@@ -196,7 +196,7 @@ FSDH_Next_IMP(FSDirHandle *self) {
     }
     else {
         DECREF(ivars->entry);
-        ivars->entry = CB_new_from_utf8(find_data->cFileName, len);
+        ivars->entry = Str_new_from_utf8(find_data->cFileName, len);
         return true;
     }
 }
@@ -207,8 +207,8 @@ FSDH_Next_IMP(FSDirHandle *self) {
 #include <dirent.h>
 
 FSDirHandle*
-FSDH_do_open(FSDirHandle *self, const CharBuf *dir) {
-    char *dir_path_ptr = (char*)CB_Get_Ptr8(dir);
+FSDH_do_open(FSDirHandle *self, const String *dir) {
+    char *dir_path_ptr = (char*)Str_Get_Ptr8(dir);
 
     DH_init((DirHandle*)self, dir);
     FSDirHandleIVARS *const ivars = FSDH_IVARS(self);
@@ -216,7 +216,7 @@ FSDH_do_open(FSDirHandle *self, const CharBuf *dir) {
 
     ivars->sys_dirhandle = opendir(dir_path_ptr);
     if (!ivars->sys_dirhandle) {
-        Err_set_error(Err_new(CB_newf("Failed to opendir '%o'", dir)));
+        Err_set_error(Err_new(Str_newf("Failed to opendir '%o'", dir)));
         DECREF(self);
         return NULL;
     }
@@ -245,7 +245,7 @@ FSDH_Next_IMP(FSDirHandle *self) {
         }
         else {
             DECREF(ivars->entry);
-            ivars->entry = CB_new_from_utf8(sys_dir_entry->d_name, len);
+            ivars->entry = Str_new_from_utf8(sys_dir_entry->d_name, len);
             return true;
         }
     }
@@ -270,9 +270,9 @@ FSDH_Entry_Is_Dir_IMP(FSDirHandle *self) {
 
     bool retval = false;
     struct stat stat_buf;
-    CharBuf *fullpath = CB_newf("%o%s%o", ivars->dir, CHY_DIR_SEP,
+    String *fullpath = Str_newf("%o%s%o", ivars->dir, CHY_DIR_SEP,
                                 ivars->entry);
-    if (stat((char*)CB_Get_Ptr8(fullpath), &stat_buf) != -1) {
+    if (stat((char*)Str_Get_Ptr8(fullpath), &stat_buf) != -1) {
         if (stat_buf.st_mode & S_IFDIR) { retval = true; }
     }
     DECREF(fullpath);
@@ -291,9 +291,9 @@ FSDH_Entry_Is_Symlink_IMP(FSDirHandle *self) {
     {
         bool retval = false;
         struct stat stat_buf;
-        CharBuf *fullpath = CB_newf("%o%s%o", ivars->dir, CHY_DIR_SEP,
+        String *fullpath = Str_newf("%o%s%o", ivars->dir, CHY_DIR_SEP,
                                     ivars->entry);
-        if (stat((char*)CB_Get_Ptr8(fullpath), &stat_buf) != -1) {
+        if (stat((char*)Str_Get_Ptr8(fullpath), &stat_buf) != -1) {
             if (stat_buf.st_mode & S_IFLNK) { retval = true; }
         }
         DECREF(fullpath);
@@ -309,7 +309,7 @@ FSDH_Close_IMP(FSDirHandle *self) {
         DIR *sys_dirhandle = (DIR*)ivars->sys_dirhandle;
         ivars->sys_dirhandle = NULL;
         if (closedir(sys_dirhandle) == -1) {
-            Err_set_error(Err_new(CB_newf("Error closing dirhandle: %s",
+            Err_set_error(Err_new(Str_newf("Error closing dirhandle: %s",
                                           strerror(errno))));
             return false;
         }

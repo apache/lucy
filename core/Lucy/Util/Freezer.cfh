@@ -56,12 +56,12 @@ inert class Lucy::Util::Freezer {
     load(Obj *dump);
 
     inert void
-    serialize_charbuf(CharBuf *charbuf, OutStream *outstream);
+    serialize_charbuf(String *charbuf, OutStream *outstream);
 
-    inert incremented CharBuf*
-    deserialize_charbuf(decremented CharBuf *charbuf, InStream *instream);
+    inert incremented String*
+    deserialize_charbuf(decremented String *charbuf, InStream *instream);
 
-    inert incremented CharBuf*
+    inert incremented String*
     read_charbuf(InStream *instream);
 
     inert void

@@ -46,7 +46,7 @@ class Lucy::Index::Posting::MatchPosting cnick MatchPost
 
     incremented RawPosting*
     Read_Raw(MatchPosting *self, InStream *instream, int32_t last_doc_id,
-             CharBuf *term_text, MemoryPool *mem_pool);
+             String *term_text, MemoryPool *mem_pool);
 
     void
     Add_Inversion_To_Pool(MatchPosting *self, PostingPool *post_pool,

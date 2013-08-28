@@ -126,7 +126,7 @@ ok( !$foo_type->equals($const_foo), "different const spoils equals" );
 like( $const_foo->to_c, qr/const/, "const included in C representation" );
 
 my $string_type
-    = Clownfish::CFC::Model::Type->new_object( specifier => 'CharBuf', );
+    = Clownfish::CFC::Model::Type->new_object( specifier => 'String', );
 ok( !$foo_type->is_string_type,   "Not is_string_type" );
 ok( $string_type->is_string_type, "is_string_type" );
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_CFISH_CHARBUF
+#define C_CFISH_STRING
 #define C_CFISH_VIEWCHARBUF
 #define C_CFISH_STACKSTRING
 #define CFISH_USE_SHORT_NAMES
@@ -28,14 +28,14 @@
 #include <ctype.h>
 
 #include "Clownfish/VTable.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 
 #include "Clownfish/Err.h"
 #include "Clownfish/Util/Memory.h"
 #include "Clownfish/Util/StringHelper.h"
 
 // Helper function for throwing invalid UTF-8 error. Since THROW uses
-// a CharBuf internally, calling THROW with invalid UTF-8 would create an
+// a String internally, calling THROW with invalid UTF-8 would create an
 // infinite loop -- so we fwrite some of the bogus text to stderr and
 // invoke THROW with a generic message.
 #define DIE_INVALID_UTF8(text, size) \
@@ -48,14 +48,14 @@ S_die_invalid_utf8(const char *text, size_t size, const char *file, int line,
 static void
 S_die_invalid_pattern(const char *pattern);
 
-CharBuf*
-CB_new(size_t size) {
-    CharBuf *self = (CharBuf*)VTable_Make_Obj(CHARBUF);
-    return CB_init(self, size);
+String*
+Str_new(size_t size) {
+    String *self = (String*)VTable_Make_Obj(STRING);
+    return Str_init(self, size);
 }
 
-CharBuf*
-CB_init(CharBuf *self, size_t size) {
+String*
+Str_init(String *self, size_t size) {
     // Derive.
     self->ptr = (char*)MALLOCATE(size + 1);
 
@@ -69,17 +69,17 @@ CB_init(CharBuf *self, size_t size) {
     return self;
 }
 
-CharBuf*
-CB_new_from_utf8(const char *ptr, size_t size) {
+String*
+Str_new_from_utf8(const char *ptr, size_t size) {
     if (!StrHelp_utf8_valid(ptr, size)) {
         DIE_INVALID_UTF8(ptr, size);
     }
-    return CB_new_from_trusted_utf8(ptr, size);
+    return Str_new_from_trusted_utf8(ptr, size);
 }
 
-CharBuf*
-CB_new_from_trusted_utf8(const char *ptr, size_t size) {
-    CharBuf *self = (CharBuf*)VTable_Make_Obj(CHARBUF);
+String*
+Str_new_from_trusted_utf8(const char *ptr, size_t size) {
+    String *self = (String*)VTable_Make_Obj(STRING);
 
     // Derive.
     self->ptr = (char*)MALLOCATE(size + 1);
@@ -95,46 +95,46 @@ CB_new_from_trusted_utf8(const char *ptr, size_t size) {
     return self;
 }
 
-CharBuf*
-CB_new_steal_from_trusted_str(char *ptr, size_t size, size_t cap) {
-    CharBuf *self = (CharBuf*)VTable_Make_Obj(CHARBUF);
-    return CB_init_steal_trusted_str(self, ptr, size, cap);
+String*
+Str_new_steal_from_trusted_str(char *ptr, size_t size, size_t cap) {
+    String *self = (String*)VTable_Make_Obj(STRING);
+    return Str_init_steal_trusted_str(self, ptr, size, cap);
 }
 
-CharBuf*
-CB_init_steal_trusted_str(CharBuf *self, char *ptr, size_t size, size_t cap) {
+String*
+Str_init_steal_trusted_str(String *self, char *ptr, size_t size, size_t cap) {
     self->ptr  = ptr;
     self->size = size;
     self->cap  = cap;
     return self;
 }
 
-CharBuf*
-CB_new_steal_str(char *ptr, size_t size, size_t cap) {
+String*
+Str_new_steal_str(char *ptr, size_t size, size_t cap) {
     if (!StrHelp_utf8_valid(ptr, size)) {
         DIE_INVALID_UTF8(ptr, size);
     }
-    return CB_new_steal_from_trusted_str(ptr, size, cap);
+    return Str_new_steal_from_trusted_str(ptr, size, cap);
 }
 
-CharBuf*
-CB_newf(const char *pattern, ...) {
-    CharBuf *self = CB_new(strlen(pattern));
+String*
+Str_newf(const char *pattern, ...) {
+    String *self = Str_new(strlen(pattern));
     va_list args;
     va_start(args, pattern);
-    CB_VCatF(self, pattern, args);
+    Str_VCatF(self, pattern, args);
     va_end(args);
     return self;
 }
 
 void
-CB_Destroy_IMP(CharBuf *self) {
+Str_Destroy_IMP(String *self) {
     FREEMEM(self->ptr);
-    SUPER_DESTROY(self, CHARBUF);
+    SUPER_DESTROY(self, STRING);
 }
 
 int32_t
-CB_Hash_Sum_IMP(CharBuf *self) {
+Str_Hash_Sum_IMP(String *self) {
     uint32_t hashvalue = 5381;
     StackString *iterator = SSTR_WRAP(self);
 
@@ -149,14 +149,14 @@ CB_Hash_Sum_IMP(CharBuf *self) {
 }
 
 static void
-S_grow(CharBuf *self, size_t size) {
+S_grow(String *self, size_t size) {
     if (size >= self->cap) {
-        CB_Grow(self, size);
+        Str_Grow(self, size);
     }
 }
 
 char*
-CB_Grow_IMP(CharBuf *self, size_t size) {
+Str_Grow_IMP(String *self, size_t size) {
     if (size >= self->cap) {
         self->cap = size + 1;
         self->ptr = (char*)REALLOCATE(self->ptr, self->cap);
@@ -184,15 +184,15 @@ S_die_invalid_pattern(const char *pattern) {
 }
 
 void
-CB_catf(CharBuf *self, const char *pattern, ...) {
+Str_catf(String *self, const char *pattern, ...) {
     va_list args;
     va_start(args, pattern);
-    CB_VCatF(self, pattern, args);
+    Str_VCatF(self, pattern, args);
     va_end(args);
 }
 
 void
-CB_VCatF_IMP(CharBuf *self, const char *pattern, va_list args) {
+Str_VCatF_IMP(String *self, const char *pattern, va_list args) {
     size_t      pattern_len   = strlen(pattern);
     const char *pattern_start = pattern;
     const char *pattern_end   = pattern + pattern_len;
@@ -205,7 +205,7 @@ CB_VCatF_IMP(CharBuf *self, const char *pattern, va_list args) {
         while (slice_end < pattern_end && *slice_end != '%') { slice_end++; }
         if (pattern != slice_end) {
             size_t size = slice_end - pattern;
-            CB_Cat_Trusted_Str(self, pattern, size);
+            Str_Cat_Trusted_Str(self, pattern, size);
             pattern = slice_end;
         }
 
@@ -214,20 +214,20 @@ CB_VCatF_IMP(CharBuf *self, const char *pattern, va_list args) {
 
             switch (*pattern) {
                 case '%': {
-                        CB_Cat_Trusted_Str(self, "%", 1);
+                        Str_Cat_Trusted_Str(self, "%", 1);
                     }
                     break;
                 case 'o': {
                         Obj *obj = va_arg(args, Obj*);
                         if (!obj) {
-                            CB_Cat_Trusted_Str(self, "[NULL]", 6);
+                            Str_Cat_Trusted_Str(self, "[NULL]", 6);
                         }
-                        else if (Obj_Is_A(obj, CHARBUF)) {
-                            CB_Cat(self, (CharBuf*)obj);
+                        else if (Obj_Is_A(obj, STRING)) {
+                            Str_Cat(self, (String*)obj);
                         }
                         else {
-                            CharBuf *string = Obj_To_String(obj);
-                            CB_Cat(self, string);
+                            String *string = Obj_To_String(obj);
+                            Str_Cat(self, string);
                             DECREF(string);
                         }
                     }
@@ -251,7 +251,7 @@ CB_VCatF_IMP(CharBuf *self, const char *pattern, va_list args) {
                             S_die_invalid_pattern(pattern_start);
                         }
                         size = sprintf(buf, "%" PRId64, val);
-                        CB_Cat_Trusted_Str(self, buf, size);
+                        Str_Cat_Trusted_Str(self, buf, size);
                     }
                     break;
                 case 'u': {
@@ -273,7 +273,7 @@ CB_VCatF_IMP(CharBuf *self, const char *pattern, va_list args) {
                             S_die_invalid_pattern(pattern_start);
                         }
                         size = sprintf(buf, "%" PRIu64, val);
-                        CB_Cat_Trusted_Str(self, buf, size);
+                        Str_Cat_Trusted_Str(self, buf, size);
                     }
                     break;
                 case 'f': {
@@ -281,7 +281,7 @@ CB_VCatF_IMP(CharBuf *self, const char *pattern, va_list args) {
                             double num  = va_arg(args, double);
                             char bigbuf[512];
                             size_t size = sprintf(bigbuf, "%g", num);
-                            CB_Cat_Trusted_Str(self, bigbuf, size);
+                            Str_Cat_Trusted_Str(self, bigbuf, size);
                             pattern += 2;
                         }
                         else {
@@ -293,7 +293,7 @@ CB_VCatF_IMP(CharBuf *self, const char *pattern, va_list args) {
                         if (pattern[1] == '3' && pattern[2] == '2') {
                             unsigned long val = va_arg(args, uint32_t);
                             size_t size = sprintf(buf, "%.8lx", val);
-                            CB_Cat_Trusted_Str(self, buf, size);
+                            Str_Cat_Trusted_Str(self, buf, size);
                             pattern += 2;
                         }
                         else {
@@ -304,15 +304,15 @@ CB_VCatF_IMP(CharBuf *self, const char *pattern, va_list args) {
                 case 's': {
                         char *string = va_arg(args, char*);
                         if (string == NULL) {
-                            CB_Cat_Trusted_Str(self, "[NULL]", 6);
+                            Str_Cat_Trusted_Str(self, "[NULL]", 6);
                         }
                         else {
                             size_t size = strlen(string);
                             if (StrHelp_utf8_valid(string, size)) {
-                                CB_Cat_Trusted_Str(self, string, size);
+                                Str_Cat_Trusted_Str(self, string, size);
                             }
                             else {
-                                CB_Cat_Trusted_Str(self, "[INVALID UTF8]", 14);
+                                Str_Cat_Trusted_Str(self, "[INVALID UTF8]", 14);
                             }
                         }
                     }
@@ -328,13 +328,13 @@ CB_VCatF_IMP(CharBuf *self, const char *pattern, va_list args) {
     }
 }
 
-CharBuf*
-CB_To_String_IMP(CharBuf *self) {
-    return CB_new_from_trusted_utf8(self->ptr, self->size);
+String*
+Str_To_String_IMP(String *self) {
+    return Str_new_from_trusted_utf8(self->ptr, self->size);
 }
 
 void
-CB_Cat_Char_IMP(CharBuf *self, uint32_t code_point) {
+Str_Cat_Char_IMP(String *self, uint32_t code_point) {
     const size_t MAX_UTF8_BYTES = 4;
     if (self->size + MAX_UTF8_BYTES >= self->cap) {
         S_grow(self, Memory_oversize(self->size + MAX_UTF8_BYTES,
@@ -347,7 +347,7 @@ CB_Cat_Char_IMP(CharBuf *self, uint32_t code_point) {
 }
 
 int32_t
-CB_Swap_Chars_IMP(CharBuf *self, uint32_t match, uint32_t replacement) {
+Str_Swap_Chars_IMP(String *self, uint32_t match, uint32_t replacement) {
     int32_t num_swapped = 0;
 
     if (match > 127) {
@@ -371,12 +371,12 @@ CB_Swap_Chars_IMP(CharBuf *self, uint32_t match, uint32_t replacement) {
 }
 
 int64_t
-CB_To_I64_IMP(CharBuf *self) {
-    return CB_BaseX_To_I64(self, 10);
+Str_To_I64_IMP(String *self) {
+    return Str_BaseX_To_I64(self, 10);
 }
 
 int64_t
-CB_BaseX_To_I64_IMP(CharBuf *self, uint32_t base) {
+Str_BaseX_To_I64_IMP(String *self, uint32_t base) {
     StackString *iterator = SSTR_WRAP(self);
     int64_t retval = 0;
     bool is_negative = false;
@@ -410,7 +410,7 @@ CB_BaseX_To_I64_IMP(CharBuf *self, uint32_t base) {
 }
 
 static double
-S_safe_to_f64(CharBuf *self) {
+S_safe_to_f64(String *self) {
     size_t amount = self->size < 511 ? self->size : 511;
     char buf[512];
     memcpy(buf, self->ptr, amount);
@@ -419,7 +419,7 @@ S_safe_to_f64(CharBuf *self) {
 }
 
 double
-CB_To_F64_IMP(CharBuf *self) {
+Str_To_F64_IMP(String *self) {
     char   *end;
     double  value    = strtod(self->ptr, &end);
     size_t  consumed = end - self->ptr;
@@ -429,18 +429,18 @@ CB_To_F64_IMP(CharBuf *self) {
     return value;
 }
 
-CharBuf*
-CB_To_CB8_IMP(CharBuf *self) {
-    return CB_new_from_trusted_utf8(self->ptr, self->size);
+String*
+Str_To_CB8_IMP(String *self) {
+    return Str_new_from_trusted_utf8(self->ptr, self->size);
 }
 
-CharBuf*
-CB_Clone_IMP(CharBuf *self) {
-    return CB_new_from_trusted_utf8(self->ptr, self->size);
+String*
+Str_Clone_IMP(String *self) {
+    return Str_new_from_trusted_utf8(self->ptr, self->size);
 }
 
 void
-CB_Mimic_Str_IMP(CharBuf *self, const char* ptr, size_t size) {
+Str_Mimic_Str_IMP(String *self, const char* ptr, size_t size) {
     if (!StrHelp_utf8_valid(ptr, size)) {
         DIE_INVALID_UTF8(ptr, size);
     }
@@ -451,8 +451,8 @@ CB_Mimic_Str_IMP(CharBuf *self, const char* ptr, size_t size) {
 }
 
 void
-CB_Mimic_IMP(CharBuf *self, Obj *other) {
-    CharBuf *twin = (CharBuf*)CERTIFY(other, CHARBUF);
+Str_Mimic_IMP(String *self, Obj *other) {
+    String *twin = (String*)CERTIFY(other, STRING);
     if (twin->size >= self->cap) { S_grow(self, twin->size); }
     memmove(self->ptr, twin->ptr, twin->size);
     self->size = twin->size;
@@ -460,15 +460,15 @@ CB_Mimic_IMP(CharBuf *self, Obj *other) {
 }
 
 void
-CB_Cat_Str_IMP(CharBuf *self, const char* ptr, size_t size) {
+Str_Cat_Str_IMP(String *self, const char* ptr, size_t size) {
     if (!StrHelp_utf8_valid(ptr, size)) {
         DIE_INVALID_UTF8(ptr, size);
     }
-    CB_Cat_Trusted_Str_IMP(self, ptr, size);
+    Str_Cat_Trusted_Str_IMP(self, ptr, size);
 }
 
 void
-CB_Cat_Trusted_Str_IMP(CharBuf *self, const char* ptr, size_t size) {
+Str_Cat_Trusted_Str_IMP(String *self, const char* ptr, size_t size) {
     const size_t new_size = self->size + size;
     if (new_size >= self->cap) {
         size_t amount = Memory_oversize(new_size, sizeof(char));
@@ -480,7 +480,7 @@ CB_Cat_Trusted_Str_IMP(CharBuf *self, const char* ptr, size_t size) {
 }
 
 void
-CB_Cat_IMP(CharBuf *self, const CharBuf *other) {
+Str_Cat_IMP(String *self, const String *other) {
     const size_t new_size = self->size + other->size;
     if (new_size >= self->cap) {
         size_t amount = Memory_oversize(new_size, sizeof(char));
@@ -492,12 +492,12 @@ CB_Cat_IMP(CharBuf *self, const CharBuf *other) {
 }
 
 bool
-CB_Starts_With_IMP(CharBuf *self, const CharBuf *prefix) {
-    return CB_Starts_With_Str_IMP(self, prefix->ptr, prefix->size);
+Str_Starts_With_IMP(String *self, const String *prefix) {
+    return Str_Starts_With_Str_IMP(self, prefix->ptr, prefix->size);
 }
 
 bool
-CB_Starts_With_Str_IMP(CharBuf *self, const char *prefix, size_t size) {
+Str_Starts_With_Str_IMP(String *self, const char *prefix, size_t size) {
     if (size <= self->size
         && (memcmp(self->ptr, prefix, size) == 0)
        ) {
@@ -509,21 +509,21 @@ CB_Starts_With_Str_IMP(CharBuf *self, const char *prefix, size_t size) {
 }
 
 bool
-CB_Equals_IMP(CharBuf *self, Obj *other) {
-    CharBuf *const twin = (CharBuf*)other;
+Str_Equals_IMP(String *self, Obj *other) {
+    String *const twin = (String*)other;
     if (twin == self)              { return true; }
-    if (!Obj_Is_A(other, CHARBUF)) { return false; }
-    return CB_Equals_Str_IMP(self, twin->ptr, twin->size);
+    if (!Obj_Is_A(other, STRING)) { return false; }
+    return Str_Equals_Str_IMP(self, twin->ptr, twin->size);
 }
 
 int32_t
-CB_Compare_To_IMP(CharBuf *self, Obj *other) {
-    CERTIFY(other, CHARBUF);
-    return CB_compare(&self, &other);
+Str_Compare_To_IMP(String *self, Obj *other) {
+    CERTIFY(other, STRING);
+    return Str_compare(&self, &other);
 }
 
 bool
-CB_Equals_Str_IMP(CharBuf *self, const char *ptr, size_t size) {
+Str_Equals_Str_IMP(String *self, const char *ptr, size_t size) {
     if (self->size != size) {
         return false;
     }
@@ -531,12 +531,12 @@ CB_Equals_Str_IMP(CharBuf *self, const char *ptr, size_t size) {
 }
 
 bool
-CB_Ends_With_IMP(CharBuf *self, const CharBuf *postfix) {
-    return CB_Ends_With_Str_IMP(self, postfix->ptr, postfix->size);
+Str_Ends_With_IMP(String *self, const String *postfix) {
+    return Str_Ends_With_Str_IMP(self, postfix->ptr, postfix->size);
 }
 
 bool
-CB_Ends_With_Str_IMP(CharBuf *self, const char *postfix, size_t postfix_len) {
+Str_Ends_With_Str_IMP(String *self, const char *postfix, size_t postfix_len) {
     if (postfix_len <= self->size) {
         char *start = self->ptr + self->size - postfix_len;
         if (memcmp(start, postfix, postfix_len) == 0) {
@@ -548,12 +548,12 @@ CB_Ends_With_Str_IMP(CharBuf *self, const char *postfix, size_t postfix_len) {
 }
 
 int64_t
-CB_Find_IMP(CharBuf *self, const CharBuf *substring) {
-    return CB_Find_Str(self, substring->ptr, substring->size);
+Str_Find_IMP(String *self, const String *substring) {
+    return Str_Find_Str(self, substring->ptr, substring->size);
 }
 
 int64_t
-CB_Find_Str_IMP(CharBuf *self, const char *ptr, size_t size) {
+Str_Find_Str_IMP(String *self, const char *ptr, size_t size) {
     StackString *iterator = SSTR_WRAP(self);
     int64_t location = 0;
 
@@ -569,12 +569,12 @@ CB_Find_Str_IMP(CharBuf *self, const char *ptr, size_t size) {
 }
 
 uint32_t
-CB_Trim_IMP(CharBuf *self) {
-    return CB_Trim_Top(self) + CB_Trim_Tail(self);
+Str_Trim_IMP(String *self) {
+    return Str_Trim_Top(self) + Str_Trim_Tail(self);
 }
 
 uint32_t
-CB_Trim_Top_IMP(CharBuf *self) {
+Str_Trim_Top_IMP(String *self) {
     char     *ptr   = self->ptr;
     char     *end   = ptr + self->size;
     uint32_t  count = 0;
@@ -599,7 +599,7 @@ CB_Trim_Top_IMP(CharBuf *self) {
 }
 
 uint32_t
-CB_Trim_Tail_IMP(CharBuf *self) {
+Str_Trim_Tail_IMP(String *self) {
     uint32_t      count    = 0;
     char *const   top      = self->ptr;
     const char   *ptr      = top + self->size;
@@ -617,7 +617,7 @@ CB_Trim_Tail_IMP(CharBuf *self) {
 }
 
 size_t
-CB_Length_IMP(CharBuf *self) {
+Str_Length_IMP(String *self) {
     size_t  len  = 0;
     char   *ptr  = self->ptr;
     char   *end  = ptr + self->size;
@@ -632,7 +632,7 @@ CB_Length_IMP(CharBuf *self) {
 }
 
 size_t
-CB_Truncate_IMP(CharBuf *self, size_t count) {
+Str_Truncate_IMP(String *self, size_t count) {
     uint32_t num_code_points;
     StackString *iterator = SSTR_WRAP(self);
     num_code_points = SStr_Nip(iterator, count);
@@ -641,7 +641,7 @@ CB_Truncate_IMP(CharBuf *self, size_t count) {
 }
 
 uint32_t
-CB_Code_Point_At_IMP(CharBuf *self, size_t tick) {
+Str_Code_Point_At_IMP(String *self, size_t tick) {
     size_t count = 0;
     char *ptr = self->ptr;
     char *const end = ptr + self->size;
@@ -660,7 +660,7 @@ CB_Code_Point_At_IMP(CharBuf *self, size_t tick) {
 }
 
 uint32_t
-CB_Code_Point_From_IMP(CharBuf *self, size_t tick) {
+Str_Code_Point_From_IMP(String *self, size_t tick) {
     size_t      count = 0;
     char       *top   = self->ptr;
     const char *ptr   = top + self->size;
@@ -671,8 +671,8 @@ CB_Code_Point_From_IMP(CharBuf *self, size_t tick) {
     return StrHelp_decode_utf8_char(ptr);
 }
 
-CharBuf*
-CB_SubString_IMP(CharBuf *self, size_t offset, size_t len) {
+String*
+Str_SubString_IMP(String *self, size_t offset, size_t len) {
     StackString *iterator = SSTR_WRAP(self);
     char *sub_start;
     size_t byte_len;
@@ -682,13 +682,13 @@ CB_SubString_IMP(CharBuf *self, size_t offset, size_t len) {
     SStr_Nip(iterator, len);
     byte_len = iterator->ptr - sub_start;
 
-    return CB_new_from_trusted_utf8(sub_start, byte_len);
+    return Str_new_from_trusted_utf8(sub_start, byte_len);
 }
 
 int
-CB_compare(const void *va, const void *vb) {
-    const CharBuf *a = *(const CharBuf**)va;
-    const CharBuf *b = *(const CharBuf**)vb;
+Str_compare(const void *va, const void *vb) {
+    const String *a = *(const String**)va;
+    const String *b = *(const String**)vb;
     StackString *iterator_a = SSTR_WRAP(a);
     StackString *iterator_b = SSTR_WRAP(b);
     while (iterator_a->size && iterator_b->size) {
@@ -704,22 +704,22 @@ CB_compare(const void *va, const void *vb) {
 }
 
 bool
-CB_less_than(const void *va, const void *vb) {
-    return CB_compare(va, vb) < 0 ? 1 : 0;
+Str_less_than(const void *va, const void *vb) {
+    return Str_compare(va, vb) < 0 ? 1 : 0;
 }
 
 void
-CB_Set_Size_IMP(CharBuf *self, size_t size) {
+Str_Set_Size_IMP(String *self, size_t size) {
     self->size = size;
 }
 
 size_t
-CB_Get_Size_IMP(CharBuf *self) {
+Str_Get_Size_IMP(String *self) {
     return self->size;
 }
 
 uint8_t*
-CB_Get_Ptr8_IMP(CharBuf *self) {
+Str_Get_Ptr8_IMP(String *self) {
     return (uint8_t*)self->ptr;
 }
 
@@ -750,12 +750,12 @@ ViewCB_init(ViewCharBuf *self, const char *utf8, size_t size) {
 void
 ViewCB_Destroy_IMP(ViewCharBuf *self) {
     // Note that we do not free self->ptr, and that we invoke the
-    // SUPER_DESTROY with CHARBUF instead of VIEWCHARBUF.
-    SUPER_DESTROY(self, CHARBUF);
+    // SUPER_DESTROY with STRING instead of VIEWCHARBUF.
+    SUPER_DESTROY(self, STRING);
 }
 
 void
-ViewCB_Assign_IMP(ViewCharBuf *self, const CharBuf *other) {
+ViewCB_Assign_IMP(ViewCharBuf *self, const String *other) {
     self->ptr  = other->ptr;
     self->size = other->size;
 }
@@ -895,7 +895,7 @@ SStr_wrap_str(void *allocation, const char *ptr, size_t size) {
 }
 
 StackString*
-SStr_wrap(void *allocation, const CharBuf *source) {
+SStr_wrap(void *allocation, const String *source) {
     return SStr_wrap_str(allocation, source->ptr, source->size);
 }
 

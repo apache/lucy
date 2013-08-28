@@ -29,14 +29,14 @@
 #include "Lucy/Store/RAMFolder.h"
 #include "Lucy/Util/Json.h"
 
-static CharBuf *cfmeta_file = NULL;
-static CharBuf *cfmeta_temp = NULL;
-static CharBuf *cf_file     = NULL;
-static CharBuf *foo         = NULL;
-static CharBuf *bar         = NULL;
-static CharBuf *baz         = NULL;
-static CharBuf *seg_1       = NULL;
-static CharBuf *stuff       = NULL;
+static String *cfmeta_file = NULL;
+static String *cfmeta_temp = NULL;
+static String *cf_file     = NULL;
+static String *foo         = NULL;
+static String *bar         = NULL;
+static String *baz         = NULL;
+static String *seg_1       = NULL;
+static String *stuff       = NULL;
 
 TestCompoundFileReader*
 TestCFReader_new() {
@@ -45,14 +45,14 @@ TestCFReader_new() {
 
 static void
 S_init_strings(void) {
-    cfmeta_file = CB_newf("cfmeta.json");
-    cfmeta_temp = CB_newf("cfmeta.json.temp");
-    cf_file     = CB_newf("cf.dat");
-    foo         = CB_newf("foo");
-    bar         = CB_newf("bar");
-    baz         = CB_newf("baz");
-    seg_1       = CB_newf("seg_1");
-    stuff       = CB_newf("stuff");
+    cfmeta_file = Str_newf("cfmeta.json");
+    cfmeta_temp = Str_newf("cfmeta.json.temp");
+    cf_file     = Str_newf("cf.dat");
+    foo         = Str_newf("foo");
+    bar         = Str_newf("bar");
+    baz         = Str_newf("baz");
+    seg_1       = Str_newf("seg_1");
+    stuff       = Str_newf("stuff");
 }
 
 static void
@@ -79,7 +79,7 @@ S_folder_with_contents() {
     DECREF(foo_out);
     DECREF(bar_out);
     StackString *empty = SStr_BLANK();
-    RAMFolder_Consolidate(folder, (CharBuf*)empty);
+    RAMFolder_Consolidate(folder, (String*)empty);
     return (Folder*)folder;
 }
 
@@ -112,7 +112,7 @@ test_open(TestBatchRunner *runner) {
     Err_set_error(NULL);
     real_folder = S_folder_with_contents();
     metadata = (Hash*)Json_slurp_json(real_folder, cfmeta_file);
-    Hash_Store_Str(metadata, "format", 6, (Obj*)CB_newf("%i32", -1));
+    Hash_Store_Str(metadata, "format", 6, (Obj*)Str_newf("%i32", -1));
     Folder_Delete(real_folder, cfmeta_file);
     Json_spew_json((Obj*)metadata, real_folder, cfmeta_file);
     cf_reader = CFReader_open(real_folder);
@@ -122,7 +122,7 @@ test_open(TestBatchRunner *runner) {
               "Set Err_error when format is invalid");
 
     Err_set_error(NULL);
-    Hash_Store_Str(metadata, "format", 6, (Obj*)CB_newf("%i32", 1000));
+    Hash_Store_Str(metadata, "format", 6, (Obj*)Str_newf("%i32", 1000));
     Folder_Delete(real_folder, cfmeta_file);
     Json_spew_json((Obj*)metadata, real_folder, cfmeta_file);
     cf_reader = CFReader_open(real_folder);
@@ -142,7 +142,7 @@ test_open(TestBatchRunner *runner) {
               "Set Err_error when format key is missing");
 
     Hash_Store_Str(metadata, "format", 6,
-                   (Obj*)CB_newf("%i32", CFWriter_current_file_format));
+                   (Obj*)Str_newf("%i32", CFWriter_current_file_format));
     DECREF(Hash_Delete_Str(metadata, "files", 5));
     Folder_Delete(real_folder, cfmeta_file);
     Json_spew_json((Obj*)metadata, real_folder, cfmeta_file);
@@ -251,11 +251,11 @@ test_Local_Open_Dir(TestBatchRunner *runner) {
 
     DirHandle *dh = CFReader_Local_Open_Dir(cf_reader);
     while (DH_Next(dh)) {
-        CharBuf *entry = DH_Get_Entry(dh);
-        if (CB_Equals(entry, (Obj*)foo)) {
+        String *entry = DH_Get_Entry(dh);
+        if (Str_Equals(entry, (Obj*)foo)) {
             saw_foo = true;
         }
-        else if (CB_Equals(entry, (Obj*)stuff)) {
+        else if (Str_Equals(entry, (Obj*)stuff)) {
             saw_stuff = true;
             stuff_was_dir = DH_Entry_Is_Dir(dh);
         }
@@ -319,7 +319,7 @@ test_Local_Open_In(TestBatchRunner *runner) {
     TEST_TRUE(runner, instream != NULL,
               "Local_Open_In for virtual file");
     TEST_TRUE(runner,
-              CB_Starts_With(InStream_Get_Filename(instream), CFReader_Get_Path(cf_reader)),
+              Str_Starts_With(InStream_Get_Filename(instream), CFReader_Get_Path(cf_reader)),
               "InStream's path includes directory");
     DECREF(instream);
 

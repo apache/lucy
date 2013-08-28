@@ -82,10 +82,10 @@ S_lazy_init(PostingListWriter *self) {
     PostingListWriterIVARS *const ivars = PListWriter_IVARS(self);
     if (!ivars->lex_temp_out) {
         Folder  *folder         = ivars->folder;
-        CharBuf *seg_name       = Seg_Get_Name(ivars->segment);
-        CharBuf *lex_temp_path  = CB_newf("%o/lextemp", seg_name);
-        CharBuf *post_temp_path = CB_newf("%o/ptemp", seg_name);
-        CharBuf *skip_path      = CB_newf("%o/postings.skip", seg_name);
+        String *seg_name       = Seg_Get_Name(ivars->segment);
+        String *lex_temp_path  = Str_newf("%o/lextemp", seg_name);
+        String *post_temp_path = Str_newf("%o/ptemp", seg_name);
+        String *skip_path      = Str_newf("%o/postings.skip", seg_name);
 
         // Open temp streams and final skip stream.
         ivars->lex_temp_out  = Folder_Open_Out(folder, lex_temp_path);
@@ -106,7 +106,7 @@ S_lazy_init_posting_pool(PostingListWriter *self, int32_t field_num) {
     PostingListWriterIVARS *const ivars = PListWriter_IVARS(self);
     PostingPool *pool = (PostingPool*)VA_Fetch(ivars->pools, field_num);
     if (!pool && field_num != 0) {
-        CharBuf *field = Seg_Field_Name(ivars->segment, field_num);
+        String *field = Seg_Field_Name(ivars->segment, field_num);
         pool = PostPool_new(ivars->schema, ivars->snapshot, ivars->segment,
                             ivars->polyreader, field, ivars->lex_writer,
                             ivars->mem_pool, ivars->lex_temp_out,
@@ -186,7 +186,7 @@ PListWriter_Add_Segment_IMP(PostingListWriter *self, SegReader *reader,
     S_lazy_init(self);
 
     for (uint32_t i = 0, max = VA_Get_Size(all_fields); i < max; i++) {
-        CharBuf   *field = (CharBuf*)VA_Fetch(all_fields, i);
+        String    *field = (String*)VA_Fetch(all_fields, i);
         FieldType *type  = Schema_Fetch_Type(schema, field);
         int32_t old_field_num = Seg_Field_Num(other_segment, field);
         int32_t new_field_num = Seg_Field_Num(segment, field);
@@ -214,9 +214,9 @@ PListWriter_Finish_IMP(PostingListWriter *self) {
     if (!ivars->lex_temp_out) { return; }
 
     Folder  *folder = ivars->folder;
-    CharBuf *seg_name = Seg_Get_Name(ivars->segment);
-    CharBuf *lex_temp_path  = CB_newf("%o/lextemp", seg_name);
-    CharBuf *post_temp_path = CB_newf("%o/ptemp", seg_name);
+    String *seg_name = Seg_Get_Name(ivars->segment);
+    String *lex_temp_path  = Str_newf("%o/lextemp", seg_name);
+    String *post_temp_path = Str_newf("%o/ptemp", seg_name);
 
     // Close temp streams.
     OutStream_Close(ivars->lex_temp_out);

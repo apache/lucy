@@ -22,7 +22,7 @@
 
 #include "Lucy/Index/Inverter.h"
 #include "Clownfish/ByteBuf.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/Num.h"
@@ -33,7 +33,7 @@
 #include "Lucy/Plan/Schema.h"
 
 static InverterEntry*
-S_fetch_entry(InverterIVARS *ivars, CharBuf *field) {
+S_fetch_entry(InverterIVARS *ivars, String *field) {
     Schema *const schema = ivars->schema;
     int32_t field_num = Seg_Field_Num(ivars->segment, field);
     if (!field_num) {
@@ -53,7 +53,7 @@ S_fetch_entry(InverterIVARS *ivars, CharBuf *field) {
     InverterEntry *entry
         = (InverterEntry*)VA_Fetch(ivars->entry_pool, field_num);
     if (!entry) {
-        entry = InvEntry_new(schema, (CharBuf*)field, field_num);
+        entry = InvEntry_new(schema, (String*)field, field_num);
         VA_Store(ivars->entry_pool, field_num, (Obj*)entry);
     }
     return entry;
@@ -72,7 +72,7 @@ Inverter_Invert_Doc_IMP(Inverter *self, Doc *doc) {
     while (num_keys--) {
         Obj *key, *obj;
         Hash_Next(fields, &key, &obj);
-        CharBuf *field = (CharBuf*)CERTIFY(key, CHARBUF);
+        String *field = (String*)CERTIFY(key, STRING);
         InverterEntry *inventry = S_fetch_entry(ivars, field);
         InverterEntryIVARS *inventry_ivars = InvEntry_IVARS(inventry);
         FieldType *type = inventry_ivars->type;
@@ -80,8 +80,8 @@ Inverter_Invert_Doc_IMP(Inverter *self, Doc *doc) {
         // Get the field value.
         switch (FType_Primitive_ID(type) & FType_PRIMITIVE_ID_MASK) {
             case FType_TEXT: {
-                    CharBuf *char_buf
-                        = (CharBuf*)CERTIFY(obj, CHARBUF);
+                    String *char_buf
+                        = (String*)CERTIFY(obj, STRING);
                     ViewCharBuf *value
                         = (ViewCharBuf*)inventry_ivars->value;
                     ViewCB_Assign(value, char_buf);

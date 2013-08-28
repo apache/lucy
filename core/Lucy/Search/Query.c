@@ -56,9 +56,9 @@ Query_Dump_IMP(Query *self) {
     QueryIVARS *ivars = Query_IVARS(self);
     Hash *dump = Hash_new(0);
     Hash_Store_Str(dump, "_class", 6,
-                   (Obj*)CB_Clone(Obj_Get_Class_Name((Obj*)self)));
+                   (Obj*)Str_Clone(Obj_Get_Class_Name((Obj*)self)));
     Hash_Store_Str(dump, "boost", 5,
-                   (Obj*)CB_newf("%f64", (double)ivars->boost));
+                   (Obj*)Str_newf("%f64", (double)ivars->boost));
     return (Obj*)dump;
 }
 
@@ -66,8 +66,8 @@ Obj*
 Query_Load_IMP(Query *self, Obj *dump) {
     CHY_UNUSED_VAR(self);
     Hash *source = (Hash*)CERTIFY(dump, HASH);
-    CharBuf *class_name
-        = (CharBuf*)CERTIFY(Hash_Fetch_Str(source, "_class", 6), CHARBUF);
+    String *class_name
+        = (String*)CERTIFY(Hash_Fetch_Str(source, "_class", 6), STRING);
     VTable *vtable = VTable_singleton(class_name, NULL);
     Query *loaded = (Query*)VTable_Make_Obj(vtable);
     Obj *boost = CERTIFY(Hash_Fetch_Str(source, "boost", 5), OBJ);

@@ -41,17 +41,17 @@
 // Shared initialization routine which assumes that it's ok to assume control
 // over [field] and [terms], eating their refcounts.
 static PhraseQuery*
-S_do_init(PhraseQuery *self, CharBuf *field, VArray *terms, float boost);
+S_do_init(PhraseQuery *self, String *field, VArray *terms, float boost);
 
 PhraseQuery*
-PhraseQuery_new(const CharBuf *field, VArray *terms) {
+PhraseQuery_new(const String *field, VArray *terms) {
     PhraseQuery *self = (PhraseQuery*)VTable_Make_Obj(PHRASEQUERY);
     return PhraseQuery_init(self, field, terms);
 }
 
 PhraseQuery*
-PhraseQuery_init(PhraseQuery *self, const CharBuf *field, VArray *terms) {
-    return S_do_init(self, CB_Clone(field), VA_Clone(terms), 1.0f);
+PhraseQuery_init(PhraseQuery *self, const String *field, VArray *terms) {
+    return S_do_init(self, Str_Clone(field), VA_Clone(terms), 1.0f);
 }
 
 void
@@ -63,7 +63,7 @@ PhraseQuery_Destroy_IMP(PhraseQuery *self) {
 }
 
 static PhraseQuery*
-S_do_init(PhraseQuery *self, CharBuf *field, VArray *terms, float boost) {
+S_do_init(PhraseQuery *self, String *field, VArray *terms, float boost) {
     Query_init((Query*)self, boost);
     PhraseQueryIVARS *const ivars = PhraseQuery_IVARS(self);
     for (uint32_t i = 0, max = VA_Get_Size(terms); i < max; i++) {
@@ -85,7 +85,7 @@ PhraseQuery_Serialize_IMP(PhraseQuery *self, OutStream *outstream) {
 PhraseQuery*
 PhraseQuery_Deserialize_IMP(PhraseQuery *self, InStream *instream) {
     float boost = InStream_Read_F32(instream);
-    CharBuf *field = Freezer_read_charbuf(instream);
+    String *field = Freezer_read_charbuf(instream);
     VArray  *terms = Freezer_read_varray(instream);
     return S_do_init(self, field, terms, boost);
 }
@@ -110,7 +110,7 @@ PhraseQuery_Load_IMP(PhraseQuery *self, Obj *dump) {
     PhraseQueryIVARS *loaded_ivars = PhraseQuery_IVARS(loaded);
     Obj *field = CERTIFY(Hash_Fetch_Str(source, "field", 5), OBJ);
     loaded_ivars->field
-        = (CharBuf*)CERTIFY(Freezer_load(field), CHARBUF);
+        = (String*)CERTIFY(Freezer_load(field), STRING);
     Obj *terms = CERTIFY(Hash_Fetch_Str(source, "terms", 5), OBJ);
     loaded_ivars->terms
         = (VArray*)CERTIFY(Freezer_load(terms), VARRAY);
@@ -126,29 +126,29 @@ PhraseQuery_Equals_IMP(PhraseQuery *self, Obj *other) {
     if (ivars->boost != ovars->boost)  { return false; }
     if (ivars->field && !ovars->field) { return false; }
     if (!ivars->field && ovars->field) { return false; }
-    if (ivars->field && !CB_Equals(ivars->field, (Obj*)ovars->field)) {
+    if (ivars->field && !Str_Equals(ivars->field, (Obj*)ovars->field)) {
         return false;
     }
     if (!VA_Equals(ovars->terms, (Obj*)ivars->terms)) { return false; }
     return true;
 }
 
-CharBuf*
+String*
 PhraseQuery_To_String_IMP(PhraseQuery *self) {
     PhraseQueryIVARS *const ivars = PhraseQuery_IVARS(self);
     uint32_t  num_terms = VA_Get_Size(ivars->terms);
-    CharBuf  *retval    = CB_Clone(ivars->field);
-    CB_Cat_Trusted_Str(retval, ":\"", 2);
+    String   *retval    = Str_Clone(ivars->field);
+    Str_Cat_Trusted_Str(retval, ":\"", 2);
     for (uint32_t i = 0; i < num_terms; i++) {
         Obj     *term        = VA_Fetch(ivars->terms, i);
-        CharBuf *term_string = Obj_To_String(term);
-        CB_Cat(retval, term_string);
+        String *term_string = Obj_To_String(term);
+        Str_Cat(retval, term_string);
         DECREF(term_string);
         if (i < num_terms - 1) {
-            CB_Cat_Trusted_Str(retval, " ",  1);
+            Str_Cat_Trusted_Str(retval, " ",  1);
         }
     }
-    CB_Cat_Trusted_Str(retval, "\"", 1);
+    Str_Cat_Trusted_Str(retval, "\"", 1);
     return retval;
 }
 
@@ -178,7 +178,7 @@ PhraseQuery_Make_Compiler_IMP(PhraseQuery *self, Searcher *searcher,
     }
 }
 
-CharBuf*
+String*
 PhraseQuery_Get_Field_IMP(PhraseQuery *self) {
     return PhraseQuery_IVARS(self)->field;
 }
@@ -339,7 +339,7 @@ PhraseCompiler_Make_Matcher_IMP(PhraseCompiler *self, SegReader *reader,
 
 VArray*
 PhraseCompiler_Highlight_Spans_IMP(PhraseCompiler *self, Searcher *searcher,
-                                   DocVector *doc_vec, const CharBuf *field) {
+                                   DocVector *doc_vec, const String *field) {
     PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
     PhraseQueryIVARS *const parent_ivars
         = PhraseQuery_IVARS((PhraseQuery*)ivars->parent);
@@ -350,7 +350,7 @@ PhraseCompiler_Highlight_Spans_IMP(PhraseCompiler *self, Searcher *searcher,
 
     // Bail if no terms or field doesn't match.
     if (!num_terms) { return spans; }
-    if (!CB_Equals(field, (Obj*)parent_ivars->field)) { return spans; }
+    if (!Str_Equals(field, (Obj*)parent_ivars->field)) { return spans; }
 
     VArray *term_vectors    = VA_new(num_terms);
     BitVector *posit_vec       = BitVec_new(0);
@@ -358,7 +358,7 @@ PhraseCompiler_Highlight_Spans_IMP(PhraseCompiler *self, Searcher *searcher,
     for (uint32_t i = 0; i < num_terms; i++) {
         Obj *term = VA_Fetch(terms, i);
         TermVector *term_vector
-            = DocVec_Term_Vector(doc_vec, field, (CharBuf*)term);
+            = DocVec_Term_Vector(doc_vec, field, (String*)term);
 
         // Bail if any term is missing.
         if (!term_vector) {

@@ -30,10 +30,10 @@ class Lucy::Index::PolyLexicon cnick PolyLex
     int32_t         size;
 
     inert incremented PolyLexicon*
-    new(const CharBuf *field, VArray *sub_readers);
+    new(const String *field, VArray *sub_readers);
 
     inert PolyLexicon*
-    init(PolyLexicon *self, const CharBuf *field, VArray *sub_readers);
+    init(PolyLexicon *self, const String *field, VArray *sub_readers);
 
     public void
     Seek(PolyLexicon *self, Obj *target = NULL);

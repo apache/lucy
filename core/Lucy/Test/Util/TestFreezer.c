@@ -78,9 +78,9 @@ test_bytebuf(TestBatchRunner *runner) {
 
 static void
 test_charbuf(TestBatchRunner *runner) {
-    CharBuf *wanted = TestUtils_get_cb("foo");
-    CharBuf *got    = (CharBuf*)S_freeze_thaw((Obj*)wanted);
-    TEST_TRUE(runner, got && CB_Equals(wanted, (Obj*)got),
+    String *wanted = TestUtils_get_cb("foo");
+    String *got    = (String*)S_freeze_thaw((Obj*)wanted);
+    TEST_TRUE(runner, got && Str_Equals(wanted, (Obj*)got),
               "Round trip through FREEZE/THAW");
     DECREF(got);
     DECREF(wanted);
@@ -91,7 +91,7 @@ test_hash(TestBatchRunner *runner) {
     Hash  *wanted = Hash_new(0);
 
     for (uint32_t i = 0; i < 10; i++) {
-        CharBuf *cb = TestUtils_random_string(rand() % 1200);
+        String *cb = TestUtils_random_string(rand() % 1200);
         Integer32 *num = Int32_new(i);
         Hash_Store(wanted, (Obj*)cb, (Obj*)num);
         Hash_Store(wanted, (Obj*)num, (Obj*)cb);
@@ -150,8 +150,8 @@ test_num(TestBatchRunner *runner) {
 static void
 test_varray(TestBatchRunner *runner) {
     VArray *array = VA_new(0);
-    VA_Store(array, 1, (Obj*)CB_newf("foo"));
-    VA_Store(array, 3, (Obj*)CB_newf("bar"));
+    VA_Store(array, 1, (Obj*)Str_newf("foo"));
+    VA_Store(array, 3, (Obj*)Str_newf("bar"));
 
     {
         Obj *got = S_freeze_thaw((Obj*)array);

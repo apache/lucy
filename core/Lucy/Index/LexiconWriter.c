@@ -104,7 +104,7 @@ S_add_last_term_to_ix(LexiconWriter *self) {
 }
 
 void
-LexWriter_Add_Term_IMP(LexiconWriter* self, CharBuf* term_text, TermInfo* tinfo) {
+LexWriter_Add_Term_IMP(LexiconWriter* self, String* term_text, TermInfo* tinfo) {
     LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
     OutStream *dat_out = ivars->dat_out;
 
@@ -128,17 +128,17 @@ LexWriter_Start_Field_IMP(LexiconWriter *self, int32_t field_num) {
     Segment   *const segment  = LexWriter_Get_Segment(self);
     Folder    *const folder   = LexWriter_Get_Folder(self);
     Schema    *const schema   = LexWriter_Get_Schema(self);
-    CharBuf   *const seg_name = Seg_Get_Name(segment);
-    CharBuf   *const field    = Seg_Field_Name(segment, field_num);
+    String    *const seg_name = Seg_Get_Name(segment);
+    String    *const field    = Seg_Field_Name(segment, field_num);
     FieldType *const type     = Schema_Fetch_Type(schema, field);
 
     // Open outstreams.
     DECREF(ivars->dat_file);
     DECREF(ivars->ix_file);
     DECREF(ivars->ixix_file);
-    ivars->dat_file  = CB_newf("%o/lexicon-%i32.dat",  seg_name, field_num);
-    ivars->ix_file   = CB_newf("%o/lexicon-%i32.ix",   seg_name, field_num);
-    ivars->ixix_file = CB_newf("%o/lexicon-%i32.ixix", seg_name, field_num);
+    ivars->dat_file  = Str_newf("%o/lexicon-%i32.dat",  seg_name, field_num);
+    ivars->ix_file   = Str_newf("%o/lexicon-%i32.ix",   seg_name, field_num);
+    ivars->ixix_file = Str_newf("%o/lexicon-%i32.ixix", seg_name, field_num);
     ivars->dat_out = Folder_Open_Out(folder, ivars->dat_file);
     if (!ivars->dat_out) { RETHROW(INCREF(Err_get_error())); }
     ivars->ix_out = Folder_Open_Out(folder, ivars->ix_file);
@@ -156,13 +156,13 @@ LexWriter_Start_Field_IMP(LexiconWriter *self, int32_t field_num) {
 void
 LexWriter_Finish_Field_IMP(LexiconWriter *self, int32_t field_num) {
     LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
-    CharBuf *field = Seg_Field_Name(ivars->segment, field_num);
+    String *field = Seg_Field_Name(ivars->segment, field_num);
 
     // Store count of terms for this field as metadata.
     Hash_Store(ivars->counts, (Obj*)field,
-               (Obj*)CB_newf("%i32", ivars->count));
+               (Obj*)Str_newf("%i32", ivars->count));
     Hash_Store(ivars->ix_counts, (Obj*)field,
-               (Obj*)CB_newf("%i32", ivars->ix_count));
+               (Obj*)Str_newf("%i32", ivars->ix_count));
 
     // Close streams.
     OutStream_Close(ivars->dat_out);
@@ -181,7 +181,7 @@ LexWriter_Finish_Field_IMP(LexiconWriter *self, int32_t field_num) {
 }
 
 void
-LexWriter_Enter_Temp_Mode_IMP(LexiconWriter *self, const CharBuf *field,
+LexWriter_Enter_Temp_Mode_IMP(LexiconWriter *self, const String *field,
                               OutStream *temp_outstream) {
     LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
     Schema    *schema = LexWriter_Get_Schema(self);
@@ -246,9 +246,9 @@ LexWriter_Metadata_IMP(LexiconWriter *self) {
 
     // Placeholders.
     if (Hash_Get_Size(counts) == 0) {
-        Hash_Store_Str(counts, "none", 4, (Obj*)CB_newf("%i32", (int32_t)0));
+        Hash_Store_Str(counts, "none", 4, (Obj*)Str_newf("%i32", (int32_t)0));
         Hash_Store_Str(ix_counts, "none", 4,
-                       (Obj*)CB_newf("%i32", (int32_t)0));
+                       (Obj*)Str_newf("%i32", (int32_t)0));
     }
 
     Hash_Store_Str(metadata, "counts", 6, (Obj*)counts);

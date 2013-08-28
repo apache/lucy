@@ -22,7 +22,7 @@
 #include "charmony.h"
 
 #include "Lucy/Document/Doc.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/VTable.h"
@@ -62,7 +62,7 @@ Doc_Get_Size_IMP(Doc *self) {
 }
 
 void
-Doc_Store_IMP(Doc *self, const CharBuf *field, Obj *value) {
+Doc_Store_IMP(Doc *self, const String *field, Obj *value) {
     Hash *hash = (Hash*)Doc_IVARS(self)->fields;
     Hash_Store(hash, (Obj *)field, value);
     INCREF(value);
@@ -85,12 +85,12 @@ Doc_Deserialize_IMP(Doc *self, InStream *instream) {
 }
 
 Obj*
-Doc_Extract_IMP(Doc *self, CharBuf *field, ViewCharBuf *target) {
+Doc_Extract_IMP(Doc *self, String *field, ViewCharBuf *target) {
     Hash *hash = (Hash*)Doc_IVARS(self)->fields;
     Obj  *obj  = Hash_Fetch(hash, (Obj *)field);
 
-    if (target && obj && Obj_Is_A(obj, CHARBUF)) {
-        ViewCB_Assign(target, (CharBuf *)obj);
+    if (target && obj && Obj_Is_A(obj, STRING)) {
+        ViewCB_Assign(target, (String *)obj);
     }
 
     return obj;

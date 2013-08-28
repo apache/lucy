@@ -70,7 +70,7 @@ void
 IxReader_Close_IMP(IndexReader *self) {
     IndexReaderIVARS *const ivars = IxReader_IVARS(self);
     if (ivars->components) {
-        CharBuf *key;
+        String *key;
         DataReader *component;
         Hash_Iterate(ivars->components);
         while (Hash_Next(ivars->components, (Obj**)&key,
@@ -108,7 +108,7 @@ IxReader_Get_Components_IMP(IndexReader *self) {
 }
 
 DataReader*
-IxReader_Obtain_IMP(IndexReader *self, const CharBuf *api) {
+IxReader_Obtain_IMP(IndexReader *self, const String *api) {
     IndexReaderIVARS *const ivars = IxReader_IVARS(self);
     DataReader *component
         = (DataReader*)Hash_Fetch(ivars->components, (Obj*)api);
@@ -119,7 +119,7 @@ IxReader_Obtain_IMP(IndexReader *self, const CharBuf *api) {
 }
 
 DataReader*
-IxReader_Fetch_IMP(IndexReader *self, const CharBuf *api) {
+IxReader_Fetch_IMP(IndexReader *self, const String *api) {
     IndexReaderIVARS *const ivars = IxReader_IVARS(self);
     return (DataReader*)Hash_Fetch(ivars->components, (Obj*)api);
 }

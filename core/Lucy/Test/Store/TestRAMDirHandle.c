@@ -33,9 +33,9 @@ TestRAMDH_new() {
 static void
 test_all(TestBatchRunner *runner) {
     RAMFolder *folder        = RAMFolder_new(NULL);
-    CharBuf   *foo           = (CharBuf*)SSTR_WRAP_STR("foo", 3);
-    CharBuf   *boffo         = (CharBuf*)SSTR_WRAP_STR("boffo", 5);
-    CharBuf   *foo_boffo     = (CharBuf*)SSTR_WRAP_STR("foo/boffo", 9);
+    String    *foo           = (String*)SSTR_WRAP_STR("foo", 3);
+    String    *boffo         = (String*)SSTR_WRAP_STR("boffo", 5);
+    String    *foo_boffo     = (String*)SSTR_WRAP_STR("foo/boffo", 9);
     bool       saw_foo       = false;
     bool       saw_boffo     = false;
     bool       foo_was_dir   = false;
@@ -54,12 +54,12 @@ test_all(TestBatchRunner *runner) {
     RAMDirHandle *dh = RAMDH_new(folder);
     while (RAMDH_Next(dh)) {
         count++;
-        CharBuf *entry = RAMDH_Get_Entry(dh);
-        if (CB_Equals(entry, (Obj*)foo)) {
+        String *entry = RAMDH_Get_Entry(dh);
+        if (Str_Equals(entry, (Obj*)foo)) {
             saw_foo = true;
             foo_was_dir = RAMDH_Entry_Is_Dir(dh);
         }
-        else if (CB_Equals(entry, (Obj*)boffo)) {
+        else if (Str_Equals(entry, (Obj*)boffo)) {
             saw_boffo = true;
             boffo_was_dir = RAMDH_Entry_Is_Dir(dh);
         }

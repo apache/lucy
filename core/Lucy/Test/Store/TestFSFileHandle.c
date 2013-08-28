@@ -42,9 +42,9 @@ static void
 test_open(TestBatchRunner *runner) {
 
     FSFileHandle *fh;
-    CharBuf *test_filename = (CharBuf*)SSTR_WRAP_STR("_fstest", 7);
+    String *test_filename = (String*)SSTR_WRAP_STR("_fstest", 7);
 
-    remove((char*)CB_Get_Ptr8(test_filename));
+    remove((char*)Str_Get_Ptr8(test_filename));
 
     Err_set_error(NULL);
     fh = FSFH_open(test_filename, FH_READ_ONLY);
@@ -98,7 +98,7 @@ test_open(TestBatchRunner *runner) {
               "open() read only -- no errors");
     DECREF(fh);
 
-    remove((char*)CB_Get_Ptr8(test_filename));
+    remove((char*)Str_Get_Ptr8(test_filename));
 }
 
 static void
@@ -108,9 +108,9 @@ test_Read_Write(TestBatchRunner *runner) {
     const char *bar = "bar";
     char buffer[12];
     char *buf = buffer;
-    CharBuf *test_filename = (CharBuf*)SSTR_WRAP_STR("_fstest", 7);
+    String *test_filename = (String*)SSTR_WRAP_STR("_fstest", 7);
 
-    remove((char*)CB_Get_Ptr8(test_filename));
+    remove((char*)Str_Get_Ptr8(test_filename));
     fh = FSFH_open(test_filename,
                    FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
 
@@ -157,15 +157,15 @@ test_Read_Write(TestBatchRunner *runner) {
               "Writing to a read-only handle sets error");
 
     DECREF(fh);
-    remove((char*)CB_Get_Ptr8(test_filename));
+    remove((char*)Str_Get_Ptr8(test_filename));
 }
 
 static void
 test_Close(TestBatchRunner *runner) {
-    CharBuf *test_filename = (CharBuf*)SSTR_WRAP_STR("_fstest", 7);
+    String *test_filename = (String*)SSTR_WRAP_STR("_fstest", 7);
     FSFileHandle *fh;
 
-    remove((char*)CB_Get_Ptr8(test_filename));
+    remove((char*)Str_Get_Ptr8(test_filename));
     fh = FSFH_open(test_filename,
                    FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
     TEST_TRUE(runner, FSFH_Close(fh), "Close returns true for write-only");
@@ -173,7 +173,7 @@ test_Close(TestBatchRunner *runner) {
 
     // Simulate an OS error when closing the file descriptor.  This
     // approximates what would happen if, say, we run out of disk space.
-    remove((char*)CB_Get_Ptr8(test_filename));
+    remove((char*)Str_Get_Ptr8(test_filename));
     fh = FSFH_open(test_filename,
                    FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
 #ifdef _MSC_VER
@@ -195,18 +195,18 @@ test_Close(TestBatchRunner *runner) {
     TEST_TRUE(runner, FSFH_Close(fh), "Close returns true for read-only");
 
     DECREF(fh);
-    remove((char*)CB_Get_Ptr8(test_filename));
+    remove((char*)Str_Get_Ptr8(test_filename));
 }
 
 static void
 test_Window(TestBatchRunner *runner) {
-    CharBuf *test_filename = (CharBuf*)SSTR_WRAP_STR("_fstest", 7);
+    String *test_filename = (String*)SSTR_WRAP_STR("_fstest", 7);
     FSFileHandle *fh;
     FileWindow *window = FileWindow_new();
     FileWindowIVARS *const window_ivars = FileWindow_IVARS(window);
     uint32_t i;
 
-    remove((char*)CB_Get_Ptr8(test_filename));
+    remove((char*)Str_Get_Ptr8(test_filename));
     fh = FSFH_open(test_filename,
                    FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
     for (i = 0; i < 1024; i++) {
@@ -245,7 +245,7 @@ test_Window(TestBatchRunner *runner) {
 
     DECREF(window);
     DECREF(fh);
-    remove((char*)CB_Get_Ptr8(test_filename));
+    remove((char*)Str_Get_Ptr8(test_filename));
 }
 
 void

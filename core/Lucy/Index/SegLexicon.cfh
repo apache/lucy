@@ -41,11 +41,11 @@ class Lucy::Index::SegLexicon cnick SegLex
      */
     inert incremented SegLexicon*
     new(Schema *schema, Folder *folder, Segment *segment,
-        const CharBuf *field);
+        const String *field);
 
     inert SegLexicon*
     init(SegLexicon *self, Schema *schema, Folder *folder, Segment *segment,
-         const CharBuf *field);
+         const String *field);
 
     nullable TermInfo*
     Get_Term_Info(SegLexicon *self);

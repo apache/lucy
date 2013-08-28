@@ -41,10 +41,10 @@ TestFSDH_new() {
 
 static void
 test_all(TestBatchRunner *runner) {
-    CharBuf  *foo           = (CharBuf*)SSTR_WRAP_STR("foo", 3);
-    CharBuf  *boffo         = (CharBuf*)SSTR_WRAP_STR("boffo", 5);
-    CharBuf  *foo_boffo     = (CharBuf*)SSTR_WRAP_STR("foo/boffo", 9);
-    CharBuf  *test_dir      = (CharBuf*)SSTR_WRAP_STR("_fsdir_test", 11);
+    String   *foo           = (String*)SSTR_WRAP_STR("foo", 3);
+    String   *boffo         = (String*)SSTR_WRAP_STR("boffo", 5);
+    String   *foo_boffo     = (String*)SSTR_WRAP_STR("foo/boffo", 9);
+    String   *test_dir      = (String*)SSTR_WRAP_STR("_fsdir_test", 11);
     FSFolder *folder        = FSFolder_new(test_dir);
     bool      saw_foo       = false;
     bool      saw_boffo     = false;
@@ -68,12 +68,12 @@ test_all(TestBatchRunner *runner) {
     FSDirHandle *dh = FSDH_open(test_dir);
     while (FSDH_Next(dh)) {
         count++;
-        CharBuf *entry = FSDH_Get_Entry(dh);
-        if (CB_Equals(entry, (Obj*)foo)) {
+        String *entry = FSDH_Get_Entry(dh);
+        if (Str_Equals(entry, (Obj*)foo)) {
             saw_foo = true;
             foo_was_dir = FSDH_Entry_Is_Dir(dh);
         }
-        else if (CB_Equals(entry, (Obj*)boffo)) {
+        else if (Str_Equals(entry, (Obj*)boffo)) {
             saw_boffo = true;
             boffo_was_dir = FSDH_Entry_Is_Dir(dh);
         }

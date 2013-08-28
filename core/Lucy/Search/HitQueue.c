@@ -76,7 +76,7 @@ HitQ_init(HitQueue *self, Schema *schema, SortSpec *sort_spec,
                                               : COMPARE_BY_DOC_ID;
             }
             else if (rule_type == SortRule_FIELD) {
-                CharBuf   *field = SortRule_Get_Field(rule);
+                String    *field = SortRule_Get_Field(rule);
                 FieldType *type  = Schema_Fetch_Type(schema, field);
                 if (type) {
                     ivars->field_types[action_num] = (FieldType*)INCREF(type);

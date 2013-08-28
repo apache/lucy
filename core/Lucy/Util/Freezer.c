@@ -41,7 +41,7 @@ Freezer_freeze(Obj *obj, OutStream *outstream) {
 
 Obj*
 Freezer_thaw(InStream *instream) {
-    CharBuf *class_name = Freezer_read_charbuf(instream);
+    String *class_name = Freezer_read_charbuf(instream);
     VTable *vtable = VTable_singleton(class_name, NULL);
     Obj *blank = VTable_Make_Obj(vtable);
     DECREF(class_name);
@@ -50,8 +50,8 @@ Freezer_thaw(InStream *instream) {
 
 void
 Freezer_serialize(Obj *obj, OutStream *outstream) {
-    if (Obj_Is_A(obj, CHARBUF)) {
-        Freezer_serialize_charbuf((CharBuf*)obj, outstream);
+    if (Obj_Is_A(obj, STRING)) {
+        Freezer_serialize_charbuf((String*)obj, outstream);
     }
     else if (Obj_Is_A(obj, BYTEBUF)) {
         Freezer_serialize_bytebuf((ByteBuf*)obj, outstream);
@@ -123,8 +123,8 @@ Freezer_serialize(Obj *obj, OutStream *outstream) {
 
 Obj*
 Freezer_deserialize(Obj *obj, InStream *instream) {
-    if (Obj_Is_A(obj, CHARBUF)) {
-        obj = (Obj*)Freezer_deserialize_charbuf((CharBuf*)obj, instream);
+    if (Obj_Is_A(obj, STRING)) {
+        obj = (Obj*)Freezer_deserialize_charbuf((String*)obj, instream);
     }
     else if (Obj_Is_A(obj, BYTEBUF)) {
         obj = (Obj*)Freezer_deserialize_bytebuf((ByteBuf*)obj, instream);
@@ -203,15 +203,15 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
 }
 
 void
-Freezer_serialize_charbuf(CharBuf *charbuf, OutStream *outstream) {
-    size_t size  = CB_Get_Size(charbuf);
-    uint8_t *buf = CB_Get_Ptr8(charbuf);
+Freezer_serialize_charbuf(String *charbuf, OutStream *outstream) {
+    size_t size  = Str_Get_Size(charbuf);
+    uint8_t *buf = Str_Get_Ptr8(charbuf);
     OutStream_Write_C64(outstream, size);
     OutStream_Write_Bytes(outstream, buf, size);
 }
 
-CharBuf*
-Freezer_deserialize_charbuf(CharBuf *charbuf, InStream *instream) {
+String*
+Freezer_deserialize_charbuf(String *charbuf, InStream *instream) {
     size_t size = InStream_Read_C32(instream);
     if (size == SIZE_MAX) {
         THROW(ERR, "Can't deserialize SIZE_MAX bytes");
@@ -223,12 +223,12 @@ Freezer_deserialize_charbuf(CharBuf *charbuf, InStream *instream) {
     if (!StrHelp_utf8_valid(buf, size)) {
         THROW(ERR, "Attempt to deserialize invalid UTF-8");
     }
-    return CB_init_steal_trusted_str(charbuf, buf, size, cap);
+    return Str_init_steal_trusted_str(charbuf, buf, size, cap);
 }
 
-CharBuf*
+String*
 Freezer_read_charbuf(InStream *instream) {
-    CharBuf *charbuf = (CharBuf*)VTable_Make_Obj(CHARBUF);
+    String *charbuf = (String*)VTable_Make_Obj(STRING);
     return Freezer_deserialize_charbuf(charbuf, instream);
 }
 
@@ -299,18 +299,18 @@ Freezer_serialize_hash(Hash *hash, OutStream *outstream) {
     uint32_t hash_size = Hash_Get_Size(hash);
     OutStream_Write_C32(outstream, hash_size);
 
-    // Write CharBuf keys first.  CharBuf keys are the common case; grouping
+    // Write String keys first.  String keys are the common case; grouping
     // them together is a form of run-length-encoding and saves space, since
     // we omit the per-key class name.
     Hash_Iterate(hash);
     while (Hash_Next(hash, &key, &val)) {
-        if (Obj_Is_A(key, CHARBUF)) { charbuf_count++; }
+        if (Obj_Is_A(key, STRING)) { charbuf_count++; }
     }
     OutStream_Write_C32(outstream, charbuf_count);
     Hash_Iterate(hash);
     while (Hash_Next(hash, &key, &val)) {
-        if (Obj_Is_A(key, CHARBUF)) {
-            Freezer_serialize_charbuf((CharBuf*)key, outstream);
+        if (Obj_Is_A(key, STRING)) {
+            Freezer_serialize_charbuf((String*)key, outstream);
             FREEZE(val, outstream);
         }
     }
@@ -318,7 +318,7 @@ Freezer_serialize_hash(Hash *hash, OutStream *outstream) {
     // Punt on the classes of the remaining keys.
     Hash_Iterate(hash);
     while (Hash_Next(hash, &key, &val)) {
-        if (!Obj_Is_A(key, CHARBUF)) {
+        if (!Obj_Is_A(key, STRING)) {
             FREEZE(key, outstream);
             FREEZE(val, outstream);
         }
@@ -330,17 +330,17 @@ Freezer_deserialize_hash(Hash *hash, InStream *instream) {
     uint32_t size         = InStream_Read_C32(instream);
     uint32_t num_charbufs = InStream_Read_C32(instream);
     uint32_t num_other    = size - num_charbufs;
-    CharBuf *key          = num_charbufs ? CB_new(0) : NULL;
+    String *key          = num_charbufs ? Str_new(0) : NULL;
 
     Hash_init(hash, size);
 
-    // Read key-value pairs with CharBuf keys.
+    // Read key-value pairs with String keys.
     while (num_charbufs--) {
         uint32_t len = InStream_Read_C32(instream);
-        char *key_buf = CB_Grow(key, len);
+        char *key_buf = Str_Grow(key, len);
         InStream_Read_Bytes(instream, key_buf, len);
         key_buf[len] = '\0';
-        CB_Set_Size(key, len);
+        Str_Set_Size(key, len);
         Hash_Store(hash, (Obj*)key, THAW(instream));
     }
     DECREF(key);
@@ -383,7 +383,7 @@ S_dump_hash(Hash *hash) {
     while (Hash_Next(hash, &key, &value)) {
         // Since JSON only supports text hash keys, dump() can only support
         // text hash keys.
-        CERTIFY(key, CHARBUF);
+        CERTIFY(key, STRING);
         Hash_Store(dump, key, Freezer_dump(value));
     }
 
@@ -392,7 +392,7 @@ S_dump_hash(Hash *hash) {
 
 Obj*
 Freezer_dump(Obj *obj) {
-    if (Obj_Is_A(obj, CHARBUF)) {
+    if (Obj_Is_A(obj, STRING)) {
         return (Obj*)Obj_To_String(obj);
     }
     else if (Obj_Is_A(obj, VARRAY)) {
@@ -457,15 +457,15 @@ S_load_via_load_method(VTable *vtable, Obj *dump) {
 
 static Obj*
 S_load_from_hash(Hash *dump) {
-    CharBuf *class_name = (CharBuf*)Hash_Fetch_Str(dump, "_class", 6);
+    String *class_name = (String*)Hash_Fetch_Str(dump, "_class", 6);
 
     // Assume that the presence of the "_class" key paired with a valid class
     // name indicates the output of a dump() rather than an ordinary Hash.
-    if (class_name && CB_Is_A(class_name, CHARBUF)) {
+    if (class_name && Str_Is_A(class_name, STRING)) {
         VTable *vtable = VTable_fetch_vtable(class_name);
 
         if (!vtable) {
-            CharBuf *parent_class = VTable_find_parent_class(class_name);
+            String *parent_class = VTable_find_parent_class(class_name);
             if (parent_class) {
                 VTable *parent = VTable_singleton(parent_class, NULL);
                 vtable = VTable_singleton(class_name, parent);

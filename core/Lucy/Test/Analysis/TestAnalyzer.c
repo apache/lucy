@@ -49,9 +49,9 @@ DummyAnalyzer_Transform_IMP(DummyAnalyzer *self, Inversion *inversion) {
 static void
 test_analysis(TestBatchRunner *runner) {
     DummyAnalyzer *analyzer = DummyAnalyzer_new();
-    CharBuf *source = CB_newf("foo bar baz");
+    String *source = Str_newf("foo bar baz");
     VArray *wanted = VA_new(1);
-    VA_Push(wanted, (Obj*)CB_newf("foo bar baz"));
+    VA_Push(wanted, (Obj*)Str_newf("foo bar baz"));
     TestUtils_test_analyzer(runner, (Analyzer*)analyzer, source, wanted,
                             "test basic analysis");
     DECREF(wanted);

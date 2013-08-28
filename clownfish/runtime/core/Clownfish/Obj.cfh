@@ -118,7 +118,7 @@ public class Clownfish::Obj {
 
     /** Return the name of the class that the object belongs to.
      */
-    public CharBuf*
+    public String*
     Get_Class_Name(Obj *self);
 
     /** Indicate whether the object is a descendent of <code>ancestor</code>.
@@ -128,7 +128,7 @@ public class Clownfish::Obj {
 
     /** Generic stringification: "ClassName@hex_mem_address".
      */
-    public incremented CharBuf*
+    public incremented String*
     To_String(Obj *self);
 
     /** Convert the object to a 64-bit integer.

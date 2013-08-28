@@ -49,7 +49,7 @@ CaseFolder_Transform_IMP(CaseFolder *self, Inversion *inversion) {
 }
 
 Inversion*
-CaseFolder_Transform_Text_IMP(CaseFolder *self, CharBuf *text) {
+CaseFolder_Transform_Text_IMP(CaseFolder *self, String *text) {
     CaseFolderIVARS *const ivars = CaseFolder_IVARS(self);
     return Normalizer_Transform_Text(ivars->normalizer, text);
 }

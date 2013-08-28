@@ -25,17 +25,17 @@
 #include "Lucy/Util/Freezer.h"
 
 LeafQuery*
-LeafQuery_new(const CharBuf *field, const CharBuf *text) {
+LeafQuery_new(const String *field, const String *text) {
     LeafQuery *self = (LeafQuery*)VTable_Make_Obj(LEAFQUERY);
     return LeafQuery_init(self, field, text);
 }
 
 LeafQuery*
-LeafQuery_init(LeafQuery *self, const CharBuf *field, const CharBuf *text) {
+LeafQuery_init(LeafQuery *self, const String *field, const String *text) {
     LeafQueryIVARS *const ivars = LeafQuery_IVARS(self);
     Query_init((Query*)self, 1.0f);
-    ivars->field       = field ? CB_Clone(field) : NULL;
-    ivars->text        = CB_Clone(text);
+    ivars->field       = field ? Str_Clone(field) : NULL;
+    ivars->text        = Str_Clone(text);
     return self;
 }
 
@@ -47,12 +47,12 @@ LeafQuery_Destroy_IMP(LeafQuery *self) {
     SUPER_DESTROY(self, LEAFQUERY);
 }
 
-CharBuf*
+String*
 LeafQuery_Get_Field_IMP(LeafQuery *self) {
     return LeafQuery_IVARS(self)->field;
 }
 
-CharBuf*
+String*
 LeafQuery_Get_Text_IMP(LeafQuery *self) {
     return LeafQuery_IVARS(self)->text;
 }
@@ -66,20 +66,20 @@ LeafQuery_Equals_IMP(LeafQuery *self, Obj *other) {
     if (ivars->boost != ovars->boost)    { return false; }
     if (!!ivars->field ^ !!ovars->field) { return false; }
     if (ivars->field) {
-        if (!CB_Equals(ivars->field, (Obj*)ovars->field)) { return false; }
+        if (!Str_Equals(ivars->field, (Obj*)ovars->field)) { return false; }
     }
-    if (!CB_Equals(ivars->text, (Obj*)ovars->text)) { return false; }
+    if (!Str_Equals(ivars->text, (Obj*)ovars->text)) { return false; }
     return true;
 }
 
-CharBuf*
+String*
 LeafQuery_To_String_IMP(LeafQuery *self) {
     LeafQueryIVARS *const ivars = LeafQuery_IVARS(self);
     if (ivars->field) {
-        return CB_newf("%o:%o", ivars->field, ivars->text);
+        return Str_newf("%o:%o", ivars->field, ivars->text);
     }
     else {
-        return CB_Clone(ivars->text);
+        return Str_Clone(ivars->text);
     }
 }
 
@@ -134,10 +134,10 @@ LeafQuery_Load_IMP(LeafQuery *self, Obj *dump) {
     Obj *field = Hash_Fetch_Str(source, "field", 5);
     if (field) {
         loaded_ivars->field
-            = (CharBuf*)CERTIFY(Freezer_load(field), CHARBUF);
+            = (String*)CERTIFY(Freezer_load(field), STRING);
     }
     Obj *text = CERTIFY(Hash_Fetch_Str(source, "text", 4), OBJ);
-    loaded_ivars->text = (CharBuf*)CERTIFY(Freezer_load(text), CHARBUF);
+    loaded_ivars->text = (String*)CERTIFY(Freezer_load(text), STRING);
     return (Obj*)loaded;
 }
 

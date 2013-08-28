@@ -27,21 +27,21 @@
 #include "Lucy/Store/OutStream.h"
 
 SharedLock*
-ShLock_new(Folder *folder, const CharBuf *name, const CharBuf *host,
+ShLock_new(Folder *folder, const String *name, const String *host,
            int32_t timeout, int32_t interval) {
     SharedLock *self = (SharedLock*)VTable_Make_Obj(SHAREDLOCK);
     return ShLock_init(self, folder, name, host, timeout, interval);
 }
 
 SharedLock*
-ShLock_init(SharedLock *self, Folder *folder, const CharBuf *name,
-            const CharBuf *host, int32_t timeout, int32_t interval) {
+ShLock_init(SharedLock *self, Folder *folder, const String *name,
+            const String *host, int32_t timeout, int32_t interval) {
     LFLock_init((LockFileLock*)self, folder, name, host, timeout, interval);
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
 
     // Override.
     DECREF(ivars->lock_path);
-    ivars->lock_path = CB_newf("");
+    ivars->lock_path = Str_newf("");
 
     return self;
 }
@@ -61,18 +61,18 @@ ShLock_Request_IMP(SharedLock *self) {
 
     // Empty lock_path indicates whether this particular instance is locked.
     if (ivars->lock_path
-        && !CB_Equals_Str(ivars->lock_path, "", 0)
+        && !Str_Equals_Str(ivars->lock_path, "", 0)
         && Folder_Exists(ivars->folder, ivars->lock_path)
        ) {
         // Don't allow double obtain.
-        Err_set_error((Err*)LockErr_new(CB_newf("Lock already obtained via '%o'",
+        Err_set_error((Err*)LockErr_new(Str_newf("Lock already obtained via '%o'",
                                                 ivars->lock_path)));
         return false;
     }
 
     do {
         DECREF(ivars->lock_path);
-        ivars->lock_path = CB_newf("locks/%o-%u32.lock", ivars->name, ++i);
+        ivars->lock_path = Str_newf("locks/%o-%u32.lock", ivars->name, ++i);
     } while (Folder_Exists(ivars->folder, ivars->lock_path));
 
     bool success = super_request(self);
@@ -83,14 +83,14 @@ ShLock_Request_IMP(SharedLock *self) {
 void
 ShLock_Release_IMP(SharedLock *self) {
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
-    if (ivars->lock_path && !CB_Equals_Str(ivars->lock_path, "", 0)) {
+    if (ivars->lock_path && !Str_Equals_Str(ivars->lock_path, "", 0)) {
         ShLock_Release_t super_release
             = SUPER_METHOD_PTR(SHAREDLOCK, LUCY_ShLock_Release);
         super_release(self);
 
         // Empty out lock_path.
         DECREF(ivars->lock_path);
-        ivars->lock_path = CB_newf("");
+        ivars->lock_path = Str_newf("");
     }
 }
 
@@ -99,7 +99,7 @@ void
 ShLock_Clear_Stale_IMP(SharedLock *self) {
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
 
-    CharBuf *lock_dir_name = (CharBuf*)SSTR_WRAP_STR("locks", 5);
+    String *lock_dir_name = (String*)SSTR_WRAP_STR("locks", 5);
     if (!Folder_Find_Folder(ivars->folder, lock_dir_name)) {
         return;
     }
@@ -109,11 +109,11 @@ ShLock_Clear_Stale_IMP(SharedLock *self) {
 
     // Take a stab at any file that begins with our lock name.
     while (DH_Next(dh)) {
-        CharBuf *entry = DH_Get_Entry(dh);
-        if (CB_Starts_With(entry, ivars->name)
-            && CB_Ends_With_Str(entry, ".lock", 5)
+        String *entry = DH_Get_Entry(dh);
+        if (Str_Starts_With(entry, ivars->name)
+            && Str_Ends_With_Str(entry, ".lock", 5)
            ) {
-            CharBuf *candidate = CB_newf("%o/%o", lock_dir_name, entry);
+            String *candidate = Str_newf("%o/%o", lock_dir_name, entry);
             ShLock_Maybe_Delete_File(self, candidate, false, true);
             DECREF(candidate);
         }
@@ -127,7 +127,7 @@ bool
 ShLock_Is_Locked_IMP(SharedLock *self) {
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
 
-    CharBuf *lock_dir_name = (CharBuf*)SSTR_WRAP_STR("locks", 5);
+    String *lock_dir_name = (String*)SSTR_WRAP_STR("locks", 5);
     if (!Folder_Find_Folder(ivars->folder, lock_dir_name)) {
         return false;
     }
@@ -136,10 +136,10 @@ ShLock_Is_Locked_IMP(SharedLock *self) {
     if (!dh) { RETHROW(INCREF(Err_get_error())); }
 
     while (DH_Next(dh)) {
-        CharBuf *entry = DH_Get_Entry(dh);
+        String *entry = DH_Get_Entry(dh);
         // Translation:  $locked = 1 if $entry =~ /^\Q$name-\d+\.lock$/
-        if (CB_Starts_With(entry, ivars->name)
-            && CB_Ends_With_Str(entry, ".lock", 5)
+        if (Str_Starts_With(entry, ivars->name)
+            && Str_Ends_With_Str(entry, ".lock", 5)
            ) {
             StackString *scratch = SSTR_WRAP(entry);
             SStr_Chop(scratch, sizeof(".lock") - 1);

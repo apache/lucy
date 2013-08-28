@@ -29,33 +29,33 @@
 #define set_up_t    LUCY_TestFolderCommon_Set_Up_t
 #define tear_down_t LUCY_TestFolderCommon_Tear_Down_t
 
-static CharBuf *foo           = NULL;
-static CharBuf *bar           = NULL;
-static CharBuf *baz           = NULL;
-static CharBuf *boffo         = NULL;
-static CharBuf *banana        = NULL;
-static CharBuf *foo_bar       = NULL;
-static CharBuf *foo_bar_baz   = NULL;
-static CharBuf *foo_bar_boffo = NULL;
-static CharBuf *foo_boffo     = NULL;
-static CharBuf *foo_foo       = NULL;
-static CharBuf *nope          = NULL;
-static CharBuf *nope_nyet     = NULL;
+static String *foo           = NULL;
+static String *bar           = NULL;
+static String *baz           = NULL;
+static String *boffo         = NULL;
+static String *banana        = NULL;
+static String *foo_bar       = NULL;
+static String *foo_bar_baz   = NULL;
+static String *foo_bar_boffo = NULL;
+static String *foo_boffo     = NULL;
+static String *foo_foo       = NULL;
+static String *nope          = NULL;
+static String *nope_nyet     = NULL;
 
 static void
 S_init_strings(void) {
-    foo           = CB_newf("foo");
-    bar           = CB_newf("bar");
-    baz           = CB_newf("baz");
-    boffo         = CB_newf("boffo");
-    banana        = CB_newf("banana");
-    foo_bar       = CB_newf("foo/bar");
-    foo_bar_baz   = CB_newf("foo/bar/baz");
-    foo_bar_boffo = CB_newf("foo/bar/boffo");
-    foo_boffo     = CB_newf("foo/boffo");
-    foo_foo       = CB_newf("foo/foo");
-    nope          = CB_newf("nope");
-    nope_nyet     = CB_newf("nope/nyet");
+    foo           = Str_newf("foo");
+    bar           = Str_newf("bar");
+    baz           = Str_newf("baz");
+    boffo         = Str_newf("boffo");
+    banana        = Str_newf("banana");
+    foo_bar       = Str_newf("foo/bar");
+    foo_bar_baz   = Str_newf("foo/bar/baz");
+    foo_bar_boffo = Str_newf("foo/bar/boffo");
+    foo_boffo     = Str_newf("foo/boffo");
+    foo_foo       = Str_newf("foo/foo");
+    nope          = Str_newf("nope");
+    nope_nyet     = Str_newf("nope/nyet");
 }
 
 static void
@@ -138,7 +138,7 @@ test_Local_Find_Folder(TestBatchRunner *runner, set_up_t set_up,
     TEST_TRUE(runner, local == NULL, "Non-existent entry yields NULL");
 
     StackString *empty = SStr_BLANK();
-    local = Folder_Local_Find_Folder(folder, (CharBuf*)empty);
+    local = Folder_Local_Find_Folder(folder, (String*)empty);
     TEST_TRUE(runner, local == NULL, "Empty string yields NULL");
 
     local = Folder_Local_Find_Folder(folder, foo_bar);
@@ -157,7 +157,7 @@ test_Local_Find_Folder(TestBatchRunner *runner, set_up_t set_up,
     TEST_TRUE(runner,
               local
               && Folder_Is_A(local, FOLDER)
-              && CB_Ends_With(Folder_Get_Path(local), foo),
+              && Str_Ends_With(Folder_Get_Path(local), foo),
               "Find local directory");
 
     Folder_Delete(folder, foo_bar);

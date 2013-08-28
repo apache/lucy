@@ -26,7 +26,7 @@ class Lucy::Index::PostingPool cnick PostPool
     Snapshot          *snapshot;
     Segment           *segment;
     PolyReader        *polyreader;
-    CharBuf           *field;
+    String            *field;
     LexiconWriter     *lex_writer;
     Lexicon           *lexicon;
     PostingList       *plist;
@@ -51,14 +51,14 @@ class Lucy::Index::PostingPool cnick PostPool
 
     inert incremented PostingPool*
     new(Schema *schema, Snapshot *snapshot, Segment *segment,
-        PolyReader *polyreader, const CharBuf *field,
+        PolyReader *polyreader, const String *field,
         LexiconWriter *lex_writer, MemoryPool *mem_pool,
         OutStream *lex_temp_out, OutStream *post_temp_out,
         OutStream *skip_out);
 
     inert PostingPool*
     init(PostingPool *self, Schema *schema, Snapshot *snapshot,
-         Segment *segment, PolyReader *polyreader, const CharBuf *field,
+         Segment *segment, PolyReader *polyreader, const String *field,
          LexiconWriter *lex_writer, MemoryPool *mem_pool,
          OutStream *lex_temp_out, OutStream *post_temp_out,
          OutStream *skip_out);

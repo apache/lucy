@@ -41,34 +41,34 @@
 #include "Lucy/Search/SortRule.h"
 #include "Lucy/Store/RAMFolder.h"
 
-static CharBuf *air_cb;
-static CharBuf *airplane_cb;
-static CharBuf *bike_cb;
-static CharBuf *car_cb;
-static CharBuf *carrot_cb;
-static CharBuf *cat_cb;
-static CharBuf *float32_cb;
-static CharBuf *float64_cb;
-static CharBuf *food_cb;
-static CharBuf *home_cb;
-static CharBuf *int32_cb;
-static CharBuf *int64_cb;
-static CharBuf *land_cb;
-static CharBuf *name_cb;
-static CharBuf *nope_cb;
-static CharBuf *num_cb;
-static CharBuf *random_cb;
-static CharBuf *sloth_cb;
-static CharBuf *speed_cb;
-static CharBuf *unknown_cb;
-static CharBuf *unused_cb;
-static CharBuf *vehicle_cb;
-static CharBuf *weight_cb;
+static String *air_cb;
+static String *airplane_cb;
+static String *bike_cb;
+static String *car_cb;
+static String *carrot_cb;
+static String *cat_cb;
+static String *float32_cb;
+static String *float64_cb;
+static String *food_cb;
+static String *home_cb;
+static String *int32_cb;
+static String *int64_cb;
+static String *land_cb;
+static String *name_cb;
+static String *nope_cb;
+static String *num_cb;
+static String *random_cb;
+static String *sloth_cb;
+static String *speed_cb;
+static String *unknown_cb;
+static String *unused_cb;
+static String *vehicle_cb;
+static String *weight_cb;
 
-static CharBuf *random_float32s_cb;
-static CharBuf *random_float64s_cb;
-static CharBuf *random_int32s_cb;
-static CharBuf *random_int64s_cb;
+static String *random_float32s_cb;
+static String *random_float64s_cb;
+static String *random_int32s_cb;
+static String *random_int64s_cb;
 
 TestSortSpec*
 TestSortSpec_new() {
@@ -77,34 +77,34 @@ TestSortSpec_new() {
 
 static void
 S_init_strings() {
-    air_cb      = CB_newf("air");
-    airplane_cb = CB_newf("airplane");
-    bike_cb     = CB_newf("bike");
-    car_cb      = CB_newf("car");
-    carrot_cb   = CB_newf("carrot");
-    cat_cb      = CB_newf("cat");
-    float32_cb  = CB_newf("float32");
-    float64_cb  = CB_newf("float64");
-    food_cb     = CB_newf("food");
-    home_cb     = CB_newf("home");
-    int32_cb    = CB_newf("int32");
-    int64_cb    = CB_newf("int64");
-    land_cb     = CB_newf("land");
-    name_cb     = CB_newf("name");
-    nope_cb     = CB_newf("nope");
-    num_cb      = CB_newf("num");
-    random_cb   = CB_newf("random");
-    sloth_cb    = CB_newf("sloth");
-    speed_cb    = CB_newf("speed");
-    unknown_cb  = CB_newf("unknown");
-    unused_cb   = CB_newf("unused");
-    vehicle_cb  = CB_newf("vehicle");
-    weight_cb   = CB_newf("weight");
+    air_cb      = Str_newf("air");
+    airplane_cb = Str_newf("airplane");
+    bike_cb     = Str_newf("bike");
+    car_cb      = Str_newf("car");
+    carrot_cb   = Str_newf("carrot");
+    cat_cb      = Str_newf("cat");
+    float32_cb  = Str_newf("float32");
+    float64_cb  = Str_newf("float64");
+    food_cb     = Str_newf("food");
+    home_cb     = Str_newf("home");
+    int32_cb    = Str_newf("int32");
+    int64_cb    = Str_newf("int64");
+    land_cb     = Str_newf("land");
+    name_cb     = Str_newf("name");
+    nope_cb     = Str_newf("nope");
+    num_cb      = Str_newf("num");
+    random_cb   = Str_newf("random");
+    sloth_cb    = Str_newf("sloth");
+    speed_cb    = Str_newf("speed");
+    unknown_cb  = Str_newf("unknown");
+    unused_cb   = Str_newf("unused");
+    vehicle_cb  = Str_newf("vehicle");
+    weight_cb   = Str_newf("weight");
 
-    random_float32s_cb = CB_newf("random_float32s");
-    random_float64s_cb = CB_newf("random_float64s");
-    random_int32s_cb   = CB_newf("random_int32s");
-    random_int64s_cb   = CB_newf("random_int64s");
+    random_float32s_cb = Str_newf("random_float32s");
+    random_float64s_cb = Str_newf("random_float64s");
+    random_int32s_cb   = Str_newf("random_int32s");
+    random_int64s_cb   = Str_newf("random_int64s");
 }
 
 static void
@@ -226,22 +226,22 @@ S_refresh_indexer(Indexer **indexer, Schema *schema, RAMFolder *folder) {
 }
 
 static void
-S_add_vehicle(Indexer *indexer, CharBuf *name, int32_t speed, int32_t sloth,
-              int32_t weight, CharBuf *home, CharBuf *cat) {
+S_add_vehicle(Indexer *indexer, String *name, int32_t speed, int32_t sloth,
+              int32_t weight, String *home, String *cat) {
     Doc       *doc   = Doc_new(NULL, 0);
 
     Doc_Store(doc, name_cb, (Obj*)name);
     Doc_Store(doc, home_cb, (Obj*)home);
     Doc_Store(doc, cat_cb,  (Obj*)cat);
 
-    CharBuf *string;
-    string = CB_newf("%i32", speed);
+    String *string;
+    string = Str_newf("%i32", speed);
     Doc_Store(doc, speed_cb, (Obj*)string);
     DECREF(string);
-    string = CB_newf("%i32", sloth);
+    string = Str_newf("%i32", sloth);
     Doc_Store(doc, sloth_cb, (Obj*)string);
     DECREF(string);
-    string = CB_newf("%i32", weight);
+    string = Str_newf("%i32", weight);
     Doc_Store(doc, weight_cb, (Obj*)string);
     DECREF(string);
 
@@ -251,9 +251,9 @@ S_add_vehicle(Indexer *indexer, CharBuf *name, int32_t speed, int32_t sloth,
 }
 
 static void
-S_add_doc(Indexer *indexer, Obj *name_obj, CharBuf *cat, CharBuf *field_name) {
+S_add_doc(Indexer *indexer, Obj *name_obj, String *cat, String *field_name) {
     Doc *doc = Doc_new(NULL, 0);
-    CharBuf *name = Obj_To_String(name_obj);
+    String *name = Obj_To_String(name_obj);
     Doc_Store(doc, name_cb, (Obj*)name);
     Doc_Store(doc, cat_cb,  (Obj*)cat);
     if (field_name) {
@@ -269,10 +269,10 @@ typedef Obj* (*random_generator_t)();
 static Obj*
 S_random_string() {
     size_t length = 1 + rand() % 10;
-    CharBuf *string = CB_new(length);
+    String *string = Str_new(length);
     while (length--) {
         uint32_t code_point = 'a' + rand() % ('z' - 'a' + 1);
-        CB_Cat_Char(string, code_point);
+        Str_Cat_Char(string, code_point);
     }
     return (Obj*)string;
 }
@@ -303,8 +303,8 @@ S_random_float64() {
 
 static VArray*
 S_add_random_objects(Indexer **indexer, Schema *schema, RAMFolder *folder,
-                     random_generator_t rng, CharBuf *field_name,
-                     CharBuf *cat) {
+                     random_generator_t rng, String *field_name,
+                     String *cat) {
     VArray *objects = VA_new(100);
 
     for (int i = 0; i < 100; ++i) {
@@ -320,7 +320,7 @@ S_add_random_objects(Indexer **indexer, Schema *schema, RAMFolder *folder,
 
     for (int i = 0; i < 100; ++i) {
         Obj *obj = VA_Fetch(objects, i);
-        CharBuf *string = Obj_To_String(obj);
+        String *string = Obj_To_String(obj);
         VA_Store(objects, i, (Obj*)string);
     }
 
@@ -328,14 +328,14 @@ S_add_random_objects(Indexer **indexer, Schema *schema, RAMFolder *folder,
 }
 
 static VArray*
-S_test_sorted_search(IndexSearcher *searcher, CharBuf *query,
+S_test_sorted_search(IndexSearcher *searcher, String *query,
                      uint32_t num_wanted, ...) {
     VArray  *rules = VA_new(2);
-    CharBuf *field;
+    String *field;
     va_list  args;
 
     va_start(args, num_wanted);
-    while (NULL != (field = va_arg(args, CharBuf*))) {
+    while (NULL != (field = va_arg(args, String*))) {
         bool        reverse = va_arg(args, int);
         SortRule *rule    = SortRule_new(SortRule_FIELD, field, reverse);
         VA_Push(rules, (Obj*)rule);
@@ -352,7 +352,7 @@ S_test_sorted_search(IndexSearcher *searcher, CharBuf *query,
     HitDoc *hit_doc;
     while (NULL != (hit_doc = Hits_Next(hits))) {
         HitDoc_Extract(hit_doc, name_cb, name);
-        VA_Push(results, (Obj*)CB_Clone((CharBuf*)name));
+        VA_Push(results, (Obj*)Str_Clone((String*)name));
         DECREF(hit_doc);
     }
 
@@ -365,7 +365,7 @@ S_test_sorted_search(IndexSearcher *searcher, CharBuf *query,
 
 typedef struct SortContext {
     IndexSearcher *searcher;
-    CharBuf       *sort_field;
+    String        *sort_field;
 } SortContext;
 
 static void
@@ -462,7 +462,7 @@ test_sort_spec(TestBatchRunner *runner) {
     error = Err_trap(S_attempt_sorted_search, &sort_ctx);
     TEST_TRUE(runner, error != NULL
               && Err_Is_A(error, ERR)
-              && CB_Find_Str(Err_Get_Mess(error), "sortable", 8) != -1,
+              && Str_Find_Str(Err_Get_Mess(error), "sortable", 8) != -1,
               "sorting on a non-sortable field throws an error");
     DECREF(error);
 
@@ -470,7 +470,7 @@ test_sort_spec(TestBatchRunner *runner) {
     error = Err_trap(S_attempt_sorted_search, &sort_ctx);
     TEST_TRUE(runner, error != NULL
               && Err_Is_A(error, ERR)
-              && CB_Find_Str(Err_Get_Mess(error), "sortable", 8) != -1,
+              && Str_Find_Str(Err_Get_Mess(error), "sortable", 8) != -1,
               "sorting on an unknown field throws an error");
     DECREF(error);
 #endif
@@ -551,7 +551,7 @@ test_sort_spec(TestBatchRunner *runner) {
               "float64");
     DECREF(results);
 
-    CharBuf *bbbcca_cb = CB_newf("bike bike bike car car airplane");
+    String *bbbcca_cb = Str_newf("bike bike bike car car airplane");
     results = S_test_sorted_search(searcher, bbbcca_cb, 100,
                                    unused_cb, false, NULL);
     VA_Clear(wanted);
@@ -563,8 +563,8 @@ test_sort_spec(TestBatchRunner *runner) {
     DECREF(results);
     DECREF(bbbcca_cb);
 
-    CharBuf *nn_cb        = CB_newf("99");
-    CharBuf *nn_or_car_cb = CB_newf("99 OR car");
+    String *nn_cb        = Str_newf("99");
+    String *nn_or_car_cb = Str_newf("99 OR car");
     results = S_test_sorted_search(searcher, nn_or_car_cb, 10,
                                    speed_cb, false, NULL);
     VA_Clear(wanted);

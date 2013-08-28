@@ -50,7 +50,7 @@ NumType_Dump_For_Schema_IMP(NumericType *self) {
 
     // Store attributes that override the defaults.
     if (ivars->boost != 1.0) {
-        Hash_Store_Str(dump, "boost", 5, (Obj*)CB_newf("%f64", ivars->boost));
+        Hash_Store_Str(dump, "boost", 5, (Obj*)Str_newf("%f64", ivars->boost));
     }
     if (!ivars->indexed) {
         Hash_Store_Str(dump, "indexed", 7, (Obj*)CFISH_FALSE);
@@ -69,7 +69,7 @@ Hash*
 NumType_Dump_IMP(NumericType *self) {
     Hash *dump = NumType_Dump_For_Schema(self);
     Hash_Store_Str(dump, "_class", 6,
-                   (Obj*)CB_Clone(NumType_Get_Class_Name(self)));
+                   (Obj*)Str_Clone(NumType_Get_Class_Name(self)));
     DECREF(Hash_Delete_Str(dump, "type", 4));
     return dump;
 }
@@ -80,23 +80,23 @@ NumType_Load_IMP(NumericType *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
 
     // Get a VTable
-    CharBuf *class_name = (CharBuf*)Hash_Fetch_Str(source, "_class", 6);
-    CharBuf *type_spec  = (CharBuf*)Hash_Fetch_Str(source, "type", 4);
+    String *class_name = (String*)Hash_Fetch_Str(source, "_class", 6);
+    String *type_spec  = (String*)Hash_Fetch_Str(source, "type", 4);
     VTable *vtable = NULL;
-    if (class_name != NULL && Obj_Is_A((Obj*)class_name, CHARBUF)) {
+    if (class_name != NULL && Obj_Is_A((Obj*)class_name, STRING)) {
         vtable = VTable_singleton(class_name, NULL);
     }
-    else if (type_spec != NULL && Obj_Is_A((Obj*)type_spec, CHARBUF)) {
-        if (CB_Equals_Str(type_spec, "i32_t", 5)) {
+    else if (type_spec != NULL && Obj_Is_A((Obj*)type_spec, STRING)) {
+        if (Str_Equals_Str(type_spec, "i32_t", 5)) {
             vtable = INT32TYPE;
         }
-        else if (CB_Equals_Str(type_spec, "i64_t", 5)) {
+        else if (Str_Equals_Str(type_spec, "i64_t", 5)) {
             vtable = INT64TYPE;
         }
-        else if (CB_Equals_Str(type_spec, "f32_t", 5)) {
+        else if (Str_Equals_Str(type_spec, "f32_t", 5)) {
             vtable = FLOAT32TYPE;
         }
-        else if (CB_Equals_Str(type_spec, "f64_t", 5)) {
+        else if (Str_Equals_Str(type_spec, "f64_t", 5)) {
             vtable = FLOAT64TYPE;
         }
         else {
@@ -141,10 +141,10 @@ Float64Type_init2(Float64Type *self, float boost, bool indexed,
                                        stored, sortable);
 }
 
-CharBuf*
+String*
 Float64Type_Specifier_IMP(Float64Type *self) {
     UNUSED_VAR(self);
-    return CB_newf("f64_t");
+    return Str_newf("f64_t");
 }
 
 int8_t
@@ -183,10 +183,10 @@ Float32Type_init2(Float32Type *self, float boost, bool indexed,
                                        stored, sortable);
 }
 
-CharBuf*
+String*
 Float32Type_Specifier_IMP(Float32Type *self) {
     UNUSED_VAR(self);
-    return CB_newf("f32_t");
+    return Str_newf("f32_t");
 }
 
 int8_t
@@ -225,10 +225,10 @@ Int32Type_init2(Int32Type *self, float boost, bool indexed,
                                      stored, sortable);
 }
 
-CharBuf*
+String*
 Int32Type_Specifier_IMP(Int32Type *self) {
     UNUSED_VAR(self);
-    return CB_newf("i32_t");
+    return Str_newf("i32_t");
 }
 
 int8_t
@@ -267,10 +267,10 @@ Int64Type_init2(Int64Type *self, float boost, bool indexed,
                                      stored, sortable);
 }
 
-CharBuf*
+String*
 Int64Type_Specifier_IMP(Int64Type *self) {
     UNUSED_VAR(self);
-    return CB_newf("i64_t");
+    return Str_newf("i64_t");
 }
 
 int8_t

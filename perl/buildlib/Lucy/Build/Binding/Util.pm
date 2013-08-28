@@ -203,7 +203,7 @@ MODULE = Lucy   PACKAGE = Lucy::Util::IndexFileNames
 
 uint64_t
 extract_gen(name)
-    const cfish_CharBuf *name;
+    const cfish_String *name;
 CODE:
     RETVAL = lucy_IxFileNames_extract_gen(name);
 OUTPUT: RETVAL
@@ -213,7 +213,7 @@ latest_snapshot(folder)
     lucy_Folder *folder;
 CODE:
 {
-    cfish_CharBuf *latest = lucy_IxFileNames_latest_snapshot(folder);
+    cfish_String *latest = lucy_IxFileNames_latest_snapshot(folder);
     RETVAL = XSBind_cb_to_sv(latest);
     CFISH_DECREF(latest);
 }

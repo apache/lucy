@@ -57,7 +57,7 @@ typedef struct lucy_SFWriterElem {
 
 SortFieldWriter*
 SortFieldWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
-                    PolyReader *polyreader, const CharBuf *field,
+                    PolyReader *polyreader, const String *field,
                     MemoryPool *memory_pool, size_t mem_thresh,
                     OutStream *temp_ord_out, OutStream *temp_ix_out,
                     OutStream *temp_dat_out) {
@@ -71,7 +71,7 @@ SortFieldWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
 SortFieldWriter*
 SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
                      Snapshot *snapshot, Segment *segment,
-                     PolyReader *polyreader, const CharBuf *field,
+                     PolyReader *polyreader, const String *field,
                      MemoryPool *memory_pool, size_t mem_thresh,
                      OutStream *temp_ord_out, OutStream *temp_ix_out,
                      OutStream *temp_dat_out) {
@@ -96,7 +96,7 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
     ivars->ord_width       = 0;
 
     // Assign.
-    ivars->field        = CB_Clone(field);
+    ivars->field        = Str_Clone(field);
     ivars->schema       = (Schema*)INCREF(schema);
     ivars->snapshot     = (Snapshot*)INCREF(snapshot);
     ivars->segment      = (Segment*)INCREF(segment);
@@ -262,11 +262,11 @@ S_write_val(Obj *val, int8_t prim_id, OutStream *ix_out, OutStream *dat_out,
     if (val) {
         switch (prim_id & FType_PRIMITIVE_ID_MASK) {
             case FType_TEXT: {
-                    CharBuf *string = (CharBuf*)val;
+                    String *string = (String*)val;
                     int64_t dat_pos = OutStream_Tell(dat_out) - dat_start;
                     OutStream_Write_I64(ix_out, dat_pos);
-                    OutStream_Write_Bytes(dat_out, (char*)CB_Get_Ptr8(string),
-                                          CB_Get_Size(string));
+                    OutStream_Write_Bytes(dat_out, (char*)Str_Get_Ptr8(string),
+                                          Str_Get_Size(string));
                     break;
                 }
             case FType_BLOB: {
@@ -499,18 +499,18 @@ SortFieldWriter_Flip_IMP(SortFieldWriter *self) {
     }
     else if (num_runs) {
         Folder  *folder = PolyReader_Get_Folder(ivars->polyreader);
-        CharBuf *seg_name = Seg_Get_Name(ivars->segment);
-        CharBuf *ord_path = CB_newf("%o/sort_ord_temp", seg_name);
+        String *seg_name = Seg_Get_Name(ivars->segment);
+        String *ord_path = Str_newf("%o/sort_ord_temp", seg_name);
         ivars->ord_in = Folder_Open_In(folder, ord_path);
         DECREF(ord_path);
         if (!ivars->ord_in) { RETHROW(INCREF(Err_get_error())); }
         if (ivars->var_width) {
-            CharBuf *ix_path = CB_newf("%o/sort_ix_temp", seg_name);
+            String *ix_path = Str_newf("%o/sort_ix_temp", seg_name);
             ivars->ix_in = Folder_Open_In(folder, ix_path);
             DECREF(ix_path);
             if (!ivars->ix_in) { RETHROW(INCREF(Err_get_error())); }
         }
-        CharBuf *dat_path = CB_newf("%o/sort_dat_temp", seg_name);
+        String *dat_path = Str_newf("%o/sort_dat_temp", seg_name);
         ivars->dat_in = Folder_Open_In(folder, dat_path);
         DECREF(dat_path);
         if (!ivars->dat_in) { RETHROW(INCREF(Err_get_error())); }
@@ -614,21 +614,21 @@ SortFieldWriter_Finish_IMP(SortFieldWriter *self) {
 
     int32_t  field_num = ivars->field_num;
     Folder  *folder    = PolyReader_Get_Folder(ivars->polyreader);
-    CharBuf *seg_name  = Seg_Get_Name(ivars->segment);
+    String *seg_name  = Seg_Get_Name(ivars->segment);
 
     // Open streams.
-    CharBuf *ord_path = CB_newf("%o/sort-%i32.ord", seg_name, field_num);
+    String *ord_path = Str_newf("%o/sort-%i32.ord", seg_name, field_num);
     OutStream *ord_out = Folder_Open_Out(folder, ord_path);
     DECREF(ord_path);
     if (!ord_out) { RETHROW(INCREF(Err_get_error())); }
     OutStream *ix_out = NULL;
     if (ivars->var_width) {
-        CharBuf *ix_path = CB_newf("%o/sort-%i32.ix", seg_name, field_num);
+        String *ix_path = Str_newf("%o/sort-%i32.ix", seg_name, field_num);
         ix_out = Folder_Open_Out(folder, ix_path);
         DECREF(ix_path);
         if (!ix_out) { RETHROW(INCREF(Err_get_error())); }
     }
-    CharBuf *dat_path = CB_newf("%o/sort-%i32.dat", seg_name, field_num);
+    String *dat_path = Str_newf("%o/sort-%i32.dat", seg_name, field_num);
     OutStream *dat_out = Folder_Open_Out(folder, dat_path);
     DECREF(dat_path);
     if (!dat_out) { RETHROW(INCREF(Err_get_error())); }
@@ -665,8 +665,8 @@ S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in,
     if (run_ivars->sort_cache) { return; }
 
     // Open the temp files for reading.
-    CharBuf *seg_name  = Seg_Get_Name(run_ivars->segment);
-    CharBuf *ord_alias = CB_newf("%o/sort_ord_temp-%i64-to-%i64", seg_name,
+    String *seg_name  = Seg_Get_Name(run_ivars->segment);
+    String *ord_alias = Str_newf("%o/sort_ord_temp-%i64-to-%i64", seg_name,
                                  run_ivars->ord_start, run_ivars->ord_end);
     InStream *ord_in_dupe
         = InStream_Reopen(ord_in, ord_alias, run_ivars->ord_start,
@@ -674,13 +674,13 @@ S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in,
     DECREF(ord_alias);
     InStream *ix_in_dupe = NULL;
     if (run_ivars->var_width) {
-        CharBuf *ix_alias = CB_newf("%o/sort_ix_temp-%i64-to-%i64", seg_name,
+        String *ix_alias = Str_newf("%o/sort_ix_temp-%i64-to-%i64", seg_name,
                                     run_ivars->ix_start, run_ivars->ix_end);
         ix_in_dupe = InStream_Reopen(ix_in, ix_alias, run_ivars->ix_start,
                                      run_ivars->ix_end - run_ivars->ix_start);
         DECREF(ix_alias);
     }
-    CharBuf *dat_alias = CB_newf("%o/sort_dat_temp-%i64-to-%i64", seg_name,
+    String *dat_alias = Str_newf("%o/sort_dat_temp-%i64-to-%i64", seg_name,
                                  run_ivars->dat_start, run_ivars->dat_end);
     InStream *dat_in_dupe
         = InStream_Reopen(dat_in, dat_alias, run_ivars->dat_start,
@@ -688,7 +688,7 @@ S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in,
     DECREF(dat_alias);
 
     // Get a SortCache.
-    CharBuf *field = Seg_Field_Name(run_ivars->segment, run_ivars->field_num);
+    String *field = Seg_Field_Name(run_ivars->segment, run_ivars->field_num);
     switch (run_ivars->prim_id & FType_PRIMITIVE_ID_MASK) {
         case FType_TEXT:
             run_ivars->sort_cache = (SortCache*)TextSortCache_new(

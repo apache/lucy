@@ -27,16 +27,16 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
 
     Searcher   *searcher;
     Query      *query;
-    CharBuf    *field;
+    String     *field;
     uint32_t    excerpt_length;
     uint32_t    window_width;
     uint32_t    slop;
-    CharBuf    *pre_tag;
-    CharBuf    *post_tag;
+    String     *pre_tag;
+    String     *post_tag;
     Compiler   *compiler;
 
     inert incremented Highlighter*
-    new(Searcher *searcher, Obj *query, const CharBuf *field,
+    new(Searcher *searcher, Obj *query, const String *field,
         uint32_t excerpt_length = 200);
 
     /**
@@ -51,12 +51,12 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
      */
     public inert Highlighter*
     init(Highlighter *self, Searcher *searcher, Obj *query,
-         const CharBuf *field, uint32_t excerpt_length = 200);
+         const String *field, uint32_t excerpt_length = 200);
 
     /** Take a HitDoc object and return a highlighted excerpt as a string if
      * the HitDoc has a value for the specified <code>field</code>.
      */
-    public incremented CharBuf*
+    public incremented String*
     Create_Excerpt(Highlighter *self, HitDoc *hit_doc);
 
     /** Encode text with HTML entities. This method is called internally by
@@ -64,8 +64,8 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
      * subclass can override this if the text should be encoded differently or
      * not at all.
      */
-    public incremented CharBuf*
-    Encode(Highlighter *self, CharBuf *text);
+    public incremented String*
+    Encode(Highlighter *self, String *text);
 
     /** Find sentence boundaries within the specified range, returning them as
      * an array of Spans.  The "offset" of each Span indicates the start of
@@ -81,39 +81,39 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
      * until the end of the string.
      */
     incremented VArray*
-    Find_Sentences(Highlighter *self, CharBuf *text, int32_t offset = 0,
+    Find_Sentences(Highlighter *self, String *text, int32_t offset = 0,
                    int32_t length = 0);
 
     /** Highlight a small section of text.  By default, prepends pre-tag and
      * appends post-tag.  This method is called internally by Create_Excerpt()
      * when assembling an excerpt.
      */
-    public incremented CharBuf*
-    Highlight(Highlighter *self, const CharBuf *text);
+    public incremented String*
+    Highlight(Highlighter *self, const String *text);
 
     /** Setter.  The default value is "<strong>".
      */
     public void
-    Set_Pre_Tag(Highlighter *self, const CharBuf *pre_tag);
+    Set_Pre_Tag(Highlighter *self, const String *pre_tag);
 
     /** Setter.  The default value is "</strong>".
      */
     public void
-    Set_Post_Tag(Highlighter *self, const CharBuf *post_tag);
+    Set_Post_Tag(Highlighter *self, const String *post_tag);
 
     /** Accessor.
      */
-    public CharBuf*
+    public String*
     Get_Pre_Tag(Highlighter *self);
 
     /** Accessor.
      */
-    public CharBuf*
+    public String*
     Get_Post_Tag(Highlighter *self);
 
     /** Accessor.
      */
-    public CharBuf*
+    public String*
     Get_Field(Highlighter *self);
 
     /** Accessor.
@@ -144,7 +144,7 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
      * (Helper function for Create_Excerpt only exposed for testing purposes.)
      */
     int32_t
-    Find_Best_Fragment(Highlighter *self, const CharBuf *field_val,
+    Find_Best_Fragment(Highlighter *self, const String *field_val,
                        ViewCharBuf *fragment, HeatMap *heat_map);
 
     /** Take the fragment and determine the best edges for it based on
@@ -154,8 +154,8 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
      * (Helper function for Create_Excerpt only exposed for testing purposes.)
      */
     int32_t
-    Raw_Excerpt(Highlighter *self, const CharBuf *field_val,
-                const CharBuf *fragment, CharBuf *raw_excerpt, int32_t top,
+    Raw_Excerpt(Highlighter *self, const String *field_val,
+                const String *fragment, String *raw_excerpt, int32_t top,
                 HeatMap *heat_map, VArray *sentences);
 
     /** Take the text in raw_excerpt, add highlight tags, encode, and place
@@ -164,8 +164,8 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
      * (Helper function for Create_Excerpt only exposed for testing purposes.)
      */
     void
-    Highlight_Excerpt(Highlighter *self, VArray *spans, CharBuf *raw_excerpt,
-                      CharBuf *highlighted, int32_t top);
+    Highlight_Excerpt(Highlighter *self, VArray *spans, String *raw_excerpt,
+                      String *highlighted, int32_t top);
 
     public void
     Destroy(Highlighter *self);

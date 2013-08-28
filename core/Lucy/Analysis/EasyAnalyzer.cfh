@@ -43,25 +43,25 @@ parcel Lucy;
  */
 public class Lucy::Analysis::EasyAnalyzer inherits Lucy::Analysis::Analyzer {
 
-    CharBuf *language;
+    String *language;
     StandardTokenizer *tokenizer;
     Normalizer *normalizer;
     SnowballStemmer *stemmer;
 
     inert incremented EasyAnalyzer*
-    new(const CharBuf *language = NULL);
+    new(const String *language = NULL);
 
     /**
      * @param language An ISO code from the list of supported languages.
      */
     public inert EasyAnalyzer*
-    init(EasyAnalyzer *self, const CharBuf *language = NULL);
+    init(EasyAnalyzer *self, const String *language = NULL);
 
     public incremented Inversion*
     Transform(EasyAnalyzer *self, Inversion *inversion);
 
     public incremented Inversion*
-    Transform_Text(EasyAnalyzer *self, CharBuf *text);
+    Transform_Text(EasyAnalyzer *self, String *text);
 
     public incremented Hash*
     Dump(EasyAnalyzer *self);

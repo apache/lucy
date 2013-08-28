@@ -18,9 +18,9 @@ parcel Clownfish;
 
 inert class Clownfish::TestHarness::TestUtils  {
 
-    /** Testing-only CharBuf factory which uses strlen().
+    /** Testing-only String factory which uses strlen().
      */
-    inert incremented CharBuf*
+    inert incremented String*
     get_cb(const char *utf8);
 
     /** Return a random unsigned 64-bit integer.
@@ -58,7 +58,7 @@ inert class Clownfish::TestHarness::TestUtils  {
     /** Return a string with a random (legal) sequence of code points.
      * @param length Length of the string in code points.
      */
-    inert incremented CharBuf*
+    inert incremented String*
     random_string(size_t length);
 }
 

@@ -143,7 +143,7 @@ PPCODE:
     cfish_StackString *klass
         = CFISH_SStr_WRAP_STR(class_name, strlen(class_name));
     cfish_VTable *vtable
-        = (cfish_VTable*)cfish_VTable_singleton((cfish_CharBuf*)klass, NULL);
+        = (cfish_VTable*)cfish_VTable_singleton((cfish_String*)klass, NULL);
     STRLEN len;
     char *ptr = SvPV(serialized_sv, len);
     cfish_ViewByteBuf *contents = cfish_ViewBB_new(ptr, len);
@@ -184,7 +184,7 @@ bool
 run_tests(package)
     char *package;
 CODE:
-    cfish_CharBuf *class_name = cfish_CB_newf("%s", package);
+    cfish_String *class_name = cfish_Str_newf("%s", package);
     cfish_TestFormatter *formatter
         = (cfish_TestFormatter*)cfish_TestFormatterTAP_new();
     cfish_TestSuite *suite = testlucy_Test_create_test_suite();

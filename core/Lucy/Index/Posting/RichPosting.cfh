@@ -47,7 +47,7 @@ class Lucy::Index::Posting::RichPosting cnick RichPost
 
     incremented RawPosting*
     Read_Raw(RichPosting *self, InStream *instream, int32_t last_doc_id,
-             CharBuf *term_text, MemoryPool *mem_pool);
+             String *term_text, MemoryPool *mem_pool);
 
     void
     Add_Inversion_To_Pool(RichPosting *self, PostingPool *post_pool,

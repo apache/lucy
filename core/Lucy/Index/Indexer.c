@@ -53,13 +53,13 @@ S_release_write_lock(Indexer *self);
 static void
 S_release_merge_lock(Indexer *self);
 
-// Verify a Folder or derive an FSFolder from a CharBuf path.  Call
+// Verify a Folder or derive an FSFolder from a String path.  Call
 // Folder_Initialize() if "create" is true.
 static Folder*
 S_init_folder(Obj *index, bool create);
 
 // Find the schema file within a snapshot.
-static CharBuf*
+static String*
 S_find_schema_file(Snapshot *snapshot);
 
 Indexer*
@@ -107,7 +107,7 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
     }
 
     // Find the latest snapshot or create a new one.
-    CharBuf *latest_snapfile = IxFileNames_latest_snapshot(folder);
+    String *latest_snapfile = IxFileNames_latest_snapshot(folder);
     if (latest_snapfile) {
         Snapshot_Read_File(latest_snapshot, folder, latest_snapfile);
     }
@@ -122,7 +122,7 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
             THROW(ERR, "No Schema supplied, and can't find one in the index");
         }
         else {
-            CharBuf *schema_file = S_find_schema_file(latest_snapshot);
+            String *schema_file = S_find_schema_file(latest_snapshot);
             Obj *dump = Json_slurp_json(folder, schema_file);
             if (dump) { // read file successfully
                 ivars->schema = (Schema*)CERTIFY(Freezer_load(dump), SCHEMA);
@@ -196,7 +196,7 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
     // Add all known fields to Segment.
     VArray *fields = Schema_All_Fields(schema);
     for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
-        Seg_Add_Field(ivars->segment, (CharBuf*)VA_Fetch(fields, i));
+        Seg_Add_Field(ivars->segment, (String*)VA_Fetch(fields, i));
     }
     DECREF(fields);
 
@@ -247,8 +247,8 @@ S_init_folder(Obj *index, bool create) {
     if (Obj_Is_A(index, FOLDER)) {
         folder = (Folder*)INCREF(index);
     }
-    else if (Obj_Is_A(index, CHARBUF)) {
-        folder = (Folder*)FSFolder_new((CharBuf*)index);
+    else if (Obj_Is_A(index, STRING)) {
+        folder = (Folder*)FSFolder_new((String*)index);
     }
     else {
         THROW(ERR, "Invalid type for 'index': %o", Obj_Get_Class_Name(index));
@@ -274,7 +274,7 @@ Indexer_Add_Doc_IMP(Indexer *self, Doc *doc, float boost) {
 }
 
 void
-Indexer_Delete_By_Term_IMP(Indexer *self, CharBuf *field, Obj *term) {
+Indexer_Delete_By_Term_IMP(Indexer *self, String *field, Obj *term) {
     IndexerIVARS *const ivars = Indexer_IVARS(self);
     Schema    *schema = ivars->schema;
     FieldType *type   = Schema_Fetch_Type(schema, field);
@@ -286,9 +286,9 @@ Indexer_Delete_By_Term_IMP(Indexer *self, CharBuf *field, Obj *term) {
 
     // Analyze term if appropriate, then zap.
     if (FType_Is_A(type, FULLTEXTTYPE)) {
-        CERTIFY(term, CHARBUF);
+        CERTIFY(term, STRING);
         Analyzer *analyzer = Schema_Fetch_Analyzer(schema, field);
-        VArray *terms = Analyzer_Split(analyzer, (CharBuf*)term);
+        VArray *terms = Analyzer_Split(analyzer, (String*)term);
         Obj *analyzed_term = VA_Fetch(terms, 0);
         if (analyzed_term) {
             DelWriter_Delete_By_Term(ivars->del_writer, field,
@@ -322,8 +322,8 @@ Indexer_Add_Index_IMP(Indexer *self, Obj *index) {
     if (Obj_Is_A(index, FOLDER)) {
         other_folder = (Folder*)INCREF(index);
     }
-    else if (Obj_Is_A(index, CHARBUF)) {
-        other_folder = (Folder*)FSFolder_new((CharBuf*)index);
+    else if (Obj_Is_A(index, STRING)) {
+        other_folder = (Folder*)FSFolder_new((String*)index);
     }
     else {
         THROW(ERR, "Invalid type for 'index': %o", Obj_Get_Class_Name(index));
@@ -344,7 +344,7 @@ Indexer_Add_Index_IMP(Indexer *self, Obj *index) {
 
         // Add fields to Segment.
         for (uint32_t i = 0, max = VA_Get_Size(other_fields); i < max; i++) {
-            CharBuf *other_field = (CharBuf*)VA_Fetch(other_fields, i);
+            String *other_field = (String*)VA_Fetch(other_fields, i);
             Seg_Add_Field(ivars->segment, other_field);
         }
         DECREF(other_fields);
@@ -378,14 +378,14 @@ Indexer_Optimize_IMP(Indexer *self) {
     Indexer_IVARS(self)->optimize = true;
 }
 
-static CharBuf*
+static String*
 S_find_schema_file(Snapshot *snapshot) {
     VArray *files = Snapshot_List(snapshot);
-    CharBuf *retval = NULL;
+    String *retval = NULL;
     for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
-        CharBuf *file = (CharBuf*)VA_Fetch(files, i);
-        if (CB_Starts_With_Str(file, "schema_", 7)
-            && CB_Ends_With_Str(file, ".json", 5)
+        String *file = (String*)VA_Fetch(files, i);
+        if (Str_Starts_With_Str(file, "schema_", 7)
+            && Str_Ends_With_Str(file, ".json", 5)
            ) {
             retval = file;
             break;
@@ -436,7 +436,7 @@ S_maybe_merge(Indexer *self, VArray *seg_readers) {
     for (uint32_t i = 0, max = VA_Get_Size(to_merge); i < max; i++) {
         SegReader *seg_reader
             = (SegReader*)CERTIFY(VA_Fetch(to_merge, i), SEGREADER);
-        CharBuf *seg_name = SegReader_Get_Seg_Name(seg_reader);
+        String *seg_name = SegReader_Get_Seg_Name(seg_reader);
         if (Hash_Fetch(seen, (Obj*)seg_name)) {
             DECREF(seen);
             DECREF(to_merge);
@@ -508,16 +508,16 @@ Indexer_Prepare_Commit_IMP(Indexer *self) {
         // Derive snapshot and schema file names.
         DECREF(ivars->snapfile);
         ivars->snapfile = IxManager_Make_Snapshot_Filename(ivars->manager);
-        CB_Cat_Trusted_Str(ivars->snapfile, ".temp", 5);
+        Str_Cat_Trusted_Str(ivars->snapfile, ".temp", 5);
         uint64_t schema_gen = IxFileNames_extract_gen(ivars->snapfile);
         char base36[StrHelp_MAX_BASE36_BYTES];
         StrHelp_to_base36(schema_gen, &base36);
-        CharBuf *new_schema_name = CB_newf("schema_%s.json", base36);
+        String *new_schema_name = Str_newf("schema_%s.json", base36);
 
         // Finish the segment, write schema file.
         SegWriter_Finish(ivars->seg_writer);
         Schema_Write(schema, folder, new_schema_name);
-        CharBuf *old_schema_name = S_find_schema_file(snapshot);
+        String *old_schema_name = S_find_schema_file(snapshot);
         if (old_schema_name) {
             Snapshot_Delete_Entry(snapshot, old_schema_name);
         }
@@ -554,13 +554,13 @@ Indexer_Commit_IMP(Indexer *self) {
         bool success;
 
         // Rename temp snapshot file.
-        CharBuf *temp_snapfile = ivars->snapfile;
+        String *temp_snapfile = ivars->snapfile;
         size_t ext_len      = sizeof(".temp") - 1;
-        size_t snapfile_len = CB_Length(temp_snapfile);
+        size_t snapfile_len = Str_Length(temp_snapfile);
         if (snapfile_len <= ext_len) {
             THROW(ERR, "Invalid snapfile name: %o", temp_snapfile);
         }
-        ivars->snapfile = CB_SubString(temp_snapfile, 0,
+        ivars->snapfile = Str_SubString(temp_snapfile, 0,
                                        snapfile_len - ext_len);
         Snapshot_Set_Path(ivars->snapshot, ivars->snapfile);
         success = Folder_Rename(ivars->folder, temp_snapfile, ivars->snapfile);

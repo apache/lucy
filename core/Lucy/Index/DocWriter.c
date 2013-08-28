@@ -63,14 +63,14 @@ S_lazy_init(DocWriter *self) {
     DocWriterIVARS *const ivars = DocWriter_IVARS(self);
     if (!ivars->dat_out) {
         Folder  *folder   = ivars->folder;
-        CharBuf *seg_name = Seg_Get_Name(ivars->segment);
+        String *seg_name = Seg_Get_Name(ivars->segment);
 
         // Get streams.
-        CharBuf *ix_file = CB_newf("%o/documents.ix", seg_name);
+        String *ix_file = Str_newf("%o/documents.ix", seg_name);
         ivars->ix_out = Folder_Open_Out(folder, ix_file);
         DECREF(ix_file);
         if (!ivars->ix_out) { RETHROW(INCREF(Err_get_error())); }
-        CharBuf *dat_file = CB_newf("%o/documents.dat", seg_name);
+        String *dat_file = Str_newf("%o/documents.dat", seg_name);
         ivars->dat_out = Folder_Open_Out(folder, dat_file);
         DECREF(dat_file);
         if (!ivars->dat_out) { RETHROW(INCREF(Err_get_error())); }
@@ -110,13 +110,13 @@ DocWriter_Add_Inverted_Doc_IMP(DocWriter *self, Inverter *inverter,
         // Only store fields marked as "stored".
         FieldType *type = Inverter_Get_Type(inverter);
         if (FType_Stored(type)) {
-            CharBuf *field = Inverter_Get_Field_Name(inverter);
+            String *field = Inverter_Get_Field_Name(inverter);
             Obj *value = Inverter_Get_Value(inverter);
             Freezer_serialize_charbuf(field, dat_out);
             switch (FType_Primitive_ID(type) & FType_PRIMITIVE_ID_MASK) {
                 case FType_TEXT: {
-                    uint8_t *buf  = CB_Get_Ptr8((CharBuf*)value);
-                    size_t   size = CB_Get_Size((CharBuf*)value);
+                    uint8_t *buf  = Str_Get_Ptr8((String*)value);
+                    size_t   size = Str_Get_Size((String*)value);
                     OutStream_Write_C32(dat_out, size);
                     OutStream_Write_Bytes(dat_out, buf, size);
                     break;

@@ -64,7 +64,7 @@ LUCY_DefDocReader_Fetch_Doc_IMP(lucy_DefaultDocReader *self, int32_t doc_id) {
         cfish_StackString *field_name_zcb
             = CFISH_SStr_WRAP_STR(field_name_ptr, field_name_len);
         CFISH_SStr_Assign_Str(field_name_zcb, field_name_ptr, field_name_len);
-        type = LUCY_Schema_Fetch_Type(schema, (cfish_CharBuf*)field_name_zcb);
+        type = LUCY_Schema_Fetch_Type(schema, (cfish_String*)field_name_zcb);
 
         // Read the field value.
         switch (LUCY_FType_Primitive_ID(type) & lucy_FType_PRIMITIVE_ID_MASK) {

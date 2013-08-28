@@ -130,11 +130,11 @@ DefDelWriter_Destroy_IMP(DefaultDeletionsWriter *self) {
     SUPER_DESTROY(self, DEFAULTDELETIONSWRITER);
 }
 
-static CharBuf*
+static String*
 S_del_filename(DefaultDeletionsWriter *self, SegReader *target_reader) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     Segment *target_seg = SegReader_Get_Segment(target_reader);
-    return CB_newf("%o/deletions-%o.bv", Seg_Get_Name(ivars->segment),
+    return Str_newf("%o/deletions-%o.bv", Seg_Get_Name(ivars->segment),
                    Seg_Get_Name(target_seg));
 }
 
@@ -151,7 +151,7 @@ DefDelWriter_Finish_IMP(DefaultDeletionsWriter *self) {
             double     used      = (doc_max + 1) / 8.0;
             uint32_t   byte_size = (uint32_t)ceil(used);
             uint32_t   new_max   = byte_size * 8 - 1;
-            CharBuf   *filename  = S_del_filename(self, seg_reader);
+            String    *filename  = S_del_filename(self, seg_reader);
             OutStream *outstream = Folder_Open_Out(folder, filename);
             if (!outstream) { RETHROW(INCREF(Err_get_error())); }
 
@@ -188,7 +188,7 @@ DefDelWriter_Metadata_IMP(DefaultDeletionsWriter *self) {
             Segment   *segment   = SegReader_Get_Segment(seg_reader);
             Hash      *mini_meta = Hash_new(2);
             Hash_Store_Str(mini_meta, "count", 5,
-                           (Obj*)CB_newf("%u32", (uint32_t)BitVec_Count(deldocs)));
+                           (Obj*)Str_newf("%u32", (uint32_t)BitVec_Count(deldocs)));
             Hash_Store_Str(mini_meta, "filename", 8,
                            (Obj*)S_del_filename(self, seg_reader));
             Hash_Store(files, (Obj*)Seg_Get_Name(segment), (Obj*)mini_meta);
@@ -211,7 +211,7 @@ DefDelWriter_Seg_Deletions_IMP(DefaultDeletionsWriter *self,
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     Matcher *deletions    = NULL;
     Segment *segment      = SegReader_Get_Segment(seg_reader);
-    CharBuf *seg_name     = Seg_Get_Name(segment);
+    String *seg_name     = Seg_Get_Name(segment);
     Integer32 *tick_obj   = (Integer32*)Hash_Fetch(ivars->name_to_tick,
                                                    (Obj*)seg_name);
     int32_t tick          = tick_obj ? Int32_Get_Value(tick_obj) : 0;
@@ -237,7 +237,7 @@ DefDelWriter_Seg_Deletions_IMP(DefaultDeletionsWriter *self,
 
 int32_t
 DefDelWriter_Seg_Del_Count_IMP(DefaultDeletionsWriter *self,
-                               const CharBuf *seg_name) {
+                               const String *seg_name) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     Integer32 *tick
         = (Integer32*)Hash_Fetch(ivars->name_to_tick, (Obj*)seg_name);
@@ -249,7 +249,7 @@ DefDelWriter_Seg_Del_Count_IMP(DefaultDeletionsWriter *self,
 
 void
 DefDelWriter_Delete_By_Term_IMP(DefaultDeletionsWriter *self,
-                                const CharBuf *field, Obj *term) {
+                                const String *field, Obj *term) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     for (uint32_t i = 0, max = VA_Get_Size(ivars->seg_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(ivars->seg_readers, i);
@@ -350,7 +350,7 @@ DefDelWriter_Merge_Segment_IMP(DefaultDeletionsWriter *self,
         VArray *seg_readers = ivars->seg_readers;
         Hash   *files = (Hash*)Hash_Fetch_Str(del_meta, "files", 5);
         if (files) {
-            CharBuf *seg;
+            String *seg;
             Hash *mini_meta;
             Hash_Iterate(files);
             while (Hash_Next(files, (Obj**)&seg, (Obj**)&mini_meta)) {
@@ -362,10 +362,10 @@ DefDelWriter_Merge_Segment_IMP(DefaultDeletionsWriter *self,
                 for (uint32_t i = 0, max = VA_Get_Size(seg_readers); i < max; i++) {
                     SegReader *candidate
                         = (SegReader*)VA_Fetch(seg_readers, i);
-                    CharBuf *candidate_name
+                    String *candidate_name
                         = Seg_Get_Name(SegReader_Get_Segment(candidate));
 
-                    if (CB_Equals(seg, (Obj*)candidate_name)) {
+                    if (Str_Equals(seg, (Obj*)candidate_name)) {
                         /* If the count hasn't changed, we're about to
                          * merge away the most recent deletions file
                          * pointing at this target segment -- so force a

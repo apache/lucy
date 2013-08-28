@@ -51,7 +51,7 @@ SegReader_init(SegReader *self, Schema *schema, Folder *folder,
     segment = SegReader_Get_Segment(self);
 
     ivars->doc_max    = (int32_t)Seg_Get_Count(segment);
-    ivars->seg_name   = (CharBuf*)INCREF(Seg_Get_Name(segment));
+    ivars->seg_name   = (String*)INCREF(Seg_Get_Name(segment));
     ivars->seg_num    = Seg_Get_Number(segment);
     Err *error = Err_trap(S_try_init_components, self);
     if (error) {
@@ -84,7 +84,7 @@ SegReader_Destroy_IMP(SegReader *self) {
 }
 
 void
-SegReader_Register_IMP(SegReader *self, const CharBuf *api,
+SegReader_Register_IMP(SegReader *self, const String *api,
                        DataReader *component) {
     SegReaderIVARS *const ivars = SegReader_IVARS(self);
     if (Hash_Fetch(ivars->components, (Obj*)api)) {
@@ -94,7 +94,7 @@ SegReader_Register_IMP(SegReader *self, const CharBuf *api,
     Hash_Store(ivars->components, (Obj*)api, (Obj*)component);
 }
 
-CharBuf*
+String*
 SegReader_Get_Seg_Name_IMP(SegReader *self) {
     return SegReader_IVARS(self)->seg_name;
 }

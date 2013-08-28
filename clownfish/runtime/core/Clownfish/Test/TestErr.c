@@ -19,7 +19,7 @@
 
 #include "Clownfish/Test/TestErr.h"
 
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Test.h"
 #include "Clownfish/TestHarness/TestBatchRunner.h"
@@ -32,10 +32,10 @@ TestErr_new() {
 
 static void
 test_To_String(TestBatchRunner *runner) {
-    CharBuf *message = CB_newf("oops");
+    String *message = Str_newf("oops");
     Err *error = Err_new(message);
-    CharBuf *string = Err_To_String(error);
-    TEST_TRUE(runner, CB_Equals(message, (Obj*)string),
+    String *string = Err_To_String(error);
+    TEST_TRUE(runner, Str_Equals(message, (Obj*)string),
               "Stringifies as message");
     DECREF(string);
     DECREF(error);

@@ -24,14 +24,14 @@ parcel Lucy;
 
 public class Lucy::Search::RangeQuery inherits Lucy::Search::Query {
 
-    CharBuf  *field;
+    String   *field;
     Obj      *lower_term;
     Obj      *upper_term;
     bool      include_lower;
     bool      include_upper;
 
     inert incremented RangeQuery*
-    new(const CharBuf *field, Obj *lower_term = NULL, Obj *upper_term = NULL,
+    new(const String *field, Obj *lower_term = NULL, Obj *upper_term = NULL,
         bool include_lower = true, bool include_upper = true);
 
     /** Takes 5 parameters; <code>field</code> is required, as
@@ -49,14 +49,14 @@ public class Lucy::Search::RangeQuery inherits Lucy::Search::Query {
      * <code>upper_term</code> should be included in the results.
      */
     public inert RangeQuery*
-    init(RangeQuery *self, const CharBuf *field,
+    init(RangeQuery *self, const String *field,
          Obj *lower_term = NULL, Obj *upper_term = NULL,
          bool include_lower = true, bool include_upper = true);
 
     public bool
     Equals(RangeQuery *self, Obj *other);
 
-    public incremented CharBuf*
+    public incremented String*
     To_String(RangeQuery *self);
 
     public incremented RangeCompiler*

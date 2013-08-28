@@ -23,7 +23,7 @@
 #include "Lucy/Analysis/Inversion.h"
 
 RegexTokenizer*
-RegexTokenizer_new(const CharBuf *pattern) {
+RegexTokenizer_new(const String *pattern) {
     RegexTokenizer *self = (RegexTokenizer*)VTable_Make_Obj(REGEXTOKENIZER);
     return RegexTokenizer_init(self, pattern);
 }
@@ -43,10 +43,10 @@ RegexTokenizer_Transform_IMP(RegexTokenizer *self, Inversion *inversion) {
 }
 
 Inversion*
-RegexTokenizer_Transform_Text_IMP(RegexTokenizer *self, CharBuf *text) {
+RegexTokenizer_Transform_Text_IMP(RegexTokenizer *self, String *text) {
     Inversion *new_inversion = Inversion_new(NULL);
-    RegexTokenizer_Tokenize_Str(self, (char*)CB_Get_Ptr8(text),
-                                CB_Get_Size(text), new_inversion);
+    RegexTokenizer_Tokenize_Str(self, (char*)Str_Get_Ptr8(text),
+                                Str_Get_Size(text), new_inversion);
     return new_inversion;
 }
 
@@ -56,7 +56,7 @@ RegexTokenizer_Dump_IMP(RegexTokenizer *self) {
     RegexTokenizer_Dump_t super_dump
         = SUPER_METHOD_PTR(REGEXTOKENIZER, LUCY_RegexTokenizer_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
-    Hash_Store_Str(dump, "pattern", 7, (Obj*)CB_Clone(ivars->pattern));
+    Hash_Store_Str(dump, "pattern", 7, (Obj*)Str_Clone(ivars->pattern));
     return (Obj*)dump;
 }
 
@@ -66,8 +66,8 @@ RegexTokenizer_Load_IMP(RegexTokenizer *self, Obj *dump) {
     RegexTokenizer_Load_t super_load
         = SUPER_METHOD_PTR(REGEXTOKENIZER, LUCY_RegexTokenizer_Load);
     RegexTokenizer *loaded = super_load(self, dump);
-    CharBuf *pattern 
-        = (CharBuf*)CERTIFY(Hash_Fetch_Str(source, "pattern", 7), CHARBUF);
+    String *pattern 
+        = (String*)CERTIFY(Hash_Fetch_Str(source, "pattern", 7), STRING);
     return RegexTokenizer_init(loaded, pattern);
 }
 
@@ -77,7 +77,7 @@ RegexTokenizer_Equals_IMP(RegexTokenizer *self, Obj *other) {
     if (!Obj_Is_A(other, REGEXTOKENIZER))                 { return false; }
     RegexTokenizerIVARS *ivars = RegexTokenizer_IVARS(self);
     RegexTokenizerIVARS *ovars = RegexTokenizer_IVARS((RegexTokenizer*)other);
-    if (!CB_Equals(ivars->pattern, (Obj*)ovars->pattern)) { return false; }
+    if (!Str_Equals(ivars->pattern, (Obj*)ovars->pattern)) { return false; }
     return true;
 }
 

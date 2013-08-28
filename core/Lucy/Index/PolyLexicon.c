@@ -29,13 +29,13 @@ static void
 S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target);
 
 PolyLexicon*
-PolyLex_new(const CharBuf *field, VArray *sub_readers) {
+PolyLex_new(const String *field, VArray *sub_readers) {
     PolyLexicon *self = (PolyLexicon*)VTable_Make_Obj(POLYLEXICON);
     return PolyLex_init(self, field, sub_readers);
 }
 
 PolyLexicon*
-PolyLex_init(PolyLexicon *self, const CharBuf *field, VArray *sub_readers) {
+PolyLex_init(PolyLexicon *self, const String *field, VArray *sub_readers) {
     uint32_t  num_sub_readers = VA_Get_Size(sub_readers);
     VArray   *seg_lexicons    = VA_new(num_sub_readers);
 
@@ -208,7 +208,7 @@ SegLexQ_Less_Than_IMP(SegLexQueue *self, Obj *a, Obj *b) {
     Obj *const term_a = SegLex_Get_Term(lex_a);
     Obj *const term_b = SegLex_Get_Term(lex_b);
     UNUSED_VAR(self);
-    return CB_less_than(&term_a, &term_b);
+    return Str_less_than(&term_a, &term_b);
 }
 
 

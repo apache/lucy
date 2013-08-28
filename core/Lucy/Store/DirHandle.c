@@ -19,9 +19,9 @@
 #include "Lucy/Store/DirHandle.h"
 
 DirHandle*
-DH_init(DirHandle *self, const CharBuf *dir) {
+DH_init(DirHandle *self, const String *dir) {
     DirHandleIVARS *const ivars = DH_IVARS(self);
-    ivars->dir   = CB_Clone(dir);
+    ivars->dir   = Str_Clone(dir);
     ivars->entry = NULL;
     ABSTRACT_CLASS_CHECK(self, DIRHANDLE);
     return self;
@@ -36,15 +36,15 @@ DH_Destroy_IMP(DirHandle *self) {
     SUPER_DESTROY(self, DIRHANDLE);
 }
 
-CharBuf*
+String*
 DH_Get_Dir_IMP(DirHandle *self) {
     return DH_IVARS(self)->dir;
 }
 
-CharBuf*
+String*
 DH_Get_Entry_IMP(DirHandle *self) {
-    CharBuf *entry = DH_IVARS(self)->entry;
-    return (CharBuf*)INCREF(entry);
+    String *entry = DH_IVARS(self)->entry;
+    return (String*)INCREF(entry);
 }
 
 

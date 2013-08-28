@@ -29,7 +29,7 @@ class Lucy::Store::RAMFileHandle cnick RAMFH
     int64_t  len;
 
     inert incremented nullable RAMFileHandle*
-    open(const CharBuf *path = NULL, uint32_t flags, RAMFile *file = NULL);
+    open(const String *path = NULL, uint32_t flags, RAMFile *file = NULL);
 
     /**
      * Return a new RAMFileHandle, or set Err_error and return NULL on
@@ -41,7 +41,7 @@ class Lucy::Store::RAMFileHandle cnick RAMFH
      * must be passed or an error will occur.
      */
     inert nullable RAMFileHandle*
-    do_open(RAMFileHandle *self, const CharBuf *path = NULL, uint32_t flags,
+    do_open(RAMFileHandle *self, const String *path = NULL, uint32_t flags,
             RAMFile *file = NULL);
 
     /** Access the backing RAMFile.

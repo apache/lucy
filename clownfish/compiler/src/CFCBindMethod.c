@@ -264,7 +264,7 @@ CFCBindMeth_abstract_method_def(CFCMethod *method) {
     char pattern[] =
         "%s\n"
         "%s(%s) {\n"
-        "    cfish_CharBuf *klass = self ? CFISH_Obj_Get_Class_Name((cfish_Obj*)self) : %s->name;%s\n"
+        "    cfish_String *klass = self ? CFISH_Obj_Get_Class_Name((cfish_Obj*)self) : %s->name;%s\n"
         "    CFISH_THROW(CFISH_ERR, \"Abstract method '%s' not defined by %%o\", klass);%s\n"
         "}\n";
     char *abstract_def

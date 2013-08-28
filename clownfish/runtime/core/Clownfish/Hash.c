@@ -27,7 +27,7 @@
 #include "Clownfish/VTable.h"
 
 #include "Clownfish/Hash.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/VArray.h"
 #include "Clownfish/Util/Memory.h"

@@ -33,7 +33,7 @@ parcel Lucy;
 
 public class Lucy::Index::Segment cnick Seg inherits Clownfish::Obj {
 
-    CharBuf     *name;
+    String      *name;
     int64_t      count;
     int64_t      number;
     Hash        *by_name;   /* field numbers by name */
@@ -48,14 +48,14 @@ public class Lucy::Index::Segment cnick Seg inherits Clownfish::Obj {
 
     /** Return a segment name with a base-36-encoded segment number.
      */
-    inert incremented CharBuf*
+    inert incremented String*
     num_to_name(int64_t number);
 
-    /** Return true if the CharBuf is a segment name, i.e. matches this
+    /** Return true if the String is a segment name, i.e. matches this
      * pattern:  /^seg_\w+$/
      */
     inert bool
-    valid_seg_name(const CharBuf *name);
+    valid_seg_name(const String *name);
 
     /** Register a new field and assign it a field number.  If the field was
      * already known, nothing happens.
@@ -64,7 +64,7 @@ public class Lucy::Index::Segment cnick Seg inherits Clownfish::Obj {
      * @return the field's field number, which is a positive integer.
      */
     public int32_t
-    Add_Field(Segment *self, const CharBuf *field);
+    Add_Field(Segment *self, const String *field);
 
     /** Store arbitrary information in the segment's metadata Hash, to be
      * serialized later.  Throws an error if <code>key</code> is used twice.
@@ -73,7 +73,7 @@ public class Lucy::Index::Segment cnick Seg inherits Clownfish::Obj {
      * @param metadata JSON-izable data structure.
      */
     public void
-    Store_Metadata(Segment *self, const CharBuf *key,
+    Store_Metadata(Segment *self, const String *key,
                    decremented Obj *metadata);
 
     void
@@ -83,7 +83,7 @@ public class Lucy::Index::Segment cnick Seg inherits Clownfish::Obj {
     /** Fetch a value from the Segment's metadata hash.
      */
     public nullable Obj*
-    Fetch_Metadata(Segment *self, const CharBuf *key);
+    Fetch_Metadata(Segment *self, const String *key);
 
     nullable Obj*
     Fetch_Metadata_Str(Segment *self, const char *key, size_t len);
@@ -95,17 +95,17 @@ public class Lucy::Index::Segment cnick Seg inherits Clownfish::Obj {
      * @param field Field name.
      */
     public int32_t
-    Field_Num(Segment *self, const CharBuf *field);
+    Field_Num(Segment *self, const String *field);
 
     /** Given a field number, return the name of its field, or NULL if the
      * field name can't be found.
      */
-    public nullable CharBuf*
+    public nullable String*
     Field_Name(Segment *self, int32_t field_num);
 
     /** Getter for the object's seg name.
      */
-    public CharBuf*
+    public String*
     Get_Name(Segment *self);
 
     /** Getter for the segment number.

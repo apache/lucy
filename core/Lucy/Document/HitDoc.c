@@ -70,7 +70,7 @@ HitDoc_Dump_IMP(HitDoc *self) {
     HitDoc_Dump_t super_dump
         = SUPER_METHOD_PTR(HITDOC, LUCY_HitDoc_Dump);
     Hash *dump = super_dump(self);
-    Hash_Store_Str(dump, "score", 5, (Obj*)CB_newf("%f64", ivars->score));
+    Hash_Store_Str(dump, "score", 5, (Obj*)Str_newf("%f64", ivars->score));
     return dump;
 }
 

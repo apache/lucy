@@ -26,14 +26,14 @@
 #include "Lucy/Store/InStream.h"
 
 RawLexicon*
-RawLex_new(Schema *schema, const CharBuf *field, InStream *instream,
+RawLex_new(Schema *schema, const String *field, InStream *instream,
            int64_t start, int64_t end) {
     RawLexicon *self = (RawLexicon*)VTable_Make_Obj(RAWLEXICON);
     return RawLex_init(self, schema, field, instream, start, end);
 }
 
 RawLexicon*
-RawLex_init(RawLexicon *self, Schema *schema, const CharBuf *field,
+RawLex_init(RawLexicon *self, Schema *schema, const String *field,
             InStream *instream, int64_t start, int64_t end) {
     FieldType *type = Schema_Fetch_Type(schema, field);
     Lex_init((Lexicon*)self, field);

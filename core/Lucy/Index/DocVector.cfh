@@ -34,18 +34,18 @@ class Lucy::Index::DocVector cnick DocVec
     init(DocVector *self);
 
     incremented TermVector*
-    Term_Vector(DocVector *self, const CharBuf *field, const CharBuf *term);
+    Term_Vector(DocVector *self, const String *field, const String *term);
 
     /** Add a compressed, encoded TermVector to the object.
      */
     void
-    Add_Field_Buf(DocVector *self, const CharBuf *field, ByteBuf *field_buf);
+    Add_Field_Buf(DocVector *self, const String *field, ByteBuf *field_buf);
 
     /** Return the compressed, encoded TermVector associated with a particular
      * field.
      */
     ByteBuf*
-    Field_Buf(DocVector *self, const CharBuf *field);
+    Field_Buf(DocVector *self, const String *field);
 
     public void
     Serialize(DocVector *self, OutStream *outstream);

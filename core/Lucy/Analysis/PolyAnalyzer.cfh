@@ -52,7 +52,7 @@ public class Lucy::Analysis::PolyAnalyzer inherits Lucy::Analysis::Analyzer {
     VArray  *analyzers;
 
     inert incremented PolyAnalyzer*
-    new(const CharBuf *language = NULL, VArray *analyzers = NULL);
+    new(const String *language = NULL, VArray *analyzers = NULL);
 
     /**
      * @param language An ISO code from the list of supported languages.
@@ -65,7 +65,7 @@ public class Lucy::Analysis::PolyAnalyzer inherits Lucy::Analysis::Analyzer {
      * stopalize, stem.
      */
     public inert PolyAnalyzer*
-    init(PolyAnalyzer *self, const CharBuf *language = NULL,
+    init(PolyAnalyzer *self, const String *language = NULL,
          VArray *analyzers = NULL);
 
     /** Getter for "analyzers" member.
@@ -77,7 +77,7 @@ public class Lucy::Analysis::PolyAnalyzer inherits Lucy::Analysis::Analyzer {
     Transform(PolyAnalyzer *self, Inversion *inversion);
 
     public incremented Inversion*
-    Transform_Text(PolyAnalyzer *self, CharBuf *text);
+    Transform_Text(PolyAnalyzer *self, String *text);
 
     public bool
     Equals(PolyAnalyzer *self, Obj *other);

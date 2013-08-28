@@ -88,7 +88,7 @@ class Lucy::Search::PolyCompiler inherits Lucy::Search::Compiler {
 
     public incremented VArray*
     Highlight_Spans(PolyCompiler *self, Searcher *searcher,
-                    DocVector *doc_vec, const CharBuf *field);
+                    DocVector *doc_vec, const String *field);
 
     public void
     Destroy(PolyCompiler *self);

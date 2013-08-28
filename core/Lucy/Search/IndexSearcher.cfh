@@ -51,7 +51,7 @@ public class Lucy::Search::IndexSearcher cnick IxSearcher
     Doc_Max(IndexSearcher *self);
 
     public uint32_t
-    Doc_Freq(IndexSearcher *self, const CharBuf *field, Obj *term);
+    Doc_Freq(IndexSearcher *self, const String *field, Obj *term);
 
     public void
     Collect(IndexSearcher *self, Query *query, Collector *collector);

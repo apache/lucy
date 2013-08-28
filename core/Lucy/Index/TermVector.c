@@ -24,20 +24,20 @@
 #include "Lucy/Util/Freezer.h"
 
 TermVector*
-TV_new(const CharBuf *field, const CharBuf *text, I32Array *positions,
+TV_new(const String *field, const String *text, I32Array *positions,
        I32Array *start_offsets, I32Array *end_offsets) {
     TermVector *self = (TermVector*)VTable_Make_Obj(TERMVECTOR);
     return TV_init(self, field, text, positions, start_offsets, end_offsets);
 }
 
 TermVector*
-TV_init(TermVector *self, const CharBuf *field, const CharBuf *text,
+TV_init(TermVector *self, const String *field, const String *text,
         I32Array *positions, I32Array *start_offsets, I32Array *end_offsets) {
     TermVectorIVARS *const ivars = TV_IVARS(self);
 
     // Assign.
-    ivars->field          = CB_Clone(field);
-    ivars->text           = CB_Clone(text);
+    ivars->field          = Str_Clone(field);
+    ivars->text           = Str_Clone(text);
     ivars->num_pos        = I32Arr_Get_Size(positions);
     ivars->positions      = (I32Array*)INCREF(positions);
     ivars->start_offsets  = (I32Array*)INCREF(start_offsets);
@@ -99,8 +99,8 @@ TV_Serialize_IMP(TermVector *self, OutStream *target) {
 
 TermVector*
 TV_Deserialize_IMP(TermVector *self, InStream *instream) {
-    CharBuf *field = Freezer_read_charbuf(instream);
-    CharBuf *text  = Freezer_read_charbuf(instream);
+    String *field = Freezer_read_charbuf(instream);
+    String *text  = Freezer_read_charbuf(instream);
     uint32_t num_pos = InStream_Read_C32(instream);
 
     // Read positional data.
@@ -132,8 +132,8 @@ TV_Equals_IMP(TermVector *self, Obj *other) {
     if ((TermVector*)other == self) { return true; }
     TermVectorIVARS *const ivars = TV_IVARS(self);
     TermVectorIVARS *const ovars = TV_IVARS((TermVector*)other);
-    if (!CB_Equals(ivars->field, (Obj*)ovars->field)) { return false; }
-    if (!CB_Equals(ivars->text, (Obj*)ovars->text))   { return false; }
+    if (!Str_Equals(ivars->field, (Obj*)ovars->field)) { return false; }
+    if (!Str_Equals(ivars->text, (Obj*)ovars->text))   { return false; }
     if (ivars->num_pos != ovars->num_pos)             { return false; }
 
     int32_t *const posits       = I32Arr_IVARS(ivars->positions)->ints;
