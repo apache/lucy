@@ -51,7 +51,7 @@ static void
 test_tokenizer(TestBatchRunner *runner) {
     StandardTokenizer *tokenizer = StandardTokenizer_new();
 
-    ZombieCharBuf *word = ZCB_WRAP_STR(
+    StackString *word = SSTR_WRAP_STR(
                               " ."
                               "tha\xCC\x82t's"
                               ":"

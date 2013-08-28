@@ -76,14 +76,14 @@ TestUtils_make_poly_query(uint32_t boolop, ...) {
 
 TermQuery*
 TestUtils_make_term_query(const char *field, const char *term) {
-    CharBuf *field_cb = (CharBuf*)ZCB_WRAP_STR(field, strlen(field));
-    CharBuf *term_cb  = (CharBuf*)ZCB_WRAP_STR(term, strlen(term));
+    CharBuf *field_cb = (CharBuf*)SSTR_WRAP_STR(field, strlen(field));
+    CharBuf *term_cb  = (CharBuf*)SSTR_WRAP_STR(term, strlen(term));
     return TermQuery_new((CharBuf*)field_cb, (Obj*)term_cb);
 }
 
 PhraseQuery*
 TestUtils_make_phrase_query(const char *field, ...) {
-    CharBuf *field_cb = (CharBuf*)ZCB_WRAP_STR(field, strlen(field));
+    CharBuf *field_cb = (CharBuf*)SSTR_WRAP_STR(field, strlen(field));
     va_list args;
     VArray *terms = VA_new(0);
     PhraseQuery *query;
@@ -102,9 +102,9 @@ TestUtils_make_phrase_query(const char *field, ...) {
 
 LeafQuery*
 TestUtils_make_leaf_query(const char *field, const char *term) {
-    CharBuf *term_cb  = (CharBuf*)ZCB_WRAP_STR(term, strlen(term));
+    CharBuf *term_cb  = (CharBuf*)SSTR_WRAP_STR(term, strlen(term));
     CharBuf *field_cb = field
-                        ? (CharBuf*)ZCB_WRAP_STR(field, strlen(field))
+                        ? (CharBuf*)SSTR_WRAP_STR(field, strlen(field))
                         : NULL;
     return LeafQuery_new(field_cb, term_cb);
 }
@@ -120,9 +120,9 @@ RangeQuery*
 TestUtils_make_range_query(const char *field, const char *lower_term,
                            const char *upper_term, bool include_lower,
                            bool include_upper) {
-    CharBuf *f     = (CharBuf*)ZCB_WRAP_STR(field, strlen(field));
-    CharBuf *lterm = (CharBuf*)ZCB_WRAP_STR(lower_term, strlen(lower_term));
-    CharBuf *uterm = (CharBuf*)ZCB_WRAP_STR(upper_term, strlen(upper_term));
+    CharBuf *f     = (CharBuf*)SSTR_WRAP_STR(field, strlen(field));
+    CharBuf *lterm = (CharBuf*)SSTR_WRAP_STR(lower_term, strlen(lower_term));
+    CharBuf *uterm = (CharBuf*)SSTR_WRAP_STR(upper_term, strlen(upper_term));
     return RangeQuery_new(f, (Obj*)lterm, (Obj*)uterm, include_lower,
                           include_upper);
 }

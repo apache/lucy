@@ -36,7 +36,7 @@ CFReader_open(Folder *folder) {
 CompoundFileReader*
 CFReader_do_open(CompoundFileReader *self, Folder *folder) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
-    CharBuf *cfmeta_file = (CharBuf*)ZCB_WRAP_STR("cfmeta.json", 11);
+    CharBuf *cfmeta_file = (CharBuf*)SSTR_WRAP_STR("cfmeta.json", 11);
     Hash *metadata = (Hash*)Json_slurp_json((Folder*)folder, cfmeta_file);
     Err *error = NULL;
 
@@ -73,7 +73,7 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder) {
     }
 
     // Open an instream which we'll clone over and over.
-    CharBuf *cf_file = (CharBuf*)ZCB_WRAP_STR("cf.dat", 6);
+    CharBuf *cf_file = (CharBuf*)SSTR_WRAP_STR("cf.dat", 6);
     ivars->instream = Folder_Open_In(folder, cf_file);
     if (!ivars->instream) {
         ERR_ADD_FRAME(Err_get_error());
@@ -87,17 +87,17 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder) {
     // Strip directory name from filepaths for old format.
     if (ivars->format == 1) {
         VArray *files = Hash_Keys(ivars->records);
-        ZombieCharBuf *filename = ZCB_BLANK();
-        ZombieCharBuf *folder_name
-            = IxFileNames_local_part(Folder_Get_Path(folder), ZCB_BLANK());
-        size_t folder_name_len = ZCB_Length(folder_name);
+        StackString *filename = SStr_BLANK();
+        StackString *folder_name
+            = IxFileNames_local_part(Folder_Get_Path(folder), SStr_BLANK());
+        size_t folder_name_len = SStr_Length(folder_name);
 
         for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
             CharBuf *orig = (CharBuf*)VA_Fetch(files, i);
             if (CB_Starts_With(orig, (CharBuf*)folder_name)) {
                 Obj *record = Hash_Delete(ivars->records, (Obj*)orig);
-                ZCB_Assign(filename, orig);
-                ZCB_Nip(filename, folder_name_len + sizeof(DIR_SEP) - 1);
+                SStr_Assign(filename, orig);
+                SStr_Nip(filename, folder_name_len + sizeof(DIR_SEP) - 1);
                 Hash_Store(ivars->records, (Obj*)filename, (Obj*)record);
             }
         }
@@ -166,11 +166,11 @@ CFReader_Local_Delete_IMP(CompoundFileReader *self, const CharBuf *name) {
         // Once the number of virtual files falls to 0, remove the compound
         // files.
         if (Hash_Get_Size(ivars->records) == 0) {
-            CharBuf *cf_file = (CharBuf*)ZCB_WRAP_STR("cf.dat", 6);
+            CharBuf *cf_file = (CharBuf*)SSTR_WRAP_STR("cf.dat", 6);
             if (!Folder_Delete(ivars->real_folder, cf_file)) {
                 return false;
             }
-            CharBuf *cfmeta_file = (CharBuf*)ZCB_WRAP_STR("cfmeta.json", 11);
+            CharBuf *cfmeta_file = (CharBuf*)SSTR_WRAP_STR("cfmeta.json", 11);
             if (!Folder_Delete(ivars->real_folder, cfmeta_file)) {
                 return false;
 

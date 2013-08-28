@@ -381,7 +381,7 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
 
         // Testing only.
         if (PolyReader_race_condition_debug1) {
-            ZombieCharBuf *temp = ZCB_WRAP_STR("temp", 4);
+            StackString *temp = SSTR_WRAP_STR("temp", 4);
             if (Folder_Exists(folder, (CharBuf*)temp)) {
                 bool success = Folder_Rename(folder, (CharBuf*)temp,
                                                PolyReader_race_condition_debug1);

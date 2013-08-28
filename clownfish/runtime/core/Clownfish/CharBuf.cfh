@@ -338,30 +338,30 @@ class Clownfish::ViewCharBuf cnick ViewCB
     Destroy(ViewCharBuf *self);
 }
 
-class Clownfish::ZombieCharBuf cnick ZCB
+class Clownfish::StackString cnick SStr
     inherits Clownfish::ViewCharBuf {
 
-    /** Return a ZombieCharBuf with a blank string.
+    /** Return a StackString with a blank string.
      */
-    inert incremented ZombieCharBuf*
+    inert incremented StackString*
     new(void *allocation);
 
     /**
      * @param allocation A single block of memory which will be used for both
-     * the ZombieCharBuf object and its buffer.
+     * the StackString object and its buffer.
      * @param alloc_size The size of the allocation.
      * @param pattern A format pattern.
      */
-    inert incremented ZombieCharBuf*
+    inert incremented StackString*
     newf(void *allocation, size_t alloc_size, const char *pattern, ...);
 
-    inert incremented ZombieCharBuf*
+    inert incremented StackString*
     wrap(void *allocation, const CharBuf *source);
 
-    inert incremented ZombieCharBuf*
+    inert incremented StackString*
     wrap_str(void *allocation, const char *ptr, size_t size);
 
-    /** Return the size for a ZombieCharBuf struct.
+    /** Return the size for a StackString struct.
      */
     inert size_t
     size();
@@ -369,23 +369,23 @@ class Clownfish::ZombieCharBuf cnick ZCB
     /** Throws an error.
      */
     public void
-    Destroy(ZombieCharBuf *self);
+    Destroy(StackString *self);
 }
 
 __C__
 
-#define CFISH_ZCB_BLANK() cfish_ZCB_new(cfish_alloca(cfish_ZCB_size()))
+#define CFISH_SStr_BLANK() cfish_SStr_new(cfish_alloca(cfish_SStr_size()))
 
-#define CFISH_ZCB_WRAP(source) \
-    cfish_ZCB_wrap(cfish_alloca(cfish_ZCB_size()), source)
+#define CFISH_SStr_WRAP(source) \
+    cfish_SStr_wrap(cfish_alloca(cfish_SStr_size()), source)
 
-#define CFISH_ZCB_WRAP_STR(ptr, size) \
-    cfish_ZCB_wrap_str(cfish_alloca(cfish_ZCB_size()), ptr, size)
+#define CFISH_SStr_WRAP_STR(ptr, size) \
+    cfish_SStr_wrap_str(cfish_alloca(cfish_SStr_size()), ptr, size)
 
 #ifdef CFISH_USE_SHORT_NAMES
-  #define ZCB_BLANK             CFISH_ZCB_BLANK
-  #define ZCB_WRAP              CFISH_ZCB_WRAP
-  #define ZCB_WRAP_STR          CFISH_ZCB_WRAP_STR
+  #define SStr_BLANK             CFISH_SStr_BLANK
+  #define SSTR_WRAP              CFISH_SStr_WRAP
+  #define SSTR_WRAP_STR          CFISH_SStr_WRAP_STR
 #endif
 __END_C__
 

@@ -66,8 +66,8 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
         InStream_Read_Bytes(dat_in, field_name, field_name_len);
 
         // Find the Field's FieldType.
-        ZombieCharBuf *field_name_zcb
-            = ZCB_WRAP_STR(field_name, field_name_len);
+        StackString *field_name_zcb
+            = SSTR_WRAP_STR(field_name, field_name_len);
         type = Schema_Fetch_Type(schema, (CharBuf*)field_name_zcb);
 
         // Read the field value.

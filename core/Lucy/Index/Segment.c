@@ -66,13 +66,13 @@ Seg_num_to_name(int64_t number) {
 bool
 Seg_valid_seg_name(const CharBuf *name) {
     if (CB_Starts_With_Str(name, "seg_", 4)) {
-        ZombieCharBuf *scratch = ZCB_WRAP(name);
-        ZCB_Nip(scratch, 4);
+        StackString *scratch = SSTR_WRAP(name);
+        SStr_Nip(scratch, 4);
         uint32_t code_point;
-        while (0 != (code_point = ZCB_Nibble(scratch))) {
+        while (0 != (code_point = SStr_Nibble(scratch))) {
             if (!isalnum(code_point)) { return false; }
         }
-        if (ZCB_Get_Size(scratch) == 0) { return true; } // Success!
+        if (SStr_Get_Size(scratch) == 0) { return true; } // Success!
     }
     return false;
 }
@@ -207,7 +207,7 @@ Seg_Store_Metadata_IMP(Segment *self, const CharBuf *key, Obj *value) {
 void
 Seg_Store_Metadata_Str_IMP(Segment *self, const char *key, size_t key_len,
                            Obj *value) {
-    ZombieCharBuf *k = ZCB_WRAP_STR((char*)key, key_len);
+    StackString *k = SSTR_WRAP_STR((char*)key, key_len);
     Seg_Store_Metadata(self, (CharBuf*)k, value);
 }
 

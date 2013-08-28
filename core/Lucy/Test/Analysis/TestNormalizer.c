@@ -38,8 +38,8 @@ static void
 test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     Normalizer *normalizer[4];
 
-    CharBuf *NFC  = (CharBuf*)ZCB_WRAP_STR("NFC",  3);
-    CharBuf *NFKC = (CharBuf*)ZCB_WRAP_STR("NFKC", 4);
+    CharBuf *NFC  = (CharBuf*)SSTR_WRAP_STR("NFC",  3);
+    CharBuf *NFKC = (CharBuf*)SSTR_WRAP_STR("NFKC", 4);
 
     normalizer[0] = Normalizer_new(NFKC, true,  false);
     normalizer[1] = Normalizer_new(NFC,  true,  false);

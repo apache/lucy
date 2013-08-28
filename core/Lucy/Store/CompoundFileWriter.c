@@ -59,7 +59,7 @@ CFWriter_Destroy_IMP(CompoundFileWriter *self) {
 void
 CFWriter_Consolidate_IMP(CompoundFileWriter *self) {
     CompoundFileWriterIVARS *const ivars = CFWriter_IVARS(self);
-    CharBuf *cfmeta_file = (CharBuf*)ZCB_WRAP_STR("cfmeta.json", 11);
+    CharBuf *cfmeta_file = (CharBuf*)SSTR_WRAP_STR("cfmeta.json", 11);
     if (Folder_Exists(ivars->folder, cfmeta_file)) {
         THROW(ERR, "Merge already performed for %o",
               Folder_Get_Path(ivars->folder));
@@ -75,8 +75,8 @@ S_clean_up_old_temp_files(CompoundFileWriter *self,
                           CompoundFileWriterIVARS *ivars) {
     UNUSED_VAR(self);
     Folder  *folder      = ivars->folder;
-    CharBuf *cfmeta_temp = (CharBuf*)ZCB_WRAP_STR("cfmeta.json.temp", 16);
-    CharBuf *cf_file     = (CharBuf*)ZCB_WRAP_STR("cf.dat", 6);
+    CharBuf *cfmeta_temp = (CharBuf*)SSTR_WRAP_STR("cfmeta.json.temp", 16);
+    CharBuf *cf_file     = (CharBuf*)SSTR_WRAP_STR("cf.dat", 6);
 
     if (Folder_Exists(folder, cf_file)) {
         if (!Folder_Delete(folder, cf_file)) {
@@ -98,7 +98,7 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
     Hash      *sub_files    = Hash_new(0);
     VArray    *files        = Folder_List(folder, NULL);
     VArray    *merged       = VA_new(VA_Get_Size(files));
-    CharBuf   *cf_file      = (CharBuf*)ZCB_WRAP_STR("cf.dat", 6);
+    CharBuf   *cf_file      = (CharBuf*)SSTR_WRAP_STR("cf.dat", 6);
     OutStream *outstream    = Folder_Open_Out(folder, (CharBuf*)cf_file);
     bool       rename_success;
 
@@ -143,8 +143,8 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
     }
 
     // Write metadata to cfmeta file.
-    CharBuf *cfmeta_temp = (CharBuf*)ZCB_WRAP_STR("cfmeta.json.temp", 16);
-    CharBuf *cfmeta_file = (CharBuf*)ZCB_WRAP_STR("cfmeta.json", 11);
+    CharBuf *cfmeta_temp = (CharBuf*)SSTR_WRAP_STR("cfmeta.json.temp", 16);
+    CharBuf *cfmeta_file = (CharBuf*)SSTR_WRAP_STR("cfmeta.json", 11);
     Json_spew_json((Obj*)metadata, (Folder*)ivars->folder, cfmeta_temp);
     rename_success = Folder_Rename(ivars->folder, cfmeta_temp, cfmeta_file);
     if (!rename_success) { RETHROW(INCREF(Err_get_error())); }

@@ -177,9 +177,9 @@ S_append_json_string(Obj *dump, CharBuf *json) {
     CB_Cat_Trusted_Str(json, "\"", 1);
 
     // Process string data.
-    ZombieCharBuf *iterator = ZCB_WRAP((CharBuf*)dump);
-    while (ZCB_Get_Size(iterator)) {
-        uint32_t code_point = ZCB_Nibble(iterator);
+    StackString *iterator = SSTR_WRAP((CharBuf*)dump);
+    while (SStr_Get_Size(iterator)) {
+        uint32_t code_point = SStr_Nibble(iterator);
         if (code_point > 127) {
             // There is no need to escape any high characters, including those
             // above the BMP, as we assume that the destination channel can
@@ -680,7 +680,7 @@ S_set_error(CharBuf *mess, char *json, char *limit, int line,
         const char *end = StrHelp_back_utf8_char(json + 32, json);
         len = end - json;
     }
-    ZombieCharBuf *snippet = ZCB_WRAP_STR(json, len);
+    StackString *snippet = SSTR_WRAP_STR(json, len);
     S_append_json_string((Obj*)snippet, mess);
 
     // Set Err_error.

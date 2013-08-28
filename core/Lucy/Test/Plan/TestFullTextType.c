@@ -88,8 +88,8 @@ static void
 test_Compare_Values(TestBatchRunner *runner) {
     StandardTokenizer *tokenizer = StandardTokenizer_new();
     FullTextType      *type      = FullTextType_new((Analyzer*)tokenizer);
-    ZombieCharBuf     *a         = ZCB_WRAP_STR("a", 1);
-    ZombieCharBuf     *b         = ZCB_WRAP_STR("b", 1);
+    StackString       *a         = SSTR_WRAP_STR("a", 1);
+    StackString       *b         = SSTR_WRAP_STR("b", 1);
 
     TEST_TRUE(runner,
               FullTextType_Compare_Values(type, (Obj*)a, (Obj*)b) < 0,

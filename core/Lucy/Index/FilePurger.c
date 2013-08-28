@@ -155,7 +155,7 @@ S_zap_dead_merge(FilePurger *self, Hash *candidates) {
         if (cutoff) {
             CharBuf *cutoff_seg = Seg_num_to_name(Obj_To_I64(cutoff));
             if (Folder_Exists(ivars->folder, cutoff_seg)) {
-                ZombieCharBuf *merge_json = ZCB_WRAP_STR("merge.json", 10);
+                StackString *merge_json = SSTR_WRAP_STR("merge.json", 10);
                 DirHandle *dh = Folder_Open_Dir(ivars->folder, cutoff_seg);
 
                 if (!dh) {

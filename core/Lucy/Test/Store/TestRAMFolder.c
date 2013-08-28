@@ -139,7 +139,7 @@ test_Local_Find_Folder(TestBatchRunner *runner) {
     local = (RAMFolder*)RAMFolder_Local_Find_Folder(folder, nope);
     TEST_TRUE(runner, local == NULL, "Non-existent entry yields NULL");
 
-    ZombieCharBuf *empty = ZCB_BLANK();
+    StackString *empty = SStr_BLANK();
     local = (RAMFolder*)RAMFolder_Local_Find_Folder(folder, (CharBuf*)empty);
     TEST_TRUE(runner, local == NULL, "Empty string yields NULL");
 

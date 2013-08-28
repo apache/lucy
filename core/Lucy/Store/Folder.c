@@ -67,7 +67,7 @@ Folder_Open_In_IMP(Folder *self, const CharBuf *path) {
     InStream *instream = NULL;
 
     if (enclosing_folder) {
-        ZombieCharBuf *name = IxFileNames_local_part(path, ZCB_BLANK());
+        StackString *name = IxFileNames_local_part(path, SStr_BLANK());
         instream = Folder_Local_Open_In(enclosing_folder, (CharBuf*)name);
         if (!instream) {
             ERR_ADD_FRAME(Err_get_error());
@@ -125,7 +125,7 @@ Folder_Open_FileHandle_IMP(Folder *self, const CharBuf *path,
     FileHandle *fh = NULL;
 
     if (enclosing_folder) {
-        ZombieCharBuf *name = IxFileNames_local_part(path, ZCB_BLANK());
+        StackString *name = IxFileNames_local_part(path, SStr_BLANK());
         fh = Folder_Local_Open_FileHandle(enclosing_folder,
                                           (CharBuf*)name, flags);
         if (!fh) {
@@ -143,7 +143,7 @@ bool
 Folder_Delete_IMP(Folder *self, const CharBuf *path) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     if (enclosing_folder) {
-        ZombieCharBuf *name = IxFileNames_local_part(path, ZCB_BLANK());
+        StackString *name = IxFileNames_local_part(path, SStr_BLANK());
         bool result = Folder_Local_Delete(enclosing_folder, (CharBuf*)name);
         return result;
     }
@@ -160,7 +160,7 @@ Folder_Delete_Tree_IMP(Folder *self, const CharBuf *path) {
     if (!path || !CB_Get_Size(path)) { return false; }
 
     if (enclosing_folder) {
-        ZombieCharBuf *local = IxFileNames_local_part(path, ZCB_BLANK());
+        StackString *local = IxFileNames_local_part(path, SStr_BLANK());
         if (Folder_Local_Is_Directory(enclosing_folder, (CharBuf*)local)) {
             Folder *inner_folder
                 = Folder_Local_Find_Folder(enclosing_folder, (CharBuf*)local);
@@ -258,7 +258,7 @@ Folder_Open_Dir_IMP(Folder *self, const CharBuf *path) {
         folder = Folder_Find_Folder(self, path);
     }
     else {
-        ZombieCharBuf *empty = ZCB_BLANK();
+        StackString *empty = SStr_BLANK();
         folder = Folder_Find_Folder(self, (CharBuf*)empty);
     }
     if (!folder) {
@@ -286,7 +286,7 @@ Folder_MkDir_IMP(Folder *self, const CharBuf *path) {
                                       path)));
     }
     else {
-        ZombieCharBuf *name = IxFileNames_local_part(path, ZCB_BLANK());
+        StackString *name = IxFileNames_local_part(path, SStr_BLANK());
         result = Folder_Local_MkDir(enclosing_folder, (CharBuf*)name);
         if (!result) {
             ERR_ADD_FRAME(Err_get_error());
@@ -301,7 +301,7 @@ Folder_Exists_IMP(Folder *self, const CharBuf *path) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     bool retval = false;
     if (enclosing_folder) {
-        ZombieCharBuf *name = IxFileNames_local_part(path, ZCB_BLANK());
+        StackString *name = IxFileNames_local_part(path, SStr_BLANK());
         if (Folder_Local_Exists(enclosing_folder, (CharBuf*)name)) {
             retval = true;
         }
@@ -314,7 +314,7 @@ Folder_Is_Directory_IMP(Folder *self, const CharBuf *path) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     bool retval = false;
     if (enclosing_folder) {
-        ZombieCharBuf *name = IxFileNames_local_part(path, ZCB_BLANK());
+        StackString *name = IxFileNames_local_part(path, SStr_BLANK());
         if (Folder_Local_Is_Directory(enclosing_folder, (CharBuf*)name)) {
             retval = true;
         }
@@ -412,7 +412,7 @@ Folder_Consolidate_IMP(Folder *self, const CharBuf *path) {
         CFWriter_Consolidate(cf_writer);
         DECREF(cf_writer);
         if (CB_Get_Size(path)) {
-            ZombieCharBuf *name = IxFileNames_local_part(path, ZCB_BLANK());
+            StackString *name = IxFileNames_local_part(path, SStr_BLANK());
             CompoundFileReader *cf_reader = CFReader_open(folder);
             if (!cf_reader) { RETHROW(INCREF(Err_get_error())); }
             Hash *entries = Folder_IVARS(enclosing_folder)->entries;
@@ -423,27 +423,27 @@ Folder_Consolidate_IMP(Folder *self, const CharBuf *path) {
 }
 
 static Folder*
-S_enclosing_folder(Folder *self, ZombieCharBuf *path) {
+S_enclosing_folder(Folder *self, StackString *path) {
     size_t path_component_len = 0;
     uint32_t code_point;
 
     // Strip trailing slash.
-    if (ZCB_Code_Point_From(path, 0) == '/') { ZCB_Chop(path, 1); }
+    if (SStr_Code_Point_From(path, 0) == '/') { SStr_Chop(path, 1); }
 
     // Find first component of the file path.
-    ZombieCharBuf *scratch        = ZCB_WRAP((CharBuf*)path);
-    ZombieCharBuf *path_component = ZCB_WRAP((CharBuf*)path);
-    while (0 != (code_point = ZCB_Nibble(scratch))) {
+    StackString *scratch        = SSTR_WRAP((CharBuf*)path);
+    StackString *path_component = SSTR_WRAP((CharBuf*)path);
+    while (0 != (code_point = SStr_Nibble(scratch))) {
         if (code_point == '/') {
-            ZCB_Truncate(path_component, path_component_len);
-            ZCB_Nip(path, path_component_len + 1);
+            SStr_Truncate(path_component, path_component_len);
+            SStr_Nip(path, path_component_len + 1);
             break;
         }
         path_component_len++;
     }
 
     // If we've eaten up the entire filepath, self is enclosing folder.
-    if (ZCB_Get_Size(scratch) == 0) { return self; }
+    if (SStr_Get_Size(scratch) == 0) { return self; }
 
     Folder *local_folder
         = Folder_Local_Find_Folder(self, (CharBuf*)path_component);
@@ -461,7 +461,7 @@ S_enclosing_folder(Folder *self, ZombieCharBuf *path) {
 
 Folder*
 Folder_Enclosing_Folder_IMP(Folder *self, const CharBuf *path) {
-    ZombieCharBuf *scratch = ZCB_WRAP(path);
+    StackString *scratch = SSTR_WRAP(path);
     return S_enclosing_folder(self, scratch);
 }
 
@@ -471,7 +471,7 @@ Folder_Find_Folder_IMP(Folder *self, const CharBuf *path) {
         return self;
     }
     else {
-        ZombieCharBuf *scratch = ZCB_WRAP(path);
+        StackString *scratch = SSTR_WRAP(path);
         Folder *enclosing_folder = S_enclosing_folder(self, scratch);
         if (!enclosing_folder) {
             return NULL;

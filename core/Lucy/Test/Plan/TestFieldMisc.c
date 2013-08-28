@@ -133,7 +133,7 @@ S_check(TestBatchRunner *runner, RAMFolder *folder, CharBuf *field,
     // Don't check the contents of the hit if there aren't any.
     if (expected_num_hits) {
         HitDoc *hit = Hits_Next(hits);
-        ViewCharBuf *value = (ViewCharBuf*)ZCB_BLANK();
+        ViewCharBuf *value = (ViewCharBuf*)SStr_BLANK();
         HitDoc_Extract(hit, field, value);
         TEST_TRUE(runner, CB_Equals(united_states_cb, (Obj*)value),
                   "%s correct doc returned", CB_Get_Ptr8(field));

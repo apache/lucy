@@ -99,7 +99,7 @@ void
 ShLock_Clear_Stale_IMP(SharedLock *self) {
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
 
-    CharBuf *lock_dir_name = (CharBuf*)ZCB_WRAP_STR("locks", 5);
+    CharBuf *lock_dir_name = (CharBuf*)SSTR_WRAP_STR("locks", 5);
     if (!Folder_Find_Folder(ivars->folder, lock_dir_name)) {
         return;
     }
@@ -127,7 +127,7 @@ bool
 ShLock_Is_Locked_IMP(SharedLock *self) {
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
 
-    CharBuf *lock_dir_name = (CharBuf*)ZCB_WRAP_STR("locks", 5);
+    CharBuf *lock_dir_name = (CharBuf*)SSTR_WRAP_STR("locks", 5);
     if (!Folder_Find_Folder(ivars->folder, lock_dir_name)) {
         return false;
     }
@@ -141,14 +141,14 @@ ShLock_Is_Locked_IMP(SharedLock *self) {
         if (CB_Starts_With(entry, ivars->name)
             && CB_Ends_With_Str(entry, ".lock", 5)
            ) {
-            ZombieCharBuf *scratch = ZCB_WRAP(entry);
-            ZCB_Chop(scratch, sizeof(".lock") - 1);
-            while (isdigit(ZCB_Code_Point_From(scratch, 1))) {
-                ZCB_Chop(scratch, 1);
+            StackString *scratch = SSTR_WRAP(entry);
+            SStr_Chop(scratch, sizeof(".lock") - 1);
+            while (isdigit(SStr_Code_Point_From(scratch, 1))) {
+                SStr_Chop(scratch, 1);
             }
-            if (ZCB_Code_Point_From(scratch, 1) == '-') {
-                ZCB_Chop(scratch, 1);
-                if (ZCB_Equals(scratch, (Obj*)ivars->name)) {
+            if (SStr_Code_Point_From(scratch, 1) == '-') {
+                SStr_Chop(scratch, 1);
+                if (SStr_Equals(scratch, (Obj*)ivars->name)) {
                     DECREF(entry);
                     DECREF(dh);
                     return true;

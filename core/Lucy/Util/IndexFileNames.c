@@ -51,41 +51,41 @@ IxFileNames_latest_snapshot(Folder *folder) {
 
 uint64_t
 IxFileNames_extract_gen(const CharBuf *name) {
-    ZombieCharBuf *num_string = ZCB_WRAP(name);
+    StackString *num_string = SSTR_WRAP(name);
 
     // Advance past first underscore.  Bail if we run out of string or if we
     // encounter a NULL.
     while (1) {
-        uint32_t code_point = ZCB_Nibble(num_string);
+        uint32_t code_point = SStr_Nibble(num_string);
         if (code_point == 0) { return 0; }
         else if (code_point == '_') { break; }
     }
 
-    return (uint64_t)ZCB_BaseX_To_I64(num_string, 36);
+    return (uint64_t)SStr_BaseX_To_I64(num_string, 36);
 }
 
-ZombieCharBuf*
-IxFileNames_local_part(const CharBuf *path, ZombieCharBuf *target) {
-    ZombieCharBuf *scratch = ZCB_WRAP(path);
+StackString*
+IxFileNames_local_part(const CharBuf *path, StackString *target) {
+    StackString *scratch = SSTR_WRAP(path);
     size_t local_part_start = CB_Length(path);
     uint32_t code_point;
 
-    ZCB_Assign(target, path);
+    SStr_Assign(target, path);
 
     // Trim trailing slash.
-    while (ZCB_Code_Point_From(target, 1) == '/') {
-        ZCB_Chop(target, 1);
-        ZCB_Chop(scratch, 1);
+    while (SStr_Code_Point_From(target, 1) == '/') {
+        SStr_Chop(target, 1);
+        SStr_Chop(scratch, 1);
         local_part_start--;
     }
 
     // Substring should start after last slash.
-    while (0 != (code_point = ZCB_Code_Point_From(scratch, 1))) {
+    while (0 != (code_point = SStr_Code_Point_From(scratch, 1))) {
         if (code_point == '/') {
-            ZCB_Nip(target, local_part_start);
+            SStr_Nip(target, local_part_start);
             break;
         }
-        ZCB_Chop(scratch, 1);
+        SStr_Chop(scratch, 1);
         local_part_start--;
     }
 

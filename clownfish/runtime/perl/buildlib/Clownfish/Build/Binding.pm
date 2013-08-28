@@ -595,7 +595,7 @@ CODE:
     CFISH_UNUSED_VAR(unused_sv);
     STRLEN size;
     char *ptr = SvPVutf8(class_name_sv, size);
-    cfish_ZombieCharBuf *class_name = CFISH_ZCB_WRAP_STR(ptr, size);
+    cfish_StackString *class_name = CFISH_SStr_WRAP_STR(ptr, size);
     cfish_VTable *vtable
         = cfish_VTable_fetch_vtable((cfish_CharBuf*)class_name);
     RETVAL = vtable ? (SV*)CFISH_VTable_To_Host(vtable) : &PL_sv_undef;
@@ -613,7 +613,7 @@ CODE:
     bool args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
                               ALLOT_OBJ(&class_name, "class_name", 10, true,
-                                        CFISH_CHARBUF, alloca(cfish_ZCB_size())),
+                                        CFISH_CHARBUF, alloca(cfish_SStr_size())),
                               ALLOT_OBJ(&parent, "parent", 6, false,
                                         CFISH_VTABLE, NULL),
                               NULL);

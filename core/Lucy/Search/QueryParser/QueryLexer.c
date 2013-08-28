@@ -35,17 +35,17 @@
 #define TOKEN_QUERY       LUCY_QPARSER_TOKEN_QUERY
 
 static ParserElem*
-S_consume_keyword(ZombieCharBuf *qstring, const char *keyword,
+S_consume_keyword(StackString *qstring, const char *keyword,
                   size_t keyword_len, int type);
 
 static ParserElem*
-S_consume_field(ZombieCharBuf *qstring);
+S_consume_field(StackString *qstring);
 
 static ParserElem*
-S_consume_text(ZombieCharBuf *qstring);
+S_consume_text(StackString *qstring);
 
 static ParserElem*
-S_consume_quoted_string(ZombieCharBuf *qstring);
+S_consume_quoted_string(StackString *qstring);
 
 QueryLexer*
 QueryLexer_new() {
@@ -76,14 +76,14 @@ QueryLexer_Tokenize_IMP(QueryLexer *self, const CharBuf *query_string) {
     CharBuf *copy = query_string
                     ? CB_Clone(query_string)
                     : CB_new_from_trusted_utf8("", 0);
-    ZombieCharBuf *qstring = ZCB_WRAP((CharBuf*)copy);
+    StackString *qstring = SSTR_WRAP((CharBuf*)copy);
     VArray *elems = VA_new(0);
-    ZCB_Trim(qstring);
+    SStr_Trim(qstring);
 
-    while (ZCB_Get_Size(qstring)) {
+    while (SStr_Get_Size(qstring)) {
         ParserElem *elem = NULL;
 
-        if (ZCB_Trim_Top(qstring)) {
+        if (SStr_Trim_Top(qstring)) {
             // Fast-forward past whitespace.
             continue;
         }
@@ -95,37 +95,37 @@ QueryLexer_Tokenize_IMP(QueryLexer *self, const CharBuf *query_string) {
             }
         }
 
-        uint32_t code_point = ZCB_Code_Point_At(qstring, 0);
+        uint32_t code_point = SStr_Code_Point_At(qstring, 0);
         switch (code_point) {
             case '(':
-                ZCB_Nip(qstring, 1);
+                SStr_Nip(qstring, 1);
                 elem = ParserElem_new(TOKEN_OPEN_PAREN, NULL);
                 break;
             case ')':
-                ZCB_Nip(qstring, 1);
+                SStr_Nip(qstring, 1);
                 elem = ParserElem_new(TOKEN_CLOSE_PAREN, NULL);
                 break;
             case '+':
-                if (ZCB_Get_Size(qstring) > 1
-                    && !StrHelp_is_whitespace(ZCB_Code_Point_At(qstring, 1))
+                if (SStr_Get_Size(qstring) > 1
+                    && !StrHelp_is_whitespace(SStr_Code_Point_At(qstring, 1))
                    ) {
                     elem = ParserElem_new(TOKEN_PLUS, NULL);
                 }
                 else {
                     elem = ParserElem_new(TOKEN_STRING, (Obj*)CB_newf("+"));
                 }
-                ZCB_Nip(qstring, 1);
+                SStr_Nip(qstring, 1);
                 break;
             case '-':
-                if (ZCB_Get_Size(qstring) > 1
-                    && !StrHelp_is_whitespace(ZCB_Code_Point_At(qstring, 1))
+                if (SStr_Get_Size(qstring) > 1
+                    && !StrHelp_is_whitespace(SStr_Code_Point_At(qstring, 1))
                    ) {
                     elem = ParserElem_new(TOKEN_MINUS, NULL);
                 }
                 else {
                     elem = ParserElem_new(TOKEN_STRING, (Obj*)CB_newf("-"));
                 }
-                ZCB_Nip(qstring, 1);
+                SStr_Nip(qstring, 1);
                 break;
             case '"':
                 elem = S_consume_quoted_string(qstring);
@@ -161,12 +161,12 @@ QueryLexer_Tokenize_IMP(QueryLexer *self, const CharBuf *query_string) {
 
 
 static ParserElem*
-S_consume_keyword(ZombieCharBuf *qstring, const char *keyword,
+S_consume_keyword(StackString *qstring, const char *keyword,
                   size_t keyword_len, int type) {
-    if (!ZCB_Starts_With_Str(qstring, keyword, keyword_len)) {
+    if (!SStr_Starts_With_Str(qstring, keyword, keyword_len)) {
         return NULL;
     }
-    uint32_t lookahead = ZCB_Code_Point_At(qstring, keyword_len);
+    uint32_t lookahead = SStr_Code_Point_At(qstring, keyword_len);
     if (!lookahead) {
         return NULL;
     }
@@ -177,18 +177,18 @@ S_consume_keyword(ZombieCharBuf *qstring, const char *keyword,
         || lookahead == '+'
         || lookahead == '-'
        ) {
-        ZCB_Nip(qstring, keyword_len);
+        SStr_Nip(qstring, keyword_len);
         return ParserElem_new(type, NULL);
     }
     return NULL;
 }
 
 static ParserElem*
-S_consume_field(ZombieCharBuf *qstring) {
+S_consume_field(StackString *qstring) {
     size_t tick = 0;
 
     // Field names constructs must start with a letter or underscore.
-    uint32_t code_point = ZCB_Code_Point_At(qstring, tick);
+    uint32_t code_point = SStr_Code_Point_At(qstring, tick);
     if (isalpha(code_point) || code_point == '_') {
         tick++;
     }
@@ -198,7 +198,7 @@ S_consume_field(ZombieCharBuf *qstring) {
 
     // Only alphanumerics and underscores are allowed  in field names.
     while (1) {
-        code_point = ZCB_Code_Point_At(qstring, tick);
+        code_point = SStr_Code_Point_At(qstring, tick);
         if (isalnum(code_point) || code_point == '_') {
             tick++;
         }
@@ -212,7 +212,7 @@ S_consume_field(ZombieCharBuf *qstring) {
     }
 
     // Field name constructs must be followed by something sensible.
-    uint32_t lookahead = ZCB_Code_Point_At(qstring, tick);
+    uint32_t lookahead = SStr_Code_Point_At(qstring, tick);
     if (!(isalnum(lookahead)
           || lookahead == '_'
           || lookahead > 127
@@ -224,20 +224,20 @@ S_consume_field(ZombieCharBuf *qstring) {
     }
 
     // Consume string data.
-    ZombieCharBuf *field = ZCB_WRAP((CharBuf*)qstring);
-    ZCB_Truncate(field, tick - 1);
-    ZCB_Nip(qstring, tick);
-    return ParserElem_new(TOKEN_FIELD, (Obj*)ZCB_Clone(field));
+    StackString *field = SSTR_WRAP((CharBuf*)qstring);
+    SStr_Truncate(field, tick - 1);
+    SStr_Nip(qstring, tick);
+    return ParserElem_new(TOKEN_FIELD, (Obj*)SStr_Clone(field));
 }
 
 static ParserElem*
-S_consume_text(ZombieCharBuf *qstring) {
-    ZombieCharBuf *text  = ZCB_WRAP((CharBuf*)qstring);
+S_consume_text(StackString *qstring) {
+    StackString *text  = SSTR_WRAP((CharBuf*)qstring);
     size_t tick = 0;
     while (1) {
-        uint32_t code_point = ZCB_Nibble(qstring);
+        uint32_t code_point = SStr_Nibble(qstring);
         if (code_point == '\\') {
-            code_point = ZCB_Nibble(qstring);
+            code_point = SStr_Nibble(qstring);
             tick++;
             if (code_point == 0) {
                 break;
@@ -254,20 +254,20 @@ S_consume_text(ZombieCharBuf *qstring) {
         tick++;
     }
 
-    ZCB_Truncate(text, tick);
-    return ParserElem_new(TOKEN_STRING, (Obj*)ZCB_Clone(text));
+    SStr_Truncate(text, tick);
+    return ParserElem_new(TOKEN_STRING, (Obj*)SStr_Clone(text));
 }
 
 static ParserElem*
-S_consume_quoted_string(ZombieCharBuf *qstring) {
-    ZombieCharBuf *text = ZCB_WRAP((CharBuf*)qstring);
-    if (ZCB_Nibble(qstring) != '"') {
+S_consume_quoted_string(StackString *qstring) {
+    StackString *text = SSTR_WRAP((CharBuf*)qstring);
+    if (SStr_Nibble(qstring) != '"') {
         THROW(ERR, "Internal error: expected a quote");
     }
 
     size_t tick = 1;
     while (1) {
-        uint32_t code_point = ZCB_Nibble(qstring);
+        uint32_t code_point = SStr_Nibble(qstring);
         if (code_point == '"') {
             tick += 1;
             break;
@@ -276,7 +276,7 @@ S_consume_quoted_string(ZombieCharBuf *qstring) {
             break;
         }
         else if (code_point == '\\') {
-            ZCB_Nibble(qstring);
+            SStr_Nibble(qstring);
             tick += 2;
         }
         else {
@@ -284,7 +284,7 @@ S_consume_quoted_string(ZombieCharBuf *qstring) {
         }
     }
 
-    ZCB_Truncate(text, tick);
-    return ParserElem_new(TOKEN_STRING, (Obj*)ZCB_Clone(text));
+    SStr_Truncate(text, tick);
+    return ParserElem_new(TOKEN_STRING, (Obj*)SStr_Clone(text));
 }
 

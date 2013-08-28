@@ -140,8 +140,8 @@ STORABLE_thaw(blank_obj, cloning, serialized_sv)
 PPCODE:
 {
     char *class_name = HvNAME(SvSTASH(SvRV(blank_obj)));
-    cfish_ZombieCharBuf *klass
-        = CFISH_ZCB_WRAP_STR(class_name, strlen(class_name));
+    cfish_StackString *klass
+        = CFISH_SStr_WRAP_STR(class_name, strlen(class_name));
     cfish_VTable *vtable
         = (cfish_VTable*)cfish_VTable_singleton((cfish_CharBuf*)klass, NULL);
     STRLEN len;

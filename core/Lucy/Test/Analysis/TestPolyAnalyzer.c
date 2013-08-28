@@ -43,8 +43,8 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
         return;
     }
 
-    CharBuf      *EN          = (CharBuf*)ZCB_WRAP_STR("en", 2);
-    CharBuf      *ES          = (CharBuf*)ZCB_WRAP_STR("es", 2);
+    CharBuf      *EN          = (CharBuf*)SSTR_WRAP_STR("en", 2);
+    CharBuf      *ES          = (CharBuf*)SSTR_WRAP_STR("es", 2);
     PolyAnalyzer *analyzer    = PolyAnalyzer_new(EN, NULL);
     PolyAnalyzer *other       = PolyAnalyzer_new(ES, NULL);
     Obj          *dump        = (Obj*)PolyAnalyzer_Dump(analyzer);
@@ -70,7 +70,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 
 static void
 test_analysis(TestBatchRunner *runner) {
-    CharBuf            *EN          = (CharBuf*)ZCB_WRAP_STR("en", 2);
+    CharBuf            *EN          = (CharBuf*)SSTR_WRAP_STR("en", 2);
     CharBuf            *source_text = CB_newf("Eats, shoots and leaves.");
     Normalizer         *normalizer  = Normalizer_new(NULL, true, false);
     StandardTokenizer  *tokenizer   = StandardTokenizer_new();

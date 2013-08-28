@@ -57,7 +57,7 @@ TestFSFolder_new() {
 static Folder*
 S_set_up() {
     rmdir("_fstest");
-    CharBuf  *test_dir = (CharBuf*)ZCB_WRAP_STR("_fstest", 7);
+    CharBuf  *test_dir = (CharBuf*)SSTR_WRAP_STR("_fstest", 7);
     FSFolder *folder = FSFolder_new(test_dir);
     FSFolder_Initialize(folder);
     if (!FSFolder_Check(folder)) {
@@ -79,7 +79,7 @@ S_tear_down() {
 static void
 test_Initialize_and_Check(TestBatchRunner *runner) {
     rmdir("_fstest");
-    CharBuf  *test_dir = (CharBuf*)ZCB_WRAP_STR("_fstest", 7);
+    CharBuf  *test_dir = (CharBuf*)SSTR_WRAP_STR("_fstest", 7);
     FSFolder *folder   = FSFolder_new(test_dir);
     TEST_FALSE(runner, FSFolder_Check(folder),
                "Check() returns false when folder dir doesn't exist");
@@ -95,9 +95,9 @@ static void
 test_protect_symlinks(TestBatchRunner *runner) {
 #ifdef ENABLE_SYMLINK_TESTS
     FSFolder *folder    = (FSFolder*)S_set_up();
-    CharBuf  *foo       = (CharBuf*)ZCB_WRAP_STR("foo", 3);
-    CharBuf  *bar       = (CharBuf*)ZCB_WRAP_STR("bar", 3);
-    CharBuf  *foo_boffo = (CharBuf*)ZCB_WRAP_STR("foo/boffo", 9);
+    CharBuf  *foo       = (CharBuf*)SSTR_WRAP_STR("foo", 3);
+    CharBuf  *bar       = (CharBuf*)SSTR_WRAP_STR("bar", 3);
+    CharBuf  *foo_boffo = (CharBuf*)SSTR_WRAP_STR("foo/boffo", 9);
 
     FSFolder_MkDir(folder, foo);
     FSFolder_MkDir(folder, bar);
@@ -152,14 +152,14 @@ void
 test_disallow_updir(TestBatchRunner *runner) {
     FSFolder *outer_folder = (FSFolder*)S_set_up();
 
-    CharBuf *foo = (CharBuf*)ZCB_WRAP_STR("foo", 3);
-    CharBuf *bar = (CharBuf*)ZCB_WRAP_STR("bar", 3);
+    CharBuf *foo = (CharBuf*)SSTR_WRAP_STR("foo", 3);
+    CharBuf *bar = (CharBuf*)SSTR_WRAP_STR("bar", 3);
     FSFolder_MkDir(outer_folder, foo);
     FSFolder_MkDir(outer_folder, bar);
 
-    CharBuf *inner_path = (CharBuf*)ZCB_WRAP_STR("_fstest/foo", 11);
+    CharBuf *inner_path = (CharBuf*)SSTR_WRAP_STR("_fstest/foo", 11);
     FSFolder *foo_folder = FSFolder_new(inner_path);
-    CharBuf *up_bar = (CharBuf*)ZCB_WRAP_STR("../bar", 6);
+    CharBuf *up_bar = (CharBuf*)SSTR_WRAP_STR("../bar", 6);
     TEST_FALSE(runner, FSFolder_Exists(foo_folder, up_bar),
                "up-dirs are inaccessible.");
 

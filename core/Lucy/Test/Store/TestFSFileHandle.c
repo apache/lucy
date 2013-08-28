@@ -42,7 +42,7 @@ static void
 test_open(TestBatchRunner *runner) {
 
     FSFileHandle *fh;
-    CharBuf *test_filename = (CharBuf*)ZCB_WRAP_STR("_fstest", 7);
+    CharBuf *test_filename = (CharBuf*)SSTR_WRAP_STR("_fstest", 7);
 
     remove((char*)CB_Get_Ptr8(test_filename));
 
@@ -108,7 +108,7 @@ test_Read_Write(TestBatchRunner *runner) {
     const char *bar = "bar";
     char buffer[12];
     char *buf = buffer;
-    CharBuf *test_filename = (CharBuf*)ZCB_WRAP_STR("_fstest", 7);
+    CharBuf *test_filename = (CharBuf*)SSTR_WRAP_STR("_fstest", 7);
 
     remove((char*)CB_Get_Ptr8(test_filename));
     fh = FSFH_open(test_filename,
@@ -162,7 +162,7 @@ test_Read_Write(TestBatchRunner *runner) {
 
 static void
 test_Close(TestBatchRunner *runner) {
-    CharBuf *test_filename = (CharBuf*)ZCB_WRAP_STR("_fstest", 7);
+    CharBuf *test_filename = (CharBuf*)SSTR_WRAP_STR("_fstest", 7);
     FSFileHandle *fh;
 
     remove((char*)CB_Get_Ptr8(test_filename));
@@ -200,7 +200,7 @@ test_Close(TestBatchRunner *runner) {
 
 static void
 test_Window(TestBatchRunner *runner) {
-    CharBuf *test_filename = (CharBuf*)ZCB_WRAP_STR("_fstest", 7);
+    CharBuf *test_filename = (CharBuf*)SSTR_WRAP_STR("_fstest", 7);
     FSFileHandle *fh;
     FileWindow *window = FileWindow_new();
     FileWindowIVARS *const window_ivars = FileWindow_IVARS(window);

@@ -38,7 +38,7 @@ S_no_op_method(const void *vself) {
 
 static FileHandle*
 S_new_filehandle() {
-    ZombieCharBuf *klass = ZCB_WRAP_STR("TestFileHandle", 14);
+    StackString *klass = SSTR_WRAP_STR("TestFileHandle", 14);
     FileHandle *fh;
     VTable *vtable = VTable_fetch_vtable((CharBuf*)klass);
     if (!vtable) {
@@ -54,7 +54,7 @@ TestFH_Run_IMP(TestFileHandle *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 2);
 
     FileHandle    *fh    = S_new_filehandle();
-    ZombieCharBuf *foo   = ZCB_WRAP_STR("foo", 3);
+    StackString *foo   = SSTR_WRAP_STR("foo", 3);
 
     TEST_TRUE(runner, CB_Equals_Str(FH_Get_Path(fh), "", 0), "Get_Path");
     FH_Set_Path(fh, (CharBuf*)foo);
