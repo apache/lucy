@@ -33,7 +33,7 @@ class Lucy::Plan::NumericType cnick NumType inherits Lucy::Plan::FieldType {
     /** Return the primitive type specifier for the object type, e.g.
      * f64_t for Float64, uint32_t for UInteger32, etc.
      */
-    abstract incremented CharBuf*
+    abstract incremented String*
     Specifier(NumericType *self);
 
     incremented Hash*
@@ -63,7 +63,7 @@ class Lucy::Plan::Float64Type inherits Lucy::Plan::FloatType {
     int8_t
     Primitive_ID(Float64Type *self);
 
-    incremented CharBuf*
+    incremented String*
     Specifier(Float64Type *self);
 
     public bool
@@ -85,7 +85,7 @@ class Lucy::Plan::Float32Type inherits Lucy::Plan::FloatType {
     int8_t
     Primitive_ID(Float32Type *self);
 
-    incremented CharBuf*
+    incremented String*
     Specifier(Float32Type *self);
 
     public bool
@@ -109,7 +109,7 @@ class Lucy::Plan::Int32Type inherits Lucy::Plan::IntType {
     int8_t
     Primitive_ID(Int32Type *self);
 
-    incremented CharBuf*
+    incremented String*
     Specifier(Int32Type *self);
 
     public bool
@@ -131,7 +131,7 @@ class Lucy::Plan::Int64Type inherits Lucy::Plan::IntType {
     int8_t
     Primitive_ID(Int64Type *self);
 
-    incremented CharBuf*
+    incremented String*
     Specifier(Int64Type *self);
 
     public bool

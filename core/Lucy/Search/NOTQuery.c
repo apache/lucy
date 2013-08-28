@@ -53,11 +53,11 @@ NOTQuery_Set_Negated_Query_IMP(NOTQuery *self, Query *negated_query) {
     VA_Store(ivars->children, 0, INCREF(negated_query));
 }
 
-CharBuf*
+String*
 NOTQuery_To_String_IMP(NOTQuery *self) {
     NOTQueryIVARS *const ivars = NOTQuery_IVARS(self);
-    CharBuf *neg_string = Obj_To_String(VA_Fetch(ivars->children, 0));
-    CharBuf *retval = CB_newf("-%o", neg_string);
+    String *neg_string = Obj_To_String(VA_Fetch(ivars->children, 0));
+    String *retval = Str_newf("-%o", neg_string);
     DECREF(neg_string);
     return retval;
 }
@@ -105,7 +105,7 @@ NOTCompiler_Sum_Of_Squared_Weights_IMP(NOTCompiler *self) {
 
 VArray*
 NOTCompiler_Highlight_Spans_IMP(NOTCompiler *self, Searcher *searcher,
-                                DocVector *doc_vec, const CharBuf *field) {
+                                DocVector *doc_vec, const String *field) {
     UNUSED_VAR(self);
     UNUSED_VAR(searcher);
     UNUSED_VAR(doc_vec);

@@ -99,20 +99,20 @@ S_lazy_init_field_writer(SortWriter *self, int32_t field_num) {
         // Open temp files.
         if (!ivars->temp_ord_out) {
             Folder  *folder   = ivars->folder;
-            CharBuf *seg_name = Seg_Get_Name(ivars->segment);
-            CharBuf *ord_path = CB_newf("%o/sort_ord_temp", seg_name);
+            String *seg_name = Seg_Get_Name(ivars->segment);
+            String *ord_path = Str_newf("%o/sort_ord_temp", seg_name);
             ivars->temp_ord_out = Folder_Open_Out(folder, ord_path);
             DECREF(ord_path);
             if (!ivars->temp_ord_out) {
                 RETHROW(INCREF(Err_get_error()));
             }
-            CharBuf *ix_path = CB_newf("%o/sort_ix_temp", seg_name);
+            String *ix_path = Str_newf("%o/sort_ix_temp", seg_name);
             ivars->temp_ix_out = Folder_Open_Out(folder, ix_path);
             DECREF(ix_path);
             if (!ivars->temp_ix_out) {
                 RETHROW(INCREF(Err_get_error()));
             }
-            CharBuf *dat_path = CB_newf("%o/sort_dat_temp", seg_name);
+            String *dat_path = Str_newf("%o/sort_dat_temp", seg_name);
             ivars->temp_dat_out = Folder_Open_Out(folder, dat_path);
             DECREF(dat_path);
             if (!ivars->temp_dat_out) {
@@ -120,7 +120,7 @@ S_lazy_init_field_writer(SortWriter *self, int32_t field_num) {
             }
         }
 
-        CharBuf *field = Seg_Field_Name(ivars->segment, field_num);
+        String *field = Seg_Field_Name(ivars->segment, field_num);
         field_writer
             = SortFieldWriter_new(ivars->schema, ivars->snapshot, ivars->segment,
                                   ivars->polyreader, field, ivars->mem_pool,
@@ -169,7 +169,7 @@ SortWriter_Add_Segment_IMP(SortWriter *self, SegReader *reader,
 
     // Proceed field-at-a-time, rather than doc-at-a-time.
     for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
-        CharBuf *field = (CharBuf*)VA_Fetch(fields, i);
+        String *field = (String*)VA_Fetch(fields, i);
         SortReader *sort_reader = (SortReader*)SegReader_Fetch(
                                       reader, VTable_Get_Name(SORTREADER));
         SortCache *cache = sort_reader
@@ -216,19 +216,19 @@ SortWriter_Finish_IMP(SortWriter *self) {
         SortFieldWriter *field_writer
             = (SortFieldWriter*)VA_Delete(field_writers, i);
         if (field_writer) {
-            CharBuf *field = Seg_Field_Name(ivars->segment, i);
+            String *field = Seg_Field_Name(ivars->segment, i);
             SortFieldWriter_Flip(field_writer);
             int32_t count = SortFieldWriter_Finish(field_writer);
             Hash_Store(ivars->counts, (Obj*)field,
-                       (Obj*)CB_newf("%i32", count));
+                       (Obj*)Str_newf("%i32", count));
             int32_t null_ord = SortFieldWriter_Get_Null_Ord(field_writer);
             if (null_ord != -1) {
                 Hash_Store(ivars->null_ords, (Obj*)field,
-                           (Obj*)CB_newf("%i32", null_ord));
+                           (Obj*)Str_newf("%i32", null_ord));
             }
             int32_t ord_width = SortFieldWriter_Get_Ord_Width(field_writer);
             Hash_Store(ivars->ord_widths, (Obj*)field,
-                       (Obj*)CB_newf("%i32", ord_width));
+                       (Obj*)Str_newf("%i32", ord_width));
         }
 
         DECREF(field_writer);
@@ -241,14 +241,14 @@ SortWriter_Finish_IMP(SortWriter *self) {
 
     // Clean up.
     Folder  *folder   = ivars->folder;
-    CharBuf *seg_name = Seg_Get_Name(ivars->segment);
-    CharBuf *ord_path = CB_newf("%o/sort_ord_temp", seg_name);
+    String *seg_name = Seg_Get_Name(ivars->segment);
+    String *ord_path = Str_newf("%o/sort_ord_temp", seg_name);
     Folder_Delete(folder, ord_path);
     DECREF(ord_path);
-    CharBuf *ix_path = CB_newf("%o/sort_ix_temp", seg_name);
+    String *ix_path = Str_newf("%o/sort_ix_temp", seg_name);
     Folder_Delete(folder, ix_path);
     DECREF(ix_path);
-    CharBuf *dat_path = CB_newf("%o/sort_dat_temp", seg_name);
+    String *dat_path = Str_newf("%o/sort_dat_temp", seg_name);
     Folder_Delete(folder, dat_path);
     DECREF(dat_path);
 }

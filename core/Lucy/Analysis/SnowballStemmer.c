@@ -26,21 +26,21 @@
 #include "libstemmer.h"
 
 SnowballStemmer*
-SnowStemmer_new(const CharBuf *language) {
+SnowStemmer_new(const String *language) {
     SnowballStemmer *self = (SnowballStemmer*)VTable_Make_Obj(SNOWBALLSTEMMER);
     return SnowStemmer_init(self, language);
 }
 
 SnowballStemmer*
-SnowStemmer_init(SnowballStemmer *self, const CharBuf *language) {
+SnowStemmer_init(SnowballStemmer *self, const String *language) {
     char lang_buf[3];
     Analyzer_init((Analyzer*)self);
     SnowballStemmerIVARS *const ivars = SnowStemmer_IVARS(self);
-    ivars->language = CB_Clone(language);
+    ivars->language = Str_Clone(language);
 
     // Get a Snowball stemmer.  Be case-insensitive.
-    lang_buf[0] = tolower(CB_Code_Point_At(language, 0));
-    lang_buf[1] = tolower(CB_Code_Point_At(language, 1));
+    lang_buf[0] = tolower(Str_Code_Point_At(language, 0));
+    lang_buf[1] = tolower(Str_Code_Point_At(language, 1));
     lang_buf[2] = '\0';
     ivars->snowstemmer = sb_stemmer_new(lang_buf, "UTF_8");
     if (!ivars->snowstemmer) {
@@ -90,7 +90,7 @@ SnowStemmer_Dump_IMP(SnowballStemmer *self) {
     SnowStemmer_Dump_t super_dump
         = SUPER_METHOD_PTR(SNOWBALLSTEMMER, LUCY_SnowStemmer_Dump);
     Hash *dump = super_dump(self);
-    Hash_Store_Str(dump, "language", 8, (Obj*)CB_Clone(ivars->language));
+    Hash_Store_Str(dump, "language", 8, (Obj*)Str_Clone(ivars->language));
     return dump;
 }
 
@@ -100,8 +100,8 @@ SnowStemmer_Load_IMP(SnowballStemmer *self, Obj *dump) {
         = SUPER_METHOD_PTR(SNOWBALLSTEMMER, LUCY_SnowStemmer_Load);
     SnowballStemmer *loaded = super_load(self, dump);
     Hash    *source = (Hash*)CERTIFY(dump, HASH);
-    CharBuf *language 
-        = (CharBuf*)CERTIFY(Hash_Fetch_Str(source, "language", 8), CHARBUF);
+    String *language 
+        = (String*)CERTIFY(Hash_Fetch_Str(source, "language", 8), STRING);
     return SnowStemmer_init(loaded, language);
 }
 
@@ -111,7 +111,7 @@ SnowStemmer_Equals_IMP(SnowballStemmer *self, Obj *other) {
     if (!Obj_Is_A(other, SNOWBALLSTEMMER))                  { return false; }
     SnowballStemmerIVARS *ivars = SnowStemmer_IVARS(self);
     SnowballStemmerIVARS *ovars = SnowStemmer_IVARS((SnowballStemmer*)other);
-    if (!CB_Equals(ovars->language, (Obj*)ivars->language)) { return false; }
+    if (!Str_Equals(ovars->language, (Obj*)ivars->language)) { return false; }
     return true;
 }
 

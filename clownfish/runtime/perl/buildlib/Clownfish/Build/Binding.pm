@@ -24,7 +24,7 @@ sub bind_all {
     $class->bind_clownfish;
     $class->bind_test;
     $class->bind_bytebuf;
-    $class->bind_charbuf;
+    $class->bind_string;
     $class->bind_err;
     $class->bind_hash;
     $class->bind_float32;
@@ -93,7 +93,7 @@ bool
 run_tests(package)
     char *package;
 CODE:
-    cfish_CharBuf *class_name = cfish_CB_newf("%s", package);
+    cfish_String *class_name = cfish_Str_newf("%s", package);
     cfish_TestFormatter *formatter
         = (cfish_TestFormatter*)cfish_TestFormatterTAP_new();
     cfish_TestSuite *suite = testcfish_Test_create_test_suite();
@@ -145,9 +145,9 @@ END_XS_CODE
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
-sub bind_charbuf {
+sub bind_string {
     my $xs_code = <<'END_XS_CODE';
-MODULE = Clownfish     PACKAGE = Clownfish::CharBuf
+MODULE = Clownfish     PACKAGE = Clownfish::String
 
 SV*
 new(either_sv, sv)
@@ -157,23 +157,23 @@ CODE:
 {
     STRLEN size;
     char *ptr = SvPVutf8(sv, size);
-    cfish_CharBuf *self = (cfish_CharBuf*)XSBind_new_blank_obj(either_sv);
-    cfish_CB_init(self, size);
-    CFISH_CB_Cat_Trusted_Str(self, ptr, size);
+    cfish_String *self = (cfish_String*)XSBind_new_blank_obj(either_sv);
+    cfish_Str_init(self, size);
+    CFISH_Str_Cat_Trusted_Str(self, ptr, size);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
 
 SV*
 _clone(self)
-    cfish_CharBuf *self;
+    cfish_String *self;
 CODE:
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(CFISH_CB_Clone_IMP(self));
+    RETVAL = CFISH_OBJ_TO_SV_NOINC(CFISH_Str_Clone_IMP(self));
 OUTPUT: RETVAL
 
 SV*
 to_perl(self)
-    cfish_CharBuf *self;
+    cfish_String *self;
 CODE:
     RETVAL = XSBind_cb_to_sv(self);
 OUTPUT: RETVAL
@@ -198,7 +198,7 @@ END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Clownfish",
-        class_name => "Clownfish::CharBuf",
+        class_name => "Clownfish::String",
     );
     $binding->append_xs($xs_code);
     $binding->exclude_constructor;
@@ -266,7 +266,7 @@ MODULE = Clownfish    PACKAGE = Clownfish::Hash
 SV*
 _fetch(self, key)
     cfish_Hash *self;
-    const cfish_CharBuf *key;
+    const cfish_String *key;
 CODE:
     RETVAL = CFISH_OBJ_TO_SV(CFISH_Hash_Fetch_IMP(self, (cfish_Obj*)key));
 OUTPUT: RETVAL
@@ -274,7 +274,7 @@ OUTPUT: RETVAL
 void
 store(self, key, value);
     cfish_Hash          *self;
-    const cfish_CharBuf *key;
+    const cfish_String *key;
     cfish_Obj           *value;
 PPCODE:
 {
@@ -472,7 +472,7 @@ MODULE = Clownfish     PACKAGE = Clownfish::Obj
 bool
 is_a(self, class_name)
     cfish_Obj *self;
-    const cfish_CharBuf *class_name;
+    const cfish_String *class_name;
 CODE:
 {
     cfish_VTable *target = cfish_VTable_fetch_vtable(class_name);
@@ -597,7 +597,7 @@ CODE:
     char *ptr = SvPVutf8(class_name_sv, size);
     cfish_StackString *class_name = CFISH_SStr_WRAP_STR(ptr, size);
     cfish_VTable *vtable
-        = cfish_VTable_fetch_vtable((cfish_CharBuf*)class_name);
+        = cfish_VTable_fetch_vtable((cfish_String*)class_name);
     RETVAL = vtable ? (SV*)CFISH_VTable_To_Host(vtable) : &PL_sv_undef;
 }
 OUTPUT: RETVAL
@@ -608,12 +608,12 @@ singleton(unused_sv, ...)
 CODE:
 {
     CFISH_UNUSED_VAR(unused_sv);
-    cfish_CharBuf *class_name = NULL;
+    cfish_String *class_name = NULL;
     cfish_VTable  *parent     = NULL;
     bool args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
                               ALLOT_OBJ(&class_name, "class_name", 10, true,
-                                        CFISH_CHARBUF, alloca(cfish_SStr_size())),
+                                        CFISH_STRING, alloca(cfish_SStr_size())),
                               ALLOT_OBJ(&parent, "parent", 6, false,
                                         CFISH_VTABLE, NULL),
                               NULL);

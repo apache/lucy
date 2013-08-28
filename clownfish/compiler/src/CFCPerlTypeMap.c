@@ -42,7 +42,7 @@ CFCPerlTypeMap_from_perl(CFCType *type, const char *xs_var) {
         const char *struct_sym = CFCType_get_specifier(type);
         const char *vtable_var = CFCType_get_vtable_var(type);
         const char *allocation;
-        if (strcmp(struct_sym, "cfish_CharBuf") == 0
+        if (strcmp(struct_sym, "cfish_String") == 0
             || strcmp(struct_sym, "cfish_Obj") == 0
            ) {
             // Share buffers rather than copy between Perl scalars and
@@ -212,7 +212,7 @@ static const char typemap_start[] =
     "uint32_t\tCFISH_UNSIGNED_INT\n"
     "uint64_t\tCFISH_BIG_UNSIGNED_INT\n"
     "\n"
-    "const cfish_CharBuf*\tCONST_CHARBUF\n";
+    "const cfish_String*\tCONST_CHARBUF\n";
 
 
 static const char typemap_input[] =
@@ -234,7 +234,7 @@ static const char typemap_input[] =
     "    $var = (sizeof(UV) == 8) ? ($type)SvUV($arg) : ($type)SvNV($arg);\n"
     "\n"
     "CONST_CHARBUF\n"
-    "    $var = (const cfish_CharBuf*)CFISH_SStr_WRAP_STR(SvPVutf8_nolen($arg), SvCUR($arg));\n"
+    "    $var = (const cfish_String*)CFISH_SStr_WRAP_STR(SvPVutf8_nolen($arg), SvCUR($arg));\n"
     "\n";
 
 static const char typemap_output[] =

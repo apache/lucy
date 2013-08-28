@@ -61,7 +61,7 @@ SegWriter_Destroy_IMP(SegWriter *self) {
 }
 
 void
-SegWriter_Register_IMP(SegWriter *self, const CharBuf *api,
+SegWriter_Register_IMP(SegWriter *self, const String *api,
                        DataWriter *component) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     CERTIFY(component, DATAWRITER);
@@ -72,7 +72,7 @@ SegWriter_Register_IMP(SegWriter *self, const CharBuf *api,
 }
 
 Obj*
-SegWriter_Fetch_IMP(SegWriter *self, const CharBuf *api) {
+SegWriter_Fetch_IMP(SegWriter *self, const String *api) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     return Hash_Fetch(ivars->by_api, (Obj*)api);
 }
@@ -87,7 +87,7 @@ void
 SegWriter_Prep_Seg_Dir_IMP(SegWriter *self) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     Folder  *folder   = SegWriter_Get_Folder(self);
-    CharBuf *seg_name = Seg_Get_Name(ivars->segment);
+    String *seg_name = Seg_Get_Name(ivars->segment);
 
     // Clear stale segment files from crashed indexing sessions.
     if (Folder_Exists(folder, seg_name)) {
@@ -158,7 +158,7 @@ SegWriter_Merge_Segment_IMP(SegWriter *self, SegReader *reader,
                             I32Array *doc_map) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     Snapshot *snapshot = SegWriter_Get_Snapshot(self);
-    CharBuf  *seg_name = Seg_Get_Name(SegReader_Get_Segment(reader));
+    String   *seg_name = Seg_Get_Name(SegReader_Get_Segment(reader));
 
     // Have all the sub-writers merge the segment.
     for (uint32_t i = 0, max = VA_Get_Size(ivars->writers); i < max; i++) {
@@ -178,7 +178,7 @@ void
 SegWriter_Delete_Segment_IMP(SegWriter *self, SegReader *reader) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     Snapshot *snapshot = SegWriter_Get_Snapshot(self);
-    CharBuf  *seg_name = Seg_Get_Name(SegReader_Get_Segment(reader));
+    String   *seg_name = Seg_Get_Name(SegReader_Get_Segment(reader));
 
     // Have all the sub-writers delete the segment.
     for (uint32_t i = 0, max = VA_Get_Size(ivars->writers); i < max; i++) {
@@ -194,7 +194,7 @@ SegWriter_Delete_Segment_IMP(SegWriter *self, SegReader *reader) {
 void
 SegWriter_Finish_IMP(SegWriter *self) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
-    CharBuf *seg_name = Seg_Get_Name(ivars->segment);
+    String *seg_name = Seg_Get_Name(ivars->segment);
 
     // Finish off children.
     for (uint32_t i = 0, max = VA_Get_Size(ivars->writers); i < max; i++) {
@@ -204,7 +204,7 @@ SegWriter_Finish_IMP(SegWriter *self) {
 
     // Write segment metadata and add the segment directory to the snapshot.
     Snapshot *snapshot = SegWriter_Get_Snapshot(self);
-    CharBuf *segmeta_filename = CB_newf("%o/segmeta.json", seg_name);
+    String *segmeta_filename = Str_newf("%o/segmeta.json", seg_name);
     Seg_Write_File(ivars->segment, ivars->folder);
     Snapshot_Add_Entry(snapshot, seg_name);
     DECREF(segmeta_filename);

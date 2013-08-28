@@ -31,7 +31,7 @@
 #include <string.h>
 
 #define LUCY_USE_SHORT_NAMES
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Lucy/Analysis/EasyAnalyzer.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Document/HitDoc.h"
@@ -45,7 +45,7 @@ static Schema*
 S_create_schema();
 
 static void
-S_index_documents(Schema *schema, CharBuf *folder);
+S_index_documents(Schema *schema, String *folder);
 
 static void
 S_add_document(Indexer *indexer, const char *title, const char *content);
@@ -59,7 +59,7 @@ main() {
     lucy_bootstrap_parcel();
 
     Schema  *schema = S_create_schema();
-    CharBuf *folder = CB_newf("lucy_index");
+    String *folder = Str_newf("lucy_index");
 
     S_index_documents(schema, folder);
 
@@ -81,7 +81,7 @@ S_create_schema() {
     Schema *schema = Schema_new();
 
     // Create an analyzer.
-    CharBuf      *language = CB_newf("en");
+    String       *language = Str_newf("en");
     EasyAnalyzer *analyzer = EasyAnalyzer_new(language);
 
     // Specify fields.
@@ -89,13 +89,13 @@ S_create_schema() {
     FullTextType *type = FullTextType_new((Analyzer*)analyzer);
 
     {
-        CharBuf *field_cb = CB_newf("title");
+        String *field_cb = Str_newf("title");
         Schema_Spec_Field(schema, field_cb, (FieldType*)type);
         DECREF(field_cb);
     }
 
     {
-        CharBuf *field_cb = CB_newf("content");
+        String *field_cb = Str_newf("content");
         Schema_Spec_Field(schema, field_cb, (FieldType*)type);
         DECREF(field_cb);
     }
@@ -107,7 +107,7 @@ S_create_schema() {
 }
 
 static void
-S_index_documents(Schema *schema, CharBuf *folder) {
+S_index_documents(Schema *schema, String *folder) {
     Indexer *indexer = Indexer_new(schema, (Obj*)folder, NULL,
                                    Indexer_CREATE | Indexer_TRUNCATE);
 
@@ -139,8 +139,8 @@ S_add_document(Indexer *indexer, const char *title, const char *content) {
 
     {
         // Store 'title' field   
-        CharBuf *field_cb = CB_newf("title");
-        CharBuf *value_cb = CB_new_from_utf8(title, strlen(title));
+        String *field_cb = Str_newf("title");
+        String *value_cb = Str_new_from_utf8(title, strlen(title));
         Doc_Store(doc, field_cb, (Obj*)value_cb);
         DECREF(field_cb);
         DECREF(value_cb);
@@ -148,8 +148,8 @@ S_add_document(Indexer *indexer, const char *title, const char *content) {
 
     {
         // Store 'content' field   
-        CharBuf *field_cb = CB_newf("content");
-        CharBuf *value_cb = CB_new_from_utf8(content, strlen(content));
+        String *field_cb = Str_newf("content");
+        String *value_cb = Str_new_from_utf8(content, strlen(content));
         Doc_Store(doc, field_cb, (Obj*)value_cb);
         DECREF(field_cb);
         DECREF(value_cb);
@@ -165,18 +165,18 @@ S_search(IndexSearcher *searcher, const char *query) {
     printf("Searching for: %s\n", query);
 
     // Execute search query.
-    CharBuf *query_cb = CB_new_from_utf8(query, strlen(query));
+    String *query_cb = Str_new_from_utf8(query, strlen(query));
     Hits    *hits     = IxSearcher_Hits(searcher, (Obj*)query_cb, 0, 10, NULL);
 
-    CharBuf *field_cb = CB_newf("title");
+    String *field_cb = Str_newf("title");
     HitDoc  *hit;
     int i = 1;
 
     // Loop over search results.
     while (NULL != (hit = Hits_Next(hits))) {
-        CharBuf *value_cb = (CharBuf*)HitDoc_Extract(hit, field_cb, NULL);
+        String *value_cb = (String*)HitDoc_Extract(hit, field_cb, NULL);
 
-        printf("Result %d: %s\n", i, CB_Get_Ptr8(value_cb));
+        printf("Result %d: %s\n", i, Str_Get_Ptr8(value_cb));
 
         DECREF(hit);
         i++;

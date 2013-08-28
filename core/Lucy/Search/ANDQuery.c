@@ -41,22 +41,22 @@ ANDQuery_init(ANDQuery *self, VArray *children) {
     return (ANDQuery*)PolyQuery_init((PolyQuery*)self, children);
 }
 
-CharBuf*
+String*
 ANDQuery_To_String_IMP(ANDQuery *self) {
     ANDQueryIVARS *const ivars = ANDQuery_IVARS(self);
     uint32_t num_kids = VA_Get_Size(ivars->children);
-    if (!num_kids) { return CB_new_from_trusted_utf8("()", 2); }
+    if (!num_kids) { return Str_new_from_trusted_utf8("()", 2); }
     else {
-        CharBuf *retval = CB_new_from_trusted_utf8("(", 1);
+        String *retval = Str_new_from_trusted_utf8("(", 1);
         for (uint32_t i = 0; i < num_kids; i++) {
-            CharBuf *kid_string = Obj_To_String(VA_Fetch(ivars->children, i));
-            CB_Cat(retval, kid_string);
+            String *kid_string = Obj_To_String(VA_Fetch(ivars->children, i));
+            Str_Cat(retval, kid_string);
             DECREF(kid_string);
             if (i == num_kids - 1) {
-                CB_Cat_Trusted_Str(retval, ")", 1);
+                Str_Cat_Trusted_Str(retval, ")", 1);
             }
             else {
-                CB_Cat_Trusted_Str(retval, " AND ", 5);
+                Str_Cat_Trusted_Str(retval, " AND ", 5);
             }
         }
         return retval;

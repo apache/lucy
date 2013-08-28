@@ -142,9 +142,9 @@ DefDocReader_init(DefaultDocReader *self, Schema *schema, Folder *folder,
     metadata = (Hash*)Seg_Fetch_Metadata_Str(segment, "documents", 9);
 
     if (metadata) {
-        CharBuf *seg_name  = Seg_Get_Name(segment);
-        CharBuf *ix_file   = CB_newf("%o/documents.ix", seg_name);
-        CharBuf *dat_file  = CB_newf("%o/documents.dat", seg_name);
+        String *seg_name  = Seg_Get_Name(segment);
+        String *ix_file   = Str_newf("%o/documents.ix", seg_name);
+        String *dat_file  = Str_newf("%o/documents.dat", seg_name);
         Obj     *format    = Hash_Fetch_Str(metadata, "format", 6);
 
         // Check format.

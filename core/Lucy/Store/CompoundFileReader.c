@@ -36,7 +36,7 @@ CFReader_open(Folder *folder) {
 CompoundFileReader*
 CFReader_do_open(CompoundFileReader *self, Folder *folder) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
-    CharBuf *cfmeta_file = (CharBuf*)SSTR_WRAP_STR("cfmeta.json", 11);
+    String *cfmeta_file = (String*)SSTR_WRAP_STR("cfmeta.json", 11);
     Hash *metadata = (Hash*)Json_slurp_json((Folder*)folder, cfmeta_file);
     Err *error = NULL;
 
@@ -44,7 +44,7 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder) {
 
     // Parse metadata file.
     if (!metadata || !Hash_Is_A(metadata, HASH)) {
-        error = Err_new(CB_newf("Can't read '%o' in '%o'", cfmeta_file,
+        error = Err_new(Str_newf("Can't read '%o' in '%o'", cfmeta_file,
                                 Folder_Get_Path(folder)));
     }
     else {
@@ -52,16 +52,16 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder) {
         ivars->format = format ? (int32_t)Obj_To_I64(format) : 0;
         ivars->records = (Hash*)INCREF(Hash_Fetch_Str(metadata, "files", 5));
         if (ivars->format < 1) {
-            error = Err_new(CB_newf("Corrupt %o file: Missing or invalid 'format'",
+            error = Err_new(Str_newf("Corrupt %o file: Missing or invalid 'format'",
                                     cfmeta_file));
         }
         else if (ivars->format > CFWriter_current_file_format) {
-            error = Err_new(CB_newf("Unsupported compound file format: %i32 "
+            error = Err_new(Str_newf("Unsupported compound file format: %i32 "
                                     "(current = %i32", ivars->format,
                                     CFWriter_current_file_format));
         }
         else if (!ivars->records) {
-            error = Err_new(CB_newf("Corrupt %o file: missing 'files' key",
+            error = Err_new(Str_newf("Corrupt %o file: missing 'files' key",
                                     cfmeta_file));
         }
     }
@@ -73,7 +73,7 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder) {
     }
 
     // Open an instream which we'll clone over and over.
-    CharBuf *cf_file = (CharBuf*)SSTR_WRAP_STR("cf.dat", 6);
+    String *cf_file = (String*)SSTR_WRAP_STR("cf.dat", 6);
     ivars->instream = Folder_Open_In(folder, cf_file);
     if (!ivars->instream) {
         ERR_ADD_FRAME(Err_get_error());
@@ -93,8 +93,8 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder) {
         size_t folder_name_len = SStr_Length(folder_name);
 
         for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
-            CharBuf *orig = (CharBuf*)VA_Fetch(files, i);
-            if (CB_Starts_With(orig, (CharBuf*)folder_name)) {
+            String *orig = (String*)VA_Fetch(files, i);
+            if (Str_Starts_With(orig, (String*)folder_name)) {
                 Obj *record = Hash_Delete(ivars->records, (Obj*)orig);
                 SStr_Assign(filename, orig);
                 SStr_Nip(filename, folder_name_len + sizeof(DIR_SEP) - 1);
@@ -123,7 +123,7 @@ CFReader_Get_Real_Folder_IMP(CompoundFileReader *self) {
 }
 
 void
-CFReader_Set_Path_IMP(CompoundFileReader *self, const CharBuf *path) {
+CFReader_Set_Path_IMP(CompoundFileReader *self, const String *path) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     Folder_Set_Path(ivars->real_folder, path);
     CFReader_Set_Path_t super_set_path
@@ -134,13 +134,13 @@ CFReader_Set_Path_IMP(CompoundFileReader *self, const CharBuf *path) {
 
 FileHandle*
 CFReader_Local_Open_FileHandle_IMP(CompoundFileReader *self,
-                                   const CharBuf *name, uint32_t flags) {
+                                   const String *name, uint32_t flags) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     Hash *entry = (Hash*)Hash_Fetch(ivars->records, (Obj*)name);
     FileHandle *fh = NULL;
 
     if (entry) {
-        Err_set_error(Err_new(CB_newf("Can't open FileHandle for virtual file %o in '%o'",
+        Err_set_error(Err_new(Str_newf("Can't open FileHandle for virtual file %o in '%o'",
                                       name, ivars->path)));
     }
     else {
@@ -154,7 +154,7 @@ CFReader_Local_Open_FileHandle_IMP(CompoundFileReader *self,
 }
 
 bool
-CFReader_Local_Delete_IMP(CompoundFileReader *self, const CharBuf *name) {
+CFReader_Local_Delete_IMP(CompoundFileReader *self, const String *name) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     Hash *record = (Hash*)Hash_Delete(ivars->records, (Obj*)name);
     DECREF(record);
@@ -166,11 +166,11 @@ CFReader_Local_Delete_IMP(CompoundFileReader *self, const CharBuf *name) {
         // Once the number of virtual files falls to 0, remove the compound
         // files.
         if (Hash_Get_Size(ivars->records) == 0) {
-            CharBuf *cf_file = (CharBuf*)SSTR_WRAP_STR("cf.dat", 6);
+            String *cf_file = (String*)SSTR_WRAP_STR("cf.dat", 6);
             if (!Folder_Delete(ivars->real_folder, cf_file)) {
                 return false;
             }
-            CharBuf *cfmeta_file = (CharBuf*)SSTR_WRAP_STR("cfmeta.json", 11);
+            String *cfmeta_file = (String*)SSTR_WRAP_STR("cfmeta.json", 11);
             if (!Folder_Delete(ivars->real_folder, cfmeta_file)) {
                 return false;
 
@@ -181,7 +181,7 @@ CFReader_Local_Delete_IMP(CompoundFileReader *self, const CharBuf *name) {
 }
 
 InStream*
-CFReader_Local_Open_In_IMP(CompoundFileReader *self, const CharBuf *name) {
+CFReader_Local_Open_In_IMP(CompoundFileReader *self, const String *name) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     Hash *entry = (Hash*)Hash_Fetch(ivars->records, (Obj*)name);
 
@@ -196,12 +196,12 @@ CFReader_Local_Open_In_IMP(CompoundFileReader *self, const CharBuf *name) {
         Obj *len    = Hash_Fetch_Str(entry, "length", 6);
         Obj *offset = Hash_Fetch_Str(entry, "offset", 6);
         if (!len || !offset) {
-            Err_set_error(Err_new(CB_newf("Malformed entry for '%o' in '%o'",
+            Err_set_error(Err_new(Str_newf("Malformed entry for '%o' in '%o'",
                                           name, Folder_Get_Path(ivars->real_folder))));
             return NULL;
         }
-        else if (CB_Get_Size(ivars->path)) {
-            CharBuf *fullpath = CB_newf("%o/%o", ivars->path, name);
+        else if (Str_Get_Size(ivars->path)) {
+            String *fullpath = Str_newf("%o/%o", ivars->path, name);
             InStream *instream = InStream_Reopen(ivars->instream, fullpath,
                                                  Obj_To_I64(offset), Obj_To_I64(len));
             DECREF(fullpath);
@@ -215,7 +215,7 @@ CFReader_Local_Open_In_IMP(CompoundFileReader *self, const CharBuf *name) {
 }
 
 bool
-CFReader_Local_Exists_IMP(CompoundFileReader *self, const CharBuf *name) {
+CFReader_Local_Exists_IMP(CompoundFileReader *self, const String *name) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     if (Hash_Fetch(ivars->records, (Obj*)name))        { return true; }
     if (Folder_Local_Exists(ivars->real_folder, name)) { return true; }
@@ -224,7 +224,7 @@ CFReader_Local_Exists_IMP(CompoundFileReader *self, const CharBuf *name) {
 
 bool
 CFReader_Local_Is_Directory_IMP(CompoundFileReader *self,
-                                const CharBuf *name) {
+                                const String *name) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     if (Hash_Fetch(ivars->records, (Obj*)name))              { return false; }
     if (Folder_Local_Is_Directory(ivars->real_folder, name)) { return true; }
@@ -238,10 +238,10 @@ CFReader_Close_IMP(CompoundFileReader *self) {
 }
 
 bool
-CFReader_Local_MkDir_IMP(CompoundFileReader *self, const CharBuf *name) {
+CFReader_Local_MkDir_IMP(CompoundFileReader *self, const String *name) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     if (Hash_Fetch(ivars->records, (Obj*)name)) {
-        Err_set_error(Err_new(CB_newf("Can't MkDir: '%o' exists", name)));
+        Err_set_error(Err_new(Str_newf("Can't MkDir: '%o' exists", name)));
         return false;
     }
     else {
@@ -253,7 +253,7 @@ CFReader_Local_MkDir_IMP(CompoundFileReader *self, const CharBuf *name) {
 
 Folder*
 CFReader_Local_Find_Folder_IMP(CompoundFileReader *self,
-                               const CharBuf *name) {
+                               const String *name) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     if (Hash_Fetch(ivars->records, (Obj*)name)) { return false; }
     return Folder_Local_Find_Folder(ivars->real_folder, name);
@@ -286,8 +286,8 @@ CFReaderDH_init(CFReaderDirHandle *self, CompoundFileReader *cf_reader) {
     Folder *real_folder = CFReader_Get_Real_Folder(ivars->cf_reader);
     DirHandle *dh = Folder_Local_Open_Dir(real_folder);
     while (DH_Next(dh)) {
-        CharBuf *entry = DH_Get_Entry(dh);
-        VA_Push(ivars->elems, (Obj*)CB_Clone(entry));
+        String *entry = DH_Get_Entry(dh);
+        VA_Push(ivars->elems, (Obj*)Str_Clone(entry));
         DECREF(entry);
     }
     DECREF(dh);
@@ -314,10 +314,10 @@ CFReaderDH_Next_IMP(CFReaderDirHandle *self) {
     if (ivars->elems) {
         ivars->tick++;
         if (ivars->tick < (int32_t)VA_Get_Size(ivars->elems)) {
-            CharBuf *path = (CharBuf*)CERTIFY(
-                                VA_Fetch(ivars->elems, ivars->tick), CHARBUF);
+            String *path = (String*)CERTIFY(
+                                VA_Fetch(ivars->elems, ivars->tick), STRING);
             DECREF(ivars->entry);
-            ivars->entry = (CharBuf*)INCREF(path);
+            ivars->entry = (String*)INCREF(path);
             return true;
         }
         else {
@@ -332,7 +332,7 @@ bool
 CFReaderDH_Entry_Is_Dir_IMP(CFReaderDirHandle *self) {
     CFReaderDirHandleIVARS *const ivars = CFReaderDH_IVARS(self);
     if (ivars->elems) {
-        CharBuf *name = (CharBuf*)VA_Fetch(ivars->elems, ivars->tick);
+        String *name = (String*)VA_Fetch(ivars->elems, ivars->tick);
         if (name) {
             return CFReader_Local_Is_Directory(ivars->cf_reader, name);
         }

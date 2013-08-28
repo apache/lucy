@@ -864,7 +864,7 @@ S_create_index() {
     Indexer    *indexer = Indexer_new(schema, (Obj*)folder, NULL, 0);
     uint32_t i, max;
 
-    CharBuf *field = (CharBuf*)SSTR_WRAP_STR("content", 7);
+    String *field = (String*)SSTR_WRAP_STR("content", 7);
     for (i = 0, max = VA_Get_Size(doc_set); i < max; i++) {
         Doc *doc = Doc_new(NULL, 0);
         Doc_Store(doc, field, VA_Fetch(doc_set, i));
@@ -892,7 +892,7 @@ TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
                                             NULL, NULL, NULL);
     StackString *AND        = SSTR_WRAP_STR("AND", 3);
     QueryParser   *and_parser = QParser_new(IxSearcher_Get_Schema(searcher),
-                                            NULL, (CharBuf*)AND, NULL);
+                                            NULL, (String*)AND, NULL);
     QParser_Set_Heed_Colons(or_parser, true);
     QParser_Set_Heed_Colons(and_parser, true);
 
@@ -906,9 +906,9 @@ TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
         Hits  *hits     = IxSearcher_Hits(searcher, (Obj*)parsed, 0, 10, NULL);
 
         TEST_TRUE(runner, Query_Equals(tree, (Obj*)test_case->tree),
-                  "tree() OR   %s", (char*)CB_Get_Ptr8(test_case->query_string));
+                  "tree() OR   %s", (char*)Str_Get_Ptr8(test_case->query_string));
         TEST_INT_EQ(runner, Hits_Total_Hits(hits), test_case->num_hits,
-                    "hits: OR   %s", (char*)CB_Get_Ptr8(test_case->query_string));
+                    "hits: OR   %s", (char*)Str_Get_Ptr8(test_case->query_string));
         DECREF(hits);
         DECREF(parsed);
         DECREF(tree);
@@ -925,9 +925,9 @@ TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
         Hits  *hits     = IxSearcher_Hits(searcher, (Obj*)parsed, 0, 10, NULL);
 
         TEST_TRUE(runner, Query_Equals(tree, (Obj*)test_case->tree),
-                  "tree() AND   %s", (char*)CB_Get_Ptr8(test_case->query_string));
+                  "tree() AND   %s", (char*)Str_Get_Ptr8(test_case->query_string));
         TEST_INT_EQ(runner, Hits_Total_Hits(hits), test_case->num_hits,
-                    "hits: AND   %s", (char*)CB_Get_Ptr8(test_case->query_string));
+                    "hits: AND   %s", (char*)Str_Get_Ptr8(test_case->query_string));
         DECREF(hits);
         DECREF(parsed);
         DECREF(tree);
@@ -939,9 +939,9 @@ TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
         LUCY_TestQPLogic_Prune_Test_t test_func = prune_test_funcs[i];
         TestQueryParser *test_case_obj = test_func();
         TestQueryParserIVARS *test_case = TestQP_IVARS(test_case_obj);
-        CharBuf *qstring = test_case->tree
+        String *qstring = test_case->tree
                            ? Query_To_String(test_case->tree)
-                           : CB_new_from_trusted_utf8("(NULL)", 6);
+                           : Str_new_from_trusted_utf8("(NULL)", 6);
         Query *tree = test_case->tree;
         Query *wanted = test_case->expanded;
         Query *pruned   = QParser_Prune(or_parser, tree);
@@ -949,11 +949,11 @@ TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
         Hits  *hits;
 
         TEST_TRUE(runner, Query_Equals(pruned, (Obj*)wanted),
-                  "prune()   %s", (char*)CB_Get_Ptr8(qstring));
+                  "prune()   %s", (char*)Str_Get_Ptr8(qstring));
         expanded = QParser_Expand(or_parser, pruned);
         hits = IxSearcher_Hits(searcher, (Obj*)expanded, 0, 10, NULL);
         TEST_INT_EQ(runner, Hits_Total_Hits(hits), test_case->num_hits,
-                    "hits:    %s", (char*)CB_Get_Ptr8(qstring));
+                    "hits:    %s", (char*)Str_Get_Ptr8(qstring));
 
         DECREF(hits);
         DECREF(expanded);

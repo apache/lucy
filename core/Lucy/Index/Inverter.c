@@ -113,7 +113,7 @@ Inverter_Get_Doc_IMP(Inverter *self) {
     return Inverter_IVARS(self)->doc;
 }
 
-CharBuf*
+String*
 Inverter_Get_Field_Name_IMP(Inverter *self) {
     InverterEntry *current = Inverter_IVARS(self)->current;
     return InvEntry_IVARS(current)->field;
@@ -160,7 +160,7 @@ Inverter_Add_Field_IMP(Inverter *self, InverterEntry *entry) {
         DECREF(entry_ivars->inversion);
         entry_ivars->inversion
             = Analyzer_Transform_Text(entry_ivars->analyzer,
-                                      (CharBuf*)entry_ivars->value);
+                                      (String*)entry_ivars->value);
         Inversion_Invert(entry_ivars->inversion);
     }
     else if (entry_ivars->indexed || entry_ivars->highlightable) {
@@ -192,17 +192,17 @@ Inverter_Clear_IMP(Inverter *self) {
 }
 
 InverterEntry*
-InvEntry_new(Schema *schema, const CharBuf *field, int32_t field_num) {
+InvEntry_new(Schema *schema, const String *field, int32_t field_num) {
     InverterEntry *self = (InverterEntry*)VTable_Make_Obj(INVERTERENTRY);
     return InvEntry_init(self, schema, field, field_num);
 }
 
 InverterEntry*
-InvEntry_init(InverterEntry *self, Schema *schema, const CharBuf *field,
+InvEntry_init(InverterEntry *self, Schema *schema, const String *field,
               int32_t field_num) {
     InverterEntryIVARS *const ivars = InvEntry_IVARS(self);
     ivars->field_num  = field_num;
-    ivars->field      = field ? CB_Clone(field) : NULL;
+    ivars->field      = field ? Str_Clone(field) : NULL;
     ivars->inversion  = NULL;
 
     if (schema) {

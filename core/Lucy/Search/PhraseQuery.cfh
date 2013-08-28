@@ -24,22 +24,22 @@ parcel Lucy;
 
 public class Lucy::Search::PhraseQuery inherits Lucy::Search::Query {
 
-    CharBuf       *field;
+    String        *field;
     VArray        *terms;
 
     inert incremented PhraseQuery*
-    new(const CharBuf *field, VArray *terms);
+    new(const String *field, VArray *terms);
 
     /**
      * @param field The field that the phrase must occur in.
      * @param terms The ordered array of terms that must match.
      */
     public inert PhraseQuery*
-    init(PhraseQuery *self, const CharBuf *field, VArray *terms);
+    init(PhraseQuery *self, const String *field, VArray *terms);
 
     /** Accessor for object's field attribute.
      */
-    public CharBuf*
+    public String*
     Get_Field(PhraseQuery *self);
 
     /** Accessor for object's array of terms.
@@ -54,7 +54,7 @@ public class Lucy::Search::PhraseQuery inherits Lucy::Search::Query {
     public bool
     Equals(PhraseQuery *self, Obj *other);
 
-    public incremented CharBuf*
+    public incremented String*
     To_String(PhraseQuery *self);
 
     public void
@@ -102,7 +102,7 @@ class Lucy::Search::PhraseCompiler
 
     public incremented VArray*
     Highlight_Spans(PhraseCompiler *self, Searcher *searcher,
-                    DocVector *doc_vec, const CharBuf *field);
+                    DocVector *doc_vec, const String *field);
 
     public bool
     Equals(PhraseCompiler *self, Obj *other);

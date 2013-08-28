@@ -88,7 +88,7 @@ S_run_tests(CFCTest *test) {
             "public inert int32_t **foo;",
             "Dog *fido;",
             "uint32_t baz",
-            "CharBuf *stuff",
+            "String *stuff",
             "float **ptr"
         };
         for (int i = 0; i < 7; ++i) {

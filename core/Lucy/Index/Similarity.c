@@ -84,15 +84,15 @@ Obj*
 Sim_Dump_IMP(Similarity *self) {
     Hash *dump = Hash_new(0);
     Hash_Store_Str(dump, "_class", 6,
-                   (Obj*)CB_Clone(Sim_Get_Class_Name(self)));
+                   (Obj*)Str_Clone(Sim_Get_Class_Name(self)));
     return (Obj*)dump;
 }
 
 Similarity*
 Sim_Load_IMP(Similarity *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
-    CharBuf *class_name 
-        = (CharBuf*)CERTIFY(Hash_Fetch_Str(source, "_class", 6), CHARBUF);
+    String *class_name 
+        = (String*)CERTIFY(Hash_Fetch_Str(source, "_class", 6), STRING);
     VTable *vtable = VTable_singleton(class_name, NULL);
     Similarity *loaded = (Similarity*)VTable_Make_Obj(vtable);
     UNUSED_VAR(self);
@@ -107,8 +107,8 @@ Sim_Serialize_IMP(Similarity *self, OutStream *target) {
 
 Similarity*
 Sim_Deserialize_IMP(Similarity *self, InStream *instream) {
-    CharBuf *class_name = Freezer_read_charbuf(instream);
-    if (!CB_Equals(class_name, (Obj*)Sim_Get_Class_Name(self))) {
+    String *class_name = Freezer_read_charbuf(instream);
+    if (!Str_Equals(class_name, (Obj*)Sim_Get_Class_Name(self))) {
         THROW(ERR, "Class name mismatch: '%o' '%o'", Sim_Get_Class_Name(self),
               class_name);
     }

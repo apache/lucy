@@ -75,7 +75,7 @@ class Lucy::Index::TermInfo cnick TInfo inherits Clownfish::Obj {
     public incremented TermInfo*
     Clone(TermInfo *self);
 
-    public incremented CharBuf*
+    public incremented String*
     To_String(TermInfo *self);
 }
 

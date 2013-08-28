@@ -90,7 +90,7 @@ PolyLexReader_Destroy_IMP(PolyLexiconReader *self) {
 }
 
 Lexicon*
-PolyLexReader_Lexicon_IMP(PolyLexiconReader *self, const CharBuf *field,
+PolyLexReader_Lexicon_IMP(PolyLexiconReader *self, const String *field,
                           Obj *term) {
     PolyLexicon *lexicon = NULL;
 
@@ -112,7 +112,7 @@ PolyLexReader_Lexicon_IMP(PolyLexiconReader *self, const CharBuf *field,
 }
 
 uint32_t
-PolyLexReader_Doc_Freq_IMP(PolyLexiconReader *self, const CharBuf *field,
+PolyLexReader_Doc_Freq_IMP(PolyLexiconReader *self, const String *field,
                            Obj *term) {
     PolyLexiconReaderIVARS *const ivars = PolyLexReader_IVARS(self);
     uint32_t doc_freq = 0;
@@ -138,7 +138,7 @@ DefLexReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
 // parameters. Will return false if the field is not indexed or if no terms
 // are present for this field in this segment.
 static bool
-S_has_data(Schema *schema, Folder *folder, Segment *segment, CharBuf *field) {
+S_has_data(Schema *schema, Folder *folder, Segment *segment, String *field) {
     FieldType *type = Schema_Fetch_Type(schema, field);
 
     if (!type || !FType_Indexed(type)) {
@@ -148,8 +148,8 @@ S_has_data(Schema *schema, Folder *folder, Segment *segment, CharBuf *field) {
     else {
         // Bail out if there are no terms for this field in this segment.
         int32_t  field_num = Seg_Field_Num(segment, field);
-        CharBuf *seg_name  = Seg_Get_Name(segment);
-        CharBuf *file = CB_newf("%o/lexicon-%i32.dat", seg_name, field_num);
+        String *seg_name  = Seg_Get_Name(segment);
+        String *file = Str_newf("%o/lexicon-%i32.dat", seg_name, field_num);
         bool retval = Folder_Exists(folder, file);
         DECREF(file);
         return retval;
@@ -169,7 +169,7 @@ DefLexReader_init(DefaultLexiconReader *self, Schema *schema, Folder *folder,
     // Build an array of SegLexicon objects.
     ivars->lexicons = VA_new(Schema_Num_Fields(schema));
     for (uint32_t i = 1, max = Schema_Num_Fields(schema) + 1; i < max; i++) {
-        CharBuf *field = Seg_Field_Name(segment, i);
+        String *field = Seg_Field_Name(segment, i);
         if (field && S_has_data(schema, folder, segment, field)) {
             SegLexicon *lexicon = SegLex_new(schema, folder, segment, field);
             VA_Store(ivars->lexicons, i, (Obj*)lexicon);
@@ -194,7 +194,7 @@ DefLexReader_Destroy_IMP(DefaultLexiconReader *self) {
 }
 
 Lexicon*
-DefLexReader_Lexicon_IMP(DefaultLexiconReader *self, const CharBuf *field,
+DefLexReader_Lexicon_IMP(DefaultLexiconReader *self, const String *field,
                          Obj *term) {
     DefaultLexiconReaderIVARS *const ivars = DefLexReader_IVARS(self);
     int32_t     field_num = Seg_Field_Num(ivars->segment, field);
@@ -211,7 +211,7 @@ DefLexReader_Lexicon_IMP(DefaultLexiconReader *self, const CharBuf *field,
 }
 
 static TermInfo*
-S_find_tinfo(DefaultLexiconReader *self, const CharBuf *field, Obj *target) {
+S_find_tinfo(DefaultLexiconReader *self, const String *field, Obj *target) {
     DefaultLexiconReaderIVARS *const ivars = DefLexReader_IVARS(self);
     if (field != NULL && target != NULL) {
         int32_t field_num = Seg_Field_Num(ivars->segment, field);
@@ -234,13 +234,13 @@ S_find_tinfo(DefaultLexiconReader *self, const CharBuf *field, Obj *target) {
 
 TermInfo*
 DefLexReader_Fetch_Term_Info_IMP(DefaultLexiconReader *self,
-                                 const CharBuf *field, Obj *target) {
+                                 const String *field, Obj *target) {
     TermInfo *tinfo = S_find_tinfo(self, field, target);
     return tinfo ? TInfo_Clone(tinfo) : NULL;
 }
 
 uint32_t
-DefLexReader_Doc_Freq_IMP(DefaultLexiconReader *self, const CharBuf *field,
+DefLexReader_Doc_Freq_IMP(DefaultLexiconReader *self, const String *field,
                           Obj *term) {
     TermInfo *tinfo = S_find_tinfo(self, field, term);
     return tinfo ? TInfo_Get_Doc_Freq(tinfo) : 0;

@@ -25,7 +25,7 @@
 
 #include "Clownfish/TestHarness/TestSuite.h"
 
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/TestHarness/TestBatch.h"
 #include "Clownfish/TestHarness/TestBatchRunner.h"
@@ -61,7 +61,7 @@ TestSuite_Add_Batch_IMP(TestSuite *self, TestBatch *batch) {
 }
 
 bool
-TestSuite_Run_Batch_IMP(TestSuite *self, CharBuf *class_name,
+TestSuite_Run_Batch_IMP(TestSuite *self, String *class_name,
                     TestFormatter *formatter) {
     S_unbuffer_stdout();
 
@@ -70,7 +70,7 @@ TestSuite_Run_Batch_IMP(TestSuite *self, CharBuf *class_name,
     for (uint32_t i = 0; i < size; ++i) {
         TestBatch *batch = (TestBatch*)VA_Fetch(self->batches, i);
 
-        if (CB_Equals(TestBatch_Get_Class_Name(batch), (Obj*)class_name)) {
+        if (Str_Equals(TestBatch_Get_Class_Name(batch), (Obj*)class_name)) {
             TestBatchRunner *runner = TestBatchRunner_new(formatter);
             bool result = TestBatchRunner_Run_Batch(runner, batch);
             DECREF(runner);

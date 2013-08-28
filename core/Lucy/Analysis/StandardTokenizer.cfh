@@ -41,7 +41,7 @@ public class Lucy::Analysis::StandardTokenizer
     Transform(StandardTokenizer *self, Inversion *inversion);
 
     public incremented Inversion*
-    Transform_Text(StandardTokenizer *self, CharBuf *text);
+    Transform_Text(StandardTokenizer *self, String *text);
 
     /** Tokenize the supplied string and add any Tokens generated to the
      * supplied Inversion.

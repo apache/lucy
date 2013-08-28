@@ -21,20 +21,20 @@
 #include "charmony.h"
 
 #include "Clownfish/Method.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/VTable.h"
 
 Method*
-Method_new(const CharBuf *name, cfish_method_t callback_func, size_t offset) {
+Method_new(const String *name, cfish_method_t callback_func, size_t offset) {
     Method *self = (Method*)VTable_Make_Obj(METHOD);
     return Method_init(self, name, callback_func, offset);
 }
 
 Method*
-Method_init(Method *self, const CharBuf *name, cfish_method_t callback_func,
+Method_init(Method *self, const String *name, cfish_method_t callback_func,
             size_t offset) {
-    self->name          = CB_Clone(name);
+    self->name          = Str_Clone(name);
     self->host_alias    = NULL;
     self->callback_func = callback_func;
     self->offset        = offset;
@@ -65,12 +65,12 @@ Method_Get_RefCount_IMP(Method *self) {
     return 1;
 }
 
-CharBuf*
+String*
 Method_Get_Name_IMP(Method *self) {
     return self->name;
 }
 
-CharBuf*
+String*
 Method_Get_Host_Alias_IMP(Method *self) {
     return self->host_alias;
 }

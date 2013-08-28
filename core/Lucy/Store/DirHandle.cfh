@@ -21,15 +21,15 @@ parcel Lucy;
 abstract class Lucy::Store::DirHandle cnick DH
     inherits Clownfish::Obj {
 
-    CharBuf  *dir;
-    CharBuf  *entry;
+    String   *dir;
+    String   *entry;
 
     /** Abstract constructor.
      *
      * @param dir The path to the directory.
      */
     inert DirHandle*
-    init(DirHandle *self, const CharBuf *dir);
+    init(DirHandle *self, const String *dir);
 
     /** Proceed to the next entry in the directory.
      *
@@ -46,13 +46,13 @@ abstract class Lucy::Store::DirHandle cnick DH
 
     /** Return the object's <code>dir</code> attribute.
      */
-    CharBuf*
+    String*
     Get_Dir(DirHandle *self);
 
     /** Return the path of the current entry.  The value is only valid when
      * Next() has returned successfully.
      */
-    incremented CharBuf*
+    incremented String*
     Get_Entry(DirHandle *self);
 
     /** Returns true if the current entry is a directory, false otherwise.

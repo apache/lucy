@@ -22,17 +22,17 @@
 #include "Lucy/Store/InStream.h"
 
 BitVecDelDocs*
-BitVecDelDocs_new(Folder *folder, const CharBuf *filename) {
+BitVecDelDocs_new(Folder *folder, const String *filename) {
     BitVecDelDocs *self = (BitVecDelDocs*)VTable_Make_Obj(BITVECDELDOCS);
     return BitVecDelDocs_init(self, folder, filename);
 }
 
 BitVecDelDocs*
 BitVecDelDocs_init(BitVecDelDocs *self, Folder *folder,
-                   const CharBuf *filename) {
+                   const String *filename) {
     BitVec_init((BitVector*)self, 0);
     BitVecDelDocsIVARS *const ivars = BitVecDelDocs_IVARS(self);
-    ivars->filename = CB_Clone(filename);
+    ivars->filename = Str_Clone(filename);
     ivars->instream = Folder_Open_In(folder, filename);
     if (!ivars->instream) {
         Err *error = (Err*)INCREF(Err_get_error());

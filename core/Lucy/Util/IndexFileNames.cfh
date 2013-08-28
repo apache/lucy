@@ -20,19 +20,19 @@ parcel Lucy;
  */
 inert class Lucy::Util::IndexFileNames cnick IxFileNames {
 
-    /** Skip past the first instance of an underscore in the CharBuf, then
+    /** Skip past the first instance of an underscore in the String, then
      * attempt to decode a base 36 number.  For example, "snapshot_5.json"
      * yields 5, and "seg_a1" yields 27.
      *
      * @return a generation number, or 0 if no number can be extracted.
      */
     inert uint64_t
-    extract_gen(const CharBuf *name);
+    extract_gen(const String *name);
 
     /** Return the name of the latest generation snapshot file in the Folder,
      * or NULL if no such file exists.
      */
-    inert incremented nullable CharBuf*
+    inert incremented nullable String*
     latest_snapshot(Folder *folder);
 
     /** Split the <code>path</code> on '/' and assign the last component to
@@ -43,7 +43,7 @@ inert class Lucy::Util::IndexFileNames cnick IxFileNames {
      * @return target, allowing an assignment idiom.
      */
     inert incremented StackString*
-    local_part(const CharBuf *path, StackString *target);
+    local_part(const String *path, StackString *target);
 }
 
 

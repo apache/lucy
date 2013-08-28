@@ -147,7 +147,7 @@ S_allot_params_arg(CFCType *type, const char *label, int required) {
         // Share buffers rather than copy between Perl scalars and Clownfish
         // string types.
         int use_sv_buffer = false;
-        if (strcmp(struct_sym, "cfish_CharBuf") == 0
+        if (strcmp(struct_sym, "cfish_String") == 0
             || strcmp(struct_sym, "cfish_Obj") == 0
            ) {
             use_sv_buffer = true;

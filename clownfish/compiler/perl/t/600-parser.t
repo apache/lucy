@@ -84,7 +84,7 @@ is( $parser->parse("(double foo = $_)")->get_initial_values->[0],
     $_, "float_constant: $_" )
     for (qw( 1.0 -9999.999  0.1 0.0 ));
 
-is( $parser->parse("(CharBuf *foo = $_)")->get_initial_values->[0],
+is( $parser->parse("(String *foo = $_)")->get_initial_values->[0],
     $_, "string_literal: $_" )
     for ( q|"blah"|, q|"blah blah"|, q|"\\"blah\\" \\"blah\\""| );
 
@@ -94,7 +94,7 @@ for my $composite (@composites) {
     ok( $parsed && $parsed->is_composite, "composite_type: $composite" );
 }
 
-my @object_types = ( 'Obj *', "incremented Foo*", "decremented CharBuf *" );
+my @object_types = ( 'Obj *', "incremented Foo*", "decremented String *" );
 for my $object_type (@object_types) {
     my $parsed = $parser->parse($object_type);
     ok( $parsed && $parsed->is_object, "object_type: $object_type" );

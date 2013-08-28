@@ -95,10 +95,10 @@ StandardTokenizer_Transform_IMP(StandardTokenizer *self, Inversion *inversion) {
 }
 
 Inversion*
-StandardTokenizer_Transform_Text_IMP(StandardTokenizer *self, CharBuf *text) {
+StandardTokenizer_Transform_Text_IMP(StandardTokenizer *self, String *text) {
     Inversion *new_inversion = Inversion_new(NULL);
-    StandardTokenizer_Tokenize_Str(self, (char*)CB_Get_Ptr8(text),
-                                   CB_Get_Size(text), new_inversion);
+    StandardTokenizer_Tokenize_Str(self, (char*)Str_Get_Ptr8(text),
+                                   Str_Get_Size(text), new_inversion);
     return new_inversion;
 }
 

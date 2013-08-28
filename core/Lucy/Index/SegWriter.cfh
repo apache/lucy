@@ -65,7 +65,7 @@ public class Lucy::Index::SegWriter inherits Lucy::Index::DataWriter {
      * @param component A DataWriter.
      */
     public void
-    Register(SegWriter *self, const CharBuf *api,
+    Register(SegWriter *self, const String *api,
              decremented DataWriter *component);
 
     /** Retrieve a registered component.
@@ -74,7 +74,7 @@ public class Lucy::Index::SegWriter inherits Lucy::Index::DataWriter {
      * implements.
      */
     public nullable Obj*
-    Fetch(SegWriter *self, const CharBuf *api);
+    Fetch(SegWriter *self, const String *api);
 
     /** Add a DataWriter to the SegWriter's stack of writers.
      */

@@ -32,18 +32,18 @@
 #include "Clownfish/Util/StringHelper.h"
 
 IndexManager*
-IxManager_new(const CharBuf *host, LockFactory *lock_factory) {
+IxManager_new(const String *host, LockFactory *lock_factory) {
     IndexManager *self = (IndexManager*)VTable_Make_Obj(INDEXMANAGER);
     return IxManager_init(self, host, lock_factory);
 }
 
 IndexManager*
-IxManager_init(IndexManager *self, const CharBuf *host,
+IxManager_init(IndexManager *self, const String *host,
                LockFactory *lock_factory) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     ivars->host                = host
-                                ? CB_Clone(host)
-                                : CB_new_from_trusted_utf8("", 0);
+                                ? Str_Clone(host)
+                                : Str_new_from_trusted_utf8("", 0);
     ivars->lock_factory        = (LockFactory*)INCREF(lock_factory);
     ivars->folder              = NULL;
     ivars->write_lock_timeout  = 1000;
@@ -71,7 +71,7 @@ IxManager_Highest_Seg_Num_IMP(IndexManager *self, Snapshot *snapshot) {
     uint64_t highest_seg_num = 0;
     UNUSED_VAR(self);
     for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
-        CharBuf *file = (CharBuf*)VA_Fetch(files, i);
+        String *file = (String*)VA_Fetch(files, i);
         if (Seg_valid_seg_name(file)) {
             uint64_t seg_num = IxFileNames_extract_gen(file);
             if (seg_num > highest_seg_num) { highest_seg_num = seg_num; }
@@ -81,7 +81,7 @@ IxManager_Highest_Seg_Num_IMP(IndexManager *self, Snapshot *snapshot) {
     return (int64_t)highest_seg_num;
 }
 
-CharBuf*
+String*
 IxManager_Make_Snapshot_Filename_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     Folder *folder = (Folder*)CERTIFY(ivars->folder, FOLDER);
@@ -90,9 +90,9 @@ IxManager_Make_Snapshot_Filename_IMP(IndexManager *self) {
 
     if (!dh) { RETHROW(INCREF(Err_get_error())); }
     while (DH_Next(dh)) {
-        CharBuf *entry = DH_Get_Entry(dh);
-        if (CB_Starts_With_Str(entry, "snapshot_", 9)
-            && CB_Ends_With_Str(entry, ".json", 5)
+        String *entry = DH_Get_Entry(dh);
+        if (Str_Starts_With_Str(entry, "snapshot_", 9)
+            && Str_Ends_With_Str(entry, ".json", 5)
            ) {
             uint64_t gen = IxFileNames_extract_gen(entry);
             if (gen > max_gen) { max_gen = gen; }
@@ -104,7 +104,7 @@ IxManager_Make_Snapshot_Filename_IMP(IndexManager *self) {
     uint64_t new_gen = max_gen + 1;
     char  base36[StrHelp_MAX_BASE36_BYTES];
     StrHelp_to_base36(new_gen, &base36);
-    return CB_newf("snapshot_%s.json", &base36);
+    return Str_newf("snapshot_%s.json", &base36);
 }
 
 static int
@@ -171,7 +171,7 @@ IxManager_Recycle_IMP(IndexManager *self, PolyReader *reader,
     // Find segments where at least 10% of all docs have been deleted.
     for (uint32_t i = threshold; i < num_candidates; i++) {
         SegReader *seg_reader = (SegReader*)VA_Delete(candidates, i);
-        CharBuf   *seg_name   = SegReader_Get_Seg_Name(seg_reader);
+        String    *seg_name   = SegReader_Get_Seg_Name(seg_reader);
         double doc_max = SegReader_Doc_Max(seg_reader);
         double num_deletions = DelWriter_Seg_Del_Count(del_writer, seg_name);
         double del_proportion = num_deletions / doc_max;
@@ -235,7 +235,7 @@ IxManager_Make_Write_Lock_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     StackString *write_lock_name = SSTR_WRAP_STR("write", 5);
     LockFactory *lock_factory = S_obtain_lock_factory(self);
-    return LockFact_Make_Lock(lock_factory, (CharBuf*)write_lock_name,
+    return LockFact_Make_Lock(lock_factory, (String*)write_lock_name,
                               ivars->write_lock_timeout,
                               ivars->write_lock_interval);
 }
@@ -245,7 +245,7 @@ IxManager_Make_Deletion_Lock_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     StackString *lock_name = SSTR_WRAP_STR("deletion", 8);
     LockFactory *lock_factory = S_obtain_lock_factory(self);
-    return LockFact_Make_Lock(lock_factory, (CharBuf*)lock_name,
+    return LockFact_Make_Lock(lock_factory, (String*)lock_name,
                               ivars->deletion_lock_timeout,
                               ivars->deletion_lock_interval);
 }
@@ -255,7 +255,7 @@ IxManager_Make_Merge_Lock_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     StackString *merge_lock_name = SSTR_WRAP_STR("merge", 5);
     LockFactory *lock_factory = S_obtain_lock_factory(self);
-    return LockFact_Make_Lock(lock_factory, (CharBuf*)merge_lock_name,
+    return LockFact_Make_Lock(lock_factory, (String*)merge_lock_name,
                               ivars->merge_lock_timeout,
                               ivars->merge_lock_interval);
 }
@@ -266,8 +266,8 @@ IxManager_Write_Merge_Data_IMP(IndexManager *self, int64_t cutoff) {
     StackString *merge_json = SSTR_WRAP_STR("merge.json", 10);
     Hash *data = Hash_new(1);
     bool success;
-    Hash_Store_Str(data, "cutoff", 6, (Obj*)CB_newf("%i64", cutoff));
-    success = Json_spew_json((Obj*)data, ivars->folder, (CharBuf*)merge_json);
+    Hash_Store_Str(data, "cutoff", 6, (Obj*)Str_newf("%i64", cutoff));
+    success = Json_spew_json((Obj*)data, ivars->folder, (String*)merge_json);
     DECREF(data);
     if (!success) {
         THROW(ERR, "Failed to write to %o", merge_json);
@@ -278,9 +278,9 @@ Hash*
 IxManager_Read_Merge_Data_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     StackString *merge_json = SSTR_WRAP_STR("merge.json", 10);
-    if (Folder_Exists(ivars->folder, (CharBuf*)merge_json)) {
+    if (Folder_Exists(ivars->folder, (String*)merge_json)) {
         Hash *stuff
-            = (Hash*)Json_slurp_json(ivars->folder, (CharBuf*)merge_json);
+            = (Hash*)Json_slurp_json(ivars->folder, (String*)merge_json);
         if (stuff) {
             CERTIFY(stuff, HASH);
             return stuff;
@@ -298,17 +298,17 @@ bool
 IxManager_Remove_Merge_Data_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     StackString *merge_json = SSTR_WRAP_STR("merge.json", 10);
-    return Folder_Delete(ivars->folder, (CharBuf*)merge_json) != 0;
+    return Folder_Delete(ivars->folder, (String*)merge_json) != 0;
 }
 
 Lock*
 IxManager_Make_Snapshot_Read_Lock_IMP(IndexManager *self,
-                                      const CharBuf *filename) {
+                                      const String *filename) {
     StackString *lock_name = SSTR_WRAP(filename);
     LockFactory *lock_factory = S_obtain_lock_factory(self);
 
-    if (!CB_Starts_With_Str(filename, "snapshot_", 9)
-        || !CB_Ends_With_Str(filename, ".json", 5)
+    if (!Str_Starts_With_Str(filename, "snapshot_", 9)
+        || !Str_Ends_With_Str(filename, ".json", 5)
        ) {
         THROW(ERR, "Not a snapshot filename: %o", filename);
     }
@@ -316,7 +316,7 @@ IxManager_Make_Snapshot_Read_Lock_IMP(IndexManager *self,
     // Truncate ".json" from end of snapshot file name.
     SStr_Chop(lock_name, sizeof(".json") - 1);
 
-    return LockFact_Make_Shared_Lock(lock_factory, (CharBuf*)lock_name, 1000, 100);
+    return LockFact_Make_Shared_Lock(lock_factory, (String*)lock_name, 1000, 100);
 }
 
 void
@@ -331,7 +331,7 @@ IxManager_Get_Folder_IMP(IndexManager *self) {
     return IxManager_IVARS(self)->folder;
 }
 
-CharBuf*
+String*
 IxManager_Get_Host_IMP(IndexManager *self) {
     return IxManager_IVARS(self)->host;
 }

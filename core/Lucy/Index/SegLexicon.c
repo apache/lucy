@@ -38,24 +38,24 @@ S_scan_to(SegLexicon *self, Obj *target);
 
 SegLexicon*
 SegLex_new(Schema *schema, Folder *folder, Segment *segment,
-           const CharBuf *field) {
+           const String *field) {
     SegLexicon *self = (SegLexicon*)VTable_Make_Obj(SEGLEXICON);
     return SegLex_init(self, schema, folder, segment, field);
 }
 
 SegLexicon*
 SegLex_init(SegLexicon *self, Schema *schema, Folder *folder,
-            Segment *segment, const CharBuf *field) {
+            Segment *segment, const String *field) {
     Hash *metadata = (Hash*)CERTIFY(
                          Seg_Fetch_Metadata_Str(segment, "lexicon", 7),
                          HASH);
     Architecture *arch      = Schema_Get_Architecture(schema);
     Hash         *counts    = (Hash*)Hash_Fetch_Str(metadata, "counts", 6);
     Obj          *format    = Hash_Fetch_Str(metadata, "format", 6);
-    CharBuf      *seg_name  = Seg_Get_Name(segment);
+    String       *seg_name  = Seg_Get_Name(segment);
     int32_t       field_num = Seg_Field_Num(segment, field);
     FieldType    *type      = Schema_Fetch_Type(schema, field);
-    CharBuf *filename = CB_newf("%o/lexicon-%i32.dat", seg_name, field_num);
+    String *filename = Str_newf("%o/lexicon-%i32.dat", seg_name, field_num);
 
     Lex_init((Lexicon*)self, field);
     SegLexiconIVARS *const ivars = SegLex_IVARS(self);

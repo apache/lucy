@@ -56,7 +56,7 @@ public class Lucy::Search::NoMatchQuery inherits Lucy::Search::Query {
     public bool
     Equals(NoMatchQuery *self, Obj *other);
 
-    public incremented CharBuf*
+    public incremented String*
     To_String(NoMatchQuery *self);
 
     public incremented Compiler*

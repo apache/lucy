@@ -95,7 +95,7 @@ Compiler_Normalize_IMP(Compiler *self) {
 
 VArray*
 Compiler_Highlight_Spans_IMP(Compiler *self, Searcher *searcher,
-                             DocVector *doc_vec, const CharBuf *field) {
+                             DocVector *doc_vec, const String *field) {
     UNUSED_VAR(self);
     UNUSED_VAR(searcher);
     UNUSED_VAR(doc_vec);
@@ -103,13 +103,13 @@ Compiler_Highlight_Spans_IMP(Compiler *self, Searcher *searcher,
     return VA_new(0);
 }
 
-CharBuf*
+String*
 Compiler_To_String_IMP(Compiler *self) {
     CompilerIVARS *const ivars = Compiler_IVARS(self);
-    CharBuf *stringified_query = Query_To_String(ivars->parent);
-    CharBuf *string = CB_new_from_trusted_utf8("compiler(", 9);
-    CB_Cat(string, stringified_query);
-    CB_Cat_Trusted_Str(string, ")", 1);
+    String *stringified_query = Query_To_String(ivars->parent);
+    String *string = Str_new_from_trusted_utf8("compiler(", 9);
+    Str_Cat(string, stringified_query);
+    Str_Cat_Trusted_Str(string, ")", 1);
     DECREF(stringified_query);
     return string;
 }

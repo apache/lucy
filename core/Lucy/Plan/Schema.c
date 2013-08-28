@@ -38,13 +38,13 @@ static void
 S_add_unique(VArray *array, Obj *elem);
 
 static void
-S_add_text_field(Schema *self, const CharBuf *field, FieldType *type);
+S_add_text_field(Schema *self, const String *field, FieldType *type);
 static void
-S_add_string_field(Schema *self, const CharBuf *field, FieldType *type);
+S_add_string_field(Schema *self, const String *field, FieldType *type);
 static void
-S_add_blob_field(Schema *self, const CharBuf *field, FieldType *type);
+S_add_blob_field(Schema *self, const String *field, FieldType *type);
 static void
-S_add_numeric_field(Schema *self, const CharBuf *field, FieldType *type);
+S_add_numeric_field(Schema *self, const String *field, FieldType *type);
 
 Schema*
 Schema_new() {
@@ -114,7 +114,7 @@ Schema_Architecture_IMP(Schema *self) {
 }
 
 void
-Schema_Spec_Field_IMP(Schema *self, const CharBuf *field, FieldType *type) {
+Schema_Spec_Field_IMP(Schema *self, const String *field, FieldType *type) {
     FieldType *existing  = Schema_Fetch_Type(self, field);
 
     // If the field already has an association, verify pairing and return.
@@ -141,7 +141,7 @@ Schema_Spec_Field_IMP(Schema *self, const CharBuf *field, FieldType *type) {
 }
 
 static void
-S_add_text_field(Schema *self, const CharBuf *field, FieldType *type) {
+S_add_text_field(Schema *self, const String *field, FieldType *type) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     FullTextType *fttype    = (FullTextType*)CERTIFY(type, FULLTEXTTYPE);
     Similarity   *sim       = FullTextType_Make_Similarity(fttype);
@@ -157,7 +157,7 @@ S_add_text_field(Schema *self, const CharBuf *field, FieldType *type) {
 }
 
 static void
-S_add_string_field(Schema *self, const CharBuf *field, FieldType *type) {
+S_add_string_field(Schema *self, const String *field, FieldType *type) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     StringType *string_type = (StringType*)CERTIFY(type, STRINGTYPE);
     Similarity *sim         = StringType_Make_Similarity(string_type);
@@ -170,27 +170,27 @@ S_add_string_field(Schema *self, const CharBuf *field, FieldType *type) {
 }
 
 static void
-S_add_blob_field(Schema *self, const CharBuf *field, FieldType *type) {
+S_add_blob_field(Schema *self, const String *field, FieldType *type) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     BlobType *blob_type = (BlobType*)CERTIFY(type, BLOBTYPE);
     Hash_Store(ivars->types, (Obj*)field, INCREF(blob_type));
 }
 
 static void
-S_add_numeric_field(Schema *self, const CharBuf *field, FieldType *type) {
+S_add_numeric_field(Schema *self, const String *field, FieldType *type) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     NumericType *num_type = (NumericType*)CERTIFY(type, NUMERICTYPE);
     Hash_Store(ivars->types, (Obj*)field, INCREF(num_type));
 }
 
 FieldType*
-Schema_Fetch_Type_IMP(Schema *self, const CharBuf *field) {
+Schema_Fetch_Type_IMP(Schema *self, const String *field) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     return (FieldType*)Hash_Fetch(ivars->types, (Obj*)field);
 }
 
 Analyzer*
-Schema_Fetch_Analyzer_IMP(Schema *self, const CharBuf *field) {
+Schema_Fetch_Analyzer_IMP(Schema *self, const String *field) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     return field
            ? (Analyzer*)Hash_Fetch(ivars->analyzers, (Obj*)field)
@@ -198,7 +198,7 @@ Schema_Fetch_Analyzer_IMP(Schema *self, const CharBuf *field) {
 }
 
 Similarity*
-Schema_Fetch_Sim_IMP(Schema *self, const CharBuf *field) {
+Schema_Fetch_Sim_IMP(Schema *self, const String *field) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     Similarity *sim = NULL;
     if (field != NULL) {
@@ -252,12 +252,12 @@ Schema_Dump_IMP(Schema *self) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     Hash *dump = Hash_new(0);
     Hash *type_dumps = Hash_new(Hash_Get_Size(ivars->types));
-    CharBuf *field;
+    String *field;
     FieldType *type;
 
     // Record class name, store dumps of unique Analyzers.
     Hash_Store_Str(dump, "_class", 6,
-                   (Obj*)CB_Clone(Schema_Get_Class_Name(self)));
+                   (Obj*)Str_Clone(Schema_Get_Class_Name(self)));
     Hash_Store_Str(dump, "analyzers", 9,
                    Freezer_dump((Obj*)ivars->uniq_analyzers));
 
@@ -277,7 +277,7 @@ Schema_Dump_IMP(Schema *self) {
 
             // Store the tick which references a unique analyzer.
             Hash_Store_Str(type_dump, "analyzer", 8,
-                           (Obj*)CB_newf("%u32", tick));
+                           (Obj*)Str_newf("%u32", tick));
 
             Hash_Store(type_dumps, (Obj*)field, (Obj*)type_dump);
         }
@@ -305,8 +305,8 @@ S_load_type(VTable *vtable, Obj *type_dump) {
 Schema*
 Schema_Load_IMP(Schema *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
-    CharBuf *class_name
-        = (CharBuf*)CERTIFY(Hash_Fetch_Str(source, "_class", 6), CHARBUF);
+    String *class_name
+        = (String*)CERTIFY(Hash_Fetch_Str(source, "_class", 6), STRING);
     VTable *vtable = VTable_singleton(class_name, NULL);
     Schema *loaded = (Schema*)VTable_Make_Obj(vtable);
     Hash *type_dumps
@@ -315,7 +315,7 @@ Schema_Load_IMP(Schema *self, Obj *dump) {
         = (VArray*)CERTIFY(Hash_Fetch_Str(source, "analyzers", 9), VARRAY);
     VArray *analyzers
         = (VArray*)Freezer_load((Obj*)analyzer_dumps);
-    CharBuf *field;
+    String *field;
     Hash    *type_dump;
     UNUSED_VAR(self);
 
@@ -326,11 +326,11 @@ Schema_Load_IMP(Schema *self, Obj *dump) {
 
     Hash_Iterate(type_dumps);
     while (Hash_Next(type_dumps, (Obj**)&field, (Obj**)&type_dump)) {
-        CharBuf *type_str;
+        String *type_str;
         CERTIFY(type_dump, HASH);
-        type_str = (CharBuf*)Hash_Fetch_Str(type_dump, "type", 4);
+        type_str = (String*)Hash_Fetch_Str(type_dump, "type", 4);
         if (type_str) {
-            if (CB_Equals_Str(type_str, "fulltext", 8)) {
+            if (Str_Equals_Str(type_str, "fulltext", 8)) {
                 // Replace the "analyzer" tick with the real thing.
                 Obj *tick
                     = CERTIFY(Hash_Fetch_Str(type_dump, "analyzer", 8), OBJ);
@@ -347,37 +347,37 @@ Schema_Load_IMP(Schema *self, Obj *dump) {
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
-            else if (CB_Equals_Str(type_str, "string", 6)) {
+            else if (Str_Equals_Str(type_str, "string", 6)) {
                 StringType *type
                     = (StringType*)S_load_type(STRINGTYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
-            else if (CB_Equals_Str(type_str, "blob", 4)) {
+            else if (Str_Equals_Str(type_str, "blob", 4)) {
                 BlobType *type
                     = (BlobType*)S_load_type(BLOBTYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
-            else if (CB_Equals_Str(type_str, "i32_t", 5)) {
+            else if (Str_Equals_Str(type_str, "i32_t", 5)) {
                 Int32Type *type
                     = (Int32Type*)S_load_type(INT32TYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
-            else if (CB_Equals_Str(type_str, "i64_t", 5)) {
+            else if (Str_Equals_Str(type_str, "i64_t", 5)) {
                 Int64Type *type
                     = (Int64Type*)S_load_type(INT64TYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
-            else if (CB_Equals_Str(type_str, "f32_t", 5)) {
+            else if (Str_Equals_Str(type_str, "f32_t", 5)) {
                 Float32Type *type
                     = (Float32Type*)S_load_type(FLOAT32TYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
-            else if (CB_Equals_Str(type_str, "f64_t", 5)) {
+            else if (Str_Equals_Str(type_str, "f64_t", 5)) {
                 Float64Type *type
                     = (Float64Type*)S_load_type(FLOAT64TYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
@@ -408,7 +408,7 @@ Schema_Eat_IMP(Schema *self, Schema *other) {
               Schema_Get_Class_Name(self), Schema_Get_Class_Name(other));
     }
 
-    CharBuf *field;
+    String *field;
     FieldType *type;
     SchemaIVARS *const ovars = Schema_IVARS(other);
     Hash_Iterate(ovars->types);
@@ -418,13 +418,13 @@ Schema_Eat_IMP(Schema *self, Schema *other) {
 }
 
 void
-Schema_Write_IMP(Schema *self, Folder *folder, const CharBuf *filename) {
+Schema_Write_IMP(Schema *self, Folder *folder, const String *filename) {
     Hash *dump = Schema_Dump(self);
     StackString *schema_temp = SSTR_WRAP_STR("schema.temp", 11);
     bool success;
-    Folder_Delete(folder, (CharBuf*)schema_temp); // Just in case.
-    Json_spew_json((Obj*)dump, folder, (CharBuf*)schema_temp);
-    success = Folder_Rename(folder, (CharBuf*)schema_temp, filename);
+    Folder_Delete(folder, (String*)schema_temp); // Just in case.
+    Json_spew_json((Obj*)dump, folder, (String*)schema_temp);
+    success = Folder_Rename(folder, (String*)schema_temp, filename);
     DECREF(dump);
     if (!success) { RETHROW(INCREF(Err_get_error())); }
 }

@@ -111,7 +111,7 @@ sub error {$Clownfish::Err::error}
         while ( my ( $symbol, $glob ) = each %$stash ) {
             next if ref $glob;
             next unless *$glob{CODE};
-            $methods->push( Clownfish::CharBuf->new($symbol) );
+            $methods->push( Clownfish::String->new($symbol) );
         }
         return $methods;
     }
@@ -147,15 +147,15 @@ sub error {$Clownfish::Err::error}
 }
 
 {
-    package Clownfish::CharBuf;
+    package Clownfish::String;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
 
     {
         # Defeat obscure bugs in the XS auto-generation by redefining clone().
-        # (Because of how the typemap works for CharBuf*,
+        # (Because of how the typemap works for String*,
         # the auto-generated methods return UTF-8 Perl scalars rather than
-        # actual CharBuf objects.)
+        # actual String objects.)
         no warnings 'redefine';
         sub clone { shift->_clone(@_) }
     }
@@ -194,7 +194,7 @@ sub error {$Clownfish::Err::error}
         my ( $either, $message ) = @_;
         my ( undef, $file, $line ) = caller;
         $message .= ", $file line $line\n";
-        return $either->_new( mess => Clownfish::CharBuf->new($message) );
+        return $either->_new( mess => Clownfish::String->new($message) );
     }
 
     sub do_throw {

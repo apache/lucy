@@ -30,7 +30,7 @@ public class Lucy::Index::IndexManager cnick IxManager
     inherits Clownfish::Obj {
 
     Folder      *folder;
-    CharBuf     *host;
+    String      *host;
     LockFactory *lock_factory;
     uint32_t     write_lock_timeout;
     uint32_t     write_lock_interval;
@@ -40,14 +40,14 @@ public class Lucy::Index::IndexManager cnick IxManager
     uint32_t     deletion_lock_interval;
 
     public inert incremented IndexManager*
-    new(const CharBuf *host = NULL, LockFactory *lock_factory = NULL);
+    new(const String *host = NULL, LockFactory *lock_factory = NULL);
 
     /**
      * @param host An identifier which should be unique per-machine.
      * @param lock_factory A LockFactory.
      */
     public inert IndexManager*
-    init(IndexManager *self, const CharBuf *host = NULL,
+    init(IndexManager *self, const String *host = NULL,
          LockFactory *lock_factory = NULL);
 
     public void
@@ -67,7 +67,7 @@ public class Lucy::Index::IndexManager cnick IxManager
 
     /** Getter for <code>host</code> member.
      */
-    public CharBuf*
+    public String*
     Get_Host(IndexManager *self);
 
     /** Return an array of SegReaders representing segments that should be
@@ -131,7 +131,7 @@ public class Lucy::Index::IndexManager cnick IxManager
      * all the files it lists and indicates that they must not be deleted.
      */
     public incremented Lock*
-    Make_Snapshot_Read_Lock(IndexManager *self, const CharBuf *filename);
+    Make_Snapshot_Read_Lock(IndexManager *self, const String *filename);
 
     /** Return the highest number for a segment directory which contains a
      * segmeta file in the snapshot.
@@ -143,7 +143,7 @@ public class Lucy::Index::IndexManager cnick IxManager
      * "generation" embedded inside it greater than the generation of any
      * snapshot file currently in the index folder.
      */
-    public incremented CharBuf*
+    public incremented String*
     Make_Snapshot_Filename(IndexManager *self);
 
     /** Setter for write lock timeout.  Default: 1000 milliseconds.

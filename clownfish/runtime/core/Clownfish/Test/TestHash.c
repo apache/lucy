@@ -22,7 +22,7 @@
 
 #include "Clownfish/Test/TestHash.h"
 
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/Num.h"
 #include "Clownfish/Test.h"
@@ -73,7 +73,7 @@ test_Store_and_Fetch(TestBatchRunner *runner) {
     StackString *foo          = SSTR_WRAP_STR("foo", 3);
 
     for (int32_t i = 0; i < 100; i++) {
-        CharBuf *cb = CB_newf("%i32", i);
+        String *cb = Str_newf("%i32", i);
         Hash_Store(hash, (Obj*)cb, (Obj*)cb);
         Hash_Store(dupe, (Obj*)cb, INCREF(cb));
         VA_Push(expected, INCREF(cb));
@@ -135,7 +135,7 @@ test_Keys_Values_Iter(TestBatchRunner *runner) {
     VArray   *values;
 
     for (uint32_t i = 0; i < 500; i++) {
-        CharBuf *cb = CB_newf("%u32", i);
+        String *cb = Str_newf("%u32", i);
         Hash_Store(hash, (Obj*)cb, (Obj*)cb);
         VA_Push(expected, INCREF(cb));
     }
@@ -190,7 +190,7 @@ test_stress(TestBatchRunner *runner) {
     VArray   *values;
 
     for (uint32_t i = 0; i < 1000; i++) {
-        CharBuf *cb = TestUtils_random_string(rand() % 1200);
+        String *cb = TestUtils_random_string(rand() % 1200);
         while (Hash_Fetch(hash, (Obj*)cb)) {
             DECREF(cb);
             cb = TestUtils_random_string(rand() % 1200);
@@ -203,7 +203,7 @@ test_stress(TestBatchRunner *runner) {
 
     // Overwrite for good measure.
     for (uint32_t i = 0; i < 1000; i++) {
-        CharBuf *cb = (CharBuf*)VA_Fetch(expected, i);
+        String *cb = (String*)VA_Fetch(expected, i);
         Hash_Store(hash, (Obj*)cb, INCREF(cb));
     }
 

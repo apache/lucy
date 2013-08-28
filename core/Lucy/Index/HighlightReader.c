@@ -137,9 +137,9 @@ DefHLReader_init(DefaultHighlightReader *self, Schema *schema,
     }
 
     // Open instreams.
-    CharBuf *seg_name = Seg_Get_Name(segment);
-    CharBuf *ix_file  = CB_newf("%o/highlight.ix", seg_name);
-    CharBuf *dat_file = CB_newf("%o/highlight.dat", seg_name);
+    String *seg_name = Seg_Get_Name(segment);
+    String *ix_file  = Str_newf("%o/highlight.ix", seg_name);
+    String *dat_file = Str_newf("%o/highlight.dat", seg_name);
     if (Folder_Exists(folder, ix_file)) {
         ivars->ix_in = Folder_Open_In(folder, ix_file);
         if (!ivars->ix_in) {
@@ -200,7 +200,7 @@ DefHLReader_Fetch_Doc_Vec_IMP(DefaultHighlightReader *self, int32_t doc_id) {
 
     uint32_t num_fields = InStream_Read_C32(dat_in);
     while (num_fields--) {
-        CharBuf *field = Freezer_read_charbuf(dat_in);
+        String *field = Freezer_read_charbuf(dat_in);
         ByteBuf *field_buf = Freezer_read_bytebuf(dat_in);
         DocVec_Add_Field_Buf(doc_vec, field, field_buf);
         DECREF(field_buf);

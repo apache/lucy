@@ -59,7 +59,7 @@ CFWriter_Destroy_IMP(CompoundFileWriter *self) {
 void
 CFWriter_Consolidate_IMP(CompoundFileWriter *self) {
     CompoundFileWriterIVARS *const ivars = CFWriter_IVARS(self);
-    CharBuf *cfmeta_file = (CharBuf*)SSTR_WRAP_STR("cfmeta.json", 11);
+    String *cfmeta_file = (String*)SSTR_WRAP_STR("cfmeta.json", 11);
     if (Folder_Exists(ivars->folder, cfmeta_file)) {
         THROW(ERR, "Merge already performed for %o",
               Folder_Get_Path(ivars->folder));
@@ -75,8 +75,8 @@ S_clean_up_old_temp_files(CompoundFileWriter *self,
                           CompoundFileWriterIVARS *ivars) {
     UNUSED_VAR(self);
     Folder  *folder      = ivars->folder;
-    CharBuf *cfmeta_temp = (CharBuf*)SSTR_WRAP_STR("cfmeta.json.temp", 16);
-    CharBuf *cf_file     = (CharBuf*)SSTR_WRAP_STR("cf.dat", 6);
+    String *cfmeta_temp = (String*)SSTR_WRAP_STR("cfmeta.json.temp", 16);
+    String *cf_file     = (String*)SSTR_WRAP_STR("cf.dat", 6);
 
     if (Folder_Exists(folder, cf_file)) {
         if (!Folder_Delete(folder, cf_file)) {
@@ -98,8 +98,8 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
     Hash      *sub_files    = Hash_new(0);
     VArray    *files        = Folder_List(folder, NULL);
     VArray    *merged       = VA_new(VA_Get_Size(files));
-    CharBuf   *cf_file      = (CharBuf*)SSTR_WRAP_STR("cf.dat", 6);
-    OutStream *outstream    = Folder_Open_Out(folder, (CharBuf*)cf_file);
+    String    *cf_file      = (String*)SSTR_WRAP_STR("cf.dat", 6);
+    OutStream *outstream    = Folder_Open_Out(folder, (String*)cf_file);
     bool       rename_success;
 
     if (!outstream) { RETHROW(INCREF(Err_get_error())); }
@@ -107,13 +107,13 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
     // Start metadata.
     Hash_Store_Str(metadata, "files", 5, INCREF(sub_files));
     Hash_Store_Str(metadata, "format", 6,
-                   (Obj*)CB_newf("%i32", CFWriter_current_file_format));
+                   (Obj*)Str_newf("%i32", CFWriter_current_file_format));
 
     VA_Sort(files, NULL, NULL);
     for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
-        CharBuf *infilename = (CharBuf*)VA_Fetch(files, i);
+        String *infilename = (String*)VA_Fetch(files, i);
 
-        if (!CB_Ends_With_Str(infilename, ".json", 5)) {
+        if (!Str_Ends_With_Str(infilename, ".json", 5)) {
             InStream *instream   = Folder_Open_In(folder, infilename);
             Hash     *file_data  = Hash_new(2);
             int64_t   offset, len;
@@ -127,9 +127,9 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
 
             // Record offset and length.
             Hash_Store_Str(file_data, "offset", 6,
-                           (Obj*)CB_newf("%i64", offset));
+                           (Obj*)Str_newf("%i64", offset));
             Hash_Store_Str(file_data, "length", 6,
-                           (Obj*)CB_newf("%i64", len));
+                           (Obj*)Str_newf("%i64", len));
             Hash_Store(sub_files, (Obj*)infilename, (Obj*)file_data);
             VA_Push(merged, INCREF(infilename));
 
@@ -143,8 +143,8 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
     }
 
     // Write metadata to cfmeta file.
-    CharBuf *cfmeta_temp = (CharBuf*)SSTR_WRAP_STR("cfmeta.json.temp", 16);
-    CharBuf *cfmeta_file = (CharBuf*)SSTR_WRAP_STR("cfmeta.json", 11);
+    String *cfmeta_temp = (String*)SSTR_WRAP_STR("cfmeta.json.temp", 16);
+    String *cfmeta_file = (String*)SSTR_WRAP_STR("cfmeta.json", 11);
     Json_spew_json((Obj*)metadata, (Folder*)ivars->folder, cfmeta_temp);
     rename_success = Folder_Rename(ivars->folder, cfmeta_temp, cfmeta_file);
     if (!rename_success) { RETHROW(INCREF(Err_get_error())); }
@@ -155,12 +155,12 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
     DECREF(files);
     DECREF(metadata);
     /*
-    CharBuf *merged_file;
+    String *merged_file;
     Obj     *ignore;
     Hash_Iterate(sub_files);
     while (Hash_Next(sub_files, (Obj**)&merged_file, &ignore)) {
         if (!Folder_Delete(folder, merged_file)) {
-            CharBuf *mess = MAKE_MESS("Can't delete '%o'", merged_file);
+            String *mess = MAKE_MESS("Can't delete '%o'", merged_file);
             DECREF(sub_files);
             Err_throw_mess(ERR, mess);
         }
@@ -168,9 +168,9 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
     */
     DECREF(sub_files);
     for (uint32_t i = 0, max = VA_Get_Size(merged); i < max; i++) {
-        CharBuf *merged_file = (CharBuf*)VA_Fetch(merged, i);
+        String *merged_file = (String*)VA_Fetch(merged, i);
         if (!Folder_Delete(folder, merged_file)) {
-            CharBuf *mess = MAKE_MESS("Can't delete '%o'", merged_file);
+            String *mess = MAKE_MESS("Can't delete '%o'", merged_file);
             DECREF(merged);
             Err_throw_mess(ERR, mess);
         }

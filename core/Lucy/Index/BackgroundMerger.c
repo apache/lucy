@@ -37,7 +37,7 @@
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/Json.h"
 
-// Verify a Folder or derive an FSFolder from a CharBuf path.
+// Verify a Folder or derive an FSFolder from a String path.
 static Folder*
 S_init_folder(Obj *index);
 
@@ -127,7 +127,7 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager) {
     VArray *fields = Schema_All_Fields(ivars->schema);
     ivars->segment = Seg_new(new_seg_num);
     for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
-        Seg_Add_Field(ivars->segment, (CharBuf*)VA_Fetch(fields, i));
+        Seg_Add_Field(ivars->segment, (String*)VA_Fetch(fields, i));
     }
     DECREF(fields);
 
@@ -182,8 +182,8 @@ S_init_folder(Obj *index) {
     if (Obj_Is_A(index, FOLDER)) {
         folder = (Folder*)INCREF(index);
     }
-    else if (Obj_Is_A(index, CHARBUF)) {
-        folder = (Folder*)FSFolder_new((CharBuf*)index);
+    else if (Obj_Is_A(index, STRING)) {
+        folder = (Folder*)FSFolder_new((String*)index);
     }
     else {
         THROW(ERR, "Invalid type for 'index': %o", Obj_Get_Class_Name(index));
@@ -229,7 +229,7 @@ S_maybe_merge(BackgroundMerger *self) {
     // Consolidate segments.
     for (uint32_t i = 0, max = num_to_merge; i < max; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(to_merge, i);
-        CharBuf   *seg_name   = SegReader_Get_Seg_Name(seg_reader);
+        String    *seg_name   = SegReader_Get_Seg_Name(seg_reader);
         int64_t    doc_count  = Seg_Get_Count(ivars->segment);
         Matcher *deletions
             = DelWriter_Seg_Deletions(ivars->del_writer, seg_reader);
@@ -262,13 +262,13 @@ S_merge_updated_deletions(BackgroundMerger *self) {
 
     for (uint32_t i = 0, max = VA_Get_Size(new_seg_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(new_seg_readers, i);
-        CharBuf   *seg_name   = SegReader_Get_Seg_Name(seg_reader);
+        String    *seg_name   = SegReader_Get_Seg_Name(seg_reader);
         Hash_Store(new_segs, (Obj*)seg_name, INCREF(seg_reader));
     }
 
     for (uint32_t i = 0, max = VA_Get_Size(old_seg_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(old_seg_readers, i);
-        CharBuf   *seg_name   = SegReader_Get_Seg_Name(seg_reader);
+        String    *seg_name   = SegReader_Get_Seg_Name(seg_reader);
 
         // If this segment was merged away...
         if (Hash_Fetch(ivars->doc_maps, (Obj*)seg_name)) {
@@ -315,7 +315,7 @@ S_merge_updated_deletions(BackgroundMerger *self) {
         int64_t  merge_seg_num = Seg_Get_Number(ivars->segment);
         uint32_t seg_tick      = INT32_MAX;
         int32_t  offset        = INT32_MAX;
-        CharBuf *seg_name      = NULL;
+        String *seg_name      = NULL;
         Matcher *deletions     = NULL;
 
         SegWriter_Prep_Seg_Dir(seg_writer);
@@ -413,20 +413,20 @@ BGMerger_Prepare_Commit_IMP(BackgroundMerger *self) {
         // Write temporary snapshot file.
         DECREF(ivars->snapfile);
         ivars->snapfile = IxManager_Make_Snapshot_Filename(ivars->manager);
-        CB_Cat_Trusted_Str(ivars->snapfile, ".temp", 5);
+        Str_Cat_Trusted_Str(ivars->snapfile, ".temp", 5);
         Folder_Delete(folder, ivars->snapfile);
         Snapshot_Write_File(snapshot, folder, ivars->snapfile);
 
         // Determine whether the index has been updated while this background
         // merge process was running.
 
-        CharBuf *start_snapfile
+        String *start_snapfile
             = Snapshot_Get_Path(PolyReader_Get_Snapshot(ivars->polyreader));
         Snapshot *latest_snapshot
             = Snapshot_Read_File(Snapshot_new(), ivars->folder, NULL);
-        CharBuf *latest_snapfile = Snapshot_Get_Path(latest_snapshot);
+        String *latest_snapfile = Snapshot_Get_Path(latest_snapshot);
         bool index_updated
-            = !CB_Equals(start_snapfile, (Obj*)latest_snapfile);
+            = !Str_Equals(start_snapfile, (Obj*)latest_snapfile);
 
         if (index_updated) {
             /* See if new deletions have been applied since this
@@ -442,8 +442,8 @@ BGMerger_Prepare_Commit_IMP(BackgroundMerger *self) {
             // we couldn't tell whether the deletion counts changed.)
             VArray *files = Snapshot_List(latest_snapshot);
             for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
-                CharBuf *file = (CharBuf*)VA_Fetch(files, i);
-                if (CB_Starts_With_Str(file, "seg_", 4)) {
+                String *file = (String*)VA_Fetch(files, i);
+                if (Str_Starts_With_Str(file, "seg_", 4)) {
                     int64_t gen = (int64_t)IxFileNames_extract_gen(file);
                     if (gen > ivars->cutoff) {
                         Snapshot_Add_Entry(ivars->snapshot, file);
@@ -483,27 +483,27 @@ BGMerger_Commit_IMP(BackgroundMerger *self) {
 
     if (ivars->needs_commit) {
         bool success = false;
-        CharBuf *temp_snapfile = ivars->snapfile;
+        String *temp_snapfile = ivars->snapfile;
 
         // Rename temp snapshot file.
         size_t ext_len      = sizeof(".temp") - 1;
-        size_t snapfile_len = CB_Length(temp_snapfile);
+        size_t snapfile_len = Str_Length(temp_snapfile);
         if (snapfile_len <= ext_len) {
             THROW(ERR, "Invalid snapfile name: %o", temp_snapfile);
         }
-        ivars->snapfile = CB_SubString(temp_snapfile, 0,
+        ivars->snapfile = Str_SubString(temp_snapfile, 0,
                                        snapfile_len - ext_len);
         success = Folder_Hard_Link(ivars->folder, temp_snapfile,
                                    ivars->snapfile);
         Snapshot_Set_Path(ivars->snapshot, ivars->snapfile);
         if (!success) {
-            CharBuf *mess = CB_newf("Can't create hard link from %o to %o",
+            String *mess = Str_newf("Can't create hard link from %o to %o",
                                     temp_snapfile, ivars->snapfile);
             DECREF(temp_snapfile);
             Err_throw_mess(ERR, mess);
         }
         if (!Folder_Delete(ivars->folder, temp_snapfile)) {
-            CharBuf *mess = CB_newf("Can't delete %o", temp_snapfile);
+            String *mess = Str_newf("Can't delete %o", temp_snapfile);
             DECREF(temp_snapfile);
             Err_throw_mess(ERR, mess);
         }

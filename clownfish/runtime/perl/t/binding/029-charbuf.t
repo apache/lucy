@@ -33,11 +33,11 @@ sub utf8_test_strings {
 
 my ( $smiley, $not_a_smiley, $frowny ) = utf8_test_strings();
 
-my $charbuf = Clownfish::CharBuf->new($smiley);
-isa_ok( $charbuf, "Clownfish::CharBuf" );
+my $charbuf = Clownfish::String->new($smiley);
+isa_ok( $charbuf, "Clownfish::String" );
 is( $charbuf->to_perl, $smiley, "round trip UTF-8" );
 
-$charbuf = Clownfish::CharBuf->new($smiley);
+$charbuf = Clownfish::String->new($smiley);
 my $clone = $charbuf->clone;
-is( $clone->to_perl, Clownfish::CharBuf->new($smiley)->to_perl, "clone" );
+is( $clone->to_perl, Clownfish::String->new($smiley)->to_perl, "clone" );
 

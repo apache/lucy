@@ -26,14 +26,14 @@
 #include "Lucy/Util/MemoryPool.h"
 
 RawPostingList*
-RawPList_new(Schema *schema, const CharBuf *field, InStream *instream,
+RawPList_new(Schema *schema, const String *field, InStream *instream,
              int64_t start, int64_t end) {
     RawPostingList *self = (RawPostingList*)VTable_Make_Obj(RAWPOSTINGLIST);
     return RawPList_init(self, schema, field, instream, start, end);
 }
 
 RawPostingList*
-RawPList_init(RawPostingList *self, Schema *schema, const CharBuf *field,
+RawPList_init(RawPostingList *self, Schema *schema, const String *field,
               InStream *instream, int64_t start, int64_t end) {
     PList_init((PostingList*)self);
     RawPostingListIVARS *const ivars = RawPList_IVARS(self);
@@ -62,7 +62,7 @@ RawPList_Get_Posting_IMP(RawPostingList *self) {
 
 RawPosting*
 RawPList_Read_Raw_IMP(RawPostingList *self, int32_t last_doc_id,
-                      CharBuf *term_text, MemoryPool *mem_pool) {
+                      String *term_text, MemoryPool *mem_pool) {
     RawPostingListIVARS *const ivars = RawPList_IVARS(self);
     return Post_Read_Raw(ivars->posting, ivars->instream,
                          last_doc_id, term_text, mem_pool);

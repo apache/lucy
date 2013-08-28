@@ -25,7 +25,7 @@
 #include "Lucy/Store/Folder.h"
 
 TextSortCache*
-TextSortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality,
+TextSortCache_new(const String *field, FieldType *type, int32_t cardinality,
                   int32_t doc_max, int32_t null_ord, int32_t ord_width,
                   InStream *ord_in, InStream *ix_in, InStream *dat_in) {
     TextSortCache *self = (TextSortCache*)VTable_Make_Obj(TEXTSORTCACHE);
@@ -34,7 +34,7 @@ TextSortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality,
 }
 
 TextSortCache*
-TextSortCache_init(TextSortCache *self, const CharBuf *field,
+TextSortCache_init(TextSortCache *self, const String *field,
                    FieldType *type, int32_t cardinality,
                    int32_t doc_max, int32_t null_ord, int32_t ord_width,
                    InStream *ord_in, InStream *ix_in, InStream *dat_in) {
@@ -109,27 +109,27 @@ TextSortCache_Value_IMP(TextSortCache *self, int32_t ord, Obj *blank) {
             next_ord++;
         }
 
-        // Read character data into CharBuf.
-        CERTIFY(blank, CHARBUF);
+        // Read character data into String.
+        CERTIFY(blank, STRING);
         int64_t len = next_offset - offset;
-        char *ptr = CB_Grow((CharBuf*)blank, (size_t)len);
+        char *ptr = Str_Grow((String*)blank, (size_t)len);
         InStream_Seek(ivars->dat_in, offset);
         InStream_Read_Bytes(ivars->dat_in, ptr, (size_t)len);
         ptr[len] = '\0';
         if (!StrHelp_utf8_valid(ptr, (size_t)len)) {
-            CB_Set_Size((CharBuf*)blank, 0);
+            Str_Set_Size((String*)blank, 0);
             THROW(ERR, "Invalid UTF-8 at %i64 in %o", offset,
                   InStream_Get_Filename(ivars->dat_in));
         }
-        CB_Set_Size((CharBuf*)blank, (size_t)len);
+        Str_Set_Size((String*)blank, (size_t)len);
     }
     return blank;
 }
 
-CharBuf*
+String*
 TextSortCache_Make_Blank_IMP(TextSortCache *self) {
     UNUSED_VAR(self);
-    return CB_new_from_trusted_utf8("", 0);
+    return Str_new_from_trusted_utf8("", 0);
 }
 
 

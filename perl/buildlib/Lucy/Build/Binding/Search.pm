@@ -464,11 +464,11 @@ CODE:
     }
     else if (strcmp(type_str, "FIELD") == 0) {
         type = LUCY_QPARSER_TOKEN_FIELD; 
-        value = CFISH_CERTIFY(XSBind_perl_to_cfish(value_sv), CFISH_CHARBUF);
+        value = CFISH_CERTIFY(XSBind_perl_to_cfish(value_sv), CFISH_STRING);
     }
     else if (strcmp(type_str, "STRING") == 0) {
         type = LUCY_QPARSER_TOKEN_STRING; 
-        value = CFISH_CERTIFY(XSBind_perl_to_cfish(value_sv), CFISH_CHARBUF);
+        value = CFISH_CERTIFY(XSBind_perl_to_cfish(value_sv), CFISH_STRING);
     }
     else if (strcmp(type_str, "QUERY") == 0) {
         type = LUCY_QPARSER_TOKEN_QUERY; 

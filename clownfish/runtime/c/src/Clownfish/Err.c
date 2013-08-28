@@ -25,7 +25,7 @@
 #include <stdlib.h>
 
 #include "Clownfish/Err.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/VTable.h"
 
 /* TODO: Thread safety */
@@ -57,8 +57,8 @@ Err_do_throw(Err *error) {
         longjmp(*current_env, 1);
     }
     else {
-        CharBuf *message = Err_Get_Mess(error);
-        fprintf(stderr, "%s", CB_Get_Ptr8(message));
+        String *message = Err_Get_Mess(error);
+        fprintf(stderr, "%s", Str_Get_Ptr8(message));
         exit(EXIT_FAILURE);
     }
 }
@@ -71,17 +71,17 @@ Err_To_Host_IMP(Err *self) {
 }
 
 void
-Err_throw_mess(VTable *vtable, CharBuf *message) {
+Err_throw_mess(VTable *vtable, String *message) {
     Err *err = (Err*)VTable_Make_Obj(vtable);
-    Err_init(err, CB_new(0));
+    Err_init(err, Str_new(0));
     Err_Cat_Mess(err, message);
     DECREF(message);
     Err_do_throw(err);
 }
 
 void
-Err_warn_mess(CharBuf *message) {
-    fprintf(stderr, "%s", CB_Get_Ptr8(message));
+Err_warn_mess(String *message) {
+    fprintf(stderr, "%s", Str_Get_Ptr8(message));
     DECREF(message);
 }
 

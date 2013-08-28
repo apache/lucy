@@ -33,18 +33,18 @@ S_read_entry(LexIndex *self);
 
 LexIndex*
 LexIndex_new(Schema *schema, Folder *folder, Segment *segment,
-             const CharBuf *field) {
+             const String *field) {
     LexIndex *self = (LexIndex*)VTable_Make_Obj(LEXINDEX);
     return LexIndex_init(self, schema, folder, segment, field);
 }
 
 LexIndex*
 LexIndex_init(LexIndex *self, Schema *schema, Folder *folder,
-              Segment *segment, const CharBuf *field) {
+              Segment *segment, const String *field) {
     int32_t  field_num = Seg_Field_Num(segment, field);
-    CharBuf *seg_name  = Seg_Get_Name(segment);
-    CharBuf *ixix_file = CB_newf("%o/lexicon-%i32.ixix", seg_name, field_num);
-    CharBuf *ix_file   = CB_newf("%o/lexicon-%i32.ix", seg_name, field_num);
+    String *seg_name  = Seg_Get_Name(segment);
+    String *ixix_file = Str_newf("%o/lexicon-%i32.ixix", seg_name, field_num);
+    String *ix_file   = Str_newf("%o/lexicon-%i32.ix", seg_name, field_num);
     Architecture *arch = Schema_Get_Architecture(schema);
 
     // Init.
@@ -56,7 +56,7 @@ LexIndex_init(LexIndex *self, Schema *schema, Folder *folder,
     // Derive
     ivars->field_type = Schema_Fetch_Type(schema, field);
     if (!ivars->field_type) {
-        CharBuf *mess = MAKE_MESS("Unknown field: '%o'", field);
+        String *mess = MAKE_MESS("Unknown field: '%o'", field);
         DECREF(ix_file);
         DECREF(ixix_file);
         DECREF(self);
@@ -153,9 +153,9 @@ LexIndex_Seek_IMP(LexIndex *self, Obj *target) {
         return;
     }
     else {
-        if (!Obj_Is_A(target, CHARBUF)) {
+        if (!Obj_Is_A(target, STRING)) {
             THROW(ERR, "Target is a %o, and not comparable to a %o",
-                  Obj_Get_Class_Name(target), VTable_Get_Name(CHARBUF));
+                  Obj_Get_Class_Name(target), VTable_Get_Name(STRING));
         }
         /* TODO:
         Obj *first_obj = VA_Fetch(terms, 0);

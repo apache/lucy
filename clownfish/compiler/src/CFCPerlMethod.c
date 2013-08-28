@@ -474,7 +474,7 @@ S_callback_start(CFCMethod *method) {
         if (CFCType_is_string_type(type)) {
             // Convert Clownfish string type to UTF-8 Perl string scalars.
             params = CFCUtil_cat(params, "    mPUSHs(XSBind_cb_to_sv(",
-                                 "(cfish_CharBuf*)", name, "));\n", NULL);
+                                 "(cfish_String*)", name, "));\n", NULL);
         }
         else if (CFCType_is_object(type)) {
             // Wrap other Clownfish object types in Perl objects.

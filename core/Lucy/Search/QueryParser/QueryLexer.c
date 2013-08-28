@@ -71,12 +71,12 @@ QueryLexer_Set_Heed_Colons_IMP(QueryLexer *self, bool heed_colons) {
 }
 
 VArray*
-QueryLexer_Tokenize_IMP(QueryLexer *self, const CharBuf *query_string) {
+QueryLexer_Tokenize_IMP(QueryLexer *self, const String *query_string) {
     QueryLexerIVARS *const ivars = QueryLexer_IVARS(self);
-    CharBuf *copy = query_string
-                    ? CB_Clone(query_string)
-                    : CB_new_from_trusted_utf8("", 0);
-    StackString *qstring = SSTR_WRAP((CharBuf*)copy);
+    String *copy = query_string
+                    ? Str_Clone(query_string)
+                    : Str_new_from_trusted_utf8("", 0);
+    StackString *qstring = SSTR_WRAP((String*)copy);
     VArray *elems = VA_new(0);
     SStr_Trim(qstring);
 
@@ -112,7 +112,7 @@ QueryLexer_Tokenize_IMP(QueryLexer *self, const CharBuf *query_string) {
                     elem = ParserElem_new(TOKEN_PLUS, NULL);
                 }
                 else {
-                    elem = ParserElem_new(TOKEN_STRING, (Obj*)CB_newf("+"));
+                    elem = ParserElem_new(TOKEN_STRING, (Obj*)Str_newf("+"));
                 }
                 SStr_Nip(qstring, 1);
                 break;
@@ -123,7 +123,7 @@ QueryLexer_Tokenize_IMP(QueryLexer *self, const CharBuf *query_string) {
                     elem = ParserElem_new(TOKEN_MINUS, NULL);
                 }
                 else {
-                    elem = ParserElem_new(TOKEN_STRING, (Obj*)CB_newf("-"));
+                    elem = ParserElem_new(TOKEN_STRING, (Obj*)Str_newf("-"));
                 }
                 SStr_Nip(qstring, 1);
                 break;
@@ -224,7 +224,7 @@ S_consume_field(StackString *qstring) {
     }
 
     // Consume string data.
-    StackString *field = SSTR_WRAP((CharBuf*)qstring);
+    StackString *field = SSTR_WRAP((String*)qstring);
     SStr_Truncate(field, tick - 1);
     SStr_Nip(qstring, tick);
     return ParserElem_new(TOKEN_FIELD, (Obj*)SStr_Clone(field));
@@ -232,7 +232,7 @@ S_consume_field(StackString *qstring) {
 
 static ParserElem*
 S_consume_text(StackString *qstring) {
-    StackString *text  = SSTR_WRAP((CharBuf*)qstring);
+    StackString *text  = SSTR_WRAP((String*)qstring);
     size_t tick = 0;
     while (1) {
         uint32_t code_point = SStr_Nibble(qstring);
@@ -260,7 +260,7 @@ S_consume_text(StackString *qstring) {
 
 static ParserElem*
 S_consume_quoted_string(StackString *qstring) {
-    StackString *text = SSTR_WRAP((CharBuf*)qstring);
+    StackString *text = SSTR_WRAP((String*)qstring);
     if (SStr_Nibble(qstring) != '"') {
         THROW(ERR, "Internal error: expected a quote");
     }

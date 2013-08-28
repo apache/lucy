@@ -26,18 +26,18 @@ class Lucy::Index::RawPostingList cnick RawPList
     int64_t        len;
 
     inert incremented RawPostingList*
-    new(Schema *schema, const CharBuf *field, InStream *instream,
+    new(Schema *schema, const String *field, InStream *instream,
         int64_t start, int64_t end);
 
     inert RawPostingList*
-    init(RawPostingList *self, Schema *schema, const CharBuf *field,
+    init(RawPostingList *self, Schema *schema, const String *field,
          InStream *instream, int64_t lex_start, int64_t lex_end);
 
     public void
     Destroy(RawPostingList *self);
 
     RawPosting*
-    Read_Raw(RawPostingList *self, int32_t last_doc_id, CharBuf *term_text,
+    Read_Raw(RawPostingList *self, int32_t last_doc_id, String *term_text,
              MemoryPool *mem_pool);
 
     Posting*

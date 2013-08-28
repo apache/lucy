@@ -43,8 +43,8 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
         return;
     }
 
-    CharBuf      *EN          = (CharBuf*)SSTR_WRAP_STR("en", 2);
-    CharBuf      *ES          = (CharBuf*)SSTR_WRAP_STR("es", 2);
+    String       *EN          = (String*)SSTR_WRAP_STR("en", 2);
+    String       *ES          = (String*)SSTR_WRAP_STR("es", 2);
     PolyAnalyzer *analyzer    = PolyAnalyzer_new(EN, NULL);
     PolyAnalyzer *other       = PolyAnalyzer_new(ES, NULL);
     Obj          *dump        = (Obj*)PolyAnalyzer_Dump(analyzer);
@@ -70,8 +70,8 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 
 static void
 test_analysis(TestBatchRunner *runner) {
-    CharBuf            *EN          = (CharBuf*)SSTR_WRAP_STR("en", 2);
-    CharBuf            *source_text = CB_newf("Eats, shoots and leaves.");
+    String             *EN          = (String*)SSTR_WRAP_STR("en", 2);
+    String             *source_text = Str_newf("Eats, shoots and leaves.");
     Normalizer         *normalizer  = Normalizer_new(NULL, true, false);
     StandardTokenizer  *tokenizer   = StandardTokenizer_new();
     SnowballStopFilter *stopfilter  = SnowStop_new(EN, NULL);
@@ -94,7 +94,7 @@ test_analysis(TestBatchRunner *runner) {
         VA_Push(analyzers, INCREF(normalizer));
         PolyAnalyzer *polyanalyzer = PolyAnalyzer_new(NULL, analyzers);
         VArray       *expected     = VA_new(1);
-        VA_Push(expected, (Obj*)CB_newf("eats, shoots and leaves."));
+        VA_Push(expected, (Obj*)Str_newf("eats, shoots and leaves."));
         TestUtils_test_analyzer(runner, (Analyzer*)polyanalyzer, source_text,
                                 expected, "With Normalizer");
         DECREF(expected);
@@ -108,10 +108,10 @@ test_analysis(TestBatchRunner *runner) {
         VA_Push(analyzers, INCREF(tokenizer));
         PolyAnalyzer *polyanalyzer = PolyAnalyzer_new(NULL, analyzers);
         VArray       *expected     = VA_new(1);
-        VA_Push(expected, (Obj*)CB_newf("eats"));
-        VA_Push(expected, (Obj*)CB_newf("shoots"));
-        VA_Push(expected, (Obj*)CB_newf("and"));
-        VA_Push(expected, (Obj*)CB_newf("leaves"));
+        VA_Push(expected, (Obj*)Str_newf("eats"));
+        VA_Push(expected, (Obj*)Str_newf("shoots"));
+        VA_Push(expected, (Obj*)Str_newf("and"));
+        VA_Push(expected, (Obj*)Str_newf("leaves"));
         TestUtils_test_analyzer(runner, (Analyzer*)polyanalyzer, source_text,
                                 expected, "With StandardTokenizer");
         DECREF(expected);
@@ -126,9 +126,9 @@ test_analysis(TestBatchRunner *runner) {
         VA_Push(analyzers, INCREF(stopfilter));
         PolyAnalyzer *polyanalyzer = PolyAnalyzer_new(NULL, analyzers);
         VArray       *expected     = VA_new(1);
-        VA_Push(expected, (Obj*)CB_newf("eats"));
-        VA_Push(expected, (Obj*)CB_newf("shoots"));
-        VA_Push(expected, (Obj*)CB_newf("leaves"));
+        VA_Push(expected, (Obj*)Str_newf("eats"));
+        VA_Push(expected, (Obj*)Str_newf("shoots"));
+        VA_Push(expected, (Obj*)Str_newf("leaves"));
         TestUtils_test_analyzer(runner, (Analyzer*)polyanalyzer, source_text,
                                 expected, "With SnowballStopFilter");
         DECREF(expected);
@@ -144,9 +144,9 @@ test_analysis(TestBatchRunner *runner) {
         VA_Push(analyzers, INCREF(stemmer));
         PolyAnalyzer *polyanalyzer = PolyAnalyzer_new(NULL, analyzers);
         VArray       *expected     = VA_new(1);
-        VA_Push(expected, (Obj*)CB_newf("eat"));
-        VA_Push(expected, (Obj*)CB_newf("shoot"));
-        VA_Push(expected, (Obj*)CB_newf("leav"));
+        VA_Push(expected, (Obj*)Str_newf("eat"));
+        VA_Push(expected, (Obj*)Str_newf("shoot"));
+        VA_Push(expected, (Obj*)Str_newf("leav"));
         TestUtils_test_analyzer(runner, (Analyzer*)polyanalyzer, source_text,
                                 expected, "With SnowballStemmer");
         DECREF(expected);

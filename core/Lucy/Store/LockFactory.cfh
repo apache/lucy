@@ -28,17 +28,17 @@ public class Lucy::Store::LockFactory cnick LockFact
     inherits Clownfish::Obj {
 
     Folder  *folder;
-    CharBuf *host;
+    String *host;
 
     inert incremented LockFactory*
-    new(Folder *folder, const CharBuf *host);
+    new(Folder *folder, const String *host);
 
     /**
      * @param folder A L<Lucy::Store::Folder>.
      * @param host An identifier which should be unique per-machine.
      */
     public inert LockFactory*
-    init(LockFactory *self, Folder *folder, const CharBuf *host);
+    init(LockFactory *self, Folder *folder, const String *host);
 
     /** Return a Lock object, which, once Obtain() returns successfully,
      * maintains an exclusive lock on a resource.
@@ -50,7 +50,7 @@ public class Lucy::Store::LockFactory cnick LockFact
      * @param interval Time in milliseconds between retries.
      */
     public incremented Lock*
-    Make_Lock(LockFactory *self, const CharBuf *name, int32_t timeout = 0,
+    Make_Lock(LockFactory *self, const String *name, int32_t timeout = 0,
               int32_t interval = 100);
 
     /** Return a Lock object for which Shared() returns true, and which
@@ -64,7 +64,7 @@ public class Lucy::Store::LockFactory cnick LockFact
      * @param interval Time in milliseconds between retries.
      */
     public incremented Lock*
-    Make_Shared_Lock(LockFactory *self, const CharBuf *name,
+    Make_Shared_Lock(LockFactory *self, const String *name,
                      int32_t timeout = 0, int32_t interval = 100);
 
     public void

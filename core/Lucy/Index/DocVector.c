@@ -30,7 +30,7 @@ S_extract_tv_cache(ByteBuf *field_buf);
 
 // Pull a TermVector object out from compressed positional data.
 static TermVector*
-S_extract_tv_from_tv_buf(const CharBuf *field, const CharBuf *term_text,
+S_extract_tv_from_tv_buf(const String *field, const String *term_text,
                          ByteBuf *tv_buf);
 
 DocVector*
@@ -71,14 +71,14 @@ DocVec_Destroy_IMP(DocVector *self) {
 }
 
 void
-DocVec_Add_Field_Buf_IMP(DocVector *self, const CharBuf *field,
+DocVec_Add_Field_Buf_IMP(DocVector *self, const String *field,
                          ByteBuf *field_buf) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
     Hash_Store(ivars->field_bufs, (Obj*)field, INCREF(field_buf));
 }
 
 ByteBuf*
-DocVec_Field_Buf_IMP(DocVector *self, const CharBuf *field) {
+DocVec_Field_Buf_IMP(DocVector *self, const String *field) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
     return (ByteBuf*)Hash_Fetch(ivars->field_bufs, (Obj*)field);
 }
@@ -90,8 +90,8 @@ DocVec_Field_Names_IMP(DocVector *self) {
 }
 
 TermVector*
-DocVec_Term_Vector_IMP(DocVector *self, const CharBuf *field,
-                       const CharBuf *term_text) {
+DocVec_Term_Vector_IMP(DocVector *self, const String *field,
+                       const String *term_text) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
     Hash *field_vector = (Hash*)Hash_Fetch(ivars->field_vectors, (Obj*)field);
 
@@ -121,7 +121,7 @@ S_extract_tv_cache(ByteBuf *field_buf) {
     Hash    *tv_cache  = Hash_new(0);
     char    *tv_string = BB_Get_Buf(field_buf);
     int32_t  num_terms = NumUtil_decode_c32(&tv_string);
-    CharBuf *text      = CB_new(0);
+    String *text      = Str_new(0);
 
     // Read the number of highlightable terms in the field.
     for (int32_t i = 0; i < num_terms; i++) {
@@ -129,8 +129,8 @@ S_extract_tv_cache(ByteBuf *field_buf) {
         size_t   len     = NumUtil_decode_c32(&tv_string);
 
         // Decompress the term text.
-        CB_Set_Size(text, overlap);
-        CB_Cat_Trusted_Str(text, tv_string, len);
+        Str_Set_Size(text, overlap);
+        Str_Cat_Trusted_Str(text, tv_string, len);
         tv_string += len;
 
         // Get positions & offsets string.
@@ -154,7 +154,7 @@ S_extract_tv_cache(ByteBuf *field_buf) {
 }
 
 static TermVector*
-S_extract_tv_from_tv_buf(const CharBuf *field, const CharBuf *term_text,
+S_extract_tv_from_tv_buf(const String *field, const String *term_text,
                          ByteBuf *tv_buf) {
     TermVector *retval      = NULL;
     char       *posdata     = BB_Get_Buf(tv_buf);

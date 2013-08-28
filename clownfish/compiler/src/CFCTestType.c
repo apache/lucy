@@ -383,7 +383,7 @@ S_run_object_tests(CFCTest *test) {
     }
 
     {
-        CFCType *string_type = CFCType_new_object(0, NULL, "CharBuf", 1);
+        CFCType *string_type = CFCType_new_object(0, NULL, "String", 1);
         OK(test, CFCType_is_string_type(string_type), "%s", "is_string_type");
         OK(test, !CFCType_is_string_type(foo), "not %s", "not is_string_type");
         CFCBase_decref((CFCBase*)string_type);

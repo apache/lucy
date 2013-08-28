@@ -41,19 +41,19 @@
 // Shared initialization routine which assumes that it's ok to assume control
 // over [field] and [terms], eating their refcounts.
 static ProximityQuery*
-S_do_init(ProximityQuery *self, CharBuf *field, VArray *terms, float boost,
+S_do_init(ProximityQuery *self, String *field, VArray *terms, float boost,
           uint32_t within);
 
 ProximityQuery*
-ProximityQuery_new(const CharBuf *field, VArray *terms, uint32_t within) {
+ProximityQuery_new(const String *field, VArray *terms, uint32_t within) {
     ProximityQuery *self = (ProximityQuery*)VTable_Make_Obj(PROXIMITYQUERY);
     return ProximityQuery_init(self, field, terms, within);
 }
 
 ProximityQuery*
-ProximityQuery_init(ProximityQuery *self, const CharBuf *field, VArray *terms,
+ProximityQuery_init(ProximityQuery *self, const String *field, VArray *terms,
                     uint32_t within) {
-    return S_do_init(self, CB_Clone(field), VA_Clone(terms), 1.0f, within);
+    return S_do_init(self, Str_Clone(field), VA_Clone(terms), 1.0f, within);
 }
 
 void
@@ -65,7 +65,7 @@ ProximityQuery_Destroy_IMP(ProximityQuery *self) {
 }
 
 static ProximityQuery*
-S_do_init(ProximityQuery *self, CharBuf *field, VArray *terms, float boost,
+S_do_init(ProximityQuery *self, String *field, VArray *terms, float boost,
           uint32_t within) {
     Query_init((Query*)self, boost);
     ProximityQueryIVARS *const ivars = ProximityQuery_IVARS(self);
@@ -90,7 +90,7 @@ ProximityQuery_Serialize_IMP(ProximityQuery *self, OutStream *outstream) {
 ProximityQuery*
 ProximityQuery_Deserialize_IMP(ProximityQuery *self, InStream *instream) {
     float boost = InStream_Read_F32(instream);
-    CharBuf *field = Freezer_read_charbuf(instream);
+    String *field = Freezer_read_charbuf(instream);
     VArray  *terms = Freezer_read_varray(instream);
     uint32_t within = InStream_Read_C32(instream);
     return S_do_init(self, field, terms, boost, within);
@@ -105,7 +105,7 @@ ProximityQuery_Dump_IMP(ProximityQuery *self) {
     Hash_Store_Str(dump, "field", 5, Freezer_dump((Obj*)ivars->field));
     Hash_Store_Str(dump, "terms", 5, Freezer_dump((Obj*)ivars->terms));
     Hash_Store_Str(dump, "within", 6,
-                   (Obj*)CB_newf("%i64", (int64_t)ivars->within));
+                   (Obj*)Str_newf("%i64", (int64_t)ivars->within));
     return (Obj*)dump;
 }
 
@@ -117,7 +117,7 @@ ProximityQuery_Load_IMP(ProximityQuery *self, Obj *dump) {
     ProximityQuery *loaded = (ProximityQuery*)super_load(self, dump);
     ProximityQueryIVARS *loaded_ivars = ProximityQuery_IVARS(loaded);
     Obj *field = CERTIFY(Hash_Fetch_Str(source, "field", 5), OBJ);
-    loaded_ivars->field = (CharBuf*)CERTIFY(Freezer_load(field), CHARBUF);
+    loaded_ivars->field = (String*)CERTIFY(Freezer_load(field), STRING);
     Obj *terms = CERTIFY(Hash_Fetch_Str(source, "terms", 5), OBJ);
     loaded_ivars->terms = (VArray*)CERTIFY(Freezer_load(terms), VARRAY);
     Obj *within = CERTIFY(Hash_Fetch_Str(source, "within", 6), OBJ);
@@ -136,7 +136,7 @@ ProximityQuery_Equals_IMP(ProximityQuery *self, Obj *other) {
     if (ivars->boost != ovars->boost)       { return false; }
     if (ivars->field && !ovars->field)      { return false; }
     if (!ivars->field && ovars->field)      { return false; }
-    if (ivars->field && !CB_Equals(ivars->field, (Obj*)ovars->field)) {
+    if (ivars->field && !Str_Equals(ivars->field, (Obj*)ovars->field)) {
         return false;
     }
     if (!VA_Equals(ovars->terms, (Obj*)ivars->terms)) { return false; }
@@ -144,23 +144,23 @@ ProximityQuery_Equals_IMP(ProximityQuery *self, Obj *other) {
     return true;
 }
 
-CharBuf*
+String*
 ProximityQuery_To_String_IMP(ProximityQuery *self) {
     ProximityQueryIVARS *const ivars = ProximityQuery_IVARS(self);
     uint32_t num_terms = VA_Get_Size(ivars->terms);
-    CharBuf *retval = CB_Clone(ivars->field);
-    CB_Cat_Trusted_Str(retval, ":\"", 2);
+    String *retval = Str_Clone(ivars->field);
+    Str_Cat_Trusted_Str(retval, ":\"", 2);
     for (uint32_t i = 0; i < num_terms; i++) {
         Obj *term = VA_Fetch(ivars->terms, i);
-        CharBuf *term_string = Obj_To_String(term);
-        CB_Cat(retval, term_string);
+        String *term_string = Obj_To_String(term);
+        Str_Cat(retval, term_string);
         DECREF(term_string);
         if (i < num_terms - 1) {
-            CB_Cat_Trusted_Str(retval, " ",  1);
+            Str_Cat_Trusted_Str(retval, " ",  1);
         }
     }
-    CB_Cat_Trusted_Str(retval, "\"", 1);
-    CB_catf(retval, "~%u32", ivars->within);
+    Str_Cat_Trusted_Str(retval, "\"", 1);
+    Str_catf(retval, "~%u32", ivars->within);
     return retval;
 }
 
@@ -189,7 +189,7 @@ ProximityQuery_Make_Compiler_IMP(ProximityQuery *self, Searcher *searcher,
     }
 }
 
-CharBuf*
+String*
 ProximityQuery_Get_Field_IMP(ProximityQuery *self) {
     return ProximityQuery_IVARS(self)->field;
 }
@@ -367,7 +367,7 @@ ProximityCompiler_Make_Matcher_IMP(ProximityCompiler *self, SegReader *reader,
 VArray*
 ProximityCompiler_Highlight_Spans_IMP(ProximityCompiler *self,
                                       Searcher *searcher, DocVector *doc_vec,
-                                      const CharBuf *field) {
+                                      const String *field) {
     ProximityCompilerIVARS *const ivars = ProximityCompiler_IVARS(self);
     ProximityQueryIVARS *const parent_ivars
         = ProximityQuery_IVARS((ProximityQuery*)ivars->parent);
@@ -378,7 +378,7 @@ ProximityCompiler_Highlight_Spans_IMP(ProximityCompiler *self,
 
     // Bail if no terms or field doesn't match.
     if (!num_terms) { return spans; }
-    if (!CB_Equals(field, (Obj*)parent_ivars->field)) { return spans; }
+    if (!Str_Equals(field, (Obj*)parent_ivars->field)) { return spans; }
 
     VArray      *term_vectors    = VA_new(num_terms);
     BitVector   *posit_vec       = BitVec_new(0);
@@ -386,7 +386,7 @@ ProximityCompiler_Highlight_Spans_IMP(ProximityCompiler *self,
     for (uint32_t i = 0; i < num_terms; i++) {
         Obj *term = VA_Fetch(terms, i);
         TermVector *term_vector
-            = DocVec_Term_Vector(doc_vec, field, (CharBuf*)term);
+            = DocVec_Term_Vector(doc_vec, field, (String*)term);
 
         // Bail if any term is missing.
         if (!term_vector) {

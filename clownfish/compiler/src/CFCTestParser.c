@@ -192,7 +192,7 @@ S_run_tests(CFCTest *test) {
         static const char *const string_literals[] = {
             "\"blah\"", "\"blah blah\"", "\"\\\"blah\\\" \\\"blah\\\"\"", NULL
         };
-        S_test_initial_value(test, parser, string_literals, "CharBuf*",
+        S_test_initial_value(test, parser, string_literals, "String*",
                              "string_literal:");
     }
 
@@ -211,7 +211,7 @@ S_run_tests(CFCTest *test) {
 
     {
         static const char *const object_types[5] = {
-            "Obj *", "incremented Foo*", "decremented CharBuf *"
+            "Obj *", "incremented Foo*", "decremented String *"
         };
         for (int i = 0; i < 3; ++i) {
             const char *object_type = object_types[i];

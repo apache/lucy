@@ -26,7 +26,7 @@
 #include <assert.h>
 #include "Clownfish/Hash.h"
 #include "Clownfish/VArray.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Lucy/Util/Json.h"
 }
@@ -51,7 +51,7 @@ result ::= top_level_value(A).
 top_level_value(A) ::= value(B).  { A = B; }
 
 /* Values */
-%type STRING { cfish_CharBuf* }
+%type STRING { cfish_String* }
 
 value(A) ::= FALSE(B).   { A = B; }
 value(A) ::= NULL(B).    { A = B; }

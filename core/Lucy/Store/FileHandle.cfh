@@ -35,7 +35,7 @@ parcel Lucy;
 abstract class Lucy::Store::FileHandle cnick FH
     inherits Clownfish::Obj {
 
-    CharBuf *path;
+    String *path;
     uint32_t flags;
 
     /* Integer which is incremented each time a FileHandle is created and
@@ -52,7 +52,7 @@ abstract class Lucy::Store::FileHandle cnick FH
      * behaviors.
      */
     inert nullable FileHandle*
-    do_open(FileHandle *self, const CharBuf *path = NULL, uint32_t flags);
+    do_open(FileHandle *self, const String *path = NULL, uint32_t flags);
 
     /** Ensure that the FileWindow's buffer provides access to file data for
      * <code>len</code> bytes starting at <code>offset</code>.
@@ -118,11 +118,11 @@ abstract class Lucy::Store::FileHandle cnick FH
     /** Set the object's <code>path</code> attribute.
      */
     void
-    Set_Path(FileHandle *self, const CharBuf *path);
+    Set_Path(FileHandle *self, const String *path);
 
     /** Return the object's <code>path</code> attribute.
      */
-    nullable CharBuf*
+    nullable String*
     Get_Path(FileHandle *self);
 
     /** Invokes Close(), but ignores whether it succeeds or fails.

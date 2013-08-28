@@ -96,10 +96,10 @@ MatchPost_Read_Record_IMP(MatchPosting *self, InStream *instream) {
 
 RawPosting*
 MatchPost_Read_Raw_IMP(MatchPosting *self, InStream *instream,
-                       int32_t last_doc_id, CharBuf *term_text,
+                       int32_t last_doc_id, String *term_text,
                        MemoryPool *mem_pool) {
-    char *const    text_buf  = (char*)CB_Get_Ptr8(term_text);
-    const size_t   text_size = CB_Get_Size(term_text);
+    char *const    text_buf  = (char*)Str_Get_Ptr8(term_text);
+    const size_t   text_size = Str_Get_Size(term_text);
     const uint32_t doc_code  = InStream_Read_C32(instream);
     const uint32_t delta_doc = doc_code >> 1;
     const int32_t  doc_id    = last_doc_id + delta_doc;
@@ -183,8 +183,8 @@ MatchPostWriter_init(MatchPostingWriter *self, Schema *schema,
                      Snapshot *snapshot, Segment *segment,
                      PolyReader *polyreader, int32_t field_num) {
     Folder  *folder = PolyReader_Get_Folder(polyreader);
-    CharBuf *filename
-        = CB_newf("%o/postings-%i32.dat", Seg_Get_Name(segment), field_num);
+    String *filename
+        = Str_newf("%o/postings-%i32.dat", Seg_Get_Name(segment), field_num);
     PostWriter_init((PostingWriter*)self, schema, snapshot, segment,
                     polyreader, field_num);
     MatchPostingWriterIVARS *const ivars = MatchPostWriter_IVARS(self);

@@ -29,17 +29,17 @@ public class Lucy::Analysis::SnowballStemmer cnick SnowStemmer
     inherits Lucy::Analysis::Analyzer {
 
     void *snowstemmer;
-    CharBuf *language;
+    String *language;
 
     inert incremented SnowballStemmer*
-    new(const CharBuf *language);
+    new(const String *language);
 
     /**
      * @param language A two-letter ISO code identifying a language supported
      * by Snowball.
      */
     public inert SnowballStemmer*
-    init(SnowballStemmer *self, const CharBuf *language);
+    init(SnowballStemmer *self, const String *language);
 
     public incremented Inversion*
     Transform(SnowballStemmer *self, Inversion *inversion);

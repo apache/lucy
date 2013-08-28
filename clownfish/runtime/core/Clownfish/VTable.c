@@ -16,7 +16,7 @@
 
 #define C_CFISH_VTABLE
 #define C_CFISH_OBJ
-#define C_CFISH_CHARBUF
+#define C_CFISH_STRING
 #define C_CFISH_METHOD
 #define CFISH_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
@@ -29,7 +29,7 @@
 #include <ctype.h>
 
 #include "Clownfish/VTable.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/LockFreeRegistry.h"
@@ -43,7 +43,7 @@ size_t VTable_offset_of_parent = offsetof(VTable, parent);
 
 // Remove spaces and underscores, convert to lower case.
 static void
-S_scrunch_charbuf(CharBuf *source, CharBuf *target);
+S_scrunch_charbuf(String *source, String *target);
 
 static Method*
 S_find_method(VTable *self, const char *meth_name);
@@ -146,12 +146,12 @@ VTable_bootstrap(const VTableSpec *specs, size_t num_specs)
         const VTableSpec *spec = &specs[i];
         VTable *vtable = *spec->vtable;
 
-        vtable->name    = CB_newf("%s", spec->name);
+        vtable->name    = Str_newf("%s", spec->name);
         vtable->methods = VA_new(0);
 
         for (size_t i = 0; i < spec->num_novel_meths; ++i) {
             const NovelMethSpec *mspec = &spec->novel_meth_specs[i];
-            CharBuf *name = CB_newf("%s", mspec->name);
+            String *name = Str_newf("%s", mspec->name);
             Method *method = Method_new(name, mspec->callback_func,
                                         *mspec->offset);
             VA_Push(vtable->methods, (Obj*)method);
@@ -174,7 +174,7 @@ VTable_Clone_IMP(VTable *self) {
 
     memcpy(twin, self, self->vt_alloc_size);
     VTable_Init_Obj(self->vtable, twin); // Set refcount.
-    twin->name = CB_Clone(self->name);
+    twin->name = Str_Clone(self->name);
 
     return twin;
 }
@@ -215,7 +215,7 @@ VTable_Override_IMP(VTable *self, cfish_method_t method, size_t offset) {
     pointer.func_ptr[0] = method;
 }
 
-CharBuf*
+String*
 VTable_Get_Name_IMP(VTable *self) {
     return self->name;
 }
@@ -247,7 +247,7 @@ VTable_init_registry() {
 }
 
 VTable*
-VTable_singleton(const CharBuf *class_name, VTable *parent) {
+VTable_singleton(const String *class_name, VTable *parent) {
     if (VTable_registry == NULL) {
         VTable_init_registry();
     }
@@ -258,7 +258,7 @@ VTable_singleton(const CharBuf *class_name, VTable *parent) {
         uint32_t num_fresh;
 
         if (parent == NULL) {
-            CharBuf *parent_class = VTable_find_parent_class(class_name);
+            String *parent_class = VTable_find_parent_class(class_name);
             if (parent_class == NULL) {
                 THROW(ERR, "Class '%o' doesn't descend from %o", class_name,
                       OBJ->name);
@@ -275,16 +275,16 @@ VTable_singleton(const CharBuf *class_name, VTable *parent) {
         // Turn clone into child.
         singleton->parent = parent;
         DECREF(singleton->name);
-        singleton->name = CB_Clone(class_name);
+        singleton->name = Str_Clone(class_name);
 
         // Allow host methods to override.
         fresh_host_methods = VTable_fresh_host_methods(class_name);
         num_fresh = VA_Get_Size(fresh_host_methods);
         if (num_fresh) {
             Hash *meths = Hash_new(num_fresh);
-            CharBuf *scrunched = CB_new(0);
+            String *scrunched = Str_new(0);
             for (uint32_t i = 0; i < num_fresh; i++) {
-                CharBuf *meth = (CharBuf*)VA_Fetch(fresh_host_methods, i);
+                String *meth = (String*)VA_Fetch(fresh_host_methods, i);
                 S_scrunch_charbuf(meth, scrunched);
                 Hash_Store(meths, (Obj*)scrunched, (Obj*)CFISH_TRUE);
             }
@@ -325,16 +325,16 @@ VTable_singleton(const CharBuf *class_name, VTable *parent) {
 }
 
 static void
-S_scrunch_charbuf(CharBuf *source, CharBuf *target) {
+S_scrunch_charbuf(String *source, String *target) {
     StackString *iterator = SSTR_WRAP(source);
-    CB_Set_Size(target, 0);
+    Str_Set_Size(target, 0);
     while (SStr_Get_Size(iterator)) {
         uint32_t code_point = SStr_Nibble(iterator);
         if (code_point > 127) {
             THROW(ERR, "Can't fold case for %o", source);
         }
         else if (code_point != '_') {
-            CB_Cat_Char(target, tolower(code_point));
+            Str_Cat_Char(target, tolower(code_point));
         }
     }
 }
@@ -348,7 +348,7 @@ VTable_add_to_registry(VTable *vtable) {
         return false;
     }
     else {
-        CharBuf *klass = CB_Clone(vtable->name);
+        String *klass = Str_Clone(vtable->name);
         bool retval
             = LFReg_Register(VTable_registry, (Obj*)klass, (Obj*)vtable);
         DECREF(klass);
@@ -357,7 +357,7 @@ VTable_add_to_registry(VTable *vtable) {
 }
 
 bool
-VTable_add_alias_to_registry(VTable *vtable, CharBuf *alias) {
+VTable_add_alias_to_registry(VTable *vtable, String *alias) {
     if (VTable_registry == NULL) {
         VTable_init_registry();
     }
@@ -365,7 +365,7 @@ VTable_add_alias_to_registry(VTable *vtable, CharBuf *alias) {
         return false;
     }
     else {
-        CharBuf *klass = CB_Clone(alias);
+        String *klass = Str_Clone(alias);
         bool retval
             = LFReg_Register(VTable_registry, (Obj*)klass, (Obj*)vtable);
         DECREF(klass);
@@ -374,7 +374,7 @@ VTable_add_alias_to_registry(VTable *vtable, CharBuf *alias) {
 }
 
 VTable*
-VTable_fetch_vtable(const CharBuf *class_name) {
+VTable_fetch_vtable(const String *class_name) {
     VTable *vtable = NULL;
     if (VTable_registry != NULL) {
         vtable = (VTable*)LFReg_Fetch(VTable_registry, (Obj*)class_name);
@@ -390,7 +390,7 @@ VTable_Add_Host_Method_Alias_IMP(VTable *self, const char *alias,
         fprintf(stderr, "Method %s not found\n", meth_name);
         abort();
     }
-    method->host_alias = CB_newf("%s", alias);
+    method->host_alias = Str_newf("%s", alias);
 }
 
 void
@@ -410,7 +410,7 @@ S_find_method(VTable *self, const char *name) {
 
     for (uint32_t i = 0; i < size; i++) {
         Method *method = (Method*)VA_Fetch(self->methods, i);
-        if (CB_Equals_Str(method->name, name, name_len)) {
+        if (Str_Equals_Str(method->name, name, name_len)) {
             return method;
         }
     }

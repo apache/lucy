@@ -24,7 +24,7 @@
 
 #include "Clownfish/TestHarness/TestFormatter.h"
 
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/TestHarness/TestBatch.h"
 #include "Clownfish/TestHarness/TestSuiteRunner.h"
@@ -78,8 +78,8 @@ TestFormatterCF_Batch_Prologue_IMP(TestFormatterCF *self, TestBatch *batch,
                                    uint32_t num_planned) {
     UNUSED_VAR(self);
     UNUSED_VAR(num_planned);
-    CharBuf *class_name = TestBatch_Get_Class_Name(batch);
-    printf("Running %s...\n", CB_Get_Ptr8(class_name));
+    String *class_name = TestBatch_Get_Class_Name(batch);
+    printf("Running %s...\n", Str_Get_Ptr8(class_name));
 }
 
 void

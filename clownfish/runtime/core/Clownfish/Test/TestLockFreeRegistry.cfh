@@ -28,7 +28,7 @@ class Clownfish::Test::TestLockFreeRegistry cnick TestLFReg
 
 /** Private test-only class for stressing LockFreeRegistry.
  */
-class Clownfish::Test::StupidHashCharBuf inherits Clownfish::CharBuf {
+class Clownfish::Test::StupidHashCharBuf inherits Clownfish::String {
     inert incremented StupidHashCharBuf*
     new(const char *text);
 

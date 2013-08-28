@@ -81,11 +81,11 @@ Hash*
 FullTextType_Dump_For_Schema_IMP(FullTextType *self) {
     FullTextTypeIVARS *const ivars = FullTextType_IVARS(self);
     Hash *dump = Hash_new(0);
-    Hash_Store_Str(dump, "type", 4, (Obj*)CB_newf("fulltext"));
+    Hash_Store_Str(dump, "type", 4, (Obj*)Str_newf("fulltext"));
 
     // Store attributes that override the defaults.
     if (ivars->boost != 1.0) {
-        Hash_Store_Str(dump, "boost", 5, (Obj*)CB_newf("%f64", ivars->boost));
+        Hash_Store_Str(dump, "boost", 5, (Obj*)Str_newf("%f64", ivars->boost));
     }
     if (!ivars->indexed) {
         Hash_Store_Str(dump, "indexed", 7, (Obj*)CFISH_FALSE);
@@ -108,7 +108,7 @@ FullTextType_Dump_IMP(FullTextType *self) {
     FullTextTypeIVARS *const ivars = FullTextType_IVARS(self);
     Hash *dump = FullTextType_Dump_For_Schema(self);
     Hash_Store_Str(dump, "_class", 6,
-                   (Obj*)CB_Clone(FullTextType_Get_Class_Name(self)));
+                   (Obj*)Str_Clone(FullTextType_Get_Class_Name(self)));
     Hash_Store_Str(dump, "analyzer", 8,
                    (Obj*)Analyzer_Dump(ivars->analyzer));
     DECREF(Hash_Delete_Str(dump, "type", 4));
@@ -120,9 +120,9 @@ FullTextType*
 FullTextType_Load_IMP(FullTextType *self, Obj *dump) {
     UNUSED_VAR(self);
     Hash *source = (Hash*)CERTIFY(dump, HASH);
-    CharBuf *class_name = (CharBuf*)Hash_Fetch_Str(source, "_class", 6);
+    String *class_name = (String*)Hash_Fetch_Str(source, "_class", 6);
     VTable *vtable
-        = (class_name != NULL && Obj_Is_A((Obj*)class_name, CHARBUF))
+        = (class_name != NULL && Obj_Is_A((Obj*)class_name, STRING))
           ? VTable_singleton(class_name, NULL)
           : FULLTEXTTYPE;
     FullTextType *loaded = (FullTextType*)VTable_Make_Obj(vtable);

@@ -40,7 +40,7 @@ public class Lucy::Index::BackgroundMerger cnick BGMerger
     FilePurger        *file_purger;
     Lock              *write_lock;
     Lock              *merge_lock;
-    CharBuf           *snapfile;
+    String            *snapfile;
     Hash              *doc_maps;
     int64_t            cutoff;
     bool               optimize;

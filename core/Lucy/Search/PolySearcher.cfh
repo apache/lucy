@@ -46,7 +46,7 @@ public class Lucy::Search::PolySearcher
     Doc_Max(PolySearcher *self);
 
     public uint32_t
-    Doc_Freq(PolySearcher *self, const CharBuf *field, Obj *term);
+    Doc_Freq(PolySearcher *self, const String *field, Obj *term);
 
     public void
     Collect(PolySearcher *self, Query *query, Collector *collector);

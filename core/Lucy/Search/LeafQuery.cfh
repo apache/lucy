@@ -27,33 +27,33 @@ parcel Lucy;
  */
 public class Lucy::Search::LeafQuery inherits Lucy::Search::Query {
 
-    CharBuf *field;
-    CharBuf *text;
+    String *field;
+    String *text;
 
     inert incremented LeafQuery*
-    new(const CharBuf *field = NULL, const CharBuf *text);
+    new(const String *field = NULL, const String *text);
 
     /**
      * @param field Optional field name.
      * @param text Raw query text.
      */
     public inert LeafQuery*
-    init(LeafQuery *self, const CharBuf *field = NULL, const CharBuf *text);
+    init(LeafQuery *self, const String *field = NULL, const String *text);
 
     /** Accessor for object's <code>field</code> attribute.
      */
-    public nullable CharBuf*
+    public nullable String*
     Get_Field(LeafQuery *self);
 
     /** Accessor for object's <code>text</code> attribute.
      */
-    public CharBuf*
+    public String*
     Get_Text(LeafQuery *self);
 
     public bool
     Equals(LeafQuery *self, Obj *other);
 
-    public incremented CharBuf*
+    public incremented String*
     To_String(LeafQuery *self);
 
     public void

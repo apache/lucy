@@ -37,7 +37,7 @@ public class Lucy::Index::PostingListReader cnick PListReader
      * term using Seek().
      */
     public abstract incremented nullable PostingList*
-    Posting_List(PostingListReader *self, const CharBuf *field = NULL,
+    Posting_List(PostingListReader *self, const String *field = NULL,
                  Obj *term = NULL);
 
     abstract LexiconReader*
@@ -65,7 +65,7 @@ class Lucy::Index::DefaultPostingListReader cnick DefPListReader
          LexiconReader *lex_reader);
 
     public incremented nullable SegPostingList*
-    Posting_List(DefaultPostingListReader *self, const CharBuf *field = NULL,
+    Posting_List(DefaultPostingListReader *self, const String *field = NULL,
                  Obj *term = NULL);
 
     LexiconReader*

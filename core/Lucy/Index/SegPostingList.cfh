@@ -23,7 +23,7 @@ class Lucy::Index::SegPostingList cnick SegPList
     inherits Lucy::Index::PostingList {
 
     PostingListReader *plist_reader;
-    CharBuf           *field;
+    String            *field;
     Posting           *posting;
     InStream          *post_stream;
     InStream          *skip_stream;
@@ -36,11 +36,11 @@ class Lucy::Index::SegPostingList cnick SegPList
     int32_t            field_num;
 
     inert incremented SegPostingList*
-    new(PostingListReader *plist_reader, const CharBuf *field);
+    new(PostingListReader *plist_reader, const String *field);
 
     inert SegPostingList*
     init(SegPostingList *self, PostingListReader *plist_reader,
-         const CharBuf *field);
+         const String *field);
 
     InStream*
     Get_Post_Stream(SegPostingList *self);
@@ -79,7 +79,7 @@ class Lucy::Index::SegPostingList cnick SegPList
                  Compiler *compiler, bool need_score);
 
     RawPosting*
-    Read_Raw(SegPostingList *self, int32_t last_doc_id, CharBuf *term_text,
+    Read_Raw(SegPostingList *self, int32_t last_doc_id, String *term_text,
              MemoryPool *mem_pool);
 }
 

@@ -58,13 +58,13 @@ TestQPSyntax_new() {
 static Folder*
 build_index() {
     // Plain type.
-    CharBuf        *pattern   = CB_newf("\\S+");
+    String         *pattern   = Str_newf("\\S+");
     RegexTokenizer *tokenizer = RegexTokenizer_new(pattern);
     FullTextType   *plain     = FullTextType_new((Analyzer*)tokenizer);
 
     // Fancy type.
 
-    CharBuf        *word_pattern   = CB_newf("\\w+");
+    String         *word_pattern   = Str_newf("\\w+");
     RegexTokenizer *word_tokenizer = RegexTokenizer_new(word_pattern);
 
     Hash *stop_list = Hash_new(0);
@@ -80,8 +80,8 @@ build_index() {
 
     // Schema.
     Schema  *schema   = Schema_new();
-    CharBuf *plain_cb = CB_newf("plain");
-    CharBuf *fancy_cb = CB_newf("fancy");
+    String *plain_cb = Str_newf("plain");
+    String *fancy_cb = Str_newf("fancy");
     Schema_Spec_Field(schema, plain_cb, (FieldType*)plain);
     Schema_Spec_Field(schema, fancy_cb, (FieldType*)fancy);
 
@@ -92,7 +92,7 @@ build_index() {
     // Index documents.
     VArray *doc_set = TestUtils_doc_set();
     for (uint32_t i = 0; i < VA_Get_Size(doc_set); ++i) {
-        CharBuf *content_string = (CharBuf*)VA_Fetch(doc_set, i);
+        String *content_string = (String*)VA_Fetch(doc_set, i);
         Doc *doc = Doc_new(NULL, 0);
         Doc_Store(doc, plain_cb, (Obj*)content_string);
         Doc_Store(doc, fancy_cb, (Obj*)content_string);
@@ -405,11 +405,11 @@ test_query_parser_syntax(TestBatchRunner *runner) {
         Hits  *hits     = IxSearcher_Hits(searcher, (Obj*)parsed, 0, 10, NULL);
 
         TEST_TRUE(runner, Query_Equals(tree, (Obj*)ivars->tree),
-                  "tree()    %s", (char*)CB_Get_Ptr8(ivars->query_string));
+                  "tree()    %s", (char*)Str_Get_Ptr8(ivars->query_string));
         TEST_TRUE(runner, Query_Equals(expanded, (Obj*)ivars->expanded),
-                  "expand_leaf()    %s", (char*)CB_Get_Ptr8(ivars->query_string));
+                  "expand_leaf()    %s", (char*)Str_Get_Ptr8(ivars->query_string));
         TEST_INT_EQ(runner, Hits_Total_Hits(hits), ivars->num_hits,
-                    "hits:    %s", (char*)CB_Get_Ptr8(ivars->query_string));
+                    "hits:    %s", (char*)Str_Get_Ptr8(ivars->query_string));
         DECREF(hits);
         DECREF(parsed);
         DECREF(expanded);
@@ -426,9 +426,9 @@ test_query_parser_syntax(TestBatchRunner *runner) {
         Hits  *hits   = IxSearcher_Hits(searcher, (Obj*)parsed, 0, 10, NULL);
 
         TEST_TRUE(runner, Query_Equals(tree, (Obj*)ivars->tree),
-                  "tree()    %s", (char*)CB_Get_Ptr8(ivars->query_string));
+                  "tree()    %s", (char*)Str_Get_Ptr8(ivars->query_string));
         TEST_INT_EQ(runner, Hits_Total_Hits(hits), ivars->num_hits,
-                    "hits:    %s", (char*)CB_Get_Ptr8(ivars->query_string));
+                    "hits:    %s", (char*)Str_Get_Ptr8(ivars->query_string));
         DECREF(hits);
         DECREF(parsed);
         DECREF(tree);

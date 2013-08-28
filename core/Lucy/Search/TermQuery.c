@@ -35,16 +35,16 @@
 #include "Lucy/Util/Freezer.h"
 
 TermQuery*
-TermQuery_new(const CharBuf *field, const Obj *term) {
+TermQuery_new(const String *field, const Obj *term) {
     TermQuery *self = (TermQuery*)VTable_Make_Obj(TERMQUERY);
     return TermQuery_init(self, field, term);
 }
 
 TermQuery*
-TermQuery_init(TermQuery *self, const CharBuf *field, const Obj *term) {
+TermQuery_init(TermQuery *self, const String *field, const Obj *term) {
     Query_init((Query*)self, 1.0f);
     TermQueryIVARS *const ivars = TermQuery_IVARS(self);
-    ivars->field  = CB_Clone(field);
+    ivars->field  = Str_Clone(field);
     ivars->term   = Obj_Clone(term);
     return self;
 }
@@ -93,13 +93,13 @@ TermQuery_Load_IMP(TermQuery *self, Obj *dump) {
     TermQuery *loaded = (TermQuery*)super_load(self, dump);
     TermQueryIVARS *loaded_ivars = TermQuery_IVARS(loaded);
     Obj *field = CERTIFY(Hash_Fetch_Str(source, "field", 5), OBJ);
-    loaded_ivars->field = (CharBuf*)CERTIFY(Freezer_load(field), CHARBUF);
+    loaded_ivars->field = (String*)CERTIFY(Freezer_load(field), STRING);
     Obj *term = CERTIFY(Hash_Fetch_Str(source, "term", 4), OBJ);
     loaded_ivars->term = (Obj*)CERTIFY(Freezer_load(term), OBJ);
     return (Obj*)loaded;
 }
 
-CharBuf*
+String*
 TermQuery_Get_Field_IMP(TermQuery *self) {
     return TermQuery_IVARS(self)->field;
 }
@@ -116,16 +116,16 @@ TermQuery_Equals_IMP(TermQuery *self, Obj *other) {
     TermQueryIVARS *const ivars = TermQuery_IVARS(self);
     TermQueryIVARS *const ovars = TermQuery_IVARS((TermQuery*)other);
     if (ivars->boost != ovars->boost)                 { return false; }
-    if (!CB_Equals(ivars->field, (Obj*)ovars->field)) { return false; }
+    if (!Str_Equals(ivars->field, (Obj*)ovars->field)) { return false; }
     if (!Obj_Equals(ivars->term, ovars->term))        { return false; }
     return true;
 }
 
-CharBuf*
+String*
 TermQuery_To_String_IMP(TermQuery *self) {
     TermQueryIVARS *const ivars = TermQuery_IVARS(self);
-    CharBuf *term_str = Obj_To_String(ivars->term);
-    CharBuf *retval = CB_newf("%o:%o", ivars->field, term_str);
+    String *term_str = Obj_To_String(ivars->term);
+    String *retval = Str_newf("%o:%o", ivars->field, term_str);
     DECREF(term_str);
     return retval;
 }
@@ -284,7 +284,7 @@ TermCompiler_Make_Matcher_IMP(TermCompiler *self, SegReader *reader,
 
 VArray*
 TermCompiler_Highlight_Spans_IMP(TermCompiler *self, Searcher *searcher,
-                                 DocVector *doc_vec, const CharBuf *field) {
+                                 DocVector *doc_vec, const String *field) {
 
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
     TermQueryIVARS *const parent_ivars
@@ -294,11 +294,11 @@ TermCompiler_Highlight_Spans_IMP(TermCompiler *self, Searcher *searcher,
     I32Array *starts, *ends;
     UNUSED_VAR(searcher);
 
-    if (!CB_Equals(parent_ivars->field, (Obj*)field)) { return spans; }
+    if (!Str_Equals(parent_ivars->field, (Obj*)field)) { return spans; }
 
     // Add all starts and ends.
     term_vector
-        = DocVec_Term_Vector(doc_vec, field, (CharBuf*)parent_ivars->term);
+        = DocVec_Term_Vector(doc_vec, field, (String*)parent_ivars->term);
     if (!term_vector) { return spans; }
 
     starts = TV_Get_Start_Offsets(term_vector);

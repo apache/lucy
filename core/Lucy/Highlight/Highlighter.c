@@ -33,18 +33,18 @@ const uint32_t ELLIPSIS_CODE_POINT = 0x2026;
  * increment the refcount of the supplied encode_buf and call encode_entities.
  * Either way, the caller takes responsibility for one refcount.
  *
- * The point of this routine is to minimize CharBuf object creation when
+ * The point of this routine is to minimize String object creation when
  * possible.
  */
-static CharBuf*
-S_do_encode(Highlighter *self, CharBuf *text, CharBuf **encode_buf);
+static String*
+S_do_encode(Highlighter *self, String *text, String **encode_buf);
 
 // Place HTML entity encoded version of [text] into [encoded].
-static CharBuf*
-S_encode_entities(CharBuf *text, CharBuf *encoded);
+static String*
+S_encode_entities(String *text, String *encoded);
 
 Highlighter*
-Highlighter_new(Searcher *searcher, Obj *query, const CharBuf *field,
+Highlighter_new(Searcher *searcher, Obj *query, const String *field,
                 uint32_t excerpt_length) {
     Highlighter *self = (Highlighter*)VTable_Make_Obj(HIGHLIGHTER);
     return Highlighter_init(self, searcher, query, field, excerpt_length);
@@ -52,16 +52,16 @@ Highlighter_new(Searcher *searcher, Obj *query, const CharBuf *field,
 
 Highlighter*
 Highlighter_init(Highlighter *self, Searcher *searcher, Obj *query,
-                 const CharBuf *field, uint32_t excerpt_length) {
+                 const String *field, uint32_t excerpt_length) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
     ivars->query          = Searcher_Glean_Query(searcher, query);
     ivars->searcher       = (Searcher*)INCREF(searcher);
-    ivars->field          = CB_Clone(field);
+    ivars->field          = Str_Clone(field);
     ivars->excerpt_length = excerpt_length;
     ivars->slop           = excerpt_length / 3;
     ivars->window_width   = excerpt_length + (ivars->slop * 2);
-    ivars->pre_tag        = CB_new_from_trusted_utf8("<strong>", 8);
-    ivars->post_tag       = CB_new_from_trusted_utf8("</strong>", 9);
+    ivars->pre_tag        = Str_new_from_trusted_utf8("<strong>", 8);
+    ivars->post_tag       = Str_new_from_trusted_utf8("</strong>", 9);
     if (Query_Is_A(ivars->query, COMPILER)) {
         ivars->compiler = (Compiler*)INCREF(ivars->query);
     }
@@ -85,44 +85,44 @@ Highlighter_Destroy_IMP(Highlighter *self) {
     SUPER_DESTROY(self, HIGHLIGHTER);
 }
 
-CharBuf*
-Highlighter_Highlight_IMP(Highlighter *self, const CharBuf *text) {
+String*
+Highlighter_Highlight_IMP(Highlighter *self, const String *text) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
-    size_t size = CB_Get_Size(text)
-                  + CB_Get_Size(ivars->pre_tag)
-                  + CB_Get_Size(ivars->post_tag);
-    CharBuf *retval = CB_new(size);
-    CB_Cat(retval, ivars->pre_tag);
-    CB_Cat(retval, text);
-    CB_Cat(retval, ivars->post_tag);
+    size_t size = Str_Get_Size(text)
+                  + Str_Get_Size(ivars->pre_tag)
+                  + Str_Get_Size(ivars->post_tag);
+    String *retval = Str_new(size);
+    Str_Cat(retval, ivars->pre_tag);
+    Str_Cat(retval, text);
+    Str_Cat(retval, ivars->post_tag);
     return retval;
 }
 
 void
-Highlighter_Set_Pre_Tag_IMP(Highlighter *self, const CharBuf *pre_tag) {
+Highlighter_Set_Pre_Tag_IMP(Highlighter *self, const String *pre_tag) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
     DECREF(ivars->pre_tag);
-    ivars->pre_tag = CB_Clone(pre_tag);
+    ivars->pre_tag = Str_Clone(pre_tag);
 }
 
 void
-Highlighter_Set_Post_Tag_IMP(Highlighter *self, const CharBuf *post_tag) {
+Highlighter_Set_Post_Tag_IMP(Highlighter *self, const String *post_tag) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
     DECREF(ivars->post_tag);
-    ivars->post_tag = CB_Clone(post_tag);
+    ivars->post_tag = Str_Clone(post_tag);
 }
 
-CharBuf*
+String*
 Highlighter_Get_Pre_Tag_IMP(Highlighter *self) {
     return Highlighter_IVARS(self)->pre_tag;
 }
 
-CharBuf*
+String*
 Highlighter_Get_Post_Tag_IMP(Highlighter *self) {
     return Highlighter_IVARS(self)->post_tag;
 }
 
-CharBuf*
+String*
 Highlighter_Get_Field_IMP(Highlighter *self) {
     return Highlighter_IVARS(self)->field;
 }
@@ -147,24 +147,24 @@ Highlighter_Get_Excerpt_Length_IMP(Highlighter *self) {
     return Highlighter_IVARS(self)->excerpt_length;
 }
 
-CharBuf*
+String*
 Highlighter_Create_Excerpt_IMP(Highlighter *self, HitDoc *hit_doc) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
     StackString *field_val
         = (StackString*)HitDoc_Extract(hit_doc, ivars->field,
                                          (ViewCharBuf*)SStr_BLANK());
 
-    if (!field_val || !Obj_Is_A((Obj*)field_val, CHARBUF)) {
+    if (!field_val || !Obj_Is_A((Obj*)field_val, STRING)) {
         return NULL;
     }
     else if (!SStr_Get_Size(field_val)) {
         // Empty string yields empty string.
-        return CB_new(0);
+        return Str_new(0);
     }
     else {
-        StackString *fragment = SSTR_WRAP((CharBuf*)field_val);
-        CharBuf *raw_excerpt = CB_new(ivars->excerpt_length + 10);
-        CharBuf *highlighted = CB_new((ivars->excerpt_length * 3) / 2);
+        StackString *fragment = SSTR_WRAP((String*)field_val);
+        String *raw_excerpt = Str_new(ivars->excerpt_length + 10);
+        String *highlighted = Str_new((ivars->excerpt_length * 3) / 2);
         DocVector *doc_vec
             = Searcher_Fetch_Doc_Vec(ivars->searcher,
                                      HitDoc_Get_Doc_ID(hit_doc));
@@ -176,14 +176,14 @@ Highlighter_Create_Excerpt_IMP(Highlighter *self, HitDoc *hit_doc) {
         HeatMap *heat_map
             = HeatMap_new(score_spans, (ivars->excerpt_length * 2) / 3);
         int32_t top
-            = Highlighter_Find_Best_Fragment(self, (CharBuf*)field_val,
+            = Highlighter_Find_Best_Fragment(self, (String*)field_val,
                                              (ViewCharBuf*)fragment, heat_map);
         VArray *sentences
-            = Highlighter_Find_Sentences(self, (CharBuf*)field_val, 0,
+            = Highlighter_Find_Sentences(self, (String*)field_val, 0,
                                          top + ivars->window_width);
 
-        top = Highlighter_Raw_Excerpt(self, (CharBuf*)field_val,
-                                      (CharBuf*)fragment, raw_excerpt, top,
+        top = Highlighter_Raw_Excerpt(self, (String*)field_val,
+                                      (String*)fragment, raw_excerpt, top,
                                       heat_map, sentences);
         Highlighter_Highlight_Excerpt(self, score_spans, raw_excerpt,
                                       highlighted, top);
@@ -215,7 +215,7 @@ S_hottest(HeatMap *heat_map) {
 
 int32_t
 Highlighter_Find_Best_Fragment_IMP(Highlighter *self,
-                                   const CharBuf *field_val,
+                                   const String *field_val,
                                    ViewCharBuf *fragment, HeatMap *heat_map) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
 
@@ -226,14 +226,14 @@ Highlighter_Find_Best_Fragment_IMP(Highlighter *self,
         // If the beginning of the string falls within the window centered
         // around the hottest point in the field, start the fragment at the
         // beginning.
-        ViewCB_Assign(fragment, (CharBuf*)field_val);
+        ViewCB_Assign(fragment, (String*)field_val);
         int32_t top = ViewCB_Trim_Top(fragment);
         ViewCB_Truncate(fragment, ivars->window_width);
         return top;
     }
     else {
         int32_t top = best_location - ivars->slop;
-        ViewCB_Assign(fragment, (CharBuf*)field_val);
+        ViewCB_Assign(fragment, (String*)field_val);
         ViewCB_Nip(fragment, top);
         top += ViewCB_Trim_Top(fragment);
         int32_t chars_left = ViewCB_Truncate(fragment, ivars->excerpt_length);
@@ -241,7 +241,7 @@ Highlighter_Find_Best_Fragment_IMP(Highlighter *self,
 
         if (!overrun) {
             // We've found an acceptable window.
-            ViewCB_Assign(fragment, (CharBuf*)field_val);
+            ViewCB_Assign(fragment, (String*)field_val);
             ViewCB_Nip(fragment, top);
             top += ViewCB_Trim_Top(fragment);
             ViewCB_Truncate(fragment, ivars->window_width);
@@ -250,13 +250,13 @@ Highlighter_Find_Best_Fragment_IMP(Highlighter *self,
         else if (overrun > top) {
             // The field is very short, so make the whole field the
             // "fragment".
-            ViewCB_Assign(fragment, (CharBuf*)field_val);
+            ViewCB_Assign(fragment, (String*)field_val);
             return ViewCB_Trim_Top(fragment);
         }
         else {
             // The fragment is too close to the end, so slide it back.
             top -= overrun;
-            ViewCB_Assign(fragment, (CharBuf*)field_val);
+            ViewCB_Assign(fragment, (String*)field_val);
             ViewCB_Nip(fragment, top);
             top += ViewCB_Trim_Top(fragment);
             ViewCB_Truncate(fragment, ivars->excerpt_length);
@@ -291,8 +291,8 @@ S_has_heat(HeatMap *heat_map, int32_t offset, int32_t length) {
 }
 
 int32_t
-Highlighter_Raw_Excerpt_IMP(Highlighter *self, const CharBuf *field_val,
-                            const CharBuf *fragment, CharBuf *raw_excerpt,
+Highlighter_Raw_Excerpt_IMP(Highlighter *self, const String *field_val,
+                            const String *fragment, String *raw_excerpt,
                             int32_t top, HeatMap *heat_map,
                             VArray *sentences) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
@@ -300,7 +300,7 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const CharBuf *field_val,
     bool     found_ending_edge   = false;
     int32_t  start = top;
     int32_t  end   = 0;
-    double   field_len = CB_Length(field_val);
+    double   field_len = Str_Length(field_val);
     uint32_t min_len = field_len < ivars->excerpt_length * 0.6666
                        ? (uint32_t)field_len
                        : (uint32_t)(ivars->excerpt_length * 0.6666);
@@ -359,7 +359,7 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const CharBuf *field_val,
                     break;
                 }
                 else {
-                    StackString *temp = SSTR_WRAP((CharBuf*)start_trimmed);
+                    StackString *temp = SSTR_WRAP((String*)start_trimmed);
                     SStr_Nip(temp, chars_left);
                     SStr_Trim_Tail(temp);
                     if (SStr_Get_Size(temp) == 0) {
@@ -377,7 +377,7 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const CharBuf *field_val,
                                : (int32_t)ivars->excerpt_length;
     if (!this_excerpt_len) { return start; }
 
-    StackString *substring = SSTR_WRAP((CharBuf*)field_val);
+    StackString *substring = SSTR_WRAP((String*)field_val);
 
     if (found_starting_edge) {
         SStr_Nip(substring, start);
@@ -423,7 +423,7 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const CharBuf *field_val,
         if (SStr_Get_Size(substring) == 0) {
             // Word is longer than excerpt_length. Reset to original position
             // truncating the word.
-            SStr_Assign(substring, (CharBuf*)field_val);
+            SStr_Assign(substring, (String*)field_val);
             start            = orig_start;
             this_excerpt_len = orig_len;
             int32_t diff = this_excerpt_len - ivars->excerpt_length;
@@ -444,7 +444,7 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const CharBuf *field_val,
     }
     else {
         // Remember original excerpt
-        StackString *orig_substring = SSTR_WRAP((CharBuf*)substring);
+        StackString *orig_substring = SSTR_WRAP((String*)substring);
         // Check for prepended ellipsis
         uint32_t min_size = found_starting_edge ? 0 : 4;
 
@@ -475,22 +475,22 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const CharBuf *field_val,
         if (SStr_Get_Size(substring) == min_size) {
             // Word is longer than excerpt_length. Reset to original excerpt
             // truncating the word.
-            SStr_Assign(substring, (CharBuf*)orig_substring);
+            SStr_Assign(substring, (String*)orig_substring);
             SStr_Chop(substring, 1);
         }
     }
 
     if (!found_starting_edge) {
-        CB_Cat_Char(raw_excerpt, ELLIPSIS_CODE_POINT);
-        CB_Cat_Char(raw_excerpt, ' ');
+        Str_Cat_Char(raw_excerpt, ELLIPSIS_CODE_POINT);
+        Str_Cat_Char(raw_excerpt, ' ');
         const size_t ELLIPSIS_LEN = 2; // Unicode ellipsis plus a space.
         start -= ELLIPSIS_LEN;
     }
 
-    CB_Cat(raw_excerpt, (CharBuf*)substring);
+    Str_Cat(raw_excerpt, (String*)substring);
 
     if (!found_ending_edge) {
-        CB_Cat_Char(raw_excerpt, ELLIPSIS_CODE_POINT);
+        Str_Cat_Char(raw_excerpt, ELLIPSIS_CODE_POINT);
     }
 
     return start;
@@ -498,13 +498,13 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const CharBuf *field_val,
 
 void
 Highlighter_Highlight_Excerpt_IMP(Highlighter *self, VArray *spans,
-                                  CharBuf *raw_excerpt, CharBuf *highlighted,
+                                  String *raw_excerpt, String *highlighted,
                                   int32_t top) {
     int32_t        hl_start        = 0;
     int32_t        hl_end          = 0;
     StackString *temp            = SSTR_WRAP(raw_excerpt);
-    CharBuf       *encode_buf      = NULL;
-    int32_t        raw_excerpt_end = top + CB_Length(raw_excerpt);
+    String        *encode_buf      = NULL;
+    int32_t        raw_excerpt_end = top + Str_Length(raw_excerpt);
 
     for (uint32_t i = 0, max = VA_Get_Size(spans); i < max; i++) {
         Span *span = (Span*)VA_Fetch(spans, i);
@@ -525,26 +525,26 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, VArray *spans,
                 }
             }
             else {
-                CharBuf *encoded;
+                String *encoded;
 
                 if (hl_start < hl_end) {
                     // Highlight previous section
                     int32_t highlighted_len = hl_end - hl_start;
-                    StackString *to_cat = SSTR_WRAP((CharBuf*)temp);
+                    StackString *to_cat = SSTR_WRAP((String*)temp);
                     SStr_Truncate(to_cat, highlighted_len);
-                    encoded = S_do_encode(self, (CharBuf*)to_cat, &encode_buf);
-                    CharBuf *hl_frag = Highlighter_Highlight(self, encoded);
-                    CB_Cat(highlighted, hl_frag);
+                    encoded = S_do_encode(self, (String*)to_cat, &encode_buf);
+                    String *hl_frag = Highlighter_Highlight(self, encoded);
+                    Str_Cat(highlighted, hl_frag);
                     SStr_Nip(temp, highlighted_len);
                     DECREF(hl_frag);
                     DECREF(encoded);
                 }
 
                 int32_t non_highlighted_len = relative_start - hl_end;
-                StackString *to_cat = SSTR_WRAP((CharBuf*)temp);
+                StackString *to_cat = SSTR_WRAP((String*)temp);
                 SStr_Truncate(to_cat, non_highlighted_len);
-                encoded = S_do_encode(self, (CharBuf*)to_cat, &encode_buf);
-                CB_Cat(highlighted, (CharBuf*)encoded);
+                encoded = S_do_encode(self, (String*)to_cat, &encode_buf);
+                Str_Cat(highlighted, (String*)encoded);
                 SStr_Nip(temp, non_highlighted_len);
                 DECREF(encoded);
 
@@ -557,11 +557,11 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, VArray *spans,
     if (hl_start < hl_end) {
         // Highlight final section
         int32_t highlighted_len = hl_end - hl_start;
-        StackString *to_cat = SSTR_WRAP((CharBuf*)temp);
+        StackString *to_cat = SSTR_WRAP((String*)temp);
         SStr_Truncate(to_cat, highlighted_len);
-        CharBuf *encoded = S_do_encode(self, (CharBuf*)to_cat, &encode_buf);
-        CharBuf *hl_frag = Highlighter_Highlight(self, encoded);
-        CB_Cat(highlighted, hl_frag);
+        String *encoded = S_do_encode(self, (String*)to_cat, &encode_buf);
+        String *hl_frag = Highlighter_Highlight(self, encoded);
+        Str_Cat(highlighted, hl_frag);
         SStr_Nip(temp, highlighted_len);
         DECREF(hl_frag);
         DECREF(encoded);
@@ -569,8 +569,8 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, VArray *spans,
 
     // Last text, beyond last highlight span.
     if (SStr_Get_Size(temp)) {
-        CharBuf *encoded = S_do_encode(self, (CharBuf*)temp, &encode_buf);
-        CB_Cat(highlighted, encoded);
+        String *encoded = S_do_encode(self, (String*)temp, &encode_buf);
+        Str_Cat(highlighted, encoded);
         DECREF(encoded);
     }
 
@@ -596,7 +596,7 @@ S_close_sentence(VArray *sentences, Span **sentence_ptr,
 }
 
 VArray*
-Highlighter_Find_Sentences_IMP(Highlighter *self, CharBuf *text,
+Highlighter_Find_Sentences_IMP(Highlighter *self, String *text,
                                int32_t offset, int32_t length) {
     /* When [sentence] is NULL, that means a sentence start has not yet been
      * found.  When it is a Span object, we have a start, but we haven't found
@@ -676,15 +676,15 @@ Highlighter_Find_Sentences_IMP(Highlighter *self, CharBuf *text,
     return sentences;
 }
 
-CharBuf*
-Highlighter_Encode_IMP(Highlighter *self, CharBuf *text) {
-    CharBuf *encoded = CB_new(0);
+String*
+Highlighter_Encode_IMP(Highlighter *self, String *text) {
+    String *encoded = Str_new(0);
     UNUSED_VAR(self);
     return S_encode_entities(text, encoded);
 }
 
-static CharBuf*
-S_do_encode(Highlighter *self, CharBuf *text, CharBuf **encode_buf) {
+static String*
+S_do_encode(Highlighter *self, String *text, String **encode_buf) {
     VTable *vtable = Highlighter_Get_VTable(self);
     Highlighter_Encode_t my_meth
         = (Highlighter_Encode_t)METHOD_PTR(vtable, LUCY_Highlighter_Encode);
@@ -695,14 +695,14 @@ S_do_encode(Highlighter *self, CharBuf *text, CharBuf **encode_buf) {
         return my_meth(self, text);
     }
     else {
-        if (*encode_buf == NULL) { *encode_buf = CB_new(0); }
+        if (*encode_buf == NULL) { *encode_buf = Str_new(0); }
         (void)S_encode_entities(text, *encode_buf);
-        return (CharBuf*)INCREF(*encode_buf);
+        return (String*)INCREF(*encode_buf);
     }
 }
 
-static CharBuf*
-S_encode_entities(CharBuf *text, CharBuf *encoded) {
+static String*
+S_encode_entities(String *text, String *encoded) {
     StackString *temp = SSTR_WRAP(text);
     size_t space = 0;
     const int MAX_ENTITY_BYTES = 9; // &#dddddd;
@@ -724,29 +724,29 @@ S_encode_entities(CharBuf *text, CharBuf *encoded) {
         }
     }
 
-    CB_Grow(encoded, space);
-    CB_Set_Size(encoded, 0);
+    Str_Grow(encoded, space);
+    Str_Set_Size(encoded, 0);
     SStr_Assign(temp, text);
     while (0 != (code_point = SStr_Nibble(temp))) {
         if (code_point > 127
             || (!isgraph(code_point) && !isspace(code_point))
            ) {
-            CB_catf(encoded, "&#%u32;", code_point);
+            Str_catf(encoded, "&#%u32;", code_point);
         }
         else if (code_point == '<') {
-            CB_Cat_Trusted_Str(encoded, "&lt;", 4);
+            Str_Cat_Trusted_Str(encoded, "&lt;", 4);
         }
         else if (code_point == '>') {
-            CB_Cat_Trusted_Str(encoded, "&gt;", 4);
+            Str_Cat_Trusted_Str(encoded, "&gt;", 4);
         }
         else if (code_point == '&') {
-            CB_Cat_Trusted_Str(encoded, "&amp;", 5);
+            Str_Cat_Trusted_Str(encoded, "&amp;", 5);
         }
         else if (code_point == '"') {
-            CB_Cat_Trusted_Str(encoded, "&quot;", 6);
+            Str_Cat_Trusted_Str(encoded, "&quot;", 6);
         }
         else {
-            CB_Cat_Char(encoded, code_point);
+            Str_Cat_Char(encoded, code_point);
         }
     }
 

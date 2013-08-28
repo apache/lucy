@@ -37,12 +37,12 @@ test_fields(TestBatchRunner *runner) {
     StackString *baz = SSTR_WRAP_STR("baz", 3);
     int32_t field_num;
 
-    field_num = Seg_Add_Field(segment, (CharBuf*)foo);
+    field_num = Seg_Add_Field(segment, (String*)foo);
     TEST_TRUE(runner, field_num == 1,
               "Add_Field returns field number, and field numbers start at 1");
-    field_num = Seg_Add_Field(segment, (CharBuf*)bar);
+    field_num = Seg_Add_Field(segment, (String*)bar);
     TEST_TRUE(runner, field_num == 2, "add a second field");
-    field_num = Seg_Add_Field(segment, (CharBuf*)foo);
+    field_num = Seg_Add_Field(segment, (String*)foo);
     TEST_TRUE(runner, field_num == 1,
               "Add_Field returns existing field number if field is already known");
 
@@ -50,9 +50,9 @@ test_fields(TestBatchRunner *runner) {
               "Field_Name");
     TEST_TRUE(runner, Seg_Field_Name(segment, 3) == NULL,
               "Field_Name returns NULL for unknown field number");
-    TEST_TRUE(runner, Seg_Field_Num(segment, (CharBuf*)bar) == 2,
+    TEST_TRUE(runner, Seg_Field_Num(segment, (String*)bar) == 2,
               "Field_Num");
-    TEST_TRUE(runner, Seg_Field_Num(segment, (CharBuf*)baz) == 0,
+    TEST_TRUE(runner, Seg_Field_Num(segment, (String*)baz) == 0,
               "Field_Num returns 0 for unknown field name");
 
     DECREF(segment);
@@ -61,14 +61,14 @@ test_fields(TestBatchRunner *runner) {
 static void
 test_metadata_storage(TestBatchRunner *runner) {
     Segment *segment = Seg_new(1);
-    CharBuf *got;
+    String *got;
 
-    Seg_Store_Metadata_Str(segment, "foo", 3, (Obj*)CB_newf("bar"));
-    got = (CharBuf*)Seg_Fetch_Metadata_Str(segment, "foo", 3);
+    Seg_Store_Metadata_Str(segment, "foo", 3, (Obj*)Str_newf("bar"));
+    got = (String*)Seg_Fetch_Metadata_Str(segment, "foo", 3);
     TEST_TRUE(runner,
               got
-              && CB_Is_A(got, CHARBUF)
-              && CB_Equals_Str(got, "bar", 3),
+              && Str_Is_A(got, STRING)
+              && Str_Equals_Str(got, "bar", 3),
               "metadata round trip"
              );
     DECREF(segment);
@@ -77,11 +77,11 @@ test_metadata_storage(TestBatchRunner *runner) {
 static void
 test_seg_name_and_num(TestBatchRunner *runner) {
     Segment *segment_z = Seg_new(35);
-    CharBuf *seg_z_name = Seg_num_to_name(35);
+    String *seg_z_name = Seg_num_to_name(35);
     TEST_TRUE(runner, Seg_Get_Number(segment_z) == INT64_C(35), "Get_Number");
-    TEST_TRUE(runner, CB_Equals_Str(Seg_Get_Name(segment_z), "seg_z", 5),
+    TEST_TRUE(runner, Str_Equals_Str(Seg_Get_Name(segment_z), "seg_z", 5),
               "Get_Name");
-    TEST_TRUE(runner, CB_Equals_Str(seg_z_name, "seg_z", 5),
+    TEST_TRUE(runner, Str_Equals_Str(seg_z_name, "seg_z", 5),
               "num_to_name");
     DECREF(seg_z_name);
     DECREF(segment_z);
@@ -125,12 +125,12 @@ test_Write_File_and_Read_File(TestBatchRunner *runner) {
     RAMFolder *folder  = RAMFolder_new(NULL);
     Segment   *segment = Seg_new(100);
     Segment   *got     = Seg_new(100);
-    CharBuf   *meta;
-    CharBuf   *flotsam = (CharBuf*)SSTR_WRAP_STR("flotsam", 7);
-    CharBuf   *jetsam  = (CharBuf*)SSTR_WRAP_STR("jetsam", 6);
+    String    *meta;
+    String    *flotsam = (String*)SSTR_WRAP_STR("flotsam", 7);
+    String    *jetsam  = (String*)SSTR_WRAP_STR("jetsam", 6);
 
     Seg_Set_Count(segment, 111);
-    Seg_Store_Metadata_Str(segment, "foo", 3, (Obj*)CB_newf("bar"));
+    Seg_Store_Metadata_Str(segment, "foo", 3, (Obj*)Str_newf("bar"));
     Seg_Add_Field(segment, flotsam);
     Seg_Add_Field(segment, jetsam);
 
@@ -143,11 +143,11 @@ test_Write_File_and_Read_File(TestBatchRunner *runner) {
     TEST_TRUE(runner,
               Seg_Field_Num(got, jetsam) == Seg_Field_Num(segment, jetsam),
               "Round trip field names through file");
-    meta = (CharBuf*)Seg_Fetch_Metadata_Str(got, "foo", 3);
+    meta = (String*)Seg_Fetch_Metadata_Str(got, "foo", 3);
     TEST_TRUE(runner,
               meta
-              && CB_Is_A(meta, CHARBUF)
-              && CB_Equals_Str(meta, "bar", 3),
+              && Str_Is_A(meta, STRING)
+              && Str_Equals_Str(meta, "bar", 3),
               "Round trip metadata through file");
 
     DECREF(got);

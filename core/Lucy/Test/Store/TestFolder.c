@@ -27,17 +27,17 @@
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Store/RAMFolder.h"
 
-static CharBuf *foo               = NULL;
-static CharBuf *bar               = NULL;
-static CharBuf *baz               = NULL;
-static CharBuf *boffo             = NULL;
-static CharBuf *banana            = NULL;
-static CharBuf *foo_bar           = NULL;
-static CharBuf *foo_bar_baz       = NULL;
-static CharBuf *foo_bar_baz_boffo = NULL;
-static CharBuf *foo_boffo         = NULL;
-static CharBuf *foo_foo           = NULL;
-static CharBuf *nope              = NULL;
+static String *foo               = NULL;
+static String *bar               = NULL;
+static String *baz               = NULL;
+static String *boffo             = NULL;
+static String *banana            = NULL;
+static String *foo_bar           = NULL;
+static String *foo_bar_baz       = NULL;
+static String *foo_bar_baz_boffo = NULL;
+static String *foo_boffo         = NULL;
+static String *foo_foo           = NULL;
+static String *nope              = NULL;
 
 TestFolder*
 TestFolder_new() {
@@ -46,17 +46,17 @@ TestFolder_new() {
 
 static void
 S_init_strings(void) {
-    foo               = CB_newf("foo");
-    bar               = CB_newf("bar");
-    baz               = CB_newf("baz");
-    boffo             = CB_newf("boffo");
-    banana            = CB_newf("banana");
-    foo_bar           = CB_newf("foo/bar");
-    foo_bar_baz       = CB_newf("foo/bar/baz");
-    foo_bar_baz_boffo = CB_newf("foo/bar/baz/boffo");
-    foo_boffo         = CB_newf("foo/boffo");
-    foo_foo           = CB_newf("foo/foo");
-    nope              = CB_newf("nope");
+    foo               = Str_newf("foo");
+    bar               = Str_newf("bar");
+    baz               = Str_newf("baz");
+    boffo             = Str_newf("boffo");
+    banana            = Str_newf("banana");
+    foo_bar           = Str_newf("foo/bar");
+    foo_bar_baz       = Str_newf("foo/bar/baz");
+    foo_bar_baz_boffo = Str_newf("foo/bar/baz/boffo");
+    foo_boffo         = Str_newf("foo/boffo");
+    foo_foo           = Str_newf("foo/foo");
+    nope              = Str_newf("nope");
 }
 
 static void
@@ -105,10 +105,10 @@ test_Exists(TestBatchRunner *runner) {
 static void
 test_Set_Path_and_Get_Path(TestBatchRunner *runner) {
     Folder *folder = (Folder*)RAMFolder_new(foo);
-    TEST_TRUE(runner, CB_Equals(Folder_Get_Path(folder), (Obj*)foo),
+    TEST_TRUE(runner, Str_Equals(Folder_Get_Path(folder), (Obj*)foo),
               "Get_Path");
     Folder_Set_Path(folder, bar);
-    TEST_TRUE(runner, CB_Equals(Folder_Get_Path(folder), (Obj*)bar),
+    TEST_TRUE(runner, Str_Equals(Folder_Get_Path(folder), (Obj*)bar),
               "Set_Path");
     DECREF(folder);
 }
@@ -171,8 +171,8 @@ test_Enclosing_Folder_and_Find_Folder(TestBatchRunner *runner) {
                                 FH_CREATE | FH_WRITE_ONLY);
 
     {
-        Folder *encloser = Folder_Enclosing_Folder(folder, (CharBuf*)nope);
-        Folder *found = Folder_Find_Folder(folder, (CharBuf*)nope);
+        Folder *encloser = Folder_Enclosing_Folder(folder, (String*)nope);
+        Folder *found = Folder_Find_Folder(folder, (String*)nope);
         TEST_TRUE(runner, encloser == folder,
                   "Enclosing_Folder() - non-existent entry yields parent");
         TEST_TRUE(runner, found == NULL,
@@ -185,12 +185,12 @@ test_Enclosing_Folder_and_Find_Folder(TestBatchRunner *runner) {
         TEST_TRUE(runner,
                   encloser
                   && Folder_Is_A(encloser, FOLDER)
-                  && CB_Ends_With(Folder_Get_Path(encloser), foo),
+                  && Str_Ends_With(Folder_Get_Path(encloser), foo),
                   "Enclosing_Folder() - find one directory down");
         TEST_TRUE(runner,
                   found
                   && Folder_Is_A(found, FOLDER)
-                  && CB_Ends_With(Folder_Get_Path(found), bar),
+                  && Str_Ends_With(Folder_Get_Path(found), bar),
                   "Find_Folder() - 'foo/bar'");
     }
 
@@ -200,12 +200,12 @@ test_Enclosing_Folder_and_Find_Folder(TestBatchRunner *runner) {
         TEST_TRUE(runner,
                   encloser
                   && Folder_Is_A(encloser, FOLDER)
-                  && CB_Ends_With(Folder_Get_Path(encloser), bar),
+                  && Str_Ends_With(Folder_Get_Path(encloser), bar),
                   "Find two directories down");
         TEST_TRUE(runner,
                   found
                   && Folder_Is_A(found, FOLDER)
-                  && CB_Ends_With(Folder_Get_Path(found), baz),
+                  && Str_Ends_With(Folder_Get_Path(found), baz),
                   "Find_Folder() - 'foo/bar/baz'");
     }
 
@@ -216,7 +216,7 @@ test_Enclosing_Folder_and_Find_Folder(TestBatchRunner *runner) {
         TEST_TRUE(runner,
                   encloser
                   && Folder_Is_A(encloser, FOLDER)
-                  && CB_Ends_With(Folder_Get_Path(encloser), baz),
+                  && Str_Ends_With(Folder_Get_Path(encloser), baz),
                   "Recurse to find a directory containing a real file");
         TEST_TRUE(runner, found == NULL,
                   "Find_Folder() - file instead of folder yields NULL");
@@ -231,7 +231,7 @@ test_List(TestBatchRunner *runner) {
     Folder     *folder = (Folder*)RAMFolder_new(NULL);
     FileHandle *fh;
     VArray     *list;
-    CharBuf    *elem;
+    String     *elem;
 
     Folder_MkDir(folder, foo);
     Folder_MkDir(folder, foo_bar);
@@ -244,20 +244,20 @@ test_List(TestBatchRunner *runner) {
     list = Folder_List(folder, NULL);
     VA_Sort(list, NULL, NULL);
     TEST_INT_EQ(runner, VA_Get_Size(list), 3, "List");
-    elem = (CharBuf*)DOWNCAST(VA_Fetch(list, 0), CHARBUF);
-    TEST_TRUE(runner, elem && CB_Equals(elem, (Obj*)banana),
+    elem = (String*)DOWNCAST(VA_Fetch(list, 0), STRING);
+    TEST_TRUE(runner, elem && Str_Equals(elem, (Obj*)banana),
               "List first file");
-    elem = (CharBuf*)DOWNCAST(VA_Fetch(list, 1), CHARBUF);
-    TEST_TRUE(runner, elem && CB_Equals(elem, (Obj*)boffo),
+    elem = (String*)DOWNCAST(VA_Fetch(list, 1), STRING);
+    TEST_TRUE(runner, elem && Str_Equals(elem, (Obj*)boffo),
               "List second file");
-    elem = (CharBuf*)DOWNCAST(VA_Fetch(list, 2), CHARBUF);
-    TEST_TRUE(runner, elem && CB_Equals(elem, (Obj*)foo), "List dir");
+    elem = (String*)DOWNCAST(VA_Fetch(list, 2), STRING);
+    TEST_TRUE(runner, elem && Str_Equals(elem, (Obj*)foo), "List dir");
     DECREF(list);
 
     list = Folder_List(folder, foo_bar);
     TEST_INT_EQ(runner, VA_Get_Size(list), 1, "List subdirectory contents");
-    elem = (CharBuf*)DOWNCAST(VA_Fetch(list, 0), CHARBUF);
-    TEST_TRUE(runner, elem && CB_Equals(elem, (Obj*)baz),
+    elem = (String*)DOWNCAST(VA_Fetch(list, 0), STRING);
+    TEST_TRUE(runner, elem && Str_Equals(elem, (Obj*)baz),
               "Just the filename");
     DECREF(list);
 

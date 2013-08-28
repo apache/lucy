@@ -89,10 +89,10 @@ TInfo_Set_Skip_FilePos_IMP(TermInfo *self, int64_t filepos) {
 
 // TODO: this should probably be some sort of Dump variant rather than
 // To_String.
-CharBuf*
+String*
 TInfo_To_String_IMP(TermInfo *self) {
     TermInfoIVARS *const ivars = TInfo_IVARS(self);
-    return CB_newf(
+    return Str_newf(
                "doc freq:      %i32\n"
                "post filepos:  %i64\n"
                "skip filepos:  %i64\n"

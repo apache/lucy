@@ -50,7 +50,7 @@ parcel Lucy;
 public class Lucy::Analysis::RegexTokenizer
     inherits Lucy::Analysis::Analyzer {
 
-    CharBuf *pattern;
+    String *pattern;
     void    *token_re;
 
     /**
@@ -60,7 +60,7 @@ public class Lucy::Analysis::RegexTokenizer
     is_available();
 
     inert incremented RegexTokenizer*
-    new(const CharBuf *pattern = NULL);
+    new(const String *pattern = NULL);
 
     /**
      * @param pattern A string specifying a Perl-syntax regular expression
@@ -69,13 +69,13 @@ public class Lucy::Analysis::RegexTokenizer
      * "it" and "O'Henry's" as well as "Henry".
      */
     public inert RegexTokenizer*
-    init(RegexTokenizer *self, const CharBuf *pattern = NULL);
+    init(RegexTokenizer *self, const String *pattern = NULL);
 
     public incremented Inversion*
     Transform(RegexTokenizer *self, Inversion *inversion);
 
     public incremented Inversion*
-    Transform_Text(RegexTokenizer *self, CharBuf *text);
+    Transform_Text(RegexTokenizer *self, String *text);
 
     /** Tokenize the supplied string and add any Tokens generated to the
      * supplied Inversion.

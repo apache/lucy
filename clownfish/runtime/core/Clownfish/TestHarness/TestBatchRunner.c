@@ -23,7 +23,7 @@
 
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/TestHarness/TestBatch.h"
 #include "Clownfish/TestHarness/TestFormatter.h"
@@ -79,7 +79,7 @@ TestBatchRunner_Run_Batch_IMP(TestBatchRunner *self, TestBatch *batch) {
     bool failed = false;
     if (err) {
         failed = true;
-        CharBuf *mess = Err_Get_Mess(err);
+        String *mess = Err_Get_Mess(err);
         INCREF(mess);
         Err_warn_mess(mess);
     }

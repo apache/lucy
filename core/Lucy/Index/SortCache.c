@@ -21,7 +21,7 @@
 #include "Lucy/Plan/FieldType.h"
 
 SortCache*
-SortCache_init(SortCache *self, const CharBuf *field, FieldType *type,
+SortCache_init(SortCache *self, const String *field, FieldType *type,
                void *ords, int32_t cardinality, int32_t doc_max, int32_t null_ord,
                int32_t ord_width) {
     SortCacheIVARS *const ivars = SortCache_IVARS(self);
@@ -33,7 +33,7 @@ SortCache_init(SortCache *self, const CharBuf *field, FieldType *type,
     if (!FType_Sortable(type)) {
         THROW(ERR, "Non-sortable FieldType for %o", field);
     }
-    ivars->field       = CB_Clone(field);
+    ivars->field       = Str_Clone(field);
     ivars->type        = (FieldType*)INCREF(type);
     ivars->ords        = ords;
     ivars->cardinality = cardinality;

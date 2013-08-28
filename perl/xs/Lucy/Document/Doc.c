@@ -52,15 +52,15 @@ LUCY_Doc_Get_Size_IMP(lucy_Doc *self) {
 }
 
 void
-LUCY_Doc_Store_IMP(lucy_Doc *self, const cfish_CharBuf *field, cfish_Obj *value) {
+LUCY_Doc_Store_IMP(lucy_Doc *self, const cfish_String *field, cfish_Obj *value) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
-    char   *key      = (char*)CFISH_CB_Get_Ptr8(field);
-    size_t  key_size = CFISH_CB_Get_Size(field);
+    char   *key      = (char*)CFISH_Str_Get_Ptr8(field);
+    size_t  key_size = CFISH_Str_Get_Size(field);
     SV *key_sv = newSVpvn(key, key_size);
     SV *val_sv = value == NULL
                  ? newSV(0)
-                 : CFISH_Obj_Is_A(value, CFISH_CHARBUF)
-                 ? XSBind_cb_to_sv((cfish_CharBuf*)value)
+                 : CFISH_Obj_Is_A(value, CFISH_STRING)
+                 ? XSBind_cb_to_sv((cfish_String*)value)
                  : (SV*)CFISH_Obj_To_Host(value);
     SvUTF8_on(key_sv);
     (void)hv_store_ent((HV*)ivars->fields, key_sv, val_sv, 0);
@@ -143,12 +143,12 @@ LUCY_Doc_Deserialize_IMP(lucy_Doc *self, lucy_InStream *instream) {
 }
 
 cfish_Obj*
-LUCY_Doc_Extract_IMP(lucy_Doc *self, cfish_CharBuf *field,
+LUCY_Doc_Extract_IMP(lucy_Doc *self, cfish_String *field,
                      cfish_ViewCharBuf *target) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     cfish_Obj *retval = NULL;
-    SV **sv_ptr = hv_fetch((HV*)ivars->fields, (char*)CFISH_CB_Get_Ptr8(field),
-                           CFISH_CB_Get_Size(field), 0);
+    SV **sv_ptr = hv_fetch((HV*)ivars->fields, (char*)CFISH_Str_Get_Ptr8(field),
+                           CFISH_Str_Get_Size(field), 0);
 
     if (sv_ptr && XSBind_sv_defined(*sv_ptr)) {
         SV *const sv = *sv_ptr;
@@ -181,9 +181,9 @@ LUCY_Doc_Dump_IMP(lucy_Doc *self) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     cfish_Hash *dump = cfish_Hash_new(0);
     CFISH_Hash_Store_Str(dump, "_class", 6,
-                        (cfish_Obj*)CFISH_CB_Clone(LUCY_Doc_Get_Class_Name(self)));
+                        (cfish_Obj*)CFISH_Str_Clone(LUCY_Doc_Get_Class_Name(self)));
     CFISH_Hash_Store_Str(dump, "doc_id", 7,
-                        (cfish_Obj*)cfish_CB_newf("%i32", ivars->doc_id));
+                        (cfish_Obj*)cfish_Str_newf("%i32", ivars->doc_id));
     CFISH_Hash_Store_Str(dump, "fields", 6,
                         XSBind_perl_to_cfish((SV*)ivars->fields));
     return dump;
@@ -192,9 +192,9 @@ LUCY_Doc_Dump_IMP(lucy_Doc *self) {
 lucy_Doc*
 LUCY_Doc_Load_IMP(lucy_Doc *self, cfish_Obj *dump) {
     cfish_Hash *source = (cfish_Hash*)CFISH_CERTIFY(dump, CFISH_HASH);
-    cfish_CharBuf *class_name = (cfish_CharBuf*)CFISH_CERTIFY(
+    cfish_String *class_name = (cfish_String*)CFISH_CERTIFY(
                                    CFISH_Hash_Fetch_Str(source, "_class", 6),
-                                   CFISH_CHARBUF);
+                                   CFISH_STRING);
     cfish_VTable *vtable = cfish_VTable_singleton(class_name, NULL);
     lucy_Doc *loaded = (lucy_Doc*)CFISH_VTable_Make_Obj(vtable);
     cfish_Obj *doc_id = CFISH_CERTIFY(

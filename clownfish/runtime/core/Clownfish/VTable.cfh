@@ -26,7 +26,7 @@ parcel Clownfish;
 class Clownfish::VTable inherits Clownfish::Obj {
 
     VTable            *parent;
-    CharBuf           *name;
+    String            *name;
     uint32_t           flags;
     int32_t            parcel_id;
     size_t             obj_alloc_size;
@@ -49,7 +49,7 @@ class Clownfish::VTable inherits Clownfish::Obj {
      * result.
      */
     inert VTable*
-    singleton(const CharBuf *class_name, VTable *parent);
+    singleton(const String *class_name, VTable *parent);
 
     /** Register a vtable, so that it can be retrieved by class name.
      *
@@ -61,7 +61,7 @@ class Clownfish::VTable inherits Clownfish::Obj {
     add_to_registry(VTable *vtable);
 
     inert bool
-    add_alias_to_registry(VTable *vtable, CharBuf *alias);
+    add_alias_to_registry(VTable *vtable, String *alias);
 
     /** Initialize the registry.
      */
@@ -77,18 +77,18 @@ class Clownfish::VTable inherits Clownfish::Obj {
      * class is not registered.
      */
     inert nullable VTable*
-    fetch_vtable(const CharBuf *class_name);
+    fetch_vtable(const String *class_name);
 
     /** Given a class name, return the name of a parent class which descends
      * from Clownfish::Obj, or NULL if such a class can't be found.
      */
-    inert nullable CharBuf*
-    find_parent_class(const CharBuf *class_name);
+    inert nullable String*
+    find_parent_class(const String *class_name);
 
     /** List all of the methods defined directly within a host subclass.
      */
     inert incremented VArray*
-    fresh_host_methods(const CharBuf *class_name);
+    fresh_host_methods(const String *class_name);
 
     /** Replace a function pointer in the VTable.
      */
@@ -120,7 +120,7 @@ class Clownfish::VTable inherits Clownfish::Obj {
     void
     Exclude_Host_Method(VTable *self, const char *meth_name);
 
-    CharBuf*
+    String*
     Get_Name(VTable *self);
 
     VTable*

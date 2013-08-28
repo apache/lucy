@@ -22,7 +22,7 @@
 
 #include "Lucy/Index/DocReader.h"
 #include "Clownfish/ByteBuf.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/Num.h"
@@ -68,7 +68,7 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
         // Find the Field's FieldType.
         StackString *field_name_zcb
             = SSTR_WRAP_STR(field_name, field_name_len);
-        type = Schema_Fetch_Type(schema, (CharBuf*)field_name_zcb);
+        type = Schema_Fetch_Type(schema, (String*)field_name_zcb);
 
         // Read the field value.
         switch (FType_Primitive_ID(type) & FType_PRIMITIVE_ID_MASK) {
@@ -77,7 +77,7 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
                     char *buf = (char*)MALLOCATE(value_len + 1);
                     InStream_Read_Bytes(dat_in, buf, value_len);
                     buf[value_len] = '\0'; 
-                    value = (Obj*)CB_new_steal_from_trusted_str(
+                    value = (Obj*)Str_new_steal_from_trusted_str(
                                 buf, value_len, value_len + 1);
                     break;
                 }

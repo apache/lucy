@@ -38,7 +38,7 @@ DummyFieldType_new() {
 static FieldType*
 S_alt_field_type() {
     StackString *name = SSTR_WRAP_STR("DummyFieldType2", 15);
-    VTable *vtable = VTable_singleton((CharBuf*)name, DUMMYFIELDTYPE);
+    VTable *vtable = VTable_singleton((String*)name, DUMMYFIELDTYPE);
     FieldType *self = (FieldType*)VTable_Make_Obj(vtable);
     return FType_init(self);
 }

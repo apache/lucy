@@ -27,7 +27,7 @@ extern "C" {
 #include "ruby.h"
 #include "Clownfish/Obj.h"
 #include "Clownfish/ByteBuf.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/Num.h"
@@ -35,7 +35,7 @@ extern "C" {
 #include "Clownfish/VTable.h"
 
 VALUE Bind_cfish_to_ruby(cfish_Obj *obj);
-VALUE Bind_cb_to_ruby(const cfish_CharBuf *cb);
+VALUE Bind_cb_to_ruby(const cfish_String *cb);
 static VALUE S_cfish_array_to_ruby_array(cfish_VArray *varray);
 
 #ifdef __cplusplus

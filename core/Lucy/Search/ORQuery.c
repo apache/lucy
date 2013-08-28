@@ -56,23 +56,23 @@ ORQuery_Equals_IMP(ORQuery *self, Obj *other) {
     return super_equals(self, other);
 }
 
-CharBuf*
+String*
 ORQuery_To_String_IMP(ORQuery *self) {
     ORQueryIVARS *const ivars = ORQuery_IVARS(self);
     uint32_t num_kids = VA_Get_Size(ivars->children);
-    if (!num_kids) { return CB_new_from_trusted_utf8("()", 2); }
+    if (!num_kids) { return Str_new_from_trusted_utf8("()", 2); }
     else {
-        CharBuf *retval = CB_new_from_trusted_utf8("(", 1);
+        String *retval = Str_new_from_trusted_utf8("(", 1);
         uint32_t last_kid = num_kids - 1;
         for (uint32_t i = 0; i < num_kids; i++) {
-            CharBuf *kid_string = Obj_To_String(VA_Fetch(ivars->children, i));
-            CB_Cat(retval, kid_string);
+            String *kid_string = Obj_To_String(VA_Fetch(ivars->children, i));
+            Str_Cat(retval, kid_string);
             DECREF(kid_string);
             if (i == last_kid) {
-                CB_Cat_Trusted_Str(retval, ")", 1);
+                Str_Cat_Trusted_Str(retval, ")", 1);
             }
             else {
-                CB_Cat_Trusted_Str(retval, " OR ", 4);
+                Str_Cat_Trusted_Str(retval, " OR ", 4);
             }
         }
         return retval;

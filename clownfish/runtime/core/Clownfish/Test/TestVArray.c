@@ -23,7 +23,7 @@
 
 #include "Clownfish/Test/TestVArray.h"
 
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Num.h"
 #include "Clownfish/Test.h"
@@ -79,24 +79,24 @@ test_Equals(TestBatchRunner *runner) {
 static void
 test_Store_Fetch(TestBatchRunner *runner) {
     VArray *array = VA_new(0);
-    CharBuf *elem;
+    String *elem;
 
     TEST_TRUE(runner, VA_Fetch(array, 2) == NULL, "Fetch beyond end");
 
-    VA_Store(array, 2, (Obj*)CB_newf("foo"));
-    elem = (CharBuf*)CERTIFY(VA_Fetch(array, 2), CHARBUF);
+    VA_Store(array, 2, (Obj*)Str_newf("foo"));
+    elem = (String*)CERTIFY(VA_Fetch(array, 2), STRING);
     TEST_INT_EQ(runner, 3, VA_Get_Size(array), "Store updates size");
-    TEST_TRUE(runner, CB_Equals_Str(elem, "foo", 3), "Store");
+    TEST_TRUE(runner, Str_Equals_Str(elem, "foo", 3), "Store");
 
     INCREF(elem);
-    TEST_INT_EQ(runner, 2, CB_Get_RefCount(elem),
+    TEST_INT_EQ(runner, 2, Str_Get_RefCount(elem),
                 "start with refcount of 2");
-    VA_Store(array, 2, (Obj*)CB_newf("bar"));
-    TEST_INT_EQ(runner, 1, CB_Get_RefCount(elem),
+    VA_Store(array, 2, (Obj*)Str_newf("bar"));
+    TEST_INT_EQ(runner, 1, Str_Get_RefCount(elem),
                 "Displacing elem via Store updates refcount");
     DECREF(elem);
-    elem = (CharBuf*)CERTIFY(VA_Fetch(array, 2), CHARBUF);
-    TEST_TRUE(runner, CB_Equals_Str(elem, "bar", 3), "Store displacement");
+    elem = (String*)CERTIFY(VA_Fetch(array, 2), STRING);
+    TEST_TRUE(runner, Str_Equals_Str(elem, "bar", 3), "Store displacement");
 
     DECREF(array);
 }
@@ -104,29 +104,29 @@ test_Store_Fetch(TestBatchRunner *runner) {
 static void
 test_Push_Pop_Shift_Unshift(TestBatchRunner *runner) {
     VArray *array = VA_new(0);
-    CharBuf *elem;
+    String *elem;
 
     TEST_INT_EQ(runner, VA_Get_Size(array), 0, "size starts at 0");
-    VA_Push(array, (Obj*)CB_newf("a"));
-    VA_Push(array, (Obj*)CB_newf("b"));
-    VA_Push(array, (Obj*)CB_newf("c"));
+    VA_Push(array, (Obj*)Str_newf("a"));
+    VA_Push(array, (Obj*)Str_newf("b"));
+    VA_Push(array, (Obj*)Str_newf("c"));
 
     TEST_INT_EQ(runner, VA_Get_Size(array), 3, "size after Push");
-    TEST_TRUE(runner, NULL != CERTIFY(VA_Fetch(array, 2), CHARBUF), "Push");
+    TEST_TRUE(runner, NULL != CERTIFY(VA_Fetch(array, 2), STRING), "Push");
 
-    elem = (CharBuf*)CERTIFY(VA_Shift(array), CHARBUF);
-    TEST_TRUE(runner, CB_Equals_Str(elem, "a", 1), "Shift");
+    elem = (String*)CERTIFY(VA_Shift(array), STRING);
+    TEST_TRUE(runner, Str_Equals_Str(elem, "a", 1), "Shift");
     TEST_INT_EQ(runner, VA_Get_Size(array), 2, "size after Shift");
     DECREF(elem);
 
-    elem = (CharBuf*)CERTIFY(VA_Pop(array), CHARBUF);
-    TEST_TRUE(runner, CB_Equals_Str(elem, "c", 1), "Pop");
+    elem = (String*)CERTIFY(VA_Pop(array), STRING);
+    TEST_TRUE(runner, Str_Equals_Str(elem, "c", 1), "Pop");
     TEST_INT_EQ(runner, VA_Get_Size(array), 1, "size after Pop");
     DECREF(elem);
 
-    VA_Unshift(array, (Obj*)CB_newf("foo"));
-    elem = (CharBuf*)CERTIFY(VA_Fetch(array, 0), CHARBUF);
-    TEST_TRUE(runner, CB_Equals_Str(elem, "foo", 3), "Unshift");
+    VA_Unshift(array, (Obj*)Str_newf("foo"));
+    elem = (String*)CERTIFY(VA_Fetch(array, 0), STRING);
+    TEST_TRUE(runner, Str_Equals_Str(elem, "foo", 3), "Unshift");
     TEST_INT_EQ(runner, VA_Get_Size(array), 2, "size after Shift");
 
     DECREF(array);
@@ -138,10 +138,10 @@ test_Delete(TestBatchRunner *runner) {
     VArray *got    = VA_new(5);
     uint32_t i;
 
-    for (i = 0; i < 5; i++) { VA_Push(got, (Obj*)CB_newf("%u32", i)); }
-    VA_Store(wanted, 0, (Obj*)CB_newf("0", i));
-    VA_Store(wanted, 1, (Obj*)CB_newf("1", i));
-    VA_Store(wanted, 4, (Obj*)CB_newf("4", i));
+    for (i = 0; i < 5; i++) { VA_Push(got, (Obj*)Str_newf("%u32", i)); }
+    VA_Store(wanted, 0, (Obj*)Str_newf("0", i));
+    VA_Store(wanted, 1, (Obj*)Str_newf("1", i));
+    VA_Store(wanted, 4, (Obj*)Str_newf("4", i));
     DECREF(VA_Delete(got, 2));
     DECREF(VA_Delete(got, 3));
     TEST_TRUE(runner, VA_Equals(wanted, (Obj*)got), "Delete");
@@ -155,7 +155,7 @@ test_Resize(TestBatchRunner *runner) {
     VArray *array = VA_new(3);
     uint32_t i;
 
-    for (i = 0; i < 2; i++) { VA_Push(array, (Obj*)CB_newf("%u32", i)); }
+    for (i = 0; i < 2; i++) { VA_Push(array, (Obj*)Str_newf("%u32", i)); }
     TEST_INT_EQ(runner, VA_Get_Capacity(array), 3, "Start with capacity 3");
 
     VA_Resize(array, 4);
@@ -176,8 +176,8 @@ test_Excise(TestBatchRunner *runner) {
     VArray *got    = VA_new(5);
 
     for (uint32_t i = 0; i < 5; i++) {
-        VA_Push(wanted, (Obj*)CB_newf("%u32", i));
-        VA_Push(got, (Obj*)CB_newf("%u32", i));
+        VA_Push(wanted, (Obj*)Str_newf("%u32", i));
+        VA_Push(got, (Obj*)Str_newf("%u32", i));
     }
 
     VA_Excise(got, 7, 1);
@@ -214,9 +214,9 @@ test_Push_VArray(TestBatchRunner *runner) {
     VArray *scratch = VA_new(0);
     uint32_t i;
 
-    for (i = 0; i < 4; i++) { VA_Push(wanted, (Obj*)CB_newf("%u32", i)); }
-    for (i = 0; i < 2; i++) { VA_Push(got, (Obj*)CB_newf("%u32", i)); }
-    for (i = 2; i < 4; i++) { VA_Push(scratch, (Obj*)CB_newf("%u32", i)); }
+    for (i = 0; i < 4; i++) { VA_Push(wanted, (Obj*)Str_newf("%u32", i)); }
+    for (i = 0; i < 2; i++) { VA_Push(got, (Obj*)Str_newf("%u32", i)); }
+    for (i = 2; i < 4; i++) { VA_Push(scratch, (Obj*)Str_newf("%u32", i)); }
 
     VA_Push_VArray(got, scratch);
     TEST_TRUE(runner, VA_Equals(wanted, (Obj*)got), "Push_VArray");
@@ -229,7 +229,7 @@ test_Push_VArray(TestBatchRunner *runner) {
 static void
 test_Slice(TestBatchRunner *runner) {
     VArray *array = VA_new(0);
-    for (uint32_t i = 0; i < 10; i++) { VA_Push(array, (Obj*)CB_newf("%u32", i)); }
+    for (uint32_t i = 0; i < 10; i++) { VA_Push(array, (Obj*)Str_newf("%u32", i)); }
     {
         VArray *slice = VA_Slice(array, 0, 10);
         TEST_TRUE(runner, VA_Equals(array, (Obj*)slice), "Slice entire array");
@@ -243,7 +243,7 @@ test_Slice(TestBatchRunner *runner) {
     }
     {
         VArray *wanted = VA_new(0);
-        VA_Push(wanted, (Obj*)CB_newf("9"));
+        VA_Push(wanted, (Obj*)Str_newf("9"));
         VArray *slice = VA_Slice(array, 9, 11);
         TEST_TRUE(runner, VA_Equals(slice, (Obj*)wanted),
             "Exceed length, start near end");
@@ -262,7 +262,7 @@ test_Slice(TestBatchRunner *runner) {
     }
     {
         VArray *wanted = VA_new(0);
-        VA_Push(wanted, (Obj*)CB_newf("9"));
+        VA_Push(wanted, (Obj*)Str_newf("9"));
         VArray *slice = VA_Slice(array, 9, UINT32_MAX - 1);
         TEST_TRUE(runner, VA_Get_Size(slice) == 1, "guard against overflow");
         DECREF(slice);
@@ -278,7 +278,7 @@ test_Clone_and_Shallow_Copy(TestBatchRunner *runner) {
     uint32_t i;
 
     for (i = 0; i < 10; i++) {
-        VA_Push(array, (Obj*)CB_newf("%u32", i));
+        VA_Push(array, (Obj*)Str_newf("%u32", i));
     }
     twin = VA_Shallow_Copy(array);
     TEST_TRUE(runner, VA_Equals(array, (Obj*)twin), "Shallow_Copy");

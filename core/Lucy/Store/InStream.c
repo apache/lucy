@@ -70,12 +70,12 @@ InStream_do_open(InStream *self, Obj *file) {
         ivars->file_handle
             = (FileHandle*)RAMFH_open(NULL, FH_READ_ONLY, (RAMFile*)file);
     }
-    else if (Obj_Is_A(file, CHARBUF)) {
+    else if (Obj_Is_A(file, STRING)) {
         ivars->file_handle
-            = (FileHandle*)FSFH_open((CharBuf*)file, FH_READ_ONLY);
+            = (FileHandle*)FSFH_open((String*)file, FH_READ_ONLY);
     }
     else {
-        Err_set_error(Err_new(CB_newf("Invalid type for param 'file': '%o'",
+        Err_set_error(Err_new(Str_newf("Invalid type for param 'file': '%o'",
                                       Obj_Get_Class_Name(file))));
         DECREF(self);
         return NULL;
@@ -87,7 +87,7 @@ InStream_do_open(InStream *self, Obj *file) {
     }
 
     // Get length and filename from the FileHandle.
-    ivars->filename     = CB_Clone(FH_Get_Path(ivars->file_handle));
+    ivars->filename     = Str_Clone(FH_Get_Path(ivars->file_handle));
     ivars->len          = FH_Length(ivars->file_handle);
     if (ivars->len == -1) {
         ERR_ADD_FRAME(Err_get_error());
@@ -122,7 +122,7 @@ InStream_Destroy_IMP(InStream *self) {
 }
 
 InStream*
-InStream_Reopen_IMP(InStream *self, const CharBuf *filename, int64_t offset,
+InStream_Reopen_IMP(InStream *self, const String *filename, int64_t offset,
                     int64_t len) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     if (!ivars->file_handle) {
@@ -139,7 +139,7 @@ InStream_Reopen_IMP(InStream *self, const CharBuf *filename, int64_t offset,
     InStream_do_open(other, (Obj*)ivars->file_handle);
     if (filename != NULL) {
         DECREF(ovars->filename);
-        ovars->filename = CB_Clone(filename);
+        ovars->filename = Str_Clone(filename);
     }
     ovars->offset = offset;
     ovars->len    = len;
@@ -158,7 +158,7 @@ InStream_Clone_IMP(InStream *self) {
     return twin;
 }
 
-CharBuf*
+String*
 InStream_Get_Filename_IMP(InStream *self) {
     return InStream_IVARS(self)->filename;
 }
@@ -219,7 +219,7 @@ S_fill(InStream *self, int64_t amount) {
     }
     else {
         Err *error = Err_get_error();
-        CB_catf(Err_Get_Mess(error), " (%o)", ivars->filename);
+        Str_catf(Err_Get_Mess(error), " (%o)", ivars->filename);
         RETHROW(INCREF(error));
     }
 }

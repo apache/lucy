@@ -27,7 +27,7 @@ abstract class Lucy::Index::SortReader
          int32_t seg_tick = -1);
 
     abstract nullable SortCache*
-    Fetch_Sort_Cache(SortReader *self, const CharBuf *field);
+    Fetch_Sort_Cache(SortReader *self, const String *field);
 
     /** Returns NULL, since multi-segment sort caches cannot be produced by
      * the default implementation.
@@ -55,7 +55,7 @@ class Lucy::Index::DefaultSortReader cnick DefSortReader
          Snapshot *snapshot, VArray *segments, int32_t seg_tick);
 
     nullable SortCache*
-    Fetch_Sort_Cache(DefaultSortReader *self, const CharBuf *field);
+    Fetch_Sort_Cache(DefaultSortReader *self, const String *field);
 
     public void
     Close(DefaultSortReader *self);

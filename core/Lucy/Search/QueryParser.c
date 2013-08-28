@@ -52,7 +52,7 @@
 
 // Helper function for Tree().
 static Query*
-S_parse_subquery(QueryParser *self, VArray *elems, CharBuf *default_field,
+S_parse_subquery(QueryParser *self, VArray *elems, String *default_field,
                  bool enclosed);
 
 // Drop unmatched right parens and add matching right parens at end to
@@ -67,7 +67,7 @@ S_parse_subqueries(QueryParser *self, VArray *elems);
 
 static void
 S_compose_inner_queries(QueryParser *self, VArray *elems,
-                        CharBuf *default_field);
+                        String *default_field);
 
 // Apply +, -, NOT.
 static void
@@ -95,7 +95,7 @@ static Query*
 S_compose_subquery(QueryParser *self, VArray *elems, bool enclosed);
 
 QueryParser*
-QParser_new(Schema *schema, Analyzer *analyzer, const CharBuf *default_boolop,
+QParser_new(Schema *schema, Analyzer *analyzer, const String *default_boolop,
             VArray *fields) {
     QueryParser *self = (QueryParser*)VTable_Make_Obj(QUERYPARSER);
     return QParser_init(self, schema, analyzer, default_boolop, fields);
@@ -103,7 +103,7 @@ QParser_new(Schema *schema, Analyzer *analyzer, const CharBuf *default_boolop,
 
 QueryParser*
 QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
-             const CharBuf *default_boolop, VArray *fields) {
+             const String *default_boolop, VArray *fields) {
     QueryParserIVARS *const ivars = QParser_IVARS(self);
     // Init.
     ivars->heed_colons = false;
@@ -113,13 +113,13 @@ QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
     ivars->schema         = (Schema*)INCREF(schema);
     ivars->analyzer       = (Analyzer*)INCREF(analyzer);
     ivars->default_boolop = default_boolop
-                           ? CB_Clone(default_boolop)
-                           : CB_new_from_trusted_utf8("OR", 2);
+                           ? Str_Clone(default_boolop)
+                           : Str_new_from_trusted_utf8("OR", 2);
 
     if (fields) {
         ivars->fields = VA_Shallow_Copy(fields);
         for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
-            CERTIFY(VA_Fetch(fields, i), CHARBUF);
+            CERTIFY(VA_Fetch(fields, i), STRING);
         }
         VA_Sort(ivars->fields, NULL, NULL);
     }
@@ -128,7 +128,7 @@ QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
         uint32_t num_fields = VA_Get_Size(all_fields);
         ivars->fields = VA_new(num_fields);
         for (uint32_t i = 0; i < num_fields; i++) {
-            CharBuf *field = (CharBuf*)VA_Fetch(all_fields, i);
+            String *field = (String*)VA_Fetch(all_fields, i);
             FieldType *type = Schema_Fetch_Type(schema, field);
             if (type && FType_Indexed(type)) {
                 VA_Push(ivars->fields, INCREF(field));
@@ -139,10 +139,10 @@ QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
     VA_Sort(ivars->fields, NULL, NULL);
 
     // Derive default "occur" from default boolean operator.
-    if (CB_Equals_Str(ivars->default_boolop, "OR", 2)) {
+    if (Str_Equals_Str(ivars->default_boolop, "OR", 2)) {
         ivars->default_occur = SHOULD;
     }
-    else if (CB_Equals_Str(ivars->default_boolop, "AND", 3)) {
+    else if (Str_Equals_Str(ivars->default_boolop, "AND", 3)) {
         ivars->default_occur = MUST;
     }
     else {
@@ -173,7 +173,7 @@ QParser_Get_Schema_IMP(QueryParser *self) {
     return QParser_IVARS(self)->schema;
 }
 
-CharBuf*
+String*
 QParser_Get_Default_BoolOp_IMP(QueryParser *self) {
     return QParser_IVARS(self)->default_boolop;
 }
@@ -197,10 +197,10 @@ QParser_Set_Heed_Colons_IMP(QueryParser *self, bool heed_colons) {
 
 
 Query*
-QParser_Parse_IMP(QueryParser *self, const CharBuf *query_string) {
-    CharBuf *qstring = query_string
-                       ? CB_Clone(query_string)
-                       : CB_new_from_trusted_utf8("", 0);
+QParser_Parse_IMP(QueryParser *self, const String *query_string) {
+    String *qstring = query_string
+                       ? Str_Clone(query_string)
+                       : Str_new_from_trusted_utf8("", 0);
     Query *tree     = QParser_Tree(self, qstring);
     Query *expanded = QParser_Expand(self, tree);
     Query *pruned   = QParser_Prune(self, expanded);
@@ -211,7 +211,7 @@ QParser_Parse_IMP(QueryParser *self, const CharBuf *query_string) {
 }
 
 Query*
-QParser_Tree_IMP(QueryParser *self, const CharBuf *query_string) {
+QParser_Tree_IMP(QueryParser *self, const String *query_string) {
     QueryParserIVARS *const ivars = QParser_IVARS(self);
     VArray *elems = QueryLexer_Tokenize(ivars->lexer, query_string);
     S_balance_parens(self, elems);
@@ -229,7 +229,7 @@ S_parse_subqueries(QueryParser *self, VArray *elems) {
         // paren group.
         size_t left = SIZE_MAX;
         size_t right = SIZE_MAX;
-        CharBuf *field = NULL;
+        String *field = NULL;
         for (size_t i = 0, max = VA_Get_Size(elems); i < max; i++) {
             ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
             uint32_t type = ParserElem_Get_Type(elem);
@@ -245,7 +245,7 @@ S_parse_subqueries(QueryParser *self, VArray *elems) {
                 ParserElem *next_elem = (ParserElem*)VA_Fetch(elems, i + 1);
                 uint32_t next_type = ParserElem_Get_Type(next_elem);
                 if (next_type == TOKEN_OPEN_PAREN) {
-                    field = (CharBuf*)ParserElem_As(elem, CHARBUF);
+                    field = (String*)ParserElem_As(elem, STRING);
                 }
             }
         }
@@ -287,7 +287,7 @@ S_discard_elems(VArray *elems, uint32_t type) {
 }
 
 static Query*
-S_parse_subquery(QueryParser *self, VArray *elems, CharBuf *default_field,
+S_parse_subquery(QueryParser *self, VArray *elems, String *default_field,
                  bool enclosed) {
     if (VA_Get_Size(elems)) {
         ParserElem *first = (ParserElem*)VA_Fetch(elems, 0);
@@ -355,12 +355,12 @@ S_balance_parens(QueryParser *self, VArray *elems) {
 
 static void
 S_compose_inner_queries(QueryParser *self, VArray *elems,
-                        CharBuf *default_field) {
+                        String *default_field) {
     const int32_t default_occur = QParser_IVARS(self)->default_occur;
 
     // Generate all queries.  Apply any fields.
     for (uint32_t i = VA_Get_Size(elems); i--;) {
-        CharBuf *field = default_field;
+        String *field = default_field;
         ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
 
         // Apply field.
@@ -369,12 +369,12 @@ S_compose_inner_queries(QueryParser *self, VArray *elems,
             ParserElem* maybe_field_elem
                 = (ParserElem*)VA_Fetch(elems, i - 1);
             if (ParserElem_Get_Type(maybe_field_elem) == TOKEN_FIELD) {
-                field = (CharBuf*)ParserElem_As(maybe_field_elem, CHARBUF);
+                field = (String*)ParserElem_As(maybe_field_elem, STRING);
             }
         }
 
         if (ParserElem_Get_Type(elem) == TOKEN_STRING) {
-            const CharBuf *text = (CharBuf*)ParserElem_As(elem, CHARBUF);
+            const String *text = (String*)ParserElem_As(elem, STRING);
             LeafQuery *query = LeafQuery_new(field, text);
             ParserElem *new_elem
                 = ParserElem_new(TOKEN_QUERY, (Obj*)query);
@@ -822,14 +822,14 @@ QParser_Expand_IMP(QueryParser *self, Query *query) {
     return retval;
 }
 
-static CharBuf*
-S_unescape(QueryParser *self, CharBuf *orig, CharBuf *target) {
+static String*
+S_unescape(QueryParser *self, String *orig, String *target) {
     StackString *source = SSTR_WRAP(orig);
     uint32_t code_point;
     UNUSED_VAR(self);
 
-    CB_Set_Size(target, 0);
-    CB_Grow(target, CB_Get_Size(orig) + 4);
+    Str_Set_Size(target, 0);
+    Str_Grow(target, Str_Get_Size(orig) + 4);
 
     while (0 != (code_point = SStr_Nibble(source))) {
         if (code_point == '\\') {
@@ -838,15 +838,15 @@ S_unescape(QueryParser *self, CharBuf *orig, CharBuf *target) {
                 || next_code_point == '"'
                 || next_code_point == '\\'
                ) {
-                CB_Cat_Char(target, next_code_point);
+                Str_Cat_Char(target, next_code_point);
             }
             else {
-                CB_Cat_Char(target, code_point);
-                if (next_code_point) { CB_Cat_Char(target, next_code_point); }
+                Str_Cat_Char(target, code_point);
+                if (next_code_point) { Str_Cat_Char(target, next_code_point); }
             }
         }
         else {
-            CB_Cat_Char(target, code_point);
+            Str_Cat_Char(target, code_point);
         }
     }
 
@@ -864,7 +864,7 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
 
     // Determine whether we can actually process the input.
     if (!Query_Is_A(query, LEAFQUERY))                { return NULL; }
-    if (!CB_Get_Size(LeafQuery_Get_Text(leaf_query))) { return NULL; }
+    if (!Str_Get_Size(LeafQuery_Get_Text(leaf_query))) { return NULL; }
     SStr_Assign(source_text, LeafQuery_Get_Text(leaf_query));
 
     // If quoted, always generate PhraseQuery.
@@ -889,10 +889,10 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
         fields = (VArray*)INCREF(ivars->fields);
     }
 
-    CharBuf *unescaped = CB_new(SStr_Get_Size(source_text));
+    String *unescaped = Str_new(SStr_Get_Size(source_text));
     VArray  *queries   = VA_new(VA_Get_Size(fields));
     for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
-        CharBuf  *field    = (CharBuf*)VA_Fetch(fields, i);
+        String   *field    = (String*)VA_Fetch(fields, i);
         Analyzer *analyzer = ivars->analyzer
                              ? ivars->analyzer
                              : Schema_Fetch_Analyzer(schema, field);
@@ -904,16 +904,16 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
         }
         else {
             // Extract token texts.
-            CharBuf *split_source
-                = S_unescape(self, (CharBuf*)source_text, unescaped);
+            String *split_source
+                = S_unescape(self, (String*)source_text, unescaped);
             VArray *maybe_texts = Analyzer_Split(analyzer, split_source);
             uint32_t num_maybe_texts = VA_Get_Size(maybe_texts);
             VArray *token_texts = VA_new(num_maybe_texts);
 
             // Filter out zero-length token texts.
             for (uint32_t j = 0; j < num_maybe_texts; j++) {
-                CharBuf *token_text = (CharBuf*)VA_Fetch(maybe_texts, j);
-                if (CB_Get_Size(token_text)) {
+                String *token_text = (String*)VA_Fetch(maybe_texts, j);
+                if (Str_Get_Size(token_text)) {
                     VA_Push(token_texts, INCREF(token_text));
                 }
             }
@@ -961,14 +961,14 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
 }
 
 Query*
-QParser_Make_Term_Query_IMP(QueryParser *self, const CharBuf *field,
+QParser_Make_Term_Query_IMP(QueryParser *self, const String *field,
                             Obj *term) {
     UNUSED_VAR(self);
     return (Query*)TermQuery_new(field, term);
 }
 
 Query*
-QParser_Make_Phrase_Query_IMP(QueryParser *self, const CharBuf *field,
+QParser_Make_Phrase_Query_IMP(QueryParser *self, const String *field,
                               VArray *terms) {
     UNUSED_VAR(self);
     return (Query*)PhraseQuery_new(field, terms);

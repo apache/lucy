@@ -51,7 +51,7 @@ public class Lucy::Document::Doc inherits Clownfish::Obj {
     /** Store a field value in the Doc.
      */
     void
-    Store(Doc *self, const CharBuf *field, Obj *value);
+    Store(Doc *self, const String *field, Obj *value);
 
     /** Set the doc's field's attribute.
      */
@@ -74,7 +74,7 @@ public class Lucy::Document::Doc inherits Clownfish::Obj {
      * object returned.
      */
     nullable Obj*
-    Extract(Doc *self, CharBuf *field, ViewCharBuf *target);
+    Extract(Doc *self, String *field, ViewCharBuf *target);
 
     /* Unimplemented methods.
      */

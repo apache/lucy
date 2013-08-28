@@ -63,7 +63,7 @@ public class Lucy::Index::PostingList cnick PList
     /** Indexing helper function.
      */
     abstract RawPosting*
-    Read_Raw(PostingList *self, int32_t last_doc_id, CharBuf *term_text,
+    Read_Raw(PostingList *self, int32_t last_doc_id, String *term_text,
              MemoryPool *mem_pool);
 }
 

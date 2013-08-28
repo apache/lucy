@@ -58,7 +58,7 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
 
 PostingPool*
 PostPool_new(Schema *schema, Snapshot *snapshot, Segment *segment,
-             PolyReader *polyreader,  const CharBuf *field,
+             PolyReader *polyreader,  const String *field,
              LexiconWriter *lex_writer, MemoryPool *mem_pool,
              OutStream *lex_temp_out, OutStream *post_temp_out,
              OutStream *skip_out) {
@@ -70,7 +70,7 @@ PostPool_new(Schema *schema, Snapshot *snapshot, Segment *segment,
 
 PostingPool*
 PostPool_init(PostingPool *self, Schema *schema, Snapshot *snapshot,
-              Segment *segment, PolyReader *polyreader, const CharBuf *field,
+              Segment *segment, PolyReader *polyreader, const String *field,
               LexiconWriter *lex_writer, MemoryPool *mem_pool,
               OutStream *lex_temp_out, OutStream *post_temp_out,
               OutStream *skip_out) {
@@ -98,7 +98,7 @@ PostPool_init(PostingPool *self, Schema *schema, Snapshot *snapshot,
     ivars->polyreader     = (PolyReader*)INCREF(polyreader);
     ivars->lex_writer     = (LexiconWriter*)INCREF(lex_writer);
     ivars->mem_pool       = (MemoryPool*)INCREF(mem_pool);
-    ivars->field          = CB_Clone(field);
+    ivars->field          = Str_Clone(field);
     ivars->lex_temp_out   = (OutStream*)INCREF(lex_temp_out);
     ivars->post_temp_out  = (OutStream*)INCREF(post_temp_out);
     ivars->skip_out       = (OutStream*)INCREF(skip_out);
@@ -174,9 +174,9 @@ PostPool_Flip_IMP(PostingPool *self) {
 
     if (num_runs) {
         Folder  *folder = PolyReader_Get_Folder(ivars->polyreader);
-        CharBuf *seg_name = Seg_Get_Name(ivars->segment);
-        CharBuf *lex_temp_path  = CB_newf("%o/lextemp", seg_name);
-        CharBuf *post_temp_path = CB_newf("%o/ptemp", seg_name);
+        String *seg_name = Seg_Get_Name(ivars->segment);
+        String *lex_temp_path  = Str_newf("%o/lextemp", seg_name);
+        String *post_temp_path = Str_newf("%o/ptemp", seg_name);
         ivars->lex_temp_in = Folder_Open_In(folder, lex_temp_path);
         if (!ivars->lex_temp_in) {
             RETHROW(INCREF(Err_get_error()));
@@ -363,7 +363,7 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
     TermInfo      *const skip_tinfo       = TInfo_new(0);
     TermInfoIVARS *const tinfo_ivars      = TInfo_IVARS(tinfo);
     TermInfoIVARS *const skip_tinfo_ivars = TInfo_IVARS(skip_tinfo);
-    CharBuf       *const last_term_text   = CB_new(0);
+    String        *const last_term_text   = Str_new(0);
     LexiconWriter *const lex_writer       = ivars->lex_writer;
     SkipStepper   *const skip_stepper     = ivars->skip_stepper;
     SkipStepperIVARS *const skip_stepper_ivars
@@ -378,9 +378,9 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
                               (*(RawPosting**)PostPool_Fetch(self)),
                               RAWPOSTING);
     RawPostingIVARS *post_ivars = RawPost_IVARS(posting);
-    CB_Mimic_Str(last_term_text, post_ivars->blob, post_ivars->content_len);
-    char *last_text_buf = (char*)CB_Get_Ptr8(last_term_text);
-    uint32_t last_text_size = CB_Get_Size(last_term_text);
+    Str_Mimic_Str(last_term_text, post_ivars->blob, post_ivars->content_len);
+    char *last_text_buf = (char*)Str_Get_Ptr8(last_term_text);
+    uint32_t last_text_size = Str_Get_Size(last_term_text);
     SkipStepper_Set_ID_And_Filepos(skip_stepper, 0, 0);
 
     // Initialize sentinel to be used on the last iter, using an empty string
@@ -426,10 +426,10 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
             last_skip_filepos     = tinfo_ivars->post_filepos;
 
             // Remember the term_text so we can write string diffs.
-            CB_Mimic_Str(last_term_text, post_ivars->blob,
+            Str_Mimic_Str(last_term_text, post_ivars->blob,
                          post_ivars->content_len);
-            last_text_buf  = (char*)CB_Get_Ptr8(last_term_text);
-            last_text_size = CB_Get_Size(last_term_text);
+            last_text_buf  = (char*)Str_Get_Ptr8(last_term_text);
+            last_text_size = Str_Get_Size(last_term_text);
         }
 
         // Bail on last iter before writing invalid posting data.
@@ -486,10 +486,10 @@ PostPool_Refill_IMP(PostingPool *self) {
     const uint32_t     mem_thresh  = ivars->mem_thresh;
     const int32_t      doc_base    = ivars->doc_base;
     uint32_t           num_elems   = 0; // number of items recovered
-    CharBuf           *term_text   = NULL;
+    String            *term_text   = NULL;
 
     if (ivars->lexicon == NULL) { return 0; }
-    else { term_text = (CharBuf*)Lex_Get_Term(lexicon); }
+    else { term_text = (String*)Lex_Get_Term(lexicon); }
 
     // Make sure cache is empty.
     if (ivars->cache_max - ivars->cache_tick > 0) {
@@ -511,9 +511,9 @@ PostPool_Refill_IMP(PostingPool *self) {
             // Read a term.
             if (Lex_Next(lexicon)) {
                 ivars->post_count = Lex_Doc_Freq(lexicon);
-                term_text = (CharBuf*)Lex_Get_Term(lexicon);
-                if (term_text && !Obj_Is_A((Obj*)term_text, CHARBUF)) {
-                    THROW(ERR, "Only CharBuf terms are supported for now");
+                term_text = (String*)Lex_Get_Term(lexicon);
+                if (term_text && !Obj_Is_A((Obj*)term_text, STRING)) {
+                    THROW(ERR, "Only String terms are supported for now");
                 }
                 Posting *posting = PList_Get_Posting(plist);
                 Post_Set_Doc_ID(posting, doc_base);
@@ -587,7 +587,7 @@ S_fresh_flip(PostingPool *self, InStream *lex_temp_in,
     if (ivars->lex_end == 0) { return; }
 
     // Get a Lexicon.
-    CharBuf *lex_alias = CB_newf("%o-%i64-to-%i64",
+    String *lex_alias = Str_newf("%o-%i64-to-%i64",
                                  InStream_Get_Filename(lex_temp_in),
                                  ivars->lex_start, ivars->lex_end);
     InStream *lex_temp_in_dupe = InStream_Reopen(
@@ -600,8 +600,8 @@ S_fresh_flip(PostingPool *self, InStream *lex_temp_in,
     DECREF(lex_temp_in_dupe);
 
     // Get a PostingList.
-    CharBuf *post_alias
-        = CB_newf("%o-%i64-to-%i64", InStream_Get_Filename(post_temp_in),
+    String *post_alias
+        = Str_newf("%o-%i64-to-%i64", InStream_Get_Filename(post_temp_in),
                   ivars->post_start, ivars->post_end);
     InStream *post_temp_in_dupe
         = InStream_Reopen(post_temp_in, post_alias, ivars->post_start,

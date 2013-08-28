@@ -29,9 +29,9 @@ Analyzer_init(Analyzer *self) {
 }
 
 Inversion*
-Analyzer_Transform_Text_IMP(Analyzer *self, CharBuf *text) {
-    size_t token_len = CB_Get_Size(text);
-    Token *seed = Token_new((char*)CB_Get_Ptr8(text), token_len, 0,
+Analyzer_Transform_Text_IMP(Analyzer *self, String *text) {
+    size_t token_len = Str_Get_Size(text);
+    Token *seed = Token_new((char*)Str_Get_Ptr8(text), token_len, 0,
                             token_len, 1.0, 1);
     Inversion *starter = Inversion_new(seed);
     Inversion *retval  = Analyzer_Transform(self, starter);
@@ -41,15 +41,15 @@ Analyzer_Transform_Text_IMP(Analyzer *self, CharBuf *text) {
 }
 
 VArray*
-Analyzer_Split_IMP(Analyzer *self, CharBuf *text) {
+Analyzer_Split_IMP(Analyzer *self, String *text) {
     Inversion  *inversion = Analyzer_Transform_Text(self, text);
     VArray     *out       = VA_new(0);
     Token      *token;
 
     while ((token = Inversion_Next(inversion)) != NULL) {
         TokenIVARS *const token_ivars = Token_IVARS(token);
-        CharBuf *string
-            = CB_new_from_trusted_utf8(token_ivars->text, token_ivars->len);
+        String *string
+            = Str_new_from_trusted_utf8(token_ivars->text, token_ivars->len);
         VA_Push(out, (Obj*)string);
     }
 
@@ -62,7 +62,7 @@ Obj*
 Analyzer_Dump_IMP(Analyzer *self) {
     Hash *dump = Hash_new(0);
     Hash_Store_Str(dump, "_class", 6,
-                   (Obj*)CB_Clone(Obj_Get_Class_Name((Obj*)self)));
+                   (Obj*)Str_Clone(Obj_Get_Class_Name((Obj*)self)));
     return (Obj*)dump;
 }
 
@@ -70,8 +70,8 @@ Obj*
 Analyzer_Load_IMP(Analyzer *self, Obj *dump) {
     CHY_UNUSED_VAR(self);
     Hash *source = (Hash*)CERTIFY(dump, HASH);
-    CharBuf *class_name
-        = (CharBuf*)CERTIFY(Hash_Fetch_Str(source, "_class", 6), CHARBUF);
+    String *class_name
+        = (String*)CERTIFY(Hash_Fetch_Str(source, "_class", 6), STRING);
     VTable *vtable = VTable_singleton(class_name, NULL);
     Analyzer *loaded = (Analyzer*)VTable_Make_Obj(vtable);
     return (Obj*)loaded;

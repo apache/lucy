@@ -61,12 +61,12 @@ OutStream_do_open(OutStream *self, Obj *file) {
         ivars->file_handle
             = (FileHandle*)RAMFH_open(NULL, FH_WRITE_ONLY, (RAMFile*)file);
     }
-    else if (Obj_Is_A(file, CHARBUF)) {
-        ivars->file_handle = (FileHandle*)FSFH_open((CharBuf*)file,
+    else if (Obj_Is_A(file, STRING)) {
+        ivars->file_handle = (FileHandle*)FSFH_open((String*)file,
                                                     FH_WRITE_ONLY | FH_CREATE | FH_EXCLUSIVE);
     }
     else {
-        Err_set_error(Err_new(CB_newf("Invalid type for param 'file': '%o'",
+        Err_set_error(Err_new(Str_newf("Invalid type for param 'file': '%o'",
                                       Obj_Get_Class_Name(file))));
         DECREF(self);
         return NULL;
@@ -78,7 +78,7 @@ OutStream_do_open(OutStream *self, Obj *file) {
     }
 
     // Derive filepath from FileHandle.
-    ivars->path = CB_Clone(FH_Get_Path(ivars->file_handle));
+    ivars->path = Str_Clone(FH_Get_Path(ivars->file_handle));
 
     return self;
 }
@@ -98,7 +98,7 @@ OutStream_Destroy_IMP(OutStream *self) {
     SUPER_DESTROY(self, OUTSTREAM);
 }
 
-CharBuf*
+String*
 OutStream_Get_Path_IMP(OutStream *self) {
     return OutStream_IVARS(self)->path;
 }

@@ -92,7 +92,7 @@ Hash*
 DataWriter_Metadata_IMP(DataWriter *self) {
     Hash *metadata = Hash_new(0);
     Hash_Store_Str(metadata, "format", 6,
-                   (Obj*)CB_newf("%i32", DataWriter_Format(self)));
+                   (Obj*)Str_newf("%i32", DataWriter_Format(self)));
     return metadata;
 }
 

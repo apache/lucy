@@ -43,24 +43,24 @@ static void
 S_seek_tinfo(SegPostingList *self, TermInfo *tinfo);
 
 SegPostingList*
-SegPList_new(PostingListReader *plist_reader, const CharBuf *field) {
+SegPList_new(PostingListReader *plist_reader, const String *field) {
     SegPostingList *self = (SegPostingList*)VTable_Make_Obj(SEGPOSTINGLIST);
     return SegPList_init(self, plist_reader, field);
 }
 
 SegPostingList*
 SegPList_init(SegPostingList *self, PostingListReader *plist_reader,
-              const CharBuf *field) {
+              const String *field) {
     SegPostingListIVARS *const ivars = SegPList_IVARS(self);
     Schema       *const schema   = PListReader_Get_Schema(plist_reader);
     Folder       *const folder   = PListReader_Get_Folder(plist_reader);
     Segment      *const segment  = PListReader_Get_Segment(plist_reader);
     Architecture *const arch     = Schema_Get_Architecture(schema);
-    CharBuf      *const seg_name = Seg_Get_Name(segment);
+    String       *const seg_name = Seg_Get_Name(segment);
     int32_t       field_num      = Seg_Field_Num(segment, field);
-    CharBuf      *post_file      = CB_newf("%o/postings-%i32.dat",
+    String       *post_file      = Str_newf("%o/postings-%i32.dat",
                                            seg_name, field_num);
-    CharBuf      *skip_file      = CB_newf("%o/postings.skip", seg_name);
+    String       *skip_file      = Str_newf("%o/postings.skip", seg_name);
 
     // Init.
     ivars->doc_freq        = 0;
@@ -73,7 +73,7 @@ SegPList_init(SegPostingList *self, PostingListReader *plist_reader,
 
     // Assign.
     ivars->plist_reader    = (PostingListReader*)INCREF(plist_reader);
-    ivars->field           = CB_Clone(field);
+    ivars->field           = Str_Clone(field);
     ivars->skip_interval   = Arch_Skip_Interval(arch);
 
     // Derive.
@@ -310,7 +310,7 @@ SegPList_Make_Matcher_IMP(SegPostingList *self, Similarity *sim,
 
 RawPosting*
 SegPList_Read_Raw_IMP(SegPostingList *self, int32_t last_doc_id,
-                      CharBuf *term_text, MemoryPool *mem_pool) {
+                      String *term_text, MemoryPool *mem_pool) {
     SegPostingListIVARS *const ivars = SegPList_IVARS(self);
     return Post_Read_Raw(ivars->posting, ivars->post_stream,
                          last_doc_id, term_text, mem_pool);

@@ -20,14 +20,14 @@
 #include "Lucy/Index/Lexicon.h"
 
 Lexicon*
-Lex_init(Lexicon *self, const CharBuf *field) {
+Lex_init(Lexicon *self, const String *field) {
     LexiconIVARS *const ivars = Lex_IVARS(self);
-    ivars->field = CB_Clone(field);
+    ivars->field = Str_Clone(field);
     ABSTRACT_CLASS_CHECK(self, LEXICON);
     return self;
 }
 
-CharBuf*
+String*
 Lex_Get_Field_IMP(Lexicon *self) {
     return Lex_IVARS(self)->field;
 }

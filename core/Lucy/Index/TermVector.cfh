@@ -22,8 +22,8 @@ parcel Lucy;
 class Lucy::Index::TermVector cnick TV
     inherits Clownfish::Obj {
 
-    CharBuf *field;
-    CharBuf *text;
+    String *field;
+    String *text;
     uint32_t num_pos;
     I32Array  *positions;
     I32Array  *start_offsets;
@@ -33,11 +33,11 @@ class Lucy::Index::TermVector cnick TV
      * start_offsets, and end_offsets arrays.
      */
     inert incremented TermVector*
-    new(const CharBuf *field, const CharBuf *text, I32Array *positions,
+    new(const String *field, const String *text, I32Array *positions,
         I32Array *start_offsets, I32Array *end_offsets);
 
     inert TermVector*
-    init(TermVector *self, const CharBuf *field, const CharBuf *text,
+    init(TermVector *self, const String *field, const String *text,
          I32Array *positions, I32Array *start_offsets, I32Array *end_offsets);
 
     I32Array*

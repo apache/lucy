@@ -23,10 +23,10 @@ class Lucy::Store::MockFileHandle inherits Lucy::Store::FileHandle {
     int64_t len;
 
     inert incremented MockFileHandle*
-    new(const CharBuf *path = NULL, int64_t length);
+    new(const String *path = NULL, int64_t length);
 
     inert MockFileHandle*
-    init(MockFileHandle *self, const CharBuf *path = NULL, int64_t length);
+    init(MockFileHandle *self, const String *path = NULL, int64_t length);
 
     bool
     Window(MockFileHandle *self, FileWindow *window, int64_t offset, int64_t len);

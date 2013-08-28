@@ -40,9 +40,9 @@ static FileHandle*
 S_new_filehandle() {
     StackString *klass = SSTR_WRAP_STR("TestFileHandle", 14);
     FileHandle *fh;
-    VTable *vtable = VTable_fetch_vtable((CharBuf*)klass);
+    VTable *vtable = VTable_fetch_vtable((String*)klass);
     if (!vtable) {
-        vtable = VTable_singleton((CharBuf*)klass, FILEHANDLE);
+        vtable = VTable_singleton((String*)klass, FILEHANDLE);
     }
     VTable_Override(vtable, S_no_op_method, LUCY_FH_Close_OFFSET);
     fh = (FileHandle*)VTable_Make_Obj(vtable);
@@ -56,9 +56,9 @@ TestFH_Run_IMP(TestFileHandle *self, TestBatchRunner *runner) {
     FileHandle    *fh    = S_new_filehandle();
     StackString *foo   = SSTR_WRAP_STR("foo", 3);
 
-    TEST_TRUE(runner, CB_Equals_Str(FH_Get_Path(fh), "", 0), "Get_Path");
-    FH_Set_Path(fh, (CharBuf*)foo);
-    TEST_TRUE(runner, CB_Equals(FH_Get_Path(fh), (Obj*)foo), "Set_Path");
+    TEST_TRUE(runner, Str_Equals_Str(FH_Get_Path(fh), "", 0), "Get_Path");
+    FH_Set_Path(fh, (String*)foo);
+    TEST_TRUE(runner, Str_Equals(FH_Get_Path(fh), (Obj*)foo), "Set_Path");
 
     DECREF(fh);
 }

@@ -31,11 +31,11 @@ class Lucy::Index::LexIndex inherits Lucy::Index::Lexicon {
 
     inert incremented LexIndex*
     new(Schema *schema, Folder *folder, Segment *segment,
-        const CharBuf *field);
+        const String *field);
 
     inert LexIndex*
     init(LexIndex *self, Schema *schema, Folder *folder, Segment *segment,
-         const CharBuf *field);
+         const String *field);
 
     public void
     Seek(LexIndex *self, Obj *target = NULL);

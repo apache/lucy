@@ -22,7 +22,7 @@
 
 #include "Clownfish/Obj.h"
 #include "Clownfish/ByteBuf.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/Num.h"
@@ -111,7 +111,7 @@ cfish_XSBind_cfish_obj_to_sv_noinc(cfish_Obj *obj) {
 #define CFISH_OBJ_TO_SV_NOINC(_obj) \
     cfish_XSBind_cfish_obj_to_sv_noinc((cfish_Obj*)_obj)
 
-/** Deep conversion of Clownfish objects to Perl objects -- CharBufs to UTF-8
+/** Deep conversion of Clownfish objects to Perl objects -- Strings to UTF-8
  * SVs, ByteBufs to SVs, VArrays to Perl array refs, Hashes to Perl hashrefs,
  * and any other object to a Perl object wrapping the Clownfish Obj.
  */
@@ -120,7 +120,7 @@ cfish_XSBind_cfish_to_perl(cfish_Obj *obj);
 
 /** Deep conversion of Perl data structures to Clownfish objects -- Perl hash
  * to Hash, Perl array to VArray, Clownfish objects stripped of their
- * wrappers, and everything else stringified and turned to a CharBuf.
+ * wrappers, and everything else stringified and turned to a String.
  */
 CFISH_VISIBLE cfish_Obj*
 cfish_XSBind_perl_to_cfish(SV *sv);
@@ -130,10 +130,10 @@ cfish_XSBind_perl_to_cfish(SV *sv);
 CFISH_VISIBLE SV*
 cfish_XSBind_bb_to_sv(const cfish_ByteBuf *bb);
 
-/** Convert a CharBuf into a new UTF-8 string SV.
+/** Convert a String into a new UTF-8 string SV.
  */
 CFISH_VISIBLE SV*
-cfish_XSBind_cb_to_sv(const cfish_CharBuf *cb);
+cfish_XSBind_cb_to_sv(const cfish_String *cb);
 
 /** Perl-specific wrapper for Err#trap.  The "routine" must be either a
  * subroutine reference or the name of a subroutine.
@@ -150,8 +150,8 @@ cfish_XSBind_enable_overload(void *pobj);
  * a NULL-terminated series of ALLOT_ macros.
  *
  *     cfish_XSBind_allot_params(stack, start, num_stack_elems,
- *          ALLOT_OBJ(&field, "field", 5, CFISH_CHARBUF, true, alloca(cfish_SStr_size()),
- *          ALLOT_OBJ(&term, "term", 4, CFISH_CHARBUF, true, alloca(cfish_SStr_size()),
+ *          ALLOT_OBJ(&field, "field", 5, CFISH_STRING, true, alloca(cfish_SStr_size()),
+ *          ALLOT_OBJ(&term, "term", 4, CFISH_STRING, true, alloca(cfish_SStr_size()),
  *          NULL);
  *
  * The following ALLOT_ macros are available for primitive types:

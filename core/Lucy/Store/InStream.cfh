@@ -37,7 +37,7 @@ class Lucy::Store::InStream inherits Clownfish::Obj {
     int64_t     len;
     char       *buf;
     char       *limit;
-    CharBuf    *filename;
+    String     *filename;
     FileHandle *file_handle;
     FileWindow *window;
 
@@ -62,7 +62,7 @@ class Lucy::Store::InStream inherits Clownfish::Obj {
      * @param len Length of the file as seen by the new InStream.
      */
     incremented InStream*
-    Reopen(InStream *self, const CharBuf *filename = NULL, int64_t offset,
+    Reopen(InStream *self, const String *filename = NULL, int64_t offset,
            int64_t len);
 
     /** Clone the InStream.  Clones share the same underlying FileHandle and
@@ -190,7 +190,7 @@ class Lucy::Store::InStream inherits Clownfish::Obj {
 
     /** Accessor for filename member.
      */
-    CharBuf*
+    String*
     Get_Filename(InStream *self);
 }
 

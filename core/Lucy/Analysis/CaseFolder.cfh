@@ -41,7 +41,7 @@ public class Lucy::Analysis::CaseFolder inherits Lucy::Analysis::Analyzer {
     Transform(CaseFolder *self, Inversion *inversion);
 
     public incremented Inversion*
-    Transform_Text(CaseFolder *self, CharBuf *text);
+    Transform_Text(CaseFolder *self, String *text);
 
     public bool
     Equals(CaseFolder *self, Obj *other);

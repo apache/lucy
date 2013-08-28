@@ -24,7 +24,7 @@
 #include <string.h>
 
 #include "Lucy/Analysis/RegexTokenizer.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Util/Memory.h"
 #include "Clownfish/Util/StringHelper.h"
@@ -44,19 +44,19 @@ RegexTokenizer_is_available(void) {
 }
 
 RegexTokenizer*
-RegexTokenizer_init(RegexTokenizer *self, const CharBuf *pattern) {
+RegexTokenizer_init(RegexTokenizer *self, const String *pattern) {
     Analyzer_init((Analyzer*)self);
     RegexTokenizerIVARS *const ivars = RegexTokenizer_IVARS(self);
 
     const char *pattern_ptr;
     if (pattern) {
-        ivars->pattern = CB_Clone(pattern);
-        pattern_ptr = (char*)CB_Get_Ptr8(ivars->pattern);
+        ivars->pattern = Str_Clone(pattern);
+        pattern_ptr = (char*)Str_Get_Ptr8(ivars->pattern);
     }
     else {
         pattern_ptr = "\\w+(?:['\\x{2019}]\\w+)*";
         ivars->pattern
-            = CB_new_from_trusted_utf8(pattern_ptr, strlen(pattern_ptr));
+            = Str_new_from_trusted_utf8(pattern_ptr, strlen(pattern_ptr));
     }
 
     int options = PCRE_UTF8 | PCRE_NO_UTF8_CHECK;
@@ -162,7 +162,7 @@ RegexTokenizer_is_available(void) {
 }
 
 RegexTokenizer*
-RegexTokenizer_init(RegexTokenizer *self, const CharBuf *pattern) {
+RegexTokenizer_init(RegexTokenizer *self, const String *pattern) {
     UNUSED_VAR(self);
     UNUSED_VAR(pattern);
     THROW(ERR,

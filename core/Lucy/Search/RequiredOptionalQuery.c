@@ -68,12 +68,12 @@ ReqOptQuery_Set_Optional_Query_IMP(RequiredOptionalQuery *self,
     VA_Store(ivars->children, 1, INCREF(optional_query));
 }
 
-CharBuf*
+String*
 ReqOptQuery_To_String_IMP(RequiredOptionalQuery *self) {
     RequiredOptionalQueryIVARS *const ivars = ReqOptQuery_IVARS(self);
-    CharBuf *req_string = Obj_To_String(VA_Fetch(ivars->children, 0));
-    CharBuf *opt_string = Obj_To_String(VA_Fetch(ivars->children, 1));
-    CharBuf *retval = CB_newf("(+%o %o)", req_string, opt_string);
+    String *req_string = Obj_To_String(VA_Fetch(ivars->children, 0));
+    String *opt_string = Obj_To_String(VA_Fetch(ivars->children, 1));
+    String *retval = Str_newf("(+%o %o)", req_string, opt_string);
     DECREF(opt_string);
     DECREF(req_string);
     return retval;

@@ -30,7 +30,7 @@
 #include "Lucy/Store/Folder.h"
 
 NumericSortCache*
-NumSortCache_init(NumericSortCache *self, const CharBuf *field,
+NumSortCache_init(NumericSortCache *self, const String *field,
                   FieldType *type, int32_t cardinality, int32_t doc_max,
                   int32_t null_ord, int32_t ord_width, InStream *ord_in,
                   InStream *dat_in) {
@@ -82,7 +82,7 @@ NumSortCache_Destroy_IMP(NumericSortCache *self) {
 /***************************************************************************/
 
 Float64SortCache*
-F64SortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality,
+F64SortCache_new(const String *field, FieldType *type, int32_t cardinality,
                  int32_t doc_max, int32_t null_ord, int32_t ord_width,
                  InStream *ord_in, InStream *dat_in) {
     Float64SortCache *self
@@ -92,7 +92,7 @@ F64SortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality,
 }
 
 Float64SortCache*
-F64SortCache_init(Float64SortCache *self, const CharBuf *field,
+F64SortCache_init(Float64SortCache *self, const String *field,
                   FieldType *type, int32_t cardinality, int32_t doc_max,
                   int32_t null_ord, int32_t ord_width, InStream *ord_in,
                   InStream *dat_in) {
@@ -127,7 +127,7 @@ F64SortCache_Make_Blank_IMP(Float64SortCache *self) {
 /***************************************************************************/
 
 Float32SortCache*
-F32SortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality,
+F32SortCache_new(const String *field, FieldType *type, int32_t cardinality,
                  int32_t doc_max, int32_t null_ord, int32_t ord_width,
                  InStream *ord_in, InStream *dat_in) {
     Float32SortCache *self
@@ -137,7 +137,7 @@ F32SortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality,
 }
 
 Float32SortCache*
-F32SortCache_init(Float32SortCache *self, const CharBuf *field,
+F32SortCache_init(Float32SortCache *self, const String *field,
                   FieldType *type, int32_t cardinality, int32_t doc_max,
                   int32_t null_ord, int32_t ord_width, InStream *ord_in,
                   InStream *dat_in) {
@@ -172,7 +172,7 @@ F32SortCache_Make_Blank_IMP(Float32SortCache *self) {
 /***************************************************************************/
 
 Int32SortCache*
-I32SortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality,
+I32SortCache_new(const String *field, FieldType *type, int32_t cardinality,
                  int32_t doc_max, int32_t null_ord, int32_t ord_width,
                  InStream *ord_in, InStream *dat_in) {
     Int32SortCache *self
@@ -182,7 +182,7 @@ I32SortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality,
 }
 
 Int32SortCache*
-I32SortCache_init(Int32SortCache *self, const CharBuf *field,
+I32SortCache_init(Int32SortCache *self, const String *field,
                   FieldType *type, int32_t cardinality, int32_t doc_max,
                   int32_t null_ord, int32_t ord_width, InStream *ord_in,
                   InStream *dat_in) {
@@ -217,7 +217,7 @@ I32SortCache_Make_Blank_IMP(Int32SortCache *self) {
 /***************************************************************************/
 
 Int64SortCache*
-I64SortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality,
+I64SortCache_new(const String *field, FieldType *type, int32_t cardinality,
                  int32_t doc_max, int32_t null_ord, int32_t ord_width,
                  InStream *ord_in, InStream *dat_in) {
     Int64SortCache *self
@@ -227,7 +227,7 @@ I64SortCache_new(const CharBuf *field, FieldType *type, int32_t cardinality,
 }
 
 Int64SortCache*
-I64SortCache_init(Int64SortCache *self, const CharBuf *field,
+I64SortCache_init(Int64SortCache *self, const String *field,
                   FieldType *type, int32_t cardinality, int32_t doc_max,
                   int32_t null_ord, int32_t ord_width, InStream *ord_in,
                   InStream *dat_in) {

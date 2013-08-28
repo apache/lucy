@@ -52,7 +52,7 @@ class Lucy::Store::CompoundFileReader cnick CFReader
     Get_Real_Folder(CompoundFileReader *self);
 
     void
-    Set_Path(CompoundFileReader *self, const CharBuf *path);
+    Set_Path(CompoundFileReader *self, const String *path);
 
     public void
     Close(CompoundFileReader *self);
@@ -61,26 +61,26 @@ class Lucy::Store::CompoundFileReader cnick CFReader
     Destroy(CompoundFileReader *self);
 
     bool
-    Local_Delete(CompoundFileReader *self, const CharBuf *name);
+    Local_Delete(CompoundFileReader *self, const String *name);
 
     bool
-    Local_Exists(CompoundFileReader *self, const CharBuf *name);
+    Local_Exists(CompoundFileReader *self, const String *name);
 
     bool
-    Local_Is_Directory(CompoundFileReader *self, const CharBuf *name);
+    Local_Is_Directory(CompoundFileReader *self, const String *name);
 
     incremented nullable FileHandle*
-    Local_Open_FileHandle(CompoundFileReader *self, const CharBuf *name,
+    Local_Open_FileHandle(CompoundFileReader *self, const String *name,
                           uint32_t flags);
 
     incremented nullable InStream*
-    Local_Open_In(CompoundFileReader *self, const CharBuf *name);
+    Local_Open_In(CompoundFileReader *self, const String *name);
 
     bool
-    Local_MkDir(CompoundFileReader *self, const CharBuf *name);
+    Local_MkDir(CompoundFileReader *self, const String *name);
 
     nullable Folder*
-    Local_Find_Folder(CompoundFileReader *self, const CharBuf *name);
+    Local_Find_Folder(CompoundFileReader *self, const String *name);
 
     incremented nullable DirHandle*
     Local_Open_Dir(CompoundFileReader *self);

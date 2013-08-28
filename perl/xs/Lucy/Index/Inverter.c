@@ -52,14 +52,14 @@ S_fetch_entry(lucy_Inverter *self, HE *hash_entry) {
 
     cfish_StackString *field = CFISH_SStr_WRAP_STR(key, key_len);
     int32_t field_num
-        = LUCY_Seg_Field_Num(ivars->segment, (cfish_CharBuf*)field);
+        = LUCY_Seg_Field_Num(ivars->segment, (cfish_String*)field);
     if (!field_num) {
         // This field seems not to be in the segment yet.  Try to find it in
         // the Schema.
-        if (LUCY_Schema_Fetch_Type(schema, (cfish_CharBuf*)field)) {
+        if (LUCY_Schema_Fetch_Type(schema, (cfish_String*)field)) {
             // The field is in the Schema.  Get a field num from the Segment.
             field_num = LUCY_Seg_Add_Field(ivars->segment,
-                                           (cfish_CharBuf*)field);
+                                           (cfish_String*)field);
         }
         else {
             // We've truly failed to find the field.  The user must
@@ -71,7 +71,7 @@ S_fetch_entry(lucy_Inverter *self, HE *hash_entry) {
     lucy_InverterEntry *entry
         = (lucy_InverterEntry*)CFISH_VA_Fetch(ivars->entry_pool, field_num);
     if (!entry) {
-        entry = lucy_InvEntry_new(schema, (cfish_CharBuf*)field, field_num);
+        entry = lucy_InvEntry_new(schema, (cfish_String*)field, field_num);
         CFISH_VA_Store(ivars->entry_pool, field_num, (cfish_Obj*)entry);
     }
     return entry;

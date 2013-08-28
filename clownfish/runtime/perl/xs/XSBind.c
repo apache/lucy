@@ -65,7 +65,7 @@ XSBind_new_blank_obj(SV *either_sv) {
         STRLEN len;
         char *ptr = SvPVutf8(either_sv, len);
         cfish_StackString *klass = CFISH_SStr_WRAP_STR(ptr, len);
-        vtable = cfish_VTable_singleton((cfish_CharBuf*)klass, NULL);
+        vtable = cfish_VTable_singleton((cfish_String*)klass, NULL);
     }
 
     // Use the VTable to allocate a new blank object of the right size.
@@ -86,7 +86,7 @@ XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation) {
     cfish_Obj *retval = NULL;
     if (XSBind_sv_defined(sv)) {
         if (sv_isobject(sv)
-            && sv_derived_from(sv, (char*)CFISH_CB_Get_Ptr8(CFISH_VTable_Get_Name(vtable)))
+            && sv_derived_from(sv, (char*)CFISH_Str_Get_Ptr8(CFISH_VTable_Get_Name(vtable)))
            ) {
             // Unwrap a real Clownfish object.
             IV tmp = SvIV(SvRV(sv));
@@ -95,7 +95,7 @@ XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation) {
         else if (allocation &&
                  (vtable == CFISH_STACKSTRING
                   || vtable == CFISH_VIEWCHARBUF
-                  || vtable == CFISH_CHARBUF
+                  || vtable == CFISH_STRING
                   || vtable == CFISH_OBJ)
                 ) {
             // Wrap the string from an ordinary Perl scalar inside a
@@ -134,8 +134,8 @@ XSBind_cfish_to_perl(cfish_Obj *obj) {
     if (obj == NULL) {
         return newSV(0);
     }
-    else if (CFISH_Obj_Is_A(obj, CFISH_CHARBUF)) {
-        return XSBind_cb_to_sv((cfish_CharBuf*)obj);
+    else if (CFISH_Obj_Is_A(obj, CFISH_STRING)) {
+        return XSBind_cb_to_sv((cfish_String*)obj);
     }
     else if (CFISH_Obj_Is_A(obj, CFISH_BYTEBUF)) {
         return XSBind_bb_to_sv((cfish_ByteBuf*)obj);
@@ -200,7 +200,7 @@ XSBind_perl_to_cfish(SV *sv) {
         if (!retval) {
             STRLEN len;
             char *ptr = SvPVutf8(sv, len);
-            retval = (cfish_Obj*)cfish_CB_new_from_trusted_utf8(ptr, len);
+            retval = (cfish_Obj*)cfish_Str_new_from_trusted_utf8(ptr, len);
         }
     }
     else if (sv) {
@@ -224,12 +224,12 @@ XSBind_bb_to_sv(const cfish_ByteBuf *bb) {
 }
 
 SV*
-XSBind_cb_to_sv(const cfish_CharBuf *cb) {
+XSBind_cb_to_sv(const cfish_String *cb) {
     if (!cb) {
         return newSV(0);
     }
     else {
-        SV *sv = newSVpvn((char*)CFISH_CB_Get_Ptr8(cb), CFISH_CB_Get_Size(cb));
+        SV *sv = newSVpvn((char*)CFISH_Str_Get_Ptr8(cb), CFISH_Str_Get_Size(cb));
         SvUTF8_on(sv);
         return sv;
     }
@@ -328,7 +328,7 @@ static SV*
 S_cfish_hash_to_perl_hash(cfish_Hash *hash) {
     HV *perl_hash = newHV();
     SV *key_sv    = newSV(1);
-    cfish_CharBuf *key;
+    cfish_String *key;
     cfish_Obj     *val;
 
     // Prepare the SV key.
@@ -340,15 +340,15 @@ S_cfish_hash_to_perl_hash(cfish_Hash *hash) {
     while (CFISH_Hash_Next(hash, (cfish_Obj**)&key, &val)) {
         // Recurse for each value.
         SV *val_sv = XSBind_cfish_to_perl(val);
-        if (!CFISH_Obj_Is_A((cfish_Obj*)key, CFISH_CHARBUF)) {
+        if (!CFISH_Obj_Is_A((cfish_Obj*)key, CFISH_STRING)) {
             CFISH_THROW(CFISH_ERR,
                         "Can't convert a key of class %o to a Perl hash key",
                         CFISH_Obj_Get_Class_Name((cfish_Obj*)key));
         }
         else {
-            STRLEN key_size = CFISH_CB_Get_Size(key);
+            STRLEN key_size = CFISH_Str_Get_Size(key);
             char *key_sv_ptr = SvGROW(key_sv, key_size + 1);
-            memcpy(key_sv_ptr, CFISH_CB_Get_Ptr8(key), key_size);
+            memcpy(key_sv_ptr, CFISH_Str_Get_Ptr8(key), key_size);
             SvCUR_set(key_sv, key_size);
             *SvEND(key_sv) = '\0';
             (void)hv_store_ent(perl_hash, key_sv, val_sv, 0);
@@ -471,7 +471,7 @@ S_extract_from_sv(SV *value, void *target, const char *label,
                         valid_assignment = true;
                     }
                     else {
-                        cfish_CharBuf *mess
+                        cfish_String *mess
                             = CFISH_MAKE_MESS(
                                   "Invalid value for '%s' - not a %o",
                                   label, CFISH_VTable_Get_Name(vtable));
@@ -485,7 +485,7 @@ S_extract_from_sv(SV *value, void *target, const char *label,
                 valid_assignment = true;
                 break;
             default: {
-                    cfish_CharBuf *mess
+                    cfish_String *mess
                         = CFISH_MAKE_MESS("Unrecognized type: %i32 for param '%s'",
                                           (int32_t)type, label);
                     cfish_Err_set_error(cfish_Err_new(mess));
@@ -497,7 +497,7 @@ S_extract_from_sv(SV *value, void *target, const char *label,
     // Enforce that required params cannot be undef and must present valid
     // values.
     if (required && !valid_assignment) {
-        cfish_CharBuf *mess = CFISH_MAKE_MESS("Missing required param %s",
+        cfish_String *mess = CFISH_MAKE_MESS("Missing required param %s",
                                               label);
         cfish_Err_set_error(cfish_Err_new(mess));
         return false;
@@ -516,7 +516,7 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems, ...) {
     // Verify that our args come in pairs. Return success if there are no
     // args.
     if ((num_stack_elems - start) % 2 != 0) {
-        cfish_CharBuf *mess
+        cfish_String *mess
             = CFISH_MAKE_MESS(
                   "Expecting hash-style params, got odd number of args");
         cfish_Err_set_error(cfish_Err_new(mess));
@@ -551,7 +551,7 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems, ...) {
         if (found_arg == -1) {
             // Didn't find this parameter. Throw an error if it was required.
             if (required) {
-                cfish_CharBuf *mess
+                cfish_String *mess
                     = CFISH_MAKE_MESS("Missing required parameter: '%s'",
                                       label);
                 cfish_Err_set_error(cfish_Err_new(mess));
@@ -577,7 +577,7 @@ XSBind_allot_params(SV** stack, int32_t start, int32_t num_stack_elems, ...) {
         if (!cfish_NumUtil_u1get(verified_labels, tick)) {
             SV *const key_sv = stack[tick];
             char *key = SvPV_nolen(key_sv);
-            cfish_CharBuf *mess
+            cfish_String *mess
                 = CFISH_MAKE_MESS("Invalid parameter: '%s'", key);
             cfish_Err_set_error(cfish_Err_new(mess));
             return false;
@@ -605,9 +605,9 @@ S_lazy_init_host_obj(cfish_Obj *self) {
     sv_setiv(inner_obj, PTR2IV(self));
 
     // Connect class association.
-    cfish_CharBuf *class_name = CFISH_VTable_Get_Name(self->vtable);
-    HV *stash = gv_stashpvn((char*)CFISH_CB_Get_Ptr8(class_name),
-                            CFISH_CB_Get_Size(class_name), TRUE);
+    cfish_String *class_name = CFISH_VTable_Get_Name(self->vtable);
+    HV *stash = gv_stashpvn((char*)CFISH_Str_Get_Ptr8(class_name),
+                            CFISH_Str_Get_Size(class_name), TRUE);
     SvSTASH_set(inner_obj, (HV*)SvREFCNT_inc(stash));
 
     /* Up till now we've been keeping track of the refcount in
@@ -719,7 +719,7 @@ cfish_VTable_register_with_host(cfish_VTable *singleton, cfish_VTable *parent) {
 }
 
 cfish_VArray*
-cfish_VTable_fresh_host_methods(const cfish_CharBuf *class_name) {
+cfish_VTable_fresh_host_methods(const cfish_String *class_name) {
     dSP;
     ENTER;
     SAVETMPS;
@@ -736,8 +736,8 @@ cfish_VTable_fresh_host_methods(const cfish_CharBuf *class_name) {
     return methods;
 }
 
-cfish_CharBuf*
-cfish_VTable_find_parent_class(const cfish_CharBuf *class_name) {
+cfish_String*
+cfish_VTable_find_parent_class(const cfish_String *class_name) {
     dSP;
     ENTER;
     SAVETMPS;
@@ -749,8 +749,8 @@ cfish_VTable_find_parent_class(const cfish_CharBuf *class_name) {
     SPAGAIN;
     SV *parent_class_sv = POPs;
     PUTBACK;
-    cfish_CharBuf *parent_class
-        = (cfish_CharBuf*)XSBind_perl_to_cfish(parent_class_sv);
+    cfish_String *parent_class
+        = (cfish_String*)XSBind_perl_to_cfish(parent_class_sv);
     FREETMPS;
     LEAVE;
     return parent_class;
@@ -857,16 +857,16 @@ CFISH_Err_To_Host_IMP(cfish_Err *self) {
 }
 
 void
-cfish_Err_throw_mess(cfish_VTable *vtable, cfish_CharBuf *message) {
+cfish_Err_throw_mess(cfish_VTable *vtable, cfish_String *message) {
     cfish_Err *err = (cfish_Err*)CFISH_VTable_Make_Obj(vtable);
-    cfish_Err_init(err, cfish_CB_new(0));
+    cfish_Err_init(err, cfish_Str_new(0));
     CFISH_Err_Cat_Mess(err, message);
     CFISH_DECREF(message);
     cfish_Err_do_throw(err);
 }
 
 void
-cfish_Err_warn_mess(cfish_CharBuf *message) {
+cfish_Err_warn_mess(cfish_String *message) {
     SV *error_sv = XSBind_cb_to_sv(message);
     CFISH_DECREF(message);
     warn("%s", SvPV_nolen(error_sv));
@@ -889,8 +889,8 @@ cfish_Err_trap(CFISH_Err_Attempt_t routine, void *context) {
 
     int count = call_sv(attempt_xsub, G_EVAL | G_DISCARD);
     if (count != 0) {
-        cfish_CharBuf *mess
-            = cfish_CB_newf("'attempt' returned too many values: %i32",
+        cfish_String *mess
+            = cfish_Str_newf("'attempt' returned too many values: %i32",
                            (int32_t)count);
         error = cfish_Err_new(mess);
     }
@@ -907,7 +907,7 @@ cfish_Err_trap(CFISH_Err_Attempt_t routine, void *context) {
             else {
                 STRLEN len;
                 char *ptr = SvPVutf8(dollar_at, len);
-                cfish_CharBuf *mess = cfish_CB_new_from_trusted_utf8(ptr, len);
+                cfish_String *mess = cfish_Str_new_from_trusted_utf8(ptr, len);
                 error = cfish_Err_new(mess);
             }
         }

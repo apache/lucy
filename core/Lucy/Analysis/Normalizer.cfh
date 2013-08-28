@@ -32,7 +32,7 @@ public class Lucy::Analysis::Normalizer inherits Lucy::Analysis::Analyzer {
     int options;
 
     inert incremented Normalizer*
-    new(const CharBuf *normalization_form = NULL, bool case_fold = true,
+    new(const String *normalization_form = NULL, bool case_fold = true,
         bool strip_accents = false);
 
     /**
@@ -42,7 +42,7 @@ public class Lucy::Analysis::Normalizer inherits Lucy::Analysis::Analyzer {
      * @param strip_accents Strip accents, default is false.
      */
     public inert Normalizer*
-    init(Normalizer *self, const CharBuf *normalization_form = NULL,
+    init(Normalizer *self, const String *normalization_form = NULL,
         bool case_fold = true, bool strip_accents = false);
 
     public incremented Inversion*

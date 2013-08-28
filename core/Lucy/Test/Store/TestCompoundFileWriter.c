@@ -26,12 +26,12 @@
 #include "Lucy/Store/RAMFolder.h"
 #include "Lucy/Util/Json.h"
 
-static CharBuf *cfmeta_file = NULL;
-static CharBuf *cfmeta_temp = NULL;
-static CharBuf *cf_file     = NULL;
-static CharBuf *foo         = NULL;
-static CharBuf *bar         = NULL;
-static CharBuf *seg_1       = NULL;
+static String *cfmeta_file = NULL;
+static String *cfmeta_temp = NULL;
+static String *cf_file     = NULL;
+static String *foo         = NULL;
+static String *bar         = NULL;
+static String *seg_1       = NULL;
 
 TestCompoundFileWriter*
 TestCFWriter_new() {
@@ -40,12 +40,12 @@ TestCFWriter_new() {
 
 static void
 S_init_strings(void) {
-    cfmeta_file = CB_newf("cfmeta.json");
-    cfmeta_temp = CB_newf("cfmeta.json.temp");
-    cf_file     = CB_newf("cf.dat");
-    foo         = CB_newf("foo");
-    bar         = CB_newf("bar");
-    seg_1       = CB_newf("seg_1");
+    cfmeta_file = Str_newf("cfmeta.json");
+    cfmeta_temp = Str_newf("cfmeta.json.temp");
+    cf_file     = Str_newf("cf.dat");
+    foo         = Str_newf("foo");
+    bar         = Str_newf("bar");
+    seg_1       = Str_newf("seg_1");
 }
 
 static void
@@ -116,7 +116,7 @@ test_offsets(TestBatchRunner *runner) {
     files = (Hash*)CERTIFY(
                 Hash_Fetch_Str(cf_metadata, "files", 5), HASH);
 
-    CharBuf *file;
+    String *file;
     Obj     *filestats;
     bool     offsets_ok = true;
 
@@ -130,7 +130,7 @@ test_offsets(TestBatchRunner *runner) {
         if (offs % 8 != 0) {
             offsets_ok = false;
             FAIL(runner, "Offset %" PRId64 " for %s not a multiple of 8",
-                 offset, CB_Get_Ptr8(file));
+                 offset, Str_Get_Ptr8(file));
             break;
         }
     }

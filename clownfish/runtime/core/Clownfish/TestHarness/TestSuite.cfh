@@ -34,7 +34,7 @@ class Clownfish::TestHarness::TestSuite inherits Clownfish::Obj {
     Add_Batch(TestSuite *self, decremented TestBatch *batch);
 
     bool
-    Run_Batch(TestSuite *self, CharBuf *class_name, TestFormatter *formatter);
+    Run_Batch(TestSuite *self, String *class_name, TestFormatter *formatter);
 
     bool
     Run_All_Batches(TestSuite *self, TestFormatter *formatter);

@@ -184,7 +184,7 @@ CFCType_new_object(int flags, CFCParcel *parcel, const char *specifier,
 
     // Add flags.
     flags |= CFCTYPE_OBJECT;
-    if (strstr(specifier, "CharBuf")) {
+    if (strstr(specifier, "String")) {
         // Determine whether this type is a string type.
         flags |= CFCTYPE_STRING_TYPE;
     }

@@ -197,7 +197,7 @@ S_write_boot_c(CFCRuby *self) {
         "#include \"charmony.h\"\n"
         "#include \"%s\"\n"
         "#include \"%sparcel.h\"\n"
-        "#include \"Clownfish/CharBuf.h\"\n"
+        "#include \"Clownfish/String.h\"\n"
         "#include \"Clownfish/VTable.h\"\n"
         "%s\n"
         "\n"

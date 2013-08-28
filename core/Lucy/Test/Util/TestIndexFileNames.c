@@ -32,28 +32,28 @@ test_local_part(TestBatchRunner *runner) {
     StackString *source = SStr_BLANK();
     StackString *got    = SStr_BLANK();
 
-    got = IxFileNames_local_part((CharBuf*)source, got);
+    got = IxFileNames_local_part((String*)source, got);
     TEST_TRUE(runner, SStr_Equals(got, (Obj*)source), "simple name");
 
     SStr_Assign_Str(source, "foo.txt", 7);
-    got = IxFileNames_local_part((CharBuf*)source, got);
+    got = IxFileNames_local_part((String*)source, got);
     TEST_TRUE(runner, SStr_Equals(got, (Obj*)source), "name with extension");
 
     SStr_Assign_Str(source, "/foo", 4);
-    got = IxFileNames_local_part((CharBuf*)source, got);
+    got = IxFileNames_local_part((String*)source, got);
     TEST_TRUE(runner, SStr_Equals_Str(got, "foo", 3), "strip leading slash");
 
     SStr_Assign_Str(source, "/foo/", 5);
-    got = IxFileNames_local_part((CharBuf*)source, got);
+    got = IxFileNames_local_part((String*)source, got);
     TEST_TRUE(runner, SStr_Equals_Str(got, "foo", 3), "strip trailing slash");
 
     SStr_Assign_Str(source, "foo/bar\\ ", 9);
-    got = IxFileNames_local_part((CharBuf*)source, got);
+    got = IxFileNames_local_part((String*)source, got);
     TEST_TRUE(runner, SStr_Equals_Str(got, "bar\\ ", 5),
               "Include garbage like backslashes and spaces");
 
     SStr_Assign_Str(source, "foo/bar/baz.txt", 15);
-    got = IxFileNames_local_part((CharBuf*)source, got);
+    got = IxFileNames_local_part((String*)source, got);
     TEST_TRUE(runner, SStr_Equals_Str(got, "baz.txt", 7), "find last component");
 }
 
@@ -62,19 +62,19 @@ test_extract_gen(TestBatchRunner *runner) {
     StackString *source = SSTR_WRAP_STR("", 0);
 
     SStr_Assign_Str(source, "seg_9", 5);
-    TEST_TRUE(runner, IxFileNames_extract_gen((CharBuf*)source) == 9,
+    TEST_TRUE(runner, IxFileNames_extract_gen((String*)source) == 9,
               "extract_gen");
 
     SStr_Assign_Str(source, "seg_9/", 6);
-    TEST_TRUE(runner, IxFileNames_extract_gen((CharBuf*)source) == 9,
+    TEST_TRUE(runner, IxFileNames_extract_gen((String*)source) == 9,
               "deal with trailing slash");
 
     SStr_Assign_Str(source, "seg_9_8", 7);
-    TEST_TRUE(runner, IxFileNames_extract_gen((CharBuf*)source) == 9,
+    TEST_TRUE(runner, IxFileNames_extract_gen((String*)source) == 9,
               "Only go past first underscore");
 
     SStr_Assign_Str(source, "snapshot_5.json", 15);
-    TEST_TRUE(runner, IxFileNames_extract_gen((CharBuf*)source) == 5,
+    TEST_TRUE(runner, IxFileNames_extract_gen((String*)source) == 5,
               "Deal with file suffix");
 }
 

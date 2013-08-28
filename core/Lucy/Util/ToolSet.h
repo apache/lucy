@@ -40,7 +40,7 @@ extern "C" {
 #include "Clownfish/Obj.h"
 #include "Lucy/Object/BitVector.h"
 #include "Clownfish/ByteBuf.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"
 #include "Lucy/Object/I32Array.h"
