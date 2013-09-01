@@ -21,7 +21,7 @@ inert class Clownfish::TestHarness::TestUtils  {
     /** Testing-only String factory which uses strlen().
      */
     inert incremented String*
-    get_cb(const char *utf8);
+    get_str(const char *utf8);
 
     /** Return a random unsigned 64-bit integer.
      */

@@ -113,7 +113,7 @@ TestUtils_random_string(size_t length) {
 }
 
 String*
-TestUtils_get_cb(const char *ptr) {
+TestUtils_get_str(const char *ptr) {
     return Str_new_from_utf8(ptr, strlen(ptr));
 }
 

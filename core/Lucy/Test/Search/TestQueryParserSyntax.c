@@ -80,10 +80,10 @@ build_index() {
 
     // Schema.
     Schema *schema   = Schema_new();
-    String *plain_cb = Str_newf("plain");
-    String *fancy_cb = Str_newf("fancy");
-    Schema_Spec_Field(schema, plain_cb, (FieldType*)plain);
-    Schema_Spec_Field(schema, fancy_cb, (FieldType*)fancy);
+    String *plain_str = Str_newf("plain");
+    String *fancy_str = Str_newf("fancy");
+    Schema_Spec_Field(schema, plain_str, (FieldType*)plain);
+    Schema_Spec_Field(schema, fancy_str, (FieldType*)fancy);
 
     // Indexer.
     RAMFolder *folder  = RAMFolder_new(NULL);
@@ -94,8 +94,8 @@ build_index() {
     for (uint32_t i = 0; i < VA_Get_Size(doc_set); ++i) {
         String *content_string = (String*)VA_Fetch(doc_set, i);
         Doc *doc = Doc_new(NULL, 0);
-        Doc_Store(doc, plain_cb, (Obj*)content_string);
-        Doc_Store(doc, fancy_cb, (Obj*)content_string);
+        Doc_Store(doc, plain_str, (Obj*)content_string);
+        Doc_Store(doc, fancy_str, (Obj*)content_string);
         Indexer_Add_Doc(indexer, doc, 1.0);
         DECREF(doc);
     }
@@ -104,8 +104,8 @@ build_index() {
     // Clean up.
     DECREF(doc_set);
     DECREF(indexer);
-    DECREF(fancy_cb);
-    DECREF(plain_cb);
+    DECREF(fancy_str);
+    DECREF(plain_str);
     DECREF(schema);
     DECREF(fancy);
     DECREF(fancy_analyzer);

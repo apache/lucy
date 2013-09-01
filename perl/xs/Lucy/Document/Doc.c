@@ -60,7 +60,7 @@ LUCY_Doc_Store_IMP(lucy_Doc *self, const cfish_String *field, cfish_Obj *value) 
     SV *val_sv = value == NULL
                  ? newSV(0)
                  : CFISH_Obj_Is_A(value, CFISH_STRING)
-                 ? XSBind_cb_to_sv((cfish_String*)value)
+                 ? XSBind_str_to_sv((cfish_String*)value)
                  : (SV*)CFISH_Obj_To_Host(value);
     SvUTF8_on(key_sv);
     (void)hv_store_ent((HV*)ivars->fields, key_sv, val_sv, 0);

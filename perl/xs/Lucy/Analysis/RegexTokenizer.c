@@ -73,7 +73,7 @@ S_compile_token_re(const cfish_String *pattern) {
     SAVETMPS;
     EXTEND(SP, 1);
     PUSHMARK(SP);
-    XPUSHs(XSBind_cb_to_sv(pattern));
+    XPUSHs(XSBind_str_to_sv(pattern));
     PUTBACK;
     call_pv("Lucy::Analysis::RegexTokenizer::_compile_token_re", G_SCALAR);
     SPAGAIN;

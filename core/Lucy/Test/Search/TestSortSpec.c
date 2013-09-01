@@ -41,34 +41,34 @@
 #include "Lucy/Search/SortRule.h"
 #include "Lucy/Store/RAMFolder.h"
 
-static String *air_cb;
-static String *airplane_cb;
-static String *bike_cb;
-static String *car_cb;
-static String *carrot_cb;
-static String *cat_cb;
-static String *float32_cb;
-static String *float64_cb;
-static String *food_cb;
-static String *home_cb;
-static String *int32_cb;
-static String *int64_cb;
-static String *land_cb;
-static String *name_cb;
-static String *nope_cb;
-static String *num_cb;
-static String *random_cb;
-static String *sloth_cb;
-static String *speed_cb;
-static String *unknown_cb;
-static String *unused_cb;
-static String *vehicle_cb;
-static String *weight_cb;
+static String *air_str;
+static String *airplane_str;
+static String *bike_str;
+static String *car_str;
+static String *carrot_str;
+static String *cat_str;
+static String *float32_str;
+static String *float64_str;
+static String *food_str;
+static String *home_str;
+static String *int32_str;
+static String *int64_str;
+static String *land_str;
+static String *name_str;
+static String *nope_str;
+static String *num_str;
+static String *random_str;
+static String *sloth_str;
+static String *speed_str;
+static String *unknown_str;
+static String *unused_str;
+static String *vehicle_str;
+static String *weight_str;
 
-static String *random_float32s_cb;
-static String *random_float64s_cb;
-static String *random_int32s_cb;
-static String *random_int64s_cb;
+static String *random_float32s_str;
+static String *random_float64s_str;
+static String *random_int32s_str;
+static String *random_int64s_str;
 
 TestSortSpec*
 TestSortSpec_new() {
@@ -77,66 +77,66 @@ TestSortSpec_new() {
 
 static void
 S_init_strings() {
-    air_cb      = Str_newf("air");
-    airplane_cb = Str_newf("airplane");
-    bike_cb     = Str_newf("bike");
-    car_cb      = Str_newf("car");
-    carrot_cb   = Str_newf("carrot");
-    cat_cb      = Str_newf("cat");
-    float32_cb  = Str_newf("float32");
-    float64_cb  = Str_newf("float64");
-    food_cb     = Str_newf("food");
-    home_cb     = Str_newf("home");
-    int32_cb    = Str_newf("int32");
-    int64_cb    = Str_newf("int64");
-    land_cb     = Str_newf("land");
-    name_cb     = Str_newf("name");
-    nope_cb     = Str_newf("nope");
-    num_cb      = Str_newf("num");
-    random_cb   = Str_newf("random");
-    sloth_cb    = Str_newf("sloth");
-    speed_cb    = Str_newf("speed");
-    unknown_cb  = Str_newf("unknown");
-    unused_cb   = Str_newf("unused");
-    vehicle_cb  = Str_newf("vehicle");
-    weight_cb   = Str_newf("weight");
+    air_str      = Str_newf("air");
+    airplane_str = Str_newf("airplane");
+    bike_str     = Str_newf("bike");
+    car_str      = Str_newf("car");
+    carrot_str   = Str_newf("carrot");
+    cat_str      = Str_newf("cat");
+    float32_str  = Str_newf("float32");
+    float64_str  = Str_newf("float64");
+    food_str     = Str_newf("food");
+    home_str     = Str_newf("home");
+    int32_str    = Str_newf("int32");
+    int64_str    = Str_newf("int64");
+    land_str     = Str_newf("land");
+    name_str     = Str_newf("name");
+    nope_str     = Str_newf("nope");
+    num_str      = Str_newf("num");
+    random_str   = Str_newf("random");
+    sloth_str    = Str_newf("sloth");
+    speed_str    = Str_newf("speed");
+    unknown_str  = Str_newf("unknown");
+    unused_str   = Str_newf("unused");
+    vehicle_str  = Str_newf("vehicle");
+    weight_str   = Str_newf("weight");
 
-    random_float32s_cb = Str_newf("random_float32s");
-    random_float64s_cb = Str_newf("random_float64s");
-    random_int32s_cb   = Str_newf("random_int32s");
-    random_int64s_cb   = Str_newf("random_int64s");
+    random_float32s_str = Str_newf("random_float32s");
+    random_float64s_str = Str_newf("random_float64s");
+    random_int32s_str   = Str_newf("random_int32s");
+    random_int64s_str   = Str_newf("random_int64s");
 }
 
 static void
 S_destroy_strings() {
-    DECREF(air_cb);
-    DECREF(airplane_cb);
-    DECREF(bike_cb);
-    DECREF(car_cb);
-    DECREF(carrot_cb);
-    DECREF(cat_cb);
-    DECREF(float32_cb);
-    DECREF(float64_cb);
-    DECREF(food_cb);
-    DECREF(home_cb);
-    DECREF(int32_cb);
-    DECREF(int64_cb);
-    DECREF(land_cb);
-    DECREF(name_cb);
-    DECREF(nope_cb);
-    DECREF(num_cb);
-    DECREF(random_cb);
-    DECREF(sloth_cb);
-    DECREF(speed_cb);
-    DECREF(unknown_cb);
-    DECREF(unused_cb);
-    DECREF(vehicle_cb);
-    DECREF(weight_cb);
+    DECREF(air_str);
+    DECREF(airplane_str);
+    DECREF(bike_str);
+    DECREF(car_str);
+    DECREF(carrot_str);
+    DECREF(cat_str);
+    DECREF(float32_str);
+    DECREF(float64_str);
+    DECREF(food_str);
+    DECREF(home_str);
+    DECREF(int32_str);
+    DECREF(int64_str);
+    DECREF(land_str);
+    DECREF(name_str);
+    DECREF(nope_str);
+    DECREF(num_str);
+    DECREF(random_str);
+    DECREF(sloth_str);
+    DECREF(speed_str);
+    DECREF(unknown_str);
+    DECREF(unused_str);
+    DECREF(vehicle_str);
+    DECREF(weight_str);
 
-    DECREF(random_float32s_cb);
-    DECREF(random_float64s_cb);
-    DECREF(random_int32s_cb);
-    DECREF(random_int64s_cb);
+    DECREF(random_float32s_str);
+    DECREF(random_float64s_str);
+    DECREF(random_int32s_str);
+    DECREF(random_int64s_str);
 }
 
 TestReverseType*
@@ -192,18 +192,18 @@ S_create_schema() {
 
     TestReverseType *reverse_type = TestReverseType_new();
 
-    Schema_Spec_Field(schema, name_cb,    (FieldType*)string_type);
-    Schema_Spec_Field(schema, speed_cb,   (FieldType*)int32_type);
-    Schema_Spec_Field(schema, sloth_cb,   (FieldType*)reverse_type);
-    Schema_Spec_Field(schema, weight_cb,  (FieldType*)int32_type);
-    Schema_Spec_Field(schema, int32_cb,   (FieldType*)int32_type);
-    Schema_Spec_Field(schema, int64_cb,   (FieldType*)int64_type);
-    Schema_Spec_Field(schema, float32_cb, (FieldType*)float32_type);
-    Schema_Spec_Field(schema, float64_cb, (FieldType*)float64_type);
-    Schema_Spec_Field(schema, home_cb,    (FieldType*)string_type);
-    Schema_Spec_Field(schema, cat_cb,     (FieldType*)string_type);
-    Schema_Spec_Field(schema, unused_cb,  (FieldType*)string_type);
-    Schema_Spec_Field(schema, nope_cb,    (FieldType*)unsortable);
+    Schema_Spec_Field(schema, name_str,    (FieldType*)string_type);
+    Schema_Spec_Field(schema, speed_str,   (FieldType*)int32_type);
+    Schema_Spec_Field(schema, sloth_str,   (FieldType*)reverse_type);
+    Schema_Spec_Field(schema, weight_str,  (FieldType*)int32_type);
+    Schema_Spec_Field(schema, int32_str,   (FieldType*)int32_type);
+    Schema_Spec_Field(schema, int64_str,   (FieldType*)int64_type);
+    Schema_Spec_Field(schema, float32_str, (FieldType*)float32_type);
+    Schema_Spec_Field(schema, float64_str, (FieldType*)float64_type);
+    Schema_Spec_Field(schema, home_str,    (FieldType*)string_type);
+    Schema_Spec_Field(schema, cat_str,     (FieldType*)string_type);
+    Schema_Spec_Field(schema, unused_str,  (FieldType*)string_type);
+    Schema_Spec_Field(schema, nope_str,    (FieldType*)unsortable);
 
     DECREF(reverse_type);
     DECREF(float64_type);
@@ -230,19 +230,19 @@ S_add_vehicle(Indexer *indexer, String *name, int32_t speed, int32_t sloth,
               int32_t weight, String *home, String *cat) {
     Doc       *doc   = Doc_new(NULL, 0);
 
-    Doc_Store(doc, name_cb, (Obj*)name);
-    Doc_Store(doc, home_cb, (Obj*)home);
-    Doc_Store(doc, cat_cb,  (Obj*)cat);
+    Doc_Store(doc, name_str, (Obj*)name);
+    Doc_Store(doc, home_str, (Obj*)home);
+    Doc_Store(doc, cat_str,  (Obj*)cat);
 
     String *string;
     string = Str_newf("%i32", speed);
-    Doc_Store(doc, speed_cb, (Obj*)string);
+    Doc_Store(doc, speed_str, (Obj*)string);
     DECREF(string);
     string = Str_newf("%i32", sloth);
-    Doc_Store(doc, sloth_cb, (Obj*)string);
+    Doc_Store(doc, sloth_str, (Obj*)string);
     DECREF(string);
     string = Str_newf("%i32", weight);
-    Doc_Store(doc, weight_cb, (Obj*)string);
+    Doc_Store(doc, weight_str, (Obj*)string);
     DECREF(string);
 
     Indexer_Add_Doc(indexer, doc, 1.0f);
@@ -254,8 +254,8 @@ static void
 S_add_doc(Indexer *indexer, Obj *name_obj, String *cat, String *field_name) {
     Doc *doc = Doc_new(NULL, 0);
     String *name = Obj_To_String(name_obj);
-    Doc_Store(doc, name_cb, (Obj*)name);
-    Doc_Store(doc, cat_cb,  (Obj*)cat);
+    Doc_Store(doc, name_str, (Obj*)name);
+    Doc_Store(doc, cat_str,  (Obj*)cat);
     if (field_name) {
         Doc_Store(doc, field_name, (Obj*)name);
     }
@@ -351,7 +351,7 @@ S_test_sorted_search(IndexSearcher *searcher, String *query,
     ViewCharBuf *name = (ViewCharBuf*)SStr_BLANK();
     HitDoc *hit_doc;
     while (NULL != (hit_doc = Hits_Next(hits))) {
-        HitDoc_Extract(hit_doc, name_cb, name);
+        HitDoc_Extract(hit_doc, name_str, name);
         VA_Push(results, (Obj*)Str_Clone((String*)name));
         DECREF(hit_doc);
     }
@@ -371,7 +371,7 @@ typedef struct SortContext {
 static void
 S_attempt_sorted_search(void *context) {
     SortContext *sort_ctx = (SortContext*)context;
-    VArray *results = S_test_sorted_search(sort_ctx->searcher, vehicle_cb, 100,
+    VArray *results = S_test_sorted_search(sort_ctx->searcher, vehicle_str, 100,
                                            sort_ctx->sort_field, false, NULL);
     DECREF(results);
 }
@@ -387,26 +387,26 @@ test_sort_spec(TestBatchRunner *runner) {
 
     // First, add vehicles.
     S_refresh_indexer(&indexer, schema, folder);
-    S_add_vehicle(indexer, airplane_cb, 200, 200, 8000, air_cb,  vehicle_cb);
-    S_add_vehicle(indexer, bike_cb,      15,  15,   25, land_cb, vehicle_cb);
-    S_add_vehicle(indexer, car_cb,       70,  70, 3000, land_cb, vehicle_cb);
+    S_add_vehicle(indexer, airplane_str, 200, 200, 8000, air_str,  vehicle_str);
+    S_add_vehicle(indexer, bike_str,      15,  15,   25, land_str, vehicle_str);
+    S_add_vehicle(indexer, car_str,       70,  70, 3000, land_str, vehicle_str);
 
     // Add random objects.
     VArray *random_strings =
         S_add_random_objects(&indexer, schema, folder, S_random_string,
-                             NULL, random_cb);
+                             NULL, random_str);
     VArray *random_int32s =
         S_add_random_objects(&indexer, schema, folder, S_random_int32,
-                             int32_cb, random_int32s_cb);
+                             int32_str, random_int32s_str);
     VArray *random_int64s =
         S_add_random_objects(&indexer, schema, folder, S_random_int64,
-                             int64_cb, random_int64s_cb);
+                             int64_str, random_int64s_str);
     VArray *random_float32s =
         S_add_random_objects(&indexer, schema, folder, S_random_float32,
-                             float32_cb, random_float32s_cb);
+                             float32_str, random_float32s_str);
     VArray *random_float64s =
         S_add_random_objects(&indexer, schema, folder, S_random_float64,
-                             float64_cb, random_float64s_cb);
+                             float64_str, random_float64s_str);
 
     // Add numbers to verify consistent ordering.
     int32_t *nums = (int32_t*)MALLOCATE(100 * sizeof(int32_t));
@@ -427,7 +427,7 @@ test_sort_spec(TestBatchRunner *runner) {
         char name_buf[3];
         sprintf(name_buf, "%02d", nums[i]);
         StackString *name = SSTR_WRAP_STR(name_buf, 2);
-        S_add_doc(indexer, (Obj*)name, num_cb, NULL);
+        S_add_doc(indexer, (Obj*)name, num_str, NULL);
         if (i % 10 == 0) {
             S_refresh_indexer(&indexer, schema, folder);
         }
@@ -441,12 +441,12 @@ test_sort_spec(TestBatchRunner *runner) {
 
     IndexSearcher *searcher = IxSearcher_new((Obj*)folder);
 
-    results = S_test_sorted_search(searcher, vehicle_cb, 100,
-                                   name_cb, false, NULL);
+    results = S_test_sorted_search(searcher, vehicle_str, 100,
+                                   name_str, false, NULL);
     VA_Clear(wanted);
-    VA_Push(wanted, INCREF(airplane_cb));
-    VA_Push(wanted, INCREF(bike_cb));
-    VA_Push(wanted, INCREF(car_cb));
+    VA_Push(wanted, INCREF(airplane_str));
+    VA_Push(wanted, INCREF(bike_str));
+    VA_Push(wanted, INCREF(car_str));
     TEST_TRUE(runner, VA_Equals(results, (Obj*)wanted), "sort by one criteria");
     DECREF(results);
 
@@ -458,7 +458,7 @@ test_sort_spec(TestBatchRunner *runner) {
     SortContext sort_ctx;
     sort_ctx.searcher = searcher;
 
-    sort_ctx.sort_field = nope_cb;
+    sort_ctx.sort_field = nope_str;
     error = Err_trap(S_attempt_sorted_search, &sort_ctx);
     TEST_TRUE(runner, error != NULL
               && Err_Is_A(error, ERR)
@@ -466,7 +466,7 @@ test_sort_spec(TestBatchRunner *runner) {
               "sorting on a non-sortable field throws an error");
     DECREF(error);
 
-    sort_ctx.sort_field = unknown_cb;
+    sort_ctx.sort_field = unknown_str;
     error = Err_trap(S_attempt_sorted_search, &sort_ctx);
     TEST_TRUE(runner, error != NULL
               && Err_Is_A(error, ERR)
@@ -475,121 +475,121 @@ test_sort_spec(TestBatchRunner *runner) {
     DECREF(error);
 #endif
 
-    results = S_test_sorted_search(searcher, vehicle_cb, 100,
-                                   weight_cb, false, NULL);
+    results = S_test_sorted_search(searcher, vehicle_str, 100,
+                                   weight_str, false, NULL);
     VA_Clear(wanted);
-    VA_Push(wanted, INCREF(bike_cb));
-    VA_Push(wanted, INCREF(car_cb));
-    VA_Push(wanted, INCREF(airplane_cb));
+    VA_Push(wanted, INCREF(bike_str));
+    VA_Push(wanted, INCREF(car_str));
+    VA_Push(wanted, INCREF(airplane_str));
     TEST_TRUE(runner, VA_Equals(results, (Obj*)wanted), "sort by one criteria");
     DECREF(results);
 
-    results = S_test_sorted_search(searcher, vehicle_cb, 100,
-                                   name_cb, true, NULL);
+    results = S_test_sorted_search(searcher, vehicle_str, 100,
+                                   name_str, true, NULL);
     VA_Clear(wanted);
-    VA_Push(wanted, INCREF(car_cb));
-    VA_Push(wanted, INCREF(bike_cb));
-    VA_Push(wanted, INCREF(airplane_cb));
+    VA_Push(wanted, INCREF(car_str));
+    VA_Push(wanted, INCREF(bike_str));
+    VA_Push(wanted, INCREF(airplane_str));
     TEST_TRUE(runner, VA_Equals(results, (Obj*)wanted), "reverse sort");
     DECREF(results);
 
-    results = S_test_sorted_search(searcher, vehicle_cb, 100,
-                                   home_cb, false, name_cb, false, NULL);
+    results = S_test_sorted_search(searcher, vehicle_str, 100,
+                                   home_str, false, name_str, false, NULL);
     VA_Clear(wanted);
-    VA_Push(wanted, INCREF(airplane_cb));
-    VA_Push(wanted, INCREF(bike_cb));
-    VA_Push(wanted, INCREF(car_cb));
+    VA_Push(wanted, INCREF(airplane_str));
+    VA_Push(wanted, INCREF(bike_str));
+    VA_Push(wanted, INCREF(car_str));
     TEST_TRUE(runner, VA_Equals(results, (Obj*)wanted), "multiple criteria");
     DECREF(results);
 
-    results = S_test_sorted_search(searcher, vehicle_cb, 100,
-                                   home_cb, false, name_cb, true, NULL);
+    results = S_test_sorted_search(searcher, vehicle_str, 100,
+                                   home_str, false, name_str, true, NULL);
     VA_Clear(wanted);
-    VA_Push(wanted, INCREF(airplane_cb));
-    VA_Push(wanted, INCREF(car_cb));
-    VA_Push(wanted, INCREF(bike_cb));
+    VA_Push(wanted, INCREF(airplane_str));
+    VA_Push(wanted, INCREF(car_str));
+    VA_Push(wanted, INCREF(bike_str));
     TEST_TRUE(runner, VA_Equals(results, (Obj*)wanted),
               "multiple criteria with reverse");
     DECREF(results);
 
-    results = S_test_sorted_search(searcher, vehicle_cb, 100,
-                                   speed_cb, true, NULL);
-    results2 = S_test_sorted_search(searcher, vehicle_cb, 100,
-                                    sloth_cb, false, NULL);
+    results = S_test_sorted_search(searcher, vehicle_str, 100,
+                                   speed_str, true, NULL);
+    results2 = S_test_sorted_search(searcher, vehicle_str, 100,
+                                    sloth_str, false, NULL);
     TEST_TRUE(runner, VA_Equals(results, (Obj*)results2),
               "FieldType_Compare_Values");
     DECREF(results2);
     DECREF(results);
 
-    results = S_test_sorted_search(searcher, random_cb, 100,
-                                   name_cb, false, NULL);
+    results = S_test_sorted_search(searcher, random_str, 100,
+                                   name_str, false, NULL);
     TEST_TRUE(runner, VA_Equals(results, (Obj*)random_strings),
               "random strings");
     DECREF(results);
 
-    results = S_test_sorted_search(searcher, random_int32s_cb, 100,
-                                   int32_cb, false, NULL);
+    results = S_test_sorted_search(searcher, random_int32s_str, 100,
+                                   int32_str, false, NULL);
     TEST_TRUE(runner, VA_Equals(results, (Obj*)random_int32s),
               "int32");
     DECREF(results);
 
-    results = S_test_sorted_search(searcher, random_int64s_cb, 100,
-                                   int64_cb, false, NULL);
+    results = S_test_sorted_search(searcher, random_int64s_str, 100,
+                                   int64_str, false, NULL);
     TEST_TRUE(runner, VA_Equals(results, (Obj*)random_int64s),
               "int64");
     DECREF(results);
 
-    results = S_test_sorted_search(searcher, random_float32s_cb, 100,
-                                   float32_cb, false, NULL);
+    results = S_test_sorted_search(searcher, random_float32s_str, 100,
+                                   float32_str, false, NULL);
     TEST_TRUE(runner, VA_Equals(results, (Obj*)random_float32s),
               "float32");
     DECREF(results);
 
-    results = S_test_sorted_search(searcher, random_float64s_cb, 100,
-                                   float64_cb, false, NULL);
+    results = S_test_sorted_search(searcher, random_float64s_str, 100,
+                                   float64_str, false, NULL);
     TEST_TRUE(runner, VA_Equals(results, (Obj*)random_float64s),
               "float64");
     DECREF(results);
 
-    String *bbbcca_cb = Str_newf("bike bike bike car car airplane");
-    results = S_test_sorted_search(searcher, bbbcca_cb, 100,
-                                   unused_cb, false, NULL);
+    String *bbbcca_str = Str_newf("bike bike bike car car airplane");
+    results = S_test_sorted_search(searcher, bbbcca_str, 100,
+                                   unused_str, false, NULL);
     VA_Clear(wanted);
-    VA_Push(wanted, INCREF(airplane_cb));
-    VA_Push(wanted, INCREF(bike_cb));
-    VA_Push(wanted, INCREF(car_cb));
+    VA_Push(wanted, INCREF(airplane_str));
+    VA_Push(wanted, INCREF(bike_str));
+    VA_Push(wanted, INCREF(car_str));
     TEST_TRUE(runner, VA_Equals(results, (Obj*)wanted),
               "sorting on field with no values sorts by doc id");
     DECREF(results);
-    DECREF(bbbcca_cb);
+    DECREF(bbbcca_str);
 
-    String *nn_cb        = Str_newf("99");
-    String *nn_or_car_cb = Str_newf("99 OR car");
-    results = S_test_sorted_search(searcher, nn_or_car_cb, 10,
-                                   speed_cb, false, NULL);
+    String *nn_str        = Str_newf("99");
+    String *nn_or_car_str = Str_newf("99 OR car");
+    results = S_test_sorted_search(searcher, nn_or_car_str, 10,
+                                   speed_str, false, NULL);
     VA_Clear(wanted);
-    VA_Push(wanted, INCREF(car_cb));
-    VA_Push(wanted, INCREF(nn_cb));
+    VA_Push(wanted, INCREF(car_str));
+    VA_Push(wanted, INCREF(nn_str));
     TEST_TRUE(runner, VA_Equals(results, (Obj*)wanted),
               "doc with NULL value sorts last");
     DECREF(results);
-    DECREF(nn_cb);
-    DECREF(nn_or_car_cb);
+    DECREF(nn_str);
+    DECREF(nn_or_car_str);
 
-    results = S_test_sorted_search(searcher, num_cb, 10,
-                                   name_cb, false, NULL);
-    results2 = S_test_sorted_search(searcher, num_cb, 30,
-                                    name_cb, false, NULL);
+    results = S_test_sorted_search(searcher, num_str, 10,
+                                   name_str, false, NULL);
+    results2 = S_test_sorted_search(searcher, num_str, 30,
+                                    name_str, false, NULL);
     VA_Resize(results2, 10);
     TEST_TRUE(runner, VA_Equals(results, (Obj*)results2),
               "same order regardless of queue size");
     DECREF(results2);
     DECREF(results);
 
-    results = S_test_sorted_search(searcher, num_cb, 10,
-                                   name_cb, true, NULL);
-    results2 = S_test_sorted_search(searcher, num_cb, 30,
-                                    name_cb, true, NULL);
+    results = S_test_sorted_search(searcher, num_str, 10,
+                                   name_str, true, NULL);
+    results2 = S_test_sorted_search(searcher, num_str, 30,
+                                    name_str, true, NULL);
     VA_Resize(results2, 10);
     TEST_TRUE(runner, VA_Equals(results, (Obj*)results2),
               "same order regardless of queue size (reverse sort)");
@@ -600,17 +600,17 @@ test_sort_spec(TestBatchRunner *runner) {
 
     // Add another seg to index.
     indexer = Indexer_new(schema, (Obj*)folder, NULL, 0);
-    S_add_vehicle(indexer, carrot_cb, 0, 0, 1, land_cb, food_cb);
+    S_add_vehicle(indexer, carrot_str, 0, 0, 1, land_str, food_str);
     Indexer_Commit(indexer);
     DECREF(indexer);
 
     searcher = IxSearcher_new((Obj*)folder);
-    results = S_test_sorted_search(searcher, vehicle_cb, 100,
-                                   name_cb, false, NULL);
+    results = S_test_sorted_search(searcher, vehicle_str, 100,
+                                   name_str, false, NULL);
     VA_Clear(wanted);
-    VA_Push(wanted, INCREF(airplane_cb));
-    VA_Push(wanted, INCREF(bike_cb));
-    VA_Push(wanted, INCREF(car_cb));
+    VA_Push(wanted, INCREF(airplane_str));
+    VA_Push(wanted, INCREF(bike_str));
+    VA_Push(wanted, INCREF(car_str));
     TEST_TRUE(runner, VA_Equals(results, (Obj*)wanted), "Multi-segment sort");
     DECREF(results);
     DECREF(searcher);

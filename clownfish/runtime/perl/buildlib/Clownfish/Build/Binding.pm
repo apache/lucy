@@ -175,7 +175,7 @@ SV*
 to_perl(self)
     cfish_String *self;
 CODE:
-    RETVAL = XSBind_cb_to_sv(self);
+    RETVAL = XSBind_str_to_sv(self);
 OUTPUT: RETVAL
 
 MODULE = Clownfish     PACKAGE = Clownfish::ViewCharBuf

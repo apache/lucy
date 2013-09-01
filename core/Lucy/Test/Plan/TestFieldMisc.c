@@ -34,14 +34,14 @@
 #include "Lucy/Search/TermQuery.h"
 #include "Lucy/Store/RAMFolder.h"
 
-static String *analyzed_cb;
-static String *easy_analyzed_cb;
-static String *state_cb;
-static String *states_cb;
-static String *string_cb;
-static String *unindexed_but_analyzed_cb;
-static String *unindexed_unanalyzed_cb;
-static String *united_states_cb;
+static String *analyzed_str;
+static String *easy_analyzed_str;
+static String *state_str;
+static String *states_str;
+static String *string_str;
+static String *unindexed_but_analyzed_str;
+static String *unindexed_unanalyzed_str;
+static String *united_states_str;
 
 TestFieldMisc*
 TestFieldMisc_new() {
@@ -50,26 +50,26 @@ TestFieldMisc_new() {
 
 static void
 S_init_strings() {
-    analyzed_cb               = Str_newf("analyzed");
-    easy_analyzed_cb          = Str_newf("easy_analyzed");
-    state_cb                  = Str_newf("state");
-    states_cb                 = Str_newf("States");
-    string_cb                 = Str_newf("string");
-    unindexed_but_analyzed_cb = Str_newf("unindexed_but_analyzed");
-    unindexed_unanalyzed_cb   = Str_newf("unindexed_unanalyzed");
-    united_states_cb          = Str_newf("United States");
+    analyzed_str               = Str_newf("analyzed");
+    easy_analyzed_str          = Str_newf("easy_analyzed");
+    state_str                  = Str_newf("state");
+    states_str                 = Str_newf("States");
+    string_str                 = Str_newf("string");
+    unindexed_but_analyzed_str = Str_newf("unindexed_but_analyzed");
+    unindexed_unanalyzed_str   = Str_newf("unindexed_unanalyzed");
+    united_states_str          = Str_newf("United States");
 }
 
 static void
 S_destroy_strings() {
-    DECREF(analyzed_cb);
-    DECREF(easy_analyzed_cb);
-    DECREF(state_cb);
-    DECREF(states_cb);
-    DECREF(string_cb);
-    DECREF(unindexed_but_analyzed_cb);
-    DECREF(unindexed_unanalyzed_cb);
-    DECREF(united_states_cb);
+    DECREF(analyzed_str);
+    DECREF(easy_analyzed_str);
+    DECREF(state_str);
+    DECREF(states_str);
+    DECREF(string_str);
+    DECREF(unindexed_but_analyzed_str);
+    DECREF(unindexed_unanalyzed_str);
+    DECREF(united_states_str);
 }
 
 static Schema*
@@ -92,12 +92,12 @@ S_create_schema() {
     StringType *unindexed_unanalyzed = StringType_new();
     StringType_Set_Indexed(unindexed_unanalyzed, false);
 
-    Schema_Spec_Field(schema, analyzed_cb, (FieldType*)plain);
-    Schema_Spec_Field(schema, easy_analyzed_cb, (FieldType*)easy_analyzed);
-    Schema_Spec_Field(schema, string_cb, (FieldType*)string_spec);
-    Schema_Spec_Field(schema, unindexed_but_analyzed_cb,
+    Schema_Spec_Field(schema, analyzed_str, (FieldType*)plain);
+    Schema_Spec_Field(schema, easy_analyzed_str, (FieldType*)easy_analyzed);
+    Schema_Spec_Field(schema, string_str, (FieldType*)string_spec);
+    Schema_Spec_Field(schema, unindexed_but_analyzed_str,
                       (FieldType*)unindexed_but_analyzed);
-    Schema_Spec_Field(schema, unindexed_unanalyzed_cb,
+    Schema_Spec_Field(schema, unindexed_unanalyzed_str,
                       (FieldType*)unindexed_unanalyzed);
 
     DECREF(unindexed_unanalyzed);
@@ -115,7 +115,7 @@ S_create_schema() {
 static void
 S_add_doc(Indexer *indexer, String *field_name) {
     Doc *doc = Doc_new(NULL, 0);
-    Doc_Store(doc, field_name, (Obj*)united_states_cb);
+    Doc_Store(doc, field_name, (Obj*)united_states_str);
     Indexer_Add_Doc(indexer, doc, 1.0f);
     DECREF(doc);
 }
@@ -135,7 +135,7 @@ S_check(TestBatchRunner *runner, RAMFolder *folder, String *field,
         HitDoc *hit = Hits_Next(hits);
         ViewCharBuf *value = (ViewCharBuf*)SStr_BLANK();
         HitDoc_Extract(hit, field, value);
-        TEST_TRUE(runner, Str_Equals(united_states_cb, (Obj*)value),
+        TEST_TRUE(runner, Str_Equals(united_states_str, (Obj*)value),
                   "%s correct doc returned", Str_Get_Ptr8(field));
         DECREF(hit);
     }
@@ -151,21 +151,21 @@ test_spec_field(TestBatchRunner *runner) {
     Schema    *schema  = S_create_schema();
     Indexer   *indexer = Indexer_new(schema, (Obj*)folder, NULL, 0);
 
-    S_add_doc(indexer, analyzed_cb);
-    S_add_doc(indexer, easy_analyzed_cb);
-    S_add_doc(indexer, string_cb);
-    S_add_doc(indexer, unindexed_but_analyzed_cb);
-    S_add_doc(indexer, unindexed_unanalyzed_cb);
+    S_add_doc(indexer, analyzed_str);
+    S_add_doc(indexer, easy_analyzed_str);
+    S_add_doc(indexer, string_str);
+    S_add_doc(indexer, unindexed_but_analyzed_str);
+    S_add_doc(indexer, unindexed_unanalyzed_str);
 
     Indexer_Commit(indexer);
 
-    S_check(runner, folder, analyzed_cb,               states_cb,        1);
-    S_check(runner, folder, easy_analyzed_cb,          state_cb,         1);
-    S_check(runner, folder, string_cb,                 united_states_cb, 1);
-    S_check(runner, folder, unindexed_but_analyzed_cb, state_cb,         0);
-    S_check(runner, folder, unindexed_but_analyzed_cb, united_states_cb, 0);
-    S_check(runner, folder, unindexed_unanalyzed_cb,   state_cb,         0);
-    S_check(runner, folder, unindexed_unanalyzed_cb,   united_states_cb, 0);
+    S_check(runner, folder, analyzed_str,               states_str,        1);
+    S_check(runner, folder, easy_analyzed_str,          state_str,         1);
+    S_check(runner, folder, string_str,                 united_states_str, 1);
+    S_check(runner, folder, unindexed_but_analyzed_str, state_str,         0);
+    S_check(runner, folder, unindexed_but_analyzed_str, united_states_str, 0);
+    S_check(runner, folder, unindexed_unanalyzed_str,   state_str,         0);
+    S_check(runner, folder, unindexed_unanalyzed_str,   united_states_str, 0);
 
     DECREF(indexer);
     DECREF(schema);
