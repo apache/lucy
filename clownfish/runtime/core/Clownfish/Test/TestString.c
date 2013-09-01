@@ -41,7 +41,7 @@ TestStr_new() {
 }
 
 static String*
-S_get_cb(const char *string) {
+S_get_str(const char *string) {
     return Str_new_from_utf8(string, strlen(string));
 }
 
@@ -51,19 +51,19 @@ test_Cat(TestBatchRunner *runner) {
     String *source;
     String *got;
 
-    source = S_get_cb("");
+    source = S_get_str("");
     got = Str_Immutable_Cat(source, wanted);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Cat");
     DECREF(got);
     DECREF(source);
 
-    source = S_get_cb("a");
+    source = S_get_str("a");
     got = Str_Immutable_Cat_UTF8(source, smiley, smiley_len);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Cat_UTF8");
     DECREF(got);
     DECREF(source);
 
-    source = S_get_cb("a");
+    source = S_get_str("a");
     got = Str_Immutable_Cat_Trusted_UTF8(source, smiley, smiley_len);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Cat_Trusted_UTF8");
     DECREF(got);
@@ -74,14 +74,14 @@ test_Cat(TestBatchRunner *runner) {
 
 static void
 test_Mimic_and_Clone(TestBatchRunner *runner) {
-    String *wanted = S_get_cb("foo");
-    String *got    = S_get_cb("bar");
+    String *wanted = S_get_str("foo");
+    String *got    = S_get_str("bar");
 
     Str_Mimic(got, (Obj*)wanted);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Mimic");
     DECREF(got);
 
-    got = S_get_cb("bar");
+    got = S_get_str("bar");
     Str_Mimic_Str(got, "foo", 3);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Mimic_Str");
     DECREF(got);
@@ -96,23 +96,23 @@ test_Mimic_and_Clone(TestBatchRunner *runner) {
 static void
 test_Find(TestBatchRunner *runner) {
     String *string;
-    String *substring = S_get_cb("foo");
+    String *substring = S_get_str("foo");
 
-    string = S_get_cb("");
+    string = S_get_str("");
     TEST_TRUE(runner, Str_Find(string, substring) == -1, "Not in empty string");
     DECREF(string);
 
-    string = S_get_cb("foo");
+    string = S_get_str("foo");
     TEST_TRUE(runner, Str_Find(string, substring) == 0, "Find complete string");
     DECREF(string);
 
-    string = S_get_cb("afoo");
+    string = S_get_str("afoo");
     TEST_TRUE(runner, Str_Find(string, substring) == 1, "Find after first");
     Str_Set_Size(string, 3);
     TEST_TRUE(runner, Str_Find(string, substring) == -1, "Don't overrun");
     DECREF(string);
 
-    string = S_get_cb("afood");
+    string = S_get_str("afood");
     TEST_TRUE(runner, Str_Find(string, substring) == 1, "Find in middle");
     DECREF(string);
 
@@ -226,19 +226,19 @@ static void
 test_To_F64(TestBatchRunner *runner) {
     String *string;
 
-    string = S_get_cb("1.5");
+    string = S_get_str("1.5");
     double difference = 1.5 - Str_To_F64(string);
     if (difference < 0) { difference = 0 - difference; }
     TEST_TRUE(runner, difference < 0.001, "To_F64");
     DECREF(string);
 
-    string = S_get_cb("-1.5");
+    string = S_get_str("-1.5");
     difference = 1.5 + Str_To_F64(string);
     if (difference < 0) { difference = 0 - difference; }
     TEST_TRUE(runner, difference < 0.001, "To_F64 negative");
     DECREF(string);
 
-    string = S_get_cb("1.59");
+    string = S_get_str("1.59");
     double value_full = Str_To_F64(string);
     Str_Set_Size(string, 3);
     double value_short = Str_To_F64(string);
@@ -251,11 +251,11 @@ static void
 test_To_I64(TestBatchRunner *runner) {
     String *string;
 
-    string = S_get_cb("10");
+    string = S_get_str("10");
     TEST_TRUE(runner, Str_To_I64(string) == 10, "To_I64");
     DECREF(string);
 
-    string = S_get_cb("-10");
+    string = S_get_str("-10");
     TEST_TRUE(runner, Str_To_I64(string) == -10, "To_I64 negative");
     DECREF(string);
 }
@@ -263,8 +263,8 @@ test_To_I64(TestBatchRunner *runner) {
 
 static void
 test_vcatf_s(TestBatchRunner *runner) {
-    String *wanted = S_get_cb("foo bar bizzle baz");
-    String *got = S_get_cb("foo ");
+    String *wanted = S_get_str("foo bar bizzle baz");
+    String *got = S_get_str("foo ");
     Str_catf(got, "bar %s baz", "bizzle");
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "%%s");
     DECREF(wanted);
@@ -273,8 +273,8 @@ test_vcatf_s(TestBatchRunner *runner) {
 
 static void
 test_vcatf_null_string(TestBatchRunner *runner) {
-    String *wanted = S_get_cb("foo bar [NULL] baz");
-    String *got = S_get_cb("foo ");
+    String *wanted = S_get_str("foo bar [NULL] baz");
+    String *got = S_get_str("foo ");
     Str_catf(got, "bar %s baz", NULL);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "%%s NULL");
     DECREF(wanted);
@@ -282,10 +282,10 @@ test_vcatf_null_string(TestBatchRunner *runner) {
 }
 
 static void
-test_vcatf_cb(TestBatchRunner *runner) {
-    String *wanted = S_get_cb("foo bar ZEKE baz");
-    String *catworthy = S_get_cb("ZEKE");
-    String *got = S_get_cb("foo ");
+test_vcatf_str(TestBatchRunner *runner) {
+    String *wanted = S_get_str("foo bar ZEKE baz");
+    String *catworthy = S_get_str("ZEKE");
+    String *got = S_get_str("foo ");
     Str_catf(got, "bar %o baz", catworthy);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "%%o String");
     DECREF(catworthy);
@@ -295,9 +295,9 @@ test_vcatf_cb(TestBatchRunner *runner) {
 
 static void
 test_vcatf_obj(TestBatchRunner *runner) {
-    String    *wanted = S_get_cb("ooga 20 booga");
+    String    *wanted = S_get_str("ooga 20 booga");
     Integer32 *i32 = Int32_new(20);
-    String    *got = S_get_cb("ooga");
+    String    *got = S_get_str("ooga");
     Str_catf(got, " %o booga", i32);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "%%o Obj");
     DECREF(i32);
@@ -307,8 +307,8 @@ test_vcatf_obj(TestBatchRunner *runner) {
 
 static void
 test_vcatf_null_obj(TestBatchRunner *runner) {
-    String *wanted = S_get_cb("foo bar [NULL] baz");
-    String *got = S_get_cb("foo ");
+    String *wanted = S_get_str("foo bar [NULL] baz");
+    String *got = S_get_str("foo ");
     Str_catf(got, "bar %o baz", NULL);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "%%o NULL");
     DECREF(wanted);
@@ -317,9 +317,9 @@ test_vcatf_null_obj(TestBatchRunner *runner) {
 
 static void
 test_vcatf_i8(TestBatchRunner *runner) {
-    String *wanted = S_get_cb("foo bar -3 baz");
+    String *wanted = S_get_str("foo bar -3 baz");
     int8_t num = -3;
-    String *got = S_get_cb("foo ");
+    String *got = S_get_str("foo ");
     Str_catf(got, "bar %i8 baz", num);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "%%i8");
     DECREF(wanted);
@@ -328,9 +328,9 @@ test_vcatf_i8(TestBatchRunner *runner) {
 
 static void
 test_vcatf_i32(TestBatchRunner *runner) {
-    String *wanted = S_get_cb("foo bar -100000 baz");
+    String *wanted = S_get_str("foo bar -100000 baz");
     int32_t num = -100000;
-    String *got = S_get_cb("foo ");
+    String *got = S_get_str("foo ");
     Str_catf(got, "bar %i32 baz", num);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "%%i32");
     DECREF(wanted);
@@ -339,9 +339,9 @@ test_vcatf_i32(TestBatchRunner *runner) {
 
 static void
 test_vcatf_i64(TestBatchRunner *runner) {
-    String *wanted = S_get_cb("foo bar -5000000000 baz");
+    String *wanted = S_get_str("foo bar -5000000000 baz");
     int64_t num = INT64_C(-5000000000);
-    String *got = S_get_cb("foo ");
+    String *got = S_get_str("foo ");
     Str_catf(got, "bar %i64 baz", num);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "%%i64");
     DECREF(wanted);
@@ -350,9 +350,9 @@ test_vcatf_i64(TestBatchRunner *runner) {
 
 static void
 test_vcatf_u8(TestBatchRunner *runner) {
-    String *wanted = S_get_cb("foo bar 3 baz");
+    String *wanted = S_get_str("foo bar 3 baz");
     uint8_t num = 3;
-    String *got = S_get_cb("foo ");
+    String *got = S_get_str("foo ");
     Str_catf(got, "bar %u8 baz", num);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "%%u8");
     DECREF(wanted);
@@ -361,9 +361,9 @@ test_vcatf_u8(TestBatchRunner *runner) {
 
 static void
 test_vcatf_u32(TestBatchRunner *runner) {
-    String *wanted = S_get_cb("foo bar 100000 baz");
+    String *wanted = S_get_str("foo bar 100000 baz");
     uint32_t num = 100000;
-    String *got = S_get_cb("foo ");
+    String *got = S_get_str("foo ");
     Str_catf(got, "bar %u32 baz", num);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "%%u32");
     DECREF(wanted);
@@ -372,9 +372,9 @@ test_vcatf_u32(TestBatchRunner *runner) {
 
 static void
 test_vcatf_u64(TestBatchRunner *runner) {
-    String *wanted = S_get_cb("foo bar 5000000000 baz");
+    String *wanted = S_get_str("foo bar 5000000000 baz");
     uint64_t num = UINT64_C(5000000000);
-    String *got = S_get_cb("foo ");
+    String *got = S_get_str("foo ");
     Str_catf(got, "bar %u64 baz", num);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "%%u64");
     DECREF(wanted);
@@ -386,7 +386,7 @@ test_vcatf_f64(TestBatchRunner *runner) {
     String *wanted;
     char buf[64];
     float num = 1.3f;
-    String *got = S_get_cb("foo ");
+    String *got = S_get_str("foo ");
     sprintf(buf, "foo bar %g baz", num);
     wanted = Str_new_from_trusted_utf8(buf, strlen(buf));
     Str_catf(got, "bar %f64 baz", num);
@@ -400,7 +400,7 @@ test_vcatf_x32(TestBatchRunner *runner) {
     String *wanted;
     char buf[64];
     unsigned long num = INT32_MAX;
-    String *got = S_get_cb("foo ");
+    String *got = S_get_str("foo ");
 #if (SIZEOF_LONG == 4)
     sprintf(buf, "foo bar %.8lx baz", num);
 #elif (SIZEOF_INT == 4)
@@ -418,7 +418,7 @@ TestStr_Run_IMP(TestString *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 53);
     test_vcatf_s(runner);
     test_vcatf_null_string(runner);
-    test_vcatf_cb(runner);
+    test_vcatf_str(runner);
     test_vcatf_obj(runner);
     test_vcatf_null_obj(runner);
     test_vcatf_i8(runner);

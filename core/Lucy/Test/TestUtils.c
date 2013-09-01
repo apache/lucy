@@ -43,13 +43,13 @@ VArray*
 TestUtils_doc_set() {
     VArray *docs = VA_new(10);
 
-    VA_Push(docs, (Obj*)TestUtils_get_cb("x"));
-    VA_Push(docs, (Obj*)TestUtils_get_cb("y"));
-    VA_Push(docs, (Obj*)TestUtils_get_cb("z"));
-    VA_Push(docs, (Obj*)TestUtils_get_cb("x a"));
-    VA_Push(docs, (Obj*)TestUtils_get_cb("x a b"));
-    VA_Push(docs, (Obj*)TestUtils_get_cb("x a b c"));
-    VA_Push(docs, (Obj*)TestUtils_get_cb("x foo a b c d"));
+    VA_Push(docs, (Obj*)TestUtils_get_str("x"));
+    VA_Push(docs, (Obj*)TestUtils_get_str("y"));
+    VA_Push(docs, (Obj*)TestUtils_get_str("z"));
+    VA_Push(docs, (Obj*)TestUtils_get_str("x a"));
+    VA_Push(docs, (Obj*)TestUtils_get_str("x a b"));
+    VA_Push(docs, (Obj*)TestUtils_get_str("x a b c"));
+    VA_Push(docs, (Obj*)TestUtils_get_str("x foo a b c d"));
 
     return docs;
 }
@@ -76,14 +76,14 @@ TestUtils_make_poly_query(uint32_t boolop, ...) {
 
 TermQuery*
 TestUtils_make_term_query(const char *field, const char *term) {
-    String *field_cb = (String*)SSTR_WRAP_STR(field, strlen(field));
-    String *term_cb  = (String*)SSTR_WRAP_STR(term, strlen(term));
-    return TermQuery_new((String*)field_cb, (Obj*)term_cb);
+    String *field_str = (String*)SSTR_WRAP_STR(field, strlen(field));
+    String *term_str  = (String*)SSTR_WRAP_STR(term, strlen(term));
+    return TermQuery_new((String*)field_str, (Obj*)term_str);
 }
 
 PhraseQuery*
 TestUtils_make_phrase_query(const char *field, ...) {
-    String *field_cb = (String*)SSTR_WRAP_STR(field, strlen(field));
+    String *field_str = (String*)SSTR_WRAP_STR(field, strlen(field));
     va_list args;
     VArray *terms = VA_new(0);
     PhraseQuery *query;
@@ -91,22 +91,22 @@ TestUtils_make_phrase_query(const char *field, ...) {
 
     va_start(args, field);
     while (NULL != (term_str = va_arg(args, char*))) {
-        VA_Push(terms, (Obj*)TestUtils_get_cb(term_str));
+        VA_Push(terms, (Obj*)TestUtils_get_str(term_str));
     }
     va_end(args);
 
-    query = PhraseQuery_new(field_cb, terms);
+    query = PhraseQuery_new(field_str, terms);
     DECREF(terms);
     return query;
 }
 
 LeafQuery*
 TestUtils_make_leaf_query(const char *field, const char *term) {
-    String *term_cb  = (String*)SSTR_WRAP_STR(term, strlen(term));
-    String *field_cb = field
+    String *term_str  = (String*)SSTR_WRAP_STR(term, strlen(term));
+    String *field_str = field
                        ? (String*)SSTR_WRAP_STR(field, strlen(field))
                        : NULL;
-    return LeafQuery_new(field_cb, term_cb);
+    return LeafQuery_new(field_str, term_str);
 }
 
 NOTQuery*

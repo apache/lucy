@@ -135,7 +135,7 @@ XSBind_cfish_to_perl(cfish_Obj *obj) {
         return newSV(0);
     }
     else if (CFISH_Obj_Is_A(obj, CFISH_STRING)) {
-        return XSBind_cb_to_sv((cfish_String*)obj);
+        return XSBind_str_to_sv((cfish_String*)obj);
     }
     else if (CFISH_Obj_Is_A(obj, CFISH_BYTEBUF)) {
         return XSBind_bb_to_sv((cfish_ByteBuf*)obj);
@@ -224,12 +224,12 @@ XSBind_bb_to_sv(const cfish_ByteBuf *bb) {
 }
 
 SV*
-XSBind_cb_to_sv(const cfish_String *cb) {
-    if (!cb) {
+XSBind_str_to_sv(const cfish_String *str) {
+    if (!str) {
         return newSV(0);
     }
     else {
-        SV *sv = newSVpvn((char*)CFISH_Str_Get_Ptr8(cb), CFISH_Str_Get_Size(cb));
+        SV *sv = newSVpvn((char*)CFISH_Str_Get_Ptr8(str), CFISH_Str_Get_Size(str));
         SvUTF8_on(sv);
         return sv;
     }
@@ -725,7 +725,7 @@ cfish_VTable_fresh_host_methods(const cfish_String *class_name) {
     SAVETMPS;
     EXTEND(SP, 1);
     PUSHMARK(SP);
-    mPUSHs(XSBind_cb_to_sv(class_name));
+    mPUSHs(XSBind_str_to_sv(class_name));
     PUTBACK;
     call_pv("Clownfish::VTable::_fresh_host_methods", G_SCALAR);
     SPAGAIN;
@@ -743,7 +743,7 @@ cfish_VTable_find_parent_class(const cfish_String *class_name) {
     SAVETMPS;
     EXTEND(SP, 1);
     PUSHMARK(SP);
-    mPUSHs(XSBind_cb_to_sv(class_name));
+    mPUSHs(XSBind_str_to_sv(class_name));
     PUTBACK;
     call_pv("Clownfish::VTable::_find_parent_class", G_SCALAR);
     SPAGAIN;
@@ -867,7 +867,7 @@ cfish_Err_throw_mess(cfish_VTable *vtable, cfish_String *message) {
 
 void
 cfish_Err_warn_mess(cfish_String *message) {
-    SV *error_sv = XSBind_cb_to_sv(message);
+    SV *error_sv = XSBind_str_to_sv(message);
     CFISH_DECREF(message);
     warn("%s", SvPV_nolen(error_sv));
     SvREFCNT_dec(error_sv);

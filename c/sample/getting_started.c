@@ -89,15 +89,15 @@ S_create_schema() {
     FullTextType *type = FullTextType_new((Analyzer*)analyzer);
 
     {
-        String *field_cb = Str_newf("title");
-        Schema_Spec_Field(schema, field_cb, (FieldType*)type);
-        DECREF(field_cb);
+        String *field_str = Str_newf("title");
+        Schema_Spec_Field(schema, field_str, (FieldType*)type);
+        DECREF(field_str);
     }
 
     {
-        String *field_cb = Str_newf("content");
-        Schema_Spec_Field(schema, field_cb, (FieldType*)type);
-        DECREF(field_cb);
+        String *field_str = Str_newf("content");
+        Schema_Spec_Field(schema, field_str, (FieldType*)type);
+        DECREF(field_str);
     }
 
     DECREF(language);
@@ -139,20 +139,20 @@ S_add_document(Indexer *indexer, const char *title, const char *content) {
 
     {
         // Store 'title' field   
-        String *field_cb = Str_newf("title");
-        String *value_cb = Str_new_from_utf8(title, strlen(title));
-        Doc_Store(doc, field_cb, (Obj*)value_cb);
-        DECREF(field_cb);
-        DECREF(value_cb);
+        String *field_str = Str_newf("title");
+        String *value_str = Str_new_from_utf8(title, strlen(title));
+        Doc_Store(doc, field_str, (Obj*)value_str);
+        DECREF(field_str);
+        DECREF(value_str);
     }
 
     {
         // Store 'content' field   
-        String *field_cb = Str_newf("content");
-        String *value_cb = Str_new_from_utf8(content, strlen(content));
-        Doc_Store(doc, field_cb, (Obj*)value_cb);
-        DECREF(field_cb);
-        DECREF(value_cb);
+        String *field_str = Str_newf("content");
+        String *value_str = Str_new_from_utf8(content, strlen(content));
+        Doc_Store(doc, field_str, (Obj*)value_str);
+        DECREF(field_str);
+        DECREF(value_str);
     }
 
     Indexer_Add_Doc(indexer, doc, 1.0);
@@ -165,18 +165,18 @@ S_search(IndexSearcher *searcher, const char *query) {
     printf("Searching for: %s\n", query);
 
     // Execute search query.
-    String *query_cb = Str_new_from_utf8(query, strlen(query));
-    Hits   *hits     = IxSearcher_Hits(searcher, (Obj*)query_cb, 0, 10, NULL);
+    String *query_str = Str_new_from_utf8(query, strlen(query));
+    Hits   *hits      = IxSearcher_Hits(searcher, (Obj*)query_str, 0, 10, NULL);
 
-    String *field_cb = Str_newf("title");
+    String *field_str = Str_newf("title");
     HitDoc *hit;
     int i = 1;
 
     // Loop over search results.
     while (NULL != (hit = Hits_Next(hits))) {
-        String *value_cb = (String*)HitDoc_Extract(hit, field_cb, NULL);
+        String *value_str = (String*)HitDoc_Extract(hit, field_str, NULL);
 
-        printf("Result %d: %s\n", i, Str_Get_Ptr8(value_cb));
+        printf("Result %d: %s\n", i, Str_Get_Ptr8(value_str));
 
         DECREF(hit);
         i++;
@@ -184,8 +184,8 @@ S_search(IndexSearcher *searcher, const char *query) {
 
     printf("\n");
 
-    DECREF(query_cb);
+    DECREF(query_str);
     DECREF(hits);
-    DECREF(field_cb);
+    DECREF(field_str);
 }
 

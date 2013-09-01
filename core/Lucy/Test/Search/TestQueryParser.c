@@ -41,7 +41,7 @@ TestQueryParser*
 TestQP_init(TestQueryParser *self, const char *query_string, Query *tree,
             Query *expanded, uint32_t num_hits) {
     TestQueryParserIVARS *const ivars = TestQP_IVARS(self);
-    ivars->query_string = query_string ? TestUtils_get_cb(query_string) : NULL;
+    ivars->query_string = query_string ? TestUtils_get_str(query_string) : NULL;
     ivars->tree         = tree     ? tree     : NULL;
     ivars->expanded     = expanded ? expanded : NULL;
     ivars->num_hits     = num_hits;

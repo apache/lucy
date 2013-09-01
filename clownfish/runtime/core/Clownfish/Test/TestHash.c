@@ -73,10 +73,10 @@ test_Store_and_Fetch(TestBatchRunner *runner) {
     StackString *foo          = SSTR_WRAP_STR("foo", 3);
 
     for (int32_t i = 0; i < 100; i++) {
-        String *cb = Str_newf("%i32", i);
-        Hash_Store(hash, (Obj*)cb, (Obj*)cb);
-        Hash_Store(dupe, (Obj*)cb, INCREF(cb));
-        VA_Push(expected, INCREF(cb));
+        String *str = Str_newf("%i32", i);
+        Hash_Store(hash, (Obj*)str, (Obj*)str);
+        Hash_Store(dupe, (Obj*)str, INCREF(str));
+        VA_Push(expected, INCREF(str));
     }
     TEST_TRUE(runner, Hash_Equals(hash, (Obj*)dupe), "Equals");
 
@@ -135,9 +135,9 @@ test_Keys_Values_Iter(TestBatchRunner *runner) {
     VArray   *values;
 
     for (uint32_t i = 0; i < 500; i++) {
-        String *cb = Str_newf("%u32", i);
-        Hash_Store(hash, (Obj*)cb, (Obj*)cb);
-        VA_Push(expected, INCREF(cb));
+        String *str = Str_newf("%u32", i);
+        Hash_Store(hash, (Obj*)str, (Obj*)str);
+        VA_Push(expected, INCREF(str));
     }
 
     VA_Sort(expected, NULL, NULL);
@@ -190,21 +190,21 @@ test_stress(TestBatchRunner *runner) {
     VArray   *values;
 
     for (uint32_t i = 0; i < 1000; i++) {
-        String *cb = TestUtils_random_string(rand() % 1200);
-        while (Hash_Fetch(hash, (Obj*)cb)) {
-            DECREF(cb);
-            cb = TestUtils_random_string(rand() % 1200);
+        String *str = TestUtils_random_string(rand() % 1200);
+        while (Hash_Fetch(hash, (Obj*)str)) {
+            DECREF(str);
+            str = TestUtils_random_string(rand() % 1200);
         }
-        Hash_Store(hash, (Obj*)cb, (Obj*)cb);
-        VA_Push(expected, INCREF(cb));
+        Hash_Store(hash, (Obj*)str, (Obj*)str);
+        VA_Push(expected, INCREF(str));
     }
 
     VA_Sort(expected, NULL, NULL);
 
     // Overwrite for good measure.
     for (uint32_t i = 0; i < 1000; i++) {
-        String *cb = (String*)VA_Fetch(expected, i);
-        Hash_Store(hash, (Obj*)cb, INCREF(cb));
+        String *str = (String*)VA_Fetch(expected, i);
+        Hash_Store(hash, (Obj*)str, INCREF(str));
     }
 
     keys   = Hash_Keys(hash);

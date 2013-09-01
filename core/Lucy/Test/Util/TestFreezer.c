@@ -78,7 +78,7 @@ test_bytebuf(TestBatchRunner *runner) {
 
 static void
 test_string(TestBatchRunner *runner) {
-    String *wanted = TestUtils_get_cb("foo");
+    String *wanted = TestUtils_get_str("foo");
     String *got    = (String*)S_freeze_thaw((Obj*)wanted);
     TEST_TRUE(runner, got && Str_Equals(wanted, (Obj*)got),
               "Round trip through FREEZE/THAW");
@@ -91,10 +91,10 @@ test_hash(TestBatchRunner *runner) {
     Hash  *wanted = Hash_new(0);
 
     for (uint32_t i = 0; i < 10; i++) {
-        String *cb = TestUtils_random_string(rand() % 1200);
+        String *str = TestUtils_random_string(rand() % 1200);
         Integer32 *num = Int32_new(i);
-        Hash_Store(wanted, (Obj*)cb, (Obj*)num);
-        Hash_Store(wanted, (Obj*)num, (Obj*)cb);
+        Hash_Store(wanted, (Obj*)str, (Obj*)num);
+        Hash_Store(wanted, (Obj*)num, (Obj*)str);
     }
 
     {
