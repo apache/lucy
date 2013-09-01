@@ -412,8 +412,9 @@ BGMerger_Prepare_Commit_IMP(BackgroundMerger *self) {
 
         // Write temporary snapshot file.
         DECREF(ivars->snapfile);
-        ivars->snapfile = IxManager_Make_Snapshot_Filename(ivars->manager);
-        Str_Cat_Trusted_Str(ivars->snapfile, ".temp", 5);
+        String *snapfile = IxManager_Make_Snapshot_Filename(ivars->manager);
+        ivars->snapfile = Str_Immutable_Cat_Trusted_UTF8(snapfile, ".temp", 5);
+        DECREF(snapfile);
         Folder_Delete(folder, ivars->snapfile);
         Snapshot_Write_File(snapshot, folder, ivars->snapfile);
 
