@@ -27,6 +27,8 @@
 #include <ctype.h>
 
 #include "Clownfish/Err.h"
+
+#include "Clownfish/CharBuf.h"
 #include "Clownfish/String.h"
 #include "Clownfish/VTable.h"
 #include "Clownfish/Util/Memory.h"
@@ -56,30 +58,39 @@ Err_To_String_IMP(Err *self) {
 
 void
 Err_Cat_Mess_IMP(Err *self, const String *mess) {
-    Str_Cat(self->mess, mess);
+    String *new_mess = Str_Immutable_Cat(self->mess, mess);
+    DECREF(self->mess);
+    self->mess = new_mess;
 }
 
 // Fallbacks in case variadic macros aren't available.
 #ifndef CHY_HAS_VARIADIC_MACROS
+static String*
+S_str_vnewf(char *pattern, va_list args) {
+    CharBuf *buf = CB_new(strlen(pattern) + 10);
+    CB_VCatF(buf, pattern, args);
+    String *message = CB_Yield_String(buf);
+    DECREF(buf);
+    return message;
+}
 void
 THROW(VTable *vtable, char *pattern, ...) {
     va_list args;
-    Err *err = (Err*)VTable_Make_Obj(vtable);
-    err = Err_init(err, Str_new(0));
 
     va_start(args, pattern);
-    Str_VCatF(err->mess, pattern, args);
+    String *message = S_str_vnewf(pattern, args);
     va_end(args);
 
+    Err *err = (Err*)VTable_Make_Obj(vtable);
+    err = Err_init(err, message);
     Err_do_throw(err);
 }
 void
 CFISH_WARN(char *pattern, ...) {
     va_list args;
-    String *const message = Str_new(strlen(pattern) + 10);
 
     va_start(args, pattern);
-    Str_VCatF(message, pattern, args);
+    String *message = S_str_vnewf(pattern, args);
     va_end(args);
 
     Err_warn_mess(message);
@@ -87,10 +98,9 @@ CFISH_WARN(char *pattern, ...) {
 String*
 CFISH_MAKE_MESS(char *pattern, ...) {
     va_list args;
-    String *const message = Str_new(strlen(pattern) + 10);
 
     va_start(args, pattern);
-    Str_VCatF(message, pattern, args);
+    String *message = S_str_vnewf(pattern, args);
     va_end(args);
 
     return message;
@@ -98,31 +108,32 @@ CFISH_MAKE_MESS(char *pattern, ...) {
 #endif
 
 
-static void
-S_vcat_mess(String *message, const char *file, int line, const char *func,
-            const char *pattern, va_list args) {
+static String*
+S_vmake_mess(const char *file, int line, const char *func,
+             const char *pattern, va_list args) {
     size_t guess_len = strlen(file)
                        + (func ? strlen(func) : 0)
                        + strlen(pattern)
                        + 30;
-    Str_Grow(message, guess_len);
-    Str_VCatF(message, pattern, args);
+    CharBuf *buf = CB_new(guess_len);
+    CB_VCatF(buf, pattern, args);
     if (func != NULL) {
-        Str_catf(message, "\n\t%s at %s line %i32\n", func, file, (int32_t)line);
+        CB_catf(buf, "\n\t%s at %s line %i32\n", func, file, (int32_t)line);
     }
     else {
-        Str_catf(message, "\n\t%s line %i32\n", file, (int32_t)line);
+        CB_catf(buf, "\n\t%s line %i32\n", file, (int32_t)line);
     }
+    String *message = CB_Yield_String(buf);
+    DECREF(buf);
+    return message;
 }
 
 String*
 Err_make_mess(const char *file, int line, const char *func,
               const char *pattern, ...) {
     va_list args;
-    size_t guess_len = strlen(pattern) + strlen(file) + 20;
-    String *message = Str_new(guess_len);
     va_start(args, pattern);
-    S_vcat_mess(message, file, line, func, pattern, args);
+    String *message = S_vmake_mess(file, line, func, pattern, args);
     va_end(args);
     return message;
 }
@@ -131,9 +142,8 @@ void
 Err_warn_at(const char *file, int line, const char *func,
             const char *pattern, ...) {
     va_list args;
-    String *message = Str_new(0);
     va_start(args, pattern);
-    S_vcat_mess(message, file, line, func, pattern, args);
+    String *message = S_vmake_mess(file, line, func, pattern, args);
     va_end(args);
     Err_warn_mess(message);
 }
@@ -145,17 +155,22 @@ Err_Get_Mess_IMP(Err *self) {
 
 void
 Err_Add_Frame_IMP(Err *self, const char *file, int line, const char *func) {
+    CharBuf *buf = CB_new_from_str(self->mess);
+
     if (!Str_Ends_With_Str(self->mess, "\n", 1)) {
-        Str_Cat_Char(self->mess, '\n');
+        CB_Cat_Char(buf, '\n');
     }
 
     if (func != NULL) {
-        Str_catf(self->mess, "\t%s at %s line %i32\n", func, file,
-                (int32_t)line);
+        CB_catf(buf, "\t%s at %s line %i32\n", func, file, (int32_t)line);
     }
     else {
-        Str_catf(self->mess, "\tat %s line %i32\n", file, (int32_t)line);
+        CB_catf(buf, "\tat %s line %i32\n", file, (int32_t)line);
     }
+
+    DECREF(self->mess);
+    self->mess = CB_Yield_String(buf);
+    DECREF(buf);
 }
 
 void
@@ -168,13 +183,13 @@ void
 Err_throw_at(VTable *vtable, const char *file, int line,
              const char *func, const char *pattern, ...) {
     va_list args;
-    Err *err = (Err*)VTable_Make_Obj(vtable);
-    err = Err_init(err, Str_new(0));
 
     va_start(args, pattern);
-    S_vcat_mess(err->mess, file, line, func, pattern, args);
+    String *message = S_vmake_mess(file, line, func, pattern, args);
     va_end(args);
 
+    Err *err = (Err*)VTable_Make_Obj(vtable);
+    err = Err_init(err, message);
     Err_do_throw(err);
 }
 
