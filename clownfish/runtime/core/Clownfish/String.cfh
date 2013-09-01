@@ -92,6 +92,22 @@ class Clownfish::String cnick Str
     void
     Mimic_Str(String *self, const char *ptr, size_t size);
 
+    /** Return the concatenation of the String and <code>other</code>.
+     */
+    incremented String*
+    Immutable_Cat(String *self, const String *other);
+
+    /** Return the concatenation of the String and the passed-in raw UTF-8.
+     */
+    incremented String*
+    Immutable_Cat_UTF8(String *self, const char *ptr, size_t size);
+
+    /** Return the concatenation of the String and the passed-in raw UTF-8.
+     * Don't check for UTF-8 validity.
+     */
+    incremented String*
+    Immutable_Cat_Trusted_UTF8(String *self, const char *ptr, size_t size);
+
     /** Concatenate the passed-in string onto the end of the String.
      */
     void

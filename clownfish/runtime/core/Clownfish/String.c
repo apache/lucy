@@ -459,6 +459,31 @@ Str_Mimic_IMP(String *self, Obj *other) {
     self->ptr[twin->size] = '\0';
 }
 
+String*
+Str_Immutable_Cat_IMP(String *self, const String *other) {
+    return Str_Immutable_Cat_Trusted_UTF8(self, other->ptr, other->size);
+}
+
+String*
+Str_Immutable_Cat_UTF8_IMP(String *self, const char* ptr, size_t size) {
+    if (!StrHelp_utf8_valid(ptr, size)) {
+        DIE_INVALID_UTF8(ptr, size);
+    }
+    return Str_Immutable_Cat_Trusted_UTF8(self, ptr, size);
+}
+
+String*
+Str_Immutable_Cat_Trusted_UTF8_IMP(String *self, const char* ptr, size_t size) {
+    size_t  result_size = self->size + size;
+    char   *result_ptr  = (char*)MALLOCATE(result_size + 1);
+    memcpy(result_ptr, self->ptr, self->size);
+    memcpy(result_ptr + self->size, ptr, size);
+    result_ptr[result_size] = '\0';
+    String *result = (String*)VTable_Make_Obj(STRING);
+    return Str_init_steal_trusted_str(result, result_ptr, result_size,
+                                      result_size + 1);
+}
+
 void
 Str_Cat_Str_IMP(String *self, const char* ptr, size_t size) {
     if (!StrHelp_utf8_valid(ptr, size)) {
