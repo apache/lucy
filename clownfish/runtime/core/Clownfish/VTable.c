@@ -30,6 +30,7 @@
 
 #include "Clownfish/VTable.h"
 #include "Clownfish/String.h"
+#include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/LockFreeRegistry.h"
@@ -42,8 +43,8 @@
 size_t VTable_offset_of_parent = offsetof(VTable, parent);
 
 // Remove spaces and underscores, convert to lower case.
-static void
-S_scrunch_charbuf(String *source, String *target);
+static String*
+S_scrunch_string(String *source);
 
 static Method*
 S_find_method(VTable *self, const char *meth_name);
@@ -282,26 +283,26 @@ VTable_singleton(const String *class_name, VTable *parent) {
         num_fresh = VA_Get_Size(fresh_host_methods);
         if (num_fresh) {
             Hash *meths = Hash_new(num_fresh);
-            String *scrunched = Str_new(0);
             for (uint32_t i = 0; i < num_fresh; i++) {
                 String *meth = (String*)VA_Fetch(fresh_host_methods, i);
-                S_scrunch_charbuf(meth, scrunched);
+                String *scrunched = S_scrunch_string(meth);
                 Hash_Store(meths, (Obj*)scrunched, (Obj*)CFISH_TRUE);
+                DECREF(scrunched);
             }
             for (VTable *vtable = parent; vtable; vtable = vtable->parent) {
                 uint32_t max = VA_Get_Size(vtable->methods);
                 for (uint32_t i = 0; i < max; i++) {
                     Method *method = (Method*)VA_Fetch(vtable->methods, i);
                     if (method->callback_func) {
-                        S_scrunch_charbuf(method->name, scrunched);
+                        String *scrunched = S_scrunch_string(method->name);
                         if (Hash_Fetch(meths, (Obj*)scrunched)) {
                             VTable_Override(singleton, method->callback_func,
                                             method->offset);
                         }
+                        DECREF(scrunched);
                     }
                 }
             }
-            DECREF(scrunched);
             DECREF(meths);
         }
         DECREF(fresh_host_methods);
@@ -324,19 +325,22 @@ VTable_singleton(const String *class_name, VTable *parent) {
     return singleton;
 }
 
-static void
-S_scrunch_charbuf(String *source, String *target) {
+static String*
+S_scrunch_string(String *source) {
+    CharBuf *buf = CB_new(Str_Get_Size(source));
     StackString *iterator = SSTR_WRAP(source);
-    Str_Set_Size(target, 0);
     while (SStr_Get_Size(iterator)) {
         uint32_t code_point = SStr_Nibble(iterator);
         if (code_point > 127) {
             THROW(ERR, "Can't fold case for %o", source);
         }
         else if (code_point != '_') {
-            Str_Cat_Char(target, tolower(code_point));
+            CB_Cat_Char(buf, tolower(code_point));
         }
     }
+    String *retval = CB_Yield_String(buf);
+    DECREF(buf);
+    return retval;
 }
 
 bool
