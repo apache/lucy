@@ -23,7 +23,7 @@
 
 #include "charmony.h"
 
-#include "Clownfish/Test/TestCharBuf.h"
+#include "Clownfish/Test/TestString.h"
 
 #include "Clownfish/String.h"
 #include "Clownfish/Num.h"
@@ -35,9 +35,9 @@
 static char smiley[] = { (char)0xE2, (char)0x98, (char)0xBA, 0 };
 static uint32_t smiley_len = 3;
 
-TestCharBuf*
-TestCB_new() {
-    return (TestCharBuf*)VTable_Make_Obj(TESTCHARBUF);
+TestString*
+TestStr_new() {
+    return (TestString*)VTable_Make_Obj(TESTSTRING);
 }
 
 static String*
@@ -414,7 +414,7 @@ test_vcatf_x32(TestBatchRunner *runner) {
 }
 
 void
-TestCB_Run_IMP(TestCharBuf *self, TestBatchRunner *runner) {
+TestStr_Run_IMP(TestString *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 54);
     test_vcatf_s(runner);
     test_vcatf_null_string(runner);
