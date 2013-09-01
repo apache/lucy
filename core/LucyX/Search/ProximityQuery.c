@@ -82,7 +82,7 @@ void
 ProximityQuery_Serialize_IMP(ProximityQuery *self, OutStream *outstream) {
     ProximityQueryIVARS *const ivars = ProximityQuery_IVARS(self);
     OutStream_Write_F32(outstream, ivars->boost);
-    Freezer_serialize_charbuf(ivars->field, outstream);
+    Freezer_serialize_string(ivars->field, outstream);
     Freezer_serialize_varray(ivars->terms, outstream);
     OutStream_Write_C32(outstream, ivars->within);
 }
@@ -90,7 +90,7 @@ ProximityQuery_Serialize_IMP(ProximityQuery *self, OutStream *outstream) {
 ProximityQuery*
 ProximityQuery_Deserialize_IMP(ProximityQuery *self, InStream *instream) {
     float boost = InStream_Read_F32(instream);
-    String *field = Freezer_read_charbuf(instream);
+    String *field = Freezer_read_string(instream);
     VArray *terms = Freezer_read_varray(instream);
     uint32_t within = InStream_Read_C32(instream);
     return S_do_init(self, field, terms, boost, within);

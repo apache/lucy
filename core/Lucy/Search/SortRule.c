@@ -65,7 +65,7 @@ SortRule_Deserialize_IMP(SortRule *self, InStream *instream) {
     SortRuleIVARS *ivars = SortRule_IVARS(self);
     ivars->type = InStream_Read_C32(instream);
     if (ivars->type == SortRule_FIELD) {
-        ivars->field = Freezer_read_charbuf(instream);
+        ivars->field = Freezer_read_string(instream);
     }
     ivars->reverse = InStream_Read_C32(instream);
     return self;
@@ -76,7 +76,7 @@ SortRule_Serialize_IMP(SortRule *self, OutStream *target) {
     SortRuleIVARS *ivars = SortRule_IVARS(self);
     OutStream_Write_C32(target, ivars->type);
     if (ivars->type == SortRule_FIELD) {
-        Freezer_serialize_charbuf(ivars->field, target);
+        Freezer_serialize_string(ivars->field, target);
     }
     OutStream_Write_C32(target, !!ivars->reverse);
 }

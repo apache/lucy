@@ -112,7 +112,7 @@ DocWriter_Add_Inverted_Doc_IMP(DocWriter *self, Inverter *inverter,
         if (FType_Stored(type)) {
             String *field = Inverter_Get_Field_Name(inverter);
             Obj *value = Inverter_Get_Value(inverter);
-            Freezer_serialize_charbuf(field, dat_out);
+            Freezer_serialize_string(field, dat_out);
             switch (FType_Primitive_ID(type) & FType_PRIMITIVE_ID_MASK) {
                 case FType_TEXT: {
                     uint8_t *buf  = Str_Get_Ptr8((String*)value);

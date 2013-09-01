@@ -103,17 +103,17 @@ test_Hash_Sum(TestBatchRunner *runner) {
 
 static void
 test_Is_A(TestBatchRunner *runner) {
-    String *charbuf   = Str_new(0);
-    VTable *bb_vtable = Str_Get_VTable(charbuf);
-    String *klass     = Str_Get_Class_Name(charbuf);
+    String *string     = Str_new(0);
+    VTable *str_vtable = Str_Get_VTable(string);
+    String *klass      = Str_Get_Class_Name(string);
 
-    TEST_TRUE(runner, Str_Is_A(charbuf, STRING), "String Is_A String.");
-    TEST_TRUE(runner, Str_Is_A(charbuf, OBJ), "String Is_A Obj.");
-    TEST_TRUE(runner, bb_vtable == STRING, "Get_VTable");
+    TEST_TRUE(runner, Str_Is_A(string, STRING), "String Is_A String.");
+    TEST_TRUE(runner, Str_Is_A(string, OBJ), "String Is_A Obj.");
+    TEST_TRUE(runner, str_vtable == STRING, "Get_VTable");
     TEST_TRUE(runner, Str_Equals(VTable_Get_Name(STRING), (Obj*)klass),
               "Get_Class_Name");
 
-    DECREF(charbuf);
+    DECREF(string);
 }
 
 static void

@@ -203,7 +203,7 @@ PolyCompiler_Highlight_Spans_IMP(PolyCompiler *self, Searcher *searcher,
 void
 PolyCompiler_Serialize_IMP(PolyCompiler *self, OutStream *outstream) {
     PolyCompilerIVARS *const ivars = PolyCompiler_IVARS(self);
-    Freezer_serialize_charbuf(PolyCompiler_Get_Class_Name(self), outstream);
+    Freezer_serialize_string(PolyCompiler_Get_Class_Name(self), outstream);
     Freezer_serialize_varray(ivars->children, outstream);
     PolyCompiler_Serialize_t super_serialize
         = SUPER_METHOD_PTR(POLYCOMPILER, LUCY_PolyCompiler_Serialize);
@@ -213,7 +213,7 @@ PolyCompiler_Serialize_IMP(PolyCompiler *self, OutStream *outstream) {
 PolyCompiler*
 PolyCompiler_Deserialize_IMP(PolyCompiler *self, InStream *instream) {
     PolyCompilerIVARS *const ivars = PolyCompiler_IVARS(self);
-    String *class_name = Freezer_read_charbuf(instream);
+    String *class_name = Freezer_read_string(instream);
     DECREF(class_name); // TODO Don't serialize class name.
     ivars->children = Freezer_read_varray(instream);
     PolyCompiler_Deserialize_t super_deserialize

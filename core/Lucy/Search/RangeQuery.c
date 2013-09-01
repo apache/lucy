@@ -120,7 +120,7 @@ void
 RangeQuery_Serialize_IMP(RangeQuery *self, OutStream *outstream) {
     RangeQueryIVARS *const ivars = RangeQuery_IVARS(self);
     OutStream_Write_F32(outstream, ivars->boost);
-    Freezer_serialize_charbuf(ivars->field, outstream);
+    Freezer_serialize_string(ivars->field, outstream);
     if (ivars->lower_term) {
         OutStream_Write_U8(outstream, true);
         FREEZE(ivars->lower_term, outstream);
@@ -143,7 +143,7 @@ RangeQuery*
 RangeQuery_Deserialize_IMP(RangeQuery *self, InStream *instream) {
     // Deserialize components.
     float boost = InStream_Read_F32(instream);
-    String *field = Freezer_read_charbuf(instream);
+    String *field = Freezer_read_string(instream);
     Obj *lower_term = InStream_Read_U8(instream) ? THAW(instream) : NULL;
     Obj *upper_term = InStream_Read_U8(instream) ? THAW(instream) : NULL;
     bool include_lower = InStream_Read_U8(instream);

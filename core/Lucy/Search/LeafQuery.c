@@ -88,12 +88,12 @@ LeafQuery_Serialize_IMP(LeafQuery *self, OutStream *outstream) {
     LeafQueryIVARS *const ivars = LeafQuery_IVARS(self);
     if (ivars->field) {
         OutStream_Write_U8(outstream, true);
-        Freezer_serialize_charbuf(ivars->field, outstream);
+        Freezer_serialize_string(ivars->field, outstream);
     }
     else {
         OutStream_Write_U8(outstream, false);
     }
-    Freezer_serialize_charbuf(ivars->text, outstream);
+    Freezer_serialize_string(ivars->text, outstream);
     OutStream_Write_F32(outstream, ivars->boost);
 }
 
@@ -101,12 +101,12 @@ LeafQuery*
 LeafQuery_Deserialize_IMP(LeafQuery *self, InStream *instream) {
     LeafQueryIVARS *const ivars = LeafQuery_IVARS(self);
     if (InStream_Read_U8(instream)) {
-        ivars->field = Freezer_read_charbuf(instream);
+        ivars->field = Freezer_read_string(instream);
     }
     else {
         ivars->field = NULL;
     }
-    ivars->text = Freezer_read_charbuf(instream);
+    ivars->text = Freezer_read_string(instream);
     ivars->boost = InStream_Read_F32(instream);
     return self;
 }
