@@ -60,7 +60,7 @@ TermQuery_Destroy_IMP(TermQuery *self) {
 void
 TermQuery_Serialize_IMP(TermQuery *self, OutStream *outstream) {
     TermQueryIVARS *const ivars = TermQuery_IVARS(self);
-    Freezer_serialize_charbuf(ivars->field, outstream);
+    Freezer_serialize_string(ivars->field, outstream);
     FREEZE(ivars->term, outstream);
     OutStream_Write_F32(outstream, ivars->boost);
 }
@@ -68,7 +68,7 @@ TermQuery_Serialize_IMP(TermQuery *self, OutStream *outstream) {
 TermQuery*
 TermQuery_Deserialize_IMP(TermQuery *self, InStream *instream) {
     TermQueryIVARS *const ivars = TermQuery_IVARS(self);
-    ivars->field = Freezer_read_charbuf(instream);
+    ivars->field = Freezer_read_string(instream);
     ivars->term  = (Obj*)THAW(instream);
     ivars->boost = InStream_Read_F32(instream);
     return self;

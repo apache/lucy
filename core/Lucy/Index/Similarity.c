@@ -102,12 +102,12 @@ Sim_Load_IMP(Similarity *self, Obj *dump) {
 void
 Sim_Serialize_IMP(Similarity *self, OutStream *target) {
     // Only the class name.
-    Freezer_serialize_charbuf(Sim_Get_Class_Name(self), target);
+    Freezer_serialize_string(Sim_Get_Class_Name(self), target);
 }
 
 Similarity*
 Sim_Deserialize_IMP(Similarity *self, InStream *instream) {
-    String *class_name = Freezer_read_charbuf(instream);
+    String *class_name = Freezer_read_string(instream);
     if (!Str_Equals(class_name, (Obj*)Sim_Get_Class_Name(self))) {
         THROW(ERR, "Class name mismatch: '%o' '%o'", Sim_Get_Class_Name(self),
               class_name);

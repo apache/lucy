@@ -77,7 +77,7 @@ test_bytebuf(TestBatchRunner *runner) {
 }
 
 static void
-test_charbuf(TestBatchRunner *runner) {
+test_string(TestBatchRunner *runner) {
     String *wanted = TestUtils_get_cb("foo");
     String *got    = (String*)S_freeze_thaw((Obj*)wanted);
     TEST_TRUE(runner, got && Str_Equals(wanted, (Obj*)got),
@@ -174,7 +174,7 @@ void
 TestFreezer_Run_IMP(TestFreezer *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 10);
     test_bytebuf(runner);
-    test_charbuf(runner);
+    test_string(runner);
     test_hash(runner);
     test_num(runner);
     test_varray(runner);

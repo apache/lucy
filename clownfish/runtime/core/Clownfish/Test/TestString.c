@@ -224,40 +224,40 @@ test_Trim(TestBatchRunner *runner) {
 
 static void
 test_To_F64(TestBatchRunner *runner) {
-    String *charbuf;
+    String *string;
 
-    charbuf = S_get_cb("1.5");
-    double difference = 1.5 - Str_To_F64(charbuf);
+    string = S_get_cb("1.5");
+    double difference = 1.5 - Str_To_F64(string);
     if (difference < 0) { difference = 0 - difference; }
     TEST_TRUE(runner, difference < 0.001, "To_F64");
-    DECREF(charbuf);
+    DECREF(string);
 
-    charbuf = S_get_cb("-1.5");
-    difference = 1.5 + Str_To_F64(charbuf);
+    string = S_get_cb("-1.5");
+    difference = 1.5 + Str_To_F64(string);
     if (difference < 0) { difference = 0 - difference; }
     TEST_TRUE(runner, difference < 0.001, "To_F64 negative");
-    DECREF(charbuf);
+    DECREF(string);
 
-    charbuf = S_get_cb("1.59");
-    double value_full = Str_To_F64(charbuf);
-    Str_Set_Size(charbuf, 3);
-    double value_short = Str_To_F64(charbuf);
+    string = S_get_cb("1.59");
+    double value_full = Str_To_F64(string);
+    Str_Set_Size(string, 3);
+    double value_short = Str_To_F64(string);
     TEST_TRUE(runner, value_short < value_full,
               "TO_F64 doesn't run past end of string");
-    DECREF(charbuf);
+    DECREF(string);
 }
 
 static void
 test_To_I64(TestBatchRunner *runner) {
-    String *charbuf;
+    String *string;
 
-    charbuf = S_get_cb("10");
-    TEST_TRUE(runner, Str_To_I64(charbuf) == 10, "To_I64");
-    DECREF(charbuf);
+    string = S_get_cb("10");
+    TEST_TRUE(runner, Str_To_I64(string) == 10, "To_I64");
+    DECREF(string);
 
-    charbuf = S_get_cb("-10");
-    TEST_TRUE(runner, Str_To_I64(charbuf) == -10, "To_I64 negative");
-    DECREF(charbuf);
+    string = S_get_cb("-10");
+    TEST_TRUE(runner, Str_To_I64(string) == -10, "To_I64 negative");
+    DECREF(string);
 }
 
 

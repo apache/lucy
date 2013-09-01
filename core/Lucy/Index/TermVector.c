@@ -86,8 +86,8 @@ TV_Serialize_IMP(TermVector *self, OutStream *target) {
     int32_t *starts = I32Arr_IVARS(ivars->start_offsets)->ints;
     int32_t *ends   = I32Arr_IVARS(ivars->start_offsets)->ints;
 
-    Freezer_serialize_charbuf(ivars->field, target);
-    Freezer_serialize_charbuf(ivars->text, target);
+    Freezer_serialize_string(ivars->field, target);
+    Freezer_serialize_string(ivars->text, target);
     OutStream_Write_C32(target, ivars->num_pos);
 
     for (uint32_t i = 0; i < ivars->num_pos; i++) {
@@ -99,8 +99,8 @@ TV_Serialize_IMP(TermVector *self, OutStream *target) {
 
 TermVector*
 TV_Deserialize_IMP(TermVector *self, InStream *instream) {
-    String *field = Freezer_read_charbuf(instream);
-    String *text  = Freezer_read_charbuf(instream);
+    String *field = Freezer_read_string(instream);
+    String *text  = Freezer_read_string(instream);
     uint32_t num_pos = InStream_Read_C32(instream);
 
     // Read positional data.

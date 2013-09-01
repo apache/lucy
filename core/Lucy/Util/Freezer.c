@@ -35,13 +35,13 @@
 
 void
 Freezer_freeze(Obj *obj, OutStream *outstream) {
-    Freezer_serialize_charbuf(Obj_Get_Class_Name(obj), outstream);
+    Freezer_serialize_string(Obj_Get_Class_Name(obj), outstream);
     Freezer_serialize(obj, outstream);
 }
 
 Obj*
 Freezer_thaw(InStream *instream) {
-    String *class_name = Freezer_read_charbuf(instream);
+    String *class_name = Freezer_read_string(instream);
     VTable *vtable = VTable_singleton(class_name, NULL);
     Obj *blank = VTable_Make_Obj(vtable);
     DECREF(class_name);
@@ -51,7 +51,7 @@ Freezer_thaw(InStream *instream) {
 void
 Freezer_serialize(Obj *obj, OutStream *outstream) {
     if (Obj_Is_A(obj, STRING)) {
-        Freezer_serialize_charbuf((String*)obj, outstream);
+        Freezer_serialize_string((String*)obj, outstream);
     }
     else if (Obj_Is_A(obj, BYTEBUF)) {
         Freezer_serialize_bytebuf((ByteBuf*)obj, outstream);
@@ -124,7 +124,7 @@ Freezer_serialize(Obj *obj, OutStream *outstream) {
 Obj*
 Freezer_deserialize(Obj *obj, InStream *instream) {
     if (Obj_Is_A(obj, STRING)) {
-        obj = (Obj*)Freezer_deserialize_charbuf((String*)obj, instream);
+        obj = (Obj*)Freezer_deserialize_string((String*)obj, instream);
     }
     else if (Obj_Is_A(obj, BYTEBUF)) {
         obj = (Obj*)Freezer_deserialize_bytebuf((ByteBuf*)obj, instream);
@@ -203,15 +203,15 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
 }
 
 void
-Freezer_serialize_charbuf(String *charbuf, OutStream *outstream) {
-    size_t size  = Str_Get_Size(charbuf);
-    uint8_t *buf = Str_Get_Ptr8(charbuf);
+Freezer_serialize_string(String *string, OutStream *outstream) {
+    size_t size  = Str_Get_Size(string);
+    uint8_t *buf = Str_Get_Ptr8(string);
     OutStream_Write_C64(outstream, size);
     OutStream_Write_Bytes(outstream, buf, size);
 }
 
 String*
-Freezer_deserialize_charbuf(String *charbuf, InStream *instream) {
+Freezer_deserialize_string(String *string, InStream *instream) {
     size_t size = InStream_Read_C32(instream);
     if (size == SIZE_MAX) {
         THROW(ERR, "Can't deserialize SIZE_MAX bytes");
@@ -223,13 +223,13 @@ Freezer_deserialize_charbuf(String *charbuf, InStream *instream) {
     if (!StrHelp_utf8_valid(buf, size)) {
         THROW(ERR, "Attempt to deserialize invalid UTF-8");
     }
-    return Str_init_steal_trusted_str(charbuf, buf, size, cap);
+    return Str_init_steal_trusted_str(string, buf, size, cap);
 }
 
 String*
-Freezer_read_charbuf(InStream *instream) {
-    String *charbuf = (String*)VTable_Make_Obj(STRING);
-    return Freezer_deserialize_charbuf(charbuf, instream);
+Freezer_read_string(InStream *instream) {
+    String *string = (String*)VTable_Make_Obj(STRING);
+    return Freezer_deserialize_string(string, instream);
 }
 
 void
@@ -295,7 +295,7 @@ void
 Freezer_serialize_hash(Hash *hash, OutStream *outstream) {
     Obj *key;
     Obj *val;
-    uint32_t charbuf_count = 0;
+    uint32_t string_count = 0;
     uint32_t hash_size = Hash_Get_Size(hash);
     OutStream_Write_C32(outstream, hash_size);
 
@@ -304,13 +304,13 @@ Freezer_serialize_hash(Hash *hash, OutStream *outstream) {
     // we omit the per-key class name.
     Hash_Iterate(hash);
     while (Hash_Next(hash, &key, &val)) {
-        if (Obj_Is_A(key, STRING)) { charbuf_count++; }
+        if (Obj_Is_A(key, STRING)) { string_count++; }
     }
-    OutStream_Write_C32(outstream, charbuf_count);
+    OutStream_Write_C32(outstream, string_count);
     Hash_Iterate(hash);
     while (Hash_Next(hash, &key, &val)) {
         if (Obj_Is_A(key, STRING)) {
-            Freezer_serialize_charbuf((String*)key, outstream);
+            Freezer_serialize_string((String*)key, outstream);
             FREEZE(val, outstream);
         }
     }
@@ -327,15 +327,15 @@ Freezer_serialize_hash(Hash *hash, OutStream *outstream) {
 
 Hash*
 Freezer_deserialize_hash(Hash *hash, InStream *instream) {
-    uint32_t size         = InStream_Read_C32(instream);
-    uint32_t num_charbufs = InStream_Read_C32(instream);
-    uint32_t num_other    = size - num_charbufs;
-    String *key           = num_charbufs ? Str_new(0) : NULL;
+    uint32_t size        = InStream_Read_C32(instream);
+    uint32_t num_strings = InStream_Read_C32(instream);
+    uint32_t num_other   = size - num_strings;
+    String *key          = num_strings ? Str_new(0) : NULL;
 
     Hash_init(hash, size);
 
     // Read key-value pairs with String keys.
-    while (num_charbufs--) {
+    while (num_strings--) {
         uint32_t len = InStream_Read_C32(instream);
         char *key_buf = Str_Grow(key, len);
         InStream_Read_Bytes(instream, key_buf, len);

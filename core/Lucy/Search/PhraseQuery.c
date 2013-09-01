@@ -78,14 +78,14 @@ void
 PhraseQuery_Serialize_IMP(PhraseQuery *self, OutStream *outstream) {
     PhraseQueryIVARS *const ivars = PhraseQuery_IVARS(self);
     OutStream_Write_F32(outstream, ivars->boost);
-    Freezer_serialize_charbuf(ivars->field, outstream);
+    Freezer_serialize_string(ivars->field, outstream);
     Freezer_serialize_varray(ivars->terms, outstream);
 }
 
 PhraseQuery*
 PhraseQuery_Deserialize_IMP(PhraseQuery *self, InStream *instream) {
     float boost = InStream_Read_F32(instream);
-    String *field = Freezer_read_charbuf(instream);
+    String *field = Freezer_read_string(instream);
     VArray *terms = Freezer_read_varray(instream);
     return S_do_init(self, field, terms, boost);
 }
