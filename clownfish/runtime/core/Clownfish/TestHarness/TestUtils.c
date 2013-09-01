@@ -24,6 +24,7 @@
 
 #include "Clownfish/TestHarness/TestUtils.h"
 
+#include "Clownfish/CharBuf.h"
 #include "Clownfish/String.h"
 #include "Clownfish/Util/Memory.h"
 
@@ -102,10 +103,12 @@ S_random_code_point(void) {
 
 String*
 TestUtils_random_string(size_t length) {
-    String *string = Str_new(length);
+    CharBuf *buf = CB_new(length);
     while (length--) {
-        Str_Cat_Char(string, S_random_code_point());
+        CB_Cat_Char(buf, S_random_code_point());
     }
+    String *string = CB_Yield_String(buf);
+    DECREF(buf);
     return string;
 }
 
