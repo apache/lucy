@@ -18,6 +18,8 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Index/DocVector.h"
+
+#include "Clownfish/CharBuf.h"
 #include "Lucy/Index/TermVector.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
@@ -121,7 +123,7 @@ S_extract_tv_cache(ByteBuf *field_buf) {
     Hash    *tv_cache  = Hash_new(0);
     char    *tv_string = BB_Get_Buf(field_buf);
     int32_t  num_terms = NumUtil_decode_c32(&tv_string);
-    String  *text      = Str_new(0);
+    CharBuf *text_buf  = CB_new(0);
 
     // Read the number of highlightable terms in the field.
     for (int32_t i = 0; i < num_terms; i++) {
@@ -129,8 +131,8 @@ S_extract_tv_cache(ByteBuf *field_buf) {
         size_t   len     = NumUtil_decode_c32(&tv_string);
 
         // Decompress the term text.
-        Str_Set_Size(text, overlap);
-        Str_Cat_Trusted_Str(text, tv_string, len);
+        CB_Set_Size(text_buf, overlap);
+        CB_Cat_Trusted_UTF8(text_buf, tv_string, len);
         tv_string += len;
 
         // Get positions & offsets string.
@@ -145,10 +147,12 @@ S_extract_tv_cache(ByteBuf *field_buf) {
         len = tv_string - bookmark_ptr;
 
         // Store the $text => $posdata pair in the output hash.
+        String *text = CB_To_String(text_buf);
         Hash_Store(tv_cache, (Obj*)text,
                    (Obj*)BB_new_bytes(bookmark_ptr, len));
+        DECREF(text);
     }
-    DECREF(text);
+    DECREF(text_buf);
 
     return tv_cache;
 }
