@@ -153,19 +153,19 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
      *
      * (Helper function for Create_Excerpt only exposed for testing purposes.)
      */
-    int32_t
+    String*
     Raw_Excerpt(Highlighter *self, const String *field_val,
-                const String *fragment, String *raw_excerpt, int32_t top,
-                HeatMap *heat_map, VArray *sentences);
+                const String *fragment, int32_t *top, HeatMap *heat_map,
+                VArray *sentences);
 
     /** Take the text in raw_excerpt, add highlight tags, encode, and place
      * the result into <code>highlighted</code>.
      *
      * (Helper function for Create_Excerpt only exposed for testing purposes.)
      */
-    void
+    String*
     Highlight_Excerpt(Highlighter *self, VArray *spans, String *raw_excerpt,
-                      String *highlighted, int32_t top);
+                      int32_t top);
 
     public void
     Destroy(Highlighter *self);

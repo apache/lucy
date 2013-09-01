@@ -19,6 +19,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Highlight/Highlighter.h"
+#include "Clownfish/CharBuf.h"
 #include "Lucy/Document/HitDoc.h"
 #include "Lucy/Search/Compiler.h"
 #include "Lucy/Search/Query.h"
@@ -37,11 +38,11 @@ const uint32_t ELLIPSIS_CODE_POINT = 0x2026;
  * possible.
  */
 static String*
-S_do_encode(Highlighter *self, String *text, String **encode_buf);
+S_do_encode(Highlighter *self, String *text, CharBuf **encode_buf);
 
 // Place HTML entity encoded version of [text] into [encoded].
 static String*
-S_encode_entities(String *text, String *encoded);
+S_encode_entities(String *text, CharBuf *encoded);
 
 Highlighter*
 Highlighter_new(Searcher *searcher, Obj *query, const String *field,
@@ -91,10 +92,12 @@ Highlighter_Highlight_IMP(Highlighter *self, const String *text) {
     size_t size = Str_Get_Size(text)
                   + Str_Get_Size(ivars->pre_tag)
                   + Str_Get_Size(ivars->post_tag);
-    String *retval = Str_new(size);
-    Str_Cat(retval, ivars->pre_tag);
-    Str_Cat(retval, text);
-    Str_Cat(retval, ivars->post_tag);
+    CharBuf *buf = CB_new(size);
+    CB_Cat(buf, ivars->pre_tag);
+    CB_Cat(buf, text);
+    CB_Cat(buf, ivars->post_tag);
+    String *retval = CB_Yield_String(buf);
+    DECREF(buf);
     return retval;
 }
 
@@ -163,8 +166,6 @@ Highlighter_Create_Excerpt_IMP(Highlighter *self, HitDoc *hit_doc) {
     }
     else {
         StackString *fragment = SSTR_WRAP((String*)field_val);
-        String *raw_excerpt = Str_new(ivars->excerpt_length + 10);
-        String *highlighted = Str_new((ivars->excerpt_length * 3) / 2);
         DocVector *doc_vec
             = Searcher_Fetch_Doc_Vec(ivars->searcher,
                                      HitDoc_Get_Doc_ID(hit_doc));
@@ -182,11 +183,13 @@ Highlighter_Create_Excerpt_IMP(Highlighter *self, HitDoc *hit_doc) {
             = Highlighter_Find_Sentences(self, (String*)field_val, 0,
                                          top + ivars->window_width);
 
-        top = Highlighter_Raw_Excerpt(self, (String*)field_val,
-                                      (String*)fragment, raw_excerpt, top,
-                                      heat_map, sentences);
-        Highlighter_Highlight_Excerpt(self, score_spans, raw_excerpt,
-                                      highlighted, top);
+        String *raw_excerpt
+            = Highlighter_Raw_Excerpt(self, (String*)field_val,
+                                      (String*)fragment, &top, heat_map,
+                                      sentences);
+        String *highlighted
+            = Highlighter_Highlight_Excerpt(self, score_spans, raw_excerpt,
+                                            top);
 
         DECREF(sentences);
         DECREF(heat_map);
@@ -290,14 +293,14 @@ S_has_heat(HeatMap *heat_map, int32_t offset, int32_t length) {
     return false;
 }
 
-int32_t
+String*
 Highlighter_Raw_Excerpt_IMP(Highlighter *self, const String *field_val,
-                            const String *fragment, String *raw_excerpt,
-                            int32_t top, HeatMap *heat_map,
-                            VArray *sentences) {
+                            const String *fragment, int32_t *top_ptr,
+                            HeatMap *heat_map, VArray *sentences) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
     bool     found_starting_edge = false;
     bool     found_ending_edge   = false;
+    int32_t  top   = *top_ptr;
     int32_t  start = top;
     int32_t  end   = 0;
     double   field_len = Str_Length(field_val);
@@ -375,7 +378,10 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const String *field_val,
     int32_t this_excerpt_len = found_ending_edge
                                ? end - start
                                : (int32_t)ivars->excerpt_length;
-    if (!this_excerpt_len) { return start; }
+    if (!this_excerpt_len) {
+        *top_ptr = start;
+        return Str_new(0);
+    }
 
     StackString *substring = SSTR_WRAP((String*)field_val);
 
@@ -480,31 +486,36 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const String *field_val,
         }
     }
 
+    CharBuf *buf = CB_new(SStr_Get_Size(substring) + 8);
+
     if (!found_starting_edge) {
-        Str_Cat_Char(raw_excerpt, ELLIPSIS_CODE_POINT);
-        Str_Cat_Char(raw_excerpt, ' ');
+        CB_Cat_Char(buf, ELLIPSIS_CODE_POINT);
+        CB_Cat_Char(buf, ' ');
         const size_t ELLIPSIS_LEN = 2; // Unicode ellipsis plus a space.
         start -= ELLIPSIS_LEN;
     }
 
-    Str_Cat(raw_excerpt, (String*)substring);
+    CB_Cat(buf, (String*)substring);
 
     if (!found_ending_edge) {
-        Str_Cat_Char(raw_excerpt, ELLIPSIS_CODE_POINT);
+        CB_Cat_Char(buf, ELLIPSIS_CODE_POINT);
     }
 
-    return start;
+    String *raw_excerpt = CB_Yield_String(buf);
+    DECREF(buf);
+    *top_ptr = start;
+    return raw_excerpt;
 }
 
-void
+String*
 Highlighter_Highlight_Excerpt_IMP(Highlighter *self, VArray *spans,
-                                  String *raw_excerpt, String *highlighted,
-                                  int32_t top) {
-    int32_t        hl_start        = 0;
-    int32_t        hl_end          = 0;
+                                  String *raw_excerpt, int32_t top) {
+    int32_t      hl_start        = 0;
+    int32_t      hl_end          = 0;
     StackString *temp            = SSTR_WRAP(raw_excerpt);
-    String        *encode_buf      = NULL;
-    int32_t        raw_excerpt_end = top + Str_Length(raw_excerpt);
+    CharBuf     *buf             = CB_new(Str_Get_Size(raw_excerpt) + 32);
+    CharBuf     *encode_buf      = NULL;
+    int32_t      raw_excerpt_end = top + Str_Length(raw_excerpt);
 
     for (uint32_t i = 0, max = VA_Get_Size(spans); i < max; i++) {
         Span *span = (Span*)VA_Fetch(spans, i);
@@ -534,7 +545,7 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, VArray *spans,
                     SStr_Truncate(to_cat, highlighted_len);
                     encoded = S_do_encode(self, (String*)to_cat, &encode_buf);
                     String *hl_frag = Highlighter_Highlight(self, encoded);
-                    Str_Cat(highlighted, hl_frag);
+                    CB_Cat(buf, hl_frag);
                     SStr_Nip(temp, highlighted_len);
                     DECREF(hl_frag);
                     DECREF(encoded);
@@ -544,7 +555,7 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, VArray *spans,
                 StackString *to_cat = SSTR_WRAP((String*)temp);
                 SStr_Truncate(to_cat, non_highlighted_len);
                 encoded = S_do_encode(self, (String*)to_cat, &encode_buf);
-                Str_Cat(highlighted, (String*)encoded);
+                CB_Cat(buf, (String*)encoded);
                 SStr_Nip(temp, non_highlighted_len);
                 DECREF(encoded);
 
@@ -561,7 +572,7 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, VArray *spans,
         SStr_Truncate(to_cat, highlighted_len);
         String *encoded = S_do_encode(self, (String*)to_cat, &encode_buf);
         String *hl_frag = Highlighter_Highlight(self, encoded);
-        Str_Cat(highlighted, hl_frag);
+        CB_Cat(buf, hl_frag);
         SStr_Nip(temp, highlighted_len);
         DECREF(hl_frag);
         DECREF(encoded);
@@ -570,11 +581,14 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, VArray *spans,
     // Last text, beyond last highlight span.
     if (SStr_Get_Size(temp)) {
         String *encoded = S_do_encode(self, (String*)temp, &encode_buf);
-        Str_Cat(highlighted, encoded);
+        CB_Cat(buf, encoded);
         DECREF(encoded);
     }
 
+    String *highlighted = CB_Yield_String(buf);
     DECREF(encode_buf);
+    DECREF(buf);
+    return highlighted;
 }
 
 static Span*
@@ -678,13 +692,15 @@ Highlighter_Find_Sentences_IMP(Highlighter *self, String *text,
 
 String*
 Highlighter_Encode_IMP(Highlighter *self, String *text) {
-    String *encoded = Str_new(0);
     UNUSED_VAR(self);
-    return S_encode_entities(text, encoded);
+    CharBuf *encode_buf = CB_new(0);
+    String *encoded = S_encode_entities(text, encode_buf);
+    DECREF(encode_buf);
+    return encoded;
 }
 
 static String*
-S_do_encode(Highlighter *self, String *text, String **encode_buf) {
+S_do_encode(Highlighter *self, String *text, CharBuf **encode_buf) {
     VTable *vtable = Highlighter_Get_VTable(self);
     Highlighter_Encode_t my_meth
         = (Highlighter_Encode_t)METHOD_PTR(vtable, LUCY_Highlighter_Encode);
@@ -695,14 +711,13 @@ S_do_encode(Highlighter *self, String *text, String **encode_buf) {
         return my_meth(self, text);
     }
     else {
-        if (*encode_buf == NULL) { *encode_buf = Str_new(0); }
-        (void)S_encode_entities(text, *encode_buf);
-        return (String*)INCREF(*encode_buf);
+        if (*encode_buf == NULL) { *encode_buf = CB_new(0); }
+        return S_encode_entities(text, *encode_buf);
     }
 }
 
 static String*
-S_encode_entities(String *text, String *encoded) {
+S_encode_entities(String *text, CharBuf *buf) {
     StackString *temp = SSTR_WRAP(text);
     size_t space = 0;
     const int MAX_ENTITY_BYTES = 9; // &#dddddd;
@@ -724,33 +739,33 @@ S_encode_entities(String *text, String *encoded) {
         }
     }
 
-    Str_Grow(encoded, space);
-    Str_Set_Size(encoded, 0);
+    CB_Grow(buf, space);
+    CB_Set_Size(buf, 0);
     SStr_Assign(temp, text);
     while (0 != (code_point = SStr_Nibble(temp))) {
         if (code_point > 127
             || (!isgraph(code_point) && !isspace(code_point))
            ) {
-            Str_catf(encoded, "&#%u32;", code_point);
+            CB_catf(buf, "&#%u32;", code_point);
         }
         else if (code_point == '<') {
-            Str_Cat_Trusted_Str(encoded, "&lt;", 4);
+            CB_Cat_Trusted_UTF8(buf, "&lt;", 4);
         }
         else if (code_point == '>') {
-            Str_Cat_Trusted_Str(encoded, "&gt;", 4);
+            CB_Cat_Trusted_UTF8(buf, "&gt;", 4);
         }
         else if (code_point == '&') {
-            Str_Cat_Trusted_Str(encoded, "&amp;", 5);
+            CB_Cat_Trusted_UTF8(buf, "&amp;", 5);
         }
         else if (code_point == '"') {
-            Str_Cat_Trusted_Str(encoded, "&quot;", 6);
+            CB_Cat_Trusted_UTF8(buf, "&quot;", 6);
         }
         else {
-            Str_Cat_Char(encoded, code_point);
+            CB_Cat_Char(buf, code_point);
         }
     }
 
-    return encoded;
+    return CB_Yield_String(buf);
 }
 
 
