@@ -51,7 +51,7 @@ class Clownfish::CharBuf cnick CB
     new_from_trusted_utf8(const char *utf8, size_t size);
 
     /** Return a pointer to a new CharBuf which contains formatted data
-     * expanded according to Str_VCatF.
+     * expanded according to CB_VCatF.
      *
      * Note: a user-supplied <code>pattern</code> string is a security hole
      * and must not be allowed.
@@ -92,12 +92,12 @@ class Clownfish::CharBuf cnick CB
      * hex:      %x32
      *
      * Note that all Clownfish Objects, including CharBufs, are printed via
-     * %o (which invokes Obj_To_CharBuf()).
+     * %o (which invokes Obj_To_String()).
      */
     void
     VCatF(CharBuf *self, const char *pattern, va_list args);
 
-    /** Invokes Str_VCatF to concatenate formatted arguments.  Note that this
+    /** Invokes CB_VCatF to concatenate formatted arguments.  Note that this
      * is only a function and not a method.
      */
     inert void
@@ -117,7 +117,7 @@ class Clownfish::CharBuf cnick CB
     char*
     Grow(CharBuf *self, size_t size);
 
-    /** Set the String's <code>size</code> attribute.
+    /** Set the CharBuf's <code>size</code> attribute.
      */
     void
     Set_Size(CharBuf *self, size_t size);
