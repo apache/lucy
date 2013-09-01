@@ -16,14 +16,14 @@
 
 parcel TestClownfish;
 
-class Clownfish::Test::TestCharBuf cnick TestCB
+class Clownfish::Test::TestString cnick TestStr
     inherits Clownfish::TestHarness::TestBatch {
 
-    inert incremented TestCharBuf*
+    inert incremented TestString*
     new();
 
     void
-    Run(TestCharBuf *self, TestBatchRunner *runner);
+    Run(TestString *self, TestBatchRunner *runner);
 }
 
 
