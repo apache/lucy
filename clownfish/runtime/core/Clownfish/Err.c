@@ -102,7 +102,7 @@ static void
 S_vcat_mess(CharBuf *message, const char *file, int line, const char *func,
             const char *pattern, va_list args) {
     size_t guess_len = strlen(file)
-                       + func ? strlen(func) : 0
+                       + (func ? strlen(func) : 0)
                        + strlen(pattern)
                        + 30;
     CB_Grow(message, guess_len);
