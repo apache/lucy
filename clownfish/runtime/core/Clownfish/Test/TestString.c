@@ -48,26 +48,26 @@ S_get_cb(const char *string) {
 static void
 test_Cat(TestBatchRunner *runner) {
     String *wanted = Str_newf("a%s", smiley);
-    String *got    = S_get_cb("");
+    String *source;
+    String *got;
 
-    Str_Cat(got, wanted);
+    source = S_get_cb("");
+    got = Str_Immutable_Cat(source, wanted);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Cat");
     DECREF(got);
+    DECREF(source);
 
-    got = S_get_cb("a");
-    Str_Cat_Char(got, 0x263A);
-    TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Cat_Char");
+    source = S_get_cb("a");
+    got = Str_Immutable_Cat_UTF8(source, smiley, smiley_len);
+    TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Cat_UTF8");
     DECREF(got);
+    DECREF(source);
 
-    got = S_get_cb("a");
-    Str_Cat_Str(got, smiley, smiley_len);
-    TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Cat_Str");
+    source = S_get_cb("a");
+    got = Str_Immutable_Cat_Trusted_UTF8(source, smiley, smiley_len);
+    TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Cat_Trusted_UTF8");
     DECREF(got);
-
-    got = S_get_cb("a");
-    Str_Cat_Trusted_Str(got, smiley, smiley_len);
-    TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Cat_Trusted_Str");
-    DECREF(got);
+    DECREF(source);
 
     DECREF(wanted);
 }
@@ -415,7 +415,7 @@ test_vcatf_x32(TestBatchRunner *runner) {
 
 void
 TestStr_Run_IMP(TestString *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 54);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 53);
     test_vcatf_s(runner);
     test_vcatf_null_string(runner);
     test_vcatf_cb(runner);
