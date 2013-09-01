@@ -507,8 +507,9 @@ Indexer_Prepare_Commit_IMP(Indexer *self) {
 
         // Derive snapshot and schema file names.
         DECREF(ivars->snapfile);
-        ivars->snapfile = IxManager_Make_Snapshot_Filename(ivars->manager);
-        Str_Cat_Trusted_Str(ivars->snapfile, ".temp", 5);
+        String *snapfile = IxManager_Make_Snapshot_Filename(ivars->manager);
+        ivars->snapfile = Str_Immutable_Cat_Trusted_UTF8(snapfile, ".temp", 5);
+        DECREF(snapfile);
         uint64_t schema_gen = IxFileNames_extract_gen(ivars->snapfile);
         char base36[StrHelp_MAX_BASE36_BYTES];
         StrHelp_to_base36(schema_gen, &base36);
