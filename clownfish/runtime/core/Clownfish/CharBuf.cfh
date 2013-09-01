@@ -1,0 +1,152 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Clownfish;
+
+/**
+ * Growable buffer holding Unicode characters.
+ */
+
+class Clownfish::CharBuf cnick CB
+    inherits Clownfish::Obj {
+
+    char    *ptr;
+    size_t   size;
+    size_t   cap;  /* allocated bytes, including terminating null */
+
+    inert incremented CharBuf*
+    new(size_t size);
+
+    inert CharBuf*
+    init(CharBuf *self, size_t size);
+
+    /** Return a new CharBuf which holds a copy of the passed-in String.
+     */
+    inert incremented CharBuf*
+    new_from_str(String *string);
+
+    /** Return a new CharBuf which holds a copy of the passed-in string.
+     * Check for UTF-8 validity.
+     */
+    inert incremented CharBuf*
+    new_from_utf8(const char *utf8, size_t size);
+
+    /** Return a new CharBuf which holds a copy of the passed-in string.  No
+     * validity checking is performed.
+     */
+    inert incremented CharBuf*
+    new_from_trusted_utf8(const char *utf8, size_t size);
+
+    /** Return a pointer to a new CharBuf which contains formatted data
+     * expanded according to Str_VCatF.
+     *
+     * Note: a user-supplied <code>pattern</code> string is a security hole
+     * and must not be allowed.
+     */
+    inert incremented CharBuf*
+    newf(const char *pattern, ...);
+
+    public void
+    Mimic(CharBuf *self, Obj *other);
+
+    void
+    Mimic_UTF8(CharBuf *self, const char *ptr, size_t size);
+
+    /** Concatenate the passed-in string onto the end of the CharBuf.
+     */
+    void
+    Cat_UTF8(CharBuf *self, const char *ptr, size_t size);
+
+    /** Concatenate the supplied text onto the end of the CharBuf.  Don't
+     * check for UTF-8 validity.
+     */
+    void
+    Cat_Trusted_UTF8(CharBuf *self, const char *ptr, size_t size);
+
+    /** Concatenate the contents of <code>string</code> onto the end of the
+     * caller.
+     */
+    void
+    Cat(CharBuf *self, const String *string);
+
+    /** Concatenate formatted arguments.  Similar to the printf family, but
+     * only accepts minimal options (just enough for decent error messages).
+     *
+     * Objects:  %o
+     * char*:    %s
+     * integers: %i8 %i32 %i64 %u8 %u32 %u64
+     * floats:   %f64
+     * hex:      %x32
+     *
+     * Note that all Clownfish Objects, including CharBufs, are printed via
+     * %o (which invokes Obj_To_CharBuf()).
+     */
+    void
+    VCatF(CharBuf *self, const char *pattern, va_list args);
+
+    /** Invokes Str_VCatF to concatenate formatted arguments.  Note that this
+     * is only a function and not a method.
+     */
+    inert void
+    catf(CharBuf *self, const char *pattern, ...);
+
+    /** Concatenate one Unicode character onto the end of the CharBuf.
+     */
+    void
+    Cat_Char(CharBuf *self, uint32_t code_point);
+
+    /** Assign more memory to the CharBuf, if it doesn't already have enough
+     * room to hold a string of <code>size</code> bytes.  Cannot shrink the
+     * allocation.
+     *
+     * @return a pointer to the raw buffer.
+     */
+    char*
+    Grow(CharBuf *self, size_t size);
+
+    /** Set the String's <code>size</code> attribute.
+     */
+    void
+    Set_Size(CharBuf *self, size_t size);
+
+    /** Get the CharBuf's <code>size</code> attribute.
+     */
+    size_t
+    Get_Size(CharBuf *self);
+
+    /** Return the internal backing array for the CharBuf if its internal
+     * encoding is UTF-8.  If it is not encoded as UTF-8 throw an exception.
+     */
+    uint8_t*
+    Get_Ptr8(CharBuf *self);
+
+    public incremented CharBuf*
+    Clone(CharBuf *self);
+
+    public void
+    Destroy(CharBuf *self);
+
+    public incremented String*
+    To_String(CharBuf *self);
+
+    /** Return the content of the CharBuf as String and clear the CharBuf.
+     * This is more efficient than To_String().
+     */
+    public incremented String*
+    Yield_String(CharBuf *self);
+}
+
+
