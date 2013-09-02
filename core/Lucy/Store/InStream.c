@@ -219,7 +219,9 @@ S_fill(InStream *self, int64_t amount) {
     }
     else {
         Err *error = Err_get_error();
-        Str_catf(Err_Get_Mess(error), " (%o)", ivars->filename);
+        String *str = Str_newf(" (%o)", ivars->filename);
+        Err_Cat_Mess(error, str);
+        DECREF(str);
         RETHROW(INCREF(error));
     }
 }
