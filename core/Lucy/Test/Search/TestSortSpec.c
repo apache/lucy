@@ -28,6 +28,7 @@
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Search/SortSpec.h"
 
+#include "Clownfish/CharBuf.h"
 #include "Lucy/Analysis/StandardTokenizer.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Document/HitDoc.h"
@@ -269,11 +270,13 @@ typedef Obj* (*random_generator_t)();
 static Obj*
 S_random_string() {
     size_t length = 1 + rand() % 10;
-    String *string = Str_new(length);
+    CharBuf *buf = CB_new(length);
     while (length--) {
         uint32_t code_point = 'a' + rand() % ('z' - 'a' + 1);
-        Str_Cat_Char(string, code_point);
+        CB_Cat_Char(buf, code_point);
     }
+    String *string = CB_Yield_String(buf);
+    DECREF(buf);
     return (Obj*)string;
 }
 
