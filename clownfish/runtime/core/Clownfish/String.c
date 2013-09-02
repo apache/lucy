@@ -30,6 +30,7 @@
 #include "Clownfish/VTable.h"
 #include "Clownfish/String.h"
 
+#include "Clownfish/CharBuf.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Util/Memory.h"
 #include "Clownfish/Util/StringHelper.h"
@@ -135,11 +136,13 @@ Str_new_from_char(uint32_t code_point) {
 
 String*
 Str_newf(const char *pattern, ...) {
-    String *self = Str_new(strlen(pattern));
+    CharBuf *buf = CB_new(strlen(pattern));
     va_list args;
     va_start(args, pattern);
-    Str_VCatF(self, pattern, args);
+    CB_VCatF(buf, pattern, args);
     va_end(args);
+    String *self = CB_Yield_String(buf);
+    DECREF(buf);
     return self;
 }
 
@@ -199,167 +202,9 @@ S_die_invalid_pattern(const char *pattern) {
     THROW(ERR, "Invalid pattern.");
 }
 
-void
-Str_catf(String *self, const char *pattern, ...) {
-    va_list args;
-    va_start(args, pattern);
-    Str_VCatF(self, pattern, args);
-    va_end(args);
-}
-
-void
-Str_VCatF_IMP(String *self, const char *pattern, va_list args) {
-    size_t      pattern_len   = strlen(pattern);
-    const char *pattern_start = pattern;
-    const char *pattern_end   = pattern + pattern_len;
-    char        buf[64];
-
-    for (; pattern < pattern_end; pattern++) {
-        const char *slice_end = pattern;
-
-        // Consume all characters leading up to a '%'.
-        while (slice_end < pattern_end && *slice_end != '%') { slice_end++; }
-        if (pattern != slice_end) {
-            size_t size = slice_end - pattern;
-            Str_Cat_Trusted_Str(self, pattern, size);
-            pattern = slice_end;
-        }
-
-        if (pattern < pattern_end) {
-            pattern++; // Move past '%'.
-
-            switch (*pattern) {
-                case '%': {
-                        Str_Cat_Trusted_Str(self, "%", 1);
-                    }
-                    break;
-                case 'o': {
-                        Obj *obj = va_arg(args, Obj*);
-                        if (!obj) {
-                            Str_Cat_Trusted_Str(self, "[NULL]", 6);
-                        }
-                        else if (Obj_Is_A(obj, STRING)) {
-                            Str_Cat(self, (String*)obj);
-                        }
-                        else {
-                            String *string = Obj_To_String(obj);
-                            Str_Cat(self, string);
-                            DECREF(string);
-                        }
-                    }
-                    break;
-                case 'i': {
-                        int64_t val = 0;
-                        size_t size;
-                        if (pattern[1] == '8') {
-                            val = va_arg(args, int32_t);
-                            pattern++;
-                        }
-                        else if (pattern[1] == '3' && pattern[2] == '2') {
-                            val = va_arg(args, int32_t);
-                            pattern += 2;
-                        }
-                        else if (pattern[1] == '6' && pattern[2] == '4') {
-                            val = va_arg(args, int64_t);
-                            pattern += 2;
-                        }
-                        else {
-                            S_die_invalid_pattern(pattern_start);
-                        }
-                        size = sprintf(buf, "%" PRId64, val);
-                        Str_Cat_Trusted_Str(self, buf, size);
-                    }
-                    break;
-                case 'u': {
-                        uint64_t val = 0;
-                        size_t size;
-                        if (pattern[1] == '8') {
-                            val = va_arg(args, uint32_t);
-                            pattern += 1;
-                        }
-                        else if (pattern[1] == '3' && pattern[2] == '2') {
-                            val = va_arg(args, uint32_t);
-                            pattern += 2;
-                        }
-                        else if (pattern[1] == '6' && pattern[2] == '4') {
-                            val = va_arg(args, uint64_t);
-                            pattern += 2;
-                        }
-                        else {
-                            S_die_invalid_pattern(pattern_start);
-                        }
-                        size = sprintf(buf, "%" PRIu64, val);
-                        Str_Cat_Trusted_Str(self, buf, size);
-                    }
-                    break;
-                case 'f': {
-                        if (pattern[1] == '6' && pattern[2] == '4') {
-                            double num  = va_arg(args, double);
-                            char bigbuf[512];
-                            size_t size = sprintf(bigbuf, "%g", num);
-                            Str_Cat_Trusted_Str(self, bigbuf, size);
-                            pattern += 2;
-                        }
-                        else {
-                            S_die_invalid_pattern(pattern_start);
-                        }
-                    }
-                    break;
-                case 'x': {
-                        if (pattern[1] == '3' && pattern[2] == '2') {
-                            unsigned long val = va_arg(args, uint32_t);
-                            size_t size = sprintf(buf, "%.8lx", val);
-                            Str_Cat_Trusted_Str(self, buf, size);
-                            pattern += 2;
-                        }
-                        else {
-                            S_die_invalid_pattern(pattern_start);
-                        }
-                    }
-                    break;
-                case 's': {
-                        char *string = va_arg(args, char*);
-                        if (string == NULL) {
-                            Str_Cat_Trusted_Str(self, "[NULL]", 6);
-                        }
-                        else {
-                            size_t size = strlen(string);
-                            if (StrHelp_utf8_valid(string, size)) {
-                                Str_Cat_Trusted_Str(self, string, size);
-                            }
-                            else {
-                                Str_Cat_Trusted_Str(self, "[INVALID UTF8]", 14);
-                            }
-                        }
-                    }
-                    break;
-                default: {
-                        // Assume NULL-terminated pattern string, which
-                        // eliminates the need for bounds checking if '%' is
-                        // the last visible character.
-                        S_die_invalid_pattern(pattern_start);
-                    }
-            }
-        }
-    }
-}
-
 String*
 Str_To_String_IMP(String *self) {
     return Str_new_from_trusted_utf8(self->ptr, self->size);
-}
-
-void
-Str_Cat_Char_IMP(String *self, uint32_t code_point) {
-    const size_t MAX_UTF8_BYTES = 4;
-    if (self->size + MAX_UTF8_BYTES >= self->cap) {
-        S_grow(self, Memory_oversize(self->size + MAX_UTF8_BYTES,
-                                     sizeof(char)));
-    }
-    char *end = self->ptr + self->size;
-    size_t count = StrHelp_encode_utf8_char(code_point, (uint8_t*)end);
-    self->size += count;
-    *(end + count) = '\0';
 }
 
 int32_t
@@ -498,38 +343,6 @@ Str_Immutable_Cat_Trusted_UTF8_IMP(String *self, const char* ptr, size_t size) {
     String *result = (String*)VTable_Make_Obj(STRING);
     return Str_init_steal_trusted_str(result, result_ptr, result_size,
                                       result_size + 1);
-}
-
-void
-Str_Cat_Str_IMP(String *self, const char* ptr, size_t size) {
-    if (!StrHelp_utf8_valid(ptr, size)) {
-        DIE_INVALID_UTF8(ptr, size);
-    }
-    Str_Cat_Trusted_Str_IMP(self, ptr, size);
-}
-
-void
-Str_Cat_Trusted_Str_IMP(String *self, const char* ptr, size_t size) {
-    const size_t new_size = self->size + size;
-    if (new_size >= self->cap) {
-        size_t amount = Memory_oversize(new_size, sizeof(char));
-        S_grow(self, amount);
-    }
-    memcpy((self->ptr + self->size), ptr, size);
-    self->size = new_size;
-    self->ptr[new_size] = '\0';
-}
-
-void
-Str_Cat_IMP(String *self, const String *other) {
-    const size_t new_size = self->size + other->size;
-    if (new_size >= self->cap) {
-        size_t amount = Memory_oversize(new_size, sizeof(char));
-        S_grow(self, amount);
-    }
-    memcpy((self->ptr + self->size), other->ptr, other->size);
-    self->size = new_size;
-    self->ptr[new_size] = '\0';
 }
 
 bool
