@@ -64,6 +64,11 @@ class Clownfish::String cnick Str
     init_steal_trusted_str(decremented String *self, char *ptr,
                            size_t size, size_t cap);
 
+    /** Return a String which holds a single character.
+     */
+    inert incremented String*
+    new_from_char(uint32_t code_point);
+
     /** Return a pointer to a new String which contains formatted data
      * expanded according to Str_VCatF.
      *
