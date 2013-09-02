@@ -330,20 +330,19 @@ Freezer_deserialize_hash(Hash *hash, InStream *instream) {
     uint32_t size        = InStream_Read_C32(instream);
     uint32_t num_strings = InStream_Read_C32(instream);
     uint32_t num_other   = size - num_strings;
-    String *key          = num_strings ? Str_new(0) : NULL;
 
     Hash_init(hash, size);
 
     // Read key-value pairs with String keys.
     while (num_strings--) {
         uint32_t len = InStream_Read_C32(instream);
-        char *key_buf = Str_Grow(key, len);
+        char *key_buf = (char*)MALLOCATE(len + 1);
         InStream_Read_Bytes(instream, key_buf, len);
         key_buf[len] = '\0';
-        Str_Set_Size(key, len);
+        String *key = Str_new_steal_from_trusted_str(key_buf, len, len + 1);
         Hash_Store(hash, (Obj*)key, THAW(instream));
+        DECREF(key);
     }
-    DECREF(key);
 
     // Read remaining key/value pairs.
     while (num_other--) {
