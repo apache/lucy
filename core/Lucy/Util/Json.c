@@ -20,6 +20,8 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Util/Json.h"
+
+#include "Clownfish/CharBuf.h"
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
@@ -40,7 +42,7 @@ LucyParseJsonTrace(FILE *trace, char *line_prefix);
 // Encode JSON for supplied "dump".  On failure, sets Err_error and returns
 // false.
 static bool
-S_to_json(Obj *dump, String *json, int32_t depth);
+S_to_json(Obj *dump, CharBuf *buf, int32_t depth);
 
 // Parse JSON from raw UTF-8 in memory.
 static Obj*
@@ -79,11 +81,11 @@ static const size_t INDENTATION_LEN = sizeof(indentation) - 1;
 
 // Append indentation spaces x depth.
 static void
-S_cat_whitespace(String *json, int32_t depth);
+S_cat_whitespace(CharBuf *buf, int32_t depth);
 
 // Set Err_error, appending escaped JSON in the vicinity of the error.
 static void
-S_set_error(String *mess, char *json, char *limit, int line,
+S_set_error(CharBuf *buf, char *json, char *limit, int line,
             const char *func);
 #define SET_ERROR(_mess, _json, _end) \
     S_set_error(_mess, _json, _end, __LINE__, CFISH_ERR_FUNC_MACRO)
@@ -150,17 +152,18 @@ Json_to_json(Obj *dump) {
     }
 
     // Encode.
-    String *json = Str_new(31);
-    if (!S_to_json(dump, json, 0)) {
-        DECREF(json);
+    CharBuf *buf = CB_new(31);
+    String *json = NULL;
+    if (!S_to_json(dump, buf, 0)) {
         ERR_ADD_FRAME(Err_get_error());
-        json = NULL;
     }
     else {
         // Append newline.
-        Str_Cat_Trusted_Str(json, "\n", 1);
+        CB_Cat_Trusted_UTF8(buf, "\n", 1);
+        json = CB_Yield_String(buf);
     }
 
+    DECREF(buf);
     return json;
 }
 
@@ -172,9 +175,9 @@ Json_set_tolerant(bool tolerance) {
 static const int32_t MAX_DEPTH = 200;
 
 static void
-S_append_json_string(Obj *dump, String *json) {
+S_append_json_string(Obj *dump, CharBuf *buf) {
     // Append opening quote.
-    Str_Cat_Trusted_Str(json, "\"", 1);
+    CB_Cat_Trusted_UTF8(buf, "\"", 1);
 
     // Process string data.
     StackString *iterator = SSTR_WRAP((String*)dump);
@@ -184,7 +187,7 @@ S_append_json_string(Obj *dump, String *json) {
             // There is no need to escape any high characters, including those
             // above the BMP, as we assume that the destination channel can
             // handle arbitrary UTF-8 data.
-            Str_Cat_Char(json, code_point);
+            CB_Cat_Char(buf, code_point);
         }
         else {
             char buffer[7];
@@ -238,23 +241,23 @@ S_append_json_string(Obj *dump, String *json) {
                     buffer[0] = (char)code_point;
                     len = 1;
             }
-            Str_Cat_Trusted_Str(json, buffer, len);
+            CB_Cat_Trusted_UTF8(buf, buffer, len);
         }
     }
 
     // Append closing quote.
-    Str_Cat_Trusted_Str(json, "\"", 1);
+    CB_Cat_Trusted_UTF8(buf, "\"", 1);
 }
 
 static void
-S_cat_whitespace(String *json, int32_t depth) {
+S_cat_whitespace(CharBuf *buf, int32_t depth) {
     while (depth--) {
-        Str_Cat_Trusted_Str(json, indentation, INDENTATION_LEN);
+        CB_Cat_Trusted_UTF8(buf, indentation, INDENTATION_LEN);
     }
 }
 
 static bool
-S_to_json(Obj *dump, String *json, int32_t depth) {
+S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
     // Guard against infinite recursion in self-referencing data structures.
     if (depth > MAX_DEPTH) {
         String *mess = MAKE_MESS("Exceeded max depth of %i32", MAX_DEPTH);
@@ -263,58 +266,58 @@ S_to_json(Obj *dump, String *json, int32_t depth) {
     }
 
     if (!dump) {
-        Str_Cat_Trusted_Str(json, "null", 4);
+        CB_Cat_Trusted_UTF8(buf, "null", 4);
     }
     else if (dump == (Obj*)CFISH_TRUE) {
-        Str_Cat_Trusted_Str(json, "true", 4);
+        CB_Cat_Trusted_UTF8(buf, "true", 4);
     }
     else if (dump == (Obj*)CFISH_FALSE) {
-        Str_Cat_Trusted_Str(json, "false", 5);
+        CB_Cat_Trusted_UTF8(buf, "false", 5);
     }
     else if (Obj_Is_A(dump, STRING)) {
-        S_append_json_string(dump, json);
+        S_append_json_string(dump, buf);
     }
     else if (Obj_Is_A(dump, INTNUM)) {
-        Str_catf(json, "%i64", Obj_To_I64(dump));
+        CB_catf(buf, "%i64", Obj_To_I64(dump));
     }
     else if (Obj_Is_A(dump, FLOATNUM)) {
-        Str_catf(json, "%f64", Obj_To_F64(dump));
+        CB_catf(buf, "%f64", Obj_To_F64(dump));
     }
     else if (Obj_Is_A(dump, VARRAY)) {
         VArray *array = (VArray*)dump;
         size_t size = VA_Get_Size(array);
         if (size == 0) {
             // Put empty array on single line.
-            Str_Cat_Trusted_Str(json, "[]", 2);
+            CB_Cat_Trusted_UTF8(buf, "[]", 2);
             return true;
         }
         else if (size == 1) {
             Obj *elem = VA_Fetch(array, 0);
             if (!(Obj_Is_A(elem, HASH) || Obj_Is_A(elem, VARRAY))) {
                 // Put array containing single scalar element on one line.
-                Str_Cat_Trusted_Str(json, "[", 1);
-                if (!S_to_json(elem, json, depth + 1)) {
+                CB_Cat_Trusted_UTF8(buf, "[", 1);
+                if (!S_to_json(elem, buf, depth + 1)) {
                     return false;
                 }
-                Str_Cat_Trusted_Str(json, "]", 1);
+                CB_Cat_Trusted_UTF8(buf, "]", 1);
                 return true;
             }
         }
         // Fall back to spreading elements across multiple lines.
-        Str_Cat_Trusted_Str(json, "[", 1);
+        CB_Cat_Trusted_UTF8(buf, "[", 1);
         for (size_t i = 0; i < size; i++) {
-            Str_Cat_Trusted_Str(json, "\n", 1);
-            S_cat_whitespace(json, depth + 1);
-            if (!S_to_json(VA_Fetch(array, i), json, depth + 1)) {
+            CB_Cat_Trusted_UTF8(buf, "\n", 1);
+            S_cat_whitespace(buf, depth + 1);
+            if (!S_to_json(VA_Fetch(array, i), buf, depth + 1)) {
                 return false;
             }
             if (i + 1 < size) {
-                Str_Cat_Trusted_Str(json, ",", 1);
+                CB_Cat_Trusted_UTF8(buf, ",", 1);
             }
         }
-        Str_Cat_Trusted_Str(json, "\n", 1);
-        S_cat_whitespace(json, depth);
-        Str_Cat_Trusted_Str(json, "]", 1);
+        CB_Cat_Trusted_UTF8(buf, "\n", 1);
+        S_cat_whitespace(buf, depth);
+        CB_Cat_Trusted_UTF8(buf, "]", 1);
     }
     else if (Obj_Is_A(dump, HASH)) {
         Hash *hash = (Hash*)dump;
@@ -322,7 +325,7 @@ S_to_json(Obj *dump, String *json, int32_t depth) {
 
         // Put empty hash on single line.
         if (size == 0) {
-            Str_Cat_Trusted_Str(json, "{}", 2);
+            CB_Cat_Trusted_UTF8(buf, "{}", 2);
             return true;
         }
 
@@ -341,24 +344,24 @@ S_to_json(Obj *dump, String *json, int32_t depth) {
         VA_Sort(keys, NULL, NULL);
 
         // Spread pairs across multiple lines.
-        Str_Cat_Trusted_Str(json, "{", 1);
+        CB_Cat_Trusted_UTF8(buf, "{", 1);
         for (size_t i = 0; i < size; i++) {
             Obj *key = VA_Fetch(keys, i);
-            Str_Cat_Trusted_Str(json, "\n", 1);
-            S_cat_whitespace(json, depth + 1);
-            S_append_json_string(key, json);
-            Str_Cat_Trusted_Str(json, ": ", 2);
-            if (!S_to_json(Hash_Fetch(hash, key), json, depth + 1)) {
+            CB_Cat_Trusted_UTF8(buf, "\n", 1);
+            S_cat_whitespace(buf, depth + 1);
+            S_append_json_string(key, buf);
+            CB_Cat_Trusted_UTF8(buf, ": ", 2);
+            if (!S_to_json(Hash_Fetch(hash, key), buf, depth + 1)) {
                 DECREF(keys);
                 return false;
             }
             if (i + 1 < size) {
-                Str_Cat_Trusted_Str(json, ",", 1);
+                CB_Cat_Trusted_UTF8(buf, ",", 1);
             }
         }
-        Str_Cat_Trusted_Str(json, "\n", 1);
-        S_cat_whitespace(json, depth);
-        Str_Cat_Trusted_Str(json, "}", 1);
+        CB_Cat_Trusted_UTF8(buf, "\n", 1);
+        S_cat_whitespace(buf, depth);
+        CB_Cat_Trusted_UTF8(buf, "}", 1);
 
         DECREF(keys);
     }
@@ -471,7 +474,7 @@ S_do_parse_json(void *json_parser, char *json, size_t len) {
         }
         LucyParseJson(json_parser, token_type, value, &state);
         if (state.errors) {
-            SET_ERROR(Str_newf("JSON syntax error"), save, end);
+            SET_ERROR(CB_newf("JSON syntax error"), save, end);
             return NULL;
         }
     }
@@ -479,7 +482,7 @@ S_do_parse_json(void *json_parser, char *json, size_t len) {
     // Finish up.
     LucyParseJson(json_parser, 0, NULL, &state);
     if (state.errors) {
-        SET_ERROR(Str_newf("JSON syntax error"), json, end);
+        SET_ERROR(CB_newf("JSON syntax error"), json, end);
         return NULL;
     }
     return state.result;
@@ -518,7 +521,7 @@ S_parse_number(char **json_ptr, char *const limit) {
         }
     }
     if (!result) {
-        SET_ERROR(Str_newf("JSON syntax error"), top, limit);
+        SET_ERROR(CB_newf("JSON syntax error"), top, limit);
     }
     return result;
 }
@@ -545,7 +548,7 @@ S_parse_string(char **json_ptr, char *const limit) {
         }
     }
     if (!end) {
-        SET_ERROR(Str_newf("Unterminated string"), *json_ptr, limit);
+        SET_ERROR(CB_newf("Unterminated string"), *json_ptr, limit);
         return NULL;
     }
 
@@ -619,12 +622,12 @@ S_unescape_text(char *const top, char *const end) {
                         char *temp_ptr = temp;
                         if (num_end != temp_ptr + 4 || code_point < 0) {
                             FREEMEM(target_buf);
-                            SET_ERROR(Str_newf("Invalid \\u escape"), text - 5, end);
+                            SET_ERROR(CB_newf("Invalid \\u escape"), text - 5, end);
                             return NULL;
                         }
                         if (code_point >= 0xD800 && code_point <= 0xDFFF) {
                             FREEMEM(target_buf);
-                            SET_ERROR(Str_newf("Surrogate pairs not supported"),
+                            SET_ERROR(CB_newf("Surrogate pairs not supported"),
                                       text - 5, end);
                             return NULL;
                         }
@@ -634,7 +637,7 @@ S_unescape_text(char *const top, char *const end) {
                     break;
                 default:
                     FREEMEM(target_buf);
-                    SET_ERROR(Str_newf("Illegal escape"), text - 1, end);
+                    SET_ERROR(CB_newf("Illegal escape"), text - 1, end);
                     return NULL;
             }
         }
@@ -664,14 +667,14 @@ SI_check_keyword(char *json, char* end, const char *keyword, size_t len) {
 }
 
 static void
-S_set_error(String *mess, char *json, char *limit, int line,
+S_set_error(CharBuf *buf, char *json, char *limit, int line,
             const char *func) {
     if (func) {
-        Str_catf(mess, " at %s %s line %i32 near ", func, __FILE__,
+        CB_catf(buf, " at %s %s line %i32 near ", func, __FILE__,
                  (int32_t)line);
     }
     else {
-        Str_catf(mess, " at %s line %i32 near ", __FILE__, (int32_t)line);
+        CB_catf(buf, " at %s line %i32 near ", __FILE__, (int32_t)line);
     }
 
     // Append escaped text.
@@ -681,7 +684,10 @@ S_set_error(String *mess, char *json, char *limit, int line,
         len = end - json;
     }
     StackString *snippet = SSTR_WRAP_STR(json, len);
-    S_append_json_string((Obj*)snippet, mess);
+    S_append_json_string((Obj*)snippet, buf);
+
+    String *mess = CB_Yield_String(buf);
+    DECREF(buf);
 
     // Set Err_error.
     Err_set_error(Err_new(mess));
