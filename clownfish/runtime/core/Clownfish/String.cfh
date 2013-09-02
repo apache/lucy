@@ -106,18 +106,18 @@ class Clownfish::String cnick Str
     /** Return the concatenation of the String and <code>other</code>.
      */
     incremented String*
-    Immutable_Cat(String *self, const String *other);
+    Cat(String *self, const String *other);
 
     /** Return the concatenation of the String and the passed-in raw UTF-8.
      */
     incremented String*
-    Immutable_Cat_UTF8(String *self, const char *ptr, size_t size);
+    Cat_UTF8(String *self, const char *ptr, size_t size);
 
     /** Return the concatenation of the String and the passed-in raw UTF-8.
      * Don't check for UTF-8 validity.
      */
     incremented String*
-    Immutable_Cat_Trusted_UTF8(String *self, const char *ptr, size_t size);
+    Cat_Trusted_UTF8(String *self, const char *ptr, size_t size);
 
     /** Replace all instances of one character for the other.  For now, both
      * the source and replacement code points must be ASCII.

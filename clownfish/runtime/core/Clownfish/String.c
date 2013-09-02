@@ -321,20 +321,20 @@ Str_Mimic_IMP(String *self, Obj *other) {
 }
 
 String*
-Str_Immutable_Cat_IMP(String *self, const String *other) {
-    return Str_Immutable_Cat_Trusted_UTF8(self, other->ptr, other->size);
+Str_Cat_IMP(String *self, const String *other) {
+    return Str_Cat_Trusted_UTF8(self, other->ptr, other->size);
 }
 
 String*
-Str_Immutable_Cat_UTF8_IMP(String *self, const char* ptr, size_t size) {
+Str_Cat_UTF8_IMP(String *self, const char* ptr, size_t size) {
     if (!StrHelp_utf8_valid(ptr, size)) {
         DIE_INVALID_UTF8(ptr, size);
     }
-    return Str_Immutable_Cat_Trusted_UTF8(self, ptr, size);
+    return Str_Cat_Trusted_UTF8(self, ptr, size);
 }
 
 String*
-Str_Immutable_Cat_Trusted_UTF8_IMP(String *self, const char* ptr, size_t size) {
+Str_Cat_Trusted_UTF8_IMP(String *self, const char* ptr, size_t size) {
     size_t  result_size = self->size + size;
     char   *result_ptr  = (char*)MALLOCATE(result_size + 1);
     memcpy(result_ptr, self->ptr, self->size);
