@@ -18,6 +18,8 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Search/Compiler.h"
+
+#include "Clownfish/CharBuf.h"
 #include "Lucy/Index/SegReader.h"
 #include "Lucy/Index/DocVector.h"
 #include "Lucy/Index/Similarity.h"
@@ -107,9 +109,11 @@ String*
 Compiler_To_String_IMP(Compiler *self) {
     CompilerIVARS *const ivars = Compiler_IVARS(self);
     String *stringified_query = Query_To_String(ivars->parent);
-    String *string = Str_new_from_trusted_utf8("compiler(", 9);
-    Str_Cat(string, stringified_query);
-    Str_Cat_Trusted_Str(string, ")", 1);
+    CharBuf *buf = CB_new_from_trusted_utf8("compiler(", 9);
+    CB_Cat(buf, stringified_query);
+    CB_Cat_Trusted_UTF8(buf, ")", 1);
+    String *string = CB_Yield_String(buf);
+    DECREF(buf);
     DECREF(stringified_query);
     return string;
 }
