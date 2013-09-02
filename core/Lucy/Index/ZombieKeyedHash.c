@@ -49,7 +49,7 @@ ZKHash_Make_Key_IMP(ZombieKeyedHash *self, Obj *key, int32_t hash_sum) {
                 String *source = (String*)key;
                 size_t size = SStr_size() + Str_Get_Size(source) + 1;
                 void *allocation = MemPool_Grab(ivars->mem_pool, size);
-                retval = (Obj*)SStr_newf(allocation, size, "%o", source);
+                retval = (Obj*)SStr_new_from_str(allocation, size, source);
             }
             break;
         case FType_INT32: {

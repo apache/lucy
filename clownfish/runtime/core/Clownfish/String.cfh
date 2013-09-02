@@ -377,10 +377,10 @@ class Clownfish::StackString cnick SStr
      * @param allocation A single block of memory which will be used for both
      * the StackString object and its buffer.
      * @param alloc_size The size of the allocation.
-     * @param pattern A format pattern.
+     * @param string String to be copied.
      */
     inert incremented StackString*
-    newf(void *allocation, size_t alloc_size, const char *pattern, ...);
+    new_from_str(void *allocation, size_t alloc_size, String *string);
 
     inert incremented StackString*
     wrap(void *allocation, const String *source);
