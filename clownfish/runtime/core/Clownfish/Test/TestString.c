@@ -53,19 +53,19 @@ test_Cat(TestBatchRunner *runner) {
     String *got;
 
     source = S_get_str("");
-    got = Str_Immutable_Cat(source, wanted);
+    got = Str_Cat(source, wanted);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Cat");
     DECREF(got);
     DECREF(source);
 
     source = S_get_str("a");
-    got = Str_Immutable_Cat_UTF8(source, smiley, smiley_len);
+    got = Str_Cat_UTF8(source, smiley, smiley_len);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Cat_UTF8");
     DECREF(got);
     DECREF(source);
 
     source = S_get_str("a");
-    got = Str_Immutable_Cat_Trusted_UTF8(source, smiley, smiley_len);
+    got = Str_Cat_Trusted_UTF8(source, smiley, smiley_len);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Cat_Trusted_UTF8");
     DECREF(got);
     DECREF(source);
