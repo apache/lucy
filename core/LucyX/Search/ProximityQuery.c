@@ -20,6 +20,8 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "LucyX/Search/ProximityQuery.h"
+
+#include "Clownfish/CharBuf.h"
 #include "Lucy/Index/DocVector.h"
 #include "Lucy/Index/Posting.h"
 #include "Lucy/Index/Posting/ScorePosting.h"
@@ -148,19 +150,21 @@ String*
 ProximityQuery_To_String_IMP(ProximityQuery *self) {
     ProximityQueryIVARS *const ivars = ProximityQuery_IVARS(self);
     uint32_t num_terms = VA_Get_Size(ivars->terms);
-    String *retval = Str_Clone(ivars->field);
-    Str_Cat_Trusted_Str(retval, ":\"", 2);
+    CharBuf *buf = CB_new_from_str(ivars->field);
+    CB_Cat_Trusted_UTF8(buf, ":\"", 2);
     for (uint32_t i = 0; i < num_terms; i++) {
         Obj *term = VA_Fetch(ivars->terms, i);
         String *term_string = Obj_To_String(term);
-        Str_Cat(retval, term_string);
+        CB_Cat(buf, term_string);
         DECREF(term_string);
         if (i < num_terms - 1) {
-            Str_Cat_Trusted_Str(retval, " ",  1);
+            CB_Cat_Trusted_UTF8(buf, " ",  1);
         }
     }
-    Str_Cat_Trusted_Str(retval, "\"", 1);
-    Str_catf(retval, "~%u32", ivars->within);
+    CB_Cat_Trusted_UTF8(buf, "\"", 1);
+    CB_catf(buf, "~%u32", ivars->within);
+    String *retval = CB_Yield_String(buf);
+    DECREF(buf);
     return retval;
 }
 

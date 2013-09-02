@@ -19,6 +19,8 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Search/ANDQuery.h"
+
+#include "Clownfish/CharBuf.h"
 #include "Lucy/Index/DocVector.h"
 #include "Lucy/Index/SegReader.h"
 #include "Lucy/Index/Similarity.h"
@@ -47,18 +49,20 @@ ANDQuery_To_String_IMP(ANDQuery *self) {
     uint32_t num_kids = VA_Get_Size(ivars->children);
     if (!num_kids) { return Str_new_from_trusted_utf8("()", 2); }
     else {
-        String *retval = Str_new_from_trusted_utf8("(", 1);
+        CharBuf *buf = CB_new_from_trusted_utf8("(", 1);
         for (uint32_t i = 0; i < num_kids; i++) {
             String *kid_string = Obj_To_String(VA_Fetch(ivars->children, i));
-            Str_Cat(retval, kid_string);
+            CB_Cat(buf, kid_string);
             DECREF(kid_string);
             if (i == num_kids - 1) {
-                Str_Cat_Trusted_Str(retval, ")", 1);
+                CB_Cat_Trusted_UTF8(buf, ")", 1);
             }
             else {
-                Str_Cat_Trusted_Str(retval, " AND ", 5);
+                CB_Cat_Trusted_UTF8(buf, " AND ", 5);
             }
         }
+        String *retval = CB_Yield_String(buf);
+        DECREF(buf);
         return retval;
     }
 }
