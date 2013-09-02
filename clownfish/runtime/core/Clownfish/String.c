@@ -74,13 +74,18 @@ Str_new_from_utf8(const char *ptr, size_t size) {
     if (!StrHelp_utf8_valid(ptr, size)) {
         DIE_INVALID_UTF8(ptr, size);
     }
-    return Str_new_from_trusted_utf8(ptr, size);
+    String *self = (String*)VTable_Make_Obj(STRING);
+    return Str_init_from_trusted_utf8(self, ptr, size);
 }
 
 String*
 Str_new_from_trusted_utf8(const char *ptr, size_t size) {
     String *self = (String*)VTable_Make_Obj(STRING);
+    return Str_init_from_trusted_utf8(self, ptr, size);
+}
 
+String*
+Str_init_from_trusted_utf8(String *self, const char *ptr, size_t size) {
     // Derive.
     self->ptr = (char*)MALLOCATE(size + 1);
 
