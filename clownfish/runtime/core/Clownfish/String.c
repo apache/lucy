@@ -118,6 +118,17 @@ Str_new_steal_str(char *ptr, size_t size, size_t cap) {
 }
 
 String*
+Str_new_from_char(uint32_t code_point) {
+    const size_t MAX_UTF8_BYTES = 4;
+    String *self = (String*)VTable_Make_Obj(STRING);
+    self->ptr  = (char*)MALLOCATE(MAX_UTF8_BYTES + 1);
+    self->cap  = MAX_UTF8_BYTES + 1;
+    self->size = StrHelp_encode_utf8_char(code_point, (uint8_t*)self->ptr);
+    self->ptr[self->size] = '\0';
+    return self;
+}
+
+String*
 Str_newf(const char *pattern, ...) {
     String *self = Str_new(strlen(pattern));
     va_list args;
