@@ -910,17 +910,19 @@ SStr_new(void *allocation) {
 }
 
 StackString*
-SStr_newf(void *allocation, size_t alloc_size, const char *pattern, ...) {
+SStr_new_from_str(void *allocation, size_t alloc_size, String *string) {
     StackString *self
         = (StackString*)VTable_Init_Obj(STACKSTRING, allocation);
     self->cap  = alloc_size - sizeof(StackString);
-    self->size = 0;
+    self->size = Str_Get_Size(string);
     self->ptr  = ((char*)allocation) + sizeof(StackString);
 
-    va_list args;
-    va_start(args, pattern);
-    SStr_VCatF(self, pattern, args);
-    va_end(args);
+    if (alloc_size < sizeof(StackString) + self->size + 1) {
+        THROW(ERR, "alloc_size of StackString too small");
+    }
+
+    memcpy(self->ptr, Str_Get_Ptr8(string), self->size);
+    self->ptr[self->size] = '\0';
 
     return self;
 }
