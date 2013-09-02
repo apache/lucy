@@ -115,8 +115,7 @@ static const char* quote_escapes_json[] = {
 static void
 test_escapes(TestBatchRunner *runner) {
     for (int i = 0; control_escapes[i] != NULL; i++) {
-        String *string = Str_new(1);
-        Str_Cat_Char(string, i);
+        String     *string  = Str_new_from_char(i);
         const char *escaped = control_escapes[i];
         String     *json    = Json_to_json((Obj*)string);
         String     *decoded = (String*)Json_from_json(json);

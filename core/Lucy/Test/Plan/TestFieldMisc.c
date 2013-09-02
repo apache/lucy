@@ -202,8 +202,7 @@ test_many_fields(TestBatchRunner *runner) {
         String *content;
 
         for (int c = 'a'; c <= 'z'; ++c) {
-            content = Str_new(1);
-            Str_Cat_Char(content, c);
+            content = Str_new_from_char(c);
             S_add_many_fields_doc(indexer, content, num_fields);
             DECREF(content);
         }
