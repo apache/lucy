@@ -45,6 +45,12 @@ class Clownfish::String cnick Str
     inert incremented String*
     new_from_trusted_utf8(const char *utf8, size_t size);
 
+    /** Initialize the String using the passed-in string.  Do not check
+     * validity of supplied UTF-8.
+     */
+    inert String*
+    init_from_trusted_utf8(String *self, const char *utf8, size_t size);
+
     /** Return a pointer to a new String which assumes ownership of the
      * passed-in string.  Check validity of supplied UTF-8.
      */
