@@ -765,7 +765,7 @@ S_encode_entities(String *text, CharBuf *buf) {
         }
     }
 
-    return CB_Yield_String(buf);
+    return CB_To_String(buf);
 }
 
 
