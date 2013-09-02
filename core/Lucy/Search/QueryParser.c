@@ -20,6 +20,8 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Search/QueryParser.h"
+
+#include "Clownfish/CharBuf.h"
 #include "Lucy/Search/QueryParser/ParserElem.h"
 #include "Lucy/Search/QueryParser/QueryLexer.h"
 #include "Lucy/Analysis/Analyzer.h"
@@ -823,13 +825,13 @@ QParser_Expand_IMP(QueryParser *self, Query *query) {
 }
 
 static String*
-S_unescape(QueryParser *self, String *orig, String *target) {
+S_unescape(QueryParser *self, String *orig, CharBuf *buf) {
     StackString *source = SSTR_WRAP(orig);
     uint32_t code_point;
     UNUSED_VAR(self);
 
-    Str_Set_Size(target, 0);
-    Str_Grow(target, Str_Get_Size(orig) + 4);
+    CB_Set_Size(buf, 0);
+    CB_Grow(buf, Str_Get_Size(orig) + 4);
 
     while (0 != (code_point = SStr_Nibble(source))) {
         if (code_point == '\\') {
@@ -838,19 +840,19 @@ S_unescape(QueryParser *self, String *orig, String *target) {
                 || next_code_point == '"'
                 || next_code_point == '\\'
                ) {
-                Str_Cat_Char(target, next_code_point);
+                CB_Cat_Char(buf, next_code_point);
             }
             else {
-                Str_Cat_Char(target, code_point);
-                if (next_code_point) { Str_Cat_Char(target, next_code_point); }
+                CB_Cat_Char(buf, code_point);
+                if (next_code_point) { CB_Cat_Char(buf, next_code_point); }
             }
         }
         else {
-            Str_Cat_Char(target, code_point);
+            CB_Cat_Char(buf, code_point);
         }
     }
 
-    return target;
+    return CB_To_String(buf);
 }
 
 Query*
@@ -889,8 +891,8 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
         fields = (VArray*)INCREF(ivars->fields);
     }
 
-    String *unescaped = Str_new(SStr_Get_Size(source_text));
-    VArray *queries   = VA_new(VA_Get_Size(fields));
+    CharBuf *unescape_buf = CB_new(SStr_Get_Size(source_text));
+    VArray  *queries      = VA_new(VA_Get_Size(fields));
     for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
         String   *field    = (String*)VA_Fetch(fields, i);
         Analyzer *analyzer = ivars->analyzer
@@ -905,7 +907,7 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
         else {
             // Extract token texts.
             String *split_source
-                = S_unescape(self, (String*)source_text, unescaped);
+                = S_unescape(self, (String*)source_text, unescape_buf);
             VArray *maybe_texts = Analyzer_Split(analyzer, split_source);
             uint32_t num_maybe_texts = VA_Get_Size(maybe_texts);
             VArray *token_texts = VA_new(num_maybe_texts);
@@ -935,6 +937,7 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
 
             DECREF(token_texts);
             DECREF(maybe_texts);
+            DECREF(split_source);
         }
     }
 
@@ -953,7 +956,7 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
     }
 
     // Clean up.
-    DECREF(unescaped);
+    DECREF(unescape_buf);
     DECREF(queries);
     DECREF(fields);
 
