@@ -76,7 +76,7 @@ class Clownfish::String cnick Str
     new_from_char(uint32_t code_point);
 
     /** Return a pointer to a new String which contains formatted data
-     * expanded according to Str_VCatF.
+     * expanded according to CB_VCatF.
      *
      * Note: a user-supplied <code>pattern</code> string is a security hole
      * and must not be allowed.
@@ -118,43 +118,6 @@ class Clownfish::String cnick Str
      */
     incremented String*
     Immutable_Cat_Trusted_UTF8(String *self, const char *ptr, size_t size);
-
-    /** Concatenate the passed-in string onto the end of the String.
-     */
-    void
-    Cat_Str(String *self, const char *ptr, size_t size);
-
-    /** Concatenate the contents of <code>other</code> onto the end of the
-     * caller.
-     */
-    void
-    Cat(String *self, const String *other);
-
-    /** Concatenate formatted arguments.  Similar to the printf family, but
-     * only accepts minimal options (just enough for decent error messages).
-     *
-     * Objects:  %o
-     * char*:    %s
-     * integers: %i8 %i32 %i64 %u8 %u32 %u64
-     * floats:   %f64
-     * hex:      %x32
-     *
-     * Note that all Clownfish Objects, including Strings, are printed via
-     * %o (which invokes Obj_To_String()).
-     */
-    void
-    VCatF(String *self, const char *pattern, va_list args);
-
-    /** Invokes Str_VCatF to concatenate formatted arguments.  Note that this
-     * is only a function and not a method.
-     */
-    inert void
-    catf(String *self, const char *pattern, ...);
-
-    /** Concatenate one Unicode character onto the end of the String.
-     */
-    void
-    Cat_Char(String *self, uint32_t code_point);
 
     /** Replace all instances of one character for the other.  For now, both
      * the source and replacement code points must be ASCII.
@@ -307,12 +270,6 @@ class Clownfish::String cnick Str
      */
     incremented String*
     SubString(String *self, size_t offset, size_t len);
-
-    /** Concatenate the supplied text onto the end of the String.  Don't
-     * check for UTF-8 validity.
-     */
-    void
-    Cat_Trusted_Str(String *self, const char *ptr, size_t size);
 }
 
 class Clownfish::ViewCharBuf cnick ViewCB
