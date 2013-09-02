@@ -26,6 +26,7 @@
 #include "Clownfish/Test/TestString.h"
 
 #include "Clownfish/String.h"
+#include "Clownfish/CharBuf.h"
 #include "Clownfish/Num.h"
 #include "Clownfish/Test.h"
 #include "Clownfish/TestHarness/TestBatchRunner.h"
@@ -192,13 +193,15 @@ test_Trim(TestBatchRunner *runner) {
     };
     uint32_t num_spaces = sizeof(spaces) / sizeof(uint32_t);
     uint32_t i;
-    String *got = Str_new(0);
+    String *got;
 
     // Surround a smiley with lots of whitespace.
-    for (i = 0; i < num_spaces; i++) { Str_Cat_Char(got, spaces[i]); }
-    Str_Cat_Char(got, 0x263A);
-    for (i = 0; i < num_spaces; i++) { Str_Cat_Char(got, spaces[i]); }
+    CharBuf *buf = CB_new(0);
+    for (i = 0; i < num_spaces; i++) { CB_Cat_Char(buf, spaces[i]); }
+    CB_Cat_Char(buf, 0x263A);
+    for (i = 0; i < num_spaces; i++) { CB_Cat_Char(buf, spaces[i]); }
 
+    got = CB_To_String(buf);
     TEST_TRUE(runner, Str_Trim_Top(got), "Trim_Top returns true on success");
     TEST_FALSE(runner, Str_Trim_Top(got),
                "Trim_Top returns false on failure");
@@ -207,19 +210,16 @@ test_Trim(TestBatchRunner *runner) {
                "Trim_Tail returns false on failure");
     TEST_TRUE(runner, Str_Equals_Str(got, smiley, smiley_len),
               "Trim_Top and Trim_Tail worked");
+    DECREF(got);
 
-    // Build the spacey smiley again.
-    Str_Truncate(got, 0);
-    for (i = 0; i < num_spaces; i++) { Str_Cat_Char(got, spaces[i]); }
-    Str_Cat_Char(got, 0x263A);
-    for (i = 0; i < num_spaces; i++) { Str_Cat_Char(got, spaces[i]); }
-
+    got = CB_To_String(buf);
     TEST_TRUE(runner, Str_Trim(got), "Trim returns true on success");
     TEST_FALSE(runner, Str_Trim(got), "Trim returns false on failure");
     TEST_TRUE(runner, Str_Equals_Str(got, smiley, smiley_len),
               "Trim worked");
-
     DECREF(got);
+
+    DECREF(buf);
 }
 
 static void
