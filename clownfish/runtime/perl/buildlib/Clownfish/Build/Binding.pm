@@ -158,8 +158,7 @@ CODE:
     STRLEN size;
     char *ptr = SvPVutf8(sv, size);
     cfish_String *self = (cfish_String*)XSBind_new_blank_obj(either_sv);
-    cfish_Str_init(self, size);
-    CFISH_Str_Cat_Trusted_Str(self, ptr, size);
+    cfish_Str_init_from_trusted_utf8(self, ptr, size);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
 OUTPUT: RETVAL
