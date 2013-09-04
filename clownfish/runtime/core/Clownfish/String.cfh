@@ -270,6 +270,26 @@ class Clownfish::String cnick Str
      */
     incremented String*
     SubString(String *self, size_t offset, size_t len);
+
+    /** Return an iterator to the start of the string.
+     */
+    incremented StringIterator*
+    Top(String *self);
+
+    /** Return an iterator to the end of the string.
+     */
+    incremented StringIterator*
+    Tail(String *self);
+
+    /** Return a stack iterator to the start of the string.
+     */
+    incremented StackStringIterator*
+    StackTop(String *self, void *allocation);
+
+    /** Return a stack iterator to the end of the string.
+     */
+    incremented StackStringIterator*
+    StackTail(String *self, void *allocation);
 }
 
 class Clownfish::ViewCharBuf cnick ViewCB
@@ -356,6 +376,104 @@ class Clownfish::StackString cnick SStr
     Destroy(StackString *self);
 }
 
+class Clownfish::StringIterator cnick StrIter
+    inherits Clownfish::Obj {
+
+    String *string;
+    size_t  byte_offset;
+
+    inert incremented StringIterator*
+    new(String *string, size_t byte_offset);
+
+    /** Return the substring between the top and tail iterators.
+     * @param offset Offset from the top, in code points.
+     * @param len The desired length of the substring, in code points.
+     */
+    inert incremented String*
+    substring(StringIterator *top, StringIterator *tail);
+
+    public incremented Obj*
+    Clone(StringIterator *self);
+
+    public void
+    Assign(StringIterator *self, StringIterator *other);
+
+    public bool
+    Equals(StringIterator *self, Obj *other);
+
+    public int32_t
+    Compare_To(StringIterator *self, Obj *other);
+
+    /** Return true if the iterator is not at the end of the string.
+     */
+    public bool
+    Has_Next(StringIterator *self);
+
+    /** Return true if the iterator is not at the start of the string.
+     */
+    public bool
+    Has_Prev(StringIterator *self);
+
+    /** Return the code point after the current position and advance the
+     * iterator. Return CFISH_STRITER_DONE at the end of the string.
+     */
+    public uint32_t
+    Next(StringIterator *self);
+
+    /** Return the code point before the current position and go one step back.
+     * Return CFISH_STRITER_DONE at the start of the string.
+     */
+    public uint32_t
+    Prev(StringIterator *self);
+
+    /** Skip code points.
+     * @param num The number of code points to skip.
+     * @return the number of code points actually skipped. This can be less
+     * than the requested number if the end of the string is reached.
+     */
+    public size_t
+    Advance(StringIterator *self, size_t num);
+
+    /** Skip code points backward.
+     * @param num The number of code points to skip.
+     * @return the number of code points actually skipped. This can be less
+     * than the requested number if the start of the string is reached.
+     */
+    public size_t
+    Recede(StringIterator *self, size_t num);
+
+    /** Skip whitespace.
+     * @return the number of code points skipped.
+     */
+    public size_t
+    Skip_Next_Whitespace(StringIterator *self);
+
+    /** Skip whitespace backward.
+     * @return the number of code points skipped.
+     */
+    public size_t
+    Skip_Prev_Whitespace(StringIterator *self);
+
+    /** Test whether the content after the iterator starts with
+     * <code>prefix</code>.
+     */
+    bool
+    Starts_With(StringIterator *self, String *prefix);
+
+    public void
+    Destroy(StringIterator *self);
+}
+
+class Clownfish::StackStringIterator cnick SStrIter
+    inherits Clownfish::StringIterator {
+
+    inert incremented StackStringIterator*
+    new(void *allocation, String *string, size_t byte_offset);
+
+    public void
+    Destroy(StackStringIterator *self);
+}
+
 __C__
 
 #define CFISH_SStr_BLANK() cfish_SStr_new(cfish_alloca(cfish_SStr_size()))
@@ -366,10 +484,13 @@ __C__
 #define CFISH_SStr_WRAP_STR(ptr, size) \
     cfish_SStr_wrap_str(cfish_alloca(cfish_SStr_size()), ptr, size)
 
+#define CFISH_STRITER_DONE  UINT32_MAX
+
 #ifdef CFISH_USE_SHORT_NAMES
   #define SStr_BLANK             CFISH_SStr_BLANK
   #define SSTR_WRAP              CFISH_SStr_WRAP
   #define SSTR_WRAP_STR          CFISH_SStr_WRAP_STR
+  #define STRITER_DONE          CFISH_STRITER_DONE
 #endif
 __END_C__
 
