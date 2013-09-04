@@ -162,12 +162,12 @@ Str_Destroy_IMP(String *self) {
 int32_t
 Str_Hash_Sum_IMP(String *self) {
     uint32_t hashvalue = 5381;
-    StackString *iterator = SSTR_WRAP(self);
+    StackStringIterator *iter = STR_STACKTOP(self);
 
-    const ViewCB_Nibble_t nibble = METHOD_PTR(iterator->vtable,
-                                              CFISH_ViewCB_Nibble);
-    while (iterator->size) {
-        uint32_t code_point = (uint32_t)nibble((ViewCharBuf*)iterator);
+    const StrIter_Next_t next
+        = METHOD_PTR(STRINGITERATOR, CFISH_StrIter_Next);
+    uint32_t code_point;
+    while (STRITER_DONE != (code_point = next((StringIterator*)iter))) {
         hashvalue = ((hashvalue << 5) + hashvalue) ^ code_point;
     }
 
@@ -245,19 +245,19 @@ Str_To_I64_IMP(String *self) {
 
 int64_t
 Str_BaseX_To_I64_IMP(String *self, uint32_t base) {
-    StackString *iterator = SSTR_WRAP(self);
+    StackStringIterator *iter = STR_STACKTOP(self);
     int64_t retval = 0;
     bool is_negative = false;
+    uint32_t code_point = SStrIter_Next(iter);
 
     // Advance past minus sign.
-    if (SStr_Code_Point_At(iterator, 0) == '-') {
-        SStr_Nibble(iterator);
+    if (code_point == '-') {
+        code_point = SStrIter_Next(iter);
         is_negative = true;
     }
 
     // Accumulate.
-    while (iterator->size) {
-        int32_t code_point = SStr_Nibble(iterator);
+    while (code_point != STRITER_DONE) {
         if (isalnum(code_point)) {
             int32_t addend = isdigit(code_point)
                              ? code_point - '0'
@@ -269,6 +269,7 @@ Str_BaseX_To_I64_IMP(String *self, uint32_t base) {
         else {
             break;
         }
+        code_point = SStrIter_Next(iter);
     }
 
     // Apply minus sign.
@@ -415,14 +416,14 @@ Str_Find_IMP(String *self, const String *substring) {
 
 int64_t
 Str_Find_Str_IMP(String *self, const char *ptr, size_t size) {
-    StackString *iterator = SSTR_WRAP(self);
+    StackStringIterator *iter = STR_STACKTOP(self);
     int64_t location = 0;
 
-    while (iterator->size) {
-        if (SStr_Starts_With_Str(iterator, ptr, size)) {
+    while (iter->byte_offset + size <= self->size) {
+        if (memcmp(self->ptr + iter->byte_offset, ptr, size) == 0) {
             return location;
         }
-        SStr_Nip(iterator, 1);
+        SStrIter_Advance(iter, 1);
         location++;
     }
 
@@ -479,17 +480,8 @@ Str_Trim_Tail_IMP(String *self) {
 
 size_t
 Str_Length_IMP(String *self) {
-    size_t  len  = 0;
-    char   *ptr  = self->ptr;
-    char   *end  = ptr + self->size;
-    while (ptr < end) {
-        ptr += StrHelp_UTF8_COUNT[*(uint8_t*)ptr];
-        len++;
-    }
-    if (ptr != end) {
-        DIE_INVALID_UTF8(self->ptr, self->size);
-    }
-    return len;
+    StackStringIterator *iter = STR_STACKTOP(self);
+    return SStrIter_Advance(iter, SIZE_MAX);
 }
 
 size_t
@@ -503,45 +495,31 @@ Str_Truncate_IMP(String *self, size_t count) {
 
 uint32_t
 Str_Code_Point_At_IMP(String *self, size_t tick) {
-    size_t count = 0;
-    char *ptr = self->ptr;
-    char *const end = ptr + self->size;
-
-    for (; ptr < end; ptr += StrHelp_UTF8_COUNT[*(uint8_t*)ptr]) {
-        if (count == tick) {
-            if (ptr > end) {
-                DIE_INVALID_UTF8(self->ptr, self->size);
-            }
-            return StrHelp_decode_utf8_char(ptr);
-        }
-        count++;
-    }
-
-    return 0;
+    StackStringIterator *iter = STR_STACKTOP(self);
+    SStrIter_Advance(iter, tick);
+    uint32_t code_point = SStrIter_Next(iter);
+    return code_point == STRITER_DONE ? 0 : code_point;
 }
 
 uint32_t
 Str_Code_Point_From_IMP(String *self, size_t tick) {
-    size_t      count = 0;
-    char       *top   = self->ptr;
-    const char *ptr   = top + self->size;
-
-    for (count = 0; count < tick; count++) {
-        if (NULL == (ptr = StrHelp_back_utf8_char(ptr, top))) { return 0; }
-    }
-    return StrHelp_decode_utf8_char(ptr);
+    if (tick == 0) { return 0; }
+    StackStringIterator *iter = STR_STACKTAIL(self);
+    SStrIter_Recede(iter, tick - 1);
+    uint32_t code_point = SStrIter_Prev(iter);
+    return code_point == STRITER_DONE ? 0 : code_point;
 }
 
 String*
 Str_SubString_IMP(String *self, size_t offset, size_t len) {
-    StackString *iterator = SSTR_WRAP(self);
-    char *sub_start;
-    size_t byte_len;
+    StackStringIterator *iter = STR_STACKTOP(self);
 
-    SStr_Nip(iterator, offset);
-    sub_start = iterator->ptr;
-    SStr_Nip(iterator, len);
-    byte_len = iterator->ptr - sub_start;
+    SStrIter_Advance(iter, offset);
+    int start_offset = iter->byte_offset;
+    char *sub_start = self->ptr + start_offset;
+
+    SStrIter_Advance(iter, len);
+    size_t byte_len = iter->byte_offset - start_offset;
 
     return Str_new_from_trusted_utf8(sub_start, byte_len);
 }
@@ -550,23 +528,31 @@ int
 Str_compare(const void *va, const void *vb) {
     const String *a = *(const String**)va;
     const String *b = *(const String**)vb;
-    StackString *iterator_a = SSTR_WRAP(a);
-    StackString *iterator_b = SSTR_WRAP(b);
-    while (iterator_a->size && iterator_b->size) {
-        int32_t code_point_a = SStr_Nibble(iterator_a);
-        int32_t code_point_b = SStr_Nibble(iterator_b);
-        const int32_t comparison = code_point_a - code_point_b;
-        if (comparison != 0) { return comparison; }
+
+    StackStringIterator *iter_a = STR_STACKTOP(a);
+    StackStringIterator *iter_b = STR_STACKTOP(b);
+
+    while (true) {
+        uint32_t code_point_a = SStrIter_Next(iter_a);
+        uint32_t code_point_b = SStrIter_Next(iter_b);
+
+        if (code_point_a == STRITER_DONE) {
+            return code_point_b == STRITER_DONE ? 0 : -1;
+        }
+        if (code_point_b == STRITER_DONE) {
+            return 1;
+        }
+        if (code_point_a != code_point_b) {
+            return code_point_a < code_point_b ? -1 : 1;
+        }
     }
-    if (iterator_a->size != iterator_b->size) {
-        return iterator_a->size < iterator_b->size ? -1 : 1;
-    }
-    return 0;
+
+    UNREACHABLE_RETURN(int);
 }
 
 bool
 Str_less_than(const void *va, const void *vb) {
-    return Str_compare(va, vb) < 0 ? 1 : 0;
+    return Str_compare(va, vb) < 0 ? true : false;
 }
 
 void

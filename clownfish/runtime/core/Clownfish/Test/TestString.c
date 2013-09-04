@@ -152,11 +152,11 @@ test_Code_Point_At_and_From(TestBatchRunner *runner) {
     uint32_t i;
 
     for (i = 0; i < num_code_points; i++) {
-        uint32_t from = num_code_points - i - 1;
+        uint32_t from = num_code_points - i;
         TEST_INT_EQ(runner, Str_Code_Point_At(string, i), code_points[i],
                     "Code_Point_At %ld", (long)i);
-        TEST_INT_EQ(runner, Str_Code_Point_At(string, from),
-                    code_points[from], "Code_Point_From %ld", (long)from);
+        TEST_INT_EQ(runner, Str_Code_Point_From(string, from),
+                    code_points[i], "Code_Point_From %ld", (long)from);
     }
 
     DECREF(string);
@@ -266,6 +266,35 @@ test_To_I64(TestBatchRunner *runner) {
     string = S_get_str("-10");
     TEST_TRUE(runner, Str_To_I64(string) == -10, "To_I64 negative");
     DECREF(string);
+}
+
+static void
+test_Length(TestBatchRunner *runner) {
+    String *string = Str_newf("a%s%sb%sc", smiley, smiley, smiley);
+    TEST_INT_EQ(runner, Str_Length(string), 6, "Length");
+    DECREF(string);
+}
+
+static void
+test_Compare_To(TestBatchRunner *runner) {
+    String *abc = Str_newf("a%s%sb%sc", smiley, smiley, smiley);
+    String *ab  = Str_newf("a%s%sb", smiley, smiley);
+    String *ac  = Str_newf("a%s%sc", smiley, smiley);
+
+    TEST_TRUE(runner, Str_Compare_To(abc, (Obj*)abc) == 0,
+              "Compare_To abc abc");
+    TEST_TRUE(runner, Str_Compare_To(ab, (Obj*)abc) < 0,
+              "Compare_To ab abc");
+    TEST_TRUE(runner, Str_Compare_To(abc, (Obj*)ab) > 0,
+              "Compare_To abc ab");
+    TEST_TRUE(runner, Str_Compare_To(ab, (Obj*)ac) < 0,
+              "Compare_To ab ac");
+    TEST_TRUE(runner, Str_Compare_To(ac, (Obj*)ab) > 0,
+              "Compare_To ac ab");
+
+    DECREF(ac);
+    DECREF(ab);
+    DECREF(abc);
 }
 
 static void
@@ -442,7 +471,7 @@ test_iterator_substring(TestBatchRunner *runner) {
 
 void
 TestStr_Run_IMP(TestString *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 96);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 102);
     test_Cat(runner);
     test_Mimic_and_Clone(runner);
     test_Code_Point_At_and_From(runner);
@@ -453,6 +482,8 @@ TestStr_Run_IMP(TestString *self, TestBatchRunner *runner) {
     test_Trim(runner);
     test_To_F64(runner);
     test_To_I64(runner);
+    test_Length(runner);
+    test_Compare_To(runner);
     test_iterator(runner);
     test_iterator_whitespace(runner);
     test_iterator_substring(runner);
