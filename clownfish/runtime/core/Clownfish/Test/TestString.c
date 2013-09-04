@@ -46,6 +46,30 @@ S_get_str(const char *string) {
     return Str_new_from_utf8(string, strlen(string));
 }
 
+// Surround a smiley with lots of whitespace.
+static String*
+S_smiley_with_whitespace(int *num_spaces_ptr) {
+    uint32_t spaces[] = {
+        ' ',    '\t',   '\r',   '\n',   0x000B, 0x000C, 0x000D, 0x0085,
+        0x00A0, 0x1680, 0x180E, 0x2000, 0x2001, 0x2002, 0x2003, 0x2004,
+        0x2005, 0x2006, 0x2007, 0x2008, 0x2009, 0x200A, 0x2028, 0x2029,
+        0x202F, 0x205F, 0x3000
+    };
+    int num_spaces = sizeof(spaces) / sizeof(uint32_t);
+    String *got;
+
+    CharBuf *buf = CB_new(0);
+    for (int i = 0; i < num_spaces; i++) { CB_Cat_Char(buf, spaces[i]); }
+    CB_Cat_Char(buf, 0x263A);
+    for (int i = 0; i < num_spaces; i++) { CB_Cat_Char(buf, spaces[i]); }
+
+    String *retval = CB_To_String(buf);
+    if (num_spaces_ptr) { *num_spaces_ptr = num_spaces; }
+
+    DECREF(buf);
+    return retval;
+}
+
 static void
 test_Cat(TestBatchRunner *runner) {
     String *wanted = Str_newf("a%s", smiley);
@@ -185,23 +209,9 @@ test_Truncate(TestBatchRunner *runner) {
 
 static void
 test_Trim(TestBatchRunner *runner) {
-    uint32_t spaces[] = {
-        ' ',    '\t',   '\r',   '\n',   0x000B, 0x000C, 0x000D, 0x0085,
-        0x00A0, 0x1680, 0x180E, 0x2000, 0x2001, 0x2002, 0x2003, 0x2004,
-        0x2005, 0x2006, 0x2007, 0x2008, 0x2009, 0x200A, 0x2028, 0x2029,
-        0x202F, 0x205F, 0x3000
-    };
-    uint32_t num_spaces = sizeof(spaces) / sizeof(uint32_t);
-    uint32_t i;
     String *got;
 
-    // Surround a smiley with lots of whitespace.
-    CharBuf *buf = CB_new(0);
-    for (i = 0; i < num_spaces; i++) { CB_Cat_Char(buf, spaces[i]); }
-    CB_Cat_Char(buf, 0x263A);
-    for (i = 0; i < num_spaces; i++) { CB_Cat_Char(buf, spaces[i]); }
-
-    got = CB_To_String(buf);
+    got = S_smiley_with_whitespace(NULL);
     TEST_TRUE(runner, Str_Trim_Top(got), "Trim_Top returns true on success");
     TEST_FALSE(runner, Str_Trim_Top(got),
                "Trim_Top returns false on failure");
@@ -212,14 +222,12 @@ test_Trim(TestBatchRunner *runner) {
               "Trim_Top and Trim_Tail worked");
     DECREF(got);
 
-    got = CB_To_String(buf);
+    got = S_smiley_with_whitespace(NULL);
     TEST_TRUE(runner, Str_Trim(got), "Trim returns true on success");
     TEST_FALSE(runner, Str_Trim(got), "Trim returns false on failure");
     TEST_TRUE(runner, Str_Equals_Str(got, smiley, smiley_len),
               "Trim worked");
     DECREF(got);
-
-    DECREF(buf);
 }
 
 static void
@@ -260,10 +268,181 @@ test_To_I64(TestBatchRunner *runner) {
     DECREF(string);
 }
 
+static void
+test_iterator(TestBatchRunner *runner) {
+    static const uint32_t code_points[] = {
+        0x41,
+        0x7F,
+        0x80,
+        0x7FF,
+        0x800,
+        0xFFFF,
+        0x10000,
+        0x10FFFF
+    };
+    static size_t num_code_points
+        = sizeof(code_points) / sizeof(code_points[0]);
+
+    CharBuf *buf = CB_new(0);
+    for (int i = 0; i < num_code_points; ++i) {
+        CB_Cat_Char(buf, code_points[i]);
+    }
+    String *string = CB_To_String(buf);
+
+    {
+        StringIterator *top  = Str_Top(string);
+        StringIterator *tail = Str_Tail(string);
+
+        TEST_INT_EQ(runner, StrIter_Compare_To(top, (Obj*)tail), -1,
+                    "Compare_To top < tail");
+        TEST_INT_EQ(runner, StrIter_Compare_To(tail, (Obj*)top), 1,
+                    "Compare_To tail > top");
+        TEST_INT_EQ(runner, StrIter_Compare_To(top, (Obj*)top), 0,
+                    "Compare_To top == top");
+
+        StringIterator *clone = (StringIterator*)StrIter_Clone(top);
+        TEST_TRUE(runner, StrIter_Equals(clone, (Obj*)top), "Clone");
+
+        StrIter_Assign(clone, tail);
+        TEST_TRUE(runner, StrIter_Equals(clone, (Obj*)tail), "Assign");
+
+        DECREF(clone);
+        DECREF(top);
+        DECREF(tail);
+    }
+
+    {
+        StringIterator *iter = Str_Top(string);
+
+        for (int i = 0; i < num_code_points; ++i) {
+            TEST_TRUE(runner, StrIter_Has_Next(iter), "Has_Next %d", i);
+            uint32_t code_point = StrIter_Next(iter);
+            TEST_INT_EQ(runner, code_point, code_points[i], "Next %d", i);
+        }
+
+        TEST_TRUE(runner, !StrIter_Has_Next(iter),
+                  "Has_Next at end of string");
+        TEST_INT_EQ(runner, StrIter_Next(iter), STRITER_DONE,
+                    "Next at end of string");
+
+        StringIterator *tail = Str_Tail(string);
+        TEST_TRUE(runner, StrIter_Equals(iter, (Obj*)tail), "Equals tail");
+
+        DECREF(tail);
+        DECREF(iter);
+    }
+
+    {
+        StringIterator *iter = Str_Tail(string);
+
+        for (int i = num_code_points - 1; i >= 0; --i) {
+            TEST_TRUE(runner, StrIter_Has_Prev(iter), "Has_Prev %d", i);
+            uint32_t code_point = StrIter_Prev(iter);
+            TEST_INT_EQ(runner, code_point, code_points[i], "Prev %d", i);
+        }
+
+        TEST_TRUE(runner, !StrIter_Has_Prev(iter),
+                  "Has_Prev at end of string");
+        TEST_INT_EQ(runner, StrIter_Prev(iter), STRITER_DONE,
+                    "Prev at start of string");
+
+        StringIterator *top = Str_Top(string);
+        TEST_TRUE(runner, StrIter_Equals(iter, (Obj*)top), "Equals top");
+
+        DECREF(top);
+        DECREF(iter);
+    }
+
+    {
+        StringIterator *iter = Str_Top(string);
+
+        StrIter_Next(iter);
+        TEST_INT_EQ(runner, StrIter_Advance(iter, 2), 2,
+                    "Advance returns number of code points");
+        TEST_INT_EQ(runner, StrIter_Next(iter), code_points[3],
+                    "Advance works");
+        TEST_INT_EQ(runner,
+                    StrIter_Advance(iter, 1000000), num_code_points - 4,
+                    "Advance past end of string");
+
+        StrIter_Prev(iter);
+        TEST_INT_EQ(runner, StrIter_Recede(iter, 2), 2,
+                    "Recede returns number of code points");
+        TEST_INT_EQ(runner, StrIter_Prev(iter), code_points[num_code_points-4],
+                    "Recede works");
+        TEST_INT_EQ(runner, StrIter_Recede(iter, 1000000), num_code_points - 4,
+                    "Recede past start of string");
+
+        DECREF(iter);
+    }
+
+    DECREF(string);
+    DECREF(buf);
+}
+
+static void
+test_iterator_whitespace(TestBatchRunner *runner) {
+    int num_spaces;
+    String *ws_smiley = S_smiley_with_whitespace(&num_spaces);
+
+    {
+        StringIterator *iter = Str_Top(ws_smiley);
+        TEST_INT_EQ(runner, StrIter_Skip_Next_Whitespace(iter), num_spaces,
+                    "Skip_Next_Whitespace");
+        TEST_INT_EQ(runner, StrIter_Skip_Next_Whitespace(iter), 0,
+                    "Skip_Next_Whitespace without whitespace");
+        DECREF(iter);
+    }
+
+    {
+        StringIterator *iter = Str_Tail(ws_smiley);
+        TEST_INT_EQ(runner, StrIter_Skip_Prev_Whitespace(iter), num_spaces,
+                    "Skip_Prev_Whitespace");
+        TEST_INT_EQ(runner, StrIter_Skip_Prev_Whitespace(iter), 0,
+                    "Skip_Prev_Whitespace without whitespace");
+        DECREF(iter);
+    }
+
+    DECREF(ws_smiley);
+}
+
+static void
+test_iterator_substring(TestBatchRunner *runner) {
+    String *string = Str_newf("a%sb%sc%sd", smiley, smiley, smiley);
+
+    StringIterator *start = Str_Top(string);
+    StringIterator *end = Str_Tail(string);
+
+    {
+        String *substring = StrIter_substring(start, end);
+        TEST_TRUE(runner, Str_Equals(substring, (Obj*)string),
+                  "StrIter_substring whole string");
+        DECREF(substring);
+    }
+
+    StrIter_Advance(start, 2);
+    StrIter_Recede(end, 2);
+
+    {
+        String *substring = StrIter_substring(start, end);
+        String *wanted = Str_newf("b%sc", smiley);
+        TEST_TRUE(runner, Str_Equals(substring, (Obj*)wanted),
+                  "StrIter_substring");
+
+        TEST_TRUE(runner, StrIter_Starts_With(start, wanted), "Starts_With");
+
+        DECREF(wanted);
+        DECREF(substring);
+    }
+
+    DECREF(start);
+    DECREF(end);
+    DECREF(string);
+}
 
 void
 TestStr_Run_IMP(TestString *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 40);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 96);
     test_Cat(runner);
     test_Mimic_and_Clone(runner);
     test_Code_Point_At_and_From(runner);
@@ -274,6 +453,9 @@ TestStr_Run_IMP(TestString *self, TestBatchRunner *runner) {
     test_Trim(runner);
     test_To_F64(runner);
     test_To_I64(runner);
+    test_iterator(runner);
+    test_iterator_whitespace(runner);
+    test_iterator_substring(runner);
 }
 
 

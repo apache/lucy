@@ -17,6 +17,8 @@
 #define C_CFISH_STRING
 #define C_CFISH_VIEWCHARBUF
 #define C_CFISH_STACKSTRING
+#define C_CFISH_STRINGITERATOR
+#define C_CFISH_STACKSTRINGITERATOR
 #define CFISH_USE_SHORT_NAMES
 #define CHY_USE_SHORT_NAMES
 
@@ -34,6 +36,11 @@
 #include "Clownfish/Err.h"
 #include "Clownfish/Util/Memory.h"
 #include "Clownfish/Util/StringHelper.h"
+
+#define STR_STACKTOP(string) \
+    Str_StackTop(string, alloca(sizeof(StackStringIterator)))
+#define STR_STACKTAIL(string) \
+    Str_StackTail(string, alloca(sizeof(StackStringIterator)))
 
 // Helper function for throwing invalid UTF-8 error. Since THROW uses
 // a String internally, calling THROW with invalid UTF-8 would create an
@@ -577,6 +584,26 @@ Str_Get_Ptr8_IMP(String *self) {
     return (uint8_t*)self->ptr;
 }
 
+StringIterator*
+Str_Top_IMP(String *self) {
+    return StrIter_new(self, 0);
+}
+
+StringIterator*
+Str_Tail_IMP(String *self) {
+    return StrIter_new(self, self->size);
+}
+
+StackStringIterator*
+Str_StackTop_IMP(String *self, void *allocation) {
+    return SStrIter_new(allocation, self, 0);
+}
+
+StackStringIterator*
+Str_StackTail_IMP(String *self, void *allocation) {
+    return SStrIter_new(allocation, self, self->size);
+}
+
 /*****************************************************************/
 
 ViewCharBuf*
@@ -763,6 +790,293 @@ SStr_size() {
 void
 SStr_Destroy_IMP(StackString *self) {
     THROW(ERR, "Can't destroy a StackString ('%o')", self);
+}
+
+/*****************************************************************/
+
+StringIterator*
+StrIter_new(String *string, size_t byte_offset) {
+    StringIterator *self = (StringIterator*)VTable_Make_Obj(STRINGITERATOR);
+    self->string      = (String*)INCREF(string);
+    self->byte_offset = byte_offset;
+    return self;
+}
+
+String*
+StrIter_substring(StringIterator *top, StringIterator *tail) {
+    String *string = top->string;
+
+    if (string != tail->string) {
+        THROW(ERR, "StrIter_substring: strings don't match");
+    }
+    if (top->byte_offset > tail->byte_offset) {
+        THROW(ERR, "StrIter_substring: top is behind tail");
+    }
+    if (tail->byte_offset > string->size) {
+        THROW(ERR, "Invalid StringIterator offset");
+    }
+
+    return Str_new_from_trusted_utf8(string->ptr + top->byte_offset,
+                                     tail->byte_offset - top->byte_offset);
+}
+
+Obj*
+StrIter_Clone_IMP(StringIterator *self) {
+    return (Obj*)StrIter_new(self->string, self->byte_offset);
+}
+
+void
+StrIter_Assign_IMP(StringIterator *self, StringIterator *other) {
+    if (self->string != other->string) {
+        DECREF(self->string);
+        self->string = (String*)INCREF(other->string);
+    }
+    self->byte_offset = other->byte_offset;
+}
+
+bool
+StrIter_Equals_IMP(StringIterator *self, Obj *other) {
+    StringIterator *const twin = (StringIterator*)other;
+    if (twin == self)                     { return true; }
+    if (!Obj_Is_A(other, STRINGITERATOR)) { return false; }
+    return self->string == twin->string
+           && self->byte_offset == twin->byte_offset;
+}
+
+int32_t
+StrIter_Compare_To_IMP(StringIterator *self, Obj *other) {
+    StringIterator *twin = (StringIterator*)CERTIFY(other, STRINGITERATOR);
+    if (self->string != twin->string) {
+        THROW(ERR, "Can't compare iterators of different strings");
+    }
+    if (self->byte_offset < twin->byte_offset) { return -1; }
+    if (self->byte_offset > twin->byte_offset) { return 1; }
+    return 0;
+}
+
+bool
+StrIter_Has_Next_IMP(StringIterator *self) {
+    return self->byte_offset < self->string->size;
+}
+
+bool
+StrIter_Has_Prev_IMP(StringIterator *self) {
+    return self->byte_offset != 0;
+}
+
+uint32_t
+StrIter_Next_IMP(StringIterator *self) {
+    String *string      = self->string;
+    size_t  byte_offset = self->byte_offset;
+    size_t  size        = string->size;
+
+    if (byte_offset >= size) { return STRITER_DONE; }
+
+    const uint8_t *const ptr = (const uint8_t*)string->ptr;
+    uint32_t retval = ptr[byte_offset++];
+
+    if (retval >= 0x80) {
+        /*
+         * The 'mask' bit is tricky. In each iteration, 'retval' is
+         * left-shifted by 6 and 'mask' by 5 bits. So relative to the first
+         * byte of the sequence, 'mask' moves one bit to the right.
+         *
+         * The possible outcomes after the loop are:
+         *
+         * Two byte sequence
+         * retval: 110aaaaa bbbbbb
+         * mask:   00100000 000000
+         *
+         * Three byte sequence
+         * retval: 1110aaaa bbbbbb cccccc
+         * mask:   00010000 000000 000000
+         *
+         * Four byte sequence
+         * retval: 11110aaa bbbbbb cccccc dddddd
+         * mask:   00001000 000000 000000 000000
+         *
+         * This also illustrates why the exit condition (retval & mask)
+         * works. After the first iteration, the third most significant bit
+         * is tested. After the second iteration, the fourth, and so on.
+         */
+
+        uint32_t mask = 1 << 6;
+
+        do {
+            if (byte_offset >= size) {
+                THROW(ERR, "StrIter_Next: Invalid UTF-8");
+            }
+
+            retval = (retval << 6) | (ptr[byte_offset++] & 0x3F);
+            mask <<= 5;
+        } while (retval & mask);
+
+        retval &= mask - 1;
+    }
+
+    self->byte_offset = byte_offset;
+    return retval;
+}
+
+uint32_t
+StrIter_Prev_IMP(StringIterator *self) {
+    size_t byte_offset = self->byte_offset;
+
+    if (byte_offset == 0) { return STRITER_DONE; }
+
+    const uint8_t *const ptr = (const uint8_t*)self->string->ptr;
+    uint32_t retval = ptr[--byte_offset];
+
+    if (retval >= 0x80) {
+        // Construct the result from right to left.
+
+        if (byte_offset == 0) {
+            THROW(ERR, "StrIter_Prev: Invalid UTF-8");
+        }
+
+        retval &= 0x3F;
+        int shift = 6;
+        uint32_t first_byte_mask = 0x1F;
+        uint32_t byte = ptr[--byte_offset];
+
+        while ((byte & 0xC0) == 0x80) {
+            if (byte_offset == 0) {
+                THROW(ERR, "StrIter_Prev: Invalid UTF-8");
+            }
+
+            retval |= (byte & 0x3F) << shift;
+            shift += 6;
+            first_byte_mask >>= 1;
+            byte = ptr[--byte_offset];
+        }
+
+        retval |= (byte & first_byte_mask) << shift;
+    }
+
+    self->byte_offset = byte_offset;
+    return retval;
+}
+
+size_t
+StrIter_Advance_IMP(StringIterator *self, size_t num) {
+    size_t num_skipped = 0;
+    size_t byte_offset = self->byte_offset;
+    size_t size        = self->string->size;
+    const uint8_t *const ptr = (const uint8_t*)self->string->ptr;
+
+    while (num_skipped < num) {
+        if (byte_offset >= size) {
+            break;
+        }
+        uint8_t first_byte = ptr[byte_offset];
+        byte_offset += StrHelp_UTF8_COUNT[first_byte];
+        ++num_skipped;
+    }
+
+    if (byte_offset > size) {
+        THROW(ERR, "StrIter_Advance: Invalid UTF-8");
+    }
+
+    self->byte_offset = byte_offset;
+    return num_skipped;
+}
+
+size_t
+StrIter_Recede_IMP(StringIterator *self, size_t num) {
+    size_t num_skipped = 0;
+    size_t byte_offset = self->byte_offset;
+    const uint8_t *const ptr = (const uint8_t*)self->string->ptr;
+
+    while (num_skipped < num) {
+        if (byte_offset == 0) {
+            break;
+        }
+
+        uint8_t byte;
+        do {
+            if (byte_offset == 0) {
+                THROW(ERR, "StrIter_Recede: Invalid UTF-8");
+            }
+
+            byte = ptr[--byte_offset];
+        } while ((byte & 0xC0) == 0x80);
+        ++num_skipped;
+    }
+
+    self->byte_offset = byte_offset;
+    return num_skipped;
+}
+
+size_t
+StrIter_Skip_Next_Whitespace_IMP(StringIterator *self) {
+    size_t   num_skipped = 0;
+    size_t   byte_offset = self->byte_offset;
+    uint32_t code_point;
+
+    while (STRITER_DONE != (code_point = StrIter_Next(self))) {
+        if (!StrHelp_is_whitespace(code_point)) { break; }
+        byte_offset = self->byte_offset;
+        ++num_skipped;
+    }
+
+    self->byte_offset = byte_offset;
+    return num_skipped;
+}
+
+size_t
+StrIter_Skip_Prev_Whitespace_IMP(StringIterator *self) {
+    size_t   num_skipped = 0;
+    size_t   byte_offset = self->byte_offset;
+    uint32_t code_point;
+
+    while (STRITER_DONE != (code_point = StrIter_Prev(self))) {
+        if (!StrHelp_is_whitespace(code_point)) { break; }
+        byte_offset = self->byte_offset;
+        ++num_skipped;
+    }
+
+    self->byte_offset = byte_offset;
+    return num_skipped;
+}
+
+bool
+StrIter_Starts_With_IMP(StringIterator *self, String *prefix) {
+    String *string      = self->string;
+    size_t  byte_offset = self->byte_offset;
+
+    if (byte_offset > string->size) {
+        THROW(ERR, "Invalid StringIterator offset");
+    }
+
+    if (string->size - byte_offset < prefix->size) { return false; }
+
+    const char *ptr = string->ptr + byte_offset;
+    return memcmp(ptr, prefix->ptr, prefix->size) == 0;
+}
+
+void
+StrIter_Destroy_IMP(StringIterator *self) {
+    DECREF(self->string);
+    SUPER_DESTROY(self, STRINGITERATOR);
+}
+
+/*****************************************************************/
+
+StackStringIterator*
+SStrIter_new(void *allocation, String *string, size_t byte_offset) {
+    StackStringIterator *self
+        = (StackStringIterator*)VTable_Init_Obj(STACKSTRINGITERATOR,
+                                                allocation);
+    // Assume that the string will be available for the lifetime of the
+    // iterator and don't increase its refcount.
+    self->string      = string;
+    self->byte_offset = byte_offset;
+    return self;
+}
+
+void
+SStrIter_Destroy_IMP(StackStringIterator *self) {
+    THROW(ERR, "Can't destroy a StackStringIterator");
 }
 
 
