@@ -60,7 +60,6 @@ Highlighter_init(Highlighter *self, Searcher *searcher, Obj *query,
     ivars->field          = Str_Clone(field);
     ivars->excerpt_length = excerpt_length;
     ivars->slop           = excerpt_length / 3;
-    ivars->window_width   = excerpt_length + (ivars->slop * 2);
     ivars->pre_tag        = Str_new_from_trusted_utf8("<strong>", 8);
     ivars->post_tag       = Str_new_from_trusted_utf8("</strong>", 9);
     if (Query_Is_A(ivars->query, COMPILER)) {
@@ -165,7 +164,6 @@ Highlighter_Create_Excerpt_IMP(Highlighter *self, HitDoc *hit_doc) {
         return Str_new(0);
     }
     else {
-        StackString *fragment = SSTR_WRAP((String*)field_val);
         DocVector *doc_vec
             = Searcher_Fetch_Doc_Vec(ivars->searcher,
                                      HitDoc_Get_Doc_ID(hit_doc));
@@ -176,22 +174,15 @@ Highlighter_Create_Excerpt_IMP(Highlighter *self, HitDoc *hit_doc) {
         VA_Sort(score_spans, NULL, NULL);
         HeatMap *heat_map
             = HeatMap_new(score_spans, (ivars->excerpt_length * 2) / 3);
-        int32_t top
-            = Highlighter_Find_Best_Fragment(self, (String*)field_val,
-                                             (ViewCharBuf*)fragment, heat_map);
-        VArray *sentences
-            = Highlighter_Find_Sentences(self, (String*)field_val, 0,
-                                         top + ivars->window_width);
 
+        int32_t top;
         String *raw_excerpt
-            = Highlighter_Raw_Excerpt(self, (String*)field_val,
-                                      (String*)fragment, &top, heat_map,
-                                      sentences);
+            = Highlighter_Raw_Excerpt(self, (String*)field_val, &top,
+                                      heat_map);
         String *highlighted
             = Highlighter_Highlight_Excerpt(self, score_spans, raw_excerpt,
                                             top);
 
-        DECREF(sentences);
         DECREF(heat_map);
         DECREF(score_spans);
         DECREF(doc_vec);
@@ -216,294 +207,259 @@ S_hottest(HeatMap *heat_map) {
     return retval;
 }
 
-int32_t
-Highlighter_Find_Best_Fragment_IMP(Highlighter *self,
-                                   const String *field_val,
-                                   ViewCharBuf *fragment, HeatMap *heat_map) {
-    HighlighterIVARS *const ivars = Highlighter_IVARS(self);
+// Find a starting boundary after the current position given by the iterator.
+// Skip up to max_skip code points plus potential whitespace. Update the
+// iterator and return number of code points skipped. Return true if a
+// starting edge (sentence) was found.
+bool
+S_find_starting_boundary(StringIterator *top, uint32_t max_skip,
+                         uint32_t *num_skipped_ptr) {
+    // Keep track of the first word boundary.
+    StringIterator *word = NULL;
+    uint32_t word_offset = 0;
 
-    // Window is 1.66 * excerpt_length, with the loc in the middle.
-    int32_t best_location = S_hottest(heat_map);
+    // Check if we're at a starting boundary already.
 
-    if (best_location < (int32_t)ivars->slop) {
-        // If the beginning of the string falls within the window centered
-        // around the hottest point in the field, start the fragment at the
-        // beginning.
-        ViewCB_Assign(fragment, (String*)field_val);
-        int32_t top = ViewCB_Trim_Top(fragment);
-        ViewCB_Truncate(fragment, ivars->window_width);
-        return top;
-    }
-    else {
-        int32_t top = best_location - ivars->slop;
-        ViewCB_Assign(fragment, (String*)field_val);
-        ViewCB_Nip(fragment, top);
-        top += ViewCB_Trim_Top(fragment);
-        int32_t chars_left = ViewCB_Truncate(fragment, ivars->excerpt_length);
-        int32_t overrun = ivars->excerpt_length - chars_left;
+    StringIterator *iter = (StringIterator*)StrIter_Clone(top);
 
-        if (!overrun) {
-            // We've found an acceptable window.
-            ViewCB_Assign(fragment, (String*)field_val);
-            ViewCB_Nip(fragment, top);
-            top += ViewCB_Trim_Top(fragment);
-            ViewCB_Truncate(fragment, ivars->window_width);
-            return top;
+    while (true) {
+        uint32_t code_point = StrIter_Prev(iter);
+
+        if (code_point == STRITER_DONE || code_point == '.') {
+            // Skip remaining whitespace.
+            *num_skipped_ptr = StrIter_Skip_Next_Whitespace(top);
+            DECREF(iter);
+            return true;
         }
-        else if (overrun > top) {
-            // The field is very short, so make the whole field the
-            // "fragment".
-            ViewCB_Assign(fragment, (String*)field_val);
-            return ViewCB_Trim_Top(fragment);
+
+        if (StrHelp_is_whitespace(code_point)) {
+            if (word == NULL) { word = (StringIterator*)StrIter_Clone(top); }
         }
         else {
-            // The fragment is too close to the end, so slide it back.
-            top -= overrun;
-            ViewCB_Assign(fragment, (String*)field_val);
-            ViewCB_Nip(fragment, top);
-            top += ViewCB_Trim_Top(fragment);
-            ViewCB_Truncate(fragment, ivars->excerpt_length);
-            return top;
+            break;
         }
     }
-}
 
-// Return true if the window represented by "offset" and "length" overlaps a
-// score span, or if there are no score spans so that no excerpt is measurably
-// superior.
-static bool
-S_has_heat(HeatMap *heat_map, int32_t offset, int32_t length) {
-    VArray   *spans     = HeatMap_Get_Spans(heat_map);
-    uint32_t  num_spans = VA_Get_Size(spans);
-    int32_t   end       = offset + length;
+    // Try to start on a boundary.
 
-    if (length == 0)    { return false; }
-    if (num_spans == 0) { return true; }
+    uint32_t num_skipped = 0;
+    bool     found_edge  = false;
 
-    for (uint32_t i = 0; i < num_spans; i++) {
-        Span *span  = (Span*)VA_Fetch(spans, i);
-        int32_t span_start = Span_Get_Offset(span);
-        int32_t span_end   = span_start + Span_Get_Length(span);;
-        if (offset >= span_start && offset <  span_end) { return true; }
-        if (end    >  span_start && end    <= span_end) { return true; }
-        if (offset <= span_start && end    >= span_end) { return true; }
-        if (span_start > end) { break; }
+    StrIter_Assign(iter, top);
+
+    for (uint32_t i = 0; i < max_skip; ++i) {
+        uint32_t code_point = StrIter_Next(iter);
+
+        if (code_point == STRITER_DONE || code_point == '.') {
+            found_edge = true;
+            StrIter_Assign(top, iter);
+            num_skipped = i + 1;
+            break;
+        }
+
+        if (word == NULL && StrHelp_is_whitespace(code_point)) {
+            word = (StringIterator*)StrIter_Clone(iter);
+            word_offset = i + 1;
+        }
     }
 
+    // Try to use word boundary if no sentence boundary was found.
+    if (!found_edge && word != NULL) {
+        StrIter_Assign(top, word);
+        num_skipped = word_offset;
+    }
+
+    // Skip remaining whitespace.
+    num_skipped += StrIter_Skip_Next_Whitespace(top);
+    *num_skipped_ptr = num_skipped;
+
+    DECREF(word);
+    DECREF(iter);
+    return found_edge;
+}
+
+// Find an ending boundary before the current position given by the iterator.
+// Skip up to max_skip code points plus potential whitespace. Update the
+// iterator and return number of code points skipped. Return true if a
+// ending edge (sentence) was found.
+bool
+S_find_ending_boundary(StringIterator *tail, uint32_t max_skip,
+                       uint32_t *num_skipped_ptr) {
+    uint32_t code_point;
+
+    // Check if we're at an ending boundary already. Don't check for a word
+    // boundary because we need space for a trailing ellipsis.
+
+    StringIterator *iter = (StringIterator*)StrIter_Clone(tail);
+
+    do {
+        code_point = StrIter_Next(iter);
+
+        if (code_point == STRITER_DONE) {
+            // Skip remaining whitespace.
+            *num_skipped_ptr = StrIter_Skip_Prev_Whitespace(tail);
+            DECREF(iter);
+            return true;
+        }
+    } while (StrHelp_is_whitespace(code_point));
+
+    // Keep track of the first word boundary.
+    StringIterator *word = NULL;
+    uint32_t word_offset = 0;
+
+    StrIter_Assign(iter, tail);
+
+    for (uint32_t i = 0;
+         STRITER_DONE != (code_point = StrIter_Prev(iter));
+         ++i)
+    {
+        if (code_point == '.') {
+            StrIter_Assign(tail, iter);
+            StrIter_Advance(tail, 1); // Include period.
+            *num_skipped_ptr = i;
+            DECREF(word);
+            DECREF(iter);
+            return true;
+        }
+
+        if (StrHelp_is_whitespace(code_point)) {
+            if (word == NULL) {
+                word = (StringIterator*)StrIter_Clone(iter);
+                word_offset = i + 1;
+            }
+        }
+        else if (i >= max_skip) {
+            // Break only at non-whitespace to allow another sentence
+            // boundary to be found.
+            break;
+        }
+    }
+
+    if (word == NULL) {
+        // Make space for ellipsis.
+        *num_skipped_ptr = StrIter_Recede(tail, 1);
+    }
+    else {
+        // Use word boundary if no sentence boundary was found.
+        StrIter_Assign(tail, word);
+
+        // Strip whitespace and punctuation that collides with an ellipsis.
+        while (STRITER_DONE != (code_point = StrIter_Prev(tail))) {
+            if (!StrHelp_is_whitespace(code_point)
+                && code_point != '.'
+                && code_point != ','
+                && code_point != ';'
+                && code_point != ':'
+                && code_point != ':'
+                && code_point != '?'
+                && code_point != '!'
+               ) {
+                StrIter_Advance(tail, 1); // Back up.
+                break;
+            }
+            ++word_offset;
+        }
+
+        *num_skipped_ptr = word_offset;
+    }
+
+    DECREF(word);
+    DECREF(iter);
     return false;
 }
 
 String*
 Highlighter_Raw_Excerpt_IMP(Highlighter *self, const String *field_val,
-                            const String *fragment, int32_t *top_ptr,
-                            HeatMap *heat_map, VArray *sentences) {
+                            int32_t *start_ptr, HeatMap *heat_map) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
-    bool     found_starting_edge = false;
-    bool     found_ending_edge   = false;
-    int32_t  top   = *top_ptr;
-    int32_t  start = top;
-    int32_t  end   = 0;
-    double   field_len = Str_Length(field_val);
-    uint32_t min_len = field_len < ivars->excerpt_length * 0.6666
-                       ? (uint32_t)field_len
-                       : (uint32_t)(ivars->excerpt_length * 0.6666);
 
-    // Try to find a starting sentence boundary.
-    const uint32_t num_sentences = VA_Get_Size(sentences);
-    if (num_sentences) {
-        for (uint32_t i = 0; i < num_sentences; i++) {
-            Span *sentence = (Span*)VA_Fetch(sentences, i);
-            int32_t candidate = Span_Get_Offset(sentence);;
+    // Find start of excerpt.
 
-            if (candidate > top + (int32_t)ivars->window_width) {
-                break;
-            }
-            else if (candidate >= top) {
-                // Try to start on the first sentence boundary, but only if
-                // there's enough relevant material left after it in the
-                // fragment.
-                StackString *temp = SSTR_WRAP(fragment);
-                SStr_Nip(temp, candidate - top);
-                uint32_t chars_left = SStr_Truncate(temp, ivars->excerpt_length);
-                if (chars_left >= min_len
-                    && S_has_heat(heat_map, candidate, chars_left)
-                   ) {
-                    start = candidate;
-                    found_starting_edge = true;
-                    break;
-                }
-            }
-        }
-    }
+    StringIterator *top = Str_Top(field_val);
 
-    // Try to end on a sentence boundary (but don't try very hard).
-    if (num_sentences) {
-        StackString *start_trimmed = SSTR_WRAP(fragment);
-        SStr_Nip(start_trimmed, start - top);
+    int32_t  best_location = S_hottest(heat_map);
+    int32_t  start;
+    uint32_t max_skip;
 
-        for (uint32_t i = num_sentences; i--;) {
-            Span    *sentence  = (Span*)VA_Fetch(sentences, i);
-            int32_t  last_edge = Span_Get_Offset(sentence)
-                                 + Span_Get_Length(sentence);
-
-            if (last_edge <= start) {
-                break;
-            }
-            else if (last_edge - start > (int32_t)ivars->excerpt_length) {
-                continue;
-            }
-            else {
-                uint32_t chars_left = last_edge - start;
-                if (chars_left > min_len
-                    && S_has_heat(heat_map, start, chars_left)
-                   ) {
-                    found_ending_edge = true;
-                    end = last_edge;
-                    break;
-                }
-                else {
-                    StackString *temp = SSTR_WRAP((String*)start_trimmed);
-                    SStr_Nip(temp, chars_left);
-                    SStr_Trim_Tail(temp);
-                    if (SStr_Get_Size(temp) == 0) {
-                        // Short, but ending on a boundary already.
-                        found_ending_edge = true;
-                        end = last_edge;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    int32_t this_excerpt_len = found_ending_edge
-                               ? end - start
-                               : (int32_t)ivars->excerpt_length;
-    if (!this_excerpt_len) {
-        *top_ptr = start;
-        return Str_new(0);
-    }
-
-    StackString *substring = SSTR_WRAP((String*)field_val);
-
-    if (found_starting_edge) {
-        SStr_Nip(substring, start);
-        SStr_Truncate(substring, this_excerpt_len);
-    }
-    // If not starting on a sentence boundary, prepend an ellipsis.
-    else {
-        const size_t ELLIPSIS_LEN = 2; // Unicode ellipsis plus a space.
-
-        // If the excerpt is already shorter than the spec'd length, we might
-        // not need to make room.
-        this_excerpt_len += ELLIPSIS_LEN;
-
-        // Remember original position
-        int32_t orig_start = start;
-        int32_t orig_len   = this_excerpt_len;
-
-        // Move the start back one in case the character right before the
-        // excerpt starts is whitespace.
-        if (start) {
-            this_excerpt_len += 1;
-            start -= 1;
-            SStr_Nip(substring, start);
-        }
-
-        do {
-            uint32_t code_point = SStr_Nibble(substring);
-            start++;
-            this_excerpt_len--;
-
-            if (StrHelp_is_whitespace(code_point)) {
-                if (!found_ending_edge) {
-                    // If we still need room, we'll lop it off the end since
-                    // we don't know a solid end point yet.
-                    break;
-                }
-                else if (this_excerpt_len <= (int32_t)ivars->excerpt_length) {
-                    break;
-                }
-            }
-        } while (SStr_Get_Size(substring));
-
-        if (SStr_Get_Size(substring) == 0) {
-            // Word is longer than excerpt_length. Reset to original position
-            // truncating the word.
-            SStr_Assign(substring, (String*)field_val);
-            start            = orig_start;
-            this_excerpt_len = orig_len;
-            int32_t diff = this_excerpt_len - ivars->excerpt_length;
-            if (diff > 0) {
-                SStr_Nip(substring, diff);
-                start            += diff;
-                this_excerpt_len -= diff;
-            }
-        }
-
-        SStr_Truncate(substring, ivars->excerpt_length - ELLIPSIS_LEN);
-    }
-
-    // If excerpt doesn't end on a sentence boundary, tack on an ellipsis.
-    if (found_ending_edge) {
-        SStr_Truncate(substring, end - start);
-        SStr_Trim_Tail(substring);
+    if (best_location <= ivars->slop) {
+        // If the beginning of the string falls within the window centered
+        // around the hottest point in the field, start the fragment at the
+        // beginning.
+        start    = 0;
+        max_skip = best_location;
     }
     else {
-        // Remember original excerpt
-        StackString *orig_substring = SSTR_WRAP((String*)substring);
-        // Check for prepended ellipsis
-        uint32_t min_size = found_starting_edge ? 0 : 4;
-
-        do {
-            uint32_t code_point = SStr_Code_Point_From(substring, 1);
-            SStr_Chop(substring, 1);
-            if (StrHelp_is_whitespace(code_point)) {
-                SStr_Trim_Tail(substring);
-
-                // Strip punctuation that collides with an ellipsis.
-                code_point = SStr_Code_Point_From(substring, 1);
-                while (code_point == '.'
-                       || code_point == ','
-                       || code_point == ';'
-                       || code_point == ':'
-                       || code_point == ':'
-                       || code_point == '?'
-                       || code_point == '!'
-                      ) {
-                    SStr_Chop(substring, 1);
-                    code_point = SStr_Code_Point_From(substring, 1);
-                }
-
-                break;
-            }
-        } while (SStr_Get_Size(substring) > min_size);
-
-        if (SStr_Get_Size(substring) == min_size) {
-            // Word is longer than excerpt_length. Reset to original excerpt
-            // truncating the word.
-            SStr_Assign(substring, (String*)orig_substring);
-            SStr_Chop(substring, 1);
-        }
+        start    = best_location - ivars->slop;
+        max_skip = ivars->slop;
+        StrIter_Advance(top, start);
     }
 
-    CharBuf *buf = CB_new(SStr_Get_Size(substring) + 8);
+    uint32_t num_skipped;
+    bool found_starting_edge
+        = S_find_starting_boundary(top, max_skip, &num_skipped);
+    start += num_skipped;
 
+    // Find end of excerpt.
+
+    StringIterator *tail = (StringIterator*)StrIter_Clone(top);
+
+    uint32_t max_len = ivars->excerpt_length;
     if (!found_starting_edge) {
-        CB_Cat_Char(buf, ELLIPSIS_CODE_POINT);
-        CB_Cat_Char(buf, ' ');
-        const size_t ELLIPSIS_LEN = 2; // Unicode ellipsis plus a space.
-        start -= ELLIPSIS_LEN;
+        // Leave space for starting ellipsis and space character.
+        max_len -= 2;
     }
 
-    CB_Cat(buf, (String*)substring);
+    bool found_ending_edge = true;
+    uint32_t excerpt_len = StrIter_Advance(tail, max_len);
 
-    if (!found_ending_edge) {
-        CB_Cat_Char(buf, ELLIPSIS_CODE_POINT);
+    // Skip up to slop code points but keep at least max_len - slop.
+    if (excerpt_len > max_len - ivars->slop) {
+        max_skip = excerpt_len - (max_len - ivars->slop);
+        found_ending_edge
+            = S_find_ending_boundary(tail, max_skip, &num_skipped);
+        if (num_skipped >= excerpt_len) {
+            excerpt_len = 0;
+        }
+        else {
+            excerpt_len -= num_skipped;
+        }
     }
 
-    String *raw_excerpt = CB_Yield_String(buf);
-    DECREF(buf);
-    *top_ptr = start;
+    // Extract excerpt.
+
+    String *raw_excerpt;
+
+    if (!excerpt_len) {
+        raw_excerpt = Str_new(0);
+    }
+    else {
+        String  *substring = StrIter_substring(top, tail);
+        CharBuf *buf       = CB_new(Str_Get_Size(substring) + 8);
+
+        // If not starting on a sentence boundary, prepend an ellipsis.
+        if (!found_starting_edge) {
+            CB_Cat_Char(buf, ELLIPSIS_CODE_POINT);
+            CB_Cat_Char(buf, ' ');
+            start -= 2;
+        }
+
+        CB_Cat(buf, substring);
+
+        // If not ending on a sentence boundary, append an ellipsis.
+        if (!found_ending_edge) {
+            CB_Cat_Char(buf, ELLIPSIS_CODE_POINT);
+        }
+
+        raw_excerpt = CB_Yield_String(buf);
+
+        DECREF(buf);
+        DECREF(substring);
+    }
+
+    *start_ptr = start;
+
+    DECREF(top);
+    DECREF(tail);
     return raw_excerpt;
 }
 
@@ -589,105 +545,6 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, VArray *spans,
     DECREF(encode_buf);
     DECREF(buf);
     return highlighted;
-}
-
-static Span*
-S_start_sentence(int32_t pos) {
-    return Span_new(pos, 0, 0.0);
-}
-
-static void
-S_close_sentence(VArray *sentences, Span **sentence_ptr,
-                 int32_t sentence_end) {
-    Span *sentence = *sentence_ptr;
-    int32_t length = sentence_end - Span_Get_Offset(sentence);
-    const int32_t MIN_SENTENCE_LENGTH = 3; // e.g. "OK.", but not "2."
-    if (length >= MIN_SENTENCE_LENGTH) {
-        Span_Set_Length(sentence, length);
-        VA_Push(sentences, (Obj*)sentence);
-        *sentence_ptr = NULL;
-    }
-}
-
-VArray*
-Highlighter_Find_Sentences_IMP(Highlighter *self, String *text,
-                               int32_t offset, int32_t length) {
-    /* When [sentence] is NULL, that means a sentence start has not yet been
-     * found.  When it is a Span object, we have a start, but we haven't found
-     * an end.  Once we find the end, we add the sentence to the [sentences]
-     * array and set [sentence] back to NULL to indicate that we're looking
-     * for a start once more.
-     */
-    Span    *sentence       = NULL;
-    VArray  *sentences      = VA_new(10);
-    int32_t  stop           = length == 0
-                              ? INT32_MAX
-                              : offset + length;
-    StackString *fragment = SSTR_WRAP(text);
-    int32_t  pos            = SStr_Trim_Top(fragment);
-    UNUSED_VAR(self);
-
-    /* Our first task will be to find a sentence that either starts at the top
-     * of the fragment, or overlaps its start. Starting at the top of the
-     * field is a special case: we define the first non-whitespace character
-     * to begin a sentence, rather than look for the first character following
-     * a period and whitespace.  Everywhere else, we have to define sentence
-     * starts based on a sentence end that has just passed by.
-     */
-    if (offset <= pos) {
-        // Assume that first non-whitespace character begins a sentence.
-        if (pos < stop && SStr_Get_Size(fragment) > 0) {
-            sentence = S_start_sentence(pos);
-        }
-    }
-    else {
-        SStr_Nip(fragment, offset - pos);
-        pos = offset;
-    }
-
-    while (1) {
-        uint32_t code_point = SStr_Code_Point_At(fragment, 0);
-        if (!code_point) {
-            // End of fragment.  If we have a sentence open, close it,
-            // then bail.
-            if (sentence) { S_close_sentence(sentences, &sentence, pos); }
-            break;
-        }
-        else if (code_point == '.') {
-            uint32_t whitespace_count;
-            pos += SStr_Nip(fragment, 1); // advance past "."
-
-            if (pos == stop && SStr_Get_Size(fragment) == 0) {
-                // Period ending the field string.
-                if (sentence) { S_close_sentence(sentences, &sentence, pos); }
-                break;
-            }
-            else if (0 != (whitespace_count = SStr_Trim_Top(fragment))) {
-                // We've found a period followed by whitespace.  Close out the
-                // existing sentence, if there is one. */
-                if (sentence) { S_close_sentence(sentences, &sentence, pos); }
-
-                // Advance past whitespace.
-                pos += whitespace_count;
-                if (pos < stop && SStr_Get_Size(fragment) > 0) {
-                    // Not at the end of the string? Then we've found a
-                    // sentence start.
-                    sentence = S_start_sentence(pos);
-                }
-            }
-
-            // We may not have reached the end of the field yet, but it's
-            // entirely possible that our last sentence overlapped the end of
-            // the fragment -- in which case, it's time to bail.
-            if (pos >= stop) { break; }
-        }
-        else {
-            SStr_Nip(fragment, 1);
-            pos++;
-        }
-    }
-
-    return sentences;
 }
 
 String*
