@@ -29,7 +29,6 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
     Query      *query;
     String     *field;
     uint32_t    excerpt_length;
-    uint32_t    window_width;
     uint32_t    slop;
     String     *pre_tag;
     String     *post_tag;
@@ -66,23 +65,6 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
      */
     public incremented String*
     Encode(Highlighter *self, String *text);
-
-    /** Find sentence boundaries within the specified range, returning them as
-     * an array of Spans.  The "offset" of each Span indicates the start of
-     * the sentence, and is measured from 0, not from <code>offset</code>.
-     * The Span's "length" member indicates the sentence length in code
-     * points.
-     *
-     * @param text The string to scan.
-     * @param offset The place to start looking for offsets, measured in
-     * Unicode code points from the top of <code>text</code>.
-     * @param length The number of code points from <code>offset</code> to
-     * scan. The default value of 0 is a sentinel which indicates to scan
-     * until the end of the string.
-     */
-    incremented VArray*
-    Find_Sentences(Highlighter *self, String *text, int32_t offset = 0,
-                   int32_t length = 0);
 
     /** Highlight a small section of text.  By default, prepends pre-tag and
      * appends post-tag.  This method is called internally by Create_Excerpt()
@@ -138,25 +120,15 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
     Get_Compiler(Highlighter *self);
 
     /** Decide based on heat map the best fragment of field to concentrate on.
-     * Place the result into <code>fragment<code> and return its offset in
-     * code points from the top of the field.
-     *
-     * (Helper function for Create_Excerpt only exposed for testing purposes.)
-     */
-    int32_t
-    Find_Best_Fragment(Highlighter *self, const String *field_val,
-                       ViewCharBuf *fragment, HeatMap *heat_map);
-
-    /** Take the fragment and determine the best edges for it based on
+     * Take the fragment and determine the best edges for it based on
      * sentence boundaries when possible.  Add ellipses when boundaries cannot
      * be found.
      *
      * (Helper function for Create_Excerpt only exposed for testing purposes.)
      */
     String*
-    Raw_Excerpt(Highlighter *self, const String *field_val,
-                const String *fragment, int32_t *top, HeatMap *heat_map,
-                VArray *sentences);
+    Raw_Excerpt(Highlighter *self, const String *field_value, int32_t *top,
+                HeatMap *heat_map);
 
     /** Take the text in raw_excerpt, add highlight tags, encode, and place
      * the result into <code>highlighted</code>.
