@@ -139,7 +139,7 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
                                           heat_map);
     TEST_TRUE(runner,
               Str_Equals_Str(raw_excerpt, "abc/d" ELLIPSIS, 8),
-              "Long word at top %s");
+              "Long word at top");
     DECREF(heat_map);
     DECREF(raw_excerpt);
 
