@@ -1048,6 +1048,12 @@ StrIter_Skip_Prev_Whitespace_IMP(StringIterator *self) {
 
 bool
 StrIter_Starts_With_IMP(StringIterator *self, String *prefix) {
+    return StrIter_Starts_With_UTF8_IMP(self, prefix->ptr, prefix->size);
+}
+
+bool
+StrIter_Starts_With_UTF8_IMP(StringIterator *self, const char *prefix,
+                             size_t size) {
     String *string      = self->string;
     size_t  byte_offset = self->byte_offset;
 
@@ -1055,10 +1061,9 @@ StrIter_Starts_With_IMP(StringIterator *self, String *prefix) {
         THROW(ERR, "Invalid StringIterator offset");
     }
 
-    if (string->size - byte_offset < prefix->size) { return false; }
+    if (string->size - byte_offset < size) { return false; }
 
-    const char *ptr = string->ptr + byte_offset;
-    return memcmp(ptr, prefix->ptr, prefix->size) == 0;
+    return memcmp(string->ptr + byte_offset, prefix, size) == 0;
 }
 
 void
