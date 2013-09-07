@@ -466,12 +466,13 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const String *field_val,
 String*
 Highlighter_Highlight_Excerpt_IMP(Highlighter *self, VArray *spans,
                                   String *raw_excerpt, int32_t top) {
-    int32_t      hl_start        = 0;
-    int32_t      hl_end          = 0;
-    StackString *temp            = SSTR_WRAP(raw_excerpt);
-    CharBuf     *buf             = CB_new(Str_Get_Size(raw_excerpt) + 32);
-    CharBuf     *encode_buf      = NULL;
-    int32_t      raw_excerpt_end = top + Str_Length(raw_excerpt);
+    int32_t         hl_start        = 0;
+    int32_t         hl_end          = 0;
+    StringIterator *iter            = Str_Top(raw_excerpt);
+    StringIterator *temp            = Str_Top(raw_excerpt);
+    CharBuf        *buf             = CB_new(Str_Get_Size(raw_excerpt) + 32);
+    CharBuf        *encode_buf      = NULL;
+    int32_t         raw_excerpt_end = top + Str_Length(raw_excerpt);
 
     for (uint32_t i = 0, max = VA_Get_Size(spans); i < max; i++) {
         Span *span = (Span*)VA_Fetch(spans, i);
@@ -492,28 +493,28 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, VArray *spans,
                 }
             }
             else {
-                String *encoded;
-
                 if (hl_start < hl_end) {
                     // Highlight previous section
                     int32_t highlighted_len = hl_end - hl_start;
-                    StackString *to_cat = SSTR_WRAP((String*)temp);
-                    SStr_Truncate(to_cat, highlighted_len);
-                    encoded = S_do_encode(self, (String*)to_cat, &encode_buf);
+                    StrIter_Assign(temp, iter);
+                    StrIter_Advance(iter, highlighted_len);
+                    String *to_cat = StrIter_substring(temp, iter);
+                    String *encoded = S_do_encode(self, to_cat, &encode_buf);
                     String *hl_frag = Highlighter_Highlight(self, encoded);
                     CB_Cat(buf, hl_frag);
-                    SStr_Nip(temp, highlighted_len);
                     DECREF(hl_frag);
                     DECREF(encoded);
+                    DECREF(to_cat);
                 }
 
                 int32_t non_highlighted_len = relative_start - hl_end;
-                StackString *to_cat = SSTR_WRAP((String*)temp);
-                SStr_Truncate(to_cat, non_highlighted_len);
-                encoded = S_do_encode(self, (String*)to_cat, &encode_buf);
+                StrIter_Assign(temp, iter);
+                StrIter_Advance(iter, non_highlighted_len);
+                String *to_cat = StrIter_substring(temp, iter);
+                String *encoded = S_do_encode(self, to_cat, &encode_buf);
                 CB_Cat(buf, (String*)encoded);
-                SStr_Nip(temp, non_highlighted_len);
                 DECREF(encoded);
+                DECREF(to_cat);
 
                 hl_start = relative_start;
                 hl_end   = relative_end;
@@ -524,26 +525,30 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, VArray *spans,
     if (hl_start < hl_end) {
         // Highlight final section
         int32_t highlighted_len = hl_end - hl_start;
-        StackString *to_cat = SSTR_WRAP((String*)temp);
-        SStr_Truncate(to_cat, highlighted_len);
-        String *encoded = S_do_encode(self, (String*)to_cat, &encode_buf);
+        StrIter_Assign(temp, iter);
+        StrIter_Advance(iter, highlighted_len);
+        String *to_cat = StrIter_substring(temp, iter);
+        String *encoded = S_do_encode(self, to_cat, &encode_buf);
         String *hl_frag = Highlighter_Highlight(self, encoded);
         CB_Cat(buf, hl_frag);
-        SStr_Nip(temp, highlighted_len);
         DECREF(hl_frag);
         DECREF(encoded);
     }
 
     // Last text, beyond last highlight span.
-    if (SStr_Get_Size(temp)) {
-        String *encoded = S_do_encode(self, (String*)temp, &encode_buf);
+    if (StrIter_Has_Next(iter)) {
+        String *to_cat = StrIter_substring(iter, NULL);
+        String *encoded = S_do_encode(self, to_cat, &encode_buf);
         CB_Cat(buf, encoded);
         DECREF(encoded);
+        DECREF(to_cat);
     }
 
     String *highlighted = CB_Yield_String(buf);
     DECREF(encode_buf);
     DECREF(buf);
+    DECREF(temp);
+    DECREF(iter);
     return highlighted;
 }
 
@@ -575,13 +580,13 @@ S_do_encode(Highlighter *self, String *text, CharBuf **encode_buf) {
 
 static String*
 S_encode_entities(String *text, CharBuf *buf) {
-    StackString *temp = SSTR_WRAP(text);
+    StringIterator *iter = Str_Top(text);
     size_t space = 0;
     const int MAX_ENTITY_BYTES = 9; // &#dddddd;
 
     // Scan first so that we only allocate once.
     uint32_t code_point;
-    while (0 != (code_point = SStr_Nibble(temp))) {
+    while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
         if (code_point > 127
             || (!isgraph(code_point) && !isspace(code_point))
             || code_point == '<'
@@ -598,8 +603,9 @@ S_encode_entities(String *text, CharBuf *buf) {
 
     CB_Grow(buf, space);
     CB_Set_Size(buf, 0);
-    SStr_Assign(temp, text);
-    while (0 != (code_point = SStr_Nibble(temp))) {
+    DECREF(iter);
+    iter = Str_Top(text);
+    while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
         if (code_point > 127
             || (!isgraph(code_point) && !isspace(code_point))
            ) {
@@ -622,6 +628,7 @@ S_encode_entities(String *text, CharBuf *buf) {
         }
     }
 
+    DECREF(iter);
     return CB_To_String(buf);
 }
 
