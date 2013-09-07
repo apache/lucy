@@ -175,25 +175,57 @@ test_SubString(TestBatchRunner *runner) {
 
 static void
 test_Trim(TestBatchRunner *runner) {
+    String *ws_smiley = S_smiley_with_whitespace(NULL);
+    String *ws_foo    = S_get_str("  foo  ");
+    String *ws_only   = S_get_str("  \t  \r\n");
+    String *trimmed   = S_get_str("a     b");
     String *got;
 
-    got = S_smiley_with_whitespace(NULL);
-    TEST_TRUE(runner, Str_Trim_Top(got), "Trim_Top returns true on success");
-    TEST_FALSE(runner, Str_Trim_Top(got),
-               "Trim_Top returns false on failure");
-    TEST_TRUE(runner, Str_Trim_Tail(got), "Trim_Tail returns true on success");
-    TEST_FALSE(runner, Str_Trim_Tail(got),
-               "Trim_Tail returns false on failure");
-    TEST_TRUE(runner, Str_Equals_Str(got, smiley, smiley_len),
-              "Trim_Top and Trim_Tail worked");
+    got = Str_Trim(ws_smiley);
+    TEST_TRUE(runner, Str_Equals_Str(got, smiley, smiley_len), "Trim");
     DECREF(got);
 
-    got = S_smiley_with_whitespace(NULL);
-    TEST_TRUE(runner, Str_Trim(got), "Trim returns true on success");
-    TEST_FALSE(runner, Str_Trim(got), "Trim returns false on failure");
-    TEST_TRUE(runner, Str_Equals_Str(got, smiley, smiley_len),
-              "Trim worked");
+    got = Str_Trim_Top(ws_foo);
+    TEST_TRUE(runner, Str_Equals_Str(got, "foo  ", 5), "Trim_Top");
     DECREF(got);
+
+    got = Str_Trim_Tail(ws_foo);
+    TEST_TRUE(runner, Str_Equals_Str(got, "  foo", 5), "Trim_Tail");
+    DECREF(got);
+
+    got = Str_Trim(ws_only);
+    TEST_TRUE(runner, Str_Equals_Str(got, "", 0), "Trim with only whitespace");
+    DECREF(got);
+
+    got = Str_Trim_Top(ws_only);
+    TEST_TRUE(runner, Str_Equals_Str(got, "", 0),
+              "Trim_Top with only whitespace");
+    DECREF(got);
+
+    got = Str_Trim_Tail(ws_only);
+    TEST_TRUE(runner, Str_Equals_Str(got, "", 0),
+              "Trim_Tail with only whitespace");
+    DECREF(got);
+
+    got = Str_Trim(trimmed);
+    TEST_TRUE(runner, Str_Equals(got, (Obj*)trimmed),
+              "Trim doesn't change trimmed string");
+    DECREF(got);
+
+    got = Str_Trim_Top(trimmed);
+    TEST_TRUE(runner, Str_Equals(got, (Obj*)trimmed),
+              "Trim_Top doesn't change trimmed string");
+    DECREF(got);
+
+    got = Str_Trim_Tail(trimmed);
+    TEST_TRUE(runner, Str_Equals(got, (Obj*)trimmed),
+              "Trim_Tail doesn't change trimmed string");
+    DECREF(got);
+
+    DECREF(trimmed);
+    DECREF(ws_only);
+    DECREF(ws_foo);
+    DECREF(ws_smiley);
 }
 
 static void
@@ -456,7 +488,7 @@ test_iterator_substring(TestBatchRunner *runner) {
 
 void
 TestStr_Run_IMP(TestString *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 102);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 103);
     test_Cat(runner);
     test_Mimic_and_Clone(runner);
     test_Code_Point_At_and_From(runner);

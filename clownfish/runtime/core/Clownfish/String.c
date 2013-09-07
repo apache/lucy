@@ -430,52 +430,32 @@ Str_Find_Str_IMP(String *self, const char *ptr, size_t size) {
     return -1;
 }
 
-uint32_t
+String*
 Str_Trim_IMP(String *self) {
-    return Str_Trim_Top(self) + Str_Trim_Tail(self);
+    StackStringIterator *top = STR_STACKTOP(self);
+    SStrIter_Skip_Next_Whitespace(top);
+
+    StackStringIterator *tail = NULL;
+    if (top->byte_offset < self->size) {
+        tail = STR_STACKTAIL(self);
+        SStrIter_Skip_Prev_Whitespace(tail);
+    }
+
+    return StrIter_substring((StringIterator*)top, (StringIterator*)tail);
 }
 
-uint32_t
+String*
 Str_Trim_Top_IMP(String *self) {
-    char     *ptr   = self->ptr;
-    char     *end   = ptr + self->size;
-    uint32_t  count = 0;
-
-    while (ptr < end) {
-        uint32_t code_point = StrHelp_decode_utf8_char(ptr);
-        if (!StrHelp_is_whitespace(code_point)) { break; }
-        ptr += StrHelp_UTF8_COUNT[*(uint8_t*)ptr];
-        count++;
-    }
-    if (ptr > end) {
-        DIE_INVALID_UTF8(self->ptr, self->size);
-    }
-
-    if (count) {
-        // Copy string backwards.
-        self->size = end - ptr;
-        memmove(self->ptr, ptr, self->size);
-    }
-
-    return count;
+    StackStringIterator *top = STR_STACKTOP(self);
+    SStrIter_Skip_Next_Whitespace(top);
+    return StrIter_substring((StringIterator*)top, NULL);
 }
 
-uint32_t
+String*
 Str_Trim_Tail_IMP(String *self) {
-    uint32_t      count    = 0;
-    char *const   top      = self->ptr;
-    const char   *ptr      = top + self->size;
-    size_t        new_size = self->size;
-
-    while (NULL != (ptr = StrHelp_back_utf8_char(ptr, top))) {
-        uint32_t code_point = StrHelp_decode_utf8_char(ptr);
-        if (!StrHelp_is_whitespace(code_point)) { break; }
-        new_size = ptr - top;
-        count++;
-    }
-    self->size = new_size;
-
-    return count;
+    StackStringIterator *tail = STR_STACKTAIL(self);
+    SStrIter_Skip_Prev_Whitespace(tail);
+    return StrIter_substring(NULL, (StringIterator*)tail);
 }
 
 size_t
@@ -631,30 +611,6 @@ void
 ViewCB_Assign_Trusted_Str_IMP(ViewCharBuf *self, const char *utf8, size_t size) {
     self->ptr  = (char*)utf8;
     self->size = size;
-}
-
-uint32_t
-ViewCB_Trim_Top_IMP(ViewCharBuf *self) {
-    uint32_t  count = 0;
-    char     *ptr   = self->ptr;
-    char     *end   = ptr + self->size;
-
-    while (ptr < end) {
-        uint32_t code_point = StrHelp_decode_utf8_char(ptr);
-        if (!StrHelp_is_whitespace(code_point)) { break; }
-        ptr += StrHelp_UTF8_COUNT[*(uint8_t*)ptr];
-        count++;
-    }
-
-    if (count) {
-        if (ptr > end) {
-            DIE_INVALID_UTF8(self->ptr, self->size);
-        }
-        self->size = end - ptr;
-        self->ptr  = ptr;
-    }
-
-    return count;
 }
 
 char*
