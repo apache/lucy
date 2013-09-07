@@ -66,13 +66,17 @@ Seg_num_to_name(int64_t number) {
 bool
 Seg_valid_seg_name(const String *name) {
     if (Str_Starts_With_Str(name, "seg_", 4)) {
-        StackString *scratch = SSTR_WRAP(name);
-        SStr_Nip(scratch, 4);
+        StringIterator *iter = Str_Top(name);
+        StrIter_Advance(iter, 4);
         uint32_t code_point;
-        while (0 != (code_point = SStr_Nibble(scratch))) {
-            if (!isalnum(code_point)) { return false; }
+        while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
+            if (!isalnum(code_point)) {
+                DECREF(iter);
+                return false;
+            }
         }
-        if (SStr_Get_Size(scratch) == 0) { return true; } // Success!
+        DECREF(iter);
+        return true; // Success!
     }
     return false;
 }
