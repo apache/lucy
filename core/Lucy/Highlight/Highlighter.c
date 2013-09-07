@@ -152,16 +152,15 @@ Highlighter_Get_Excerpt_Length_IMP(Highlighter *self) {
 String*
 Highlighter_Create_Excerpt_IMP(Highlighter *self, HitDoc *hit_doc) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
-    StackString *field_val
-        = (StackString*)HitDoc_Extract(hit_doc, ivars->field,
-                                         (ViewCharBuf*)SStr_BLANK());
+    String *field_val = (String*)HitDoc_Extract(hit_doc, ivars->field);
+    String *retval;
 
     if (!field_val || !Obj_Is_A((Obj*)field_val, STRING)) {
-        return NULL;
+        retval = NULL;
     }
-    else if (!SStr_Get_Size(field_val)) {
+    else if (!Str_Get_Size(field_val)) {
         // Empty string yields empty string.
-        return Str_new(0);
+        retval = Str_new(0);
     }
     else {
         DocVector *doc_vec
@@ -177,19 +176,21 @@ Highlighter_Create_Excerpt_IMP(Highlighter *self, HitDoc *hit_doc) {
 
         int32_t top;
         String *raw_excerpt
-            = Highlighter_Raw_Excerpt(self, (String*)field_val, &top,
-                                      heat_map);
+            = Highlighter_Raw_Excerpt(self, field_val, &top, heat_map);
         String *highlighted
             = Highlighter_Highlight_Excerpt(self, score_spans, raw_excerpt,
                                             top);
 
+        DECREF(raw_excerpt);
         DECREF(heat_map);
         DECREF(score_spans);
         DECREF(doc_vec);
-        DECREF(raw_excerpt);
 
-        return highlighted;
+        retval = highlighted;
     }
+
+    DECREF(field_val);
+    return retval;
 }
 
 static int32_t
