@@ -790,20 +790,41 @@ StrIter_new(String *string, size_t byte_offset) {
 
 String*
 StrIter_substring(StringIterator *top, StringIterator *tail) {
-    String *string = top->string;
+    String *string;
+    size_t  top_offset;
+    size_t  tail_offset;
 
-    if (string != tail->string) {
-        THROW(ERR, "StrIter_substring: strings don't match");
+    if (tail == NULL) {
+        if (top == NULL) {
+            THROW(ERR, "StrIter_substring: Both top and tail are NULL");
+        }
+        string      = top->string;
+        tail_offset = string->size;
     }
-    if (top->byte_offset > tail->byte_offset) {
-        THROW(ERR, "StrIter_substring: top is behind tail");
-    }
-    if (tail->byte_offset > string->size) {
-        THROW(ERR, "Invalid StringIterator offset");
+    else {
+        string = tail->string;
+        if (top != NULL && string != top->string) {
+            THROW(ERR, "StrIter_substring: strings don't match");
+        }
+
+        tail_offset = tail->byte_offset;
+        if (tail_offset > string->size) {
+            THROW(ERR, "Invalid StringIterator offset");
+        }
     }
 
-    return Str_new_from_trusted_utf8(string->ptr + top->byte_offset,
-                                     tail->byte_offset - top->byte_offset);
+    if (top == NULL) {
+        top_offset = 0;
+    }
+    else {
+        top_offset = top->byte_offset;
+        if (top_offset > tail_offset) {
+            THROW(ERR, "StrIter_substring: top is behind tail");
+        }
+    }
+
+    return Str_new_from_trusted_utf8(string->ptr + top_offset,
+                                     tail_offset - top_offset);
 }
 
 StringIterator*
