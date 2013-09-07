@@ -39,9 +39,9 @@ Lock_init(Lock *self, Folder *folder, const String *name,
         DECREF(self);
         THROW(ERR, "Invalid value for 'interval': %i32", interval);
     }
-    StackString *scratch = SSTR_WRAP(name);
+    StringIterator *iter = Str_Top(name);
     uint32_t code_point;
-    while (0 != (code_point = SStr_Nibble(scratch))) {
+    while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
         if (isalnum(code_point)
             || code_point == '.'
             || code_point == '-'
@@ -52,6 +52,7 @@ Lock_init(Lock *self, Folder *folder, const String *name,
         DECREF(self);
         THROW(ERR, "Lock name contains disallowed characters: '%o'", name);
     }
+    DECREF(iter);
 
     // Assign.
     ivars->folder       = (Folder*)INCREF(folder);
@@ -230,17 +231,18 @@ LFLock_Maybe_Delete_File_IMP(LockFileLock *self, const String *path,
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
     Folder *folder  = ivars->folder;
     bool    success = false;
-    StackString *scratch = SSTR_WRAP(path);
 
     // Only delete locks that start with our lock name.
-    String *lock_dir_name = (String*)SSTR_WRAP_STR("locks", 5);
-    if (!SStr_Starts_With(scratch, lock_dir_name)) {
+    if (!Str_Starts_With_Str(path, "locks", 5)) {
         return false;
     }
-    SStr_Nip(scratch, Str_Get_Size(lock_dir_name) + 1);
-    if (!SStr_Starts_With(scratch, ivars->name)) {
+    StringIterator *iter = Str_Top(path);
+    StrIter_Advance(iter, 5 + 1);
+    if (!StrIter_Starts_With(iter, ivars->name)) {
+        DECREF(iter);
         return false;
     }
+    DECREF(iter);
 
     // Attempt to delete dead lock file.
     if (Folder_Exists(folder, path)) {
