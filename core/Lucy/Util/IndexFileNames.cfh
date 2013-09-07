@@ -35,15 +35,11 @@ inert class Lucy::Util::IndexFileNames cnick IxFileNames {
     inert incremented nullable String*
     latest_snapshot(Folder *folder);
 
-    /** Split the <code>path</code> on '/' and assign the last component to
-     * <code>target</code>, which will remain valid only as long as
-     * <code>path</code> is unmodified.  Trailing slashes will be stripped.
-     *
-     * @param target The target string to assign to.
-     * @return target, allowing an assignment idiom.
+    /** Split the <code>path</code> on '/' and return the last component.
+     * Trailing slashes will be stripped.
      */
-    inert incremented StackString*
-    local_part(const String *path, StackString *target);
+    inert incremented String*
+    local_part(const String *path);
 }
 
 

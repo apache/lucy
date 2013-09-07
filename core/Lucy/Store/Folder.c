@@ -67,11 +67,12 @@ Folder_Open_In_IMP(Folder *self, const String *path) {
     InStream *instream = NULL;
 
     if (enclosing_folder) {
-        StackString *name = IxFileNames_local_part(path, SStr_BLANK());
-        instream = Folder_Local_Open_In(enclosing_folder, (String*)name);
+        String *name = IxFileNames_local_part(path);
+        instream = Folder_Local_Open_In(enclosing_folder, name);
         if (!instream) {
             ERR_ADD_FRAME(Err_get_error());
         }
+        DECREF(name);
     }
     else {
         Err_set_error(Err_new(Str_newf("Invalid path: '%o'", path)));
@@ -125,12 +126,12 @@ Folder_Open_FileHandle_IMP(Folder *self, const String *path,
     FileHandle *fh = NULL;
 
     if (enclosing_folder) {
-        StackString *name = IxFileNames_local_part(path, SStr_BLANK());
-        fh = Folder_Local_Open_FileHandle(enclosing_folder,
-                                          (String*)name, flags);
+        String *name = IxFileNames_local_part(path);
+        fh = Folder_Local_Open_FileHandle(enclosing_folder, name, flags);
         if (!fh) {
             ERR_ADD_FRAME(Err_get_error());
         }
+        DECREF(name);
     }
     else {
         Err_set_error(Err_new(Str_newf("Invalid path: '%o'", path)));
@@ -143,8 +144,9 @@ bool
 Folder_Delete_IMP(Folder *self, const String *path) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     if (enclosing_folder) {
-        StackString *name = IxFileNames_local_part(path, SStr_BLANK());
-        bool result = Folder_Local_Delete(enclosing_folder, (String*)name);
+        String *name = IxFileNames_local_part(path);
+        bool result = Folder_Local_Delete(enclosing_folder, name);
+        DECREF(name);
         return result;
     }
     else {
@@ -160,10 +162,10 @@ Folder_Delete_Tree_IMP(Folder *self, const String *path) {
     if (!path || !Str_Get_Size(path)) { return false; }
 
     if (enclosing_folder) {
-        StackString *local = IxFileNames_local_part(path, SStr_BLANK());
-        if (Folder_Local_Is_Directory(enclosing_folder, (String*)local)) {
+        String *local = IxFileNames_local_part(path);
+        if (Folder_Local_Is_Directory(enclosing_folder, local)) {
             Folder *inner_folder
-                = Folder_Local_Find_Folder(enclosing_folder, (String*)local);
+                = Folder_Local_Find_Folder(enclosing_folder, local);
             DirHandle *dh = Folder_Local_Open_Dir(inner_folder);
             if (dh) {
                 VArray *files = VA_new(20);
@@ -195,7 +197,9 @@ Folder_Delete_Tree_IMP(Folder *self, const String *path) {
                 DECREF(dh);
             }
         }
-        return Folder_Local_Delete(enclosing_folder, (String*)local);
+        bool retval = Folder_Local_Delete(enclosing_folder, local);
+        DECREF(local);
+        return retval;
     }
     else {
         // Return failure if the entry wasn't there in the first place.
@@ -286,11 +290,12 @@ Folder_MkDir_IMP(Folder *self, const String *path) {
                                        path)));
     }
     else {
-        StackString *name = IxFileNames_local_part(path, SStr_BLANK());
-        result = Folder_Local_MkDir(enclosing_folder, (String*)name);
+        String *name = IxFileNames_local_part(path);
+        result = Folder_Local_MkDir(enclosing_folder, name);
         if (!result) {
             ERR_ADD_FRAME(Err_get_error());
         }
+        DECREF(name);
     }
 
     return result;
@@ -301,10 +306,11 @@ Folder_Exists_IMP(Folder *self, const String *path) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     bool retval = false;
     if (enclosing_folder) {
-        StackString *name = IxFileNames_local_part(path, SStr_BLANK());
-        if (Folder_Local_Exists(enclosing_folder, (String*)name)) {
+        String *name = IxFileNames_local_part(path);
+        if (Folder_Local_Exists(enclosing_folder, name)) {
             retval = true;
         }
+        DECREF(name);
     }
     return retval;
 }
@@ -314,10 +320,11 @@ Folder_Is_Directory_IMP(Folder *self, const String *path) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     bool retval = false;
     if (enclosing_folder) {
-        StackString *name = IxFileNames_local_part(path, SStr_BLANK());
-        if (Folder_Local_Is_Directory(enclosing_folder, (String*)name)) {
+        String *name = IxFileNames_local_part(path);
+        if (Folder_Local_Is_Directory(enclosing_folder, name)) {
             retval = true;
         }
+        DECREF(name);
     }
     return retval;
 }
@@ -412,12 +419,12 @@ Folder_Consolidate_IMP(Folder *self, const String *path) {
         CFWriter_Consolidate(cf_writer);
         DECREF(cf_writer);
         if (Str_Get_Size(path)) {
-            StackString *name = IxFileNames_local_part(path, SStr_BLANK());
             CompoundFileReader *cf_reader = CFReader_open(folder);
             if (!cf_reader) { RETHROW(INCREF(Err_get_error())); }
             Hash *entries = Folder_IVARS(enclosing_folder)->entries;
-            Hash_Store(entries, (Obj*)name,
-                       (Obj*)cf_reader);
+            String *name = IxFileNames_local_part(path);
+            Hash_Store(entries, (Obj*)name, (Obj*)cf_reader);
+            DECREF(name);
         }
     }
 }

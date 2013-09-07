@@ -28,33 +28,24 @@ TestIxFileNames_new() {
 }
 
 static void
+S_test_local_part(TestBatchRunner *runner, const char *source,
+                  const char *wanted, const char *test_name) {
+    StackString *source_str = SSTR_WRAP_STR(source, strlen(source));
+    String *got = IxFileNames_local_part((String*)source_str);
+    TEST_TRUE(runner, Str_Equals_Str(got, wanted, strlen(wanted)), test_name);
+    DECREF(got);
+}
+
+static void
 test_local_part(TestBatchRunner *runner) {
-    StackString *source = SStr_BLANK();
-    StackString *got    = SStr_BLANK();
-
-    got = IxFileNames_local_part((String*)source, got);
-    TEST_TRUE(runner, SStr_Equals(got, (Obj*)source), "simple name");
-
-    SStr_Assign_Str(source, "foo.txt", 7);
-    got = IxFileNames_local_part((String*)source, got);
-    TEST_TRUE(runner, SStr_Equals(got, (Obj*)source), "name with extension");
-
-    SStr_Assign_Str(source, "/foo", 4);
-    got = IxFileNames_local_part((String*)source, got);
-    TEST_TRUE(runner, SStr_Equals_Str(got, "foo", 3), "strip leading slash");
-
-    SStr_Assign_Str(source, "/foo/", 5);
-    got = IxFileNames_local_part((String*)source, got);
-    TEST_TRUE(runner, SStr_Equals_Str(got, "foo", 3), "strip trailing slash");
-
-    SStr_Assign_Str(source, "foo/bar\\ ", 9);
-    got = IxFileNames_local_part((String*)source, got);
-    TEST_TRUE(runner, SStr_Equals_Str(got, "bar\\ ", 5),
-              "Include garbage like backslashes and spaces");
-
-    SStr_Assign_Str(source, "foo/bar/baz.txt", 15);
-    got = IxFileNames_local_part((String*)source, got);
-    TEST_TRUE(runner, SStr_Equals_Str(got, "baz.txt", 7), "find last component");
+    S_test_local_part(runner, "", "", "simple name");
+    S_test_local_part(runner, "foo.txt", "foo.txt", "name with extension");
+    S_test_local_part(runner, "/foo", "foo", "strip leading slash");
+    S_test_local_part(runner, "/foo/", "foo", "strip trailing slash");
+    S_test_local_part(runner, "foo/bar\\ ", "bar\\ ",
+                      "Include garbage like backslashes and spaces");
+    S_test_local_part(runner, "foo/bar/baz.txt", "baz.txt",
+                      "find last component");
 }
 
 static void
