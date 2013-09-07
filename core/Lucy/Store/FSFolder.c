@@ -297,12 +297,7 @@ S_create_dir(const String *path) {
 
 static bool
 S_is_local_entry(const String *path) {
-    StackString *scratch = SSTR_WRAP(path);
-    uint32_t code_point;
-    while (0 != (code_point = SStr_Nibble(scratch))) {
-        if (code_point == '/') { return false; }
-    }
-    return true;
+    return Str_Find_Str(path, "/", 1) == -1;
 }
 
 /***************************************************************************/
