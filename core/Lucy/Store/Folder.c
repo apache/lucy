@@ -423,30 +423,28 @@ Folder_Consolidate_IMP(Folder *self, const String *path) {
 }
 
 static Folder*
-S_enclosing_folder(Folder *self, StackString *path) {
-    size_t path_component_len = 0;
+S_enclosing_folder(Folder *self, StringIterator *path) {
     uint32_t code_point;
 
-    // Strip trailing slash.
-    if (SStr_Code_Point_From(path, 0) == '/') { SStr_Chop(path, 1); }
-
     // Find first component of the file path.
-    StackString *scratch        = SSTR_WRAP((String*)path);
-    StackString *path_component = SSTR_WRAP((String*)path);
-    while (0 != (code_point = SStr_Nibble(scratch))) {
-        if (code_point == '/') {
-            SStr_Truncate(path_component, path_component_len);
-            SStr_Nip(path, path_component_len + 1);
+    String *path_component = NULL;
+    StringIterator *iter = StrIter_Clone(path);
+    while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
+        if (code_point == '/' && StrIter_Has_Next(iter)) {
+            StrIter_Recede(iter, 1);
+            path_component = StrIter_substring(path, iter);
+            StrIter_Advance(iter, 1);
+            StrIter_Assign(path, iter);
             break;
         }
-        path_component_len++;
     }
+    DECREF(iter);
 
     // If we've eaten up the entire filepath, self is enclosing folder.
-    if (SStr_Get_Size(scratch) == 0) { return self; }
+    if (!path_component) { return self; }
 
-    Folder *local_folder
-        = Folder_Local_Find_Folder(self, (String*)path_component);
+    Folder *local_folder = Folder_Local_Find_Folder(self, path_component);
+    DECREF(path_component);
     if (!local_folder) {
         /* This element of the filepath doesn't exist, or it's not a
          * directory.  However, there are filepath characters left over,
@@ -461,8 +459,10 @@ S_enclosing_folder(Folder *self, StackString *path) {
 
 Folder*
 Folder_Enclosing_Folder_IMP(Folder *self, const String *path) {
-    StackString *scratch = SSTR_WRAP(path);
-    return S_enclosing_folder(self, scratch);
+    StringIterator *iter = Str_Top(path);
+    Folder *folder = S_enclosing_folder(self, iter);
+    DECREF(iter);
+    return folder;
 }
 
 Folder*
@@ -471,15 +471,16 @@ Folder_Find_Folder_IMP(Folder *self, const String *path) {
         return self;
     }
     else {
-        StackString *scratch = SSTR_WRAP(path);
-        Folder *enclosing_folder = S_enclosing_folder(self, scratch);
-        if (!enclosing_folder) {
-            return NULL;
+        Folder *folder = NULL;
+        StringIterator *iter = Str_Top(path);
+        Folder *enclosing_folder = S_enclosing_folder(self, iter);
+        if (enclosing_folder) {
+            String *folder_name = StrIter_substring(iter, NULL);
+            folder = Folder_Local_Find_Folder(enclosing_folder, folder_name);
+            DECREF(folder_name);
         }
-        else {
-            return Folder_Local_Find_Folder(enclosing_folder,
-                                            (String*)scratch);
-        }
+        DECREF(iter);
+        return folder;
     }
 }
 
