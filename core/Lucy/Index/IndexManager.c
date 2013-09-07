@@ -304,7 +304,6 @@ IxManager_Remove_Merge_Data_IMP(IndexManager *self) {
 Lock*
 IxManager_Make_Snapshot_Read_Lock_IMP(IndexManager *self,
                                       const String *filename) {
-    StackString *lock_name = SSTR_WRAP(filename);
     LockFactory *lock_factory = S_obtain_lock_factory(self);
 
     if (!Str_Starts_With_Str(filename, "snapshot_", 9)
@@ -314,9 +313,13 @@ IxManager_Make_Snapshot_Read_Lock_IMP(IndexManager *self,
     }
 
     // Truncate ".json" from end of snapshot file name.
-    SStr_Chop(lock_name, sizeof(".json") - 1);
+    size_t lock_name_len = Str_Length(filename) - (sizeof(".json") - 1);
+    String *lock_name = Str_SubString(filename, 0, lock_name_len);
 
-    return LockFact_Make_Shared_Lock(lock_factory, (String*)lock_name, 1000, 100);
+    Lock *lock = LockFact_Make_Shared_Lock(lock_factory, lock_name, 1000, 100);
+
+    DECREF(lock_name);
+    return lock;
 }
 
 void
