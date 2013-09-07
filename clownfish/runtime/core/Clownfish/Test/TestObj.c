@@ -67,12 +67,7 @@ static void
 test_To_String(TestBatchRunner *runner) {
     Obj *testobj = S_new_testobj();
     String *string = Obj_To_String(testobj);
-    StackString *temp = SSTR_WRAP(string);
-    while (SStr_Get_Size(temp)) {
-        if (SStr_Starts_With_Str(temp, "TestObj", 7)) { break; }
-        SStr_Nibble(temp);
-    }
-    TEST_TRUE(runner, SStr_Starts_With_Str(temp, "TestObj", 7), "To_String");
+    TEST_TRUE(runner, Str_Find_Str(string, "TestObj", 7) >= 0, "To_String");
     DECREF(string);
     DECREF(testobj);
 }
