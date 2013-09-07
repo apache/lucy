@@ -73,8 +73,8 @@ public class Lucy::Document::Doc inherits Clownfish::Obj {
      * return the interior object.  Callers must check to verify the kind of
      * object returned.
      */
-    nullable Obj*
-    Extract(Doc *self, String *field, ViewCharBuf *target);
+    nullable incremented Obj*
+    Extract(Doc *self, String *field);
 
     /* Unimplemented methods.
      */

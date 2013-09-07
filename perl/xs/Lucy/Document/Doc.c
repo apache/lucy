@@ -143,8 +143,7 @@ LUCY_Doc_Deserialize_IMP(lucy_Doc *self, lucy_InStream *instream) {
 }
 
 cfish_Obj*
-LUCY_Doc_Extract_IMP(lucy_Doc *self, cfish_String *field,
-                     cfish_ViewCharBuf *target) {
+LUCY_Doc_Extract_IMP(lucy_Doc *self, cfish_String *field) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     cfish_Obj *retval = NULL;
     SV **sv_ptr = hv_fetch((HV*)ivars->fields, (char*)CFISH_Str_Get_Ptr8(field),
@@ -154,13 +153,12 @@ LUCY_Doc_Extract_IMP(lucy_Doc *self, cfish_String *field,
         SV *const sv = *sv_ptr;
         if (sv_isobject(sv) && sv_derived_from(sv, "Clownfish::Obj")) {
             IV tmp = SvIV(SvRV(sv));
-            retval = INT2PTR(cfish_Obj*, tmp);
+            retval = CFISH_INCREF(INT2PTR(cfish_Obj*, tmp));
         }
         else {
             STRLEN size;
             char *ptr = SvPVutf8(sv, size);
-            CFISH_ViewCB_Assign_Str(target, ptr, size);
-            retval = (cfish_Obj*)target;
+            retval = (cfish_Obj*)cfish_ViewCB_new_from_trusted_utf8(ptr, size);
         }
     }
 

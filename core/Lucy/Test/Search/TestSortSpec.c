@@ -351,11 +351,11 @@ S_test_sorted_search(IndexSearcher *searcher, String *query,
     Hits *hits = IxSearcher_Hits(searcher, (Obj*)query, 0, num_wanted, spec);
 
     VArray *results = VA_new(10);
-    ViewCharBuf *name = (ViewCharBuf*)SStr_BLANK();
     HitDoc *hit_doc;
     while (NULL != (hit_doc = Hits_Next(hits))) {
-        HitDoc_Extract(hit_doc, name_str, name);
+        String *name = (String*)HitDoc_Extract(hit_doc, name_str);
         VA_Push(results, (Obj*)Str_Clone((String*)name));
+        DECREF(name);
         DECREF(hit_doc);
     }
 

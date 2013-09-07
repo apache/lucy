@@ -174,10 +174,11 @@ S_search(IndexSearcher *searcher, const char *query) {
 
     // Loop over search results.
     while (NULL != (hit = Hits_Next(hits))) {
-        String *value_str = (String*)HitDoc_Extract(hit, field_str, NULL);
+        String *value_str = (String*)HitDoc_Extract(hit, field_str);
 
         printf("Result %d: %s\n", i, Str_Get_Ptr8(value_str));
 
+        DECREF(value_str);
         DECREF(hit);
         i++;
     }

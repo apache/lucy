@@ -85,15 +85,9 @@ Doc_Deserialize_IMP(Doc *self, InStream *instream) {
 }
 
 Obj*
-Doc_Extract_IMP(Doc *self, String *field, ViewCharBuf *target) {
+Doc_Extract_IMP(Doc *self, String *field) {
     Hash *hash = (Hash*)Doc_IVARS(self)->fields;
-    Obj  *obj  = Hash_Fetch(hash, (Obj *)field);
-
-    if (target && obj && Obj_Is_A(obj, STRING)) {
-        ViewCB_Assign(target, (String *)obj);
-    }
-
-    return obj;
+    return INCREF(Hash_Fetch(hash, (Obj *)field));
 }
 
 void*
