@@ -35,17 +35,17 @@
 #define TOKEN_QUERY       LUCY_QPARSER_TOKEN_QUERY
 
 static ParserElem*
-S_consume_keyword(StackString *qstring, const char *keyword,
+S_consume_keyword(StringIterator *iter, const char *keyword,
                   size_t keyword_len, int type);
 
 static ParserElem*
-S_consume_field(StackString *qstring);
+S_consume_field(StringIterator *iter);
 
 static ParserElem*
-S_consume_text(StackString *qstring);
+S_consume_text(StringIterator *iter);
 
 static ParserElem*
-S_consume_quoted_string(StackString *qstring);
+S_consume_quoted_string(StringIterator *iter);
 
 QueryLexer*
 QueryLexer_new() {
@@ -73,101 +73,103 @@ QueryLexer_Set_Heed_Colons_IMP(QueryLexer *self, bool heed_colons) {
 VArray*
 QueryLexer_Tokenize_IMP(QueryLexer *self, const String *query_string) {
     QueryLexerIVARS *const ivars = QueryLexer_IVARS(self);
-    String *copy = query_string
-                   ? Str_Clone(query_string)
-                   : Str_new_from_trusted_utf8("", 0);
-    StackString *qstring = SSTR_WRAP((String*)copy);
-    VArray *elems = VA_new(0);
-    SStr_Trim(qstring);
 
-    while (SStr_Get_Size(qstring)) {
+    VArray *elems = VA_new(0);
+    if (!query_string) { return elems; }
+
+    StringIterator *iter = Str_Top(query_string);
+
+    while (StrIter_Has_Next(iter)) {
         ParserElem *elem = NULL;
 
-        if (SStr_Trim_Top(qstring)) {
+        if (StrIter_Skip_Next_Whitespace(iter)) {
             // Fast-forward past whitespace.
             continue;
         }
 
         if (ivars->heed_colons) {
-            ParserElem *elem = S_consume_field(qstring);
+            ParserElem *elem = S_consume_field(iter);
             if (elem) {
                 VA_Push(elems, (Obj*)elem);
             }
         }
 
-        uint32_t code_point = SStr_Code_Point_At(qstring, 0);
+        uint32_t code_point = StrIter_Next(iter);
         switch (code_point) {
             case '(':
-                SStr_Nip(qstring, 1);
                 elem = ParserElem_new(TOKEN_OPEN_PAREN, NULL);
                 break;
             case ')':
-                SStr_Nip(qstring, 1);
                 elem = ParserElem_new(TOKEN_CLOSE_PAREN, NULL);
                 break;
             case '+':
-                if (SStr_Get_Size(qstring) > 1
-                    && !StrHelp_is_whitespace(SStr_Code_Point_At(qstring, 1))
+                if (StrIter_Has_Next(iter)
+                    && !StrIter_Skip_Next_Whitespace(iter)
                    ) {
                     elem = ParserElem_new(TOKEN_PLUS, NULL);
                 }
                 else {
                     elem = ParserElem_new(TOKEN_STRING, (Obj*)Str_newf("+"));
                 }
-                SStr_Nip(qstring, 1);
                 break;
             case '-':
-                if (SStr_Get_Size(qstring) > 1
-                    && !StrHelp_is_whitespace(SStr_Code_Point_At(qstring, 1))
+                if (StrIter_Has_Next(iter)
+                    && !StrIter_Skip_Next_Whitespace(iter)
                    ) {
                     elem = ParserElem_new(TOKEN_MINUS, NULL);
                 }
                 else {
                     elem = ParserElem_new(TOKEN_STRING, (Obj*)Str_newf("-"));
                 }
-                SStr_Nip(qstring, 1);
                 break;
             case '"':
-                elem = S_consume_quoted_string(qstring);
+                StrIter_Recede(iter, 1);
+                elem = S_consume_quoted_string(iter);
                 break;
             case 'O':
-                elem = S_consume_keyword(qstring, "OR", 2, TOKEN_OR);
+                StrIter_Recede(iter, 1);
+                elem = S_consume_keyword(iter, "OR", 2, TOKEN_OR);
                 if (!elem) {
-                    elem = S_consume_text(qstring);
+                    elem = S_consume_text(iter);
                 }
                 break;
             case 'A':
-                elem = S_consume_keyword(qstring, "AND", 3, TOKEN_AND);
+                StrIter_Recede(iter, 1);
+                elem = S_consume_keyword(iter, "AND", 3, TOKEN_AND);
                 if (!elem) {
-                    elem = S_consume_text(qstring);
+                    elem = S_consume_text(iter);
                 }
                 break;
             case 'N':
-                elem = S_consume_keyword(qstring, "NOT", 3, TOKEN_NOT);
+                StrIter_Recede(iter, 1);
+                elem = S_consume_keyword(iter, "NOT", 3, TOKEN_NOT);
                 if (!elem) {
-                    elem = S_consume_text(qstring);
+                    elem = S_consume_text(iter);
                 }
                 break;
             default:
-                elem = S_consume_text(qstring);
+                StrIter_Recede(iter, 1);
+                elem = S_consume_text(iter);
                 break;
         }
         VA_Push(elems, (Obj*)elem);
     }
 
-    DECREF(copy);
     return elems;
 }
 
 
 static ParserElem*
-S_consume_keyword(StackString *qstring, const char *keyword,
+S_consume_keyword(StringIterator *iter, const char *keyword,
                   size_t keyword_len, int type) {
-    if (!SStr_Starts_With_Str(qstring, keyword, keyword_len)) {
+    if (!StrIter_Starts_With_UTF8(iter, keyword, keyword_len)) {
         return NULL;
     }
-    uint32_t lookahead = SStr_Code_Point_At(qstring, keyword_len);
-    if (!lookahead) {
+    StringIterator *temp = StrIter_Clone(iter);
+    StrIter_Advance(temp, keyword_len);
+    uint32_t lookahead = StrIter_Next(temp);
+    if (lookahead == STRITER_DONE) {
+        DECREF(temp);
         return NULL;
     }
     if (StrHelp_is_whitespace(lookahead)
@@ -177,42 +179,48 @@ S_consume_keyword(StackString *qstring, const char *keyword,
         || lookahead == '+'
         || lookahead == '-'
        ) {
-        SStr_Nip(qstring, keyword_len);
+        StrIter_Recede(temp, 1);
+        StrIter_Assign(iter, temp);
+        DECREF(temp);
         return ParserElem_new(type, NULL);
     }
+    DECREF(temp);
     return NULL;
 }
 
 static ParserElem*
-S_consume_field(StackString *qstring) {
-    size_t tick = 0;
+S_consume_field(StringIterator *iter) {
+    StringIterator *temp = StrIter_Clone(iter);
 
     // Field names constructs must start with a letter or underscore.
-    uint32_t code_point = SStr_Code_Point_At(qstring, tick);
-    if (isalpha(code_point) || code_point == '_') {
-        tick++;
+    uint32_t code_point = StrIter_Next(temp);
+    if (code_point == STRITER_DONE) {
+        DECREF(temp);
+        return NULL;
     }
-    else {
+    if (!(isalpha(code_point) || code_point == '_')) {
+        DECREF(temp);
         return NULL;
     }
 
-    // Only alphanumerics and underscores are allowed  in field names.
-    while (1) {
-        code_point = SStr_Code_Point_At(qstring, tick);
-        if (isalnum(code_point) || code_point == '_') {
-            tick++;
+    // Only alphanumerics and underscores are allowed in field names.
+    while (':' != (code_point = StrIter_Next(temp))) {
+        if (code_point == STRITER_DONE) {
+            DECREF(temp);
+            return NULL;
         }
-        else if (code_point == ':') {
-            tick++;
-            break;
-        }
-        else {
+        if (!(isalnum(code_point) || code_point != '_')) {
+            DECREF(temp);
             return NULL;
         }
     }
 
     // Field name constructs must be followed by something sensible.
-    uint32_t lookahead = SStr_Code_Point_At(qstring, tick);
+    uint32_t lookahead = StrIter_Next(temp);
+    if (lookahead == STRITER_DONE) {
+        DECREF(temp);
+        return NULL;
+    }
     if (!(isalnum(lookahead)
           || lookahead == '_'
           || lookahead > 127
@@ -220,71 +228,71 @@ S_consume_field(StackString *qstring) {
           || lookahead == '('
          )
        ) {
+        DECREF(temp);
         return NULL;
     }
 
     // Consume string data.
-    StackString *field = SSTR_WRAP((String*)qstring);
-    SStr_Truncate(field, tick - 1);
-    SStr_Nip(qstring, tick);
-    return ParserElem_new(TOKEN_FIELD, (Obj*)SStr_Clone(field));
+    StrIter_Recede(temp, 2); // Back up over lookahead and colon.
+    String *field = StrIter_substring(iter, temp);
+    StrIter_Advance(temp, 1); // Skip colon.
+    StrIter_Assign(iter, temp);
+    DECREF(temp);
+    return ParserElem_new(TOKEN_FIELD, (Obj*)field);
 }
 
 static ParserElem*
-S_consume_text(StackString *qstring) {
-    StackString *text  = SSTR_WRAP((String*)qstring);
-    size_t tick = 0;
+S_consume_text(StringIterator *iter) {
+    StringIterator *temp = StrIter_Clone(iter);
+
     while (1) {
-        uint32_t code_point = SStr_Nibble(qstring);
+        uint32_t code_point = StrIter_Next(temp);
         if (code_point == '\\') {
-            code_point = SStr_Nibble(qstring);
-            tick++;
-            if (code_point == 0) {
+            code_point = StrIter_Next(temp);
+            if (code_point == STRITER_DONE) {
                 break;
             }
+        }
+        else if (code_point == STRITER_DONE) {
+            break;
         }
         else if (StrHelp_is_whitespace(code_point)
             || code_point == '"'
             || code_point == '('
             || code_point == ')'
-            || code_point == 0 
            ) {
+            StrIter_Recede(temp, 1);
             break;
         }
-        tick++;
     }
 
-    SStr_Truncate(text, tick);
-    return ParserElem_new(TOKEN_STRING, (Obj*)SStr_Clone(text));
+    String *text = StrIter_substring(iter, temp);
+    StrIter_Assign(iter, temp);
+    DECREF(temp);
+    return ParserElem_new(TOKEN_STRING, (Obj*)text);
 }
 
 static ParserElem*
-S_consume_quoted_string(StackString *qstring) {
-    StackString *text = SSTR_WRAP((String*)qstring);
-    if (SStr_Nibble(qstring) != '"') {
+S_consume_quoted_string(StringIterator *iter) {
+    StringIterator *temp = StrIter_Clone(iter);
+
+    if (StrIter_Next(temp) != '"') {
         THROW(ERR, "Internal error: expected a quote");
     }
 
-    size_t tick = 1;
     while (1) {
-        uint32_t code_point = SStr_Nibble(qstring);
-        if (code_point == '"') {
-            tick += 1;
-            break;
-        }
-        else if (code_point == 0) {
+        uint32_t code_point = StrIter_Next(temp);
+        if (code_point == STRITER_DONE || code_point == '"') {
             break;
         }
         else if (code_point == '\\') {
-            SStr_Nibble(qstring);
-            tick += 2;
-        }
-        else {
-            tick += 1;
+            StrIter_Next(temp);
         }
     }
 
-    SStr_Truncate(text, tick);
-    return ParserElem_new(TOKEN_STRING, (Obj*)SStr_Clone(text));
+    String *text = StrIter_substring(iter, temp);
+    StrIter_Assign(iter, temp);
+    DECREF(temp);
+    return ParserElem_new(TOKEN_STRING, (Obj*)text);
 }
 
