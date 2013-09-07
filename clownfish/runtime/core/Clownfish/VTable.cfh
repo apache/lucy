@@ -61,7 +61,8 @@ class Clownfish::VTable inherits Clownfish::Obj {
     add_to_registry(VTable *vtable);
 
     inert bool
-    add_alias_to_registry(VTable *vtable, String *alias);
+    add_alias_to_registry(VTable *vtable, const char *alias_ptr,
+                          size_t alias_len);
 
     /** Initialize the registry.
      */

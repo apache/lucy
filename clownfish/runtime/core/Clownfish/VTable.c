@@ -362,15 +362,17 @@ VTable_add_to_registry(VTable *vtable) {
 }
 
 bool
-VTable_add_alias_to_registry(VTable *vtable, String *alias) {
+VTable_add_alias_to_registry(VTable *vtable, const char *alias_ptr,
+                             size_t alias_len) {
     if (VTable_registry == NULL) {
         VTable_init_registry();
     }
+    StackString *alias = SSTR_WRAP_STR(alias_ptr, alias_len);
     if (LFReg_Fetch(VTable_registry, (Obj*)alias)) {
         return false;
     }
     else {
-        String *klass = Str_Clone(alias);
+        String *klass = SStr_Clone(alias);
         bool retval
             = LFReg_Register(VTable_registry, (Obj*)klass, (Obj*)vtable);
         DECREF(klass);
