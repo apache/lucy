@@ -175,14 +175,14 @@ Json_set_tolerant(bool tolerance) {
 static const int32_t MAX_DEPTH = 200;
 
 static void
-S_append_json_string(Obj *dump, CharBuf *buf) {
+S_append_json_string(String *dump, CharBuf *buf) {
     // Append opening quote.
     CB_Cat_Trusted_UTF8(buf, "\"", 1);
 
     // Process string data.
-    StackString *iterator = SSTR_WRAP((String*)dump);
-    while (SStr_Get_Size(iterator)) {
-        uint32_t code_point = SStr_Nibble(iterator);
+    StringIterator *iter = Str_Top(dump);
+    uint32_t code_point;
+    while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
         if (code_point > 127) {
             // There is no need to escape any high characters, including those
             // above the BMP, as we assume that the destination channel can
@@ -247,6 +247,8 @@ S_append_json_string(Obj *dump, CharBuf *buf) {
 
     // Append closing quote.
     CB_Cat_Trusted_UTF8(buf, "\"", 1);
+
+    DECREF(iter);
 }
 
 static void
@@ -275,7 +277,7 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
         CB_Cat_Trusted_UTF8(buf, "false", 5);
     }
     else if (Obj_Is_A(dump, STRING)) {
-        S_append_json_string(dump, buf);
+        S_append_json_string((String*)dump, buf);
     }
     else if (Obj_Is_A(dump, INTNUM)) {
         CB_catf(buf, "%i64", Obj_To_I64(dump));
@@ -349,7 +351,7 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
             Obj *key = VA_Fetch(keys, i);
             CB_Cat_Trusted_UTF8(buf, "\n", 1);
             S_cat_whitespace(buf, depth + 1);
-            S_append_json_string(key, buf);
+            S_append_json_string((String*)key, buf);
             CB_Cat_Trusted_UTF8(buf, ": ", 2);
             if (!S_to_json(Hash_Fetch(hash, key), buf, depth + 1)) {
                 DECREF(keys);
@@ -684,7 +686,7 @@ S_set_error(CharBuf *buf, char *json, char *limit, int line,
         len = end - json;
     }
     StackString *snippet = SSTR_WRAP_STR(json, len);
-    S_append_json_string((Obj*)snippet, buf);
+    S_append_json_string((String*)snippet, buf);
 
     String *mess = CB_Yield_String(buf);
     DECREF(buf);
