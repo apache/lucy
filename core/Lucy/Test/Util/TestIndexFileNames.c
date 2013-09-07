@@ -49,24 +49,19 @@ test_local_part(TestBatchRunner *runner) {
 }
 
 static void
+S_test_extract_gen(TestBatchRunner *runner, const char *name, uint64_t gen,
+                   const char *test_name) {
+    StackString *source = SSTR_WRAP_STR(name, strlen(name));
+    TEST_TRUE(runner, IxFileNames_extract_gen((String*)source) == gen,
+              test_name);
+}
+
+static void
 test_extract_gen(TestBatchRunner *runner) {
-    StackString *source = SSTR_WRAP_STR("", 0);
-
-    SStr_Assign_Str(source, "seg_9", 5);
-    TEST_TRUE(runner, IxFileNames_extract_gen((String*)source) == 9,
-              "extract_gen");
-
-    SStr_Assign_Str(source, "seg_9/", 6);
-    TEST_TRUE(runner, IxFileNames_extract_gen((String*)source) == 9,
-              "deal with trailing slash");
-
-    SStr_Assign_Str(source, "seg_9_8", 7);
-    TEST_TRUE(runner, IxFileNames_extract_gen((String*)source) == 9,
-              "Only go past first underscore");
-
-    SStr_Assign_Str(source, "snapshot_5.json", 15);
-    TEST_TRUE(runner, IxFileNames_extract_gen((String*)source) == 5,
-              "Deal with file suffix");
+    S_test_extract_gen(runner, "seg_9", 9, "extract_gen");
+    S_test_extract_gen(runner, "seg_9/", 9, "deal with trailing slash");
+    S_test_extract_gen(runner, "seg_9_8", 9, "Only go past first underscore");
+    S_test_extract_gen(runner, "snapshot_5.json", 5, "Deal with file suffix");
 }
 
 void
