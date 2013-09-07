@@ -386,8 +386,8 @@ class Clownfish::StringIterator cnick StrIter
     new(String *string, size_t byte_offset);
 
     /** Return the substring between the top and tail iterators.
-     * @param offset Offset from the top, in code points.
-     * @param len The desired length of the substring, in code points.
+     * @param offset Top iterator. Use start of string if NULL.
+     * @param len Tail iterator. Use end of string if NULL.
      */
     inert incremented String*
     substring(StringIterator *top, StringIterator *tail);

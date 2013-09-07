@@ -464,6 +464,24 @@ test_iterator_substring(TestBatchRunner *runner) {
         DECREF(substring);
     }
 
+    {
+        String *substring = StrIter_substring(end, NULL);
+        String *wanted = Str_newf("%sd", smiley);
+        TEST_TRUE(runner, Str_Equals(substring, (Obj*)wanted),
+                  "StrIter_substring with NULL tail");
+        DECREF(wanted);
+        DECREF(substring);
+    }
+
+    {
+        String *substring = StrIter_substring(NULL, start);
+        String *wanted = Str_newf("a%s", smiley);
+        TEST_TRUE(runner, Str_Equals(substring, (Obj*)wanted),
+                  "StrIter_substring with NULL top");
+        DECREF(wanted);
+        DECREF(substring);
+    }
+
     DECREF(start);
     DECREF(end);
     DECREF(string);
@@ -471,7 +489,7 @@ test_iterator_substring(TestBatchRunner *runner) {
 
 void
 TestStr_Run_IMP(TestString *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 102);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 104);
     test_Cat(runner);
     test_Mimic_and_Clone(runner);
     test_Code_Point_At_and_From(runner);
