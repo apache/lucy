@@ -138,22 +138,30 @@ ShLock_Is_Locked_IMP(SharedLock *self) {
     while (DH_Next(dh)) {
         String *entry = DH_Get_Entry(dh);
         // Translation:  $locked = 1 if $entry =~ /^\Q$name-\d+\.lock$/
-        if (Str_Starts_With(entry, ivars->name)
-            && Str_Ends_With_Str(entry, ".lock", 5)
-           ) {
-            StackString *scratch = SSTR_WRAP(entry);
-            SStr_Chop(scratch, sizeof(".lock") - 1);
-            while (isdigit(SStr_Code_Point_From(scratch, 1))) {
-                SStr_Chop(scratch, 1);
-            }
-            if (SStr_Code_Point_From(scratch, 1) == '-') {
-                SStr_Chop(scratch, 1);
-                if (SStr_Equals(scratch, (Obj*)ivars->name)) {
-                    DECREF(entry);
-                    DECREF(dh);
-                    return true;
+        if (Str_Starts_With(entry, ivars->name)) {
+            StringIterator *iter = Str_Top(entry);
+            StrIter_Advance(iter, Str_Length(ivars->name));
+            uint32_t code_point = StrIter_Next(iter);
+            if (code_point == '-') {
+                code_point = StrIter_Next(iter);
+                if (code_point != STRITER_DONE && isdigit(code_point)) {
+                    while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
+                        if (!isdigit(code_point)) { break; }
+                    }
+                    if (code_point == '.'
+                        && StrIter_Starts_With_UTF8(iter, "lock", 4)
+                    ) {
+                        StrIter_Advance(iter, 4);
+                        if (!StrIter_Has_Next(iter)) {
+                            DECREF(iter);
+                            DECREF(entry);
+                            DECREF(dh);
+                            return true;
+                        }
+                    }
                 }
             }
+            DECREF(iter);
         }
         DECREF(entry);
     }
