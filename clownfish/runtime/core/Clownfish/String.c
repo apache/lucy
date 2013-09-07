@@ -484,15 +484,6 @@ Str_Length_IMP(String *self) {
     return SStrIter_Advance(iter, SIZE_MAX);
 }
 
-size_t
-Str_Truncate_IMP(String *self, size_t count) {
-    uint32_t num_code_points;
-    StackString *iterator = SSTR_WRAP(self);
-    num_code_points = SStr_Nip(iterator, count);
-    self->size -= iterator->size;
-    return num_code_points;
-}
-
 uint32_t
 Str_Code_Point_At_IMP(String *self, size_t tick) {
     StackStringIterator *iter = STR_STACKTOP(self);
@@ -664,55 +655,6 @@ ViewCB_Trim_Top_IMP(ViewCharBuf *self) {
     }
 
     return count;
-}
-
-size_t
-ViewCB_Nip_IMP(ViewCharBuf *self, size_t count) {
-    size_t  num_nipped;
-    char   *ptr = self->ptr;
-    char   *end = ptr + self->size;
-    for (num_nipped = 0;
-         ptr < end && count--;
-         ptr += StrHelp_UTF8_COUNT[*(uint8_t*)ptr]
-        ) {
-        num_nipped++;
-    }
-    if (ptr > end) {
-        DIE_INVALID_UTF8(self->ptr, self->size);
-    }
-    self->size = end - ptr;
-    self->ptr  = ptr;
-    return num_nipped;
-}
-
-int32_t
-ViewCB_Nibble_IMP(ViewCharBuf *self) {
-    if (self->size == 0) {
-        return 0;
-    }
-    else {
-        int32_t retval = (int32_t)StrHelp_decode_utf8_char(self->ptr);
-        size_t consumed = StrHelp_UTF8_COUNT[*(uint8_t*)self->ptr];
-        if (consumed > self->size) {
-            DIE_INVALID_UTF8(self->ptr, self->size);
-        }
-        self->ptr  += consumed;
-        self->size -= consumed;
-        return retval;
-    }
-}
-
-size_t
-ViewCB_Chop_IMP(ViewCharBuf *self, size_t count) {
-    size_t      num_chopped = 0;
-    char       *top         = self->ptr;
-    const char *ptr         = top + self->size;
-    for (num_chopped = 0; num_chopped < count; num_chopped++) {
-        const char *end = ptr;
-        if (NULL == (ptr = StrHelp_back_utf8_char(ptr, top))) { break; }
-        self->size -= (end - ptr);
-    }
-    return num_chopped;
 }
 
 char*

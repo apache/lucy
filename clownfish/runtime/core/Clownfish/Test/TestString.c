@@ -174,40 +174,6 @@ test_SubString(TestBatchRunner *runner) {
 }
 
 static void
-test_Nip_and_Chop(TestBatchRunner *runner) {
-    String *wanted;
-    String *string;
-    StackString *got;
-
-    wanted = Str_newf("%sb%sc", smiley, smiley);
-    string = Str_newf("a%s%sb%sc", smiley, smiley, smiley);
-    got    = SSTR_WRAP(string);
-    SStr_Nip(got, 2);
-    TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Nip");
-    DECREF(wanted);
-    DECREF(string);
-
-    wanted = Str_newf("a%s%s", smiley, smiley);
-    string = Str_newf("a%s%sb%sc", smiley, smiley, smiley);
-    got    = SSTR_WRAP(string);
-    SStr_Chop(got, 3);
-    TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Chop");
-    DECREF(wanted);
-    DECREF(string);
-}
-
-
-static void
-test_Truncate(TestBatchRunner *runner) {
-    String *wanted = Str_newf("a%s", smiley, smiley);
-    String *got    = Str_newf("a%s%sb%sc", smiley, smiley, smiley);
-    Str_Truncate(got, 2);
-    TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Truncate");
-    DECREF(wanted);
-    DECREF(got);
-}
-
-static void
 test_Trim(TestBatchRunner *runner) {
     String *got;
 
@@ -490,14 +456,12 @@ test_iterator_substring(TestBatchRunner *runner) {
 
 void
 TestStr_Run_IMP(TestString *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 105);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 102);
     test_Cat(runner);
     test_Mimic_and_Clone(runner);
     test_Code_Point_At_and_From(runner);
     test_Find(runner);
     test_SubString(runner);
-    test_Nip_and_Chop(runner);
-    test_Truncate(runner);
     test_Trim(runner);
     test_To_F64(runner);
     test_To_I64(runner);

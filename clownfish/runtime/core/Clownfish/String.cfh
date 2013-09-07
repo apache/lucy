@@ -239,15 +239,6 @@ class Clownfish::String cnick Str
     uint32_t
     Trim_Tail(String *self);
 
-    /** Truncate the String so that it contains no more than
-     * <code>count</code>characters.
-     *
-     * @param count Maximum new length, in Unicode code points.
-     * @return The number of code points left in the string after truncation.
-     */
-    size_t
-    Truncate(String *self, size_t count);
-
     /** Return the Unicode code point at the specified number of code points
      * in.  Return 0 if the string length is exceeded.  (XXX It would be
      * better to throw an exception, but that's not practical with UTF-8 and
@@ -315,24 +306,6 @@ class Clownfish::ViewCharBuf cnick ViewCB
 
     uint32_t
     Trim_Top(ViewCharBuf *self);
-
-    /** Remove characters (measured in code points) from the top of the
-     * ViewCharBuf.  Returns the number nipped.
-     */
-    size_t
-    Nip(ViewCharBuf *self, size_t count);
-
-    /** Remove one character from the top of the ViewCharBuf.  Returns the
-     * code point, or 0 if the string was empty.
-     */
-    int32_t
-    Nibble(ViewCharBuf *self);
-
-    /** Remove characters (measured in code points) from the end of the
-     * ViewCharBuf.  Returns the number chopped.
-     */
-    size_t
-    Chop(ViewCharBuf *self, size_t count);
 
     /** Throws an error. */
     char*
