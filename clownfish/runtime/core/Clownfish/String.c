@@ -1066,6 +1066,26 @@ StrIter_Starts_With_UTF8_IMP(StringIterator *self, const char *prefix,
     return memcmp(string->ptr + byte_offset, prefix, size) == 0;
 }
 
+bool
+StrIter_Ends_With_IMP(StringIterator *self, String *postfix) {
+    return StrIter_Ends_With_UTF8_IMP(self, postfix->ptr, postfix->size);
+}
+
+bool
+StrIter_Ends_With_UTF8_IMP(StringIterator *self, const char *postfix,
+                             size_t size) {
+    String *string      = self->string;
+    size_t  byte_offset = self->byte_offset;
+
+    if (byte_offset > string->size) {
+        THROW(ERR, "Invalid StringIterator offset");
+    }
+
+    if (byte_offset < size) { return false; }
+
+    return memcmp(string->ptr + byte_offset - size, postfix, size) == 0;
+}
+
 void
 StrIter_Destroy_IMP(StringIterator *self) {
     DECREF(self->string);

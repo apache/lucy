@@ -459,6 +459,7 @@ test_iterator_substring(TestBatchRunner *runner) {
                   "StrIter_substring");
 
         TEST_TRUE(runner, StrIter_Starts_With(start, wanted), "Starts_With");
+        TEST_TRUE(runner, StrIter_Ends_With(end, wanted), "Ends_With");
 
         DECREF(wanted);
         DECREF(substring);
@@ -489,7 +490,7 @@ test_iterator_substring(TestBatchRunner *runner) {
 
 void
 TestStr_Run_IMP(TestString *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 104);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 105);
     test_Cat(runner);
     test_Mimic_and_Clone(runner);
     test_Code_Point_At_and_From(runner);
