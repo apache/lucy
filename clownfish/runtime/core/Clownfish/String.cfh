@@ -460,6 +460,12 @@ class Clownfish::StringIterator cnick StrIter
     bool
     Starts_With(StringIterator *self, String *prefix);
 
+    /** Test whether the content after the iterator starts with the passed-in
+     * string.
+     */
+    bool
+    Starts_With_UTF8(StringIterator *self, const char *prefix, size_t size);
+
     public void
     Destroy(StringIterator *self);
 }
