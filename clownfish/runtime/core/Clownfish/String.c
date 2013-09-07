@@ -806,9 +806,9 @@ StrIter_substring(StringIterator *top, StringIterator *tail) {
                                      tail->byte_offset - top->byte_offset);
 }
 
-Obj*
+StringIterator*
 StrIter_Clone_IMP(StringIterator *self) {
-    return (Obj*)StrIter_new(self->string, self->byte_offset);
+    return StrIter_new(self->string, self->byte_offset);
 }
 
 void

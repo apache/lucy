@@ -220,7 +220,7 @@ S_find_starting_boundary(StringIterator *top, uint32_t max_skip,
 
     // Check if we're at a starting boundary already.
 
-    StringIterator *iter = (StringIterator*)StrIter_Clone(top);
+    StringIterator *iter = StrIter_Clone(top);
 
     while (true) {
         uint32_t code_point = StrIter_Prev(iter);
@@ -233,7 +233,7 @@ S_find_starting_boundary(StringIterator *top, uint32_t max_skip,
         }
 
         if (StrHelp_is_whitespace(code_point)) {
-            if (word == NULL) { word = (StringIterator*)StrIter_Clone(top); }
+            if (word == NULL) { word = StrIter_Clone(top); }
         }
         else {
             break;
@@ -258,7 +258,7 @@ S_find_starting_boundary(StringIterator *top, uint32_t max_skip,
         }
 
         if (word == NULL && StrHelp_is_whitespace(code_point)) {
-            word = (StringIterator*)StrIter_Clone(iter);
+            word = StrIter_Clone(iter);
             word_offset = i + 1;
         }
     }
@@ -290,7 +290,7 @@ S_find_ending_boundary(StringIterator *tail, uint32_t max_skip,
     // Check if we're at an ending boundary already. Don't check for a word
     // boundary because we need space for a trailing ellipsis.
 
-    StringIterator *iter = (StringIterator*)StrIter_Clone(tail);
+    StringIterator *iter = StrIter_Clone(tail);
 
     do {
         code_point = StrIter_Next(iter);
@@ -324,7 +324,7 @@ S_find_ending_boundary(StringIterator *tail, uint32_t max_skip,
 
         if (StrHelp_is_whitespace(code_point)) {
             if (word == NULL) {
-                word = (StringIterator*)StrIter_Clone(iter);
+                word = StrIter_Clone(iter);
                 word_offset = i + 1;
             }
         }
@@ -401,7 +401,7 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const String *field_val,
 
     // Find end of excerpt.
 
-    StringIterator *tail = (StringIterator*)StrIter_Clone(top);
+    StringIterator *tail = StrIter_Clone(top);
 
     uint32_t max_len = ivars->excerpt_length;
     if (!found_starting_edge) {
