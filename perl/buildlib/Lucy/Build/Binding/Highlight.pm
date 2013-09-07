@@ -90,10 +90,6 @@ END_CONSTRUCTOR
         class_name => "Lucy::Highlight::Highlighter",
     );
     $binding->bind_method(
-        alias  => '_find_best_fragment',
-        method => 'Find_Best_Fragment'
-    );
-    $binding->bind_method(
         alias  => '_raw_excerpt',
         method => 'Raw_Excerpt'
     );
