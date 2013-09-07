@@ -208,7 +208,6 @@ S_write_boot_c(CFCPerl *self) {
     char *bootstrap_code  = CFCUtil_strdup("");
     char *alias_adds      = CFCUtil_strdup("");
     char *isa_pushes      = CFCUtil_strdup("");
-    int   has_aliases     = 0;
 
     for (size_t i = 0; parcels[i]; ++i) {
         if (!CFCParcel_included(parcels[i])) {
@@ -237,28 +236,16 @@ S_write_boot_c(CFCPerl *self) {
             const char **aliases
                 = CFCPerlClass_get_class_aliases(class_binding);
             for (size_t j = 0; aliases[j] != NULL; j++) {
-                if (!has_aliases) {
-                    // There's at least one alias, so include the buffer.
-                    alias_adds
-                        = CFCUtil_cat(alias_adds,
-                                      "    cfish_StackString *alias "
-                                      "= CFISH_SStr_WRAP_STR(\"\", 0);\n",
-                                      NULL);
-                    has_aliases = 1;
-                }
-
                 const char *alias = aliases[j];
                 size_t alias_len  = strlen(alias);
                 const char pattern[] =
-                    "%s"
-                    "    CFISH_SStr_Assign_Str(alias, \"%s\", %u);\n"
-                    "    cfish_VTable_add_alias_to_registry(%s,\n"
-                    "        (cfish_String*)alias);\n";
-                char *new_alias_adds
-                    = CFCUtil_sprintf(pattern, alias_adds, alias,
-                                      (unsigned)alias_len, vtable_var);
-                FREEMEM(alias_adds);
-                alias_adds = new_alias_adds;
+                    "    cfish_VTable_add_alias_to_registry("
+                    "%s, \"%s\", %u);\n";
+                char *alias_add
+                    = CFCUtil_sprintf(pattern, vtable_var, alias,
+                                      (unsigned)alias_len);
+                alias_adds = CFCUtil_cat(alias_adds, alias_add, NULL);
+                FREEMEM(alias_add);
             }
 
             char *metadata_code
