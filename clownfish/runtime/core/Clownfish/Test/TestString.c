@@ -329,7 +329,7 @@ test_iterator(TestBatchRunner *runner) {
         TEST_INT_EQ(runner, StrIter_Compare_To(top, (Obj*)top), 0,
                     "Compare_To top == top");
 
-        StringIterator *clone = (StringIterator*)StrIter_Clone(top);
+        StringIterator *clone = StrIter_Clone(top);
         TEST_TRUE(runner, StrIter_Equals(clone, (Obj*)top), "Clone");
 
         StrIter_Assign(clone, tail);
