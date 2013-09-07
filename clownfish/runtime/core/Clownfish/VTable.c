@@ -328,9 +328,9 @@ VTable_singleton(const String *class_name, VTable *parent) {
 static String*
 S_scrunch_string(String *source) {
     CharBuf *buf = CB_new(Str_Get_Size(source));
-    StackString *iterator = SSTR_WRAP(source);
-    while (SStr_Get_Size(iterator)) {
-        uint32_t code_point = SStr_Nibble(iterator);
+    StringIterator *iter = Str_Top(source);
+    uint32_t code_point;
+    while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
         if (code_point > 127) {
             THROW(ERR, "Can't fold case for %o", source);
         }
@@ -339,6 +339,7 @@ S_scrunch_string(String *source) {
         }
     }
     String *retval = CB_Yield_String(buf);
+    DECREF(iter);
     DECREF(buf);
     return retval;
 }
