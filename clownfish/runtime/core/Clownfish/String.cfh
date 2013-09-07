@@ -466,6 +466,18 @@ class Clownfish::StringIterator cnick StrIter
     bool
     Starts_With_UTF8(StringIterator *self, const char *prefix, size_t size);
 
+    /** Test whether the content before the iterator ends with
+     * <code>postfix</code>.
+     */
+    bool
+    Ends_With(StringIterator *self, String *postfix);
+
+    /** Test whether the content before the iterator ends with the passed-in
+     * string.
+     */
+    bool
+    Ends_With_UTF8(StringIterator *self, const char *postfix, size_t size);
+
     public void
     Destroy(StringIterator *self);
 }
