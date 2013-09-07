@@ -226,17 +226,17 @@ class Clownfish::String cnick Str
 
     /** Remove Unicode whitespace characters from both top and tail.
      */
-    uint32_t
+    String*
     Trim(String *self);
 
     /** Remove leading Unicode whitespace.
      */
-    uint32_t
+    String*
     Trim_Top(String *self);
 
     /** Remove trailing Unicode whitespace.
      */
-    uint32_t
+    String*
     Trim_Tail(String *self);
 
     /** Return the Unicode code point at the specified number of code points
@@ -303,9 +303,6 @@ class Clownfish::ViewCharBuf cnick ViewCB
 
     void
     Assign_Trusted_Str(ViewCharBuf *self, const char *utf8, size_t size);
-
-    uint32_t
-    Trim_Top(ViewCharBuf *self);
 
     /** Throws an error. */
     char*

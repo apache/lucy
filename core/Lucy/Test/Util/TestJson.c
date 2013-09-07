@@ -118,11 +118,11 @@ test_escapes(TestBatchRunner *runner) {
         String     *string  = Str_new_from_char(i);
         const char *escaped = control_escapes[i];
         String     *json    = Json_to_json((Obj*)string);
+        String     *trimmed = Str_Trim(json);
         String     *decoded = (String*)Json_from_json(json);
 
         String *json_wanted = Str_newf("\"%s\"", escaped);
-        Str_Trim(json);
-        TEST_TRUE(runner, json != NULL && Str_Equals(json_wanted, (Obj*)json),
+        TEST_TRUE(runner, Str_Equals(json_wanted, (Obj*)trimmed),
                   "encode control escape: %s", escaped);
 
         TEST_TRUE(runner, decoded != NULL && Str_Equals(string, (Obj*)decoded),
@@ -130,6 +130,7 @@ test_escapes(TestBatchRunner *runner) {
 
         DECREF(string);
         DECREF(json);
+        DECREF(trimmed);
         DECREF(decoded);
         DECREF(json_wanted);
     }
@@ -139,11 +140,11 @@ test_escapes(TestBatchRunner *runner) {
         const char *escaped = quote_escapes_json[i];
         String *string  = Str_new_from_utf8(source, strlen(source));
         String *json    = Json_to_json((Obj*)string);
+        String *trimmed = Str_Trim(json);
         String *decoded = (String*)Json_from_json(json);
 
         String *json_wanted = Str_newf("\"%s\"", escaped);
-        Str_Trim(json);
-        TEST_TRUE(runner, json != NULL && Str_Equals(json_wanted, (Obj*)json),
+        TEST_TRUE(runner, Str_Equals(json_wanted, (Obj*)trimmed),
                   "encode quote/backslash escapes: %s", source);
 
         TEST_TRUE(runner, decoded != NULL && Str_Equals(string, (Obj*)decoded),
@@ -151,6 +152,7 @@ test_escapes(TestBatchRunner *runner) {
 
         DECREF(string);
         DECREF(json);
+        DECREF(trimmed);
         DECREF(decoded);
         DECREF(json_wanted);
     }
@@ -158,11 +160,12 @@ test_escapes(TestBatchRunner *runner) {
 
 static void
 test_numbers(TestBatchRunner *runner) {
-    Integer64 *i64  = Int64_new(33);
-    String    *json = Json_to_json((Obj*)i64);
-    Str_Trim(json);
-    TEST_TRUE(runner, json && Str_Equals_Str(json, "33", 2), "Integer");
+    Integer64 *i64     = Int64_new(33);
+    String    *json    = Json_to_json((Obj*)i64);
+    String    *trimmed = Str_Trim(json);
+    TEST_TRUE(runner, Str_Equals_Str(trimmed, "33", 2), "Integer");
     DECREF(json);
+    DECREF(trimmed);
 
     Float64 *f64 = Float64_new(33.33);
     json = Json_to_json((Obj*)f64);
