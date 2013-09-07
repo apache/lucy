@@ -826,16 +826,16 @@ QParser_Expand_IMP(QueryParser *self, Query *query) {
 
 static String*
 S_unescape(QueryParser *self, String *orig, CharBuf *buf) {
-    StackString *source = SSTR_WRAP(orig);
+    StringIterator *iter = Str_Top(orig);
     uint32_t code_point;
     UNUSED_VAR(self);
 
     CB_Set_Size(buf, 0);
     CB_Grow(buf, Str_Get_Size(orig) + 4);
 
-    while (0 != (code_point = SStr_Nibble(source))) {
+    while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
         if (code_point == '\\') {
-            uint32_t next_code_point = SStr_Nibble(source);
+            uint32_t next_code_point = StrIter_Next(iter);
             if (next_code_point == ':'
                 || next_code_point == '"'
                 || next_code_point == '\\'
@@ -844,7 +844,9 @@ S_unescape(QueryParser *self, String *orig, CharBuf *buf) {
             }
             else {
                 CB_Cat_Char(buf, code_point);
-                if (next_code_point) { CB_Cat_Char(buf, next_code_point); }
+                if (next_code_point != STRITER_DONE) {
+                    CB_Cat_Char(buf, next_code_point);
+                }
             }
         }
         else {
@@ -852,34 +854,38 @@ S_unescape(QueryParser *self, String *orig, CharBuf *buf) {
         }
     }
 
+    DECREF(iter);
     return CB_To_String(buf);
 }
 
 Query*
 QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
     QueryParserIVARS *const ivars = QParser_IVARS(self);
-    LeafQuery     *leaf_query  = (LeafQuery*)query;
-    Schema        *schema      = ivars->schema;
-    StackString *source_text = SStr_BLANK();
-    bool           is_phrase   = false;
-    bool           ambiguous   = false;
+    LeafQuery *leaf_query = (LeafQuery*)query;
+    Schema    *schema     = ivars->schema;
+    bool       is_phrase  = false;
+    bool       ambiguous  = false;
 
     // Determine whether we can actually process the input.
-    if (!Query_Is_A(query, LEAFQUERY))                { return NULL; }
-    if (!Str_Get_Size(LeafQuery_Get_Text(leaf_query))) { return NULL; }
-    SStr_Assign(source_text, LeafQuery_Get_Text(leaf_query));
+    if (!Query_Is_A(query, LEAFQUERY)) { return NULL; }
+    String *full_text = LeafQuery_Get_Text(leaf_query);
+    if (!Str_Get_Size(full_text)) { return NULL; }
 
     // If quoted, always generate PhraseQuery.
-    SStr_Trim(source_text);
-    if (SStr_Code_Point_At(source_text, 0) == '"') {
+    StringIterator *top  = Str_Top(full_text);
+    StringIterator *tail = Str_Tail(full_text);
+    StrIter_Skip_Next_Whitespace(top);
+    StrIter_Skip_Prev_Whitespace(tail);
+    if (StrIter_Starts_With_UTF8(top, "\"", 1)) {
         is_phrase = true;
-        SStr_Nip(source_text, 1);
-        if (SStr_Code_Point_From(source_text, 1) == '"'
-            && SStr_Code_Point_From(source_text, 2) != '\\'
-           ) {
-            SStr_Chop(source_text, 1);
+        StrIter_Advance(top, 1);
+        if (StrIter_Ends_With_UTF8(tail, "\"", 1)
+            && !StrIter_Ends_With_UTF8(tail, "\\\"", 2)
+        ) {
+            StrIter_Recede(tail, 1);
         }
     }
+    String *source_text = StrIter_substring(top, tail);
 
     // Either use LeafQuery's field or default to Parser's list.
     VArray *fields;
@@ -891,7 +897,7 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
         fields = (VArray*)INCREF(ivars->fields);
     }
 
-    CharBuf *unescape_buf = CB_new(SStr_Get_Size(source_text));
+    CharBuf *unescape_buf = CB_new(Str_Get_Size(source_text));
     VArray  *queries      = VA_new(VA_Get_Size(fields));
     for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
         String   *field    = (String*)VA_Fetch(fields, i);
@@ -906,8 +912,7 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
         }
         else {
             // Extract token texts.
-            String *split_source
-                = S_unescape(self, (String*)source_text, unescape_buf);
+            String *split_source = S_unescape(self, source_text, unescape_buf);
             VArray *maybe_texts = Analyzer_Split(analyzer, split_source);
             uint32_t num_maybe_texts = VA_Get_Size(maybe_texts);
             VArray *token_texts = VA_new(num_maybe_texts);
@@ -959,6 +964,9 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
     DECREF(unescape_buf);
     DECREF(queries);
     DECREF(fields);
+    DECREF(source_text);
+    DECREF(tail);
+    DECREF(top);
 
     return retval;
 }
