@@ -51,45 +51,51 @@ IxFileNames_latest_snapshot(Folder *folder) {
 
 uint64_t
 IxFileNames_extract_gen(const String *name) {
-    StackString *num_string = SSTR_WRAP(name);
+    StringIterator *iter = Str_Top(name);
 
     // Advance past first underscore.  Bail if we run out of string or if we
     // encounter a NULL.
     while (1) {
-        uint32_t code_point = SStr_Nibble(num_string);
-        if (code_point == 0) { return 0; }
+        uint32_t code_point = StrIter_Next(iter);
+        if (code_point == STRITER_DONE) { return 0; }
         else if (code_point == '_') { break; }
     }
 
-    return (uint64_t)SStr_BaseX_To_I64(num_string, 36);
+    String *num_string = StrIter_substring(iter, NULL);
+    uint64_t retval = (uint64_t)Str_BaseX_To_I64(num_string, 36);
+
+    DECREF(num_string);
+    DECREF(iter);
+    return retval;
 }
 
-StackString*
-IxFileNames_local_part(const String *path, StackString *target) {
-    StackString *scratch = SSTR_WRAP(path);
-    size_t local_part_start = Str_Length(path);
-    uint32_t code_point;
-
-    SStr_Assign(target, path);
+String*
+IxFileNames_local_part(const String *path) {
+    StringIterator *top = Str_Tail(path);
+    uint32_t code_point = StrIter_Prev(top);
 
     // Trim trailing slash.
-    while (SStr_Code_Point_From(target, 1) == '/') {
-        SStr_Chop(target, 1);
-        SStr_Chop(scratch, 1);
-        local_part_start--;
+    while (code_point == '/') {
+        code_point = StrIter_Prev(top);
     }
+
+    StringIterator *tail = StrIter_Clone(top);
+    StrIter_Advance(tail, 1);
 
     // Substring should start after last slash.
-    while (0 != (code_point = SStr_Code_Point_From(scratch, 1))) {
+    while (code_point != STRITER_DONE) {
         if (code_point == '/') {
-            SStr_Nip(target, local_part_start);
+            StrIter_Advance(top, 1);
             break;
         }
-        SStr_Chop(scratch, 1);
-        local_part_start--;
+        code_point = StrIter_Prev(top);
     }
 
-    return target;
+    String *retval = StrIter_substring(top, tail);
+
+    DECREF(tail);
+    DECREF(top);
+    return retval;
 }
 
 

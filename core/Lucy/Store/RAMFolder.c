@@ -141,7 +141,7 @@ RAMFolder_Local_Is_Directory_IMP(RAMFolder *self, const String *name) {
 static bool
 S_rename_or_hard_link(RAMFolder *self, const String* from, const String *to,
                       Folder *from_folder, Folder *to_folder,
-                      StackString *from_name, StackString *to_name,
+                      String *from_name, String *to_name,
                       int op) {
     Obj       *elem              = NULL;
     RAMFolder *inner_from_folder = NULL;
@@ -190,7 +190,7 @@ S_rename_or_hard_link(RAMFolder *self, const String* from, const String *to,
                       (Obj*)from_name);
     if (!elem) {
         if (Folder_Is_A(from_folder, COMPOUNDFILEREADER)
-            && Folder_Local_Exists(from_folder, (String*)from_name)
+            && Folder_Local_Exists(from_folder, from_name)
            ) {
             Err_set_error(Err_new(Str_newf("Source file '%o' is virtual",
                                            from)));
@@ -210,7 +210,7 @@ S_rename_or_hard_link(RAMFolder *self, const String* from, const String *to,
 
             // Return success fast if file is copied on top of itself.
             if (inner_from_folder == inner_to_folder
-                && SStr_Equals(from_name, (Obj*)to_name)
+                && Str_Equals(from_name, (Obj*)to_name)
                ) {
                 return true;
             }
@@ -241,7 +241,7 @@ S_rename_or_hard_link(RAMFolder *self, const String* from, const String *to,
         DECREF(Hash_Delete(RAMFolder_IVARS(inner_from_folder)->entries,
                            (Obj*)from_name));
         if (Obj_Is_A(elem, FOLDER)) {
-            String *newpath = S_fullpath(inner_to_folder, (String*)to_name);
+            String *newpath = S_fullpath(inner_to_folder, to_name);
             Folder_Set_Path((Folder*)elem, newpath);
             DECREF(newpath);
         }
@@ -276,28 +276,30 @@ S_rename_or_hard_link(RAMFolder *self, const String* from, const String *to,
 bool
 RAMFolder_Rename_IMP(RAMFolder *self, const String* from,
                      const String *to) {
-    Folder        *from_folder = RAMFolder_Enclosing_Folder(self, from);
-    Folder        *to_folder   = RAMFolder_Enclosing_Folder(self, to);
-    StackString *from_name   = IxFileNames_local_part(from, SStr_BLANK());
-    StackString *to_name     = IxFileNames_local_part(to, SStr_BLANK());
-    bool result = S_rename_or_hard_link(self, from, to, from_folder,
-                                          to_folder, from_name, to_name,
-                                          OP_RENAME);
+    Folder *from_folder = RAMFolder_Enclosing_Folder(self, from);
+    Folder *to_folder   = RAMFolder_Enclosing_Folder(self, to);
+    String *from_name   = IxFileNames_local_part(from);
+    String *to_name     = IxFileNames_local_part(to);
+    bool result = S_rename_or_hard_link(self, from, to, from_folder, to_folder,
+                                        from_name, to_name, OP_RENAME);
     if (!result) { ERR_ADD_FRAME(Err_get_error()); }
+    DECREF(to_name);
+    DECREF(from_name);
     return result;
 }
 
 bool
 RAMFolder_Hard_Link_IMP(RAMFolder *self, const String *from,
                         const String *to) {
-    Folder        *from_folder = RAMFolder_Enclosing_Folder(self, from);
-    Folder        *to_folder   = RAMFolder_Enclosing_Folder(self, to);
-    StackString *from_name   = IxFileNames_local_part(from, SStr_BLANK());
-    StackString *to_name     = IxFileNames_local_part(to, SStr_BLANK());
-    bool result = S_rename_or_hard_link(self, from, to, from_folder,
-                                          to_folder, from_name, to_name,
-                                          OP_HARD_LINK);
+    Folder *from_folder = RAMFolder_Enclosing_Folder(self, from);
+    Folder *to_folder   = RAMFolder_Enclosing_Folder(self, to);
+    String *from_name   = IxFileNames_local_part(from);
+    String *to_name     = IxFileNames_local_part(to);
+    bool result = S_rename_or_hard_link(self, from, to, from_folder, to_folder,
+                                        from_name, to_name, OP_HARD_LINK);
     if (!result) { ERR_ADD_FRAME(Err_get_error()); }
+    DECREF(to_name);
+    DECREF(from_name);
     return result;
 }
 

@@ -87,13 +87,12 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder) {
     // Strip directory name from filepaths for old format.
     if (ivars->format == 1) {
         VArray *files = Hash_Keys(ivars->records);
-        StackString *folder_name
-            = IxFileNames_local_part(Folder_Get_Path(folder), SStr_BLANK());
-        size_t folder_name_len = SStr_Length(folder_name);
+        String *folder_name = IxFileNames_local_part(Folder_Get_Path(folder));
+        size_t folder_name_len = Str_Length(folder_name);
 
         for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
             String *orig = (String*)VA_Fetch(files, i);
-            if (Str_Starts_With(orig, (String*)folder_name)) {
+            if (Str_Starts_With(orig, folder_name)) {
                 Obj *record = Hash_Delete(ivars->records, (Obj*)orig);
                 size_t offset = folder_name_len + sizeof(DIR_SEP) - 1;
                 size_t len    = Str_Length(orig) - offset;
@@ -103,6 +102,7 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder) {
             }
         }
 
+        DECREF(folder_name);
         DECREF(files);
     }
 
