@@ -164,9 +164,9 @@ Inverter_Add_Field_IMP(Inverter *self, InverterEntry *entry) {
         Inversion_Invert(entry_ivars->inversion);
     }
     else if (entry_ivars->indexed || entry_ivars->highlightable) {
-        ViewCharBuf *value = (ViewCharBuf*)entry_ivars->value;
-        size_t token_len = ViewCB_Get_Size(value);
-        Token *seed = Token_new((char*)ViewCB_Get_Ptr8(value),
+        String *value = (String*)entry_ivars->value;
+        size_t token_len = Str_Get_Size(value);
+        Token *seed = Token_new((char*)Str_Get_Ptr8(value),
                                 token_len, 0, token_len, 1.0f, 1);
         DECREF(entry_ivars->inversion);
         entry_ivars->inversion = Inversion_new(seed);
@@ -215,7 +215,7 @@ InvEntry_init(InverterEntry *self, Schema *schema, const String *field,
         uint8_t prim_id = FType_Primitive_ID(ivars->type);
         switch (prim_id & FType_PRIMITIVE_ID_MASK) {
             case FType_TEXT:
-                ivars->value = (Obj*)ViewCB_new_from_trusted_utf8(NULL, 0);
+                ivars->value = NULL;
                 break;
             case FType_BLOB:
                 ivars->value = (Obj*)ViewBB_new(NULL, 0);
