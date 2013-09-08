@@ -295,15 +295,6 @@ class Clownfish::ViewCharBuf cnick ViewCB
     inert ViewCharBuf*
     init(ViewCharBuf *self, const char *utf8, size_t size);
 
-    void
-    Assign(ViewCharBuf *self, const String *other);
-
-    void
-    Assign_Str(ViewCharBuf *self, const char *utf8, size_t size);
-
-    void
-    Assign_Trusted_Str(ViewCharBuf *self, const char *utf8, size_t size);
-
     /** Throws an error. */
     char*
     Grow(ViewCharBuf *self, size_t size);

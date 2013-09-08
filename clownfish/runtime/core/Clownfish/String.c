@@ -592,27 +592,6 @@ ViewCB_Destroy_IMP(ViewCharBuf *self) {
     SUPER_DESTROY(self, STRING);
 }
 
-void
-ViewCB_Assign_IMP(ViewCharBuf *self, const String *other) {
-    self->ptr  = other->ptr;
-    self->size = other->size;
-}
-
-void
-ViewCB_Assign_Str_IMP(ViewCharBuf *self, const char *utf8, size_t size) {
-    if (!StrHelp_utf8_valid(utf8, size)) {
-        DIE_INVALID_UTF8(utf8, size);
-    }
-    self->ptr  = (char*)utf8;
-    self->size = size;
-}
-
-void
-ViewCB_Assign_Trusted_Str_IMP(ViewCharBuf *self, const char *utf8, size_t size) {
-    self->ptr  = (char*)utf8;
-    self->size = size;
-}
-
 char*
 ViewCB_Grow_IMP(ViewCharBuf *self, size_t size) {
     UNUSED_VAR(size);
