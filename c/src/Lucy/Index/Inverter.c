@@ -80,11 +80,9 @@ Inverter_Invert_Doc_IMP(Inverter *self, Doc *doc) {
         // Get the field value.
         switch (FType_Primitive_ID(type) & FType_PRIMITIVE_ID_MASK) {
             case FType_TEXT: {
-                    String *char_buf
-                        = (String*)CERTIFY(obj, STRING);
-                    ViewCharBuf *value
-                        = (ViewCharBuf*)inventry_ivars->value;
-                    ViewCB_Assign(value, char_buf);
+                    String *string = (String*)CERTIFY(obj, STRING);
+                    DECREF(inventry_ivars->value);
+                    inventry_ivars->value = INCREF(string);
                     break;
                 }
             case FType_BLOB: {
