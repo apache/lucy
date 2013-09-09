@@ -533,6 +533,7 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, VArray *spans,
         CB_Cat(buf, hl_frag);
         DECREF(hl_frag);
         DECREF(encoded);
+        DECREF(to_cat);
     }
 
     // Last text, beyond last highlight span.
