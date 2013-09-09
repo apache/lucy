@@ -102,26 +102,19 @@ F64SortCache_init(Float64SortCache *self, const String *field,
 }
 
 Obj*
-F64SortCache_Value_IMP(Float64SortCache *self, int32_t ord, Obj *blank) {
+F64SortCache_Value_IMP(Float64SortCache *self, int32_t ord) {
     Float64SortCacheIVARS *const ivars = F64SortCache_IVARS(self);
     if (ord == ivars->null_ord) {
         return NULL;
     }
     else if (ord < 0) {
         THROW(ERR, "Ordinal less than 0 for %o: %i32", ivars->field, ord);
+        UNREACHABLE_RETURN(Obj*);
     }
     else {
-        Float64 *num_blank = (Float64*)CERTIFY(blank, FLOAT64);
         InStream_Seek(ivars->dat_in, ord * sizeof(double));
-        Float64_Set_Value(num_blank, InStream_Read_F64(ivars->dat_in));
+        return (Obj*)Float64_new(InStream_Read_F64(ivars->dat_in));
     }
-    return blank;
-}
-
-Float64*
-F64SortCache_Make_Blank_IMP(Float64SortCache *self) {
-    UNUSED_VAR(self);
-    return Float64_new(0.0);
 }
 
 /***************************************************************************/
@@ -147,26 +140,19 @@ F32SortCache_init(Float32SortCache *self, const String *field,
 }
 
 Obj*
-F32SortCache_Value_IMP(Float32SortCache *self, int32_t ord, Obj *blank) {
+F32SortCache_Value_IMP(Float32SortCache *self, int32_t ord) {
     Float32SortCacheIVARS *const ivars = F32SortCache_IVARS(self);
     if (ord == ivars->null_ord) {
         return NULL;
     }
     else if (ord < 0) {
         THROW(ERR, "Ordinal less than 0 for %o: %i32", ivars->field, ord);
+        UNREACHABLE_RETURN(Obj*);
     }
     else {
-        Float32 *num_blank = (Float32*)CERTIFY(blank, FLOAT32);
         InStream_Seek(ivars->dat_in, ord * sizeof(float));
-        Float32_Set_Value(num_blank, InStream_Read_F32(ivars->dat_in));
+        return (Obj*)Float32_new(InStream_Read_F32(ivars->dat_in));
     }
-    return blank;
-}
-
-Float32*
-F32SortCache_Make_Blank_IMP(Float32SortCache *self) {
-    UNUSED_VAR(self);
-    return Float32_new(0.0f);
 }
 
 /***************************************************************************/
@@ -192,26 +178,19 @@ I32SortCache_init(Int32SortCache *self, const String *field,
 }
 
 Obj*
-I32SortCache_Value_IMP(Int32SortCache *self, int32_t ord, Obj *blank) {
+I32SortCache_Value_IMP(Int32SortCache *self, int32_t ord) {
     Int32SortCacheIVARS *const ivars = I32SortCache_IVARS(self);
     if (ord == ivars->null_ord) {
         return NULL;
     }
     else if (ord < 0) {
         THROW(ERR, "Ordinal less than 0 for %o: %i32", ivars->field, ord);
+        UNREACHABLE_RETURN(Obj*);
     }
     else {
-        Integer32 *int_blank = (Integer32*)CERTIFY(blank, INTEGER32);
         InStream_Seek(ivars->dat_in, ord * sizeof(int32_t));
-        Int32_Set_Value(int_blank, InStream_Read_I32(ivars->dat_in));
+        return (Obj*)Int32_new(InStream_Read_I32(ivars->dat_in));
     }
-    return blank;
-}
-
-Integer32*
-I32SortCache_Make_Blank_IMP(Int32SortCache *self) {
-    UNUSED_VAR(self);
-    return Int32_new(0);
 }
 
 /***************************************************************************/
@@ -237,26 +216,19 @@ I64SortCache_init(Int64SortCache *self, const String *field,
 }
 
 Obj*
-I64SortCache_Value_IMP(Int64SortCache *self, int32_t ord, Obj *blank) {
+I64SortCache_Value_IMP(Int64SortCache *self, int32_t ord) {
     Int64SortCacheIVARS *const ivars = I64SortCache_IVARS(self);
     if (ord == ivars->null_ord) {
         return NULL;
     }
     else if (ord < 0) {
         THROW(ERR, "Ordinal less than 0 for %o: %i32", ivars->field, ord);
+        UNREACHABLE_RETURN(Obj*);
     }
     else {
-        Integer64 *int_blank = (Integer64*)CERTIFY(blank, INTEGER64);
         InStream_Seek(ivars->dat_in, ord * sizeof(int64_t));
-        Int64_Set_Value(int_blank, InStream_Read_I64(ivars->dat_in));
+        return (Obj*)Int64_new(InStream_Read_I64(ivars->dat_in));
     }
-    return blank;
-}
-
-Integer64*
-I64SortCache_Make_Blank_IMP(Int64SortCache *self) {
-    UNUSED_VAR(self);
-    return Int64_new(0);
 }
 
 

@@ -89,7 +89,7 @@ TextSortCache_Destroy_IMP(TextSortCache *self) {
 #define NULL_SENTINEL -1
 
 Obj*
-TextSortCache_Value_IMP(TextSortCache *self, int32_t ord, Obj *blank) {
+TextSortCache_Value_IMP(TextSortCache *self, int32_t ord) {
     TextSortCacheIVARS *const ivars = TextSortCache_IVARS(self);
     if (ord == ivars->null_ord) {
         return NULL;
@@ -110,26 +110,13 @@ TextSortCache_Value_IMP(TextSortCache *self, int32_t ord, Obj *blank) {
         }
 
         // Read character data into String.
-        CERTIFY(blank, STRING);
-        int64_t len = next_offset - offset;
-        char *ptr = Str_Grow((String*)blank, (size_t)len);
+        size_t len = (size_t)(next_offset - offset);
+        char *ptr = (char*)MALLOCATE(len + 1);
         InStream_Seek(ivars->dat_in, offset);
-        InStream_Read_Bytes(ivars->dat_in, ptr, (size_t)len);
+        InStream_Read_Bytes(ivars->dat_in, ptr, len);
         ptr[len] = '\0';
-        if (!StrHelp_utf8_valid(ptr, (size_t)len)) {
-            Str_Set_Size((String*)blank, 0);
-            THROW(ERR, "Invalid UTF-8 at %i64 in %o", offset,
-                  InStream_Get_Filename(ivars->dat_in));
-        }
-        Str_Set_Size((String*)blank, (size_t)len);
+        return (Obj*)Str_new_steal_str(ptr, len, len + 1);
     }
-    return blank;
-}
-
-String*
-TextSortCache_Make_Blank_IMP(TextSortCache *self) {
-    UNUSED_VAR(self);
-    return Str_new_from_trusted_utf8("", 0);
 }
 
 
