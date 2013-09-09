@@ -17,7 +17,7 @@
 parcel Clownfish;
 
 /**
- * Growable buffer holding Unicode characters.
+ * Immutable string holding Unicode characters.
  */
 
 class Clownfish::String cnick Str
@@ -97,12 +97,6 @@ class Clownfish::String cnick Str
     inert bool
     less_than(const void *va, const void *vb);
 
-    public void
-    Mimic(String *self, Obj *other);
-
-    void
-    Mimic_Str(String *self, const char *ptr, size_t size);
-
     /** Return the concatenation of the String and <code>other</code>.
      */
     incremented String*
@@ -135,15 +129,6 @@ class Clownfish::String cnick Str
 
     public double
     To_F64(String *self);
-
-    /** Assign more memory to the String, if it doesn't already have enough
-     * room to hold a string of <code>size</code> bytes.  Cannot shrink the
-     * allocation.
-     *
-     * @return a pointer to the raw buffer.
-     */
-    char*
-    Grow(String *self, size_t size);
 
     /** Test whether the String starts with the content of another.
      */
@@ -183,11 +168,6 @@ class Clownfish::String cnick Str
      */
     size_t
     Length(String *self);
-
-    /** Set the String's <code>size</code> attribute.
-     */
-    void
-    Set_Size(String *self, size_t size);
 
     /** Get the String's <code>size</code> attribute.
      */
@@ -294,10 +274,6 @@ class Clownfish::ViewCharBuf cnick ViewCB
 
     inert ViewCharBuf*
     init(ViewCharBuf *self, const char *utf8, size_t size);
-
-    /** Throws an error. */
-    char*
-    Grow(ViewCharBuf *self, size_t size);
 
     public void
     Destroy(ViewCharBuf *self);
