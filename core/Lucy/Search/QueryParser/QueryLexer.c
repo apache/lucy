@@ -155,6 +155,7 @@ QueryLexer_Tokenize_IMP(QueryLexer *self, const String *query_string) {
         VA_Push(elems, (Obj*)elem);
     }
 
+    DECREF(iter);
     return elems;
 }
 
