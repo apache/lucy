@@ -436,14 +436,14 @@ SortFieldWriter_Refill_IMP(SortFieldWriter *self) {
     Hash *const      uniq_vals  = ivars->uniq_vals;
     I32Array *const  doc_map    = ivars->doc_map;
     SortCache *const sort_cache = ivars->sort_cache;
-    Obj *const       blank      = SortCache_Make_Blank(sort_cache);
 
     while (ivars->run_ord < ivars->run_cardinality
            && MemPool_Get_Consumed(ivars->mem_pool) < ivars->mem_thresh
           ) {
-        Obj *val = SortCache_Value(sort_cache, ivars->run_ord, blank);
+        Obj *val = SortCache_Value(sort_cache, ivars->run_ord);
         if (val) {
             Hash_Store(uniq_vals, val, (Obj*)CFISH_TRUE);
+            DECREF(val);
             break;
         }
         ivars->run_ord++;
@@ -457,9 +457,10 @@ SortFieldWriter_Refill_IMP(SortFieldWriter *self) {
                                ? I32Arr_Get(doc_map, raw_doc_id)
                                : raw_doc_id;
             if (remapped) {
-                Obj *val = SortCache_Value(sort_cache, ord, blank);
+                Obj *val = SortCache_Value(sort_cache, ord);
                 SortFieldWriter_Add(self, remapped, val);
                 count++;
+                DECREF(val);
             }
         }
         else if (ord > ivars->run_ord) {
@@ -475,7 +476,6 @@ SortFieldWriter_Refill_IMP(SortFieldWriter *self) {
         ivars->sort_cache = NULL;
     }
 
-    DECREF(blank);
     return count;
 }
 

@@ -295,15 +295,12 @@ SortColl_Collect_IMP(SortCollector *self, int32_t doc_id) {
 
             for (uint32_t i = 0, max = ivars->num_rules; i < max; i++) {
                 SortCache *cache   = ivars->sort_caches[i];
-                Obj       *old_val = (Obj*)VA_Delete(values, i);
+                Obj       *old_val = VA_Delete(values, i);
+                DECREF(old_val);
                 if (cache) {
                     int32_t ord = SortCache_Ordinal(cache, doc_id);
-                    Obj *blank = old_val
-                                 ? old_val
-                                 : SortCache_Make_Blank(cache);
-                    Obj *val = SortCache_Value(cache, ord, blank);
+                    Obj *val = SortCache_Value(cache, ord);
                     if (val) { VA_Store(values, i, (Obj*)val); }
-                    else     { DECREF(blank); }
                 }
             }
         }

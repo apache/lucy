@@ -111,22 +111,13 @@ SortCache_Find_IMP(SortCache *self, Obj *term) {
     int32_t          lo     = 0;
     int32_t          hi     = ivars->cardinality - 1;
     int32_t          result = -100;
-    Obj             *blank  = SortCache_Make_Blank(self);
-
-    if (term != NULL
-        && !Obj_Is_A(term, Obj_Get_VTable(blank))
-        && !Obj_Is_A(blank, Obj_Get_VTable(term))
-       ) {
-        THROW(ERR, "SortCache error for field %o: term is a %o, and not "
-              "comparable to a %o", ivars->field, Obj_Get_Class_Name(term),
-              Obj_Get_Class_Name(blank));
-    }
 
     // Binary search.
     while (hi >= lo) {
         const int32_t mid = lo + ((hi - lo) / 2);
-        Obj *val = SortCache_Value(self, mid, blank);
+        Obj *val = SortCache_Value(self, mid);
         int32_t comparison = FType_null_back_compare_values(type, term, val);
+        DECREF(val);
         if (comparison < 0) {
             hi = mid - 1;
         }
@@ -138,8 +129,6 @@ SortCache_Find_IMP(SortCache *self, Obj *term) {
             break;
         }
     }
-
-    DECREF(blank);
 
     if (hi < 0) {
         // Target is "less than" the first cache entry.

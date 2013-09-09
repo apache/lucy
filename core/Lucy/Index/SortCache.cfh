@@ -34,18 +34,11 @@ class Lucy::Index::SortCache inherits Clownfish::Obj {
          void *ords, int32_t cardinality, int32_t doc_max, int32_t null_ord = -1,
          int32_t ord_width);
 
-    /** Assign the value for ordinal <code>ord</code> to <code>blank</code>.
-     *
-     * @return either <code>blank</code> (no longer blank), or NULL if the
-     * value for <code>ord</code> is NULL.
+    /** Return the value for ordinal <code>ord</code>, or NULL if the value
+     * for <code>ord</code> is NULL.
      */
-    public abstract nullable Obj*
-    Value(SortCache *self, int32_t ord, Obj *blank);
-
-    /** Return an object appropriate for use as an argument to Value().
-     */
-    public abstract incremented Obj*
-    Make_Blank(SortCache *self);
+    public abstract nullable incremented Obj*
+    Value(SortCache *self, int32_t ord);
 
     public void*
     Get_Ords(SortCache *self);

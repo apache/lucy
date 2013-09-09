@@ -36,11 +36,8 @@ class Lucy::Index::SortCache::TextSortCache
          int32_t ord_width, InStream *ord_in, InStream *ix_in,
          InStream *dat_in);
 
-    public nullable Obj*
-    Value(TextSortCache *self, int32_t ord, Obj *blank);
-
-    public incremented String*
-    Make_Blank(TextSortCache *self);
+    public nullable incremented Obj*
+    Value(TextSortCache *self, int32_t ord);
 
     public void
     Destroy(TextSortCache *self);

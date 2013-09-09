@@ -936,10 +936,9 @@ CODE:
         CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
     }
     {
-        cfish_Obj *blank = LUCY_SortCache_Make_Blank(self);
-        cfish_Obj *value = LUCY_SortCache_Value(self, ord, blank);
+        cfish_Obj *value = LUCY_SortCache_Value(self, ord);
         RETVAL = XSBind_cfish_to_perl(value);
-        CFISH_DECREF(blank);
+        CFISH_DECREF(value);
     }
 }
 OUTPUT: RETVAL
