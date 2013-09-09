@@ -98,18 +98,9 @@ test_Cat(TestBatchRunner *runner) {
 }
 
 static void
-test_Mimic_and_Clone(TestBatchRunner *runner) {
+test_Clone(TestBatchRunner *runner) {
     String *wanted = S_get_str("foo");
     String *got    = S_get_str("bar");
-
-    Str_Mimic(got, (Obj*)wanted);
-    TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Mimic");
-    DECREF(got);
-
-    got = S_get_str("bar");
-    Str_Mimic_Str(got, "foo", 3);
-    TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Mimic_Str");
-    DECREF(got);
 
     got = Str_Clone(wanted);
     TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Clone");
@@ -133,8 +124,9 @@ test_Find(TestBatchRunner *runner) {
 
     string = S_get_str("afoo");
     TEST_TRUE(runner, Str_Find(string, substring) == 1, "Find after first");
-    Str_Set_Size(string, 3);
-    TEST_TRUE(runner, Str_Find(string, substring) == -1, "Don't overrun");
+    // TODO: Enable this test when we have real substrings.
+    /*Str_Set_Size(string, 3);
+    TEST_TRUE(runner, Str_Find(string, substring) == -1, "Don't overrun");*/
     DECREF(string);
 
     string = S_get_str("afood");
@@ -244,13 +236,14 @@ test_To_F64(TestBatchRunner *runner) {
     TEST_TRUE(runner, difference < 0.001, "To_F64 negative");
     DECREF(string);
 
-    string = S_get_str("1.59");
+    // TODO: Enable this test when we have real substrings.
+    /*string = S_get_str("1.59");
     double value_full = Str_To_F64(string);
     Str_Set_Size(string, 3);
     double value_short = Str_To_F64(string);
     TEST_TRUE(runner, value_short < value_full,
               "TO_F64 doesn't run past end of string");
-    DECREF(string);
+    DECREF(string);*/
 }
 
 static void
@@ -488,9 +481,9 @@ test_iterator_substring(TestBatchRunner *runner) {
 
 void
 TestStr_Run_IMP(TestString *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 103);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 99);
     test_Cat(runner);
-    test_Mimic_and_Clone(runner);
+    test_Clone(runner);
     test_Code_Point_At_and_From(runner);
     test_Find(runner);
     test_SubString(runner);

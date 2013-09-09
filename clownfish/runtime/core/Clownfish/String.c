@@ -175,22 +175,6 @@ Str_Hash_Sum_IMP(String *self) {
 }
 
 static void
-S_grow(String *self, size_t size) {
-    if (size >= self->cap) {
-        Str_Grow(self, size);
-    }
-}
-
-char*
-Str_Grow_IMP(String *self, size_t size) {
-    if (size >= self->cap) {
-        self->cap = size + 1;
-        self->ptr = (char*)REALLOCATE(self->ptr, self->cap);
-    }
-    return self->ptr;
-}
-
-static void
 S_die_invalid_utf8(const char *text, size_t size, const char *file, int line,
                    const char *func) {
     fprintf(stderr, "Invalid UTF-8, aborting: '");
@@ -306,26 +290,6 @@ Str_To_CB8_IMP(String *self) {
 String*
 Str_Clone_IMP(String *self) {
     return Str_new_from_trusted_utf8(self->ptr, self->size);
-}
-
-void
-Str_Mimic_Str_IMP(String *self, const char* ptr, size_t size) {
-    if (!StrHelp_utf8_valid(ptr, size)) {
-        DIE_INVALID_UTF8(ptr, size);
-    }
-    if (size >= self->cap) { S_grow(self, size); }
-    memmove(self->ptr, ptr, size);
-    self->size = size;
-    self->ptr[size] = '\0';
-}
-
-void
-Str_Mimic_IMP(String *self, Obj *other) {
-    String *twin = (String*)CERTIFY(other, STRING);
-    if (twin->size >= self->cap) { S_grow(self, twin->size); }
-    memmove(self->ptr, twin->ptr, twin->size);
-    self->size = twin->size;
-    self->ptr[twin->size] = '\0';
 }
 
 String*
@@ -526,11 +490,6 @@ Str_less_than(const void *va, const void *vb) {
     return Str_compare(va, vb) < 0 ? true : false;
 }
 
-void
-Str_Set_Size_IMP(String *self, size_t size) {
-    self->size = size;
-}
-
 size_t
 Str_Get_Size_IMP(String *self) {
     return self->size;
@@ -590,13 +549,6 @@ ViewCB_Destroy_IMP(ViewCharBuf *self) {
     // Note that we do not free self->ptr, and that we invoke the
     // SUPER_DESTROY with STRING instead of VIEWCHARBUF.
     SUPER_DESTROY(self, STRING);
-}
-
-char*
-ViewCB_Grow_IMP(ViewCharBuf *self, size_t size) {
-    UNUSED_VAR(size);
-    THROW(ERR, "Can't grow a ViewCharBuf ('%o')", self);
-    UNREACHABLE_RETURN(char*);
 }
 
 /*****************************************************************/
