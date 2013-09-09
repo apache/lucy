@@ -76,6 +76,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     DECREF(stored);
     DECREF(indexed);
     DECREF(boost_differs);
+    DECREF(class_differs);
     DECREF(other);
     DECREF(type);
 }
