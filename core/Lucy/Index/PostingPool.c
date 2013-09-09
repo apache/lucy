@@ -363,7 +363,6 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
     TermInfo      *const skip_tinfo       = TInfo_new(0);
     TermInfoIVARS *const tinfo_ivars      = TInfo_IVARS(tinfo);
     TermInfoIVARS *const skip_tinfo_ivars = TInfo_IVARS(skip_tinfo);
-    String        *const last_term_text   = Str_new(0);
     LexiconWriter *const lex_writer       = ivars->lex_writer;
     SkipStepper   *const skip_stepper     = ivars->skip_stepper;
     SkipStepperIVARS *const skip_stepper_ivars
@@ -378,7 +377,8 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
                               (*(RawPosting**)PostPool_Fetch(self)),
                               RAWPOSTING);
     RawPostingIVARS *post_ivars = RawPost_IVARS(posting);
-    Str_Mimic_Str(last_term_text, post_ivars->blob, post_ivars->content_len);
+    String *last_term_text
+        = Str_new_from_utf8(post_ivars->blob, post_ivars->content_len);
     char *last_text_buf = (char*)Str_Get_Ptr8(last_term_text);
     uint32_t last_text_size = Str_Get_Size(last_term_text);
     SkipStepper_Set_ID_And_Filepos(skip_stepper, 0, 0);
@@ -426,8 +426,9 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
             last_skip_filepos     = tinfo_ivars->post_filepos;
 
             // Remember the term_text so we can write string diffs.
-            Str_Mimic_Str(last_term_text, post_ivars->blob,
-                          post_ivars->content_len);
+            DECREF(last_term_text);
+            last_term_text
+                = Str_new_from_utf8(post_ivars->blob, post_ivars->content_len);
             last_text_buf  = (char*)Str_Get_Ptr8(last_term_text);
             last_text_size = Str_Get_Size(last_term_text);
         }
