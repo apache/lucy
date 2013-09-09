@@ -290,7 +290,7 @@ static CFISH_INLINE bool
 SI_window(FSFileHandle *self, FSFileHandleIVARS *ivars, FileWindow *window,
           int64_t offset, int64_t len) {
     // Release the previously mmap'd region, if any.
-    FSFH_release_window(self, window);
+    FSFH_Release_Window_IMP(self, window);
 
     // Start map on a page boundary.  Ensure that the window is at
     // least wide enough to view all the data spec'd in the original
