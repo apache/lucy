@@ -202,15 +202,10 @@ static void
 S_scan_to(SegLexicon *self, Obj *target) {
     SegLexiconIVARS *const ivars = SegLex_IVARS(self);
 
-    // (mildly evil encapsulation violation, since value can be null)
-    Obj *current = TermStepper_Get_Value(ivars->term_stepper);
-    if (!Obj_Is_A(target, Obj_Get_VTable(current))) {
-        THROW(ERR, "Target is a %o, and not comparable to a %o",
-              Obj_Get_Class_Name(target), Obj_Get_Class_Name(current));
-    }
-
     // Keep looping until the term text is ge target.
     do {
+        // (mildly evil encapsulation violation, since value can be null)
+        Obj *current = TermStepper_Get_Value(ivars->term_stepper);
         const int32_t comparison = Obj_Compare_To(current, target);
         if (comparison >= 0 && ivars->term_num != -1) { break; }
     } while (SegLex_Next(self));

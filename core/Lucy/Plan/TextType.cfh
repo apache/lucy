@@ -30,11 +30,16 @@ class Lucy::Plan::TextType inherits Lucy::Plan::FieldType {
 class Lucy::Index::TermStepper::TextTermStepper
     inherits Lucy::Index::TermStepper {
 
+    String *string;
+
     inert incremented TextTermStepper*
     new();
 
     inert TextTermStepper*
     init(TextTermStepper *self);
+
+    public void
+    Destroy(TextTermStepper *self);
 
     public void
     Reset(TextTermStepper *self);
@@ -44,6 +49,9 @@ class Lucy::Index::TermStepper::TextTermStepper
      */
     public void
     Set_Value(TextTermStepper *self, Obj *value = NULL);
+
+    public nullable Obj*
+    Get_Value(TextTermStepper *self);
 
     public void
     Write_Key_Frame(TextTermStepper *self, OutStream *outstream, Obj *value);
