@@ -304,7 +304,7 @@ CB_To_String_IMP(CharBuf *self) {
 String*
 CB_Yield_String_IMP(CharBuf *self) {
     String *retval
-        = Str_new_steal_from_trusted_str(self->ptr, self->size, self->cap);
+        = Str_new_steal_from_trusted_str(self->ptr, self->size);
     self->ptr  = NULL;
     self->size = 0;
     self->cap  = 0;

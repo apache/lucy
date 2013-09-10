@@ -77,8 +77,8 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
                     char *buf = (char*)MALLOCATE(value_len + 1);
                     InStream_Read_Bytes(dat_in, buf, value_len);
                     buf[value_len] = '\0'; 
-                    value = (Obj*)Str_new_steal_from_trusted_str(
-                                buf, value_len, value_len + 1);
+                    value
+                        = (Obj*)Str_new_steal_from_trusted_str(buf, value_len);
                     break;
                 }
             case FType_BLOB: {

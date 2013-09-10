@@ -25,7 +25,6 @@ class Clownfish::String cnick Str
 
     char    *ptr;
     size_t   size;
-    size_t   cap;  /* allocated bytes, including terminating null */
 
     inert incremented String*
     new(size_t size);
@@ -55,20 +54,19 @@ class Clownfish::String cnick Str
      * passed-in string.  Check validity of supplied UTF-8.
      */
     inert incremented String*
-    new_steal_str(char *ptr, size_t size, size_t cap);
+    new_steal_str(char *ptr, size_t size);
 
     /** Return a pointer to a new String which assumes ownership of the
      * passed-in string.  Do not check validity of supplied UTF-8.
      */
     inert incremented String*
-    new_steal_from_trusted_str(char *ptr, size_t size, size_t cap);
+    new_steal_from_trusted_str(char *ptr, size_t size);
 
     /** Initialize the String using the passed-in string.  Do not check
      * validity of supplied UTF-8.
      */
     public inert String*
-    init_steal_trusted_str(decremented String *self, char *ptr,
-                           size_t size, size_t cap);
+    init_steal_trusted_str(decremented String *self, char *ptr, size_t size);
 
     /** Return a String which holds a single character.
      */
