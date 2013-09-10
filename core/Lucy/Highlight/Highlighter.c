@@ -160,7 +160,7 @@ Highlighter_Create_Excerpt_IMP(Highlighter *self, HitDoc *hit_doc) {
     }
     else if (!Str_Get_Size(field_val)) {
         // Empty string yields empty string.
-        retval = Str_new(0);
+        retval = Str_new_from_trusted_utf8("", 0);
     }
     else {
         DocVector *doc_vec
@@ -431,7 +431,7 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, const String *field_val,
     String *raw_excerpt;
 
     if (!excerpt_len) {
-        raw_excerpt = Str_new(0);
+        raw_excerpt = Str_new_from_trusted_utf8("", 0);
     }
     else {
         String  *substring = StrIter_substring(top, tail);

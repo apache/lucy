@@ -354,7 +354,7 @@ Folder_List_R_IMP(Folder *self, const String *path) {
     Folder *local_folder = Folder_Find_Folder(self, path);
     VArray *list =  VA_new(0);
     if (local_folder) {
-        String *dir    = Str_new(20);
+        String *dir = Str_new_from_trusted_utf8("", 0);
         S_add_to_file_list(local_folder, list, dir, path);
         DECREF(dir);
     }

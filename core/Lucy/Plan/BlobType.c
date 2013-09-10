@@ -45,12 +45,6 @@ BlobType_Set_Sortable_IMP(BlobType *self, bool sortable) {
     if (sortable) { THROW(ERR, "BlobType fields can't be sortable"); }
 }
 
-ViewByteBuf*
-BlobType_Make_Blank_IMP(BlobType *self) {
-    UNUSED_VAR(self);
-    return ViewBB_new(NULL, 0);
-}
-
 int8_t
 BlobType_Primitive_ID_IMP(BlobType *self) {
     UNUSED_VAR(self);

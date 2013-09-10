@@ -853,10 +853,7 @@ CFISH_Err_To_Host_IMP(cfish_Err *self) {
 
 void
 cfish_Err_throw_mess(cfish_VTable *vtable, cfish_String *message) {
-    cfish_Err *err = (cfish_Err*)CFISH_VTable_Make_Obj(vtable);
-    cfish_Err_init(err, cfish_Str_new(0));
-    CFISH_Err_Cat_Mess(err, message);
-    CFISH_DECREF(message);
+    cfish_Err *err = cfish_Err_new(message);
     cfish_Err_do_throw(err);
 }
 

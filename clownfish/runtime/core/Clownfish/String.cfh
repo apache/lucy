@@ -26,12 +26,6 @@ class Clownfish::String cnick Str
     char    *ptr;
     size_t   size;
 
-    inert incremented String*
-    new(size_t size);
-
-    inert String*
-    init(String *self, size_t size);
-
     /** Return a new String which holds a copy of the passed-in string.
      * Check for UTF-8 validity.
      */
