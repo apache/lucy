@@ -216,14 +216,13 @@ Freezer_deserialize_string(String *string, InStream *instream) {
     if (size == SIZE_MAX) {
         THROW(ERR, "Can't deserialize SIZE_MAX bytes");
     }
-    size_t cap = Memory_oversize(size + 1, sizeof(char));
-    char *buf = MALLOCATE(cap);
+    char *buf = MALLOCATE(size + 1);
     InStream_Read_Bytes(instream, buf, size);
     buf[size] = '\0';
     if (!StrHelp_utf8_valid(buf, size)) {
         THROW(ERR, "Attempt to deserialize invalid UTF-8");
     }
-    return Str_init_steal_trusted_str(string, buf, size, cap);
+    return Str_init_steal_trusted_str(string, buf, size);
 }
 
 String*
@@ -339,7 +338,7 @@ Freezer_deserialize_hash(Hash *hash, InStream *instream) {
         char *key_buf = (char*)MALLOCATE(len + 1);
         InStream_Read_Bytes(instream, key_buf, len);
         key_buf[len] = '\0';
-        String *key = Str_new_steal_from_trusted_str(key_buf, len, len + 1);
+        String *key = Str_new_steal_from_trusted_str(key_buf, len);
         Hash_Store(hash, (Obj*)key, THAW(instream));
         DECREF(key);
     }

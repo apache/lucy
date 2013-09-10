@@ -72,7 +72,6 @@ Str_init(String *self, size_t size) {
 
     // Assign.
     self->size = 0;
-    self->cap  = size + 1;
 
     return self;
 }
@@ -102,32 +101,30 @@ Str_init_from_trusted_utf8(String *self, const char *ptr, size_t size) {
 
     // Assign.
     self->size      = size;
-    self->cap       = size + 1;
     self->ptr[size] = '\0'; // Null terminate.
 
     return self;
 }
 
 String*
-Str_new_steal_from_trusted_str(char *ptr, size_t size, size_t cap) {
+Str_new_steal_from_trusted_str(char *ptr, size_t size) {
     String *self = (String*)VTable_Make_Obj(STRING);
-    return Str_init_steal_trusted_str(self, ptr, size, cap);
+    return Str_init_steal_trusted_str(self, ptr, size);
 }
 
 String*
-Str_init_steal_trusted_str(String *self, char *ptr, size_t size, size_t cap) {
+Str_init_steal_trusted_str(String *self, char *ptr, size_t size) {
     self->ptr  = ptr;
     self->size = size;
-    self->cap  = cap;
     return self;
 }
 
 String*
-Str_new_steal_str(char *ptr, size_t size, size_t cap) {
+Str_new_steal_str(char *ptr, size_t size) {
     if (!StrHelp_utf8_valid(ptr, size)) {
         DIE_INVALID_UTF8(ptr, size);
     }
-    return Str_new_steal_from_trusted_str(ptr, size, cap);
+    return Str_new_steal_from_trusted_str(ptr, size);
 }
 
 String*
@@ -135,7 +132,6 @@ Str_new_from_char(uint32_t code_point) {
     const size_t MAX_UTF8_BYTES = 4;
     String *self = (String*)VTable_Make_Obj(STRING);
     self->ptr  = (char*)MALLOCATE(MAX_UTF8_BYTES + 1);
-    self->cap  = MAX_UTF8_BYTES + 1;
     self->size = StrHelp_encode_utf8_char(code_point, (uint8_t*)self->ptr);
     self->ptr[self->size] = '\0';
     return self;
@@ -313,8 +309,7 @@ Str_Cat_Trusted_UTF8_IMP(String *self, const char* ptr, size_t size) {
     memcpy(result_ptr + self->size, ptr, size);
     result_ptr[result_size] = '\0';
     String *result = (String*)VTable_Make_Obj(STRING);
-    return Str_init_steal_trusted_str(result, result_ptr, result_size,
-                                      result_size + 1);
+    return Str_init_steal_trusted_str(result, result_ptr, result_size);
 }
 
 bool
@@ -540,7 +535,6 @@ ViewCharBuf*
 ViewCB_init(ViewCharBuf *self, const char *utf8, size_t size) {
     self->ptr  = (char*)utf8;
     self->size = size;
-    self->cap  = 0;
     return self;
 }
 
@@ -558,7 +552,6 @@ SStr_new(void *allocation) {
     static char empty_string[] = "";
     StackString *self
         = (StackString*)VTable_Init_Obj(STACKSTRING, allocation);
-    self->cap  = 0;
     self->size = 0;
     self->ptr  = empty_string;
     return self;
@@ -568,7 +561,6 @@ StackString*
 SStr_new_from_str(void *allocation, size_t alloc_size, String *string) {
     StackString *self
         = (StackString*)VTable_Init_Obj(STACKSTRING, allocation);
-    self->cap  = alloc_size - sizeof(StackString);
     self->size = Str_Get_Size(string);
     self->ptr  = ((char*)allocation) + sizeof(StackString);
 
@@ -586,7 +578,6 @@ StackString*
 SStr_wrap_str(void *allocation, const char *ptr, size_t size) {
     StackString *self
         = (StackString*)VTable_Init_Obj(STACKSTRING, allocation);
-    self->cap  = 0;
     self->size = size;
     self->ptr  = (char*)ptr;
     return self;
