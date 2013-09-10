@@ -425,26 +425,23 @@ int
 Str_compare(const void *va, const void *vb) {
     const String *a = *(const String**)va;
     const String *b = *(const String**)vb;
+    size_t min_size;
+    int    tie;
 
-    StackStringIterator *iter_a = STR_STACKTOP(a);
-    StackStringIterator *iter_b = STR_STACKTOP(b);
-
-    while (true) {
-        uint32_t code_point_a = SStrIter_Next(iter_a);
-        uint32_t code_point_b = SStrIter_Next(iter_b);
-
-        if (code_point_a == STRITER_DONE) {
-            return code_point_b == STRITER_DONE ? 0 : -1;
-        }
-        if (code_point_b == STRITER_DONE) {
-            return 1;
-        }
-        if (code_point_a != code_point_b) {
-            return code_point_a < code_point_b ? -1 : 1;
-        }
+    if (a->size <= b->size) {
+        min_size = a->size;
+        tie      = a->size < b->size ? -1 : 0;
+    }
+    else {
+        min_size = b->size;
+        tie      = 1;
     }
 
-    UNREACHABLE_RETURN(int);
+    int comparison = memcmp(a->ptr, b->ptr, min_size);
+    if (comparison < 0) { return -1; }
+    if (comparison > 0) { return 1; }
+
+    return tie;
 }
 
 bool
