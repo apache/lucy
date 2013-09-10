@@ -24,12 +24,6 @@
 #include "Clownfish/CharBuf.h"
 #include "Clownfish/Util/StringHelper.h"
 
-String*
-TextType_Make_Blank_IMP(TextType *self) {
-    UNUSED_VAR(self);
-    return Str_new(0);
-}
-
 TermStepper*
 TextType_Make_Term_Stepper_IMP(TextType *self) {
     UNUSED_VAR(self);

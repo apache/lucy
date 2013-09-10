@@ -42,9 +42,6 @@ public class Lucy::Plan::BlobType inherits Lucy::Plan::FieldType {
     public void
     Set_Sortable(BlobType *self, bool sortable);
 
-    incremented ViewByteBuf*
-    Make_Blank(BlobType *self);
-
     int8_t
     Primitive_ID(BlobType *self);
 

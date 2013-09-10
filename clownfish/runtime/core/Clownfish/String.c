@@ -53,26 +53,6 @@ S_die_invalid_utf8(const char *text, size_t size, const char *file, int line,
                    const char *func);
 
 String*
-Str_new(size_t size) {
-    String *self = (String*)VTable_Make_Obj(STRING);
-    return Str_init(self, size);
-}
-
-String*
-Str_init(String *self, size_t size) {
-    // Derive.
-    self->ptr = (char*)MALLOCATE(size + 1);
-
-    // Init.
-    *self->ptr = '\0'; // Empty string.
-
-    // Assign.
-    self->size = 0;
-
-    return self;
-}
-
-String*
 Str_new_from_utf8(const char *ptr, size_t size) {
     if (!StrHelp_utf8_valid(ptr, size)) {
         DIE_INVALID_UTF8(ptr, size);

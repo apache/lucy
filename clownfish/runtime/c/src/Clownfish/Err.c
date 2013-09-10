@@ -72,10 +72,7 @@ Err_To_Host_IMP(Err *self) {
 
 void
 Err_throw_mess(VTable *vtable, String *message) {
-    Err *err = (Err*)VTable_Make_Obj(vtable);
-    Err_init(err, Str_new(0));
-    Err_Cat_Mess(err, message);
-    DECREF(message);
+    Err *err = Err_new(message);
     Err_do_throw(err);
 }
 

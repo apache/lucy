@@ -98,7 +98,7 @@ test_Hash_Sum(TestBatchRunner *runner) {
 
 static void
 test_Is_A(TestBatchRunner *runner) {
-    String *string     = Str_new(0);
+    String *string     = Str_new_from_trusted_utf8("", 0);
     VTable *str_vtable = Str_Get_VTable(string);
     String *klass      = Str_Get_Class_Name(string);
 

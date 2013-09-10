@@ -17,9 +17,6 @@
 parcel Lucy;
 
 class Lucy::Plan::TextType inherits Lucy::Plan::FieldType {
-    incremented String*
-    Make_Blank(TextType *self);
-
     incremented TermStepper*
     Make_Term_Stepper(TextType *self);
 

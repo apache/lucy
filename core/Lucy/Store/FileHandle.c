@@ -24,7 +24,7 @@ int32_t FH_object_count = 0;
 FileHandle*
 FH_do_open(FileHandle *self, const String *path, uint32_t flags) {
     FileHandleIVARS *const ivars = FH_IVARS(self);
-    ivars->path    = path ? Str_Clone(path) : Str_new(0);
+    ivars->path    = path ? Str_Clone(path) : Str_new_from_trusted_utf8("", 0);
     ivars->flags   = flags;
 
     // Track number of live FileHandles released into the wild.
