@@ -52,10 +52,6 @@ static void
 S_die_invalid_utf8(const char *text, size_t size, const char *file, int line,
                    const char *func);
 
-// Helper function for throwing invalid pattern error.
-static void
-S_die_invalid_pattern(const char *pattern);
-
 String*
 Str_new(size_t size) {
     String *self = (String*)VTable_Make_Obj(STRING);
@@ -178,15 +174,6 @@ S_die_invalid_utf8(const char *text, size_t size, const char *file, int line,
     if (size > 200) { fwrite("[...]", sizeof(char), 5, stderr); }
     fprintf(stderr, "' (length %lu)\n", (unsigned long)size);
     Err_throw_at(ERR, file, line, func, "Invalid UTF-8");
-}
-
-static void
-S_die_invalid_pattern(const char *pattern) {
-    size_t  pattern_len = strlen(pattern);
-    fprintf(stderr, "Invalid pattern, aborting: '");
-    fwrite(pattern, sizeof(char), pattern_len, stderr);
-    fprintf(stderr, "'\n");
-    THROW(ERR, "Invalid pattern.");
 }
 
 String*
