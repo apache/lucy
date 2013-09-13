@@ -205,7 +205,7 @@ S_write_boot_c(CFCRuby *self) {
         "%s() {\n"
         "    %sbootstrap_parcel();\n"
         "\n"
-        "    cfish_StackString *alias = CFISH_SStr_WRAP_STR(\"\", 0);\n"
+        "    cfish_StackString *alias = CFISH_SSTR_WRAP_STR(\"\", 0);\n"
         "}\n"
         "\n"
         "%s\n"

@@ -423,20 +423,20 @@ class Clownfish::StackStringIterator cnick SStrIter
 
 __C__
 
-#define CFISH_SStr_BLANK() cfish_SStr_new(cfish_alloca(cfish_SStr_size()))
+#define CFISH_SSTR_BLANK() cfish_SStr_new(cfish_alloca(cfish_SStr_size()))
 
-#define CFISH_SStr_WRAP(source) \
+#define CFISH_SSTR_WRAP(source) \
     cfish_SStr_wrap(cfish_alloca(cfish_SStr_size()), source)
 
-#define CFISH_SStr_WRAP_STR(ptr, size) \
+#define CFISH_SSTR_WRAP_STR(ptr, size) \
     cfish_SStr_wrap_str(cfish_alloca(cfish_SStr_size()), ptr, size)
 
 #define CFISH_STRITER_DONE  UINT32_MAX
 
 #ifdef CFISH_USE_SHORT_NAMES
-  #define SStr_BLANK             CFISH_SStr_BLANK
-  #define SSTR_WRAP              CFISH_SStr_WRAP
-  #define SSTR_WRAP_STR          CFISH_SStr_WRAP_STR
+  #define SSTR_BLANK             CFISH_SSTR_BLANK
+  #define SSTR_WRAP              CFISH_SSTR_WRAP
+  #define SSTR_WRAP_STR          CFISH_SSTR_WRAP_STR
   #define STRITER_DONE          CFISH_STRITER_DONE
 #endif
 __END_C__
