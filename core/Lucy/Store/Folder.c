@@ -262,7 +262,7 @@ Folder_Open_Dir_IMP(Folder *self, const String *path) {
         folder = Folder_Find_Folder(self, path);
     }
     else {
-        StackString *empty = SStr_BLANK();
+        StackString *empty = SSTR_BLANK();
         folder = Folder_Find_Folder(self, (String*)empty);
     }
     if (!folder) {

@@ -137,7 +137,7 @@ test_Local_Find_Folder(TestBatchRunner *runner, set_up_t set_up,
     local = Folder_Local_Find_Folder(folder, nope);
     TEST_TRUE(runner, local == NULL, "Non-existent entry yields NULL");
 
-    StackString *empty = SStr_BLANK();
+    StackString *empty = SSTR_BLANK();
     local = Folder_Local_Find_Folder(folder, (String*)empty);
     TEST_TRUE(runner, local == NULL, "Empty string yields NULL");
 

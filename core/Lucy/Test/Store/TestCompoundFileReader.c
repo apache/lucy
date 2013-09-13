@@ -78,7 +78,7 @@ S_folder_with_contents() {
     OutStream_Close(bar_out);
     DECREF(foo_out);
     DECREF(bar_out);
-    StackString *empty = SStr_BLANK();
+    StackString *empty = SSTR_BLANK();
     RAMFolder_Consolidate(folder, (String*)empty);
     return (Folder*)folder;
 }
