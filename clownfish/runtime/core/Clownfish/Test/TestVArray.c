@@ -278,7 +278,7 @@ test_Clone_and_Shallow_Copy(TestBatchRunner *runner) {
     uint32_t i;
 
     for (i = 0; i < 10; i++) {
-        VA_Push(array, (Obj*)Str_newf("%u32", i));
+        VA_Push(array, (Obj*)Int32_new(i));
     }
     twin = VA_Shallow_Copy(array);
     TEST_TRUE(runner, VA_Equals(array, (Obj*)twin), "Shallow_Copy");

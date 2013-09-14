@@ -164,6 +164,20 @@ S_new_substring(String *origin, size_t byte_offset, size_t size) {
     return self;
 }
 
+Obj*
+Str_Inc_RefCount_IMP(String *self) {
+    if (self->origin == NULL) {
+        // Copy wrapped strings when the refcount is increased.
+        String *copy = (String*)VTable_Make_Obj(STRING);
+        return (Obj*)Str_init_from_trusted_utf8(copy, self->ptr, self->size);
+    }
+    else {
+        Str_Inc_RefCount_t super_incref
+            = SUPER_METHOD_PTR(STRING, CFISH_Str_Inc_RefCount);
+        return super_incref(self);
+    }
+}
+
 void
 Str_Destroy_IMP(String *self) {
     if (self->origin == self) {
@@ -202,7 +216,7 @@ S_die_invalid_utf8(const char *text, size_t size, const char *file, int line,
 
 String*
 Str_To_String_IMP(String *self) {
-    return Str_new_from_trusted_utf8(self->ptr, self->size);
+    return (String*)INCREF(self);
 }
 
 String*
@@ -291,7 +305,7 @@ Str_To_Utf8_IMP(String *self) {
 
 String*
 Str_Clone_IMP(String *self) {
-    return Str_new_from_trusted_utf8(self->ptr, self->size);
+    return (String*)INCREF(self);
 }
 
 String*
