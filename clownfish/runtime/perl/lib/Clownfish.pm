@@ -162,14 +162,6 @@ sub error {$Clownfish::Err::error}
 }
 
 {
-    package Clownfish::ViewCharBuf;
-    our $VERSION = '0.003000';
-    $VERSION = eval $VERSION;
-    use Carp;
-    sub new { confess "ViewCharBuf has no public constructor." }
-}
-
-{
     package Clownfish::StackString;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;

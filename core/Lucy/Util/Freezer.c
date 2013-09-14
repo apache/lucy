@@ -222,7 +222,7 @@ Freezer_deserialize_string(String *string, InStream *instream) {
     if (!StrHelp_utf8_valid(buf, size)) {
         THROW(ERR, "Attempt to deserialize invalid UTF-8");
     }
-    return Str_init_steal_trusted_str(string, buf, size);
+    return Str_init_steal_trusted_utf8(string, buf, size);
 }
 
 String*
@@ -338,7 +338,7 @@ Freezer_deserialize_hash(Hash *hash, InStream *instream) {
         char *key_buf = (char*)MALLOCATE(len + 1);
         InStream_Read_Bytes(instream, key_buf, len);
         key_buf[len] = '\0';
-        String *key = Str_new_steal_from_trusted_str(key_buf, len);
+        String *key = Str_new_steal_utf8(key_buf, len);
         Hash_Store(hash, (Obj*)key, THAW(instream));
         DECREF(key);
     }

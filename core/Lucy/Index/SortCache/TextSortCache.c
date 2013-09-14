@@ -115,7 +115,7 @@ TextSortCache_Value_IMP(TextSortCache *self, int32_t ord) {
         InStream_Seek(ivars->dat_in, offset);
         InStream_Read_Bytes(ivars->dat_in, ptr, len);
         ptr[len] = '\0';
-        return (Obj*)Str_new_steal_str(ptr, len);
+        return (Obj*)Str_new_steal_utf8(ptr, len);
     }
 }
 

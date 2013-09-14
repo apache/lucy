@@ -15,7 +15,6 @@
  */
 
 #define C_CFISH_STRING
-#define C_CFISH_VIEWCHARBUF
 #define C_CFISH_STACKSTRING
 #define C_CFISH_STRINGITERATOR
 #define C_CFISH_STACKSTRINGITERATOR
@@ -53,18 +52,18 @@ S_die_invalid_utf8(const char *text, size_t size, const char *file, int line,
                    const char *func);
 
 String*
-Str_new_from_utf8(const char *ptr, size_t size) {
-    if (!StrHelp_utf8_valid(ptr, size)) {
-        DIE_INVALID_UTF8(ptr, size);
+Str_new_from_utf8(const char *utf8, size_t size) {
+    if (!StrHelp_utf8_valid(utf8, size)) {
+        DIE_INVALID_UTF8(utf8, size);
     }
     String *self = (String*)VTable_Make_Obj(STRING);
-    return Str_init_from_trusted_utf8(self, ptr, size);
+    return Str_init_from_trusted_utf8(self, utf8, size);
 }
 
 String*
-Str_new_from_trusted_utf8(const char *ptr, size_t size) {
+Str_new_from_trusted_utf8(const char *utf8, size_t size) {
     String *self = (String*)VTable_Make_Obj(STRING);
-    return Str_init_from_trusted_utf8(self, ptr, size);
+    return Str_init_from_trusted_utf8(self, utf8, size);
 }
 
 String*
@@ -77,31 +76,57 @@ Str_init_from_trusted_utf8(String *self, const char *utf8, size_t size) {
     ptr[size] = '\0'; // Null terminate.
 
     // Assign.
-    self->ptr  = ptr;
-    self->size = size;
+    self->ptr    = ptr;
+    self->size   = size;
+    self->origin = self;
 
     return self;
 }
 
 String*
-Str_new_steal_from_trusted_str(const char *ptr, size_t size) {
-    String *self = (String*)VTable_Make_Obj(STRING);
-    return Str_init_steal_trusted_str(self, ptr, size);
-}
-
-String*
-Str_init_steal_trusted_str(String *self, const char *ptr, size_t size) {
-    self->ptr  = ptr;
-    self->size = size;
-    return self;
-}
-
-String*
-Str_new_steal_str(const char *ptr, size_t size) {
-    if (!StrHelp_utf8_valid(ptr, size)) {
-        DIE_INVALID_UTF8(ptr, size);
+Str_new_steal_utf8(const char *utf8, size_t size) {
+    if (!StrHelp_utf8_valid(utf8, size)) {
+        DIE_INVALID_UTF8(utf8, size);
     }
-    return Str_new_steal_from_trusted_str(ptr, size);
+    String *self = (String*)VTable_Make_Obj(STRING);
+    return Str_init_steal_trusted_utf8(self, utf8, size);
+}
+
+String*
+Str_new_steal_trusted_utf8(const char *utf8, size_t size) {
+    String *self = (String*)VTable_Make_Obj(STRING);
+    return Str_init_steal_trusted_utf8(self, utf8, size);
+}
+
+String*
+Str_init_steal_trusted_utf8(String *self, const char *utf8, size_t size) {
+    self->ptr    = utf8;
+    self->size   = size;
+    self->origin = self;
+    return self;
+}
+
+String*
+Str_new_wrap_utf8(const char *utf8, size_t size) {
+    if (!StrHelp_utf8_valid(utf8, size)) {
+        DIE_INVALID_UTF8(utf8, size);
+    }
+    String *self = (String*)VTable_Make_Obj(STRING);
+    return Str_init_wrap_trusted_utf8(self, utf8, size);
+}
+
+String*
+Str_new_wrap_trusted_utf8(const char *utf8, size_t size) {
+    String *self = (String*)VTable_Make_Obj(STRING);
+    return Str_init_wrap_trusted_utf8(self, utf8, size);
+}
+
+String*
+Str_init_wrap_trusted_utf8(String *self, const char *ptr, size_t size) {
+    self->ptr    = ptr;
+    self->size   = size;
+    self->origin = NULL;
+    return self;
 }
 
 String*
@@ -112,8 +137,9 @@ Str_new_from_char(uint32_t code_point) {
     ptr[size] = '\0';
 
     String *self = (String*)VTable_Make_Obj(STRING);
-    self->ptr  = ptr;
-    self->size = size;
+    self->ptr    = ptr;
+    self->size   = size;
+    self->origin = self;
     return self;
 }
 
@@ -129,9 +155,23 @@ Str_newf(const char *pattern, ...) {
     return self;
 }
 
+static String*
+S_new_substring(String *origin, size_t byte_offset, size_t size) {
+    String *self = (String*)VTable_Make_Obj(STRING);
+    self->ptr    = origin->ptr + byte_offset;
+    self->size   = size;
+    self->origin = (String*)INCREF(origin);
+    return self;
+}
+
 void
 Str_Destroy_IMP(String *self) {
-    FREEMEM((char*)self->ptr);
+    if (self->origin == self) {
+        FREEMEM((char*)self->ptr);
+    }
+    else {
+        DECREF(self->origin);
+    }
     SUPER_DESTROY(self, STRING);
 }
 
@@ -275,7 +315,7 @@ Str_Cat_Trusted_Utf8_IMP(String *self, const char* ptr, size_t size) {
     memcpy(result_ptr + self->size, ptr, size);
     result_ptr[result_size] = '\0';
     String *result = (String*)VTable_Make_Obj(STRING);
-    return Str_init_steal_trusted_str(result, result_ptr, result_size);
+    return Str_init_steal_trusted_utf8(result, result_ptr, result_size);
 }
 
 bool
@@ -411,13 +451,12 @@ Str_SubString_IMP(String *self, size_t offset, size_t len) {
     StackStringIterator *iter = STR_STACKTOP(self);
 
     SStrIter_Advance(iter, offset);
-    int start_offset = iter->byte_offset;
-    const char *sub_start = self->ptr + start_offset;
+    size_t start_offset = iter->byte_offset;
 
     SStrIter_Advance(iter, len);
-    size_t byte_len = iter->byte_offset - start_offset;
+    size_t size = iter->byte_offset - start_offset;
 
-    return Str_new_from_trusted_utf8(sub_start, byte_len);
+    return S_new_substring(self, start_offset, size);
 }
 
 int
@@ -480,46 +519,6 @@ Str_StackTail_IMP(String *self, void *allocation) {
 
 /*****************************************************************/
 
-ViewCharBuf*
-ViewCB_new_from_utf8(const char *utf8, size_t size) {
-    if (!StrHelp_utf8_valid(utf8, size)) {
-        DIE_INVALID_UTF8(utf8, size);
-    }
-    return ViewCB_new_from_trusted_utf8(utf8, size);
-}
-
-ViewCharBuf*
-ViewCB_new_from_trusted_utf8(const char *utf8, size_t size) {
-    ViewCharBuf *self = (ViewCharBuf*)VTable_Make_Obj(VIEWCHARBUF);
-    return ViewCB_init(self, utf8, size);
-}
-
-ViewCharBuf*
-ViewCB_init(ViewCharBuf *self, const char *utf8, size_t size) {
-    self->ptr  = utf8;
-    self->size = size;
-    return self;
-}
-
-void
-ViewCB_Destroy_IMP(ViewCharBuf *self) {
-    // Note that we do not free self->ptr, and that we invoke the
-    // SUPER_DESTROY with STRING instead of VIEWCHARBUF.
-    SUPER_DESTROY(self, STRING);
-}
-
-/*****************************************************************/
-
-StackString*
-SStr_new(void *allocation) {
-    static char empty_string[] = "";
-    StackString *self
-        = (StackString*)VTable_Init_Obj(STACKSTRING, allocation);
-    self->size = 0;
-    self->ptr  = empty_string;
-    return self;
-}
-
 StackString*
 SStr_new_from_str(void *allocation, size_t alloc_size, String *string) {
     size_t  size = string->size;
@@ -533,8 +532,9 @@ SStr_new_from_str(void *allocation, size_t alloc_size, String *string) {
     ptr[size] = '\0';
 
     StackString *self = (StackString*)VTable_Init_Obj(STACKSTRING, allocation);
-    self->ptr  = ptr;
-    self->size = size;
+    self->ptr    = ptr;
+    self->size   = size;
+    self->origin = NULL;
     return self;
 }
 
@@ -542,8 +542,9 @@ StackString*
 SStr_wrap_str(void *allocation, const char *ptr, size_t size) {
     StackString *self
         = (StackString*)VTable_Init_Obj(STACKSTRING, allocation);
-    self->size = size;
-    self->ptr  = ptr;
+    self->size   = size;
+    self->ptr    = ptr;
+    self->origin = NULL;
     return self;
 }
 
@@ -607,8 +608,7 @@ StrIter_substring(StringIterator *top, StringIterator *tail) {
         }
     }
 
-    return Str_new_from_trusted_utf8(string->ptr + top_offset,
-                                     tail_offset - top_offset);
+    return S_new_substring(string, top_offset, tail_offset - top_offset);
 }
 
 StringIterator*

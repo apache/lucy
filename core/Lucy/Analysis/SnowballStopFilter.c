@@ -144,7 +144,7 @@ SnowStop_gen_stoplist(const String *language) {
     NoCloneHash *stoplist = NoCloneHash_new(num_stopwords);
     for (uint32_t i = 0; words[i] != NULL; i++) {
         char *word = (char*)words[i];
-        ViewCharBuf *stop = ViewCB_new_from_trusted_utf8(word, strlen(word));
+        String *stop = Str_new_wrap_trusted_utf8(word, strlen(word));
         NoCloneHash_Store(stoplist, (Obj*)stop, (Obj*)Str_newf(""));
         DECREF(stop);
     }

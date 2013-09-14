@@ -101,7 +101,7 @@ LUCY_Inverter_Invert_Doc_IMP(lucy_Inverter *self, lucy_Doc *doc) {
                     char *val_ptr = SvPVutf8(value_sv, val_len);
                     CFISH_DECREF(entry_ivars->value);
                     entry_ivars->value
-                        = (cfish_Obj*)cfish_ViewCB_new_from_trusted_utf8(
+                        = (cfish_Obj*)cfish_Str_new_wrap_trusted_utf8(
                                 val_ptr, val_len);
                     break;
                 }
