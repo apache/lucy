@@ -158,7 +158,7 @@ LUCY_Doc_Extract_IMP(lucy_Doc *self, cfish_String *field) {
         else {
             STRLEN size;
             char *ptr = SvPVutf8(sv, size);
-            retval = (cfish_Obj*)cfish_ViewCB_new_from_trusted_utf8(ptr, size);
+            retval = (cfish_Obj*)cfish_Str_new_wrap_trusted_utf8(ptr, size);
         }
     }
 

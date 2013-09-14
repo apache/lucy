@@ -654,7 +654,7 @@ S_unescape_text(const char *top, const char *end) {
         Err_set_error(Err_new(mess));
         return NULL;
     }
-    return Str_new_steal_from_trusted_str(target_buf, target_size);
+    return Str_new_steal_trusted_utf8(target_buf, target_size);
 }
 
 static CFISH_INLINE bool

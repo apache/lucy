@@ -176,23 +176,6 @@ to_perl(self)
 CODE:
     RETVAL = XSBind_str_to_sv(self);
 OUTPUT: RETVAL
-
-MODULE = Clownfish     PACKAGE = Clownfish::ViewCharBuf
-
-SV*
-_new(unused, sv)
-    SV *unused;
-    SV *sv;
-CODE:
-{
-    STRLEN size;
-    char *ptr = SvPVutf8(sv, size);
-    cfish_ViewCharBuf *self
-        = cfish_ViewCB_new_from_trusted_utf8(ptr, size);
-    CFISH_UNUSED_VAR(unused);
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
-}
-OUTPUT: RETVAL
 END_XS_CODE
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(

@@ -25,6 +25,7 @@ class Clownfish::String cnick Str
 
     const char *ptr;
     size_t      size;
+    String     *origin;
 
     /** Return a new String which holds a copy of the passed-in string.
      * Check for UTF-8 validity.
@@ -48,19 +49,39 @@ class Clownfish::String cnick Str
      * passed-in string.  Check validity of supplied UTF-8.
      */
     inert incremented String*
-    new_steal_str(const char *ptr, size_t size);
+    new_steal_utf8(const char *utf8, size_t size);
 
     /** Return a pointer to a new String which assumes ownership of the
      * passed-in string.  Do not check validity of supplied UTF-8.
      */
     inert incremented String*
-    new_steal_from_trusted_str(const char *ptr, size_t size);
+    new_steal_trusted_utf8(const char *utf8, size_t size);
 
     /** Initialize the String using the passed-in string.  Do not check
      * validity of supplied UTF-8.
      */
     public inert String*
-    init_steal_trusted_str(String *self, const char *ptr, size_t size);
+    init_steal_trusted_utf8(String *self, const char *utf8, size_t size);
+
+    /** Return a pointer to a new String which wraps an external buffer
+     * containing UTF-8.  The buffer must stay unchanged for the lifetime
+     * of the String.  Check validity of supplied UTF-8.
+     */
+    inert incremented String*
+    new_wrap_utf8(const char *utf8, size_t size);
+
+    /** Return a pointer to a new String which wraps an external buffer
+     * containing UTF-8.  The buffer must stay unchanged for the lifetime
+     * of the String.  Do not check validity of supplied UTF-8.
+     */
+    inert incremented String*
+    new_wrap_trusted_utf8(const char *utf8, size_t size);
+
+    /** Initialize the String which wraps an external buffer containing
+     * UTF-8.  Do not check validity of supplied UTF-8.
+     */
+    public inert String*
+    init_wrap_trusted_utf8(String *self, const char *utf8, size_t size);
 
     /** Return a String which holds a single character.
      */
@@ -256,29 +277,8 @@ class Clownfish::String cnick Str
     StackTail(String *self, void *allocation);
 }
 
-class Clownfish::ViewCharBuf cnick ViewCB
-    inherits Clownfish::String {
-
-    inert incremented ViewCharBuf*
-    new_from_utf8(const char *utf8, size_t size);
-
-    inert incremented ViewCharBuf*
-    new_from_trusted_utf8(const char *utf8, size_t size);
-
-    inert ViewCharBuf*
-    init(ViewCharBuf *self, const char *utf8, size_t size);
-
-    public void
-    Destroy(ViewCharBuf *self);
-}
-
 class Clownfish::StackString cnick SStr
-    inherits Clownfish::ViewCharBuf {
-
-    /** Return a StackString with a blank string.
-     */
-    inert incremented StackString*
-    new(void *allocation);
+    inherits Clownfish::String {
 
     /**
      * @param allocation A single block of memory which will be used for both
@@ -424,7 +424,8 @@ class Clownfish::StackStringIterator cnick SStrIter
 
 __C__
 
-#define CFISH_SSTR_BLANK() cfish_SStr_new(cfish_alloca(cfish_SStr_size()))
+#define CFISH_SSTR_BLANK() \
+   cfish_SStr_wrap_str(cfish_alloca(cfish_SStr_size()), "", 0)
 
 #define CFISH_SSTR_WRAP(source) \
     cfish_SStr_wrap(cfish_alloca(cfish_SStr_size()), source)

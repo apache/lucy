@@ -96,7 +96,6 @@ XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation) {
         }
         else if (allocation &&
                  (vtable == CFISH_STACKSTRING
-                  || vtable == CFISH_VIEWCHARBUF
                   || vtable == CFISH_STRING
                   || vtable == CFISH_OBJ)
                 ) {

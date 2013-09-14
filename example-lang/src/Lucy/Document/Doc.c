@@ -55,8 +55,7 @@ lucy_Doc_deserialize(lucy_Doc *self, lucy_InStream *instream) {
 }
 
 lucy_Obj*
-lucy_Doc_extract(lucy_Doc *self, lucy_CharBuf *field,
-                 lucy_ViewCharBuf *target) {
+lucy_Doc_extract(lucy_Doc *self, lucy_CharBuf *field) {
     THROW(LUCY_ERR, "TODO");
     UNREACHABLE_RETURN(lucy_Obj*);
 }
