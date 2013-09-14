@@ -204,8 +204,8 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
 
 void
 Freezer_serialize_string(String *string, OutStream *outstream) {
-    size_t size  = Str_Get_Size(string);
-    uint8_t *buf = Str_Get_Ptr8(string);
+    size_t      size = Str_Get_Size(string);
+    const char *buf  = Str_Get_Ptr8(string);
     OutStream_Write_C64(outstream, size);
     OutStream_Write_Bytes(outstream, buf, size);
 }

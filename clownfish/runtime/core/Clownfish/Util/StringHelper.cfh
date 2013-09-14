@@ -67,7 +67,7 @@ inert class Clownfish::Util::StringHelper cnick StrHelp {
      * If backtracking progresses beyond the supplied start, return NULL.
      */
     inert nullable const char*
-    back_utf8_char(const char *utf8, char *start);
+    back_utf8_char(const char *utf8, const char *start);
 }
 
 __C__

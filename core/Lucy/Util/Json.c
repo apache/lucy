@@ -46,31 +46,32 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth);
 
 // Parse JSON from raw UTF-8 in memory.
 static Obj*
-S_parse_json(char *text, size_t size);
+S_parse_json(const char *text, size_t size);
 static Obj*
-S_do_parse_json(void *json_parser, char *json, size_t len);
+S_do_parse_json(void *json_parser, const char *json, size_t len);
 
 // Parse a JSON number.  Advance the text buffer just past the number.
 static Float64*
-S_parse_number(char **json_ptr, char *const limit);
+S_parse_number(const char **json_ptr, const char *limit);
 
 // Parse a JSON string.  Advance the text buffer from pointing at the opening
 // double quote to pointing just after the closing double quote.
 static String*
-S_parse_string(char **json_ptr, char *const limit);
+S_parse_string(const char **json_ptr, const char *limit);
 
 // Unescape JSON string text.  Expects pointers bookending the text data (i.e.
 // pointing just after the opening double quote and directly at the closing
 // double quote), and assumes that escapes have already been sanity checked
 // for length.
 static String*
-S_unescape_text(char *const top, char *const end);
+S_unescape_text(const char *top, const char *end);
 
 // Check that the supplied text begins with the specified keyword, which must
 // then end on a word boundary (i.e. match "null" but not the first four
 // letters of "nullify").
 static CFISH_INLINE bool
-SI_check_keyword(char *json, char* end, const char *keyword, size_t len);
+SI_check_keyword(const char *json, const char* end, const char *keyword,
+                 size_t len);
 
 // Make it possible to be loosen constraints during testing.
 static bool tolerant = false;
@@ -85,14 +86,14 @@ S_cat_whitespace(CharBuf *buf, int32_t depth);
 
 // Set Err_error, appending escaped JSON in the vicinity of the error.
 static void
-S_set_error(CharBuf *buf, char *json, char *limit, int line,
+S_set_error(CharBuf *buf, const char *json, const char *limit, int line,
             const char *func);
 #define SET_ERROR(_mess, _json, _end) \
     S_set_error(_mess, _json, _end, __LINE__, CFISH_ERR_FUNC_MACRO)
 
 Obj*
 Json_from_json(String *json) {
-    Obj *dump = S_parse_json((char*)Str_Get_Ptr8(json), Str_Get_Size(json));
+    Obj *dump = S_parse_json(Str_Get_Ptr8(json), Str_Get_Size(json));
     if (!dump) {
         ERR_ADD_FRAME(Err_get_error());
     }
@@ -372,7 +373,7 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
 }
 
 static Obj*
-S_parse_json(char *text, size_t size) {
+S_parse_json(const char *text, size_t size) {
     void *json_parser = LucyParseJsonAlloc(Memory_wrapped_malloc);
     if (json_parser == NULL) {
         String *mess = MAKE_MESS("Failed to allocate JSON parser");
@@ -385,17 +386,17 @@ S_parse_json(char *text, size_t size) {
 }
 
 static Obj*
-S_do_parse_json(void *json_parser, char *json, size_t len) {
+S_do_parse_json(void *json_parser, const char *json, size_t len) {
     lucy_JsonParserState state;
     state.result = NULL;
     state.errors = false;
 
-    char *text = json;
-    char *const end = text + len;
+    const char *text = json;
+    const char *const end = text + len;
     while (text < end) {
         int  token_type = -1;
         Obj *value      = NULL;
-        char *const save = text;
+        const char *const save = text;
         switch (*text) {
             case ' ': case '\n': case '\r': case '\t':
                 // Skip insignificant whitespace, which the JSON RFC defines
@@ -491,9 +492,9 @@ S_do_parse_json(void *json_parser, char *json, size_t len) {
 }
 
 static Float64*
-S_parse_number(char **json_ptr, char *const limit) {
-    char *top = *json_ptr;
-    char *end = top;
+S_parse_number(const char **json_ptr, const char *limit) {
+    const char *top = *json_ptr;
+    const char *end = top;
     bool terminated = false;
 
     // We can't assume NULL termination for the JSON string, so we need to
@@ -529,12 +530,12 @@ S_parse_number(char **json_ptr, char *const limit) {
 }
 
 static String*
-S_parse_string(char **json_ptr, char *const limit) {
+S_parse_string(const char **json_ptr, const char *limit) {
     // Find terminating double quote, determine whether there are any escapes.
-    char *top = *json_ptr + 1;
-    char *end = NULL;
+    const char *top = *json_ptr + 1;
+    const char *end = NULL;
     bool saw_backslash = false;
-    for (char *text = top; text < limit; text++) {
+    for (const char *text = top; text < limit; text++) {
         if (*text == '"') {
             end = text;
             break;
@@ -573,7 +574,7 @@ S_parse_string(char **json_ptr, char *const limit) {
 }
 
 static String*
-S_unescape_text(char *const top, char *const end) {
+S_unescape_text(const char *top, const char *end) {
     // The unescaped string will never be longer than the escaped string
     // because only a \u escape can theoretically be too long and
     // StrHelp_encode_utf8_char guards against sequences over 4 bytes.
@@ -581,7 +582,7 @@ S_unescape_text(char *const top, char *const end) {
     size_t cap = end - top + 1;
     char *target_buf = (char*)MALLOCATE(cap);
     size_t target_size = 0;
-    for (char *text = top; text < end; text++) {
+    for (const char *text = top; text < end; text++) {
         if (*text != '\\') {
             target_buf[target_size++] = *text;
         }
@@ -657,7 +658,8 @@ S_unescape_text(char *const top, char *const end) {
 }
 
 static CFISH_INLINE bool
-SI_check_keyword(char *json, char* end, const char *keyword, size_t len) {
+SI_check_keyword(const char *json, const char* end, const char *keyword,
+                 size_t len) {
     if ((size_t)(end - json) > len
         && strncmp(json, keyword, len) == 0
         && json[len] != '_'
@@ -669,7 +671,7 @@ SI_check_keyword(char *json, char* end, const char *keyword, size_t len) {
 }
 
 static void
-S_set_error(CharBuf *buf, char *json, char *limit, int line,
+S_set_error(CharBuf *buf, const char *json, const char *limit, int line,
             const char *func) {
     if (func) {
         CB_catf(buf, " at %s %s line %i32 near ", func, __FILE__,

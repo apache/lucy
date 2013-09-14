@@ -65,10 +65,10 @@ SI_is_updir(const char *name, size_t len) {
 
 FSDirHandle*
 FSDH_do_open(FSDirHandle *self, const String *dir) {
-    size_t  dir_path_size = Str_Get_Size(dir);
-    char   *dir_path_ptr  = (char*)Str_Get_Ptr8(dir);
-    char    search_string[MAX_PATH + 1];
-    char   *path_ptr = search_string;
+    size_t      dir_path_size = Str_Get_Size(dir);
+    const char *dir_path_ptr  = Str_Get_Ptr8(dir);
+    char        search_string[MAX_PATH + 1];
+    char       *path_ptr = search_string;
 
     DH_init((DirHandle*)self, dir);
     FSDirHandleIVARS *const ivars = FSDH_IVARS(self);

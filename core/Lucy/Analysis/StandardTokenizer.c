@@ -97,7 +97,7 @@ StandardTokenizer_Transform_IMP(StandardTokenizer *self, Inversion *inversion) {
 Inversion*
 StandardTokenizer_Transform_Text_IMP(StandardTokenizer *self, String *text) {
     Inversion *new_inversion = Inversion_new(NULL);
-    StandardTokenizer_Tokenize_Utf8(self, (char*)Str_Get_Ptr8(text),
+    StandardTokenizer_Tokenize_Utf8(self, Str_Get_Ptr8(text),
                                     Str_Get_Size(text), new_inversion);
     return new_inversion;
 }

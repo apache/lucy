@@ -32,7 +32,7 @@
 
 RawPosting*
 RawPost_new(void *pre_allocated_memory, int32_t doc_id, uint32_t freq,
-            char *term_text, size_t term_text_len) {
+            const char *term_text, size_t term_text_len) {
     RawPosting *self
         = (RawPosting*)VTable_Init_Obj(RAWPOSTING, pre_allocated_memory);
     RawPostingIVARS *const ivars = RawPost_IVARS(self);

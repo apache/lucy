@@ -166,7 +166,7 @@ Inverter_Add_Field_IMP(Inverter *self, InverterEntry *entry) {
     else if (entry_ivars->indexed || entry_ivars->highlightable) {
         String *value = (String*)entry_ivars->value;
         size_t token_len = Str_Get_Size(value);
-        Token *seed = Token_new((char*)Str_Get_Ptr8(value),
+        Token *seed = Token_new(Str_Get_Ptr8(value),
                                 token_len, 0, token_len, 1.0f, 1);
         DECREF(entry_ivars->inversion);
         entry_ivars->inversion = Inversion_new(seed);

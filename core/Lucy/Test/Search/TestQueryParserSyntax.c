@@ -405,11 +405,11 @@ test_query_parser_syntax(TestBatchRunner *runner) {
         Hits  *hits     = IxSearcher_Hits(searcher, (Obj*)parsed, 0, 10, NULL);
 
         TEST_TRUE(runner, Query_Equals(tree, (Obj*)ivars->tree),
-                  "tree()    %s", (char*)Str_Get_Ptr8(ivars->query_string));
+                  "tree()    %s", Str_Get_Ptr8(ivars->query_string));
         TEST_TRUE(runner, Query_Equals(expanded, (Obj*)ivars->expanded),
-                  "expand_leaf()    %s", (char*)Str_Get_Ptr8(ivars->query_string));
+                  "expand_leaf()    %s", Str_Get_Ptr8(ivars->query_string));
         TEST_INT_EQ(runner, Hits_Total_Hits(hits), ivars->num_hits,
-                    "hits:    %s", (char*)Str_Get_Ptr8(ivars->query_string));
+                    "hits:    %s", Str_Get_Ptr8(ivars->query_string));
         DECREF(hits);
         DECREF(parsed);
         DECREF(expanded);
@@ -426,9 +426,9 @@ test_query_parser_syntax(TestBatchRunner *runner) {
         Hits  *hits   = IxSearcher_Hits(searcher, (Obj*)parsed, 0, 10, NULL);
 
         TEST_TRUE(runner, Query_Equals(tree, (Obj*)ivars->tree),
-                  "tree()    %s", (char*)Str_Get_Ptr8(ivars->query_string));
+                  "tree()    %s", Str_Get_Ptr8(ivars->query_string));
         TEST_INT_EQ(runner, Hits_Total_Hits(hits), ivars->num_hits,
-                    "hits:    %s", (char*)Str_Get_Ptr8(ivars->query_string));
+                    "hits:    %s", Str_Get_Ptr8(ivars->query_string));
         DECREF(hits);
         DECREF(parsed);
         DECREF(tree);

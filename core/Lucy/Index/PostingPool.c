@@ -379,8 +379,8 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
     RawPostingIVARS *post_ivars = RawPost_IVARS(posting);
     String *last_term_text
         = Str_new_from_utf8(post_ivars->blob, post_ivars->content_len);
-    char *last_text_buf = (char*)Str_Get_Ptr8(last_term_text);
-    uint32_t last_text_size = Str_Get_Size(last_term_text);
+    const char *last_text_buf  = Str_Get_Ptr8(last_term_text);
+    uint32_t    last_text_size = Str_Get_Size(last_term_text);
     SkipStepper_Set_ID_And_Filepos(skip_stepper, 0, 0);
 
     // Initialize sentinel to be used on the last iter, using an empty string
@@ -429,7 +429,7 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
             DECREF(last_term_text);
             last_term_text
                 = Str_new_from_utf8(post_ivars->blob, post_ivars->content_len);
-            last_text_buf  = (char*)Str_Get_Ptr8(last_term_text);
+            last_text_buf  = Str_Get_Ptr8(last_term_text);
             last_text_size = Str_Get_Size(last_term_text);
         }
 

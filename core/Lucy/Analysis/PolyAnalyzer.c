@@ -91,9 +91,9 @@ PolyAnalyzer_Transform_Text_IMP(PolyAnalyzer *self, String *text) {
     Inversion      *retval;
 
     if (num_analyzers == 0) {
-        size_t  token_len = Str_Get_Size(text);
-        char   *buf       = (char*)Str_Get_Ptr8(text);
-        Token  *seed      = Token_new(buf, token_len, 0, token_len, 1.0f, 1);
+        size_t      token_len = Str_Get_Size(text);
+        const char *buf       = Str_Get_Ptr8(text);
+        Token *seed = Token_new(buf, token_len, 0, token_len, 1.0f, 1);
         retval = Inversion_new(seed);
         DECREF(seed);
     }

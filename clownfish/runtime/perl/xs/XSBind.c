@@ -88,7 +88,7 @@ XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation) {
         // Assume that the class name is always NULL-terminated. Somewhat
         // dangerous but should be safe.
         if (sv_isobject(sv)
-            && sv_derived_from(sv, (char*)CFISH_Str_Get_Ptr8(CFISH_VTable_Get_Name(vtable)))
+            && sv_derived_from(sv, CFISH_Str_Get_Ptr8(CFISH_VTable_Get_Name(vtable)))
            ) {
             // Unwrap a real Clownfish object.
             IV tmp = SvIV(SvRV(sv));
@@ -231,7 +231,7 @@ XSBind_str_to_sv(const cfish_String *str) {
         return newSV(0);
     }
     else {
-        SV *sv = newSVpvn((char*)CFISH_Str_Get_Ptr8(str), CFISH_Str_Get_Size(str));
+        SV *sv = newSVpvn(CFISH_Str_Get_Ptr8(str), CFISH_Str_Get_Size(str));
         SvUTF8_on(sv);
         return sv;
     }
@@ -603,7 +603,7 @@ S_lazy_init_host_obj(cfish_Obj *self) {
 
     // Connect class association.
     cfish_String *class_name = CFISH_VTable_Get_Name(self->vtable);
-    HV *stash = gv_stashpvn((char*)CFISH_Str_Get_Ptr8(class_name),
+    HV *stash = gv_stashpvn(CFISH_Str_Get_Ptr8(class_name),
                             CFISH_Str_Get_Size(class_name), TRUE);
     SvSTASH_set(inner_obj, (HV*)SvREFCNT_inc(stash));
 

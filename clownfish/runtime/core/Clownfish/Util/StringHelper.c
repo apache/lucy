@@ -222,7 +222,7 @@ StrHelp_decode_utf8_char(const char *ptr) {
 }
 
 const char*
-StrHelp_back_utf8_char(const char *ptr, char *start) {
+StrHelp_back_utf8_char(const char *ptr, const char *start) {
     while (--ptr >= start) {
         if ((*ptr & 0xC0) != 0x80) { return ptr; }
     }
