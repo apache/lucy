@@ -105,10 +105,11 @@ class Clownfish::String cnick Str
     incremented String*
     Cat_Trusted_UTF8(String *self, const char *ptr, size_t size);
 
-    /** Replace all instances of one character for the other.  For now, both
-     * the source and replacement code points must be ASCII.
+    /** Replace all instances of one character for the other.
+     *
+     * @return a new String with the characters replaced.
      */
-    int32_t
+    incremented String*
     Swap_Chars(String *self, uint32_t match, uint32_t replacement);
 
     public int64_t

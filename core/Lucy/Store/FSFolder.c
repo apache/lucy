@@ -270,10 +270,15 @@ static String*
 S_fullpath(FSFolder *self, const String *path) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
     String *fullpath = Str_newf("%o%s%o", ivars->path, DIR_SEP, path);
+    String *retval;
     if (DIR_SEP[0] != '/') {
-        Str_Swap_Chars(fullpath, '/', DIR_SEP[0]);
+        retval = Str_Swap_Chars(fullpath, '/', DIR_SEP[0]);
+        DECREF(fullpath);
     }
-    return fullpath;
+    else {
+        retval = fullpath;
+    }
+    return retval;
 }
 
 static bool

@@ -161,28 +161,20 @@ Str_To_String_IMP(String *self) {
     return Str_new_from_trusted_utf8(self->ptr, self->size);
 }
 
-int32_t
+String*
 Str_Swap_Chars_IMP(String *self, uint32_t match, uint32_t replacement) {
-    int32_t num_swapped = 0;
+    CharBuf *charbuf = CB_new(self->size);
+    StackStringIterator *iter = STR_STACKTOP(self);
+    uint32_t code_point;
 
-    if (match > 127) {
-        THROW(ERR, "match point too high: %u32", match);
-    }
-    else if (replacement > 127) {
-        THROW(ERR, "replacement code point too high: %u32", replacement);
-    }
-    else {
-        char *ptr = self->ptr;
-        char *const limit = ptr + self->size;
-        for (; ptr < limit; ptr++) {
-            if (*ptr == (char)match) {
-                *ptr = (char)replacement;
-                num_swapped++;
-            }
-        }
+    while (STRITER_DONE != (code_point = SStrIter_Next(iter))) {
+        if (code_point == match) { code_point = replacement; }
+        CB_Cat_Char(charbuf, code_point);
     }
 
-    return num_swapped;
+    String *retval = CB_Yield_String(charbuf);
+    DECREF(charbuf);
+    return retval;
 }
 
 int64_t

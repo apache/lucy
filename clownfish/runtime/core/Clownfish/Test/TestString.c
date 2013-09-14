@@ -35,6 +35,7 @@
 
 static char smiley[] = { (char)0xE2, (char)0x98, (char)0xBA, 0 };
 static uint32_t smiley_len = 3;
+static uint32_t smiley_cp  = 0x263A;
 
 TestString*
 TestStr_new() {
@@ -60,7 +61,7 @@ S_smiley_with_whitespace(int *num_spaces_ptr) {
 
     CharBuf *buf = CB_new(0);
     for (int i = 0; i < num_spaces; i++) { CB_Cat_Char(buf, spaces[i]); }
-    CB_Cat_Char(buf, 0x263A);
+    CB_Cat_Char(buf, smiley_cp);
     for (int i = 0; i < num_spaces; i++) { CB_Cat_Char(buf, spaces[i]); }
 
     String *retval = CB_To_String(buf);
@@ -138,7 +139,9 @@ test_Find(TestBatchRunner *runner) {
 
 static void
 test_Code_Point_At_and_From(TestBatchRunner *runner) {
-    uint32_t code_points[] = { 'a', 0x263A, 0x263A, 'b', 0x263A, 'c' };
+    uint32_t code_points[] = {
+        'a', smiley_cp, smiley_cp, 'b', smiley_cp, 'c'
+    };
     uint32_t num_code_points = sizeof(code_points) / sizeof(uint32_t);
     String *string = Str_newf("a%s%sb%sc", smiley, smiley, smiley);
     uint32_t i;
@@ -286,6 +289,17 @@ test_Compare_To(TestBatchRunner *runner) {
     DECREF(ac);
     DECREF(ab);
     DECREF(abc);
+}
+
+static void
+test_Swap_Chars(TestBatchRunner *runner) {
+    String *source = S_get_str("aXXbXc");
+    String *got    = Str_Swap_Chars(source, 'X', smiley_cp);
+    String *wanted = Str_newf("a%s%sb%sc", smiley, smiley, smiley);
+    TEST_TRUE(runner, Str_Equals(got, (Obj*)wanted), "Swap_Chars");
+    DECREF(wanted);
+    DECREF(got);
+    DECREF(source);
 }
 
 static void
@@ -481,7 +495,7 @@ test_iterator_substring(TestBatchRunner *runner) {
 
 void
 TestStr_Run_IMP(TestString *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 99);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 100);
     test_Cat(runner);
     test_Clone(runner);
     test_Code_Point_At_and_From(runner);
@@ -492,6 +506,7 @@ TestStr_Run_IMP(TestString *self, TestBatchRunner *runner) {
     test_To_I64(runner);
     test_Length(runner);
     test_Compare_To(runner);
+    test_Swap_Chars(runner);
     test_iterator(runner);
     test_iterator_whitespace(runner);
     test_iterator_substring(runner);
