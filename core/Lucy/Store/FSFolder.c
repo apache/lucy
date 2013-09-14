@@ -50,6 +50,10 @@
 static String*
 S_fullpath(FSFolder *self, const String *path);
 
+// Return a String containing a platform-specific absolute filepath.
+static char*
+S_fullpath_ptr(FSFolder *self, const String *path);
+
 // Return true if the supplied path is a directory.
 static bool
 S_dir_ok(const String *path);
@@ -72,7 +76,7 @@ S_absolutify(const String *path);
 
 // Create a hard link.
 static bool
-S_hard_link(String *from_path, String *to_path);
+S_hard_link(char *from_path, char *to_path);
 
 FSFolder*
 FSFolder_new(const String *path) {
@@ -142,12 +146,12 @@ FSFolder_Local_Exists_IMP(FSFolder *self, const String *name) {
     }
     else {
         struct stat stat_buf;
-        String *fullpath = S_fullpath(self, name);
+        char *fullpath_ptr = S_fullpath_ptr(self, name);
         bool retval = false;
-        if (stat((char*)Str_Get_Ptr8(fullpath), &stat_buf) != -1) {
+        if (stat(fullpath_ptr, &stat_buf) != -1) {
             retval = true;
         }
-        DECREF(fullpath);
+        FREEMEM(fullpath_ptr);
         return retval;
     }
 }
@@ -171,27 +175,26 @@ FSFolder_Local_Is_Directory_IMP(FSFolder *self, const String *name) {
 
 bool
 FSFolder_Rename_IMP(FSFolder *self, const String* from, const String *to) {
-    String *from_path = S_fullpath(self, from);
-    String *to_path   = S_fullpath(self, to);
-    bool    retval    = !rename((char*)Str_Get_Ptr8(from_path),
-                                 (char*)Str_Get_Ptr8(to_path));
+    char *from_path = S_fullpath_ptr(self, from);
+    char *to_path   = S_fullpath_ptr(self, to);
+    bool  retval    = !rename(from_path, to_path);
     if (!retval) {
-        Err_set_error(Err_new(Str_newf("rename from '%o' to '%o' failed: %s",
+        Err_set_error(Err_new(Str_newf("rename from '%s' to '%s' failed: %s",
                                        from_path, to_path, strerror(errno))));
     }
-    DECREF(from_path);
-    DECREF(to_path);
+    FREEMEM(from_path);
+    FREEMEM(to_path);
     return retval;
 }
 
 bool
 FSFolder_Hard_Link_IMP(FSFolder *self, const String *from,
                        const String *to) {
-    String *from_path = S_fullpath(self, from);
-    String *to_path   = S_fullpath(self, to);
-    bool    retval    = S_hard_link(from_path, to_path);
-    DECREF(from_path);
-    DECREF(to_path);
+    char *from_path_ptr = S_fullpath_ptr(self, from);
+    char *to_path_ptr   = S_fullpath_ptr(self, to);
+    bool  retval        = S_hard_link(from_path_ptr, to_path_ptr);
+    FREEMEM(from_path_ptr);
+    FREEMEM(to_path_ptr);
     return retval;
 }
 
@@ -199,15 +202,14 @@ bool
 FSFolder_Local_Delete_IMP(FSFolder *self, const String *name) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
 
-    String *fullpath = S_fullpath(self, name);
-    char   *path_ptr = (char*)Str_Get_Ptr8(fullpath);
+    char *path_ptr = S_fullpath_ptr(self, name);
 #ifdef CHY_REMOVE_ZAPS_DIRS
     bool result = !remove(path_ptr);
 #else
     bool result = !rmdir(path_ptr) || !remove(path_ptr);
 #endif
     DECREF(Hash_Delete(ivars->entries, (Obj*)name));
-    DECREF(fullpath);
+    FREEMEM(path_ptr);
     return result;
 }
 
@@ -281,23 +283,53 @@ S_fullpath(FSFolder *self, const String *path) {
     return retval;
 }
 
+static char*
+S_fullpath_ptr(FSFolder *self, const String *path) {
+    FSFolderIVARS *const ivars = FSFolder_IVARS(self);
+    size_t folder_size = Str_Get_Size(ivars->path);
+    size_t path_size   = Str_Get_Size(path);
+    size_t full_size   = folder_size + 1 + path_size;
+    const char *folder_ptr = (char*)Str_Get_Ptr8(ivars->path);
+    const char *path_ptr   = (char*)Str_Get_Ptr8(path);
+
+    char *buf = (char*)MALLOCATE(full_size + 1);
+    memcpy(buf, folder_ptr, folder_size);
+    buf[folder_size] = DIR_SEP[0];
+    memcpy(buf + folder_size + 1, path_ptr, path_size);
+    buf[full_size] = '\0';
+
+    if (DIR_SEP[0] != '/') {
+        for (size_t i = 0; i < full_size; ++i) {
+            if (buf[i] == '/') { buf[i] = DIR_SEP[0]; }
+        }
+    }
+
+    return buf;
+}
+
 static bool
 S_dir_ok(const String *path) {
+    bool retval = false;
+    char *path_ptr = Str_To_Utf8(path);
     struct stat stat_buf;
-    if (stat((char*)Str_Get_Ptr8(path), &stat_buf) != -1) {
-        if (stat_buf.st_mode & S_IFDIR) { return true; }
+    if (stat(path_ptr, &stat_buf) != -1) {
+        if (stat_buf.st_mode & S_IFDIR) { retval = true; }
     }
-    return false;
+    FREEMEM(path_ptr);
+    return retval;
 }
 
 static bool
 S_create_dir(const String *path) {
-    if (-1 == chy_makedir((char*)Str_Get_Ptr8(path), 0777)) {
+    bool retval = true;
+    char *path_ptr = Str_To_Utf8(path);
+    if (-1 == chy_makedir(path_ptr, 0777)) {
         Err_set_error(Err_new(Str_newf("Couldn't create directory '%o': %s",
                                        path, strerror(errno))));
-        return false;
+        retval = false;
     }
-    return true;
+    FREEMEM(path_ptr);
+    return retval;
 }
 
 static bool
@@ -346,17 +378,14 @@ S_absolutify(const String *path) {
 }
 
 static bool
-S_hard_link(String *from_path, String *to_path) {
-    char *from8 = (char*)Str_Get_Ptr8(from_path);
-    char *to8   = (char*)Str_Get_Ptr8(to_path);
-
+S_hard_link(char *from8, char *to8) {
     if (CreateHardLink(to8, from8, NULL)) {
         return true;
     }
     else {
         char *win_error = Err_win_error();
-        Err_set_error(Err_new(Str_newf("CreateHardLink for new file '%o' from '%o' failed: %s",
-                                       to_path, from_path, win_error)));
+        Err_set_error(Err_new(Str_newf("CreateHardLink for new file '%s' from '%s' failed: %s",
+                                       to8, from8, win_error)));
         FREEMEM(win_error);
         return false;
     }
@@ -382,13 +411,10 @@ S_absolutify(const String *path) {
 }
 
 static bool
-S_hard_link(String *from_path, String *to_path) {
-    char *from8 = (char*)Str_Get_Ptr8(from_path);
-    char *to8   = (char*)Str_Get_Ptr8(to_path);
-
+S_hard_link(char *from8, char *to8) {
     if (-1 == link(from8, to8)) {
-        Err_set_error(Err_new(Str_newf("hard link for new file '%o' from '%o' failed: %s",
-                                       to_path, from_path, strerror(errno))));
+        Err_set_error(Err_new(Str_newf("hard link for new file '%s' from '%s' failed: %s",
+                                       to8, from8, strerror(errno))));
         return false;
     }
     else {

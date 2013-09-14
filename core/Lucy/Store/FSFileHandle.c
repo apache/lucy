@@ -100,7 +100,9 @@ FSFH_do_open(FSFileHandle *self, const String *path, uint32_t flags) {
 
     // Attempt to open file.
     if (flags & FH_WRITE_ONLY) {
-        ivars->fd = open((char*)Str_Get_Ptr8(path), SI_posix_flags(flags), 0666);
+        char *path_ptr = Str_To_Utf8(path);
+        ivars->fd = open(path_ptr, SI_posix_flags(flags), 0666);
+        FREEMEM(path_ptr);
         if (ivars->fd == -1) {
             ivars->fd = 0;
             Err_set_error(Err_new(Str_newf("Attempt to open '%o' failed: %s",
@@ -330,8 +332,9 @@ SI_init_read_only(FSFileHandle *self, FSFileHandleIVARS *ivars) {
     UNUSED_VAR(self);
 
     // Open.
-    ivars->fd = open((char*)Str_Get_Ptr8(ivars->path),
-                    SI_posix_flags(ivars->flags), 0666);
+    char *path_ptr = Str_To_Utf8(ivars->path);
+    ivars->fd = open(path_ptr, SI_posix_flags(ivars->flags), 0666);
+    FREEMEM(path_ptr);
     if (ivars->fd == -1) {
         ivars->fd = 0;
         Err_set_error(Err_new(Str_newf("Can't open '%o': %s", ivars->path,
@@ -438,7 +441,7 @@ FSFH_Read_IMP(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
 
 static CFISH_INLINE bool
 SI_init_read_only(FSFileHandle *self, FSFileHandleIVARS *ivars) {
-    char *filepath = (char*)Str_Get_Ptr8(ivars->path);
+    char *filepath = Str_To_Utf8(ivars->path);
     SYSTEM_INFO sys_info;
 
     // Get system page size.
@@ -455,6 +458,7 @@ SI_init_read_only(FSFileHandle *self, FSFileHandleIVARS *ivars) {
                             FILE_ATTRIBUTE_READONLY | FILE_FLAG_OVERLAPPED,
                             NULL
                         );
+    FREEMEM(filepath);
     if (ivars->win_fhandle == INVALID_HANDLE_VALUE) {
         char *win_error = Err_win_error();
         Err_set_error(Err_new(Str_newf("CreateFile for %o failed: %s",

@@ -26,6 +26,7 @@
 
 #include "Clownfish/Err.h"
 #include "Clownfish/String.h"
+#include "Clownfish/Util/Memory.h"
 #include "Clownfish/VTable.h"
 
 /* TODO: Thread safety */
@@ -58,7 +59,9 @@ Err_do_throw(Err *error) {
     }
     else {
         String *message = Err_Get_Mess(error);
-        fprintf(stderr, "%s", Str_Get_Ptr8(message));
+        char *utf8 = Str_To_Utf8(message);
+        fprintf(stderr, "%s", utf8);
+        FREEMEM(utf8);
         exit(EXIT_FAILURE);
     }
 }
@@ -78,7 +81,9 @@ Err_throw_mess(VTable *vtable, String *message) {
 
 void
 Err_warn_mess(String *message) {
-    fprintf(stderr, "%s", Str_Get_Ptr8(message));
+    char *utf8 = Str_To_Utf8(message);
+    fprintf(stderr, "%s", utf8);
+    FREEMEM(utf8);
     DECREF(message);
 }
 

@@ -48,10 +48,12 @@ RegexTokenizer_init(RegexTokenizer *self, const String *pattern) {
     Analyzer_init((Analyzer*)self);
     RegexTokenizerIVARS *const ivars = RegexTokenizer_IVARS(self);
 
+    char *pattern_buf = NULL;
     const char *pattern_ptr;
     if (pattern) {
         ivars->pattern = Str_Clone(pattern);
-        pattern_ptr = (char*)Str_Get_Ptr8(ivars->pattern);
+        pattern_buf = Str_To_Utf8(ivars->pattern);
+        pattern_ptr = pattern_buf;
     }
     else {
         pattern_ptr = "\\w+(?:['\\x{2019}]\\w+)*";
@@ -71,6 +73,9 @@ RegexTokenizer_init(RegexTokenizer *self, const String *pattern) {
     const char *err_ptr;
     int err_offset;
     pcre *re = pcre_compile(pattern_ptr, options, &err_ptr, &err_offset, NULL);
+    if (pattern_buf) {
+        FREEMEM(pattern_buf);
+    }
     if (!re) {
         THROW(ERR, "%s", err_ptr);
     }
