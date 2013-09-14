@@ -63,18 +63,18 @@ class Clownfish::CharBuf cnick CB
     Mimic(CharBuf *self, Obj *other);
 
     void
-    Mimic_UTF8(CharBuf *self, const char *ptr, size_t size);
+    Mimic_Utf8(CharBuf *self, const char *ptr, size_t size);
 
     /** Concatenate the passed-in string onto the end of the CharBuf.
      */
     void
-    Cat_UTF8(CharBuf *self, const char *ptr, size_t size);
+    Cat_Utf8(CharBuf *self, const char *ptr, size_t size);
 
     /** Concatenate the supplied text onto the end of the CharBuf.  Don't
      * check for UTF-8 validity.
      */
     void
-    Cat_Trusted_UTF8(CharBuf *self, const char *ptr, size_t size);
+    Cat_Trusted_Utf8(CharBuf *self, const char *ptr, size_t size);
 
     /** Concatenate the contents of <code>string</code> onto the end of the
      * caller.

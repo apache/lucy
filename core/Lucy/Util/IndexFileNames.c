@@ -32,8 +32,8 @@ IxFileNames_latest_snapshot(Folder *folder) {
 
     while (DH_Next(dh)) {
         String *entry = DH_Get_Entry(dh);
-        if (Str_Starts_With_Str(entry, "snapshot_", 9)
-            && Str_Ends_With_Str(entry, ".json", 5)
+        if (Str_Starts_With_Utf8(entry, "snapshot_", 9)
+            && Str_Ends_With_Utf8(entry, ".json", 5)
            ) {
             uint64_t gen = IxFileNames_extract_gen(entry);
             if (gen > latest_gen) {

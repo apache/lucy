@@ -84,14 +84,14 @@ test_Cat(TestBatchRunner *runner) {
     DECREF(source);
 
     source = S_get_str("a");
-    got = Str_Cat_UTF8(source, smiley, smiley_len);
-    TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Cat_UTF8");
+    got = Str_Cat_Utf8(source, smiley, smiley_len);
+    TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Cat_Utf8");
     DECREF(got);
     DECREF(source);
 
     source = S_get_str("a");
-    got = Str_Cat_Trusted_UTF8(source, smiley, smiley_len);
-    TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Cat_Trusted_UTF8");
+    got = Str_Cat_Trusted_Utf8(source, smiley, smiley_len);
+    TEST_TRUE(runner, Str_Equals(wanted, (Obj*)got), "Cat_Trusted_Utf8");
     DECREF(got);
     DECREF(source);
 
@@ -177,28 +177,28 @@ test_Trim(TestBatchRunner *runner) {
     String *got;
 
     got = Str_Trim(ws_smiley);
-    TEST_TRUE(runner, Str_Equals_Str(got, smiley, smiley_len), "Trim");
+    TEST_TRUE(runner, Str_Equals_Utf8(got, smiley, smiley_len), "Trim");
     DECREF(got);
 
     got = Str_Trim_Top(ws_foo);
-    TEST_TRUE(runner, Str_Equals_Str(got, "foo  ", 5), "Trim_Top");
+    TEST_TRUE(runner, Str_Equals_Utf8(got, "foo  ", 5), "Trim_Top");
     DECREF(got);
 
     got = Str_Trim_Tail(ws_foo);
-    TEST_TRUE(runner, Str_Equals_Str(got, "  foo", 5), "Trim_Tail");
+    TEST_TRUE(runner, Str_Equals_Utf8(got, "  foo", 5), "Trim_Tail");
     DECREF(got);
 
     got = Str_Trim(ws_only);
-    TEST_TRUE(runner, Str_Equals_Str(got, "", 0), "Trim with only whitespace");
+    TEST_TRUE(runner, Str_Equals_Utf8(got, "", 0), "Trim with only whitespace");
     DECREF(got);
 
     got = Str_Trim_Top(ws_only);
-    TEST_TRUE(runner, Str_Equals_Str(got, "", 0),
+    TEST_TRUE(runner, Str_Equals_Utf8(got, "", 0),
               "Trim_Top with only whitespace");
     DECREF(got);
 
     got = Str_Trim_Tail(ws_only);
-    TEST_TRUE(runner, Str_Equals_Str(got, "", 0),
+    TEST_TRUE(runner, Str_Equals_Utf8(got, "", 0),
               "Trim_Tail with only whitespace");
     DECREF(got);
 

@@ -74,13 +74,13 @@ test_Cat(TestBatchRunner *runner) {
     DECREF(got);
 
     got = S_get_cb("a");
-    CB_Cat_UTF8(got, smiley, smiley_len);
-    TEST_TRUE(runner, S_cb_equals(got, wanted), "Cat_UTF8");
+    CB_Cat_Utf8(got, smiley, smiley_len);
+    TEST_TRUE(runner, S_cb_equals(got, wanted), "Cat_Utf8");
     DECREF(got);
 
     got = S_get_cb("a");
-    CB_Cat_Trusted_UTF8(got, smiley, smiley_len);
-    TEST_TRUE(runner, S_cb_equals(got, wanted), "Cat_Trusted_UTF8");
+    CB_Cat_Trusted_Utf8(got, smiley, smiley_len);
+    TEST_TRUE(runner, S_cb_equals(got, wanted), "Cat_Trusted_Utf8");
     DECREF(got);
 
     DECREF(wanted);
@@ -102,8 +102,8 @@ test_Mimic_and_Clone(TestBatchRunner *runner) {
     DECREF(got);
 
     got = S_get_cb("bar");
-    CB_Mimic_UTF8(got, "foo", 3);
-    TEST_TRUE(runner, S_cb_equals(got, wanted), "Mimic_Str");
+    CB_Mimic_Utf8(got, "foo", 3);
+    TEST_TRUE(runner, S_cb_equals(got, wanted), "Mimic_Utf8");
     DECREF(got);
 
     got = CB_Clone(wanted_cb);

@@ -83,8 +83,8 @@ Sim_Get_Norm_Decoder_IMP(Similarity *self) {
 Obj*
 Sim_Dump_IMP(Similarity *self) {
     Hash *dump = Hash_new(0);
-    Hash_Store_Str(dump, "_class", 6,
-                   (Obj*)Str_Clone(Sim_Get_Class_Name(self)));
+    Hash_Store_Utf8(dump, "_class", 6,
+                    (Obj*)Str_Clone(Sim_Get_Class_Name(self)));
     return (Obj*)dump;
 }
 
@@ -92,7 +92,7 @@ Similarity*
 Sim_Load_IMP(Similarity *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     String *class_name 
-        = (String*)CERTIFY(Hash_Fetch_Str(source, "_class", 6), STRING);
+        = (String*)CERTIFY(Hash_Fetch_Utf8(source, "_class", 6), STRING);
     VTable *vtable = VTable_singleton(class_name, NULL);
     Similarity *loaded = (Similarity*)VTable_Make_Obj(vtable);
     UNUSED_VAR(self);

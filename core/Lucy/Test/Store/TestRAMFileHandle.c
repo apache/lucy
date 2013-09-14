@@ -55,7 +55,7 @@ test_Read_Write(TestBatchRunner *runner) {
     char buffer[12];
     char *buf = buffer;
 
-    TEST_TRUE(runner, Str_Equals_Str(RAMFH_Get_Path(fh), "", 0),
+    TEST_TRUE(runner, Str_Equals_Utf8(RAMFH_Get_Path(fh), "", 0),
               "NULL arg as filepath yields empty string");
 
     TEST_TRUE(runner, RAMFH_Write(fh, foo, 3), "Write returns success");

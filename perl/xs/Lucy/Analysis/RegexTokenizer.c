@@ -45,8 +45,8 @@ lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
     lucy_RegexTokenizerIVARS *const ivars = lucy_RegexTokenizer_IVARS(self);
     #define DEFAULT_PATTERN "\\w+(?:['\\x{2019}]\\w+)*"
     if (pattern) {
-        if (CFISH_Str_Find_Str(pattern, "\\p", 2) != -1
-            || CFISH_Str_Find_Str(pattern, "\\P", 2) != -1
+        if (CFISH_Str_Find_Utf8(pattern, "\\p", 2) != -1
+            || CFISH_Str_Find_Utf8(pattern, "\\P", 2) != -1
            ) {
             CFISH_DECREF(self);
             THROW(CFISH_ERR, "\\p and \\P constructs forbidden");
@@ -137,9 +137,9 @@ LUCY_RegexTokenizer_Destroy_IMP(lucy_RegexTokenizer *self) {
 }
 
 void
-LUCY_RegexTokenizer_Tokenize_Str_IMP(lucy_RegexTokenizer *self,
-                                     const char *string, size_t string_len,
-                                     lucy_Inversion *inversion) {
+LUCY_RegexTokenizer_Tokenize_Utf8_IMP(lucy_RegexTokenizer *self,
+                                      const char *string, size_t string_len,
+                                      lucy_Inversion *inversion) {
     lucy_RegexTokenizerIVARS *const ivars = lucy_RegexTokenizer_IVARS(self);
     uint32_t   num_code_points = 0;
     SV        *wrapper    = sv_newmortal();

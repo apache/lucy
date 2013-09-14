@@ -614,16 +614,16 @@ S_encode_entities(String *text, CharBuf *buf) {
             CB_catf(buf, "&#%u32;", code_point);
         }
         else if (code_point == '<') {
-            CB_Cat_Trusted_UTF8(buf, "&lt;", 4);
+            CB_Cat_Trusted_Utf8(buf, "&lt;", 4);
         }
         else if (code_point == '>') {
-            CB_Cat_Trusted_UTF8(buf, "&gt;", 4);
+            CB_Cat_Trusted_Utf8(buf, "&gt;", 4);
         }
         else if (code_point == '&') {
-            CB_Cat_Trusted_UTF8(buf, "&amp;", 5);
+            CB_Cat_Trusted_Utf8(buf, "&amp;", 5);
         }
         else if (code_point == '"') {
-            CB_Cat_Trusted_UTF8(buf, "&quot;", 6);
+            CB_Cat_Trusted_Utf8(buf, "&quot;", 6);
         }
         else {
             CB_Cat_Char(buf, code_point);

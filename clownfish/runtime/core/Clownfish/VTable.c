@@ -417,7 +417,7 @@ S_find_method(VTable *self, const char *name) {
 
     for (uint32_t i = 0; i < size; i++) {
         Method *method = (Method*)VA_Fetch(self->methods, i);
-        if (Str_Equals_Str(method->name, name, name_len)) {
+        if (Str_Equals_Utf8(method->name, name, name_len)) {
             return method;
         }
     }

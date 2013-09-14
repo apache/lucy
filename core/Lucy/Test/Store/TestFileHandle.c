@@ -56,7 +56,7 @@ TestFH_Run_IMP(TestFileHandle *self, TestBatchRunner *runner) {
     FileHandle    *fh    = S_new_filehandle();
     StackString *foo   = SSTR_WRAP_STR("foo", 3);
 
-    TEST_TRUE(runner, Str_Equals_Str(FH_Get_Path(fh), "", 0), "Get_Path");
+    TEST_TRUE(runner, Str_Equals_Utf8(FH_Get_Path(fh), "", 0), "Get_Path");
     FH_Set_Path(fh, (String*)foo);
     TEST_TRUE(runner, Str_Equals(FH_Get_Path(fh), (Obj*)foo), "Set_Path");
 

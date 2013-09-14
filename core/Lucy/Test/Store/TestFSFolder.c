@@ -119,7 +119,7 @@ test_protect_symlinks(TestBatchRunner *runner) {
         bool saw_bazooka_boffo = false;
         for (uint32_t i = 0, max = VA_Get_Size(list); i < max; i++) {
             String *entry = (String*)VA_Fetch(list, i);
-            if (Str_Ends_With_Str(entry, "bazooka/boffo", 13)) {
+            if (Str_Ends_With_Utf8(entry, "bazooka/boffo", 13)) {
                 saw_bazooka_boffo = true;
             }
         }

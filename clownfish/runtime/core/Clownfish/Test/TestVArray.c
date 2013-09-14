@@ -86,7 +86,7 @@ test_Store_Fetch(TestBatchRunner *runner) {
     VA_Store(array, 2, (Obj*)Str_newf("foo"));
     elem = (String*)CERTIFY(VA_Fetch(array, 2), STRING);
     TEST_INT_EQ(runner, 3, VA_Get_Size(array), "Store updates size");
-    TEST_TRUE(runner, Str_Equals_Str(elem, "foo", 3), "Store");
+    TEST_TRUE(runner, Str_Equals_Utf8(elem, "foo", 3), "Store");
 
     INCREF(elem);
     TEST_INT_EQ(runner, 2, Str_Get_RefCount(elem),
@@ -96,7 +96,7 @@ test_Store_Fetch(TestBatchRunner *runner) {
                 "Displacing elem via Store updates refcount");
     DECREF(elem);
     elem = (String*)CERTIFY(VA_Fetch(array, 2), STRING);
-    TEST_TRUE(runner, Str_Equals_Str(elem, "bar", 3), "Store displacement");
+    TEST_TRUE(runner, Str_Equals_Utf8(elem, "bar", 3), "Store displacement");
 
     DECREF(array);
 }
@@ -115,18 +115,18 @@ test_Push_Pop_Shift_Unshift(TestBatchRunner *runner) {
     TEST_TRUE(runner, NULL != CERTIFY(VA_Fetch(array, 2), STRING), "Push");
 
     elem = (String*)CERTIFY(VA_Shift(array), STRING);
-    TEST_TRUE(runner, Str_Equals_Str(elem, "a", 1), "Shift");
+    TEST_TRUE(runner, Str_Equals_Utf8(elem, "a", 1), "Shift");
     TEST_INT_EQ(runner, VA_Get_Size(array), 2, "size after Shift");
     DECREF(elem);
 
     elem = (String*)CERTIFY(VA_Pop(array), STRING);
-    TEST_TRUE(runner, Str_Equals_Str(elem, "c", 1), "Pop");
+    TEST_TRUE(runner, Str_Equals_Utf8(elem, "c", 1), "Pop");
     TEST_INT_EQ(runner, VA_Get_Size(array), 1, "size after Pop");
     DECREF(elem);
 
     VA_Unshift(array, (Obj*)Str_newf("foo"));
     elem = (String*)CERTIFY(VA_Fetch(array, 0), STRING);
-    TEST_TRUE(runner, Str_Equals_Str(elem, "foo", 3), "Unshift");
+    TEST_TRUE(runner, Str_Equals_Utf8(elem, "foo", 3), "Unshift");
     TEST_INT_EQ(runner, VA_Get_Size(array), 2, "size after Shift");
 
     DECREF(array);

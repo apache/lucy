@@ -66,31 +66,31 @@ test_tokenizer(TestBatchRunner *runner) {
     TEST_TRUE(runner,
               token
               && Str_Is_A(token, STRING)
-              && Str_Equals_Str(token, "tha\xcc\x82t's", 8),
+              && Str_Equals_Utf8(token, "tha\xcc\x82t's", 8),
               "Token: %s", Str_Get_Ptr8(token));
     token = (String*)VA_Fetch(got, 1);
     TEST_TRUE(runner,
               token
               && Str_Is_A(token, STRING)
-              && Str_Equals_Str(token, "1,02\xC2\xADZ4.38", 11),
+              && Str_Equals_Utf8(token, "1,02\xC2\xADZ4.38", 11),
               "Token: %s", Str_Get_Ptr8(token));
     token = (String*)VA_Fetch(got, 2);
     TEST_TRUE(runner,
               token
               && Str_Is_A(token, STRING)
-              && Str_Equals_Str(token, "\xE0\xB8\x81\xC2\xAD\xC2\xAD", 7),
+              && Str_Equals_Utf8(token, "\xE0\xB8\x81\xC2\xAD\xC2\xAD", 7),
               "Token: %s", Str_Get_Ptr8(token));
     token = (String*)VA_Fetch(got, 3);
     TEST_TRUE(runner,
               token
               && Str_Is_A(token, STRING)
-              && Str_Equals_Str(token, "\xF0\xA0\x80\x80", 4),
+              && Str_Equals_Utf8(token, "\xF0\xA0\x80\x80", 4),
               "Token: %s", Str_Get_Ptr8(token));
     token = (String*)VA_Fetch(got, 4);
     TEST_TRUE(runner,
               token
               && Str_Is_A(token, STRING)
-              && Str_Equals_Str(token, "a", 1),
+              && Str_Equals_Utf8(token, "a", 1),
               "Token: %s", Str_Get_Ptr8(token));
     DECREF(got);
 
@@ -101,8 +101,8 @@ test_tokenizer(TestBatchRunner *runner) {
 
     for (uint32_t i = 0, max = VA_Get_Size(tests); i < max; i++) {
         Hash *test = (Hash*)VA_Fetch(tests, i);
-        String *text = (String*)Hash_Fetch_Str(test, "text", 4);
-        VArray *wanted = (VArray*)Hash_Fetch_Str(test, "words", 5);
+        String *text = (String*)Hash_Fetch_Utf8(test, "text", 4);
+        VArray *wanted = (VArray*)Hash_Fetch_Utf8(test, "words", 5);
         VArray *got = StandardTokenizer_Split(tokenizer, text);
         TEST_TRUE(runner, VA_Equals(wanted, (Obj*)got), "UCD test #%d", i + 1);
         DECREF(got);

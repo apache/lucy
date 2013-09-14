@@ -128,8 +128,8 @@ PolyAnalyzer_Dump_IMP(PolyAnalyzer *self) {
         = SUPER_METHOD_PTR(POLYANALYZER, LUCY_PolyAnalyzer_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
     if (ivars->analyzers) {
-        Hash_Store_Str(dump, "analyzers", 9,
-                       Freezer_dump((Obj*)ivars->analyzers));
+        Hash_Store_Utf8(dump, "analyzers", 9,
+                        Freezer_dump((Obj*)ivars->analyzers));
     }
     return (Obj*)dump;
 }
@@ -141,7 +141,7 @@ PolyAnalyzer_Load_IMP(PolyAnalyzer *self, Obj *dump) {
         = SUPER_METHOD_PTR(POLYANALYZER, LUCY_PolyAnalyzer_Load);
     PolyAnalyzer *loaded = super_load(self, dump);
     VArray *analyzer_dumps
-        = (VArray*)CERTIFY(Hash_Fetch_Str(source, "analyzers", 9), VARRAY);
+        = (VArray*)CERTIFY(Hash_Fetch_Utf8(source, "analyzers", 9), VARRAY);
     VArray *analyzers
         = (VArray*)CERTIFY(Freezer_load((Obj*)analyzer_dumps), VARRAY);
     PolyAnalyzer_init(loaded, NULL, analyzers);

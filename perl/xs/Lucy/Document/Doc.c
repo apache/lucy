@@ -178,12 +178,12 @@ cfish_Hash*
 LUCY_Doc_Dump_IMP(lucy_Doc *self) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     cfish_Hash *dump = cfish_Hash_new(0);
-    CFISH_Hash_Store_Str(dump, "_class", 6,
-                        (cfish_Obj*)CFISH_Str_Clone(LUCY_Doc_Get_Class_Name(self)));
-    CFISH_Hash_Store_Str(dump, "doc_id", 7,
-                        (cfish_Obj*)cfish_Str_newf("%i32", ivars->doc_id));
-    CFISH_Hash_Store_Str(dump, "fields", 6,
-                        XSBind_perl_to_cfish((SV*)ivars->fields));
+    CFISH_Hash_Store_Utf8(dump, "_class", 6,
+                          (cfish_Obj*)CFISH_Str_Clone(LUCY_Doc_Get_Class_Name(self)));
+    CFISH_Hash_Store_Utf8(dump, "doc_id", 7,
+                          (cfish_Obj*)cfish_Str_newf("%i32", ivars->doc_id));
+    CFISH_Hash_Store_Utf8(dump, "fields", 6,
+                          XSBind_perl_to_cfish((SV*)ivars->fields));
     return dump;
 }
 
@@ -191,15 +191,15 @@ lucy_Doc*
 LUCY_Doc_Load_IMP(lucy_Doc *self, cfish_Obj *dump) {
     cfish_Hash *source = (cfish_Hash*)CFISH_CERTIFY(dump, CFISH_HASH);
     cfish_String *class_name = (cfish_String*)CFISH_CERTIFY(
-                                   CFISH_Hash_Fetch_Str(source, "_class", 6),
+                                   CFISH_Hash_Fetch_Utf8(source, "_class", 6),
                                    CFISH_STRING);
     cfish_VTable *vtable = cfish_VTable_singleton(class_name, NULL);
     lucy_Doc *loaded = (lucy_Doc*)CFISH_VTable_Make_Obj(vtable);
     cfish_Obj *doc_id = CFISH_CERTIFY(
-                           CFISH_Hash_Fetch_Str(source, "doc_id", 7),
+                           CFISH_Hash_Fetch_Utf8(source, "doc_id", 7),
                            CFISH_OBJ);
     cfish_Hash *fields = (cfish_Hash*)CFISH_CERTIFY(
-                            CFISH_Hash_Fetch_Str(source, "fields", 6),
+                            CFISH_Hash_Fetch_Utf8(source, "fields", 6),
                             CFISH_HASH);
     SV *fields_sv = XSBind_cfish_to_perl((cfish_Obj*)fields);
     CHY_UNUSED_VAR(self);

@@ -63,12 +63,12 @@ DefSortReader_init(DefaultSortReader *self, Schema *schema, Folder *folder,
                     seg_tick);
     DefaultSortReaderIVARS *const ivars = DefSortReader_IVARS(self);
     Segment *segment  = DefSortReader_Get_Segment(self);
-    Hash    *metadata = (Hash*)Seg_Fetch_Metadata_Str(segment, "sort", 4);
+    Hash    *metadata = (Hash*)Seg_Fetch_Metadata_Utf8(segment, "sort", 4);
 
     // Check format.
     ivars->format = 0;
     if (metadata) {
-        Obj *format = Hash_Fetch_Str(metadata, "format", 6);
+        Obj *format = Hash_Fetch_Utf8(metadata, "format", 6);
         if (!format) { THROW(ERR, "Missing 'format' var"); }
         else {
             ivars->format = (int32_t)Obj_To_I64(format);
@@ -86,9 +86,9 @@ DefSortReader_init(DefaultSortReader *self, Schema *schema, Folder *folder,
     // hashes.
     if (metadata) {
         ivars->counts
-            = (Hash*)INCREF(CERTIFY(Hash_Fetch_Str(metadata, "counts", 6),
+            = (Hash*)INCREF(CERTIFY(Hash_Fetch_Utf8(metadata, "counts", 6),
                                     HASH));
-        ivars->null_ords = (Hash*)Hash_Fetch_Str(metadata, "null_ords", 9);
+        ivars->null_ords = (Hash*)Hash_Fetch_Utf8(metadata, "null_ords", 9);
         if (ivars->null_ords) {
             CERTIFY(ivars->null_ords, HASH);
             INCREF(ivars->null_ords);
@@ -96,7 +96,7 @@ DefSortReader_init(DefaultSortReader *self, Schema *schema, Folder *folder,
         else {
             ivars->null_ords = Hash_new(0);
         }
-        ivars->ord_widths = (Hash*)Hash_Fetch_Str(metadata, "ord_widths", 10);
+        ivars->ord_widths = (Hash*)Hash_Fetch_Utf8(metadata, "ord_widths", 10);
         if (ivars->ord_widths) {
             CERTIFY(ivars->ord_widths, HASH);
             INCREF(ivars->ord_widths);

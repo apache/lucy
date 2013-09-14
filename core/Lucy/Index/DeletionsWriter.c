@@ -168,8 +168,8 @@ DefDelWriter_Finish_IMP(DefaultDeletionsWriter *self) {
         }
     }
 
-    Seg_Store_Metadata_Str(ivars->segment, "deletions", 9,
-                           (Obj*)DefDelWriter_Metadata(self));
+    Seg_Store_Metadata_Utf8(ivars->segment, "deletions", 9,
+                            (Obj*)DefDelWriter_Metadata(self));
 }
 
 Hash*
@@ -187,14 +187,14 @@ DefDelWriter_Metadata_IMP(DefaultDeletionsWriter *self) {
             BitVector *deldocs   = (BitVector*)VA_Fetch(ivars->bit_vecs, i);
             Segment   *segment   = SegReader_Get_Segment(seg_reader);
             Hash      *mini_meta = Hash_new(2);
-            Hash_Store_Str(mini_meta, "count", 5,
-                           (Obj*)Str_newf("%u32", (uint32_t)BitVec_Count(deldocs)));
-            Hash_Store_Str(mini_meta, "filename", 8,
-                           (Obj*)S_del_filename(self, seg_reader));
+            Hash_Store_Utf8(mini_meta, "count", 5,
+                            (Obj*)Str_newf("%u32", (uint32_t)BitVec_Count(deldocs)));
+            Hash_Store_Utf8(mini_meta, "filename", 8,
+                            (Obj*)S_del_filename(self, seg_reader));
             Hash_Store(files, (Obj*)Seg_Get_Name(segment), (Obj*)mini_meta);
         }
     }
-    Hash_Store_Str(metadata, "files", 5, (Obj*)files);
+    Hash_Store_Utf8(metadata, "files", 5, (Obj*)files);
 
     return metadata;
 }
@@ -344,11 +344,11 @@ DefDelWriter_Merge_Segment_IMP(DefaultDeletionsWriter *self,
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     UNUSED_VAR(doc_map);
     Segment *segment = SegReader_Get_Segment(reader);
-    Hash *del_meta = (Hash*)Seg_Fetch_Metadata_Str(segment, "deletions", 9);
+    Hash *del_meta = (Hash*)Seg_Fetch_Metadata_Utf8(segment, "deletions", 9);
 
     if (del_meta) {
         VArray *seg_readers = ivars->seg_readers;
-        Hash   *files = (Hash*)Hash_Fetch_Str(del_meta, "files", 5);
+        Hash   *files = (Hash*)Hash_Fetch_Utf8(del_meta, "files", 5);
         if (files) {
             String *seg;
             Hash *mini_meta;
@@ -370,7 +370,7 @@ DefDelWriter_Merge_Segment_IMP(DefaultDeletionsWriter *self,
                          * merge away the most recent deletions file
                          * pointing at this target segment -- so force a
                          * new file to be written out. */
-                        int32_t count = (int32_t)Obj_To_I64(Hash_Fetch_Str(mini_meta, "count", 5));
+                        int32_t count = (int32_t)Obj_To_I64(Hash_Fetch_Utf8(mini_meta, "count", 5));
                         DeletionsReader *del_reader
                             = (DeletionsReader*)SegReader_Obtain(
                                   candidate, VTable_Get_Name(DELETIONSREADER));

@@ -61,7 +61,7 @@ ShLock_Request_IMP(SharedLock *self) {
 
     // Empty lock_path indicates whether this particular instance is locked.
     if (ivars->lock_path
-        && !Str_Equals_Str(ivars->lock_path, "", 0)
+        && !Str_Equals_Utf8(ivars->lock_path, "", 0)
         && Folder_Exists(ivars->folder, ivars->lock_path)
        ) {
         // Don't allow double obtain.
@@ -83,7 +83,7 @@ ShLock_Request_IMP(SharedLock *self) {
 void
 ShLock_Release_IMP(SharedLock *self) {
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
-    if (ivars->lock_path && !Str_Equals_Str(ivars->lock_path, "", 0)) {
+    if (ivars->lock_path && !Str_Equals_Utf8(ivars->lock_path, "", 0)) {
         ShLock_Release_t super_release
             = SUPER_METHOD_PTR(SHAREDLOCK, LUCY_ShLock_Release);
         super_release(self);
@@ -111,7 +111,7 @@ ShLock_Clear_Stale_IMP(SharedLock *self) {
     while (DH_Next(dh)) {
         String *entry = DH_Get_Entry(dh);
         if (Str_Starts_With(entry, ivars->name)
-            && Str_Ends_With_Str(entry, ".lock", 5)
+            && Str_Ends_With_Utf8(entry, ".lock", 5)
            ) {
             String *candidate = Str_newf("%o/%o", lock_dir_name, entry);
             ShLock_Maybe_Delete_File(self, candidate, false, true);
@@ -149,7 +149,7 @@ ShLock_Is_Locked_IMP(SharedLock *self) {
                         if (!isdigit(code_point)) { break; }
                     }
                     if (code_point == '.'
-                        && StrIter_Starts_With_UTF8(iter, "lock", 4)
+                        && StrIter_Starts_With_Utf8(iter, "lock", 4)
                     ) {
                         StrIter_Advance(iter, 4);
                         if (!StrIter_Has_Next(iter)) {

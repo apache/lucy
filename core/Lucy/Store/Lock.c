@@ -168,10 +168,10 @@ LFLock_Request_IMP(LockFileLock *self) {
 
     // Prepare to write pid, lock name, and host to the lock file as JSON.
     file_data = Hash_new(3);
-    Hash_Store_Str(file_data, "pid", 3,
-                   (Obj*)Str_newf("%i32", (int32_t)PID_getpid()));
-    Hash_Store_Str(file_data, "host", 4, INCREF(ivars->host));
-    Hash_Store_Str(file_data, "name", 4, INCREF(ivars->name));
+    Hash_Store_Utf8(file_data, "pid", 3,
+                    (Obj*)Str_newf("%i32", (int32_t)PID_getpid()));
+    Hash_Store_Utf8(file_data, "host", 4, INCREF(ivars->host));
+    Hash_Store_Utf8(file_data, "name", 4, INCREF(ivars->name));
 
     // Write to a temporary file, then use the creation of a hard link to
     // ensure atomic but non-destructive creation of the lockfile with its
@@ -233,7 +233,7 @@ LFLock_Maybe_Delete_File_IMP(LockFileLock *self, const String *path,
     bool    success = false;
 
     // Only delete locks that start with our lock name.
-    if (!Str_Starts_With_Str(path, "locks", 5)) {
+    if (!Str_Starts_With_Utf8(path, "locks", 5)) {
         return false;
     }
     StringIterator *iter = Str_Top(path);
@@ -248,10 +248,10 @@ LFLock_Maybe_Delete_File_IMP(LockFileLock *self, const String *path,
     if (Folder_Exists(folder, path)) {
         Hash *hash = (Hash*)Json_slurp_json(folder, path);
         if (hash != NULL && Obj_Is_A((Obj*)hash, HASH)) {
-            String *pid_buf = (String*)Hash_Fetch_Str(hash, "pid", 3);
-            String *host    = (String*)Hash_Fetch_Str(hash, "host", 4);
+            String *pid_buf = (String*)Hash_Fetch_Utf8(hash, "pid", 3);
+            String *host    = (String*)Hash_Fetch_Utf8(hash, "host", 4);
             String *name
-                = (String*)Hash_Fetch_Str(hash, "name", 4);
+                = (String*)Hash_Fetch_Utf8(hash, "name", 4);
 
             // Match hostname and lock name.
             if (host != NULL

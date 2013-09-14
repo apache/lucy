@@ -111,7 +111,7 @@ Compiler_To_String_IMP(Compiler *self) {
     String *stringified_query = Query_To_String(ivars->parent);
     CharBuf *buf = CB_new_from_trusted_utf8("compiler(", 9);
     CB_Cat(buf, stringified_query);
-    CB_Cat_Trusted_UTF8(buf, ")", 1);
+    CB_Cat_Trusted_Utf8(buf, ")", 1);
     String *string = CB_Yield_String(buf);
     DECREF(buf);
     DECREF(stringified_query);

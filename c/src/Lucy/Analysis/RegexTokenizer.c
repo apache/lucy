@@ -101,8 +101,8 @@ RegexTokenizer_Destroy_IMP(RegexTokenizer *self) {
 }
 
 void
-RegexTokenizer_Tokenize_Str_IMP(RegexTokenizer *self, const char *string,
-                                size_t string_len, Inversion *inversion) {
+RegexTokenizer_Tokenize_Utf8_IMP(RegexTokenizer *self, const char *string,
+                                 size_t string_len, Inversion *inversion) {
     RegexTokenizerIVARS *const ivars = RegexTokenizer_IVARS(self);
     pcre      *re          = (pcre*)ivars->token_re;
     int        byte_offset = 0;
@@ -189,8 +189,8 @@ RegexTokenizer_Destroy_IMP(RegexTokenizer *self) {
 }
 
 void
-RegexTokenizer_Tokenize_Str_IMP(RegexTokenizer *self, const char *string,
-                                size_t string_len, Inversion *inversion) {
+RegexTokenizer_Tokenize_Utf8_IMP(RegexTokenizer *self, const char *string,
+                                 size_t string_len, Inversion *inversion) {
     UNUSED_VAR(self);
     UNUSED_VAR(string);
     UNUSED_VAR(string_len);

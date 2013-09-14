@@ -70,7 +70,7 @@ HitDoc_Dump_IMP(HitDoc *self) {
     HitDoc_Dump_t super_dump
         = SUPER_METHOD_PTR(HITDOC, LUCY_HitDoc_Dump);
     Hash *dump = super_dump(self);
-    Hash_Store_Str(dump, "score", 5, (Obj*)Str_newf("%f64", ivars->score));
+    Hash_Store_Utf8(dump, "score", 5, (Obj*)Str_newf("%f64", ivars->score));
     return dump;
 }
 
@@ -81,7 +81,7 @@ HitDoc_Load_IMP(HitDoc *self, Obj *dump) {
         = SUPER_METHOD_PTR(HITDOC, LUCY_HitDoc_Load);
     HitDoc *loaded = super_load(self, dump);
     HitDocIVARS *const loaded_ivars = HitDoc_IVARS(loaded);
-    Obj *score = CERTIFY(Hash_Fetch_Str(source, "score", 5), OBJ);
+    Obj *score = CERTIFY(Hash_Fetch_Utf8(source, "score", 5), OBJ);
     loaded_ivars->score = (float)Obj_To_F64(score);
     return loaded;
 }

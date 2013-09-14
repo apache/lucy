@@ -69,7 +69,7 @@ SnowStop_Transform_IMP(SnowballStopFilter *self, Inversion *inversion) {
 
     while (NULL != (token = Inversion_Next(inversion))) {
         TokenIVARS *const token_ivars = Token_IVARS(token);
-        if (!Hash_Fetch_Str(stoplist, token_ivars->text, token_ivars->len)) {
+        if (!Hash_Fetch_Utf8(stoplist, token_ivars->text, token_ivars->len)) {
             Inversion_Append(new_inversion, (Token*)INCREF(token));
         }
     }
@@ -97,8 +97,8 @@ SnowStop_Dump_IMP(SnowballStopFilter *self) {
         = SUPER_METHOD_PTR(SNOWBALLSTOPFILTER, LUCY_SnowStop_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
     if (ivars->stoplist) {
-        Hash_Store_Str(dump, "stoplist", 8,
-                       Freezer_dump((Obj*)ivars->stoplist));
+        Hash_Store_Utf8(dump, "stoplist", 8,
+                        Freezer_dump((Obj*)ivars->stoplist));
     }
     return (Obj*)dump;
 }
@@ -109,7 +109,7 @@ SnowStop_Load_IMP(SnowballStopFilter *self, Obj *dump) {
     SnowStop_Load_t super_load
         = SUPER_METHOD_PTR(SNOWBALLSTOPFILTER, LUCY_SnowStop_Load);
     SnowballStopFilter *loaded = (SnowballStopFilter*)super_load(self, dump);
-    Obj *stoplist = Hash_Fetch_Str(source, "stoplist", 8);
+    Obj *stoplist = Hash_Fetch_Utf8(source, "stoplist", 8);
     if (stoplist) {
         SnowStop_IVARS(loaded)->stoplist
             = (Hash*)CERTIFY(Freezer_load(stoplist), HASH);

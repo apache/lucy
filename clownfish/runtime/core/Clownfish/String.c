@@ -249,19 +249,19 @@ Str_Clone_IMP(String *self) {
 
 String*
 Str_Cat_IMP(String *self, const String *other) {
-    return Str_Cat_Trusted_UTF8(self, other->ptr, other->size);
+    return Str_Cat_Trusted_Utf8(self, other->ptr, other->size);
 }
 
 String*
-Str_Cat_UTF8_IMP(String *self, const char* ptr, size_t size) {
+Str_Cat_Utf8_IMP(String *self, const char* ptr, size_t size) {
     if (!StrHelp_utf8_valid(ptr, size)) {
         DIE_INVALID_UTF8(ptr, size);
     }
-    return Str_Cat_Trusted_UTF8(self, ptr, size);
+    return Str_Cat_Trusted_Utf8(self, ptr, size);
 }
 
 String*
-Str_Cat_Trusted_UTF8_IMP(String *self, const char* ptr, size_t size) {
+Str_Cat_Trusted_Utf8_IMP(String *self, const char* ptr, size_t size) {
     size_t  result_size = self->size + size;
     char   *result_ptr  = (char*)MALLOCATE(result_size + 1);
     memcpy(result_ptr, self->ptr, self->size);
@@ -273,11 +273,11 @@ Str_Cat_Trusted_UTF8_IMP(String *self, const char* ptr, size_t size) {
 
 bool
 Str_Starts_With_IMP(String *self, const String *prefix) {
-    return Str_Starts_With_Str_IMP(self, prefix->ptr, prefix->size);
+    return Str_Starts_With_Utf8_IMP(self, prefix->ptr, prefix->size);
 }
 
 bool
-Str_Starts_With_Str_IMP(String *self, const char *prefix, size_t size) {
+Str_Starts_With_Utf8_IMP(String *self, const char *prefix, size_t size) {
     if (size <= self->size
         && (memcmp(self->ptr, prefix, size) == 0)
        ) {
@@ -293,7 +293,7 @@ Str_Equals_IMP(String *self, Obj *other) {
     String *const twin = (String*)other;
     if (twin == self)              { return true; }
     if (!Obj_Is_A(other, STRING)) { return false; }
-    return Str_Equals_Str_IMP(self, twin->ptr, twin->size);
+    return Str_Equals_Utf8_IMP(self, twin->ptr, twin->size);
 }
 
 int32_t
@@ -303,7 +303,7 @@ Str_Compare_To_IMP(String *self, Obj *other) {
 }
 
 bool
-Str_Equals_Str_IMP(String *self, const char *ptr, size_t size) {
+Str_Equals_Utf8_IMP(String *self, const char *ptr, size_t size) {
     if (self->size != size) {
         return false;
     }
@@ -312,11 +312,11 @@ Str_Equals_Str_IMP(String *self, const char *ptr, size_t size) {
 
 bool
 Str_Ends_With_IMP(String *self, const String *postfix) {
-    return Str_Ends_With_Str_IMP(self, postfix->ptr, postfix->size);
+    return Str_Ends_With_Utf8_IMP(self, postfix->ptr, postfix->size);
 }
 
 bool
-Str_Ends_With_Str_IMP(String *self, const char *postfix, size_t postfix_len) {
+Str_Ends_With_Utf8_IMP(String *self, const char *postfix, size_t postfix_len) {
     if (postfix_len <= self->size) {
         char *start = self->ptr + self->size - postfix_len;
         if (memcmp(start, postfix, postfix_len) == 0) {
@@ -329,11 +329,11 @@ Str_Ends_With_Str_IMP(String *self, const char *postfix, size_t postfix_len) {
 
 int64_t
 Str_Find_IMP(String *self, const String *substring) {
-    return Str_Find_Str(self, substring->ptr, substring->size);
+    return Str_Find_Utf8(self, substring->ptr, substring->size);
 }
 
 int64_t
-Str_Find_Str_IMP(String *self, const char *ptr, size_t size) {
+Str_Find_Utf8_IMP(String *self, const char *ptr, size_t size) {
     StackStringIterator *iter = STR_STACKTOP(self);
     int64_t location = 0;
 
@@ -824,11 +824,11 @@ StrIter_Skip_Prev_Whitespace_IMP(StringIterator *self) {
 
 bool
 StrIter_Starts_With_IMP(StringIterator *self, String *prefix) {
-    return StrIter_Starts_With_UTF8_IMP(self, prefix->ptr, prefix->size);
+    return StrIter_Starts_With_Utf8_IMP(self, prefix->ptr, prefix->size);
 }
 
 bool
-StrIter_Starts_With_UTF8_IMP(StringIterator *self, const char *prefix,
+StrIter_Starts_With_Utf8_IMP(StringIterator *self, const char *prefix,
                              size_t size) {
     String *string      = self->string;
     size_t  byte_offset = self->byte_offset;
@@ -844,12 +844,12 @@ StrIter_Starts_With_UTF8_IMP(StringIterator *self, const char *prefix,
 
 bool
 StrIter_Ends_With_IMP(StringIterator *self, String *postfix) {
-    return StrIter_Ends_With_UTF8_IMP(self, postfix->ptr, postfix->size);
+    return StrIter_Ends_With_Utf8_IMP(self, postfix->ptr, postfix->size);
 }
 
 bool
-StrIter_Ends_With_UTF8_IMP(StringIterator *self, const char *postfix,
-                             size_t size) {
+StrIter_Ends_With_Utf8_IMP(StringIterator *self, const char *postfix,
+                           size_t size) {
     String *string      = self->string;
     size_t  byte_offset = self->byte_offset;
 

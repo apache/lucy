@@ -259,8 +259,8 @@ HLWriter_Finish_IMP(HighlightWriter *self) {
         // Close down the output streams.
         OutStream_Close(ivars->dat_out);
         OutStream_Close(ivars->ix_out);
-        Seg_Store_Metadata_Str(ivars->segment, "highlight", 9,
-                               (Obj*)HLWriter_Metadata(self));
+        Seg_Store_Metadata_Utf8(ivars->segment, "highlight", 9,
+                                (Obj*)HLWriter_Metadata(self));
     }
 }
 

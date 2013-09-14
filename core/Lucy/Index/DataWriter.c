@@ -91,8 +91,8 @@ DataWriter_Merge_Segment_IMP(DataWriter *self, SegReader *reader,
 Hash*
 DataWriter_Metadata_IMP(DataWriter *self) {
     Hash *metadata = Hash_new(0);
-    Hash_Store_Str(metadata, "format", 6,
-                   (Obj*)Str_newf("%i32", DataWriter_Format(self)));
+    Hash_Store_Utf8(metadata, "format", 6,
+                    (Obj*)Str_newf("%i32", DataWriter_Format(self)));
     return metadata;
 }
 

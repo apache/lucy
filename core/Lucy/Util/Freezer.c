@@ -455,7 +455,7 @@ S_load_via_load_method(VTable *vtable, Obj *dump) {
 
 static Obj*
 S_load_from_hash(Hash *dump) {
-    String *class_name = (String*)Hash_Fetch_Str(dump, "_class", 6);
+    String *class_name = (String*)Hash_Fetch_Utf8(dump, "_class", 6);
 
     // Assume that the presence of the "_class" key paired with a valid class
     // name indicates the output of a dump() rather than an ordinary Hash.

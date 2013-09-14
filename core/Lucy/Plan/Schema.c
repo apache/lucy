@@ -256,13 +256,13 @@ Schema_Dump_IMP(Schema *self) {
     FieldType *type;
 
     // Record class name, store dumps of unique Analyzers.
-    Hash_Store_Str(dump, "_class", 6,
-                   (Obj*)Str_Clone(Schema_Get_Class_Name(self)));
-    Hash_Store_Str(dump, "analyzers", 9,
-                   Freezer_dump((Obj*)ivars->uniq_analyzers));
+    Hash_Store_Utf8(dump, "_class", 6,
+                    (Obj*)Str_Clone(Schema_Get_Class_Name(self)));
+    Hash_Store_Utf8(dump, "analyzers", 9,
+                    Freezer_dump((Obj*)ivars->uniq_analyzers));
 
     // Dump FieldTypes.
-    Hash_Store_Str(dump, "fields", 6, (Obj*)type_dumps);
+    Hash_Store_Utf8(dump, "fields", 6, (Obj*)type_dumps);
     Hash_Iterate(ivars->types);
     while (Hash_Next(ivars->types, (Obj**)&field, (Obj**)&type)) {
         VTable *type_vtable = FType_Get_VTable(type);
@@ -276,8 +276,8 @@ Schema_Dump_IMP(Schema *self) {
                 = S_find_in_array(ivars->uniq_analyzers, (Obj*)analyzer);
 
             // Store the tick which references a unique analyzer.
-            Hash_Store_Str(type_dump, "analyzer", 8,
-                           (Obj*)Str_newf("%u32", tick));
+            Hash_Store_Utf8(type_dump, "analyzer", 8,
+                            (Obj*)Str_newf("%u32", tick));
 
             Hash_Store(type_dumps, (Obj*)field, (Obj*)type_dump);
         }
@@ -306,13 +306,13 @@ Schema*
 Schema_Load_IMP(Schema *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     String *class_name
-        = (String*)CERTIFY(Hash_Fetch_Str(source, "_class", 6), STRING);
+        = (String*)CERTIFY(Hash_Fetch_Utf8(source, "_class", 6), STRING);
     VTable *vtable = VTable_singleton(class_name, NULL);
     Schema *loaded = (Schema*)VTable_Make_Obj(vtable);
     Hash *type_dumps
-        = (Hash*)CERTIFY(Hash_Fetch_Str(source, "fields", 6), HASH);
+        = (Hash*)CERTIFY(Hash_Fetch_Utf8(source, "fields", 6), HASH);
     VArray *analyzer_dumps
-        = (VArray*)CERTIFY(Hash_Fetch_Str(source, "analyzers", 9), VARRAY);
+        = (VArray*)CERTIFY(Hash_Fetch_Utf8(source, "analyzers", 9), VARRAY);
     VArray *analyzers
         = (VArray*)Freezer_load((Obj*)analyzer_dumps);
     String *field;
@@ -328,56 +328,56 @@ Schema_Load_IMP(Schema *self, Obj *dump) {
     while (Hash_Next(type_dumps, (Obj**)&field, (Obj**)&type_dump)) {
         String *type_str;
         CERTIFY(type_dump, HASH);
-        type_str = (String*)Hash_Fetch_Str(type_dump, "type", 4);
+        type_str = (String*)Hash_Fetch_Utf8(type_dump, "type", 4);
         if (type_str) {
-            if (Str_Equals_Str(type_str, "fulltext", 8)) {
+            if (Str_Equals_Utf8(type_str, "fulltext", 8)) {
                 // Replace the "analyzer" tick with the real thing.
                 Obj *tick
-                    = CERTIFY(Hash_Fetch_Str(type_dump, "analyzer", 8), OBJ);
+                    = CERTIFY(Hash_Fetch_Utf8(type_dump, "analyzer", 8), OBJ);
                 Analyzer *analyzer
                     = (Analyzer*)VA_Fetch(analyzers,
                                           (uint32_t)Obj_To_I64(tick));
                 if (!analyzer) {
                     THROW(ERR, "Can't find analyzer for '%o'", field);
                 }
-                Hash_Store_Str(type_dump, "analyzer", 8, INCREF(analyzer));
+                Hash_Store_Utf8(type_dump, "analyzer", 8, INCREF(analyzer));
                 FullTextType *type
                     = (FullTextType*)S_load_type(FULLTEXTTYPE,
                                                  (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
-            else if (Str_Equals_Str(type_str, "string", 6)) {
+            else if (Str_Equals_Utf8(type_str, "string", 6)) {
                 StringType *type
                     = (StringType*)S_load_type(STRINGTYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
-            else if (Str_Equals_Str(type_str, "blob", 4)) {
+            else if (Str_Equals_Utf8(type_str, "blob", 4)) {
                 BlobType *type
                     = (BlobType*)S_load_type(BLOBTYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
-            else if (Str_Equals_Str(type_str, "i32_t", 5)) {
+            else if (Str_Equals_Utf8(type_str, "i32_t", 5)) {
                 Int32Type *type
                     = (Int32Type*)S_load_type(INT32TYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
-            else if (Str_Equals_Str(type_str, "i64_t", 5)) {
+            else if (Str_Equals_Utf8(type_str, "i64_t", 5)) {
                 Int64Type *type
                     = (Int64Type*)S_load_type(INT64TYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
-            else if (Str_Equals_Str(type_str, "f32_t", 5)) {
+            else if (Str_Equals_Utf8(type_str, "f32_t", 5)) {
                 Float32Type *type
                     = (Float32Type*)S_load_type(FLOAT32TYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);
                 DECREF(type);
             }
-            else if (Str_Equals_Str(type_str, "f64_t", 5)) {
+            else if (Str_Equals_Utf8(type_str, "f64_t", 5)) {
                 Float64Type *type
                     = (Float64Type*)S_load_type(FLOAT64TYPE, (Obj*)type_dump);
                 Schema_Spec_Field(loaded, field, (FieldType*)type);

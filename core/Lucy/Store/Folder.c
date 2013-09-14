@@ -41,7 +41,7 @@ Folder_init(Folder *self, const String *path) {
     }
     else {
         // Copy path, strip trailing slash or equivalent.
-        if (Str_Ends_With_Str(path, DIR_SEP, strlen(DIR_SEP))) {
+        if (Str_Ends_With_Utf8(path, DIR_SEP, strlen(DIR_SEP))) {
             ivars->path = Str_SubString(path, 0, Str_Length(path) - 1);
         }
         else {
@@ -209,7 +209,7 @@ Folder_Delete_Tree_IMP(Folder *self, const String *path) {
 
 static bool
 S_is_updir(String *path) {
-    if (Str_Equals_Str(path, ".", 1) || Str_Equals_Str(path, "..", 2)) {
+    if (Str_Equals_Utf8(path, ".", 1) || Str_Equals_Utf8(path, "..", 2)) {
         return true;
     }
     else {

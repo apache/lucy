@@ -111,7 +111,7 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
         }
 
         // Store the value.
-        Hash_Store_Str(fields, field_name, field_name_len, value);
+        Hash_Store_Utf8(fields, field_name, field_name_len, value);
     }
     FREEMEM(field_name);
 

@@ -168,19 +168,19 @@ DefDelReader_Read_Deletions_IMP(DefaultDeletionsReader *self) {
     for (int32_t i = VA_Get_Size(segments) - 1; i >= 0; i--) {
         Segment *other_seg = (Segment*)VA_Fetch(segments, i);
         Hash *metadata
-            = (Hash*)Seg_Fetch_Metadata_Str(other_seg, "deletions", 9);
+            = (Hash*)Seg_Fetch_Metadata_Utf8(other_seg, "deletions", 9);
         if (metadata) {
             Hash *files = (Hash*)CERTIFY(
-                              Hash_Fetch_Str(metadata, "files", 5), HASH);
+                              Hash_Fetch_Utf8(metadata, "files", 5), HASH);
             Hash *seg_files_data
                 = (Hash*)Hash_Fetch(files, (Obj*)my_seg_name);
             if (seg_files_data) {
                 Obj *count = (Obj*)CERTIFY(
-                                 Hash_Fetch_Str(seg_files_data, "count", 5),
+                                 Hash_Fetch_Utf8(seg_files_data, "count", 5),
                                  OBJ);
                 del_count = (int32_t)Obj_To_I64(count);
                 del_file  = (String*)CERTIFY(
-                                Hash_Fetch_Str(seg_files_data, "filename", 8),
+                                Hash_Fetch_Utf8(seg_files_data, "filename", 8),
                                 STRING);
                 break;
             }

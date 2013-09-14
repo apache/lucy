@@ -229,7 +229,7 @@ FSFolder_Local_Find_Folder_IMP(FSFolder *self, const String *name) {
     else if (!S_is_local_entry(name)) {
         return NULL;
     }
-    else if (Str_Starts_With_Str(name, ".", 1)) {
+    else if (Str_Starts_With_Utf8(name, ".", 1)) {
         // Don't allow access outside of the main dir.
         return NULL;
     }
@@ -302,7 +302,7 @@ S_create_dir(const String *path) {
 
 static bool
 S_is_local_entry(const String *path) {
-    return Str_Find_Str(path, "/", 1) == -1;
+    return Str_Find_Utf8(path, "/", 1) == -1;
 }
 
 /***************************************************************************/
@@ -366,7 +366,7 @@ S_hard_link(String *from_path, String *to_path) {
 
 static bool
 S_is_absolute(const String *path) {
-    return Str_Starts_With_Str(path, DIR_SEP, 1);
+    return Str_Starts_With_Utf8(path, DIR_SEP, 1);
 }
 
 static String*

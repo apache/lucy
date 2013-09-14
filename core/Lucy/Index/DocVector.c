@@ -132,7 +132,7 @@ S_extract_tv_cache(ByteBuf *field_buf) {
 
         // Decompress the term text.
         CB_Set_Size(text_buf, overlap);
-        CB_Cat_Trusted_UTF8(text_buf, tv_string, len);
+        CB_Cat_Trusted_Utf8(text_buf, tv_string, len);
         tv_string += len;
 
         // Get positions & offsets string.

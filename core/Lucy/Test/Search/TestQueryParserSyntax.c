@@ -68,7 +68,7 @@ build_index() {
     RegexTokenizer *word_tokenizer = RegexTokenizer_new(word_pattern);
 
     Hash *stop_list = Hash_new(0);
-    Hash_Store_Str(stop_list, "x", 1, (Obj*)CFISH_TRUE);
+    Hash_Store_Utf8(stop_list, "x", 1, (Obj*)CFISH_TRUE);
     SnowballStopFilter *stop_filter = SnowStop_new(NULL, stop_list);
 
     VArray *analyzers = VA_new(0);

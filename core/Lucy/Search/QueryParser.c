@@ -141,10 +141,10 @@ QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
     VA_Sort(ivars->fields, NULL, NULL);
 
     // Derive default "occur" from default boolean operator.
-    if (Str_Equals_Str(ivars->default_boolop, "OR", 2)) {
+    if (Str_Equals_Utf8(ivars->default_boolop, "OR", 2)) {
         ivars->default_occur = SHOULD;
     }
-    else if (Str_Equals_Str(ivars->default_boolop, "AND", 3)) {
+    else if (Str_Equals_Utf8(ivars->default_boolop, "AND", 3)) {
         ivars->default_occur = MUST;
     }
     else {
@@ -876,11 +876,11 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
     StringIterator *tail = Str_Tail(full_text);
     StrIter_Skip_Next_Whitespace(top);
     StrIter_Skip_Prev_Whitespace(tail);
-    if (StrIter_Starts_With_UTF8(top, "\"", 1)) {
+    if (StrIter_Starts_With_Utf8(top, "\"", 1)) {
         is_phrase = true;
         StrIter_Advance(top, 1);
-        if (StrIter_Ends_With_UTF8(tail, "\"", 1)
-            && !StrIter_Ends_With_UTF8(tail, "\\\"", 2)
+        if (StrIter_Ends_With_Utf8(tail, "\"", 1)
+            && !StrIter_Ends_With_Utf8(tail, "\\\"", 2)
         ) {
             StrIter_Recede(tail, 1);
         }

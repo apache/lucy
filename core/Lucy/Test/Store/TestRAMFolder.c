@@ -159,7 +159,7 @@ test_Local_Find_Folder(TestBatchRunner *runner) {
     TEST_TRUE(runner,
               local
               && RAMFolder_Is_A(local, RAMFOLDER)
-              && Str_Equals_Str(RAMFolder_Get_Path(local), "foo", 3),
+              && Str_Equals_Utf8(RAMFolder_Get_Path(local), "foo", 3),
               "Find local directory");
 
     DECREF(folder);

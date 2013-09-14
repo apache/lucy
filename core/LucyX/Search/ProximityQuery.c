@@ -104,10 +104,10 @@ ProximityQuery_Dump_IMP(ProximityQuery *self) {
     ProximityQuery_Dump_t super_dump
         = SUPER_METHOD_PTR(PROXIMITYQUERY, LUCY_ProximityQuery_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
-    Hash_Store_Str(dump, "field", 5, Freezer_dump((Obj*)ivars->field));
-    Hash_Store_Str(dump, "terms", 5, Freezer_dump((Obj*)ivars->terms));
-    Hash_Store_Str(dump, "within", 6,
-                   (Obj*)Str_newf("%i64", (int64_t)ivars->within));
+    Hash_Store_Utf8(dump, "field", 5, Freezer_dump((Obj*)ivars->field));
+    Hash_Store_Utf8(dump, "terms", 5, Freezer_dump((Obj*)ivars->terms));
+    Hash_Store_Utf8(dump, "within", 6,
+                    (Obj*)Str_newf("%i64", (int64_t)ivars->within));
     return (Obj*)dump;
 }
 
@@ -118,11 +118,11 @@ ProximityQuery_Load_IMP(ProximityQuery *self, Obj *dump) {
         = SUPER_METHOD_PTR(PROXIMITYQUERY, LUCY_ProximityQuery_Load);
     ProximityQuery *loaded = (ProximityQuery*)super_load(self, dump);
     ProximityQueryIVARS *loaded_ivars = ProximityQuery_IVARS(loaded);
-    Obj *field = CERTIFY(Hash_Fetch_Str(source, "field", 5), OBJ);
+    Obj *field = CERTIFY(Hash_Fetch_Utf8(source, "field", 5), OBJ);
     loaded_ivars->field = (String*)CERTIFY(Freezer_load(field), STRING);
-    Obj *terms = CERTIFY(Hash_Fetch_Str(source, "terms", 5), OBJ);
+    Obj *terms = CERTIFY(Hash_Fetch_Utf8(source, "terms", 5), OBJ);
     loaded_ivars->terms = (VArray*)CERTIFY(Freezer_load(terms), VARRAY);
-    Obj *within = CERTIFY(Hash_Fetch_Str(source, "within", 6), OBJ);
+    Obj *within = CERTIFY(Hash_Fetch_Utf8(source, "within", 6), OBJ);
     loaded_ivars->within = (uint32_t)Obj_To_I64(within);
     return (Obj*)loaded;
 }
@@ -151,17 +151,17 @@ ProximityQuery_To_String_IMP(ProximityQuery *self) {
     ProximityQueryIVARS *const ivars = ProximityQuery_IVARS(self);
     uint32_t num_terms = VA_Get_Size(ivars->terms);
     CharBuf *buf = CB_new_from_str(ivars->field);
-    CB_Cat_Trusted_UTF8(buf, ":\"", 2);
+    CB_Cat_Trusted_Utf8(buf, ":\"", 2);
     for (uint32_t i = 0; i < num_terms; i++) {
         Obj *term = VA_Fetch(ivars->terms, i);
         String *term_string = Obj_To_String(term);
         CB_Cat(buf, term_string);
         DECREF(term_string);
         if (i < num_terms - 1) {
-            CB_Cat_Trusted_UTF8(buf, " ",  1);
+            CB_Cat_Trusted_Utf8(buf, " ",  1);
         }
     }
-    CB_Cat_Trusted_UTF8(buf, "\"", 1);
+    CB_Cat_Trusted_Utf8(buf, "\"", 1);
     CB_catf(buf, "~%u32", ivars->within);
     String *retval = CB_Yield_String(buf);
     DECREF(buf);

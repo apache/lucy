@@ -45,15 +45,15 @@ test_Equals(TestBatchRunner *runner) {
     TEST_TRUE(runner, Hash_Equals(hash, (Obj*)other),
               "Empty hashes are equal");
 
-    Hash_Store_Str(hash, "foo", 3, (Obj*)CFISH_TRUE);
+    Hash_Store_Utf8(hash, "foo", 3, (Obj*)CFISH_TRUE);
     TEST_FALSE(runner, Hash_Equals(hash, (Obj*)other),
                "Add one pair and Equals returns false");
 
-    Hash_Store_Str(other, "foo", 3, (Obj*)CFISH_TRUE);
+    Hash_Store_Utf8(other, "foo", 3, (Obj*)CFISH_TRUE);
     TEST_TRUE(runner, Hash_Equals(hash, (Obj*)other),
               "Add a matching pair and Equals returns true");
 
-    Hash_Store_Str(other, "foo", 3, INCREF(stuff));
+    Hash_Store_Utf8(other, "foo", 3, INCREF(stuff));
     TEST_FALSE(runner, Hash_Equals(hash, (Obj*)other),
                "Non-matching value spoils Equals");
 

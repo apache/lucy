@@ -77,8 +77,8 @@ public class Lucy::Index::Segment cnick Seg inherits Clownfish::Obj {
                    decremented Obj *metadata);
 
     void
-    Store_Metadata_Str(Segment *self, const char *key, size_t len,
-                       decremented Obj *value);
+    Store_Metadata_Utf8(Segment *self, const char *key, size_t len,
+                        decremented Obj *value);
 
     /** Fetch a value from the Segment's metadata hash.
      */
@@ -86,7 +86,7 @@ public class Lucy::Index::Segment cnick Seg inherits Clownfish::Obj {
     Fetch_Metadata(Segment *self, const String *key);
 
     nullable Obj*
-    Fetch_Metadata_Str(Segment *self, const char *key, size_t len);
+    Fetch_Metadata_Utf8(Segment *self, const char *key, size_t len);
 
     /** Given a field name, return its field number for this segment (which
      * may differ from its number in other segments).  Return 0 (an invalid

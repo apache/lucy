@@ -47,8 +47,8 @@ public class Lucy::Analysis::StandardTokenizer
      * supplied Inversion.
      */
     void
-    Tokenize_Str(StandardTokenizer *self, const char *text, size_t len,
-                 Inversion *inversion);
+    Tokenize_Utf8(StandardTokenizer *self, const char *text, size_t len,
+                  Inversion *inversion);
 
     public bool
     Equals(StandardTokenizer *self, Obj *other);

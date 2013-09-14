@@ -87,8 +87,8 @@ StandardTokenizer_Transform_IMP(StandardTokenizer *self, Inversion *inversion) {
 
     while (NULL != (token = Inversion_Next(inversion))) {
         TokenIVARS *const token_ivars = Token_IVARS(token);
-        StandardTokenizer_Tokenize_Str(self, token_ivars->text,
-                                       token_ivars->len, new_inversion);
+        StandardTokenizer_Tokenize_Utf8(self, token_ivars->text,
+                                        token_ivars->len, new_inversion);
     }
 
     return new_inversion;
@@ -97,14 +97,14 @@ StandardTokenizer_Transform_IMP(StandardTokenizer *self, Inversion *inversion) {
 Inversion*
 StandardTokenizer_Transform_Text_IMP(StandardTokenizer *self, String *text) {
     Inversion *new_inversion = Inversion_new(NULL);
-    StandardTokenizer_Tokenize_Str(self, (char*)Str_Get_Ptr8(text),
-                                   Str_Get_Size(text), new_inversion);
+    StandardTokenizer_Tokenize_Utf8(self, (char*)Str_Get_Ptr8(text),
+                                    Str_Get_Size(text), new_inversion);
     return new_inversion;
 }
 
 void
-StandardTokenizer_Tokenize_Str_IMP(StandardTokenizer *self, const char *text,
-                                   size_t len, Inversion *inversion) {
+StandardTokenizer_Tokenize_Utf8_IMP(StandardTokenizer *self, const char *text,
+                                    size_t len, Inversion *inversion) {
     UNUSED_VAR(self);
     if ((len >= 1 && (uint8_t)text[len - 1] >= 0xC0)
         ||  (len >= 2 && (uint8_t)text[len - 2] >= 0xE0)

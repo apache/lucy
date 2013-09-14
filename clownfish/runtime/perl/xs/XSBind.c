@@ -252,10 +252,10 @@ S_perl_hash_to_cfish_hash(HV *phash) {
             // this.
             SV   *key_sv  = HeKEY_sv(entry);
             char *key_str = SvPVutf8(key_sv, key_len);
-            CFISH_Hash_Store_Str(retval, key_str, key_len, value);
+            CFISH_Hash_Store_Utf8(retval, key_str, key_len, value);
         }
         else if (HeKUTF8(entry)) {
-            CFISH_Hash_Store_Str(retval, HeKEY(entry), key_len, value);
+            CFISH_Hash_Store_Utf8(retval, HeKEY(entry), key_len, value);
         }
         else {
             char *key_str = HeKEY(entry);
@@ -264,12 +264,12 @@ S_perl_hash_to_cfish_hash(HV *phash) {
                 if ((key_str[i] & 0x80) == 0x80) { pure_ascii = false; }
             }
             if (pure_ascii) {
-                CFISH_Hash_Store_Str(retval, key_str, key_len, value);
+                CFISH_Hash_Store_Utf8(retval, key_str, key_len, value);
             }
             else {
                 SV *key_sv = HeSVKEY_force(entry);
                 key_str = SvPVutf8(key_sv, key_len);
-                CFISH_Hash_Store_Str(retval, key_str, key_len, value);
+                CFISH_Hash_Store_Utf8(retval, key_str, key_len, value);
             }
         }
     }

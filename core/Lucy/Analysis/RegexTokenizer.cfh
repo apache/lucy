@@ -81,8 +81,8 @@ public class Lucy::Analysis::RegexTokenizer
      * supplied Inversion.
      */
     void
-    Tokenize_Str(RegexTokenizer *self, const char *text, size_t len,
-                 Inversion *inversion);
+    Tokenize_Utf8(RegexTokenizer *self, const char *text, size_t len,
+                  Inversion *inversion);
 
     /** Set the compiled regular expression for matching a token.  Also sets
      * <code>pattern</code> as a side effect.

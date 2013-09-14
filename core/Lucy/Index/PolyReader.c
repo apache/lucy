@@ -237,8 +237,8 @@ S_try_open_elements(void *context) {
         if (Seg_valid_seg_name(entry)) {
             num_segs++;
         }
-        else if (Str_Starts_With_Str(entry, "schema_", 7)
-                 && Str_Ends_With_Str(entry, ".json", 5)
+        else if (Str_Starts_With_Utf8(entry, "schema_", 7)
+                 && Str_Ends_With_Utf8(entry, ".json", 5)
                 ) {
             uint64_t gen = IxFileNames_extract_gen(entry);
             if (gen > latest_schema_gen) {

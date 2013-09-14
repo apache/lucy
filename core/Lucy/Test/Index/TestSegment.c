@@ -63,12 +63,12 @@ test_metadata_storage(TestBatchRunner *runner) {
     Segment *segment = Seg_new(1);
     String *got;
 
-    Seg_Store_Metadata_Str(segment, "foo", 3, (Obj*)Str_newf("bar"));
-    got = (String*)Seg_Fetch_Metadata_Str(segment, "foo", 3);
+    Seg_Store_Metadata_Utf8(segment, "foo", 3, (Obj*)Str_newf("bar"));
+    got = (String*)Seg_Fetch_Metadata_Utf8(segment, "foo", 3);
     TEST_TRUE(runner,
               got
               && Str_Is_A(got, STRING)
-              && Str_Equals_Str(got, "bar", 3),
+              && Str_Equals_Utf8(got, "bar", 3),
               "metadata round trip"
              );
     DECREF(segment);
@@ -79,9 +79,9 @@ test_seg_name_and_num(TestBatchRunner *runner) {
     Segment *segment_z = Seg_new(35);
     String *seg_z_name = Seg_num_to_name(35);
     TEST_TRUE(runner, Seg_Get_Number(segment_z) == INT64_C(35), "Get_Number");
-    TEST_TRUE(runner, Str_Equals_Str(Seg_Get_Name(segment_z), "seg_z", 5),
+    TEST_TRUE(runner, Str_Equals_Utf8(Seg_Get_Name(segment_z), "seg_z", 5),
               "Get_Name");
-    TEST_TRUE(runner, Str_Equals_Str(seg_z_name, "seg_z", 5),
+    TEST_TRUE(runner, Str_Equals_Utf8(seg_z_name, "seg_z", 5),
               "num_to_name");
     DECREF(seg_z_name);
     DECREF(segment_z);
@@ -130,7 +130,7 @@ test_Write_File_and_Read_File(TestBatchRunner *runner) {
     String    *jetsam  = (String*)SSTR_WRAP_STR("jetsam", 6);
 
     Seg_Set_Count(segment, 111);
-    Seg_Store_Metadata_Str(segment, "foo", 3, (Obj*)Str_newf("bar"));
+    Seg_Store_Metadata_Utf8(segment, "foo", 3, (Obj*)Str_newf("bar"));
     Seg_Add_Field(segment, flotsam);
     Seg_Add_Field(segment, jetsam);
 
@@ -143,11 +143,11 @@ test_Write_File_and_Read_File(TestBatchRunner *runner) {
     TEST_TRUE(runner,
               Seg_Field_Num(got, jetsam) == Seg_Field_Num(segment, jetsam),
               "Round trip field names through file");
-    meta = (String*)Seg_Fetch_Metadata_Str(got, "foo", 3);
+    meta = (String*)Seg_Fetch_Metadata_Utf8(got, "foo", 3);
     TEST_TRUE(runner,
               meta
               && Str_Is_A(meta, STRING)
-              && Str_Equals_Str(meta, "bar", 3),
+              && Str_Equals_Utf8(meta, "bar", 3),
               "Round trip metadata through file");
 
     DECREF(got);

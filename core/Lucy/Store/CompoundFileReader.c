@@ -48,9 +48,9 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder) {
                                  Folder_Get_Path(folder)));
     }
     else {
-        Obj *format = Hash_Fetch_Str(metadata, "format", 6);
+        Obj *format = Hash_Fetch_Utf8(metadata, "format", 6);
         ivars->format = format ? (int32_t)Obj_To_I64(format) : 0;
-        ivars->records = (Hash*)INCREF(Hash_Fetch_Str(metadata, "files", 5));
+        ivars->records = (Hash*)INCREF(Hash_Fetch_Utf8(metadata, "files", 5));
         if (ivars->format < 1) {
             error = Err_new(Str_newf("Corrupt %o file: Missing or invalid 'format'",
                                      cfmeta_file));
@@ -194,8 +194,8 @@ CFReader_Local_Open_In_IMP(CompoundFileReader *self, const String *name) {
         return instream;
     }
     else {
-        Obj *len    = Hash_Fetch_Str(entry, "length", 6);
-        Obj *offset = Hash_Fetch_Str(entry, "offset", 6);
+        Obj *len    = Hash_Fetch_Utf8(entry, "length", 6);
+        Obj *offset = Hash_Fetch_Utf8(entry, "offset", 6);
         if (!len || !offset) {
             Err_set_error(Err_new(Str_newf("Malformed entry for '%o' in '%o'",
                                            name, Folder_Get_Path(ivars->real_folder))));

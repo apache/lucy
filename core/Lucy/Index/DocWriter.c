@@ -208,8 +208,8 @@ DocWriter_Finish_IMP(DocWriter *self) {
         // Close down output streams.
         OutStream_Close(ivars->dat_out);
         OutStream_Close(ivars->ix_out);
-        Seg_Store_Metadata_Str(ivars->segment, "documents", 9,
-                               (Obj*)DocWriter_Metadata(self));
+        Seg_Store_Metadata_Utf8(ivars->segment, "documents", 9,
+                                (Obj*)DocWriter_Metadata(self));
     }
 }
 

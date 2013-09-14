@@ -236,8 +236,8 @@ SortWriter_Finish_IMP(SortWriter *self) {
     VA_Clear(field_writers);
 
     // Store metadata.
-    Seg_Store_Metadata_Str(ivars->segment, "sort", 4,
-                           (Obj*)SortWriter_Metadata(self));
+    Seg_Store_Metadata_Utf8(ivars->segment, "sort", 4,
+                            (Obj*)SortWriter_Metadata(self));
 
     // Clean up.
     Folder *folder   = ivars->folder;
@@ -260,9 +260,9 @@ SortWriter_Metadata_IMP(SortWriter *self) {
         = (SortWriter_Metadata_t)SUPER_METHOD_PTR(SORTWRITER,
                                                   LUCY_SortWriter_Metadata);
     Hash *const metadata = super_meta(self);
-    Hash_Store_Str(metadata, "counts", 6, INCREF(ivars->counts));
-    Hash_Store_Str(metadata, "null_ords", 9, INCREF(ivars->null_ords));
-    Hash_Store_Str(metadata, "ord_widths", 10, INCREF(ivars->ord_widths));
+    Hash_Store_Utf8(metadata, "counts", 6, INCREF(ivars->counts));
+    Hash_Store_Utf8(metadata, "null_ords", 9, INCREF(ivars->null_ords));
+    Hash_Store_Utf8(metadata, "ord_widths", 10, INCREF(ivars->ord_widths));
     return metadata;
 }
 

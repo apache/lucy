@@ -72,7 +72,7 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
     raw_excerpt = Highlighter_Raw_Excerpt(highlighter, field_val, &top,
                                           heat_map);
     TEST_TRUE(runner,
-              Str_Equals_Str(raw_excerpt, "Ook.", 4),
+              Str_Equals_Utf8(raw_excerpt, "Ook.", 4),
               "Raw_Excerpt at top %s", Str_Get_Ptr8(raw_excerpt));
     TEST_TRUE(runner,
               top == 0,
@@ -87,7 +87,7 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
     raw_excerpt = Highlighter_Raw_Excerpt(highlighter, field_val, &top,
                                           heat_map);
     TEST_TRUE(runner,
-              Str_Equals_Str(raw_excerpt, "Urk.", 4),
+              Str_Equals_Utf8(raw_excerpt, "Urk.", 4),
               "Raw_Excerpt in middle, with 2 bounds");
     TEST_TRUE(runner,
               top == 6,
@@ -103,7 +103,7 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
     raw_excerpt = Highlighter_Raw_Excerpt(highlighter, field_val, &top,
                                           heat_map);
     TEST_TRUE(runner,
-              Str_Equals_Str(raw_excerpt, ELLIPSIS " i.", 6),
+              Str_Equals_Utf8(raw_excerpt, ELLIPSIS " i.", 6),
               "Ellipsis at top");
     TEST_TRUE(runner,
               top == 10,
@@ -119,7 +119,7 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
     raw_excerpt = Highlighter_Raw_Excerpt(highlighter, field_val, &top,
                                           heat_map);
     TEST_TRUE(runner,
-              Str_Equals_Str(raw_excerpt, "Iz no" ELLIPSIS, 8),
+              Str_Equals_Utf8(raw_excerpt, "Iz no" ELLIPSIS, 8),
               "Ellipsis at end");
     TEST_TRUE(runner,
               top == 6,
@@ -138,7 +138,7 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
     raw_excerpt = Highlighter_Raw_Excerpt(highlighter, field_val, &top,
                                           heat_map);
     TEST_TRUE(runner,
-              Str_Equals_Str(raw_excerpt, "abc/d" ELLIPSIS, 8),
+              Str_Equals_Utf8(raw_excerpt, "abc/d" ELLIPSIS, 8),
               "Long word at top");
     DECREF(heat_map);
     DECREF(raw_excerpt);
@@ -150,7 +150,7 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
     raw_excerpt = Highlighter_Raw_Excerpt(highlighter, field_val, &top,
                                           heat_map);
     TEST_TRUE(runner,
-              Str_Equals_Str(raw_excerpt, ELLIPSIS " f/g" ELLIPSIS, 10),
+              Str_Equals_Utf8(raw_excerpt, ELLIPSIS " f/g" ELLIPSIS, 10),
               "Long word in middle");
     DECREF(heat_map);
     DECREF(raw_excerpt);
@@ -170,7 +170,7 @@ test_Highlight_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) 
     highlighted = Highlighter_Highlight_Excerpt(highlighter, spans,
                                                 raw_excerpt, 0);
     TEST_TRUE(runner,
-              Str_Equals_Str(highlighted, "a <strong>b</strong> c", 22),
+              Str_Equals_Utf8(highlighted, "a <strong>b</strong> c", 22),
               "basic Highlight_Excerpt");
     DECREF(highlighted);
     DECREF(spans);
@@ -182,7 +182,7 @@ test_Highlight_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) 
     highlighted = Highlighter_Highlight_Excerpt(highlighter, spans,
                                                 raw_excerpt, 0);
     TEST_TRUE(runner,
-              Str_Equals_Str(highlighted, "<strong>&#934;</strong>", 23),
+              Str_Equals_Utf8(highlighted, "<strong>&#934;</strong>", 23),
               "don't surround spans off end of raw excerpt.");
     DECREF(highlighted);
     DECREF(spans);
@@ -193,7 +193,7 @@ test_Highlight_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) 
     highlighted = Highlighter_Highlight_Excerpt(highlighter, spans,
                                                 raw_excerpt, 1);
     TEST_TRUE(runner,
-              Str_Equals_Str(highlighted,
+              Str_Equals_Utf8(highlighted,
                             "&#934; <strong>&#934;</strong> &#934;", 37),
               "Highlight_Excerpt pays attention to offset");
     DECREF(highlighted);
@@ -208,7 +208,7 @@ test_Highlight_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) 
     highlighted = Highlighter_Highlight_Excerpt(highlighter, spans,
                                                 raw_excerpt, 0);
     TEST_TRUE(runner,
-              Str_Equals_Str(highlighted,
+              Str_Equals_Utf8(highlighted,
                             "&#934; <strong>Oook. Urk. Ick.</strong> &#934;",
                             46),
               "Highlight_Excerpt works with overlapping spans");
@@ -227,7 +227,7 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     HitDoc *hit = Hits_Next(hits);
     String *excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_TRUE(runner,
-              Str_Find_Str(excerpt,
+              Str_Find_Utf8(excerpt,
                            "<strong>&#934;</strong> a b c d <strong>x y z</strong>",
                            54) >= 0,
               "highlighter tagged phrase and single term");
@@ -239,7 +239,7 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     Highlighter_Set_Post_Tag(highlighter, post_tag);
     excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_TRUE(runner,
-              Str_Find_Str(excerpt,
+              Str_Find_Utf8(excerpt,
                           "\x1B[1m&#934;\x1B[0m a b c d \x1B[1mx y z\x1B[0m",
                           36) >= 0,
               "set_pre_tag and set_post_tag");
@@ -249,7 +249,7 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     hit = Hits_Next(hits);
     excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_TRUE(runner,
-              Str_Find_Str(excerpt, "x", 1) >= 0,
+              Str_Find_Utf8(excerpt, "x", 1) >= 0,
               "excerpt field with partial hit doesn't cause highlighter freakout");
     DECREF(excerpt);
     DECREF(hit);
@@ -261,7 +261,7 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     hit = Hits_Next(hits);
     excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_TRUE(runner,
-              Str_Find_Str(excerpt,
+              Str_Find_Utf8(excerpt,
                           "<strong>b</strong> c d <strong>x y z</strong>",
                           45) >= 0,
               "query with same word in both phrase and term doesn't cause freakout");
@@ -276,7 +276,7 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     hit = Hits_Next(hits);
     excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_TRUE(runner,
-              Str_Find_Str(excerpt, "&quot;", 6) >= 0,
+              Str_Find_Utf8(excerpt, "&quot;", 6) >= 0,
               "HTML entity encoded properly");
     DECREF(excerpt);
     DECREF(hit);
@@ -289,7 +289,7 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     hit = Hits_Next(hits);
     excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_TRUE(runner,
-              Str_Find_Str(excerpt, "&#934;", 6) == -1,
+              Str_Find_Utf8(excerpt, "&#934;", 6) == -1,
               "no ellipsis for short excerpt");
     DECREF(excerpt);
     DECREF(hit);
@@ -303,7 +303,7 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     highlighter = Highlighter_new(searcher, query, content, 200);
     excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_TRUE(runner,
-              Str_Find_Str(excerpt, "strong", 5) >= 0,
+              Str_Find_Utf8(excerpt, "strong", 5) >= 0,
               "specify field highlights correct field...");
     DECREF(excerpt);
     DECREF(highlighter);
@@ -311,7 +311,7 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     highlighter = Highlighter_new(searcher, query, alt, 200);
     excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_TRUE(runner,
-              Str_Find_Str(excerpt, "strong", 5) == -1,
+              Str_Find_Utf8(excerpt, "strong", 5) == -1,
               "... but not another field");
     DECREF(excerpt);
     DECREF(highlighter);

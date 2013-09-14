@@ -32,7 +32,7 @@ S_test_local_part(TestBatchRunner *runner, const char *source,
                   const char *wanted, const char *test_name) {
     StackString *source_str = SSTR_WRAP_STR(source, strlen(source));
     String *got = IxFileNames_local_part((String*)source_str);
-    TEST_TRUE(runner, Str_Equals_Str(got, wanted, strlen(wanted)), test_name);
+    TEST_TRUE(runner, Str_Equals_Utf8(got, wanted, strlen(wanted)), test_name);
     DECREF(got);
 }
 
