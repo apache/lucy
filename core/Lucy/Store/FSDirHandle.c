@@ -208,13 +208,13 @@ FSDH_Next_IMP(FSDirHandle *self) {
 
 FSDirHandle*
 FSDH_do_open(FSDirHandle *self, const String *dir) {
-    char *dir_path_ptr = (char*)Str_Get_Ptr8(dir);
-
     DH_init((DirHandle*)self, dir);
     FSDirHandleIVARS *const ivars = FSDH_IVARS(self);
     ivars->sys_dir_entry = NULL;
 
+    char *dir_path_ptr = Str_To_Utf8(dir);
     ivars->sys_dirhandle = opendir(dir_path_ptr);
+    FREEMEM(dir_path_ptr);
     if (!ivars->sys_dirhandle) {
         Err_set_error(Err_new(Str_newf("Failed to opendir '%o'", dir)));
         DECREF(self);
@@ -272,9 +272,11 @@ FSDH_Entry_Is_Dir_IMP(FSDirHandle *self) {
     struct stat stat_buf;
     String *fullpath = Str_newf("%o%s%o", ivars->dir, CHY_DIR_SEP,
                                 ivars->entry);
-    if (stat((char*)Str_Get_Ptr8(fullpath), &stat_buf) != -1) {
+    char *fullpath_ptr = Str_To_Utf8(fullpath);
+    if (stat(fullpath_ptr, &stat_buf) != -1) {
         if (stat_buf.st_mode & S_IFDIR) { retval = true; }
     }
+    FREEMEM(fullpath_ptr);
     DECREF(fullpath);
     return retval;
 }
@@ -293,9 +295,11 @@ FSDH_Entry_Is_Symlink_IMP(FSDirHandle *self) {
         struct stat stat_buf;
         String *fullpath = Str_newf("%o%s%o", ivars->dir, CHY_DIR_SEP,
                                     ivars->entry);
-        if (stat((char*)Str_Get_Ptr8(fullpath), &stat_buf) != -1) {
+        char *fullpath_ptr = Str_To_Utf8(fullpath);
+        if (stat(fullpath_ptr, &stat_buf) != -1) {
             if (stat_buf.st_mode & S_IFLNK) { retval = true; }
         }
+        FREEMEM(fullpath_ptr);
         DECREF(fullpath);
         return retval;
     }

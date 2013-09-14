@@ -85,6 +85,8 @@ cfish_Obj*
 XSBind_maybe_sv_to_cfish_obj(SV *sv, cfish_VTable *vtable, void *allocation) {
     cfish_Obj *retval = NULL;
     if (XSBind_sv_defined(sv)) {
+        // Assume that the class name is always NULL-terminated. Somewhat
+        // dangerous but should be safe.
         if (sv_isobject(sv)
             && sv_derived_from(sv, (char*)CFISH_Str_Get_Ptr8(CFISH_VTable_Get_Name(vtable)))
            ) {
