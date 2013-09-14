@@ -237,9 +237,12 @@ Str_To_F64_IMP(String *self) {
     return value;
 }
 
-String*
-Str_To_CB8_IMP(String *self) {
-    return Str_new_from_trusted_utf8(self->ptr, self->size);
+char*
+Str_To_Utf8_IMP(String *self) {
+    char *buf = (char*)MALLOCATE(self->size + 1);
+    memcpy(buf, self->ptr, self->size);
+    buf[self->size] = '\0'; // NULL-terminate.
+    return buf;
 }
 
 String*

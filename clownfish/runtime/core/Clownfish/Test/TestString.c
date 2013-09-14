@@ -31,8 +31,10 @@
 #include "Clownfish/Test.h"
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Clownfish/TestHarness/TestUtils.h"
+#include "Clownfish/Util/Memory.h"
 #include "Clownfish/VTable.h"
 
+#define SMILEY "\xE2\x98\xBA"
 static char smiley[] = { (char)0xE2, (char)0x98, (char)0xBA, 0 };
 static uint32_t smiley_len = 3;
 static uint32_t smiley_cp  = 0x263A;
@@ -259,6 +261,16 @@ test_To_I64(TestBatchRunner *runner) {
 
     string = S_get_str("-10");
     TEST_TRUE(runner, Str_To_I64(string) == -10, "To_I64 negative");
+    DECREF(string);
+}
+
+static void
+test_To_Utf8(TestBatchRunner *runner) {
+    String *string = Str_newf("a%s%sb%sc", smiley, smiley, smiley);
+    char *buf = Str_To_Utf8(string);
+    TEST_TRUE(runner, strcmp(buf, "a" SMILEY SMILEY "b" SMILEY "c") == 0,
+              "To_Utf8");
+    FREEMEM(buf);
     DECREF(string);
 }
 
@@ -495,7 +507,7 @@ test_iterator_substring(TestBatchRunner *runner) {
 
 void
 TestStr_Run_IMP(TestString *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 100);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 101);
     test_Cat(runner);
     test_Clone(runner);
     test_Code_Point_At_and_From(runner);
@@ -504,6 +516,7 @@ TestStr_Run_IMP(TestString *self, TestBatchRunner *runner) {
     test_Trim(runner);
     test_To_F64(runner);
     test_To_I64(runner);
+    test_To_Utf8(runner);
     test_Length(runner);
     test_Compare_To(runner);
     test_Swap_Chars(runner);
