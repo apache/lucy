@@ -131,7 +131,7 @@ void
 TestUtils_test_analyzer(TestBatchRunner *runner, Analyzer *analyzer,
                         String *source, VArray *expected,
                         const char *message) {
-    Token *seed = Token_new((char*)Str_Get_Ptr8(source), Str_Get_Size(source),
+    Token *seed = Token_new(Str_Get_Ptr8(source), Str_Get_Size(source),
                             0, 0, 1.0f, 1);
     Inversion *starter = Inversion_new(seed);
     Inversion *transformed = Analyzer_Transform(analyzer, starter);

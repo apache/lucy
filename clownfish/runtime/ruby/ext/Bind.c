@@ -35,7 +35,7 @@ Bind_str_to_ruby(const cfish_String *str) {
         return rb_str_new2("");
     }
     else {
-        return rb_str_new((char*)CFISH_Str_Get_Ptr8(str), CFISH_Str_Get_Size(str));
+        return rb_str_new(CFISH_Str_Get_Ptr8(str), CFISH_Str_Get_Size(str));
     }
 }
 

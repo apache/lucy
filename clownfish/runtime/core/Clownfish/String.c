@@ -449,9 +449,9 @@ Str_Get_Size_IMP(String *self) {
     return self->size;
 }
 
-uint8_t*
+const char*
 Str_Get_Ptr8_IMP(String *self) {
-    return (uint8_t*)self->ptr;
+    return self->ptr;
 }
 
 StringIterator*

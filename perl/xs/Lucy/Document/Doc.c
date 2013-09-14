@@ -54,8 +54,8 @@ LUCY_Doc_Get_Size_IMP(lucy_Doc *self) {
 void
 LUCY_Doc_Store_IMP(lucy_Doc *self, const cfish_String *field, cfish_Obj *value) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
-    char   *key      = (char*)CFISH_Str_Get_Ptr8(field);
-    size_t  key_size = CFISH_Str_Get_Size(field);
+    const char *key      = CFISH_Str_Get_Ptr8(field);
+    size_t      key_size = CFISH_Str_Get_Size(field);
     SV *key_sv = newSVpvn(key, key_size);
     SV *val_sv = value == NULL
                  ? newSV(0)
@@ -146,7 +146,7 @@ cfish_Obj*
 LUCY_Doc_Extract_IMP(lucy_Doc *self, cfish_String *field) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     cfish_Obj *retval = NULL;
-    SV **sv_ptr = hv_fetch((HV*)ivars->fields, (char*)CFISH_Str_Get_Ptr8(field),
+    SV **sv_ptr = hv_fetch((HV*)ivars->fields, CFISH_Str_Get_Ptr8(field),
                            CFISH_Str_Get_Size(field), 0);
 
     if (sv_ptr && XSBind_sv_defined(*sv_ptr)) {

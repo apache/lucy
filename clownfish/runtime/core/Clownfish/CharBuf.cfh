@@ -130,7 +130,7 @@ class Clownfish::CharBuf cnick CB
     /** Return the internal backing array for the CharBuf if its internal
      * encoding is UTF-8.  If it is not encoded as UTF-8 throw an exception.
      */
-    uint8_t*
+    char*
     Get_Ptr8(CharBuf *self);
 
     public incremented CharBuf*

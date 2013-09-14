@@ -265,7 +265,7 @@ S_write_val(Obj *val, int8_t prim_id, OutStream *ix_out, OutStream *dat_out,
                     String *string = (String*)val;
                     int64_t dat_pos = OutStream_Tell(dat_out) - dat_start;
                     OutStream_Write_I64(ix_out, dat_pos);
-                    OutStream_Write_Bytes(dat_out, (char*)Str_Get_Ptr8(string),
+                    OutStream_Write_Bytes(dat_out, Str_Get_Ptr8(string),
                                           Str_Get_Size(string));
                     break;
                 }

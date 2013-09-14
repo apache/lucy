@@ -289,8 +289,8 @@ S_fullpath_ptr(FSFolder *self, const String *path) {
     size_t folder_size = Str_Get_Size(ivars->path);
     size_t path_size   = Str_Get_Size(path);
     size_t full_size   = folder_size + 1 + path_size;
-    const char *folder_ptr = (char*)Str_Get_Ptr8(ivars->path);
-    const char *path_ptr   = (char*)Str_Get_Ptr8(path);
+    const char *folder_ptr = Str_Get_Ptr8(ivars->path);
+    const char *path_ptr   = Str_Get_Ptr8(path);
 
     char *buf = (char*)MALLOCATE(full_size + 1);
     memcpy(buf, folder_ptr, folder_size);

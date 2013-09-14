@@ -115,8 +115,8 @@ DocWriter_Add_Inverted_Doc_IMP(DocWriter *self, Inverter *inverter,
             Freezer_serialize_string(field, dat_out);
             switch (FType_Primitive_ID(type) & FType_PRIMITIVE_ID_MASK) {
                 case FType_TEXT: {
-                    uint8_t *buf  = Str_Get_Ptr8((String*)value);
-                    size_t   size = Str_Get_Size((String*)value);
+                    const char *buf  = Str_Get_Ptr8((String*)value);
+                    size_t      size = Str_Get_Size((String*)value);
                     OutStream_Write_C32(dat_out, size);
                     OutStream_Write_Bytes(dat_out, buf, size);
                     break;

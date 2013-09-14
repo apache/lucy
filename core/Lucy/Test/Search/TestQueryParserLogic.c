@@ -906,9 +906,9 @@ TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
         Hits  *hits     = IxSearcher_Hits(searcher, (Obj*)parsed, 0, 10, NULL);
 
         TEST_TRUE(runner, Query_Equals(tree, (Obj*)test_case->tree),
-                  "tree() OR   %s", (char*)Str_Get_Ptr8(test_case->query_string));
+                  "tree() OR   %s", Str_Get_Ptr8(test_case->query_string));
         TEST_INT_EQ(runner, Hits_Total_Hits(hits), test_case->num_hits,
-                    "hits: OR   %s", (char*)Str_Get_Ptr8(test_case->query_string));
+                    "hits: OR   %s", Str_Get_Ptr8(test_case->query_string));
         DECREF(hits);
         DECREF(parsed);
         DECREF(tree);
@@ -925,9 +925,9 @@ TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
         Hits  *hits     = IxSearcher_Hits(searcher, (Obj*)parsed, 0, 10, NULL);
 
         TEST_TRUE(runner, Query_Equals(tree, (Obj*)test_case->tree),
-                  "tree() AND   %s", (char*)Str_Get_Ptr8(test_case->query_string));
+                  "tree() AND   %s", Str_Get_Ptr8(test_case->query_string));
         TEST_INT_EQ(runner, Hits_Total_Hits(hits), test_case->num_hits,
-                    "hits: AND   %s", (char*)Str_Get_Ptr8(test_case->query_string));
+                    "hits: AND   %s", Str_Get_Ptr8(test_case->query_string));
         DECREF(hits);
         DECREF(parsed);
         DECREF(tree);
@@ -949,11 +949,11 @@ TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
         Hits  *hits;
 
         TEST_TRUE(runner, Query_Equals(pruned, (Obj*)wanted),
-                  "prune()   %s", (char*)Str_Get_Ptr8(qstring));
+                  "prune()   %s", Str_Get_Ptr8(qstring));
         expanded = QParser_Expand(or_parser, pruned);
         hits = IxSearcher_Hits(searcher, (Obj*)expanded, 0, 10, NULL);
         TEST_INT_EQ(runner, Hits_Total_Hits(hits), test_case->num_hits,
-                    "hits:    %s", (char*)Str_Get_Ptr8(qstring));
+                    "hits:    %s", Str_Get_Ptr8(qstring));
 
         DECREF(hits);
         DECREF(expanded);

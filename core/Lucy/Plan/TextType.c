@@ -93,8 +93,8 @@ void
 TextTermStepper_Write_Key_Frame_IMP(TextTermStepper *self,
                                     OutStream *outstream, Obj *value) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
-    uint8_t *buf  = Str_Get_Ptr8((String*)value);
-    size_t   size = Str_Get_Size((String*)value);
+    const char *buf  = Str_Get_Ptr8((String*)value);
+    size_t      size = Str_Get_Size((String*)value);
     OutStream_Write_C32(outstream, size);
     OutStream_Write_Bytes(outstream, buf, size);
     Obj_Mimic(ivars->value, value);
@@ -107,12 +107,12 @@ void
 TextTermStepper_Write_Delta_IMP(TextTermStepper *self, OutStream *outstream,
                                 Obj *value) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
-    String  *new_value  = (String*)CERTIFY(value, STRING);
-    CharBuf *last_value = (CharBuf*)ivars->value;
-    char    *new_text   = (char*)Str_Get_Ptr8(new_value);
-    size_t   new_size   = Str_Get_Size(new_value);
-    char    *last_text  = (char*)CB_Get_Ptr8(last_value);
-    size_t   last_size  = CB_Get_Size(last_value);
+    String     *new_value  = (String*)CERTIFY(value, STRING);
+    CharBuf    *last_value = (CharBuf*)ivars->value;
+    const char *new_text   = Str_Get_Ptr8(new_value);
+    size_t      new_size   = Str_Get_Size(new_value);
+    const char *last_text  = CB_Get_Ptr8(last_value);
+    size_t      last_size  = CB_Get_Size(last_value);
 
     // Count how many bytes the strings share at the top.
     const int32_t overlap = StrHelp_overlap(last_text, new_text,

@@ -406,9 +406,9 @@ CB_Get_Size_IMP(CharBuf *self) {
     return self->size;
 }
 
-uint8_t*
+char*
 CB_Get_Ptr8_IMP(CharBuf *self) {
-    return (uint8_t*)self->ptr;
+    return self->ptr;
 }
 
 
