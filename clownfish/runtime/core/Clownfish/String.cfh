@@ -23,8 +23,8 @@ parcel Clownfish;
 class Clownfish::String cnick Str
     inherits Clownfish::Obj {
 
-    char    *ptr;
-    size_t   size;
+    const char *ptr;
+    size_t      size;
 
     /** Return a new String which holds a copy of the passed-in string.
      * Check for UTF-8 validity.
@@ -48,19 +48,19 @@ class Clownfish::String cnick Str
      * passed-in string.  Check validity of supplied UTF-8.
      */
     inert incremented String*
-    new_steal_str(char *ptr, size_t size);
+    new_steal_str(const char *ptr, size_t size);
 
     /** Return a pointer to a new String which assumes ownership of the
      * passed-in string.  Do not check validity of supplied UTF-8.
      */
     inert incremented String*
-    new_steal_from_trusted_str(char *ptr, size_t size);
+    new_steal_from_trusted_str(const char *ptr, size_t size);
 
     /** Initialize the String using the passed-in string.  Do not check
      * validity of supplied UTF-8.
      */
     public inert String*
-    init_steal_trusted_str(decremented String *self, char *ptr, size_t size);
+    init_steal_trusted_str(String *self, const char *ptr, size_t size);
 
     /** Return a String which holds a single character.
      */

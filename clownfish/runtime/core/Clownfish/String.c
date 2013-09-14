@@ -68,35 +68,36 @@ Str_new_from_trusted_utf8(const char *ptr, size_t size) {
 }
 
 String*
-Str_init_from_trusted_utf8(String *self, const char *ptr, size_t size) {
-    // Derive.
-    self->ptr = (char*)MALLOCATE(size + 1);
+Str_init_from_trusted_utf8(String *self, const char *utf8, size_t size) {
+    // Allocate.
+    char *ptr = (char*)MALLOCATE(size + 1);
 
     // Copy.
-    memcpy(self->ptr, ptr, size);
+    memcpy(ptr, utf8, size);
+    ptr[size] = '\0'; // Null terminate.
 
     // Assign.
-    self->size      = size;
-    self->ptr[size] = '\0'; // Null terminate.
+    self->ptr  = ptr;
+    self->size = size;
 
     return self;
 }
 
 String*
-Str_new_steal_from_trusted_str(char *ptr, size_t size) {
+Str_new_steal_from_trusted_str(const char *ptr, size_t size) {
     String *self = (String*)VTable_Make_Obj(STRING);
     return Str_init_steal_trusted_str(self, ptr, size);
 }
 
 String*
-Str_init_steal_trusted_str(String *self, char *ptr, size_t size) {
+Str_init_steal_trusted_str(String *self, const char *ptr, size_t size) {
     self->ptr  = ptr;
     self->size = size;
     return self;
 }
 
 String*
-Str_new_steal_str(char *ptr, size_t size) {
+Str_new_steal_str(const char *ptr, size_t size) {
     if (!StrHelp_utf8_valid(ptr, size)) {
         DIE_INVALID_UTF8(ptr, size);
     }
@@ -106,10 +107,13 @@ Str_new_steal_str(char *ptr, size_t size) {
 String*
 Str_new_from_char(uint32_t code_point) {
     const size_t MAX_UTF8_BYTES = 4;
+    char   *ptr  = (char*)MALLOCATE(MAX_UTF8_BYTES + 1);
+    size_t  size = StrHelp_encode_utf8_char(code_point, (uint8_t*)ptr);
+    ptr[size] = '\0';
+
     String *self = (String*)VTable_Make_Obj(STRING);
-    self->ptr  = (char*)MALLOCATE(MAX_UTF8_BYTES + 1);
-    self->size = StrHelp_encode_utf8_char(code_point, (uint8_t*)self->ptr);
-    self->ptr[self->size] = '\0';
+    self->ptr  = ptr;
+    self->size = size;
     return self;
 }
 
@@ -127,7 +131,7 @@ Str_newf(const char *pattern, ...) {
 
 void
 Str_Destroy_IMP(String *self) {
-    FREEMEM(self->ptr);
+    FREEMEM((char*)self->ptr);
     SUPER_DESTROY(self, STRING);
 }
 
@@ -321,7 +325,7 @@ Str_Ends_With_IMP(String *self, const String *postfix) {
 bool
 Str_Ends_With_Utf8_IMP(String *self, const char *postfix, size_t postfix_len) {
     if (postfix_len <= self->size) {
-        char *start = self->ptr + self->size - postfix_len;
+        const char *start = self->ptr + self->size - postfix_len;
         if (memcmp(start, postfix, postfix_len) == 0) {
             return true;
         }
@@ -408,7 +412,7 @@ Str_SubString_IMP(String *self, size_t offset, size_t len) {
 
     SStrIter_Advance(iter, offset);
     int start_offset = iter->byte_offset;
-    char *sub_start = self->ptr + start_offset;
+    const char *sub_start = self->ptr + start_offset;
 
     SStrIter_Advance(iter, len);
     size_t byte_len = iter->byte_offset - start_offset;
@@ -492,7 +496,7 @@ ViewCB_new_from_trusted_utf8(const char *utf8, size_t size) {
 
 ViewCharBuf*
 ViewCB_init(ViewCharBuf *self, const char *utf8, size_t size) {
-    self->ptr  = (char*)utf8;
+    self->ptr  = utf8;
     self->size = size;
     return self;
 }
@@ -518,18 +522,19 @@ SStr_new(void *allocation) {
 
 StackString*
 SStr_new_from_str(void *allocation, size_t alloc_size, String *string) {
-    StackString *self
-        = (StackString*)VTable_Init_Obj(STACKSTRING, allocation);
-    self->size = Str_Get_Size(string);
-    self->ptr  = ((char*)allocation) + sizeof(StackString);
+    size_t  size = string->size;
+    char   *ptr  = ((char*)allocation) + sizeof(StackString);
 
-    if (alloc_size < sizeof(StackString) + self->size + 1) {
+    if (alloc_size < sizeof(StackString) + size + 1) {
         THROW(ERR, "alloc_size of StackString too small");
     }
 
-    memcpy(self->ptr, Str_Get_Ptr8(string), self->size);
-    self->ptr[self->size] = '\0';
+    memcpy(ptr, string->ptr, size);
+    ptr[size] = '\0';
 
+    StackString *self = (StackString*)VTable_Init_Obj(STACKSTRING, allocation);
+    self->ptr  = ptr;
+    self->size = size;
     return self;
 }
 
@@ -538,7 +543,7 @@ SStr_wrap_str(void *allocation, const char *ptr, size_t size) {
     StackString *self
         = (StackString*)VTable_Init_Obj(STACKSTRING, allocation);
     self->size = size;
-    self->ptr  = (char*)ptr;
+    self->ptr  = ptr;
     return self;
 }
 
