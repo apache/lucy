@@ -173,11 +173,11 @@ class Clownfish::String cnick Str
     uint8_t*
     Get_Ptr8(String *self);
 
-    /** Return a fresh copy of the string data in a String with an internal
-     * encoding of UTF-8.
+    /** Return a NULL-terminated copy of the string data in UTF-8 encoding.
+     * The buffer must be freed by the caller.
      */
-    String*
-    To_CB8(String *self);
+    char*
+    To_Utf8(String *self);
 
     public incremented String*
     Clone(String *self);
