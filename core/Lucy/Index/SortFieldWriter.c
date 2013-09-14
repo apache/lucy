@@ -552,7 +552,7 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
     ords[0] = 0;
 
     // Build array of ords, write non-NULL sorted values.
-    Obj *val = elem->value;
+    Obj *val = INCREF(elem->value);
     Obj *last_val_address = elem->value;
     S_write_val(elem->value, prim_id, ix_out, dat_out, dat_start);
     while (NULL != (elem = (SFWriterElem*)SortFieldWriter_Fetch(self))) {
@@ -562,12 +562,14 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
             if (comparison != 0) {
                 ord++;
                 S_write_val(elem->value, prim_id, ix_out, dat_out, dat_start);
-                val = elem->value;
+                DECREF(val);
+                val = INCREF(elem->value);
             }
             last_val_address = elem->value;
         }
         ords[elem->doc_id] = ord;
     }
+    DECREF(val);
 
     // If there are NULL values, write one now and record the NULL ord.
     if (has_nulls) {
