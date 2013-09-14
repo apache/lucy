@@ -157,7 +157,7 @@ void
 Err_Add_Frame_IMP(Err *self, const char *file, int line, const char *func) {
     CharBuf *buf = CB_new_from_str(self->mess);
 
-    if (!Str_Ends_With_Str(self->mess, "\n", 1)) {
+    if (!Str_Ends_With_Utf8(self->mess, "\n", 1)) {
         CB_Cat_Char(buf, '\n');
     }
 

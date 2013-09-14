@@ -71,13 +71,13 @@ DefPListReader_init(DefaultPostingListReader *self, Schema *schema,
     ivars->lex_reader = (LexiconReader*)INCREF(lex_reader);
 
     // Check format.
-    Hash *my_meta = (Hash*)Seg_Fetch_Metadata_Str(segment, "postings", 8);
+    Hash *my_meta = (Hash*)Seg_Fetch_Metadata_Utf8(segment, "postings", 8);
     if (!my_meta) {
-        my_meta = (Hash*)Seg_Fetch_Metadata_Str(segment, "posting_list", 12);
+        my_meta = (Hash*)Seg_Fetch_Metadata_Utf8(segment, "posting_list", 12);
     }
 
     if (my_meta) {
-        Obj *format = Hash_Fetch_Str(my_meta, "format", 6);
+        Obj *format = Hash_Fetch_Utf8(my_meta, "format", 6);
         if (!format) { THROW(ERR, "Missing 'format' var"); }
         else {
             if (Obj_To_I64(format) != PListWriter_current_file_format) {

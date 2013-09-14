@@ -60,7 +60,7 @@ FilePurger_init(FilePurger *self, Folder *folder, Snapshot *snapshot,
 
     // Don't allow the locks directory to be zapped.
     ivars->disallowed = Hash_new(0);
-    Hash_Store_Str(ivars->disallowed, "locks", 5, (Obj*)CFISH_TRUE);
+    Hash_Store_Utf8(ivars->disallowed, "locks", 5, (Obj*)CFISH_TRUE);
 
     return self;
 }
@@ -149,7 +149,7 @@ S_zap_dead_merge(FilePurger *self, Hash *candidates) {
     if (!Lock_Is_Locked(merge_lock)) {
         Hash *merge_data = IxManager_Read_Merge_Data(manager);
         Obj  *cutoff = merge_data
-                       ? Hash_Fetch_Str(merge_data, "cutoff", 6)
+                       ? Hash_Fetch_Utf8(merge_data, "cutoff", 6)
                        : NULL;
 
         if (cutoff) {
@@ -209,8 +209,8 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
     Hash *candidates = Hash_new(64);
     while (DH_Next(dh)) {
         String *entry = DH_Get_Entry(dh);
-        if (Str_Starts_With_Str(entry, "snapshot_", 9)
-            && Str_Ends_With_Str(entry, ".json", 5)
+        if (Str_Starts_With_Utf8(entry, "snapshot_", 9)
+            && Str_Ends_With_Utf8(entry, ".json", 5)
             && (!snapfile || !Str_Equals(entry, (Obj*)snapfile))
         ) {
             Snapshot *snapshot

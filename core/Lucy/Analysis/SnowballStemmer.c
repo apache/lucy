@@ -90,7 +90,7 @@ SnowStemmer_Dump_IMP(SnowballStemmer *self) {
     SnowStemmer_Dump_t super_dump
         = SUPER_METHOD_PTR(SNOWBALLSTEMMER, LUCY_SnowStemmer_Dump);
     Hash *dump = super_dump(self);
-    Hash_Store_Str(dump, "language", 8, (Obj*)Str_Clone(ivars->language));
+    Hash_Store_Utf8(dump, "language", 8, (Obj*)Str_Clone(ivars->language));
     return dump;
 }
 
@@ -101,7 +101,7 @@ SnowStemmer_Load_IMP(SnowballStemmer *self, Obj *dump) {
     SnowballStemmer *loaded = super_load(self, dump);
     Hash    *source = (Hash*)CERTIFY(dump, HASH);
     String *language 
-        = (String*)CERTIFY(Hash_Fetch_Str(source, "language", 8), STRING);
+        = (String*)CERTIFY(Hash_Fetch_Utf8(source, "language", 8), STRING);
     return SnowStemmer_init(loaded, language);
 }
 

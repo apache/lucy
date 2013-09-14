@@ -47,11 +47,11 @@ SegLexicon*
 SegLex_init(SegLexicon *self, Schema *schema, Folder *folder,
             Segment *segment, const String *field) {
     Hash *metadata = (Hash*)CERTIFY(
-                         Seg_Fetch_Metadata_Str(segment, "lexicon", 7),
+                         Seg_Fetch_Metadata_Utf8(segment, "lexicon", 7),
                          HASH);
     Architecture *arch      = Schema_Get_Architecture(schema);
-    Hash         *counts    = (Hash*)Hash_Fetch_Str(metadata, "counts", 6);
-    Obj          *format    = Hash_Fetch_Str(metadata, "format", 6);
+    Hash         *counts    = (Hash*)Hash_Fetch_Utf8(metadata, "counts", 6);
+    Obj          *format    = Hash_Fetch_Utf8(metadata, "format", 6);
     String       *seg_name  = Seg_Get_Name(segment);
     int32_t       field_num = Seg_Field_Num(segment, field);
     FieldType    *type      = Schema_Fetch_Type(schema, field);

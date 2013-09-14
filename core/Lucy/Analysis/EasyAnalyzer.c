@@ -78,7 +78,7 @@ EasyAnalyzer_Dump_IMP(EasyAnalyzer *self) {
     EasyAnalyzer_Dump_t super_dump
         = SUPER_METHOD_PTR(EASYANALYZER, LUCY_EasyAnalyzer_Dump);
     Hash *dump = super_dump(self);
-    Hash_Store_Str(dump, "language", 8, (Obj*)Str_Clone(ivars->language));
+    Hash_Store_Utf8(dump, "language", 8, (Obj*)Str_Clone(ivars->language));
     return dump;
 }
 
@@ -89,7 +89,7 @@ EasyAnalyzer_Load_IMP(EasyAnalyzer *self, Obj *dump) {
     EasyAnalyzer *loaded = super_load(self, dump);
     Hash    *source = (Hash*)CERTIFY(dump, HASH);
     String *language
-        = (String*)CERTIFY(Hash_Fetch_Str(source, "language", 8), STRING);
+        = (String*)CERTIFY(Hash_Fetch_Utf8(source, "language", 8), STRING);
     return EasyAnalyzer_init(loaded, language);
 }
 

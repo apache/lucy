@@ -65,7 +65,7 @@ Seg_num_to_name(int64_t number) {
 
 bool
 Seg_valid_seg_name(const String *name) {
-    if (Str_Starts_With_Str(name, "seg_", 4)) {
+    if (Str_Starts_With_Utf8(name, "seg_", 4)) {
         StringIterator *iter = Str_Top(name);
         StrIter_Advance(iter, 4);
         uint32_t code_point;
@@ -107,17 +107,17 @@ Seg_Read_File_IMP(Segment *self, Folder *folder) {
     DECREF(ivars->metadata);
     ivars->metadata = metadata;
     my_metadata
-        = (Hash*)CERTIFY(Hash_Fetch_Str(ivars->metadata, "segmeta", 7), HASH);
+        = (Hash*)CERTIFY(Hash_Fetch_Utf8(ivars->metadata, "segmeta", 7), HASH);
 
     // Assign.
-    Obj *count = Hash_Fetch_Str(my_metadata, "count", 5);
-    if (!count) { count = Hash_Fetch_Str(my_metadata, "doc_count", 9); }
+    Obj *count = Hash_Fetch_Utf8(my_metadata, "count", 5);
+    if (!count) { count = Hash_Fetch_Utf8(my_metadata, "doc_count", 9); }
     if (!count) { THROW(ERR, "Missing 'count'"); }
     else { ivars->count = Obj_To_I64(count); }
 
     // Get list of field nums.
-    VArray *source_by_num = (VArray*)Hash_Fetch_Str(my_metadata,
-                                                    "field_names", 11);
+    VArray *source_by_num = (VArray*)Hash_Fetch_Utf8(my_metadata,
+                                                     "field_names", 11);
     uint32_t num_fields = source_by_num ? VA_Get_Size(source_by_num) : 0;
     if (source_by_num == NULL) {
         THROW(ERR, "Failed to extract 'field_names' from metadata");
@@ -144,12 +144,12 @@ Seg_Write_File_IMP(Segment *self, Folder *folder) {
     Hash *my_metadata = Hash_new(16);
 
     // Store metadata specific to this Segment object.
-    Hash_Store_Str(my_metadata, "count", 5,
-                   (Obj*)Str_newf("%i64", ivars->count));
-    Hash_Store_Str(my_metadata, "name", 4, (Obj*)Str_Clone(ivars->name));
-    Hash_Store_Str(my_metadata, "field_names", 11, INCREF(ivars->by_num));
-    Hash_Store_Str(my_metadata, "format", 6, (Obj*)Str_newf("%i32", 1));
-    Hash_Store_Str(ivars->metadata, "segmeta", 7, (Obj*)my_metadata);
+    Hash_Store_Utf8(my_metadata, "count", 5,
+                    (Obj*)Str_newf("%i64", ivars->count));
+    Hash_Store_Utf8(my_metadata, "name", 4, (Obj*)Str_Clone(ivars->name));
+    Hash_Store_Utf8(my_metadata, "field_names", 11, INCREF(ivars->by_num));
+    Hash_Store_Utf8(my_metadata, "format", 6, (Obj*)Str_newf("%i32", 1));
+    Hash_Store_Utf8(ivars->metadata, "segmeta", 7, (Obj*)my_metadata);
 
     String *filename = Str_newf("%o/segmeta.json", ivars->name);
     bool result = Json_spew_json((Obj*)ivars->metadata, folder, filename);
@@ -209,8 +209,8 @@ Seg_Store_Metadata_IMP(Segment *self, const String *key, Obj *value) {
 }
 
 void
-Seg_Store_Metadata_Str_IMP(Segment *self, const char *key, size_t key_len,
-                           Obj *value) {
+Seg_Store_Metadata_Utf8_IMP(Segment *self, const char *key, size_t key_len,
+                            Obj *value) {
     StackString *k = SSTR_WRAP_STR((char*)key, key_len);
     Seg_Store_Metadata(self, (String*)k, value);
 }
@@ -222,9 +222,9 @@ Seg_Fetch_Metadata_IMP(Segment *self, const String *key) {
 }
 
 Obj*
-Seg_Fetch_Metadata_Str_IMP(Segment *self, const char *key, size_t len) {
+Seg_Fetch_Metadata_Utf8_IMP(Segment *self, const char *key, size_t len) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
-    return Hash_Fetch_Str(ivars->metadata, key, len);
+    return Hash_Fetch_Utf8(ivars->metadata, key, len);
 }
 
 Hash*

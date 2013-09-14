@@ -97,13 +97,13 @@ class Clownfish::String cnick Str
     /** Return the concatenation of the String and the passed-in raw UTF-8.
      */
     incremented String*
-    Cat_UTF8(String *self, const char *ptr, size_t size);
+    Cat_Utf8(String *self, const char *ptr, size_t size);
 
     /** Return the concatenation of the String and the passed-in raw UTF-8.
      * Don't check for UTF-8 validity.
      */
     incremented String*
-    Cat_Trusted_UTF8(String *self, const char *ptr, size_t size);
+    Cat_Trusted_Utf8(String *self, const char *ptr, size_t size);
 
     /** Replace all instances of one character for the other.
      *
@@ -131,7 +131,7 @@ class Clownfish::String cnick Str
     /** Test whether the String starts with the passed-in string.
      */
     bool
-    Starts_With_Str(String *self, const char *prefix, size_t size);
+    Starts_With_Utf8(String *self, const char *prefix, size_t size);
 
     /** Test whether the String ends with the content of another.
      */
@@ -141,7 +141,7 @@ class Clownfish::String cnick Str
     /** Test whether the String ends with the passed-in string.
      */
     bool
-    Ends_With_Str(String *self, const char *postfix, size_t size);
+    Ends_With_Utf8(String *self, const char *postfix, size_t size);
 
     /** Return the location of the substring within the String (measured in
      * code points), or -1 if the substring does not match.
@@ -150,12 +150,12 @@ class Clownfish::String cnick Str
     Find(String *self, const String *substring);
 
     int64_t
-    Find_Str(String *self, const char *ptr, size_t size);
+    Find_Utf8(String *self, const char *ptr, size_t size);
 
     /** Test whether the String matches the passed-in string.
      */
     bool
-    Equals_Str(String *self, const char *ptr, size_t size);
+    Equals_Utf8(String *self, const char *ptr, size_t size);
 
     /** Return the number of Unicode code points in the object's string.
      */
@@ -394,7 +394,7 @@ class Clownfish::StringIterator cnick StrIter
      * string.
      */
     bool
-    Starts_With_UTF8(StringIterator *self, const char *prefix, size_t size);
+    Starts_With_Utf8(StringIterator *self, const char *prefix, size_t size);
 
     /** Test whether the content before the iterator ends with
      * <code>postfix</code>.
@@ -406,7 +406,7 @@ class Clownfish::StringIterator cnick StrIter
      * string.
      */
     bool
-    Ends_With_UTF8(StringIterator *self, const char *postfix, size_t size);
+    Ends_With_Utf8(StringIterator *self, const char *postfix, size_t size);
 
     public void
     Destroy(StringIterator *self);

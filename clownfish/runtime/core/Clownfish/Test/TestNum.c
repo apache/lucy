@@ -44,17 +44,17 @@ test_To_String(TestBatchRunner *runner) {
     String *true_string  = Bool_To_String(CFISH_TRUE);
     String *false_string = Bool_To_String(CFISH_FALSE);
 
-    TEST_TRUE(runner, Str_Starts_With_Str(f32_string, "1.3", 3),
+    TEST_TRUE(runner, Str_Starts_With_Utf8(f32_string, "1.3", 3),
               "Float32_To_String");
-    TEST_TRUE(runner, Str_Starts_With_Str(f64_string, "1.3", 3),
+    TEST_TRUE(runner, Str_Starts_With_Utf8(f64_string, "1.3", 3),
               "Float64_To_String");
-    TEST_TRUE(runner, Str_Equals_Str(i32_string, "2147483647", 10),
+    TEST_TRUE(runner, Str_Equals_Utf8(i32_string, "2147483647", 10),
               "Int32_To_String");
-    TEST_TRUE(runner, Str_Equals_Str(i64_string, "9223372036854775807", 19),
+    TEST_TRUE(runner, Str_Equals_Utf8(i64_string, "9223372036854775807", 19),
               "Int64_To_String");
-    TEST_TRUE(runner, Str_Equals_Str(true_string, "true", 4),
+    TEST_TRUE(runner, Str_Equals_Utf8(true_string, "true", 4),
               "Bool_To_String [true]");
-    TEST_TRUE(runner, Str_Equals_Str(false_string, "false", 5),
+    TEST_TRUE(runner, Str_Equals_Utf8(false_string, "false", 5),
               "Bool_To_String [false]");
 
     DECREF(false_string);

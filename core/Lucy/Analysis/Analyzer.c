@@ -61,8 +61,8 @@ Analyzer_Split_IMP(Analyzer *self, String *text) {
 Obj*
 Analyzer_Dump_IMP(Analyzer *self) {
     Hash *dump = Hash_new(0);
-    Hash_Store_Str(dump, "_class", 6,
-                   (Obj*)Str_Clone(Obj_Get_Class_Name((Obj*)self)));
+    Hash_Store_Utf8(dump, "_class", 6,
+                    (Obj*)Str_Clone(Obj_Get_Class_Name((Obj*)self)));
     return (Obj*)dump;
 }
 
@@ -71,7 +71,7 @@ Analyzer_Load_IMP(Analyzer *self, Obj *dump) {
     CHY_UNUSED_VAR(self);
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     String *class_name
-        = (String*)CERTIFY(Hash_Fetch_Str(source, "_class", 6), STRING);
+        = (String*)CERTIFY(Hash_Fetch_Utf8(source, "_class", 6), STRING);
     VTable *vtable = VTable_singleton(class_name, NULL);
     Analyzer *loaded = (Analyzer*)VTable_Make_Obj(vtable);
     return (Obj*)loaded;

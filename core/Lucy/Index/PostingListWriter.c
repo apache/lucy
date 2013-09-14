@@ -243,8 +243,8 @@ PListWriter_Finish_IMP(PostingListWriter *self) {
     }
 
     // Store metadata.
-    Seg_Store_Metadata_Str(ivars->segment, "postings", 8,
-                           (Obj*)PListWriter_Metadata(self));
+    Seg_Store_Metadata_Utf8(ivars->segment, "postings", 8,
+                            (Obj*)PListWriter_Metadata(self));
 
     // Close down and clean up.
     OutStream_Close(ivars->skip_out);

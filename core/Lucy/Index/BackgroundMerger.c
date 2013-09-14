@@ -413,7 +413,7 @@ BGMerger_Prepare_Commit_IMP(BackgroundMerger *self) {
         // Write temporary snapshot file.
         DECREF(ivars->snapfile);
         String *snapfile = IxManager_Make_Snapshot_Filename(ivars->manager);
-        ivars->snapfile = Str_Cat_Trusted_UTF8(snapfile, ".temp", 5);
+        ivars->snapfile = Str_Cat_Trusted_Utf8(snapfile, ".temp", 5);
         DECREF(snapfile);
         Folder_Delete(folder, ivars->snapfile);
         Snapshot_Write_File(snapshot, folder, ivars->snapfile);
@@ -444,7 +444,7 @@ BGMerger_Prepare_Commit_IMP(BackgroundMerger *self) {
             VArray *files = Snapshot_List(latest_snapshot);
             for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
                 String *file = (String*)VA_Fetch(files, i);
-                if (Str_Starts_With_Str(file, "seg_", 4)) {
+                if (Str_Starts_With_Utf8(file, "seg_", 4)) {
                     int64_t gen = (int64_t)IxFileNames_extract_gen(file);
                     if (gen > ivars->cutoff) {
                         Snapshot_Add_Entry(ivars->snapshot, file);

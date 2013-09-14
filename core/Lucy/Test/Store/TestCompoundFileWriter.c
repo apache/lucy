@@ -114,7 +114,7 @@ test_offsets(TestBatchRunner *runner) {
     cf_metadata = (Hash*)CERTIFY(
                       Json_slurp_json(folder, cfmeta_file), HASH);
     files = (Hash*)CERTIFY(
-                Hash_Fetch_Str(cf_metadata, "files", 5), HASH);
+                Hash_Fetch_Utf8(cf_metadata, "files", 5), HASH);
 
     String *file;
     Obj     *filestats;
@@ -125,7 +125,7 @@ test_offsets(TestBatchRunner *runner) {
     Hash_Iterate(files);
     while (Hash_Next(files, (Obj**)&file, &filestats)) {
         Hash *stats = (Hash*)CERTIFY(filestats, HASH);
-        Obj *offset = CERTIFY(Hash_Fetch_Str(stats, "offset", 6), OBJ);
+        Obj *offset = CERTIFY(Hash_Fetch_Utf8(stats, "offset", 6), OBJ);
         int64_t offs = Obj_To_I64(offset);
         if (offs % 8 != 0) {
             offsets_ok = false;

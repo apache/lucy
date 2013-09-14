@@ -79,15 +79,15 @@ test_normalization(TestBatchRunner *runner) {
 
     for (uint32_t i = 0, max = VA_Get_Size(tests); i < max; i++) {
         Hash *test = (Hash*)VA_Fetch(tests, i);
-        String *form = (String*)Hash_Fetch_Str(
+        String *form = (String*)Hash_Fetch_Utf8(
                             test, "normalization_form", 18);
-        bool case_fold = Bool_Get_Value((BoolNum*)Hash_Fetch_Str(
+        bool case_fold = Bool_Get_Value((BoolNum*)Hash_Fetch_Utf8(
                                               test, "case_fold", 9));
-        bool strip_accents = Bool_Get_Value((BoolNum*)Hash_Fetch_Str(
+        bool strip_accents = Bool_Get_Value((BoolNum*)Hash_Fetch_Utf8(
                                                   test, "strip_accents", 13));
         Normalizer *normalizer = Normalizer_new(form, case_fold, strip_accents);
-        VArray *words = (VArray*)Hash_Fetch_Str(test, "words", 5);
-        VArray *norms = (VArray*)Hash_Fetch_Str(test, "norms", 5);
+        VArray *words = (VArray*)Hash_Fetch_Utf8(test, "words", 5);
+        VArray *norms = (VArray*)Hash_Fetch_Utf8(test, "norms", 5);
         for (uint32_t j = 0, max = VA_Get_Size(words); j < max; j++) {
             String *word = (String*)VA_Fetch(words, j);
             VArray *got  = Normalizer_Split(normalizer, word);

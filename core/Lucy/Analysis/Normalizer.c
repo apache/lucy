@@ -40,17 +40,17 @@ Normalizer_init(Normalizer *self, const String *form, bool case_fold,
     NormalizerIVARS *const ivars = Normalizer_IVARS(self);
 
     if (form == NULL
-        || Str_Equals_Str(form, "NFKC", 4) || Str_Equals_Str(form, "nfkc", 4)
+        || Str_Equals_Utf8(form, "NFKC", 4) || Str_Equals_Utf8(form, "nfkc", 4)
        ) {
         options |= UTF8PROC_COMPOSE | UTF8PROC_COMPAT;
     }
-    else if (Str_Equals_Str(form, "NFC", 3) || Str_Equals_Str(form, "nfc", 3)) {
+    else if (Str_Equals_Utf8(form, "NFC", 3) || Str_Equals_Utf8(form, "nfc", 3)) {
         options |= UTF8PROC_COMPOSE;
     }
-    else if (Str_Equals_Str(form, "NFKD", 4) || Str_Equals_Str(form, "nfkd", 4)) {
+    else if (Str_Equals_Utf8(form, "NFKD", 4) || Str_Equals_Utf8(form, "nfkd", 4)) {
         options |= UTF8PROC_DECOMPOSE | UTF8PROC_COMPAT;
     }
-    else if (Str_Equals_Str(form, "NFD", 3) || Str_Equals_Str(form, "nfd", 3)) {
+    else if (Str_Equals_Utf8(form, "NFD", 3) || Str_Equals_Utf8(form, "nfd", 3)) {
         options |= UTF8PROC_DECOMPOSE;
     }
     else {
@@ -133,13 +133,13 @@ Normalizer_Dump_IMP(Normalizer *self) {
                         Str_new_from_trusted_utf8("NFKD", 4) :
                         Str_new_from_trusted_utf8("NFD", 3);
 
-    Hash_Store_Str(dump, "normalization_form", 18, (Obj*)form);
+    Hash_Store_Utf8(dump, "normalization_form", 18, (Obj*)form);
 
     BoolNum *case_fold = Bool_singleton(options & UTF8PROC_CASEFOLD);
-    Hash_Store_Str(dump, "case_fold", 9, (Obj*)case_fold);
+    Hash_Store_Utf8(dump, "case_fold", 9, (Obj*)case_fold);
 
     BoolNum *strip_accents = Bool_singleton(options & UTF8PROC_STRIPMARK);
-    Hash_Store_Str(dump, "strip_accents", 13, (Obj*)strip_accents);
+    Hash_Store_Utf8(dump, "strip_accents", 13, (Obj*)strip_accents);
 
     return dump;
 }
@@ -151,11 +151,11 @@ Normalizer_Load_IMP(Normalizer *self, Obj *dump) {
     Normalizer *loaded = super_load(self, dump);
     Hash    *source = (Hash*)CERTIFY(dump, HASH);
 
-    Obj *obj = Hash_Fetch_Str(source, "normalization_form", 18);
+    Obj *obj = Hash_Fetch_Utf8(source, "normalization_form", 18);
     String *form = (String*)CERTIFY(obj, STRING);
-    obj = Hash_Fetch_Str(source, "case_fold", 9);
+    obj = Hash_Fetch_Utf8(source, "case_fold", 9);
     bool case_fold = Bool_Get_Value((BoolNum*)CERTIFY(obj, BOOLNUM));
-    obj = Hash_Fetch_Str(source, "strip_accents", 13);
+    obj = Hash_Fetch_Utf8(source, "strip_accents", 13);
     bool strip_accents = Bool_Get_Value((BoolNum*)CERTIFY(obj, BOOLNUM));
 
     return Normalizer_init(loaded, form, case_fold, strip_accents);

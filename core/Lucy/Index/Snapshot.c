@@ -114,9 +114,9 @@ Snapshot_Read_File_IMP(Snapshot *self, Folder *folder, const String *path) {
         Hash *snap_data
             = (Hash*)CERTIFY(Json_slurp_json(folder, ivars->path), HASH);
         Obj *format_obj
-            = CERTIFY(Hash_Fetch_Str(snap_data, "format", 6), OBJ);
+            = CERTIFY(Hash_Fetch_Utf8(snap_data, "format", 6), OBJ);
         int32_t format = (int32_t)Obj_To_I64(format_obj);
-        Obj *subformat_obj = Hash_Fetch_Str(snap_data, "subformat", 9);
+        Obj *subformat_obj = Hash_Fetch_Utf8(snap_data, "subformat", 9);
         int32_t subformat = subformat_obj
                             ? (int32_t)Obj_To_I64(subformat_obj)
                             : 0;
@@ -129,7 +129,7 @@ Snapshot_Read_File_IMP(Snapshot *self, Folder *folder, const String *path) {
 
         // Build up list of entries.
         VArray *list = (VArray*)CERTIFY(
-                           Hash_Fetch_Str(snap_data, "entries", 7),
+                           Hash_Fetch_Utf8(snap_data, "entries", 7),
                            VARRAY);
         INCREF(list);
         if (format == 1 || (format == 2 && subformat < 1)) {
@@ -160,7 +160,7 @@ S_clean_segment_contents(VArray *orig) {
     for (uint32_t i = 0, max = VA_Get_Size(orig); i < max; i++) {
         String *name = (String*)VA_Fetch(orig, i);
         if (!Seg_valid_seg_name(name)) {
-            if (Str_Starts_With_Str(name, "seg_", 4)) {
+            if (Str_Starts_With_Utf8(name, "seg_", 4)) {
                 continue;  // Skip this file.
             }
         }
@@ -197,13 +197,13 @@ Snapshot_Write_File_IMP(Snapshot *self, Folder *folder, const String *path) {
 
     // Sort, then store file names.
     VA_Sort(list, NULL, NULL);
-    Hash_Store_Str(all_data, "entries", 7, (Obj*)list);
+    Hash_Store_Utf8(all_data, "entries", 7, (Obj*)list);
 
     // Create a JSON-izable data structure.
-    Hash_Store_Str(all_data, "format", 6,
-                   (Obj*)Str_newf("%i32", (int32_t)Snapshot_current_file_format));
-    Hash_Store_Str(all_data, "subformat", 9,
-                   (Obj*)Str_newf("%i32", (int32_t)Snapshot_current_file_subformat));
+    Hash_Store_Utf8(all_data, "format", 6,
+                    (Obj*)Str_newf("%i32", (int32_t)Snapshot_current_file_format));
+    Hash_Store_Utf8(all_data, "subformat", 9,
+                    (Obj*)Str_newf("%i32", (int32_t)Snapshot_current_file_subformat));
 
     // Write out JSON-ized data to the new file.
     Json_spew_json((Obj*)all_data, folder, ivars->path);

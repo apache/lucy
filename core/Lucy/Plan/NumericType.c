@@ -46,20 +46,20 @@ Hash*
 NumType_Dump_For_Schema_IMP(NumericType *self) {
     NumericTypeIVARS *const ivars = NumType_IVARS(self);
     Hash *dump = Hash_new(0);
-    Hash_Store_Str(dump, "type", 4, (Obj*)NumType_Specifier(self));
+    Hash_Store_Utf8(dump, "type", 4, (Obj*)NumType_Specifier(self));
 
     // Store attributes that override the defaults.
     if (ivars->boost != 1.0) {
-        Hash_Store_Str(dump, "boost", 5, (Obj*)Str_newf("%f64", ivars->boost));
+        Hash_Store_Utf8(dump, "boost", 5, (Obj*)Str_newf("%f64", ivars->boost));
     }
     if (!ivars->indexed) {
-        Hash_Store_Str(dump, "indexed", 7, (Obj*)CFISH_FALSE);
+        Hash_Store_Utf8(dump, "indexed", 7, (Obj*)CFISH_FALSE);
     }
     if (!ivars->stored) {
-        Hash_Store_Str(dump, "stored", 6, (Obj*)CFISH_FALSE);
+        Hash_Store_Utf8(dump, "stored", 6, (Obj*)CFISH_FALSE);
     }
     if (ivars->sortable) {
-        Hash_Store_Str(dump, "sortable", 8, (Obj*)CFISH_TRUE);
+        Hash_Store_Utf8(dump, "sortable", 8, (Obj*)CFISH_TRUE);
     }
 
     return dump;
@@ -68,9 +68,9 @@ NumType_Dump_For_Schema_IMP(NumericType *self) {
 Hash*
 NumType_Dump_IMP(NumericType *self) {
     Hash *dump = NumType_Dump_For_Schema(self);
-    Hash_Store_Str(dump, "_class", 6,
-                   (Obj*)Str_Clone(NumType_Get_Class_Name(self)));
-    DECREF(Hash_Delete_Str(dump, "type", 4));
+    Hash_Store_Utf8(dump, "_class", 6,
+                    (Obj*)Str_Clone(NumType_Get_Class_Name(self)));
+    DECREF(Hash_Delete_Utf8(dump, "type", 4));
     return dump;
 }
 
@@ -80,23 +80,23 @@ NumType_Load_IMP(NumericType *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
 
     // Get a VTable
-    String *class_name = (String*)Hash_Fetch_Str(source, "_class", 6);
-    String *type_spec  = (String*)Hash_Fetch_Str(source, "type", 4);
+    String *class_name = (String*)Hash_Fetch_Utf8(source, "_class", 6);
+    String *type_spec  = (String*)Hash_Fetch_Utf8(source, "type", 4);
     VTable *vtable = NULL;
     if (class_name != NULL && Obj_Is_A((Obj*)class_name, STRING)) {
         vtable = VTable_singleton(class_name, NULL);
     }
     else if (type_spec != NULL && Obj_Is_A((Obj*)type_spec, STRING)) {
-        if (Str_Equals_Str(type_spec, "i32_t", 5)) {
+        if (Str_Equals_Utf8(type_spec, "i32_t", 5)) {
             vtable = INT32TYPE;
         }
-        else if (Str_Equals_Str(type_spec, "i64_t", 5)) {
+        else if (Str_Equals_Utf8(type_spec, "i64_t", 5)) {
             vtable = INT64TYPE;
         }
-        else if (Str_Equals_Str(type_spec, "f32_t", 5)) {
+        else if (Str_Equals_Utf8(type_spec, "f32_t", 5)) {
             vtable = FLOAT32TYPE;
         }
-        else if (Str_Equals_Str(type_spec, "f64_t", 5)) {
+        else if (Str_Equals_Utf8(type_spec, "f64_t", 5)) {
             vtable = FLOAT64TYPE;
         }
         else {
@@ -107,13 +107,13 @@ NumType_Load_IMP(NumericType *self, Obj *dump) {
     NumericType *loaded = (NumericType*)VTable_Make_Obj(vtable);
 
     // Extract boost.
-    Obj *boost_dump = Hash_Fetch_Str(source, "boost", 5);
+    Obj *boost_dump = Hash_Fetch_Utf8(source, "boost", 5);
     float boost = boost_dump ? (float)Obj_To_F64(boost_dump) : 1.0f;
 
     // Find boolean properties.
-    Obj *indexed_dump = Hash_Fetch_Str(source, "indexed", 7);
-    Obj *stored_dump  = Hash_Fetch_Str(source, "stored", 6);
-    Obj *sort_dump    = Hash_Fetch_Str(source, "sortable", 8);
+    Obj *indexed_dump = Hash_Fetch_Utf8(source, "indexed", 7);
+    Obj *stored_dump  = Hash_Fetch_Utf8(source, "stored", 6);
+    Obj *sort_dump    = Hash_Fetch_Utf8(source, "sortable", 8);
     bool indexed  = indexed_dump ? Obj_To_Bool(indexed_dump) : true;
     bool stored   = stored_dump  ? Obj_To_Bool(stored_dump)  : true;
     bool sortable = sort_dump    ? Obj_To_Bool(sort_dump)    : false;

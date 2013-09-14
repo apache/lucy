@@ -35,8 +35,8 @@ TestJson_new() {
 static Obj*
 S_make_dump() {
     Hash *dump = Hash_new(0);
-    Hash_Store_Str(dump, "foo", 3, (Obj*)Str_newf("foo"));
-    Hash_Store_Str(dump, "stuff", 5, (Obj*)VA_new(0));
+    Hash_Store_Utf8(dump, "foo", 3, (Obj*)Str_newf("foo"));
+    Hash_Store_Utf8(dump, "stuff", 5, (Obj*)VA_new(0));
     return (Obj*)dump;
 }
 
@@ -163,7 +163,7 @@ test_numbers(TestBatchRunner *runner) {
     Integer64 *i64     = Int64_new(33);
     String    *json    = Json_to_json((Obj*)i64);
     String    *trimmed = Str_Trim(json);
-    TEST_TRUE(runner, Str_Equals_Str(trimmed, "33", 2), "Integer");
+    TEST_TRUE(runner, Str_Equals_Utf8(trimmed, "33", 2), "Integer");
     DECREF(json);
     DECREF(trimmed);
 
@@ -326,14 +326,14 @@ test_floats(TestBatchRunner *runner) {
 static void
 test_max_depth(TestBatchRunner *runner) {
     Hash *circular = Hash_new(0);
-    Hash_Store_Str(circular, "circular", 8, INCREF(circular));
+    Hash_Store_Utf8(circular, "circular", 8, INCREF(circular));
     Err_set_error(NULL);
     String *not_json = Json_to_json((Obj*)circular);
     TEST_TRUE(runner, not_json == NULL,
               "to_json returns NULL when fed recursing data");
     TEST_TRUE(runner, Err_get_error() != NULL,
               "to_json sets Err_error when fed recursing data");
-    DECREF(Hash_Delete_Str(circular, "circular", 8));
+    DECREF(Hash_Delete_Utf8(circular, "circular", 8));
     DECREF(circular);
 }
 

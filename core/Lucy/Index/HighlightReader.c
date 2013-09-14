@@ -119,14 +119,14 @@ DefHLReader_init(DefaultHighlightReader *self, Schema *schema,
                   segments, seg_tick);
     DefaultHighlightReaderIVARS *const ivars = DefHLReader_IVARS(self);
     Segment *segment    = DefHLReader_Get_Segment(self);
-    Hash *metadata      = (Hash*)Seg_Fetch_Metadata_Str(segment, "highlight", 9);
+    Hash *metadata      = (Hash*)Seg_Fetch_Metadata_Utf8(segment, "highlight", 9);
     if (!metadata) {
-        metadata = (Hash*)Seg_Fetch_Metadata_Str(segment, "term_vectors", 12);
+        metadata = (Hash*)Seg_Fetch_Metadata_Utf8(segment, "term_vectors", 12);
     }
 
     // Check format.
     if (metadata) {
-        Obj *format = Hash_Fetch_Str(metadata, "format", 6);
+        Obj *format = Hash_Fetch_Utf8(metadata, "format", 6);
         if (!format) { THROW(ERR, "Missing 'format' var"); }
         else {
             if (Obj_To_I64(format) != HLWriter_current_file_format) {

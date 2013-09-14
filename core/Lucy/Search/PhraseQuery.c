@@ -98,8 +98,8 @@ PhraseQuery_Dump_IMP(PhraseQuery *self) {
     PhraseQuery_Dump_t super_dump
         = SUPER_METHOD_PTR(PHRASEQUERY, LUCY_PhraseQuery_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
-    Hash_Store_Str(dump, "field", 5, Freezer_dump((Obj*)ivars->field));
-    Hash_Store_Str(dump, "terms", 5, Freezer_dump((Obj*)ivars->terms));
+    Hash_Store_Utf8(dump, "field", 5, Freezer_dump((Obj*)ivars->field));
+    Hash_Store_Utf8(dump, "terms", 5, Freezer_dump((Obj*)ivars->terms));
     return (Obj*)dump;
 }
 
@@ -110,10 +110,10 @@ PhraseQuery_Load_IMP(PhraseQuery *self, Obj *dump) {
         = SUPER_METHOD_PTR(PHRASEQUERY, LUCY_PhraseQuery_Load);
     PhraseQuery *loaded = (PhraseQuery*)super_load(self, dump);
     PhraseQueryIVARS *loaded_ivars = PhraseQuery_IVARS(loaded);
-    Obj *field = CERTIFY(Hash_Fetch_Str(source, "field", 5), OBJ);
+    Obj *field = CERTIFY(Hash_Fetch_Utf8(source, "field", 5), OBJ);
     loaded_ivars->field
         = (String*)CERTIFY(Freezer_load(field), STRING);
-    Obj *terms = CERTIFY(Hash_Fetch_Str(source, "terms", 5), OBJ);
+    Obj *terms = CERTIFY(Hash_Fetch_Utf8(source, "terms", 5), OBJ);
     loaded_ivars->terms
         = (VArray*)CERTIFY(Freezer_load(terms), VARRAY);
     return (Obj*)loaded;
@@ -140,17 +140,17 @@ PhraseQuery_To_String_IMP(PhraseQuery *self) {
     PhraseQueryIVARS *const ivars = PhraseQuery_IVARS(self);
     uint32_t  num_terms = VA_Get_Size(ivars->terms);
     CharBuf  *buf       = CB_new_from_str(ivars->field);
-    CB_Cat_Trusted_UTF8(buf, ":\"", 2);
+    CB_Cat_Trusted_Utf8(buf, ":\"", 2);
     for (uint32_t i = 0; i < num_terms; i++) {
         Obj    *term        = VA_Fetch(ivars->terms, i);
         String *term_string = Obj_To_String(term);
         CB_Cat(buf, term_string);
         DECREF(term_string);
         if (i < num_terms - 1) {
-            CB_Cat_Trusted_UTF8(buf, " ",  1);
+            CB_Cat_Trusted_Utf8(buf, " ",  1);
         }
     }
-    CB_Cat_Trusted_UTF8(buf, "\"", 1);
+    CB_Cat_Trusted_Utf8(buf, "\"", 1);
     String *retval = CB_Yield_String(buf);
     DECREF(buf);
     return retval;

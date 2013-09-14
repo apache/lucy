@@ -71,10 +71,10 @@ ORQuery_To_String_IMP(ORQuery *self) {
             CB_Cat(buf, kid_string);
             DECREF(kid_string);
             if (i == last_kid) {
-                CB_Cat_Trusted_UTF8(buf, ")", 1);
+                CB_Cat_Trusted_Utf8(buf, ")", 1);
             }
             else {
-                CB_Cat_Trusted_UTF8(buf, " OR ", 4);
+                CB_Cat_Trusted_Utf8(buf, " OR ", 4);
             }
         }
         String *retval = CB_Yield_String(buf);

@@ -173,7 +173,7 @@ CB_VCatF_IMP(CharBuf *self, const char *pattern, va_list args) {
         while (slice_end < pattern_end && *slice_end != '%') { slice_end++; }
         if (pattern != slice_end) {
             size_t size = slice_end - pattern;
-            CB_Cat_Trusted_UTF8(self, pattern, size);
+            CB_Cat_Trusted_Utf8(self, pattern, size);
             pattern = slice_end;
         }
 
@@ -182,13 +182,13 @@ CB_VCatF_IMP(CharBuf *self, const char *pattern, va_list args) {
 
             switch (*pattern) {
                 case '%': {
-                        CB_Cat_Trusted_UTF8(self, "%", 1);
+                        CB_Cat_Trusted_Utf8(self, "%", 1);
                     }
                     break;
                 case 'o': {
                         Obj *obj = va_arg(args, Obj*);
                         if (!obj) {
-                            CB_Cat_Trusted_UTF8(self, "[NULL]", 6);
+                            CB_Cat_Trusted_Utf8(self, "[NULL]", 6);
                         }
                         else if (Obj_Is_A(obj, STRING)) {
                             CB_Cat(self, (String*)obj);
@@ -219,7 +219,7 @@ CB_VCatF_IMP(CharBuf *self, const char *pattern, va_list args) {
                             S_die_invalid_pattern(pattern_start);
                         }
                         size = sprintf(buf, "%" PRId64, val);
-                        CB_Cat_Trusted_UTF8(self, buf, size);
+                        CB_Cat_Trusted_Utf8(self, buf, size);
                     }
                     break;
                 case 'u': {
@@ -241,7 +241,7 @@ CB_VCatF_IMP(CharBuf *self, const char *pattern, va_list args) {
                             S_die_invalid_pattern(pattern_start);
                         }
                         size = sprintf(buf, "%" PRIu64, val);
-                        CB_Cat_Trusted_UTF8(self, buf, size);
+                        CB_Cat_Trusted_Utf8(self, buf, size);
                     }
                     break;
                 case 'f': {
@@ -249,7 +249,7 @@ CB_VCatF_IMP(CharBuf *self, const char *pattern, va_list args) {
                             double num  = va_arg(args, double);
                             char bigbuf[512];
                             size_t size = sprintf(bigbuf, "%g", num);
-                            CB_Cat_Trusted_UTF8(self, bigbuf, size);
+                            CB_Cat_Trusted_Utf8(self, bigbuf, size);
                             pattern += 2;
                         }
                         else {
@@ -261,7 +261,7 @@ CB_VCatF_IMP(CharBuf *self, const char *pattern, va_list args) {
                         if (pattern[1] == '3' && pattern[2] == '2') {
                             unsigned long val = va_arg(args, uint32_t);
                             size_t size = sprintf(buf, "%.8lx", val);
-                            CB_Cat_Trusted_UTF8(self, buf, size);
+                            CB_Cat_Trusted_Utf8(self, buf, size);
                             pattern += 2;
                         }
                         else {
@@ -272,15 +272,15 @@ CB_VCatF_IMP(CharBuf *self, const char *pattern, va_list args) {
                 case 's': {
                         char *string = va_arg(args, char*);
                         if (string == NULL) {
-                            CB_Cat_Trusted_UTF8(self, "[NULL]", 6);
+                            CB_Cat_Trusted_Utf8(self, "[NULL]", 6);
                         }
                         else {
                             size_t size = strlen(string);
                             if (StrHelp_utf8_valid(string, size)) {
-                                CB_Cat_Trusted_UTF8(self, string, size);
+                                CB_Cat_Trusted_Utf8(self, string, size);
                             }
                             else {
-                                CB_Cat_Trusted_UTF8(self, "[INVALID UTF8]", 14);
+                                CB_Cat_Trusted_Utf8(self, "[INVALID UTF8]", 14);
                             }
                         }
                     }
@@ -330,7 +330,7 @@ CB_Clone_IMP(CharBuf *self) {
 }
 
 void
-CB_Mimic_UTF8_IMP(CharBuf *self, const char* ptr, size_t size) {
+CB_Mimic_Utf8_IMP(CharBuf *self, const char* ptr, size_t size) {
     if (!StrHelp_utf8_valid(ptr, size)) {
         DIE_INVALID_UTF8(ptr, size);
     }
@@ -362,15 +362,15 @@ CB_Mimic_IMP(CharBuf *self, Obj *other) {
 }
 
 void
-CB_Cat_UTF8_IMP(CharBuf *self, const char* ptr, size_t size) {
+CB_Cat_Utf8_IMP(CharBuf *self, const char* ptr, size_t size) {
     if (!StrHelp_utf8_valid(ptr, size)) {
         DIE_INVALID_UTF8(ptr, size);
     }
-    CB_Cat_Trusted_UTF8_IMP(self, ptr, size);
+    CB_Cat_Trusted_Utf8_IMP(self, ptr, size);
 }
 
 void
-CB_Cat_Trusted_UTF8_IMP(CharBuf *self, const char* ptr, size_t size) {
+CB_Cat_Trusted_Utf8_IMP(CharBuf *self, const char* ptr, size_t size) {
     const size_t new_size = self->size + size;
     if (new_size >= self->cap) {
         size_t amount = Memory_oversize(new_size, sizeof(char));

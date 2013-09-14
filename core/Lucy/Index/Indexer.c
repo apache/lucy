@@ -176,7 +176,7 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
         // way.
         Hash *merge_data = IxManager_Read_Merge_Data(ivars->manager);
         Obj *cutoff_obj = merge_data
-                          ? Hash_Fetch_Str(merge_data, "cutoff", 6)
+                          ? Hash_Fetch_Utf8(merge_data, "cutoff", 6)
                           : NULL;
         if (!cutoff_obj) {
             DECREF(merge_lock);
@@ -384,8 +384,8 @@ S_find_schema_file(Snapshot *snapshot) {
     String *retval = NULL;
     for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
         String *file = (String*)VA_Fetch(files, i);
-        if (Str_Starts_With_Str(file, "schema_", 7)
-            && Str_Ends_With_Str(file, ".json", 5)
+        if (Str_Starts_With_Utf8(file, "schema_", 7)
+            && Str_Ends_With_Utf8(file, ".json", 5)
            ) {
             retval = file;
             break;
@@ -412,7 +412,7 @@ S_maybe_merge(Indexer *self, VArray *seg_readers) {
         // If something else holds the merge lock, don't interfere.
         Hash *merge_data = IxManager_Read_Merge_Data(ivars->manager);
         if (merge_data) {
-            Obj *cutoff_obj = Hash_Fetch_Str(merge_data, "cutoff", 6);
+            Obj *cutoff_obj = Hash_Fetch_Utf8(merge_data, "cutoff", 6);
             if (cutoff_obj) {
                 cutoff = Obj_To_I64(cutoff_obj);
             }
@@ -508,7 +508,7 @@ Indexer_Prepare_Commit_IMP(Indexer *self) {
         // Derive snapshot and schema file names.
         DECREF(ivars->snapfile);
         String *snapfile = IxManager_Make_Snapshot_Filename(ivars->manager);
-        ivars->snapfile = Str_Cat_Trusted_UTF8(snapfile, ".temp", 5);
+        ivars->snapfile = Str_Cat_Trusted_Utf8(snapfile, ".temp", 5);
         DECREF(snapfile);
         uint64_t schema_gen = IxFileNames_extract_gen(ivars->snapfile);
         char base36[StrHelp_MAX_BASE36_BYTES];

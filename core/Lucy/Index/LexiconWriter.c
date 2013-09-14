@@ -230,8 +230,8 @@ LexWriter_Finish_IMP(LexiconWriter *self) {
     }
 
     // Store metadata.
-    Seg_Store_Metadata_Str(ivars->segment, "lexicon", 7,
-                           (Obj*)LexWriter_Metadata(self));
+    Seg_Store_Metadata_Utf8(ivars->segment, "lexicon", 7,
+                            (Obj*)LexWriter_Metadata(self));
 }
 
 Hash*
@@ -246,13 +246,13 @@ LexWriter_Metadata_IMP(LexiconWriter *self) {
 
     // Placeholders.
     if (Hash_Get_Size(counts) == 0) {
-        Hash_Store_Str(counts, "none", 4, (Obj*)Str_newf("%i32", (int32_t)0));
-        Hash_Store_Str(ix_counts, "none", 4,
-                       (Obj*)Str_newf("%i32", (int32_t)0));
+        Hash_Store_Utf8(counts, "none", 4, (Obj*)Str_newf("%i32", (int32_t)0));
+        Hash_Store_Utf8(ix_counts, "none", 4,
+                        (Obj*)Str_newf("%i32", (int32_t)0));
     }
 
-    Hash_Store_Str(metadata, "counts", 6, (Obj*)counts);
-    Hash_Store_Str(metadata, "index_counts", 12, (Obj*)ix_counts);
+    Hash_Store_Utf8(metadata, "counts", 6, (Obj*)counts);
+    Hash_Store_Utf8(metadata, "index_counts", 12, (Obj*)ix_counts);
 
     return metadata;
 }

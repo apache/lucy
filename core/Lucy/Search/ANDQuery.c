@@ -55,10 +55,10 @@ ANDQuery_To_String_IMP(ANDQuery *self) {
             CB_Cat(buf, kid_string);
             DECREF(kid_string);
             if (i == num_kids - 1) {
-                CB_Cat_Trusted_UTF8(buf, ")", 1);
+                CB_Cat_Trusted_Utf8(buf, ")", 1);
             }
             else {
-                CB_Cat_Trusted_UTF8(buf, " AND ", 5);
+                CB_Cat_Trusted_Utf8(buf, " AND ", 5);
             }
         }
         String *retval = CB_Yield_String(buf);

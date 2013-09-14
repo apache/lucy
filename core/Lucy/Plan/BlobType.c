@@ -64,18 +64,18 @@ Hash*
 BlobType_Dump_For_Schema_IMP(BlobType *self) {
     BlobTypeIVARS *const ivars = BlobType_IVARS(self);
     Hash *dump = Hash_new(0);
-    Hash_Store_Str(dump, "type", 4, (Obj*)Str_newf("blob"));
+    Hash_Store_Utf8(dump, "type", 4, (Obj*)Str_newf("blob"));
 
     // Store attributes that override the defaults -- even if they're
     // meaningless.
     if (ivars->boost != 1.0) {
-        Hash_Store_Str(dump, "boost", 5, (Obj*)Str_newf("%f64", ivars->boost));
+        Hash_Store_Utf8(dump, "boost", 5, (Obj*)Str_newf("%f64", ivars->boost));
     }
     if (ivars->indexed) {
-        Hash_Store_Str(dump, "indexed", 7, (Obj*)CFISH_TRUE);
+        Hash_Store_Utf8(dump, "indexed", 7, (Obj*)CFISH_TRUE);
     }
     if (ivars->stored) {
-        Hash_Store_Str(dump, "stored", 6, (Obj*)CFISH_TRUE);
+        Hash_Store_Utf8(dump, "stored", 6, (Obj*)CFISH_TRUE);
     }
 
     return dump;
@@ -84,24 +84,24 @@ BlobType_Dump_For_Schema_IMP(BlobType *self) {
 Hash*
 BlobType_Dump_IMP(BlobType *self) {
     Hash *dump = BlobType_Dump_For_Schema(self);
-    Hash_Store_Str(dump, "_class", 6,
-                   (Obj*)Str_Clone(BlobType_Get_Class_Name(self)));
-    DECREF(Hash_Delete_Str(dump, "type", 4));
+    Hash_Store_Utf8(dump, "_class", 6,
+                    (Obj*)Str_Clone(BlobType_Get_Class_Name(self)));
+    DECREF(Hash_Delete_Utf8(dump, "type", 4));
     return dump;
 }
 
 BlobType*
 BlobType_Load_IMP(BlobType *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
-    String *class_name = (String*)Hash_Fetch_Str(source, "_class", 6);
+    String *class_name = (String*)Hash_Fetch_Utf8(source, "_class", 6);
     VTable *vtable
         = (class_name != NULL && Obj_Is_A((Obj*)class_name, STRING))
           ? VTable_singleton(class_name, NULL)
           : BLOBTYPE;
     BlobType *loaded     = (BlobType*)VTable_Make_Obj(vtable);
-    Obj *boost_dump      = Hash_Fetch_Str(source, "boost", 5);
-    Obj *indexed_dump    = Hash_Fetch_Str(source, "indexed", 7);
-    Obj *stored_dump     = Hash_Fetch_Str(source, "stored", 6);
+    Obj *boost_dump      = Hash_Fetch_Utf8(source, "boost", 5);
+    Obj *indexed_dump    = Hash_Fetch_Utf8(source, "indexed", 7);
+    Obj *stored_dump     = Hash_Fetch_Utf8(source, "stored", 6);
     UNUSED_VAR(self);
 
     BlobType_init(loaded, false);

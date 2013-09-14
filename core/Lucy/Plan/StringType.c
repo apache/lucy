@@ -58,20 +58,20 @@ Hash*
 StringType_Dump_For_Schema_IMP(StringType *self) {
     StringTypeIVARS *const ivars = StringType_IVARS(self);
     Hash *dump = Hash_new(0);
-    Hash_Store_Str(dump, "type", 4, (Obj*)Str_newf("string"));
+    Hash_Store_Utf8(dump, "type", 4, (Obj*)Str_newf("string"));
 
     // Store attributes that override the defaults.
     if (ivars->boost != 1.0) {
-        Hash_Store_Str(dump, "boost", 5, (Obj*)Str_newf("%f64", ivars->boost));
+        Hash_Store_Utf8(dump, "boost", 5, (Obj*)Str_newf("%f64", ivars->boost));
     }
     if (!ivars->indexed) {
-        Hash_Store_Str(dump, "indexed", 7, (Obj*)CFISH_FALSE);
+        Hash_Store_Utf8(dump, "indexed", 7, (Obj*)CFISH_FALSE);
     }
     if (!ivars->stored) {
-        Hash_Store_Str(dump, "stored", 6, (Obj*)CFISH_FALSE);
+        Hash_Store_Utf8(dump, "stored", 6, (Obj*)CFISH_FALSE);
     }
     if (ivars->sortable) {
-        Hash_Store_Str(dump, "sortable", 8, (Obj*)CFISH_TRUE);
+        Hash_Store_Utf8(dump, "sortable", 8, (Obj*)CFISH_TRUE);
     }
 
     return dump;
@@ -80,25 +80,25 @@ StringType_Dump_For_Schema_IMP(StringType *self) {
 Hash*
 StringType_Dump_IMP(StringType *self) {
     Hash *dump = StringType_Dump_For_Schema(self);
-    Hash_Store_Str(dump, "_class", 6,
-                   (Obj*)Str_Clone(StringType_Get_Class_Name(self)));
-    DECREF(Hash_Delete_Str(dump, "type", 4));
+    Hash_Store_Utf8(dump, "_class", 6,
+                    (Obj*)Str_Clone(StringType_Get_Class_Name(self)));
+    DECREF(Hash_Delete_Utf8(dump, "type", 4));
     return dump;
 }
 
 StringType*
 StringType_Load_IMP(StringType *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
-    String *class_name = (String*)Hash_Fetch_Str(source, "_class", 6);
+    String *class_name = (String*)Hash_Fetch_Utf8(source, "_class", 6);
     VTable *vtable
         = (class_name != NULL && Obj_Is_A((Obj*)class_name, STRING))
           ? VTable_singleton(class_name, NULL)
           : STRINGTYPE;
     StringType *loaded   = (StringType*)VTable_Make_Obj(vtable);
-    Obj *boost_dump      = Hash_Fetch_Str(source, "boost", 5);
-    Obj *indexed_dump    = Hash_Fetch_Str(source, "indexed", 7);
-    Obj *stored_dump     = Hash_Fetch_Str(source, "stored", 6);
-    Obj *sortable_dump   = Hash_Fetch_Str(source, "sortable", 8);
+    Obj *boost_dump      = Hash_Fetch_Utf8(source, "boost", 5);
+    Obj *indexed_dump    = Hash_Fetch_Utf8(source, "indexed", 7);
+    Obj *stored_dump     = Hash_Fetch_Utf8(source, "stored", 6);
+    Obj *sortable_dump   = Hash_Fetch_Utf8(source, "sortable", 8);
     UNUSED_VAR(self);
 
     float boost    = boost_dump    ? (float)Obj_To_F64(boost_dump) : 1.0f;

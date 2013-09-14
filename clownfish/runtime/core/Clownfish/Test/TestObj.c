@@ -67,7 +67,7 @@ static void
 test_To_String(TestBatchRunner *runner) {
     Obj *testobj = S_new_testobj();
     String *string = Obj_To_String(testobj);
-    TEST_TRUE(runner, Str_Find_Str(string, "TestObj", 7) >= 0, "To_String");
+    TEST_TRUE(runner, Str_Find_Utf8(string, "TestObj", 7) >= 0, "To_String");
     DECREF(string);
     DECREF(testobj);
 }
@@ -149,7 +149,7 @@ S_verify_abstract_error(TestBatchRunner *runner, Err_Attempt_t routine,
     Err *error = Err_trap(routine, context);
     TEST_TRUE(runner, error != NULL
               && Err_Is_A(error, ERR) 
-              && Str_Find_Str(Err_Get_Mess(error), "bstract", 7) != -1,
+              && Str_Find_Utf8(Err_Get_Mess(error), "bstract", 7) != -1,
               message);
     DECREF(error);
 }

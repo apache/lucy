@@ -35,8 +35,8 @@ RegexTokenizer_Transform_IMP(RegexTokenizer *self, Inversion *inversion) {
 
     while (NULL != (token = Inversion_Next(inversion))) {
         TokenIVARS *const token_ivars = Token_IVARS(token);
-        RegexTokenizer_Tokenize_Str(self, token_ivars->text, token_ivars->len,
-                                    new_inversion);
+        RegexTokenizer_Tokenize_Utf8(self, token_ivars->text, token_ivars->len,
+                                     new_inversion);
     }
 
     return new_inversion;
@@ -45,8 +45,8 @@ RegexTokenizer_Transform_IMP(RegexTokenizer *self, Inversion *inversion) {
 Inversion*
 RegexTokenizer_Transform_Text_IMP(RegexTokenizer *self, String *text) {
     Inversion *new_inversion = Inversion_new(NULL);
-    RegexTokenizer_Tokenize_Str(self, (char*)Str_Get_Ptr8(text),
-                                Str_Get_Size(text), new_inversion);
+    RegexTokenizer_Tokenize_Utf8(self, (char*)Str_Get_Ptr8(text),
+                                 Str_Get_Size(text), new_inversion);
     return new_inversion;
 }
 
@@ -56,7 +56,7 @@ RegexTokenizer_Dump_IMP(RegexTokenizer *self) {
     RegexTokenizer_Dump_t super_dump
         = SUPER_METHOD_PTR(REGEXTOKENIZER, LUCY_RegexTokenizer_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
-    Hash_Store_Str(dump, "pattern", 7, (Obj*)Str_Clone(ivars->pattern));
+    Hash_Store_Utf8(dump, "pattern", 7, (Obj*)Str_Clone(ivars->pattern));
     return (Obj*)dump;
 }
 
@@ -67,7 +67,7 @@ RegexTokenizer_Load_IMP(RegexTokenizer *self, Obj *dump) {
         = SUPER_METHOD_PTR(REGEXTOKENIZER, LUCY_RegexTokenizer_Load);
     RegexTokenizer *loaded = super_load(self, dump);
     String *pattern 
-        = (String*)CERTIFY(Hash_Fetch_Str(source, "pattern", 7), STRING);
+        = (String*)CERTIFY(Hash_Fetch_Utf8(source, "pattern", 7), STRING);
     return RegexTokenizer_init(loaded, pattern);
 }
 

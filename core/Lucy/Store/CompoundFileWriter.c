@@ -105,15 +105,15 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
     if (!outstream) { RETHROW(INCREF(Err_get_error())); }
 
     // Start metadata.
-    Hash_Store_Str(metadata, "files", 5, INCREF(sub_files));
-    Hash_Store_Str(metadata, "format", 6,
-                   (Obj*)Str_newf("%i32", CFWriter_current_file_format));
+    Hash_Store_Utf8(metadata, "files", 5, INCREF(sub_files));
+    Hash_Store_Utf8(metadata, "format", 6,
+                    (Obj*)Str_newf("%i32", CFWriter_current_file_format));
 
     VA_Sort(files, NULL, NULL);
     for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
         String *infilename = (String*)VA_Fetch(files, i);
 
-        if (!Str_Ends_With_Str(infilename, ".json", 5)) {
+        if (!Str_Ends_With_Utf8(infilename, ".json", 5)) {
             InStream *instream   = Folder_Open_In(folder, infilename);
             Hash     *file_data  = Hash_new(2);
             int64_t   offset, len;
@@ -126,10 +126,10 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
             len = OutStream_Tell(outstream) - offset;
 
             // Record offset and length.
-            Hash_Store_Str(file_data, "offset", 6,
-                           (Obj*)Str_newf("%i64", offset));
-            Hash_Store_Str(file_data, "length", 6,
-                           (Obj*)Str_newf("%i64", len));
+            Hash_Store_Utf8(file_data, "offset", 6,
+                            (Obj*)Str_newf("%i64", offset));
+            Hash_Store_Utf8(file_data, "length", 6,
+                            (Obj*)Str_newf("%i64", len));
             Hash_Store(sub_files, (Obj*)infilename, (Obj*)file_data);
             VA_Push(merged, INCREF(infilename));
 

@@ -159,7 +159,7 @@ Json_to_json(Obj *dump) {
     }
     else {
         // Append newline.
-        CB_Cat_Trusted_UTF8(buf, "\n", 1);
+        CB_Cat_Trusted_Utf8(buf, "\n", 1);
         json = CB_Yield_String(buf);
     }
 
@@ -177,7 +177,7 @@ static const int32_t MAX_DEPTH = 200;
 static void
 S_append_json_string(String *dump, CharBuf *buf) {
     // Append opening quote.
-    CB_Cat_Trusted_UTF8(buf, "\"", 1);
+    CB_Cat_Trusted_Utf8(buf, "\"", 1);
 
     // Process string data.
     StringIterator *iter = Str_Top(dump);
@@ -241,12 +241,12 @@ S_append_json_string(String *dump, CharBuf *buf) {
                     buffer[0] = (char)code_point;
                     len = 1;
             }
-            CB_Cat_Trusted_UTF8(buf, buffer, len);
+            CB_Cat_Trusted_Utf8(buf, buffer, len);
         }
     }
 
     // Append closing quote.
-    CB_Cat_Trusted_UTF8(buf, "\"", 1);
+    CB_Cat_Trusted_Utf8(buf, "\"", 1);
 
     DECREF(iter);
 }
@@ -254,7 +254,7 @@ S_append_json_string(String *dump, CharBuf *buf) {
 static void
 S_cat_whitespace(CharBuf *buf, int32_t depth) {
     while (depth--) {
-        CB_Cat_Trusted_UTF8(buf, indentation, INDENTATION_LEN);
+        CB_Cat_Trusted_Utf8(buf, indentation, INDENTATION_LEN);
     }
 }
 
@@ -268,13 +268,13 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
     }
 
     if (!dump) {
-        CB_Cat_Trusted_UTF8(buf, "null", 4);
+        CB_Cat_Trusted_Utf8(buf, "null", 4);
     }
     else if (dump == (Obj*)CFISH_TRUE) {
-        CB_Cat_Trusted_UTF8(buf, "true", 4);
+        CB_Cat_Trusted_Utf8(buf, "true", 4);
     }
     else if (dump == (Obj*)CFISH_FALSE) {
-        CB_Cat_Trusted_UTF8(buf, "false", 5);
+        CB_Cat_Trusted_Utf8(buf, "false", 5);
     }
     else if (Obj_Is_A(dump, STRING)) {
         S_append_json_string((String*)dump, buf);
@@ -290,36 +290,36 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
         size_t size = VA_Get_Size(array);
         if (size == 0) {
             // Put empty array on single line.
-            CB_Cat_Trusted_UTF8(buf, "[]", 2);
+            CB_Cat_Trusted_Utf8(buf, "[]", 2);
             return true;
         }
         else if (size == 1) {
             Obj *elem = VA_Fetch(array, 0);
             if (!(Obj_Is_A(elem, HASH) || Obj_Is_A(elem, VARRAY))) {
                 // Put array containing single scalar element on one line.
-                CB_Cat_Trusted_UTF8(buf, "[", 1);
+                CB_Cat_Trusted_Utf8(buf, "[", 1);
                 if (!S_to_json(elem, buf, depth + 1)) {
                     return false;
                 }
-                CB_Cat_Trusted_UTF8(buf, "]", 1);
+                CB_Cat_Trusted_Utf8(buf, "]", 1);
                 return true;
             }
         }
         // Fall back to spreading elements across multiple lines.
-        CB_Cat_Trusted_UTF8(buf, "[", 1);
+        CB_Cat_Trusted_Utf8(buf, "[", 1);
         for (size_t i = 0; i < size; i++) {
-            CB_Cat_Trusted_UTF8(buf, "\n", 1);
+            CB_Cat_Trusted_Utf8(buf, "\n", 1);
             S_cat_whitespace(buf, depth + 1);
             if (!S_to_json(VA_Fetch(array, i), buf, depth + 1)) {
                 return false;
             }
             if (i + 1 < size) {
-                CB_Cat_Trusted_UTF8(buf, ",", 1);
+                CB_Cat_Trusted_Utf8(buf, ",", 1);
             }
         }
-        CB_Cat_Trusted_UTF8(buf, "\n", 1);
+        CB_Cat_Trusted_Utf8(buf, "\n", 1);
         S_cat_whitespace(buf, depth);
-        CB_Cat_Trusted_UTF8(buf, "]", 1);
+        CB_Cat_Trusted_Utf8(buf, "]", 1);
     }
     else if (Obj_Is_A(dump, HASH)) {
         Hash *hash = (Hash*)dump;
@@ -327,7 +327,7 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
 
         // Put empty hash on single line.
         if (size == 0) {
-            CB_Cat_Trusted_UTF8(buf, "{}", 2);
+            CB_Cat_Trusted_Utf8(buf, "{}", 2);
             return true;
         }
 
@@ -346,24 +346,24 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
         VA_Sort(keys, NULL, NULL);
 
         // Spread pairs across multiple lines.
-        CB_Cat_Trusted_UTF8(buf, "{", 1);
+        CB_Cat_Trusted_Utf8(buf, "{", 1);
         for (size_t i = 0; i < size; i++) {
             Obj *key = VA_Fetch(keys, i);
-            CB_Cat_Trusted_UTF8(buf, "\n", 1);
+            CB_Cat_Trusted_Utf8(buf, "\n", 1);
             S_cat_whitespace(buf, depth + 1);
             S_append_json_string((String*)key, buf);
-            CB_Cat_Trusted_UTF8(buf, ": ", 2);
+            CB_Cat_Trusted_Utf8(buf, ": ", 2);
             if (!S_to_json(Hash_Fetch(hash, key), buf, depth + 1)) {
                 DECREF(keys);
                 return false;
             }
             if (i + 1 < size) {
-                CB_Cat_Trusted_UTF8(buf, ",", 1);
+                CB_Cat_Trusted_Utf8(buf, ",", 1);
             }
         }
-        CB_Cat_Trusted_UTF8(buf, "\n", 1);
+        CB_Cat_Trusted_Utf8(buf, "\n", 1);
         S_cat_whitespace(buf, depth);
-        CB_Cat_Trusted_UTF8(buf, "}", 1);
+        CB_Cat_Trusted_Utf8(buf, "}", 1);
 
         DECREF(keys);
     }

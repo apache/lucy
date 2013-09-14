@@ -80,8 +80,8 @@ TermQuery_Dump_IMP(TermQuery *self) {
     TermQuery_Dump_t super_dump
         = SUPER_METHOD_PTR(TERMQUERY, LUCY_TermQuery_Dump);
     Hash *dump = (Hash*)CERTIFY(super_dump(self), HASH);
-    Hash_Store_Str(dump, "field", 5, Freezer_dump((Obj*)ivars->field));
-    Hash_Store_Str(dump, "term", 4, Freezer_dump(ivars->term));
+    Hash_Store_Utf8(dump, "field", 5, Freezer_dump((Obj*)ivars->field));
+    Hash_Store_Utf8(dump, "term", 4, Freezer_dump(ivars->term));
     return (Obj*)dump;
 }
 
@@ -92,9 +92,9 @@ TermQuery_Load_IMP(TermQuery *self, Obj *dump) {
         = SUPER_METHOD_PTR(TERMQUERY, LUCY_TermQuery_Load);
     TermQuery *loaded = (TermQuery*)super_load(self, dump);
     TermQueryIVARS *loaded_ivars = TermQuery_IVARS(loaded);
-    Obj *field = CERTIFY(Hash_Fetch_Str(source, "field", 5), OBJ);
+    Obj *field = CERTIFY(Hash_Fetch_Utf8(source, "field", 5), OBJ);
     loaded_ivars->field = (String*)CERTIFY(Freezer_load(field), STRING);
-    Obj *term = CERTIFY(Hash_Fetch_Str(source, "term", 4), OBJ);
+    Obj *term = CERTIFY(Hash_Fetch_Utf8(source, "term", 4), OBJ);
     loaded_ivars->term = (Obj*)CERTIFY(Freezer_load(term), OBJ);
     return (Obj*)loaded;
 }

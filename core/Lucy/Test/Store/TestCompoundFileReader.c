@@ -112,7 +112,7 @@ test_open(TestBatchRunner *runner) {
     Err_set_error(NULL);
     real_folder = S_folder_with_contents();
     metadata = (Hash*)Json_slurp_json(real_folder, cfmeta_file);
-    Hash_Store_Str(metadata, "format", 6, (Obj*)Str_newf("%i32", -1));
+    Hash_Store_Utf8(metadata, "format", 6, (Obj*)Str_newf("%i32", -1));
     Folder_Delete(real_folder, cfmeta_file);
     Json_spew_json((Obj*)metadata, real_folder, cfmeta_file);
     cf_reader = CFReader_open(real_folder);
@@ -122,7 +122,7 @@ test_open(TestBatchRunner *runner) {
               "Set Err_error when format is invalid");
 
     Err_set_error(NULL);
-    Hash_Store_Str(metadata, "format", 6, (Obj*)Str_newf("%i32", 1000));
+    Hash_Store_Utf8(metadata, "format", 6, (Obj*)Str_newf("%i32", 1000));
     Folder_Delete(real_folder, cfmeta_file);
     Json_spew_json((Obj*)metadata, real_folder, cfmeta_file);
     cf_reader = CFReader_open(real_folder);
@@ -132,7 +132,7 @@ test_open(TestBatchRunner *runner) {
               "Set Err_error when format too recent");
 
     Err_set_error(NULL);
-    DECREF(Hash_Delete_Str(metadata, "format", 6));
+    DECREF(Hash_Delete_Utf8(metadata, "format", 6));
     Folder_Delete(real_folder, cfmeta_file);
     Json_spew_json((Obj*)metadata, real_folder, cfmeta_file);
     cf_reader = CFReader_open(real_folder);
@@ -141,9 +141,9 @@ test_open(TestBatchRunner *runner) {
     TEST_TRUE(runner, Err_get_error() != NULL,
               "Set Err_error when format key is missing");
 
-    Hash_Store_Str(metadata, "format", 6,
-                   (Obj*)Str_newf("%i32", CFWriter_current_file_format));
-    DECREF(Hash_Delete_Str(metadata, "files", 5));
+    Hash_Store_Utf8(metadata, "format", 6,
+                    (Obj*)Str_newf("%i32", CFWriter_current_file_format));
+    DECREF(Hash_Delete_Utf8(metadata, "files", 5));
     Folder_Delete(real_folder, cfmeta_file);
     Json_spew_json((Obj*)metadata, real_folder, cfmeta_file);
     cf_reader = CFReader_open(real_folder);

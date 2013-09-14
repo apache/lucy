@@ -163,7 +163,7 @@ QueryLexer_Tokenize_IMP(QueryLexer *self, const String *query_string) {
 static ParserElem*
 S_consume_keyword(StringIterator *iter, const char *keyword,
                   size_t keyword_len, int type) {
-    if (!StrIter_Starts_With_UTF8(iter, keyword, keyword_len)) {
+    if (!StrIter_Starts_With_Utf8(iter, keyword, keyword_len)) {
         return NULL;
     }
     StringIterator *temp = StrIter_Clone(iter);

@@ -91,8 +91,8 @@ IxManager_Make_Snapshot_Filename_IMP(IndexManager *self) {
     if (!dh) { RETHROW(INCREF(Err_get_error())); }
     while (DH_Next(dh)) {
         String *entry = DH_Get_Entry(dh);
-        if (Str_Starts_With_Str(entry, "snapshot_", 9)
-            && Str_Ends_With_Str(entry, ".json", 5)
+        if (Str_Starts_With_Utf8(entry, "snapshot_", 9)
+            && Str_Ends_With_Utf8(entry, ".json", 5)
            ) {
             uint64_t gen = IxFileNames_extract_gen(entry);
             if (gen > max_gen) { max_gen = gen; }
@@ -266,7 +266,7 @@ IxManager_Write_Merge_Data_IMP(IndexManager *self, int64_t cutoff) {
     StackString *merge_json = SSTR_WRAP_STR("merge.json", 10);
     Hash *data = Hash_new(1);
     bool success;
-    Hash_Store_Str(data, "cutoff", 6, (Obj*)Str_newf("%i64", cutoff));
+    Hash_Store_Utf8(data, "cutoff", 6, (Obj*)Str_newf("%i64", cutoff));
     success = Json_spew_json((Obj*)data, ivars->folder, (String*)merge_json);
     DECREF(data);
     if (!success) {
@@ -306,8 +306,8 @@ IxManager_Make_Snapshot_Read_Lock_IMP(IndexManager *self,
                                       const String *filename) {
     LockFactory *lock_factory = S_obtain_lock_factory(self);
 
-    if (!Str_Starts_With_Str(filename, "snapshot_", 9)
-        || !Str_Ends_With_Str(filename, ".json", 5)
+    if (!Str_Starts_With_Utf8(filename, "snapshot_", 9)
+        || !Str_Ends_With_Utf8(filename, ".json", 5)
        ) {
         THROW(ERR, "Not a snapshot filename: %o", filename);
     }
