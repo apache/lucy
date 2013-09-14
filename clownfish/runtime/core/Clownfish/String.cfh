@@ -203,6 +203,9 @@ class Clownfish::String cnick Str
     public incremented String*
     Clone(String *self);
 
+    incremented Obj*
+    Inc_RefCount(String *self);
+
     public void
     Destroy(String *self);
 

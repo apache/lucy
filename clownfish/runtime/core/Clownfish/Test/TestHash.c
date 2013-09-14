@@ -97,7 +97,8 @@ test_Store_and_Fetch(TestBatchRunner *runner) {
     TEST_TRUE(runner, Hash_Fetch(hash, (Obj*)foo) == NULL,
               "Fetch against non-existent key returns NULL");
 
-    Hash_Store(hash, (Obj*)forty, INCREF(foo));
+    Obj *stored_foo = INCREF(foo);
+    Hash_Store(hash, (Obj*)forty, stored_foo);
     TEST_TRUE(runner, SStr_Equals(foo, Hash_Fetch(hash, (Obj*)forty)),
               "Hash_Store replaces existing value");
     TEST_FALSE(runner, Hash_Equals(hash, (Obj*)dupe),
@@ -105,9 +106,9 @@ test_Store_and_Fetch(TestBatchRunner *runner) {
     TEST_INT_EQ(runner, Hash_Get_Size(hash), 100,
                 "size unaffected after value replaced");
 
-    TEST_TRUE(runner, Hash_Delete(hash, (Obj*)forty) == (Obj*)foo,
+    TEST_TRUE(runner, Hash_Delete(hash, (Obj*)forty) == stored_foo,
               "Delete returns value");
-    DECREF(foo);
+    DECREF(stored_foo);
     TEST_INT_EQ(runner, Hash_Get_Size(hash), 99,
                 "size decremented by successful Delete");
     TEST_TRUE(runner, Hash_Delete(hash, (Obj*)forty) == NULL,
