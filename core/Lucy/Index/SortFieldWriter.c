@@ -94,6 +94,7 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
     ivars->run_ord         = 0;
     ivars->run_tick        = 0;
     ivars->ord_width       = 0;
+    ivars->last_val        = NULL;
 
     // Assign.
     ivars->field        = Str_Clone(field);
@@ -128,6 +129,11 @@ void
 SortFieldWriter_Clear_Cache_IMP(SortFieldWriter *self) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
     if (ivars->uniq_vals) {
+        if (ivars->last_val) {
+            Obj *clone = Obj_Clone(ivars->last_val);
+            DECREF(ivars->last_val);
+            ivars->last_val = clone;
+        }
         Hash_Clear(ivars->uniq_vals);
     }
     SortFieldWriter_Clear_Cache_t super_clear_cache
@@ -552,24 +558,25 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
     ords[0] = 0;
 
     // Build array of ords, write non-NULL sorted values.
-    Obj *val = INCREF(elem->value);
+    ivars->last_val = INCREF(elem->value);
     Obj *last_val_address = elem->value;
     S_write_val(elem->value, prim_id, ix_out, dat_out, dat_start);
     while (NULL != (elem = (SFWriterElem*)SortFieldWriter_Fetch(self))) {
         if (elem->value != last_val_address) {
             int32_t comparison
-                = FType_Compare_Values(ivars->type, elem->value, val);
+                = FType_Compare_Values(ivars->type, elem->value, ivars->last_val);
             if (comparison != 0) {
                 ord++;
                 S_write_val(elem->value, prim_id, ix_out, dat_out, dat_start);
-                DECREF(val);
-                val = INCREF(elem->value);
+                DECREF(ivars->last_val);
+                ivars->last_val = INCREF(elem->value);
             }
             last_val_address = elem->value;
         }
         ords[elem->doc_id] = ord;
     }
-    DECREF(val);
+    DECREF(ivars->last_val);
+    ivars->last_val = NULL;
 
     // If there are NULL values, write one now and record the NULL ord.
     if (has_nulls) {
