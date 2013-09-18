@@ -156,11 +156,19 @@ Str_newf(const char *pattern, ...) {
 }
 
 static String*
-S_new_substring(String *origin, size_t byte_offset, size_t size) {
+S_new_substring(String *string, size_t byte_offset, size_t size) {
     String *self = (String*)VTable_Make_Obj(STRING);
-    self->ptr    = origin->ptr + byte_offset;
-    self->size   = size;
-    self->origin = (String*)INCREF(origin);
+
+    if (string->origin == NULL) {
+        // Copy substring of wrapped strings.
+        Str_init_from_trusted_utf8(self, string->ptr + byte_offset, size);
+    }
+    else {
+        self->ptr    = string->ptr + byte_offset;
+        self->size   = size;
+        self->origin = (String*)INCREF(string->origin);
+    }
+
     return self;
 }
 
