@@ -297,7 +297,7 @@ Str_To_F64_IMP(String *self) {
 
 char*
 Str_To_Utf8_IMP(String *self) {
-    char *buf = (char*)MALLOCATE(self->size + 1);
+    char *buf = (char*)malloc(self->size + 1);
     memcpy(buf, self->ptr, self->size);
     buf[self->size] = '\0'; // NULL-terminate.
     return buf;
