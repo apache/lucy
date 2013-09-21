@@ -93,11 +93,12 @@ void
 TextTermStepper_Write_Key_Frame_IMP(TextTermStepper *self,
                                     OutStream *outstream, Obj *value) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
-    const char *buf  = Str_Get_Ptr8((String*)value);
-    size_t      size = Str_Get_Size((String*)value);
+    CharBuf *charbuf = (CharBuf*)ivars->value;
+    CB_Mimic(charbuf, value);
+    const char *buf  = CB_Get_Ptr8(charbuf);
+    size_t      size = CB_Get_Size(charbuf);
     OutStream_Write_C32(outstream, size);
     OutStream_Write_Bytes(outstream, buf, size);
-    Obj_Mimic(ivars->value, value);
     // Invalidate string.
     DECREF(ivars->string);
     ivars->string = NULL;
@@ -107,12 +108,25 @@ void
 TextTermStepper_Write_Delta_IMP(TextTermStepper *self, OutStream *outstream,
                                 Obj *value) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
-    String     *new_value  = (String*)CERTIFY(value, STRING);
-    CharBuf    *last_value = (CharBuf*)ivars->value;
-    const char *new_text   = Str_Get_Ptr8(new_value);
-    size_t      new_size   = Str_Get_Size(new_value);
-    const char *last_text  = CB_Get_Ptr8(last_value);
-    size_t      last_size  = CB_Get_Size(last_value);
+    CharBuf    *charbuf   = (CharBuf*)ivars->value;
+    const char *last_text = CB_Get_Ptr8(charbuf);
+    size_t      last_size = CB_Get_Size(charbuf);
+    const char *new_text  = NULL;
+    size_t      new_size  = 0;
+
+    if (Obj_Is_A(value, STRING)) {
+        String *new_string = (String*)value;
+        new_text = Str_Get_Ptr8(new_string);
+        new_size = Str_Get_Size(new_string);
+    }
+    else if (Obj_Is_A(value, CHARBUF)) {
+        CharBuf *new_charbuf = (CharBuf*)value;
+        new_text = CB_Get_Ptr8(new_charbuf);
+        new_size = CB_Get_Size(new_charbuf);
+    }
+    else {
+        THROW(ERR, "'value' must be a String or CharBuf");
+    }
 
     // Count how many bytes the strings share at the top.
     const int32_t overlap = StrHelp_overlap(last_text, new_text,
@@ -125,7 +139,7 @@ TextTermStepper_Write_Delta_IMP(TextTermStepper *self, OutStream *outstream,
     OutStream_Write_String(outstream, diff_start_str, diff_len);
 
     // Update value.
-    Obj_Mimic(ivars->value, value);
+    CB_Mimic_Utf8(charbuf, new_text, new_size);
 
     // Invalidate string.
     DECREF(ivars->string);

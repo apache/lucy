@@ -72,7 +72,7 @@ class Lucy::Index::LexiconWriter cnick LexWriter
      * field number).
      */
     void
-    Add_Term(LexiconWriter* self, String* term_text, TermInfo* tinfo);
+    Add_Term(LexiconWriter* self, Obj* term_text, TermInfo* tinfo);
 
     public void
     Add_Segment(LexiconWriter *self, SegReader *reader,
