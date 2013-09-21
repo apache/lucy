@@ -18,6 +18,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Index/LexiconWriter.h"
+#include "Clownfish/CharBuf.h"
 #include "Lucy/Plan/FieldType.h"
 #include "Lucy/Plan/Schema.h"
 #include "Lucy/Index/PolyReader.h"
@@ -104,7 +105,7 @@ S_add_last_term_to_ix(LexiconWriter *self) {
 }
 
 void
-LexWriter_Add_Term_IMP(LexiconWriter* self, String* term_text, TermInfo* tinfo) {
+LexWriter_Add_Term_IMP(LexiconWriter* self, Obj* term_text, TermInfo* tinfo) {
     LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
     OutStream *dat_out = ivars->dat_out;
 
@@ -115,7 +116,7 @@ LexWriter_Add_Term_IMP(LexiconWriter* self, String* term_text, TermInfo* tinfo) 
         S_add_last_term_to_ix(self);
     }
 
-    TermStepper_Write_Delta(ivars->term_stepper, dat_out, (Obj*)term_text);
+    TermStepper_Write_Delta(ivars->term_stepper, dat_out, term_text);
     TermStepper_Write_Delta(ivars->tinfo_stepper, dat_out, (Obj*)tinfo);
 
     // Track number of terms.

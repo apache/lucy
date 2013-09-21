@@ -22,6 +22,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Index/PostingPool.h"
+#include "Clownfish/CharBuf.h"
 #include "Lucy/Analysis/Inversion.h"
 #include "Lucy/Plan/Architecture.h"
 #include "Lucy/Plan/FieldType.h"
@@ -377,10 +378,10 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
                               (*(RawPosting**)PostPool_Fetch(self)),
                               RAWPOSTING);
     RawPostingIVARS *post_ivars = RawPost_IVARS(posting);
-    String *last_term_text
-        = Str_new_from_utf8(post_ivars->blob, post_ivars->content_len);
-    const char *last_text_buf  = Str_Get_Ptr8(last_term_text);
-    uint32_t    last_text_size = Str_Get_Size(last_term_text);
+    CharBuf *last_term_text
+        = CB_new_from_trusted_utf8(post_ivars->blob, post_ivars->content_len);
+    const char *last_text_buf  = CB_Get_Ptr8(last_term_text);
+    uint32_t    last_text_size = CB_Get_Size(last_term_text);
     SkipStepper_Set_ID_And_Filepos(skip_stepper, 0, 0);
 
     // Initialize sentinel to be used on the last iter, using an empty string
@@ -413,7 +414,7 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
         // If the term text changes, process the last term.
         if (!same_text_as_last) {
             // Hand off to LexiconWriter.
-            LexWriter_Add_Term(lex_writer, last_term_text, tinfo);
+            LexWriter_Add_Term(lex_writer, (Obj*)last_term_text, tinfo);
 
             // Start each term afresh.
             TInfo_Reset(tinfo);
@@ -426,11 +427,10 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
             last_skip_filepos     = tinfo_ivars->post_filepos;
 
             // Remember the term_text so we can write string diffs.
-            DECREF(last_term_text);
-            last_term_text
-                = Str_new_from_utf8(post_ivars->blob, post_ivars->content_len);
-            last_text_buf  = Str_Get_Ptr8(last_term_text);
-            last_text_size = Str_Get_Size(last_term_text);
+            CB_Mimic_Utf8(last_term_text, post_ivars->blob,
+                          post_ivars->content_len);
+            last_text_buf  = CB_Get_Ptr8(last_term_text);
+            last_text_size = CB_Get_Size(last_term_text);
         }
 
         // Bail on last iter before writing invalid posting data.
