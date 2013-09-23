@@ -204,7 +204,7 @@ Str_Hash_Sum_IMP(String *self) {
 
     const StrIter_Next_t next
         = METHOD_PTR(STRINGITERATOR, CFISH_StrIter_Next);
-    uint32_t code_point;
+    int32_t code_point;
     while (STRITER_DONE != (code_point = next((StringIterator*)iter))) {
         hashvalue = ((hashvalue << 5) + hashvalue) ^ code_point;
     }
@@ -231,7 +231,7 @@ String*
 Str_Swap_Chars_IMP(String *self, uint32_t match, uint32_t replacement) {
     CharBuf *charbuf = CB_new(self->size);
     StackStringIterator *iter = STR_STACKTOP(self);
-    uint32_t code_point;
+    int32_t code_point;
 
     while (STRITER_DONE != (code_point = SStrIter_Next(iter))) {
         if (code_point == match) { code_point = replacement; }
@@ -253,7 +253,7 @@ Str_BaseX_To_I64_IMP(String *self, uint32_t base) {
     StackStringIterator *iter = STR_STACKTOP(self);
     int64_t retval = 0;
     bool is_negative = false;
-    uint32_t code_point = SStrIter_Next(iter);
+    int32_t code_point = SStrIter_Next(iter);
 
     // Advance past minus sign.
     if (code_point == '-') {
@@ -455,7 +455,7 @@ uint32_t
 Str_Code_Point_At_IMP(String *self, size_t tick) {
     StackStringIterator *iter = STR_STACKTOP(self);
     SStrIter_Advance(iter, tick);
-    uint32_t code_point = SStrIter_Next(iter);
+    int32_t code_point = SStrIter_Next(iter);
     return code_point == STRITER_DONE ? 0 : code_point;
 }
 
@@ -464,7 +464,7 @@ Str_Code_Point_From_IMP(String *self, size_t tick) {
     if (tick == 0) { return 0; }
     StackStringIterator *iter = STR_STACKTAIL(self);
     SStrIter_Recede(iter, tick - 1);
-    uint32_t code_point = SStrIter_Prev(iter);
+    int32_t code_point = SStrIter_Prev(iter);
     return code_point == STRITER_DONE ? 0 : code_point;
 }
 
@@ -677,7 +677,7 @@ StrIter_Has_Prev_IMP(StringIterator *self) {
     return self->byte_offset != 0;
 }
 
-uint32_t
+int32_t
 StrIter_Next_IMP(StringIterator *self) {
     String *string      = self->string;
     size_t  byte_offset = self->byte_offset;
@@ -686,7 +686,7 @@ StrIter_Next_IMP(StringIterator *self) {
     if (byte_offset >= size) { return STRITER_DONE; }
 
     const uint8_t *const ptr = (const uint8_t*)string->ptr;
-    uint32_t retval = ptr[byte_offset++];
+    int32_t retval = ptr[byte_offset++];
 
     if (retval >= 0x80) {
         /*
@@ -713,7 +713,7 @@ StrIter_Next_IMP(StringIterator *self) {
          * is tested. After the second iteration, the fourth, and so on.
          */
 
-        uint32_t mask = 1 << 6;
+        int32_t mask = 1 << 6;
 
         do {
             if (byte_offset >= size) {
@@ -731,14 +731,14 @@ StrIter_Next_IMP(StringIterator *self) {
     return retval;
 }
 
-uint32_t
+int32_t
 StrIter_Prev_IMP(StringIterator *self) {
     size_t byte_offset = self->byte_offset;
 
     if (byte_offset == 0) { return STRITER_DONE; }
 
     const uint8_t *const ptr = (const uint8_t*)self->string->ptr;
-    uint32_t retval = ptr[--byte_offset];
+    int32_t retval = ptr[--byte_offset];
 
     if (retval >= 0x80) {
         // Construct the result from right to left.
@@ -749,8 +749,8 @@ StrIter_Prev_IMP(StringIterator *self) {
 
         retval &= 0x3F;
         int shift = 6;
-        uint32_t first_byte_mask = 0x1F;
-        uint32_t byte = ptr[--byte_offset];
+        int32_t first_byte_mask = 0x1F;
+        int32_t byte = ptr[--byte_offset];
 
         while ((byte & 0xC0) == 0x80) {
             if (byte_offset == 0) {
@@ -822,9 +822,9 @@ StrIter_Recede_IMP(StringIterator *self, size_t num) {
 
 size_t
 StrIter_Skip_Next_Whitespace_IMP(StringIterator *self) {
-    size_t   num_skipped = 0;
-    size_t   byte_offset = self->byte_offset;
-    uint32_t code_point;
+    size_t  num_skipped = 0;
+    size_t  byte_offset = self->byte_offset;
+    int32_t code_point;
 
     while (STRITER_DONE != (code_point = StrIter_Next(self))) {
         if (!StrHelp_is_whitespace(code_point)) { break; }
@@ -838,9 +838,9 @@ StrIter_Skip_Next_Whitespace_IMP(StringIterator *self) {
 
 size_t
 StrIter_Skip_Prev_Whitespace_IMP(StringIterator *self) {
-    size_t   num_skipped = 0;
-    size_t   byte_offset = self->byte_offset;
-    uint32_t code_point;
+    size_t  num_skipped = 0;
+    size_t  byte_offset = self->byte_offset;
+    int32_t code_point;
 
     while (STRITER_DONE != (code_point = StrIter_Prev(self))) {
         if (!StrHelp_is_whitespace(code_point)) { break; }

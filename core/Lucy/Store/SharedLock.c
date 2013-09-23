@@ -141,7 +141,7 @@ ShLock_Is_Locked_IMP(SharedLock *self) {
         if (Str_Starts_With(entry, ivars->name)) {
             StringIterator *iter = Str_Top(entry);
             StrIter_Advance(iter, Str_Length(ivars->name));
-            uint32_t code_point = StrIter_Next(iter);
+            int32_t code_point = StrIter_Next(iter);
             if (code_point == '-') {
                 code_point = StrIter_Next(iter);
                 if (code_point != STRITER_DONE && isdigit(code_point)) {

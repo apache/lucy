@@ -350,13 +350,13 @@ class Clownfish::StringIterator cnick StrIter
     /** Return the code point after the current position and advance the
      * iterator. Return CFISH_STRITER_DONE at the end of the string.
      */
-    public uint32_t
+    public int32_t
     Next(StringIterator *self);
 
     /** Return the code point before the current position and go one step back.
      * Return CFISH_STRITER_DONE at the start of the string.
      */
-    public uint32_t
+    public int32_t
     Prev(StringIterator *self);
 
     /** Skip code points.
@@ -436,7 +436,7 @@ __C__
 #define CFISH_SSTR_WRAP_STR(ptr, size) \
     cfish_SStr_wrap_str(cfish_alloca(cfish_SStr_size()), ptr, size)
 
-#define CFISH_STRITER_DONE  UINT32_MAX
+#define CFISH_STRITER_DONE  -1
 
 #ifdef CFISH_USE_SHORT_NAMES
   #define SSTR_BLANK             CFISH_SSTR_BLANK

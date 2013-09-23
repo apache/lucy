@@ -56,7 +56,7 @@ IxFileNames_extract_gen(const String *name) {
     // Advance past first underscore.  Bail if we run out of string or if we
     // encounter a NULL.
     while (1) {
-        uint32_t code_point = StrIter_Next(iter);
+        int32_t code_point = StrIter_Next(iter);
         if (code_point == STRITER_DONE) { return 0; }
         else if (code_point == '_') { break; }
     }
@@ -72,7 +72,7 @@ IxFileNames_extract_gen(const String *name) {
 String*
 IxFileNames_local_part(const String *path) {
     StringIterator *top = Str_Tail(path);
-    uint32_t code_point = StrIter_Prev(top);
+    int32_t code_point = StrIter_Prev(top);
 
     // Trim trailing slash.
     while (code_point == '/') {

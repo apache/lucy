@@ -329,7 +329,7 @@ static String*
 S_scrunch_string(String *source) {
     CharBuf *buf = CB_new(Str_Get_Size(source));
     StringIterator *iter = Str_Top(source);
-    uint32_t code_point;
+    int32_t code_point;
     while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
         if (code_point > 127) {
             THROW(ERR, "Can't fold case for %o", source);

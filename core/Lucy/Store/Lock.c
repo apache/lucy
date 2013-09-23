@@ -40,7 +40,7 @@ Lock_init(Lock *self, Folder *folder, const String *name,
         THROW(ERR, "Invalid value for 'interval': %i32", interval);
     }
     StringIterator *iter = Str_Top(name);
-    uint32_t code_point;
+    int32_t code_point;
     while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
         if (isalnum(code_point)
             || code_point == '.'

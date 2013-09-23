@@ -362,7 +362,7 @@ test_iterator(TestBatchRunner *runner) {
 
         for (int i = 0; i < num_code_points; ++i) {
             TEST_TRUE(runner, StrIter_Has_Next(iter), "Has_Next %d", i);
-            uint32_t code_point = StrIter_Next(iter);
+            int32_t code_point = StrIter_Next(iter);
             TEST_INT_EQ(runner, code_point, code_points[i], "Next %d", i);
         }
 
@@ -383,7 +383,7 @@ test_iterator(TestBatchRunner *runner) {
 
         for (int i = num_code_points - 1; i >= 0; --i) {
             TEST_TRUE(runner, StrIter_Has_Prev(iter), "Has_Prev %d", i);
-            uint32_t code_point = StrIter_Prev(iter);
+            int32_t code_point = StrIter_Prev(iter);
             TEST_INT_EQ(runner, code_point, code_points[i], "Prev %d", i);
         }
 
