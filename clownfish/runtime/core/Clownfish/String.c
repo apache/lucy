@@ -130,7 +130,7 @@ Str_init_wrap_trusted_utf8(String *self, const char *ptr, size_t size) {
 }
 
 String*
-Str_new_from_char(uint32_t code_point) {
+Str_new_from_char(int32_t code_point) {
     const size_t MAX_UTF8_BYTES = 4;
     char   *ptr  = (char*)MALLOCATE(MAX_UTF8_BYTES + 1);
     size_t  size = StrHelp_encode_utf8_char(code_point, (uint8_t*)ptr);
@@ -451,7 +451,7 @@ Str_Length_IMP(String *self) {
     return SStrIter_Advance(iter, SIZE_MAX);
 }
 
-uint32_t
+int32_t
 Str_Code_Point_At_IMP(String *self, size_t tick) {
     StackStringIterator *iter = STR_STACKTOP(self);
     SStrIter_Advance(iter, tick);
@@ -459,7 +459,7 @@ Str_Code_Point_At_IMP(String *self, size_t tick) {
     return code_point == STRITER_DONE ? 0 : code_point;
 }
 
-uint32_t
+int32_t
 Str_Code_Point_From_IMP(String *self, size_t tick) {
     if (tick == 0) { return 0; }
     StackStringIterator *iter = STR_STACKTAIL(self);

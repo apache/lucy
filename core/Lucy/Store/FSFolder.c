@@ -350,7 +350,7 @@ S_is_local_entry(const String *path) {
 
 static bool
 S_is_absolute(const String *path) {
-    uint32_t code_point = Str_Code_Point_At(path, 0);
+    int32_t code_point = Str_Code_Point_At(path, 0);
 
     if (isalpha(code_point)) {
         code_point = Str_Code_Point_At(path, 1);

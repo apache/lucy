@@ -634,7 +634,7 @@ S_unescape_text(const char *top, const char *end) {
                                       text - 5, end);
                             return NULL;
                         }
-                        target_size += StrHelp_encode_utf8_char((uint32_t)code_point,
+                        target_size += StrHelp_encode_utf8_char((int32_t)code_point,
                                                                 target_buf + target_size);
                     }
                     break;
