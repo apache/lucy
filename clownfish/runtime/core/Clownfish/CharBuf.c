@@ -312,7 +312,7 @@ CB_Yield_String_IMP(CharBuf *self) {
 }
 
 void
-CB_Cat_Char_IMP(CharBuf *self, uint32_t code_point) {
+CB_Cat_Char_IMP(CharBuf *self, int32_t code_point) {
     const size_t MAX_UTF8_BYTES = 4;
     if (self->size + MAX_UTF8_BYTES >= self->cap) {
         S_grow(self, Memory_oversize(self->size + MAX_UTF8_BYTES,

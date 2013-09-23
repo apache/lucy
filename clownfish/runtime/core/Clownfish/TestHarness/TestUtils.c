@@ -70,9 +70,9 @@ TestUtils_random_f64s(double *buf, size_t count) {
     return f64s;
 }
 
-static uint32_t
+static int32_t
 S_random_code_point(void) {
-    uint32_t code_point = 0;
+    int32_t code_point = 0;
     while (1) {
         uint8_t chance = (rand() % 9) + 1;
         switch (chance) {

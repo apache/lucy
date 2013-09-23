@@ -272,7 +272,7 @@ S_random_string() {
     size_t length = 1 + rand() % 10;
     CharBuf *buf = CB_new(length);
     while (length--) {
-        uint32_t code_point = 'a' + rand() % ('z' - 'a' + 1);
+        int32_t code_point = 'a' + rand() % ('z' - 'a' + 1);
         CB_Cat_Char(buf, code_point);
     }
     String *string = CB_Yield_String(buf);

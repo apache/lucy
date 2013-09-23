@@ -106,7 +106,7 @@ class Clownfish::CharBuf cnick CB
     /** Concatenate one Unicode character onto the end of the CharBuf.
      */
     void
-    Cat_Char(CharBuf *self, uint32_t code_point);
+    Cat_Char(CharBuf *self, int32_t code_point);
 
     /** Assign more memory to the CharBuf, if it doesn't already have enough
      * room to hold a string of <code>size</code> bytes.  Cannot shrink the

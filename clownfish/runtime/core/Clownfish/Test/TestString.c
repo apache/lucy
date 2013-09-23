@@ -52,7 +52,7 @@ S_get_str(const char *string) {
 // Surround a smiley with lots of whitespace.
 static String*
 S_smiley_with_whitespace(int *num_spaces_ptr) {
-    uint32_t spaces[] = {
+    int32_t spaces[] = {
         ' ',    '\t',   '\r',   '\n',   0x000B, 0x000C, 0x000D, 0x0085,
         0x00A0, 0x1680, 0x180E, 0x2000, 0x2001, 0x2002, 0x2003, 0x2004,
         0x2005, 0x2006, 0x2007, 0x2008, 0x2009, 0x200A, 0x2028, 0x2029,
@@ -141,10 +141,10 @@ test_Find(TestBatchRunner *runner) {
 
 static void
 test_Code_Point_At_and_From(TestBatchRunner *runner) {
-    uint32_t code_points[] = {
+    int32_t code_points[] = {
         'a', smiley_cp, smiley_cp, 'b', smiley_cp, 'c'
     };
-    uint32_t num_code_points = sizeof(code_points) / sizeof(uint32_t);
+    uint32_t num_code_points = sizeof(code_points) / sizeof(int32_t);
     String *string = Str_newf("a%s%sb%sc", smiley, smiley, smiley);
     uint32_t i;
 
@@ -316,7 +316,7 @@ test_Swap_Chars(TestBatchRunner *runner) {
 
 static void
 test_iterator(TestBatchRunner *runner) {
-    static const uint32_t code_points[] = {
+    static const int32_t code_points[] = {
         0x41,
         0x7F,
         0x80,

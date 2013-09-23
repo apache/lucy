@@ -130,7 +130,7 @@ StrHelp_utf8_valid(const char *ptr, size_t size) {
 }
 
 bool
-StrHelp_is_whitespace(uint32_t code_point) {
+StrHelp_is_whitespace(int32_t code_point) {
     switch (code_point) {
             // <control-0009>..<control-000D>
         case 0x0009: case 0x000A: case 0x000B: case 0x000C: case 0x000D:
@@ -156,7 +156,7 @@ StrHelp_is_whitespace(uint32_t code_point) {
 }
 
 uint32_t
-StrHelp_encode_utf8_char(uint32_t code_point, void *buffer) {
+StrHelp_encode_utf8_char(int32_t code_point, void *buffer) {
     uint8_t *buf = (uint8_t*)buffer;
     if (code_point <= 0x7F) { // ASCII
         buf[0] = (uint8_t)code_point;
@@ -186,10 +186,10 @@ StrHelp_encode_utf8_char(uint32_t code_point, void *buffer) {
     }
 }
 
-uint32_t
+int32_t
 StrHelp_decode_utf8_char(const char *ptr) {
     const uint8_t *const string = (const uint8_t*)ptr;
-    uint32_t retval = *string;
+    int32_t retval = *string;
     int bytes = StrHelp_UTF8_COUNT[retval];
 
     switch (bytes & 0x7) {

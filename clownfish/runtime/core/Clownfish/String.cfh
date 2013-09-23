@@ -86,7 +86,7 @@ class Clownfish::String cnick Str
     /** Return a String which holds a single character.
      */
     inert incremented String*
-    new_from_char(uint32_t code_point);
+    new_from_char(int32_t code_point);
 
     /** Return a pointer to a new String which contains formatted data
      * expanded according to CB_VCatF.
@@ -241,14 +241,14 @@ class Clownfish::String cnick Str
      * better to throw an exception, but that's not practical with UTF-8 and
      * no cached length.)
      */
-    uint32_t
+    int32_t
     Code_Point_At(String *self, size_t tick);
 
     /** Return the Unicode code point at the specified number of code points
      * counted backwards from the end of the string.  Return 0 if outside the
      * string.
      */
-    uint32_t
+    int32_t
     Code_Point_From(String *self, size_t tick);
 
     /** Return a newly allocated String containing a copy of the indicated

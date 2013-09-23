@@ -28,7 +28,7 @@
 #include "Lucy/Search/Span.h"
 #include "Lucy/Index/DocVector.h"
 
-const uint32_t ELLIPSIS_CODE_POINT = 0x2026;
+const int32_t ELLIPSIS_CODE_POINT = 0x2026;
 
 /* If Highlighter_Encode has been overridden, return its output.  If not,
  * increment the refcount of the supplied encode_buf and call encode_entities.

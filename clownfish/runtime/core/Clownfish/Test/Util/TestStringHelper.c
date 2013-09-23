@@ -156,7 +156,7 @@ test_to_base36(TestBatchRunner *runner) {
 
 static void
 test_utf8_round_trip(TestBatchRunner *runner) {
-    uint32_t code_point;
+    int32_t code_point;
     for (code_point = 0; code_point <= 0x10FFFF; code_point++) {
         char buffer[4];
         uint32_t size = StrHelp_encode_utf8_char(code_point, buffer);
