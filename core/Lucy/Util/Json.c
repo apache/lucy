@@ -182,7 +182,7 @@ S_append_json_string(String *dump, CharBuf *buf) {
 
     // Process string data.
     StringIterator *iter = Str_Top(dump);
-    uint32_t code_point;
+    int32_t code_point;
     while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
         if (code_point > 127) {
             // There is no need to escape any high characters, including those

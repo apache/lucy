@@ -431,7 +431,7 @@ Folder_Consolidate_IMP(Folder *self, const String *path) {
 
 static Folder*
 S_enclosing_folder(Folder *self, StringIterator *path) {
-    uint32_t code_point;
+    int32_t code_point;
 
     // Find first component of the file path.
     String *path_component = NULL;

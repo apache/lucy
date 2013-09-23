@@ -94,7 +94,7 @@ QueryLexer_Tokenize_IMP(QueryLexer *self, const String *query_string) {
             }
         }
 
-        uint32_t code_point = StrIter_Next(iter);
+        int32_t code_point = StrIter_Next(iter);
         switch (code_point) {
             case '(':
                 elem = ParserElem_new(TOKEN_OPEN_PAREN, NULL);
@@ -168,7 +168,7 @@ S_consume_keyword(StringIterator *iter, const char *keyword,
     }
     StringIterator *temp = StrIter_Clone(iter);
     StrIter_Advance(temp, keyword_len);
-    uint32_t lookahead = StrIter_Next(temp);
+    int32_t lookahead = StrIter_Next(temp);
     if (lookahead == STRITER_DONE) {
         DECREF(temp);
         return NULL;
@@ -194,7 +194,7 @@ S_consume_field(StringIterator *iter) {
     StringIterator *temp = StrIter_Clone(iter);
 
     // Field names constructs must start with a letter or underscore.
-    uint32_t code_point = StrIter_Next(temp);
+    int32_t code_point = StrIter_Next(temp);
     if (code_point == STRITER_DONE) {
         DECREF(temp);
         return NULL;
@@ -217,7 +217,7 @@ S_consume_field(StringIterator *iter) {
     }
 
     // Field name constructs must be followed by something sensible.
-    uint32_t lookahead = StrIter_Next(temp);
+    int32_t lookahead = StrIter_Next(temp);
     if (lookahead == STRITER_DONE) {
         DECREF(temp);
         return NULL;
@@ -247,7 +247,7 @@ S_consume_text(StringIterator *iter) {
     StringIterator *temp = StrIter_Clone(iter);
 
     while (1) {
-        uint32_t code_point = StrIter_Next(temp);
+        int32_t code_point = StrIter_Next(temp);
         if (code_point == '\\') {
             code_point = StrIter_Next(temp);
             if (code_point == STRITER_DONE) {
@@ -282,7 +282,7 @@ S_consume_quoted_string(StringIterator *iter) {
     }
 
     while (1) {
-        uint32_t code_point = StrIter_Next(temp);
+        int32_t code_point = StrIter_Next(temp);
         if (code_point == STRITER_DONE || code_point == '"') {
             break;
         }

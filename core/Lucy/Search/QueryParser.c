@@ -827,7 +827,7 @@ QParser_Expand_IMP(QueryParser *self, Query *query) {
 static String*
 S_unescape(QueryParser *self, String *orig, CharBuf *buf) {
     StringIterator *iter = Str_Top(orig);
-    uint32_t code_point;
+    int32_t code_point;
     UNUSED_VAR(self);
 
     CB_Set_Size(buf, 0);
@@ -835,7 +835,7 @@ S_unescape(QueryParser *self, String *orig, CharBuf *buf) {
 
     while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
         if (code_point == '\\') {
-            uint32_t next_code_point = StrIter_Next(iter);
+            int32_t next_code_point = StrIter_Next(iter);
             if (next_code_point == ':'
                 || next_code_point == '"'
                 || next_code_point == '\\'

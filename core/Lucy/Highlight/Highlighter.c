@@ -224,7 +224,7 @@ S_find_starting_boundary(StringIterator *top, uint32_t max_skip,
     StringIterator *iter = StrIter_Clone(top);
 
     while (true) {
-        uint32_t code_point = StrIter_Prev(iter);
+        int32_t code_point = StrIter_Prev(iter);
 
         if (code_point == STRITER_DONE || code_point == '.') {
             // Skip remaining whitespace.
@@ -249,7 +249,7 @@ S_find_starting_boundary(StringIterator *top, uint32_t max_skip,
     StrIter_Assign(iter, top);
 
     for (uint32_t i = 0; i < max_skip; ++i) {
-        uint32_t code_point = StrIter_Next(iter);
+        int32_t code_point = StrIter_Next(iter);
 
         if (code_point == STRITER_DONE || code_point == '.') {
             found_edge = true;
@@ -286,7 +286,7 @@ S_find_starting_boundary(StringIterator *top, uint32_t max_skip,
 bool
 S_find_ending_boundary(StringIterator *tail, uint32_t max_skip,
                        uint32_t *num_skipped_ptr) {
-    uint32_t code_point;
+    int32_t code_point;
 
     // Check if we're at an ending boundary already. Don't check for a word
     // boundary because we need space for a trailing ellipsis.
@@ -587,7 +587,7 @@ S_encode_entities(String *text, CharBuf *buf) {
     const int MAX_ENTITY_BYTES = 9; // &#dddddd;
 
     // Scan first so that we only allocate once.
-    uint32_t code_point;
+    int32_t code_point;
     while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
         if (code_point > 127
             || (!isgraph(code_point) && !isspace(code_point))

@@ -68,7 +68,7 @@ Seg_valid_seg_name(const String *name) {
     if (Str_Starts_With_Utf8(name, "seg_", 4)) {
         StringIterator *iter = Str_Top(name);
         StrIter_Advance(iter, 4);
-        uint32_t code_point;
+        int32_t code_point;
         while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
             if (!isalnum(code_point)) {
                 DECREF(iter);
