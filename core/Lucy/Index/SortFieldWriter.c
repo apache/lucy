@@ -345,7 +345,7 @@ SortFieldWriter_Compare_IMP(SortFieldWriter *self, void *va, void *vb) {
     SFWriterElemIVARS *b = SFWriterElem_IVARS(*(SFWriterElem**)vb);
     int32_t comparison
         = FType_null_back_compare_values(ivars->type, a->value, b->value);
-    if (comparison == 0) { comparison = b->doc_id - a->doc_id; }
+    if (comparison == 0) { comparison = a->doc_id - b->doc_id; }
     return comparison;
 }
 
@@ -356,7 +356,9 @@ S_compare_doc_ids_by_ord_rev(void *context, const void *va, const void *vb) {
     int32_t b = *(int32_t*)vb;
     int32_t ord_a = SortCache_Ordinal(sort_cache, a);
     int32_t ord_b = SortCache_Ordinal(sort_cache, b);
-    return ord_a - ord_b;
+    int32_t comparison = ord_a - ord_b;
+    if (comparison == 0) { comparison = a - b; }
+    return comparison;
 }
 
 static void
@@ -480,7 +482,6 @@ SortFieldWriter_Refill_IMP(SortFieldWriter *self) {
         ivars->run_tick++;
     }
     ivars->run_ord++;
-    SortFieldWriter_Sort_Buffer(self);
 
     if (ivars->run_ord >= ivars->run_cardinality) {
         DECREF(ivars->sort_cache);
