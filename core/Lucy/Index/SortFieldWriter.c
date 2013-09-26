@@ -92,7 +92,6 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
     ivars->sort_cache      = NULL;
     ivars->doc_map         = NULL;
     ivars->sorted_ids      = NULL;
-    ivars->run_ord         = 0;
     ivars->run_tick        = 0;
     ivars->ord_width       = 0;
     ivars->last_val        = NULL;
@@ -450,19 +449,10 @@ SortFieldWriter_Refill_IMP(SortFieldWriter *self) {
     I32Array *const  doc_map    = ivars->doc_map;
     SortCache *const sort_cache = ivars->sort_cache;
 
-    while (ivars->run_ord < ivars->run_cardinality
+    uint32_t count = 0;
+    while (ivars->run_tick <= ivars->run_max
            && MemPool_Get_Consumed(ivars->mem_pool) < ivars->mem_thresh
           ) {
-        Obj *val = SortCache_Value(sort_cache, ivars->run_ord);
-        if (val) {
-            Hash_Store(uniq_vals, val, (Obj*)CFISH_TRUE);
-            DECREF(val);
-            break;
-        }
-        ivars->run_ord++;
-    }
-    uint32_t count = 0;
-    while (ivars->run_tick <= ivars->run_max) {
         int32_t raw_doc_id = ivars->sorted_ids[ivars->run_tick];
         int32_t ord = SortCache_Ordinal(sort_cache, raw_doc_id);
         if (ord != null_ord) {
@@ -476,14 +466,10 @@ SortFieldWriter_Refill_IMP(SortFieldWriter *self) {
                 DECREF(val);
             }
         }
-        else if (ord > ivars->run_ord) {
-            break;
-        }
         ivars->run_tick++;
     }
-    ivars->run_ord++;
 
-    if (ivars->run_ord >= ivars->run_cardinality) {
+    if (ivars->run_tick > ivars->run_max) {
         DECREF(ivars->sort_cache);
         ivars->sort_cache = NULL;
     }
