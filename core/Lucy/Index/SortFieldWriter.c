@@ -92,7 +92,7 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
     ivars->sort_cache      = NULL;
     ivars->doc_map         = NULL;
     ivars->sorted_ids      = NULL;
-    ivars->run_tick        = 0;
+    ivars->run_tick        = 1;
     ivars->ord_width       = 0;
     ivars->last_val        = NULL;
 
@@ -217,7 +217,6 @@ SortFieldWriter_Add_Segment_IMP(SortFieldWriter *self, SegReader *reader,
     run_ivars->run_max    = SegReader_Doc_Max(reader);
     run_ivars->run_cardinality = SortCache_Get_Cardinality(sort_cache);
     run_ivars->null_ord   = SortCache_Get_Null_Ord(sort_cache);
-    run_ivars->run_tick   = 1;
     SortFieldWriter_Add_Run(self, (SortExternal*)run);
 }
 
