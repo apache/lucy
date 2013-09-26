@@ -471,6 +471,8 @@ SortFieldWriter_Refill_IMP(SortFieldWriter *self) {
     if (ivars->run_tick > ivars->run_max) {
         DECREF(ivars->sort_cache);
         ivars->sort_cache = NULL;
+        FREEMEM(ivars->sorted_ids);
+        ivars->sorted_ids = NULL;
     }
 
     return count;
