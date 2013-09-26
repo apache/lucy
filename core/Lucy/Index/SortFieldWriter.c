@@ -347,30 +347,43 @@ SortFieldWriter_Compare_IMP(SortFieldWriter *self, void *va, void *vb) {
     return comparison;
 }
 
-static int
-S_compare_doc_ids_by_ord_rev(void *context, const void *va, const void *vb) {
-    SortCache *sort_cache = (SortCache*)context;
-    int32_t a = *(int32_t*)va;
-    int32_t b = *(int32_t*)vb;
-    int32_t ord_a = SortCache_Ordinal(sort_cache, a);
-    int32_t ord_b = SortCache_Ordinal(sort_cache, b);
-    int32_t comparison = ord_a - ord_b;
-    if (comparison == 0) { comparison = a - b; }
-    return comparison;
-}
-
 static void
 S_lazy_init_sorted_ids(SortFieldWriter *self) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
-    if (!ivars->sorted_ids) {
-        ivars->sorted_ids
-            = (int32_t*)MALLOCATE((ivars->run_max + 1) * sizeof(int32_t));
-        for (int32_t i = 0, max = ivars->run_max; i <= max; i++) {
-            ivars->sorted_ids[i] = i;
-        }
-        Sort_quicksort(ivars->sorted_ids + 1, ivars->run_max, sizeof(int32_t),
-                       S_compare_doc_ids_by_ord_rev, ivars->sort_cache);
+    if (ivars->sorted_ids) { return; }
+
+    // Counting sort. Could be optimized by working directly on the
+    // ordinal arrays.
+
+    SortCache *sort_cache      = ivars->sort_cache;
+    int32_t    run_cardinality = ivars->run_cardinality;
+    int32_t    run_max         = ivars->run_max;
+
+    // Count.
+    int32_t *counts = (int32_t*)CALLOCATE(run_cardinality, sizeof(int32_t));
+    for (int32_t doc_id = 0; doc_id <= run_max; ++doc_id) {
+        int32_t ord = SortCache_Ordinal(sort_cache, doc_id);
+        ++counts[ord];
     }
+
+    // Compute partial sums.
+    int32_t sum = 0;
+    for (int32_t ord = 0; ord < run_cardinality; ++ord) {
+        int32_t count = counts[ord];
+        counts[ord] = sum;
+        sum += count;
+    }
+
+    // Distribute.
+    int32_t *sorted_ids = (int32_t*)MALLOCATE((run_max + 1) * sizeof(int32_t));
+    for (int32_t doc_id = 0; doc_id <= run_max; ++doc_id) {
+        int32_t ord = SortCache_Ordinal(sort_cache, doc_id);
+        int32_t pos = counts[ord]++;
+        sorted_ids[pos] = doc_id;
+    }
+
+    ivars->sorted_ids = sorted_ids;
+    FREEMEM(counts);
 }
 
 void
