@@ -52,7 +52,7 @@ LUCY_Doc_Get_Size_IMP(lucy_Doc *self) {
 }
 
 void
-LUCY_Doc_Store_IMP(lucy_Doc *self, const cfish_String *field, cfish_Obj *value) {
+LUCY_Doc_Store_IMP(lucy_Doc *self, cfish_String *field, cfish_Obj *value) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     const char *key      = CFISH_Str_Get_Ptr8(field);
     size_t      key_size = CFISH_Str_Get_Size(field);

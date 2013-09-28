@@ -248,7 +248,7 @@ MODULE = Clownfish    PACKAGE = Clownfish::Hash
 SV*
 _fetch(self, key)
     cfish_Hash *self;
-    const cfish_String *key;
+    cfish_String *key;
 CODE:
     RETVAL = CFISH_OBJ_TO_SV(CFISH_Hash_Fetch_IMP(self, (cfish_Obj*)key));
 OUTPUT: RETVAL
@@ -256,7 +256,7 @@ OUTPUT: RETVAL
 void
 store(self, key, value);
     cfish_Hash         *self;
-    const cfish_String *key;
+    cfish_String *key;
     cfish_Obj          *value;
 PPCODE:
 {
@@ -454,7 +454,7 @@ MODULE = Clownfish     PACKAGE = Clownfish::Obj
 bool
 is_a(self, class_name)
     cfish_Obj *self;
-    const cfish_String *class_name;
+    cfish_String *class_name;
 CODE:
 {
     cfish_VTable *target = cfish_VTable_fetch_vtable(class_name);

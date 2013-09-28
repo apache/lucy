@@ -30,8 +30,8 @@
 #include "Lucy/Util/Sleep.h"
 
 Lock*
-Lock_init(Lock *self, Folder *folder, const String *name,
-          const String *host, int32_t timeout, int32_t interval) {
+Lock_init(Lock *self, Folder *folder, String *name,
+          String *host, int32_t timeout, int32_t interval) {
     LockIVARS *const ivars = Lock_IVARS(self);
 
     // Validate.
@@ -112,15 +112,15 @@ Lock_Obtain_IMP(Lock *self) {
 /***************************************************************************/
 
 LockFileLock*
-LFLock_new(Folder *folder, const String *name, const String *host,
+LFLock_new(Folder *folder, String *name, String *host,
            int32_t timeout, int32_t interval) {
     LockFileLock *self = (LockFileLock*)VTable_Make_Obj(LOCKFILELOCK);
     return LFLock_init(self, folder, name, host, timeout, interval);
 }
 
 LockFileLock*
-LFLock_init(LockFileLock *self, Folder *folder, const String *name,
-            const String *host, int32_t timeout, int32_t interval) {
+LFLock_init(LockFileLock *self, Folder *folder, String *name,
+            String *host, int32_t timeout, int32_t interval) {
     int pid = PID_getpid();
     Lock_init((Lock*)self, folder, name, host, timeout, interval);
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
@@ -226,7 +226,7 @@ LFLock_Clear_Stale_IMP(LockFileLock *self) {
 }
 
 bool
-LFLock_Maybe_Delete_File_IMP(LockFileLock *self, const String *path,
+LFLock_Maybe_Delete_File_IMP(LockFileLock *self, String *path,
                              bool delete_mine, bool delete_other) {
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
     Folder *folder  = ivars->folder;

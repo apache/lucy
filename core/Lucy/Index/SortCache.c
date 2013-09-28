@@ -21,7 +21,7 @@
 #include "Lucy/Plan/FieldType.h"
 
 SortCache*
-SortCache_init(SortCache *self, const String *field, FieldType *type,
+SortCache_init(SortCache *self, String *field, FieldType *type,
                void *ords, int32_t cardinality, int32_t doc_max, int32_t null_ord,
                int32_t ord_width) {
     SortCacheIVARS *const ivars = SortCache_IVARS(self);

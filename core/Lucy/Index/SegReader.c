@@ -84,7 +84,7 @@ SegReader_Destroy_IMP(SegReader *self) {
 }
 
 void
-SegReader_Register_IMP(SegReader *self, const String *api,
+SegReader_Register_IMP(SegReader *self, String *api,
                        DataReader *component) {
     SegReaderIVARS *const ivars = SegReader_IVARS(self);
     if (Hash_Fetch(ivars->components, (Obj*)api)) {

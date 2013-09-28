@@ -57,24 +57,24 @@ public class Lucy::Plan::Schema inherits Clownfish::Obj {
      * @param type A FieldType.
      */
     public void
-    Spec_Field(Schema *self, const String *name, FieldType *type);
+    Spec_Field(Schema *self, String *name, FieldType *type);
 
     /** Return the FieldType for the specified field.  If the field can't be
      * found, return NULL.
      */
     public nullable FieldType*
-    Fetch_Type(Schema *self, const String *field);
+    Fetch_Type(Schema *self, String *field);
 
     /** Return the Analyzer for the specified field.
      */
     nullable Analyzer*
-    Fetch_Analyzer(Schema *self, const String *field = NULL);
+    Fetch_Analyzer(Schema *self, String *field = NULL);
 
     /** Return the Similarity for the specified field, or NULL if either the
      * field can't be found or it isn't associated with a Similarity.
      */
     public nullable Similarity*
-    Fetch_Sim(Schema *self, const String *field = NULL);
+    Fetch_Sim(Schema *self, String *field = NULL);
 
     /** Return the number of fields currently defined.
      */
@@ -108,7 +108,7 @@ public class Lucy::Plan::Schema inherits Clownfish::Obj {
     Eat(Schema *self, Schema *other);
 
     void
-    Write(Schema *self, Folder *folder, const String *filename = NULL);
+    Write(Schema *self, Folder *folder, String *filename = NULL);
 
     public void
     Destroy(Schema *self);

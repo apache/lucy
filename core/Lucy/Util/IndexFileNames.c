@@ -50,7 +50,7 @@ IxFileNames_latest_snapshot(Folder *folder) {
 }
 
 uint64_t
-IxFileNames_extract_gen(const String *name) {
+IxFileNames_extract_gen(String *name) {
     StringIterator *iter = Str_Top(name);
 
     // Advance past first underscore.  Bail if we run out of string or if we
@@ -70,7 +70,7 @@ IxFileNames_extract_gen(const String *name) {
 }
 
 String*
-IxFileNames_local_part(const String *path) {
+IxFileNames_local_part(String *path) {
     StringIterator *top = Str_Tail(path);
     int32_t code_point = StrIter_Prev(top);
 

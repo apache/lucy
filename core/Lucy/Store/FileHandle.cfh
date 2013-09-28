@@ -52,7 +52,7 @@ abstract class Lucy::Store::FileHandle cnick FH
      * behaviors.
      */
     inert nullable FileHandle*
-    do_open(FileHandle *self, const String *path = NULL, uint32_t flags);
+    do_open(FileHandle *self, String *path = NULL, uint32_t flags);
 
     /** Ensure that the FileWindow's buffer provides access to file data for
      * <code>len</code> bytes starting at <code>offset</code>.
@@ -118,7 +118,7 @@ abstract class Lucy::Store::FileHandle cnick FH
     /** Set the object's <code>path</code> attribute.
      */
     void
-    Set_Path(FileHandle *self, const String *path);
+    Set_Path(FileHandle *self, String *path);
 
     /** Return the object's <code>path</code> attribute.
      */

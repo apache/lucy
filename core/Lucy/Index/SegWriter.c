@@ -61,7 +61,7 @@ SegWriter_Destroy_IMP(SegWriter *self) {
 }
 
 void
-SegWriter_Register_IMP(SegWriter *self, const String *api,
+SegWriter_Register_IMP(SegWriter *self, String *api,
                        DataWriter *component) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     CERTIFY(component, DATAWRITER);
@@ -72,7 +72,7 @@ SegWriter_Register_IMP(SegWriter *self, const String *api,
 }
 
 Obj*
-SegWriter_Fetch_IMP(SegWriter *self, const String *api) {
+SegWriter_Fetch_IMP(SegWriter *self, String *api) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     return Hash_Fetch(ivars->by_api, (Obj*)api);
 }

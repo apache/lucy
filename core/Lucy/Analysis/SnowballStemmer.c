@@ -26,13 +26,13 @@
 #include "libstemmer.h"
 
 SnowballStemmer*
-SnowStemmer_new(const String *language) {
+SnowStemmer_new(String *language) {
     SnowballStemmer *self = (SnowballStemmer*)VTable_Make_Obj(SNOWBALLSTEMMER);
     return SnowStemmer_init(self, language);
 }
 
 SnowballStemmer*
-SnowStemmer_init(SnowballStemmer *self, const String *language) {
+SnowStemmer_init(SnowballStemmer *self, String *language) {
     char lang_buf[3];
     Analyzer_init((Analyzer*)self);
     SnowballStemmerIVARS *const ivars = SnowStemmer_IVARS(self);

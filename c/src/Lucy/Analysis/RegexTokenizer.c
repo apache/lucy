@@ -44,7 +44,7 @@ RegexTokenizer_is_available(void) {
 }
 
 RegexTokenizer*
-RegexTokenizer_init(RegexTokenizer *self, const String *pattern) {
+RegexTokenizer_init(RegexTokenizer *self, String *pattern) {
     Analyzer_init((Analyzer*)self);
     RegexTokenizerIVARS *const ivars = RegexTokenizer_IVARS(self);
 
@@ -167,7 +167,7 @@ RegexTokenizer_is_available(void) {
 }
 
 RegexTokenizer*
-RegexTokenizer_init(RegexTokenizer *self, const String *pattern) {
+RegexTokenizer_init(RegexTokenizer *self, String *pattern) {
     UNUSED_VAR(self);
     UNUSED_VAR(pattern);
     THROW(ERR,

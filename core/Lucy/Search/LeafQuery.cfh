@@ -31,14 +31,14 @@ public class Lucy::Search::LeafQuery inherits Lucy::Search::Query {
     String *text;
 
     inert incremented LeafQuery*
-    new(const String *field = NULL, const String *text);
+    new(String *field = NULL, String *text);
 
     /**
      * @param field Optional field name.
      * @param text Raw query text.
      */
     public inert LeafQuery*
-    init(LeafQuery *self, const String *field = NULL, const String *text);
+    init(LeafQuery *self, String *field = NULL, String *text);
 
     /** Accessor for object's <code>field</code> attribute.
      */

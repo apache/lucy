@@ -36,7 +36,7 @@
 
 // Obtain/release read locks and commit locks.
 static bool
-S_obtain_read_lock(PolyReader *self, const String *snapshot_filename);
+S_obtain_read_lock(PolyReader *self, String *snapshot_filename);
 static bool 
 S_obtain_deletion_lock(PolyReader *self);
 static void
@@ -478,7 +478,7 @@ S_obtain_deletion_lock(PolyReader *self) {
 }
 
 static bool
-S_obtain_read_lock(PolyReader *self, const String *snapshot_file_name) {
+S_obtain_read_lock(PolyReader *self, String *snapshot_file_name) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
     ivars->read_lock = IxManager_Make_Snapshot_Read_Lock(ivars->manager,
                                                          snapshot_file_name);

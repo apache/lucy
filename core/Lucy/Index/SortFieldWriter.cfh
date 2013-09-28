@@ -55,13 +55,13 @@ class Lucy::Index::SortFieldWriter
 
     inert incremented SortFieldWriter*
     new(Schema *schema, Snapshot *snapshot, Segment *segment,
-        PolyReader *polyreader, const String *field, MemoryPool *memory_pool,
+        PolyReader *polyreader, String *field, MemoryPool *memory_pool,
         size_t mem_thresh, OutStream *temp_ord_out, OutStream *temp_ix_out,
         OutStream *temp_dat_out);
 
     inert SortFieldWriter*
     init(SortFieldWriter *self, Schema *schema, Snapshot *snapshot,
-         Segment *segment, PolyReader *polyreader, const String *field,
+         Segment *segment, PolyReader *polyreader, String *field,
          MemoryPool *memory_pool, size_t mem_thresh, OutStream *temp_ord_out,
          OutStream *temp_ix_out, OutStream *temp_dat_out);
 

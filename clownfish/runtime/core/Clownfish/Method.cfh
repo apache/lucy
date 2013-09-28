@@ -28,10 +28,10 @@ class Clownfish::Method inherits Clownfish::Obj {
     bool            is_excluded;
 
     inert Method*
-    new(const String *name, cfish_method_t callback_func, size_t offset);
+    new(String *name, cfish_method_t callback_func, size_t offset);
 
     inert Method*
-    init(Method *self, const String *name, cfish_method_t callback_func,
+    init(Method *self, String *name, cfish_method_t callback_func,
          size_t offset);
 
     String*

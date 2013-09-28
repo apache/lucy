@@ -38,13 +38,13 @@ static void
 S_add_unique(VArray *array, Obj *elem);
 
 static void
-S_add_text_field(Schema *self, const String *field, FieldType *type);
+S_add_text_field(Schema *self, String *field, FieldType *type);
 static void
-S_add_string_field(Schema *self, const String *field, FieldType *type);
+S_add_string_field(Schema *self, String *field, FieldType *type);
 static void
-S_add_blob_field(Schema *self, const String *field, FieldType *type);
+S_add_blob_field(Schema *self, String *field, FieldType *type);
 static void
-S_add_numeric_field(Schema *self, const String *field, FieldType *type);
+S_add_numeric_field(Schema *self, String *field, FieldType *type);
 
 Schema*
 Schema_new() {
@@ -114,7 +114,7 @@ Schema_Architecture_IMP(Schema *self) {
 }
 
 void
-Schema_Spec_Field_IMP(Schema *self, const String *field, FieldType *type) {
+Schema_Spec_Field_IMP(Schema *self, String *field, FieldType *type) {
     FieldType *existing  = Schema_Fetch_Type(self, field);
 
     // If the field already has an association, verify pairing and return.
@@ -141,7 +141,7 @@ Schema_Spec_Field_IMP(Schema *self, const String *field, FieldType *type) {
 }
 
 static void
-S_add_text_field(Schema *self, const String *field, FieldType *type) {
+S_add_text_field(Schema *self, String *field, FieldType *type) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     FullTextType *fttype    = (FullTextType*)CERTIFY(type, FULLTEXTTYPE);
     Similarity   *sim       = FullTextType_Make_Similarity(fttype);
@@ -157,7 +157,7 @@ S_add_text_field(Schema *self, const String *field, FieldType *type) {
 }
 
 static void
-S_add_string_field(Schema *self, const String *field, FieldType *type) {
+S_add_string_field(Schema *self, String *field, FieldType *type) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     StringType *string_type = (StringType*)CERTIFY(type, STRINGTYPE);
     Similarity *sim         = StringType_Make_Similarity(string_type);
@@ -170,27 +170,27 @@ S_add_string_field(Schema *self, const String *field, FieldType *type) {
 }
 
 static void
-S_add_blob_field(Schema *self, const String *field, FieldType *type) {
+S_add_blob_field(Schema *self, String *field, FieldType *type) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     BlobType *blob_type = (BlobType*)CERTIFY(type, BLOBTYPE);
     Hash_Store(ivars->types, (Obj*)field, INCREF(blob_type));
 }
 
 static void
-S_add_numeric_field(Schema *self, const String *field, FieldType *type) {
+S_add_numeric_field(Schema *self, String *field, FieldType *type) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     NumericType *num_type = (NumericType*)CERTIFY(type, NUMERICTYPE);
     Hash_Store(ivars->types, (Obj*)field, INCREF(num_type));
 }
 
 FieldType*
-Schema_Fetch_Type_IMP(Schema *self, const String *field) {
+Schema_Fetch_Type_IMP(Schema *self, String *field) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     return (FieldType*)Hash_Fetch(ivars->types, (Obj*)field);
 }
 
 Analyzer*
-Schema_Fetch_Analyzer_IMP(Schema *self, const String *field) {
+Schema_Fetch_Analyzer_IMP(Schema *self, String *field) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     return field
            ? (Analyzer*)Hash_Fetch(ivars->analyzers, (Obj*)field)
@@ -198,7 +198,7 @@ Schema_Fetch_Analyzer_IMP(Schema *self, const String *field) {
 }
 
 Similarity*
-Schema_Fetch_Sim_IMP(Schema *self, const String *field) {
+Schema_Fetch_Sim_IMP(Schema *self, String *field) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     Similarity *sim = NULL;
     if (field != NULL) {
@@ -418,7 +418,7 @@ Schema_Eat_IMP(Schema *self, Schema *other) {
 }
 
 void
-Schema_Write_IMP(Schema *self, Folder *folder, const String *filename) {
+Schema_Write_IMP(Schema *self, Folder *folder, String *filename) {
     Hash *dump = Schema_Dump(self);
     StackString *schema_temp = SSTR_WRAP_UTF8("schema.temp", 11);
     bool success;

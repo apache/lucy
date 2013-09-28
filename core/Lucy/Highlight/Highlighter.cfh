@@ -35,7 +35,7 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
     Compiler   *compiler;
 
     inert incremented Highlighter*
-    new(Searcher *searcher, Obj *query, const String *field,
+    new(Searcher *searcher, Obj *query, String *field,
         uint32_t excerpt_length = 200);
 
     /**
@@ -50,7 +50,7 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
      */
     public inert Highlighter*
     init(Highlighter *self, Searcher *searcher, Obj *query,
-         const String *field, uint32_t excerpt_length = 200);
+         String *field, uint32_t excerpt_length = 200);
 
     /** Take a HitDoc object and return a highlighted excerpt as a string if
      * the HitDoc has a value for the specified <code>field</code>.
@@ -71,17 +71,17 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
      * when assembling an excerpt.
      */
     public incremented String*
-    Highlight(Highlighter *self, const String *text);
+    Highlight(Highlighter *self, String *text);
 
     /** Setter.  The default value is "<strong>".
      */
     public void
-    Set_Pre_Tag(Highlighter *self, const String *pre_tag);
+    Set_Pre_Tag(Highlighter *self, String *pre_tag);
 
     /** Setter.  The default value is "</strong>".
      */
     public void
-    Set_Post_Tag(Highlighter *self, const String *post_tag);
+    Set_Post_Tag(Highlighter *self, String *post_tag);
 
     /** Accessor.
      */
@@ -127,7 +127,7 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
      * (Helper function for Create_Excerpt only exposed for testing purposes.)
      */
     String*
-    Raw_Excerpt(Highlighter *self, const String *field_value, int32_t *top,
+    Raw_Excerpt(Highlighter *self, String *field_value, int32_t *top,
                 HeatMap *heat_map);
 
     /** Take the text in raw_excerpt, add highlight tags, encode, and place

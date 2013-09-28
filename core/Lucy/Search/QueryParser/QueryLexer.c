@@ -71,7 +71,7 @@ QueryLexer_Set_Heed_Colons_IMP(QueryLexer *self, bool heed_colons) {
 }
 
 VArray*
-QueryLexer_Tokenize_IMP(QueryLexer *self, const String *query_string) {
+QueryLexer_Tokenize_IMP(QueryLexer *self, String *query_string) {
     QueryLexerIVARS *const ivars = QueryLexer_IVARS(self);
 
     VArray *elems = VA_new(0);

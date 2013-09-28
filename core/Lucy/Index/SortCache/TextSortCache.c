@@ -25,7 +25,7 @@
 #include "Lucy/Store/Folder.h"
 
 TextSortCache*
-TextSortCache_new(const String *field, FieldType *type, int32_t cardinality,
+TextSortCache_new(String *field, FieldType *type, int32_t cardinality,
                   int32_t doc_max, int32_t null_ord, int32_t ord_width,
                   InStream *ord_in, InStream *ix_in, InStream *dat_in) {
     TextSortCache *self = (TextSortCache*)VTable_Make_Obj(TEXTSORTCACHE);
@@ -34,7 +34,7 @@ TextSortCache_new(const String *field, FieldType *type, int32_t cardinality,
 }
 
 TextSortCache*
-TextSortCache_init(TextSortCache *self, const String *field,
+TextSortCache_init(TextSortCache *self, String *field,
                    FieldType *type, int32_t cardinality,
                    int32_t doc_max, int32_t null_ord, int32_t ord_width,
                    InStream *ord_in, InStream *ix_in, InStream *dat_in) {

@@ -97,7 +97,7 @@ Compiler_Normalize_IMP(Compiler *self) {
 
 VArray*
 Compiler_Highlight_Spans_IMP(Compiler *self, Searcher *searcher,
-                             DocVector *doc_vec, const String *field) {
+                             DocVector *doc_vec, String *field) {
     UNUSED_VAR(self);
     UNUSED_VAR(searcher);
     UNUSED_VAR(doc_vec);

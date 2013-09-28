@@ -105,7 +105,7 @@ NOTCompiler_Sum_Of_Squared_Weights_IMP(NOTCompiler *self) {
 
 VArray*
 NOTCompiler_Highlight_Spans_IMP(NOTCompiler *self, Searcher *searcher,
-                                DocVector *doc_vec, const String *field) {
+                                DocVector *doc_vec, String *field) {
     UNUSED_VAR(self);
     UNUSED_VAR(searcher);
     UNUSED_VAR(doc_vec);

@@ -124,7 +124,7 @@ CFReader_Get_Real_Folder_IMP(CompoundFileReader *self) {
 }
 
 void
-CFReader_Set_Path_IMP(CompoundFileReader *self, const String *path) {
+CFReader_Set_Path_IMP(CompoundFileReader *self, String *path) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     Folder_Set_Path(ivars->real_folder, path);
     CFReader_Set_Path_t super_set_path
@@ -135,7 +135,7 @@ CFReader_Set_Path_IMP(CompoundFileReader *self, const String *path) {
 
 FileHandle*
 CFReader_Local_Open_FileHandle_IMP(CompoundFileReader *self,
-                                   const String *name, uint32_t flags) {
+                                   String *name, uint32_t flags) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     Hash *entry = (Hash*)Hash_Fetch(ivars->records, (Obj*)name);
     FileHandle *fh = NULL;
@@ -155,7 +155,7 @@ CFReader_Local_Open_FileHandle_IMP(CompoundFileReader *self,
 }
 
 bool
-CFReader_Local_Delete_IMP(CompoundFileReader *self, const String *name) {
+CFReader_Local_Delete_IMP(CompoundFileReader *self, String *name) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     Hash *record = (Hash*)Hash_Delete(ivars->records, (Obj*)name);
     DECREF(record);
@@ -182,7 +182,7 @@ CFReader_Local_Delete_IMP(CompoundFileReader *self, const String *name) {
 }
 
 InStream*
-CFReader_Local_Open_In_IMP(CompoundFileReader *self, const String *name) {
+CFReader_Local_Open_In_IMP(CompoundFileReader *self, String *name) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     Hash *entry = (Hash*)Hash_Fetch(ivars->records, (Obj*)name);
 
@@ -216,7 +216,7 @@ CFReader_Local_Open_In_IMP(CompoundFileReader *self, const String *name) {
 }
 
 bool
-CFReader_Local_Exists_IMP(CompoundFileReader *self, const String *name) {
+CFReader_Local_Exists_IMP(CompoundFileReader *self, String *name) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     if (Hash_Fetch(ivars->records, (Obj*)name))        { return true; }
     if (Folder_Local_Exists(ivars->real_folder, name)) { return true; }
@@ -225,7 +225,7 @@ CFReader_Local_Exists_IMP(CompoundFileReader *self, const String *name) {
 
 bool
 CFReader_Local_Is_Directory_IMP(CompoundFileReader *self,
-                                const String *name) {
+                                String *name) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     if (Hash_Fetch(ivars->records, (Obj*)name))              { return false; }
     if (Folder_Local_Is_Directory(ivars->real_folder, name)) { return true; }
@@ -239,7 +239,7 @@ CFReader_Close_IMP(CompoundFileReader *self) {
 }
 
 bool
-CFReader_Local_MkDir_IMP(CompoundFileReader *self, const String *name) {
+CFReader_Local_MkDir_IMP(CompoundFileReader *self, String *name) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     if (Hash_Fetch(ivars->records, (Obj*)name)) {
         Err_set_error(Err_new(Str_newf("Can't MkDir: '%o' exists", name)));
@@ -254,7 +254,7 @@ CFReader_Local_MkDir_IMP(CompoundFileReader *self, const String *name) {
 
 Folder*
 CFReader_Local_Find_Folder_IMP(CompoundFileReader *self,
-                               const String *name) {
+                               String *name) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
     if (Hash_Fetch(ivars->records, (Obj*)name)) { return false; }
     return Folder_Local_Find_Folder(ivars->real_folder, name);

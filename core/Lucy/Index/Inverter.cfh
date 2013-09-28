@@ -155,11 +155,11 @@ final class Lucy::Index::Inverter::InverterEntry cnick InvEntry
     bool         highlightable;
 
     inert incremented InverterEntry*
-    new(Schema *schema = NULL, const String *field_name, int32_t field_num);
+    new(Schema *schema = NULL, String *field_name, int32_t field_num);
 
     inert InverterEntry*
     init(InverterEntry *self = NULL, Schema *schema,
-         const String *field_name, int32_t field_num);
+         String *field_name, int32_t field_num);
 
     public int32_t
     Compare_To(InverterEntry *self, Obj *other);

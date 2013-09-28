@@ -25,13 +25,13 @@
 #include "Lucy/Util/Freezer.h"
 
 LeafQuery*
-LeafQuery_new(const String *field, const String *text) {
+LeafQuery_new(String *field, String *text) {
     LeafQuery *self = (LeafQuery*)VTable_Make_Obj(LEAFQUERY);
     return LeafQuery_init(self, field, text);
 }
 
 LeafQuery*
-LeafQuery_init(LeafQuery *self, const String *field, const String *text) {
+LeafQuery_init(LeafQuery *self, String *field, String *text) {
     LeafQueryIVARS *const ivars = LeafQuery_IVARS(self);
     Query_init((Query*)self, 1.0f);
     ivars->field       = field ? Str_Clone(field) : NULL;

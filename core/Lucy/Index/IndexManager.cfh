@@ -40,14 +40,14 @@ public class Lucy::Index::IndexManager cnick IxManager
     uint32_t     deletion_lock_interval;
 
     public inert incremented IndexManager*
-    new(const String *host = NULL, LockFactory *lock_factory = NULL);
+    new(String *host = NULL, LockFactory *lock_factory = NULL);
 
     /**
      * @param host An identifier which should be unique per-machine.
      * @param lock_factory A LockFactory.
      */
     public inert IndexManager*
-    init(IndexManager *self, const String *host = NULL,
+    init(IndexManager *self, String *host = NULL,
          LockFactory *lock_factory = NULL);
 
     public void
@@ -131,7 +131,7 @@ public class Lucy::Index::IndexManager cnick IxManager
      * all the files it lists and indicates that they must not be deleted.
      */
     public incremented Lock*
-    Make_Snapshot_Read_Lock(IndexManager *self, const String *filename);
+    Make_Snapshot_Read_Lock(IndexManager *self, String *filename);
 
     /** Return the highest number for a segment directory which contains a
      * segmeta file in the snapshot.

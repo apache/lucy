@@ -64,7 +64,7 @@ Seg_num_to_name(int64_t number) {
 }
 
 bool
-Seg_valid_seg_name(const String *name) {
+Seg_valid_seg_name(String *name) {
     if (Str_Starts_With_Utf8(name, "seg_", 4)) {
         StringIterator *iter = Str_Top(name);
         StrIter_Advance(iter, 4);
@@ -158,7 +158,7 @@ Seg_Write_File_IMP(Segment *self, Folder *folder) {
 }
 
 int32_t
-Seg_Add_Field_IMP(Segment *self, const String *field) {
+Seg_Add_Field_IMP(Segment *self, String *field) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
     Integer32 *num = (Integer32*)Hash_Fetch(ivars->by_name, (Obj*)field);
     if (num) {
@@ -200,7 +200,7 @@ Seg_Increment_Count_IMP(Segment *self, int64_t increment) {
 }
 
 void
-Seg_Store_Metadata_IMP(Segment *self, const String *key, Obj *value) {
+Seg_Store_Metadata_IMP(Segment *self, String *key, Obj *value) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
     if (Hash_Fetch(ivars->metadata, (Obj*)key)) {
         THROW(ERR, "Metadata key '%o' already registered", key);
@@ -216,7 +216,7 @@ Seg_Store_Metadata_Utf8_IMP(Segment *self, const char *key, size_t key_len,
 }
 
 Obj*
-Seg_Fetch_Metadata_IMP(Segment *self, const String *key) {
+Seg_Fetch_Metadata_IMP(Segment *self, String *key) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
     return Hash_Fetch(ivars->metadata, (Obj*)key);
 }
@@ -251,7 +251,7 @@ Seg_Field_Name_IMP(Segment *self, int32_t field_num) {
 }
 
 int32_t
-Seg_Field_Num_IMP(Segment *self, const String *field) {
+Seg_Field_Num_IMP(Segment *self, String *field) {
     if (field == NULL) {
         return 0;
     }

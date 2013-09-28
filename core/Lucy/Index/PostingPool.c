@@ -59,7 +59,7 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
 
 PostingPool*
 PostPool_new(Schema *schema, Snapshot *snapshot, Segment *segment,
-             PolyReader *polyreader,  const String *field,
+             PolyReader *polyreader,  String *field,
              LexiconWriter *lex_writer, MemoryPool *mem_pool,
              OutStream *lex_temp_out, OutStream *post_temp_out,
              OutStream *skip_out) {
@@ -71,7 +71,7 @@ PostPool_new(Schema *schema, Snapshot *snapshot, Segment *segment,
 
 PostingPool*
 PostPool_init(PostingPool *self, Schema *schema, Snapshot *snapshot,
-              Segment *segment, PolyReader *polyreader, const String *field,
+              Segment *segment, PolyReader *polyreader, String *field,
               LexiconWriter *lex_writer, MemoryPool *mem_pool,
               OutStream *lex_temp_out, OutStream *post_temp_out,
               OutStream *skip_out) {

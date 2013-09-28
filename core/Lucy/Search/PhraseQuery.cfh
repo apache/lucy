@@ -28,14 +28,14 @@ public class Lucy::Search::PhraseQuery inherits Lucy::Search::Query {
     VArray        *terms;
 
     inert incremented PhraseQuery*
-    new(const String *field, VArray *terms);
+    new(String *field, VArray *terms);
 
     /**
      * @param field The field that the phrase must occur in.
      * @param terms The ordered array of terms that must match.
      */
     public inert PhraseQuery*
-    init(PhraseQuery *self, const String *field, VArray *terms);
+    init(PhraseQuery *self, String *field, VArray *terms);
 
     /** Accessor for object's field attribute.
      */
@@ -102,7 +102,7 @@ class Lucy::Search::PhraseCompiler
 
     public incremented VArray*
     Highlight_Spans(PhraseCompiler *self, Searcher *searcher,
-                    DocVector *doc_vec, const String *field);
+                    DocVector *doc_vec, String *field);
 
     public bool
     Equals(PhraseCompiler *self, Obj *other);

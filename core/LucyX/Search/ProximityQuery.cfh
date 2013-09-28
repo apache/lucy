@@ -29,14 +29,14 @@ public class LucyX::Search::ProximityQuery inherits Lucy::Search::Query {
     uint32_t       within;
 
     inert incremented ProximityQuery*
-    new(const String *field, VArray *terms, uint32_t within);
+    new(String *field, VArray *terms, uint32_t within);
 
     /**
      * @param field The field that the phrase must occur in.
      * @param terms The ordered array of terms that must match.
      */
     public inert ProximityQuery*
-    init(ProximityQuery *self, const String *field, VArray *terms, uint32_t within);
+    init(ProximityQuery *self, String *field, VArray *terms, uint32_t within);
 
     /** Accessor for object's field attribute.
      */
@@ -109,7 +109,7 @@ class LucyX::Search::ProximityCompiler
 
     public incremented VArray*
     Highlight_Spans(ProximityCompiler *self, Searcher *searcher,
-                    DocVector *doc_vec, const String *field);
+                    DocVector *doc_vec, String *field);
 
     public bool
     Equals(ProximityCompiler *self, Obj *other);

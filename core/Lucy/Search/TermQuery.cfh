@@ -29,14 +29,14 @@ public class Lucy::Search::TermQuery inherits Lucy::Search::Query {
     Obj    *term;
 
     inert incremented TermQuery*
-    new(const String *field, const Obj *term);
+    new(String *field, const Obj *term);
 
     /**
      * @param field Field name.
      * @param term Term text.
      */
     public inert TermQuery*
-    init(TermQuery *self, const String *field, const Obj *term);
+    init(TermQuery *self, String *field, const Obj *term);
 
     /** Accessor for object's <code>field</code> member.
      */
@@ -101,7 +101,7 @@ class Lucy::Search::TermCompiler inherits Lucy::Search::Compiler {
 
     public incremented VArray*
     Highlight_Spans(TermCompiler *self, Searcher *searcher,
-                    DocVector *doc_vec, const String *field);
+                    DocVector *doc_vec, String *field);
 
     public bool
     Equals(TermCompiler *self, Obj *other);

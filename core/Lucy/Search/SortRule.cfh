@@ -34,7 +34,7 @@ public class Lucy::Search::SortRule inherits Clownfish::Obj {
     inert int32_t DOC_ID;
 
     public inert incremented SortRule*
-    new(int32_t type = 0, const String *field = NULL,
+    new(int32_t type = 0, String *field = NULL,
         bool reverse = false);
 
     /**
@@ -44,7 +44,7 @@ public class Lucy::Search::SortRule inherits Clownfish::Obj {
      * @param reverse If true, reverse the order of the sort for this rule.
      */
     public inert incremented SortRule*
-    init(SortRule *self, int32_t type = 0, const String *field = NULL,
+    init(SortRule *self, int32_t type = 0, String *field = NULL,
          bool reverse = false);
 
     /** Accessor for "field" member.

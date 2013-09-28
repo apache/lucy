@@ -149,7 +149,7 @@ public class Lucy::Search::Compiler inherits Lucy::Search::Query {
      */
     public incremented VArray*
     Highlight_Spans(Compiler *self, Searcher *searcher,
-                    DocVector *doc_vec, const String *field);
+                    DocVector *doc_vec, String *field);
 
     public void
     Serialize(Compiler *self, OutStream *outstream);

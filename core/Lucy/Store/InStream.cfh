@@ -62,7 +62,7 @@ class Lucy::Store::InStream inherits Clownfish::Obj {
      * @param len Length of the file as seen by the new InStream.
      */
     incremented InStream*
-    Reopen(InStream *self, const String *filename = NULL, int64_t offset,
+    Reopen(InStream *self, String *filename = NULL, int64_t offset,
            int64_t len);
 
     /** Clone the InStream.  Clones share the same underlying FileHandle and

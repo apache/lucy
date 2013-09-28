@@ -40,7 +40,7 @@ class Lucy::Util::Json inherits Clownfish::Obj {
      * @return true if the write succeeds, false on failure (sets Err_error).
      */
     inert bool
-    spew_json(Obj *dump, Folder *folder, const String *path);
+    spew_json(Obj *dump, Folder *folder, String *path);
 
     /** Decode the JSON in the file at <code>path</code> and return a data
      * structure made of Hashes, VArrays, and Strings.  Returns NULL and sets
@@ -48,7 +48,7 @@ class Lucy::Util::Json inherits Clownfish::Obj {
      * contain valid JSON.
      */
     inert incremented nullable Obj*
-    slurp_json(Folder *folder, const String *path);
+    slurp_json(Folder *folder, String *path);
 
     /** Allow the encoder to output strings, etc, instead of throwing an error
      * on anything other than a hash or an array.  Testing only.

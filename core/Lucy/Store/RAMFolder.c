@@ -28,16 +28,16 @@
 
 // Return the concatenation of the Folder's path and the supplied path.
 static String*
-S_fullpath(RAMFolder *self, const String *path);
+S_fullpath(RAMFolder *self, String *path);
 
 RAMFolder*
-RAMFolder_new(const String *path) {
+RAMFolder_new(String *path) {
     RAMFolder *self = (RAMFolder*)VTable_Make_Obj(RAMFOLDER);
     return RAMFolder_init(self, path);
 }
 
 RAMFolder*
-RAMFolder_init(RAMFolder *self, const String *path) {
+RAMFolder_init(RAMFolder *self, String *path) {
     Folder_init((Folder*)self, path);
     return self;
 }
@@ -54,7 +54,7 @@ RAMFolder_Check_IMP(RAMFolder *self) {
 }
 
 bool
-RAMFolder_Local_MkDir_IMP(RAMFolder *self, const String *name) {
+RAMFolder_Local_MkDir_IMP(RAMFolder *self, String *name) {
     RAMFolderIVARS *const ivars = RAMFolder_IVARS(self);
     if (Hash_Fetch(ivars->entries, (Obj*)name)) {
         Err_set_error(Err_new(Str_newf("Can't MkDir, '%o' already exists",
@@ -71,7 +71,7 @@ RAMFolder_Local_MkDir_IMP(RAMFolder *self, const String *name) {
 }
 
 FileHandle*
-RAMFolder_Local_Open_FileHandle_IMP(RAMFolder *self, const String *name,
+RAMFolder_Local_Open_FileHandle_IMP(RAMFolder *self, String *name,
                                     uint32_t flags) {
     RAMFolderIVARS *const ivars = RAMFolder_IVARS(self);
     RAMFileHandle *fh;
@@ -122,13 +122,13 @@ RAMFolder_Local_Open_Dir_IMP(RAMFolder *self) {
 }
 
 bool
-RAMFolder_Local_Exists_IMP(RAMFolder *self, const String *name) {
+RAMFolder_Local_Exists_IMP(RAMFolder *self, String *name) {
     RAMFolderIVARS *const ivars = RAMFolder_IVARS(self);
     return !!Hash_Fetch(ivars->entries, (Obj*)name);
 }
 
 bool
-RAMFolder_Local_Is_Directory_IMP(RAMFolder *self, const String *name) {
+RAMFolder_Local_Is_Directory_IMP(RAMFolder *self, String *name) {
     RAMFolderIVARS *const ivars = RAMFolder_IVARS(self);
     Obj *entry = Hash_Fetch(ivars->entries, (Obj*)name);
     if (entry && Obj_Is_A(entry, FOLDER)) { return true; }
@@ -139,7 +139,7 @@ RAMFolder_Local_Is_Directory_IMP(RAMFolder *self, const String *name) {
 #define OP_HARD_LINK 2
 
 static bool
-S_rename_or_hard_link(RAMFolder *self, const String* from, const String *to,
+S_rename_or_hard_link(RAMFolder *self, String* from, String *to,
                       Folder *from_folder, Folder *to_folder,
                       String *from_name, String *to_name,
                       int op) {
@@ -274,8 +274,8 @@ S_rename_or_hard_link(RAMFolder *self, const String* from, const String *to,
 }
 
 bool
-RAMFolder_Rename_IMP(RAMFolder *self, const String* from,
-                     const String *to) {
+RAMFolder_Rename_IMP(RAMFolder *self, String* from,
+                     String *to) {
     Folder *from_folder = RAMFolder_Enclosing_Folder(self, from);
     Folder *to_folder   = RAMFolder_Enclosing_Folder(self, to);
     String *from_name   = IxFileNames_local_part(from);
@@ -289,8 +289,8 @@ RAMFolder_Rename_IMP(RAMFolder *self, const String* from,
 }
 
 bool
-RAMFolder_Hard_Link_IMP(RAMFolder *self, const String *from,
-                        const String *to) {
+RAMFolder_Hard_Link_IMP(RAMFolder *self, String *from,
+                        String *to) {
     Folder *from_folder = RAMFolder_Enclosing_Folder(self, from);
     Folder *to_folder   = RAMFolder_Enclosing_Folder(self, to);
     String *from_name   = IxFileNames_local_part(from);
@@ -304,7 +304,7 @@ RAMFolder_Hard_Link_IMP(RAMFolder *self, const String *from,
 }
 
 bool
-RAMFolder_Local_Delete_IMP(RAMFolder *self, const String *name) {
+RAMFolder_Local_Delete_IMP(RAMFolder *self, String *name) {
     RAMFolderIVARS *const ivars = RAMFolder_IVARS(self);
     Obj *entry = Hash_Fetch(ivars->entries, (Obj*)name);
     if (entry) {
@@ -338,7 +338,7 @@ RAMFolder_Local_Delete_IMP(RAMFolder *self, const String *name) {
 }
 
 Folder*
-RAMFolder_Local_Find_Folder_IMP(RAMFolder *self, const String *path) {
+RAMFolder_Local_Find_Folder_IMP(RAMFolder *self, String *path) {
     RAMFolderIVARS *const ivars = RAMFolder_IVARS(self);
     Folder *local_folder = (Folder*)Hash_Fetch(ivars->entries, (Obj*)path);
     if (local_folder && Folder_Is_A(local_folder, FOLDER)) {
@@ -353,7 +353,7 @@ RAMFolder_Close_IMP(RAMFolder *self) {
 }
 
 static String*
-S_fullpath(RAMFolder *self, const String *path) {
+S_fullpath(RAMFolder *self, String *path) {
     RAMFolderIVARS *const ivars = RAMFolder_IVARS(self);
     if (Str_Get_Size(ivars->path)) {
         return Str_newf("%o/%o", ivars->path, path);

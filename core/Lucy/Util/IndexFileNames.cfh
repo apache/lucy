@@ -27,7 +27,7 @@ inert class Lucy::Util::IndexFileNames cnick IxFileNames {
      * @return a generation number, or 0 if no number can be extracted.
      */
     inert uint64_t
-    extract_gen(const String *name);
+    extract_gen(String *name);
 
     /** Return the name of the latest generation snapshot file in the Folder,
      * or NULL if no such file exists.
@@ -39,7 +39,7 @@ inert class Lucy::Util::IndexFileNames cnick IxFileNames {
      * Trailing slashes will be stripped.
      */
     inert incremented String*
-    local_part(const String *path);
+    local_part(String *path);
 }
 
 

@@ -74,20 +74,20 @@ public class Lucy::Analysis::SnowballStopFilter cnick SnowStop
     inert const uint8_t** snow_sv;
 
     inert incremented SnowballStopFilter*
-    new(const String *language = NULL, Hash *stoplist = NULL);
+    new(String *language = NULL, Hash *stoplist = NULL);
 
     /**
      * @param stoplist A hash with stopwords as the keys.
      * @param language The ISO code for a supported language.
      */
     public inert SnowballStopFilter*
-    init(SnowballStopFilter *self, const String *language = NULL,
+    init(SnowballStopFilter *self, String *language = NULL,
          Hash *stoplist = NULL);
 
     /** Return a Hash with the Snowball stoplist for the supplied language.
      */
     inert incremented Hash*
-    gen_stoplist(const String *language);
+    gen_stoplist(String *language);
 
     public incremented Inversion*
     Transform(SnowballStopFilter *self, Inversion *inversion);

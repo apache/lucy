@@ -97,7 +97,7 @@ static Query*
 S_compose_subquery(QueryParser *self, VArray *elems, bool enclosed);
 
 QueryParser*
-QParser_new(Schema *schema, Analyzer *analyzer, const String *default_boolop,
+QParser_new(Schema *schema, Analyzer *analyzer, String *default_boolop,
             VArray *fields) {
     QueryParser *self = (QueryParser*)VTable_Make_Obj(QUERYPARSER);
     return QParser_init(self, schema, analyzer, default_boolop, fields);
@@ -105,7 +105,7 @@ QParser_new(Schema *schema, Analyzer *analyzer, const String *default_boolop,
 
 QueryParser*
 QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
-             const String *default_boolop, VArray *fields) {
+             String *default_boolop, VArray *fields) {
     QueryParserIVARS *const ivars = QParser_IVARS(self);
     // Init.
     ivars->heed_colons = false;
@@ -199,7 +199,7 @@ QParser_Set_Heed_Colons_IMP(QueryParser *self, bool heed_colons) {
 
 
 Query*
-QParser_Parse_IMP(QueryParser *self, const String *query_string) {
+QParser_Parse_IMP(QueryParser *self, String *query_string) {
     String *qstring = query_string
                       ? Str_Clone(query_string)
                       : Str_new_from_trusted_utf8("", 0);
@@ -213,7 +213,7 @@ QParser_Parse_IMP(QueryParser *self, const String *query_string) {
 }
 
 Query*
-QParser_Tree_IMP(QueryParser *self, const String *query_string) {
+QParser_Tree_IMP(QueryParser *self, String *query_string) {
     QueryParserIVARS *const ivars = QParser_IVARS(self);
     VArray *elems = QueryLexer_Tokenize(ivars->lexer, query_string);
     S_balance_parens(self, elems);
@@ -376,7 +376,7 @@ S_compose_inner_queries(QueryParser *self, VArray *elems,
         }
 
         if (ParserElem_Get_Type(elem) == TOKEN_STRING) {
-            const String *text = (String*)ParserElem_As(elem, STRING);
+            String *text = (String*)ParserElem_As(elem, STRING);
             LeafQuery *query = LeafQuery_new(field, text);
             ParserElem *new_elem
                 = ParserElem_new(TOKEN_QUERY, (Obj*)query);
@@ -972,14 +972,14 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
 }
 
 Query*
-QParser_Make_Term_Query_IMP(QueryParser *self, const String *field,
+QParser_Make_Term_Query_IMP(QueryParser *self, String *field,
                             Obj *term) {
     UNUSED_VAR(self);
     return (Query*)TermQuery_new(field, term);
 }
 
 Query*
-QParser_Make_Phrase_Query_IMP(QueryParser *self, const String *field,
+QParser_Make_Phrase_Query_IMP(QueryParser *self, String *field,
                               VArray *terms) {
     UNUSED_VAR(self);
     return (Query*)PhraseQuery_new(field, terms);

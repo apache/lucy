@@ -57,7 +57,7 @@ Err_To_String_IMP(Err *self) {
 }
 
 void
-Err_Cat_Mess_IMP(Err *self, const String *mess) {
+Err_Cat_Mess_IMP(Err *self, String *mess) {
     String *new_mess = Str_Cat(self->mess, mess);
     DECREF(self->mess);
     self->mess = new_mess;

@@ -32,7 +32,7 @@ S_extract_tv_cache(ByteBuf *field_buf);
 
 // Pull a TermVector object out from compressed positional data.
 static TermVector*
-S_extract_tv_from_tv_buf(const String *field, const String *term_text,
+S_extract_tv_from_tv_buf(String *field, String *term_text,
                          ByteBuf *tv_buf);
 
 DocVector*
@@ -73,14 +73,14 @@ DocVec_Destroy_IMP(DocVector *self) {
 }
 
 void
-DocVec_Add_Field_Buf_IMP(DocVector *self, const String *field,
+DocVec_Add_Field_Buf_IMP(DocVector *self, String *field,
                          ByteBuf *field_buf) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
     Hash_Store(ivars->field_bufs, (Obj*)field, INCREF(field_buf));
 }
 
 ByteBuf*
-DocVec_Field_Buf_IMP(DocVector *self, const String *field) {
+DocVec_Field_Buf_IMP(DocVector *self, String *field) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
     return (ByteBuf*)Hash_Fetch(ivars->field_bufs, (Obj*)field);
 }
@@ -92,8 +92,8 @@ DocVec_Field_Names_IMP(DocVector *self) {
 }
 
 TermVector*
-DocVec_Term_Vector_IMP(DocVector *self, const String *field,
-                       const String *term_text) {
+DocVec_Term_Vector_IMP(DocVector *self, String *field,
+                       String *term_text) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
     Hash *field_vector = (Hash*)Hash_Fetch(ivars->field_vectors, (Obj*)field);
 
@@ -158,7 +158,7 @@ S_extract_tv_cache(ByteBuf *field_buf) {
 }
 
 static TermVector*
-S_extract_tv_from_tv_buf(const String *field, const String *term_text,
+S_extract_tv_from_tv_buf(String *field, String *term_text,
                          ByteBuf *tv_buf) {
     TermVector *retval      = NULL;
     char       *posdata     = BB_Get_Buf(tv_buf);

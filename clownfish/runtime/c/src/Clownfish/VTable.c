@@ -58,13 +58,13 @@ VTable_register_with_host(VTable *singleton, VTable *parent) {
 }
 
 VArray*
-VTable_fresh_host_methods(const String *class_name) {
+VTable_fresh_host_methods(String *class_name) {
     UNUSED_VAR(class_name);
     return VA_new(0);
 }
 
 String*
-VTable_find_parent_class(const String *class_name) {
+VTable_find_parent_class(String *class_name) {
     UNUSED_VAR(class_name);
     THROW(ERR, "TODO");
     UNREACHABLE_RETURN(String*);

@@ -41,7 +41,7 @@ static int32_t
 S_find_upper_bound(RangeCompiler *self, SortCache *sort_cache);
 
 RangeQuery*
-RangeQuery_new(const String *field, Obj *lower_term, Obj *upper_term,
+RangeQuery_new(String *field, Obj *lower_term, Obj *upper_term,
                bool include_lower, bool include_upper) {
     RangeQuery *self = (RangeQuery*)VTable_Make_Obj(RANGEQUERY);
     return RangeQuery_init(self, field, lower_term, upper_term,
@@ -49,7 +49,7 @@ RangeQuery_new(const String *field, Obj *lower_term, Obj *upper_term,
 }
 
 RangeQuery*
-RangeQuery_init(RangeQuery *self, const String *field, Obj *lower_term,
+RangeQuery_init(RangeQuery *self, String *field, Obj *lower_term,
                 Obj *upper_term, bool include_lower, bool include_upper) {
     Query_init((Query*)self, 0.0f);
     RangeQueryIVARS *const ivars = RangeQuery_IVARS(self);
@@ -240,7 +240,7 @@ Matcher*
 RangeCompiler_Make_Matcher_IMP(RangeCompiler *self, SegReader *reader,
                                bool need_score) {
     RangeQuery *parent = (RangeQuery*)RangeCompiler_IVARS(self)->parent;
-    const String *field = RangeQuery_IVARS(parent)->field;
+    String *field = RangeQuery_IVARS(parent)->field;
     SortReader *sort_reader
         = (SortReader*)SegReader_Fetch(reader, VTable_Get_Name(SORTREADER));
     SortCache *sort_cache = sort_reader

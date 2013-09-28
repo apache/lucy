@@ -32,14 +32,14 @@ public class Lucy::Analysis::SnowballStemmer cnick SnowStemmer
     String *language;
 
     inert incremented SnowballStemmer*
-    new(const String *language);
+    new(String *language);
 
     /**
      * @param language A two-letter ISO code identifying a language supported
      * by Snowball.
      */
     public inert SnowballStemmer*
-    init(SnowballStemmer *self, const String *language);
+    init(SnowballStemmer *self, String *language);
 
     public incremented Inversion*
     Transform(SnowballStemmer *self, Inversion *inversion);

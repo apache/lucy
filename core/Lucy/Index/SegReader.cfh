@@ -63,7 +63,7 @@ public class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
      * @param component A DataReader.
      */
     public void
-    Register(SegReader *self, const String *api,
+    Register(SegReader *self, String *api,
              decremented DataReader *component);
 
     /** Return the name of the segment.

@@ -36,11 +36,11 @@ class Lucy::Index::SegPostingList cnick SegPList
     int32_t            field_num;
 
     inert incremented SegPostingList*
-    new(PostingListReader *plist_reader, const String *field);
+    new(PostingListReader *plist_reader, String *field);
 
     inert SegPostingList*
     init(SegPostingList *self, PostingListReader *plist_reader,
-         const String *field);
+         String *field);
 
     InStream*
     Get_Post_Stream(SegPostingList *self);

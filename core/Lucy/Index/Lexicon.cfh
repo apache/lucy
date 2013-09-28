@@ -36,7 +36,7 @@ public class Lucy::Index::Lexicon cnick Lex inherits Clownfish::Obj {
     String *field;
 
     public inert Lexicon*
-    init(Lexicon *self, const String *field);
+    init(Lexicon *self, String *field);
 
     public void
     Destroy(Lexicon *self);

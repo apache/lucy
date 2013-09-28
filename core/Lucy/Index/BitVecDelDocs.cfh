@@ -22,10 +22,10 @@ class Lucy::Index::BitVecDelDocs inherits Lucy::Object::BitVector {
     String    *filename;
 
     inert incremented BitVecDelDocs*
-    new(Folder *folder, const String *filename);
+    new(Folder *folder, String *filename);
 
     inert BitVecDelDocs*
-    init(BitVecDelDocs *self, Folder *folder, const String *filename);
+    init(BitVecDelDocs *self, Folder *folder, String *filename);
 
     public void
     Destroy(BitVecDelDocs *self);

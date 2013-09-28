@@ -27,13 +27,13 @@
 #include "Lucy/Store/SharedLock.h"
 
 LockFactory*
-LockFact_new(Folder *folder, const String *host) {
+LockFact_new(Folder *folder, String *host) {
     LockFactory *self = (LockFactory*)VTable_Make_Obj(LOCKFACTORY);
     return LockFact_init(self, folder, host);
 }
 
 LockFactory*
-LockFact_init(LockFactory *self, Folder *folder, const String *host) {
+LockFact_init(LockFactory *self, Folder *folder, String *host) {
     LockFactoryIVARS *const ivars = LockFact_IVARS(self);
     ivars->folder    = (Folder*)INCREF(folder);
     ivars->host      = Str_Clone(host);
@@ -49,7 +49,7 @@ LockFact_Destroy_IMP(LockFactory *self) {
 }
 
 Lock*
-LockFact_Make_Lock_IMP(LockFactory *self, const String *name,
+LockFact_Make_Lock_IMP(LockFactory *self, String *name,
                        int32_t timeout, int32_t interval) {
     LockFactoryIVARS *const ivars = LockFact_IVARS(self);
     return (Lock*)LFLock_new(ivars->folder, name, ivars->host, timeout,
@@ -57,7 +57,7 @@ LockFact_Make_Lock_IMP(LockFactory *self, const String *name,
 }
 
 Lock*
-LockFact_Make_Shared_Lock_IMP(LockFactory *self, const String *name,
+LockFact_Make_Shared_Lock_IMP(LockFactory *self, String *name,
                               int32_t timeout, int32_t interval) {
     LockFactoryIVARS *const ivars = LockFact_IVARS(self);
     return (Lock*)ShLock_new(ivars->folder, name, ivars->host, timeout,

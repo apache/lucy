@@ -43,14 +43,14 @@ static void
 S_seek_tinfo(SegPostingList *self, TermInfo *tinfo);
 
 SegPostingList*
-SegPList_new(PostingListReader *plist_reader, const String *field) {
+SegPList_new(PostingListReader *plist_reader, String *field) {
     SegPostingList *self = (SegPostingList*)VTable_Make_Obj(SEGPOSTINGLIST);
     return SegPList_init(self, plist_reader, field);
 }
 
 SegPostingList*
 SegPList_init(SegPostingList *self, PostingListReader *plist_reader,
-              const String *field) {
+              String *field) {
     SegPostingListIVARS *const ivars = SegPList_IVARS(self);
     Schema       *const schema   = PListReader_Get_Schema(plist_reader);
     Folder       *const folder   = PListReader_Get_Folder(plist_reader);

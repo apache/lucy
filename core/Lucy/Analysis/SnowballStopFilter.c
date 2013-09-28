@@ -25,13 +25,13 @@
 #include "Lucy/Util/Freezer.h"
 
 SnowballStopFilter*
-SnowStop_new(const String *language, Hash *stoplist) {
+SnowStop_new(String *language, Hash *stoplist) {
     SnowballStopFilter *self = (SnowballStopFilter*)VTable_Make_Obj(SNOWBALLSTOPFILTER);
     return SnowStop_init(self, language, stoplist);
 }
 
 SnowballStopFilter*
-SnowStop_init(SnowballStopFilter *self, const String *language,
+SnowStop_init(SnowballStopFilter *self, String *language,
               Hash *stoplist) {
     Analyzer_init((Analyzer*)self);
     SnowballStopFilterIVARS *const ivars = SnowStop_IVARS(self);
@@ -118,7 +118,7 @@ SnowStop_Load_IMP(SnowballStopFilter *self, Obj *dump) {
 }
 
 Hash*
-SnowStop_gen_stoplist(const String *language) {
+SnowStop_gen_stoplist(String *language) {
     char lang[2];
     lang[0] = tolower(Str_Code_Point_At(language, 0));
     lang[1] = tolower(Str_Code_Point_At(language, 1));

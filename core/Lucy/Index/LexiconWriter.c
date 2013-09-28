@@ -182,7 +182,7 @@ LexWriter_Finish_Field_IMP(LexiconWriter *self, int32_t field_num) {
 }
 
 void
-LexWriter_Enter_Temp_Mode_IMP(LexiconWriter *self, const String *field,
+LexWriter_Enter_Temp_Mode_IMP(LexiconWriter *self, String *field,
                               OutStream *temp_outstream) {
     LexiconWriterIVARS *const ivars = LexWriter_IVARS(self);
     Schema    *schema = LexWriter_Get_Schema(self);

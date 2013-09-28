@@ -49,13 +49,13 @@ public class Lucy::Analysis::EasyAnalyzer inherits Lucy::Analysis::Analyzer {
     SnowballStemmer *stemmer;
 
     inert incremented EasyAnalyzer*
-    new(const String *language = NULL);
+    new(String *language = NULL);
 
     /**
      * @param language An ISO code from the list of supported languages.
      */
     public inert EasyAnalyzer*
-    init(EasyAnalyzer *self, const String *language = NULL);
+    init(EasyAnalyzer *self, String *language = NULL);
 
     public incremented Inversion*
     Transform(EasyAnalyzer *self, Inversion *inversion);

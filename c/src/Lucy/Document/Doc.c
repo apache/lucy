@@ -61,7 +61,7 @@ Doc_Get_Size_IMP(Doc *self) {
 }
 
 void
-Doc_Store_IMP(Doc *self, const String *field, Obj *value) {
+Doc_Store_IMP(Doc *self, String *field, Obj *value) {
     Hash *hash = (Hash*)Doc_IVARS(self)->fields;
     Hash_Store(hash, (Obj *)field, INCREF(value));
 }

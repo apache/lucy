@@ -237,7 +237,7 @@ DefDelWriter_Seg_Deletions_IMP(DefaultDeletionsWriter *self,
 
 int32_t
 DefDelWriter_Seg_Del_Count_IMP(DefaultDeletionsWriter *self,
-                               const String *seg_name) {
+                               String *seg_name) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     Integer32 *tick
         = (Integer32*)Hash_Fetch(ivars->name_to_tick, (Obj*)seg_name);
@@ -249,7 +249,7 @@ DefDelWriter_Seg_Del_Count_IMP(DefaultDeletionsWriter *self,
 
 void
 DefDelWriter_Delete_By_Term_IMP(DefaultDeletionsWriter *self,
-                                const String *field, Obj *term) {
+                                String *field, Obj *term) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     for (uint32_t i = 0, max = VA_Get_Size(ivars->seg_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(ivars->seg_readers, i);

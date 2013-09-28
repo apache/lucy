@@ -47,7 +47,7 @@ public abstract class Lucy::Index::DeletionsWriter cnick DelWriter
      * will be processed automatically (so don't pre-process it yourself).
      */
     public abstract void
-    Delete_By_Term(DeletionsWriter *self, const String *field, Obj *term);
+    Delete_By_Term(DeletionsWriter *self, String *field, Obj *term);
 
     /** Delete all documents in the index that match <code>query</code>.
      *
@@ -92,7 +92,7 @@ public abstract class Lucy::Index::DeletionsWriter cnick DelWriter
      * @param seg_name The name of the segment.
      */
     public abstract int32_t
-    Seg_Del_Count(DeletionsWriter *self, const String *seg_name);
+    Seg_Del_Count(DeletionsWriter *self, String *seg_name);
 }
 
 /** Implements DeletionsWriter using BitVector files.
@@ -124,7 +124,7 @@ class Lucy::Index::DefaultDeletionsWriter cnick DefDelWriter
          Segment *segment, PolyReader *polyreader);
 
     public void
-    Delete_By_Term(DefaultDeletionsWriter *self, const String *field,
+    Delete_By_Term(DefaultDeletionsWriter *self, String *field,
                    Obj *term);
 
     public void
@@ -140,7 +140,7 @@ class Lucy::Index::DefaultDeletionsWriter cnick DefDelWriter
     Seg_Deletions(DefaultDeletionsWriter *self, SegReader *seg_reader);
 
     public int32_t
-    Seg_Del_Count(DefaultDeletionsWriter *self, const String *seg_name);
+    Seg_Del_Count(DefaultDeletionsWriter *self, String *seg_name);
 
     public void
     Add_Segment(DefaultDeletionsWriter *self, SegReader *reader,

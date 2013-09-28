@@ -211,8 +211,7 @@ static const char typemap_start[] =
     "uint16_t\tCFISH_UNSIGNED_INT\n"
     "uint32_t\tCFISH_UNSIGNED_INT\n"
     "uint64_t\tCFISH_BIG_UNSIGNED_INT\n"
-    "\n"
-    "const cfish_String*\tCONST_CHARBUF\n";
+    "\n";
 
 
 static const char typemap_input[] =
@@ -232,9 +231,6 @@ static const char typemap_input[] =
     "\n"
     "CFISH_BIG_UNSIGNED_INT \n"
     "    $var = (sizeof(UV) == 8) ? ($type)SvUV($arg) : ($type)SvNV($arg);\n"
-    "\n"
-    "CONST_CHARBUF\n"
-    "    $var = (const cfish_String*)CFISH_SSTR_WRAP_UTF8(SvPVutf8_nolen($arg), SvCUR($arg));\n"
     "\n";
 
 static const char typemap_output[] =

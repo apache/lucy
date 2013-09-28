@@ -22,13 +22,13 @@
 #include "Lucy/Store/FileWindow.h"
 
 RAMFileHandle*
-RAMFH_open(const String *path, uint32_t flags, RAMFile *file) {
+RAMFH_open(String *path, uint32_t flags, RAMFile *file) {
     RAMFileHandle *self = (RAMFileHandle*)VTable_Make_Obj(RAMFILEHANDLE);
     return RAMFH_do_open(self, path, flags, file);
 }
 
 RAMFileHandle*
-RAMFH_do_open(RAMFileHandle *self, const String *path, uint32_t flags,
+RAMFH_do_open(RAMFileHandle *self, String *path, uint32_t flags,
               RAMFile *file) {
     bool must_create
         = (flags & (FH_CREATE | FH_EXCLUSIVE)) == (FH_CREATE | FH_EXCLUSIVE)

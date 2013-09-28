@@ -19,7 +19,7 @@
 #include "Lucy/Store/DirHandle.h"
 
 DirHandle*
-DH_init(DirHandle *self, const String *dir) {
+DH_init(DirHandle *self, String *dir) {
     DirHandleIVARS *const ivars = DH_IVARS(self);
     ivars->dir   = Str_Clone(dir);
     ivars->entry = NULL;

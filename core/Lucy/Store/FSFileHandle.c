@@ -83,13 +83,13 @@ SI_close_win_handles(FSFileHandle *self);
 #endif
 
 FSFileHandle*
-FSFH_open(const String *path, uint32_t flags) {
+FSFH_open(String *path, uint32_t flags) {
     FSFileHandle *self = (FSFileHandle*)VTable_Make_Obj(FSFILEHANDLE);
     return FSFH_do_open(self, path, flags);
 }
 
 FSFileHandle*
-FSFH_do_open(FSFileHandle *self, const String *path, uint32_t flags) {
+FSFH_do_open(FSFileHandle *self, String *path, uint32_t flags) {
     FH_do_open((FileHandle*)self, path, flags);
     FSFileHandleIVARS *const ivars = FSFH_IVARS(self);
     if (!path || !Str_Get_Size(path)) {

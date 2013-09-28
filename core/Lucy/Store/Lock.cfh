@@ -47,8 +47,8 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
      * @param interval Time in milliseconds between retries.
      */
     public inert Lock*
-    init(Lock *self, Folder *folder, const String *name,
-         const String *host, int32_t timeout = 0, int32_t interval = 100);
+    init(Lock *self, Folder *folder, String *name,
+         String *host, int32_t timeout = 0, int32_t interval = 100);
 
     /** Returns true if the Lock is shared, false if the Lock is exclusive.
      */
@@ -116,12 +116,12 @@ class Lucy::Store::LockFileLock cnick LFLock
     String *link_path;
 
     inert incremented LockFileLock*
-    new(Folder *folder, const String *name, const String *host,
+    new(Folder *folder, String *name, String *host,
         int32_t timeout = 0, int32_t interval = 100);
 
     public inert LockFileLock*
-    init(LockFileLock *self, Folder *folder, const String *name,
-         const String *host, int32_t timeout = 0, int32_t interval = 100);
+    init(LockFileLock *self, Folder *folder, String *name,
+         String *host, int32_t timeout = 0, int32_t interval = 100);
 
     public bool
     Shared(LockFileLock *self);
@@ -148,7 +148,7 @@ class Lucy::Store::LockFileLock cnick LFLock
      * don't match this process's pid.
      */
     bool
-    Maybe_Delete_File(LockFileLock *self, const String *filepath,
+    Maybe_Delete_File(LockFileLock *self, String *filepath,
                       bool delete_mine, bool delete_other);
 
     public void

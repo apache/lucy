@@ -27,10 +27,10 @@ class Lucy::Store::FSDirHandle cnick FSDH
     bool     delayed_iter;
 
     inert incremented nullable FSDirHandle*
-    open(const String *path);
+    open(String *path);
 
     inert nullable FSDirHandle*
-    do_open(FSDirHandle *self, const String *path);
+    do_open(FSDirHandle *self, String *path);
 
     bool
     Next(FSDirHandle *self);
