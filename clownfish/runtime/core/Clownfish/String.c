@@ -228,7 +228,7 @@ Str_To_String_IMP(String *self) {
 }
 
 String*
-Str_Swap_Chars_IMP(String *self, uint32_t match, uint32_t replacement) {
+Str_Swap_Chars_IMP(String *self, int32_t match, int32_t replacement) {
     CharBuf *charbuf = CB_new(self->size);
     StackStringIterator *iter = STR_STACKTOP(self);
     int32_t code_point;

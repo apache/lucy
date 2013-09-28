@@ -131,7 +131,7 @@ class Clownfish::String cnick Str
      * @return a new String with the characters replaced.
      */
     incremented String*
-    Swap_Chars(String *self, uint32_t match, uint32_t replacement);
+    Swap_Chars(String *self, int32_t match, int32_t replacement);
 
     public int64_t
     To_I64(String *self);
