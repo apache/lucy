@@ -41,7 +41,7 @@ static void
 test_Equals(TestBatchRunner *runner) {
     VArray *array = VA_new(0);
     VArray *other = VA_new(0);
-    StackString *stuff = SSTR_WRAP_STR("stuff", 5);
+    StackString *stuff = SSTR_WRAP_UTF8("stuff", 5);
 
     TEST_TRUE(runner, VA_Equals(array, (Obj*)other),
               "Empty arrays are equal");

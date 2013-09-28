@@ -864,7 +864,7 @@ S_create_index() {
     Indexer    *indexer = Indexer_new(schema, (Obj*)folder, NULL, 0);
     uint32_t i, max;
 
-    String *field = (String*)SSTR_WRAP_STR("content", 7);
+    String *field = (String*)SSTR_WRAP_UTF8("content", 7);
     for (i = 0, max = VA_Get_Size(doc_set); i < max; i++) {
         Doc *doc = Doc_new(NULL, 0);
         Doc_Store(doc, field, VA_Fetch(doc_set, i));
@@ -890,7 +890,7 @@ TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
     IndexSearcher *searcher   = IxSearcher_new((Obj*)folder);
     QueryParser   *or_parser  = QParser_new(IxSearcher_Get_Schema(searcher),
                                             NULL, NULL, NULL);
-    StackString *AND        = SSTR_WRAP_STR("AND", 3);
+    StackString *AND        = SSTR_WRAP_UTF8("AND", 3);
     QueryParser   *and_parser = QParser_new(IxSearcher_Get_Schema(searcher),
                                             NULL, (String*)AND, NULL);
     QParser_Set_Heed_Colons(or_parser, true);

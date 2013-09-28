@@ -40,7 +40,7 @@ static void
 test_Equals(TestBatchRunner *runner) {
     Hash *hash  = Hash_new(0);
     Hash *other = Hash_new(0);
-    StackString *stuff = SSTR_WRAP_STR("stuff", 5);
+    StackString *stuff = SSTR_WRAP_UTF8("stuff", 5);
 
     TEST_TRUE(runner, Hash_Equals(hash, (Obj*)other),
               "Empty hashes are equal");
@@ -68,9 +68,9 @@ test_Store_and_Fetch(TestBatchRunner *runner) {
     const uint32_t starting_cap = Hash_Get_Capacity(hash);
     VArray        *expected     = VA_new(100);
     VArray        *got          = VA_new(100);
-    StackString *twenty       = SSTR_WRAP_STR("20", 2);
-    StackString *forty        = SSTR_WRAP_STR("40", 2);
-    StackString *foo          = SSTR_WRAP_STR("foo", 3);
+    StackString *twenty       = SSTR_WRAP_UTF8("20", 2);
+    StackString *forty        = SSTR_WRAP_UTF8("40", 2);
+    StackString *foo          = SSTR_WRAP_UTF8("foo", 3);
 
     for (int32_t i = 0; i < 100; i++) {
         String *str = Str_newf("%i32", i);
@@ -168,8 +168,8 @@ test_Keys_Values_Iter(TestBatchRunner *runner) {
     TEST_TRUE(runner, VA_Equals(values, (Obj*)expected), "Values from Iter");
 
     {
-        StackString *forty = SSTR_WRAP_STR("40", 2);
-        StackString *nope  = SSTR_WRAP_STR("nope", 4);
+        StackString *forty = SSTR_WRAP_UTF8("40", 2);
+        StackString *nope  = SSTR_WRAP_UTF8("nope", 4);
         Obj *key = Hash_Find_Key(hash, (Obj*)forty, SStr_Hash_Sum(forty));
         TEST_TRUE(runner, Obj_Equals(key, (Obj*)forty), "Find_Key");
         key = Hash_Find_Key(hash, (Obj*)nope, SStr_Hash_Sum(nope)),

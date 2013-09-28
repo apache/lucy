@@ -433,7 +433,7 @@ __C__
 #define CFISH_SSTR_WRAP(source) \
     cfish_SStr_wrap(cfish_alloca(cfish_SStr_size()), source)
 
-#define CFISH_SSTR_WRAP_STR(ptr, size) \
+#define CFISH_SSTR_WRAP_UTF8(ptr, size) \
     cfish_SStr_wrap_str(cfish_alloca(cfish_SStr_size()), ptr, size)
 
 #define CFISH_STRITER_DONE  -1
@@ -441,8 +441,8 @@ __C__
 #ifdef CFISH_USE_SHORT_NAMES
   #define SSTR_BLANK             CFISH_SSTR_BLANK
   #define SSTR_WRAP              CFISH_SSTR_WRAP
-  #define SSTR_WRAP_STR          CFISH_SSTR_WRAP_STR
-  #define STRITER_DONE          CFISH_STRITER_DONE
+  #define SSTR_WRAP_UTF8         CFISH_SSTR_WRAP_UTF8
+  #define STRITER_DONE           CFISH_STRITER_DONE
 #endif
 __END_C__
 

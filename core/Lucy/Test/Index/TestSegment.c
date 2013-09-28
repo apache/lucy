@@ -32,9 +32,9 @@ TestSeg_new() {
 static void
 test_fields(TestBatchRunner *runner) {
     Segment *segment = Seg_new(1);
-    StackString *foo = SSTR_WRAP_STR("foo", 3);
-    StackString *bar = SSTR_WRAP_STR("bar", 3);
-    StackString *baz = SSTR_WRAP_STR("baz", 3);
+    StackString *foo = SSTR_WRAP_UTF8("foo", 3);
+    StackString *bar = SSTR_WRAP_UTF8("bar", 3);
+    StackString *baz = SSTR_WRAP_UTF8("baz", 3);
     int32_t field_num;
 
     field_num = Seg_Add_Field(segment, (String*)foo);
@@ -126,8 +126,8 @@ test_Write_File_and_Read_File(TestBatchRunner *runner) {
     Segment   *segment = Seg_new(100);
     Segment   *got     = Seg_new(100);
     String    *meta;
-    String    *flotsam = (String*)SSTR_WRAP_STR("flotsam", 7);
-    String    *jetsam  = (String*)SSTR_WRAP_STR("jetsam", 6);
+    String    *flotsam = (String*)SSTR_WRAP_UTF8("flotsam", 7);
+    String    *jetsam  = (String*)SSTR_WRAP_UTF8("jetsam", 6);
 
     Seg_Set_Count(segment, 111);
     Seg_Store_Metadata_Utf8(segment, "foo", 3, (Obj*)Str_newf("bar"));

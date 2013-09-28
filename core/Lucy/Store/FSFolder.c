@@ -253,7 +253,7 @@ FSFolder_Local_Find_Folder_IMP(FSFolder *self, const String *name) {
         }
         // Try to open a CompoundFileReader. On failure, just use the
         // existing folder.
-        String *cfmeta_file = (String*)SSTR_WRAP_STR("cfmeta.json", 11);
+        String *cfmeta_file = (String*)SSTR_WRAP_UTF8("cfmeta.json", 11);
         if (Folder_Local_Exists(subfolder, cfmeta_file)) {
             CompoundFileReader *cf_reader = CFReader_open(subfolder);
             if (cf_reader) {

@@ -420,7 +420,7 @@ Schema_Eat_IMP(Schema *self, Schema *other) {
 void
 Schema_Write_IMP(Schema *self, Folder *folder, const String *filename) {
     Hash *dump = Schema_Dump(self);
-    StackString *schema_temp = SSTR_WRAP_STR("schema.temp", 11);
+    StackString *schema_temp = SSTR_WRAP_UTF8("schema.temp", 11);
     bool success;
     Folder_Delete(folder, (String*)schema_temp); // Just in case.
     Json_spew_json((Obj*)dump, folder, (String*)schema_temp);

@@ -51,7 +51,7 @@ static void
 test_tokenizer(TestBatchRunner *runner) {
     StandardTokenizer *tokenizer = StandardTokenizer_new();
 
-    StackString *word = SSTR_WRAP_STR(
+    StackString *word = SSTR_WRAP_UTF8(
                               " ."
                               "tha\xCC\x82t's"
                               ":"

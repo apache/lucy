@@ -160,7 +160,7 @@ Hash_Store_IMP(Hash *self, Obj *key, Obj *value) {
 
 void
 Hash_Store_Utf8_IMP(Hash *self, const char *key, size_t key_len, Obj *value) {
-    StackString *key_buf = SSTR_WRAP_STR((char*)key, key_len);
+    StackString *key_buf = SSTR_WRAP_UTF8((char*)key, key_len);
     Hash_do_store(self, (Obj*)key_buf, value,
                   SStr_Hash_Sum(key_buf), false);
 }
@@ -174,7 +174,7 @@ Hash_Make_Key_IMP(Hash *self, Obj *key, int32_t hash_sum) {
 
 Obj*
 Hash_Fetch_Utf8_IMP(Hash *self, const char *key, size_t key_len) {
-    StackString *key_buf = SSTR_WRAP_STR(key, key_len);
+    StackString *key_buf = SSTR_WRAP_UTF8(key, key_len);
     return Hash_Fetch_IMP(self, (Obj*)key_buf);
 }
 
@@ -226,7 +226,7 @@ Hash_Delete_IMP(Hash *self, const Obj *key) {
 
 Obj*
 Hash_Delete_Utf8_IMP(Hash *self, const char *key, size_t key_len) {
-    StackString *key_buf = SSTR_WRAP_STR(key, key_len);
+    StackString *key_buf = SSTR_WRAP_UTF8(key, key_len);
     return Hash_Delete_IMP(self, (Obj*)key_buf);
 }
 

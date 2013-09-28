@@ -687,7 +687,7 @@ S_set_error(CharBuf *buf, const char *json, const char *limit, int line,
         const char *end = StrHelp_back_utf8_char(json + 32, json);
         len = end - json;
     }
-    StackString *snippet = SSTR_WRAP_STR(json, len);
+    StackString *snippet = SSTR_WRAP_UTF8(json, len);
     S_append_json_string((String*)snippet, buf);
 
     String *mess = CB_Yield_String(buf);

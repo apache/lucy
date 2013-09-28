@@ -64,7 +64,7 @@ XSBind_new_blank_obj(SV *either_sv) {
         // Use the supplied class name string to find a VTable.
         STRLEN len;
         char *ptr = SvPVutf8(either_sv, len);
-        cfish_StackString *klass = CFISH_SSTR_WRAP_STR(ptr, len);
+        cfish_StackString *klass = CFISH_SSTR_WRAP_UTF8(ptr, len);
         vtable = cfish_VTable_singleton((cfish_String*)klass, NULL);
     }
 

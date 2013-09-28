@@ -67,7 +67,7 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
 
         // Find the Field's FieldType.
         StackString *field_name_zcb
-            = SSTR_WRAP_STR(field_name, field_name_len);
+            = SSTR_WRAP_UTF8(field_name, field_name_len);
         type = Schema_Fetch_Type(schema, (String*)field_name_zcb);
 
         // Read the field value.

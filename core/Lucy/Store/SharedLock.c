@@ -99,7 +99,7 @@ void
 ShLock_Clear_Stale_IMP(SharedLock *self) {
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
 
-    String *lock_dir_name = (String*)SSTR_WRAP_STR("locks", 5);
+    String *lock_dir_name = (String*)SSTR_WRAP_UTF8("locks", 5);
     if (!Folder_Find_Folder(ivars->folder, lock_dir_name)) {
         return;
     }
@@ -127,7 +127,7 @@ bool
 ShLock_Is_Locked_IMP(SharedLock *self) {
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
 
-    String *lock_dir_name = (String*)SSTR_WRAP_STR("locks", 5);
+    String *lock_dir_name = (String*)SSTR_WRAP_UTF8("locks", 5);
     if (!Folder_Find_Folder(ivars->folder, lock_dir_name)) {
         return false;
     }

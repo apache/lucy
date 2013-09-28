@@ -141,7 +141,7 @@ PPCODE:
 {
     char *class_name = HvNAME(SvSTASH(SvRV(blank_obj)));
     cfish_StackString *klass
-        = CFISH_SSTR_WRAP_STR(class_name, strlen(class_name));
+        = CFISH_SSTR_WRAP_UTF8(class_name, strlen(class_name));
     cfish_VTable *vtable
         = (cfish_VTable*)cfish_VTable_singleton((cfish_String*)klass, NULL);
     STRLEN len;
