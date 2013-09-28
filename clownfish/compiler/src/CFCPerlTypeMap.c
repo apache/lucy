@@ -275,10 +275,19 @@ CFCPerlTypeMap_write_xs_typemap(CFCHierarchy *hierarchy) {
 
         start = CFCUtil_cat(start, full_struct_sym, "*\t", vtable_var, "_\n",
                             NULL);
+        const char *allocation;
+        if (strcmp(full_struct_sym, "cfish_String") == 0) {
+            // Share buffers rather than copy between Perl scalars and
+            // Clownfish string types.
+            allocation = "alloca(cfish_SStr_size())";
+        }
+        else {
+            allocation = "NULL";
+        }
         input = CFCUtil_cat(input, vtable_var, "_\n"
                             "    $var = (", full_struct_sym,
                             "*)XSBind_sv_to_cfish_obj($arg, ", vtable_var,
-                            ", NULL);\n\n", NULL);
+                            ", ", allocation, ");\n\n", NULL);
 
         output = CFCUtil_cat(output, vtable_var, "_\n"
                              "    $arg = (SV*)CFISH_Obj_To_Host((cfish_Obj*)$var);\n"
