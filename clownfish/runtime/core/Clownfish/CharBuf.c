@@ -116,13 +116,6 @@ CB_Destroy_IMP(CharBuf *self) {
     SUPER_DESTROY(self, CHARBUF);
 }
 
-static void
-S_grow(CharBuf *self, size_t size) {
-    if (size >= self->cap) {
-        CB_Grow(self, size);
-    }
-}
-
 char*
 CB_Grow_IMP(CharBuf *self, size_t size) {
     if (size >= self->cap) {
@@ -315,7 +308,7 @@ void
 CB_Cat_Char_IMP(CharBuf *self, int32_t code_point) {
     const size_t MAX_UTF8_BYTES = 4;
     if (self->size + MAX_UTF8_BYTES >= self->cap) {
-        S_grow(self, Memory_oversize(self->size + MAX_UTF8_BYTES,
+        CB_Grow(self, Memory_oversize(self->size + MAX_UTF8_BYTES,
                                      sizeof(char)));
     }
     char *end = self->ptr + self->size;
@@ -334,7 +327,7 @@ CB_Mimic_Utf8_IMP(CharBuf *self, const char* ptr, size_t size) {
     if (!StrHelp_utf8_valid(ptr, size)) {
         DIE_INVALID_UTF8(ptr, size);
     }
-    if (size >= self->cap) { S_grow(self, size); }
+    if (size >= self->cap) { CB_Grow(self, size); }
     memmove(self->ptr, ptr, size);
     self->size = size;
     self->ptr[size] = '\0';
@@ -344,14 +337,14 @@ void
 CB_Mimic_IMP(CharBuf *self, Obj *other) {
     if (Obj_Is_A(other, CHARBUF)) {
         CharBuf *twin = (CharBuf*)other;
-        if (twin->size >= self->cap) { S_grow(self, twin->size); }
+        if (twin->size >= self->cap) { CB_Grow(self, twin->size); }
         memmove(self->ptr, twin->ptr, twin->size);
         self->size = twin->size;
         self->ptr[twin->size] = '\0';
     }
     else if (Obj_Is_A(other, STRING)) {
         String *twin = (String*)other;
-        if (twin->size >= self->cap) { S_grow(self, twin->size); }
+        if (twin->size >= self->cap) { CB_Grow(self, twin->size); }
         memmove(self->ptr, twin->ptr, twin->size);
         self->size = twin->size;
         self->ptr[twin->size] = '\0';
@@ -374,7 +367,7 @@ CB_Cat_Trusted_Utf8_IMP(CharBuf *self, const char* ptr, size_t size) {
     const size_t new_size = self->size + size;
     if (new_size >= self->cap) {
         size_t amount = Memory_oversize(new_size, sizeof(char));
-        S_grow(self, amount);
+        CB_Grow(self, amount);
     }
     memcpy((self->ptr + self->size), ptr, size);
     self->size = new_size;
@@ -386,7 +379,7 @@ CB_Cat_IMP(CharBuf *self, String *string) {
     const size_t new_size = self->size + string->size;
     if (new_size >= self->cap) {
         size_t amount = Memory_oversize(new_size, sizeof(char));
-        S_grow(self, amount);
+        CB_Grow(self, amount);
     }
     memcpy((self->ptr + self->size), string->ptr, string->size);
     self->size = new_size;
