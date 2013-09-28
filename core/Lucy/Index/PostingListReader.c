@@ -109,7 +109,7 @@ DefPListReader_Destroy_IMP(DefaultPostingListReader *self) {
 
 SegPostingList*
 DefPListReader_Posting_List_IMP(DefaultPostingListReader *self,
-                                const String *field, Obj *target) {
+                                String *field, Obj *target) {
     DefaultPostingListReaderIVARS *const ivars = DefPListReader_IVARS(self);
     FieldType *type = Schema_Fetch_Type(ivars->schema, field);
 

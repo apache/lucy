@@ -29,7 +29,7 @@
 #include "Lucy/Util/IndexFileNames.h"
 
 Folder*
-Folder_init(Folder *self, const String *path) {
+Folder_init(Folder *self, String *path) {
     FolderIVARS *const ivars = Folder_IVARS(self);
 
     // Init.
@@ -62,7 +62,7 @@ Folder_Destroy_IMP(Folder *self) {
 }
 
 InStream*
-Folder_Open_In_IMP(Folder *self, const String *path) {
+Folder_Open_In_IMP(Folder *self, String *path) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     InStream *instream = NULL;
 
@@ -85,7 +85,7 @@ Folder_Open_In_IMP(Folder *self, const String *path) {
  * necessary because calling CFReader_Local_Open_FileHandle() won't find
  * virtual files.  No other class should need to override it. */
 InStream*
-Folder_Local_Open_In_IMP(Folder *self, const String *name) {
+Folder_Local_Open_In_IMP(Folder *self, String *name) {
     FileHandle *fh = Folder_Local_Open_FileHandle(self, name, FH_READ_ONLY);
     InStream *instream = NULL;
     if (fh) {
@@ -102,7 +102,7 @@ Folder_Local_Open_In_IMP(Folder *self, const String *name) {
 }
 
 OutStream*
-Folder_Open_Out_IMP(Folder *self, const String *path) {
+Folder_Open_Out_IMP(Folder *self, String *path) {
     const uint32_t flags = FH_WRITE_ONLY | FH_CREATE | FH_EXCLUSIVE;
     FileHandle *fh = Folder_Open_FileHandle(self, path, flags);
     OutStream *outstream = NULL;
@@ -120,7 +120,7 @@ Folder_Open_Out_IMP(Folder *self, const String *path) {
 }
 
 FileHandle*
-Folder_Open_FileHandle_IMP(Folder *self, const String *path,
+Folder_Open_FileHandle_IMP(Folder *self, String *path,
                            uint32_t flags) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     FileHandle *fh = NULL;
@@ -141,7 +141,7 @@ Folder_Open_FileHandle_IMP(Folder *self, const String *path,
 }
 
 bool
-Folder_Delete_IMP(Folder *self, const String *path) {
+Folder_Delete_IMP(Folder *self, String *path) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     if (enclosing_folder) {
         String *name = IxFileNames_local_part(path);
@@ -155,7 +155,7 @@ Folder_Delete_IMP(Folder *self, const String *path) {
 }
 
 bool
-Folder_Delete_Tree_IMP(Folder *self, const String *path) {
+Folder_Delete_Tree_IMP(Folder *self, String *path) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
 
     // Don't allow Folder to delete itself.
@@ -219,7 +219,7 @@ S_is_updir(String *path) {
 
 static void
 S_add_to_file_list(Folder *self, VArray *list, String *dir,
-                   const String *path) {
+                   String *path) {
     DirHandle *dh = Folder_Open_Dir(self, dir);
 
     if (!dh) {
@@ -255,7 +255,7 @@ S_add_to_file_list(Folder *self, VArray *list, String *dir,
 }
 
 DirHandle*
-Folder_Open_Dir_IMP(Folder *self, const String *path) {
+Folder_Open_Dir_IMP(Folder *self, String *path) {
     DirHandle *dh = NULL;
     Folder *folder;
     if (path) {
@@ -278,7 +278,7 @@ Folder_Open_Dir_IMP(Folder *self, const String *path) {
 }
 
 bool
-Folder_MkDir_IMP(Folder *self, const String *path) {
+Folder_MkDir_IMP(Folder *self, String *path) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     bool result = false;
 
@@ -302,7 +302,7 @@ Folder_MkDir_IMP(Folder *self, const String *path) {
 }
 
 bool
-Folder_Exists_IMP(Folder *self, const String *path) {
+Folder_Exists_IMP(Folder *self, String *path) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     bool retval = false;
     if (enclosing_folder) {
@@ -316,7 +316,7 @@ Folder_Exists_IMP(Folder *self, const String *path) {
 }
 
 bool
-Folder_Is_Directory_IMP(Folder *self, const String *path) {
+Folder_Is_Directory_IMP(Folder *self, String *path) {
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     bool retval = false;
     if (enclosing_folder) {
@@ -330,7 +330,7 @@ Folder_Is_Directory_IMP(Folder *self, const String *path) {
 }
 
 VArray*
-Folder_List_IMP(Folder *self, const String *path) {
+Folder_List_IMP(Folder *self, String *path) {
     Folder *local_folder = Folder_Find_Folder(self, path);
     VArray *list = NULL;
     DirHandle *dh = Folder_Local_Open_Dir(local_folder);
@@ -350,7 +350,7 @@ Folder_List_IMP(Folder *self, const String *path) {
 }
 
 VArray*
-Folder_List_R_IMP(Folder *self, const String *path) {
+Folder_List_R_IMP(Folder *self, String *path) {
     Folder *local_folder = Folder_Find_Folder(self, path);
     VArray *list =  VA_new(0);
     if (local_folder) {
@@ -362,7 +362,7 @@ Folder_List_R_IMP(Folder *self, const String *path) {
 }
 
 ByteBuf*
-Folder_Slurp_File_IMP(Folder *self, const String *path) {
+Folder_Slurp_File_IMP(Folder *self, String *path) {
     InStream *instream = Folder_Open_In(self, path);
     ByteBuf  *retval   = NULL;
 
@@ -398,14 +398,14 @@ Folder_Get_Path_IMP(Folder *self) {
 }
 
 void
-Folder_Set_Path_IMP(Folder *self, const String *path) {
+Folder_Set_Path_IMP(Folder *self, String *path) {
     FolderIVARS *const ivars = Folder_IVARS(self);
     DECREF(ivars->path);
     ivars->path = Str_Clone(path);
 }
 
 void
-Folder_Consolidate_IMP(Folder *self, const String *path) {
+Folder_Consolidate_IMP(Folder *self, String *path) {
     Folder *folder = Folder_Find_Folder(self, path);
     Folder *enclosing_folder = Folder_Enclosing_Folder(self, path);
     if (!folder) {
@@ -465,7 +465,7 @@ S_enclosing_folder(Folder *self, StringIterator *path) {
 }
 
 Folder*
-Folder_Enclosing_Folder_IMP(Folder *self, const String *path) {
+Folder_Enclosing_Folder_IMP(Folder *self, String *path) {
     StringIterator *iter = Str_Top(path);
     Folder *folder = S_enclosing_folder(self, iter);
     DECREF(iter);
@@ -473,7 +473,7 @@ Folder_Enclosing_Folder_IMP(Folder *self, const String *path) {
 }
 
 Folder*
-Folder_Find_Folder_IMP(Folder *self, const String *path) {
+Folder_Find_Folder_IMP(Folder *self, String *path) {
     if (!path || !Str_Get_Size(path)) {
         return self;
     }

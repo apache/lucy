@@ -192,13 +192,13 @@ Inverter_Clear_IMP(Inverter *self) {
 }
 
 InverterEntry*
-InvEntry_new(Schema *schema, const String *field, int32_t field_num) {
+InvEntry_new(Schema *schema, String *field, int32_t field_num) {
     InverterEntry *self = (InverterEntry*)VTable_Make_Obj(INVERTERENTRY);
     return InvEntry_init(self, schema, field, field_num);
 }
 
 InverterEntry*
-InvEntry_init(InverterEntry *self, Schema *schema, const String *field,
+InvEntry_init(InverterEntry *self, Schema *schema, String *field,
               int32_t field_num) {
     InverterEntryIVARS *const ivars = InvEntry_IVARS(self);
     ivars->field_num  = field_num;

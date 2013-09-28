@@ -53,7 +53,7 @@ public class Lucy::Search::QueryParser cnick QParser
 
     inert incremented QueryParser*
     new(Schema *schema, Analyzer *analyzer = NULL,
-        const String *default_boolop = NULL, VArray *fields = NULL);
+        String *default_boolop = NULL, VArray *fields = NULL);
 
     /** Constructor.
      *
@@ -73,7 +73,7 @@ public class Lucy::Search::QueryParser cnick QParser
      */
     public inert QueryParser*
     init(QueryParser *self, Schema *schema, Analyzer *analyzer = NULL,
-        const String *default_boolop = NULL, VArray *fields = NULL);
+        String *default_boolop = NULL, VArray *fields = NULL);
 
     /** Build a Query object from the contents of a query string.  At present,
      * implemented internally by calling Tree(), Expand(), and Prune().
@@ -82,7 +82,7 @@ public class Lucy::Search::QueryParser cnick QParser
      * @return a Query.
      */
     public incremented Query*
-    Parse(QueryParser *self, const String *query_string = NULL);
+    Parse(QueryParser *self, String *query_string = NULL);
 
     /** Parse the logical structure of a query string, building a tree
      * comprised of Query objects.  Leaf nodes in the tree will most often be
@@ -97,7 +97,7 @@ public class Lucy::Search::QueryParser cnick QParser
      * @return a Query.
      */
     public incremented Query*
-    Tree(QueryParser *self, const String *query_string);
+    Tree(QueryParser *self, String *query_string);
 
     /** Walk the hierarchy of a Query tree, descending through all PolyQuery
      * nodes and calling Expand_Leaf() on any LeafQuery nodes encountered.
@@ -157,7 +157,7 @@ public class Lucy::Search::QueryParser cnick QParser
      * @return A Query.
      */
     public incremented Query*
-    Make_Term_Query(QueryParser *self, const String *field, Obj *term);
+    Make_Term_Query(QueryParser *self, String *field, Obj *term);
 
     /** Factory method creating a PhraseQuery.
      *
@@ -166,7 +166,7 @@ public class Lucy::Search::QueryParser cnick QParser
      * @return A Query.
      */
     public incremented Query*
-    Make_Phrase_Query(QueryParser *self, const String *field, VArray *terms);
+    Make_Phrase_Query(QueryParser *self, String *field, VArray *terms);
 
     /** Factory method creating an ORQuery.
      *

@@ -60,7 +60,7 @@ public class Lucy::Analysis::RegexTokenizer
     is_available();
 
     inert incremented RegexTokenizer*
-    new(const String *pattern = NULL);
+    new(String *pattern = NULL);
 
     /**
      * @param pattern A string specifying a Perl-syntax regular expression
@@ -69,7 +69,7 @@ public class Lucy::Analysis::RegexTokenizer
      * "it" and "O'Henry's" as well as "Henry".
      */
     public inert RegexTokenizer*
-    init(RegexTokenizer *self, const String *pattern = NULL);
+    init(RegexTokenizer *self, String *pattern = NULL);
 
     public incremented Inversion*
     Transform(RegexTokenizer *self, Inversion *inversion);

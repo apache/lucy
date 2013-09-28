@@ -105,7 +105,7 @@ PolySearcher_Doc_Max_IMP(PolySearcher *self) {
 }
 
 uint32_t
-PolySearcher_Doc_Freq_IMP(PolySearcher *self, const String *field, Obj *term) {
+PolySearcher_Doc_Freq_IMP(PolySearcher *self, String *field, Obj *term) {
     PolySearcherIVARS *const ivars = PolySearcher_IVARS(self);
     uint32_t doc_freq = 0;
     for (uint32_t i = 0, max = VA_Get_Size(ivars->searchers); i < max; i++) {

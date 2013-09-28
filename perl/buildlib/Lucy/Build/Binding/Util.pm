@@ -203,7 +203,7 @@ MODULE = Lucy   PACKAGE = Lucy::Util::IndexFileNames
 
 uint64_t
 extract_gen(name)
-    const cfish_String *name;
+    cfish_String *name;
 CODE:
     RETVAL = lucy_IxFileNames_extract_gen(name);
 OUTPUT: RETVAL

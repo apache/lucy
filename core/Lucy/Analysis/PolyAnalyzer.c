@@ -26,13 +26,13 @@
 #include "Lucy/Util/Freezer.h"
 
 PolyAnalyzer*
-PolyAnalyzer_new(const String *language, VArray *analyzers) {
+PolyAnalyzer_new(String *language, VArray *analyzers) {
     PolyAnalyzer *self = (PolyAnalyzer*)VTable_Make_Obj(POLYANALYZER);
     return PolyAnalyzer_init(self, language, analyzers);
 }
 
 PolyAnalyzer*
-PolyAnalyzer_init(PolyAnalyzer *self, const String *language,
+PolyAnalyzer_init(PolyAnalyzer *self, String *language,
                   VArray *analyzers) {
     Analyzer_init((Analyzer*)self);
     PolyAnalyzerIVARS *const ivars = PolyAnalyzer_IVARS(self);

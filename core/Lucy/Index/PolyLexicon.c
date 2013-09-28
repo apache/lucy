@@ -29,13 +29,13 @@ static void
 S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target);
 
 PolyLexicon*
-PolyLex_new(const String *field, VArray *sub_readers) {
+PolyLex_new(String *field, VArray *sub_readers) {
     PolyLexicon *self = (PolyLexicon*)VTable_Make_Obj(POLYLEXICON);
     return PolyLex_init(self, field, sub_readers);
 }
 
 PolyLexicon*
-PolyLex_init(PolyLexicon *self, const String *field, VArray *sub_readers) {
+PolyLex_init(PolyLexicon *self, String *field, VArray *sub_readers) {
     uint32_t  num_sub_readers = VA_Get_Size(sub_readers);
     VArray   *seg_lexicons    = VA_new(num_sub_readers);
 

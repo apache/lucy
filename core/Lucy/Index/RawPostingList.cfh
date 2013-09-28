@@ -26,11 +26,11 @@ class Lucy::Index::RawPostingList cnick RawPList
     int64_t        len;
 
     inert incremented RawPostingList*
-    new(Schema *schema, const String *field, InStream *instream,
+    new(Schema *schema, String *field, InStream *instream,
         int64_t start, int64_t end);
 
     inert RawPostingList*
-    init(RawPostingList *self, Schema *schema, const String *field,
+    init(RawPostingList *self, Schema *schema, String *field,
          InStream *instream, int64_t lex_start, int64_t lex_end);
 
     public void

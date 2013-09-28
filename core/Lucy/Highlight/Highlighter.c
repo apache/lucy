@@ -45,7 +45,7 @@ static String*
 S_encode_entities(String *text, CharBuf *encoded);
 
 Highlighter*
-Highlighter_new(Searcher *searcher, Obj *query, const String *field,
+Highlighter_new(Searcher *searcher, Obj *query, String *field,
                 uint32_t excerpt_length) {
     Highlighter *self = (Highlighter*)VTable_Make_Obj(HIGHLIGHTER);
     return Highlighter_init(self, searcher, query, field, excerpt_length);
@@ -53,7 +53,7 @@ Highlighter_new(Searcher *searcher, Obj *query, const String *field,
 
 Highlighter*
 Highlighter_init(Highlighter *self, Searcher *searcher, Obj *query,
-                 const String *field, uint32_t excerpt_length) {
+                 String *field, uint32_t excerpt_length) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
     ivars->query          = Searcher_Glean_Query(searcher, query);
     ivars->searcher       = (Searcher*)INCREF(searcher);
@@ -86,7 +86,7 @@ Highlighter_Destroy_IMP(Highlighter *self) {
 }
 
 String*
-Highlighter_Highlight_IMP(Highlighter *self, const String *text) {
+Highlighter_Highlight_IMP(Highlighter *self, String *text) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
     size_t size = Str_Get_Size(text)
                   + Str_Get_Size(ivars->pre_tag)
@@ -101,14 +101,14 @@ Highlighter_Highlight_IMP(Highlighter *self, const String *text) {
 }
 
 void
-Highlighter_Set_Pre_Tag_IMP(Highlighter *self, const String *pre_tag) {
+Highlighter_Set_Pre_Tag_IMP(Highlighter *self, String *pre_tag) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
     DECREF(ivars->pre_tag);
     ivars->pre_tag = Str_Clone(pre_tag);
 }
 
 void
-Highlighter_Set_Post_Tag_IMP(Highlighter *self, const String *post_tag) {
+Highlighter_Set_Post_Tag_IMP(Highlighter *self, String *post_tag) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
     DECREF(ivars->post_tag);
     ivars->post_tag = Str_Clone(post_tag);
@@ -370,7 +370,7 @@ S_find_ending_boundary(StringIterator *tail, uint32_t max_skip,
 }
 
 String*
-Highlighter_Raw_Excerpt_IMP(Highlighter *self, const String *field_val,
+Highlighter_Raw_Excerpt_IMP(Highlighter *self, String *field_val,
                             int32_t *start_ptr, HeatMap *heat_map) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
 

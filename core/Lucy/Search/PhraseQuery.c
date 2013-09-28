@@ -46,13 +46,13 @@ static PhraseQuery*
 S_do_init(PhraseQuery *self, String *field, VArray *terms, float boost);
 
 PhraseQuery*
-PhraseQuery_new(const String *field, VArray *terms) {
+PhraseQuery_new(String *field, VArray *terms) {
     PhraseQuery *self = (PhraseQuery*)VTable_Make_Obj(PHRASEQUERY);
     return PhraseQuery_init(self, field, terms);
 }
 
 PhraseQuery*
-PhraseQuery_init(PhraseQuery *self, const String *field, VArray *terms) {
+PhraseQuery_init(PhraseQuery *self, String *field, VArray *terms) {
     return S_do_init(self, Str_Clone(field), VA_Clone(terms), 1.0f);
 }
 
@@ -343,7 +343,7 @@ PhraseCompiler_Make_Matcher_IMP(PhraseCompiler *self, SegReader *reader,
 
 VArray*
 PhraseCompiler_Highlight_Spans_IMP(PhraseCompiler *self, Searcher *searcher,
-                                   DocVector *doc_vec, const String *field) {
+                                   DocVector *doc_vec, String *field) {
     PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
     PhraseQueryIVARS *const parent_ivars
         = PhraseQuery_IVARS((PhraseQuery*)ivars->parent);

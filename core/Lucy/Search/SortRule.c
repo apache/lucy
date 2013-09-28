@@ -27,13 +27,13 @@ int32_t SortRule_SCORE  = 1;
 int32_t SortRule_DOC_ID = 2;
 
 SortRule*
-SortRule_new(int32_t type, const String *field, bool reverse) {
+SortRule_new(int32_t type, String *field, bool reverse) {
     SortRule *self = (SortRule*)VTable_Make_Obj(SORTRULE);
     return SortRule_init(self, type, field, reverse);
 }
 
 SortRule*
-SortRule_init(SortRule *self, int32_t type, const String *field,
+SortRule_init(SortRule *self, int32_t type, String *field,
               bool reverse) {
     SortRuleIVARS *ivars = SortRule_IVARS(self);
     ivars->field    = field ? Str_Clone(field) : NULL;

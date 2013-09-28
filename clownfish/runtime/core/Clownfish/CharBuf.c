@@ -382,7 +382,7 @@ CB_Cat_Trusted_Utf8_IMP(CharBuf *self, const char* ptr, size_t size) {
 }
 
 void
-CB_Cat_IMP(CharBuf *self, const String *string) {
+CB_Cat_IMP(CharBuf *self, String *string) {
     const size_t new_size = self->size + string->size;
     if (new_size >= self->cap) {
         size_t amount = Memory_oversize(new_size, sizeof(char));

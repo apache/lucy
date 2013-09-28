@@ -31,7 +31,7 @@
 #endif
 
 FSDirHandle*
-FSDH_open(const String *dir) {
+FSDH_open(String *dir) {
     FSDirHandle *self = (FSDirHandle*)VTable_Make_Obj(FSDIRHANDLE);
     return FSDH_do_open(self, dir);
 }
@@ -64,7 +64,7 @@ SI_is_updir(const char *name, size_t len) {
 #include <windows.h>
 
 FSDirHandle*
-FSDH_do_open(FSDirHandle *self, const String *dir) {
+FSDH_do_open(FSDirHandle *self, String *dir) {
     size_t      dir_path_size = Str_Get_Size(dir);
     const char *dir_path_ptr  = Str_Get_Ptr8(dir);
     char        search_string[MAX_PATH + 1];
@@ -207,7 +207,7 @@ FSDH_Next_IMP(FSDirHandle *self) {
 #include <dirent.h>
 
 FSDirHandle*
-FSDH_do_open(FSDirHandle *self, const String *dir) {
+FSDH_do_open(FSDirHandle *self, String *dir) {
     DH_init((DirHandle*)self, dir);
     FSDirHandleIVARS *const ivars = FSDH_IVARS(self);
     ivars->sys_dir_entry = NULL;

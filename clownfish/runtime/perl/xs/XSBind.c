@@ -225,7 +225,7 @@ XSBind_bb_to_sv(const cfish_ByteBuf *bb) {
 }
 
 SV*
-XSBind_str_to_sv(const cfish_String *str) {
+XSBind_str_to_sv(cfish_String *str) {
     if (!str) {
         return newSV(0);
     }
@@ -715,7 +715,7 @@ cfish_VTable_register_with_host(cfish_VTable *singleton, cfish_VTable *parent) {
 }
 
 cfish_VArray*
-cfish_VTable_fresh_host_methods(const cfish_String *class_name) {
+cfish_VTable_fresh_host_methods(cfish_String *class_name) {
     dSP;
     ENTER;
     SAVETMPS;
@@ -733,7 +733,7 @@ cfish_VTable_fresh_host_methods(const cfish_String *class_name) {
 }
 
 cfish_String*
-cfish_VTable_find_parent_class(const cfish_String *class_name) {
+cfish_VTable_find_parent_class(cfish_String *class_name) {
     dSP;
     ENTER;
     SAVETMPS;

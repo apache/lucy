@@ -30,7 +30,7 @@ Bind_cfish_to_ruby(cfish_Obj *obj) {
 }
 
 VALUE
-Bind_str_to_ruby(const cfish_String *str) {
+Bind_str_to_ruby(cfish_String *str) {
     if (!str) {
         return rb_str_new2("");
     }

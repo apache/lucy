@@ -101,7 +101,7 @@ Json_from_json(String *json) {
 }
 
 Obj*
-Json_slurp_json(Folder *folder, const String *path) {
+Json_slurp_json(Folder *folder, String *path) {
     InStream *instream = Folder_Open_In(folder, path);
     if (!instream) {
         ERR_ADD_FRAME(Err_get_error());
@@ -119,7 +119,7 @@ Json_slurp_json(Folder *folder, const String *path) {
 }
 
 bool
-Json_spew_json(Obj *dump, Folder *folder, const String *path) {
+Json_spew_json(Obj *dump, Folder *folder, String *path) {
     String *json = Json_to_json(dump);
     if (!json) {
         ERR_ADD_FRAME(Err_get_error());

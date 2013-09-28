@@ -22,7 +22,7 @@
 int32_t FH_object_count = 0;
 
 FileHandle*
-FH_do_open(FileHandle *self, const String *path, uint32_t flags) {
+FH_do_open(FileHandle *self, String *path, uint32_t flags) {
     FileHandleIVARS *const ivars = FH_IVARS(self);
     ivars->path    = path ? Str_Clone(path) : Str_new_from_trusted_utf8("", 0);
     ivars->flags   = flags;
@@ -53,7 +53,7 @@ FH_Grow_IMP(FileHandle *self, int64_t length) {
 }
 
 void
-FH_Set_Path_IMP(FileHandle *self, const String *path) {
+FH_Set_Path_IMP(FileHandle *self, String *path) {
     FileHandleIVARS *const ivars = FH_IVARS(self);
     DECREF(ivars->path);
     ivars->path = Str_Clone(path);

@@ -24,14 +24,14 @@
 #include "Lucy/Util/Freezer.h"
 
 TermVector*
-TV_new(const String *field, const String *text, I32Array *positions,
+TV_new(String *field, String *text, I32Array *positions,
        I32Array *start_offsets, I32Array *end_offsets) {
     TermVector *self = (TermVector*)VTable_Make_Obj(TERMVECTOR);
     return TV_init(self, field, text, positions, start_offsets, end_offsets);
 }
 
 TermVector*
-TV_init(TermVector *self, const String *field, const String *text,
+TV_init(TermVector *self, String *field, String *text,
         I32Array *positions, I32Array *start_offsets, I32Array *end_offsets) {
     TermVectorIVARS *const ivars = TV_IVARS(self);
 

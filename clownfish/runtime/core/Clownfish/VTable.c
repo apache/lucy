@@ -248,7 +248,7 @@ VTable_init_registry() {
 }
 
 VTable*
-VTable_singleton(const String *class_name, VTable *parent) {
+VTable_singleton(String *class_name, VTable *parent) {
     if (VTable_registry == NULL) {
         VTable_init_registry();
     }
@@ -381,7 +381,7 @@ VTable_add_alias_to_registry(VTable *vtable, const char *alias_ptr,
 }
 
 VTable*
-VTable_fetch_vtable(const String *class_name) {
+VTable_fetch_vtable(String *class_name) {
     VTable *vtable = NULL;
     if (VTable_registry != NULL) {
         vtable = (VTable*)LFReg_Fetch(VTable_registry, (Obj*)class_name);

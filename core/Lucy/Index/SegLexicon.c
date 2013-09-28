@@ -38,14 +38,14 @@ S_scan_to(SegLexicon *self, Obj *target);
 
 SegLexicon*
 SegLex_new(Schema *schema, Folder *folder, Segment *segment,
-           const String *field) {
+           String *field) {
     SegLexicon *self = (SegLexicon*)VTable_Make_Obj(SEGLEXICON);
     return SegLex_init(self, schema, folder, segment, field);
 }
 
 SegLexicon*
 SegLex_init(SegLexicon *self, Schema *schema, Folder *folder,
-            Segment *segment, const String *field) {
+            Segment *segment, String *field) {
     Hash *metadata = (Hash*)CERTIFY(
                          Seg_Fetch_Metadata_Utf8(segment, "lexicon", 7),
                          HASH);

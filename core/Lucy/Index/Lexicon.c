@@ -20,7 +20,7 @@
 #include "Lucy/Index/Lexicon.h"
 
 Lexicon*
-Lex_init(Lexicon *self, const String *field) {
+Lex_init(Lexicon *self, String *field) {
     LexiconIVARS *const ivars = Lex_IVARS(self);
     ivars->field = Str_Clone(field);
     ABSTRACT_CLASS_CHECK(self, LEXICON);

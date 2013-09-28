@@ -29,7 +29,7 @@ abstract class Lucy::Store::DirHandle cnick DH
      * @param dir The path to the directory.
      */
     inert DirHandle*
-    init(DirHandle *self, const String *dir);
+    init(DirHandle *self, String *dir);
 
     /** Proceed to the next entry in the directory.
      *

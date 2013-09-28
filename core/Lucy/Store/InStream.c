@@ -122,7 +122,7 @@ InStream_Destroy_IMP(InStream *self) {
 }
 
 InStream*
-InStream_Reopen_IMP(InStream *self, const String *filename, int64_t offset,
+InStream_Reopen_IMP(InStream *self, String *filename, int64_t offset,
                     int64_t len) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     if (!ivars->file_handle) {

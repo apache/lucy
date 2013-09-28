@@ -80,7 +80,7 @@ class Clownfish::CharBuf cnick CB
      * caller.
      */
     void
-    Cat(CharBuf *self, const String *string);
+    Cat(CharBuf *self, String *string);
 
     /** Concatenate formatted arguments.  Similar to the printf family, but
      * only accepts minimal options (just enough for decent error messages).

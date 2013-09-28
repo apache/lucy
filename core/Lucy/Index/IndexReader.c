@@ -108,7 +108,7 @@ IxReader_Get_Components_IMP(IndexReader *self) {
 }
 
 DataReader*
-IxReader_Obtain_IMP(IndexReader *self, const String *api) {
+IxReader_Obtain_IMP(IndexReader *self, String *api) {
     IndexReaderIVARS *const ivars = IxReader_IVARS(self);
     DataReader *component
         = (DataReader*)Hash_Fetch(ivars->components, (Obj*)api);
@@ -119,7 +119,7 @@ IxReader_Obtain_IMP(IndexReader *self, const String *api) {
 }
 
 DataReader*
-IxReader_Fetch_IMP(IndexReader *self, const String *api) {
+IxReader_Fetch_IMP(IndexReader *self, String *api) {
     IndexReaderIVARS *const ivars = IxReader_IVARS(self);
     return (DataReader*)Hash_Fetch(ivars->components, (Obj*)api);
 }

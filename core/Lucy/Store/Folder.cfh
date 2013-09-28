@@ -32,7 +32,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     Hash   *entries;
 
     public inert nullable Folder*
-    init(Folder *self, const String *path);
+    init(Folder *self, String *path);
 
     public void
     Destroy(Folder *self);
@@ -45,7 +45,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     /** Setter for <code>path</code> member var.
      */
     void
-    Set_Path(Folder *self, const String *path);
+    Set_Path(Folder *self, String *path);
 
     /** Open an OutStream, or set Err_error and return NULL on failure.
      *
@@ -53,7 +53,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @return an OutStream.
      */
     public incremented nullable OutStream*
-    Open_Out(Folder *self,  const String *path);
+    Open_Out(Folder *self,  String *path);
 
     /** Open an InStream, or set Err_error and return NULL on failure.
      *
@@ -61,7 +61,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @return an InStream.
      */
     public incremented nullable InStream*
-    Open_In(Folder *self, const String *path);
+    Open_In(Folder *self, String *path);
 
     /** Open a FileHandle, or set Err_error and return NULL on failure.
      *
@@ -70,7 +70,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @return a FileHandle.
      */
     public incremented nullable FileHandle*
-    Open_FileHandle(Folder *self, const String *path, uint32_t flags);
+    Open_FileHandle(Folder *self, String *path, uint32_t flags);
 
     /** Open a DirHandle or set Err_error and return NULL on failure.
      *
@@ -79,7 +79,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @return a DirHandle.
      */
     public incremented nullable DirHandle*
-    Open_Dir(Folder *self, const String *path = NULL);
+    Open_Dir(Folder *self, String *path = NULL);
 
     /** Create a subdirectory.
      *
@@ -87,7 +87,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @return true on success, false on failure (sets Err_error).
      */
     public bool
-    MkDir(Folder *self, const String *path);
+    MkDir(Folder *self, String *path);
 
     /** List all local entries within a directory.  Set Err_error and return
      * NULL if something goes wrong.
@@ -96,7 +96,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @return an unsorted array of filenames.
      */
     incremented VArray*
-    List(Folder *self, const String *path = NULL);
+    List(Folder *self, String *path = NULL);
 
     /** Recursively list all files and directories in the Folder.
      *
@@ -104,7 +104,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @return an unsorted array of relative filepaths.
      */
     incremented VArray*
-    List_R(Folder *self, const String *path = NULL);
+    List_R(Folder *self, String *path = NULL);
 
     /** Indicate whether an entity exists at <code>path</code>.
      *
@@ -112,7 +112,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @return true if <code>path</code> exists.
      */
     public bool
-    Exists(Folder *self, const String *path);
+    Exists(Folder *self, String *path);
 
     /** Indicate whether a directory exists at <code>path</code>.
      *
@@ -120,7 +120,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @return true if <code>path</code> is a directory.
      */
     bool
-    Is_Directory(Folder *self, const String *path);
+    Is_Directory(Folder *self, String *path);
 
     /** Delete an entry from the folder.
      *
@@ -128,7 +128,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @return true if the deletion was successful.
      */
     public bool
-    Delete(Folder *self, const String *path);
+    Delete(Folder *self, String *path);
 
     /** Delete recursively, starting at <code>path</code>
      *
@@ -137,7 +137,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * part remains.
      */
     public bool
-    Delete_Tree(Folder *self, const String *path);
+    Delete_Tree(Folder *self, String *path);
 
     /** Rename a file or directory, or set Err_error and return false on
      * failure.  If an entry exists at <code>to</code>, the results are
@@ -148,7 +148,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @return true on success, false on failure.
      */
     public abstract bool
-    Rename(Folder *self, const String *from, const String *to);
+    Rename(Folder *self, String *from, String *to);
 
     /** Create a hard link at path <code>to</code> pointing at the existing
      * file <code>from</code>, or set Err_error and return false on failure.
@@ -156,7 +156,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @return true on success, false on failure.
      */
     public abstract bool
-    Hard_Link(Folder *self, const String *from, const String *to);
+    Hard_Link(Folder *self, String *from, String *to);
 
     /** Read a file and return its contents.
      *
@@ -164,12 +164,12 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @param return the file's contents.
      */
     public incremented ByteBuf*
-    Slurp_File(Folder *self, const String *path);
+    Slurp_File(Folder *self, String *path);
 
     /** Collapse the contents of the directory into a compound file.
      */
     void
-    Consolidate(Folder *self, const String *path);
+    Consolidate(Folder *self, String *path);
 
     /** Given a filepath, return the Folder representing everything except
      * the last component.  E.g. the 'foo/bar' Folder for '/foo/bar/baz.txt',
@@ -179,7 +179,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * either doesn't exist or isn't a directory, return NULL.
      */
     nullable Folder*
-    Enclosing_Folder(Folder *self, const String *path);
+    Enclosing_Folder(Folder *self, String *path);
 
     /** Return the Folder at the subdirectory specified by <code>path</code>.
      * If <code>path</code> is NULL or an empty string, return this Folder.
@@ -190,7 +190,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @return A Folder.
      */
     nullable Folder*
-    Find_Folder(Folder *self, const String *path);
+    Find_Folder(Folder *self, String *path);
 
     /** Perform implementation-specific initialization.  For example: FSFolder
      * creates its own directory.
@@ -214,13 +214,13 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * on failure.
      */
     abstract incremented nullable FileHandle*
-    Local_Open_FileHandle(Folder *self, const String *name, uint32_t flags);
+    Local_Open_FileHandle(Folder *self, String *name, uint32_t flags);
 
     /** Open an InStream for a local file, or set Err_error and return NULL on
      * failure.
      */
     incremented nullable InStream*
-    Local_Open_In(Folder *self, const String *name);
+    Local_Open_In(Folder *self, String *name);
 
     /** Open a DirHandle to iterate over the local entries in this Folder, or
      * set Err_error and return NULL on failure.
@@ -234,7 +234,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @return true on success, false on failure (sets Err_error)
      */
     abstract bool
-    Local_MkDir(Folder *self, const String *name);
+    Local_MkDir(Folder *self, String *name);
 
     /** Indicate whether a local entry exists for the supplied
      * <code>name</code>.
@@ -242,7 +242,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @param name The name of the local entry.
      */
     abstract bool
-    Local_Exists(Folder *self, const String *name);
+    Local_Exists(Folder *self, String *name);
 
     /** Indicate whether a local subdirectory exists with the supplied
      * <code>name</code>.
@@ -250,7 +250,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @param name The name of the local subdirectory.
      */
     abstract bool
-    Local_Is_Directory(Folder *self, const String *name);
+    Local_Is_Directory(Folder *self, String *name);
 
     /** Return the Folder object representing the specified directory, if such
      * a directory exists.
@@ -259,7 +259,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @return a Folder.
      */
     abstract nullable Folder*
-    Local_Find_Folder(Folder *self, const String *name);
+    Local_Find_Folder(Folder *self, String *name);
 
     /** Delete a local entry.
      *
@@ -267,7 +267,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @return true if the deletion was successful.
      */
     abstract bool
-    Local_Delete(Folder *self, const String *name);
+    Local_Delete(Folder *self, String *name);
 }
 
 

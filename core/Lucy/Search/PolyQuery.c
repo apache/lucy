@@ -185,7 +185,7 @@ PolyCompiler_Apply_Norm_Factor_IMP(PolyCompiler *self, float factor) {
 
 VArray*
 PolyCompiler_Highlight_Spans_IMP(PolyCompiler *self, Searcher *searcher,
-                                 DocVector *doc_vec, const String *field) {
+                                 DocVector *doc_vec, String *field) {
     PolyCompilerIVARS *const ivars = PolyCompiler_IVARS(self);
     VArray *spans = VA_new(0);
     for (uint32_t i = 0, max = VA_Get_Size(ivars->children); i < max; i++) {

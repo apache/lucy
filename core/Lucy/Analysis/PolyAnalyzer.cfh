@@ -52,7 +52,7 @@ public class Lucy::Analysis::PolyAnalyzer inherits Lucy::Analysis::Analyzer {
     VArray  *analyzers;
 
     inert incremented PolyAnalyzer*
-    new(const String *language = NULL, VArray *analyzers = NULL);
+    new(String *language = NULL, VArray *analyzers = NULL);
 
     /**
      * @param language An ISO code from the list of supported languages.
@@ -65,7 +65,7 @@ public class Lucy::Analysis::PolyAnalyzer inherits Lucy::Analysis::Analyzer {
      * stopalize, stem.
      */
     public inert PolyAnalyzer*
-    init(PolyAnalyzer *self, const String *language = NULL,
+    init(PolyAnalyzer *self, String *language = NULL,
          VArray *analyzers = NULL);
 
     /** Getter for "analyzers" member.

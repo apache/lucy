@@ -27,15 +27,15 @@
 #include "Lucy/Store/OutStream.h"
 
 SharedLock*
-ShLock_new(Folder *folder, const String *name, const String *host,
+ShLock_new(Folder *folder, String *name, String *host,
            int32_t timeout, int32_t interval) {
     SharedLock *self = (SharedLock*)VTable_Make_Obj(SHAREDLOCK);
     return ShLock_init(self, folder, name, host, timeout, interval);
 }
 
 SharedLock*
-ShLock_init(SharedLock *self, Folder *folder, const String *name,
-            const String *host, int32_t timeout, int32_t interval) {
+ShLock_init(SharedLock *self, Folder *folder, String *name,
+            String *host, int32_t timeout, int32_t interval) {
     LFLock_init((LockFileLock*)self, folder, name, host, timeout, interval);
     SharedLockIVARS *const ivars = ShLock_IVARS(self);
 

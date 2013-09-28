@@ -102,7 +102,7 @@ public class Lucy::Index::IndexReader cnick IxReader
      * component must implement.
      */
     public DataReader*
-    Obtain(IndexReader *self, const String *api);
+    Obtain(IndexReader *self, String *api);
 
     /** Fetch a component, or return NULL if the component can't be found.
      *
@@ -110,7 +110,7 @@ public class Lucy::Index::IndexReader cnick IxReader
      * component must implement.
      */
     public nullable DataReader*
-    Fetch(IndexReader *self, const String *api);
+    Fetch(IndexReader *self, String *api);
 
     public void
     Close(IndexReader *self);

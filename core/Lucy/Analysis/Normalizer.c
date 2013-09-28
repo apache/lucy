@@ -28,13 +28,13 @@
 #define INITIAL_BUFSIZE 63
 
 Normalizer*
-Normalizer_new(const String *form, bool case_fold, bool strip_accents) {
+Normalizer_new(String *form, bool case_fold, bool strip_accents) {
     Normalizer *self = (Normalizer*)VTable_Make_Obj(NORMALIZER);
     return Normalizer_init(self, form, case_fold, strip_accents);
 }
 
 Normalizer*
-Normalizer_init(Normalizer *self, const String *form, bool case_fold,
+Normalizer_init(Normalizer *self, String *form, bool case_fold,
                 bool strip_accents) {
     int options = UTF8PROC_STABLE;
     NormalizerIVARS *const ivars = Normalizer_IVARS(self);

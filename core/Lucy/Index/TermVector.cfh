@@ -33,11 +33,11 @@ class Lucy::Index::TermVector cnick TV
      * start_offsets, and end_offsets arrays.
      */
     inert incremented TermVector*
-    new(const String *field, const String *text, I32Array *positions,
+    new(String *field, String *text, I32Array *positions,
         I32Array *start_offsets, I32Array *end_offsets);
 
     inert TermVector*
-    init(TermVector *self, const String *field, const String *text,
+    init(TermVector *self, String *field, String *text,
          I32Array *positions, I32Array *start_offsets, I32Array *end_offsets);
 
     I32Array*

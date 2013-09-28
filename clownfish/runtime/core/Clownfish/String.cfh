@@ -113,7 +113,7 @@ class Clownfish::String cnick Str
     /** Return the concatenation of the String and <code>other</code>.
      */
     incremented String*
-    Cat(String *self, const String *other);
+    Cat(String *self, String *other);
 
     /** Return the concatenation of the String and the passed-in raw UTF-8.
      */
@@ -147,7 +147,7 @@ class Clownfish::String cnick Str
     /** Test whether the String starts with the content of another.
      */
     bool
-    Starts_With(String *self, const String *prefix);
+    Starts_With(String *self, String *prefix);
 
     /** Test whether the String starts with the passed-in string.
      */
@@ -157,7 +157,7 @@ class Clownfish::String cnick Str
     /** Test whether the String ends with the content of another.
      */
     bool
-    Ends_With(String *self, const String *postfix);
+    Ends_With(String *self, String *postfix);
 
     /** Test whether the String ends with the passed-in string.
      */
@@ -168,7 +168,7 @@ class Clownfish::String cnick Str
      * code points), or -1 if the substring does not match.
      */
     int64_t
-    Find(String *self, const String *substring);
+    Find(String *self, String *substring);
 
     int64_t
     Find_Utf8(String *self, const char *ptr, size_t size);
@@ -293,7 +293,7 @@ class Clownfish::StackString cnick SStr
     new_from_str(void *allocation, size_t alloc_size, String *string);
 
     inert incremented StackString*
-    wrap(void *allocation, const String *source);
+    wrap(void *allocation, String *source);
 
     inert incremented StackString*
     wrap_str(void *allocation, const char *ptr, size_t size);

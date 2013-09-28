@@ -57,7 +57,7 @@ typedef struct lucy_SFWriterElem {
 
 SortFieldWriter*
 SortFieldWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
-                    PolyReader *polyreader, const String *field,
+                    PolyReader *polyreader, String *field,
                     MemoryPool *memory_pool, size_t mem_thresh,
                     OutStream *temp_ord_out, OutStream *temp_ix_out,
                     OutStream *temp_dat_out) {
@@ -71,7 +71,7 @@ SortFieldWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
 SortFieldWriter*
 SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
                      Snapshot *snapshot, Segment *segment,
-                     PolyReader *polyreader, const String *field,
+                     PolyReader *polyreader, String *field,
                      MemoryPool *memory_pool, size_t mem_thresh,
                      OutStream *temp_ord_out, OutStream *temp_ix_out,
                      OutStream *temp_dat_out) {

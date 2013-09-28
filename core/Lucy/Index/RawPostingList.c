@@ -26,14 +26,14 @@
 #include "Lucy/Util/MemoryPool.h"
 
 RawPostingList*
-RawPList_new(Schema *schema, const String *field, InStream *instream,
+RawPList_new(Schema *schema, String *field, InStream *instream,
              int64_t start, int64_t end) {
     RawPostingList *self = (RawPostingList*)VTable_Make_Obj(RAWPOSTINGLIST);
     return RawPList_init(self, schema, field, instream, start, end);
 }
 
 RawPostingList*
-RawPList_init(RawPostingList *self, Schema *schema, const String *field,
+RawPList_init(RawPostingList *self, Schema *schema, String *field,
               InStream *instream, int64_t start, int64_t end) {
     PList_init((PostingList*)self);
     RawPostingListIVARS *const ivars = RawPList_IVARS(self);

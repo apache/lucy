@@ -155,7 +155,7 @@ S_calc_ord_width(int32_t cardinality) {
 }
 
 static SortCache*
-S_lazy_init_sort_cache(DefaultSortReader *self, const String *field) {
+S_lazy_init_sort_cache(DefaultSortReader *self, String *field) {
     DefaultSortReaderIVARS *const ivars = DefSortReader_IVARS(self);
 
     // See if we have any values.
@@ -257,7 +257,7 @@ S_lazy_init_sort_cache(DefaultSortReader *self, const String *field) {
 
 SortCache*
 DefSortReader_Fetch_Sort_Cache_IMP(DefaultSortReader *self,
-                                   const String *field) {
+                                   String *field) {
     SortCache *cache = NULL;
 
     if (field) {

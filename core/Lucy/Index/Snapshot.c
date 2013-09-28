@@ -60,13 +60,13 @@ Snapshot_Destroy_IMP(Snapshot *self) {
 }
 
 void
-Snapshot_Add_Entry_IMP(Snapshot *self, const String *entry) {
+Snapshot_Add_Entry_IMP(Snapshot *self, String *entry) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
     Hash_Store(ivars->entries, (Obj*)entry, (Obj*)CFISH_TRUE);
 }
 
 bool
-Snapshot_Delete_Entry_IMP(Snapshot *self, const String *entry) {
+Snapshot_Delete_Entry_IMP(Snapshot *self, String *entry) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
     Obj *val = Hash_Delete(ivars->entries, (Obj*)entry);
     if (val) {
@@ -91,7 +91,7 @@ Snapshot_Num_Entries_IMP(Snapshot *self) {
 }
 
 void
-Snapshot_Set_Path_IMP(Snapshot *self, const String *path) {
+Snapshot_Set_Path_IMP(Snapshot *self, String *path) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
     DECREF(ivars->path);
     ivars->path = path ? Str_Clone(path) : NULL;
@@ -103,7 +103,7 @@ Snapshot_Get_Path_IMP(Snapshot *self) {
 }
 
 Snapshot*
-Snapshot_Read_File_IMP(Snapshot *self, Folder *folder, const String *path) {
+Snapshot_Read_File_IMP(Snapshot *self, Folder *folder, String *path) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
 
     // Eliminate all prior data. Pick a snapshot file.
@@ -170,7 +170,7 @@ S_clean_segment_contents(VArray *orig) {
 
 
 void
-Snapshot_Write_File_IMP(Snapshot *self, Folder *folder, const String *path) {
+Snapshot_Write_File_IMP(Snapshot *self, Folder *folder, String *path) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
     Hash   *all_data = Hash_new(0);
     VArray *list     = Snapshot_List(self);

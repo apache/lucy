@@ -55,7 +55,7 @@ public class Lucy::Index::Snapshot inherits Clownfish::Obj {
     /** Add a filepath to the snapshot.
      */
     public void
-    Add_Entry(Snapshot *self, const String *entry);
+    Add_Entry(Snapshot *self, String *entry);
 
     /** Delete a filepath from the snapshot.
      *
@@ -63,7 +63,7 @@ public class Lucy::Index::Snapshot inherits Clownfish::Obj {
      * otherwise.
      */
     public bool
-    Delete_Entry(Snapshot *self, const String *entry);
+    Delete_Entry(Snapshot *self, String *entry);
 
     /** Decode a snapshot file and initialize the object to reflect its
      * contents.
@@ -74,7 +74,7 @@ public class Lucy::Index::Snapshot inherits Clownfish::Obj {
      * @return the object, allowing an assignment idiom.
      */
     public Snapshot*
-    Read_File(Snapshot *self, Folder *folder, const String *path = NULL);
+    Read_File(Snapshot *self, Folder *folder, String *path = NULL);
 
     /** Write a snapshot file.  The caller must lock the index while this
      * operation takes place, and the operation will fail if the snapshot file
@@ -86,13 +86,13 @@ public class Lucy::Index::Snapshot inherits Clownfish::Obj {
      * folder.
      */
     public void
-    Write_File(Snapshot *self, Folder *folder, const String *path = NULL);
+    Write_File(Snapshot *self, Folder *folder, String *path = NULL);
 
     /** Set the path to the file that the Snapshot object serves as a proxy
      * for.
      */
     public void
-    Set_Path(Snapshot *self, const String *path);
+    Set_Path(Snapshot *self, String *path);
 
     /** Get the path to the snapshot file.  Initially NULL; updated by
      * Read_File(), Write_File(), and Set_Path().

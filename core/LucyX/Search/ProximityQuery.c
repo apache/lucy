@@ -47,13 +47,13 @@ S_do_init(ProximityQuery *self, String *field, VArray *terms, float boost,
           uint32_t within);
 
 ProximityQuery*
-ProximityQuery_new(const String *field, VArray *terms, uint32_t within) {
+ProximityQuery_new(String *field, VArray *terms, uint32_t within) {
     ProximityQuery *self = (ProximityQuery*)VTable_Make_Obj(PROXIMITYQUERY);
     return ProximityQuery_init(self, field, terms, within);
 }
 
 ProximityQuery*
-ProximityQuery_init(ProximityQuery *self, const String *field, VArray *terms,
+ProximityQuery_init(ProximityQuery *self, String *field, VArray *terms,
                     uint32_t within) {
     return S_do_init(self, Str_Clone(field), VA_Clone(terms), 1.0f, within);
 }
@@ -371,7 +371,7 @@ ProximityCompiler_Make_Matcher_IMP(ProximityCompiler *self, SegReader *reader,
 VArray*
 ProximityCompiler_Highlight_Spans_IMP(ProximityCompiler *self,
                                       Searcher *searcher, DocVector *doc_vec,
-                                      const String *field) {
+                                      String *field) {
     ProximityCompilerIVARS *const ivars = ProximityCompiler_IVARS(self);
     ProximityQueryIVARS *const parent_ivars
         = ProximityQuery_IVARS((ProximityQuery*)ivars->parent);

@@ -317,7 +317,7 @@ Str_Clone_IMP(String *self) {
 }
 
 String*
-Str_Cat_IMP(String *self, const String *other) {
+Str_Cat_IMP(String *self, String *other) {
     return Str_Cat_Trusted_Utf8(self, other->ptr, other->size);
 }
 
@@ -341,7 +341,7 @@ Str_Cat_Trusted_Utf8_IMP(String *self, const char* ptr, size_t size) {
 }
 
 bool
-Str_Starts_With_IMP(String *self, const String *prefix) {
+Str_Starts_With_IMP(String *self, String *prefix) {
     return Str_Starts_With_Utf8_IMP(self, prefix->ptr, prefix->size);
 }
 
@@ -380,7 +380,7 @@ Str_Equals_Utf8_IMP(String *self, const char *ptr, size_t size) {
 }
 
 bool
-Str_Ends_With_IMP(String *self, const String *postfix) {
+Str_Ends_With_IMP(String *self, String *postfix) {
     return Str_Ends_With_Utf8_IMP(self, postfix->ptr, postfix->size);
 }
 
@@ -397,7 +397,7 @@ Str_Ends_With_Utf8_IMP(String *self, const char *postfix, size_t postfix_len) {
 }
 
 int64_t
-Str_Find_IMP(String *self, const String *substring) {
+Str_Find_IMP(String *self, String *substring) {
     return Str_Find_Utf8(self, substring->ptr, substring->size);
 }
 
@@ -483,8 +483,8 @@ Str_SubString_IMP(String *self, size_t offset, size_t len) {
 
 int
 Str_compare(const void *va, const void *vb) {
-    const String *a = *(const String**)va;
-    const String *b = *(const String**)vb;
+    String *a = *(String**)va;
+    String *b = *(String**)vb;
     size_t min_size;
     int    tie;
 
@@ -571,7 +571,7 @@ SStr_wrap_str(void *allocation, const char *ptr, size_t size) {
 }
 
 StackString*
-SStr_wrap(void *allocation, const String *source) {
+SStr_wrap(void *allocation, String *source) {
     return SStr_wrap_str(allocation, source->ptr, source->size);
 }
 

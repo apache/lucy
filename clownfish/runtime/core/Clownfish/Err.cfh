@@ -61,7 +61,7 @@ public class Clownfish::Err inherits Clownfish::Obj {
     /** Concatenate the supplied argument onto the internal "mess".
      */
     public void
-    Cat_Mess(Err *self, const String *mess);
+    Cat_Mess(Err *self, String *mess);
 
     public String*
     Get_Mess(Err *self);

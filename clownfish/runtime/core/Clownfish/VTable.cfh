@@ -49,7 +49,7 @@ class Clownfish::VTable inherits Clownfish::Obj {
      * result.
      */
     inert VTable*
-    singleton(const String *class_name, VTable *parent);
+    singleton(String *class_name, VTable *parent);
 
     /** Register a vtable, so that it can be retrieved by class name.
      *
@@ -78,18 +78,18 @@ class Clownfish::VTable inherits Clownfish::Obj {
      * class is not registered.
      */
     inert nullable VTable*
-    fetch_vtable(const String *class_name);
+    fetch_vtable(String *class_name);
 
     /** Given a class name, return the name of a parent class which descends
      * from Clownfish::Obj, or NULL if such a class can't be found.
      */
     inert nullable String*
-    find_parent_class(const String *class_name);
+    find_parent_class(String *class_name);
 
     /** List all of the methods defined directly within a host subclass.
      */
     inert incremented VArray*
-    fresh_host_methods(const String *class_name);
+    fresh_host_methods(String *class_name);
 
     /** Replace a function pointer in the VTable.
      */

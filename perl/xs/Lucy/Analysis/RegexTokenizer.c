@@ -25,7 +25,7 @@
 #include "Clownfish/Util/StringHelper.h"
 
 static SV*
-S_compile_token_re(const cfish_String *pattern);
+S_compile_token_re(cfish_String *pattern);
 
 static void
 S_set_token_re_but_not_pattern(lucy_RegexTokenizer *self, void *token_re);
@@ -40,7 +40,7 @@ lucy_RegexTokenizer_is_available(void) {
 
 lucy_RegexTokenizer*
 lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
-                         const cfish_String *pattern) {
+                         cfish_String *pattern) {
     lucy_Analyzer_init((lucy_Analyzer*)self);
     lucy_RegexTokenizerIVARS *const ivars = lucy_RegexTokenizer_IVARS(self);
     #define DEFAULT_PATTERN "\\w+(?:['\\x{2019}]\\w+)*"
@@ -67,7 +67,7 @@ lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
 }
 
 static SV*
-S_compile_token_re(const cfish_String *pattern) {
+S_compile_token_re(cfish_String *pattern) {
     dSP;
     ENTER;
     SAVETMPS;

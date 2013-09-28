@@ -36,17 +36,17 @@ public abstract class Lucy::Index::LexiconReader cnick LexReader
      * @param term Pre-locate the Lexicon to this term.
      */
     public abstract incremented nullable Lexicon*
-    Lexicon(LexiconReader *self, const String *field, Obj *term = NULL);
+    Lexicon(LexiconReader *self, String *field, Obj *term = NULL);
 
     /** Return the number of documents where the specified term is present.
      */
     public abstract uint32_t
-    Doc_Freq(LexiconReader *self, const String *field, Obj *term);
+    Doc_Freq(LexiconReader *self, String *field, Obj *term);
 
     /** If the term can be found, return a term info, otherwise return NULL.
      */
     abstract incremented nullable TermInfo*
-    Fetch_Term_Info(LexiconReader *self, const String *field, Obj *term);
+    Fetch_Term_Info(LexiconReader *self, String *field, Obj *term);
 
     /** Return a LexiconReader which merges the output of other
      * LexiconReaders.
@@ -71,10 +71,10 @@ class Lucy::Index::PolyLexiconReader cnick PolyLexReader
     init(PolyLexiconReader *self, VArray *readers, I32Array *offsets);
 
     public incremented nullable Lexicon*
-    Lexicon(PolyLexiconReader *self, const String *field, Obj *term = NULL);
+    Lexicon(PolyLexiconReader *self, String *field, Obj *term = NULL);
 
     public uint32_t
-    Doc_Freq(PolyLexiconReader *self, const String *field, Obj *term);
+    Doc_Freq(PolyLexiconReader *self, String *field, Obj *term);
 
     public void
     Close(PolyLexiconReader *self);
@@ -97,16 +97,16 @@ class Lucy::Index::DefaultLexiconReader cnick DefLexReader
          Snapshot *snapshot, VArray *segments, int32_t seg_tick);
 
     public incremented nullable Lexicon*
-    Lexicon(DefaultLexiconReader *self, const String *field,
+    Lexicon(DefaultLexiconReader *self, String *field,
             Obj *term = NULL);
 
     /** Return the number of documents in which the term appears.
      */
     public uint32_t
-    Doc_Freq(DefaultLexiconReader *self, const String *field, Obj *term);
+    Doc_Freq(DefaultLexiconReader *self, String *field, Obj *term);
 
     incremented nullable TermInfo*
-    Fetch_Term_Info(DefaultLexiconReader *self, const String *field,
+    Fetch_Term_Info(DefaultLexiconReader *self, String *field,
                     Obj *term);
 
     public void

@@ -26,12 +26,12 @@ class Lucy::Index::SortCache::TextSortCache
     InStream  *dat_in;
 
     inert incremented TextSortCache*
-    new(const String *field, FieldType *type, int32_t cardinality,
+    new(String *field, FieldType *type, int32_t cardinality,
         int32_t doc_max, int32_t null_ord = -1, int32_t ord_width,
         InStream *ord_in, InStream *ix_in, InStream *dat_in);
 
     inert TextSortCache*
-    init(TextSortCache *self, const String *field, FieldType *type,
+    init(TextSortCache *self, String *field, FieldType *type,
          int32_t cardinality, int32_t doc_max, int32_t null_ord = -1,
          int32_t ord_width, InStream *ord_in, InStream *ix_in,
          InStream *dat_in);

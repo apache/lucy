@@ -23,7 +23,7 @@
 #include "Lucy/Analysis/Inversion.h"
 
 RegexTokenizer*
-RegexTokenizer_new(const String *pattern) {
+RegexTokenizer_new(String *pattern) {
     RegexTokenizer *self = (RegexTokenizer*)VTable_Make_Obj(REGEXTOKENIZER);
     return RegexTokenizer_init(self, pattern);
 }

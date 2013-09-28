@@ -133,7 +133,7 @@ cfish_XSBind_bb_to_sv(const cfish_ByteBuf *bb);
 /** Convert a String into a new UTF-8 string SV.
  */
 CFISH_VISIBLE SV*
-cfish_XSBind_str_to_sv(const cfish_String *str);
+cfish_XSBind_str_to_sv(cfish_String *str);
 
 /** Perl-specific wrapper for Err#trap.  The "routine" must be either a
  * subroutine reference or the name of a subroutine.

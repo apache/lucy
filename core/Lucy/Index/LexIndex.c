@@ -33,14 +33,14 @@ S_read_entry(LexIndex *self);
 
 LexIndex*
 LexIndex_new(Schema *schema, Folder *folder, Segment *segment,
-             const String *field) {
+             String *field) {
     LexIndex *self = (LexIndex*)VTable_Make_Obj(LEXINDEX);
     return LexIndex_init(self, schema, folder, segment, field);
 }
 
 LexIndex*
 LexIndex_init(LexIndex *self, Schema *schema, Folder *folder,
-              Segment *segment, const String *field) {
+              Segment *segment, String *field) {
     int32_t  field_num = Seg_Field_Num(segment, field);
     String  *seg_name  = Seg_Get_Name(segment);
     String  *ixix_file = Str_newf("%o/lexicon-%i32.ixix", seg_name, field_num);

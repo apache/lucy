@@ -24,13 +24,13 @@
 #include "Lucy/Analysis/SnowballStemmer.h"
 
 EasyAnalyzer*
-EasyAnalyzer_new(const String *language) {
+EasyAnalyzer_new(String *language) {
     EasyAnalyzer *self = (EasyAnalyzer*)VTable_Make_Obj(EASYANALYZER);
     return EasyAnalyzer_init(self, language);
 }
 
 EasyAnalyzer*
-EasyAnalyzer_init(EasyAnalyzer *self, const String *language) {
+EasyAnalyzer_init(EasyAnalyzer *self, String *language) {
     Analyzer_init((Analyzer*)self);
     EasyAnalyzerIVARS *const ivars = EasyAnalyzer_IVARS(self);
     ivars->language   = Str_Clone(language);

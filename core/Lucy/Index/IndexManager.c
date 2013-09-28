@@ -32,13 +32,13 @@
 #include "Clownfish/Util/StringHelper.h"
 
 IndexManager*
-IxManager_new(const String *host, LockFactory *lock_factory) {
+IxManager_new(String *host, LockFactory *lock_factory) {
     IndexManager *self = (IndexManager*)VTable_Make_Obj(INDEXMANAGER);
     return IxManager_init(self, host, lock_factory);
 }
 
 IndexManager*
-IxManager_init(IndexManager *self, const String *host,
+IxManager_init(IndexManager *self, String *host,
                LockFactory *lock_factory) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     ivars->host                = host
@@ -303,7 +303,7 @@ IxManager_Remove_Merge_Data_IMP(IndexManager *self) {
 
 Lock*
 IxManager_Make_Snapshot_Read_Lock_IMP(IndexManager *self,
-                                      const String *filename) {
+                                      String *filename) {
     LockFactory *lock_factory = S_obtain_lock_factory(self);
 
     if (!Str_Starts_With_Utf8(filename, "snapshot_", 9)

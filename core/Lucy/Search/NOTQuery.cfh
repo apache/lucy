@@ -78,7 +78,7 @@ class Lucy::Search::NOTCompiler
 
     public incremented VArray*
     Highlight_Spans(NOTCompiler *self, Searcher *searcher,
-                    DocVector *doc_vec, const String *field);
+                    DocVector *doc_vec, String *field);
 }
 
 

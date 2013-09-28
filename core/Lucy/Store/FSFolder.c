@@ -48,44 +48,44 @@
 
 // Return a String containing a platform-specific absolute filepath.
 static String*
-S_fullpath(FSFolder *self, const String *path);
+S_fullpath(FSFolder *self, String *path);
 
 // Return a String containing a platform-specific absolute filepath.
 static char*
-S_fullpath_ptr(FSFolder *self, const String *path);
+S_fullpath_ptr(FSFolder *self, String *path);
 
 // Return true if the supplied path is a directory.
 static bool
-S_dir_ok(const String *path);
+S_dir_ok(String *path);
 
 // Create a directory, or set Err_error and return false.
 static bool
-S_create_dir(const String *path);
+S_create_dir(String *path);
 
 // Return true unless the supplied path contains a slash.
 static bool
-S_is_local_entry(const String *path);
+S_is_local_entry(String *path);
 
 // Return true if the supplied path is absolute.
 static bool
-S_is_absolute(const String *path);
+S_is_absolute(String *path);
 
 // Transform a possibly relative path into an absolute path.
 static String*
-S_absolutify(const String *path);
+S_absolutify(String *path);
 
 // Create a hard link.
 static bool
 S_hard_link(char *from_path, char *to_path);
 
 FSFolder*
-FSFolder_new(const String *path) {
+FSFolder_new(String *path) {
     FSFolder *self = (FSFolder*)VTable_Make_Obj(FSFOLDER);
     return FSFolder_init(self, path);
 }
 
 FSFolder*
-FSFolder_init(FSFolder *self, const String *path) {
+FSFolder_init(FSFolder *self, String *path) {
     String *abs_path = S_absolutify(path);
     Folder_init((Folder*)self, abs_path);
     DECREF(abs_path);
@@ -109,7 +109,7 @@ FSFolder_Check_IMP(FSFolder *self) {
 }
 
 FileHandle*
-FSFolder_Local_Open_FileHandle_IMP(FSFolder *self, const String *name,
+FSFolder_Local_Open_FileHandle_IMP(FSFolder *self, String *name,
                                    uint32_t flags) {
     String       *fullpath = S_fullpath(self, name);
     FSFileHandle *fh = FSFH_open(fullpath, flags);
@@ -119,7 +119,7 @@ FSFolder_Local_Open_FileHandle_IMP(FSFolder *self, const String *name,
 }
 
 bool
-FSFolder_Local_MkDir_IMP(FSFolder *self, const String *name) {
+FSFolder_Local_MkDir_IMP(FSFolder *self, String *name) {
     String *dir = S_fullpath(self, name);
     bool result = S_create_dir(dir);
     if (!result) { ERR_ADD_FRAME(Err_get_error()); }
@@ -136,7 +136,7 @@ FSFolder_Local_Open_Dir_IMP(FSFolder *self) {
 }
 
 bool
-FSFolder_Local_Exists_IMP(FSFolder *self, const String *name) {
+FSFolder_Local_Exists_IMP(FSFolder *self, String *name) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
     if (Hash_Fetch(ivars->entries, (Obj*)name)) {
         return true;
@@ -157,7 +157,7 @@ FSFolder_Local_Exists_IMP(FSFolder *self, const String *name) {
 }
 
 bool
-FSFolder_Local_Is_Directory_IMP(FSFolder *self, const String *name) {
+FSFolder_Local_Is_Directory_IMP(FSFolder *self, String *name) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
 
     // Check for a cached object, then fall back to a system call.
@@ -174,7 +174,7 @@ FSFolder_Local_Is_Directory_IMP(FSFolder *self, const String *name) {
 }
 
 bool
-FSFolder_Rename_IMP(FSFolder *self, const String* from, const String *to) {
+FSFolder_Rename_IMP(FSFolder *self, String* from, String *to) {
     char *from_path = S_fullpath_ptr(self, from);
     char *to_path   = S_fullpath_ptr(self, to);
     bool  retval    = !rename(from_path, to_path);
@@ -188,8 +188,8 @@ FSFolder_Rename_IMP(FSFolder *self, const String* from, const String *to) {
 }
 
 bool
-FSFolder_Hard_Link_IMP(FSFolder *self, const String *from,
-                       const String *to) {
+FSFolder_Hard_Link_IMP(FSFolder *self, String *from,
+                       String *to) {
     char *from_path_ptr = S_fullpath_ptr(self, from);
     char *to_path_ptr   = S_fullpath_ptr(self, to);
     bool  retval        = S_hard_link(from_path_ptr, to_path_ptr);
@@ -199,7 +199,7 @@ FSFolder_Hard_Link_IMP(FSFolder *self, const String *from,
 }
 
 bool
-FSFolder_Local_Delete_IMP(FSFolder *self, const String *name) {
+FSFolder_Local_Delete_IMP(FSFolder *self, String *name) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
 
     char *path_ptr = S_fullpath_ptr(self, name);
@@ -220,7 +220,7 @@ FSFolder_Close_IMP(FSFolder *self) {
 }
 
 Folder*
-FSFolder_Local_Find_Folder_IMP(FSFolder *self, const String *name) {
+FSFolder_Local_Find_Folder_IMP(FSFolder *self, String *name) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
 
     Folder *subfolder = NULL;
@@ -269,7 +269,7 @@ FSFolder_Local_Find_Folder_IMP(FSFolder *self, const String *name) {
 }
 
 static String*
-S_fullpath(FSFolder *self, const String *path) {
+S_fullpath(FSFolder *self, String *path) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
     String *fullpath = Str_newf("%o%s%o", ivars->path, DIR_SEP, path);
     String *retval;
@@ -284,7 +284,7 @@ S_fullpath(FSFolder *self, const String *path) {
 }
 
 static char*
-S_fullpath_ptr(FSFolder *self, const String *path) {
+S_fullpath_ptr(FSFolder *self, String *path) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
     size_t folder_size = Str_Get_Size(ivars->path);
     size_t path_size   = Str_Get_Size(path);
@@ -308,7 +308,7 @@ S_fullpath_ptr(FSFolder *self, const String *path) {
 }
 
 static bool
-S_dir_ok(const String *path) {
+S_dir_ok(String *path) {
     bool retval = false;
     char *path_ptr = Str_To_Utf8(path);
     struct stat stat_buf;
@@ -320,7 +320,7 @@ S_dir_ok(const String *path) {
 }
 
 static bool
-S_create_dir(const String *path) {
+S_create_dir(String *path) {
     bool retval = true;
     char *path_ptr = Str_To_Utf8(path);
     if (-1 == chy_makedir(path_ptr, 0777)) {
@@ -333,7 +333,7 @@ S_create_dir(const String *path) {
 }
 
 static bool
-S_is_local_entry(const String *path) {
+S_is_local_entry(String *path) {
     return Str_Find_Utf8(path, "/", 1) == -1;
 }
 
@@ -349,7 +349,7 @@ S_is_local_entry(const String *path) {
 #include <windows.h>
 
 static bool
-S_is_absolute(const String *path) {
+S_is_absolute(String *path) {
     int32_t code_point = Str_Code_Point_At(path, 0);
 
     if (isalpha(code_point)) {
@@ -362,7 +362,7 @@ S_is_absolute(const String *path) {
 }
 
 static String*
-S_absolutify(const String *path) {
+S_absolutify(String *path) {
     if (S_is_absolute(path)) { return Str_Clone(path); }
 
     DWORD  cwd_len = GetCurrentDirectory(0, NULL);
@@ -394,12 +394,12 @@ S_hard_link(char *from8, char *to8) {
 #elif (defined(CHY_HAS_UNISTD_H))
 
 static bool
-S_is_absolute(const String *path) {
+S_is_absolute(String *path) {
     return Str_Starts_With_Utf8(path, DIR_SEP, 1);
 }
 
 static String*
-S_absolutify(const String *path) {
+S_absolutify(String *path) {
     if (S_is_absolute(path)) { return Str_Clone(path); }
 
     char *cwd = getcwd(NULL, 0);

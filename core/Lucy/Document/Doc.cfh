@@ -51,7 +51,7 @@ public class Lucy::Document::Doc inherits Clownfish::Obj {
     /** Store a field value in the Doc.
      */
     void
-    Store(Doc *self, const String *field, Obj *value);
+    Store(Doc *self, String *field, Obj *value);
 
     /** Set the doc's field's attribute.
      */
