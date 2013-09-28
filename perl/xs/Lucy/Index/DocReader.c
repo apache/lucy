@@ -61,9 +61,9 @@ LUCY_DefDocReader_Fetch_Doc_IMP(lucy_DefaultDocReader *self, int32_t doc_id) {
         *SvEND(field_name_sv) = '\0';
 
         // Find the Field's FieldType.
-        cfish_StackString *field_name_zcb
+        cfish_StackString *field_name_str
             = CFISH_SSTR_WRAP_UTF8(field_name_ptr, field_name_len);
-        type = LUCY_Schema_Fetch_Type(schema, (cfish_String*)field_name_zcb);
+        type = LUCY_Schema_Fetch_Type(schema, (cfish_String*)field_name_str);
 
         // Read the field value.
         switch (LUCY_FType_Primitive_ID(type) & lucy_FType_PRIMITIVE_ID_MASK) {
