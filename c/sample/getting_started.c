@@ -23,13 +23,14 @@
  *
  *     c99 \
  *         getting_started.c \
- *         -I $PREFIX/include -L $PREFIX/lib -l lucy \
+ *         -I $PREFIX/include -L $PREFIX/lib -l cfish -l lucy \
  *         -o getting_started
  */
 
 #include <stdio.h>
 #include <string.h>
 
+#define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
 #include "Clownfish/String.h"
 #include "Lucy/Analysis/EasyAnalyzer.h"
@@ -179,7 +180,7 @@ S_search(IndexSearcher *searcher, const char *query) {
 
         printf("Result %d: %s\n", i, value);
 
-        DECREF(value);
+        free(value);
         DECREF(value_str);
         DECREF(hit);
         i++;
