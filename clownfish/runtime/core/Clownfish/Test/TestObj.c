@@ -37,7 +37,7 @@ TestObj_new() {
 
 static Obj*
 S_new_testobj() {
-    StackString *klass = SSTR_WRAP_STR("TestObj", 7);
+    StackString *klass = SSTR_WRAP_UTF8("TestObj", 7);
     Obj *obj;
     VTable *vtable = VTable_fetch_vtable((String*)klass);
     if (!vtable) {

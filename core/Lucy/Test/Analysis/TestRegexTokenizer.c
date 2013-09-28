@@ -38,8 +38,8 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
         return;
     }
 
-    StackString *word_char_pattern  = SSTR_WRAP_STR("\\w+", 3);
-    StackString *whitespace_pattern = SSTR_WRAP_STR("\\S+", 3);
+    StackString *word_char_pattern  = SSTR_WRAP_UTF8("\\w+", 3);
+    StackString *whitespace_pattern = SSTR_WRAP_UTF8("\\S+", 3);
     RegexTokenizer *word_char_tokenizer
         = RegexTokenizer_new((String*)word_char_pattern);
     RegexTokenizer *whitespace_tokenizer

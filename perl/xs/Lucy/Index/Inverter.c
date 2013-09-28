@@ -50,7 +50,7 @@ S_fetch_entry(lucy_Inverter *self, HE *hash_entry) {
         }
     }
 
-    cfish_StackString *field = CFISH_SSTR_WRAP_STR(key, key_len);
+    cfish_StackString *field = CFISH_SSTR_WRAP_UTF8(key, key_len);
     int32_t field_num
         = LUCY_Seg_Field_Num(ivars->segment, (cfish_String*)field);
     if (!field_num) {

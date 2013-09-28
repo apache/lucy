@@ -367,7 +367,7 @@ VTable_add_alias_to_registry(VTable *vtable, const char *alias_ptr,
     if (VTable_registry == NULL) {
         VTable_init_registry();
     }
-    StackString *alias = SSTR_WRAP_STR(alias_ptr, alias_len);
+    StackString *alias = SSTR_WRAP_UTF8(alias_ptr, alias_len);
     if (LFReg_Fetch(VTable_registry, (Obj*)alias)) {
         return false;
     }

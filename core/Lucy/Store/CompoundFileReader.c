@@ -36,7 +36,7 @@ CFReader_open(Folder *folder) {
 CompoundFileReader*
 CFReader_do_open(CompoundFileReader *self, Folder *folder) {
     CompoundFileReaderIVARS *const ivars = CFReader_IVARS(self);
-    String *cfmeta_file = (String*)SSTR_WRAP_STR("cfmeta.json", 11);
+    String *cfmeta_file = (String*)SSTR_WRAP_UTF8("cfmeta.json", 11);
     Hash *metadata = (Hash*)Json_slurp_json((Folder*)folder, cfmeta_file);
     Err *error = NULL;
 
@@ -73,7 +73,7 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder) {
     }
 
     // Open an instream which we'll clone over and over.
-    String *cf_file = (String*)SSTR_WRAP_STR("cf.dat", 6);
+    String *cf_file = (String*)SSTR_WRAP_UTF8("cf.dat", 6);
     ivars->instream = Folder_Open_In(folder, cf_file);
     if (!ivars->instream) {
         ERR_ADD_FRAME(Err_get_error());
@@ -167,11 +167,11 @@ CFReader_Local_Delete_IMP(CompoundFileReader *self, const String *name) {
         // Once the number of virtual files falls to 0, remove the compound
         // files.
         if (Hash_Get_Size(ivars->records) == 0) {
-            String *cf_file = (String*)SSTR_WRAP_STR("cf.dat", 6);
+            String *cf_file = (String*)SSTR_WRAP_UTF8("cf.dat", 6);
             if (!Folder_Delete(ivars->real_folder, cf_file)) {
                 return false;
             }
-            String *cfmeta_file = (String*)SSTR_WRAP_STR("cfmeta.json", 11);
+            String *cfmeta_file = (String*)SSTR_WRAP_UTF8("cfmeta.json", 11);
             if (!Folder_Delete(ivars->real_folder, cfmeta_file)) {
                 return false;
 

@@ -30,7 +30,7 @@ TestIxFileNames_new() {
 static void
 S_test_local_part(TestBatchRunner *runner, const char *source,
                   const char *wanted, const char *test_name) {
-    StackString *source_str = SSTR_WRAP_STR(source, strlen(source));
+    StackString *source_str = SSTR_WRAP_UTF8(source, strlen(source));
     String *got = IxFileNames_local_part((String*)source_str);
     TEST_TRUE(runner, Str_Equals_Utf8(got, wanted, strlen(wanted)), test_name);
     DECREF(got);
@@ -51,7 +51,7 @@ test_local_part(TestBatchRunner *runner) {
 static void
 S_test_extract_gen(TestBatchRunner *runner, const char *name, uint64_t gen,
                    const char *test_name) {
-    StackString *source = SSTR_WRAP_STR(name, strlen(name));
+    StackString *source = SSTR_WRAP_UTF8(name, strlen(name));
     TEST_TRUE(runner, IxFileNames_extract_gen((String*)source) == gen,
               test_name);
 }

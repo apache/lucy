@@ -234,7 +234,7 @@ static const char typemap_input[] =
     "    $var = (sizeof(UV) == 8) ? ($type)SvUV($arg) : ($type)SvNV($arg);\n"
     "\n"
     "CONST_CHARBUF\n"
-    "    $var = (const cfish_String*)CFISH_SSTR_WRAP_STR(SvPVutf8_nolen($arg), SvCUR($arg));\n"
+    "    $var = (const cfish_String*)CFISH_SSTR_WRAP_UTF8(SvPVutf8_nolen($arg), SvCUR($arg));\n"
     "\n";
 
 static const char typemap_output[] =
