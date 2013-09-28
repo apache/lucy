@@ -40,6 +40,7 @@
 #include "Lucy/Test/Index/TestSegWriter.h"
 #include "Lucy/Test/Index/TestSegment.h"
 #include "Lucy/Test/Index/TestSnapshot.h"
+#include "Lucy/Test/Index/TestSortWriter.h"
 #include "Lucy/Test/Index/TestTermInfo.h"
 #include "Lucy/Test/Object/TestBitVector.h"
 #include "Lucy/Test/Object/TestI32Array.h"
@@ -121,6 +122,7 @@ Test_create_test_suite() {
     TestSuite_Add_Batch(suite, (TestBatch*)TestHLWriter_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestPListWriter_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestSegWriter_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestSortWriter_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestPolyReader_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestFullTextType_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestBlobType_new());
