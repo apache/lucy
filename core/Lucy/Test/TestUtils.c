@@ -170,7 +170,7 @@ FSFolder*
 TestUtils_modules_folder() {
     static const char *const paths[] = { "modules", "../modules" };
 
-    for (int i = 0; i < sizeof(paths) / sizeof(char*); i++) {
+    for (size_t i = 0; i < sizeof(paths) / sizeof(char*); i++) {
         String *path = Str_newf(paths[i]);
         FSFolder *modules_folder = FSFolder_new(path);
         DECREF(path);

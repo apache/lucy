@@ -75,6 +75,7 @@ Err_To_Host_IMP(Err *self) {
 
 void
 Err_throw_mess(VTable *vtable, String *message) {
+    UNUSED_VAR(vtable);
     Err *err = Err_new(message);
     Err_do_throw(err);
 }

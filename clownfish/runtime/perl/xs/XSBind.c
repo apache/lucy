@@ -854,6 +854,7 @@ CFISH_Err_To_Host_IMP(cfish_Err *self) {
 
 void
 cfish_Err_throw_mess(cfish_VTable *vtable, cfish_String *message) {
+    CHY_UNUSED_VAR(vtable);
     cfish_Err *err = cfish_Err_new(message);
     cfish_Err_do_throw(err);
 }

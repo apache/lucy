@@ -914,6 +914,7 @@ SStrIter_new(void *allocation, String *string, size_t byte_offset) {
 
 void
 SStrIter_Destroy_IMP(StackStringIterator *self) {
+    UNUSED_VAR(self);
     THROW(ERR, "Can't destroy a StackStringIterator");
 }
 

@@ -59,7 +59,6 @@ S_smiley_with_whitespace(int *num_spaces_ptr) {
         0x202F, 0x205F, 0x3000
     };
     int num_spaces = sizeof(spaces) / sizeof(uint32_t);
-    String *got;
 
     CharBuf *buf = CB_new(0);
     for (int i = 0; i < num_spaces; i++) { CB_Cat_Char(buf, spaces[i]); }
@@ -330,7 +329,7 @@ test_iterator(TestBatchRunner *runner) {
         = sizeof(code_points) / sizeof(code_points[0]);
 
     CharBuf *buf = CB_new(0);
-    for (int i = 0; i < num_code_points; ++i) {
+    for (size_t i = 0; i < num_code_points; ++i) {
         CB_Cat_Char(buf, code_points[i]);
     }
     String *string = CB_To_String(buf);
@@ -360,7 +359,7 @@ test_iterator(TestBatchRunner *runner) {
     {
         StringIterator *iter = Str_Top(string);
 
-        for (int i = 0; i < num_code_points; ++i) {
+        for (size_t i = 0; i < num_code_points; ++i) {
             TEST_TRUE(runner, StrIter_Has_Next(iter), "Has_Next %d", i);
             int32_t code_point = StrIter_Next(iter);
             TEST_INT_EQ(runner, code_point, code_points[i], "Next %d", i);

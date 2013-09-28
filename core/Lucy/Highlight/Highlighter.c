@@ -382,7 +382,7 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, String *field_val,
     int32_t  start;
     uint32_t max_skip;
 
-    if (best_location <= ivars->slop) {
+    if ((uint32_t)best_location <= ivars->slop) {
         // If the beginning of the string falls within the window centered
         // around the hottest point in the field, start the fragment at the
         // beginning.
