@@ -202,10 +202,10 @@ Str_Hash_Sum_IMP(String *self) {
     uint32_t hashvalue = 5381;
     StackStringIterator *iter = STR_STACKTOP(self);
 
-    const StrIter_Next_t next
-        = METHOD_PTR(STRINGITERATOR, CFISH_StrIter_Next);
+    const SStrIter_Next_t next
+        = METHOD_PTR(STACKSTRINGITERATOR, CFISH_SStrIter_Next);
     int32_t code_point;
-    while (STRITER_DONE != (code_point = next((StringIterator*)iter))) {
+    while (STRITER_DONE != (code_point = next(iter))) {
         hashvalue = ((hashvalue << 5) + hashvalue) ^ code_point;
     }
 
