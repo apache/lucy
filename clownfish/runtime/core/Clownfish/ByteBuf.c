@@ -172,7 +172,7 @@ BB_Cat_Bytes_IMP(ByteBuf *self, const void *bytes, size_t size) {
 }
 
 void
-BB_Cat_IMP(ByteBuf *self, const ByteBuf *other) {
+BB_Cat_IMP(ByteBuf *self, ByteBuf *other) {
     SI_cat_bytes(self, other->buf, other->size);
 }
 
@@ -198,8 +198,8 @@ BB_Grow_IMP(ByteBuf *self, size_t size) {
 
 int
 BB_compare(const void *va, const void *vb) {
-    const ByteBuf *a = *(const ByteBuf**)va;
-    const ByteBuf *b = *(const ByteBuf**)vb;
+    ByteBuf *a = *(ByteBuf**)va;
+    ByteBuf *b = *(ByteBuf**)vb;
     const size_t size = a->size < b->size ? a->size : b->size;
 
     int32_t comparison = memcmp(a->buf, b->buf, size);
@@ -246,7 +246,7 @@ ViewBB_Assign_Bytes_IMP(ViewByteBuf *self, char*buf, size_t size) {
 }
 
 void
-ViewBB_Assign_IMP(ViewByteBuf *self, const ByteBuf *other) {
+ViewBB_Assign_IMP(ViewByteBuf *self, ByteBuf *other) {
     self->buf  = other->buf;
     self->size = other->size;
 }

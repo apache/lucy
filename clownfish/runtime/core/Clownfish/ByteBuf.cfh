@@ -96,7 +96,7 @@ class Clownfish::ByteBuf cnick BB inherits Clownfish::Obj {
      * original ByteBuf. Allocate more memory as needed.
      */
     void
-    Cat(ByteBuf *self, const ByteBuf *other);
+    Cat(ByteBuf *self, ByteBuf *other);
 
     /** Assign more memory to the ByteBuf, if it doesn't already have enough
      * room to hold <code>size</code> bytes.  Cannot shrink the allocation.
@@ -150,7 +150,7 @@ class Clownfish::ViewByteBuf cnick ViewBB
     /** Assign buf and size members from the passed-in ByteBuf.
      */
     void
-    Assign(ViewByteBuf *self, const ByteBuf *other);
+    Assign(ViewByteBuf *self, ByteBuf *other);
 
     public void
     Destroy(ViewByteBuf *self);

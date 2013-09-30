@@ -128,7 +128,7 @@ cfish_XSBind_perl_to_cfish(SV *sv);
 /** Convert a ByteBuf into a new string SV.
  */
 CFISH_VISIBLE SV*
-cfish_XSBind_bb_to_sv(const cfish_ByteBuf *bb);
+cfish_XSBind_bb_to_sv(cfish_ByteBuf *bb);
 
 /** Convert a String into a new UTF-8 string SV.
  */
