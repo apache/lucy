@@ -48,7 +48,7 @@ SI_kill_iter(Hash *self);
 
 // Return the entry associated with the key, if any.
 static CFISH_INLINE HashEntry*
-SI_fetch_entry(Hash *self, const Obj *key, int32_t hash_sum);
+SI_fetch_entry(Hash *self, Obj *key, int32_t hash_sum);
 
 // Double the number of buckets and redistribute all entries.
 static CFISH_INLINE HashEntry*
@@ -179,7 +179,7 @@ Hash_Fetch_Utf8_IMP(Hash *self, const char *key, size_t key_len) {
 }
 
 static CFISH_INLINE HashEntry*
-SI_fetch_entry(Hash *self, const Obj *key, int32_t hash_sum) {
+SI_fetch_entry(Hash *self, Obj *key, int32_t hash_sum) {
     uint32_t tick = hash_sum;
     HashEntry *const entries = (HashEntry*)self->entries;
     HashEntry *entry;
@@ -201,13 +201,13 @@ SI_fetch_entry(Hash *self, const Obj *key, int32_t hash_sum) {
 }
 
 Obj*
-Hash_Fetch_IMP(Hash *self, const Obj *key) {
+Hash_Fetch_IMP(Hash *self, Obj *key) {
     HashEntry *entry = SI_fetch_entry(self, key, Obj_Hash_Sum(key));
     return entry ? entry->value : NULL;
 }
 
 Obj*
-Hash_Delete_IMP(Hash *self, const Obj *key) {
+Hash_Delete_IMP(Hash *self, Obj *key) {
     HashEntry *entry = SI_fetch_entry(self, key, Obj_Hash_Sum(key));
     if (entry) {
         Obj *value = entry->value;
@@ -265,7 +265,7 @@ Hash_Next_IMP(Hash *self, Obj **key, Obj **value) {
 }
 
 Obj*
-Hash_Find_Key_IMP(Hash *self, const Obj *key, int32_t hash_sum) {
+Hash_Find_Key_IMP(Hash *self, Obj *key, int32_t hash_sum) {
     HashEntry *entry = SI_fetch_entry(self, key, hash_sum);
     return entry ? entry->key : NULL;
 }

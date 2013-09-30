@@ -35,13 +35,13 @@
 #include "Lucy/Util/Freezer.h"
 
 TermQuery*
-TermQuery_new(String *field, const Obj *term) {
+TermQuery_new(String *field, Obj *term) {
     TermQuery *self = (TermQuery*)VTable_Make_Obj(TERMQUERY);
     return TermQuery_init(self, field, term);
 }
 
 TermQuery*
-TermQuery_init(TermQuery *self, String *field, const Obj *term) {
+TermQuery_init(TermQuery *self, String *field, Obj *term) {
     Query_init((Query*)self, 1.0f);
     TermQueryIVARS *const ivars = TermQuery_IVARS(self);
     ivars->field  = Str_Clone(field);
