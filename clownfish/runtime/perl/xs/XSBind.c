@@ -218,7 +218,7 @@ XSBind_perl_to_cfish(SV *sv) {
 }
 
 SV*
-XSBind_bb_to_sv(const cfish_ByteBuf *bb) {
+XSBind_bb_to_sv(cfish_ByteBuf *bb) {
     return bb
            ? newSVpvn(CFISH_BB_Get_Buf(bb), CFISH_BB_Get_Size(bb))
            : newSV(0);
