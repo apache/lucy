@@ -65,7 +65,7 @@ class Clownfish::Hash inherits Clownfish::Obj {
      * @return the value, or NULL if <code>key</code> is not present.
      */
     nullable Obj*
-    Fetch(Hash *self, const Obj *key);
+    Fetch(Hash *self, Obj *key);
 
     nullable Obj*
     Fetch_Utf8(Hash *self, const char *key, size_t key_len);
@@ -76,7 +76,7 @@ class Clownfish::Hash inherits Clownfish::Obj {
      * succeeds; otherwise NULL.
      */
     incremented nullable Obj*
-    Delete(Hash *self, const Obj *key);
+    Delete(Hash *self, Obj *key);
 
     incremented nullable Obj*
     Delete_Utf8(Hash *self, const char *key, size_t key_ley);
@@ -101,7 +101,7 @@ class Clownfish::Hash inherits Clownfish::Obj {
      * rather than its value.
      */
     nullable Obj*
-    Find_Key(Hash *self, const Obj *key, int32_t hash_sum);
+    Find_Key(Hash *self, Obj *key, int32_t hash_sum);
 
     /** Return an VArray of pointers to the hash's keys.
      */
