@@ -115,16 +115,15 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
     const char pattern[] =
         "extern %sVISIBLE size_t %s;\n"
         "static CFISH_INLINE %s\n"
-        "%s(const %s *self%s) {\n"
+        "%s(%s *self%s) {\n"
         "    const %s method = (%s)cfish_obj_method(self, %s);\n"
-        "    %smethod((%s*)self%s);\n"
+        "    %smethod(self%s);\n"
         "}\n";
     char *method_def
         = CFCUtil_sprintf(pattern, PREFIX, full_offset_sym, ret_type_str,
                           full_meth_sym, invoker_struct, params_minus_invoker,
                           full_typedef, full_typedef, full_offset_sym,
-                          maybe_return, invoker_struct,
-                          arg_names_minus_invoker);
+                          maybe_return, arg_names_minus_invoker);
 
     FREEMEM(full_offset_sym);
     FREEMEM(full_meth_sym);
