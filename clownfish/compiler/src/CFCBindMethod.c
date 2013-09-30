@@ -88,8 +88,6 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
     CFCParamList *param_list = CFCMethod_get_param_list(method);
     const char *PREFIX         = CFCClass_get_PREFIX(klass);
     const char *invoker_struct = CFCClass_full_struct_sym(klass);
-    const char *common_struct 
-        = CFCType_get_specifier(CFCMethod_self_type(method));
 
     char *full_meth_sym   = CFCMethod_full_method_sym(method, klass);
     char *full_offset_sym = CFCMethod_full_offset_sym(method, klass);
@@ -125,7 +123,7 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
         = CFCUtil_sprintf(pattern, PREFIX, full_offset_sym, ret_type_str,
                           full_meth_sym, invoker_struct, params_minus_invoker,
                           full_typedef, full_typedef, full_offset_sym,
-                          maybe_return, common_struct,
+                          maybe_return, invoker_struct,
                           arg_names_minus_invoker);
 
     FREEMEM(full_offset_sym);
@@ -136,11 +134,17 @@ S_virtual_method_def(CFCMethod *method, CFCClass *klass) {
 
 char*
 CFCBindMeth_typedef_dec(struct CFCMethod *method, CFCClass *klass) {
-    const char *params = CFCParamList_to_c(CFCMethod_get_param_list(method));
+    const char *params_minus_invoker
+        = CFCParamList_to_c(CFCMethod_get_param_list(method));
+    while (*params_minus_invoker && *params_minus_invoker != ',') {
+        params_minus_invoker++;
+    }
+    const char *self_struct = CFCClass_full_struct_sym(klass);
     const char *ret_type = CFCType_to_c(CFCMethod_get_return_type(method));
     char *full_typedef = CFCMethod_full_typedef(method, klass);
-    char *buf = CFCUtil_sprintf("typedef %s\n(*%s)(%s);\n", ret_type,
-                                full_typedef, params);
+    char *buf = CFCUtil_sprintf("typedef %s\n(*%s)(%s *self%s);\n", ret_type,
+                                full_typedef, self_struct,
+                                params_minus_invoker);
     FREEMEM(full_typedef);
     return buf;
 }
