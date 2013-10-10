@@ -49,19 +49,19 @@ class Clownfish::String cnick Str
      * passed-in string.  Check validity of supplied UTF-8.
      */
     inert incremented String*
-    new_steal_utf8(const char *utf8, size_t size);
+    new_steal_utf8(char *utf8, size_t size);
 
     /** Return a pointer to a new String which assumes ownership of the
      * passed-in string.  Do not check validity of supplied UTF-8.
      */
     inert incremented String*
-    new_steal_trusted_utf8(const char *utf8, size_t size);
+    new_steal_trusted_utf8(char *utf8, size_t size);
 
     /** Initialize the String using the passed-in string.  Do not check
      * validity of supplied UTF-8.
      */
     public inert String*
-    init_steal_trusted_utf8(String *self, const char *utf8, size_t size);
+    init_steal_trusted_utf8(String *self, char *utf8, size_t size);
 
     /** Return a pointer to a new String which wraps an external buffer
      * containing UTF-8.  The buffer must stay unchanged for the lifetime

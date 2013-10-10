@@ -84,7 +84,7 @@ Str_init_from_trusted_utf8(String *self, const char *utf8, size_t size) {
 }
 
 String*
-Str_new_steal_utf8(const char *utf8, size_t size) {
+Str_new_steal_utf8(char *utf8, size_t size) {
     if (!StrHelp_utf8_valid(utf8, size)) {
         DIE_INVALID_UTF8(utf8, size);
     }
@@ -93,13 +93,13 @@ Str_new_steal_utf8(const char *utf8, size_t size) {
 }
 
 String*
-Str_new_steal_trusted_utf8(const char *utf8, size_t size) {
+Str_new_steal_trusted_utf8(char *utf8, size_t size) {
     String *self = (String*)VTable_Make_Obj(STRING);
     return Str_init_steal_trusted_utf8(self, utf8, size);
 }
 
 String*
-Str_init_steal_trusted_utf8(String *self, const char *utf8, size_t size) {
+Str_init_steal_trusted_utf8(String *self, char *utf8, size_t size) {
     self->ptr    = utf8;
     self->size   = size;
     self->origin = self;
