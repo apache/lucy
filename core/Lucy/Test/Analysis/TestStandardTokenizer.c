@@ -117,7 +117,7 @@ test_tokenizer(TestBatchRunner *runner) {
 
 void
 TestStandardTokenizer_Run_IMP(TestStandardTokenizer *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 1084);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 1378);
     test_Dump_Load_and_Equals(runner);
     test_tokenizer(runner);
 }

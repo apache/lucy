@@ -32,7 +32,7 @@ the UCD to JSON.
 UCD_SRC_DIR should point to a directory containing the files
 WordBreakProperty.txt, WordBreakTest.txt, and DerivedCoreProperties.txt from
 the Unicode Character Database available at
-L<http://www.unicode.org/Public/6.2.0/ucd/>.
+L<http://www.unicode.org/Public/6.3.0/ucd/>.
 
 =head1 OUTPUT FILES
 
@@ -63,14 +63,17 @@ my %wb_map = (
     Newline            => 0,
     Regional_Indicator => 0,  # These are symbols, so ignore them.
     ALetter            => 2,
-    Numeric            => 3,
-    Katakana           => 4,
-    ExtendNumLet       => 5,
-    Extend             => 6,
-    Format             => 6,
-    MidNumLet          => 7,
-    MidLetter          => 8,
-    MidNum             => 9,
+    Hebrew_Letter      => 3,
+    Numeric            => 4,
+    Katakana           => 5,
+    ExtendNumLet       => 6,
+    Extend             => 7,
+    Format             => 7,
+    Single_Quote       => 8,
+    Double_Quote       => 9,
+    MidNumLet          => 10,
+    MidLetter          => 11,
+    MidNum             => 12,
 );
 
 my %opts;
@@ -175,7 +178,7 @@ while (<$in_file>) {
             }
 
             my $wb = $wb->lookup($code);
-            $word = $chr if $wb >= 1 && $wb <= 5;
+            $word = $chr if $wb >= 1 && $wb <= 6;
         }
         elsif ( $break eq "\xD7" ) {    # multiplication sign
             $word .= $chr if $word ne '';
@@ -207,7 +210,7 @@ __DATA__
 
 This file is generated with devel/bin/gen_word_break_data.pl. DO NOT EDIT!
 The contents of this file are derived from the Unicode Character Database,
-version 6.2.0, available from http://www.unicode.org/Public/6.2.0/ucd/.
+version 6.3.0, available from http://www.unicode.org/Public/6.3.0/ucd/.
 The Unicode copyright and permission notice follows.
 
 Copyright (c) 1991-2011 Unicode, Inc. All rights reserved. Distributed under

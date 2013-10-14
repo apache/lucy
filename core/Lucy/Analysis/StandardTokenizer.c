@@ -34,15 +34,18 @@
  * in devel/bin.
  */
 
-#define WB_ASingle        1
-#define WB_ALetter        2
-#define WB_Numeric        3
-#define WB_Katakana       4
-#define WB_ExtendNumLet   5
-#define WB_Extend_Format  6
-#define WB_MidNumLet      7
-#define WB_MidLetter      8
-#define WB_MidNum         9
+#define WB_ASingle          1
+#define WB_ALetter          2
+#define WB_Hebrew_Letter    3
+#define WB_Numeric          4
+#define WB_Katakana         5
+#define WB_ExtendNumLet     6
+#define WB_Extend_Format    7
+#define WB_Single_Quote     8
+#define WB_Double_Quote     9
+#define WB_MidNumLet       10
+#define WB_MidLetter       11
+#define WB_MidNum          12
 
 #include "WordBreak.tab"
 
@@ -170,27 +173,67 @@ S_parse_word(const char *text, size_t len, lucy_StringIter *iter,
 
         switch (wb) {
             case WB_ALetter:
+            case WB_Hebrew_Letter:
             case WB_Numeric:
                 if (state == WB_Katakana) { goto word_break; }
+                // Rules WB5, WB8, WB9, WB10, and WB13b.
                 break;
             case WB_Katakana:
-                if (state == WB_ALetter || state == WB_Numeric) {
+                if (state != WB_Katakana && state != WB_ExtendNumLet) {
                     goto word_break;
                 }
+                // Rules WB13 and WB13b.
                 break;
             case WB_ExtendNumLet:
+                // Rule WB13a.
                 break;
             case WB_Extend_Format:
-                // keep state
+                // Rule WB4. Keep state.
                 wb = state;
                 break;
+            case WB_Single_Quote:
             case WB_MidNumLet:
             case WB_MidLetter:
             case WB_MidNum:
-                if ((state == WB_ALetter && wb != WB_MidNum)
-                    ||  (state == WB_Numeric && wb != WB_MidLetter)) {
+                if (state == WB_ALetter) {
+                    if (wb == WB_MidNum) { goto word_break; }
                     wb = S_skip_extend_format(text, len, iter);
-                    if (wb == state) { break; }
+                    if (wb == WB_ALetter || wb == WB_Hebrew_Letter) {
+                        // Rules WB6 and WB7.
+                        state = wb;
+                        break;
+                    }
+                }
+                else if (state == WB_Hebrew_Letter) {
+                    if (wb == WB_MidNum) { goto word_break; }
+                    if (wb == WB_Single_Quote) {
+                        // Rule WB7a.
+                        ++end.byte_pos;
+                        ++end.char_pos;
+                    }
+                    wb = S_skip_extend_format(text, len, iter);
+                    if (wb == WB_ALetter || wb == WB_Hebrew_Letter) {
+                        // Rules WB6 and WB7.
+                        state = wb;
+                        break;
+                    }
+                }
+                else if (state == WB_Numeric) {
+                    if (wb == WB_MidLetter) { goto word_break; }
+                    wb = S_skip_extend_format(text, len, iter);
+                    if (wb == state) {
+                        // Rules WB11 and WB12.
+                        break;
+                    }
+                }
+                goto word_break;
+            case WB_Double_Quote:
+                if (state == WB_Hebrew_Letter) {
+                    wb = S_skip_extend_format(text, len, iter);
+                    if (wb == state) {
+                        // Rules WB7b and WB7c.
+                        break;
+                    }
                 }
                 goto word_break;
             default:
