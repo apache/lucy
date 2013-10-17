@@ -13,13 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package Lucy::Util::BBSortEx;
-use Lucy;
-our $VERSION = '0.003000';
-$VERSION = eval $VERSION;
+use strict;
+use warnings;
 
-1;
+use Lucy::Test;
+my $success = Lucy::Test::run_tests("Lucy::Test::Util::TestSortExternal");
 
-__END__
-
+exit($success ? 0 : 1);
 

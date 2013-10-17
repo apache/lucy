@@ -81,6 +81,7 @@
 #include "Lucy/Test/Util/TestJson.h"
 #include "Lucy/Test/Util/TestMemoryPool.h"
 #include "Lucy/Test/Util/TestPriorityQueue.h"
+#include "Lucy/Test/Util/TestSortExternal.h"
 
 TestSuite*
 Test_create_test_suite() {
@@ -88,6 +89,7 @@ Test_create_test_suite() {
 
     TestSuite_Add_Batch(suite, (TestBatch*)TestPriQ_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestBitVector_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestSortExternal_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestMemPool_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestIxFileNames_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestJson_new());

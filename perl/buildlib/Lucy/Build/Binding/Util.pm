@@ -21,19 +21,10 @@ $VERSION = eval $VERSION;
 
 sub bind_all {
     my $class = shift;
-    $class->bind_bbsortex;
     $class->bind_debug;
     $class->bind_freezer;
     $class->bind_indexfilenames;
     $class->bind_sortexternal;
-}
-
-sub bind_bbsortex {
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Util::BBSortEx",
-    );
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
 sub bind_debug {

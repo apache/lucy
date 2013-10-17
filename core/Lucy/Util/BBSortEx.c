@@ -169,4 +169,24 @@ BBSortEx_Compare_IMP(BBSortEx *self, void *va, void *vb) {
     return BB_compare((ByteBuf**)va, (ByteBuf**)vb);
 }
 
+VArray*
+BBSortEx_Peek_Cache_IMP(BBSortEx *self) {
+    BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
+    uint32_t   count  = ivars->buf_max - ivars->buf_tick;
+    Obj      **buffer = ivars->buffer;
+    VArray    *retval = VA_new(count);
+
+    for (uint32_t i = ivars->buf_tick; i < ivars->buf_max; ++i) {
+        VA_Push(retval, INCREF(buffer[i]));
+    }
+
+    return retval;
+}
+
+uint32_t
+BBSortEx_Get_Num_Runs_IMP(BBSortEx *self) {
+    BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
+    return VA_Get_Size(ivars->runs);
+}
+
 
