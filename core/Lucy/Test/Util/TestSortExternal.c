@@ -269,9 +269,44 @@ test_sort_random_strings(TestBatchRunner *runner) {
     DECREF(bytebufs);
 }
 
+static void
+test_run(TestBatchRunner *runner) {
+    VArray *letters = VA_new(26);
+    for (int i = 0; i < 26; ++i) {
+        char ch = 'a' + i;
+        ByteBuf *bytebuf = BB_new_bytes(&ch, 1);
+        VA_Push(letters, (Obj*)bytebuf);
+    }
+    BBSortEx *run = BBSortEx_new(0x1000000, letters);
+    BBSortEx_Set_Mem_Thresh(run, 5);
+
+    BBSortEx_Refill(run);
+    TEST_INT_EQ(runner, BBSortEx_Buffer_Count(run), 5,
+                "Refill doesn't exceed memory threshold");
+
+    Obj *endpost = BBSortEx_Peek_Last(run);
+    ByteBuf *wanted = BB_new_bytes("e", 1);
+    TEST_TRUE(runner, BB_Equals(wanted, endpost), "Peek_Last");
+
+    VArray *elems = VA_new(26);
+    do {
+        while (BBSortEx_Buffer_Count(run) > 0) {
+            Obj *object = BBSortEx_Fetch(run);
+            VA_Push(elems, object);
+        }
+    } while (BBSortEx_Refill(run) > 0);
+    TEST_TRUE(runner, VA_Equals(elems, (Obj*)letters), "retrieve all elems");
+
+    DECREF(elems);
+    DECREF(wanted);
+    DECREF(endpost);
+    DECREF(letters);
+    DECREF(run);
+}
+
 void
 TestSortExternal_Run_IMP(TestSortExternal *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 16);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 19);
 
     srand((unsigned int)time((time_t*)NULL));
     S_init_bytebufs();
@@ -281,6 +316,7 @@ TestSortExternal_Run_IMP(TestSortExternal *self, TestBatchRunner *runner) {
     test_sort_nothing(runner);
     test_sort_packed_ints(runner);
     test_sort_random_strings(runner);
+    test_run(runner);
     S_destroy_bytebufs();
 }
 

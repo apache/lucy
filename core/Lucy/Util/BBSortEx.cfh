@@ -54,6 +54,9 @@ class Lucy::Util::BBSortEx
     incremented VArray*
     Peek_Cache(BBSortEx *self);
 
+    incremented nullable Obj*
+    Peek_Last(BBSortEx *self);
+
     uint32_t
     Get_Num_Runs(BBSortEx *self);
 
