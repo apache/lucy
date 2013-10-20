@@ -16,7 +16,7 @@
 # limitations under the License.
 
 # This also configures CFC
-(cd ../clownfish/runtime/c && ./configure "$@")
+(cd ../clownfish/runtime/c && ./configure "$@") || exit
 echo
 
 echo Configuring Lucy...
