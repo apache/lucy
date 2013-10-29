@@ -41,7 +41,7 @@ TestUtils_random_u64() {
 int64_t*
 TestUtils_random_i64s(int64_t *buf, size_t count, int64_t min,
                       int64_t limit) {
-    uint64_t  range = min < limit ? limit - min : 0;
+    uint64_t  range = min < limit ? (uint64_t)limit - (uint64_t)min : 0;
     int64_t *ints = buf ? buf : (int64_t*)CALLOCATE(count, sizeof(int64_t));
     for (size_t i = 0; i < count; i++) {
         ints[i] = min + TestUtils_random_u64() % range;
