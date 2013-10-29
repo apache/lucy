@@ -227,30 +227,30 @@ cfish_NumUtil_encode_bigend_u64(uint64_t value, void *dest_ptr) {
 static CFISH_INLINE uint16_t
 cfish_NumUtil_decode_bigend_u16(void *source) {
     uint8_t *const buf = (uint8_t*)source;
-    return  (buf[0] << 8) |
-            (buf[1]);
+    return  ((uint16_t)buf[0] << 8) |
+            ((uint16_t)buf[1]);
 }
 
 static CFISH_INLINE uint32_t
 cfish_NumUtil_decode_bigend_u32(void *source) {
     uint8_t *const buf = (uint8_t*)source;
-    return  (buf[0]  << 24) |
-            (buf[1]  << 16) |
-            (buf[2]  << 8)  |
-            (buf[3]);
+    return  ((uint32_t)buf[0]  << 24) |
+            ((uint32_t)buf[1]  << 16) |
+            ((uint32_t)buf[2]  << 8)  |
+            ((uint32_t)buf[3]);
 }
 
 static CFISH_INLINE uint64_t
 cfish_NumUtil_decode_bigend_u64(void *source) {
     uint8_t *const buf = (uint8_t*)source;
-    uint64_t high_bits = (buf[0]  << 24) |
-                         (buf[1]  << 16) |
-                         (buf[2]  << 8)  |
-                         (buf[3]);
-    uint32_t low_bits  = (buf[4]  << 24) |
-                         (buf[5]  << 16) |
-                         (buf[6]  << 8)  |
-                         (buf[7]);
+    uint64_t high_bits = ((uint32_t)buf[0]  << 24) |
+                         ((uint32_t)buf[1]  << 16) |
+                         ((uint32_t)buf[2]  << 8)  |
+                         ((uint32_t)buf[3]);
+    uint32_t low_bits  = ((uint32_t)buf[4]  << 24) |
+                         ((uint32_t)buf[5]  << 16) |
+                         ((uint32_t)buf[6]  << 8)  |
+                         ((uint32_t)buf[7]);
     uint64_t retval = high_bits << 32;
     retval |= low_bits;
     return retval;
