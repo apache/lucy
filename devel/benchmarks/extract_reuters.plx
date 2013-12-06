@@ -20,14 +20,12 @@ use warnings;
 
 use File::Spec::Functions qw( catfile catdir );
 use Cwd qw( getcwd );
+use Fcntl;
 
 # Ensure call from correct location and with required arg.
 my $source_dir = $ARGV[0];
 die "Usage: ./extract_reuters.plx /path/to/expanded/archive"
     unless -d $source_dir;
-my $working_dir = getcwd;
-die "Must be run from the benchmarks/ directory"
-    unless ( $working_dir =~ /benchmarks\W*$/ );
 
 # Create the main output directory.
 my $main_out_dir = 'extracted_corpus';
@@ -95,7 +93,8 @@ for my $sgm_file (@sgm_files) {
             if ( length $title and length $body ) {
                 my $out_filename = sprintf( "article%05d.txt", $num_files );
                 my $out_filepath = catfile( $out_dir, $out_filename );
-                open( my $out_fh, '>', $out_filepath )
+                sysopen( my $out_fh, $out_filepath,
+                    O_CREAT | O_EXCL | O_WRONLY )
                     or die "Couldn't open '$out_filepath' for writing: $!";
                 $title =~ s/^\s*//;
                 $title =~ s/\s*$//;
