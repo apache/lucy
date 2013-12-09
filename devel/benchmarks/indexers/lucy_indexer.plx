@@ -67,7 +67,7 @@ else {
         for (@INC) {
             next unless /\bblib\b/;
             # Propagate -Mblib to the child.
-            $command .= "-Mblib ";
+            $command .= "-Mblib=$_ ";
             last;
         }
         $command .= "$0 --build_index=1 ";
