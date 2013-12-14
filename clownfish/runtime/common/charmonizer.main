@@ -198,7 +198,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     }
 
     chaz_CFlags_add_include_dir(makefile_cflags, ".");
-    chaz_CFlags_add_include_dir(makefile_cflags, core_dir);
     chaz_CFlags_add_include_dir(makefile_cflags, autogen_inc_dir);
 
     var = chaz_MakeFile_add_var(makefile, "CFLAGS", NULL);
