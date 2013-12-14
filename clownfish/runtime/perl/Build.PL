@@ -48,7 +48,6 @@ my $builder = Clownfish::Build->new(
         },
     },
     include_dirs => [
-        $CORE_SOURCE_DIR,
         $XS_SOURCE_DIR,
     ],
     clownfish_params => {
