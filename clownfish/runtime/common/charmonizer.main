@@ -190,6 +190,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     makefile_cflags = chaz_CC_new_cflags();
 
     chaz_CFlags_enable_optimization(makefile_cflags);
+    chaz_CFlags_enable_debugging(makefile_cflags);
     chaz_CFlags_disable_strict_aliasing(makefile_cflags);
     chaz_CFlags_compile_shared_library(makefile_cflags);
     chaz_CFlags_hide_symbols(makefile_cflags);
@@ -263,6 +264,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeFile_add_rule(makefile, "$(CLOWNFISH_OBJS)", "autogen");
 
     link_flags = chaz_CC_new_cflags();
+    chaz_CFlags_enable_debugging(link_flags);
     if (math_library) {
         chaz_CFlags_add_external_library(link_flags, math_library);
     }
