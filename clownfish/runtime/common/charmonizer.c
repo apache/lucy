@@ -1778,6 +1778,13 @@ chaz_CFlags_enable_optimization(chaz_CFlags *flags) {
 }
 
 void
+chaz_CFlags_enable_debugging(chaz_CFlags *flags) {
+    if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
+        chaz_CFlags_append(flags, "-g");
+    }
+}
+
+void
 chaz_CFlags_disable_strict_aliasing(chaz_CFlags *flags) {
     if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
         return;
@@ -6938,6 +6945,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     makefile_cflags = chaz_CC_new_cflags();
 
     chaz_CFlags_enable_optimization(makefile_cflags);
+    chaz_CFlags_enable_debugging(makefile_cflags);
     chaz_CFlags_disable_strict_aliasing(makefile_cflags);
     chaz_CFlags_compile_shared_library(makefile_cflags);
     chaz_CFlags_hide_symbols(makefile_cflags);
@@ -6946,7 +6954,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     }
 
     chaz_CFlags_add_include_dir(makefile_cflags, ".");
-    chaz_CFlags_add_include_dir(makefile_cflags, core_dir);
     chaz_CFlags_add_include_dir(makefile_cflags, autogen_inc_dir);
 
     var = chaz_MakeFile_add_var(makefile, "CFLAGS", NULL);
@@ -7012,6 +7019,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeFile_add_rule(makefile, "$(CLOWNFISH_OBJS)", "autogen");
 
     link_flags = chaz_CC_new_cflags();
+    chaz_CFlags_enable_debugging(link_flags);
     if (math_library) {
         chaz_CFlags_add_external_library(link_flags, math_library);
     }

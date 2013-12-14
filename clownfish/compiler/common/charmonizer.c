@@ -1778,6 +1778,13 @@ chaz_CFlags_enable_optimization(chaz_CFlags *flags) {
 }
 
 void
+chaz_CFlags_enable_debugging(chaz_CFlags *flags) {
+    if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
+        chaz_CFlags_append(flags, "-g");
+    }
+}
+
+void
 chaz_CFlags_disable_strict_aliasing(chaz_CFlags *flags) {
     if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
         return;

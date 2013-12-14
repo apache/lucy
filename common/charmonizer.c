@@ -1778,6 +1778,13 @@ chaz_CFlags_enable_optimization(chaz_CFlags *flags) {
 }
 
 void
+chaz_CFlags_enable_debugging(chaz_CFlags *flags) {
+    if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
+        chaz_CFlags_append(flags, "-g");
+    }
+}
+
+void
 chaz_CFlags_disable_strict_aliasing(chaz_CFlags *flags) {
     if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
         return;
@@ -6963,6 +6970,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     makefile_cflags = chaz_CC_new_cflags();
 
     chaz_CFlags_enable_optimization(makefile_cflags);
+    chaz_CFlags_enable_debugging(makefile_cflags);
     chaz_CFlags_disable_strict_aliasing(makefile_cflags);
     chaz_CFlags_compile_shared_library(makefile_cflags);
     chaz_CFlags_hide_symbols(makefile_cflags);
@@ -7076,6 +7084,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     free(scratch);
 
     link_flags = chaz_CC_new_cflags();
+    chaz_CFlags_enable_debugging(link_flags);
     chaz_CFlags_add_library_path(link_flags, cfr_dir);
     if (math_lib) {
         chaz_CFlags_add_external_library(link_flags, math_lib);
