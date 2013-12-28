@@ -73,6 +73,7 @@ my @core = qw(
     ConfWriter
     ConfWriterC
     ConfWriterPerl
+    ConfWriterPython
     ConfWriterRuby
     HeaderChecker
     Make

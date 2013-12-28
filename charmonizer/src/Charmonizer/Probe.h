@@ -32,6 +32,7 @@ struct chaz_CLIArgs {
     char cflags[CHAZ_PROBE_MAX_CFLAGS_LEN + 1];
     int  charmony_h;
     int  charmony_pm;
+    int  charmony_py;
     int  charmony_rb;
     int  verbosity;
     int  write_makefile;
@@ -44,6 +45,7 @@ struct chaz_CLIArgs {
  *     APP_NAME --cc=CC_COMMAND
  *              [--enable-c]
  *              [--enable-perl]
+ *              [--enable-python]
  *              [--enable-ruby]
  *              [-- [CFLAGS]]
  *

@@ -22,6 +22,7 @@
 #include "Charmonizer/Core/ConfWriter.h"
 #include "Charmonizer/Core/ConfWriterC.h"
 #include "Charmonizer/Core/ConfWriterPerl.h"
+#include "Charmonizer/Core/ConfWriterPython.h"
 #include "Charmonizer/Core/ConfWriterRuby.h"
 #include "Charmonizer/Core/Util.h"
 #include "Charmonizer/Core/Compiler.h"
@@ -50,6 +51,10 @@ chaz_Probe_parse_cli_args(int argc, const char *argv[],
         }
         else if (strcmp(arg, "--enable-perl") == 0) {
             args->charmony_pm = 1;
+            output_enabled = 1;
+        }
+        else if (strcmp(arg, "--enable-python") == 0) {
+            args->charmony_py = 1;
             output_enabled = 1;
         }
         else if (strcmp(arg, "--enable-ruby") == 0) {
@@ -103,7 +108,7 @@ void
 chaz_Probe_die_usage(void) {
     fprintf(stderr,
             "Usage: ./charmonize --cc=CC_COMMAND [--enable-c] "
-            "[--enable-perl] [--enable-ruby] -- CFLAGS\n");
+            "[--enable-perl] [--enable-python] [--enable-ruby] -- CFLAGS\n");
     exit(1);
 }
 
@@ -133,6 +138,10 @@ chaz_Probe_init(struct chaz_CLIArgs *args) {
     }
     if (args->charmony_pm) {
         chaz_ConfWriterPerl_enable();
+        output_enabled = true;
+    }
+    if (args->charmony_py) {
+        chaz_ConfWriterPython_enable();
         output_enabled = true;
     }
     if (args->charmony_rb) {
