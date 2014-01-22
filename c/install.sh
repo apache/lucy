@@ -53,19 +53,27 @@ if [ -z "$prefix" ]; then
     exit 1
 fi
 
-case $(uname) in
+if ! mkdir -p "$prefix"; then
+    echo "Can't create directory: $prefix"
+    exit 1
+fi
+
+prefix=`cd "$prefix" && pwd`
+
+# Install libraries.
+case `uname` in
     Darwin*)
         lib_file=liblucy.$version.dylib
         if [ ! -f $lib_file ]; then
             echo "$lib_file not found. Did you run make?"
             exit 1
         fi
-        mkdir -p $prefix/lib
-        cp $lib_file $prefix/lib
+        mkdir -p "$prefix/lib"
+        cp $lib_file "$prefix/lib"
         install_name=$prefix/lib/liblucy.$major_version.dylib
-        ln -sf $lib_file $install_name
-        ln -sf $lib_file $prefix/lib/liblucy.dylib
-        install_name_tool -id $install_name $prefix/lib/$lib_file
+        ln -sf $lib_file "$install_name"
+        ln -sf $lib_file "$prefix/lib/liblucy.dylib"
+        install_name_tool -id "$install_name" "$prefix/lib/$lib_file"
         ;;
     *)
         lib_file=liblucy.so.$version
@@ -73,29 +81,34 @@ case $(uname) in
             echo "$lib_file not found. Did you run make?"
             exit 1
         fi
-        mkdir -p $prefix/lib
-        cp $lib_file $prefix/lib
+        mkdir -p "$prefix/lib"
+        cp $lib_file "$prefix/lib"
         soname=liblucy.so.$major_version
-        ln -sf $lib_file $prefix/lib/$soname
-        ln -sf $soname $prefix/lib/liblucy.so
+        ln -sf $lib_file "$prefix/lib/$soname"
+        ln -sf $soname "$prefix/lib/liblucy.so"
         ;;
 esac
 
-mkdir -p $prefix/include
-cp autogen/include/cfish_hostdefs.h $prefix/include
-cp autogen/include/cfish_parcel.h $prefix/include
-cp autogen/include/lucy_parcel.h $prefix/include
-cp -R autogen/include/Clownfish $prefix/include
-cp -R autogen/include/Lucy $prefix/include
-cp -R autogen/include/LucyX $prefix/include
+# Install Clownfish header files.
+for src in `find ../core -name '*.cf[hp]'`; do
+    file=${src#../core/}
+    dest=$prefix/share/clownfish/include/$file
+    dir=`dirname "$dest"`
+    mkdir -p "$dir"
+    cp $src "$dest"
+done
 
-cp -R autogen/man $prefix
+# Install man pages.
+cp -R autogen/man "$prefix"
 
-# create pkg-config file
-# some platforms require .bak extension for temp file
-cp lucy.pc.in lucy.pc
-sed -i.bak "s,@version@,$version,g" lucy.pc
-sed -i.bak "s,@prefix@,$prefix,g" lucy.pc
-rm lucy.pc.bak
-mkdir -p $prefix/lib/pkgconfig
-cp lucy.pc $prefix/lib/pkgconfig
+# Create pkg-config file.
+mkdir -p "$prefix/lib/pkgconfig"
+cat <<EOF >"$prefix/lib/pkgconfig/lucy.pc"
+Name: Apache Lucy
+Description: Full-text search for dynamic languages
+Version: $version
+URL: http://lucy.apache.org/
+Requires: clownfish
+Libs: -L$prefix/lib -llucy -lcfish
+EOF
+
