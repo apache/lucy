@@ -269,7 +269,11 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     scratch = chaz_Util_join("", "cfc --source=", core_dir,
                              " --dest=autogen --header=cfc_header", NULL);
     chaz_MakeRule_add_command(rule, scratch);
-    /* TODO: Find a way to touch the autogen directory on Windows. */
+    /*
+     * TODO
+     * - Only touch autogen if cfc succeeds.
+     * - Find a way to touch the autogen directory on Windows.
+     */
     if (chaz_Make_shell_type() == CHAZ_OS_POSIX) {
         chaz_MakeRule_add_command(rule, "touch autogen");
     }
