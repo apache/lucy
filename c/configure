@@ -15,10 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This also configures CFC
-(cd ../clownfish/runtime/c && ./configure "$@") || exit
-echo
-
 echo Configuring Lucy...
 
 probe_clang() { clang -v; }
