@@ -7038,8 +7038,6 @@ typedef struct SourceFileContext {
 
 static const char lucy_version[]        = "0.3.0";
 static const char lucy_major_version[]  = "0.3";
-static const char cfish_version[]       = "0.3.0";
-static const char cfish_major_version[] = "0.3";
 
 static void
 S_add_compiler_flags(struct chaz_CLIArgs *args) {
@@ -7148,12 +7146,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     char *core_dir      = chaz_Util_join(dir_sep, base_dir, "core", NULL);
     char *lemon_dir     = chaz_Util_join(dir_sep, base_dir, "lemon", NULL);
-    char *cfc_dir       = chaz_Util_join(dir_sep, base_dir, "clownfish",
-                                         "compiler", "c", NULL);
-    char *cfr_dir       = chaz_Util_join(dir_sep, base_dir, "clownfish",
-                                         "runtime", "c", NULL);
-    char *cfr_core_dir  = chaz_Util_join(dir_sep, base_dir, "clownfish",
-                                         "runtime", "core", NULL);
     char *modules_dir   = chaz_Util_join(dir_sep, base_dir, "modules", NULL);
     char *snowstem_dir  = chaz_Util_join(dir_sep, modules_dir, "analysis",
                                          "snowstem", "source", NULL);
@@ -7165,8 +7157,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
                                          "utf8proc", NULL);
     char *json_parser   = chaz_Util_join(dir_sep, core_dir, "Lucy", "Util",
                                          "Json", "JsonParser", NULL);
-    char *cfc_exe       = chaz_Util_join("", cfc_dir, dir_sep, "cfc", exe_ext,
-                                         NULL);
     char *test_lucy_exe = chaz_Util_join("", "t", dir_sep, "test_lucy",
                                          exe_ext, NULL);
 
@@ -7179,7 +7169,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeVar  *var;
     chaz_MakeRule *rule;
     chaz_MakeRule *clean_rule;
-    chaz_MakeRule *distclean_rule;
 
     chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
     chaz_CFlags *makefile_cflags;
@@ -7187,10 +7176,8 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_CFlags *test_cflags;
 
     chaz_SharedLib *lib;
-    chaz_SharedLib *cfish_lib;
 
     char *lib_filename;
-    char *cfish_lib_filename;
     char *test_command;
     char *scratch;
 
@@ -7271,33 +7258,16 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeFile_add_lemon_exe(makefile, lemon_dir);
     chaz_MakeFile_add_lemon_grammar(makefile, json_parser);
 
-    /*
-     * CFC also builds LEMON_EXE, so it might be built twice at the same time
-     * in parallel builds. Adding LEMON_EXE as prereq of CFC_EXE avoids this.
-     */
-    rule = chaz_MakeFile_add_rule(makefile, cfc_exe, "$(LEMON_EXE)");
-    chaz_MakeRule_add_make_command(rule, cfc_dir, NULL);
-
-    cfish_lib = chaz_SharedLib_new("cfish", cfish_version,
-                                   cfish_major_version);
-    scratch = chaz_SharedLib_filename(cfish_lib);
-    cfish_lib_filename = chaz_Util_join(dir_sep, cfr_dir, scratch, NULL);
-    free(scratch);
-
-    /*
-     * The Clownfish runtime also builds CFC, so it might be built twice at
-     * the same time in parallel builds. Add CFC as prereq to avoid this.
-     */
-    rule = chaz_MakeFile_add_rule(makefile, cfish_lib_filename, cfc_exe);
-    chaz_MakeRule_add_make_command(rule, cfr_dir, NULL);
-
-    rule = chaz_MakeFile_add_rule(makefile, "autogen", cfc_exe);
+    rule = chaz_MakeFile_add_rule(makefile, "autogen", NULL);
     chaz_MakeRule_add_prereq(rule, "$(CLOWNFISH_HEADERS)");
-    scratch = chaz_Util_join("", cfc_exe, " --source=", core_dir,
-                             " --include=", cfr_core_dir,
+    scratch = chaz_Util_join("", "cfc --source=", core_dir,
                              " --dest=autogen --header=cfc_header", NULL);
     chaz_MakeRule_add_command(rule, scratch);
-    /* TODO: Find a way to touch the autogen directory on Windows. */
+    /*
+     * TODO
+     * - Only touch autogen if cfc succeeds.
+     * - Find a way to touch the autogen directory on Windows.
+     */
     if (chaz_Make_shell_type() == CHAZ_OS_POSIX) {
         chaz_MakeRule_add_command(rule, "touch autogen");
     }
@@ -7324,7 +7294,6 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     link_flags = chaz_CC_new_cflags();
     chaz_CFlags_enable_debugging(link_flags);
-    chaz_CFlags_add_library_path(link_flags, cfr_dir);
     if (math_lib) {
         chaz_CFlags_add_external_library(link_flags, math_lib);
     }
@@ -7337,13 +7306,11 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     }
     rule = chaz_MakeFile_add_shared_lib(makefile, lib, "$(LUCY_OBJS)",
                                         link_flags);
-    chaz_MakeRule_add_prereq(rule, cfish_lib_filename);
     chaz_CFlags_destroy(link_flags);
 
     test_cflags = chaz_CC_new_cflags();
     chaz_CFlags_enable_optimization(test_cflags);
     chaz_CFlags_add_include_dir(test_cflags, autogen_inc_dir);
-    chaz_CFlags_add_library_path(test_cflags, cfr_dir);
     chaz_CFlags_add_library(test_cflags, lib);
     chaz_CFlags_add_external_library(test_cflags, "cfish");
     scratch = chaz_Util_join(dir_sep, "t", "test_lucy.c", NULL);
@@ -7351,13 +7318,12 @@ S_write_makefile(struct chaz_CLIArgs *args) {
                                           test_cflags);
     free(scratch);
     chaz_MakeRule_add_prereq(rule, lib_filename);
-    chaz_MakeRule_add_prereq(rule, cfish_lib_filename);
     chaz_CFlags_destroy(test_cflags);
 
     rule = chaz_MakeFile_add_rule(makefile, "test", test_lucy_exe);
     if (strcmp(chaz_OS_shared_lib_ext(), ".so") == 0) {
-        test_command = chaz_Util_join("", "LD_LIBRARY_PATH=.:", cfr_dir, " ",
-                                      test_lucy_exe, NULL);
+        test_command = chaz_Util_join(" ", "LD_LIBRARY_PATH=.", test_lucy_exe,
+                                      NULL);
     }
     else {
         test_command = chaz_Util_strdup(test_lucy_exe);
@@ -7409,33 +7375,24 @@ S_write_makefile(struct chaz_CLIArgs *args) {
         chaz_MakeRule_add_recursive_rm_command(clean_rule, "coverage");
     }
 
-    chaz_MakeRule_add_make_command(clean_rule, cfr_dir, "clean");
-
-    distclean_rule = chaz_MakeFile_distclean_rule(makefile);
-    chaz_MakeRule_add_make_command(distclean_rule, cfr_dir, "distclean");
+    chaz_MakeFile_distclean_rule(makefile);
 
     chaz_MakeFile_write(makefile);
 
     chaz_MakeFile_destroy(makefile);
     chaz_SharedLib_destroy(lib);
-    chaz_SharedLib_destroy(cfish_lib);
     free(core_dir);
     free(lemon_dir);
-    free(cfc_dir);
-    free(cfr_dir);
-    free(cfr_core_dir);
     free(modules_dir);
     free(snowstem_dir);
     free(snowstop_dir);
     free(ucd_dir);
     free(utf8proc_dir);
     free(json_parser);
-    free(cfc_exe);
     free(test_lucy_exe);
     free(autogen_inc_dir);
     free(snowstem_inc_dir);
     free(lib_filename);
-    free(cfish_lib_filename);
     free(test_command);
 }
 
