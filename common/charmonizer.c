@@ -7322,8 +7322,9 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     rule = chaz_MakeFile_add_rule(makefile, "test", test_lucy_exe);
     if (strcmp(chaz_OS_shared_lib_ext(), ".so") == 0) {
-        test_command = chaz_Util_join(" ", "LD_LIBRARY_PATH=.", test_lucy_exe,
-                                      NULL);
+        test_command
+            = chaz_Util_join(" ", "LD_LIBRARY_PATH=.:$$LD_LIBRARY_PATH",
+                             test_lucy_exe, NULL);
     }
     else {
         test_command = chaz_Util_strdup(test_lucy_exe);
