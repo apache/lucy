@@ -43,4 +43,12 @@ Options include
         lcov by running "make coverage".
     --disable-threads
         Disable thread support.
+    --clownfish-prefix=path
+        Specify an alternative location for Clownfish if it isn't installed
+        in a system directory.
+
+To build Lucy with an uninstalled Clownfish, run the following before
+configuration:
+
+    . ../devel/bin/setup_clownfish_env.sh clownfish-source-dir
 
