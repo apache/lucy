@@ -7032,6 +7032,10 @@ chaz_VariadicMacros_run(void) {
 /* #include "Charmonizer/Core/ConfWriterPerl.h" */
 /* #include "Charmonizer/Core/ConfWriterRuby.h" */
 
+struct lucy_CLIArgs {
+    const char *clownfish_prefix;
+};
+
 typedef struct SourceFileContext {
     chaz_MakeVar *var;
 } SourceFileContext;
@@ -7135,14 +7139,16 @@ S_cfh_file_callback(const char *dir, char *file, void *context) {
 }
 
 static void
-S_write_makefile(struct chaz_CLIArgs *args) {
+S_write_makefile(struct chaz_CLIArgs *chaz_args,
+                 struct lucy_CLIArgs *lucy_args) {
     SourceFileContext sfc;
 
-    const char *base_dir = "..";
-    const char *dir_sep  = chaz_OS_dir_sep();
-    const char *exe_ext  = chaz_OS_exe_ext();
-    const char *obj_ext  = chaz_CC_obj_ext();
-    const char *math_lib = chaz_Floats_math_library();
+    const char *base_dir     = "..";
+    const char *dir_sep      = chaz_OS_dir_sep();
+    const char *exe_ext      = chaz_OS_exe_ext();
+    const char *obj_ext      = chaz_CC_obj_ext();
+    const char *math_lib     = chaz_Floats_math_library();
+    const char *cfish_prefix = lucy_args->clownfish_prefix;
 
     char *core_dir      = chaz_Util_join(dir_sep, base_dir, "core", NULL);
     char *lemon_dir     = chaz_Util_join(dir_sep, base_dir, "lemon", NULL);
@@ -7177,6 +7183,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     chaz_SharedLib *lib;
 
+    char *cfish_lib = NULL;
     char *lib_filename;
     char *test_command;
     char *scratch;
@@ -7200,7 +7207,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_CFlags_disable_strict_aliasing(makefile_cflags);
     chaz_CFlags_compile_shared_library(makefile_cflags);
     chaz_CFlags_hide_symbols(makefile_cflags);
-    if (args->code_coverage) {
+    if (chaz_args->code_coverage) {
         chaz_CFlags_enable_code_coverage(makefile_cflags);
     }
 
@@ -7260,8 +7267,17 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     rule = chaz_MakeFile_add_rule(makefile, "autogen", NULL);
     chaz_MakeRule_add_prereq(rule, "$(CLOWNFISH_HEADERS)");
-    scratch = chaz_Util_join("", "cfc --source=", core_dir,
-                             " --dest=autogen --header=cfc_header", NULL);
+    if (cfish_prefix == NULL) {
+        scratch = chaz_Util_join("", "cfc --source=", core_dir,
+                                 " --dest=autogen --header=cfc_header", NULL);
+    }
+    else {
+        scratch = chaz_Util_join("", cfish_prefix, dir_sep, "bin", dir_sep,
+                                 "cfc --source=", core_dir, " --include=",
+                                 cfish_prefix, dir_sep, "share", dir_sep,
+                                 "clownfish", dir_sep, "include",
+                                 " --dest=autogen --header=cfc_header", NULL);
+    }
     chaz_MakeRule_add_command(rule, scratch);
     /*
      * TODO
@@ -7292,8 +7308,15 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_MakeRule_add_prereq(rule, scratch);
     free(scratch);
 
+    if (cfish_prefix) {
+        cfish_lib = chaz_Util_join(dir_sep, cfish_prefix, "lib", NULL);
+    }
+
     link_flags = chaz_CC_new_cflags();
     chaz_CFlags_enable_debugging(link_flags);
+    if (cfish_lib) {
+        chaz_CFlags_add_library_path(link_flags, cfish_lib);
+    }
     if (math_lib) {
         chaz_CFlags_add_external_library(link_flags, math_lib);
     }
@@ -7301,7 +7324,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     if (chaz_HeadCheck_check_header("pcre.h")) {
         chaz_CFlags_add_external_library(link_flags, "pcre");
     }
-    if (args->code_coverage) {
+    if (chaz_args->code_coverage) {
         chaz_CFlags_enable_code_coverage(link_flags);
     }
     rule = chaz_MakeFile_add_shared_lib(makefile, lib, "$(LUCY_OBJS)",
@@ -7312,6 +7335,9 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     chaz_CFlags_enable_optimization(test_cflags);
     chaz_CFlags_add_include_dir(test_cflags, autogen_inc_dir);
     chaz_CFlags_add_library(test_cflags, lib);
+    if (cfish_lib) {
+        chaz_CFlags_add_library_path(link_flags, cfish_lib);
+    }
     chaz_CFlags_add_external_library(test_cflags, "cfish");
     scratch = chaz_Util_join(dir_sep, "t", "test_lucy.c", NULL);
     rule = chaz_MakeFile_add_compiled_exe(makefile, test_lucy_exe, scratch,
@@ -7322,16 +7348,23 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     rule = chaz_MakeFile_add_rule(makefile, "test", test_lucy_exe);
     if (strcmp(chaz_OS_shared_lib_ext(), ".so") == 0) {
-        test_command
-            = chaz_Util_join(" ", "LD_LIBRARY_PATH=.:$$LD_LIBRARY_PATH",
-                             test_lucy_exe, NULL);
+        if (cfish_lib) {
+            test_command
+                = chaz_Util_join(" ", "LD_LIBRARY_PATH=.:", cfish_lib,
+                                 ":$$LD_LIBRARY_PATH", test_lucy_exe, NULL);
+        }
+        else {
+            test_command
+                = chaz_Util_join(" ", "LD_LIBRARY_PATH=.:$$LD_LIBRARY_PATH",
+                                 test_lucy_exe, NULL);
+        }
     }
     else {
         test_command = chaz_Util_strdup(test_lucy_exe);
     }
     chaz_MakeRule_add_command(rule, test_command);
 
-    if (args->code_coverage) {
+    if (chaz_args->code_coverage) {
         rule = chaz_MakeFile_add_rule(makefile, "coverage", test_lucy_exe);
         chaz_MakeRule_add_command(rule,
                                   "lcov"
@@ -7371,7 +7404,7 @@ S_write_makefile(struct chaz_CLIArgs *args) {
 
     chaz_MakeRule_add_recursive_rm_command(clean_rule, "autogen");
 
-    if (args->code_coverage) {
+    if (chaz_args->code_coverage) {
         chaz_MakeRule_add_rm_command(clean_rule, "lucy.info");
         chaz_MakeRule_add_recursive_rm_command(clean_rule, "coverage");
     }
@@ -7393,28 +7426,34 @@ S_write_makefile(struct chaz_CLIArgs *args) {
     free(test_lucy_exe);
     free(autogen_inc_dir);
     free(snowstem_inc_dir);
+    free(cfish_lib);
     free(lib_filename);
     free(test_command);
 }
 
 int main(int argc, const char **argv) {
     /* Initialize. */
-    struct chaz_CLIArgs args;
+    struct chaz_CLIArgs chaz_args;
+    struct lucy_CLIArgs lucy_args = { NULL };
     {
-        int result = chaz_Probe_parse_cli_args(argc, argv, &args);
+        int result = chaz_Probe_parse_cli_args(argc, argv, &chaz_args);
         if (!result) {
             chaz_Probe_die_usage();
         }
-        chaz_Probe_init(&args);
-        S_add_compiler_flags(&args);
+        chaz_Probe_init(&chaz_args);
+        S_add_compiler_flags(&chaz_args);
     }
     {
         int i;
         for (i = 0; i < argc; i++) {
-            if (strncmp(argv[i], "--disable-threads", 17) == 0) {
+            const char *arg = argv[i];
+            if (strncmp(arg, "--disable-threads", 17) == 0) {
                 chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
                 chaz_CFlags_append(extra_cflags, "-DCFISH_NOTHREADS");
                 break;
+            }
+            else if (memcmp(arg, "--clownfish-prefix=", 19) == 0) {
+                lucy_args.clownfish_prefix = arg + 19;
             }
         }
     }
@@ -7466,8 +7505,8 @@ int main(int argc, const char **argv) {
         "#endif\n\n"
     );
 
-    if (args.write_makefile) {
-        S_write_makefile(&args);
+    if (chaz_args.write_makefile) {
+        S_write_makefile(&chaz_args, &lucy_args);
     }
 
     /* Clean up. */
