@@ -356,8 +356,8 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     if (strcmp(chaz_OS_shared_lib_ext(), ".so") == 0) {
         if (cfish_lib) {
             test_command
-                = chaz_Util_join(" ", "LD_LIBRARY_PATH=.:", cfish_lib,
-                                 ":$$LD_LIBRARY_PATH", test_lucy_exe, NULL);
+                = chaz_Util_join("", "LD_LIBRARY_PATH=.:", cfish_lib,
+                                 ":$$LD_LIBRARY_PATH ", test_lucy_exe, NULL);
         }
         else {
             test_command
