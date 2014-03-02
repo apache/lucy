@@ -1,6 +1,31 @@
 Build instructions for the Apache Lucy C library
 ================================================
 
+Clownfish dependency
+--------------------
+
+IMPORTANT: The Apache Lucy C library depends on the Clownfish object system
+which must be built first. Please read this section, or your build will
+probably FAIL.
+
+Lucy needs the following Clownfish components:
+
+    * The command-line Clownfish compiler 'cfc'.
+    * The Clownfish header files of the Clownfish runtime.
+    * The 'libcfish' shared library.
+
+If you installed Clownfish to /usr/local or /usr on UNIX, no further action
+should be required. If you installed Clownfish to an alternate location,
+make sure to use the --clownfish-prefix configure option:
+
+    $ ./configure --clownfish-prefix=clownfish-install-dir
+
+It's also possible to build Lucy with an uninstalled Clownfish build from
+the Clownfish source directory. To setup the required environment variables,
+run the following from the lucy/c directory before configuration:
+
+    $ source ../devel/bin/setup_clownfish_env.sh clownfish-source-dir
+
 Building under UNIX and derivatives or Cygwin
 ---------------------------------------------
 
@@ -46,9 +71,4 @@ Options include
     --clownfish-prefix=path
         Specify an alternative location for Clownfish if it isn't installed
         in a system directory.
-
-To build Lucy with an uninstalled Clownfish, run the following before
-configuration:
-
-    . ../devel/bin/setup_clownfish_env.sh clownfish-source-dir
 
