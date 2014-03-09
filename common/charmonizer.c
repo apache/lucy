@@ -7168,6 +7168,8 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
 
     char *autogen_inc_dir
         = chaz_Util_join(dir_sep, "autogen", "include", NULL);
+    char *autogen_target
+        = chaz_Util_join(dir_sep, "autogen", "hierarchy.json", NULL);
     char *snowstem_inc_dir
         = chaz_Util_join(dir_sep, snowstem_dir, "include", NULL);
 
@@ -7265,7 +7267,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     chaz_MakeFile_add_lemon_exe(makefile, lemon_dir);
     chaz_MakeFile_add_lemon_grammar(makefile, json_parser);
 
-    rule = chaz_MakeFile_add_rule(makefile, "autogen", NULL);
+    rule = chaz_MakeFile_add_rule(makefile, autogen_target, NULL);
     chaz_MakeRule_add_prereq(rule, "$(CLOWNFISH_HEADERS)");
     if (cfish_prefix == NULL) {
         scratch = chaz_Util_join("", "cfc --source=", core_dir,
@@ -7279,27 +7281,19 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
                                  " --dest=autogen --header=cfc_header", NULL);
     }
     chaz_MakeRule_add_command(rule, scratch);
-    /*
-     * TODO
-     * - Only touch autogen if cfc succeeds.
-     * - Find a way to touch the autogen directory on Windows.
-     */
-    if (chaz_Make_shell_type() == CHAZ_OS_POSIX) {
-        chaz_MakeRule_add_command(rule, "touch autogen");
-    }
     free(scratch);
 
     /* Needed for parallel builds. */
     scratch = chaz_Util_join(dir_sep, "autogen", "source", "lucy_parcel.c",
                              NULL);
-    rule = chaz_MakeFile_add_rule(makefile, scratch, "autogen");
+    rule = chaz_MakeFile_add_rule(makefile, scratch, autogen_target);
     free(scratch);
     scratch = chaz_Util_join(dir_sep, "autogen", "source", "testlucy_parcel.c",
                              NULL);
-    rule = chaz_MakeFile_add_rule(makefile, scratch, "autogen");
+    rule = chaz_MakeFile_add_rule(makefile, scratch, autogen_target);
     free(scratch);
 
-    rule = chaz_MakeFile_add_rule(makefile, "$(LUCY_OBJS)", "autogen");
+    rule = chaz_MakeFile_add_rule(makefile, "$(LUCY_OBJS)", autogen_target);
     /*
      * The dependency is actually on JsonParser.h, but make doesn't cope
      * well with multiple output files.
@@ -7425,6 +7419,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     free(json_parser);
     free(test_lucy_exe);
     free(autogen_inc_dir);
+    free(autogen_target);
     free(snowstem_inc_dir);
     free(cfish_lib);
     free(lib_filename);
