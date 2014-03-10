@@ -519,7 +519,7 @@ SI_map(FSFileHandle *self, FSFileHandleIVARS *ivars, int64_t offset,
 }
 
 static CFISH_INLINE bool
-SI_unmap(FSFileHandle *self, char *ptr, int64_t len) {
+SI_unmap(FSFileHandle *self, char *buf, int64_t len) {
     if (buf != NULL) {
         if (!UnmapViewOfFile(buf)) {
             char *win_error = Err_win_error();
