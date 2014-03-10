@@ -1836,16 +1836,20 @@ chaz_CFlags_set_warnings_as_errors(chaz_CFlags *flags) {
 void
 chaz_CFlags_compile_shared_library(chaz_CFlags *flags) {
     const char *string;
-    if (flags->style != CHAZ_CFLAGS_STYLE_GNU
-        || strcmp(chaz_OS_shared_lib_ext(), ".dll") == 0
-       ) {
-        return;
+    if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
+        string = "/MD";
     }
-    if (chaz_OS_is_darwin()) {
-        string = "-fno-common";
+    else if (flags->style != CHAZ_CFLAGS_STYLE_GNU) {
+        const char *shlib_ext = chaz_OS_shared_lib_ext();
+        if (strcmp(shlib_ext, ".dylib") == 0) {
+            string = "-fno-common";
+        }
+        else if (strcmp(shlib_ext, ".so") == 0) {
+            string = "-fPIC";
+        }
     }
     else {
-        string = "-fPIC";
+        return;
     }
     chaz_CFlags_append(flags, string);
 }
