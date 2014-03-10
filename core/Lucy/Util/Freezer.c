@@ -216,7 +216,7 @@ Freezer_deserialize_string(String *string, InStream *instream) {
     if (size == SIZE_MAX) {
         THROW(ERR, "Can't deserialize SIZE_MAX bytes");
     }
-    char *buf = MALLOCATE(size + 1);
+    char *buf = (char*)MALLOCATE(size + 1);
     InStream_Read_Bytes(instream, buf, size);
     buf[size] = '\0';
     if (!StrHelp_utf8_valid(buf, size)) {
@@ -241,7 +241,7 @@ Freezer_serialize_bytebuf(ByteBuf *bytebuf, OutStream *outstream) {
 ByteBuf*
 Freezer_deserialize_bytebuf(ByteBuf *bytebuf, InStream *instream) {
     size_t size = InStream_Read_C32(instream);
-    char   *buf = MALLOCATE(size);
+    char   *buf = (char*)MALLOCATE(size);
     InStream_Read_Bytes(instream, buf, size);
     return BB_init_steal_bytes(bytebuf, buf, size, size);
 }

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include "testlucy_parcel.h"
+
 void
 testlucy_init_parcel() {
 }

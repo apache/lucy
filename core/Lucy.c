@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include "lucy_parcel.h"
+
 void
 lucy_init_parcel() {
 }
