@@ -24,8 +24,19 @@ use File::Spec::Functions qw( catdir catfile updir );
 # Execute from the root of the Lucy repository.
 chdir catdir( $Bin, updir(), updir() );
 
-my $CHAZ_DIR = 'charmonizer';
+my $CHAZ_DIR;
+
+if (@ARGV > 0) {
+    $CHAZ_DIR = $ARGV[0];
+}
+else {
+    # Assume that Charmonizer is in '../charmonizer'.
+    $CHAZ_DIR = catdir( updir(), 'charmonizer' );
+}
+
 my $MELD_EXE = catfile( $CHAZ_DIR, 'buildbin', 'meld.pl' );
+die("Couldn't find meld.pl at $MELD_EXE")
+    if !-e $MELD_EXE;
 
 # Clownfish compiler.
 {
