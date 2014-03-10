@@ -15,15 +15,12 @@ rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 rem See the License for the specific language governing permissions and
 rem limitations under the License.
 
-rem This also configures CFC
-cd ..\clownfish\runtime\c
-call configure.bat
-cd ..\..\..\c
-echo.
-
 echo Configuring Lucy...
 
+setlocal
+set CL=
 cl >nul 2>nul
+endlocal
 if not errorlevel 1 goto found_cl
 
 gcc -v >nul 2>nul
