@@ -22,22 +22,6 @@ $VERSION = eval $VERSION;
 # that we simulate large indexes by performing a lot of PostingPool flushes.
 Lucy::Index::PostingListWriter::set_default_mem_thresh(0x1000);
 
-package Lucy::Test::TestCharmonizer;
-our $VERSION = '0.003000';
-$VERSION = eval $VERSION;
-use Config;
-use File::Spec::Functions qw( catfile updir );
-
-sub run_tests {
-    my $name = ucfirst shift;
-    $name =~ s/_([a-z])/\u$1/g;
-    my $path = catfile( 'charmonizer', "Test$name$Config{_exe}" );
-    if ( !-e $path ) {
-        $path = catfile( updir(), $path );
-    }
-    exec $path;
-}
-
 1;
 
 __END__

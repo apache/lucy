@@ -18,22 +18,6 @@ use Clownfish;
 our $VERSION = '0.003000';
 $VERSION = eval $VERSION;
 
-package Clownfish::Test::TestCharmonizer;
-our $VERSION = '0.003000';
-$VERSION = eval $VERSION;
-use Config;
-use File::Spec::Functions qw( catfile updir );
-
-sub run_tests {
-    my $name = ucfirst shift;
-    $name =~ s/_([a-z])/\u$1/g;
-    my $path = catfile( 'charmonizer', "Test$name$Config{_exe}" );
-    if ( !-e $path ) {
-        $path = catfile( updir(), updir(), updir(), $path );
-    }
-    exec $path;
-}
-
 1;
 
 __END__

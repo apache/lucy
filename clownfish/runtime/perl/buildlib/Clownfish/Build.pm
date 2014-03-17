@@ -40,14 +40,12 @@ use Cwd qw( getcwd );
 
 my @BASE_PATH = __PACKAGE__->cf_base_path;
 
-my $CHARMONIZER_ORIG_DIR
-    = rel2abs( catdir( @BASE_PATH, updir(), updir(), 'charmonizer' ) );
-my $COMMON_SOURCE_DIR    = catdir( @BASE_PATH, 'common' );
-my $CHARMONIZER_C        = catfile( $COMMON_SOURCE_DIR, 'charmonizer.c' );
-my $CORE_SOURCE_DIR = catdir( @BASE_PATH, 'core' );
-my $CFC_DIR = catdir( @BASE_PATH, updir(), 'compiler', 'perl' );
-my $CFC_BUILD  = catfile( $CFC_DIR, 'Build' );
-my $LIB_DIR          = 'lib';
+my $COMMON_SOURCE_DIR = catdir( @BASE_PATH, 'common' );
+my $CHARMONIZER_C     = catfile( $COMMON_SOURCE_DIR, 'charmonizer.c' );
+my $CORE_SOURCE_DIR   = catdir( @BASE_PATH, 'core' );
+my $CFC_DIR           = catdir( @BASE_PATH, updir(), 'compiler', 'perl' );
+my $CFC_BUILD         = catfile( $CFC_DIR, 'Build' );
+my $LIB_DIR           = 'lib';
 
 sub new {
     my $self = shift->SUPER::new( recursive_test_files => 1, @_ );
@@ -83,23 +81,6 @@ sub _run_make {
     chdir $current_directory if $dir;
 }
 
-# Build the charmonizer tests.
-sub ACTION_charmonizer_tests {
-    my $self = shift;
-    $self->dispatch('charmony');
-    print "Building Charmonizer Tests...\n\n";
-    my $flags = join( " ",
-        $self->config('ccflags'),
-        @{ $self->extra_compiler_flags },
-        '-I' . rel2abs( getcwd() ),
-    );
-    $flags =~ s/"/\\"/g;
-    $self->_run_make(
-        dir  => $CHARMONIZER_ORIG_DIR,
-        args => [ "DEFS=$flags", "tests" ],
-    );
-}
-
 sub ACTION_cfc {
     my $self    = shift;
     my $old_dir = getcwd();
@@ -127,7 +108,7 @@ sub ACTION_copy_clownfish_includes {
 sub ACTION_clownfish {
     my $self = shift;
 
-    $self->dispatch('charmonizer_tests');
+    $self->dispatch('charmony');
     $self->dispatch('cfc');
 
     $self->SUPER::ACTION_clownfish;
@@ -288,7 +269,6 @@ sub _clean_prereq_builds {
             and die "Clownfish clean failed";
         chdir $old_dir;
     }
-    $self->_run_make( dir => $CHARMONIZER_ORIG_DIR, args => ['clean'] );
 }
 
 sub ACTION_clean {
