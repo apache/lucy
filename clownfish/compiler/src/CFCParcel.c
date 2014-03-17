@@ -300,6 +300,7 @@ S_new_from_json(const char *json, const char *path, int is_included) {
         if (strcmp(key->string, "name") == 0
             || strcmp(key->string, "nickname") == 0
             || strcmp(key->string, "version") == 0
+            || strcmp(key->string, "prerequisites") == 0
            ) {
             ;
         }
