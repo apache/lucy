@@ -1,4 +1,8 @@
 {
     "name": "TestLucy",
-    "version": "v0.3.0"
+    "version": "v0.3.0",
+    "prerequisites": {
+        "Clownfish": "v0.3.0",
+        "Lucy": "v0.3.0"
+    }
 }
