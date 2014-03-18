@@ -564,7 +564,7 @@ S_write_callbacks_c(CFCPerl *self) {
 
     for (size_t i = 0; ordered[i] != NULL; i++) {
         CFCClass *klass = ordered[i];
-        if (CFCClass_inert(klass)) { continue; }
+        if (CFCClass_included(klass) || CFCClass_inert(klass)) { continue; }
 
         CFCMethod **fresh_methods = CFCClass_fresh_methods(klass);
         for (int meth_num = 0; fresh_methods[meth_num] != NULL; meth_num++) {
