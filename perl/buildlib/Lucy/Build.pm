@@ -16,25 +16,8 @@
 use strict;
 use warnings;
 
-use lib '../clownfish/compiler/perl/blib/arch';
-use lib '../clownfish/compiler/perl/blib/lib';
-use lib 'clownfish/compiler/perl/blib/arch';
-use lib 'clownfish/compiler/perl/blib/lib';
-use lib '../clownfish/runtime/perl/blib/arch';
-use lib '../clownfish/runtime/perl/blib/lib';
-use lib 'clownfish/runtime/perl/blib/arch';
-use lib 'clownfish/runtime/perl/blib/lib';
-
 package Lucy::Build;
-
-# We want to subclass Clownfish::CFC::Perl::Build, but CFC might not be built
-# yet. So we look in 'clownfish/compiler/perl/lib' directly and cleanup @INC
-# afterwards.
-use lib '../clownfish/compiler/perl/lib';
-use lib 'clownfish/compiler/perl/lib';
 use base qw( Clownfish::CFC::Perl::Build );
-no lib '../clownfish/compiler/perl/lib';
-no lib 'clownfish/compiler/perl/lib';
 
 our $VERSION = '0.003000';
 $VERSION = eval $VERSION;
@@ -53,10 +36,6 @@ my $CHARMONIZER_C     = catfile( $COMMON_SOURCE_DIR, 'charmonizer.c' );
 my $LEMON_DIR         = catdir( @BASE_PATH, 'lemon' );
 my $LEMON_EXE_PATH    = catfile( $LEMON_DIR, "lemon$Config{_exe}" );
 my $CORE_SOURCE_DIR   = catdir( @BASE_PATH, 'core' );
-my $CFC_DIR           = catdir( @BASE_PATH, 'clownfish', 'compiler', 'perl' );
-my $CFC_BUILD         = catfile( $CFC_DIR, 'Build' );
-my $CFR_DIR           = catdir( @BASE_PATH, 'clownfish', 'runtime', 'perl' );
-my $CFR_BUILD         = catfile( $CFR_DIR, 'Build' );
 my $LIB_DIR           = 'lib';
 
 sub new {
@@ -103,32 +82,6 @@ sub ACTION_lemon {
     );
 }
 
-sub ACTION_cfc {
-    my $self    = shift;
-    my $old_dir = getcwd();
-    chdir($CFC_DIR);
-    if ( !-f 'Build' ) {
-        print "\nBuilding Clownfish compiler... \n";
-        system("$^X Build.PL");
-        system("$^X Build code");
-        print "\nFinished building Clownfish compiler.\n\n";
-    }
-    chdir($old_dir);
-}
-
-sub ACTION_cfr {
-    my $self    = shift;
-    my $old_dir = getcwd();
-    chdir($CFR_DIR);
-    if ( !-f 'Build' ) {
-        print "\nBuilding Clownfish runtime... \n";
-        system("$^X Build.PL");
-        system("$^X Build code");
-        print "\nFinished building Clownfish runtime.\n\n";
-    }
-    chdir($old_dir);
-}
-
 sub ACTION_copy_clownfish_includes {
     my $self = shift;
 
@@ -145,8 +98,6 @@ sub ACTION_clownfish {
     my $self = shift;
 
     $self->dispatch('charmony');
-    $self->dispatch('cfc');
-    $self->dispatch('cfr');
 
     $self->SUPER::ACTION_clownfish;
 }
@@ -448,29 +399,9 @@ sub ACTION_semiclean {
     }
 }
 
-# Run the cleanup targets for independent prerequisite builds.
-sub _clean_prereq_builds {
-    my $self = shift;
-    if ( -e $CFC_BUILD ) {
-        my $old_dir = getcwd();
-        chdir $CFC_DIR;
-        system("$^X Build realclean")
-            and die "Clownfish compiler clean failed";
-        chdir $old_dir;
-    }
-    if ( -e $CFR_BUILD ) {
-        my $old_dir = getcwd();
-        chdir $CFR_DIR;
-        system("$^X Build realclean")
-            and die "Clownfish runtime clean failed";
-        chdir $old_dir;
-    }
-    $self->_run_make( dir => $LEMON_DIR, args => ['clean'] );
-}
-
 sub ACTION_clean {
     my $self = shift;
-    _clean_prereq_builds($self);
+    $self->_run_make( dir => $LEMON_DIR, args => ['clean'] );
     $self->SUPER::ACTION_clean;
 }
 
