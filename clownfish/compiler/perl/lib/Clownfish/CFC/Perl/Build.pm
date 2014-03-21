@@ -201,7 +201,7 @@ sub ACTION_copy_clownfish_includes {
     my $source_dirs = $self->clownfish_params('source');
 
     for my $source_dir (@$source_dirs) {
-        my $cfh_filepaths = $self->rscan_dir( $source_dir, qr/\.cfh$/ );
+        my $cfh_filepaths = $self->rscan_dir( $source_dir, qr/\.cf[hp]$/ );
 
         for my $file (@$cfh_filepaths) {
             my $rel  = abs2rel( $file, $source_dir );
