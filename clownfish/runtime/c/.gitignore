@@ -1,9 +1,0 @@
-/Makefile
-/autogen/
-/charmonizer
-/charmony.h
-/libcfish.*.dylib
-/libcfish.dylib
-/libcfish.so
-/libcfish.so.*
-/t/test_cfish
