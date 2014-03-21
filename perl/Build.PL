@@ -40,8 +40,14 @@ my $builder = Lucy::Build->new(
     dist_author =>
         'The Apache Lucy Project <dev at lucy dot apache dot org>',
     dist_version       => '0.3.0',
-    requires           => { 'perl' => '5.8.3', },
-    configure_requires => { 'Module::Build' => 0.280801 },
+    requires           => {
+        'perl'      => '5.8.3',
+        'Clownfish' => undef,
+    },
+    configure_requires => {
+        'Module::Build'               => 0.280801,
+        'Clownfish::CFC::Perl::Build' => undef,
+    },
     build_requires     => {
         'Module::Build'      => 0.280801,
         'ExtUtils::CBuilder' => 0.21,
