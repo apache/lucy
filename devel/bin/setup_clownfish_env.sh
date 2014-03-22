@@ -56,15 +56,19 @@ then
     return 1 2>/dev/null || exit 1
 fi
 
-compiler_dir=$src_dir/compiler/c
-runtime_dir=$src_dir/runtime/c
-core_dir=$src_dir/runtime/core
+compiler_dir=$src_dir/compiler
+runtime_dir=$src_dir/runtime
 
-export PATH=`add_to_path "$PATH" "$compiler_dir"`
-export LIBRARY_PATH=`add_to_path "$LIBRARY_PATH" "$runtime_dir"`
-export CLOWNFISH_INCLUDE=`add_to_path "$CLOWNFISH_INCLUDE" "$core_dir"`
+export PATH=`add_to_path "$PATH" "$compiler_dir/c"`
+export C_INCLUDE_PATH=`add_to_path "$C_INCLUDE_PATH" "$runtime_dir/perl/xs"`
+export LIBRARY_PATH=`add_to_path "$LIBRARY_PATH" "$runtime_dir/c"`
+export CLOWNFISH_INCLUDE=`add_to_path "$CLOWNFISH_INCLUDE" "$runtime_dir/core"`
+export PERL5LIB=`add_to_path "$PERL5LIB" "$compiler_dir/perl/blib/arch"`
+export PERL5LIB=`add_to_path "$PERL5LIB" "$compiler_dir/perl/blib/lib"`
+export PERL5LIB=`add_to_path "$PERL5LIB" "$runtime_dir/perl/blib/arch"`
+export PERL5LIB=`add_to_path "$PERL5LIB" "$runtime_dir/perl/blib/lib"`
 
 if [ `uname` != Darwin ]; then
-    export LD_LIBRARY_PATH=`add_to_path "$LD_LIBRARY_PATH" "$runtime_dir"`
+    export LD_LIBRARY_PATH=`add_to_path "$LD_LIBRARY_PATH" "$runtime_dir/c"`
 fi
 
