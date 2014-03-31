@@ -21,9 +21,13 @@
  *
  * If $PREFIX points to your installation directory, it can be compiled with:
  *
+ *     $PREFIX/bin/cfc \
+ *         --include=$PREFIX/share/clownfish/include \
+ *         --parcel=Lucy \
+ *         --dest=autogen
  *     c99 \
  *         getting_started.c \
- *         -I $PREFIX/include -L $PREFIX/lib -l cfish -l lucy \
+ *         -I autogen/include -L $PREFIX/lib -l cfish -l lucy \
  *         -o getting_started
  */
 
