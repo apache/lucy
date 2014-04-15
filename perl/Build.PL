@@ -21,7 +21,6 @@ use File::Spec::Functions qw( catdir );
 use Lucy::Build;
 
 my @BASE_PATH        = Lucy::Build->cf_base_path;
-my @CF_SYS_INCLUDES  = Lucy::Build->cf_system_include_dirs;
 my $MODULES_DIR      = catdir( @BASE_PATH, 'modules' );
 my $SNOWSTEM_SRC_DIR = catdir( $MODULES_DIR, qw( analysis snowstem source ) );
 my $SNOWSTEM_INC_DIR = catdir( $SNOWSTEM_SRC_DIR, 'include' );
@@ -65,7 +64,6 @@ my $builder = Lucy::Build->new(
         $SNOWSTEM_INC_DIR,
         $UCD_INC_DIR,
         $UTF8PROC_SRC_DIR,
-        @CF_SYS_INCLUDES,
     ],
     clownfish_params => {
         source => [
@@ -74,9 +72,6 @@ my $builder = Lucy::Build->new(
             $SNOWSTEM_SRC_DIR,
             $SNOWSTOP_SRC_DIR,
             $UTF8PROC_SRC_DIR,
-        ],
-        include => [
-            @CF_SYS_INCLUDES,
         ],
     },
     extra_compiler_flags => '-DCFP_LUCY -DCFP_TESTLUCY',
