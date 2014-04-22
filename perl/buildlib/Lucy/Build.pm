@@ -93,14 +93,6 @@ sub ACTION_copy_clownfish_includes {
     $self->cf_copy_include_file( qw( Lucy Util ToolSet.h ) );
 }
 
-sub ACTION_clownfish {
-    my $self = shift;
-
-    $self->depends_on('charmony');
-
-    $self->SUPER::ACTION_clownfish;
-}
-
 sub ACTION_suppressions {
     my $self       = shift;
     my $LOCAL_SUPP = 'local.supp';
