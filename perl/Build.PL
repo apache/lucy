@@ -74,7 +74,6 @@ my $builder = Lucy::Build->new(
             $UTF8PROC_SRC_DIR,
         ],
     },
-    extra_compiler_flags => '-DCFP_LUCY -DCFP_TESTLUCY',
     add_to_cleanup => [
         qw(
             Lucy-*
