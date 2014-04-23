@@ -19,7 +19,7 @@ parcel Lucy;
 /** Single-segment PostingList.
  */
 
-class Lucy::Index::SegPostingList cnick SegPList
+class Lucy::Index::SegPostingList nickname SegPList
     inherits Lucy::Index::PostingList {
 
     PostingListReader *plist_reader;

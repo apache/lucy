@@ -32,7 +32,7 @@ parcel Lucy;
  *       already exists.
  */
 
-abstract class Lucy::Store::FileHandle cnick FH
+abstract class Lucy::Store::FileHandle nickname FH
     inherits Clownfish::Obj {
 
     String *path;

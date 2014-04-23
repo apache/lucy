@@ -30,7 +30,7 @@ parcel Lucy;
  * available filehandles.
  */
 
-class Lucy::Store::CompoundFileReader cnick CFReader
+class Lucy::Store::CompoundFileReader nickname CFReader
     inherits Lucy::Store::Folder {
 
     Folder       *real_folder;
@@ -88,7 +88,7 @@ class Lucy::Store::CompoundFileReader cnick CFReader
 
 /** DirHandle for CompoundFileReader.
  */
-class Lucy::Store::CFReaderDirHandle cnick CFReaderDH
+class Lucy::Store::CFReaderDirHandle nickname CFReaderDH
     inherits Lucy::Store::DirHandle {
 
     CompoundFileReader *cf_reader;

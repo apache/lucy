@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** DirHandle for RAMFolder.
  */
-class Lucy::Store::RAMDirHandle cnick RAMDH
+class Lucy::Store::RAMDirHandle nickname RAMDH
     inherits Lucy::Store::DirHandle {
 
     RAMFolder *folder;

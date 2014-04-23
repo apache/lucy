@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-class Lucy::Index::SortCache::NumericSortCache cnick NumSortCache
+class Lucy::Index::SortCache::NumericSortCache nickname NumSortCache
     inherits Lucy::Index::SortCache {
 
     InStream  *ord_in;
@@ -31,7 +31,7 @@ class Lucy::Index::SortCache::NumericSortCache cnick NumSortCache
     Destroy(NumericSortCache *self);
 }
 
-class Lucy::Index::SortCache::Float64SortCache cnick F64SortCache
+class Lucy::Index::SortCache::Float64SortCache nickname F64SortCache
     inherits Lucy::Index::SortCache::NumericSortCache {
 
     public inert incremented Float64SortCache*
@@ -48,7 +48,7 @@ class Lucy::Index::SortCache::Float64SortCache cnick F64SortCache
     Value(Float64SortCache *self, int32_t ord);
 }
 
-class Lucy::Index::SortCache::Float32SortCache cnick F32SortCache
+class Lucy::Index::SortCache::Float32SortCache nickname F32SortCache
     inherits Lucy::Index::SortCache::NumericSortCache {
 
     public inert incremented Float32SortCache*
@@ -65,7 +65,7 @@ class Lucy::Index::SortCache::Float32SortCache cnick F32SortCache
     Value(Float32SortCache *self, int32_t ord);
 }
 
-class Lucy::Index::SortCache::Int32SortCache cnick I32SortCache
+class Lucy::Index::SortCache::Int32SortCache nickname I32SortCache
     inherits Lucy::Index::SortCache::NumericSortCache {
 
     public inert incremented Int32SortCache*
@@ -82,7 +82,7 @@ class Lucy::Index::SortCache::Int32SortCache cnick I32SortCache
     Value(Int32SortCache *self, int32_t ord);
 }
 
-class Lucy::Index::SortCache::Int64SortCache cnick I64SortCache
+class Lucy::Index::SortCache::Int64SortCache nickname I64SortCache
     inherits Lucy::Index::SortCache::NumericSortCache {
 
     public inert incremented Int64SortCache*

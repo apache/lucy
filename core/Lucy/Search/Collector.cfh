@@ -28,7 +28,7 @@ parcel Lucy;
  * collector must take the updated information into account.
  */
 
-public abstract class Lucy::Search::Collector cnick Coll
+public abstract class Lucy::Search::Collector nickname Coll
     inherits Clownfish::Obj {
 
     SegReader *reader;
@@ -80,7 +80,7 @@ public abstract class Lucy::Search::Collector cnick Coll
  * L<BitVector|Lucy::Object::BitVector>.  It is useful for recording the
  * entire set of documents which matches a query.
  */
-public class Lucy::Search::Collector::BitCollector cnick BitColl
+public class Lucy::Search::Collector::BitCollector nickname BitColl
     inherits Lucy::Search::Collector {
 
     BitVector    *bit_vec;
@@ -105,7 +105,7 @@ public class Lucy::Search::Collector::BitCollector cnick BitColl
     Need_Score(BitCollector *self);
 }
 
-class Lucy::Search::Collector::OffsetCollector cnick OffsetColl
+class Lucy::Search::Collector::OffsetCollector nickname OffsetColl
     inherits Lucy::Search::Collector {
 
     int32_t    offset;

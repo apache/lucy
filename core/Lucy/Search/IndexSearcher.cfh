@@ -26,7 +26,7 @@ parcel Lucy;
  * L<Snapshot|Lucy::Index::Snapshot> of the index.  If an index is
  * modified, a new IndexSearcher must be opened to access the changes.
  */
-public class Lucy::Search::IndexSearcher cnick IxSearcher
+public class Lucy::Search::IndexSearcher nickname IxSearcher
     inherits Lucy::Search::Searcher {
 
     IndexReader       *reader;

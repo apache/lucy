@@ -27,7 +27,7 @@ parcel Lucy;
  * posting format, and
  * L<ScorePosting|Lucy::Index::Posting::ScorePosting>, the default.
  */
-class Lucy::Index::Posting cnick Post inherits Lucy::Util::Stepper {
+class Lucy::Index::Posting nickname Post inherits Lucy::Util::Stepper {
 
     int32_t doc_id;
 
@@ -64,7 +64,7 @@ class Lucy::Index::Posting cnick Post inherits Lucy::Util::Stepper {
                  Compiler *compiler, bool need_score);
 }
 
-abstract class Lucy::Index::Posting::PostingWriter cnick PostWriter
+abstract class Lucy::Index::Posting::PostingWriter nickname PostWriter
     inherits Lucy::Index::DataWriter {
 
     int32_t field_num;

@@ -16,7 +16,7 @@
 
 parcel TestLucy;
 
-class Lucy::Test::Object::TestI32Array cnick TestI32Arr
+class Lucy::Test::Object::TestI32Array nickname TestI32Arr
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestI32Array*

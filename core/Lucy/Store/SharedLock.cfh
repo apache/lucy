@@ -38,7 +38,7 @@ parcel Lucy;
  * SharedLock is considered fully released when no lock files with a given
  * lock name are left.
  */
-class Lucy::Store::SharedLock cnick ShLock
+class Lucy::Store::SharedLock nickname ShLock
     inherits Lucy::Store::LockFileLock {
 
     inert incremented SharedLock*

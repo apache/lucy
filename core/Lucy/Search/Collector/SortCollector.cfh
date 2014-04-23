@@ -21,7 +21,7 @@ parcel Lucy;
  * A SortCollector sorts hits according to a SortSpec, keeping the highest
  * ranking N documents in a priority queue.
  */
-class Lucy::Search::Collector::SortCollector cnick SortColl
+class Lucy::Search::Collector::SortCollector nickname SortColl
     inherits Lucy::Search::Collector {
 
     uint32_t        wanted;

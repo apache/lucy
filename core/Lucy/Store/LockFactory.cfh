@@ -24,7 +24,7 @@ parcel Lucy;
  * alternatives such as flock() are possible.
  */
 
-public class Lucy::Store::LockFactory cnick LockFact
+public class Lucy::Store::LockFactory nickname LockFact
     inherits Clownfish::Obj {
 
     Folder  *folder;

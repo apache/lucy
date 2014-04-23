@@ -16,7 +16,7 @@
 
 parcel TestLucy;
 
-class Lucy::Test::Util::TestMemoryPool cnick TestMemPool
+class Lucy::Test::Util::TestMemoryPool nickname TestMemPool
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestMemoryPool*

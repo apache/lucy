@@ -16,7 +16,7 @@
 
 parcel TestLucy;
 
-class Lucy::Test::Analysis::TestSnowballStemmer cnick TestSnowStemmer
+class Lucy::Test::Analysis::TestSnowballStemmer nickname TestSnowStemmer
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestSnowballStemmer*

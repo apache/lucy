@@ -16,7 +16,7 @@
 
 parcel TestLucy;
 
-class Lucy::Test::Index::TestSegment cnick TestSeg
+class Lucy::Test::Index::TestSegment nickname TestSeg
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestSegment*

@@ -20,7 +20,7 @@ parcel TestLucy;
  * Returns absurdly low values for Index_Interval() and Skip_Interval().
  */
 
-class Lucy::Test::Plan::TestArchitecture cnick TestArch
+class Lucy::Test::Plan::TestArchitecture nickname TestArch
     inherits Lucy::Plan::Architecture {
 
     inert incremented TestArchitecture*

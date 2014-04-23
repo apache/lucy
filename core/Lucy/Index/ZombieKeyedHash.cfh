@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Hash which creates keys allocated from a MemoryPool rather than malloc.
  */
-class Lucy::Index::SortFieldWriter::ZombieKeyedHash cnick ZKHash
+class Lucy::Index::SortFieldWriter::ZombieKeyedHash nickname ZKHash
     inherits Clownfish::Hash {
 
     MemoryPool *mem_pool;

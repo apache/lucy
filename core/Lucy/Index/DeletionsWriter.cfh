@@ -31,7 +31,7 @@ parcel Lucy;
  * merged into new ones.
  */
 
-public abstract class Lucy::Index::DeletionsWriter cnick DelWriter
+public abstract class Lucy::Index::DeletionsWriter nickname DelWriter
     inherits Lucy::Index::DataWriter {
 
     inert DeletionsWriter*
@@ -97,7 +97,7 @@ public abstract class Lucy::Index::DeletionsWriter cnick DelWriter
 
 /** Implements DeletionsWriter using BitVector files.
  */
-class Lucy::Index::DefaultDeletionsWriter cnick DefDelWriter
+class Lucy::Index::DefaultDeletionsWriter nickname DefDelWriter
     inherits Lucy::Index::DeletionsWriter {
 
     VArray        *seg_readers;

@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Private scan-only Lexicon helper class.
  */
-class Lucy::Index::RawLexicon cnick RawLex
+class Lucy::Index::RawLexicon nickname RawLex
     inherits Lucy::Index::Lexicon {
 
     InStream      *instream;

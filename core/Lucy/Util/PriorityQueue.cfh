@@ -24,7 +24,7 @@ parcel Lucy;
  * Subclasses must define the abstract method Less_Than.
  */
 
-class Lucy::Util::PriorityQueue cnick PriQ
+class Lucy::Util::PriorityQueue nickname PriQ
     inherits Clownfish::Obj {
     uint32_t   size;
     uint32_t   max_size;

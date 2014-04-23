@@ -16,7 +16,7 @@
 
 parcel TestLucy;
 
-class Lucy::Test::Store::TestCompoundFileReader cnick TestCFReader
+class Lucy::Test::Store::TestCompoundFileReader nickname TestCFReader
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestCompoundFileReader*

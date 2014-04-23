@@ -21,7 +21,7 @@ parcel Lucy;
  * Interleaves the output of multiple SegLexicons.
  */
 
-class Lucy::Index::PolyLexicon cnick PolyLex
+class Lucy::Index::PolyLexicon nickname PolyLex
     inherits Lucy::Index::Lexicon {
 
     Obj            *term;
@@ -54,7 +54,7 @@ class Lucy::Index::PolyLexicon cnick PolyLex
     Destroy(PolyLexicon *self);
 }
 
-class Lucy::Index::SegLexQueue cnick SegLexQ
+class Lucy::Index::SegLexQueue nickname SegLexQ
     inherits Lucy::Util::PriorityQueue {
 
     inert incremented SegLexQueue*

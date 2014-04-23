@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-class Lucy::Plan::NumericType cnick NumType inherits Lucy::Plan::FieldType {
+class Lucy::Plan::NumericType nickname NumType inherits Lucy::Plan::FieldType {
 
     public inert NumericType*
     init(NumericType *self);

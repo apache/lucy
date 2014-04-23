@@ -16,7 +16,7 @@
 
 parcel TestLucy;
 
-class Lucy::Test::Store::TestFSFileHandle cnick TestFSFH
+class Lucy::Test::Store::TestFSFileHandle nickname TestFSFH
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestFSFileHandle*

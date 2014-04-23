@@ -22,7 +22,7 @@ parcel Lucy;
  * data to LexiconWriter.
  */
 
-class Lucy::Index::PostingListWriter cnick PListWriter
+class Lucy::Index::PostingListWriter nickname PListWriter
     inherits Lucy::Index::DataWriter {
 
     LexiconWriter   *lex_writer;

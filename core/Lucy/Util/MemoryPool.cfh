@@ -26,7 +26,7 @@ parcel Lucy;
  * class to specific applications.
  */
 
-class Lucy::Util::MemoryPool cnick MemPool
+class Lucy::Util::MemoryPool nickname MemPool
     inherits Clownfish::Obj {
 
     uint32_t     arena_size;

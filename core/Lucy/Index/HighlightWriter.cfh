@@ -19,7 +19,7 @@ parcel Lucy;
 /**  Add highlighting data to index.
  */
 
-class Lucy::Index::HighlightWriter cnick HLWriter
+class Lucy::Index::HighlightWriter nickname HLWriter
     inherits Lucy::Index::DataWriter {
 
     OutStream *ix_out;

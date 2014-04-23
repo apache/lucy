@@ -40,7 +40,7 @@ parcel Lucy;
  *
  *
  */
-public class Lucy::Search::QueryParser cnick QParser
+public class Lucy::Search::QueryParser nickname QParser
     inherits Clownfish::Obj {
 
     Schema     *schema;

@@ -16,7 +16,7 @@
 
 parcel TestLucy;
 
-class Lucy::Test::Plan::TestFieldType cnick TestFType
+class Lucy::Test::Plan::TestFieldType nickname TestFType
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestFieldType*

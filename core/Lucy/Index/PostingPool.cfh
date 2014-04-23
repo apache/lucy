@@ -19,7 +19,7 @@ parcel Lucy;
 /**
  * External sorter for raw postings.
  */
-class Lucy::Index::PostingPool cnick PostPool
+class Lucy::Index::PostingPool nickname PostPool
     inherits Lucy::Util::SortExternal {
 
     Schema            *schema;

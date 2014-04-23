@@ -19,7 +19,7 @@ parcel TestLucy;
 /** Test case object for QueryParser unit tests.
  */
 
-class Lucy::Test::Search::TestQueryParser cnick TestQP
+class Lucy::Test::Search::TestQueryParser nickname TestQP
     inherits Clownfish::Obj {
 
     String  *query_string;

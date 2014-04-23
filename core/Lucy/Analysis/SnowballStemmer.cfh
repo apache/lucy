@@ -25,7 +25,7 @@ parcel Lucy;
  * 'horsing'.
  */
 
-public class Lucy::Analysis::SnowballStemmer cnick SnowStemmer
+public class Lucy::Analysis::SnowballStemmer nickname SnowStemmer
     inherits Lucy::Analysis::Analyzer {
 
     void *snowstemmer;

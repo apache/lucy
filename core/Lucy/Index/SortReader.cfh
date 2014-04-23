@@ -37,7 +37,7 @@ abstract class Lucy::Index::SortReader
 
 }
 
-class Lucy::Index::DefaultSortReader cnick DefSortReader
+class Lucy::Index::DefaultSortReader nickname DefSortReader
     inherits Lucy::Index::SortReader {
 
     Hash *caches;

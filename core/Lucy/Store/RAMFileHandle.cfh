@@ -21,7 +21,7 @@ parcel Lucy;
  * RAM-based implementation of FileHandle, to be used in conjunction with
  * RAMFolder.
  */
-class Lucy::Store::RAMFileHandle cnick RAMFH
+class Lucy::Store::RAMFileHandle nickname RAMFH
     inherits Lucy::Store::FileHandle {
 
     RAMFile *ram_file;

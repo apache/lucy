@@ -19,7 +19,7 @@ parcel Lucy;
 /** Single-segment Lexicon.
  */
 
-class Lucy::Index::SegLexicon cnick SegLex
+class Lucy::Index::SegLexicon nickname SegLex
     inherits Lucy::Index::Lexicon {
 
     Segment         *segment;

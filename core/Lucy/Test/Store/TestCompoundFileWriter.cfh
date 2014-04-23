@@ -16,7 +16,7 @@
 
 parcel TestLucy;
 
-class Lucy::Test::Store::TestCompoundFileWriter cnick TestCFWriter
+class Lucy::Test::Store::TestCompoundFileWriter nickname TestCFWriter
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestCompoundFileWriter*

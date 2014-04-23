@@ -28,7 +28,7 @@ parcel Lucy;
  * boost based on the visual size and weight of the marked up text: H1
  * blocks get the greatest weight, H2 blocks almost as much, etc.
  */
-class Lucy::Index::Posting::RichPosting cnick RichPost
+class Lucy::Index::Posting::RichPosting nickname RichPost
     inherits Lucy::Index::Posting::ScorePosting {
 
     float  *prox_boosts;
@@ -60,7 +60,7 @@ class Lucy::Index::Posting::RichPosting cnick RichPost
                  Compiler *compiler, bool need_score);
 }
 
-class Lucy::Index::Posting::RichPostingMatcher cnick RichPostMatcher
+class Lucy::Index::Posting::RichPostingMatcher nickname RichPostMatcher
     inherits Lucy::Index::Posting::ScorePostingMatcher {
 
     inert RichPostingMatcher*

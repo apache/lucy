@@ -19,7 +19,7 @@ parcel TestLucy;
 /** Tests for logical structure of Query objects output by QueryParser.
  */
 
-class Lucy::Test::Search::TestQueryParserLogic cnick TestQPLogic
+class Lucy::Test::Search::TestQueryParserLogic nickname TestQPLogic
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestQueryParserLogic*

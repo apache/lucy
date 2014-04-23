@@ -16,7 +16,7 @@
 
 parcel Lucy;
 
-class Lucy::Index::RawPostingList cnick RawPList
+class Lucy::Index::RawPostingList nickname RawPList
     inherits Lucy::Index::PostingList {
 
     Posting       *posting;

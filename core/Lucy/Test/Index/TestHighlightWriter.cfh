@@ -16,7 +16,7 @@
 
 parcel TestLucy;
 
-class Lucy::Test::Index::TestHighlightWriter cnick TestHLWriter
+class Lucy::Test::Index::TestHighlightWriter nickname TestHLWriter
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestHighlightWriter*

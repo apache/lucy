@@ -32,7 +32,7 @@ syn keyword cfishType void
 syn keyword cfishType class
 syn keyword cfishType parcel
 
-syn keyword cfishAttribute inherits cnick
+syn keyword cfishAttribute inherits nickname
 
 syn keyword cfishModifier public private
 syn keyword cfishModifier abstract inert const final

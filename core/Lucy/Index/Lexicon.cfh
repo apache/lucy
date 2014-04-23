@@ -31,7 +31,7 @@ parcel Lucy;
  *     three
  */
 
-public class Lucy::Index::Lexicon cnick Lex inherits Clownfish::Obj {
+public class Lucy::Index::Lexicon nickname Lex inherits Clownfish::Obj {
 
     String *field;
 

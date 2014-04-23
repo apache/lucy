@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Utilities for parsing, interpreting and generating index file names.
  */
-inert class Lucy::Util::IndexFileNames cnick IxFileNames {
+inert class Lucy::Util::IndexFileNames nickname IxFileNames {
 
     /** Skip past the first instance of an underscore in the String, then
      * attempt to decode a base 36 number.  For example, "snapshot_5.json"

@@ -24,7 +24,7 @@ parcel Lucy;
  * See L<Lucy::Docs::IRTheory> for definitions of "posting" and "posting
  * list".
  */
-public class Lucy::Index::PostingList cnick PList
+public class Lucy::Index::PostingList nickname PList
     inherits Lucy::Search::Matcher {
 
     public inert PostingList*

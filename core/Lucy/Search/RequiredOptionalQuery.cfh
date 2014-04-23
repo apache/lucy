@@ -23,7 +23,7 @@ parcel Lucy;
  * its score is passed along; when both match, the scores are summed.
  */
 
-public class Lucy::Search::RequiredOptionalQuery cnick ReqOptQuery
+public class Lucy::Search::RequiredOptionalQuery nickname ReqOptQuery
     inherits Lucy::Search::PolyQuery {
 
     inert incremented RequiredOptionalQuery*
@@ -64,7 +64,7 @@ public class Lucy::Search::RequiredOptionalQuery cnick ReqOptQuery
     Equals(RequiredOptionalQuery *self, Obj *other);
 }
 
-class Lucy::Search::RequiredOptionalCompiler cnick ReqOptCompiler
+class Lucy::Search::RequiredOptionalCompiler nickname ReqOptCompiler
     inherits Lucy::Search::PolyCompiler {
 
     inert incremented RequiredOptionalCompiler*

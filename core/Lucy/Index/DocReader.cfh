@@ -69,7 +69,7 @@ class Lucy::Index::PolyDocReader inherits Lucy::Index::DocReader {
     Destroy(PolyDocReader *self);
 }
 
-class Lucy::Index::DefaultDocReader cnick DefDocReader
+class Lucy::Index::DefaultDocReader nickname DefDocReader
     inherits Lucy::Index::DocReader {
 
     InStream    *dat_in;

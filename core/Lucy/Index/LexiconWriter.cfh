@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Writer for a term dictionary.
  */
-class Lucy::Index::LexiconWriter cnick LexWriter
+class Lucy::Index::LexiconWriter nickname LexWriter
     inherits Lucy::Index::DataWriter {
 
     TermStepper      *term_stepper;

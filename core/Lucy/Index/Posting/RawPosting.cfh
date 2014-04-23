@@ -36,7 +36,7 @@ parcel Lucy;
  * file once the after the doc id is written.
  */
 
-class Lucy::Index::RawPosting cnick RawPost
+class Lucy::Index::RawPosting nickname RawPost
     inherits Lucy::Index::Posting {
 
     uint32_t  freq;
@@ -65,7 +65,7 @@ class Lucy::Index::RawPosting cnick RawPost
     Destroy(RawPosting *self);
 }
 
-class Lucy::Index::Posting::RawPostingWriter cnick RawPostWriter
+class Lucy::Index::Posting::RawPostingWriter nickname RawPostWriter
     inherits Lucy::Index::Posting::PostingWriter {
 
     OutStream *outstream;

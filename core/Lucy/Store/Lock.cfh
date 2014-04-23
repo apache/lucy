@@ -110,7 +110,7 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
     Destroy(Lock *self);
 }
 
-class Lucy::Store::LockFileLock cnick LFLock
+class Lucy::Store::LockFileLock nickname LFLock
     inherits Lucy::Store::Lock {
 
     String *link_path;

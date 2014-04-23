@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** File system FileHandle.
  */
-class Lucy::Store::FSFileHandle cnick FSFH
+class Lucy::Store::FSFileHandle nickname FSFH
     inherits Lucy::Store::FileHandle {
 
     int      fd;

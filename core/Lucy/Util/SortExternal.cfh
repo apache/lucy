@@ -46,7 +46,7 @@ __END_C__
  * SortExternal object then interleaves multiple sorted streams to produce a
  * single unified stream of sorted values.
  */
-abstract class Lucy::Util::SortExternal cnick SortEx
+abstract class Lucy::Util::SortExternal nickname SortEx
     inherits Clownfish::Obj {
 
     uint8_t       *cache;

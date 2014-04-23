@@ -19,7 +19,7 @@ parcel Lucy;
 /** Intersect required and optional Matchers.
  */
 
-class Lucy::Search::RequiredOptionalMatcher cnick ReqOptMatcher
+class Lucy::Search::RequiredOptionalMatcher nickname ReqOptMatcher
     inherits Lucy::Search::PolyMatcher {
 
     Matcher      *req_matcher;

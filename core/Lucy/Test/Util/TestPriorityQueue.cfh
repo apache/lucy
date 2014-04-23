@@ -16,7 +16,7 @@
 
 parcel TestLucy;
 
-class Lucy::Test::Util::NumPriorityQueue cnick NumPriQ
+class Lucy::Test::Util::NumPriorityQueue nickname NumPriQ
     inherits Lucy::Util::PriorityQueue {
 
     inert incremented NumPriorityQueue*
@@ -26,7 +26,7 @@ class Lucy::Test::Util::NumPriorityQueue cnick NumPriQ
     Less_Than(NumPriorityQueue *self, Obj *a, Obj *b);
 }
 
-class Lucy::Test::Util::TestPriorityQueue cnick TestPriQ
+class Lucy::Test::Util::TestPriorityQueue nickname TestPriQ
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestPriorityQueue*

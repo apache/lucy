@@ -25,7 +25,7 @@ parcel Lucy;
  * L<SegWriter|Lucy::Index::SegWriter> and
  * L<SegReader|Lucy::Index::SegReader>.
  */
-public class Lucy::Plan::Architecture cnick Arch inherits Clownfish::Obj {
+public class Lucy::Plan::Architecture nickname Arch inherits Clownfish::Obj {
 
     public inert incremented Architecture*
     new();

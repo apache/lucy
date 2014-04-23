@@ -19,7 +19,7 @@ parcel Lucy;
 /** A collection of TermVectors.
  */
 
-class Lucy::Index::DocVector cnick DocVec
+class Lucy::Index::DocVector nickname DocVec
     inherits Clownfish::Obj {
 
     Hash    *field_bufs;

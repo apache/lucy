@@ -19,7 +19,7 @@ parcel TestLucy;
 /** Tests for logical structure of Query objects output by QueryParser.
  */
 
-class Lucy::Test::Search::TestQueryParserSyntax cnick TestQPSyntax
+class Lucy::Test::Search::TestQueryParserSyntax nickname TestQPSyntax
     inherits Clownfish::TestHarness::TestBatch {
 
     inert incremented TestQueryParserSyntax*

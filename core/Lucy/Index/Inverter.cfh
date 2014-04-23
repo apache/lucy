@@ -141,7 +141,7 @@ class Lucy::Index::Inverter inherits Clownfish::Obj {
  * Inverter needs to check certain field characteristics frequently.  Since
  * field definitions are unchanging, we cache them in an InverterEntry object.
  */
-final class Lucy::Index::Inverter::InverterEntry cnick InvEntry
+final class Lucy::Index::Inverter::InverterEntry nickname InvEntry
     inherits Clownfish::Obj {
 
     int32_t      field_num;

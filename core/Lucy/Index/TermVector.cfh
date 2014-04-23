@@ -19,7 +19,7 @@ parcel Lucy;
 /** Term freq and positional data.
  */
 
-class Lucy::Index::TermVector cnick TV
+class Lucy::Index::TermVector nickname TV
     inherits Clownfish::Obj {
 
     String *field;

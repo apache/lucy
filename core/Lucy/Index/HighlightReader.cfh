@@ -20,7 +20,7 @@ parcel Lucy;
  *
  * Read segment data used for creating highlighted excerpts.
  */
-class Lucy::Index::HighlightReader cnick HLReader
+class Lucy::Index::HighlightReader nickname HLReader
     inherits Lucy::Index::DataReader {
 
     inert HighlightReader*
@@ -37,7 +37,7 @@ class Lucy::Index::HighlightReader cnick HLReader
     Aggregator(HighlightReader *self, VArray *readers, I32Array *offsets);
 }
 
-class Lucy::Index::PolyHighlightReader cnick PolyHLReader
+class Lucy::Index::PolyHighlightReader nickname PolyHLReader
     inherits Lucy::Index::HighlightReader {
 
     VArray   *readers;
@@ -59,7 +59,7 @@ class Lucy::Index::PolyHighlightReader cnick PolyHLReader
     Destroy(PolyHighlightReader *self);
 }
 
-class Lucy::Index::DefaultHighlightReader cnick DefHLReader
+class Lucy::Index::DefaultHighlightReader nickname DefHLReader
     inherits Lucy::Index::HighlightReader {
 
     InStream *ix_in;

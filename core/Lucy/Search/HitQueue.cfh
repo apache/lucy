@@ -22,7 +22,7 @@ parcel Lucy;
  * float to the top of the queue and poor matches fall out the bottom.
  */
 
-class Lucy::Search::HitQueue cnick HitQ
+class Lucy::Search::HitQueue nickname HitQ
     inherits Lucy::Util::PriorityQueue {
 
     FieldType     **field_types;

@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** File system DirHandle.
  */
-class Lucy::Store::FSDirHandle cnick FSDH
+class Lucy::Store::FSDirHandle nickname FSDH
     inherits Lucy::Store::DirHandle {
 
     void    *sys_dirhandle;

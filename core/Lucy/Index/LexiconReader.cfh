@@ -20,7 +20,7 @@ parcel Lucy;
  *
  * LexiconReader reads term dictionary information.
  */
-public abstract class Lucy::Index::LexiconReader cnick LexReader
+public abstract class Lucy::Index::LexiconReader nickname LexReader
     inherits Lucy::Index::DataReader {
 
     inert LexiconReader*
@@ -58,7 +58,7 @@ public abstract class Lucy::Index::LexiconReader cnick LexReader
     Aggregator(LexiconReader *self, VArray *readers, I32Array *offsets);
 }
 
-class Lucy::Index::PolyLexiconReader cnick PolyLexReader
+class Lucy::Index::PolyLexiconReader nickname PolyLexReader
     inherits Lucy::Index::LexiconReader {
 
     VArray   *readers;
@@ -83,7 +83,7 @@ class Lucy::Index::PolyLexiconReader cnick PolyLexReader
     Destroy(PolyLexiconReader *self);
 }
 
-class Lucy::Index::DefaultLexiconReader cnick DefLexReader
+class Lucy::Index::DefaultLexiconReader nickname DefLexReader
     inherits Lucy::Index::LexiconReader {
 
     VArray *lexicons;

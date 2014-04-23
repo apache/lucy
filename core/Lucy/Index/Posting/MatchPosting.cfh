@@ -23,7 +23,7 @@ parcel Lucy;
  * category, but don't want the match to contribute to the document score, use
  * MatchPosting for the field.
  */
-class Lucy::Index::Posting::MatchPosting cnick MatchPost
+class Lucy::Index::Posting::MatchPosting nickname MatchPost
     inherits Lucy::Index::Posting {
 
     Similarity *sim;
@@ -62,7 +62,7 @@ class Lucy::Index::Posting::MatchPosting cnick MatchPost
                  Compiler *compiler, bool need_score);
 }
 
-class Lucy::Index::Posting::MatchPostingMatcher cnick MatchPostMatcher
+class Lucy::Index::Posting::MatchPostingMatcher nickname MatchPostMatcher
     inherits Lucy::Search::TermMatcher {
 
     inert MatchPostingMatcher*
@@ -73,7 +73,7 @@ class Lucy::Index::Posting::MatchPostingMatcher cnick MatchPostMatcher
     Score(MatchPostingMatcher *self);
 }
 
-class Lucy::Index::Posting::MatchPostingWriter cnick MatchPostWriter
+class Lucy::Index::Posting::MatchPostingWriter nickname MatchPostWriter
     inherits Lucy::Index::Posting::PostingWriter {
 
     OutStream *outstream;
@@ -101,7 +101,7 @@ class Lucy::Index::Posting::MatchPostingWriter cnick MatchPostWriter
 }
 
 class Lucy::Index::Posting::MatchPosting::MatchTermInfoStepper
-    cnick MatchTInfoStepper inherits Lucy::Index::TermStepper {
+    nickname MatchTInfoStepper inherits Lucy::Index::TermStepper {
 
     int32_t skip_interval;
 

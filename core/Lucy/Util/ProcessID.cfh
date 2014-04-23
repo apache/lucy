@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Provide platform-compatible process ID functions.
  */
-inert class Lucy::Util::ProcessID cnick PID {
+inert class Lucy::Util::ProcessID nickname PID {
 
     /** Return the ID for the current process.
      */
