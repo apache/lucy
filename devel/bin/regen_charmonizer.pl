@@ -38,30 +38,9 @@ my $MELD_EXE = catfile( $CHAZ_DIR, 'buildbin', 'meld.pl' );
 die("Couldn't find meld.pl at $MELD_EXE")
     if !-e $MELD_EXE;
 
-# Clownfish compiler.
-{
-    my $main = catfile(qw( clownfish compiler common charmonizer.main ));
-    my $out  = $main;
-    $out =~ s/\.main/.c/ or die "no match";
-    unlink $out;
-    system( $MELD_EXE, "--probes=", "--files=$main", "--out=$out" );
-}
-
-# Clownfish runtime.
-{
-    my $main = catfile(qw( clownfish runtime common charmonizer.main ));
-    my $out  = $main;
-    $out =~ s/\.main/.c/ or die "no match";
-    unlink $out;
-    system( $MELD_EXE, '--probes=', "--files=$main", "--out=$out" );
-}
-
-# Lucy core.
-{
-    my $main = catfile(qw( common charmonizer.main ));
-    my $out  = $main;
-    $out =~ s/\.main/.c/ or die "no match";
-    unlink $out;
-    system( $MELD_EXE, '--probes=', "--files=$main", "--out=$out" );
-}
+my $main = catfile(qw( common charmonizer.main ));
+my $out  = $main;
+$out =~ s/\.main/.c/ or die "no match";
+unlink $out;
+system( $MELD_EXE, '--probes=', "--files=$main", "--out=$out" );
 
