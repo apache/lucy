@@ -157,24 +157,3 @@ MemPool_Release_All_IMP(MemoryPool *self) {
     ivars->consumed = 0;
 }
 
-void
-MemPool_Eat_IMP(MemoryPool *self, MemoryPool *other) {
-    MemoryPoolIVARS *const ivars = MemPool_IVARS(self);
-    MemoryPoolIVARS *const ovars = MemPool_IVARS(other);
-    if (ivars->buf != NULL) {
-        THROW(ERR, "Memory pool is not empty");
-    }
-
-    // Move active arenas from other to self.
-    for (int32_t i = 0; i <= ovars->tick; i++) {
-        ByteBuf *arena = (ByteBuf*)VA_Shift(ovars->arenas);
-        // Maybe displace existing arena.
-        VA_Store(ivars->arenas, i, (Obj*)arena);
-    }
-    ivars->tick     = ovars->tick;
-    ivars->last_buf = ovars->last_buf;
-    ivars->buf      = ovars->buf;
-    ivars->limit    = ovars->limit;
-}
-
-

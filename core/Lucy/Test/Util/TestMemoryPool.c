@@ -31,12 +31,10 @@ TestMemPool_new() {
 
 void
 TestMemPool_Run_IMP(TestMemoryPool *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 7);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 5);
 
     MemoryPool *mem_pool = MemPool_new(0);
-    MemoryPool *other    = MemPool_new(0);
     MemoryPoolIVARS *const ivars = MemPool_IVARS(mem_pool);
-    MemoryPoolIVARS *const ovars = MemPool_IVARS(other);
     char *ptr_a, *ptr_b;
 
     ptr_a = (char*)MemPool_Grab(mem_pool, 10);
@@ -57,15 +55,7 @@ TestMemPool_Run_IMP(TestMemoryPool *self, TestBatchRunner *runner) {
     TEST_INT_EQ(runner, MemPool_Get_Consumed(mem_pool), 0,
                 "Release_All() resets `consumed`");
 
-    ptr_a = (char*)MemPool_Grab(mem_pool, 20);
-    ptr_b = (char*)MemPool_Grab(other, 20);
-    MemPool_Release_All(other);
-    MemPool_Eat(other, mem_pool);
-    TEST_TRUE(runner, ovars->buf == ivars->buf, "Eat");
-    TEST_TRUE(runner, ovars->buf != NULL, "Eat");
-
     DECREF(mem_pool);
-    DECREF(other);
 }
 
 
