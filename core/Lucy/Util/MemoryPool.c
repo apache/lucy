@@ -148,10 +148,13 @@ MemPool_Resize_IMP(MemoryPool *self, void *ptr, size_t new_amount) {
 void
 MemPool_Release_All_IMP(MemoryPool *self) {
     MemoryPoolIVARS *const ivars = MemPool_IVARS(self);
+    DECREF(ivars->arenas);
+    ivars->arenas   = VA_new(16);
     ivars->tick     = -1;
     ivars->buf      = NULL;
     ivars->last_buf = NULL;
     ivars->limit    = NULL;
+    ivars->consumed = 0;
 }
 
 void

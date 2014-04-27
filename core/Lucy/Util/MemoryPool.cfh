@@ -57,7 +57,7 @@ class Lucy::Util::MemoryPool nickname MemPool
     void
     Resize(MemoryPool *self, void *ptr, size_t revised_amount);
 
-    /** Tell the pool to consider all previous allocations released.
+    /** Bulk free all previous allocations.
      */
     void
     Release_All(MemoryPool *self);
