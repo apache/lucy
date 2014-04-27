@@ -24,7 +24,7 @@
 
 void
 TestMemPool_run_tests() {
-    TestBatch  *batch     = TestBatch_new(4);
+    TestBatch  *batch     = TestBatch_new(7);
     MemoryPool *mem_pool  = MemPool_new(0);
     MemoryPool *other     = MemPool_new(0);
     char *ptr_a, *ptr_b;
@@ -32,17 +32,25 @@ TestMemPool_run_tests() {
     TestBatch_Plan(batch);
 
     ptr_a = (char*)MemPool_Grab(mem_pool, 10);
-    strcpy(ptr_a, "foo");
-    MemPool_Release_All(mem_pool);
-
+    size_t expected = sizeof(void*) == 8 ? 16 : 12;
+    TEST_INT_EQ(batch, MemPool_Get_Consumed(mem_pool), expected,
+                "Round up allocation to word size");
     ptr_b = (char*)MemPool_Grab(mem_pool, 10);
-    TEST_STR_EQ(batch, ptr_b, "foo", "Recycle RAM on Release_All");
+    TEST_INT_EQ(batch, MemPool_Get_Consumed(mem_pool), expected * 2,
+                "Accumulate consumed.");
 
     ptr_a = mem_pool->buf;
     MemPool_Resize(mem_pool, ptr_b, 6);
-    TEST_TRUE(batch, mem_pool->buf < ptr_a, "Resize");
+    TEST_TRUE(batch, mem_pool->buf < ptr_a, "Resize adjusts next allocation");
+    TEST_TRUE(batch, MemPool_Get_Consumed(mem_pool) < expected * 2,
+                "Resize() adjusts `consumed`");
 
-    ptr_a = (char*)MemPool_Grab(other, 20);
+    MemPool_Release_All(mem_pool);
+    TEST_INT_EQ(batch, MemPool_Get_Consumed(mem_pool), 0,
+                "Release_All() resets `consumed`");
+
+    ptr_a = (char*)MemPool_Grab(mem_pool, 20);
+    ptr_b = (char*)MemPool_Grab(other, 20);
     MemPool_Release_All(other);
     MemPool_Eat(other, mem_pool);
     TEST_TRUE(batch, other->buf == mem_pool->buf, "Eat");

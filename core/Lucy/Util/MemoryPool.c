@@ -142,10 +142,13 @@ MemPool_resize(MemoryPool *self, void *ptr, size_t new_amount) {
 
 void
 MemPool_release_all(MemoryPool *self) {
+    DECREF(self->arenas);
+    self->arenas   = VA_new(16);
     self->tick     = -1;
     self->buf      = NULL;
     self->last_buf = NULL;
     self->limit    = NULL;
+    self->consumed = 0;
 }
 
 void
