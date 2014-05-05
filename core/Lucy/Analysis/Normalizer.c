@@ -148,9 +148,9 @@ Normalizer_load(Normalizer *self, Obj *dump) {
     Obj *obj = Hash_Fetch_Str(source, "normalization_form", 18);
     CharBuf *form = (CharBuf*)CERTIFY(obj, CHARBUF);
     obj = Hash_Fetch_Str(source, "case_fold", 9);
-    bool_t case_fold = Bool_Get_Value((BoolNum*)CERTIFY(obj, BOOLNUM));
+    bool_t case_fold = Obj_To_Bool(CERTIFY(obj, OBJ));
     obj = Hash_Fetch_Str(source, "strip_accents", 13);
-    bool_t strip_accents = Bool_Get_Value((BoolNum*)CERTIFY(obj, BOOLNUM));
+    bool_t strip_accents = Obj_To_Bool(CERTIFY(obj, OBJ));
 
     return Normalizer_init(loaded, form, case_fold, strip_accents);
 }
