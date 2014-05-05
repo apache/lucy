@@ -154,9 +154,9 @@ Normalizer_Load_IMP(Normalizer *self, Obj *dump) {
     Obj *obj = Hash_Fetch_Utf8(source, "normalization_form", 18);
     String *form = (String*)CERTIFY(obj, STRING);
     obj = Hash_Fetch_Utf8(source, "case_fold", 9);
-    bool case_fold = Bool_Get_Value((BoolNum*)CERTIFY(obj, BOOLNUM));
+    bool case_fold = Obj_To_Bool(CERTIFY(obj, OBJ));
     obj = Hash_Fetch_Utf8(source, "strip_accents", 13);
-    bool strip_accents = Bool_Get_Value((BoolNum*)CERTIFY(obj, BOOLNUM));
+    bool strip_accents = Obj_To_Bool(CERTIFY(obj, OBJ));
 
     return Normalizer_init(loaded, form, case_fold, strip_accents);
 }
