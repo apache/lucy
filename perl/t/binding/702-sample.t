@@ -27,8 +27,8 @@ my $indexer_pl_orig_path = catfile(qw( sample indexer.pl ));
 # because search.cgi runs with taint mode and environment vars are tainted.
 my $blib_arch = catdir(qw( blib arch ));
 my $blib_lib  = catdir(qw( blib lib ));
-my @inc_dirs  = map {"use lib '$_';"} ( @INC, $blib_arch, $blib_lib );
-my $use_dirs  = join( "\n", @inc_dirs );
+my @inc_dirs = map { "use lib '$_';" } ( reverse(@INC), $blib_arch, $blib_lib );
+my $use_dirs = join( "\n", @inc_dirs );
 
 for my $filename (qw( search.cgi indexer.pl )) {
     my $orig_path = catfile( 'sample', $filename );
