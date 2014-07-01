@@ -141,33 +141,13 @@ SnowStop_gen_stoplist(String *language) {
     }
     size_t num_stopwords = 0;
     for (uint32_t i = 0; words[i] != NULL; i++) { num_stopwords++; }
-    NoCloneHash *stoplist = NoCloneHash_new(num_stopwords);
+    Hash *stoplist = Hash_new(num_stopwords);
     for (uint32_t i = 0; words[i] != NULL; i++) {
         char *word = (char*)words[i];
         String *stop = Str_new_wrap_trusted_utf8(word, strlen(word));
-        NoCloneHash_Store(stoplist, (Obj*)stop, (Obj*)Str_newf(""));
+        Hash_Store(stoplist, (Obj*)stop, (Obj*)CFISH_TRUE);
         DECREF(stop);
     }
     return (Hash*)stoplist;
-}
-
-/***************************************************************************/
-
-NoCloneHash*
-NoCloneHash_new(uint32_t capacity) {
-    NoCloneHash *self = (NoCloneHash*)VTable_Make_Obj(NOCLONEHASH);
-    return NoCloneHash_init(self, capacity);
-}
-
-NoCloneHash*
-NoCloneHash_init(NoCloneHash *self, uint32_t capacity) {
-    return (NoCloneHash*)Hash_init((Hash*)self, capacity);
-}
-
-Obj*
-NoCloneHash_Make_Key_IMP(NoCloneHash *self, Obj *key, int32_t hash_sum) {
-    UNUSED_VAR(self);
-    UNUSED_VAR(hash_sum);
-    return INCREF(key);
 }
 

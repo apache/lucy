@@ -105,14 +105,3 @@ public class Lucy::Analysis::SnowballStopFilter nickname SnowStop
     Destroy(SnowballStopFilter *self);
 }
 
-class Lucy::Analysis::SnowballStopFilter::NoCloneHash inherits Clownfish::Hash {
-    inert incremented NoCloneHash*
-    new(uint32_t capacity = 0);
-
-    inert NoCloneHash*
-    init(NoCloneHash *self, uint32_t capacity = 0);
-
-    public incremented Obj*
-    Make_Key(NoCloneHash *self, Obj *key, int32_t hash_sum);
-}
-
