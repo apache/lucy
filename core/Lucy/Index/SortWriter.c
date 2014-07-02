@@ -15,6 +15,7 @@
  */
 
 #define C_LUCY_SORTWRITER
+#define C_LUCY_COUNTER
 #include "Lucy/Util/ToolSet.h"
 #include <math.h>
 
@@ -63,6 +64,7 @@ SortWriter_init(SortWriter *self, Schema *schema, Snapshot *snapshot,
     ivars->temp_ix_out     = NULL;
     ivars->temp_dat_out    = NULL;
     ivars->mem_pool        = MemPool_new(0);
+    ivars->counter         = Counter_new();
     ivars->mem_thresh      = default_mem_thresh;
     ivars->flush_at_finish = false;
 
@@ -80,6 +82,7 @@ SortWriter_Destroy_IMP(SortWriter *self) {
     DECREF(ivars->temp_ix_out);
     DECREF(ivars->temp_dat_out);
     DECREF(ivars->mem_pool);
+    DECREF(ivars->counter);
     SUPER_DESTROY(self, SORTWRITER);
 }
 
@@ -123,7 +126,7 @@ S_lazy_init_field_writer(SortWriter *self, int32_t field_num) {
         String *field = Seg_Field_Name(ivars->segment, field_num);
         field_writer
             = SortFieldWriter_new(ivars->schema, ivars->snapshot, ivars->segment,
-                                  ivars->polyreader, field, ivars->mem_pool,
+                                  ivars->polyreader, field, ivars->mem_pool, ivars->counter,
                                   ivars->mem_thresh, ivars->temp_ord_out,
                                   ivars->temp_ix_out, ivars->temp_dat_out);
         VA_Store(ivars->field_writers, field_num, (Obj*)field_writer);
@@ -150,13 +153,14 @@ SortWriter_Add_Inverted_Doc_IMP(SortWriter *self, Inverter *inverter,
 
     // If our SortFieldWriters have collectively passed the memory threshold,
     // flush all of them, then release all unique values with a single action.
-    if (MemPool_Get_Consumed(ivars->mem_pool) > ivars->mem_thresh) {
+    if (Counter_Get_Value(ivars->counter) > ivars->mem_thresh) {
         for (uint32_t i = 0; i < VA_Get_Size(ivars->field_writers); i++) {
             SortFieldWriter *const field_writer
                 = (SortFieldWriter*)VA_Fetch(ivars->field_writers, i);
             if (field_writer) { SortFieldWriter_Flush(field_writer); }
         }
         MemPool_Release_All(ivars->mem_pool);
+        Counter_Reset(ivars->counter);
         ivars->flush_at_finish = true;
     }
 }
@@ -272,4 +276,35 @@ SortWriter_Format_IMP(SortWriter *self) {
     return SortWriter_current_file_format;
 }
 
+/*************************************************************************/
+
+Counter*
+Counter_new() {
+    Counter *self = (Counter*)VTable_Make_Obj(COUNTER);
+    return Counter_init(self);
+}
+
+Counter*
+Counter_init(Counter *self) {
+    CounterIVARS *ivars = Counter_IVARS(self);
+    ivars->value = 0;
+    return self;
+}
+
+int64_t
+Counter_Add_IMP(Counter *self, int64_t amount) {
+    CounterIVARS *ivars = Counter_IVARS(self);
+    ivars->value += amount;
+    return ivars->value;
+}
+
+int64_t
+Counter_Get_Value_IMP(Counter *self) {
+    return Counter_IVARS(self)->value;
+}
+
+void
+Counter_Reset_IMP(Counter *self) {
+    Counter_IVARS(self)->value = 0;
+}
 

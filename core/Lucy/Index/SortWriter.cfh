@@ -36,6 +36,7 @@ class Lucy::Index::SortWriter inherits Lucy::Index::DataWriter {
     OutStream  *temp_ix_out;
     OutStream  *temp_dat_out;
     MemoryPool *mem_pool;
+    Counter    *counter;
     size_t      mem_thresh;
     bool        flush_at_finish;
 
@@ -73,4 +74,22 @@ class Lucy::Index::SortWriter inherits Lucy::Index::DataWriter {
     Destroy(SortWriter *self);
 }
 
+final class Lucy::Index::Counter inherits Clownfish::Obj {
+    int64_t value;
+
+    inert incremented Counter*
+    new();
+
+    inert Counter*
+    init(Counter *self);
+
+    int64_t
+    Add(Counter *self, int64_t amount);
+
+    int64_t
+    Get_Value(Counter *self);
+
+    void
+    Reset(Counter *self);
+}
 

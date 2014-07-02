@@ -27,6 +27,7 @@ class Lucy::Index::SortFieldWriter
     FieldType  *type;
     I32Array   *doc_map;
     MemoryPool *mem_pool;
+    Counter    *counter;
     int32_t     field_num;
     int32_t     null_ord;
     int8_t      prim_id;
@@ -54,14 +55,14 @@ class Lucy::Index::SortFieldWriter
 
     inert incremented SortFieldWriter*
     new(Schema *schema, Snapshot *snapshot, Segment *segment,
-        PolyReader *polyreader, String *field, MemoryPool *memory_pool,
+        PolyReader *polyreader, String *field, MemoryPool *memory_pool, Counter *counter,
         size_t mem_thresh, OutStream *temp_ord_out, OutStream *temp_ix_out,
         OutStream *temp_dat_out);
 
     inert SortFieldWriter*
     init(SortFieldWriter *self, Schema *schema, Snapshot *snapshot,
          Segment *segment, PolyReader *polyreader, String *field,
-         MemoryPool *memory_pool, size_t mem_thresh, OutStream *temp_ord_out,
+         MemoryPool *memory_pool, Counter *counter, size_t mem_thresh, OutStream *temp_ord_out,
          OutStream *temp_ix_out, OutStream *temp_dat_out);
 
     void

@@ -29,6 +29,7 @@
 #include "Lucy/Index/SortCache/NumericSortCache.h"
 #include "Lucy/Index/SortCache/TextSortCache.h"
 #include "Lucy/Index/SortReader.h"
+#include "Lucy/Index/SortWriter.h"
 #include "Lucy/Index/ZombieKeyedHash.h"
 #include "Lucy/Plan/FieldType.h"
 #include "Lucy/Plan/Schema.h"
@@ -54,18 +55,28 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
 // allocation itself will come from the MemoryPool, so the the element will be
 // deallocated via MemPool_Release_All().
 static SFWriterElem*
-S_SFWriterElem_create(MemoryPool *mem_pool, Obj *value, int32_t doc_id);
+S_SFWriterElem_create(MemoryPool *mem_pool, Counter *counter, Obj *value, int32_t doc_id);
+
+static int64_t
+SI_increase_to_word_multiple(int64_t amount) {
+    const int64_t remainder = amount % sizeof(void*);
+    if (remainder) {
+        amount += sizeof(void*);
+        amount -= remainder;
+    }
+    return amount;
+}
 
 SortFieldWriter*
 SortFieldWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
                     PolyReader *polyreader, String *field,
-                    MemoryPool *memory_pool, size_t mem_thresh,
+                    MemoryPool *memory_pool, Counter *counter, size_t mem_thresh,
                     OutStream *temp_ord_out, OutStream *temp_ix_out,
                     OutStream *temp_dat_out) {
     SortFieldWriter *self
         = (SortFieldWriter*)VTable_Make_Obj(SORTFIELDWRITER);
     return SortFieldWriter_init(self, schema, snapshot, segment, polyreader,
-                                field, memory_pool, mem_thresh, temp_ord_out,
+                                field, memory_pool, counter, mem_thresh, temp_ord_out,
                                 temp_ix_out, temp_dat_out);
 }
 
@@ -73,7 +84,7 @@ SortFieldWriter*
 SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
                      Snapshot *snapshot, Segment *segment,
                      PolyReader *polyreader, String *field,
-                     MemoryPool *memory_pool, size_t mem_thresh,
+                     MemoryPool *memory_pool, Counter *counter, size_t mem_thresh,
                      OutStream *temp_ord_out, OutStream *temp_ix_out,
                      OutStream *temp_dat_out) {
     // Init.
@@ -103,6 +114,7 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
     ivars->segment      = (Segment*)INCREF(segment);
     ivars->polyreader   = (PolyReader*)INCREF(polyreader);
     ivars->mem_pool     = (MemoryPool*)INCREF(memory_pool);
+    ivars->counter      = (Counter*)INCREF(counter);
     ivars->temp_ord_out = (OutStream*)INCREF(temp_ord_out);
     ivars->temp_ix_out  = (OutStream*)INCREF(temp_ix_out);
     ivars->temp_dat_out = (OutStream*)INCREF(temp_dat_out);
@@ -158,6 +170,7 @@ SortFieldWriter_Destroy_IMP(SortFieldWriter *self) {
     DECREF(ivars->polyreader);
     DECREF(ivars->type);
     DECREF(ivars->mem_pool);
+    DECREF(ivars->counter);
     DECREF(ivars->temp_ord_out);
     DECREF(ivars->temp_ix_out);
     DECREF(ivars->temp_dat_out);
@@ -181,11 +194,18 @@ SortFieldWriter_Get_Ord_Width_IMP(SortFieldWriter *self) {
 }
 
 static Obj*
-S_find_unique_value(Hash *uniq_vals, Obj *val) {
+S_find_unique_value(Hash *uniq_vals, Counter *counter, Obj *val) {
     int32_t  hash_sum  = Obj_Hash_Sum(val);
     Obj     *uniq_val  = Hash_Find_Key(uniq_vals, val, hash_sum);
     if (!uniq_val) {
         Hash_Store(uniq_vals, val, (Obj*)CFISH_TRUE);
+        VTable *vtable = Obj_Get_VTable(val);
+        Counter_Add(counter, VTable_Get_Obj_Alloc_Size(vtable));
+        if (vtable == STRING) {
+            int64_t size = Str_Get_Size((String*)val) + 1;
+            size = SI_increase_to_word_multiple(size);
+            Counter_Add(counter, size);
+        }
         uniq_val = Hash_Find_Key(uniq_vals, val, hash_sum);
     }
     return uniq_val;
@@ -196,8 +216,8 @@ SortFieldWriter_Add_IMP(SortFieldWriter *self, int32_t doc_id, Obj *value) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
 
     // Uniq-ify the value, and record it for this document.
-    Obj *copy = S_find_unique_value(ivars->uniq_vals, value);
-    SFWriterElem *elem = S_SFWriterElem_create(ivars->mem_pool, copy, doc_id);
+    Obj *copy = S_find_unique_value(ivars->uniq_vals, ivars->counter, value);
+    SFWriterElem *elem = S_SFWriterElem_create(ivars->mem_pool, ivars->counter, copy, doc_id);
     SortFieldWriter_Feed(self, (Obj*)elem);
     ivars->count++;
 }
@@ -209,7 +229,7 @@ SortFieldWriter_Add_Segment_IMP(SortFieldWriter *self, SegReader *reader,
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
     SortFieldWriter *run
         = SortFieldWriter_new(ivars->schema, ivars->snapshot, ivars->segment,
-                              ivars->polyreader, ivars->field, ivars->mem_pool,
+                              ivars->polyreader, ivars->field, ivars->mem_pool, ivars->counter,
                               ivars->mem_thresh, NULL, NULL, NULL);
     SortFieldWriterIVARS *const run_ivars = SortFieldWriter_IVARS(run);
     run_ivars->sort_cache = (SortCache*)INCREF(sort_cache);
@@ -400,7 +420,7 @@ SortFieldWriter_Flush_IMP(SortFieldWriter *self) {
     SortFieldWriter_Sort_Buffer(self);
     SortFieldWriter *run
         = SortFieldWriter_new(ivars->schema, ivars->snapshot, ivars->segment,
-                              ivars->polyreader, ivars->field, ivars->mem_pool,
+                              ivars->polyreader, ivars->field, ivars->mem_pool, ivars->counter,
                               ivars->mem_thresh, NULL, NULL, NULL);
     SortFieldWriterIVARS *const run_ivars = SortFieldWriter_IVARS(run);
 
@@ -454,16 +474,16 @@ SortFieldWriter_Refill_IMP(SortFieldWriter *self) {
     }
     SortFieldWriter_Clear_Buffer(self);
     MemPool_Release_All(ivars->mem_pool);
+    Counter_Reset(ivars->counter);
     S_lazy_init_sorted_ids(self);
 
     const int32_t    null_ord   = ivars->null_ord;
-    Hash *const      uniq_vals  = ivars->uniq_vals;
     I32Array *const  doc_map    = ivars->doc_map;
     SortCache *const sort_cache = ivars->sort_cache;
 
     uint32_t count = 0;
     while (ivars->run_tick <= ivars->run_max
-           && MemPool_Get_Consumed(ivars->mem_pool) < ivars->mem_thresh
+           && Counter_Get_Value(ivars->counter) < ivars->mem_thresh
           ) {
         int32_t raw_doc_id = ivars->sorted_ids[ivars->run_tick];
         int32_t ord = SortCache_Ordinal(sort_cache, raw_doc_id);
@@ -675,7 +695,9 @@ S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in,
     // Get our own MemoryPool, ZombieKeyedHash, and slice of mem_thresh.
     DECREF(run_ivars->uniq_vals);
     DECREF(run_ivars->mem_pool);
+    DECREF(run_ivars->counter);
     run_ivars->mem_pool   = MemPool_new(0);
+    run_ivars->counter    = Counter_new();
     run_ivars->uniq_vals  = (Hash*)ZKHash_new(run_ivars->mem_pool, run_ivars->prim_id);
     run_ivars->mem_thresh = sub_thresh;
 
@@ -755,8 +777,9 @@ S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in,
 /***************************************************************************/
 
 static SFWriterElem*
-S_SFWriterElem_create(MemoryPool *mem_pool, Obj *value, int32_t doc_id) {
+S_SFWriterElem_create(MemoryPool *mem_pool, Counter *counter, Obj *value, int32_t doc_id) {
     size_t size = VTable_Get_Obj_Alloc_Size(SFWRITERELEM);
+    Counter_Add(counter, size);
     SFWriterElem *self = (SFWriterElem*)MemPool_Grab(mem_pool, size);
     VTable_Init_Obj(SFWRITERELEM, (Obj*)self);
     SFWriterElemIVARS *ivars = SFWriterElem_IVARS(self);
