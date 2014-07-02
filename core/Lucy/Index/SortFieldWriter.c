@@ -55,7 +55,7 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
 // allocation itself will come from the MemoryPool, so the the element will be
 // deallocated via MemPool_Release_All().
 static SFWriterElem*
-S_SFWriterElem_create(MemoryPool *mem_pool, Counter *counter, Obj *value, int32_t doc_id);
+S_SFWriterElem_create(Obj *value, int32_t doc_id);
 
 static int64_t
 SI_increase_to_word_multiple(int64_t amount) {
@@ -217,7 +217,7 @@ SortFieldWriter_Add_IMP(SortFieldWriter *self, int32_t doc_id, Obj *value) {
 
     // Uniq-ify the value, and record it for this document.
     Obj *copy = S_find_unique_value(ivars->uniq_vals, ivars->counter, value);
-    SFWriterElem *elem = S_SFWriterElem_create(ivars->mem_pool, ivars->counter, copy, doc_id);
+    SFWriterElem *elem = S_SFWriterElem_create(copy, doc_id);
     SortFieldWriter_Feed(self, (Obj*)elem);
     ivars->count++;
 }
@@ -588,6 +588,7 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
     ivars->last_val = INCREF(elem_ivars->value);
     Obj *last_val_address = elem_ivars->value;
     S_write_val(elem_ivars->value, prim_id, ix_out, dat_out, dat_start);
+    DECREF(elem);
     while (NULL != (elem = (SFWriterElem*)SortFieldWriter_Fetch(self))) {
         elem_ivars = SFWriterElem_IVARS(elem);
         if (elem_ivars->value != last_val_address) {
@@ -604,6 +605,7 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
             last_val_address = elem_ivars->value;
         }
         ords[elem_ivars->doc_id] = ord;
+        DECREF(elem);
     }
     DECREF(ivars->last_val);
     ivars->last_val = NULL;
@@ -777,11 +779,8 @@ S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in,
 /***************************************************************************/
 
 static SFWriterElem*
-S_SFWriterElem_create(MemoryPool *mem_pool, Counter *counter, Obj *value, int32_t doc_id) {
-    size_t size = VTable_Get_Obj_Alloc_Size(SFWRITERELEM);
-    Counter_Add(counter, size);
-    SFWriterElem *self = (SFWriterElem*)MemPool_Grab(mem_pool, size);
-    VTable_Init_Obj(SFWRITERELEM, (Obj*)self);
+S_SFWriterElem_create(Obj *value, int32_t doc_id) {
+    SFWriterElem *self = (SFWriterElem*)VTable_Make_Obj(SFWRITERELEM);
     SFWriterElemIVARS *ivars = SFWriterElem_IVARS(self);
     ivars->value  = value;
     ivars->doc_id = doc_id;
@@ -790,24 +789,6 @@ S_SFWriterElem_create(MemoryPool *mem_pool, Counter *counter, Obj *value, int32_
 
 void
 SFWriterElem_Destroy_IMP(SFWriterElem *self) {
-    UNUSED_VAR(self);
-    THROW(ERR, "Illegal attempt to destroy SFWriterElem object");
-}
-
-uint32_t
-SFWriterElem_Get_RefCount_IMP(SFWriterElem* self) {
-    UNUSED_VAR(self);
-    return 1;
-}
-
-SFWriterElem*
-SFWriterElem_Inc_RefCount_IMP(SFWriterElem* self) {
-    return self;
-}
-
-uint32_t
-SFWriterElem_Dec_RefCount_IMP(SFWriterElem* self) {
-    UNUSED_VAR(self);
-    return 1;
+    SUPER_DESTROY(self, SFWRITERELEM);
 }
 

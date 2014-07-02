@@ -104,17 +104,6 @@ class Lucy::Index::SortFieldWriter::SFWriterElem inherits Clownfish::Obj {
     int32_t doc_id;
     Obj *value;
 
-    uint32_t
-    Get_RefCount(SFWriterElem* self);
-
-    incremented SFWriterElem*
-    Inc_RefCount(SFWriterElem* self);
-
-    uint32_t
-    Dec_RefCount(SFWriterElem* self);
-
-    /** Throws an error.
-     */
     public void
     Destroy(SFWriterElem *self);
 }
