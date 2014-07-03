@@ -120,10 +120,17 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
                           Schema_Fetch_Type(ivars->schema, field), FIELDTYPE);
     ivars->type    = (FieldType*)INCREF(type);
     ivars->prim_id = FType_Primitive_ID(type);
-    if (ivars->prim_id == FType_TEXT || ivars->prim_id == FType_BLOB) {
+    ivars->mem_per_entry = VTable_Get_Obj_Alloc_Size(SFWRITERELEM);
+    if (ivars->prim_id == FType_TEXT) {
+        ivars->mem_per_entry += VTable_Get_Obj_Alloc_Size(STRING);
+        ivars->var_width = true;
+    }
+    else if (ivars->prim_id == FType_BLOB) {
+        ivars->mem_per_entry += VTable_Get_Obj_Alloc_Size(BYTEBUF);
         ivars->var_width = true;
     }
     else {
+        ivars->mem_per_entry += VTable_Get_Obj_Alloc_Size(FLOAT64);
         ivars->var_width = false;
     }
     ivars->uniq_vals = Hash_new(0);
@@ -181,31 +188,32 @@ SortFieldWriter_Get_Ord_Width_IMP(SortFieldWriter *self) {
     return SortFieldWriter_IVARS(self)->ord_width;
 }
 
-static Obj*
-S_find_unique_value(Hash *uniq_vals, Counter *counter, Obj *val) {
-    int32_t  hash_sum  = Obj_Hash_Sum(val);
-    Obj     *uniq_val  = Hash_Find_Key(uniq_vals, val, hash_sum);
-    if (!uniq_val) {
-        Hash_Store(uniq_vals, val, (Obj*)CFISH_TRUE);
-        VTable *vtable = Obj_Get_VTable(val);
-        Counter_Add(counter, VTable_Get_Obj_Alloc_Size(vtable));
-        if (vtable == STRING) {
-            int64_t size = Str_Get_Size((String*)val) + 1;
-            size = SI_increase_to_word_multiple(size);
-            Counter_Add(counter, size);
-        }
-        uniq_val = Hash_Find_Key(uniq_vals, val, hash_sum);
-    }
-    return uniq_val;
-}
-
 void
 SortFieldWriter_Add_IMP(SortFieldWriter *self, int32_t doc_id, Obj *value) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
+    Hash    *uniq_vals = ivars->uniq_vals;
+    Counter *counter   = ivars->counter;
 
-    // Uniq-ify the value, and record it for this document.
-    Obj *copy = S_find_unique_value(ivars->uniq_vals, ivars->counter, value);
-    SFWriterElem *elem = S_SFWriterElem_create(copy, doc_id);
+    // Uniq-ify the value.
+    int32_t  hash_sum  = Obj_Hash_Sum(value);
+    Obj     *uniq_val  = Hash_Find_Key(uniq_vals, value, hash_sum);
+    if (!uniq_val) {
+        Hash_Store(uniq_vals, value, (Obj*)CFISH_TRUE);
+        Counter_Add(counter, ivars->mem_per_entry);
+        if (ivars->prim_id == FType_TEXT) {
+            int64_t size = Str_Get_Size((String*)value) + 1;
+            size = SI_increase_to_word_multiple(size);
+            Counter_Add(counter, size);
+        }
+        else if (ivars->prim_id == FType_BLOB) {
+            int64_t size = BB_Get_Size((ByteBuf*)value) + 1;
+            size = SI_increase_to_word_multiple(size);
+            Counter_Add(counter, size);
+        }
+        uniq_val = Hash_Find_Key(uniq_vals, value, hash_sum);
+    }
+
+    SFWriterElem *elem = S_SFWriterElem_create(uniq_val, doc_id);
     SortFieldWriter_Feed(self, (Obj*)elem);
     ivars->count++;
 }

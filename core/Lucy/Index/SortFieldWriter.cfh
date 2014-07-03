@@ -29,6 +29,7 @@ class Lucy::Index::SortFieldWriter
     Counter    *counter;
     int32_t     field_num;
     int32_t     null_ord;
+    size_t      mem_per_entry;
     int8_t      prim_id;
     int32_t     count;
     OutStream  *temp_ord_out;
