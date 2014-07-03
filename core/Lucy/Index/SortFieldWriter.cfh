@@ -19,7 +19,6 @@ parcel Lucy;
 class Lucy::Index::SortFieldWriter
     inherits Lucy::Util::SortExternal {
     String     *field;
-    Hash       *uniq_vals;
     Schema     *schema;
     Snapshot   *snapshot;
     Segment    *segment;
@@ -85,9 +84,6 @@ class Lucy::Index::SortFieldWriter
 
     int
     Compare(SortFieldWriter *self, void *va, void *vb);
-
-    void
-    Clear_Buffer(SortFieldWriter *self);
 
     int32_t
     Get_Null_Ord(SortFieldWriter *self);

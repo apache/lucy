@@ -133,32 +133,13 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
         ivars->mem_per_entry += VTable_Get_Obj_Alloc_Size(FLOAT64);
         ivars->var_width = false;
     }
-    ivars->uniq_vals = Hash_new(0);
 
     return self;
 }
 
 void
-SortFieldWriter_Clear_Buffer_IMP(SortFieldWriter *self) {
-    SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
-    if (ivars->uniq_vals) {
-        Hash_Clear(ivars->uniq_vals);
-    }
-    SortFieldWriter_Clear_Buffer_t super_clear_buffer
-        = SUPER_METHOD_PTR(SORTFIELDWRITER, LUCY_SortFieldWriter_Clear_Buffer);
-    super_clear_buffer(self);
-    // Note that we have not Reset() the Counter which tracks memory usage.
-    // This is because the counter is shared amongst multiple SortFieldWriters
-    // which belong to a parent SortWriter; it is the responsibility of the
-    // parent SortWriter to reset it once **all** of its child
-    // SortFieldWriters have cleared their buffers.
-}
-
-void
 SortFieldWriter_Destroy_IMP(SortFieldWriter *self) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
-    DECREF(ivars->uniq_vals);
-    ivars->uniq_vals = NULL;
     DECREF(ivars->field);
     DECREF(ivars->schema);
     DECREF(ivars->snapshot);
@@ -191,29 +172,19 @@ SortFieldWriter_Get_Ord_Width_IMP(SortFieldWriter *self) {
 void
 SortFieldWriter_Add_IMP(SortFieldWriter *self, int32_t doc_id, Obj *value) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
-    Hash    *uniq_vals = ivars->uniq_vals;
     Counter *counter   = ivars->counter;
-
-    // Uniq-ify the value.
-    int32_t  hash_sum  = Obj_Hash_Sum(value);
-    Obj     *uniq_val  = Hash_Find_Key(uniq_vals, value, hash_sum);
-    if (!uniq_val) {
-        Hash_Store(uniq_vals, value, (Obj*)CFISH_TRUE);
-        Counter_Add(counter, ivars->mem_per_entry);
-        if (ivars->prim_id == FType_TEXT) {
-            int64_t size = Str_Get_Size((String*)value) + 1;
-            size = SI_increase_to_word_multiple(size);
-            Counter_Add(counter, size);
-        }
-        else if (ivars->prim_id == FType_BLOB) {
-            int64_t size = BB_Get_Size((ByteBuf*)value) + 1;
-            size = SI_increase_to_word_multiple(size);
-            Counter_Add(counter, size);
-        }
-        uniq_val = Hash_Find_Key(uniq_vals, value, hash_sum);
+    Counter_Add(counter, ivars->mem_per_entry);
+    if (ivars->prim_id == FType_TEXT) {
+        int64_t size = Str_Get_Size((String*)value) + 1;
+        size = SI_increase_to_word_multiple(size);
+        Counter_Add(counter, size);
     }
-
-    SFWriterElem *elem = S_SFWriterElem_create(uniq_val, doc_id);
+    else if (ivars->prim_id == FType_BLOB) {
+        int64_t size = BB_Get_Size((ByteBuf*)value) + 1;
+        size = SI_increase_to_word_multiple(size);
+        Counter_Add(counter, size);
+    }
+    SFWriterElem *elem = S_SFWriterElem_create(Obj_Clone(value), doc_id);
     SortFieldWriter_Feed(self, (Obj*)elem);
     ivars->count++;
 }
@@ -770,7 +741,7 @@ static SFWriterElem*
 S_SFWriterElem_create(Obj *value, int32_t doc_id) {
     SFWriterElem *self = (SFWriterElem*)VTable_Make_Obj(SFWRITERELEM);
     SFWriterElemIVARS *ivars = SFWriterElem_IVARS(self);
-    ivars->value  = INCREF(value);
+    ivars->value  = value;
     ivars->doc_id = doc_id;
     return self;
 }
