@@ -50,7 +50,6 @@ class Lucy::Index::SortFieldWriter
     int32_t    *sorted_ids;
     int32_t     run_tick;
     int32_t     ord_width;
-    Obj        *last_val;
 
     inert incremented SortFieldWriter*
     new(Schema *schema, Snapshot *snapshot, Segment *segment,
