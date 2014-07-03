@@ -35,7 +35,6 @@ class Lucy::Index::SortWriter inherits Lucy::Index::DataWriter {
     OutStream  *temp_ord_out;
     OutStream  *temp_ix_out;
     OutStream  *temp_dat_out;
-    MemoryPool *mem_pool;
     Counter    *counter;
     size_t      mem_thresh;
     bool        flush_at_finish;

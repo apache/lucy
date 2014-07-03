@@ -36,7 +36,6 @@
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 #include "Clownfish/Util/Memory.h"
-#include "Lucy/Util/MemoryPool.h"
 #include "Clownfish/Util/SortUtils.h"
 
 // Prepare to read back a run.
@@ -67,13 +66,13 @@ SI_increase_to_word_multiple(int64_t amount) {
 SortFieldWriter*
 SortFieldWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
                     PolyReader *polyreader, String *field,
-                    MemoryPool *memory_pool, Counter *counter, size_t mem_thresh,
+                    Counter *counter, size_t mem_thresh,
                     OutStream *temp_ord_out, OutStream *temp_ix_out,
                     OutStream *temp_dat_out) {
     SortFieldWriter *self
         = (SortFieldWriter*)VTable_Make_Obj(SORTFIELDWRITER);
     return SortFieldWriter_init(self, schema, snapshot, segment, polyreader,
-                                field, memory_pool, counter, mem_thresh, temp_ord_out,
+                                field, counter, mem_thresh, temp_ord_out,
                                 temp_ix_out, temp_dat_out);
 }
 
@@ -81,7 +80,7 @@ SortFieldWriter*
 SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
                      Snapshot *snapshot, Segment *segment,
                      PolyReader *polyreader, String *field,
-                     MemoryPool *memory_pool, Counter *counter, size_t mem_thresh,
+                     Counter *counter, size_t mem_thresh,
                      OutStream *temp_ord_out, OutStream *temp_ix_out,
                      OutStream *temp_dat_out) {
     // Init.
@@ -109,7 +108,6 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
     ivars->snapshot     = (Snapshot*)INCREF(snapshot);
     ivars->segment      = (Segment*)INCREF(segment);
     ivars->polyreader   = (PolyReader*)INCREF(polyreader);
-    ivars->mem_pool     = (MemoryPool*)INCREF(memory_pool);
     ivars->counter      = (Counter*)INCREF(counter);
     ivars->temp_ord_out = (OutStream*)INCREF(temp_ord_out);
     ivars->temp_ix_out  = (OutStream*)INCREF(temp_ix_out);
@@ -142,10 +140,10 @@ SortFieldWriter_Clear_Buffer_IMP(SortFieldWriter *self) {
     SortFieldWriter_Clear_Buffer_t super_clear_buffer
         = SUPER_METHOD_PTR(SORTFIELDWRITER, LUCY_SortFieldWriter_Clear_Buffer);
     super_clear_buffer(self);
-    // Note that we have not called MemPool_Release_All() on our memory pool.
-    // This is because the pool is shared amongst multiple SortFieldWriters
+    // Note that we have not Reset() the Counter which tracks memory usage.
+    // This is because the counter is shared amongst multiple SortFieldWriters
     // which belong to a parent SortWriter; it is the responsibility of the
-    // parent SortWriter to release the memory pool once **all** of its child
+    // parent SortWriter to reset it once **all** of its child
     // SortFieldWriters have cleared their buffers.
 }
 
@@ -160,7 +158,6 @@ SortFieldWriter_Destroy_IMP(SortFieldWriter *self) {
     DECREF(ivars->segment);
     DECREF(ivars->polyreader);
     DECREF(ivars->type);
-    DECREF(ivars->mem_pool);
     DECREF(ivars->counter);
     DECREF(ivars->temp_ord_out);
     DECREF(ivars->temp_ix_out);
@@ -220,7 +217,7 @@ SortFieldWriter_Add_Segment_IMP(SortFieldWriter *self, SegReader *reader,
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
     SortFieldWriter *run
         = SortFieldWriter_new(ivars->schema, ivars->snapshot, ivars->segment,
-                              ivars->polyreader, ivars->field, ivars->mem_pool, ivars->counter,
+                              ivars->polyreader, ivars->field, ivars->counter,
                               ivars->mem_thresh, NULL, NULL, NULL);
     SortFieldWriterIVARS *const run_ivars = SortFieldWriter_IVARS(run);
     run_ivars->sort_cache = (SortCache*)INCREF(sort_cache);
@@ -411,7 +408,7 @@ SortFieldWriter_Flush_IMP(SortFieldWriter *self) {
     SortFieldWriter_Sort_Buffer(self);
     SortFieldWriter *run
         = SortFieldWriter_new(ivars->schema, ivars->snapshot, ivars->segment,
-                              ivars->polyreader, ivars->field, ivars->mem_pool, ivars->counter,
+                              ivars->polyreader, ivars->field, ivars->counter,
                               ivars->mem_thresh, NULL, NULL, NULL);
     SortFieldWriterIVARS *const run_ivars = SortFieldWriter_IVARS(run);
 
@@ -464,7 +461,6 @@ SortFieldWriter_Refill_IMP(SortFieldWriter *self) {
               buf_count);
     }
     SortFieldWriter_Clear_Buffer(self);
-    MemPool_Release_All(ivars->mem_pool);
     Counter_Reset(ivars->counter);
     S_lazy_init_sorted_ids(self);
 
@@ -683,9 +679,7 @@ S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in,
     run_ivars->flipped = true;
 
     // Get our own slice of mem_thresh.
-    DECREF(run_ivars->mem_pool);
     DECREF(run_ivars->counter);
-    run_ivars->mem_pool   = MemPool_new(0);
     run_ivars->counter    = Counter_new();
     run_ivars->mem_thresh = sub_thresh;
 
