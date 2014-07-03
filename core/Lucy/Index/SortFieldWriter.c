@@ -30,7 +30,6 @@
 #include "Lucy/Index/SortCache/TextSortCache.h"
 #include "Lucy/Index/SortReader.h"
 #include "Lucy/Index/SortWriter.h"
-#include "Lucy/Index/ZombieKeyedHash.h"
 #include "Lucy/Plan/FieldType.h"
 #include "Lucy/Plan/Schema.h"
 #include "Lucy/Store/Folder.h"
@@ -51,9 +50,7 @@ static int32_t
 S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
               OutStream *dat_out);
 
-// Create an element for the sort pool.  Both the `value` and the object
-// allocation itself will come from the MemoryPool, so the the element will be
-// deallocated via MemPool_Release_All().
+// Constructor for an element in the sort pool.
 static SFWriterElem*
 S_SFWriterElem_create(Obj *value, int32_t doc_id);
 
@@ -105,7 +102,6 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
     ivars->sorted_ids      = NULL;
     ivars->run_tick        = 1;
     ivars->ord_width       = 0;
-    ivars->last_val        = NULL;
 
     // Assign.
     ivars->field        = Str_Clone(field);
@@ -132,7 +128,7 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
     else {
         ivars->var_width = false;
     }
-    ivars->uniq_vals = (Hash*)ZKHash_new(memory_pool, ivars->prim_id);
+    ivars->uniq_vals = Hash_new(0);
 
     return self;
 }
@@ -141,11 +137,6 @@ void
 SortFieldWriter_Clear_Buffer_IMP(SortFieldWriter *self) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
     if (ivars->uniq_vals) {
-        if (ivars->last_val) {
-            Obj *clone = Obj_Clone(ivars->last_val);
-            DECREF(ivars->last_val);
-            ivars->last_val = clone;
-        }
         Hash_Clear(ivars->uniq_vals);
     }
     SortFieldWriter_Clear_Buffer_t super_clear_buffer
@@ -585,30 +576,27 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
     ords[0] = 0;
 
     // Build array of ords, write non-NULL sorted values.
-    ivars->last_val = INCREF(elem_ivars->value);
-    Obj *last_val_address = elem_ivars->value;
+    Obj *last_val = INCREF(elem_ivars->value);
     S_write_val(elem_ivars->value, prim_id, ix_out, dat_out, dat_start);
     DECREF(elem);
     while (NULL != (elem = (SFWriterElem*)SortFieldWriter_Fetch(self))) {
         elem_ivars = SFWriterElem_IVARS(elem);
-        if (elem_ivars->value != last_val_address) {
+        if (elem_ivars->value != last_val) {
             int32_t comparison
                 = FType_Compare_Values(ivars->type, elem_ivars->value,
-                                       ivars->last_val);
+                                       last_val);
             if (comparison != 0) {
                 ord++;
                 S_write_val(elem_ivars->value, prim_id, ix_out, dat_out,
                             dat_start);
-                DECREF(ivars->last_val);
-                ivars->last_val = INCREF(elem_ivars->value);
             }
-            last_val_address = elem_ivars->value;
+            DECREF(last_val);
+            last_val = INCREF(elem_ivars->value);
         }
         ords[elem_ivars->doc_id] = ord;
         DECREF(elem);
     }
-    DECREF(ivars->last_val);
-    ivars->last_val = NULL;
+    DECREF(last_val);
 
     // If there are NULL values, write one now and record the NULL ord.
     if (has_nulls) {
@@ -694,13 +682,11 @@ S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in,
     if (run_ivars->flipped) { THROW(ERR, "Can't Flip twice"); }
     run_ivars->flipped = true;
 
-    // Get our own MemoryPool, ZombieKeyedHash, and slice of mem_thresh.
-    DECREF(run_ivars->uniq_vals);
+    // Get our own slice of mem_thresh.
     DECREF(run_ivars->mem_pool);
     DECREF(run_ivars->counter);
     run_ivars->mem_pool   = MemPool_new(0);
     run_ivars->counter    = Counter_new();
-    run_ivars->uniq_vals  = (Hash*)ZKHash_new(run_ivars->mem_pool, run_ivars->prim_id);
     run_ivars->mem_thresh = sub_thresh;
 
     // Done if we already have a SortCache to read from.
@@ -782,13 +768,15 @@ static SFWriterElem*
 S_SFWriterElem_create(Obj *value, int32_t doc_id) {
     SFWriterElem *self = (SFWriterElem*)VTable_Make_Obj(SFWRITERELEM);
     SFWriterElemIVARS *ivars = SFWriterElem_IVARS(self);
-    ivars->value  = value;
+    ivars->value  = INCREF(value);
     ivars->doc_id = doc_id;
     return self;
 }
 
 void
 SFWriterElem_Destroy_IMP(SFWriterElem *self) {
+    SFWriterElemIVARS *ivars = SFWriterElem_IVARS(self);
+    DECREF(ivars->value);
     SUPER_DESTROY(self, SFWRITERELEM);
 }
 
