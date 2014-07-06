@@ -28,7 +28,7 @@
 RequiredOptionalQuery*
 ReqOptQuery_new(Query *required_query, Query *optional_query) {
     RequiredOptionalQuery *self
-        = (RequiredOptionalQuery*)VTable_Make_Obj(REQUIREDOPTIONALQUERY);
+        = (RequiredOptionalQuery*)Class_Make_Obj(REQUIREDOPTIONALQUERY);
     return ReqOptQuery_init(self, required_query, optional_query);
 }
 
@@ -106,7 +106,7 @@ RequiredOptionalCompiler*
 ReqOptCompiler_new(RequiredOptionalQuery *parent, Searcher *searcher,
                    float boost) {
     RequiredOptionalCompiler *self
-        = (RequiredOptionalCompiler*)VTable_Make_Obj(
+        = (RequiredOptionalCompiler*)Class_Make_Obj(
               REQUIREDOPTIONALCOMPILER);
     return ReqOptCompiler_init(self, parent, searcher, boost);
 }

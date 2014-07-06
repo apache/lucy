@@ -64,7 +64,7 @@ S_find_schema_file(Snapshot *snapshot);
 
 Indexer*
 Indexer_new(Schema *schema, Obj *index, IndexManager *manager, int32_t flags) {
-    Indexer *self = (Indexer*)VTable_Make_Obj(INDEXER);
+    Indexer *self = (Indexer*)Class_Make_Obj(INDEXER);
     return Indexer_init(self, schema, index, manager, flags);
 }
 
@@ -354,7 +354,7 @@ Indexer_Add_Index_IMP(Indexer *self, Obj *index) {
             SegReader *seg_reader = (SegReader*)VA_Fetch(seg_readers, i);
             DeletionsReader *del_reader
                 = (DeletionsReader*)SegReader_Fetch(
-                      seg_reader, VTable_Get_Name(DELETIONSREADER));
+                      seg_reader, Class_Get_Name(DELETIONSREADER));
             Matcher *deletions = del_reader
                                  ? DelReader_Iterator(del_reader)
                                  : NULL;

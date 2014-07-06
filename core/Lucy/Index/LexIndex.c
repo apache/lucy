@@ -34,7 +34,7 @@ S_read_entry(LexIndex *self);
 LexIndex*
 LexIndex_new(Schema *schema, Folder *folder, Segment *segment,
              String *field) {
-    LexIndex *self = (LexIndex*)VTable_Make_Obj(LEXINDEX);
+    LexIndex *self = (LexIndex*)Class_Make_Obj(LEXINDEX);
     return LexIndex_init(self, schema, folder, segment, field);
 }
 
@@ -155,11 +155,11 @@ LexIndex_Seek_IMP(LexIndex *self, Obj *target) {
     else {
         if (!Obj_Is_A(target, STRING)) {
             THROW(ERR, "Target is a %o, and not comparable to a %o",
-                  Obj_Get_Class_Name(target), VTable_Get_Name(STRING));
+                  Obj_Get_Class_Name(target), Class_Get_Name(STRING));
         }
         /* TODO:
         Obj *first_obj = VA_Fetch(terms, 0);
-        if (!Obj_Is_A(target, Obj_Get_VTable(first_obj))) {
+        if (!Obj_Is_A(target, Obj_Get_Class(first_obj))) {
             THROW(ERR, "Target is a %o, and not comparable to a %o",
                 Obj_Get_Class_Name(target), Obj_Get_Class_Name(first_obj));
         }

@@ -44,7 +44,7 @@ S_seek_tinfo(SegPostingList *self, TermInfo *tinfo);
 
 SegPostingList*
 SegPList_new(PostingListReader *plist_reader, String *field) {
-    SegPostingList *self = (SegPostingList*)VTable_Make_Obj(SEGPOSTINGLIST);
+    SegPostingList *self = (SegPostingList*)Class_Make_Obj(SEGPOSTINGLIST);
     return SegPList_init(self, plist_reader, field);
 }
 

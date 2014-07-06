@@ -25,13 +25,13 @@
 
 TestPriorityQueue*
 TestPriQ_new() {
-    return (TestPriorityQueue*)VTable_Make_Obj(TESTPRIORITYQUEUE);
+    return (TestPriorityQueue*)Class_Make_Obj(TESTPRIORITYQUEUE);
 }
 
 NumPriorityQueue*
 NumPriQ_new(uint32_t max_size) {
     NumPriorityQueue *self
-        = (NumPriorityQueue*)VTable_Make_Obj(NUMPRIORITYQUEUE);
+        = (NumPriorityQueue*)Class_Make_Obj(NUMPRIORITYQUEUE);
     return (NumPriorityQueue*)PriQ_init((PriorityQueue*)self, max_size);
 }
 

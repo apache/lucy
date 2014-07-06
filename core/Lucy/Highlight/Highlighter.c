@@ -47,7 +47,7 @@ S_encode_entities(String *text, CharBuf *encoded);
 Highlighter*
 Highlighter_new(Searcher *searcher, Obj *query, String *field,
                 uint32_t excerpt_length) {
-    Highlighter *self = (Highlighter*)VTable_Make_Obj(HIGHLIGHTER);
+    Highlighter *self = (Highlighter*)Class_Make_Obj(HIGHLIGHTER);
     return Highlighter_init(self, searcher, query, field, excerpt_length);
 }
 
@@ -565,9 +565,9 @@ Highlighter_Encode_IMP(Highlighter *self, String *text) {
 
 static String*
 S_do_encode(Highlighter *self, String *text, CharBuf **encode_buf) {
-    VTable *vtable = Highlighter_Get_VTable(self);
+    Class *klass = Highlighter_Get_Class(self);
     Highlighter_Encode_t my_meth
-        = (Highlighter_Encode_t)METHOD_PTR(vtable, LUCY_Highlighter_Encode);
+        = (Highlighter_Encode_t)METHOD_PTR(klass, LUCY_Highlighter_Encode);
     Highlighter_Encode_t orig_meth
         = (Highlighter_Encode_t)METHOD_PTR(HIGHLIGHTER, LUCY_Highlighter_Encode);
 

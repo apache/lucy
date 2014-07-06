@@ -42,8 +42,8 @@ Freezer_freeze(Obj *obj, OutStream *outstream) {
 Obj*
 Freezer_thaw(InStream *instream) {
     String *class_name = Freezer_read_string(instream);
-    VTable *vtable = VTable_singleton(class_name, NULL);
-    Obj *blank = VTable_Make_Obj(vtable);
+    Class *klass = Class_singleton(class_name, NULL);
+    Obj *blank = Class_Make_Obj(klass);
     DECREF(class_name);
     return Freezer_deserialize(blank, instream);
 }
@@ -227,7 +227,7 @@ Freezer_deserialize_string(String *string, InStream *instream) {
 
 String*
 Freezer_read_string(InStream *instream) {
-    String *string = (String*)VTable_Make_Obj(STRING);
+    String *string = (String*)Class_Make_Obj(STRING);
     return Freezer_deserialize_string(string, instream);
 }
 
@@ -248,7 +248,7 @@ Freezer_deserialize_bytebuf(ByteBuf *bytebuf, InStream *instream) {
 
 ByteBuf*
 Freezer_read_bytebuf(InStream *instream) {
-    ByteBuf *bytebuf = (ByteBuf*)VTable_Make_Obj(BYTEBUF);
+    ByteBuf *bytebuf = (ByteBuf*)Class_Make_Obj(BYTEBUF);
     return Freezer_deserialize_bytebuf(bytebuf, instream);
 }
 
@@ -286,7 +286,7 @@ Freezer_deserialize_varray(VArray *array, InStream *instream) {
 
 VArray*
 Freezer_read_varray(InStream *instream) {
-    VArray *array = (VArray*)VTable_Make_Obj(VARRAY);
+    VArray *array = (VArray*)Class_Make_Obj(VARRAY);
     return Freezer_deserialize_varray(array, instream);
 }
 
@@ -355,7 +355,7 @@ Freezer_deserialize_hash(Hash *hash, InStream *instream) {
 
 Hash*
 Freezer_read_hash(InStream *instream) {
-    Hash *hash = (Hash*)VTable_Make_Obj(HASH);
+    Hash *hash = (Hash*)Class_Make_Obj(HASH);
     return Freezer_deserialize_hash(hash, instream);
 }
 
@@ -423,8 +423,8 @@ Freezer_dump(Obj *obj) {
 }
 
 static Obj*
-S_load_via_load_method(VTable *vtable, Obj *dump) {
-    Obj *dummy = VTable_Make_Obj(vtable);
+S_load_via_load_method(Class *klass, Obj *dump) {
+    Obj *dummy = Class_Make_Obj(klass);
     Obj *loaded = NULL;
     if (Obj_Is_A(dummy, ANALYZER)) {
         loaded = Analyzer_Load((Analyzer*)dummy, dump);
@@ -446,7 +446,7 @@ S_load_via_load_method(VTable *vtable, Obj *dump) {
     }
     else {
         DECREF(dummy);
-        THROW(ERR, "Don't know how to load '%o'", VTable_Get_Name(vtable));
+        THROW(ERR, "Don't know how to load '%o'", Class_Get_Name(klass));
     }
 
     DECREF(dummy);
@@ -460,14 +460,14 @@ S_load_from_hash(Hash *dump) {
     // Assume that the presence of the "_class" key paired with a valid class
     // name indicates the output of a dump() rather than an ordinary Hash.
     if (class_name && Str_Is_A(class_name, STRING)) {
-        VTable *vtable = VTable_fetch_vtable(class_name);
+        Class *klass = Class_fetch_class(class_name);
 
-        if (!vtable) {
-            String *parent_class = VTable_find_parent_class(class_name);
-            if (parent_class) {
-                VTable *parent = VTable_singleton(parent_class, NULL);
-                vtable = VTable_singleton(class_name, parent);
-                DECREF(parent_class);
+        if (!klass) {
+            String *parent_class_name = Class_find_parent_class(class_name);
+            if (parent_class_name) {
+                Class *parent = Class_singleton(parent_class_name, NULL);
+                klass = Class_singleton(class_name, parent);
+                DECREF(parent_class_name);
             }
             else {
                 // TODO: Fix load() so that it works with ordinary hash keys
@@ -477,8 +477,8 @@ S_load_from_hash(Hash *dump) {
         }
 
         // Dispatch to an alternate Load() method.
-        if (vtable) {
-            return S_load_via_load_method(vtable, (Obj*)dump);
+        if (klass) {
+            return S_load_via_load_method(klass, (Obj*)dump);
         }
 
     }

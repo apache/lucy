@@ -28,7 +28,7 @@
 
 LockFactory*
 LockFact_new(Folder *folder, String *host) {
-    LockFactory *self = (LockFactory*)VTable_Make_Obj(LOCKFACTORY);
+    LockFactory *self = (LockFactory*)Class_Make_Obj(LOCKFACTORY);
     return LockFact_init(self, folder, host);
 }
 

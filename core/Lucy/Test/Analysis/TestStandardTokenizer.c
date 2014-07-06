@@ -28,7 +28,7 @@
 
 TestStandardTokenizer*
 TestStandardTokenizer_new() {
-    return (TestStandardTokenizer*)VTable_Make_Obj(TESTSTANDARDTOKENIZER);
+    return (TestStandardTokenizer*)Class_Make_Obj(TESTSTANDARDTOKENIZER);
 }
 
 static void

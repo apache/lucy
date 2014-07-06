@@ -35,7 +35,7 @@
 
 TestIOPrimitives*
 TestIOPrimitives_new() {
-    return (TestIOPrimitives*)VTable_Make_Obj(TESTIOPRIMITIVES);
+    return (TestIOPrimitives*)Class_Make_Obj(TESTIOPRIMITIVES);
 }
 
 static void

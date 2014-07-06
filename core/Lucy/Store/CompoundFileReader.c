@@ -29,7 +29,7 @@
 CompoundFileReader*
 CFReader_open(Folder *folder) {
     CompoundFileReader *self
-        = (CompoundFileReader*)VTable_Make_Obj(COMPOUNDFILEREADER);
+        = (CompoundFileReader*)Class_Make_Obj(COMPOUNDFILEREADER);
     return CFReader_do_open(self, folder);
 }
 
@@ -270,7 +270,7 @@ CFReader_Local_Open_Dir_IMP(CompoundFileReader *self) {
 CFReaderDirHandle*
 CFReaderDH_new(CompoundFileReader *cf_reader) {
     CFReaderDirHandle *self
-        = (CFReaderDirHandle*)VTable_Make_Obj(CFREADERDIRHANDLE);
+        = (CFReaderDirHandle*)Class_Make_Obj(CFREADERDIRHANDLE);
     return CFReaderDH_init(self, cf_reader);
 }
 

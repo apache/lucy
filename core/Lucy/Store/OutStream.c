@@ -40,7 +40,7 @@ S_flush(OutStream *self, OutStreamIVARS *ivars);
 
 OutStream*
 OutStream_open(Obj *file) {
-    OutStream *self = (OutStream*)VTable_Make_Obj(OUTSTREAM);
+    OutStream *self = (OutStream*)Class_Make_Obj(OUTSTREAM);
     return OutStream_do_open(self, file);
 }
 

@@ -37,7 +37,7 @@ S_extract_tv_from_tv_buf(String *field, String *term_text,
 
 DocVector*
 DocVec_new() {
-    DocVector *self = (DocVector*)VTable_Make_Obj(DOCVECTOR);
+    DocVector *self = (DocVector*)Class_Make_Obj(DOCVECTOR);
     return DocVec_init(self);
 }
 

@@ -23,7 +23,7 @@
 
 StringType*
 StringType_new() {
-    StringType *self = (StringType*)VTable_Make_Obj(STRINGTYPE);
+    StringType *self = (StringType*)Class_Make_Obj(STRINGTYPE);
     return StringType_init(self);
 }
 
@@ -90,11 +90,11 @@ StringType*
 StringType_Load_IMP(StringType *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     String *class_name = (String*)Hash_Fetch_Utf8(source, "_class", 6);
-    VTable *vtable
+    Class *klass
         = (class_name != NULL && Obj_Is_A((Obj*)class_name, STRING))
-          ? VTable_singleton(class_name, NULL)
+          ? Class_singleton(class_name, NULL)
           : STRINGTYPE;
-    StringType *loaded   = (StringType*)VTable_Make_Obj(vtable);
+    StringType *loaded   = (StringType*)Class_Make_Obj(klass);
     Obj *boost_dump      = Hash_Fetch_Utf8(source, "boost", 5);
     Obj *indexed_dump    = Hash_Fetch_Utf8(source, "indexed", 7);
     Obj *stored_dump     = Hash_Fetch_Utf8(source, "stored", 6);

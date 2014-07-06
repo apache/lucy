@@ -23,7 +23,7 @@
 
 CaseFolder*
 CaseFolder_new() {
-    CaseFolder *self = (CaseFolder*)VTable_Make_Obj(CASEFOLDER);
+    CaseFolder *self = (CaseFolder*)Class_Make_Obj(CASEFOLDER);
     return CaseFolder_init(self);
 }
 

@@ -48,7 +48,7 @@ LexReader_Aggregator_IMP(LexiconReader *self, VArray *readers,
 PolyLexiconReader*
 PolyLexReader_new(VArray *readers, I32Array *offsets) {
     PolyLexiconReader *self
-        = (PolyLexiconReader*)VTable_Make_Obj(POLYLEXICONREADER);
+        = (PolyLexiconReader*)Class_Make_Obj(POLYLEXICONREADER);
     return PolyLexReader_init(self, readers, offsets);
 }
 
@@ -129,7 +129,7 @@ DefaultLexiconReader*
 DefLexReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
                  VArray *segments, int32_t seg_tick) {
     DefaultLexiconReader *self
-        = (DefaultLexiconReader*)VTable_Make_Obj(DEFAULTLEXICONREADER);
+        = (DefaultLexiconReader*)Class_Make_Obj(DEFAULTLEXICONREADER);
     return DefLexReader_init(self, schema, folder, snapshot, segments,
                              seg_tick);
 }

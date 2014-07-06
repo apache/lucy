@@ -50,7 +50,7 @@ static const uint32_t BYTE_COUNTS[256] = {
 
 BitVector*
 BitVec_new(uint32_t capacity) {
-    BitVector *self = (BitVector*)VTable_Make_Obj(BITVECTOR);
+    BitVector *self = (BitVector*)Class_Make_Obj(BITVECTOR);
     return BitVec_init(self, capacity);
 }
 
@@ -85,7 +85,7 @@ BitVec_Clone_IMP(BitVector *self) {
     BitVectorIVARS *const ovars = BitVec_IVARS(other);
 
     // Forbid inheritance.
-    if (BitVec_Get_VTable(self) != BITVECTOR) {
+    if (BitVec_Get_Class(self) != BITVECTOR) {
         THROW(ERR, "Attempt by %o to inherit BitVec_Clone",
               BitVec_Get_Class_Name(self));
     }

@@ -31,7 +31,7 @@
 
 MatchAllQuery*
 MatchAllQuery_new() {
-    MatchAllQuery *self = (MatchAllQuery*)VTable_Make_Obj(MATCHALLQUERY);
+    MatchAllQuery *self = (MatchAllQuery*)Class_Make_Obj(MATCHALLQUERY);
     return MatchAllQuery_init(self);
 }
 
@@ -71,7 +71,7 @@ MatchAllCompiler*
 MatchAllCompiler_new(MatchAllQuery *parent, Searcher *searcher,
                      float boost) {
     MatchAllCompiler *self
-        = (MatchAllCompiler*)VTable_Make_Obj(MATCHALLCOMPILER);
+        = (MatchAllCompiler*)Class_Make_Obj(MATCHALLCOMPILER);
     return MatchAllCompiler_init(self, parent, searcher, boost);
 }
 

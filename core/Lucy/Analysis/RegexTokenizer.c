@@ -24,7 +24,7 @@
 
 RegexTokenizer*
 RegexTokenizer_new(String *pattern) {
-    RegexTokenizer *self = (RegexTokenizer*)VTable_Make_Obj(REGEXTOKENIZER);
+    RegexTokenizer *self = (RegexTokenizer*)Class_Make_Obj(REGEXTOKENIZER);
     return RegexTokenizer_init(self, pattern);
 }
 

@@ -25,7 +25,7 @@
 
 TestSnapshot*
 TestSnapshot_new() {
-    return (TestSnapshot*)VTable_Make_Obj(TESTSNAPSHOT);
+    return (TestSnapshot*)Class_Make_Obj(TESTSNAPSHOT);
 }
 
 static void

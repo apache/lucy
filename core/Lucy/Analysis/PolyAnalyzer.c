@@ -27,7 +27,7 @@
 
 PolyAnalyzer*
 PolyAnalyzer_new(String *language, VArray *analyzers) {
-    PolyAnalyzer *self = (PolyAnalyzer*)VTable_Make_Obj(POLYANALYZER);
+    PolyAnalyzer *self = (PolyAnalyzer*)Class_Make_Obj(POLYANALYZER);
     return PolyAnalyzer_init(self, language, analyzers);
 }
 

@@ -33,7 +33,7 @@
 
 Similarity*
 Sim_new() {
-    Similarity *self = (Similarity*)VTable_Make_Obj(SIMILARITY);
+    Similarity *self = (Similarity*)Class_Make_Obj(SIMILARITY);
     return Sim_init(self);
 }
 
@@ -93,8 +93,8 @@ Sim_Load_IMP(Similarity *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     String *class_name 
         = (String*)CERTIFY(Hash_Fetch_Utf8(source, "_class", 6), STRING);
-    VTable *vtable = VTable_singleton(class_name, NULL);
-    Similarity *loaded = (Similarity*)VTable_Make_Obj(vtable);
+    Class *klass = Class_singleton(class_name, NULL);
+    Similarity *loaded = (Similarity*)Class_Make_Obj(klass);
     UNUSED_VAR(self);
     return Sim_init(loaded);
 }
@@ -119,7 +119,7 @@ Sim_Deserialize_IMP(Similarity *self, InStream *instream) {
 
 bool
 Sim_Equals_IMP(Similarity *self, Obj *other) {
-    if (Sim_Get_VTable(self) != Obj_Get_VTable(other)) { return false; }
+    if (Sim_Get_Class(self) != Obj_Get_Class(other)) { return false; }
     return true;
 }
 

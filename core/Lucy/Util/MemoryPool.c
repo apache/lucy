@@ -36,7 +36,7 @@ S_init_arena(MemoryPool *self, MemoryPoolIVARS *ivars, size_t amount);
 
 MemoryPool*
 MemPool_new(uint32_t arena_size) {
-    MemoryPool *self = (MemoryPool*)VTable_Make_Obj(MEMORYPOOL);
+    MemoryPool *self = (MemoryPool*)Class_Make_Obj(MEMORYPOOL);
     return MemPool_init(self, arena_size);
 }
 

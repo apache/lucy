@@ -25,7 +25,7 @@
 
 FullTextType*
 FullTextType_new(Analyzer *analyzer) {
-    FullTextType *self = (FullTextType*)VTable_Make_Obj(FULLTEXTTYPE);
+    FullTextType *self = (FullTextType*)Class_Make_Obj(FULLTEXTTYPE);
     return FullTextType_init(self, analyzer);
 }
 
@@ -121,11 +121,11 @@ FullTextType_Load_IMP(FullTextType *self, Obj *dump) {
     UNUSED_VAR(self);
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     String *class_name = (String*)Hash_Fetch_Utf8(source, "_class", 6);
-    VTable *vtable
+    Class *klass
         = (class_name != NULL && Obj_Is_A((Obj*)class_name, STRING))
-          ? VTable_singleton(class_name, NULL)
+          ? Class_singleton(class_name, NULL)
           : FULLTEXTTYPE;
-    FullTextType *loaded = (FullTextType*)VTable_Make_Obj(vtable);
+    FullTextType *loaded = (FullTextType*)Class_Make_Obj(klass);
 
     // Extract boost.
     Obj *boost_dump = Hash_Fetch_Utf8(source, "boost", 5);

@@ -25,7 +25,7 @@
 
 TestTermInfo*
 TestTermInfo_new() {
-    return (TestTermInfo*)VTable_Make_Obj(TESTTERMINFO);
+    return (TestTermInfo*)Class_Make_Obj(TESTTERMINFO);
 }
 
 void 

@@ -27,7 +27,7 @@
 
 TestRangeQuery*
 TestRangeQuery_new() {
-    return (TestRangeQuery*)VTable_Make_Obj(TESTRANGEQUERY);
+    return (TestRangeQuery*)Class_Make_Obj(TESTRANGEQUERY);
 }
 
 static void

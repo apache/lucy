@@ -50,7 +50,7 @@
 
 MatchPosting*
 MatchPost_new(Similarity *sim) {
-    MatchPosting *self = (MatchPosting*)VTable_Make_Obj(MATCHPOSTING);
+    MatchPosting *self = (MatchPosting*)Class_Make_Obj(MATCHPOSTING);
     return MatchPost_init(self, sim);
 }
 
@@ -106,7 +106,7 @@ MatchPost_Read_Raw_IMP(MatchPosting *self, InStream *instream,
     const uint32_t    freq      = (doc_code & 1)
                                   ? 1
                                   : InStream_Read_C32(instream);
-    const size_t base_size = VTable_Get_Obj_Alloc_Size(RAWPOSTING);
+    const size_t base_size = Class_Get_Obj_Alloc_Size(RAWPOSTING);
     size_t raw_post_bytes  = MAX_RAW_POSTING_LEN(base_size, text_size);
     void *const allocation = MemPool_Grab(mem_pool, raw_post_bytes);
     UNUSED_VAR(self);
@@ -121,7 +121,7 @@ MatchPost_Add_Inversion_To_Pool_IMP(MatchPosting *self,
                                     int32_t doc_id, float doc_boost,
                                     float length_norm) {
     MemoryPool  *mem_pool = PostPool_Get_Mem_Pool(post_pool);
-    const size_t base_size = VTable_Get_Obj_Alloc_Size(RAWPOSTING);
+    const size_t base_size = Class_Get_Obj_Alloc_Size(RAWPOSTING);
     Token      **tokens;
     uint32_t     freq;
 
@@ -147,7 +147,7 @@ MatchPost_Make_Matcher_IMP(MatchPosting *self, Similarity *sim,
                            PostingList *plist, Compiler *compiler,
                            bool need_score) {
     MatchPostingMatcher *matcher
-        = (MatchPostingMatcher*)VTable_Make_Obj(MATCHPOSTINGMATCHER);
+        = (MatchPostingMatcher*)Class_Make_Obj(MATCHPOSTINGMATCHER);
     UNUSED_VAR(self);
     UNUSED_VAR(need_score);
     return MatchPostMatcher_init(matcher, sim, plist, compiler);
@@ -173,7 +173,7 @@ MatchPostingWriter*
 MatchPostWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
                     PolyReader *polyreader, int32_t field_num) {
     MatchPostingWriter *self
-        = (MatchPostingWriter*)VTable_Make_Obj(MATCHPOSTINGWRITER);
+        = (MatchPostingWriter*)Class_Make_Obj(MATCHPOSTINGWRITER);
     return MatchPostWriter_init(self, schema, snapshot, segment, polyreader,
                                 field_num);
 }
@@ -243,7 +243,7 @@ MatchPostWriter_Update_Skip_Info_IMP(MatchPostingWriter *self, TermInfo *tinfo) 
 MatchTermInfoStepper*
 MatchTInfoStepper_new(Schema *schema) {
     MatchTermInfoStepper *self
-        = (MatchTermInfoStepper*)VTable_Make_Obj(MATCHTERMINFOSTEPPER);
+        = (MatchTermInfoStepper*)Class_Make_Obj(MATCHTERMINFOSTEPPER);
     return MatchTInfoStepper_init(self, schema);
 }
 

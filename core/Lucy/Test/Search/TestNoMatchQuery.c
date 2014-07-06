@@ -27,7 +27,7 @@
 
 TestNoMatchQuery*
 TestNoMatchQuery_new() {
-    return (TestNoMatchQuery*)VTable_Make_Obj(TESTNOMATCHQUERY);
+    return (TestNoMatchQuery*)Class_Make_Obj(TESTNOMATCHQUERY);
 }
 
 static void

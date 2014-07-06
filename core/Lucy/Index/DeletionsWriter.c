@@ -72,7 +72,7 @@ DefaultDeletionsWriter*
 DefDelWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
                  PolyReader *polyreader) {
     DefaultDeletionsWriter *self
-        = (DefaultDeletionsWriter*)VTable_Make_Obj(DEFAULTDELETIONSWRITER);
+        = (DefaultDeletionsWriter*)Class_Make_Obj(DEFAULTDELETIONSWRITER);
     return DefDelWriter_init(self, schema, snapshot, segment, polyreader);
 }
 
@@ -97,7 +97,7 @@ DefDelWriter_init(DefaultDeletionsWriter *self, Schema *schema,
         BitVector *bit_vec    = BitVec_new(SegReader_Doc_Max(seg_reader));
         DeletionsReader *del_reader
             = (DeletionsReader*)SegReader_Fetch(
-                  seg_reader, VTable_Get_Name(DELETIONSREADER));
+                  seg_reader, Class_Get_Name(DELETIONSREADER));
         Matcher *seg_dels = del_reader
                             ? DelReader_Iterator(del_reader)
                             : NULL;
@@ -222,7 +222,7 @@ DefDelWriter_Seg_Deletions_IMP(DefaultDeletionsWriter *self,
     if (tick_obj) {
         DeletionsReader *del_reader
             = (DeletionsReader*)SegReader_Obtain(
-                  candidate, VTable_Get_Name(DELETIONSREADER));
+                  candidate, Class_Get_Name(DELETIONSREADER));
         if (ivars->updated[tick] || DelReader_Del_Count(del_reader)) {
             BitVector *deldocs = (BitVector*)VA_Fetch(ivars->bit_vecs, tick);
             deletions = (Matcher*)BitVecMatcher_new(deldocs);
@@ -255,7 +255,7 @@ DefDelWriter_Delete_By_Term_IMP(DefaultDeletionsWriter *self,
         SegReader *seg_reader = (SegReader*)VA_Fetch(ivars->seg_readers, i);
         PostingListReader *plist_reader
             = (PostingListReader*)SegReader_Fetch(
-                  seg_reader, VTable_Get_Name(POSTINGLISTREADER));
+                  seg_reader, Class_Get_Name(POSTINGLISTREADER));
         BitVector *bit_vec = (BitVector*)VA_Fetch(ivars->bit_vecs, i);
         PostingList *plist = plist_reader
                              ? PListReader_Posting_List(plist_reader, field, term)
@@ -373,7 +373,7 @@ DefDelWriter_Merge_Segment_IMP(DefaultDeletionsWriter *self,
                         int32_t count = (int32_t)Obj_To_I64(Hash_Fetch_Utf8(mini_meta, "count", 5));
                         DeletionsReader *del_reader
                             = (DeletionsReader*)SegReader_Obtain(
-                                  candidate, VTable_Get_Name(DELETIONSREADER));
+                                  candidate, Class_Get_Name(DELETIONSREADER));
                         if (count == DelReader_Del_Count(del_reader)) {
                             ivars->updated[i] = true;
                         }

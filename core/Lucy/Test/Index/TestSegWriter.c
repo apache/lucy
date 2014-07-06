@@ -25,7 +25,7 @@
 
 TestSegWriter*
 TestSegWriter_new() {
-    return (TestSegWriter*)VTable_Make_Obj(TESTSEGWRITER);
+    return (TestSegWriter*)Class_Make_Obj(TESTSEGWRITER);
 }
 
 void

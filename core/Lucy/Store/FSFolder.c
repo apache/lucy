@@ -80,7 +80,7 @@ S_hard_link(char *from_path, char *to_path);
 
 FSFolder*
 FSFolder_new(String *path) {
-    FSFolder *self = (FSFolder*)VTable_Make_Obj(FSFOLDER);
+    FSFolder *self = (FSFolder*)Class_Make_Obj(FSFOLDER);
     return FSFolder_init(self, path);
 }
 

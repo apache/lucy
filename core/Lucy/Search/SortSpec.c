@@ -29,7 +29,7 @@
 
 SortSpec*
 SortSpec_new(VArray *rules) {
-    SortSpec *self = (SortSpec*)VTable_Make_Obj(SORTSPEC);
+    SortSpec *self = (SortSpec*)Class_Make_Obj(SORTSPEC);
     return SortSpec_init(self, rules);
 }
 
@@ -58,7 +58,7 @@ SortSpec_Deserialize_IMP(SortSpec *self, InStream *instream) {
 
     // Add rules.
     for (uint32_t i = 0; i < num_rules; i++) {
-        SortRule *blank = (SortRule*)VTable_Make_Obj(SORTRULE);
+        SortRule *blank = (SortRule*)Class_Make_Obj(SORTRULE);
         VA_Push(rules, (Obj*)SortRule_Deserialize(blank, instream));
     }
     SortSpec_init(self, rules);

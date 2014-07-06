@@ -26,7 +26,7 @@
 
 LeafQuery*
 LeafQuery_new(String *field, String *text) {
-    LeafQuery *self = (LeafQuery*)VTable_Make_Obj(LEAFQUERY);
+    LeafQuery *self = (LeafQuery*)Class_Make_Obj(LEAFQUERY);
     return LeafQuery_init(self, field, text);
 }
 

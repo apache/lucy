@@ -26,7 +26,7 @@
 
 TestMemoryPool*
 TestMemPool_new() {
-    return (TestMemoryPool*)VTable_Make_Obj(TESTMEMORYPOOL);
+    return (TestMemoryPool*)Class_Make_Obj(TESTMEMORYPOOL);
 }
 
 void

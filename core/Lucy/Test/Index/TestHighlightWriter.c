@@ -25,7 +25,7 @@
 
 TestHighlightWriter*
 TestHLWriter_new() {
-    return (TestHighlightWriter*)VTable_Make_Obj(TESTHIGHLIGHTWRITER);
+    return (TestHighlightWriter*)Class_Make_Obj(TESTHIGHLIGHTWRITER);
 }
 
 void

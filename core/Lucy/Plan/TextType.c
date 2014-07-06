@@ -41,7 +41,7 @@ TextType_Primitive_ID_IMP(TextType *self) {
 TextTermStepper*
 TextTermStepper_new() {
     TextTermStepper *self
-        = (TextTermStepper*)VTable_Make_Obj(TEXTTERMSTEPPER);
+        = (TextTermStepper*)Class_Make_Obj(TEXTTERMSTEPPER);
     return TextTermStepper_init(self);
 }
 

@@ -32,7 +32,7 @@ S_fullpath(RAMFolder *self, String *path);
 
 RAMFolder*
 RAMFolder_new(String *path) {
-    RAMFolder *self = (RAMFolder*)VTable_Make_Obj(RAMFOLDER);
+    RAMFolder *self = (RAMFolder*)Class_Make_Obj(RAMFOLDER);
     return RAMFolder_init(self, path);
 }
 

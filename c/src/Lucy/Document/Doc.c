@@ -25,7 +25,7 @@
 #include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"
-#include "Clownfish/VTable.h"
+#include "Clownfish/Class.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/Freezer.h"

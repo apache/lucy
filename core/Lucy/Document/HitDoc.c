@@ -23,7 +23,7 @@
 
 HitDoc*
 HitDoc_new(void *fields, int32_t doc_id, float score) {
-    HitDoc *self = (HitDoc*)VTable_Make_Obj(HITDOC);
+    HitDoc *self = (HitDoc*)Class_Make_Obj(HITDOC);
     return HitDoc_init(self, fields, doc_id, score);
 }
 

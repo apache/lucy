@@ -27,7 +27,7 @@ static size_t num_ints = sizeof(source_ints) / sizeof(int32_t);
 
 TestI32Array*
 TestI32Arr_new() {
-    return (TestI32Array*)VTable_Make_Obj(TESTI32ARRAY);
+    return (TestI32Array*)Class_Make_Obj(TESTI32ARRAY);
 }
 
 static void

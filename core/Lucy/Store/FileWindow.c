@@ -21,7 +21,7 @@
 
 FileWindow*
 FileWindow_new() {
-    FileWindow *self = (FileWindow*)VTable_Make_Obj(FILEWINDOW);
+    FileWindow *self = (FileWindow*)Class_Make_Obj(FILEWINDOW);
     return FileWindow_init(self);
 }
 

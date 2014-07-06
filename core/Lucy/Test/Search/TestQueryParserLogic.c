@@ -49,7 +49,7 @@
 
 TestQueryParserLogic*
 TestQPLogic_new() {
-    return (TestQueryParserLogic*)VTable_Make_Obj(TESTQUERYPARSERLOGIC);
+    return (TestQueryParserLogic*)Class_Make_Obj(TESTQUERYPARSERLOGIC);
 }
 
 static TestQueryParser*

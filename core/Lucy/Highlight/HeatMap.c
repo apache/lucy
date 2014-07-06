@@ -23,7 +23,7 @@
 
 HeatMap*
 HeatMap_new(VArray *spans, uint32_t window) {
-    HeatMap *self = (HeatMap*)VTable_Make_Obj(HEATMAP);
+    HeatMap *self = (HeatMap*)Class_Make_Obj(HEATMAP);
     return HeatMap_init(self, spans, window);
 }
 

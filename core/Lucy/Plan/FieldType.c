@@ -99,14 +99,14 @@ FType_Compare_Values_IMP(FieldType *self, Obj *a, Obj *b) {
 
 bool
 FType_Equals_IMP(FieldType *self, Obj *other) {
-    if ((FieldType*)other == self)                       { return true; }
-    if (FType_Get_VTable(self) != Obj_Get_VTable(other)) { return false; }
+    if ((FieldType*)other == self)                     { return true; }
+    if (FType_Get_Class(self) != Obj_Get_Class(other)) { return false; }
     FieldTypeIVARS *const ivars = FType_IVARS(self);
     FieldTypeIVARS *const ovars = FType_IVARS((FieldType*)other);
-    if (ivars->boost != ovars->boost)                    { return false; }
-    if (!!ivars->indexed    != !!ovars->indexed)         { return false; }
-    if (!!ivars->stored     != !!ovars->stored)          { return false; }
-    if (!!ivars->sortable   != !!ovars->sortable)        { return false; }
+    if (ivars->boost != ovars->boost)                  { return false; }
+    if (!!ivars->indexed    != !!ovars->indexed)       { return false; }
+    if (!!ivars->stored     != !!ovars->stored)        { return false; }
+    if (!!ivars->sortable   != !!ovars->sortable)      { return false; }
     if (!!FType_Binary(self) != !!FType_Binary((FieldType*)other)) {
         return false;
     }

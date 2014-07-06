@@ -21,7 +21,6 @@
 
 #include "Lucy/Search/Matcher.h"
 #include "Clownfish/Err.h"
-#include "Clownfish/VTable.h"
 #include "Lucy/Search/Collector.h"
 
 Matcher*

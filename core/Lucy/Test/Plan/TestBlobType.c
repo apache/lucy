@@ -27,7 +27,7 @@
 
 TestBlobType*
 TestBlobType_new() {
-    return (TestBlobType*)VTable_Make_Obj(TESTBLOBTYPE);
+    return (TestBlobType*)Class_Make_Obj(TESTBLOBTYPE);
 }
 
 static void

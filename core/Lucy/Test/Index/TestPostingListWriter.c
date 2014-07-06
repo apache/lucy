@@ -24,7 +24,7 @@
 
 TestPostingListWriter*
 TestPListWriter_new() {
-    return (TestPostingListWriter*)VTable_Make_Obj(TESTPOSTINGLISTWRITER);
+    return (TestPostingListWriter*)Class_Make_Obj(TESTPOSTINGLISTWRITER);
 }
 
 void

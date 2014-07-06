@@ -28,7 +28,7 @@
 
 TestFileHandle*
 TestFH_new() {
-    return (TestFileHandle*)VTable_Make_Obj(TESTFILEHANDLE);
+    return (TestFileHandle*)Class_Make_Obj(TESTFILEHANDLE);
 }
 
 static void
@@ -38,14 +38,14 @@ S_no_op_method(const void *vself) {
 
 static FileHandle*
 S_new_filehandle() {
-    StackString *klass = SSTR_WRAP_UTF8("TestFileHandle", 14);
+    StackString *class_name = SSTR_WRAP_UTF8("TestFileHandle", 14);
     FileHandle *fh;
-    VTable *vtable = VTable_fetch_vtable((String*)klass);
-    if (!vtable) {
-        vtable = VTable_singleton((String*)klass, FILEHANDLE);
+    Class *klass = Class_fetch_class((String*)class_name);
+    if (!klass) {
+        klass = Class_singleton((String*)class_name, FILEHANDLE);
     }
-    VTable_Override(vtable, S_no_op_method, LUCY_FH_Close_OFFSET);
-    fh = (FileHandle*)VTable_Make_Obj(vtable);
+    Class_Override(klass, S_no_op_method, LUCY_FH_Close_OFFSET);
+    fh = (FileHandle*)Class_Make_Obj(klass);
     return FH_do_open(fh, NULL, 0);
 }
 

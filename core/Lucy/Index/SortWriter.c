@@ -43,7 +43,7 @@ static size_t default_mem_thresh = 0x400000; // 4 MB
 SortWriter*
 SortWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
                PolyReader *polyreader) {
-    SortWriter *self = (SortWriter*)VTable_Make_Obj(SORTWRITER);
+    SortWriter *self = (SortWriter*)Class_Make_Obj(SORTWRITER);
     return SortWriter_init(self, schema, snapshot, segment, polyreader);
 }
 
@@ -172,7 +172,7 @@ SortWriter_Add_Segment_IMP(SortWriter *self, SegReader *reader,
     for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
         String *field = (String*)VA_Fetch(fields, i);
         SortReader *sort_reader = (SortReader*)SegReader_Fetch(
-                                      reader, VTable_Get_Name(SORTREADER));
+                                      reader, Class_Get_Name(SORTREADER));
         SortCache *cache = sort_reader
                            ? SortReader_Fetch_Sort_Cache(sort_reader, field)
                            : NULL;
@@ -277,7 +277,7 @@ SortWriter_Format_IMP(SortWriter *self) {
 
 Counter*
 Counter_new() {
-    Counter *self = (Counter*)VTable_Make_Obj(COUNTER);
+    Counter *self = (Counter*)Class_Make_Obj(COUNTER);
     return Counter_init(self);
 }
 

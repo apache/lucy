@@ -49,7 +49,7 @@ S_consume_quoted_string(StringIterator *iter);
 
 QueryLexer*
 QueryLexer_new() {
-    QueryLexer *self = (QueryLexer*)VTable_Make_Obj(QUERYLEXER);
+    QueryLexer *self = (QueryLexer*)Class_Make_Obj(QUERYLEXER);
     return QueryLexer_init(self);
 }
 

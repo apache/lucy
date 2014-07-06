@@ -60,7 +60,7 @@ S_release_merge_lock(BackgroundMerger *self);
 BackgroundMerger*
 BGMerger_new(Obj *index, IndexManager *manager) {
     BackgroundMerger *self
-        = (BackgroundMerger*)VTable_Make_Obj(BACKGROUNDMERGER);
+        = (BackgroundMerger*)Class_Make_Obj(BACKGROUNDMERGER);
     return BGMerger_init(self, index, manager);
 }
 
@@ -283,7 +283,7 @@ S_merge_updated_deletions(BackgroundMerger *self) {
                 DeletionsReader *del_reader
                     = (DeletionsReader*)SegReader_Obtain(
                           new_seg_reader,
-                          VTable_Get_Name(DELETIONSREADER));
+                          Class_Get_Name(DELETIONSREADER));
                 if (!updated_deletions) {
                     updated_deletions = Hash_new(max);
                 }

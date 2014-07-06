@@ -30,7 +30,7 @@ ProximityMatcher*
 ProximityMatcher_new(Similarity *sim, VArray *plists, Compiler *compiler,
                      uint32_t within) {
     ProximityMatcher *self =
-        (ProximityMatcher*)VTable_Make_Obj(PROXIMITYMATCHER);
+        (ProximityMatcher*)Class_Make_Obj(PROXIMITYMATCHER);
     return ProximityMatcher_init(self, sim, plists, compiler, within);
 
 }

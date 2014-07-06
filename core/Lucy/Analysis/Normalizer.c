@@ -29,7 +29,7 @@
 
 Normalizer*
 Normalizer_new(String *form, bool case_fold, bool strip_accents) {
-    Normalizer *self = (Normalizer*)VTable_Make_Obj(NORMALIZER);
+    Normalizer *self = (Normalizer*)Class_Make_Obj(NORMALIZER);
     return Normalizer_init(self, form, case_fold, strip_accents);
 }
 

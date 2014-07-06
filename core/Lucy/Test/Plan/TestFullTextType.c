@@ -29,7 +29,7 @@
 
 TestFullTextType*
 TestFullTextType_new() {
-    return (TestFullTextType*)VTable_Make_Obj(TESTFULLTEXTTYPE);
+    return (TestFullTextType*)Class_Make_Obj(TESTFULLTEXTTYPE);
 }
 
 static void

@@ -38,7 +38,7 @@
 
 HitQueue*
 HitQ_new(Schema *schema, SortSpec *sort_spec, uint32_t wanted) {
-    HitQueue *self = (HitQueue*)VTable_Make_Obj(HITQUEUE);
+    HitQueue *self = (HitQueue*)Class_Make_Obj(HITQUEUE);
     return HitQ_init(self, schema, sort_spec, wanted);
 }
 

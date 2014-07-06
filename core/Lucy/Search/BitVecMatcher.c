@@ -21,7 +21,7 @@
 
 BitVecMatcher*
 BitVecMatcher_new(BitVector *bit_vector) {
-    BitVecMatcher *self = (BitVecMatcher*)VTable_Make_Obj(BITVECMATCHER);
+    BitVecMatcher *self = (BitVecMatcher*)Class_Make_Obj(BITVECMATCHER);
     return BitVecMatcher_init(self, bit_vector);
 }
 

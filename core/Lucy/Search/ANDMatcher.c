@@ -22,7 +22,7 @@
 
 ANDMatcher*
 ANDMatcher_new(VArray *children, Similarity *sim) {
-    ANDMatcher *self = (ANDMatcher*)VTable_Make_Obj(ANDMATCHER);
+    ANDMatcher *self = (ANDMatcher*)Class_Make_Obj(ANDMATCHER);
     return ANDMatcher_init(self, children, sim);
 }
 

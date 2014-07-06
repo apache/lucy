@@ -47,7 +47,7 @@ S_do_init(PhraseQuery *self, String *field, VArray *terms, float boost);
 
 PhraseQuery*
 PhraseQuery_new(String *field, VArray *terms) {
-    PhraseQuery *self = (PhraseQuery*)VTable_Make_Obj(PHRASEQUERY);
+    PhraseQuery *self = (PhraseQuery*)Class_Make_Obj(PHRASEQUERY);
     return PhraseQuery_init(self, field, terms);
 }
 
@@ -196,7 +196,7 @@ PhraseQuery_Get_Terms_IMP(PhraseQuery *self) {
 
 PhraseCompiler*
 PhraseCompiler_new(PhraseQuery *parent, Searcher *searcher, float boost) {
-    PhraseCompiler *self = (PhraseCompiler*)VTable_Make_Obj(PHRASECOMPILER);
+    PhraseCompiler *self = (PhraseCompiler*)Class_Make_Obj(PHRASECOMPILER);
     return PhraseCompiler_init(self, parent, searcher, boost);
 }
 
@@ -316,7 +316,7 @@ PhraseCompiler_Make_Matcher_IMP(PhraseCompiler *self, SegReader *reader,
     // Bail if there's no PostingListReader for this segment.
     PostingListReader *const plist_reader
         = (PostingListReader*)SegReader_Fetch(
-              reader, VTable_Get_Name(POSTINGLISTREADER));
+              reader, Class_Get_Name(POSTINGLISTREADER));
     if (!plist_reader) { return NULL; }
 
     // Look up each term.

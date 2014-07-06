@@ -21,7 +21,7 @@
 
 I32Array*
 I32Arr_new(int32_t *ints, uint32_t size) {
-    I32Array *self = (I32Array*)VTable_Make_Obj(I32ARRAY);
+    I32Array *self = (I32Array*)Class_Make_Obj(I32ARRAY);
     int32_t *ints_copy = (int32_t*)MALLOCATE(size * sizeof(int32_t));
     memcpy(ints_copy, ints, size * sizeof(int32_t));
     return I32Arr_init(self, ints_copy, size);
@@ -29,14 +29,14 @@ I32Arr_new(int32_t *ints, uint32_t size) {
 
 I32Array*
 I32Arr_new_blank(uint32_t size) {
-    I32Array *self = (I32Array*)VTable_Make_Obj(I32ARRAY);
+    I32Array *self = (I32Array*)Class_Make_Obj(I32ARRAY);
     int32_t *ints = (int32_t*)CALLOCATE(size, sizeof(int32_t));
     return I32Arr_init(self, ints, size);
 }
 
 I32Array*
 I32Arr_new_steal(int32_t *ints, uint32_t size) {
-    I32Array *self = (I32Array*)VTable_Make_Obj(I32ARRAY);
+    I32Array *self = (I32Array*)Class_Make_Obj(I32ARRAY);
     return I32Arr_init(self, ints, size);
 }
 

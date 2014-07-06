@@ -28,7 +28,7 @@
 RawPostingList*
 RawPList_new(Schema *schema, String *field, InStream *instream,
              int64_t start, int64_t end) {
-    RawPostingList *self = (RawPostingList*)VTable_Make_Obj(RAWPOSTINGLIST);
+    RawPostingList *self = (RawPostingList*)Class_Make_Obj(RAWPOSTINGLIST);
     return RawPList_init(self, schema, field, instream, start, end);
 }
 

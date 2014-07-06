@@ -21,7 +21,7 @@
 
 FilterMatcher*
 FilterMatcher_new(BitVector *bits, int32_t doc_max) {
-    FilterMatcher *self = (FilterMatcher*)VTable_Make_Obj(FILTERMATCHER);
+    FilterMatcher *self = (FilterMatcher*)Class_Make_Obj(FILTERMATCHER);
     return FilterMatcher_init(self, bits, doc_max);
 }
 

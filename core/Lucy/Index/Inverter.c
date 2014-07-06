@@ -34,7 +34,7 @@
 
 Inverter*
 Inverter_new(Schema *schema, Segment *segment) {
-    Inverter *self = (Inverter*)VTable_Make_Obj(INVERTER);
+    Inverter *self = (Inverter*)Class_Make_Obj(INVERTER);
     return Inverter_init(self, schema, segment);
 }
 
@@ -193,7 +193,7 @@ Inverter_Clear_IMP(Inverter *self) {
 
 InverterEntry*
 InvEntry_new(Schema *schema, String *field, int32_t field_num) {
-    InverterEntry *self = (InverterEntry*)VTable_Make_Obj(INVERTERENTRY);
+    InverterEntry *self = (InverterEntry*)Class_Make_Obj(INVERTERENTRY);
     return InvEntry_init(self, schema, field, field_num);
 }
 

@@ -43,7 +43,7 @@
 
 RichPosting*
 RichPost_new(Similarity *sim) {
-    RichPosting *self = (RichPosting*)VTable_Make_Obj(RICHPOSTING);
+    RichPosting *self = (RichPosting*)Class_Make_Obj(RICHPOSTING);
     return RichPost_init(self, sim);
 }
 
@@ -113,7 +113,7 @@ RichPost_Add_Inversion_To_Pool_IMP(RichPosting *self, PostingPool *post_pool,
     MemoryPool *mem_pool = PostPool_Get_Mem_Pool(post_pool);
     Similarity *sim = ivars->sim;
     float       field_boost = doc_boost * FType_Get_Boost(type) * length_norm;
-    const size_t base_size = VTable_Get_Obj_Alloc_Size(RAWPOSTING);
+    const size_t base_size = Class_Get_Obj_Alloc_Size(RAWPOSTING);
     Token     **tokens;
     uint32_t    freq;
 
@@ -163,7 +163,7 @@ RichPost_Read_Raw_IMP(RichPosting *self, InStream *instream,
     const uint32_t    freq      = (doc_code & 1)
                                   ? 1
                                   : InStream_Read_C32(instream);
-    const size_t base_size = VTable_Get_Obj_Alloc_Size(RAWPOSTING);
+    const size_t base_size = Class_Get_Obj_Alloc_Size(RAWPOSTING);
     size_t raw_post_bytes  = MAX_RAW_POSTING_LEN(base_size, text_size, freq);
     void *const allocation = MemPool_Grab(mem_pool, raw_post_bytes);
     RawPosting *const raw_posting
@@ -194,7 +194,7 @@ RichPost_Make_Matcher_IMP(RichPosting *self, Similarity *sim,
                           PostingList *plist, Compiler *compiler,
                           bool need_score) {
     RichPostingMatcher* matcher
-        = (RichPostingMatcher*)VTable_Make_Obj(RICHPOSTINGMATCHER);
+        = (RichPostingMatcher*)Class_Make_Obj(RICHPOSTINGMATCHER);
     UNUSED_VAR(self);
     UNUSED_VAR(need_score);
     return RichPostMatcher_init(matcher, sim, plist, compiler);

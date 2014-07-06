@@ -50,7 +50,7 @@ HLReader_Aggregator_IMP(HighlightReader *self, VArray *readers,
 PolyHighlightReader*
 PolyHLReader_new(VArray *readers, I32Array *offsets) {
     PolyHighlightReader *self
-        = (PolyHighlightReader*)VTable_Make_Obj(POLYHIGHLIGHTREADER);
+        = (PolyHighlightReader*)Class_Make_Obj(POLYHIGHLIGHTREADER);
     return PolyHLReader_init(self, readers, offsets);
 }
 
@@ -105,7 +105,7 @@ PolyHLReader_Fetch_Doc_Vec_IMP(PolyHighlightReader *self, int32_t doc_id) {
 DefaultHighlightReader*
 DefHLReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
                 VArray *segments, int32_t seg_tick) {
-    DefaultHighlightReader *self = (DefaultHighlightReader*)VTable_Make_Obj(
+    DefaultHighlightReader *self = (DefaultHighlightReader*)Class_Make_Obj(
                                        DEFAULTHIGHLIGHTREADER);
     return DefHLReader_init(self, schema, folder, snapshot, segments,
                             seg_tick);

@@ -73,7 +73,7 @@ S_skip_extend_format(const char *text, size_t len, lucy_StringIter *iter);
 
 StandardTokenizer*
 StandardTokenizer_new() {
-    StandardTokenizer *self = (StandardTokenizer*)VTable_Make_Obj(STANDARDTOKENIZER);
+    StandardTokenizer *self = (StandardTokenizer*)Class_Make_Obj(STANDARDTOKENIZER);
     return StandardTokenizer_init(self);
 }
 

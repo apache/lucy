@@ -21,7 +21,7 @@
 
 BlobType*
 BlobType_new(bool stored) {
-    BlobType *self = (BlobType*)VTable_Make_Obj(BLOBTYPE);
+    BlobType *self = (BlobType*)Class_Make_Obj(BLOBTYPE);
     return BlobType_init(self, stored);
 }
 
@@ -94,11 +94,11 @@ BlobType*
 BlobType_Load_IMP(BlobType *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     String *class_name = (String*)Hash_Fetch_Utf8(source, "_class", 6);
-    VTable *vtable
+    Class *klass
         = (class_name != NULL && Obj_Is_A((Obj*)class_name, STRING))
-          ? VTable_singleton(class_name, NULL)
+          ? Class_singleton(class_name, NULL)
           : BLOBTYPE;
-    BlobType *loaded     = (BlobType*)VTable_Make_Obj(vtable);
+    BlobType *loaded     = (BlobType*)Class_Make_Obj(klass);
     Obj *boost_dump      = Hash_Fetch_Utf8(source, "boost", 5);
     Obj *indexed_dump    = Hash_Fetch_Utf8(source, "indexed", 7);
     Obj *stored_dump     = Hash_Fetch_Utf8(source, "stored", 6);

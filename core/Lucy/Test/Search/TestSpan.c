@@ -25,7 +25,7 @@
 
 TestSpan*
 TestSpan_new() {
-    return (TestSpan*)VTable_Make_Obj(TESTSPAN);
+    return (TestSpan*)Class_Make_Obj(TESTSPAN);
 }
 
 void 

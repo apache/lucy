@@ -31,12 +31,12 @@
 
 TestANDQuery*
 TestANDQuery_new() {
-    return (TestANDQuery*)VTable_Make_Obj(TESTANDQUERY);
+    return (TestANDQuery*)Class_Make_Obj(TESTANDQUERY);
 }
 
 TestORQuery*
 TestORQuery_new() {
-    return (TestORQuery*)VTable_Make_Obj(TESTORQUERY);
+    return (TestORQuery*)Class_Make_Obj(TESTORQUERY);
 }
 
 static void

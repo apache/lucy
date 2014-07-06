@@ -35,7 +35,7 @@
 
 TestFSFileHandle*
 TestFSFH_new() {
-    return (TestFSFileHandle*)VTable_Make_Obj(TESTFSFILEHANDLE);
+    return (TestFSFileHandle*)Class_Make_Obj(TESTFSFILEHANDLE);
 }
 
 static void

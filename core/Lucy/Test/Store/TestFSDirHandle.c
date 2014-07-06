@@ -36,7 +36,7 @@
 
 TestFSDirHandle*
 TestFSDH_new() {
-    return (TestFSDirHandle*)VTable_Make_Obj(TESTFSDIRHANDLE);
+    return (TestFSDirHandle*)Class_Make_Obj(TESTFSDIRHANDLE);
 }
 
 static void

@@ -26,7 +26,7 @@
 
 SkipStepper*
 SkipStepper_new() {
-    SkipStepper *self = (SkipStepper*)VTable_Make_Obj(SKIPSTEPPER);
+    SkipStepper *self = (SkipStepper*)Class_Make_Obj(SKIPSTEPPER);
     SkipStepperIVARS *const ivars = SkipStepper_IVARS(self);
 
     // Init.

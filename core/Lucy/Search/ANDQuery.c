@@ -34,7 +34,7 @@
 
 ANDQuery*
 ANDQuery_new(VArray *children) {
-    ANDQuery *self = (ANDQuery*)VTable_Make_Obj(ANDQUERY);
+    ANDQuery *self = (ANDQuery*)Class_Make_Obj(ANDQUERY);
     return ANDQuery_init(self, children);
 }
 
@@ -91,7 +91,7 @@ ANDQuery_Make_Compiler_IMP(ANDQuery *self, Searcher *searcher, float boost,
 
 ANDCompiler*
 ANDCompiler_new(ANDQuery *parent, Searcher *searcher, float boost) {
-    ANDCompiler *self = (ANDCompiler*)VTable_Make_Obj(ANDCOMPILER);
+    ANDCompiler *self = (ANDCompiler*)Class_Make_Obj(ANDCOMPILER);
     return ANDCompiler_init(self, parent, searcher, boost);
 }
 

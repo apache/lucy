@@ -41,7 +41,7 @@ static String *nope              = NULL;
 
 TestFolder*
 TestFolder_new() {
-    return (TestFolder*)VTable_Make_Obj(TESTFOLDER);
+    return (TestFolder*)Class_Make_Obj(TESTFOLDER);
 }
 
 static void

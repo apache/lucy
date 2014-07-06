@@ -45,7 +45,7 @@ DocReader_Aggregator_IMP(DocReader *self, VArray *readers,
 
 PolyDocReader*
 PolyDocReader_new(VArray *readers, I32Array *offsets) {
-    PolyDocReader *self = (PolyDocReader*)VTable_Make_Obj(POLYDOCREADER);
+    PolyDocReader *self = (PolyDocReader*)Class_Make_Obj(POLYDOCREADER);
     return PolyDocReader_init(self, readers, offsets);
 }
 
@@ -102,7 +102,7 @@ DefaultDocReader*
 DefDocReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
                  VArray *segments, int32_t seg_tick) {
     DefaultDocReader *self
-        = (DefaultDocReader*)VTable_Make_Obj(DEFAULTDOCREADER);
+        = (DefaultDocReader*)Class_Make_Obj(DEFAULTDOCREADER);
     return DefDocReader_init(self, schema, folder, snapshot, segments,
                              seg_tick);
 }

@@ -29,7 +29,7 @@
 
 TestSchema*
 TestSchema_new(bool use_alt_arch) {
-    TestSchema *self = (TestSchema*)VTable_Make_Obj(TESTSCHEMA);
+    TestSchema *self = (TestSchema*)Class_Make_Obj(TESTSCHEMA);
     return TestSchema_init(self, use_alt_arch);
 }
 
@@ -62,7 +62,7 @@ TestSchema_Architecture_IMP(TestSchema *self) {
 
 TestBatchSchema*
 TestBatchSchema_new() {
-    return (TestBatchSchema*)VTable_Make_Obj(TESTBATCHSCHEMA);
+    return (TestBatchSchema*)Class_Make_Obj(TESTBATCHSCHEMA);
 }
 
 static void

@@ -26,7 +26,7 @@
 
 TestSegment*
 TestSeg_new() {
-    return (TestSegment*)VTable_Make_Obj(TESTSEGMENT);
+    return (TestSegment*)Class_Make_Obj(TESTSEGMENT);
 }
 
 static void

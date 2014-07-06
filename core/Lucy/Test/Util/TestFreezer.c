@@ -28,7 +28,7 @@
 
 TestFreezer*
 TestFreezer_new() {
-    return (TestFreezer*)VTable_Make_Obj(TESTFREEZER);
+    return (TestFreezer*)Class_Make_Obj(TESTFREEZER);
 }
 
 // Return the result of round-tripping the object through FREEZE and THAW.

@@ -67,7 +67,7 @@ SI_competitive(SortCollectorIVARS *ivars, int32_t doc_id);
 
 SortCollector*
 SortColl_new(Schema *schema, SortSpec *sort_spec, uint32_t wanted) {
-    SortCollector *self = (SortCollector*)VTable_Make_Obj(SORTCOLLECTOR);
+    SortCollector *self = (SortCollector*)Class_Make_Obj(SORTCOLLECTOR);
     return SortColl_init(self, schema, sort_spec, wanted);
 }
 
@@ -225,7 +225,7 @@ void
 SortColl_Set_Reader_IMP(SortCollector *self, SegReader *reader) {
     SortCollectorIVARS *const ivars = SortColl_IVARS(self);
     SortReader *sort_reader
-        = (SortReader*)SegReader_Fetch(reader, VTable_Get_Name(SORTREADER));
+        = (SortReader*)SegReader_Fetch(reader, Class_Get_Name(SORTREADER));
 
     // Reset threshold variables and trigger auto-action behavior.
     MatchDocIVARS *const bumped_ivars = MatchDoc_IVARS(ivars->bumped);

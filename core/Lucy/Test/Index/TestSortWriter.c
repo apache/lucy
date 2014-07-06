@@ -48,7 +48,7 @@ static String *nope_str;
 
 TestSortWriter*
 TestSortWriter_new() {
-    return (TestSortWriter*)VTable_Make_Obj(TESTSORTWRITER);
+    return (TestSortWriter*)Class_Make_Obj(TESTSORTWRITER);
 }
 
 static void
@@ -153,9 +153,9 @@ S_test_sort_cache(TestBatchRunner *runner, RAMFolder *folder,
 
     SortReader *sort_reader
         = (SortReader*)SegReader_Obtain(seg_reader,
-                                        VTable_Get_Name(SORTREADER));
+                                        Class_Get_Name(SORTREADER));
     DocReader *doc_reader
-        = (DocReader*)SegReader_Obtain(seg_reader, VTable_Get_Name(DOCREADER));
+        = (DocReader*)SegReader_Obtain(seg_reader, Class_Get_Name(DOCREADER));
     SortCache *sort_cache
         = SortReader_Fetch_Sort_Cache(sort_reader, field);
 
@@ -290,7 +290,7 @@ TestSortWriter_Run_IMP(TestSortWriter *self, TestBatchRunner *runner) {
 NonMergingIndexManager*
 NMIxManager_new() {
     NonMergingIndexManager *self
-        = (NonMergingIndexManager*)VTable_Make_Obj(NONMERGINGINDEXMANAGER);
+        = (NonMergingIndexManager*)Class_Make_Obj(NONMERGINGINDEXMANAGER);
     return NMIxManager_init(self);
 }
 

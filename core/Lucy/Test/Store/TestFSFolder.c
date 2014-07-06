@@ -51,7 +51,7 @@ S_create_test_symlinks(void);
 
 TestFSFolder*
 TestFSFolder_new() {
-    return (TestFSFolder*)VTable_Make_Obj(TESTFSFOLDER);
+    return (TestFSFolder*)Class_Make_Obj(TESTFSFOLDER);
 }
 
 static Folder*

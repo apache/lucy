@@ -23,7 +23,7 @@
 
 NOTMatcher*
 NOTMatcher_new(Matcher *negated_matcher, int32_t doc_max) {
-    NOTMatcher *self = (NOTMatcher*)VTable_Make_Obj(NOTMATCHER);
+    NOTMatcher *self = (NOTMatcher*)Class_Make_Obj(NOTMATCHER);
     return NOTMatcher_init(self, negated_matcher, doc_max);
 }
 

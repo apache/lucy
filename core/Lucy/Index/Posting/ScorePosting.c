@@ -45,7 +45,7 @@
 
 ScorePosting*
 ScorePost_new(Similarity *sim) {
-    ScorePosting *self = (ScorePosting*)VTable_Make_Obj(SCOREPOSTING);
+    ScorePosting *self = (ScorePosting*)Class_Make_Obj(SCOREPOSTING);
     return ScorePost_init(self, sim);
 }
 
@@ -84,7 +84,7 @@ ScorePost_Add_Inversion_To_Pool_IMP(ScorePosting *self,
     Similarity     *sim = ivars->sim;
     float           field_boost = doc_boost * FType_Get_Boost(type) * length_norm;
     const uint8_t   field_boost_byte  = Sim_Encode_Norm(sim, field_boost);
-    const size_t    base_size = VTable_Get_Obj_Alloc_Size(RAWPOSTING);
+    const size_t    base_size = Class_Get_Obj_Alloc_Size(RAWPOSTING);
     Token         **tokens;
     uint32_t        freq;
 
@@ -182,7 +182,7 @@ ScorePost_Read_Raw_IMP(ScorePosting *self, InStream *instream,
     const uint32_t    freq      = (doc_code & 1)
                                   ? 1
                                   : InStream_Read_C32(instream);
-    const size_t base_size = VTable_Get_Obj_Alloc_Size(RAWPOSTING);
+    const size_t base_size = Class_Get_Obj_Alloc_Size(RAWPOSTING);
     size_t raw_post_bytes  = MAX_RAW_POSTING_LEN(base_size, text_size, freq);
     void *const allocation = MemPool_Grab(mem_pool, raw_post_bytes);
     RawPosting *const raw_posting
@@ -215,7 +215,7 @@ ScorePost_Make_Matcher_IMP(ScorePosting *self, Similarity *sim,
                            PostingList *plist, Compiler *compiler,
                            bool need_score) {
     ScorePostingMatcher *matcher
-        = (ScorePostingMatcher*)VTable_Make_Obj(SCOREPOSTINGMATCHER);
+        = (ScorePostingMatcher*)Class_Make_Obj(SCOREPOSTINGMATCHER);
     UNUSED_VAR(self);
     UNUSED_VAR(need_score);
     return ScorePostMatcher_init(matcher, sim, plist, compiler);

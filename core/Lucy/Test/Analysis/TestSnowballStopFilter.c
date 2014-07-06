@@ -25,13 +25,13 @@
 
 TestSnowballStopFilter*
 TestSnowStop_new() {
-    return (TestSnowballStopFilter*)VTable_Make_Obj(TESTSNOWBALLSTOPFILTER);
+    return (TestSnowballStopFilter*)Class_Make_Obj(TESTSNOWBALLSTOPFILTER);
 }
 
 static SnowballStopFilter*
 S_make_stopfilter(void *unused, ...) {
     va_list args;
-    SnowballStopFilter *self = (SnowballStopFilter*)VTable_Make_Obj(SNOWBALLSTOPFILTER);
+    SnowballStopFilter *self = (SnowballStopFilter*)Class_Make_Obj(SNOWBALLSTOPFILTER);
     Hash *stoplist = Hash_new(0);
     char *stopword;
 

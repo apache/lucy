@@ -29,7 +29,7 @@
 SharedLock*
 ShLock_new(Folder *folder, String *name, String *host,
            int32_t timeout, int32_t interval) {
-    SharedLock *self = (SharedLock*)VTable_Make_Obj(SHAREDLOCK);
+    SharedLock *self = (SharedLock*)Class_Make_Obj(SHAREDLOCK);
     return ShLock_init(self, folder, name, host, timeout, interval);
 }
 

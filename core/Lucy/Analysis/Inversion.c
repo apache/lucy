@@ -28,7 +28,7 @@ S_count_clusters(Inversion *self, InversionIVARS *ivars);
 
 Inversion*
 Inversion_new(Token *seed_token) {
-    Inversion *self = (Inversion*)VTable_Make_Obj(INVERSION);
+    Inversion *self = (Inversion*)Class_Make_Obj(INVERSION);
     InversionIVARS *const ivars = Inversion_IVARS(self);
 
     // Init.

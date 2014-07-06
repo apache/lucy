@@ -24,7 +24,7 @@
 
 NoMatchMatcher*
 NoMatchMatcher_new() {
-    NoMatchMatcher *self = (NoMatchMatcher*)VTable_Make_Obj(NOMATCHMATCHER);
+    NoMatchMatcher *self = (NoMatchMatcher*)Class_Make_Obj(NOMATCHMATCHER);
     return NoMatchMatcher_init(self);
 }
 

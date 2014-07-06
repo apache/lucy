@@ -43,7 +43,7 @@ S_find_upper_bound(RangeCompiler *self, SortCache *sort_cache);
 RangeQuery*
 RangeQuery_new(String *field, Obj *lower_term, Obj *upper_term,
                bool include_lower, bool include_upper) {
-    RangeQuery *self = (RangeQuery*)VTable_Make_Obj(RANGEQUERY);
+    RangeQuery *self = (RangeQuery*)Class_Make_Obj(RANGEQUERY);
     return RangeQuery_init(self, field, lower_term, upper_term,
                            include_lower, include_upper);
 }
@@ -225,7 +225,7 @@ RangeQuery_Make_Compiler_IMP(RangeQuery *self, Searcher *searcher,
 RangeCompiler*
 RangeCompiler_new(RangeQuery *parent, Searcher *searcher, float boost) {
     RangeCompiler *self
-        = (RangeCompiler*)VTable_Make_Obj(RANGECOMPILER);
+        = (RangeCompiler*)Class_Make_Obj(RANGECOMPILER);
     return RangeCompiler_init(self, parent, searcher, boost);
 }
 
@@ -242,7 +242,7 @@ RangeCompiler_Make_Matcher_IMP(RangeCompiler *self, SegReader *reader,
     RangeQuery *parent = (RangeQuery*)RangeCompiler_IVARS(self)->parent;
     String *field = RangeQuery_IVARS(parent)->field;
     SortReader *sort_reader
-        = (SortReader*)SegReader_Fetch(reader, VTable_Get_Name(SORTREADER));
+        = (SortReader*)SegReader_Fetch(reader, Class_Get_Name(SORTREADER));
     SortCache *sort_cache = sort_reader
                             ? SortReader_Fetch_Sort_Cache(sort_reader, field)
                             : NULL;

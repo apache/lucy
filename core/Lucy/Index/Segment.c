@@ -27,7 +27,7 @@
 
 Segment*
 Seg_new(int64_t number) {
-    Segment *self = (Segment*)VTable_Make_Obj(SEGMENT);
+    Segment *self = (Segment*)Class_Make_Obj(SEGMENT);
     return Seg_init(self, number);
 }
 

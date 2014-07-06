@@ -24,7 +24,7 @@
 
 TestIndexFileNames*
 TestIxFileNames_new() {
-    return (TestIndexFileNames*)VTable_Make_Obj(TESTINDEXFILENAMES);
+    return (TestIndexFileNames*)Class_Make_Obj(TESTINDEXFILENAMES);
 }
 
 static void

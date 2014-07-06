@@ -27,7 +27,7 @@
 
 TestJson*
 TestJson_new() {
-    return (TestJson*)VTable_Make_Obj(TESTJSON);
+    return (TestJson*)Class_Make_Obj(TESTJSON);
 }
 
 // Create a test data structure including at least one each of Hash, VArray,

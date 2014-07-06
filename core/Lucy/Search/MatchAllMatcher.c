@@ -22,7 +22,7 @@
 MatchAllMatcher*
 MatchAllMatcher_new(float score, int32_t doc_max) {
     MatchAllMatcher *self
-        = (MatchAllMatcher*)VTable_Make_Obj(MATCHALLMATCHER);
+        = (MatchAllMatcher*)Class_Make_Obj(MATCHALLMATCHER);
     return MatchAllMatcher_init(self, score, doc_max);
 }
 

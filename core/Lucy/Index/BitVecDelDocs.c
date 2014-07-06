@@ -23,7 +23,7 @@
 
 BitVecDelDocs*
 BitVecDelDocs_new(Folder *folder, String *filename) {
-    BitVecDelDocs *self = (BitVecDelDocs*)VTable_Make_Obj(BITVECDELDOCS);
+    BitVecDelDocs *self = (BitVecDelDocs*)Class_Make_Obj(BITVECDELDOCS);
     return BitVecDelDocs_init(self, folder, filename);
 }
 

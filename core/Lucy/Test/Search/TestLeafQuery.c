@@ -27,7 +27,7 @@
 
 TestLeafQuery*
 TestLeafQuery_new() {
-    return (TestLeafQuery*)VTable_Make_Obj(TESTLEAFQUERY);
+    return (TestLeafQuery*)Class_Make_Obj(TESTLEAFQUERY);
 }
 
 static void

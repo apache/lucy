@@ -86,7 +86,7 @@ F64SortCache_new(String *field, FieldType *type, int32_t cardinality,
                  int32_t doc_max, int32_t null_ord, int32_t ord_width,
                  InStream *ord_in, InStream *dat_in) {
     Float64SortCache *self
-        = (Float64SortCache*)VTable_Make_Obj(FLOAT64SORTCACHE);
+        = (Float64SortCache*)Class_Make_Obj(FLOAT64SORTCACHE);
     return F64SortCache_init(self, field, type, cardinality, doc_max,
                              null_ord, ord_width, ord_in, dat_in);
 }
@@ -124,7 +124,7 @@ F32SortCache_new(String *field, FieldType *type, int32_t cardinality,
                  int32_t doc_max, int32_t null_ord, int32_t ord_width,
                  InStream *ord_in, InStream *dat_in) {
     Float32SortCache *self
-        = (Float32SortCache*)VTable_Make_Obj(FLOAT32SORTCACHE);
+        = (Float32SortCache*)Class_Make_Obj(FLOAT32SORTCACHE);
     return F32SortCache_init(self, field, type, cardinality, doc_max,
                              null_ord, ord_width, ord_in, dat_in);
 }
@@ -162,7 +162,7 @@ I32SortCache_new(String *field, FieldType *type, int32_t cardinality,
                  int32_t doc_max, int32_t null_ord, int32_t ord_width,
                  InStream *ord_in, InStream *dat_in) {
     Int32SortCache *self
-        = (Int32SortCache*)VTable_Make_Obj(INT32SORTCACHE);
+        = (Int32SortCache*)Class_Make_Obj(INT32SORTCACHE);
     return I32SortCache_init(self, field, type, cardinality, doc_max,
                              null_ord, ord_width, ord_in, dat_in);
 }
@@ -200,7 +200,7 @@ I64SortCache_new(String *field, FieldType *type, int32_t cardinality,
                  int32_t doc_max, int32_t null_ord, int32_t ord_width,
                  InStream *ord_in, InStream *dat_in) {
     Int64SortCache *self
-        = (Int64SortCache*)VTable_Make_Obj(INT64SORTCACHE);
+        = (Int64SortCache*)Class_Make_Obj(INT64SORTCACHE);
     return I64SortCache_init(self, field, type, cardinality, doc_max,
                              null_ord, ord_width, ord_in, dat_in);
 }

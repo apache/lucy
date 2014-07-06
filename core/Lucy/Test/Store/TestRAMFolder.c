@@ -41,7 +41,7 @@ static String *nope_nyet     = NULL;
 
 TestRAMFolder*
 TestRAMFolder_new() {
-    return (TestRAMFolder*)VTable_Make_Obj(TESTRAMFOLDER);
+    return (TestRAMFolder*)Class_Make_Obj(TESTRAMFOLDER);
 }
 
 static void

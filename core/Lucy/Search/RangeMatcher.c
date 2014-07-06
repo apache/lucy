@@ -23,7 +23,7 @@
 RangeMatcher*
 RangeMatcher_new(int32_t lower_bound, int32_t upper_bound, SortCache *sort_cache,
                  int32_t doc_max) {
-    RangeMatcher *self = (RangeMatcher*)VTable_Make_Obj(RANGEMATCHER);
+    RangeMatcher *self = (RangeMatcher*)Class_Make_Obj(RANGEMATCHER);
     return RangeMatcher_init(self, lower_bound, upper_bound, sort_cache,
                              doc_max);
 }

@@ -31,7 +31,7 @@
 
 TestRAMFileHandle*
 TestRAMFH_new() {
-    return (TestRAMFileHandle*)VTable_Make_Obj(TESTRAMFILEHANDLE);
+    return (TestRAMFileHandle*)Class_Make_Obj(TESTRAMFILEHANDLE);
 }
 
 static void

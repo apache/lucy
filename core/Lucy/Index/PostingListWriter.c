@@ -52,7 +52,7 @@ PostingListWriter*
 PListWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
                 PolyReader *polyreader, LexiconWriter *lex_writer) {
     PostingListWriter *self
-        = (PostingListWriter*)VTable_Make_Obj(POSTINGLISTWRITER);
+        = (PostingListWriter*)Class_Make_Obj(POSTINGLISTWRITER);
     return PListWriter_init(self, schema, snapshot, segment, polyreader,
                             lex_writer);
 }

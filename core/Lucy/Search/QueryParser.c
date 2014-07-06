@@ -99,7 +99,7 @@ S_compose_subquery(QueryParser *self, VArray *elems, bool enclosed);
 QueryParser*
 QParser_new(Schema *schema, Analyzer *analyzer, String *default_boolop,
             VArray *fields) {
-    QueryParser *self = (QueryParser*)VTable_Make_Obj(QUERYPARSER);
+    QueryParser *self = (QueryParser*)Class_Make_Obj(QUERYPARSER);
     return QParser_init(self, schema, analyzer, default_boolop, fields);
 }
 

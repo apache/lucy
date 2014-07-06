@@ -28,7 +28,7 @@ int32_t SortRule_DOC_ID = 2;
 
 SortRule*
 SortRule_new(int32_t type, String *field, bool reverse) {
-    SortRule *self = (SortRule*)VTable_Make_Obj(SORTRULE);
+    SortRule *self = (SortRule*)Class_Make_Obj(SORTRULE);
     return SortRule_init(self, type, field, reverse);
 }
 

@@ -26,12 +26,12 @@
 
 TestAnalyzer*
 TestAnalyzer_new() {
-    return (TestAnalyzer*)VTable_Make_Obj(TESTANALYZER);
+    return (TestAnalyzer*)Class_Make_Obj(TESTANALYZER);
 }
 
 DummyAnalyzer*
 DummyAnalyzer_new() {
-    DummyAnalyzer *self = (DummyAnalyzer*)VTable_Make_Obj(DUMMYANALYZER);
+    DummyAnalyzer *self = (DummyAnalyzer*)Class_Make_Obj(DUMMYANALYZER);
     return DummyAnalyzer_init(self);
 }
 

@@ -48,7 +48,7 @@ S_refill(InStream *self);
 
 InStream*
 InStream_open(Obj *file) {
-    InStream *self = (InStream*)VTable_Make_Obj(INSTREAM);
+    InStream *self = (InStream*)Class_Make_Obj(INSTREAM);
     return InStream_do_open(self, file);
 }
 
@@ -133,8 +133,8 @@ InStream_Reopen_IMP(InStream *self, String *filename, int64_t offset,
               offset, len, FH_Length(ivars->file_handle));
     }
 
-    VTable *vtable = InStream_Get_VTable(self);
-    InStream *other = (InStream*)VTable_Make_Obj(vtable);
+    Class *klass = InStream_Get_Class(self);
+    InStream *other = (InStream*)Class_Make_Obj(klass);
     InStreamIVARS *const ovars = InStream_IVARS(other);
     InStream_do_open(other, (Obj*)ivars->file_handle);
     if (filename != NULL) {
@@ -151,8 +151,8 @@ InStream_Reopen_IMP(InStream *self, String *filename, int64_t offset,
 InStream*
 InStream_Clone_IMP(InStream *self) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
-    VTable *vtable = InStream_Get_VTable(self);
-    InStream *twin = (InStream*)VTable_Make_Obj(vtable);
+    Class *klass = InStream_Get_Class(self);
+    InStream *twin = (InStream*)Class_Make_Obj(klass);
     InStream_do_open(twin, (Obj*)ivars->file_handle);
     InStream_Seek(twin, SI_tell(self));
     return twin;

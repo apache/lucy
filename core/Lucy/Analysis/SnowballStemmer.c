@@ -27,7 +27,7 @@
 
 SnowballStemmer*
 SnowStemmer_new(String *language) {
-    SnowballStemmer *self = (SnowballStemmer*)VTable_Make_Obj(SNOWBALLSTEMMER);
+    SnowballStemmer *self = (SnowballStemmer*)Class_Make_Obj(SNOWBALLSTEMMER);
     return SnowStemmer_init(self, language);
 }
 

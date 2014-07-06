@@ -45,7 +45,7 @@ static String *united_states_str;
 
 TestFieldMisc*
 TestFieldMisc_new() {
-    return (TestFieldMisc*)VTable_Make_Obj(TESTFIELDMISC);
+    return (TestFieldMisc*)Class_Make_Obj(TESTFIELDMISC);
 }
 
 static void

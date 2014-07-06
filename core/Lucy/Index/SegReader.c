@@ -36,7 +36,7 @@ S_try_init_components(void *context);
 SegReader*
 SegReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
               VArray *segments, int32_t seg_tick) {
-    SegReader *self = (SegReader*)VTable_Make_Obj(SEGREADER);
+    SegReader *self = (SegReader*)Class_Make_Obj(SEGREADER);
     return SegReader_init(self, schema, folder, snapshot, segments, seg_tick);
 }
 
@@ -62,7 +62,7 @@ SegReader_init(SegReader *self, Schema *schema, Folder *folder,
 
     DeletionsReader *del_reader
         = (DeletionsReader*)Hash_Fetch(
-              ivars->components, (Obj*)VTable_Get_Name(DELETIONSREADER));
+              ivars->components, (Obj*)Class_Get_Name(DELETIONSREADER));
     ivars->del_count = del_reader ? DelReader_Del_Count(del_reader) : 0;
 
     return self;

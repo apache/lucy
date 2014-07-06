@@ -26,7 +26,7 @@
 
 SnowballStopFilter*
 SnowStop_new(String *language, Hash *stoplist) {
-    SnowballStopFilter *self = (SnowballStopFilter*)VTable_Make_Obj(SNOWBALLSTOPFILTER);
+    SnowballStopFilter *self = (SnowballStopFilter*)Class_Make_Obj(SNOWBALLSTOPFILTER);
     return SnowStop_init(self, language, stoplist);
 }
 

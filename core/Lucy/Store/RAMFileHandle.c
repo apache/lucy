@@ -23,7 +23,7 @@
 
 RAMFileHandle*
 RAMFH_open(String *path, uint32_t flags, RAMFile *file) {
-    RAMFileHandle *self = (RAMFileHandle*)VTable_Make_Obj(RAMFILEHANDLE);
+    RAMFileHandle *self = (RAMFileHandle*)Class_Make_Obj(RAMFILEHANDLE);
     return RAMFH_do_open(self, path, flags, file);
 }
 

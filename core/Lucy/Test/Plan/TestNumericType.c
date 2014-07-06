@@ -28,7 +28,7 @@
 
 TestNumericType*
 TestNumericType_new() {
-    return (TestNumericType*)VTable_Make_Obj(TESTNUMERICTYPE);
+    return (TestNumericType*)Class_Make_Obj(TESTNUMERICTYPE);
 }
 
 static void

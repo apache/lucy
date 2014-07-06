@@ -72,8 +72,8 @@ Analyzer_Load_IMP(Analyzer *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     String *class_name
         = (String*)CERTIFY(Hash_Fetch_Utf8(source, "_class", 6), STRING);
-    VTable *vtable = VTable_singleton(class_name, NULL);
-    Analyzer *loaded = (Analyzer*)VTable_Make_Obj(vtable);
+    Class *klass = Class_singleton(class_name, NULL);
+    Analyzer *loaded = (Analyzer*)Class_Make_Obj(klass);
     return (Obj*)loaded;
 }
 

@@ -28,7 +28,7 @@ TextSortCache*
 TextSortCache_new(String *field, FieldType *type, int32_t cardinality,
                   int32_t doc_max, int32_t null_ord, int32_t ord_width,
                   InStream *ord_in, InStream *ix_in, InStream *dat_in) {
-    TextSortCache *self = (TextSortCache*)VTable_Make_Obj(TEXTSORTCACHE);
+    TextSortCache *self = (TextSortCache*)Class_Make_Obj(TEXTSORTCACHE);
     return TextSortCache_init(self, field, type, cardinality, doc_max,
                               null_ord, ord_width, ord_in, ix_in, dat_in);
 }

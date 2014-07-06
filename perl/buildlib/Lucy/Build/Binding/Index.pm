@@ -499,7 +499,7 @@ PPCODE:
     }
     if (!doc) {
         THROW(CFISH_ERR, "Need either a hashref or a %o",
-              CFISH_VTable_Get_Name(LUCY_DOC));
+              CFISH_Class_Get_Name(LUCY_DOC));
     }
 
     LUCY_Indexer_Add_Doc(self, doc, boost);

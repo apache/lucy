@@ -26,7 +26,7 @@
 
 TestHeatMap*
 TestHeatMap_new() {
-    return (TestHeatMap*)VTable_Make_Obj(TESTHEATMAP);
+    return (TestHeatMap*)Class_Make_Obj(TESTHEATMAP);
 }
 
 static void

@@ -53,7 +53,7 @@ DefPListReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
                    VArray *segments, int32_t seg_tick,
                    LexiconReader *lex_reader) {
     DefaultPostingListReader *self
-        = (DefaultPostingListReader*)VTable_Make_Obj(DEFAULTPOSTINGLISTREADER);
+        = (DefaultPostingListReader*)Class_Make_Obj(DEFAULTPOSTINGLISTREADER);
     return DefPListReader_init(self, schema, folder, snapshot, segments,
                                seg_tick, lex_reader);
 }

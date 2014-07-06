@@ -25,7 +25,7 @@
 
 TestDocWriter*
 TestDocWriter_new() {
-    return (TestDocWriter*)VTable_Make_Obj(TESTDOCWRITER);
+    return (TestDocWriter*)Class_Make_Obj(TESTDOCWRITER);
 }
 
 void

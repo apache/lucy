@@ -48,7 +48,7 @@ S_add_numeric_field(Schema *self, String *field, FieldType *type);
 
 Schema*
 Schema_new() {
-    Schema *self = (Schema*)VTable_Make_Obj(SCHEMA);
+    Schema *self = (Schema*)Class_Make_Obj(SCHEMA);
     return Schema_init(self);
 }
 
@@ -88,7 +88,7 @@ S_add_unique(VArray *array, Obj *elem) {
         Obj *candidate = VA_Fetch(array, i);
         if (!candidate) { continue; }
         if (elem == candidate) { return; }
-        if (Obj_Get_VTable(elem) == Obj_Get_VTable(candidate)) {
+        if (Obj_Get_Class(elem) == Obj_Get_Class(candidate)) {
             if (Obj_Equals(elem, candidate)) { return; }
         }
     }
@@ -236,7 +236,7 @@ S_find_in_array(VArray *array, Obj *obj) {
             return i;
         }
         else if (obj != NULL && candidate != NULL) {
-            if (Obj_Get_VTable(obj) == Obj_Get_VTable(candidate)) {
+            if (Obj_Get_Class(obj) == Obj_Get_Class(candidate)) {
                 if (Obj_Equals(obj, candidate)) {
                     return i;
                 }
@@ -265,10 +265,10 @@ Schema_Dump_IMP(Schema *self) {
     Hash_Store_Utf8(dump, "fields", 6, (Obj*)type_dumps);
     Hash_Iterate(ivars->types);
     while (Hash_Next(ivars->types, (Obj**)&field, (Obj**)&type)) {
-        VTable *type_vtable = FType_Get_VTable(type);
+        Class *type_class = FType_Get_Class(type);
 
         // Dump known types to simplified format.
-        if (type_vtable == FULLTEXTTYPE) {
+        if (type_class == FULLTEXTTYPE) {
             FullTextType *fttype = (FullTextType*)type;
             Hash *type_dump = FullTextType_Dump_For_Schema(fttype);
             Analyzer *analyzer = FullTextType_Get_Analyzer(fttype);
@@ -281,7 +281,7 @@ Schema_Dump_IMP(Schema *self) {
 
             Hash_Store(type_dumps, (Obj*)field, (Obj*)type_dump);
         }
-        else if (type_vtable == STRINGTYPE || type_vtable == BLOBTYPE) {
+        else if (type_class == STRINGTYPE || type_class == BLOBTYPE) {
             Hash *type_dump = FType_Dump_For_Schema(type);
             Hash_Store(type_dumps, (Obj*)field, (Obj*)type_dump);
         }
@@ -295,8 +295,8 @@ Schema_Dump_IMP(Schema *self) {
 }
 
 static FieldType*
-S_load_type(VTable *vtable, Obj *type_dump) {
-    FieldType *dummy = (FieldType*)VTable_Make_Obj(vtable);
+S_load_type(Class *klass, Obj *type_dump) {
+    FieldType *dummy = (FieldType*)Class_Make_Obj(klass);
     FieldType *loaded = (FieldType*)FType_Load(dummy, type_dump);
     DECREF(dummy);
     return loaded;
@@ -307,8 +307,8 @@ Schema_Load_IMP(Schema *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     String *class_name
         = (String*)CERTIFY(Hash_Fetch_Utf8(source, "_class", 6), STRING);
-    VTable *vtable = VTable_singleton(class_name, NULL);
-    Schema *loaded = (Schema*)VTable_Make_Obj(vtable);
+    Class *klass = Class_singleton(class_name, NULL);
+    Schema *loaded = (Schema*)Class_Make_Obj(klass);
     Hash *type_dumps
         = (Hash*)CERTIFY(Hash_Fetch_Utf8(source, "fields", 6), HASH);
     VArray *analyzer_dumps
@@ -403,7 +403,7 @@ Schema_Load_IMP(Schema *self, Obj *dump) {
 
 void
 Schema_Eat_IMP(Schema *self, Schema *other) {
-    if (!Schema_Is_A(self, Schema_Get_VTable(other))) {
+    if (!Schema_Is_A(self, Schema_Get_Class(other))) {
         THROW(ERR, "%o not a descendent of %o",
               Schema_Get_Class_Name(self), Schema_Get_Class_Name(other));
     }

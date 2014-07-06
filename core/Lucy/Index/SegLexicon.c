@@ -39,7 +39,7 @@ S_scan_to(SegLexicon *self, Obj *target);
 SegLexicon*
 SegLex_new(Schema *schema, Folder *folder, Segment *segment,
            String *field) {
-    SegLexicon *self = (SegLexicon*)VTable_Make_Obj(SEGLEXICON);
+    SegLexicon *self = (SegLexicon*)Class_Make_Obj(SEGLEXICON);
     return SegLex_init(self, schema, folder, segment, field);
 }
 

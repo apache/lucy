@@ -34,7 +34,7 @@
 
 TestInStream*
 TestInStream_new() {
-    return (TestInStream*)VTable_Make_Obj(TESTINSTREAM);
+    return (TestInStream*)Class_Make_Obj(TESTINSTREAM);
 }
 
 static void

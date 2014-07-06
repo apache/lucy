@@ -27,7 +27,7 @@
 
 TestSeriesMatcher*
 TestSeriesMatcher_new() {
-    return (TestSeriesMatcher*)VTable_Make_Obj(TESTSERIESMATCHER);
+    return (TestSeriesMatcher*)Class_Make_Obj(TESTSERIESMATCHER);
 }
 
 static SeriesMatcher*

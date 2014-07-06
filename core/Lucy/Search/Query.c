@@ -68,8 +68,8 @@ Query_Load_IMP(Query *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     String *class_name
         = (String*)CERTIFY(Hash_Fetch_Utf8(source, "_class", 6), STRING);
-    VTable *vtable = VTable_singleton(class_name, NULL);
-    Query *loaded = (Query*)VTable_Make_Obj(vtable);
+    Class *klass  = Class_singleton(class_name, NULL);
+    Query *loaded = (Query*)Class_Make_Obj(klass);
     Obj *boost = CERTIFY(Hash_Fetch_Utf8(source, "boost", 5), OBJ);
     Query_IVARS(loaded)->boost = (float)Obj_To_F64(boost);
     return (Obj*)loaded;

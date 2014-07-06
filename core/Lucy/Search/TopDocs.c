@@ -28,7 +28,7 @@
 
 TopDocs*
 TopDocs_new(VArray *match_docs, uint32_t total_hits) {
-    TopDocs *self = (TopDocs*)VTable_Make_Obj(TOPDOCS);
+    TopDocs *self = (TopDocs*)Class_Make_Obj(TOPDOCS);
     return TopDocs_init(self, match_docs, total_hits);
 }
 

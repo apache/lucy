@@ -62,7 +62,7 @@ Coll_Set_Base_IMP(Collector *self, int32_t base) {
 
 BitCollector*
 BitColl_new(BitVector *bit_vec) {
-    BitCollector *self = (BitCollector*)VTable_Make_Obj(BITCOLLECTOR);
+    BitCollector *self = (BitCollector*)Class_Make_Obj(BITCOLLECTOR);
     return BitColl_init(self, bit_vec);
 }
 
@@ -98,7 +98,7 @@ BitColl_Need_Score_IMP(BitCollector *self) {
 OffsetCollector*
 OffsetColl_new(Collector *inner_coll, int32_t offset) {
     OffsetCollector *self
-        = (OffsetCollector*)VTable_Make_Obj(OFFSETCOLLECTOR);
+        = (OffsetCollector*)Class_Make_Obj(OFFSETCOLLECTOR);
     return OffsetColl_init(self, inner_coll, offset);
 }
 

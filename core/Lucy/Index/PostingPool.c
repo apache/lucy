@@ -63,7 +63,7 @@ PostPool_new(Schema *schema, Snapshot *snapshot, Segment *segment,
              LexiconWriter *lex_writer, MemoryPool *mem_pool,
              OutStream *lex_temp_out, OutStream *post_temp_out,
              OutStream *skip_out) {
-    PostingPool *self = (PostingPool*)VTable_Make_Obj(POSTINGPOOL);
+    PostingPool *self = (PostingPool*)Class_Make_Obj(POSTINGPOOL);
     return PostPool_init(self, schema, snapshot, segment, polyreader, field,
                          lex_writer, mem_pool, lex_temp_out, post_temp_out,
                          skip_out);
@@ -229,7 +229,7 @@ PostPool_Add_Segment_IMP(PostingPool *self, SegReader *reader,
                          I32Array *doc_map, int32_t doc_base) {
     PostingPoolIVARS *const ivars = PostPool_IVARS(self);
     LexiconReader *lex_reader = (LexiconReader*)SegReader_Fetch(
-                                    reader, VTable_Get_Name(LEXICONREADER));
+                                    reader, Class_Get_Name(LEXICONREADER));
     Lexicon *lexicon = lex_reader
                        ? LexReader_Lexicon(lex_reader, ivars->field, NULL)
                        : NULL;
@@ -237,7 +237,7 @@ PostPool_Add_Segment_IMP(PostingPool *self, SegReader *reader,
     if (lexicon) {
         PostingListReader *plist_reader
             = (PostingListReader*)SegReader_Fetch(
-                  reader, VTable_Get_Name(POSTINGLISTREADER));
+                  reader, Class_Get_Name(POSTINGLISTREADER));
         PostingList *plist = plist_reader
                              ? PListReader_Posting_List(plist_reader, ivars->field, NULL)
                              : NULL;
@@ -355,7 +355,7 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
 
     // Initialize sentinel to be used on the last iter, using an empty string
     // in order to make LexiconWriter Do The Right Thing.
-    size_t sentinel_size = VTable_Get_Obj_Alloc_Size(RAWPOSTING)
+    size_t sentinel_size = Class_Get_Obj_Alloc_Size(RAWPOSTING)
                            + 20;  // blob length + cushion
     char empty_string[] = "";
     RawPosting *sentinel = RawPost_new(alloca(sentinel_size), 0, 1,

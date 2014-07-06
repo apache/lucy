@@ -50,7 +50,7 @@ DelReader_Aggregator_IMP(DeletionsReader *self, VArray *readers,
 PolyDeletionsReader*
 PolyDelReader_new(VArray *readers, I32Array *offsets) {
     PolyDeletionsReader *self
-        = (PolyDeletionsReader*)VTable_Make_Obj(POLYDELETIONSREADER);
+        = (PolyDeletionsReader*)Class_Make_Obj(POLYDELETIONSREADER);
     return PolyDelReader_init(self, readers, offsets);
 }
 
@@ -119,7 +119,7 @@ DefaultDeletionsReader*
 DefDelReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
                  VArray *segments, int32_t seg_tick) {
     DefaultDeletionsReader *self
-        = (DefaultDeletionsReader*)VTable_Make_Obj(DEFAULTDELETIONSREADER);
+        = (DefaultDeletionsReader*)Class_Make_Obj(DEFAULTDELETIONSREADER);
     return DefDelReader_init(self, schema, folder, snapshot, segments,
                              seg_tick);
 }

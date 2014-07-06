@@ -24,7 +24,7 @@
 
 MatchDoc*
 MatchDoc_new(int32_t doc_id, float score, VArray *values) {
-    MatchDoc *self = (MatchDoc*)VTable_Make_Obj(MATCHDOC);
+    MatchDoc *self = (MatchDoc*)Class_Make_Obj(MATCHDOC);
     return MatchDoc_init(self, doc_id, score, values);
 }
 

@@ -24,7 +24,7 @@
 
 RAMDirHandle*
 RAMDH_new(RAMFolder *folder) {
-    RAMDirHandle *self = (RAMDirHandle*)VTable_Make_Obj(RAMDIRHANDLE);
+    RAMDirHandle *self = (RAMDirHandle*)Class_Make_Obj(RAMDIRHANDLE);
     return RAMDH_init(self, folder);
 }
 

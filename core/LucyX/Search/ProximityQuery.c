@@ -48,7 +48,7 @@ S_do_init(ProximityQuery *self, String *field, VArray *terms, float boost,
 
 ProximityQuery*
 ProximityQuery_new(String *field, VArray *terms, uint32_t within) {
-    ProximityQuery *self = (ProximityQuery*)VTable_Make_Obj(PROXIMITYQUERY);
+    ProximityQuery *self = (ProximityQuery*)Class_Make_Obj(PROXIMITYQUERY);
     return ProximityQuery_init(self, field, terms, within);
 }
 
@@ -214,7 +214,7 @@ ProximityCompiler*
 ProximityCompiler_new(ProximityQuery *parent, Searcher *searcher, float boost,
                       uint32_t within) {
     ProximityCompiler *self =
-        (ProximityCompiler*)VTable_Make_Obj(PROXIMITYCOMPILER);
+        (ProximityCompiler*)Class_Make_Obj(PROXIMITYCOMPILER);
     return ProximityCompiler_init(self, parent, searcher, boost, within);
 }
 
@@ -343,7 +343,7 @@ ProximityCompiler_Make_Matcher_IMP(ProximityCompiler *self, SegReader *reader,
     // Bail if there's no PostingListReader for this segment.
     PostingListReader *const plist_reader
         = (PostingListReader*)SegReader_Fetch(
-              reader, VTable_Get_Name(POSTINGLISTREADER));
+              reader, Class_Get_Name(POSTINGLISTREADER));
     if (!plist_reader) { return NULL; }
 
     // Look up each term.

@@ -36,7 +36,7 @@
 
 TermQuery*
 TermQuery_new(String *field, Obj *term) {
-    TermQuery *self = (TermQuery*)VTable_Make_Obj(TERMQUERY);
+    TermQuery *self = (TermQuery*)Class_Make_Obj(TERMQUERY);
     return TermQuery_init(self, field, term);
 }
 
@@ -145,7 +145,7 @@ TermQuery_Make_Compiler_IMP(TermQuery *self, Searcher *searcher, float boost,
 
 TermCompiler*
 TermCompiler_new(Query *parent, Searcher *searcher, float boost) {
-    TermCompiler *self = (TermCompiler*)VTable_Make_Obj(TERMCOMPILER);
+    TermCompiler *self = (TermCompiler*)Class_Make_Obj(TERMCOMPILER);
     return TermCompiler_init(self, parent, searcher, boost);
 }
 
@@ -263,7 +263,7 @@ TermCompiler_Make_Matcher_IMP(TermCompiler *self, SegReader *reader,
         = TermQuery_IVARS((TermQuery*)ivars->parent);
     PostingListReader *plist_reader
         = (PostingListReader*)SegReader_Fetch(
-              reader, VTable_Get_Name(POSTINGLISTREADER));
+              reader, Class_Get_Name(POSTINGLISTREADER));
     PostingList *plist = plist_reader
                          ? PListReader_Posting_List(plist_reader,
                                                     parent_ivars->field,

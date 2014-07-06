@@ -34,7 +34,7 @@ RawPosting*
 RawPost_new(void *pre_allocated_memory, int32_t doc_id, uint32_t freq,
             const char *term_text, size_t term_text_len) {
     RawPosting *self
-        = (RawPosting*)VTable_Init_Obj(RAWPOSTING, pre_allocated_memory);
+        = (RawPosting*)Class_Init_Obj(RAWPOSTING, pre_allocated_memory);
     RawPostingIVARS *const ivars = RawPost_IVARS(self);
     ivars->doc_id      = doc_id;
     ivars->freq        = freq;
@@ -96,7 +96,7 @@ RawPostingWriter*
 RawPostWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
                   PolyReader *polyreader, OutStream *outstream) {
     RawPostingWriter *self
-        = (RawPostingWriter*)VTable_Make_Obj(RAWPOSTINGWRITER);
+        = (RawPostingWriter*)Class_Make_Obj(RAWPOSTINGWRITER);
     return RawPostWriter_init(self, schema, snapshot, segment, polyreader,
                               outstream);
 }

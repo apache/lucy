@@ -79,32 +79,32 @@ NumType_Load_IMP(NumericType *self, Obj *dump) {
     UNUSED_VAR(self);
     Hash *source = (Hash*)CERTIFY(dump, HASH);
 
-    // Get a VTable
+    // Get a Class
     String *class_name = (String*)Hash_Fetch_Utf8(source, "_class", 6);
     String *type_spec  = (String*)Hash_Fetch_Utf8(source, "type", 4);
-    VTable *vtable = NULL;
+    Class *klass = NULL;
     if (class_name != NULL && Obj_Is_A((Obj*)class_name, STRING)) {
-        vtable = VTable_singleton(class_name, NULL);
+        klass = Class_singleton(class_name, NULL);
     }
     else if (type_spec != NULL && Obj_Is_A((Obj*)type_spec, STRING)) {
         if (Str_Equals_Utf8(type_spec, "i32_t", 5)) {
-            vtable = INT32TYPE;
+            klass = INT32TYPE;
         }
         else if (Str_Equals_Utf8(type_spec, "i64_t", 5)) {
-            vtable = INT64TYPE;
+            klass = INT64TYPE;
         }
         else if (Str_Equals_Utf8(type_spec, "f32_t", 5)) {
-            vtable = FLOAT32TYPE;
+            klass = FLOAT32TYPE;
         }
         else if (Str_Equals_Utf8(type_spec, "f64_t", 5)) {
-            vtable = FLOAT64TYPE;
+            klass = FLOAT64TYPE;
         }
         else {
             THROW(ERR, "Unrecognized type string: '%o'", type_spec);
         }
     }
-    CERTIFY(vtable, VTABLE);
-    NumericType *loaded = (NumericType*)VTable_Make_Obj(vtable);
+    CERTIFY(klass, CLASS);
+    NumericType *loaded = (NumericType*)Class_Make_Obj(klass);
 
     // Extract boost.
     Obj *boost_dump = Hash_Fetch_Utf8(source, "boost", 5);
@@ -125,7 +125,7 @@ NumType_Load_IMP(NumericType *self, Obj *dump) {
 
 Float64Type*
 Float64Type_new() {
-    Float64Type *self = (Float64Type*)VTable_Make_Obj(FLOAT64TYPE);
+    Float64Type *self = (Float64Type*)Class_Make_Obj(FLOAT64TYPE);
     return Float64Type_init(self);
 }
 
@@ -167,7 +167,7 @@ Float64Type_Equals_IMP(Float64Type *self, Obj *other) {
 
 Float32Type*
 Float32Type_new() {
-    Float32Type *self = (Float32Type*)VTable_Make_Obj(FLOAT32TYPE);
+    Float32Type *self = (Float32Type*)Class_Make_Obj(FLOAT32TYPE);
     return Float32Type_init(self);
 }
 
@@ -209,7 +209,7 @@ Float32Type_Equals_IMP(Float32Type *self, Obj *other) {
 
 Int32Type*
 Int32Type_new() {
-    Int32Type *self = (Int32Type*)VTable_Make_Obj(INT32TYPE);
+    Int32Type *self = (Int32Type*)Class_Make_Obj(INT32TYPE);
     return Int32Type_init(self);
 }
 
@@ -251,7 +251,7 @@ Int32Type_Equals_IMP(Int32Type *self, Obj *other) {
 
 Int64Type*
 Int64Type_new() {
-    Int64Type *self = (Int64Type*)VTable_Make_Obj(INT64TYPE);
+    Int64Type *self = (Int64Type*)Class_Make_Obj(INT64TYPE);
     return Int64Type_init(self);
 }
 

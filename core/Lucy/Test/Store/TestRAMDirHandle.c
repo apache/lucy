@@ -27,7 +27,7 @@
 
 TestRAMDirHandle*
 TestRAMDH_new() {
-    return (TestRAMDirHandle*)VTable_Make_Obj(TESTRAMDIRHANDLE);
+    return (TestRAMDirHandle*)Class_Make_Obj(TESTRAMDIRHANDLE);
 }
 
 static void

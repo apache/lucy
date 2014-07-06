@@ -24,7 +24,7 @@ RequiredOptionalMatcher*
 ReqOptMatcher_new(Similarity *similarity, Matcher *required_matcher,
                   Matcher *optional_matcher) {
     RequiredOptionalMatcher *self
-        = (RequiredOptionalMatcher*)VTable_Make_Obj(REQUIREDOPTIONALMATCHER);
+        = (RequiredOptionalMatcher*)Class_Make_Obj(REQUIREDOPTIONALMATCHER);
     return ReqOptMatcher_init(self, similarity, required_matcher,
                               optional_matcher);
 }

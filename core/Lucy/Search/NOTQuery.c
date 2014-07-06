@@ -29,7 +29,7 @@
 
 NOTQuery*
 NOTQuery_new(Query *negated_query) {
-    NOTQuery *self = (NOTQuery*)VTable_Make_Obj(NOTQUERY);
+    NOTQuery *self = (NOTQuery*)Class_Make_Obj(NOTQUERY);
     return NOTQuery_init(self, negated_query);
 }
 
@@ -85,7 +85,7 @@ NOTQuery_Make_Compiler_IMP(NOTQuery *self, Searcher *searcher, float boost,
 
 NOTCompiler*
 NOTCompiler_new(NOTQuery *parent, Searcher *searcher, float boost) {
-    NOTCompiler *self = (NOTCompiler*)VTable_Make_Obj(NOTCOMPILER);
+    NOTCompiler *self = (NOTCompiler*)Class_Make_Obj(NOTCOMPILER);
     return NOTCompiler_init(self, parent, searcher, boost);
 }
 

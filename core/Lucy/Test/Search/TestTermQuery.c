@@ -27,7 +27,7 @@
 
 TestTermQuery*
 TestTermQuery_new() {
-    return (TestTermQuery*)VTable_Make_Obj(TESTTERMQUERY);
+    return (TestTermQuery*)Class_Make_Obj(TESTTERMQUERY);
 }
 
 static void

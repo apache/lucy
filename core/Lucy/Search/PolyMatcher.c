@@ -22,7 +22,7 @@
 
 PolyMatcher*
 PolyMatcher_new(VArray *children, Similarity *sim) {
-    PolyMatcher *self = (PolyMatcher*)VTable_Make_Obj(POLYMATCHER);
+    PolyMatcher *self = (PolyMatcher*)Class_Make_Obj(POLYMATCHER);
     return PolyMatcher_init(self, children, sim);
 }
 

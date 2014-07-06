@@ -45,7 +45,7 @@
 
 IndexSearcher*
 IxSearcher_new(Obj *index) {
-    IndexSearcher *self = (IndexSearcher*)VTable_Make_Obj(INDEXSEARCHER);
+    IndexSearcher *self = (IndexSearcher*)Class_Make_Obj(INDEXSEARCHER);
     return IxSearcher_init(self, index);
 }
 
@@ -62,9 +62,9 @@ IxSearcher_init(IndexSearcher *self, Obj *index) {
     ivars->seg_readers = IxReader_Seg_Readers(ivars->reader);
     ivars->seg_starts  = IxReader_Offsets(ivars->reader);
     ivars->doc_reader = (DocReader*)IxReader_Fetch(
-                           ivars->reader, VTable_Get_Name(DOCREADER));
+                           ivars->reader, Class_Get_Name(DOCREADER));
     ivars->hl_reader = (HighlightReader*)IxReader_Fetch(
-                          ivars->reader, VTable_Get_Name(HIGHLIGHTREADER));
+                          ivars->reader, Class_Get_Name(HIGHLIGHTREADER));
     if (ivars->doc_reader) { INCREF(ivars->doc_reader); }
     if (ivars->hl_reader)  { INCREF(ivars->hl_reader); }
 
@@ -107,7 +107,7 @@ IxSearcher_Doc_Freq_IMP(IndexSearcher *self, String *field, Obj *term) {
     IndexSearcherIVARS *const ivars = IxSearcher_IVARS(self);
     LexiconReader *lex_reader
         = (LexiconReader*)IxReader_Fetch(ivars->reader,
-                                         VTable_Get_Name(LEXICONREADER));
+                                         Class_Get_Name(LEXICONREADER));
     return lex_reader ? LexReader_Doc_Freq(lex_reader, field, term) : 0;
 }
 
@@ -143,7 +143,7 @@ IxSearcher_Collect_IMP(IndexSearcher *self, Query *query, Collector *collector) 
         SegReader *seg_reader = (SegReader*)VA_Fetch(seg_readers, i);
         DeletionsReader *del_reader = (DeletionsReader*)SegReader_Fetch(
                                           seg_reader,
-                                          VTable_Get_Name(DELETIONSREADER));
+                                          Class_Get_Name(DELETIONSREADER));
         Matcher *matcher
             = Compiler_Make_Matcher(compiler, seg_reader, need_score);
         if (matcher) {

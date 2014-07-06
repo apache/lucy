@@ -114,7 +114,7 @@ Lock_Obtain_IMP(Lock *self) {
 LockFileLock*
 LFLock_new(Folder *folder, String *name, String *host,
            int32_t timeout, int32_t interval) {
-    LockFileLock *self = (LockFileLock*)VTable_Make_Obj(LOCKFILELOCK);
+    LockFileLock *self = (LockFileLock*)Class_Make_Obj(LOCKFILELOCK);
     return LFLock_init(self, folder, name, host, timeout, interval);
 }
 
@@ -294,7 +294,7 @@ LFLock_Destroy_IMP(LockFileLock *self) {
 
 LockErr*
 LockErr_new(String *message) {
-    LockErr *self = (LockErr*)VTable_Make_Obj(LOCKERR);
+    LockErr *self = (LockErr*)Class_Make_Obj(LOCKERR);
     return LockErr_init(self, message);
 }
 

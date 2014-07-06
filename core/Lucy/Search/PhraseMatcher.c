@@ -27,7 +27,7 @@
 
 PhraseMatcher*
 PhraseMatcher_new(Similarity *sim, VArray *plists, Compiler *compiler) {
-    PhraseMatcher *self = (PhraseMatcher*)VTable_Make_Obj(PHRASEMATCHER);
+    PhraseMatcher *self = (PhraseMatcher*)Class_Make_Obj(PHRASEMATCHER);
     return PhraseMatcher_init(self, sim, plists, compiler);
 
 }

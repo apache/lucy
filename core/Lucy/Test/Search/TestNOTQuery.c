@@ -29,7 +29,7 @@
 
 TestNOTQuery*
 TestNOTQuery_new() {
-    return (TestNOTQuery*)VTable_Make_Obj(TESTNOTQUERY);
+    return (TestNOTQuery*)Class_Make_Obj(TESTNOTQUERY);
 }
 
 static void

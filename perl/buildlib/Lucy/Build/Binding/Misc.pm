@@ -35,9 +35,9 @@ sub inherit_metadata {
         next if $class->get_parcel->get_name ne 'Clownfish' || $class->inert;
 
         my $class_name = $class->get_class_name;
-        my $vtable     = Clownfish::VTable->fetch_vtable($class_name);
+        my $rt_class   = Clownfish::Class->fetch_class($class_name);
 
-        for my $rt_method (@{ $vtable->get_methods }) {
+        for my $rt_method (@{ $rt_class->get_methods }) {
             if ($rt_method->is_excluded_from_host) {
                 my $method = $class->method($rt_method->get_name);
                 $method->exclude_from_host;
@@ -140,10 +140,10 @@ STORABLE_thaw(blank_obj, cloning, serialized_sv)
 PPCODE:
 {
     char *class_name = HvNAME(SvSTASH(SvRV(blank_obj)));
-    cfish_StackString *klass
+    cfish_StackString *class_name_str
         = CFISH_SSTR_WRAP_UTF8(class_name, strlen(class_name));
-    cfish_VTable *vtable
-        = (cfish_VTable*)cfish_VTable_singleton((cfish_String*)klass, NULL);
+    cfish_Class *klass
+        = cfish_Class_singleton((cfish_String*)class_name_str, NULL);
     STRLEN len;
     char *ptr = SvPV(serialized_sv, len);
     cfish_ViewByteBuf *contents = cfish_ViewBB_new(ptr, len);
@@ -151,7 +151,7 @@ PPCODE:
     lucy_RAMFileHandle *file_handle
         = lucy_RAMFH_open(NULL, LUCY_FH_READ_ONLY, ram_file);
     lucy_InStream *instream = lucy_InStream_open((cfish_Obj*)file_handle);
-    cfish_Obj *self = CFISH_VTable_Foster_Obj(vtable, blank_obj);
+    cfish_Obj *self = CFISH_Class_Foster_Obj(klass, blank_obj);
     cfish_Obj *deserialized = lucy_Freezer_deserialize(self, instream);
 
     CFISH_UNUSED_VAR(cloning);

@@ -21,7 +21,7 @@
 
 RAMFile*
 RAMFile_new(ByteBuf *contents, bool read_only) {
-    RAMFile *self = (RAMFile*)VTable_Make_Obj(RAMFILE);
+    RAMFile *self = (RAMFile*)Class_Make_Obj(RAMFILE);
     return RAMFile_init(self, contents, read_only);
 }
 

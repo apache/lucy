@@ -25,7 +25,7 @@
 
 EasyAnalyzer*
 EasyAnalyzer_new(String *language) {
-    EasyAnalyzer *self = (EasyAnalyzer*)VTable_Make_Obj(EASYANALYZER);
+    EasyAnalyzer *self = (EasyAnalyzer*)Class_Make_Obj(EASYANALYZER);
     return EasyAnalyzer_init(self, language);
 }
 

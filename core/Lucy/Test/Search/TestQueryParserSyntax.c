@@ -52,7 +52,7 @@
 
 TestQueryParserSyntax*
 TestQPSyntax_new() {
-    return (TestQueryParserSyntax*)VTable_Make_Obj(TESTQUERYPARSERSYNTAX);
+    return (TestQueryParserSyntax*)Class_Make_Obj(TESTQUERYPARSERSYNTAX);
 }
 
 static Folder*

@@ -54,7 +54,7 @@
 
 TestHighlighter*
 TestHighlighter_new() {
-    return (TestHighlighter*)VTable_Make_Obj(TESTHIGHLIGHTER);
+    return (TestHighlighter*)Class_Make_Obj(TESTHIGHLIGHTER);
 }
 
 static void

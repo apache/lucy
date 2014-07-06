@@ -35,7 +35,7 @@
 
 TestIOChunks*
 TestIOChunks_new() {
-    return (TestIOChunks*)VTable_Make_Obj(TESTIOCHUNKS);
+    return (TestIOChunks*)Class_Make_Obj(TESTIOCHUNKS);
 }
 
 static void

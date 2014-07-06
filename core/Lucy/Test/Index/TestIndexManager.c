@@ -24,7 +24,7 @@
 
 TestIndexManager*
 TestIxManager_new() {
-    return (TestIndexManager*)VTable_Make_Obj(TESTINDEXMANAGER);
+    return (TestIndexManager*)Class_Make_Obj(TESTINDEXMANAGER);
 }
 
 static void

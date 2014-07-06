@@ -26,7 +26,7 @@
 
 TestCaseFolder*
 TestCaseFolder_new() {
-    return (TestCaseFolder*)VTable_Make_Obj(TESTCASEFOLDER);
+    return (TestCaseFolder*)Class_Make_Obj(TESTCASEFOLDER);
 }
 
 static void

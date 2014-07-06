@@ -25,7 +25,7 @@
 
 TestPolyReader*
 TestPolyReader_new() {
-    return (TestPolyReader*)VTable_Make_Obj(TESTPOLYREADER);
+    return (TestPolyReader*)Class_Make_Obj(TESTPOLYREADER);
 }
 
 static void

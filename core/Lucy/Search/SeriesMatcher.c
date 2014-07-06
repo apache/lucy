@@ -21,7 +21,7 @@
 
 SeriesMatcher*
 SeriesMatcher_new(VArray *matchers, I32Array *offsets) {
-    SeriesMatcher *self = (SeriesMatcher*)VTable_Make_Obj(SERIESMATCHER);
+    SeriesMatcher *self = (SeriesMatcher*)Class_Make_Obj(SERIESMATCHER);
     return SeriesMatcher_init(self, matchers, offsets);
 }
 

@@ -29,7 +29,7 @@
 
 TestReqOptQuery*
 TestReqOptQuery_new() {
-    return (TestReqOptQuery*)VTable_Make_Obj(TESTREQOPTQUERY);
+    return (TestReqOptQuery*)Class_Make_Obj(TESTREQOPTQUERY);
 }
 
 static void

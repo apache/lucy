@@ -26,7 +26,7 @@
 
 TestBitVector*
 TestBitVector_new() {
-    return (TestBitVector*)VTable_Make_Obj(TESTBITVECTOR);
+    return (TestBitVector*)Class_Make_Obj(TESTBITVECTOR);
 }
 
 static void

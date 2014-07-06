@@ -36,7 +36,7 @@ static ByteBuf *z_bb;
 
 TestSortExternal*
 TestSortExternal_new() {
-    return (TestSortExternal*)VTable_Make_Obj(TESTSORTEXTERNAL);
+    return (TestSortExternal*)Class_Make_Obj(TESTSORTEXTERNAL);
 }
 
 static void

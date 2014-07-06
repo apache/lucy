@@ -39,7 +39,7 @@ int32_t DocWriter_current_file_format = 2;
 DocWriter*
 DocWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
               PolyReader *polyreader) {
-    DocWriter *self = (DocWriter*)VTable_Make_Obj(DOCWRITER);
+    DocWriter *self = (DocWriter*)Class_Make_Obj(DOCWRITER);
     return DocWriter_init(self, schema, snapshot, segment, polyreader);
 }
 
@@ -174,7 +174,7 @@ DocWriter_Add_Segment_IMP(DocWriter *self, SegReader *reader,
         ByteBuf   *const buffer  = BB_new(0);
         DefaultDocReader *const doc_reader
             = (DefaultDocReader*)CERTIFY(
-                  SegReader_Obtain(reader, VTable_Get_Name(DOCREADER)),
+                  SegReader_Obtain(reader, Class_Get_Name(DOCREADER)),
                   DEFAULTDOCREADER);
 
         for (int32_t i = 1, max = SegReader_Doc_Max(reader); i <= max; i++) {

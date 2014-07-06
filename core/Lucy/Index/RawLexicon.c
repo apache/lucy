@@ -28,7 +28,7 @@
 RawLexicon*
 RawLex_new(Schema *schema, String *field, InStream *instream,
            int64_t start, int64_t end) {
-    RawLexicon *self = (RawLexicon*)VTable_Make_Obj(RAWLEXICON);
+    RawLexicon *self = (RawLexicon*)Class_Make_Obj(RAWLEXICON);
     return RawLex_init(self, schema, field, instream, start, end);
 }
 

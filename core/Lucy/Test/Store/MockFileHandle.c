@@ -24,7 +24,7 @@
 
 MockFileHandle*
 MockFileHandle_new(String *path, int64_t length) {
-    MockFileHandle *self = (MockFileHandle*)VTable_Make_Obj(MOCKFILEHANDLE);
+    MockFileHandle *self = (MockFileHandle*)Class_Make_Obj(MOCKFILEHANDLE);
     return MockFileHandle_init(self, path, length);
 }
 

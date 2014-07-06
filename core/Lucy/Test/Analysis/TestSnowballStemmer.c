@@ -28,7 +28,7 @@
 
 TestSnowballStemmer*
 TestSnowStemmer_new() {
-    return (TestSnowballStemmer*)VTable_Make_Obj(TESTSNOWBALLSTEMMER);
+    return (TestSnowballStemmer*)Class_Make_Obj(TESTSNOWBALLSTEMMER);
 }
 
 static void

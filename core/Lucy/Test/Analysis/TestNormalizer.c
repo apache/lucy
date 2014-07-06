@@ -31,7 +31,7 @@
 
 TestNormalizer*
 TestNormalizer_new() {
-    return (TestNormalizer*)VTable_Make_Obj(TESTNORMALIZER);
+    return (TestNormalizer*)Class_Make_Obj(TESTNORMALIZER);
 }
 
 static void

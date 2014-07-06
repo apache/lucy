@@ -37,7 +37,7 @@ int32_t LexWriter_current_file_format = 3;
 LexiconWriter*
 LexWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
               PolyReader *polyreader) {
-    LexiconWriter *self = (LexiconWriter*)VTable_Make_Obj(LEXICONWRITER);
+    LexiconWriter *self = (LexiconWriter*)Class_Make_Obj(LEXICONWRITER);
     return LexWriter_init(self, schema, snapshot, segment, polyreader);
 }
 

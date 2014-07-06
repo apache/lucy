@@ -193,8 +193,8 @@ LUCY_Doc_Load_IMP(lucy_Doc *self, cfish_Obj *dump) {
     cfish_String *class_name = (cfish_String*)CFISH_CERTIFY(
                                    CFISH_Hash_Fetch_Utf8(source, "_class", 6),
                                    CFISH_STRING);
-    cfish_VTable *vtable = cfish_VTable_singleton(class_name, NULL);
-    lucy_Doc *loaded = (lucy_Doc*)CFISH_VTable_Make_Obj(vtable);
+    cfish_Class *klass = cfish_Class_singleton(class_name, NULL);
+    lucy_Doc *loaded = (lucy_Doc*)CFISH_Class_Make_Obj(klass);
     cfish_Obj *doc_id = CFISH_CERTIFY(
                            CFISH_Hash_Fetch_Utf8(source, "doc_id", 7),
                            CFISH_OBJ);

@@ -43,7 +43,7 @@ S_find_all_referenced(Folder *folder, VArray *entries);
 
 FilePurger*
 FilePurger_new(Folder *folder, Snapshot *snapshot, IndexManager *manager) {
-    FilePurger *self = (FilePurger*)VTable_Make_Obj(FILEPURGER);
+    FilePurger *self = (FilePurger*)Class_Make_Obj(FILEPURGER);
     return FilePurger_init(self, folder, snapshot, manager);
 }
 

@@ -28,7 +28,7 @@
 
 TestPhraseQuery*
 TestPhraseQuery_new() {
-    return (TestPhraseQuery*)VTable_Make_Obj(TESTPHRASEQUERY);
+    return (TestPhraseQuery*)Class_Make_Obj(TESTPHRASEQUERY);
 }
 
 static void

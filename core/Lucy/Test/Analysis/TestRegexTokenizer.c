@@ -26,7 +26,7 @@
 
 TestRegexTokenizer*
 TestRegexTokenizer_new() {
-    return (TestRegexTokenizer*)VTable_Make_Obj(TESTREGEXTOKENIZER);
+    return (TestRegexTokenizer*)Class_Make_Obj(TESTREGEXTOKENIZER);
 }
 
 static void

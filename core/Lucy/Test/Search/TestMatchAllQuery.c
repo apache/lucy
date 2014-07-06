@@ -27,7 +27,7 @@
 
 TestMatchAllQuery*
 TestMatchAllQuery_new() {
-    return (TestMatchAllQuery*)VTable_Make_Obj(TESTMATCHALLQUERY);
+    return (TestMatchAllQuery*)Class_Make_Obj(TESTMATCHALLQUERY);
 }
 
 static void

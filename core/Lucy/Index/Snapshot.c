@@ -32,7 +32,7 @@ static int32_t Snapshot_current_file_subformat = 1;
 
 Snapshot*
 Snapshot_new() {
-    Snapshot *self = (Snapshot*)VTable_Make_Obj(SNAPSHOT);
+    Snapshot *self = (Snapshot*)Class_Make_Obj(SNAPSHOT);
     return Snapshot_init(self);
 }
 

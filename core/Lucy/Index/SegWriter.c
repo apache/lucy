@@ -33,7 +33,7 @@
 SegWriter*
 SegWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
               PolyReader *polyreader) {
-    SegWriter *self = (SegWriter*)VTable_Make_Obj(SEGWRITER);
+    SegWriter *self = (SegWriter*)Class_Make_Obj(SEGWRITER);
     return SegWriter_init(self, schema, snapshot, segment, polyreader);
 }
 

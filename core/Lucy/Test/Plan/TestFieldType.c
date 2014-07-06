@@ -26,20 +26,20 @@
 
 TestFieldType*
 TestFType_new() {
-    return (TestFieldType*)VTable_Make_Obj(TESTFIELDTYPE);
+    return (TestFieldType*)Class_Make_Obj(TESTFIELDTYPE);
 }
 
 DummyFieldType*
 DummyFieldType_new() {
-    DummyFieldType *self = (DummyFieldType*)VTable_Make_Obj(DUMMYFIELDTYPE);
+    DummyFieldType *self = (DummyFieldType*)Class_Make_Obj(DUMMYFIELDTYPE);
     return (DummyFieldType*)FType_init((FieldType*)self);
 }
 
 static FieldType*
 S_alt_field_type() {
     StackString *name = SSTR_WRAP_UTF8("DummyFieldType2", 15);
-    VTable *vtable = VTable_singleton((String*)name, DUMMYFIELDTYPE);
-    FieldType *self = (FieldType*)VTable_Make_Obj(vtable);
+    Class *klass = Class_singleton((String*)name, DUMMYFIELDTYPE);
+    FieldType *self = (FieldType*)Class_Make_Obj(klass);
     return FType_init(self);
 }
 

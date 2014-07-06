@@ -21,7 +21,7 @@
 
 MockMatcher*
 MockMatcher_new(I32Array *doc_ids, ByteBuf *scores) {
-    MockMatcher *self = (MockMatcher*)VTable_Make_Obj(MOCKMATCHER);
+    MockMatcher *self = (MockMatcher*)Class_Make_Obj(MOCKMATCHER);
     return MockMatcher_init(self, doc_ids, scores);
 }
 

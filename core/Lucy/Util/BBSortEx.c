@@ -27,7 +27,7 @@
 
 BBSortEx*
 BBSortEx_new(uint32_t mem_threshold, VArray *external) {
-    BBSortEx *self = (BBSortEx*)VTable_Make_Obj(BBSORTEX);
+    BBSortEx *self = (BBSortEx*)Class_Make_Obj(BBSORTEX);
     return BBSortEx_init(self, mem_threshold, external);
 }
 

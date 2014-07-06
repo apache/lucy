@@ -84,7 +84,7 @@ SI_close_win_handles(FSFileHandle *self);
 
 FSFileHandle*
 FSFH_open(String *path, uint32_t flags) {
-    FSFileHandle *self = (FSFileHandle*)VTable_Make_Obj(FSFILEHANDLE);
+    FSFileHandle *self = (FSFileHandle*)Class_Make_Obj(FSFILEHANDLE);
     return FSFH_do_open(self, path, flags);
 }
 

@@ -40,7 +40,7 @@ class Lucy::Search::QueryParser::ParserElem inherits Clownfish::Obj {
      * otherwise.
      */
     nullable Obj*
-    As(ParserElem *self, VTable *metaclass);
+    As(ParserElem *self, Class *klass);
 
     uint32_t
     Get_Type(ParserElem *self);

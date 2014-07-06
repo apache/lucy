@@ -40,7 +40,7 @@ static String *stuff       = NULL;
 
 TestCompoundFileReader*
 TestCFReader_new() {
-    return (TestCompoundFileReader*)VTable_Make_Obj(TESTCOMPOUNDFILEREADER);
+    return (TestCompoundFileReader*)Class_Make_Obj(TESTCOMPOUNDFILEREADER);
 }
 
 static void

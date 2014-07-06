@@ -32,7 +32,7 @@
 
 FSDirHandle*
 FSDH_open(String *dir) {
-    FSDirHandle *self = (FSDirHandle*)VTable_Make_Obj(FSDIRHANDLE);
+    FSDirHandle *self = (FSDirHandle*)Class_Make_Obj(FSDIRHANDLE);
     return FSDH_do_open(self, dir);
 }
 

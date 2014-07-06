@@ -73,7 +73,7 @@ static String *random_int64s_str;
 
 TestSortSpec*
 TestSortSpec_new() {
-    return (TestSortSpec*)VTable_Make_Obj(TESTSORTSPEC);
+    return (TestSortSpec*)Class_Make_Obj(TESTSORTSPEC);
 }
 
 static void
@@ -142,7 +142,7 @@ S_destroy_strings() {
 
 TestReverseType*
 TestReverseType_new() {
-    TestReverseType *self = (TestReverseType*)VTable_Make_Obj(TESTREVERSETYPE);
+    TestReverseType *self = (TestReverseType*)Class_Make_Obj(TESTREVERSETYPE);
     return TestReverseType_init(self);
 }
 

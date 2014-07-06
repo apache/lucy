@@ -22,7 +22,7 @@
 
 TermInfo*
 TInfo_new(int32_t doc_freq) {
-    TermInfo *self = (TermInfo*)VTable_Make_Obj(TERMINFO);
+    TermInfo *self = (TermInfo*)Class_Make_Obj(TERMINFO);
     return TInfo_init(self, doc_freq);
 }
 

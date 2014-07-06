@@ -33,7 +33,7 @@
 
 IndexManager*
 IxManager_new(String *host, LockFactory *lock_factory) {
-    IndexManager *self = (IndexManager*)VTable_Make_Obj(INDEXMANAGER);
+    IndexManager *self = (IndexManager*)Class_Make_Obj(INDEXMANAGER);
     return IxManager_init(self, host, lock_factory);
 }
 

@@ -31,7 +31,7 @@
 
 TestPolyAnalyzer*
 TestPolyAnalyzer_new() {
-    return (TestPolyAnalyzer*)VTable_Make_Obj(TESTPOLYANALYZER);
+    return (TestPolyAnalyzer*)Class_Make_Obj(TESTPOLYANALYZER);
 }
 
 static void

@@ -35,7 +35,7 @@ static String *seg_1       = NULL;
 
 TestCompoundFileWriter*
 TestCFWriter_new() {
-    return (TestCompoundFileWriter*)VTable_Make_Obj(TESTCOMPOUNDFILEWRITER);
+    return (TestCompoundFileWriter*)Class_Make_Obj(TESTCOMPOUNDFILEWRITER);
 }
 
 static void

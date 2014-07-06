@@ -46,7 +46,7 @@ HighlightWriter*
 HLWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
              PolyReader *polyreader) {
     HighlightWriter *self
-        = (HighlightWriter*)VTable_Make_Obj(HIGHLIGHTWRITER);
+        = (HighlightWriter*)Class_Make_Obj(HIGHLIGHTWRITER);
     return HLWriter_init(self, schema, snapshot, segment, polyreader);
 }
 
@@ -221,7 +221,7 @@ HLWriter_Add_Segment_IMP(HighlightWriter *self, SegReader *reader,
     else {
         DefaultHighlightReader *hl_reader
             = (DefaultHighlightReader*)CERTIFY(
-                  SegReader_Obtain(reader, VTable_Get_Name(HIGHLIGHTREADER)),
+                  SegReader_Obtain(reader, Class_Get_Name(HIGHLIGHTREADER)),
                   DEFAULTHIGHLIGHTREADER);
         OutStream *dat_out = S_lazy_init(self);
         OutStream *ix_out  = ivars->ix_out;

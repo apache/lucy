@@ -27,7 +27,7 @@
 
 Hits*
 Hits_new(Searcher *searcher, TopDocs *top_docs, uint32_t offset) {
-    Hits *self = (Hits*)VTable_Make_Obj(HITS);
+    Hits *self = (Hits*)Class_Make_Obj(HITS);
     return Hits_init(self, searcher, top_docs, offset);
 }
 

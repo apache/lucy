@@ -133,9 +133,9 @@ SortEx_Sort_Buffer_IMP(SortExternal *self) {
         THROW(ERR, "Cant Sort_Buffer() after fetching %u32 items", ivars->buf_tick);
     }
     if (ivars->buf_max != 0) {
-        VTable *vtable = SortEx_Get_VTable(self);
+        Class *klass = SortEx_Get_Class(self);
         CFISH_Sort_Compare_t compare
-            = (CFISH_Sort_Compare_t)METHOD_PTR(vtable, LUCY_SortEx_Compare);
+            = (CFISH_Sort_Compare_t)METHOD_PTR(klass, LUCY_SortEx_Compare);
         if (ivars->scratch_cap < ivars->buf_cap) {
             ivars->scratch_cap = ivars->buf_cap;
             ivars->scratch
@@ -259,9 +259,9 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
     uint32_t    num_runs     = VA_Get_Size(ivars->runs);
     Obj      ***slice_starts = ivars->slice_starts;
     uint32_t   *slice_sizes  = ivars->slice_sizes;
-    VTable     *vtable       = SortEx_Get_VTable(self);
+    Class      *klass        = SortEx_Get_Class(self);
     CFISH_Sort_Compare_t compare
-        = (CFISH_Sort_Compare_t)METHOD_PTR(vtable, LUCY_SortEx_Compare);
+        = (CFISH_Sort_Compare_t)METHOD_PTR(klass, LUCY_SortEx_Compare);
 
     if (ivars->buf_max != 0) { THROW(ERR, "Can't refill unless empty"); }
 
@@ -353,7 +353,7 @@ S_find_slice_size(SortExternal *self, SortExternalIVARS *ivars,
     int32_t          hi      = ivars->buf_max;
     Obj            **buffer  = ivars->buffer;
     SortEx_Compare_t compare
-        = METHOD_PTR(SortEx_Get_VTable(self), LUCY_SortEx_Compare);
+        = METHOD_PTR(SortEx_Get_Class(self), LUCY_SortEx_Compare);
 
     // Binary search.
     while (hi - lo > 1) {

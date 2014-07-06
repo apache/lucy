@@ -38,7 +38,7 @@ S_clean_up_old_temp_files(CompoundFileWriter *self,
 CompoundFileWriter*
 CFWriter_new(Folder *folder) {
     CompoundFileWriter *self
-        = (CompoundFileWriter*)VTable_Make_Obj(COMPOUNDFILEWRITER);
+        = (CompoundFileWriter*)Class_Make_Obj(COMPOUNDFILEWRITER);
     return CFWriter_init(self, folder);
 }
 

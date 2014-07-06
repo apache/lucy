@@ -70,7 +70,7 @@ SortFieldWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
                     OutStream *temp_ord_out, OutStream *temp_ix_out,
                     OutStream *temp_dat_out) {
     SortFieldWriter *self
-        = (SortFieldWriter*)VTable_Make_Obj(SORTFIELDWRITER);
+        = (SortFieldWriter*)Class_Make_Obj(SORTFIELDWRITER);
     return SortFieldWriter_init(self, schema, snapshot, segment, polyreader,
                                 field, counter, mem_thresh, temp_ord_out,
                                 temp_ix_out, temp_dat_out);
@@ -120,17 +120,17 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
                           Schema_Fetch_Type(ivars->schema, field), FIELDTYPE);
     ivars->type    = (FieldType*)INCREF(type);
     ivars->prim_id = FType_Primitive_ID(type);
-    ivars->mem_per_entry = VTable_Get_Obj_Alloc_Size(SFWRITERELEM);
+    ivars->mem_per_entry = Class_Get_Obj_Alloc_Size(SFWRITERELEM);
     if (ivars->prim_id == FType_TEXT) {
-        ivars->mem_per_entry += VTable_Get_Obj_Alloc_Size(STRING);
+        ivars->mem_per_entry += Class_Get_Obj_Alloc_Size(STRING);
         ivars->var_width = true;
     }
     else if (ivars->prim_id == FType_BLOB) {
-        ivars->mem_per_entry += VTable_Get_Obj_Alloc_Size(BYTEBUF);
+        ivars->mem_per_entry += Class_Get_Obj_Alloc_Size(BYTEBUF);
         ivars->var_width = true;
     }
     else {
-        ivars->mem_per_entry += VTable_Get_Obj_Alloc_Size(FLOAT64);
+        ivars->mem_per_entry += Class_Get_Obj_Alloc_Size(FLOAT64);
         ivars->var_width = false;
     }
 
@@ -739,7 +739,7 @@ S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in,
 
 static SFWriterElem*
 S_SFWriterElem_create(Obj *value, int32_t doc_id) {
-    SFWriterElem *self = (SFWriterElem*)VTable_Make_Obj(SFWRITERELEM);
+    SFWriterElem *self = (SFWriterElem*)Class_Make_Obj(SFWRITERELEM);
     SFWriterElemIVARS *ivars = SFWriterElem_IVARS(self);
     ivars->value  = value;
     ivars->doc_id = doc_id;

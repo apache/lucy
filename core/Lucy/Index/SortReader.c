@@ -51,7 +51,7 @@ DefaultSortReader*
 DefSortReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
                   VArray *segments, int32_t seg_tick) {
     DefaultSortReader *self
-        = (DefaultSortReader*)VTable_Make_Obj(DEFAULTSORTREADER);
+        = (DefaultSortReader*)Class_Make_Obj(DEFAULTSORTREADER);
     return DefSortReader_init(self, schema, folder, snapshot, segments,
                               seg_tick);
 }

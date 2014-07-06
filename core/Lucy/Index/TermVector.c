@@ -26,7 +26,7 @@
 TermVector*
 TV_new(String *field, String *text, I32Array *positions,
        I32Array *start_offsets, I32Array *end_offsets) {
-    TermVector *self = (TermVector*)VTable_Make_Obj(TERMVECTOR);
+    TermVector *self = (TermVector*)Class_Make_Obj(TERMVECTOR);
     return TV_init(self, field, text, positions, start_offsets, end_offsets);
 }
 

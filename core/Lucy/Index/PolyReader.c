@@ -79,14 +79,14 @@ S_derive_folder(Obj *index);
 PolyReader*
 PolyReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
                IndexManager *manager, VArray *sub_readers) {
-    PolyReader *self = (PolyReader*)VTable_Make_Obj(POLYREADER);
+    PolyReader *self = (PolyReader*)Class_Make_Obj(POLYREADER);
     return PolyReader_init(self, schema, folder, snapshot, manager,
                            sub_readers);
 }
 
 PolyReader*
 PolyReader_open(Obj *index, Snapshot *snapshot, IndexManager *manager) {
-    PolyReader *self = (PolyReader*)VTable_Make_Obj(POLYREADER);
+    PolyReader *self = (PolyReader*)Class_Make_Obj(POLYREADER);
     return PolyReader_do_open(self, index, snapshot, manager);
 }
 
@@ -148,7 +148,7 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
 
     DeletionsReader *del_reader
         = (DeletionsReader*)Hash_Fetch(
-              ivars->components, (Obj*)VTable_Get_Name(DELETIONSREADER));
+              ivars->components, (Obj*)Class_Get_Name(DELETIONSREADER));
     ivars->del_count = del_reader ? DelReader_Del_Count(del_reader) : 0;
 }
 

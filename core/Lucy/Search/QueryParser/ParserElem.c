@@ -21,7 +21,7 @@
 
 ParserElem*
 ParserElem_new(uint32_t type, Obj *value) {
-    ParserElem *self = (ParserElem*)VTable_Make_Obj(PARSERELEM);
+    ParserElem *self = (ParserElem*)Class_Make_Obj(PARSERELEM);
     return ParserElem_init(self, type, value);
 }
 
@@ -50,9 +50,9 @@ ParserElem_Set_Value_IMP(ParserElem *self, Obj *value) {
 }
 
 Obj*
-ParserElem_As_IMP(ParserElem *self, VTable *metaclass) {
+ParserElem_As_IMP(ParserElem *self, Class *klass) {
     ParserElemIVARS *const ivars = ParserElem_IVARS(self);
-    if (ivars->value && Obj_Is_A(ivars->value, metaclass)) {
+    if (ivars->value && Obj_Is_A(ivars->value, klass)) {
         return ivars->value;
     }
     return NULL;

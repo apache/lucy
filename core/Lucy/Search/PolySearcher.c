@@ -47,12 +47,12 @@ PolySearcher_init(PolySearcher *self, Schema *schema, VArray *searchers) {
     for (uint32_t i = 0; i < num_searchers; i++) {
         Searcher *searcher
             = (Searcher*)CERTIFY(VA_Fetch(searchers, i), SEARCHER);
-        Schema *candidate    = Searcher_Get_Schema(searcher);
-        VTable *orig_vt      = Schema_Get_VTable(schema);
-        VTable *candidate_vt = Schema_Get_VTable(candidate);
+        Schema *candidate       = Searcher_Get_Schema(searcher);
+        Class  *orig_class      = Schema_Get_Class(schema);
+        Class  *candidate_class = Schema_Get_Class(candidate);
 
         // Confirm that searchers all use the same schema.
-        if (orig_vt != candidate_vt) {
+        if (orig_class != candidate_class) {
             THROW(ERR, "Conflicting schemas: '%o', '%o'",
                   Schema_Get_Class_Name(schema),
                   Schema_Get_Class_Name(candidate));
