@@ -21,36 +21,12 @@ $VERSION = eval $VERSION;
 
 sub bind_all {
     my ($class, $hierarchy) = @_;
-    $class->inherit_metadata($hierarchy);
-    $class->bind_lucy;
-    $class->bind_test;
-}
-
-sub inherit_metadata {
-    my ($class, $hierarchy) = @_;
 
     require Clownfish;
+    $hierarchy->inherit_metadata;
 
-    for my $class (@{ $hierarchy->ordered_classes }) {
-        next if $class->get_parcel->get_name ne 'Clownfish' || $class->inert;
-
-        my $class_name = $class->get_class_name;
-        my $rt_class   = Clownfish::Class->fetch_class($class_name);
-
-        for my $rt_method (@{ $rt_class->get_methods }) {
-            if ($rt_method->is_excluded_from_host) {
-                my $method = $class->method($rt_method->get_name);
-                $method->exclude_from_host;
-            }
-            else {
-                my $alias = $rt_method->get_host_alias;
-                if (defined($alias)) {
-                    my $method = $class->method($rt_method->get_name);
-                    $method->set_host_alias($alias);
-                }
-            }
-        }
-    }
+    $class->bind_lucy;
+    $class->bind_test;
 }
 
 sub bind_lucy {
