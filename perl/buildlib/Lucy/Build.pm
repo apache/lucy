@@ -35,11 +35,18 @@ use Cwd qw( getcwd );
 my @BASE_PATH = __PACKAGE__->cf_base_path;
 
 my $COMMON_SOURCE_DIR = catdir( @BASE_PATH, 'common' );
-my $CHARMONIZER_C     = catfile( $COMMON_SOURCE_DIR, 'charmonizer.c' );
 my $LEMON_DIR         = catdir( @BASE_PATH, 'lemon' );
-my $LEMON_EXE_PATH    = catfile( $LEMON_DIR, "lemon$Config{_exe}" );
-my $CORE_SOURCE_DIR   = catdir( @BASE_PATH, 'core' );
-my $LIB_DIR           = 'lib';
+my $LEMON_EXE_PATH = catfile( $LEMON_DIR, "lemon$Config{_exe}" );
+my $CORE_SOURCE_DIR = catdir( @BASE_PATH, 'core' );
+my $LIB_DIR         = 'lib';
+my $IS_CPAN_DIST    = !@BASE_PATH;
+my $CHARMONIZER_C;
+if ($IS_CPAN_DIST) {
+    $CHARMONIZER_C = 'charmonizer.c';
+}
+else {
+    $CHARMONIZER_C = catfile( $COMMON_SOURCE_DIR, 'charmonizer.c' );
+}
 
 sub new {
     my $self = shift->SUPER::new( recursive_test_files => 1, @_ );
@@ -289,9 +296,9 @@ sub ACTION_dist {
     my $self = shift;
     _check_module_build_for_dist;
 
-    # Create POD but make sure not to include build artifacts.
+    # Create POD.
     $self->depends_on('pod');
-    _clean_prereq_builds($self);
+    rmtree("autogen");
 
     # We build our Perl release tarball from $REPOS_ROOT/perl, rather than
     # from the top-level.
@@ -299,24 +306,25 @@ sub ACTION_dist {
     # Because some items we need are outside this directory, we need to copy a
     # bunch of stuff.  After the tarball is packaged up, we delete the copied
     # directories.
-    my @items_to_copy = qw(
-        core
-        modules
-        devel
-        lemon
-        CHANGES
-        CONTRIBUTING
-        LICENSE
-        NOTICE
-        README
+    my %to_copy = (
+        '../core'         => 'core',
+        '../modules'      => 'modules',
+        '../devel'        => 'devel',
+        '../lemon'        => 'lemon',
+        '../CHANGES'      => 'CHANGES',
+        '../CONTRIBUTING' => 'CONTRIBUTING',
+        '../LICENSE'      => 'LICENSE',
+        '../NOTICE'       => 'NOTICE',
+        '../README'       => 'README',
+        $CHARMONIZER_C    => 'charmonizer.c',
     );
     print "Copying files...\n";
-
-    for my $item (@items_to_copy) {
-        confess("'$item' already exists") if -e $item;
-        system("cp -R ../$item $item");
+    while (my ($from, $to) = each %to_copy) {
+        confess("'$to' already exists") if -e $to;
+        system("cp -R $from $to") and confess();
     }
 
+    move( "MANIFEST", "MANIFEST.bak" ) or die "move() failed: $!";
     $self->depends_on('manifest');
     my $no_index = $self->_gen_pause_exclusion_list;
     my $meta_add = $self->meta_add || {};
@@ -326,8 +334,9 @@ sub ACTION_dist {
 
     # Clean up.
     print "Removing copied files...\n";
-    rmtree($_) for @items_to_copy;
+    rmtree($_) for values %to_copy;
     unlink("META.yml");
+    unlink("META.json");
     move( "MANIFEST.bak", "MANIFEST" ) or die "move() failed: $!";
 }
 
