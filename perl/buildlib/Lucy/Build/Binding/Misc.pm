@@ -33,9 +33,6 @@ sub bind_lucy {
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy    PACKAGE = Lucy
 
-BOOT:
-    cfish_Lucy_bootstrap();
-
 IV
 _dummy_function()
 CODE:
