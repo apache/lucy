@@ -15,7 +15,6 @@
  */
 
 #define C_LUCY_DOC
-#include "charmony.h"
 #include "XSBind.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Store/InStream.h"
@@ -202,7 +201,7 @@ LUCY_Doc_Load_IMP(lucy_Doc *self, cfish_Obj *dump) {
                             CFISH_Hash_Fetch_Utf8(source, "fields", 6),
                             CFISH_HASH);
     SV *fields_sv = XSBind_cfish_to_perl((cfish_Obj*)fields);
-    CHY_UNUSED_VAR(self);
+    CFISH_UNUSED_VAR(self);
 
     lucy_DocIVARS *const loaded_ivars = lucy_Doc_IVARS(loaded);
     loaded_ivars->doc_id = (int32_t)CFISH_Obj_To_I64(doc_id);

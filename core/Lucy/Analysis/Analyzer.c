@@ -68,7 +68,7 @@ Analyzer_Dump_IMP(Analyzer *self) {
 
 Obj*
 Analyzer_Load_IMP(Analyzer *self, Obj *dump) {
-    CHY_UNUSED_VAR(self);
+    UNUSED_VAR(self);
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     String *class_name
         = (String*)CERTIFY(Hash_Fetch_Utf8(source, "_class", 6), STRING);

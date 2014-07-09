@@ -89,6 +89,8 @@ chaz_SharedLib_export_filename(chaz_SharedLib *lib);
 #ifndef H_CHAZ_CFLAGS
 #define H_CHAZ_CFLAGS
 
+/* #include "Charmonizer/Core/SharedLibrary.h" */
+
 #define CHAZ_CFLAGS_STYLE_POSIX  1
 #define CHAZ_CFLAGS_STYLE_GNU    2
 #define CHAZ_CFLAGS_STYLE_MSVC   3
@@ -490,7 +492,7 @@ chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
 #define H_CHAZ_MAKE
 
 /* #include "Charmonizer/Core/CFlags.h" */
-/* #include "Charmonizer/Core/SharedLib.h" */
+/* #include "Charmonizer/Core/SharedLibrary.h" */
 
 typedef struct chaz_MakeFile chaz_MakeFile;
 typedef struct chaz_MakeVar chaz_MakeVar;
@@ -1537,7 +1539,7 @@ void chaz_VariadicMacros_run(void);
 #line 17 "src/Charmonizer/Core/SharedLibrary.c"
 #include <string.h>
 #include <stdlib.h>
-/* #include "Charmonizer/Core/SharedLib.h" */
+/* #include "Charmonizer/Core/SharedLibrary.h" */
 /* #include "Charmonizer/Core/Compiler.h" */
 /* #include "Charmonizer/Core/Util.h" */
 /* #include "Charmonizer/Core/OperatingSystem.h" */
@@ -1661,6 +1663,7 @@ S_get_prefix() {
 #include <string.h>
 #include <stdlib.h>
 /* #include "Charmonizer/Core/CFlags.h" */
+/* #include "Charmonizer/Core/Compiler.h" */
 /* #include "Charmonizer/Core/Util.h" */
 /* #include "Charmonizer/Core/OperatingSystem.h" */
 /* #include "Charmonizer/Core/SharedLibrary.h" */
@@ -3696,6 +3699,7 @@ chaz_HeadCheck_maybe_add_to_cache(const char *header_name, int exists) {
 
 #line 17 "src/Charmonizer/Core/Make.c"
 #include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 /* #include "Charmonizer/Core/Make.h" */
 /* #include "Charmonizer/Core/Compiler.h" */
@@ -4686,6 +4690,7 @@ chaz_OS_rmdir(const char *filepath) {
 #include <stdlib.h>
 #include <string.h>
 /* #include "Charmonizer/Core/Util.h" */
+/* #include "Charmonizer/Core/OperatingSystem.h" */
 
 /* Global verbosity setting. */
 int chaz_Util_verbosity = 1;
@@ -4894,6 +4899,7 @@ chaz_Util_can_open_file(const char *file_path) {
 /* #include "Charmonizer/Core/ConfWriterRuby.h" */
 /* #include "Charmonizer/Core/Util.h" */
 /* #include "Charmonizer/Core/Compiler.h" */
+/* #include "Charmonizer/Core/Make.h" */
 /* #include "Charmonizer/Core/OperatingSystem.h" */
 
 int
@@ -5146,6 +5152,8 @@ chaz_Booleans_run(void) {
 
 #line 17 "src/Charmonizer/Probe/BuildEnv.c"
 /* #include "Charmonizer/Core/HeaderChecker.h" */
+/* #include "Charmonizer/Core/CFlags.h" */
+/* #include "Charmonizer/Core/Compiler.h" */
 /* #include "Charmonizer/Core/ConfWriter.h" */
 /* #include "Charmonizer/Probe/BuildEnv.h" */
 
@@ -5361,6 +5369,8 @@ chaz_DirManip_run(void) {
 
 #line 17 "src/Charmonizer/Probe/Floats.c"
 /* #include "Charmonizer/Core/HeaderChecker.h" */
+/* #include "Charmonizer/Core/CFlags.h" */
+/* #include "Charmonizer/Core/Compiler.h" */
 /* #include "Charmonizer/Core/ConfWriter.h" */
 /* #include "Charmonizer/Core/Util.h" */
 /* #include "Charmonizer/Probe/Floats.h" */
@@ -6716,6 +6726,7 @@ chaz_Memory_probe_alloca(void) {
 
 #line 17 "src/Charmonizer/Probe/RegularExpressions.c"
 /* #include "Charmonizer/Core/HeaderChecker.h" */
+/* #include "Charmonizer/Core/Compiler.h" */
 /* #include "Charmonizer/Core/ConfWriter.h" */
 /* #include "Charmonizer/Probe/RegularExpressions.h" */
 
@@ -6763,6 +6774,8 @@ chaz_RegularExpressions_run(void) {
 /* #include "Charmonizer/Core/Compiler.h" */
 /* #include "Charmonizer/Core/ConfWriter.h" */
 /* #include "Charmonizer/Probe/Strings.h" */
+
+#include <stdlib.h>
 
 /* Check for C99-compatible snprintf and possible replacements.
  */
@@ -6936,6 +6949,7 @@ chaz_UnusedVars_run(void) {
 /* #include "Charmonizer/Probe/VariadicMacros.h" */
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 
 /* Code for verifying ISO-style variadic macros. */
@@ -7028,7 +7042,6 @@ chaz_VariadicMacros_run(void) {
 /* #include "Charmonizer/Probe/LargeFiles.h" */
 /* #include "Charmonizer/Probe/Memory.h" */
 /* #include "Charmonizer/Probe/SymbolVisibility.h" */
-/* #include "Charmonizer/Probe/UnusedVars.h" */
 /* #include "Charmonizer/Probe/VariadicMacros.h" */
 /* #include "Charmonizer/Core/HeaderChecker.h" */
 /* #include "Charmonizer/Core/ConfWriter.h" */
@@ -7465,7 +7478,6 @@ int main(int argc, const char **argv) {
     chaz_LargeFiles_run();
     chaz_Memory_run();
     chaz_RegularExpressions_run();
-    chaz_UnusedVars_run();
     chaz_VariadicMacros_run();
 
     /* Write custom postamble. */

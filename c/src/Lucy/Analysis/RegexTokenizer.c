@@ -15,11 +15,8 @@
  */
 
 #define C_LUCY_REGEXTOKENIZER
-#define CHY_USE_SHORT_NAMES
 #define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
-
-#include "charmony.h"
 
 #include <string.h>
 

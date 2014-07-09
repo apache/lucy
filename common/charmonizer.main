@@ -30,7 +30,6 @@
 #include "Charmonizer/Probe/LargeFiles.h"
 #include "Charmonizer/Probe/Memory.h"
 #include "Charmonizer/Probe/SymbolVisibility.h"
-#include "Charmonizer/Probe/UnusedVars.h"
 #include "Charmonizer/Probe/VariadicMacros.h"
 #include "Charmonizer/Core/HeaderChecker.h"
 #include "Charmonizer/Core/ConfWriter.h"
@@ -467,7 +466,6 @@ int main(int argc, const char **argv) {
     chaz_LargeFiles_run();
     chaz_Memory_run();
     chaz_RegularExpressions_run();
-    chaz_UnusedVars_run();
     chaz_VariadicMacros_run();
 
     /* Write custom postamble. */
