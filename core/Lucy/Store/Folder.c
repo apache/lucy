@@ -19,6 +19,8 @@
 #include <ctype.h>
 #include <limits.h>
 
+#include "charmony.h"
+
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/CompoundFileReader.h"
 #include "Lucy/Store/CompoundFileWriter.h"
@@ -41,7 +43,7 @@ Folder_init(Folder *self, String *path) {
     }
     else {
         // Copy path, strip trailing slash or equivalent.
-        if (Str_Ends_With_Utf8(path, DIR_SEP, strlen(DIR_SEP))) {
+        if (Str_Ends_With_Utf8(path, CHY_DIR_SEP, strlen(CHY_DIR_SEP))) {
             ivars->path = Str_SubString(path, 0, Str_Length(path) - 1);
         }
         else {

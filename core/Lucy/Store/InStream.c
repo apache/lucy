@@ -17,6 +17,8 @@
 #define C_LUCY_INSTREAM
 #include "Lucy/Util/ToolSet.h"
 
+#include "charmony.h"
+
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/FileHandle.h"
 #include "Lucy/Store/FSFileHandle.h"
@@ -270,7 +272,7 @@ static CFISH_INLINE int64_t
 SI_tell(InStream *self) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     char *fw_buf = FileWindow_Get_Buf(ivars->window);
-    int64_t pos_in_buf = PTR_TO_I64(ivars->buf) - PTR_TO_I64(fw_buf);
+    int64_t pos_in_buf = CHY_PTR_TO_I64(ivars->buf) - CHY_PTR_TO_I64(fw_buf);
     return pos_in_buf + FileWindow_Get_Offset(ivars->window) - ivars->offset;
 }
 
@@ -287,7 +289,8 @@ InStream_Length_IMP(InStream *self) {
 char*
 InStream_Buf_IMP(InStream *self, size_t request) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
-    const int64_t bytes_in_buf = PTR_TO_I64(ivars->limit) - PTR_TO_I64(ivars->buf);
+    const int64_t bytes_in_buf
+        = CHY_PTR_TO_I64(ivars->limit) - CHY_PTR_TO_I64(ivars->buf);
 
     /* It's common for client code to overestimate how much is needed, because
      * the request has to figure in worst-case for compressed data.  However,
@@ -318,12 +321,12 @@ void
 InStream_Advance_Buf_IMP(InStream *self, char *buf) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     if (buf > ivars->limit) {
-        int64_t overrun = PTR_TO_I64(buf) - PTR_TO_I64(ivars->limit);
+        int64_t overrun = CHY_PTR_TO_I64(buf) - CHY_PTR_TO_I64(ivars->limit);
         THROW(ERR, "Supplied value is %i64 bytes beyond end of buffer",
               overrun);
     }
     else if (buf < ivars->buf) {
-        int64_t underrun = PTR_TO_I64(ivars->buf) - PTR_TO_I64(buf);
+        int64_t underrun = CHY_PTR_TO_I64(ivars->buf) - CHY_PTR_TO_I64(buf);
         THROW(ERR, "Can't Advance_Buf backwards: (underrun: %i64))", underrun);
     }
     else {
@@ -339,7 +342,8 @@ InStream_Read_Bytes_IMP(InStream *self, char* buf, size_t len) {
 static CFISH_INLINE void
 SI_read_bytes(InStream *self, char* buf, size_t len) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
-    const int64_t available = PTR_TO_I64(ivars->limit) - PTR_TO_I64(ivars->buf);
+    const int64_t available
+        = CHY_PTR_TO_I64(ivars->limit) - CHY_PTR_TO_I64(ivars->buf);
     if (available >= (int64_t)len) {
         // Request is entirely within buffer, so copy.
         memcpy(buf, ivars->buf, len);
@@ -404,7 +408,7 @@ static CFISH_INLINE uint32_t
 SI_read_u32(InStream *self) {
     uint32_t retval;
     SI_read_bytes(self, (char*)&retval, 4);
-#ifdef LITTLE_END
+#ifdef CHY_LITTLE_END
     retval = NumUtil_decode_bigend_u32((char*)&retval);
 #endif
     return retval;
@@ -424,7 +428,7 @@ static CFISH_INLINE uint64_t
 SI_read_u64(InStream *self) {
     uint64_t retval;
     SI_read_bytes(self, (char*)&retval, 8);
-#ifdef LITTLE_END
+#ifdef CHY_LITTLE_END
     retval = NumUtil_decode_bigend_u64((char*)&retval);
 #endif
     return retval;
@@ -444,7 +448,7 @@ float
 InStream_Read_F32_IMP(InStream *self) {
     union { float f; uint32_t u32; } duo;
     SI_read_bytes(self, (char*)&duo, sizeof(float));
-#ifdef LITTLE_END
+#ifdef CHY_LITTLE_END
     duo.u32 = NumUtil_decode_bigend_u32(&duo.u32);
 #endif
     return duo.f;
@@ -454,7 +458,7 @@ double
 InStream_Read_F64_IMP(InStream *self) {
     union { double d; uint64_t u64; } duo;
     SI_read_bytes(self, (char*)&duo, sizeof(double));
-#ifdef LITTLE_END
+#ifdef CHY_LITTLE_END
     duo.u64 = NumUtil_decode_bigend_u64(&duo.u64);
 #endif
     return duo.d;

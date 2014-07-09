@@ -18,6 +18,8 @@
 #define C_LUCY_CFREADERDIRHANDLE
 #include "Lucy/Util/ToolSet.h"
 
+#include "charmony.h"
+
 #include "Lucy/Store/CompoundFileReader.h"
 #include "Lucy/Store/CompoundFileWriter.h"
 #include "Lucy/Store/FileHandle.h"
@@ -94,7 +96,7 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder) {
             String *orig = (String*)VA_Fetch(files, i);
             if (Str_Starts_With(orig, folder_name)) {
                 Obj *record = Hash_Delete(ivars->records, (Obj*)orig);
-                size_t offset = folder_name_len + sizeof(DIR_SEP) - 1;
+                size_t offset = folder_name_len + sizeof(CHY_DIR_SEP) - 1;
                 size_t len    = Str_Length(orig) - offset;
                 String *filename = Str_SubString(orig, offset, len);
                 Hash_Store(ivars->records, (Obj*)filename, (Obj*)record);

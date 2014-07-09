@@ -21,6 +21,8 @@
 #include <errno.h>
 #include <sys/stat.h>
 
+#include "charmony.h"
+
 #include "Lucy/Util/ToolSet.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/VArray.h"

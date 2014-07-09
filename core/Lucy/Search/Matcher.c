@@ -17,7 +17,6 @@
 #define C_LUCY_MATCHER
 #define CFISH_USE_SHORT_NAMES
 #define LUCY_USE_SHORT_NAMES
-#define CHY_USE_SHORT_NAMES
 
 #include "Lucy/Search/Matcher.h"
 #include "Clownfish/Err.h"

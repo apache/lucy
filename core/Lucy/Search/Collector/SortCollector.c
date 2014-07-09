@@ -18,6 +18,8 @@
 #define C_LUCY_MATCHDOC
 #include "Lucy/Util/ToolSet.h"
 
+#include "charmony.h"
+
 #include "Lucy/Search/Collector/SortCollector.h"
 #include "Lucy/Index/SegReader.h"
 #include "Lucy/Index/SortCache.h"
@@ -101,7 +103,7 @@ SortColl_init(SortCollector *self, Schema *schema, SortSpec *sort_spec,
     SortCollectorIVARS *const ivars = SortColl_IVARS(self);
     ivars->total_hits    = 0;
     ivars->bubble_doc    = INT32_MAX;
-    ivars->bubble_score  = F32_NEGINF;
+    ivars->bubble_score  = CHY_F32_NEGINF;
     ivars->seg_doc_max   = 0;
 
     // Assign.
@@ -155,7 +157,7 @@ SortColl_init(SortCollector *self, Schema *schema, SortSpec *sort_spec,
 
     // Prepare a MatchDoc-in-waiting.
     VArray *values = ivars->need_values ? VA_new(num_rules) : NULL;
-    float   score  = ivars->need_score  ? F32_NEGINF : F32_NAN;
+    float   score  = ivars->need_score  ? CHY_F32_NEGINF : CHY_F32_NAN;
     ivars->bumped = MatchDoc_new(INT32_MAX, score, values);
     DECREF(values);
 
@@ -231,8 +233,8 @@ SortColl_Set_Reader_IMP(SortCollector *self, SegReader *reader) {
     MatchDocIVARS *const bumped_ivars = MatchDoc_IVARS(ivars->bumped);
     bumped_ivars->doc_id = INT32_MAX;
     ivars->bubble_doc    = INT32_MAX;
-    bumped_ivars->score  = ivars->need_score ? F32_NEGINF : F32_NAN;
-    ivars->bubble_score  = ivars->need_score ? F32_NEGINF : F32_NAN;
+    bumped_ivars->score  = ivars->need_score ? CHY_F32_NEGINF : CHY_F32_NAN;
+    ivars->bubble_score  = ivars->need_score ? CHY_F32_NEGINF : CHY_F32_NAN;
     ivars->actions       = ivars->auto_actions;
 
     // Obtain sort caches. Derive actions array for this segment.
@@ -285,7 +287,7 @@ SortColl_Collect_IMP(SortCollector *self, int32_t doc_id) {
         MatchDocIVARS *const match_doc_ivars = MatchDoc_IVARS(match_doc);
         match_doc_ivars->doc_id = doc_id + ivars->base;
 
-        if (ivars->need_score && match_doc_ivars->score == F32_NEGINF) {
+        if (ivars->need_score && match_doc_ivars->score == CHY_F32_NEGINF) {
             match_doc_ivars->score = Matcher_Score(ivars->matcher);
         }
 
@@ -321,15 +323,17 @@ SortColl_Collect_IMP(SortCollector *self, int32_t doc_id) {
 
             // Recycle.
             MatchDoc_IVARS(ivars->bumped)->score = ivars->need_score
-                                                   ? F32_NEGINF
-                                                   : F32_NAN;
+                                                   ? CHY_F32_NEGINF
+                                                   : CHY_F32_NAN;
         }
         else {
             // The queue isn't full yet, so create a fresh MatchDoc.
             VArray *values = ivars->need_values
                              ? VA_new(ivars->num_rules)
                              : NULL;
-            float fake_score = ivars->need_score ? F32_NEGINF : F32_NAN;
+            float fake_score = ivars->need_score
+                               ? CHY_F32_NEGINF
+                               : CHY_F32_NAN;
             ivars->bumped = MatchDoc_new(INT32_MAX, fake_score, values);
             DECREF(values);
         }

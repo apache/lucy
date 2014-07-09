@@ -20,6 +20,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "charmony.h"
+
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 #include "Clownfish/TestHarness/TestBatchRunner.h"

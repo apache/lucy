@@ -28,7 +28,7 @@
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
 
-#if defined(HAS_PCRE_H)
+#if defined(CHY_HAS_PCRE_H)
 
 #include <pcre.h>
 
@@ -156,7 +156,7 @@ S_count_code_points(const char *string, size_t len) {
     return num_code_points;
 }
 
-#else // HAS_PCRE_H
+#else // CHY_HAS_PCRE_H
 
 bool
 RegexTokenizer_is_available(void) {
@@ -202,5 +202,5 @@ RegexTokenizer_Tokenize_Utf8_IMP(RegexTokenizer *self, const char *string,
           " without PCRE.");
 }
 
-#endif // HAS_PCRE_H
+#endif // CHY_HAS_PCRE_H
 

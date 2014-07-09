@@ -17,6 +17,8 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
+#include "charmony.h"
+
 // mkdir, rmdir
 #ifdef CHY_HAS_DIRECT_H
   #include <direct.h>

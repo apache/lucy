@@ -20,6 +20,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "charmony.h"
+
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 #include "Clownfish/TestHarness/TestBatchRunner.h"
@@ -104,7 +106,7 @@ test_Buf(TestBatchRunner *runner) {
 
     int64_t  expected = InStream_Length(instream) - InStream_Tell(instream);
     char    *buff     = InStream_Buf(instream, 100000);
-    int64_t  got      = PTR_TO_I64(ivars->limit) - PTR_TO_I64(buff);
+    int64_t  got      = CHY_PTR_TO_I64(ivars->limit) - CHY_PTR_TO_I64(buff);
     TEST_TRUE(runner, got == expected,
               "Requests greater than file size get pared down");
 

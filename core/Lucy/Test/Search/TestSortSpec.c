@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "charmony.h"
+
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Clownfish/TestHarness/TestUtils.h"
 #include "Lucy/Test.h"
@@ -295,13 +297,13 @@ S_random_int64() {
 static Obj*
 S_random_float32() {
     uint64_t num = TestUtils_random_u64();
-    return (Obj*)Float32_new(U64_TO_DOUBLE(num) * (10.0 / UINT64_MAX));
+    return (Obj*)Float32_new(CHY_U64_TO_DOUBLE(num) * (10.0 / UINT64_MAX));
 }
 
 static Obj*
 S_random_float64() {
     uint64_t num = TestUtils_random_u64();
-    return (Obj*)Float64_new(U64_TO_DOUBLE(num) * (10.0 / UINT64_MAX));
+    return (Obj*)Float64_new(CHY_U64_TO_DOUBLE(num) * (10.0 / UINT64_MAX));
 }
 
 static VArray*

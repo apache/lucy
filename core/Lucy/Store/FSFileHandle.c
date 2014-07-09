@@ -17,6 +17,8 @@
 #define C_LUCY_FSFILEHANDLE
 #include "Lucy/Util/ToolSet.h"
 
+#include "charmony.h"
+
 #include <errno.h>
 #include <stdio.h>
 #include <fcntl.h> // open, POSIX flags
@@ -54,7 +56,7 @@ SI_posix_flags(uint32_t fh_flags) {
     return posix_flags;
 }
 
-#define IS_64_BIT (SIZEOF_PTR == 8 ? 1 : 0)
+#define IS_64_BIT (CHY_SIZEOF_PTR == 8 ? 1 : 0)
 
 // Memory map a region of the file with shared (read-only) permissions.  If
 // the requested length is 0, return NULL.  If an error occurs, return NULL
@@ -115,7 +117,7 @@ FSFH_do_open(FSFileHandle *self, String *path, uint32_t flags) {
         }
         else {
             // Derive length.
-            ivars->len = lseek64(ivars->fd, INT64_C(0), SEEK_END);
+            ivars->len = chy_lseek64(ivars->fd, INT64_C(0), SEEK_END);
             if (ivars->len == -1) {
                 Err_set_error(Err_new(Str_newf("lseek64 on %o failed: %s",
                                                ivars->path, strerror(errno))));
@@ -123,7 +125,8 @@ FSFH_do_open(FSFileHandle *self, String *path, uint32_t flags) {
                 return NULL;
             }
             else {
-                int64_t check_val = lseek64(ivars->fd, INT64_C(0), SEEK_SET);
+                int64_t check_val
+                    = chy_lseek64(ivars->fd, INT64_C(0), SEEK_SET);
                 if (check_val == -1) {
                     Err_set_error(Err_new(Str_newf("lseek64 on %o failed: %s",
                                                    ivars->path, strerror(errno))));
@@ -343,14 +346,14 @@ SI_init_read_only(FSFileHandle *self, FSFileHandleIVARS *ivars) {
     }
 
     // Derive len.
-    ivars->len = lseek64(ivars->fd, INT64_C(0), SEEK_END);
+    ivars->len = chy_lseek64(ivars->fd, INT64_C(0), SEEK_END);
     if (ivars->len == -1) {
         Err_set_error(Err_new(Str_newf("lseek64 on %o failed: %s", ivars->path,
                                        strerror(errno))));
         return false;
     }
     else {
-        int64_t check_val = lseek64(ivars->fd, INT64_C(0), SEEK_SET);
+        int64_t check_val = chy_lseek64(ivars->fd, INT64_C(0), SEEK_SET);
         if (check_val == -1) {
             Err_set_error(Err_new(Str_newf("lseek64 on %o failed: %s",
                                            ivars->path, strerror(errno))));

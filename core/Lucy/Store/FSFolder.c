@@ -17,6 +17,8 @@
 #define C_LUCY_FSFOLDER
 #include "Lucy/Util/ToolSet.h"
 
+#include "charmony.h"
+
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -271,10 +273,10 @@ FSFolder_Local_Find_Folder_IMP(FSFolder *self, String *name) {
 static String*
 S_fullpath(FSFolder *self, String *path) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
-    String *fullpath = Str_newf("%o%s%o", ivars->path, DIR_SEP, path);
+    String *fullpath = Str_newf("%o%s%o", ivars->path, CHY_DIR_SEP, path);
     String *retval;
-    if (DIR_SEP[0] != '/') {
-        retval = Str_Swap_Chars(fullpath, '/', DIR_SEP[0]);
+    if (CHY_DIR_SEP[0] != '/') {
+        retval = Str_Swap_Chars(fullpath, '/', CHY_DIR_SEP[0]);
         DECREF(fullpath);
     }
     else {
@@ -294,13 +296,13 @@ S_fullpath_ptr(FSFolder *self, String *path) {
 
     char *buf = (char*)MALLOCATE(full_size + 1);
     memcpy(buf, folder_ptr, folder_size);
-    buf[folder_size] = DIR_SEP[0];
+    buf[folder_size] = CHY_DIR_SEP[0];
     memcpy(buf + folder_size + 1, path_ptr, path_size);
     buf[full_size] = '\0';
 
-    if (DIR_SEP[0] != '/') {
+    if (CHY_DIR_SEP[0] != '/') {
         for (size_t i = 0; i < full_size; ++i) {
-            if (buf[i] == '/') { buf[i] = DIR_SEP[0]; }
+            if (buf[i] == '/') { buf[i] = CHY_DIR_SEP[0]; }
         }
     }
 
@@ -395,7 +397,7 @@ S_hard_link(char *from8, char *to8) {
 
 static bool
 S_is_absolute(String *path) {
-    return Str_Starts_With_Utf8(path, DIR_SEP, 1);
+    return Str_Starts_With_Utf8(path, CHY_DIR_SEP, 1);
 }
 
 static String*
@@ -404,7 +406,7 @@ S_absolutify(String *path) {
 
     char *cwd = getcwd(NULL, 0);
     if (!cwd) { THROW(ERR, "getcwd failed"); }
-    String *abs_path = Str_newf("%s" DIR_SEP "%o", cwd, path);
+    String *abs_path = Str_newf("%s" CHY_DIR_SEP "%o", cwd, path);
     free(cwd);
 
     return abs_path;

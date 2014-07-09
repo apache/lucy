@@ -17,6 +17,8 @@
 #define C_LUCY_OUTSTREAM
 #include "Lucy/Util/ToolSet.h"
 
+#include "charmony.h"
+
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Store/FileHandle.h"
 #include "Lucy/Store/FSFileHandle.h"
@@ -222,7 +224,7 @@ OutStream_Write_U8_IMP(OutStream *self, uint8_t value) {
 
 static CFISH_INLINE void
 SI_write_u32(OutStream *self, OutStreamIVARS *ivars, uint32_t value) {
-#ifdef BIG_END
+#ifdef CHY_BIG_END
     SI_write_bytes(self, ivars, &value, 4);
 #else
     char  buf[4];
@@ -244,7 +246,7 @@ OutStream_Write_U32_IMP(OutStream *self, uint32_t value) {
 
 static CFISH_INLINE void
 SI_write_u64(OutStream *self, OutStreamIVARS *ivars, uint64_t value) {
-#ifdef BIG_END
+#ifdef CHY_BIG_END
     SI_write_bytes(self, ivars, &value, 8);
 #else
     char  buf[sizeof(uint64_t)];
