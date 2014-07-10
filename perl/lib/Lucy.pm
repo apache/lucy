@@ -103,19 +103,6 @@ BEGIN {
 }
 
 {
-    package Clownfish::Obj;
-    use Carp qw( confess );
-    sub STORABLE_freeze {
-        my $class_name = shift->get_class_name;
-        confess("Storable serialization not implemented for $class_name");
-    }
-    sub STORABLE_thaw {
-        my $class_name = shift->get_class_name;
-        confess("Storable serialization not implemented for $class_name");
-    }
-}
-
-{
     package Lucy::Index::DocVector;
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
