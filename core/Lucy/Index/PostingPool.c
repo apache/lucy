@@ -121,7 +121,6 @@ PostPool_Destroy_IMP(PostingPool *self) {
     DECREF(ivars->segment);
     DECREF(ivars->polyreader);
     DECREF(ivars->lex_writer);
-    DECREF(ivars->mem_pool);
     DECREF(ivars->field);
     DECREF(ivars->doc_map);
     DECREF(ivars->lexicon);
@@ -134,7 +133,14 @@ PostPool_Destroy_IMP(PostingPool *self) {
     DECREF(ivars->posting);
     DECREF(ivars->skip_stepper);
     DECREF(ivars->type);
+    MemoryPool *mem_pool = ivars->mem_pool;
     SUPER_DESTROY(self, POSTINGPOOL);
+
+    // The MemoryPool must be kept alive while SUPER_DESTROY runs because if
+    // it is destroyed sooner, any RawPosting objects which belong to it will
+    // become dangling references.  SortExternal's destructor will then
+    // malfunction when it traverses the buffer DECREFing each element.
+    DECREF(mem_pool);
 }
 
 int
