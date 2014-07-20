@@ -156,7 +156,7 @@ test_clear_buffer(TestBatchRunner *runner) {
 static void
 S_test_sort(TestBatchRunner *runner, VArray *bytebufs, uint32_t mem_thresh,
             const char *test_name) {
-    uint32_t   size     = VA_Get_Size(bytebufs);
+    int        size     = (int)VA_Get_Size(bytebufs);
     BBSortEx  *sortex   = BBSortEx_new(mem_thresh, NULL);
     ByteBuf  **shuffled = (ByteBuf**)MALLOCATE(size * sizeof(ByteBuf*));
 
@@ -192,7 +192,7 @@ S_test_sort_letters(TestBatchRunner *runner, const char *letters,
     size_t  num_letters = strlen(letters);
     VArray *bytebufs    = VA_new(num_letters);
 
-    for (int i = 0; i < num_letters; ++i) {
+    for (size_t i = 0; i < num_letters; ++i) {
         char ch = letters[i];
         size_t size = ch == '_' ? 0 : 1;
         ByteBuf *bytebuf = BB_new_bytes(&ch, size);

@@ -67,7 +67,7 @@ SortRule_Deserialize_IMP(SortRule *self, InStream *instream) {
     if (ivars->type == SortRule_FIELD) {
         ivars->field = Freezer_read_string(instream);
     }
-    ivars->reverse = InStream_Read_C32(instream);
+    ivars->reverse = !!InStream_Read_C32(instream);
     return self;
 }
 

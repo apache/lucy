@@ -297,7 +297,8 @@ S_random_int64() {
 static Obj*
 S_random_float32() {
     uint64_t num = TestUtils_random_u64();
-    return (Obj*)Float32_new(CHY_U64_TO_DOUBLE(num) * (10.0 / UINT64_MAX));
+    double d = CHY_U64_TO_DOUBLE(num) * (10.0 / UINT64_MAX);
+    return (Obj*)Float32_new((float)d);
 }
 
 static Obj*
@@ -341,8 +342,8 @@ S_test_sorted_search(IndexSearcher *searcher, String *query,
 
     va_start(args, num_wanted);
     while (NULL != (field = va_arg(args, String*))) {
-        bool        reverse = va_arg(args, int);
-        SortRule *rule    = SortRule_new(SortRule_FIELD, field, reverse);
+        int       reverse = va_arg(args, int);
+        SortRule *rule    = SortRule_new(SortRule_FIELD, field, !!reverse);
         VA_Push(rules, (Obj*)rule);
     }
     va_end(args);

@@ -146,8 +146,8 @@ RangeQuery_Deserialize_IMP(RangeQuery *self, InStream *instream) {
     String *field = Freezer_read_string(instream);
     Obj *lower_term = InStream_Read_U8(instream) ? THAW(instream) : NULL;
     Obj *upper_term = InStream_Read_U8(instream) ? THAW(instream) : NULL;
-    bool include_lower = InStream_Read_U8(instream);
-    bool include_upper = InStream_Read_U8(instream);
+    bool include_lower = !!InStream_Read_U8(instream);
+    bool include_upper = !!InStream_Read_U8(instream);
 
     // Init object.
     RangeQuery_init(self, field, lower_term, upper_term, include_lower,

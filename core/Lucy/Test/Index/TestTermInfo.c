@@ -40,22 +40,22 @@ test_freqfilepos(TestBatchRunner *runner) {
     TEST_FALSE(runner, LUCY_TInfo_Equals(tinfo, (Obj*)cloned_tinfo),"the clone should be a separate C struct");
     TEST_INT_EQ(runner, TInfo_Get_Doc_Freq(tinfo), 10, "new sets doc_freq correctly" );
     TEST_INT_EQ(runner, TInfo_Get_Doc_Freq(tinfo), 10, "... doc_freq cloned" );
-    TEST_INT_EQ(runner, TInfo_Get_Post_FilePos(tinfo), 20, "... post_filepos cloned" );
-    TEST_INT_EQ(runner, TInfo_Get_Skip_FilePos(tinfo), 40, "... skip_filepos cloned" );
-    TEST_INT_EQ(runner, TInfo_Get_Lex_FilePos(tinfo),  50, "... lex_filepos cloned" );
+    TEST_INT_EQ(runner, (int)TInfo_Get_Post_FilePos(tinfo), 20, "... post_filepos cloned" );
+    TEST_INT_EQ(runner, (int)TInfo_Get_Skip_FilePos(tinfo), 40, "... skip_filepos cloned" );
+    TEST_INT_EQ(runner, (int)TInfo_Get_Lex_FilePos(tinfo),  50, "... lex_filepos cloned" );
 
     TInfo_Set_Doc_Freq(tinfo, 5);
     TEST_INT_EQ(runner, TInfo_Get_Doc_Freq(tinfo), 5,  "set/get doc_freq" );
     TEST_INT_EQ(runner, TInfo_Get_Doc_Freq(cloned_tinfo), 10, "setting orig doesn't affect clone" );
 
     TInfo_Set_Post_FilePos(tinfo, 15);
-    TEST_INT_EQ(runner, TInfo_Get_Post_FilePos(tinfo), 15, "set/get post_filepos" );
+    TEST_INT_EQ(runner, (int)TInfo_Get_Post_FilePos(tinfo), 15, "set/get post_filepos" );
 
     TInfo_Set_Skip_FilePos(tinfo, 35);
-    TEST_INT_EQ(runner, TInfo_Get_Skip_FilePos(tinfo), 35, "set/get skip_filepos" );
+    TEST_INT_EQ(runner, (int)TInfo_Get_Skip_FilePos(tinfo), 35, "set/get skip_filepos" );
 
     TInfo_Set_Lex_FilePos(tinfo, 45);
-    TEST_INT_EQ(runner, TInfo_Get_Lex_FilePos(tinfo), 45, "set/get lex_filepos" );
+    TEST_INT_EQ(runner, (int)TInfo_Get_Lex_FilePos(tinfo), 45, "set/get lex_filepos" );
 
     DECREF(tinfo);
     DECREF(cloned_tinfo);

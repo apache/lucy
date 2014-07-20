@@ -30,18 +30,18 @@ TestSpan_new() {
 
 void 
 test_span_init_values(TestBatchRunner *runner) {
-    Span* span = Span_new(2,3,7);
+    Span* span = Span_new(2,3,7.0);
     TEST_INT_EQ(runner, Span_Get_Offset(span), 2, "get_offset" );
     TEST_INT_EQ(runner, Span_Get_Length(span), 3, "get_length" );
-    TEST_INT_EQ(runner, Span_Get_Weight(span), 7, "get_weight" );
+    TEST_FLOAT_EQ(runner, Span_Get_Weight(span), 7.0, "get_weight" );
 
     Span_Set_Offset(span, 10);
     Span_Set_Length(span, 1);
-    Span_Set_Weight(span, 4);
+    Span_Set_Weight(span, 4.0);
 
     TEST_INT_EQ(runner, Span_Get_Offset(span), 10, "set_offset" );
     TEST_INT_EQ(runner, Span_Get_Length(span), 1, "set_length" );
-    TEST_INT_EQ(runner, Span_Get_Weight(span), 4, "set_weight" );
+    TEST_FLOAT_EQ(runner, Span_Get_Weight(span), 4.0, "set_weight" );
 
     DECREF(span);
 }

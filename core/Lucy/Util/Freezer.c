@@ -138,7 +138,7 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
     else if (Obj_Is_A(obj, NUM)) {
         if (Obj_Is_A(obj, INTNUM)) {
             if (Obj_Is_A(obj, BOOLNUM)) {
-                bool value = (bool)InStream_Read_U8(instream);
+                bool value = !!InStream_Read_U8(instream);
                 BoolNum *self = (BoolNum*)obj;
                 if (self && self != CFISH_TRUE && self != CFISH_FALSE) {
                     Bool_Dec_RefCount_t super_decref

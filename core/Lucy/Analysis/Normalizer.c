@@ -135,10 +135,10 @@ Normalizer_Dump_IMP(Normalizer *self) {
 
     Hash_Store_Utf8(dump, "normalization_form", 18, (Obj*)form);
 
-    BoolNum *case_fold = Bool_singleton(options & UTF8PROC_CASEFOLD);
+    BoolNum *case_fold = Bool_singleton(!!(options & UTF8PROC_CASEFOLD));
     Hash_Store_Utf8(dump, "case_fold", 9, (Obj*)case_fold);
 
-    BoolNum *strip_accents = Bool_singleton(options & UTF8PROC_STRIPMARK);
+    BoolNum *strip_accents = Bool_singleton(!!(options & UTF8PROC_STRIPMARK));
     Hash_Store_Utf8(dump, "strip_accents", 13, (Obj*)strip_accents);
 
     return dump;
