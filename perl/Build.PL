@@ -30,6 +30,10 @@ my $UTF8PROC_SRC_DIR = catdir( $MODULES_DIR, qw( unicode utf8proc ) );
 my $CORE_SOURCE_DIR  = catdir( @BASE_PATH, 'core' );
 my $XS_SOURCE_DIR    = 'xs';
 
+my @cf_linker_flags = Clownfish::CFC::Perl::Build->cf_linker_flags(
+    'Clownfish',
+);
+
 my $builder = Lucy::Build->new(
     module_name => 'Lucy',
     license     => 'apache',
@@ -74,6 +78,7 @@ my $builder = Lucy::Build->new(
             $UTF8PROC_SRC_DIR,
         ],
     },
+    extra_linker_flags => [ @cf_linker_flags ],
     add_to_cleanup => [
         qw(
             Lucy-*
