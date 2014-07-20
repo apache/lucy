@@ -58,9 +58,13 @@ new(either_sv, ...)
     SV *either_sv;
 CODE:
 {
-    SV* fields_sv = NULL;
-    int32_t doc_id = 0;
-    bool args_ok
+    SV*       fields_sv = NULL;
+    HV       *fields    = NULL;
+    int32_t   doc_id    = 0;
+    lucy_Doc *self      = NULL;
+    bool      args_ok;
+
+    args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
                               ALLOT_SV(&fields_sv, "fields", 6, false),
                               ALLOT_I32(&doc_id, "doc_id", 6, false),
@@ -69,7 +73,6 @@ CODE:
         CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
     }
 
-    HV *fields = NULL;
     if (fields_sv && XSBind_sv_defined(fields_sv)) {
         if (SvROK(fields_sv)) {
             fields = (HV*)SvRV(fields_sv);
@@ -79,7 +82,7 @@ CODE:
         }
     }
 
-    lucy_Doc *self = (lucy_Doc*)XSBind_new_blank_obj(either_sv);
+    self = (lucy_Doc*)XSBind_new_blank_obj(either_sv);
     lucy_Doc_init(self, fields, doc_id);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
@@ -139,10 +142,14 @@ new(either_sv, ...)
     SV *either_sv;
 CODE:
 {
-    SV *fields_sv = NULL;
-    int32_t doc_id = 0;
-    float score = 0.0f;
-    bool args_ok
+    SV          *fields_sv = NULL;
+    HV          *fields    = NULL;
+    int32_t      doc_id    = 0;
+    float        score     = 0.0f;
+    lucy_HitDoc *self      = NULL;
+    bool         args_ok;
+
+    args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
                               ALLOT_SV(&fields_sv, "fields", 6, false),
                               ALLOT_I32(&doc_id, "doc_id", 6, false),
@@ -152,7 +159,6 @@ CODE:
         CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
     }
 
-    HV *fields = NULL;
     if (fields_sv && XSBind_sv_defined(fields_sv)) {
         if (SvROK(fields_sv)) {
             fields = (HV*)SvRV(fields_sv);
@@ -162,7 +168,7 @@ CODE:
         }
     }
 
-    lucy_HitDoc *self = (lucy_HitDoc*)XSBind_new_blank_obj(either_sv);
+    self = (lucy_HitDoc*)XSBind_new_blank_obj(either_sv);
     lucy_HitDoc_init(self, fields, doc_id, score);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }

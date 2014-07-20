@@ -79,10 +79,12 @@ new(either_sv, ...)
     SV *either_sv;
 CODE:
 {
-    SV *ints_sv = NULL;
-    lucy_I32Array *self = NULL;
+    SV            *ints_sv = NULL;
+    AV            *ints_av = NULL;
+    lucy_I32Array *self    = NULL;
+    bool           args_ok;
 
-    bool args_ok
+    args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
                               ALLOT_SV(&ints_sv, "ints", 4, true),
                               NULL);
@@ -90,7 +92,6 @@ CODE:
         CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
     }
 
-    AV *ints_av = NULL;
     if (SvROK(ints_sv)) {
         ints_av = (AV*)SvRV(ints_sv);
     }

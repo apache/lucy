@@ -425,10 +425,15 @@ new(either_sv, ...)
     SV *either_sv;
 CODE:
 {
-    SV *type_sv;
-    SV *value_sv;
+    SV              *type_sv  = NULL;
+    SV              *value_sv = NULL;
+    const char      *type_str = NULL;
+    cfish_Obj       *value    = NULL;
+    uint32_t         type     = 0;
+    lucy_ParserElem *self     = NULL;
+    bool args_ok;
 
-    bool args_ok
+    args_ok
         = XSBind_allot_params(&(ST(0)), 1, items,
                               ALLOT_SV(&type_sv, "type", 4, true),
                               ALLOT_SV(&value_sv, "value", 5, false),
@@ -437,9 +442,7 @@ CODE:
     if (!args_ok) {
         CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
     }
-    const char *type_str = SvPVutf8_nolen(type_sv);
-    cfish_Obj *value = NULL;
-    uint32_t type = 0;
+    type_str = SvPVutf8_nolen(type_sv);
 
     if (strcmp(type_str, "OPEN_PAREN") == 0) {
         type = LUCY_QPARSER_TOKEN_OPEN_PAREN; 
@@ -478,7 +481,7 @@ CODE:
         CFISH_THROW(CFISH_ERR, "Bad type: '%s'", type_str);
     }
 
-    lucy_ParserElem *self = (lucy_ParserElem*)XSBind_new_blank_obj(either_sv);
+    self = (lucy_ParserElem*)XSBind_new_blank_obj(either_sv);
     self = lucy_ParserElem_init(self, type, value);
     RETVAL = XSBind_cfish_to_perl((cfish_Obj*)self);
     CFISH_DECREF(self);
