@@ -22,9 +22,13 @@ make sure to use the --clownfish-prefix configure option:
 
 It's also possible to build Lucy with an uninstalled Clownfish build from
 the Clownfish source directory. To setup the required environment variables,
-run the following from the lucy/c directory before configuration:
+source the file devel/bin/setup_env.sh from the Clownfish source tree:
 
-    $ source ../devel/bin/setup_clownfish_env.sh clownfish-source-dir
+    $ source path_to_clownfish/devel/bin/setup_env.sh
+
+Or, if you're on the Windows shell:
+
+    $ path_to_clownfish/devel/bin/setup_env.bat
 
 Building under UNIX and derivatives or Cygwin
 ---------------------------------------------

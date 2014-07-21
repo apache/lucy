@@ -1,14 +1,33 @@
 Installing Apache Lucy with Perl bindings
 =========================================
 
+Requirements
+------------
+
+Module::Build is required.  Since Perl 5.10.0, Module::Build has been bundled
+with the Perl core, but on older systems it may be necessary to install it
+from CPAN first.
+
+Lucy also depends on the Clownfish compiler and runtime which are available
+as Perl distributions Clownfish and Clownfish::CFC.
+
+It's also possible to build Lucy with an uninstalled Clownfish build from
+the Clownfish source directory. To setup the required environment variables,
+source the file devel/bin/setup_env.sh from the Clownfish source tree:
+
+    $ source path_to_clownfish/devel/bin/setup_env.sh
+
+Or, if you're on the Windows shell:
+
+    $ path_to_clownfish/devel/bin/setup_env.bat
+
+Build and installation
+----------------------
+
 To install Apache Lucy as a suite of Perl modules, run the following commands:
 
     perl Build.PL
     perl Build
     perl Build test
     perl Build install
-
-Module::Build is required.  Since Perl 5.10.0, Module::Build has been bundled
-with the Perl core, but on older systems it may be necessary to install it
-from CPAN first.
 
