@@ -3,6 +3,7 @@
 /charmonizer
 /charmonizer.exe
 /charmony.h
+/liblucy-*.dll
 /liblucy.*.dylib
 /liblucy.dylib
 /liblucy.so
