@@ -179,7 +179,7 @@ FSDH_Next_IMP(FSDirHandle *self) {
     }
     else if ((FindNextFile(dirhandle, find_data) == 0)) {
         // Iterator exhausted.  Verify that no errors were encountered.
-        DECREF(ivars->entry);
+        CFISH_DECREF(ivars->entry);
         ivars->entry = NULL;
         if (GetLastError() != ERROR_NO_MORE_FILES) {
             char *win_error = Err_win_error();
@@ -197,7 +197,7 @@ FSDH_Next_IMP(FSDirHandle *self) {
         return FSDH_Next(self);
     }
     else {
-        DECREF(ivars->entry);
+        CFISH_DECREF(ivars->entry);
         ivars->entry = Str_new_from_utf8(find_data->cFileName, len);
         return true;
     }
