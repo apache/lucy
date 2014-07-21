@@ -6887,7 +6887,19 @@ chaz_SymbolVisibility_run(void) {
         if (chaz_CC_test_compile(code_buf)) {
             can_control_visibility = true;
             chaz_ConfWriter_add_def("EXPORT", export_win);
-            chaz_ConfWriter_add_def("IMPORT", "__declspec(dllimport)");
+            if (chaz_CC_gcc_version_num()) {
+                /*
+                 * Under MinGW, symbols with dllimport storage class aren't
+                 * constant. If a global variable is initialized to such a
+                 * symbol, an "initializer element is not constant" error
+                 * results. Omitting dllimport works, but has a small
+                 * performance penalty.
+                 */
+                chaz_ConfWriter_add_def("IMPORT", NULL);
+            }
+            else {
+                chaz_ConfWriter_add_def("IMPORT", "__declspec(dllimport)");
+            }
         }
     }
 
