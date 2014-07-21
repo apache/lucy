@@ -7194,10 +7194,11 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
 
     chaz_SharedLib *lib;
 
-    char *cfish_lib = NULL;
-    char *lib_filename;
-    char *test_command;
-    char *scratch;
+    const char *cfish_lib_name = NULL;
+    char       *cfish_lib_dir  = NULL;
+    char       *lib_filename   = NULL;
+    char       *test_command   = NULL;
+    char       *scratch        = NULL;
 
     printf("Creating Makefile...\n");
 
@@ -7311,18 +7312,25 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     free(scratch);
 
     if (cfish_prefix) {
-        cfish_lib = chaz_Util_join(dir_sep, cfish_prefix, "lib", NULL);
+        cfish_lib_dir = chaz_Util_join(dir_sep, cfish_prefix, "lib", NULL);
+    }
+
+    if (strcmp(chaz_OS_shared_lib_ext(), ".dll") == 0) {
+        cfish_lib_name = "cfish-0.3";
+    }
+    else {
+        cfish_lib_name = "cfish";
     }
 
     link_flags = chaz_CC_new_cflags();
     chaz_CFlags_enable_debugging(link_flags);
-    if (cfish_lib) {
-        chaz_CFlags_add_library_path(link_flags, cfish_lib);
+    if (cfish_lib_dir) {
+        chaz_CFlags_add_library_path(link_flags, cfish_lib_dir);
     }
     if (math_lib) {
         chaz_CFlags_add_external_library(link_flags, math_lib);
     }
-    chaz_CFlags_add_external_library(link_flags, "cfish");
+    chaz_CFlags_add_external_library(link_flags, cfish_lib_name);
     if (chaz_HeadCheck_check_header("pcre.h")) {
         chaz_CFlags_add_external_library(link_flags, "pcre");
     }
@@ -7337,10 +7345,10 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     chaz_CFlags_enable_optimization(test_cflags);
     chaz_CFlags_add_include_dir(test_cflags, autogen_inc_dir);
     chaz_CFlags_add_library(test_cflags, lib);
-    if (cfish_lib) {
-        chaz_CFlags_add_library_path(link_flags, cfish_lib);
+    if (cfish_lib_dir) {
+        chaz_CFlags_add_library_path(link_flags, cfish_lib_dir);
     }
-    chaz_CFlags_add_external_library(test_cflags, "cfish");
+    chaz_CFlags_add_external_library(test_cflags, cfish_lib_name);
     scratch = chaz_Util_join(dir_sep, "t", "test_lucy.c", NULL);
     rule = chaz_MakeFile_add_compiled_exe(makefile, test_lucy_exe, scratch,
                                           test_cflags);
@@ -7350,9 +7358,9 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
 
     rule = chaz_MakeFile_add_rule(makefile, "test", test_lucy_exe);
     if (strcmp(chaz_OS_shared_lib_ext(), ".so") == 0) {
-        if (cfish_lib) {
+        if (cfish_lib_dir) {
             test_command
-                = chaz_Util_join("", "LD_LIBRARY_PATH=.:", cfish_lib,
+                = chaz_Util_join("", "LD_LIBRARY_PATH=.:", cfish_lib_dir,
                                  ":$$LD_LIBRARY_PATH ", test_lucy_exe, NULL);
         }
         else {
@@ -7429,7 +7437,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     free(autogen_inc_dir);
     free(autogen_target);
     free(snowstem_inc_dir);
-    free(cfish_lib);
+    free(cfish_lib_dir);
     free(lib_filename);
     free(test_command);
 }
