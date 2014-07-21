@@ -1,5 +1,6 @@
 *.pod
 /Build
+/Build.bat
 /Charmony.pm
 /MYMETA.json
 /MYMETA.yml
@@ -7,6 +8,7 @@
 /autogen/
 /blib/
 /charmonizer
+/charmonizer.exe
 /charmonize.c
 /charmony.h
 /lib/Lucy.c

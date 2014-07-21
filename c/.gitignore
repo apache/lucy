@@ -1,9 +1,14 @@
 /Makefile
 /autogen/
 /charmonizer
+/charmonizer.exe
 /charmony.h
 /liblucy.*.dylib
 /liblucy.dylib
 /liblucy.so
 /liblucy.so.*
+/lucy-*.dll
+/lucy-*.exp
+/lucy-*.lib
 /t/test_lucy
+/t/test_lucy.exe

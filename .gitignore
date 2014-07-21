@@ -1,5 +1,6 @@
 *.o
 *.obj
+*.pdb
 *.dSYM
 *.gcda
 *.gcno
