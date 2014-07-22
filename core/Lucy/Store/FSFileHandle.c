@@ -421,7 +421,7 @@ FSFH_Read_IMP(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
     }
 
     // Read.
-    check_val = pread64(ivars->fd, dest, len, offset);
+    check_val = chy_pread64(ivars->fd, dest, len, offset);
     if (check_val != (int64_t)len) {
         if (check_val == -1) {
             Err_set_error(Err_new(Str_newf("Tried to read %u64 bytes, got %i64: %s",
