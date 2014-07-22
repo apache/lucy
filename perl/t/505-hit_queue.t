@@ -36,7 +36,7 @@ my @match_docs = map {
         doc_id => $_->[0],
         score  => $_->[1],
         )
-} @docs_and_scores;
+} shuffle(@docs_and_scores);
 
 my @correct_order = sort {
            $b->get_score <=> $a->get_score
@@ -196,7 +196,7 @@ for ( 1 .. 30 ) {
         doc_id => $_->[0],
         score  => $_->[1],
         )
-} sort { $a->[0] <=> $b->[0] } @docs_and_scores;
+} shuffle(@docs_and_scores);
 
 for my $size ( 0 .. $#match_docs ) {
     $hit_q = Lucy::Search::HitQueue->new( wanted => $size, );
