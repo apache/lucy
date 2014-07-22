@@ -39,7 +39,7 @@ sub extra_ccflags {
         || $self->config('gccversion')
         || undef;
     if ( defined $gcc_version ) {
-        $gcc_version =~ /^(\d+(\.\d+))/
+        $gcc_version =~ /\b(\d+(\.\d+))/
             or die "Invalid GCC version: $gcc_version";
         $gcc_version = $1;
     }
