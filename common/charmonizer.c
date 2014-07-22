@@ -4458,6 +4458,7 @@ chaz_Make_list_files(const char *dir, const char *ext,
 #include <string.h>
 #include <stdarg.h>
 #include <ctype.h>
+#include <time.h>
 
 /* #include "Charmonizer/Core/Compiler.h" */
 /* #include "Charmonizer/Core/Util.h" */
@@ -4584,13 +4585,15 @@ chaz_OS_remove(const char *name) {
      * fail. As a workaround, files are renamed to a random name
      * before deletion.
      */
-    int retval;
+    int retval = 0;
 
     static const size_t num_random_chars = 16;
 
     size_t  name_len = strlen(name);
     size_t  i;
     char   *temp_name = (char*)malloc(name_len + num_random_chars + 1);
+    const char *working_name = name;
+    clock_t start, now;
 
     strcpy(temp_name, name);
     for (i = 0; i < num_random_chars; i++) {
@@ -4598,12 +4601,30 @@ chaz_OS_remove(const char *name) {
     }
     temp_name[name_len+num_random_chars] = '\0';
 
-    if (rename(name, temp_name) == 0) {
-        retval = !remove(temp_name);
+    /* Try over and over again for around 1 second to rename the file.
+     * Ideally we would sleep between attempts, but sleep functionality is not
+     * portable. */
+    start = now = clock();
+    while (now - start < CLOCKS_PER_SEC) {
+        now = clock();
+        if (!rename(name, temp_name)) {
+            /* The rename succeeded. */
+            working_name = temp_name;
+            break;
+        }
+        else if (errno == ENOENT) {
+            /* No such file or directory, so no point in trying to remove it.
+             * (Technically ENOENT is POSIX but hopefully this works.) */
+            free(temp_name);
+            return 0;
+        }
     }
-    else {
-        // Error during rename, remove using old name.
-        retval = !remove(name);
+
+    /* Try over and over again for around 1 second to delete the file. */
+    start = now = clock();
+    while (!retval && now - start < CLOCKS_PER_SEC) {
+        now = clock();
+        retval = !remove(working_name);
     }
 
     free(temp_name);
