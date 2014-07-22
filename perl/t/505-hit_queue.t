@@ -187,8 +187,9 @@ is_deeply( \@got, \@wanted, "sort by value when no reader set" );
 for ( 1 .. 30 ) {
     push @docs_and_scores, [ int( rand(10000) ) + 1, rand(10) ];
 }
-@docs_and_scores = sort { $b->[1] <=> $a->[1] } @docs_and_scores;
-@doc_ids         = map  { $_->[0] } @docs_and_scores;
+@docs_and_scores
+  = sort { $b->[1] <=> $a->[1] || $a->[0] <=> $b->[0] } @docs_and_scores;
+@doc_ids = map  { $_->[0] } @docs_and_scores;
 
 @match_docs = map {
     Lucy::Search::MatchDoc->new(
