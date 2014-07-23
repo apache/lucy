@@ -73,11 +73,9 @@ sub _rpc {
     my $packed_len = pack( 'N', length($serialized) );
     print $sock "$packed_len$serialized" or confess $!;
 
-=begin disabled
-    my $check_val = $sock->syswrite("$packed_len$serialized");
-    confess $! if $check_val != length($serialized) + 4;
-
-=cut
+    # disabled
+    #my $check_val = $sock->syswrite("$packed_len$serialized");
+    #confess $! if $check_val != length($serialized) + 4;
 
     my $check_val;
 
