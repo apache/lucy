@@ -1842,7 +1842,7 @@ chaz_CFlags_compile_shared_library(chaz_CFlags *flags) {
     if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
         string = "/MD";
     }
-    else if (flags->style != CHAZ_CFLAGS_STYLE_GNU) {
+    else if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
         const char *shlib_ext = chaz_OS_shared_lib_ext();
         if (strcmp(shlib_ext, ".dylib") == 0) {
             string = "-fno-common";
