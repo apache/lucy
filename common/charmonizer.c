@@ -4166,16 +4166,14 @@ chaz_MakeFile_write(chaz_MakeFile *makefile) {
     S_write_rule(makefile->clean, out);
     S_write_rule(makefile->distclean, out);
 
-    if (chaz_Make.is_nmake) {
-        /* Inference rule for .c files. */
-        if (chaz_CC_msvc_version_num()) {
-            fprintf(out, ".c.obj :\n");
-            fprintf(out, "\t$(CC) /nologo $(CFLAGS) /c $< /Fo$@\n\n");
-        }
-        else {
-            fprintf(out, ".c.o :\n");
-            fprintf(out, "\t$(CC) $(CFLAGS) -c $< -o $@\n\n");
-        }
+    /* Suffix rule for .c files. */
+    if (chaz_CC_msvc_version_num()) {
+        fprintf(out, ".c.obj :\n");
+        fprintf(out, "\t$(CC) /nologo $(CFLAGS) /c $< /Fo$@\n\n");
+    }
+    else {
+        fprintf(out, ".c.o :\n");
+        fprintf(out, "\t$(CC) $(CFLAGS) -c $< -o $@\n\n");
     }
 
     fclose(out);
