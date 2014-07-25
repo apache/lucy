@@ -19,34 +19,3 @@ routines whose interfaces are defined within "trunk/core".
 Once all the stubs have been implemented correctly, Lucy will theoretically
 build and pass its tests.
 
-There is one pair of files with an interface *not* defined in core.
-
-    example-lang/src/CFBind.h
-    example-lang/src/CFBind.c
-
-The CFBind files are there to hold conversion routines which are specific to a
-language binding.  Since it is impractical to impose a generic interface, they
-are not defined in core.
-
-You may wish to start by referencing a finished language binding to get a feel
-for what should go in the CFBind files.
-
-Some of Lucy's classes really ought to be grouped with Clownfish, as they form
-something similar to a free floating "standard library" and are not
-search-related.  At some point everything under Lucy::Object will probably
-migrate to a new namespace:
-
-    Clownfish::Obj       => Clownfish::Obj
-    Lucy::Object::String    => Clownfish::String
-    Lucy::Object::VArray    => Clownfish::VArray
-    Lucy::Object::Hash      => Clownfish::Hash
-    Lucy::Object::BitVector => Clownfish::BitVector
-    ...
-
-Other, search-related classes belong with Lucy itself, but are represented
-here because they lack one or more implementing functions:
-
-    Lucy::Document::Doc
-    Lucy::Analysis::RegexTokenizer
-    Lucy::Index::Inverter
-    ...
