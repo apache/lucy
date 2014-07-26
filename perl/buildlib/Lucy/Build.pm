@@ -111,47 +111,11 @@ sub ACTION_copy_clownfish_includes {
     $self->cf_copy_include_file( qw( Lucy Util ToolSet.h ) );
 }
 
-sub ACTION_suppressions {
-    my $self       = shift;
-    my $LOCAL_SUPP = 'local.supp';
-    return
-        if $self->up_to_date( '../devel/bin/valgrind_triggers.pl',
-        $LOCAL_SUPP );
-
-    # Generate suppressions.
-    print "Writing $LOCAL_SUPP...\n";
-    $self->add_to_cleanup($LOCAL_SUPP);
-    my $command
-        = "yes | "
-        . $self->_valgrind_base_command
-        . "--gen-suppressions=yes "
-        . $self->perl
-        . " ../devel/bin/valgrind_triggers.pl 2>&1";
-    my $suppressions = `$command`;
-    $suppressions =~ s/^==.*?\n//mg;
-    $suppressions =~ s/^--.*?\n//mg;
-    my $rule_number = 1;
-
-    while ( $suppressions =~ /<insert.a.*?>/ ) {
-        $suppressions =~ s/^\s*<insert.a.*?>/{\n  <core_perl_$rule_number>/m;
-        $rule_number++;
-    }
-
-    # Change e.g. fun:_vgrZU_libcZdsoZa_calloc to fun:calloc
-    $suppressions =~ s/fun:\w+_((m|c|re)alloc)/fun:$1/g;
-
-    # Write local suppressions file.
-    open( my $supp_fh, '>', $LOCAL_SUPP )
-        or confess("Can't open '$LOCAL_SUPP': $!");
-    print $supp_fh $suppressions;
-}
-
 sub _valgrind_base_command {
     return
           "PERL_DESTRUCT_LEVEL=2 LUCY_VALGRIND=1 valgrind "
         . "--leak-check=yes "
         . "--show-reachable=yes "
-        . "--num-callers=10 "
         . "--dsymutil=yes "
         . "--suppressions=../devel/conf/lucyperl.supp ";
 }
@@ -173,13 +137,12 @@ sub ACTION_test_valgrind {
     if ( !$ENV{LUCY_VALGRIND} ) {
         warn "\$ENV{LUCY_VALGRIND} not true -- possible false positives";
     }
-    $self->depends_on(qw( code suppressions ));
+    $self->depends_on('code');
 
-    # Unbuffer STDOUT, grab test file names and suppressions files.
+    # Unbuffer STDOUT, grab test file names.
     $|++;
     my $t_files = $self->find_test_files;    # not public M::B API, may fail
     my $valgrind_command = $self->_valgrind_base_command;
-    $valgrind_command .= "--suppressions=local.supp ";
 
     if ( my $local_supp = $self->args('suppressions') ) {
         for my $supp ( split( ',', $local_supp ) ) {

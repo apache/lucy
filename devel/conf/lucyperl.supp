@@ -14,187 +14,80 @@
 # limitations under the License.
 
 {
-   <insert a suppression name here>
+   <boot_Clownfish>
    Memcheck:Leak
-   fun:calloc
-   fun:lucy_Memory_wrapped_calloc
-   fun:lucy_VTable_make_obj
-   fun:lucy_LFReg_new
-   fun:lucy_VTable_init_registry
-   fun:*
+   ...
+   fun:boot_Clownfish
+   ...
 }
 
 {
-   <insert a suppression name here>
+   <XS_DynaLoader_dl_load_file>
    Memcheck:Leak
-   fun:calloc
-   fun:lucy_Memory_wrapped_calloc
-   fun:lucy_VTable_make_obj
-   fun:S_alt_field_type
-   fun:*
+   ...
+   fun:XS_DynaLoader_dl_load_file
+   ...
 }
 
 {
-   <insert_a_suppression_name_here>
+   <cfish_Class_singleton>
    Memcheck:Leak
-   fun:calloc
-   fun:lucy_Memory_wrapped_calloc
-   fun:lucy_LFReg_init
-   fun:lucy_LFReg_new
-   fun:lucy_VTable_init_registry
-   fun:*
+   ...
+   fun:cfish_Class_singleton
+   ...
+}
+{
+   <cfish_Class_bootstrap>
+   Memcheck:Leak
+   ...
+   fun:cfish_Class_bootstrap
+   ...
+}
+{
+   <cfish_Class_add_alias_to_registry>
+   Memcheck:Leak
+   ...
+   fun:cfish_Class_add_alias_to_registry
+   ...
 }
 
 {
-   <insert a suppression name here>
+   <cfish_Lucy_bootstrap>
    Memcheck:Leak
-   fun:malloc
-   fun:lucy_Memory_wrapped_malloc
-   fun:lucy_LFReg_register
-   fun:lucy_VTable_add_to_registry
-   fun:*
+   ...
+   fun:cfish_Lucy_bootstrap
+   ...
 }
 
 {
-   <Class name key for VTable_registry (malloc)>
+   <Perl_pad_findmy_pvn>
    Memcheck:Leak
-   fun:malloc
-   fun:lucy_Memory_wrapped_malloc
-   fun:lucy_CB_new_from_trusted_utf8
-   fun:lucy_CB_clone
-   fun:lucy_VTable_add_to_registry
-   fun:*
+   ...
+   fun:Perl_pad_findmy_pvn
+   fun:Perl_yylex
+   fun:Perl_yyparse
+   ...
 }
 
 {
-   <Class name key for VTable_registry (calloc)>
+   <Perl_pad_add_name_pvn>
    Memcheck:Leak
-   fun:calloc
-   fun:lucy_Memory_wrapped_calloc
-   fun:lucy_VTable_make_obj
-   fun:lucy_CB_new_from_trusted_utf8
-   fun:lucy_CB_clone
-   fun:lucy_VTable_add_to_registry
-   fun:*
+   ...
+   fun:Perl_pad_add_name_pvn
+   fun:Perl_allocmy
+   fun:Perl_yylex
+   fun:Perl_yyparse
+   ...
 }
 
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:lucy_Memory_wrapped_calloc
-   fun:lucy_VTable_clone
-   fun:lucy_VTable_singleton
-   fun:*
-}
 
 {
-   <Add class name to child VTable (malloc)>
+   <_dl_catch_error>
    Memcheck:Leak
-   fun:malloc
-   fun:lucy_Memory_wrapped_malloc
-   fun:lucy_CB_new_from_trusted_utf8
-   fun:lucy_CB_clone
-   fun:lucy_VTable_singleton
-   fun:*
-}
-
-{
-   <Add class name to child VTable (calloc)>
-   Memcheck:Leak
-   fun:calloc
-   fun:lucy_Memory_wrapped_calloc
-   fun:lucy_VTable_make_obj
-   fun:lucy_CB_new_from_trusted_utf8
-   fun:lucy_CB_clone
-   fun:lucy_VTable_singleton
-   fun:*
-}
-
-{
-   <Add aliased class name for VTable (malloc)>
-   Memcheck:Leak
-   fun:malloc
-   fun:lucy_Memory_wrapped_malloc
-   fun:lucy_CB_new_from_trusted_utf8
-   fun:lucy_CB_clone
-   fun:lucy_VTable_add_alias_to_registry
-   fun:*
-}
-
-{
-   <Add aliased class name for VTable (calloc)>
-   Memcheck:Leak
-   fun:calloc
-   fun:lucy_Memory_wrapped_calloc
-   fun:lucy_VTable_make_obj
-   fun:lucy_CB_new_from_trusted_utf8
-   fun:lucy_CB_clone
-   fun:lucy_VTable_add_alias_to_registry
-   fun:*
-}
-
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   fun:malloc
-   fun:lucy_Memory_wrapped_malloc
-   fun:lucy_LFReg_register
-   fun:lucy_VTable_add_alias_to_registry
-   fun:*
-}
-
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   fun:malloc
-   fun:lucy_Memory_wrapped_malloc
-   fun:lucy_CB_init
-   fun:lucy_CB_new
-   fun:lucy_CB_newf
-   fun:lucy_Bool_init_class
-   fun:*
-}
-
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   fun:calloc
-   fun:lucy_Memory_wrapped_calloc
-   fun:lucy_VTable_make_obj
-   fun:lucy_CB_new
-   fun:lucy_CB_newf
-   fun:lucy_Bool_init_class
-   fun:*
-}
-
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   fun:calloc
-   fun:lucy_Memory_wrapped_calloc
-   fun:lucy_VTable_make_obj
-   fun:lucy_Bool_init_class
-   fun:*
-}
-
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   fun:calloc
-   fun:lucy_Memory_wrapped_calloc
-   fun:lucy_VTable_make_obj
-   fun:lucy_Hash_init_class
-   fun:*
-}
-
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   fun:calloc
-   fun:lucy_Memory_wrapped_calloc
-   fun:lucy_VTable_allocate
-   fun:lucy_bootstrap_parcel
-   fun:*
+   ...
+   fun:_dl_map_object
+   ...
+   fun:_dl_catch_error
+   ...
 }
 
