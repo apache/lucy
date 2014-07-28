@@ -132,8 +132,11 @@ sub _valgrind_base_command {
 #   $ ./Build test_valgrind --suppressions=foo.supp,bar.supp
 sub ACTION_test_valgrind {
     my $self = shift;
+    # Debian's debugperl uses the Config.pm of the standard system perl
+    # so -DDEBUGGING won't be detected.
     die "Must be run under a perl that was compiled with -DDEBUGGING"
-        unless $self->config('ccflags') =~ /-D?DEBUGGING\b/;
+        unless $self->config('ccflags') =~ /-D?DEBUGGING\b/
+               || $^X =~ /\bdebugperl\b/;
     if ( !$ENV{LUCY_VALGRIND} ) {
         warn "\$ENV{LUCY_VALGRIND} not true -- possible false positives";
     }
