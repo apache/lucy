@@ -86,8 +86,10 @@ my $thawed = thaw($frozen);
 $hits = $searcher->hits( query => $thawed );
 is( $hits->total_hits, 4, 'freeze/thaw' );
 
-my $proximity_compiler
-    = $proximity_query->make_compiler( searcher => $searcher, );
+my $proximity_compiler = $proximity_query->make_compiler(
+    searcher => $searcher,
+    boost    => $proximity_query->get_boost,
+);
 $frozen = freeze($proximity_compiler);
 $thawed = thaw($frozen);
 ok( $proximity_compiler->equals($thawed), "freeze/thaw compiler" );

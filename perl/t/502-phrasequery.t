@@ -78,7 +78,10 @@ my $thawed = thaw($frozen);
 $hits = $searcher->hits( query => $thawed );
 is( $hits->total_hits, 3, 'freeze/thaw' );
 
-my $phrase_compiler = $phrase_query->make_compiler( searcher => $searcher );
+my $phrase_compiler = $phrase_query->make_compiler(
+    searcher => $searcher,
+    boost    => $phrase_query->get_boost,
+);
 $frozen = freeze($phrase_compiler);
 $thawed = thaw($frozen);
 ok( $phrase_compiler->equals($thawed), "freeze/thaw compiler" );

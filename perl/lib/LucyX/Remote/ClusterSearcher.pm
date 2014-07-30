@@ -267,7 +267,10 @@ sub top_docs {
     my $compiler
         = $query->isa("Lucy::Search::Compiler")
         ? $query
-        : $query->make_compiler( searcher => $self );
+        : $query->make_compiler(
+            searcher => $self,
+            boost    => $query->get_boost,
+          );
 
     # Create HitQueue.
     my $hit_q;

@@ -109,7 +109,10 @@ like(
 );
 
 $q = $searcher->glean_query("foo");
-my $compiler = $q->make_compiler( searcher => $searcher );
+my $compiler = $q->make_compiler(
+    searcher => $searcher,
+    boost    => $q->get_boost,
+);
 $hl = Lucy::Highlight::Highlighter->new(
     searcher => $searcher,
     query    => $compiler,

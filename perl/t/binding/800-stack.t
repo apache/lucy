@@ -47,7 +47,10 @@ for ( 1 .. 50 ) {
     $q = Lucy::Search::ORQuery->new( children => \@kids );
 }
 my $searcher = MockSearcher->new( schema => Lucy::Plan::Schema->new );
-my $compiler = $q->make_compiler( searcher => $searcher );
+my $compiler = $q->make_compiler(
+    searcher => $searcher,
+    boost    => $q->get_boost,
+);
 
 pass("Made it through deep recursion with multiple stack reallocations");
 

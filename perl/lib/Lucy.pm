@@ -219,12 +219,6 @@ BEGIN {
     our $VERSION = '0.003000';
     $VERSION = eval $VERSION;
     use Lucy qw( STORABLE_freeze STORABLE_thaw load );
-
-    sub make_compiler {
-        my ( $self, %args ) = @_;
-        $args{boost} = $self->get_boost unless defined $args{boost};
-        return $self->_make_compiler(%args);
-    }
 }
 
 {

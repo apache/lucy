@@ -633,10 +633,6 @@ END_CONSTRUCTOR_CODE_SAMPLE
         class_name => "Lucy::Search::Query",
     );
     $binding->bind_method(
-        alias  => '_make_compiler',
-        method => 'Make_Compiler',
-    );
-    $binding->bind_method(
         alias  => '_load',
         method => 'Load',
     );

@@ -44,7 +44,10 @@ my $req_opt_query = Lucy::Search::RequiredOptionalQuery->new(
 );
 is( $req_opt_query->to_string, "(+content:b content:c)", "to_string" );
 
-my $compiler = $req_opt_query->make_compiler( searcher => $searcher );
+my $compiler = $req_opt_query->make_compiler(
+    searcher => $searcher,
+    boost    => $req_opt_query->get_boost,
+);
 my $frozen   = freeze($compiler);
 my $thawed   = thaw($frozen);
 ok( $thawed->equals($compiler), "freeze/thaw compiler" );
@@ -55,8 +58,10 @@ $req_opt_query = Lucy::Search::RequiredOptionalQuery->new(
     required_query => $x_query,
     optional_query => $b_query,
 );
-$matcher = $req_opt_query->make_compiler( searcher => $searcher )
-    ->make_matcher( reader => $reader, need_score => 0 );
+$matcher = $req_opt_query->make_compiler(
+    searcher => $searcher,
+    boost    => $req_opt_query->get_boost,
+)->make_matcher( reader => $reader, need_score => 0 );
 ok( !defined($matcher), "if required matcher has no match, return undef" );
 
 $frozen = freeze($req_opt_query);

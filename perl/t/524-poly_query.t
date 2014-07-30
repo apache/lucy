@@ -52,7 +52,10 @@ for my $conjunction (qw( AND OR )) {
     my $one_child = $class->new( children => [$a_query] );
     ok( !$polyquery->equals($one_child), '!equals (too few children)' );
 
-    my $compiler = $polyquery->make_compiler( searcher => $searcher );
+    my $compiler = $polyquery->make_compiler(
+        searcher => $searcher,
+        boost    => $polyquery->get_boost,
+    );
     isa_ok( $compiler, "Lucy::Search::${conjunction}Compiler",
         "make_compiler" );
     $frozen = freeze($compiler);
@@ -67,8 +70,10 @@ for my $conjunction (qw( AND OR )) {
         : 'Lucy::Search::ORScorer';
     isa_ok( $matcher, $wanted_class, "make_matcher with need_score" );
 
-    my $term_matcher = $one_child->make_compiler( searcher => $searcher )
-        ->make_matcher( reader => $reader, need_score => 0 );
+    my $term_matcher = $one_child->make_compiler(
+        searcher => $searcher,
+        boost    => $one_child->get_boost,
+    )->make_matcher( reader => $reader, need_score => 0 );
     isa_ok( $term_matcher, "Lucy::Search::TermMatcher",
         "make_matcher compiles to child's Matcher if there's only one child"
     );
@@ -83,8 +88,10 @@ for my $conjunction (qw( AND OR )) {
     );
     $polyquery
         = $class->new( children => [ $hopeless_query, $doomed_query ] );
-    my $nope = $polyquery->make_compiler( searcher => $searcher )
-        ->make_matcher( reader => $reader, need_score => 0 );
+    my $nope = $polyquery->make_compiler(
+        searcher => $searcher,
+        boost    => $polyquery->get_boost,
+    )->make_matcher( reader => $reader, need_score => 0 );
     ok( !defined $nope,
         "If Matcher wouldn't return any docs, make_matcher returns undef" );
 }

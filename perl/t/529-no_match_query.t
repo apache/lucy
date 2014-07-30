@@ -36,7 +36,10 @@ ok( $no_match_query->equals($thawed), "equals" );
 $thawed->set_boost(10);
 ok( !$no_match_query->equals($thawed), '!equals (boost)' );
 
-my $compiler = $no_match_query->make_compiler( searcher => $searcher );
+my $compiler = $no_match_query->make_compiler(
+    searcher => $searcher,
+    boost    => $no_match_query->get_boost,
+);
 $frozen = freeze($compiler);
 $thawed = thaw($frozen);
 ok( $compiler->equals($thawed), "freeze/thaw compiler" );

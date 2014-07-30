@@ -47,7 +47,12 @@ my $diff_text
     = Lucy::Search::LeafQuery->new( field => 'content', text => 'c' );
 ok( !$diff_text->equals($leaf_query), "!equals (different text)" );
 
-eval { $leaf_query->make_compiler( searcher => $searcher ); };
+eval {
+    $leaf_query->make_compiler(
+        searcher => $searcher,
+        boost    => $leaf_query->get_boost,
+    );
+};
 like( $@, qr/Make_Compiler/, "Make_Compiler throws error" );
 
 my $frozen = freeze($leaf_query);

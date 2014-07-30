@@ -52,7 +52,10 @@ ok( $match_all_query->equals($thawed), "equals" );
 $thawed->set_boost(10);
 ok( !$match_all_query->equals($thawed), '!equals (boost)' );
 
-my $compiler = $match_all_query->make_compiler( searcher => $searcher );
+my $compiler = $match_all_query->make_compiler(
+    searcher => $searcher,
+    boost    => $match_all_query->get_boost,
+);
 $frozen = freeze($compiler);
 $thawed = thaw($frozen);
 ok( $thawed->equals($compiler), "freeze/thaw compiler" );

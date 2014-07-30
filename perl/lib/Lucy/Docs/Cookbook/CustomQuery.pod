@@ -64,7 +64,10 @@ together the three classes.
 
     sub hits {
         my ( $self, $query ) = @_;
-        my $compiler = $query->make_compiler( searcher => $self );
+        my $compiler = $query->make_compiler(
+            searcher => $self,
+            boost    => $query->get_boost,
+        );
         my $matcher = $compiler->make_matcher(
             reader     => $self->get_reader,
             need_score => 1,
