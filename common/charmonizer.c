@@ -1850,6 +1850,14 @@ chaz_CFlags_compile_shared_library(chaz_CFlags *flags) {
         else if (strcmp(shlib_ext, ".so") == 0) {
             string = "-fPIC";
         }
+        else if (strcmp(shlib_ext, ".dll") == 0) {
+            /* MinGW */
+            return;
+        }
+        else {
+            /* unknown */
+            return;
+        }
     }
     else {
         return;
