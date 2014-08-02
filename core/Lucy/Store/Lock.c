@@ -133,13 +133,23 @@ LFLock_Shared_IMP(LockFileLock *self) {
     UNUSED_VAR(self); return false;
 }
 
+struct lockfile_context {
+    OutStream *outstream;
+    String *json;
+};
+
+static void
+S_write_lockfile_json(void *context) {
+    struct lockfile_context *stuff = (struct lockfile_context*)context;
+    size_t size = Str_Get_Size(stuff->json);
+    OutStream_Write_Bytes(stuff->outstream, Str_Get_Ptr8(stuff->json), size);
+    OutStream_Close(stuff->outstream);
+}
+
 bool
 LFLock_Request_IMP(LockFileLock *self) {
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
-    Hash   *file_data;
-    bool wrote_json;
     bool success = false;
-    bool deletion_failed = false;
 
     if (Folder_Exists(ivars->folder, ivars->lock_path)) {
         Err_set_error((Err*)LockErr_new(Str_newf("Can't obtain lock: '%o' exists",
@@ -167,16 +177,30 @@ LFLock_Request_IMP(LockFileLock *self) {
     }
 
     // Prepare to write pid, lock name, and host to the lock file as JSON.
-    file_data = Hash_new(3);
+    Hash *file_data = Hash_new(3);
     Hash_Store_Utf8(file_data, "pid", 3,
                     (Obj*)Str_newf("%i32", (int32_t)PID_getpid()));
     Hash_Store_Utf8(file_data, "host", 4, INCREF(ivars->host));
     Hash_Store_Utf8(file_data, "name", 4, INCREF(ivars->name));
+    String *json = Json_to_json((Obj*)file_data);
+    DECREF(file_data);
 
     // Write to a temporary file, then use the creation of a hard link to
     // ensure atomic but non-destructive creation of the lockfile with its
     // complete contents.
-    wrote_json = Json_spew_json((Obj*)file_data, ivars->folder, ivars->link_path);
+
+    OutStream *outstream = Folder_Open_Out(ivars->folder, ivars->link_path);
+    if (!outstream) {
+        ERR_ADD_FRAME(Err_get_error());
+        DECREF(json);
+        return false;
+    }
+
+    struct lockfile_context context;
+    context.outstream = outstream;
+    context.json = json;
+    Err *json_error = Err_trap(S_write_lockfile_json, &context);
+    bool wrote_json = !json_error;
     if (wrote_json) {
         success = Folder_Hard_Link(ivars->folder, ivars->link_path,
                                    ivars->lock_path);
@@ -186,18 +210,17 @@ LFLock_Request_IMP(LockFileLock *self) {
                                                      ivars->lock_path,
                                                      Err_Get_Mess(hard_link_err))));
         }
-        deletion_failed = !Folder_Delete(ivars->folder, ivars->link_path);
     }
     else {
-        Err *spew_json_err = (Err*)CERTIFY(Err_get_error(), ERR);
         Err_set_error((Err*)LockErr_new(Str_newf("Failed to obtain lock at '%o': %o",
                                                  ivars->lock_path,
-                                                 Err_Get_Mess(spew_json_err))));
+                                                 Err_Get_Mess(json_error))));
+        DECREF(json_error);
     }
-    DECREF(file_data);
 
     // Verify that our temporary file got zapped.
-    if (wrote_json && deletion_failed) {
+    bool deletion_failed = !Folder_Delete(ivars->folder, ivars->link_path);
+    if (deletion_failed) {
         String *mess = MAKE_MESS("Failed to delete '%o'", ivars->link_path);
         Err_throw_mess(ERR, mess);
     }
