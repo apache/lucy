@@ -319,7 +319,7 @@ test_c64(TestBatchRunner *runner) {
     raw_instream = InStream_open((Obj*)raw_file);
     for (i = 0; i < 1000; i++) {
         char  buffer[10];
-        char *buf = buffer;
+        const char *buf = buffer;
         size_t size = InStream_Read_Raw_C64(raw_instream, buffer);
         uint64_t got = NumUtil_decode_c64(&buf);
         UNUSED_VAR(size);

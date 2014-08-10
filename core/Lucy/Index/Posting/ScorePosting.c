@@ -134,7 +134,7 @@ ScorePost_Read_Record_IMP(ScorePosting *self, InStream *instream) {
     ScorePostingIVARS *const ivars = ScorePost_IVARS(self);
     uint32_t  position = 0;
     const size_t max_start_bytes = (C32_MAX_BYTES * 2) + 1;
-    char *buf = InStream_Buf(instream, max_start_bytes);
+    const char *buf = InStream_Buf(instream, max_start_bytes);
     const uint32_t doc_code = NumUtil_decode_c32(&buf);
     const uint32_t doc_delta = doc_code >> 1;
 

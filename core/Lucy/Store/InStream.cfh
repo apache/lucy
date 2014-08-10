@@ -123,7 +123,7 @@ class Lucy::Store::InStream inherits Clownfish::Obj {
      * Advance_Buf() to update the InStream object.
      */
     final void
-    Advance_Buf(InStream *self, char *buf);
+    Advance_Buf(InStream *self, const char *buf);
 
     /** Read <code>len</code> bytes from the InStream into <code>buf</code>.
      */

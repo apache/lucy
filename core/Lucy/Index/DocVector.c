@@ -120,10 +120,10 @@ DocVec_Term_Vector_IMP(DocVector *self, String *field,
 
 static Hash*
 S_extract_tv_cache(ByteBuf *field_buf) {
-    Hash    *tv_cache  = Hash_new(0);
-    char    *tv_string = BB_Get_Buf(field_buf);
-    int32_t  num_terms = NumUtil_decode_c32(&tv_string);
-    CharBuf *text_buf  = CB_new(0);
+    Hash       *tv_cache  = Hash_new(0);
+    const char *tv_string = BB_Get_Buf(field_buf);
+    int32_t     num_terms = NumUtil_decode_c32(&tv_string);
+    CharBuf    *text_buf  = CB_new(0);
 
     // Read the number of highlightable terms in the field.
     for (int32_t i = 0; i < num_terms; i++) {
@@ -136,8 +136,8 @@ S_extract_tv_cache(ByteBuf *field_buf) {
         tv_string += len;
 
         // Get positions & offsets string.
-        char *bookmark_ptr      = tv_string;
-        int32_t num_positions   = NumUtil_decode_c32(&tv_string);
+        const char *bookmark_ptr  = tv_string;
+        int32_t     num_positions = NumUtil_decode_c32(&tv_string);
         while (num_positions--) {
             // Leave nums compressed to save a little mem.
             NumUtil_skip_cint(&tv_string);
@@ -161,8 +161,8 @@ static TermVector*
 S_extract_tv_from_tv_buf(String *field, String *term_text,
                          ByteBuf *tv_buf) {
     TermVector *retval      = NULL;
-    char       *posdata     = BB_Get_Buf(tv_buf);
-    char       *posdata_end = posdata + BB_Get_Size(tv_buf);
+    const char *posdata     = BB_Get_Buf(tv_buf);
+    const char *posdata_end = posdata + BB_Get_Size(tv_buf);
     int32_t    *positions   = NULL;
     int32_t    *starts      = NULL;
     int32_t    *ends        = NULL;

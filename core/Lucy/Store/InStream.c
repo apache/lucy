@@ -318,7 +318,7 @@ InStream_Buf_IMP(InStream *self, size_t request) {
 }
 
 void
-InStream_Advance_Buf_IMP(InStream *self, char *buf) {
+InStream_Advance_Buf_IMP(InStream *self, const char *buf) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     if (buf > ivars->limit) {
         int64_t overrun = CHY_PTR_TO_I64(buf) - CHY_PTR_TO_I64(ivars->limit);
@@ -330,7 +330,7 @@ InStream_Advance_Buf_IMP(InStream *self, char *buf) {
         THROW(ERR, "Can't Advance_Buf backwards: (underrun: %i64))", underrun);
     }
     else {
-        ivars->buf = buf;
+        ivars->buf += buf - ivars->buf;
     }
 }
 
