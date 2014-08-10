@@ -60,7 +60,7 @@ MockMatcher_Score_IMP(MockMatcher* self) {
     if (!ivars->scores) {
         THROW(ERR, "Can't call Score() unless scores supplied");
     }
-    float *raw_scores = (float*)BB_Get_Buf(ivars->scores);
+    const float *raw_scores = (const float*)BB_Get_Buf(ivars->scores);
     return raw_scores[ivars->tick];
 }
 

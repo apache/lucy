@@ -129,7 +129,7 @@ RAMFH_Read_IMP(RAMFileHandle *self, char *dest, int64_t offset, size_t len) {
         return false;
     }
     else {
-        char *const source = BB_Get_Buf(ivars->contents) + offset;
+        const char *const source = BB_Get_Buf(ivars->contents) + offset;
         memcpy(dest, source, len);
         return true;
     }

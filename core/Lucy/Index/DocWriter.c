@@ -122,8 +122,8 @@ DocWriter_Add_Inverted_Doc_IMP(DocWriter *self, Inverter *inverter,
                     break;
                 }
                 case FType_BLOB: {
-                    char   *buf  = BB_Get_Buf((ByteBuf*)value);
-                    size_t  size = BB_Get_Size((ByteBuf*)value);
+                    const char *buf  = BB_Get_Buf((ByteBuf*)value);
+                    size_t      size = BB_Get_Size((ByteBuf*)value);
                     OutStream_Write_C32(dat_out, size);
                     OutStream_Write_Bytes(dat_out, buf, size);
                     break;
@@ -183,8 +183,8 @@ DocWriter_Add_Segment_IMP(DocWriter *self, SegReader *reader,
 
                 // Copy record over.
                 DefDocReader_Read_Record(doc_reader, buffer, i);
-                char *buf   = BB_Get_Buf(buffer);
-                size_t size = BB_Get_Size(buffer);
+                const char *buf  = BB_Get_Buf(buffer);
+                size_t      size = BB_Get_Size(buffer);
                 OutStream_Write_Bytes(dat_out, buf, size);
 
                 // Write file pointer.

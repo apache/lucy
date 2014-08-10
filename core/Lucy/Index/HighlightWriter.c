@@ -143,7 +143,6 @@ HLWriter_TV_Buf_IMP(HighlightWriter *self, Inversion *inversion) {
     size_t      last_len = 0;
     ByteBuf    *tv_buf = BB_new(20 + Inversion_Get_Size(inversion) * 8);
     uint32_t    num_postings = 0;
-    char       *dest;
     Token     **tokens;
     uint32_t    freq;
     UNUSED_VAR(self);
@@ -202,7 +201,7 @@ HLWriter_TV_Buf_IMP(HighlightWriter *self, Inversion *inversion) {
     }
 
     // Go back and start the term vector string with the posting count.
-    dest = BB_Get_Buf(tv_buf);
+    char *dest = BB_Get_Buf(tv_buf);
     NumUtil_encode_padded_c32(num_postings, &dest);
 
     return tv_buf;
