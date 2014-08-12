@@ -83,8 +83,8 @@ LexIndex_init(LexIndex *self, Schema *schema, Folder *folder,
     ivars->index_interval = Arch_Index_Interval(arch);
     ivars->skip_interval  = Arch_Skip_Interval(arch);
     ivars->size    = (int32_t)(InStream_Length(ivars->ixix_in) / sizeof(int64_t));
-    ivars->offsets = (int64_t*)InStream_Buf(ivars->ixix_in,
-                                           (size_t)InStream_Length(ivars->ixix_in));
+    ivars->offsets = (const int64_t*)InStream_Buf(ivars->ixix_in,
+            (size_t)InStream_Length(ivars->ixix_in));
 
     DECREF(ixix_file);
     DECREF(ix_file);

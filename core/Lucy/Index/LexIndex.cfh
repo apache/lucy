@@ -18,16 +18,16 @@ parcel Lucy;
 
 class Lucy::Index::LexIndex inherits Lucy::Index::Lexicon {
 
-    FieldType   *field_type;
-    InStream    *ixix_in;
-    InStream    *ix_in;
-    int64_t     *offsets;
-    int32_t      tick;
-    int32_t      size;
-    int32_t      index_interval;
-    int32_t      skip_interval;
-    TermStepper *term_stepper;
-    TermInfo    *tinfo;
+    FieldType     *field_type;
+    InStream      *ixix_in;
+    InStream      *ix_in;
+    const int64_t *offsets;
+    int32_t        tick;
+    int32_t        size;
+    int32_t        index_interval;
+    int32_t        skip_interval;
+    TermStepper   *term_stepper;
+    TermInfo      *tinfo;
 
     inert incremented LexIndex*
     new(Schema *schema, Folder *folder, Segment *segment,
