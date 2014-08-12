@@ -46,7 +46,7 @@ TextSortCache_init(TextSortCache *self, String *field,
 
     // Memory map ords and super-init.
     int64_t ord_len = InStream_Length(ord_in);
-    void *ords = InStream_Buf(ord_in, (size_t)ord_len);
+    const void *ords = InStream_Buf(ord_in, (size_t)ord_len);
     SortCache_init((SortCache*)self, field, type, ords, cardinality, doc_max,
                    null_ord, ord_width);
     TextSortCacheIVARS *const ivars = TextSortCache_IVARS(self);

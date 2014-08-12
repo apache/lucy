@@ -30,7 +30,7 @@ class Lucy::Search::Collector::SortCollector nickname SortColl
     MatchDoc       *bumped;
     VArray         *rules;
     SortCache     **sort_caches;
-    void          **ord_arrays;
+    const void    **ord_arrays;
     uint8_t        *actions;
     uint8_t        *auto_actions;
     uint8_t        *derived_actions;

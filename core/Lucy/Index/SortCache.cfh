@@ -20,18 +20,18 @@ parcel Lucy;
  */
 class Lucy::Index::SortCache inherits Clownfish::Obj {
 
-    String    *field;
-    FieldType *type;
-    void      *ords;
-    int32_t    doc_max;
-    int32_t    cardinality;
-    int32_t    ord_width;
-    int32_t    null_ord;
-    bool       native_ords;
+    String     *field;
+    FieldType  *type;
+    const void *ords;
+    int32_t     doc_max;
+    int32_t     cardinality;
+    int32_t     ord_width;
+    int32_t     null_ord;
+    bool        native_ords;
 
     public inert SortCache*
-    init(SortCache *self, String *field, FieldType *type,
-         void *ords, int32_t cardinality, int32_t doc_max, int32_t null_ord = -1,
+    init(SortCache *self, String *field, FieldType *type, const void *ords,
+         int32_t cardinality, int32_t doc_max, int32_t null_ord = -1,
          int32_t ord_width);
 
     /** Return the value for ordinal <code>ord</code>, or NULL if the value
@@ -40,7 +40,7 @@ class Lucy::Index::SortCache inherits Clownfish::Obj {
     public abstract nullable incremented Obj*
     Value(SortCache *self, int32_t ord);
 
-    public void*
+    public const void*
     Get_Ords(SortCache *self);
 
     public int32_t

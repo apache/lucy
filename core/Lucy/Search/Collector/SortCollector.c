@@ -114,7 +114,7 @@ SortColl_init(SortCollector *self, Schema *schema, SortSpec *sort_spec,
     ivars->rules         = rules; // absorb refcount.
     ivars->num_rules     = num_rules;
     ivars->sort_caches   = (SortCache**)CALLOCATE(num_rules, sizeof(SortCache*));
-    ivars->ord_arrays    = (void**)CALLOCATE(num_rules, sizeof(void*));
+    ivars->ord_arrays    = (const void**)CALLOCATE(num_rules, sizeof(void*));
     ivars->actions       = (uint8_t*)CALLOCATE(num_rules, sizeof(uint8_t));
 
     // Build up an array of "actions" which we will execute during each call
@@ -344,7 +344,7 @@ SortColl_Collect_IMP(SortCollector *self, int32_t doc_id) {
 static CFISH_INLINE int32_t
 SI_compare_by_ord1(SortCollectorIVARS *ivars, uint32_t tick,
                    int32_t a, int32_t b) {
-    void *const ords = ivars->ord_arrays[tick];
+    const void *const ords = ivars->ord_arrays[tick];
     int32_t a_ord = NumUtil_u1get(ords, a);
     int32_t b_ord = NumUtil_u1get(ords, b);
     return a_ord - b_ord;
@@ -352,7 +352,7 @@ SI_compare_by_ord1(SortCollectorIVARS *ivars, uint32_t tick,
 static CFISH_INLINE int32_t
 SI_compare_by_ord2(SortCollectorIVARS *ivars, uint32_t tick,
                    int32_t a, int32_t b) {
-    void *const ords = ivars->ord_arrays[tick];
+    const void *const ords = ivars->ord_arrays[tick];
     int32_t a_ord = NumUtil_u2get(ords, a);
     int32_t b_ord = NumUtil_u2get(ords, b);
     return a_ord - b_ord;
@@ -360,7 +360,7 @@ SI_compare_by_ord2(SortCollectorIVARS *ivars, uint32_t tick,
 static CFISH_INLINE int32_t
 SI_compare_by_ord4(SortCollectorIVARS *ivars, uint32_t tick,
                    int32_t a, int32_t b) {
-    void *const ords = ivars->ord_arrays[tick];
+    const void *const ords = ivars->ord_arrays[tick];
     int32_t a_ord = NumUtil_u4get(ords, a);
     int32_t b_ord = NumUtil_u4get(ords, b);
     return a_ord - b_ord;
@@ -368,7 +368,7 @@ SI_compare_by_ord4(SortCollectorIVARS *ivars, uint32_t tick,
 static CFISH_INLINE int32_t
 SI_compare_by_ord8(SortCollectorIVARS *ivars, uint32_t tick,
                    int32_t a, int32_t b) {
-    uint8_t *ords = (uint8_t*)ivars->ord_arrays[tick];
+    const uint8_t *ords = (const uint8_t*)ivars->ord_arrays[tick];
     int32_t a_ord = ords[a];
     int32_t b_ord = ords[b];
     return a_ord - b_ord;
@@ -376,9 +376,9 @@ SI_compare_by_ord8(SortCollectorIVARS *ivars, uint32_t tick,
 static CFISH_INLINE int32_t
 SI_compare_by_ord16(SortCollectorIVARS *ivars, uint32_t tick,
                     int32_t a, int32_t b) {
-    uint8_t *ord_bytes = (uint8_t*)ivars->ord_arrays[tick];
-    uint8_t *address_a = ord_bytes + a * sizeof(uint16_t);
-    uint8_t *address_b = ord_bytes + b * sizeof(uint16_t);
+    const uint8_t *ord_bytes = (const uint8_t*)ivars->ord_arrays[tick];
+    const uint8_t *address_a = ord_bytes + a * sizeof(uint16_t);
+    const uint8_t *address_b = ord_bytes + b * sizeof(uint16_t);
     int32_t  ord_a = NumUtil_decode_bigend_u16(address_a);
     int32_t  ord_b = NumUtil_decode_bigend_u16(address_b);
     return ord_a - ord_b;
@@ -386,9 +386,9 @@ SI_compare_by_ord16(SortCollectorIVARS *ivars, uint32_t tick,
 static CFISH_INLINE int32_t
 SI_compare_by_ord32(SortCollectorIVARS *ivars, uint32_t tick,
                     int32_t a, int32_t b) {
-    uint8_t *ord_bytes = (uint8_t*)ivars->ord_arrays[tick];
-    uint8_t *address_a = ord_bytes + a * sizeof(uint32_t);
-    uint8_t *address_b = ord_bytes + b * sizeof(uint32_t);
+    const uint8_t *ord_bytes = (const uint8_t*)ivars->ord_arrays[tick];
+    const uint8_t *address_a = ord_bytes + a * sizeof(uint32_t);
+    const uint8_t *address_b = ord_bytes + b * sizeof(uint32_t);
     int32_t  ord_a = NumUtil_decode_bigend_u32(address_a);
     int32_t  ord_b = NumUtil_decode_bigend_u32(address_b);
     return ord_a - ord_b;
@@ -396,7 +396,7 @@ SI_compare_by_ord32(SortCollectorIVARS *ivars, uint32_t tick,
 static CFISH_INLINE int32_t
 SI_compare_by_native_ord16(SortCollectorIVARS *ivars, uint32_t tick,
                            int32_t a, int32_t b) {
-    uint16_t *ords = (uint16_t*)ivars->ord_arrays[tick];
+    const uint16_t *ords = (const uint16_t*)ivars->ord_arrays[tick];
     int32_t a_ord = ords[a];
     int32_t b_ord = ords[b];
     return a_ord - b_ord;
@@ -404,7 +404,7 @@ SI_compare_by_native_ord16(SortCollectorIVARS *ivars, uint32_t tick,
 static CFISH_INLINE int32_t
 SI_compare_by_native_ord32(SortCollectorIVARS *ivars, uint32_t tick,
                            int32_t a, int32_t b) {
-    int32_t *ords = (int32_t*)ivars->ord_arrays[tick];
+    const int32_t *ords = (const int32_t*)ivars->ord_arrays[tick];
     return ords[a] - ords[b];
 }
 

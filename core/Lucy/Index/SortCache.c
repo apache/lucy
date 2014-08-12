@@ -22,8 +22,8 @@
 
 SortCache*
 SortCache_init(SortCache *self, String *field, FieldType *type,
-               void *ords, int32_t cardinality, int32_t doc_max, int32_t null_ord,
-               int32_t ord_width) {
+               const void *ords, int32_t cardinality, int32_t doc_max,
+               int32_t null_ord, int32_t ord_width) {
     SortCacheIVARS *const ivars = SortCache_IVARS(self);
 
     // Init.
@@ -143,7 +143,7 @@ SortCache_Find_IMP(SortCache *self, Obj *term) {
     }
 }
 
-void*
+const void*
 SortCache_Get_Ords_IMP(SortCache *self) {
     return SortCache_IVARS(self)->ords;
 }

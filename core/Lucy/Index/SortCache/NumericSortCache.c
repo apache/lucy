@@ -41,8 +41,8 @@ NumSortCache_init(NumericSortCache *self, String *field,
     }
 
     // Mmap ords and super-init.
-    int64_t  ord_len = InStream_Length(ord_in);
-    void    *ords    = InStream_Buf(ord_in, (size_t)ord_len);
+    int64_t     ord_len = InStream_Length(ord_in);
+    const void *ords    = InStream_Buf(ord_in, (size_t)ord_len);
     SortCache_init((SortCache*)self, field, type, ords, cardinality, doc_max,
                    null_ord, ord_width);
     NumericSortCacheIVARS *const ivars = NumSortCache_IVARS(self);
