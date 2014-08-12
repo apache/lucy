@@ -286,7 +286,7 @@ InStream_Length_IMP(InStream *self) {
     return InStream_IVARS(self)->len;
 }
 
-char*
+const char*
 InStream_Buf_IMP(InStream *self, size_t request) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     const int64_t bytes_in_buf
@@ -330,7 +330,7 @@ InStream_Advance_Buf_IMP(InStream *self, const char *buf) {
         THROW(ERR, "Can't Advance_Buf backwards: (underrun: %i64))", underrun);
     }
     else {
-        ivars->buf += buf - ivars->buf;
+        ivars->buf = buf;
     }
 }
 

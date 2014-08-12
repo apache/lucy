@@ -35,8 +35,8 @@ class Lucy::Store::InStream inherits Clownfish::Obj {
 
     int64_t     offset;
     int64_t     len;
-    char       *buf;
-    char       *limit;
+    const char *buf;
+    const char *limit;
     String     *filename;
     FileHandle *file_handle;
     FileWindow *window;
@@ -115,7 +115,7 @@ class Lucy::Store::InStream inherits Clownfish::Obj {
      * @param request Advisory byte size request.
      * @return Pointer to the InStream's internal buffer.
      */
-    final char*
+    final const char*
     Buf(InStream *self, size_t request);
 
     /** Set the buf to a new value, checking for overrun.  The idiom is for

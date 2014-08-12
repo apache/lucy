@@ -108,7 +108,7 @@ Json_slurp_json(Folder *folder, String *path) {
         return NULL;
     }
     size_t len = (size_t)InStream_Length(instream);
-    char *buf = InStream_Buf(instream, len);
+    const char *buf = InStream_Buf(instream, len);
     Obj *dump = S_parse_json(buf, len);
     InStream_Close(instream);
     DECREF(instream);
