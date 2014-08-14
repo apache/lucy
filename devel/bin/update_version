@@ -28,29 +28,40 @@ my $usage = "$0 version\n";
 my $version = shift(@ARGV) or die $usage;
 
 # standardize version strings
-my $x_y_z_version    = "";
-my $x_yyyzzz_version = "";
+my ( $x, $y, $z );
 if ( $version =~ m/^(\d+)\.(\d+)\.(\d+)$/ ) {
-    $x_yyyzzz_version = sprintf( "%d.%03d%03d", $1, $2, $3 );
-    $x_y_z_version = $version;
+    ( $x, $y, $z ) = ( $1, $2, $3 );
 }
 elsif ( $version =~ m/^(\d+)\.(\d\d\d)(\d\d\d)$/ ) {
-    $x_y_z_version = sprintf( "%d.%d.%d", $1, $2, $3 );
-    $x_yyyzzz_version = $version;
+    ( $x, $y, $z ) = ( int($1), int($2), int($3) );
 }
 else {
     die "Unknown version syntax. Try X.Y.Z or X.YYYZZZ\n";
 }
+my $x_y_z_version    = sprintf( "%d.%d.%d",    $x, $y, $z );
+my $x_yyyzzz_version = sprintf( "%d.%03d%03d", $x, $y, $z );
 
 print "Using version: $x_y_z_version ( $x_yyyzzz_version )\n";
 
 my $buf;
 
+# Update charmonizer.
+for my $path ('common/charmonizer.c', 'common/charmonizer.main') {
+    $buf = read_file($path);
+    $buf =~ s/(lucy_version\[\]\s+=\s+)"[\d.]+"/$1"$x_y_z_version"/
+        or die "no match";
+    $buf =~ s/(lucy_major_version\[\]\s+=\s+)"[\d.]+"/$1"$x.$y"/
+        or die "no match";
+    $buf =~ s/(cfish_lib_name\s+=\s+)"cfish-[\d.]+"/$1"cfish-$x.$y"/
+        or die "no match";
+    write_file($path, $buf);
+}
+
 # Update Lucy.pm.
 $buf = read_file('perl/lib/Lucy.pm');
 $buf =~ s/(our \$VERSION\ +=\ +)'.+?'/$1'$x_yyyzzz_version'/g
     or die "no match";
-$buf =~ s/XSLoader::load\( 'Lucy', '(.+?)'/XSLoader::load\( 'Lucy', '$x_y_z_version'/
+$buf =~ s/(bootstrap\s+Lucy\s+)'[\d\.]+'/$1'$x_y_z_version'/
     or die "no match";
 write_file( 'perl/lib/Lucy.pm', $buf );
 
@@ -66,17 +77,35 @@ $buf =~ s/(dist_version\ +=>\ +)'.+?'/$1'$x_y_z_version'/
     or die "no match";
 write_file( 'perl/Build.PL', $buf );
 
+# Update ruby/apache_lucy.gemspec
+$buf = read_file('ruby/apache_lucy.gemspec');
+$buf =~ s/(spec\.version\s+=\s+)'.+?'/$1'$x_y_z_version'/
+    or die "no match";
+write_file( 'ruby/apache_lucy.gemspec', $buf );
+
+# Update ruby/lib/apache_lucy.rb
+$buf = read_file('ruby/lib/apache_lucy.rb');
+$buf =~ s/(VERSION\s+=\s+)'.+?'/$1'$x_y_z_version'/
+    or die "no match";
+write_file( 'ruby/lib/apache_lucy.rb', $buf );
+
 # Update Lucy.cfp.
 $buf = read_file('core/Lucy.cfp');
 $buf =~ s/("version":\s+)"v\d+\.\d+\.\d+"/$1"v$x_y_z_version"/
     or die "no match";
+$buf =~ s/("Clownfish":\s+)"v\d+\.\d+\.\d+"/$1"v$x_y_z_version"/
+    or die "no match";
 write_file( 'core/Lucy.cfp', $buf );
 
-# Update temporary hack in CFCParcel.
-$buf = read_file('clownfish/src/CFCParcel.c');
-$buf =~ s/"v\d\.\d\.\d"/"v$x_y_z_version"/
+# Update TestLucy.cfp
+$buf = read_file('core/TestLucy.cfp');
+$buf =~ s/("version":\s+)"v\d+\.\d+\.\d+"/$1"v$x_y_z_version"/
     or die "no match";
-write_file( 'clownfish/src/CFCParcel.c', $buf );
+$buf =~ s/("Clownfish":\s+)"v\d+\.\d+\.\d+"/$1"v$x_y_z_version"/
+    or die "no match";
+$buf =~ s/("Lucy":\s+)"v\d+\.\d+\.\d+"/$1"v$x_y_z_version"/
+    or die "no match";
+write_file( 'core/TestLucy.cfp', $buf );
 
 # Update all other Perl modules.
 find sub {
@@ -88,6 +117,14 @@ find sub {
         or die "no match in $File::Find::name";
     write_file($name, $buf);
 }, 'perl';
+
+# Update c/install.sh
+$buf = read_file('c/install.sh');
+$buf =~ s/\bversion=[\d.]+/version=$x_y_z_version/
+    or die "no match";
+$buf =~ s/\bmajor_version=[\d.]+/major_version=$x.$y/
+    or die "no match";
+write_file( 'c/install.sh', $buf );
 
 # utility functions
 sub read_file {
@@ -106,6 +143,7 @@ sub write_file {
     close(F) or die "Cannot close $file: $!\n";
 }
 
+print "Done.  Consider running git grep to search for the old version.\n";
 exit();
 
 __END__
