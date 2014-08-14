@@ -45,8 +45,8 @@ typedef struct SourceFileContext {
     chaz_MakeVar *var;
 } SourceFileContext;
 
-static const char lucy_version[]        = "0.3.0";
-static const char lucy_major_version[]  = "0.3";
+static const char lucy_version[]        = "0.4.0";
+static const char lucy_major_version[]  = "0.4";
 
 static void
 S_add_compiler_flags(struct chaz_CLIArgs *args) {
@@ -304,7 +304,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     }
 
     if (strcmp(chaz_OS_shared_lib_ext(), ".dll") == 0) {
-        cfish_lib_name = "cfish-0.3";
+        cfish_lib_name = "cfish-0.4";
     }
     else {
         cfish_lib_name = "cfish";

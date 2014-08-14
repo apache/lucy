@@ -18,7 +18,7 @@ use warnings;
 
 package LucyX::Remote::SearchServer;
 BEGIN { our @ISA = qw( Clownfish::Obj ) }
-our $VERSION = '0.003000';
+our $VERSION = '0.004000';
 $VERSION = eval $VERSION;
 use Carp;
 use Storable qw( nfreeze thaw );
