@@ -1,5 +1,35 @@
 Revision history for Lucy
 
+0.3.3  2013-07-22
+
+  Bugfixes:
+
+    * [LUCY-239] - Simplify JSON Parser Y File
+    * [LUCY-243] - Trap remove errno and warn
+    * [LUCY-245] - Charmonizer fails to detect syntax for 64-bit integer
+      literals
+    * [LUCY-259] - Compensate for Perl export flakiness of to_utf8_lower
+
+0.3.2  2012-07-05
+
+  Bugfixes:
+
+    * [LUCY-238] - Improve reliability of loading from JSON
+
+
+0.3.1  2012-05-04
+
+  Bugfixes:
+
+    * [LUCY-213] - Explicit version number for each Perl module
+    * [LUCY-216] - t/152-inversion.t failure
+    * [LUCY-235] - Don't ship dev-only tests with CPAN tarball
+
+  Tasks:
+
+    * [LUCY-218] - Adapt codebase for TLP status
+
+
 0.3.0  2012-01-15
 
   New features:
