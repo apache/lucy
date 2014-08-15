@@ -1,5 +1,33 @@
 Revision history for Lucy
 
+0.4.0  2014-08-19
+
+  Bugfixes:
+
+    * [LUCY-199] - Highlighting/excerpt on URLs
+    * [LUCY-211] - MSVC 6 support
+    * [LUCY-234] - Brittle object struct ABI
+    * [LUCY-240] - Build Broken on clang
+    * [LUCY-254] - Creation of Charmonizer temp files sometimes fails on
+                   Windows
+    * [LUCY-261] - Include paths for benchmark scripts
+    * [LUCY-263] - MemoryPool's Release_All() should free
+    * [LUCY-265] - Index lockfiles left behind
+
+  New features:
+
+    * [LUCY-250] - Add delete_by_doc_id to Lucy::Index::Indexer
+
+  Tasks:
+
+    * [LUCY-201] - Port CFC tests to C
+    * [LUCY-212] - The "language" parameter to PolyAnalyzer#new is deprecated
+    * [LUCY-214] - Port terminfo tests to C
+    * [LUCY-222] - Port span tests to C
+    * [LUCY-246] - Migrate Apache Lucy to Git
+    * [LUCY-257] - Separate Clownfish from Lucy
+
+
 0.3.3  2013-07-22
 
   Bugfixes:
