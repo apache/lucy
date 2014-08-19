@@ -94,6 +94,7 @@ chaz_SharedLib_export_filename(chaz_SharedLib *lib);
 #define CHAZ_CFLAGS_STYLE_POSIX  1
 #define CHAZ_CFLAGS_STYLE_GNU    2
 #define CHAZ_CFLAGS_STYLE_MSVC   3
+#define CHAZ_CFLAGS_STYLE_SUN_C  4
 
 typedef struct chaz_CFlags chaz_CFlags;
 
@@ -255,6 +256,9 @@ chaz_CC_gcc_version(void);
 
 int
 chaz_CC_msvc_version_num(void);
+
+int
+chaz_CC_sun_c_version_num(void);
 
 const char*
 chaz_CC_link_command(void);
@@ -1792,6 +1796,9 @@ chaz_CFlags_enable_optimization(chaz_CFlags *flags) {
     else if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
         string = "-O2";
     }
+    else if (flags->style == CHAZ_CFLAGS_STYLE_SUN_C) {
+        string = "-xO4";
+    }
     else {
         /* POSIX */
         string = "-O 1";
@@ -1801,7 +1808,8 @@ chaz_CFlags_enable_optimization(chaz_CFlags *flags) {
 
 void
 chaz_CFlags_enable_debugging(chaz_CFlags *flags) {
-    if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
+    if (flags->style == CHAZ_CFLAGS_STYLE_GNU
+        || flags->style == CHAZ_CFLAGS_STYLE_SUN_C) {
         chaz_CFlags_append(flags, "-g");
     }
 }
@@ -1813,6 +1821,9 @@ chaz_CFlags_disable_strict_aliasing(chaz_CFlags *flags) {
     }
     else if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
         chaz_CFlags_append(flags, "-fno-strict-aliasing");
+    }
+    else if (flags->style == CHAZ_CFLAGS_STYLE_SUN_C) {
+        chaz_CFlags_append(flags, "-xalias_level=any");
     }
     else {
         chaz_Util_die("Don't know how to disable strict aliasing with '%s'",
@@ -1828,6 +1839,9 @@ chaz_CFlags_set_warnings_as_errors(chaz_CFlags *flags) {
     }
     else if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
         string = "-Werror";
+    }
+    else if (flags->style == CHAZ_CFLAGS_STYLE_SUN_C) {
+        string = "-errwarn=%all";
     }
     else {
         chaz_Util_die("Don't know how to set warnings as errors with '%s'",
@@ -1859,6 +1873,9 @@ chaz_CFlags_compile_shared_library(chaz_CFlags *flags) {
             return;
         }
     }
+    else if (flags->style == CHAZ_CFLAGS_STYLE_SUN_C) {
+        string = "-KPIC";
+    }
     else {
         return;
     }
@@ -1867,9 +1884,16 @@ chaz_CFlags_compile_shared_library(chaz_CFlags *flags) {
 
 void
 chaz_CFlags_hide_symbols(chaz_CFlags *flags) {
-    if (flags->style == CHAZ_CFLAGS_STYLE_GNU
-        && strcmp(chaz_OS_shared_lib_ext(), ".dll") != 0) {
-        chaz_CFlags_append(flags, "-fvisibility=hidden");
+    if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
+        if (strcmp(chaz_OS_shared_lib_ext(), ".dll") != 0) {
+            chaz_CFlags_append(flags, "-fvisibility=hidden");
+        }
+    }
+    else if (flags->style == CHAZ_CFLAGS_STYLE_SUN_C) {
+        if (chaz_CC_sun_c_version_num() >= 0x550) {
+            /* Sun Studio 8. */
+            chaz_CFlags_append(flags, "-xldscope=hidden");
+        }
     }
 }
 
@@ -1887,6 +1911,9 @@ chaz_CFlags_link_shared_library(chaz_CFlags *flags) {
             string = "-shared";
         }
     }
+    else if (flags->style == CHAZ_CFLAGS_STYLE_SUN_C) {
+        string = "-G";
+    }
     else {
         chaz_Util_die("Don't know how to link a shared library with '%s'",
                       chaz_CC_get_cc());
@@ -1897,25 +1924,31 @@ chaz_CFlags_link_shared_library(chaz_CFlags *flags) {
 void
 chaz_CFlags_set_shared_library_version(chaz_CFlags *flags,
                                        chaz_SharedLib *lib) {
-    const char *shlib_ext = chaz_OS_shared_lib_ext();
-    char       *string;
+    if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
+        const char *shlib_ext = chaz_OS_shared_lib_ext();
 
-    if (flags->style != CHAZ_CFLAGS_STYLE_GNU
-        || strcmp(shlib_ext, ".dll") == 0) {
-        return;
+        if (strcmp(shlib_ext, ".dylib") == 0) {
+            const char *version = chaz_SharedLib_get_version(lib);
+            char *string
+                = chaz_Util_join(" ", "-current_version", version, NULL);
+            chaz_CFlags_append(flags, string);
+            free(string);
+        }
+        else if (strcmp(shlib_ext, ".so") == 0) {
+            char *soname = chaz_SharedLib_major_version_filename(lib);
+            char *string = chaz_Util_join("", "-Wl,-soname,", soname, NULL);
+            chaz_CFlags_append(flags, string);
+            free(string);
+            free(soname);
+        }
     }
-
-    if (strcmp(chaz_OS_shared_lib_ext(), ".dylib") == 0) {
-        const char *version = chaz_SharedLib_get_version(lib);
-        string = chaz_Util_join(" ", "-current_version", version, NULL);
-    }
-    else {
+    else if (flags->style == CHAZ_CFLAGS_STYLE_SUN_C) {
         char *soname = chaz_SharedLib_major_version_filename(lib);
-        string = chaz_Util_join("", "-Wl,-soname,", soname, NULL);
+        char *string = chaz_Util_join(" ", "-h", soname, NULL);
+        chaz_CFlags_append(flags, string);
+        free(string);
         free(soname);
     }
-    chaz_CFlags_append(flags, string);
-    free(string);
 }
 
 void
@@ -2026,12 +2059,13 @@ static struct {
     int       intval___GNUC_PATCHLEVEL__;
     int       intval__MSC_VER;
     int       intval___clang__;
+    int       intval___SUNPRO_C;
     chaz_CFlags *extra_cflags;
     chaz_CFlags *temp_cflags;
 } chaz_CC = {
     NULL, NULL, NULL,
     "", "",
-    0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0,
     NULL, NULL
 };
 
@@ -2077,6 +2111,9 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     }
     else if (chaz_CC.intval__MSC_VER) {
         chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_MSVC;
+    }
+    else if (chaz_CC.intval___SUNPRO_C) {
+        chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_SUN_C;
     }
     else {
         chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_POSIX;
@@ -2126,8 +2163,9 @@ chaz_CC_detect_known_compilers(void) {
                 chaz_CC.intval___GNUC_MINOR__,
                 chaz_CC.intval___GNUC_PATCHLEVEL__);
     }
-    chaz_CC.intval__MSC_VER  = chaz_CC_detect_macro("_MSC_VER");
-    chaz_CC.intval___clang__ = chaz_CC_detect_macro("__clang__");
+    chaz_CC.intval__MSC_VER   = chaz_CC_detect_macro("_MSC_VER");
+    chaz_CC.intval___clang__  = chaz_CC_detect_macro("__clang__");
+    chaz_CC.intval___SUNPRO_C = chaz_CC_detect_macro("__SUNPRO_C");
 }
 
 void
@@ -2336,6 +2374,11 @@ chaz_CC_gcc_version(void) {
 int
 chaz_CC_msvc_version_num(void) {
     return chaz_CC.intval__MSC_VER;
+}
+
+int
+chaz_CC_sun_c_version_num(void) {
+    return chaz_CC.intval___SUNPRO_C;
 }
 
 const char*
@@ -3738,12 +3781,10 @@ struct chaz_MakeFile {
 /* Static vars. */
 static struct {
     char *make_command;
-    int   is_gnu_make;
-    int   is_nmake;
     int   shell_type;
 } chaz_Make = {
     NULL,
-    0, 0, 0
+    0
 };
 
 /* Detect make command.
@@ -3781,19 +3822,12 @@ chaz_Make_init(void) {
     make = chaz_Make.make_command;
 
     if (make) {
-        if (strcmp(make, "make") == 0
-            || strcmp(make, "gmake") == 0
-            || strcmp(make, "mingw32-make") == 0
-            || strcmp(make, "mingw64-make") == 0
-           ) {
-            /* TODO: Add a feature test for GNU make. */
-            chaz_Make.is_gnu_make = 1;
-            /* TODO: Feature test which shell GNU make uses on Windows. */
-            chaz_Make.shell_type = CHAZ_OS_POSIX;
-        }
-        else if (strcmp(make, "nmake") == 0) {
-            chaz_Make.is_nmake = 1;
+        if (strcmp(make, "nmake") == 0) {
             chaz_Make.shell_type = CHAZ_OS_CMD_EXE;
+        }
+        else {
+            /* TODO: Feature test which shell make uses on Windows. */
+            chaz_Make.shell_type = CHAZ_OS_POSIX;
         }
     }
 }
@@ -4337,34 +4371,31 @@ chaz_MakeRule_add_make_command(chaz_MakeRule *rule, const char *dir,
                                const char *target) {
     char *command;
 
-    if (chaz_Make.is_gnu_make) {
+    if (chaz_Make.shell_type == CHAZ_OS_POSIX) {
         if (!target) {
-            command = chaz_Util_join(" ", "$(MAKE)", "-C", dir, NULL);
+            command = chaz_Util_join("", "(cd ", dir, " && $(MAKE))", NULL);
         }
         else {
-            command = chaz_Util_join(" ", "$(MAKE)", "-C", dir, target, NULL);
+            command = chaz_Util_join("", "(cd ", dir, " && $(MAKE) ", target,
+                                     ")", NULL);
         }
         chaz_MakeRule_add_command(rule, command);
         free(command);
     }
-    else if (chaz_Make.is_nmake) {
-        command = chaz_Util_join(" ", "cd", dir, NULL);
-        chaz_MakeRule_add_command(rule, command);
-        free(command);
-
+    else if (chaz_Make.shell_type == CHAZ_OS_CMD_EXE) {
         if (!target) {
-            chaz_MakeRule_add_command(rule, "$(MAKE) /nologo");
+            command = chaz_Util_join(" ", "pushd", dir, "&& $(MAKE) && popd",
+                                     NULL);
         }
         else {
-            command = chaz_Util_join(" ", "$(MAKE) /nologo", target, NULL);
-            chaz_MakeRule_add_command(rule, command);
-            free(command);
+            command = chaz_Util_join(" ", "pushd", dir, "&& $(MAKE)", target,
+                                     "&& popd", NULL);
         }
-
-        chaz_MakeRule_add_command(rule, "cd $(MAKEDIR)");
+        chaz_MakeRule_add_command(rule, command);
+        free(command);
     }
     else {
-        chaz_Util_die("Couldn't find a supported 'make' utility.");
+        chaz_Util_die("Unsupported shell type: %d", chaz_Make.shell_type);
     }
 }
 
@@ -6635,7 +6666,7 @@ chaz_LargeFiles_probe_unbuff(void) {
             break;
         }
     }
-};
+}
 
 
 /***************************************************************************/
@@ -6905,6 +6936,18 @@ chaz_SymbolVisibility_run(void) {
 
     chaz_ConfWriter_start_module("SymbolVisibility");
     chaz_CFlags_set_warnings_as_errors(temp_cflags);
+
+    /* Sun C. */
+    if (!can_control_visibility) {
+        char export_sun[] = "__global";
+        sprintf(code_buf, chaz_SymbolVisibility_symbol_exporting_code,
+                export_sun);
+        if (chaz_CC_test_compile(code_buf)) {
+            can_control_visibility = true;
+            chaz_ConfWriter_add_def("EXPORT", export_sun);
+            chaz_ConfWriter_add_def("IMPORT", export_sun);
+        }
+    }
 
     /* Windows. */
     if (!can_control_visibility) {
