@@ -404,10 +404,17 @@ static String*
 S_absolutify(String *path) {
     if (S_is_absolute(path)) { return Str_Clone(path); }
 
-    char *cwd = getcwd(NULL, 0);
+    char *cwd = NULL;
+    for (size_t buf_size = 256; buf_size <= 65536; buf_size *= 2) {
+        cwd = (char*)MALLOCATE(buf_size);
+        if (getcwd(cwd, buf_size)) { break; }
+        FREEMEM(cwd);
+        cwd = NULL;
+        if (errno != ERANGE) { THROW(ERR, "getcwd failed"); }
+    }
     if (!cwd) { THROW(ERR, "getcwd failed"); }
     String *abs_path = Str_newf("%s" CHY_DIR_SEP "%o", cwd, path);
-    free(cwd);
+    FREEMEM(cwd);
 
     return abs_path;
 }
