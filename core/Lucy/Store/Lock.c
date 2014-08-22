@@ -201,6 +201,8 @@ LFLock_Request_IMP(LockFileLock *self) {
     context.json = json;
     Err *json_error = Err_trap(S_write_lockfile_json, &context);
     bool wrote_json = !json_error;
+    DECREF(outstream);
+    DECREF(json);
     if (wrote_json) {
         success = Folder_Hard_Link(ivars->folder, ivars->link_path,
                                    ivars->lock_path);
