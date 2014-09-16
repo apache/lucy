@@ -210,7 +210,7 @@ S_consume_field(StringIterator *iter) {
             DECREF(temp);
             return NULL;
         }
-        if (!(isalnum(code_point) || code_point != '_')) {
+        if (!(isalnum(code_point) || code_point == '_')) {
             DECREF(temp);
             return NULL;
         }
