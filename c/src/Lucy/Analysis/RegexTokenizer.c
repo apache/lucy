@@ -20,6 +20,8 @@
 
 #include <string.h>
 
+#include "charmony.h"
+
 #include "Lucy/Analysis/RegexTokenizer.h"
 #include "Clownfish/String.h"
 #include "Clownfish/Err.h"
