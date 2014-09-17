@@ -52,7 +52,7 @@ my $builder = Lucy::Build->new(
         'Module::Build'      => 0.280801,
         'ExtUtils::CBuilder' => 0.21,
         'ExtUtils::ParseXS'  => 2.18,
-        'Devel::PPPort'      => 3.13,
+        'Devel::PPPort'      => 3.14,
     },
     meta_merge => { keywords => [qw( search lucy lucene )], },
     meta_add   => {
