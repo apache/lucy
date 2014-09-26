@@ -25,7 +25,7 @@ use Clownfish qw( to_perl );
 use bytes;
 no bytes;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.004001';
 $VERSION = eval $VERSION;
 
 # Inside-out member vars.
