@@ -1,5 +1,12 @@
 Revision history for Lucy
 
+0.4.1  2014-09-25
+
+  Bugfixes:
+
+    * [LUCY-269] - Field names with underscores break query parser
+    * [LUCY-270] - RegexTokenizer broken in C bindings
+
 0.4.0  2014-08-21
 
   Bugfixes:
