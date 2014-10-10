@@ -49,7 +49,7 @@ static const char lucy_version[]        = "0.4.0";
 static const char lucy_major_version[]  = "0.4";
 
 static void
-S_add_compiler_flags(struct chaz_CLIArgs *args) {
+S_add_compiler_flags(struct chaz_CLI *cli) {
     chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
 
     if (chaz_Probe_gcc_version_num()) {
@@ -60,7 +60,7 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
         else if (getenv("LUCY_DEBUG")) {
             chaz_CFlags_append(extra_cflags,
                 "-DLUCY_DEBUG -pedantic -Wall -Wextra -Wno-variadic-macros");
-            if (args->charmony_pm) {
+            if (chaz_CLI_defined(cli, "enable-perl")) {
                 chaz_CFlags_append(extra_cflags, "-DPERL_GCC_PEDANTIC");
             }
         }
@@ -136,8 +136,7 @@ S_cfh_file_callback(const char *dir, char *file, void *context) {
 }
 
 static void
-S_write_makefile(struct chaz_CLIArgs *chaz_args,
-                 struct lucy_CLIArgs *lucy_args) {
+S_write_makefile(chaz_CLI *cli, struct lucy_CLIArgs *lucy_args) {
     SourceFileContext sfc;
 
     const char *base_dir     = "..";
@@ -208,7 +207,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     chaz_CFlags_enable_debugging(makefile_cflags);
     chaz_CFlags_disable_strict_aliasing(makefile_cflags);
     chaz_CFlags_compile_shared_library(makefile_cflags);
-    if (chaz_args->code_coverage) {
+    if (chaz_CLI_defined(cli, "enable-coverage")) {
         chaz_CFlags_enable_code_coverage(makefile_cflags);
     }
 
@@ -331,7 +330,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     if (chaz_HeadCheck_check_header("pcre.h")) {
         chaz_CFlags_add_external_library(link_flags, "pcre");
     }
-    if (chaz_args->code_coverage) {
+    if (chaz_CLI_defined(cli, "enable-coverage")) {
         chaz_CFlags_enable_code_coverage(link_flags);
     }
     rule = chaz_MakeFile_add_shared_lib(makefile, shared_lib, "$(LUCY_OBJS)",
@@ -372,7 +371,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     }
     chaz_MakeRule_add_command(rule, test_command);
 
-    if (chaz_args->code_coverage) {
+    if (chaz_CLI_defined(cli, "enable-coverage")) {
         rule = chaz_MakeFile_add_rule(makefile, "coverage", test_lucy_exe);
         chaz_MakeRule_add_command(rule,
                                   "lcov"
@@ -412,7 +411,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
 
     chaz_MakeRule_add_recursive_rm_command(clean_rule, "autogen");
 
-    if (chaz_args->code_coverage) {
+    if (chaz_CLI_defined(cli, "enable-coverage")) {
         chaz_MakeRule_add_rm_command(clean_rule, "lucy.info");
         chaz_MakeRule_add_recursive_rm_command(clean_rule, "coverage");
     }
@@ -444,15 +443,17 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
 
 int main(int argc, const char **argv) {
     /* Initialize. */
-    struct chaz_CLIArgs chaz_args;
+    chaz_CLI *cli
+        = chaz_CLI_new(argv[0], "charmonizer: Probe C build environment");
+    chaz_CLI_set_usage(cli, "Usage: charmonizer [OPTIONS] [-- [CFLAGS]]");
     struct lucy_CLIArgs lucy_args = { NULL };
     {
-        int result = chaz_Probe_parse_cli_args(argc, argv, &chaz_args);
+        int result = chaz_Probe_parse_cli_args(argc, argv, cli);
         if (!result) {
             chaz_Probe_die_usage();
         }
-        chaz_Probe_init(&chaz_args);
-        S_add_compiler_flags(&chaz_args);
+        chaz_Probe_init(cli);
+        S_add_compiler_flags(cli);
     }
     {
         int i;
@@ -515,11 +516,12 @@ int main(int argc, const char **argv) {
         "#endif\n\n"
     );
 
-    if (chaz_args.write_makefile) {
-        S_write_makefile(&chaz_args, &lucy_args);
+    if (chaz_CLI_defined(cli, "enable-makefile")) {
+        S_write_makefile(cli, &lucy_args);
     }
 
     /* Clean up. */
+    chaz_CLI_destroy(cli);
     chaz_Probe_clean_up();
 
     return 0;
