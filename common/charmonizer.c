@@ -179,6 +179,97 @@ chaz_CFlags_enable_code_coverage(chaz_CFlags *flags);
 
 /***************************************************************************/
 
+#line 21 "src/Charmonizer/Core/CLI.h"
+#ifndef H_CHAZ_CLI
+#define H_CHAZ_CLI 1
+
+#define CHAZ_CLI_NO_ARG       0
+#define CHAZ_CLI_ARG_REQUIRED (1 << 0)
+#define CHAZ_CLI_ARG_OPTIONAL (1 << 1)
+
+/* The CLI module provides argument parsing for a command line interface.
+ */
+
+typedef struct chaz_CLI chaz_CLI;
+
+/* Constructor.
+ *
+ * @param name The name of the application.
+ * @param description A description of the application.
+ */
+chaz_CLI*
+chaz_CLI_new(const char *name, const char *description);
+
+/* Destructor.
+ */
+void
+chaz_CLI_destroy(chaz_CLI *self);
+
+/* Return a string combining usage header with documentation of options.
+ */
+const char*
+chaz_CLI_help(chaz_CLI *self);
+
+/* Override the generated usage header.
+ */
+void
+chaz_CLI_set_usage(chaz_CLI *self, const char *usage);
+
+/* Register an option.  Updates the "help" string, invalidating previous
+ * values.  Returns true on success, or reports an error and returns false if
+ * the option was already registered.
+ */
+int
+chaz_CLI_register(chaz_CLI *self, const char *name, const char *help,
+                  int flags);
+
+/* Set an option.  The specified option must have been registered previously.
+ * The supplied `value` is optional and will be copied.
+ *
+ * Returns true on success.  Reports an error and returns false on failure.
+ */
+int
+chaz_CLI_set(chaz_CLI *self, const char *name, const char *value);
+
+/* Returns true if the option has been set, false otherwise.
+ */
+int
+chaz_CLI_defined(chaz_CLI *self, const char *name);
+
+/* Return the value of a given option converted to a long int.  Defaults to 0.
+ * Reports an error if the named option has not been registered.
+ */
+long
+chaz_CLI_longval(chaz_CLI *self, const char *name);
+
+/* Return the value of an option as a C string.  Defaults to NULL.  Reports an
+ * error if the named option has not been registered.
+ */
+const char*
+chaz_CLI_strval(chaz_CLI *self, const char *name);
+
+/* Unset an option, making subsequent calls to `get` return false and making
+ * it possible to call `set` again.
+ *
+ * Returns true if the option exists and was able to be unset.
+ */
+int
+chaz_CLI_unset(chaz_CLI *self, const char *name);
+
+/* Parse `argc` and `argv`, setting options as appropriate.  Returns true on
+ * success.  Reports an error and returns false if either an unexpected option
+ * was encountered or an option which requires an argument was supplied
+ * without one.
+ */
+int
+chaz_CLI_parse(chaz_CLI *self, int argc, const char *argv[]);
+
+#endif /* H_CHAZ_CLI */
+
+
+
+/***************************************************************************/
+
 #line 21 "src/Charmonizer/Core/Compiler.h"
 /* Charmonizer/Core/Compiler.h
  */
@@ -924,20 +1015,7 @@ chaz_Util_can_open_file(const char *file_path);
 #include <stddef.h>
 #include <stdio.h>
 
-#define CHAZ_PROBE_MAX_CC_LEN 100
-#define CHAZ_PROBE_MAX_CFLAGS_LEN 2000
-
-struct chaz_CLIArgs {
-    char cc[CHAZ_PROBE_MAX_CC_LEN + 1];
-    char cflags[CHAZ_PROBE_MAX_CFLAGS_LEN + 1];
-    int  charmony_h;
-    int  charmony_pm;
-    int  charmony_py;
-    int  charmony_rb;
-    int  verbosity;
-    int  write_makefile;
-    int  code_coverage;
-};
+struct chaz_CLI;
 
 /* Parse command line arguments, initializing and filling in the supplied
  * `args` struct.
@@ -954,7 +1032,7 @@ struct chaz_CLIArgs {
  */
 int
 chaz_Probe_parse_cli_args(int argc, const char *argv[],
-                          struct chaz_CLIArgs *args);
+                          struct chaz_CLI *cli);
 
 /* Exit after printing usage instructions to stderr.
  */
@@ -971,7 +1049,7 @@ chaz_Probe_die_usage(void);
  *      2 - debugging
  */
 void
-chaz_Probe_init(struct chaz_CLIArgs *args);
+chaz_Probe_init(struct chaz_CLI *cli);
 
 /* Clean up the Charmonizer environment -- deleting tempfiles, etc.  This
  * should be called only after everything else finishes.
@@ -2095,6 +2173,351 @@ chaz_CFlags_enable_code_coverage(chaz_CFlags *flags) {
     }
 }
 
+
+
+/***************************************************************************/
+
+#line 17 "src/Charmonizer/Core/CLI.c"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
+#include <ctype.h>
+/* #include "Charmonizer/Core/CLI.h" */
+/* #include "Charmonizer/Core/Util.h" */
+
+typedef struct chaz_CLIOption {
+    char *name;
+    char *help;
+    char *value;
+    int   defined;
+    int   flags;
+} chaz_CLIOption;
+
+struct chaz_CLI {
+    char *name;
+    char *desc;
+    char *usage;
+    char *help;
+    chaz_CLIOption *opts;
+    int   num_opts;
+};
+
+static void
+S_chaz_CLI_error(chaz_CLI *self, const char *pattern, ...) {
+    va_list ap;
+    if (chaz_Util_verbosity > 0) {
+        va_start(ap, pattern);
+        vfprintf(stderr, pattern, ap);
+        va_end(ap);
+        fprintf(stderr, "\n");
+    }
+}
+
+static void
+S_chaz_CLI_rebuild_help(chaz_CLI *self) {
+    int i;
+    size_t amount = 200; // Length of section headers.
+
+    // Allocate space.
+    if (self->usage) {
+        amount += strlen(self->usage);
+    }
+    else {
+        amount += strlen(self->name);
+    }
+    if (self->desc) {
+        amount += strlen(self->desc);
+    }
+    for (i = 0; i < self->num_opts; i++) {
+        chaz_CLIOption *opt = &self->opts[i];
+        amount += 24 + 2 * strlen(opt->name);
+        if (opt->flags) {
+            amount += strlen(opt->name);
+        }
+        if (opt->help) {
+            amount += strlen(opt->help);
+        }
+    }
+    free(self->help);
+    self->help = (char*)malloc(amount);
+    self->help[0] = '\0';
+
+    // Accumulate "help" string.
+    if (self->usage) {
+        strcat(self->help, self->usage);
+    }
+    else {
+        strcat(self->help, "Usage: ");
+        strcat(self->help, self->name);
+        if (self->num_opts) {
+            strcat(self->help, " [OPTIONS]");
+        }
+    }
+    if (self->desc) {
+        strcat(self->help, "\n\n");
+        strcat(self->help, self->desc);
+    }
+    strcat(self->help, "\n");
+    if (self->num_opts) {
+        strcat(self->help, "\nOptional arguments:\n");
+        for (i = 0; i < self->num_opts; i++) {
+            chaz_CLIOption *opt = &self->opts[i];
+            size_t line_start = strlen(self->help);
+            size_t current_len;
+
+            strcat(self->help, "  --");
+            strcat(self->help, opt->name);
+            current_len = strlen(self->help);
+            if (opt->flags) {
+                int j;
+                if (opt->flags & CHAZ_CLI_ARG_OPTIONAL) {
+                    self->help[current_len++] = '[';
+                }
+                self->help[current_len++] = '=';
+                for (j = 0; opt->name[j]; j++) {
+                    self->help[current_len++] = toupper(opt->name[j]);
+                }
+                if (opt->flags & CHAZ_CLI_ARG_OPTIONAL) {
+                    strcat(self->help, "]");
+                }
+                self->help[current_len] = '\0';
+            }
+            if (opt->help) {
+                self->help[current_len++] = ' ';
+                while (current_len - line_start < 25) {
+                    self->help[current_len++] = ' ';
+                }
+                self->help[current_len] = '\0';
+                strcpy(self->help + current_len, opt->help);
+            }
+            strcat(self->help, "\n");
+        }
+    }
+    strcat(self->help, "\n");
+}
+
+chaz_CLI*
+chaz_CLI_new(const char *name, const char *description) {
+    chaz_CLI *self  = calloc(1, sizeof(chaz_CLI));
+    self->name      = chaz_Util_strdup(name ? name : "PROGRAM");
+    self->desc      = description ? chaz_Util_strdup(description) : NULL;
+    self->help      = NULL;
+    self->opts      = NULL;
+    self->num_opts  = 0;
+    S_chaz_CLI_rebuild_help(self);
+    return self;
+}
+
+void
+chaz_CLI_destroy(chaz_CLI *self) {
+    int i;
+    for (i = 0; i < self->num_opts; i++) {
+        chaz_CLIOption *opt = &self->opts[i];
+        free(opt->name);
+        free(opt->help);
+        free(opt->value);
+    }
+    free(self->name);
+    free(self->desc);
+    free(self->opts);
+    free(self->usage);
+    free(self->help);
+}
+
+void
+chaz_CLI_set_usage(chaz_CLI *self, const char *usage) {
+    free(self->usage);
+    self->usage = chaz_Util_strdup(usage);
+}
+
+const char*
+chaz_CLI_help(chaz_CLI *self) {
+    return self->help;
+}
+
+int
+chaz_CLI_register(chaz_CLI *self, const char *name, const char *help,
+                  int flags) {
+    int rank;
+    int i;
+    int arg_required = !!(flags & CHAZ_CLI_ARG_REQUIRED);
+    int arg_optional = !!(flags & CHAZ_CLI_ARG_OPTIONAL);
+
+    // Validate flags
+    if (arg_required && arg_optional) {
+        S_chaz_CLI_error(self, "Conflicting flags: value both optional "
+                         "and required");
+        return 0;
+    }
+
+    // Insert new option.  Keep options sorted by name.
+    for (rank = self->num_opts; rank > 0; rank--) {
+        int comparison = strcmp(name, self->opts[rank - 1].name);
+        if (comparison == 0) {
+            S_chaz_CLI_error(self, "Option '%s' already registered", name);
+            return 0;
+        }
+        else if (comparison > 0) {
+            break;
+        }
+    }
+    self->num_opts += 1;
+    self->opts = realloc(self->opts, self->num_opts * sizeof(chaz_CLIOption));
+    for (i = self->num_opts - 1; i > rank; i--) {
+        self->opts[i] = self->opts[i - 1];
+    }
+    self->opts[rank].name    = chaz_Util_strdup(name);
+    self->opts[rank].help    = help ? chaz_Util_strdup(help) : NULL;
+    self->opts[rank].flags   = flags;
+    self->opts[rank].defined = 0;
+    self->opts[rank].value   = NULL;
+
+    // Update `help` with new option.
+    S_chaz_CLI_rebuild_help(self);
+
+    return 1;
+}
+
+int
+chaz_CLI_set(chaz_CLI *self, const char *name, const char *value) {
+    int i;
+    for (i = 0; i < self->num_opts; i++) {
+        chaz_CLIOption *opt = &self->opts[i];
+        if (strcmp(opt->name, name) == 0) {
+            if (opt->defined) {
+                S_chaz_CLI_error(self, "'%s' specified multiple times", name);
+                return 0;
+            }
+            opt->defined = 1;
+            if (value != NULL) {
+                opt->value = chaz_Util_strdup(value);
+            }
+            return 1;
+        }
+    }
+    S_chaz_CLI_error(self, "Attempt to set unknown option: '%s'", name);
+    return 0;
+}
+
+int
+chaz_CLI_unset(chaz_CLI *self, const char *name) {
+    int i;
+    for (i = 0; i < self->num_opts; i++) {
+        chaz_CLIOption *opt = &self->opts[i];
+        if (strcmp(opt->name, name) == 0) {
+            free(opt->value);
+            opt->value = NULL;
+            opt->defined = 0;
+            return 1;
+        }
+    }
+    S_chaz_CLI_error(self, "Attempt to unset unknown option: '%s'", name);
+    return 0;
+}
+
+int
+chaz_CLI_defined(chaz_CLI *self, const char *name) {
+    int i;
+    for (i = 0; i < self->num_opts; i++) {
+        chaz_CLIOption *opt = &self->opts[i];
+        if (strcmp(opt->name, name) == 0) {
+            return opt->defined;
+        }
+    }
+    S_chaz_CLI_error(self, "Inquiry for unknown option: '%s'", name);
+    return 0;
+}
+
+long
+chaz_CLI_longval(chaz_CLI *self, const char *name) {
+    int i;
+    for (i = 0; i < self->num_opts; i++) {
+        chaz_CLIOption *opt = &self->opts[i];
+        if (strcmp(opt->name, name) == 0) {
+            if (!opt->defined || !opt->value) {
+                return 0;
+            }
+            return strtol(opt->value, NULL, 10);
+        }
+    }
+    S_chaz_CLI_error(self, "Longval request for unknown option: '%s'", name);
+    return 0;
+}
+
+const char*
+chaz_CLI_strval(chaz_CLI *self, const char *name) {
+    int i;
+    for (i = 0; i < self->num_opts; i++) {
+        chaz_CLIOption *opt = &self->opts[i];
+        if (strcmp(opt->name, name) == 0) {
+            return opt->value;
+        }
+    }
+    S_chaz_CLI_error(self, "Strval request for unknown option: '%s'", name);
+    return 0;
+}
+
+int
+chaz_CLI_parse(chaz_CLI *self, int argc, const char *argv[]) {
+    int i;
+    char *name = NULL;
+    size_t name_cap = 0;
+
+    /* Parse most args. */
+    for (i = 1; i < argc; i++) {
+        const char *arg = argv[i];
+        size_t name_len = 0;
+        int has_equals = 0;
+        const char *value = NULL;
+
+        /* Stop processing if we see `-` or `--`. */
+        if (strcmp(arg, "--") == 0 || strcmp(arg, "-") == 0) {
+            break;
+        }
+
+        if (strncmp(arg, "--", 2) != 0) {
+            S_chaz_CLI_error(self, "Unexpected argument: '%s'", arg);
+            free(name);
+            return 0;
+        }
+
+        /* Extract the name of the argument, look for a potential value. */
+        while (1) {
+            char c = arg[name_len + 2];
+            if (isalnum(c) || c == '-' || c == '_') {
+                name_len++;
+            }
+            else if (c == '\0') {
+                break;
+            }
+            else if (c == '=') {
+                /* The rest of the arg is the value. */
+                value = arg + 2 + name_len + 1;
+                break;
+            }
+            else {
+                free(name);
+                S_chaz_CLI_error(self, "Malformed argument: '%s'", arg);
+                return 0;
+            }
+        }
+        if (name_len + 1 > name_cap) {
+            name_cap = name_len + 1;
+            name = (char*)realloc(name, name_cap);
+        }
+        memcpy(name, arg + 2, name_len);
+        name[name_len] = '\0';
+
+        /* Attempt to set the option. */
+        if (!chaz_CLI_set(self, name, value)) {
+            free(name);
+            return 0;
+        }
+    }
+
+    return 1;
+}
 
 
 /***************************************************************************/
@@ -5110,99 +5533,82 @@ chaz_Util_can_open_file(const char *file_path) {
 /* #include "Charmonizer/Core/ConfWriterPython.h" */
 /* #include "Charmonizer/Core/ConfWriterRuby.h" */
 /* #include "Charmonizer/Core/Util.h" */
+/* #include "Charmonizer/Core/CLI.h" */
 /* #include "Charmonizer/Core/Compiler.h" */
 /* #include "Charmonizer/Core/Make.h" */
 /* #include "Charmonizer/Core/OperatingSystem.h" */
 
 int
-chaz_Probe_parse_cli_args(int argc, const char *argv[],
-                          struct chaz_CLIArgs *args) {
+chaz_Probe_parse_cli_args(int argc, const char *argv[], chaz_CLI *cli) {
     int i;
     int output_enabled = 0;
 
-    /* Zero out args struct. */
-    memset(args, 0, sizeof(struct chaz_CLIArgs));
+    /* Register Charmonizer-specific options. */
+    chaz_CLI_register(cli, "enable-c", "generate charmony.h", CHAZ_CLI_NO_ARG);
+    chaz_CLI_register(cli, "enable-perl", "generate Charmony.pm", CHAZ_CLI_NO_ARG);
+    chaz_CLI_register(cli, "enable-python", "generate charmony.py", CHAZ_CLI_NO_ARG);
+    chaz_CLI_register(cli, "enable-ruby", "generate charmony.rb", CHAZ_CLI_NO_ARG);
+    chaz_CLI_register(cli, "enable-makefile", NULL, CHAZ_CLI_NO_ARG);
+    chaz_CLI_register(cli, "enable-coverage", NULL, CHAZ_CLI_NO_ARG);
+    chaz_CLI_register(cli, "cc", "compiler command", CHAZ_CLI_ARG_REQUIRED);
+    chaz_CLI_register(cli, "cflags", NULL, CHAZ_CLI_ARG_REQUIRED);
 
-    /* Parse most args. */
-    for (i = 1; i < argc; i++) {
-        const char *arg = argv[i];
-        if (strcmp(arg, "--") == 0) {
-            /* From here on out, everything will be a compiler flag. */
-            i++;
-            break;
-        }
-        if (strcmp(arg, "--enable-c") == 0) {
-            args->charmony_h = 1;
-            output_enabled = 1;
-        }
-        else if (strcmp(arg, "--enable-perl") == 0) {
-            args->charmony_pm = 1;
-            output_enabled = 1;
-        }
-        else if (strcmp(arg, "--enable-python") == 0) {
-            args->charmony_py = 1;
-            output_enabled = 1;
-        }
-        else if (strcmp(arg, "--enable-ruby") == 0) {
-            args->charmony_rb = 1;
-            output_enabled = 1;
-        }
-        else if (strcmp(arg, "--enable-makefile") == 0) {
-            args->write_makefile = 1;
-        }
-        else if (strcmp(arg, "--enable-coverage") == 0) {
-            args->code_coverage = 1;
-        }
-        else if (memcmp(arg, "--cc=", 5) == 0) {
-            size_t len = strlen(arg);
-            size_t l   = 5;
-            size_t r   = len;
-            size_t trimmed_len;
-
-            if (len > CHAZ_PROBE_MAX_CC_LEN - 5) {
-                fprintf(stderr, "Exceeded max length for compiler command");
-                exit(1);
-            }
-
-            /*
-             * Some Perl setups have a 'cc' config value with leading
-             * whitespace.
-             */
-            while (isspace(arg[l])) {
-                ++l;
-            }
-            while (r > l && isspace(arg[r-1])) {
-                --r;
-            }
-
-            trimmed_len = r - l;
-            memcpy(args->cc, arg + l, trimmed_len);
-            args->cc[trimmed_len] = '\0';
-        }
-    } /* preserve value of i */
-
-    /* Accumulate compiler flags. */
-    for (; i < argc; i++) {
-        const char *arg = argv[i];
-        size_t new_len = strlen(arg) + strlen(args->cflags) + 2;
-        if (new_len >= CHAZ_PROBE_MAX_CFLAGS_LEN) {
-            fprintf(stderr, "Exceeded max length for compiler flags");
-            exit(1);
-        }
-        strcat(args->cflags, " ");
-        strcat(args->cflags, arg);
+    /* Parse options, exiting on failure. */
+    if (!chaz_CLI_parse(cli, argc, argv)) {
+        fprintf(stderr, "%s", chaz_CLI_help(cli));
+        exit(1);
     }
 
-    /* Process CHARM_VERBOSITY environment variable. */
+    /* Accumulate compiler flags. */
     {
-        const char *verbosity_env = getenv("CHARM_VERBOSITY");
-        if (verbosity_env && strlen(verbosity_env)) {
-            args->verbosity = strtol(verbosity_env, NULL, 10);
+        char *cflags = chaz_Util_strdup("");
+        size_t cflags_len = 0;
+        for (i = 0; i < argc; i++) {
+            if (strcmp(argv[i], "--") == 0) {
+                i++;
+                break;
+            }
         }
+        for (; i < argc; i++) {
+            const char *arg = argv[i];
+            cflags_len += strlen(arg) + 2;
+            cflags = (char*)realloc(cflags, cflags_len);
+            strcat(cflags, " ");
+            strcat(cflags, arg);
+        }
+        chaz_CLI_set(cli, "cflags", cflags);
+        free(cflags);
+    }
+
+    /* Some Perl setups have a 'cc' config value with leading whitespace. */
+    if (chaz_CLI_defined(cli, "cc")) {
+        const char *arg = chaz_CLI_strval(cli, "cc");
+        char  *cc;
+        size_t len = strlen(arg);
+        size_t l   = 0;
+        size_t r   = len;
+        size_t trimmed_len;
+
+        while (isspace(arg[l])) {
+            ++l;
+        }
+        while (r > l && isspace(arg[r-1])) {
+            --r;
+        }
+
+        trimmed_len = r - l;
+        cc = (char*)malloc(trimmed_len + 1);
+        memcpy(cc, arg + l, trimmed_len);
+        cc[trimmed_len] = '\0';
+        chaz_CLI_unset(cli, "cc");
+        chaz_CLI_set(cli, "cc", cc);
+        free(cc);
     }
 
     /* Validate. */
-    if (!strlen(args->cc) || !output_enabled) {
+    if (!chaz_CLI_defined(cli, "cc")
+        || !strlen(chaz_CLI_strval(cli, "cc"))
+       ) {
         return false;
     }
 
@@ -5218,7 +5624,7 @@ chaz_Probe_die_usage(void) {
 }
 
 void
-chaz_Probe_init(struct chaz_CLIArgs *args) {
+chaz_Probe_init(struct chaz_CLI *cli) {
     int output_enabled = 0;
 
     {
@@ -5231,25 +5637,25 @@ chaz_Probe_init(struct chaz_CLIArgs *args) {
 
     /* Dispatch other initializers. */
     chaz_OS_init();
-    chaz_CC_init(args->cc, args->cflags);
+    chaz_CC_init(chaz_CLI_strval(cli, "cc"), chaz_CLI_strval(cli, "cflags"));
     chaz_ConfWriter_init();
     chaz_HeadCheck_init();
     chaz_Make_init();
 
     /* Enable output. */
-    if (args->charmony_h) {
+    if (chaz_CLI_defined(cli, "enable-c")) {
         chaz_ConfWriterC_enable();
         output_enabled = true;
     }
-    if (args->charmony_pm) {
+    if (chaz_CLI_defined(cli, "enable-perl")) {
         chaz_ConfWriterPerl_enable();
         output_enabled = true;
     }
-    if (args->charmony_py) {
+    if (chaz_CLI_defined(cli, "enable-python")) {
         chaz_ConfWriterPython_enable();
         output_enabled = true;
     }
-    if (args->charmony_rb) {
+    if (chaz_CLI_defined(cli, "enable-ruby")) {
         chaz_ConfWriterRuby_enable();
         output_enabled = true;
     }
@@ -7316,7 +7722,7 @@ static const char lucy_version[]        = "0.4.0";
 static const char lucy_major_version[]  = "0.4";
 
 static void
-S_add_compiler_flags(struct chaz_CLIArgs *args) {
+S_add_compiler_flags(struct chaz_CLI *cli) {
     chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
 
     if (chaz_Probe_gcc_version_num()) {
@@ -7327,7 +7733,7 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
         else if (getenv("LUCY_DEBUG")) {
             chaz_CFlags_append(extra_cflags,
                 "-DLUCY_DEBUG -pedantic -Wall -Wextra -Wno-variadic-macros");
-            if (args->charmony_pm) {
+            if (chaz_CLI_defined(cli, "enable-perl")) {
                 chaz_CFlags_append(extra_cflags, "-DPERL_GCC_PEDANTIC");
             }
         }
@@ -7403,8 +7809,7 @@ S_cfh_file_callback(const char *dir, char *file, void *context) {
 }
 
 static void
-S_write_makefile(struct chaz_CLIArgs *chaz_args,
-                 struct lucy_CLIArgs *lucy_args) {
+S_write_makefile(chaz_CLI *cli, struct lucy_CLIArgs *lucy_args) {
     SourceFileContext sfc;
 
     const char *base_dir     = "..";
@@ -7475,7 +7880,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     chaz_CFlags_enable_debugging(makefile_cflags);
     chaz_CFlags_disable_strict_aliasing(makefile_cflags);
     chaz_CFlags_compile_shared_library(makefile_cflags);
-    if (chaz_args->code_coverage) {
+    if (chaz_CLI_defined(cli, "enable-coverage")) {
         chaz_CFlags_enable_code_coverage(makefile_cflags);
     }
 
@@ -7598,7 +8003,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     if (chaz_HeadCheck_check_header("pcre.h")) {
         chaz_CFlags_add_external_library(link_flags, "pcre");
     }
-    if (chaz_args->code_coverage) {
+    if (chaz_CLI_defined(cli, "enable-coverage")) {
         chaz_CFlags_enable_code_coverage(link_flags);
     }
     rule = chaz_MakeFile_add_shared_lib(makefile, shared_lib, "$(LUCY_OBJS)",
@@ -7639,7 +8044,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     }
     chaz_MakeRule_add_command(rule, test_command);
 
-    if (chaz_args->code_coverage) {
+    if (chaz_CLI_defined(cli, "enable-coverage")) {
         rule = chaz_MakeFile_add_rule(makefile, "coverage", test_lucy_exe);
         chaz_MakeRule_add_command(rule,
                                   "lcov"
@@ -7679,7 +8084,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
 
     chaz_MakeRule_add_recursive_rm_command(clean_rule, "autogen");
 
-    if (chaz_args->code_coverage) {
+    if (chaz_CLI_defined(cli, "enable-coverage")) {
         chaz_MakeRule_add_rm_command(clean_rule, "lucy.info");
         chaz_MakeRule_add_recursive_rm_command(clean_rule, "coverage");
     }
@@ -7711,15 +8116,17 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
 
 int main(int argc, const char **argv) {
     /* Initialize. */
-    struct chaz_CLIArgs chaz_args;
+    chaz_CLI *cli
+        = chaz_CLI_new(argv[0], "charmonizer: Probe C build environment");
+    chaz_CLI_set_usage(cli, "Usage: charmonizer [OPTIONS] [-- [CFLAGS]]");
     struct lucy_CLIArgs lucy_args = { NULL };
     {
-        int result = chaz_Probe_parse_cli_args(argc, argv, &chaz_args);
+        int result = chaz_Probe_parse_cli_args(argc, argv, cli);
         if (!result) {
             chaz_Probe_die_usage();
         }
-        chaz_Probe_init(&chaz_args);
-        S_add_compiler_flags(&chaz_args);
+        chaz_Probe_init(cli);
+        S_add_compiler_flags(cli);
     }
     {
         int i;
@@ -7782,11 +8189,12 @@ int main(int argc, const char **argv) {
         "#endif\n\n"
     );
 
-    if (chaz_args.write_makefile) {
-        S_write_makefile(&chaz_args, &lucy_args);
+    if (chaz_CLI_defined(cli, "enable-makefile")) {
+        S_write_makefile(cli, &lucy_args);
     }
 
     /* Clean up. */
+    chaz_CLI_destroy(cli);
     chaz_Probe_clean_up();
 
     return 0;
