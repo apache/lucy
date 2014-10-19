@@ -38,7 +38,7 @@ sub new {
 }
 
 package main;
-use Test::More tests => 9;
+use Test::More tests => 10;
 use Lucy::Test;
 use bytes;
 no bytes;
@@ -78,6 +78,11 @@ for ( 0 .. 255 ) {
 }
 is_deeply( \@transformed, \@floats,
     "using the norm_decoder produces desired results" );
+
+my $small_encoded = $sim->encode_norm(1e-30);
+my $large_encoded = $sim->encode_norm(1e30);
+ok( $small_encoded != $large_encoded,
+    "extremely small and large values are encoded differently" );
 
 my $folder  = Lucy::Store::RAMFolder->new;
 my $indexer = Lucy::Index::Indexer->new(

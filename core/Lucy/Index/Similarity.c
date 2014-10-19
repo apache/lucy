@@ -30,6 +30,12 @@
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 
+// The exponent range [-31;32] is mapped to [0;63]. Values outside
+// of the range are clamped resulting in 6 bits for the exponent.
+// The IEEE bias is 127, so we have to subtract 127 and add 31 to
+// the upper bits.
+#define EXP_OFFSET ((127 - 31) << 2)
+
 Similarity*
 Sim_new() {
     Similarity *self = (Similarity*)VTable_Make_Obj(SIMILARITY);
@@ -158,15 +164,21 @@ Sim_encode_norm(Similarity *self, float f) {
     }
     else {
         const uint32_t bits = *(uint32_t*)&f;
-        uint32_t mantissa   = (bits & 0xffffff) >> 21;
-        uint32_t exponent   = (((bits >> 24) & 0x7f) - 63) + 15;
 
-        if (exponent > 31) {
-            exponent = 31;
-            mantissa = 7;
+        // The normalized value contains two bits of mantissa (excluding
+        // the implicit leading bit) in the least significant bits and the
+        // exponent in the upper bits.
+        norm = (bits >> 21) & 0x3ff;
+
+        if (norm <= EXP_OFFSET) {
+            norm = 0;
         }
-
-        norm = (exponent << 3) | mantissa;
+        else {
+            norm -= EXP_OFFSET;
+            if (norm > 255) {
+                norm = 255;
+            }
+        }
     }
 
     return norm;
