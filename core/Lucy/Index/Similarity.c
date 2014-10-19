@@ -193,9 +193,7 @@ Sim_Decode_Norm_IMP(Similarity *self, uint32_t input) {
         result = 0;
     }
     else {
-        const uint32_t mantissa = byte & 7;
-        const uint32_t exponent = (byte >> 3) & 31;
-        result = ((exponent + (63 - 15)) << 24) | (mantissa << 21);
+        result = (input + EXP_OFFSET) << 21;
     }
 
     return *(float*)&result;
