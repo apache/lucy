@@ -105,7 +105,7 @@ public class Lucy::Index::Similarity nickname Sim inherits Clownfish::Obj {
     Query_Norm(Similarity *self, float sum_of_squared_weights);
 
     /** encode_norm and decode_norm encode and decode between 32-bit IEEE
-     * floating point numbers and a 5-bit exponent, 3-bit mantissa float.  The
+     * floating point numbers and a 6-bit exponent, 3-bit mantissa float.  The
      * range covered by the single-byte encoding is 7x10^9 to 2x10^-9.  The
      * accuracy is about one significant decimal digit.
      */
