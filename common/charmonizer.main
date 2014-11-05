@@ -45,6 +45,92 @@ static const char lucy_version[]        = "0.4.0";
 static const char lucy_major_version[]  = "0.4";
 
 static void
+S_add_compiler_flags(struct chaz_CLI *cli);
+
+static void
+S_write_makefile(chaz_CLI *cli);
+
+static void
+S_c_file_callback(const char *dir, char *file, void *context);
+
+static void
+S_cfh_file_callback(const char *dir, char *file, void *context);
+
+static int
+S_ends_with(const char *string, const char *postfix);
+
+int main(int argc, const char **argv) {
+    /* Initialize. */
+    chaz_CLI *cli
+        = chaz_CLI_new(argv[0], "charmonizer: Probe C build environment");
+    chaz_CLI_register(cli, "clownfish-prefix",
+                      "prefix of Clownfish installation",
+                      CHAZ_CLI_ARG_OPTIONAL);
+    chaz_CLI_set_usage(cli, "Usage: charmonizer [OPTIONS] [-- [CFLAGS]]");
+    if (!chaz_Probe_parse_cli_args(argc, argv, cli)) {
+        chaz_Probe_die_usage();
+    }
+    chaz_Probe_init(cli);
+    S_add_compiler_flags(cli);
+
+    /* Employ integer features but don't define stdint types in charmony.h. */
+    chaz_ConfWriter_append_conf(
+        "#define CHY_EMPLOY_INTEGERLIMITS\n"
+        "#define CHY_EMPLOY_INTEGERLITERALS\n"
+        "#define CHY_EMPLOY_INTEGERFORMATSTRINGS\n\n"
+    );
+
+    /* Run probe modules. Booleans is only needed for the Charmonizer tests. */
+    chaz_BuildEnv_run();
+    chaz_DirManip_run();
+    chaz_Headers_run();
+    chaz_Booleans_run();
+    chaz_Integers_run();
+    chaz_Floats_run();
+    chaz_LargeFiles_run();
+    chaz_Memory_run();
+    chaz_RegularExpressions_run();
+    chaz_VariadicMacros_run();
+
+    /* Write custom postamble. */
+    chaz_ConfWriter_append_conf(
+        "#ifdef CHY_HAS_SYS_TYPES_H\n"
+        "  #include <sys/types.h>\n"
+        "#endif\n\n"
+    );
+    chaz_ConfWriter_append_conf(
+        "#ifdef CHY_HAS_ALLOCA_H\n"
+        "  #include <alloca.h>\n"
+        "#elif defined(CHY_HAS_MALLOC_H)\n"
+        "  #include <malloc.h>\n"
+        "#elif defined(CHY_ALLOCA_IN_STDLIB_H)\n"
+        "  #include <stdlib.h>\n"
+        "#endif\n\n"
+    );
+    chaz_ConfWriter_append_conf(
+        "#ifdef CHY_HAS_WINDOWS_H\n"
+        "  /* Target Windows XP. */\n"
+        "  #ifndef WINVER\n"
+        "    #define WINVER 0x0500\n"
+        "  #endif\n"
+        "  #ifndef _WIN32_WINNT\n"
+        "    #define _WIN32_WINNT 0x0500\n"
+        "  #endif\n"
+        "#endif\n\n"
+    );
+
+    if (chaz_CLI_defined(cli, "enable-makefile")) {
+        S_write_makefile(cli);
+    }
+
+    /* Clean up. */
+    chaz_CLI_destroy(cli);
+    chaz_Probe_clean_up();
+
+    return 0;
+}
+
+static void
 S_add_compiler_flags(struct chaz_CLI *cli) {
     chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
 
@@ -83,52 +169,6 @@ S_add_compiler_flags(struct chaz_CLI *cli) {
     chaz_CFlags_add_define(extra_cflags, "CFP_TESTLUCY", NULL);
 
     chaz_CFlags_hide_symbols(extra_cflags);
-}
-
-static int
-S_ends_with(const char *string, const char *postfix) {
-    size_t len         = strlen(string);
-    size_t postfix_len = strlen(postfix);
-    return len >= postfix_len
-           && memcmp(string + len - postfix_len, postfix, postfix_len) == 0;
-}
-
-static void
-S_c_file_callback(const char *dir, char *file, void *context) {
-    SourceFileContext *sfc = (SourceFileContext*)context;
-    const char *dir_sep = chaz_OS_dir_sep();
-    const char *obj_ext = chaz_CC_obj_ext();
-    size_t file_len = strlen(file);
-    char *obj_file;
-
-    /* Strip extension */
-    if (!S_ends_with(file, ".c")) {
-        chaz_Util_warn("Unexpected C filename: %s", file);
-        return;
-    }
-    file[file_len-2] = '\0';
-
-    if (!S_ends_with(file, "JsonParser")) {
-        obj_file = chaz_Util_join("", dir, dir_sep, file, obj_ext, NULL);
-        chaz_MakeVar_append(sfc->var, obj_file);
-        free(obj_file);
-    }
-}
-
-static void
-S_cfh_file_callback(const char *dir, char *file, void *context) {
-    SourceFileContext *sfc = (SourceFileContext*)context;
-    const char *dir_sep = chaz_OS_dir_sep();
-    char *cfh_file;
-
-    if (!S_ends_with(file, ".cfh")) {
-        chaz_Util_warn("Unexpected Clownfish header filename: %s", file);
-        return;
-    }
-
-    cfh_file = chaz_Util_join(dir_sep, dir, file, NULL);
-    chaz_MakeVar_append(sfc->var, cfh_file);
-    free(cfh_file);
 }
 
 static void
@@ -437,75 +477,50 @@ S_write_makefile(chaz_CLI *cli) {
     free(test_command);
 }
 
-int main(int argc, const char **argv) {
-    /* Initialize. */
-    chaz_CLI *cli
-        = chaz_CLI_new(argv[0], "charmonizer: Probe C build environment");
-    chaz_CLI_register(cli, "clownfish-prefix",
-                      "prefix of Clownfish installation",
-                      CHAZ_CLI_ARG_OPTIONAL);
-    chaz_CLI_set_usage(cli, "Usage: charmonizer [OPTIONS] [-- [CFLAGS]]");
-    if (!chaz_Probe_parse_cli_args(argc, argv, cli)) {
-        chaz_Probe_die_usage();
+static void
+S_c_file_callback(const char *dir, char *file, void *context) {
+    SourceFileContext *sfc = (SourceFileContext*)context;
+    const char *dir_sep = chaz_OS_dir_sep();
+    const char *obj_ext = chaz_CC_obj_ext();
+    size_t file_len = strlen(file);
+    char *obj_file;
+
+    /* Strip extension */
+    if (!S_ends_with(file, ".c")) {
+        chaz_Util_warn("Unexpected C filename: %s", file);
+        return;
     }
-    chaz_Probe_init(cli);
-    S_add_compiler_flags(cli);
+    file[file_len-2] = '\0';
 
-    /* Employ integer features but don't define stdint types in charmony.h. */
-    chaz_ConfWriter_append_conf(
-        "#define CHY_EMPLOY_INTEGERLIMITS\n"
-        "#define CHY_EMPLOY_INTEGERLITERALS\n"
-        "#define CHY_EMPLOY_INTEGERFORMATSTRINGS\n\n"
-    );
+    if (!S_ends_with(file, "JsonParser")) {
+        obj_file = chaz_Util_join("", dir, dir_sep, file, obj_ext, NULL);
+        chaz_MakeVar_append(sfc->var, obj_file);
+        free(obj_file);
+    }
+}
 
-    /* Run probe modules. Booleans is only needed for the Charmonizer tests. */
-    chaz_BuildEnv_run();
-    chaz_DirManip_run();
-    chaz_Headers_run();
-    chaz_Booleans_run();
-    chaz_Integers_run();
-    chaz_Floats_run();
-    chaz_LargeFiles_run();
-    chaz_Memory_run();
-    chaz_RegularExpressions_run();
-    chaz_VariadicMacros_run();
+static void
+S_cfh_file_callback(const char *dir, char *file, void *context) {
+    SourceFileContext *sfc = (SourceFileContext*)context;
+    const char *dir_sep = chaz_OS_dir_sep();
+    char *cfh_file;
 
-    /* Write custom postamble. */
-    chaz_ConfWriter_append_conf(
-        "#ifdef CHY_HAS_SYS_TYPES_H\n"
-        "  #include <sys/types.h>\n"
-        "#endif\n\n"
-    );
-    chaz_ConfWriter_append_conf(
-        "#ifdef CHY_HAS_ALLOCA_H\n"
-        "  #include <alloca.h>\n"
-        "#elif defined(CHY_HAS_MALLOC_H)\n"
-        "  #include <malloc.h>\n"
-        "#elif defined(CHY_ALLOCA_IN_STDLIB_H)\n"
-        "  #include <stdlib.h>\n"
-        "#endif\n\n"
-    );
-    chaz_ConfWriter_append_conf(
-        "#ifdef CHY_HAS_WINDOWS_H\n"
-        "  /* Target Windows XP. */\n"
-        "  #ifndef WINVER\n"
-        "    #define WINVER 0x0500\n"
-        "  #endif\n"
-        "  #ifndef _WIN32_WINNT\n"
-        "    #define _WIN32_WINNT 0x0500\n"
-        "  #endif\n"
-        "#endif\n\n"
-    );
-
-    if (chaz_CLI_defined(cli, "enable-makefile")) {
-        S_write_makefile(cli);
+    if (!S_ends_with(file, ".cfh")) {
+        chaz_Util_warn("Unexpected Clownfish header filename: %s", file);
+        return;
     }
 
-    /* Clean up. */
-    chaz_CLI_destroy(cli);
-    chaz_Probe_clean_up();
+    cfh_file = chaz_Util_join(dir_sep, dir, file, NULL);
+    chaz_MakeVar_append(sfc->var, cfh_file);
+    free(cfh_file);
+}
 
-    return 0;
+static int
+S_ends_with(const char *string, const char *postfix) {
+    size_t len         = strlen(string);
+    size_t postfix_len = strlen(postfix);
+    return len >= postfix_len
+           && memcmp(string + len - postfix_len, postfix, postfix_len) == 0;
 }
 
 
