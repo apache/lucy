@@ -2217,9 +2217,9 @@ S_chaz_CLI_error(chaz_CLI *self, const char *pattern, ...) {
 static void
 S_chaz_CLI_rebuild_help(chaz_CLI *self) {
     int i;
-    size_t amount = 200; // Length of section headers.
+    size_t amount = 200; /* Length of section headers. */
 
-    // Allocate space.
+    /* Allocate space. */
     if (self->usage) {
         amount += strlen(self->usage);
     }
@@ -2243,7 +2243,7 @@ S_chaz_CLI_rebuild_help(chaz_CLI *self) {
     self->help = (char*)malloc(amount);
     self->help[0] = '\0';
 
-    // Accumulate "help" string.
+    /* Accumulate "help" string. */
     if (self->usage) {
         strcat(self->help, self->usage);
     }
@@ -2323,6 +2323,7 @@ chaz_CLI_destroy(chaz_CLI *self) {
     free(self->opts);
     free(self->usage);
     free(self->help);
+    free(self);
 }
 
 void
@@ -2344,14 +2345,14 @@ chaz_CLI_register(chaz_CLI *self, const char *name, const char *help,
     int arg_required = !!(flags & CHAZ_CLI_ARG_REQUIRED);
     int arg_optional = !!(flags & CHAZ_CLI_ARG_OPTIONAL);
 
-    // Validate flags
+    /* Validate flags */
     if (arg_required && arg_optional) {
         S_chaz_CLI_error(self, "Conflicting flags: value both optional "
                          "and required");
         return 0;
     }
 
-    // Insert new option.  Keep options sorted by name.
+    /* Insert new option.  Keep options sorted by name. */
     for (rank = self->num_opts; rank > 0; rank--) {
         int comparison = strcmp(name, self->opts[rank - 1].name);
         if (comparison == 0) {
@@ -2373,7 +2374,7 @@ chaz_CLI_register(chaz_CLI *self, const char *name, const char *help,
     self->opts[rank].defined = 0;
     self->opts[rank].value   = NULL;
 
-    // Update `help` with new option.
+    /* Update `help` with new option. */
     S_chaz_CLI_rebuild_help(self);
 
     return 1;
@@ -2516,6 +2517,7 @@ chaz_CLI_parse(chaz_CLI *self, int argc, const char *argv[]) {
         }
     }
 
+    free(name);
     return 1;
 }
 
@@ -7710,10 +7712,6 @@ chaz_VariadicMacros_run(void) {
 /* #include "Charmonizer/Core/ConfWriterPerl.h" */
 /* #include "Charmonizer/Core/ConfWriterRuby.h" */
 
-struct lucy_CLIArgs {
-    const char *clownfish_prefix;
-};
-
 typedef struct SourceFileContext {
     chaz_MakeVar *var;
 } SourceFileContext;
@@ -7809,7 +7807,7 @@ S_cfh_file_callback(const char *dir, char *file, void *context) {
 }
 
 static void
-S_write_makefile(chaz_CLI *cli, struct lucy_CLIArgs *lucy_args) {
+S_write_makefile(chaz_CLI *cli) {
     SourceFileContext sfc;
 
     const char *base_dir     = "..";
@@ -7817,7 +7815,7 @@ S_write_makefile(chaz_CLI *cli, struct lucy_CLIArgs *lucy_args) {
     const char *exe_ext      = chaz_OS_exe_ext();
     const char *obj_ext      = chaz_CC_obj_ext();
     const char *math_lib     = chaz_Floats_math_library();
-    const char *cfish_prefix = lucy_args->clownfish_prefix;
+    const char *cfish_prefix = chaz_CLI_strval(cli, "clownfish-prefix");
 
     char *core_dir      = chaz_Util_join(dir_sep, base_dir, "core", NULL);
     char *lemon_dir     = chaz_Util_join(dir_sep, base_dir, "lemon", NULL);
@@ -8118,30 +8116,15 @@ int main(int argc, const char **argv) {
     /* Initialize. */
     chaz_CLI *cli
         = chaz_CLI_new(argv[0], "charmonizer: Probe C build environment");
+    chaz_CLI_register(cli, "clownfish-prefix",
+                      "prefix of Clownfish installation",
+                      CHAZ_CLI_ARG_OPTIONAL);
     chaz_CLI_set_usage(cli, "Usage: charmonizer [OPTIONS] [-- [CFLAGS]]");
-    struct lucy_CLIArgs lucy_args = { NULL };
-    {
-        int result = chaz_Probe_parse_cli_args(argc, argv, cli);
-        if (!result) {
-            chaz_Probe_die_usage();
-        }
-        chaz_Probe_init(cli);
-        S_add_compiler_flags(cli);
+    if (!chaz_Probe_parse_cli_args(argc, argv, cli)) {
+        chaz_Probe_die_usage();
     }
-    {
-        int i;
-        for (i = 0; i < argc; i++) {
-            const char *arg = argv[i];
-            if (strncmp(arg, "--disable-threads", 17) == 0) {
-                chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
-                chaz_CFlags_append(extra_cflags, "-DCFISH_NOTHREADS");
-                break;
-            }
-            else if (memcmp(arg, "--clownfish-prefix=", 19) == 0) {
-                lucy_args.clownfish_prefix = arg + 19;
-            }
-        }
-    }
+    chaz_Probe_init(cli);
+    S_add_compiler_flags(cli);
 
     /* Employ integer features but don't define stdint types in charmony.h. */
     chaz_ConfWriter_append_conf(
@@ -8190,7 +8173,7 @@ int main(int argc, const char **argv) {
     );
 
     if (chaz_CLI_defined(cli, "enable-makefile")) {
-        S_write_makefile(cli, &lucy_args);
+        S_write_makefile(cli);
     }
 
     /* Clean up. */
