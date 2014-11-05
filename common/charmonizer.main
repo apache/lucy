@@ -459,12 +459,7 @@ int main(int argc, const char **argv) {
         int i;
         for (i = 0; i < argc; i++) {
             const char *arg = argv[i];
-            if (strncmp(arg, "--disable-threads", 17) == 0) {
-                chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
-                chaz_CFlags_append(extra_cflags, "-DCFISH_NOTHREADS");
-                break;
-            }
-            else if (memcmp(arg, "--clownfish-prefix=", 19) == 0) {
+            if (memcmp(arg, "--clownfish-prefix=", 19) == 0) {
                 lucy_args.clownfish_prefix = arg + 19;
             }
         }

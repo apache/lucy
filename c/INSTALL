@@ -70,8 +70,6 @@ Options include
     --enable-coverage
         Enable code coverage. Create HTML pages with coverage data using
         lcov by running "make coverage".
-    --disable-threads
-        Disable thread support.
     --clownfish-prefix=path
         Specify an alternative location for Clownfish if it isn't installed
         in a system directory.
