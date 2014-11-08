@@ -94,6 +94,9 @@ static void
 lucy_MakeFile_write_c_cfc_rules(lucy_MakeFile *self);
 
 static void
+lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self);
+
+static void
 S_c_file_callback(const char *dir, char *file, void *context);
 
 static void
@@ -323,12 +326,8 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
     SourceFileContext sfc;
 
     const char *dir_sep  = chaz_OS_dir_sep();
-    const char *exe_ext  = chaz_OS_exe_ext();
     const char *obj_ext  = chaz_CC_obj_ext();
     const char *math_lib = chaz_Floats_math_library();
-
-    char *test_lucy_exe = chaz_Util_join("", "t", dir_sep, "test_lucy",
-                                         exe_ext, NULL);
 
     chaz_MakeVar  *var;
     chaz_MakeRule *rule;
@@ -337,9 +336,7 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
     chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
     chaz_CFlags *makefile_cflags;
     chaz_CFlags *link_flags;
-    chaz_CFlags *test_cflags;
 
-    char *test_command;
     char *scratch;
     int   i;
 
@@ -450,18 +447,88 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
     chaz_CFlags_destroy(link_flags);
     chaz_MakeFile_add_static_lib(self->makefile, self->static_lib, "$(LUCY_OBJS)");
 
+    lucy_MakeFile_write_c_test_rules(self);
+
+    clean_rule = chaz_MakeFile_clean_rule(self->makefile);
+
+    if (chaz_Make_shell_type() == CHAZ_OS_CMD_EXE) {
+        /*
+         * The length of the command would exceed the limit of 8191
+         * characters. As a work-around, delete all .obj files in BASE_DIR
+         * using 'del /s /q'.
+         */
+        scratch = chaz_Util_join("", "del /s /q ", self->base_dir, "\\*",
+                                 obj_ext, NULL);
+        chaz_MakeRule_add_command(clean_rule, scratch);
+        free(scratch);
+    }
+    else {
+        chaz_MakeRule_add_rm_command(clean_rule, "$(LUCY_OBJS)");
+    }
+
+    chaz_MakeRule_add_recursive_rm_command(clean_rule, "autogen");
+
+    chaz_MakeFile_write(self->makefile);
+}
+
+static void
+lucy_MakeFile_write_c_cfc_rules(lucy_MakeFile *self) {
+    SourceFileContext sfc;
+    chaz_MakeRule *rule;
+
+    const char *dir_sep      = chaz_OS_dir_sep();
+    const char *cfish_prefix = chaz_CLI_strval(self->cli, "clownfish-prefix");
+
+    char *cfc_command;
+
+    sfc.var = chaz_MakeFile_add_var(self->makefile, "CLOWNFISH_HEADERS", NULL);
+    chaz_Make_list_files(self->core_dir, "cfh", S_cfh_file_callback, &sfc);
+
+    rule = chaz_MakeFile_add_rule(self->makefile, self->autogen_target, NULL);
+    chaz_MakeRule_add_prereq(rule, "$(CLOWNFISH_HEADERS)");
+    if (cfish_prefix == NULL) {
+        cfc_command
+            = chaz_Util_join("", "cfc --source=", self->core_dir,
+                             " --dest=autogen --header=cfc_header", NULL);
+    }
+    else {
+        cfc_command
+            = chaz_Util_join("", cfish_prefix, dir_sep, "bin", dir_sep,
+                             "cfc --source=", self->core_dir, " --include=",
+                             cfish_prefix, dir_sep, "share", dir_sep,
+                             "clownfish", dir_sep, "include",
+                             " --dest=autogen --header=cfc_header", NULL);
+    }
+    chaz_MakeRule_add_command(rule, cfc_command);
+
+    free(cfc_command);
+}
+
+static void
+lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
+    const char *dir_sep  = chaz_OS_dir_sep();
+    const char *exe_ext  = chaz_OS_exe_ext();
+
+    chaz_CFlags   *test_cflags;
+    chaz_MakeRule *rule;
+
+    char *test_lucy_exe;
+    char *test_lucy_c;
+    char *test_command;
+
+    test_lucy_exe = chaz_Util_join("", "t", dir_sep, "test_lucy", exe_ext,
+                                   NULL);
+    test_lucy_c = chaz_Util_join(dir_sep, "t", "test_lucy.c", NULL);
     test_cflags = chaz_CC_new_cflags();
     chaz_CFlags_enable_optimization(test_cflags);
     chaz_CFlags_add_include_dir(test_cflags, self->autogen_inc_dir);
     chaz_CFlags_add_library(test_cflags, self->shared_lib);
     if (self->cfish_lib_dir) {
-        chaz_CFlags_add_library_path(link_flags, self->cfish_lib_dir);
+        chaz_CFlags_add_library_path(test_cflags, self->cfish_lib_dir);
     }
     chaz_CFlags_add_external_library(test_cflags, self->cfish_lib_name);
-    scratch = chaz_Util_join(dir_sep, "t", "test_lucy.c", NULL);
-    rule = chaz_MakeFile_add_compiled_exe(self->makefile, test_lucy_exe, scratch,
-                                          test_cflags);
-    free(scratch);
+    rule = chaz_MakeFile_add_compiled_exe(self->makefile, test_lucy_exe,
+                                          test_lucy_c, test_cflags);
     chaz_MakeRule_add_prereq(rule, self->shared_lib_filename);
     chaz_CFlags_destroy(test_cflags);
 
@@ -502,71 +569,15 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
                                   " --branch-coverage"
                                   " --output-directory coverage"
                                   " lucy.info");
+
+        rule = chaz_MakeFile_clean_rule(self->makefile);
+        chaz_MakeRule_add_rm_command(rule, "lucy.info");
+        chaz_MakeRule_add_recursive_rm_command(rule, "coverage");
     }
-
-    clean_rule = chaz_MakeFile_clean_rule(self->makefile);
-
-    if (chaz_Make_shell_type() == CHAZ_OS_CMD_EXE) {
-        /*
-         * The length of the command would exceed the limit of 8191
-         * characters. As a work-around, delete all .obj files in BASE_DIR
-         * using 'del /s /q'.
-         */
-        scratch = chaz_Util_join("", "del /s /q ", self->base_dir, "\\*",
-                                 obj_ext, NULL);
-        chaz_MakeRule_add_command(clean_rule, scratch);
-        free(scratch);
-    }
-    else {
-        chaz_MakeRule_add_rm_command(clean_rule, "$(LUCY_OBJS)");
-    }
-
-    chaz_MakeRule_add_recursive_rm_command(clean_rule, "autogen");
-
-    if (chaz_CLI_defined(cli, "enable-coverage")) {
-        chaz_MakeRule_add_rm_command(clean_rule, "lucy.info");
-        chaz_MakeRule_add_recursive_rm_command(clean_rule, "coverage");
-    }
-
-    chaz_MakeFile_distclean_rule(self->makefile);
-
-    chaz_MakeFile_write(self->makefile);
 
     free(test_lucy_exe);
+    free(test_lucy_c);
     free(test_command);
-}
-
-static void
-lucy_MakeFile_write_c_cfc_rules(lucy_MakeFile *self) {
-    SourceFileContext sfc;
-    chaz_MakeRule *rule;
-
-    const char *dir_sep      = chaz_OS_dir_sep();
-    const char *cfish_prefix = chaz_CLI_strval(self->cli, "clownfish-prefix");
-
-    char *cfc_command;
-
-    sfc.var = chaz_MakeFile_add_var(self->makefile, "CLOWNFISH_HEADERS", NULL);
-    chaz_Make_list_files(self->core_dir, "cfh", S_cfh_file_callback, &sfc);
-
-    rule = chaz_MakeFile_add_rule(self->makefile, self->autogen_target, NULL);
-    chaz_MakeRule_add_prereq(rule, "$(CLOWNFISH_HEADERS)");
-    if (cfish_prefix == NULL) {
-        cfc_command
-            = chaz_Util_join("", "cfc --source=", self->core_dir,
-                             " --dest=autogen --header=cfc_header", NULL);
-    }
-    else {
-        cfc_command
-            = chaz_Util_join("", cfish_prefix, dir_sep, "bin", dir_sep,
-                             "cfc --source=", self->core_dir, " --include=",
-                             cfish_prefix, dir_sep, "share", dir_sep,
-                             "clownfish", dir_sep, "include",
-                             " --dest=autogen --header=cfc_header", NULL);
-    }
-    chaz_MakeRule_add_command(rule, cfc_command);
-
-    free(cfc_command);
 }
 
 static void
