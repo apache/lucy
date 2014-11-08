@@ -168,6 +168,11 @@ int main(int argc, const char **argv) {
     if (chaz_CLI_defined(cli, "enable-makefile")) {
         lucy_MakeFile *mf = lucy_MakeFile_new(cli);
         lucy_MakeFile_write(mf);
+        /* Export filenames. */
+        chaz_ConfWriter_add_def("SHARED_LIB_FILENAME",
+                                mf->shared_lib_filename);
+        chaz_ConfWriter_add_def("STATIC_LIB_FILENAME",
+                                mf->static_lib_filename);
         lucy_MakeFile_destroy(mf);
     }
 
@@ -221,12 +226,6 @@ S_add_compiler_flags(struct chaz_CLI *cli) {
 
 static lucy_MakeFile*
 lucy_MakeFile_new(chaz_CLI *cli) {
-    static const char *c_autogen_src_files[] = {
-        "lucy_parcel",
-        "testlucy_parcel",
-        NULL
-    };
-
     const char *dir_sep      = chaz_OS_dir_sep();
     const char *cfish_prefix = chaz_CLI_strval(cli, "clownfish-prefix");
 
@@ -238,7 +237,12 @@ lucy_MakeFile_new(chaz_CLI *cli) {
     /* Initialize directories. */
     self->base_dir = "..";
     self->core_dir = chaz_Util_join(dir_sep, self->base_dir, "core", NULL);
-    self->host_src_dir = "src";
+    if (chaz_CLI_defined(cli, "enable-perl")) {
+        self->host_src_dir = "xs";
+    }
+    else {
+        self->host_src_dir = "src";
+    }
     self->autogen_src_dir = chaz_Util_join(dir_sep, "autogen", "source", NULL);
     self->autogen_inc_dir
         = chaz_Util_join(dir_sep, "autogen", "include", NULL);
@@ -260,7 +264,24 @@ lucy_MakeFile_new(chaz_CLI *cli) {
                          NULL);
 
     /* Initialize file names. */
-    self->autogen_src_files = c_autogen_src_files;
+    if (chaz_CLI_defined(cli, "enable-perl")) {
+        static const char *perl_autogen_src_files[] = {
+            "boot",
+            "callbacks",
+            "lucy_parcel",
+            "testlucy_parcel",
+            NULL
+        };
+        self->autogen_src_files = perl_autogen_src_files;
+    }
+    else {
+        static const char *c_autogen_src_files[] = {
+            "lucy_parcel",
+            "testlucy_parcel",
+            NULL
+        };
+        self->autogen_src_files = c_autogen_src_files;
+    }
     self->autogen_target
         = chaz_Util_join(dir_sep, "autogen", "hierarchy.json", NULL);
     self->json_parser
@@ -406,7 +427,9 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
     chaz_MakeFile_add_lemon_exe(self->makefile, self->lemon_dir);
     chaz_MakeFile_add_lemon_grammar(self->makefile, self->json_parser);
 
-    lucy_MakeFile_write_c_cfc_rules(self);
+    if (!chaz_CLI_defined(self->cli, "enable-perl")) {
+        lucy_MakeFile_write_c_cfc_rules(self);
+    }
 
     /* Needed for parallel builds. */
     for (i = 0; self->autogen_src_files[i] != NULL; ++i) {
@@ -447,7 +470,9 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
     chaz_CFlags_destroy(link_flags);
     chaz_MakeFile_add_static_lib(self->makefile, self->static_lib, "$(LUCY_OBJS)");
 
-    lucy_MakeFile_write_c_test_rules(self);
+    if (!chaz_CLI_defined(self->cli, "enable-perl")) {
+        lucy_MakeFile_write_c_test_rules(self);
+    }
 
     clean_rule = chaz_MakeFile_clean_rule(self->makefile);
 
