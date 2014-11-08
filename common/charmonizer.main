@@ -37,6 +37,40 @@
 #include "Charmonizer/Core/ConfWriterPerl.h"
 #include "Charmonizer/Core/ConfWriterRuby.h"
 
+typedef struct lucy_MakeFile {
+    chaz_MakeFile *makefile;
+    chaz_CLI      *cli;
+
+    /* Directories. */
+    const char *base_dir;
+    char       *core_dir;
+    const char *host_src_dir;
+    char       *autogen_src_dir;
+    char       *autogen_inc_dir;
+    char       *lemon_dir;
+    char       *modules_dir;
+    char       *snowstem_dir;
+    char       *snowstem_inc_dir;
+    char       *snowstop_dir;
+    char       *ucd_dir;
+    char       *utf8proc_dir;
+
+    /* Files. */
+    char        *autogen_target;
+    const char **autogen_src_files;
+    char        *json_parser;
+
+    /* Clownfish library. */
+    char       *cfish_lib_dir;
+    const char *cfish_lib_name;
+
+    /* Lucy libraries. */
+    chaz_Lib *shared_lib;
+    chaz_Lib *static_lib;
+    char     *shared_lib_filename;
+    char     *static_lib_filename;
+} lucy_MakeFile;
+
 typedef struct SourceFileContext {
     chaz_MakeVar *var;
 } SourceFileContext;
@@ -47,8 +81,14 @@ static const char lucy_major_version[]  = "0.4";
 static void
 S_add_compiler_flags(struct chaz_CLI *cli);
 
+static lucy_MakeFile*
+lucy_MakeFile_new(chaz_CLI *cli);
+
 static void
-S_write_makefile(chaz_CLI *cli);
+lucy_MakeFile_destroy(lucy_MakeFile *self);
+
+static void
+lucy_MakeFile_write(lucy_MakeFile *self);
 
 static void
 S_c_file_callback(const char *dir, char *file, void *context);
@@ -120,7 +160,9 @@ int main(int argc, const char **argv) {
     );
 
     if (chaz_CLI_defined(cli, "enable-makefile")) {
-        S_write_makefile(cli);
+        lucy_MakeFile *mf = lucy_MakeFile_new(cli);
+        lucy_MakeFile_write(mf);
+        lucy_MakeFile_destroy(mf);
     }
 
     /* Clean up. */
@@ -171,41 +213,121 @@ S_add_compiler_flags(struct chaz_CLI *cli) {
     chaz_CFlags_hide_symbols(extra_cflags);
 }
 
-static void
-S_write_makefile(chaz_CLI *cli) {
-    SourceFileContext sfc;
+static lucy_MakeFile*
+lucy_MakeFile_new(chaz_CLI *cli) {
+    static const char *c_autogen_src_files[] = {
+        "lucy_parcel",
+        "testlucy_parcel",
+        NULL
+    };
 
-    const char *base_dir     = "..";
     const char *dir_sep      = chaz_OS_dir_sep();
-    const char *exe_ext      = chaz_OS_exe_ext();
-    const char *obj_ext      = chaz_CC_obj_ext();
-    const char *math_lib     = chaz_Floats_math_library();
     const char *cfish_prefix = chaz_CLI_strval(cli, "clownfish-prefix");
 
-    char *core_dir      = chaz_Util_join(dir_sep, base_dir, "core", NULL);
-    char *lemon_dir     = chaz_Util_join(dir_sep, base_dir, "lemon", NULL);
-    char *modules_dir   = chaz_Util_join(dir_sep, base_dir, "modules", NULL);
-    char *snowstem_dir  = chaz_Util_join(dir_sep, modules_dir, "analysis",
-                                         "snowstem", "source", NULL);
-    char *snowstop_dir  = chaz_Util_join(dir_sep, modules_dir, "analysis",
-                                         "snowstop", "source", NULL);
-    char *ucd_dir       = chaz_Util_join(dir_sep, modules_dir, "unicode",
-                                         "ucd", NULL);
-    char *utf8proc_dir  = chaz_Util_join(dir_sep, modules_dir, "unicode",
-                                         "utf8proc", NULL);
-    char *json_parser   = chaz_Util_join(dir_sep, core_dir, "Lucy", "Util",
-                                         "Json", "JsonParser", NULL);
+    lucy_MakeFile *self = malloc(sizeof(lucy_MakeFile));
+
+    self->makefile = chaz_MakeFile_new();
+    self->cli      = cli;
+
+    /* Initialize directories. */
+    self->base_dir = "..";
+    self->core_dir = chaz_Util_join(dir_sep, self->base_dir, "core", NULL);
+    self->host_src_dir = "src";
+    self->autogen_src_dir = chaz_Util_join(dir_sep, "autogen", "source", NULL);
+    self->autogen_inc_dir
+        = chaz_Util_join(dir_sep, "autogen", "include", NULL);
+    self->lemon_dir = chaz_Util_join(dir_sep, self->base_dir, "lemon", NULL);
+    self->modules_dir
+        = chaz_Util_join(dir_sep, self->base_dir, "modules", NULL);
+    self->snowstem_dir
+        = chaz_Util_join(dir_sep, self->modules_dir, "analysis", "snowstem",
+                         "source", NULL);
+    self->snowstem_inc_dir
+        = chaz_Util_join(dir_sep, self->snowstem_dir, "include", NULL);
+    self->snowstop_dir
+        = chaz_Util_join(dir_sep, self->modules_dir, "analysis", "snowstop",
+                         "source", NULL);
+    self->ucd_dir
+        = chaz_Util_join(dir_sep, self->modules_dir, "unicode", "ucd", NULL);
+    self->utf8proc_dir
+        = chaz_Util_join(dir_sep, self->modules_dir, "unicode", "utf8proc",
+                         NULL);
+
+    /* Initialize file names. */
+    self->autogen_src_files = c_autogen_src_files;
+    self->autogen_target
+        = chaz_Util_join(dir_sep, "autogen", "hierarchy.json", NULL);
+    self->json_parser
+        = chaz_Util_join(dir_sep, self->core_dir, "Lucy", "Util", "Json",
+                         "JsonParser", NULL);
+
+    /* Clownfish library. */
+    if (cfish_prefix) {
+        self->cfish_lib_dir
+            = chaz_Util_join(dir_sep, cfish_prefix, "lib", NULL);
+    }
+    else {
+        self->cfish_lib_dir = NULL;
+    }
+    if (strcmp(chaz_OS_shared_lib_ext(), ".dll") == 0) {
+        self->cfish_lib_name = "cfish-0.4";
+    }
+    else {
+        self->cfish_lib_name = "cfish";
+    }
+
+    /* Lucy libraries. */
+    self->shared_lib = chaz_Lib_new("lucy", chaz_Lib_SHARED, lucy_version,
+                                    lucy_major_version);
+    self->static_lib = chaz_Lib_new("lucy", chaz_Lib_STATIC, lucy_version,
+                                    lucy_major_version);
+    self->shared_lib_filename = chaz_Lib_filename(self->shared_lib);
+    self->static_lib_filename = chaz_Lib_filename(self->static_lib);
+
+    return self;
+}
+
+static void
+lucy_MakeFile_destroy(lucy_MakeFile *self) {
+    chaz_MakeFile_destroy(self->makefile);
+
+    free(self->core_dir);
+    free(self->autogen_inc_dir);
+    free(self->autogen_src_dir);
+    free(self->lemon_dir);
+    free(self->modules_dir);
+    free(self->snowstem_dir);
+    free(self->snowstem_inc_dir);
+    free(self->snowstop_dir);
+    free(self->ucd_dir);
+    free(self->utf8proc_dir);
+
+    free(self->autogen_target);
+    free(self->json_parser);
+
+    free(self->cfish_lib_dir);
+
+    chaz_Lib_destroy(self->shared_lib);
+    chaz_Lib_destroy(self->static_lib);
+    free(self->shared_lib_filename);
+    free(self->static_lib_filename);
+
+    free(self);
+}
+
+static void
+lucy_MakeFile_write(lucy_MakeFile *self) {
+    SourceFileContext sfc;
+
+    const char *dir_sep  = chaz_OS_dir_sep();
+    const char *exe_ext  = chaz_OS_exe_ext();
+    const char *obj_ext  = chaz_CC_obj_ext();
+    const char *math_lib = chaz_Floats_math_library();
+    const char *cfish_prefix = chaz_CLI_strval(self->cli, "clownfish-prefix");
+
     char *test_lucy_exe = chaz_Util_join("", "t", dir_sep, "test_lucy",
                                          exe_ext, NULL);
 
-    char *autogen_inc_dir
-        = chaz_Util_join(dir_sep, "autogen", "include", NULL);
-    char *autogen_target
-        = chaz_Util_join(dir_sep, "autogen", "hierarchy.json", NULL);
-    char *snowstem_inc_dir
-        = chaz_Util_join(dir_sep, snowstem_dir, "include", NULL);
-
-    chaz_MakeFile *makefile;
     chaz_MakeVar  *var;
     chaz_MakeRule *rule;
     chaz_MakeRule *clean_rule;
@@ -215,27 +337,19 @@ S_write_makefile(chaz_CLI *cli) {
     chaz_CFlags *link_flags;
     chaz_CFlags *test_cflags;
 
-    chaz_Lib *shared_lib;
-    chaz_Lib *static_lib;
-
-    const char *cfish_lib_name = NULL;
-    char       *cfish_lib_dir  = NULL;
-    char       *test_command   = NULL;
-    char       *scratch        = NULL;
-    char       *shared_lib_filename = NULL;
-    char       *static_lib_filename = NULL;
+    char *test_command;
+    char *scratch;
+    int   i;
 
     printf("Creating Makefile...\n");
 
-    makefile = chaz_MakeFile_new();
-
     /* Directories */
 
-    chaz_MakeFile_add_var(makefile, "BASE_DIR", base_dir);
+    chaz_MakeFile_add_var(self->makefile, "BASE_DIR", self->base_dir);
 
     /* C compiler */
 
-    chaz_MakeFile_add_var(makefile, "CC", chaz_CC_get_cc());
+    chaz_MakeFile_add_var(self->makefile, "CC", chaz_CC_get_cc());
 
     makefile_cflags = chaz_CC_new_cflags();
 
@@ -243,18 +357,18 @@ S_write_makefile(chaz_CLI *cli) {
     chaz_CFlags_enable_debugging(makefile_cflags);
     chaz_CFlags_disable_strict_aliasing(makefile_cflags);
     chaz_CFlags_compile_shared_library(makefile_cflags);
-    if (chaz_CLI_defined(cli, "enable-coverage")) {
+    if (chaz_CLI_defined(self->cli, "enable-coverage")) {
         chaz_CFlags_enable_code_coverage(makefile_cflags);
     }
 
     chaz_CFlags_add_include_dir(makefile_cflags, ".");
-    chaz_CFlags_add_include_dir(makefile_cflags, core_dir);
-    chaz_CFlags_add_include_dir(makefile_cflags, autogen_inc_dir);
-    chaz_CFlags_add_include_dir(makefile_cflags, snowstem_inc_dir);
-    chaz_CFlags_add_include_dir(makefile_cflags, ucd_dir);
-    chaz_CFlags_add_include_dir(makefile_cflags, utf8proc_dir);
+    chaz_CFlags_add_include_dir(makefile_cflags, self->core_dir);
+    chaz_CFlags_add_include_dir(makefile_cflags, self->autogen_inc_dir);
+    chaz_CFlags_add_include_dir(makefile_cflags, self->snowstem_inc_dir);
+    chaz_CFlags_add_include_dir(makefile_cflags, self->ucd_dir);
+    chaz_CFlags_add_include_dir(makefile_cflags, self->utf8proc_dir);
 
-    var = chaz_MakeFile_add_var(makefile, "CFLAGS", NULL);
+    var = chaz_MakeFile_add_var(self->makefile, "CFLAGS", NULL);
     chaz_MakeVar_append(var, chaz_CFlags_get_string(extra_cflags));
     chaz_MakeVar_append(var, chaz_CFlags_get_string(makefile_cflags));
     chaz_MakeVar_append(var, chaz_CC_get_cflags());
@@ -263,60 +377,52 @@ S_write_makefile(chaz_CLI *cli) {
 
     /* Object files */
 
-    var = chaz_MakeFile_add_var(makefile, "LUCY_OBJS", NULL);
+    var = chaz_MakeFile_add_var(self->makefile, "LUCY_OBJS", NULL);
     sfc.var = var;
 
-    chaz_Make_list_files("src",        "c", S_c_file_callback, &sfc);
-    chaz_Make_list_files(core_dir,     "c", S_c_file_callback, &sfc);
-    chaz_Make_list_files(snowstem_dir, "c", S_c_file_callback, &sfc);
-    chaz_Make_list_files(snowstop_dir, "c", S_c_file_callback, &sfc);
-    chaz_Make_list_files(utf8proc_dir, "c", S_c_file_callback, &sfc);
+    chaz_Make_list_files(self->host_src_dir, "c", S_c_file_callback, &sfc);
+    chaz_Make_list_files(self->core_dir,     "c", S_c_file_callback, &sfc);
+    chaz_Make_list_files(self->snowstem_dir, "c", S_c_file_callback, &sfc);
+    chaz_Make_list_files(self->snowstop_dir, "c", S_c_file_callback, &sfc);
+    chaz_Make_list_files(self->utf8proc_dir, "c", S_c_file_callback, &sfc);
 
-    scratch = chaz_Util_join("", json_parser, obj_ext, NULL);
+    scratch = chaz_Util_join("", self->json_parser, obj_ext, NULL);
     chaz_MakeVar_append(var, scratch);
     free(scratch);
 
-    scratch = chaz_Util_join("", "autogen", dir_sep, "source", dir_sep,
-                             "lucy_parcel", obj_ext, NULL);
-    chaz_MakeVar_append(var, scratch);
-    free(scratch);
-    scratch = chaz_Util_join("", "autogen", dir_sep, "source", dir_sep,
-                             "testlucy_parcel", obj_ext, NULL);
-    chaz_MakeVar_append(var, scratch);
-    free(scratch);
+    for (i = 0; self->autogen_src_files[i] != NULL; ++i) {
+        char *path = chaz_Util_join("", self->autogen_src_dir, dir_sep,
+                                    self->autogen_src_files[i], obj_ext, NULL);
+        chaz_MakeVar_append(var, path);
+        free(path);
+    }
 
     /* Clownfish header files */
 
-    var = chaz_MakeFile_add_var(makefile, "CLOWNFISH_HEADERS", NULL);
+    var = chaz_MakeFile_add_var(self->makefile, "CLOWNFISH_HEADERS", NULL);
     sfc.var = var;
 
-    chaz_Make_list_files(core_dir, "cfh", S_cfh_file_callback, &sfc);
+    chaz_Make_list_files(self->core_dir, "cfh", S_cfh_file_callback, &sfc);
 
     /* Rules */
 
-    shared_lib = chaz_Lib_new("lucy", chaz_Lib_SHARED, lucy_version,
-                              lucy_major_version);
-    shared_lib_filename = chaz_Lib_filename(shared_lib);
-    static_lib = chaz_Lib_new("lucy", chaz_Lib_STATIC, lucy_version,
-                              lucy_major_version);
-    static_lib_filename = chaz_Lib_filename(static_lib);
-    scratch = chaz_Util_join(" ", shared_lib_filename, static_lib_filename,
-                             NULL);
-    chaz_MakeFile_add_rule(makefile, "all", scratch);
+    scratch = chaz_Util_join(" ", self->shared_lib_filename,
+                             self->static_lib_filename, NULL);
+    chaz_MakeFile_add_rule(self->makefile, "all", scratch);
     free(scratch);
 
-    chaz_MakeFile_add_lemon_exe(makefile, lemon_dir);
-    chaz_MakeFile_add_lemon_grammar(makefile, json_parser);
+    chaz_MakeFile_add_lemon_exe(self->makefile, self->lemon_dir);
+    chaz_MakeFile_add_lemon_grammar(self->makefile, self->json_parser);
 
-    rule = chaz_MakeFile_add_rule(makefile, autogen_target, NULL);
+    rule = chaz_MakeFile_add_rule(self->makefile, self->autogen_target, NULL);
     chaz_MakeRule_add_prereq(rule, "$(CLOWNFISH_HEADERS)");
     if (cfish_prefix == NULL) {
-        scratch = chaz_Util_join("", "cfc --source=", core_dir,
+        scratch = chaz_Util_join("", "cfc --source=", self->core_dir,
                                  " --dest=autogen --header=cfc_header", NULL);
     }
     else {
         scratch = chaz_Util_join("", cfish_prefix, dir_sep, "bin", dir_sep,
-                                 "cfc --source=", core_dir, " --include=",
+                                 "cfc --source=", self->core_dir, " --include=",
                                  cfish_prefix, dir_sep, "share", dir_sep,
                                  "clownfish", dir_sep, "include",
                                  " --dest=autogen --header=cfc_header", NULL);
@@ -325,75 +431,64 @@ S_write_makefile(chaz_CLI *cli) {
     free(scratch);
 
     /* Needed for parallel builds. */
-    scratch = chaz_Util_join(dir_sep, "autogen", "source", "lucy_parcel.c",
-                             NULL);
-    rule = chaz_MakeFile_add_rule(makefile, scratch, autogen_target);
-    free(scratch);
-    scratch = chaz_Util_join(dir_sep, "autogen", "source", "testlucy_parcel.c",
-                             NULL);
-    rule = chaz_MakeFile_add_rule(makefile, scratch, autogen_target);
-    free(scratch);
+    for (i = 0; self->autogen_src_files[i] != NULL; ++i) {
+        char *path = chaz_Util_join("", self->autogen_src_dir, dir_sep,
+                                    self->autogen_src_files[i], ".c", NULL);
+        rule = chaz_MakeFile_add_rule(self->makefile, path,
+                                      self->autogen_target);
+        free(path);
+    }
 
-    rule = chaz_MakeFile_add_rule(makefile, "$(LUCY_OBJS)", autogen_target);
+    rule = chaz_MakeFile_add_rule(self->makefile, "$(LUCY_OBJS)",
+                                  self->autogen_target);
     /*
      * The dependency is actually on JsonParser.h, but make doesn't cope
      * well with multiple output files.
      */
-    scratch = chaz_Util_join(".", json_parser, "c", NULL);
+    scratch = chaz_Util_join(".", self->json_parser, "c", NULL);
     chaz_MakeRule_add_prereq(rule, scratch);
     free(scratch);
 
-    if (cfish_prefix) {
-        cfish_lib_dir = chaz_Util_join(dir_sep, cfish_prefix, "lib", NULL);
-    }
-
-    if (strcmp(chaz_OS_shared_lib_ext(), ".dll") == 0) {
-        cfish_lib_name = "cfish-0.4";
-    }
-    else {
-        cfish_lib_name = "cfish";
-    }
-
     link_flags = chaz_CC_new_cflags();
     chaz_CFlags_enable_debugging(link_flags);
-    if (cfish_lib_dir) {
-        chaz_CFlags_add_library_path(link_flags, cfish_lib_dir);
+    if (self->cfish_lib_dir) {
+        chaz_CFlags_add_library_path(link_flags, self->cfish_lib_dir);
     }
     if (math_lib) {
         chaz_CFlags_add_external_library(link_flags, math_lib);
     }
-    chaz_CFlags_add_external_library(link_flags, cfish_lib_name);
+    chaz_CFlags_add_external_library(link_flags, self->cfish_lib_name);
     if (chaz_HeadCheck_check_header("pcre.h")) {
         chaz_CFlags_add_external_library(link_flags, "pcre");
     }
-    if (chaz_CLI_defined(cli, "enable-coverage")) {
+    if (chaz_CLI_defined(self->cli, "enable-coverage")) {
         chaz_CFlags_enable_code_coverage(link_flags);
     }
-    rule = chaz_MakeFile_add_shared_lib(makefile, shared_lib, "$(LUCY_OBJS)",
-                                        link_flags);
+    rule = chaz_MakeFile_add_shared_lib(self->makefile, self->shared_lib,
+                                        "$(LUCY_OBJS)", link_flags);
     chaz_CFlags_destroy(link_flags);
-    chaz_MakeFile_add_static_lib(makefile, static_lib, "$(LUCY_OBJS)");
+    chaz_MakeFile_add_static_lib(self->makefile, self->static_lib, "$(LUCY_OBJS)");
 
     test_cflags = chaz_CC_new_cflags();
     chaz_CFlags_enable_optimization(test_cflags);
-    chaz_CFlags_add_include_dir(test_cflags, autogen_inc_dir);
-    chaz_CFlags_add_library(test_cflags, shared_lib);
-    if (cfish_lib_dir) {
-        chaz_CFlags_add_library_path(link_flags, cfish_lib_dir);
+    chaz_CFlags_add_include_dir(test_cflags, self->autogen_inc_dir);
+    chaz_CFlags_add_library(test_cflags, self->shared_lib);
+    if (self->cfish_lib_dir) {
+        chaz_CFlags_add_library_path(link_flags, self->cfish_lib_dir);
     }
-    chaz_CFlags_add_external_library(test_cflags, cfish_lib_name);
+    chaz_CFlags_add_external_library(test_cflags, self->cfish_lib_name);
     scratch = chaz_Util_join(dir_sep, "t", "test_lucy.c", NULL);
-    rule = chaz_MakeFile_add_compiled_exe(makefile, test_lucy_exe, scratch,
+    rule = chaz_MakeFile_add_compiled_exe(self->makefile, test_lucy_exe, scratch,
                                           test_cflags);
     free(scratch);
-    chaz_MakeRule_add_prereq(rule, shared_lib_filename);
+    chaz_MakeRule_add_prereq(rule, self->shared_lib_filename);
     chaz_CFlags_destroy(test_cflags);
 
-    rule = chaz_MakeFile_add_rule(makefile, "test", test_lucy_exe);
+    rule = chaz_MakeFile_add_rule(self->makefile, "test", test_lucy_exe);
     if (strcmp(chaz_OS_shared_lib_ext(), ".so") == 0) {
-        if (cfish_lib_dir) {
+        if (self->cfish_lib_dir) {
             test_command
-                = chaz_Util_join("", "LD_LIBRARY_PATH=.:", cfish_lib_dir,
+                = chaz_Util_join("", "LD_LIBRARY_PATH=.:", self->cfish_lib_dir,
                                  ":$$LD_LIBRARY_PATH ", test_lucy_exe, NULL);
         }
         else {
@@ -407,8 +502,8 @@ S_write_makefile(chaz_CLI *cli) {
     }
     chaz_MakeRule_add_command(rule, test_command);
 
-    if (chaz_CLI_defined(cli, "enable-coverage")) {
-        rule = chaz_MakeFile_add_rule(makefile, "coverage", test_lucy_exe);
+    if (chaz_CLI_defined(self->cli, "enable-coverage")) {
+        rule = chaz_MakeFile_add_rule(self->makefile, "coverage", test_lucy_exe);
         chaz_MakeRule_add_command(rule,
                                   "lcov"
                                   " --zerocounters"
@@ -428,7 +523,7 @@ S_write_makefile(chaz_CLI *cli) {
                                   " lucy.info");
     }
 
-    clean_rule = chaz_MakeFile_clean_rule(makefile);
+    clean_rule = chaz_MakeFile_clean_rule(self->makefile);
 
     if (chaz_Make_shell_type() == CHAZ_OS_CMD_EXE) {
         /*
@@ -436,8 +531,8 @@ S_write_makefile(chaz_CLI *cli) {
          * characters. As a work-around, delete all .obj files in BASE_DIR
          * using 'del /s /q'.
          */
-        scratch = chaz_Util_join("", "del /s /q ", base_dir, "\\*", obj_ext,
-                                 NULL);
+        scratch = chaz_Util_join("", "del /s /q ", self->base_dir, "\\*",
+                                 obj_ext, NULL);
         chaz_MakeRule_add_command(clean_rule, scratch);
         free(scratch);
     }
@@ -452,28 +547,11 @@ S_write_makefile(chaz_CLI *cli) {
         chaz_MakeRule_add_recursive_rm_command(clean_rule, "coverage");
     }
 
-    chaz_MakeFile_distclean_rule(makefile);
+    chaz_MakeFile_distclean_rule(self->makefile);
 
-    chaz_MakeFile_write(makefile);
+    chaz_MakeFile_write(self->makefile);
 
-    chaz_MakeFile_destroy(makefile);
-    chaz_Lib_destroy(shared_lib);
-    chaz_Lib_destroy(static_lib);
-    free(core_dir);
-    free(lemon_dir);
-    free(modules_dir);
-    free(snowstem_dir);
-    free(snowstop_dir);
-    free(ucd_dir);
-    free(utf8proc_dir);
-    free(json_parser);
     free(test_lucy_exe);
-    free(autogen_inc_dir);
-    free(autogen_target);
-    free(snowstem_inc_dir);
-    free(cfish_lib_dir);
-    free(shared_lib_filename);
-    free(static_lib_filename);
     free(test_command);
 }
 
