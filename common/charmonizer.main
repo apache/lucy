@@ -91,6 +91,9 @@ static void
 lucy_MakeFile_write(lucy_MakeFile *self);
 
 static void
+lucy_MakeFile_write_c_cfc_rules(lucy_MakeFile *self);
+
+static void
 S_c_file_callback(const char *dir, char *file, void *context);
 
 static void
@@ -323,7 +326,6 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
     const char *exe_ext  = chaz_OS_exe_ext();
     const char *obj_ext  = chaz_CC_obj_ext();
     const char *math_lib = chaz_Floats_math_library();
-    const char *cfish_prefix = chaz_CLI_strval(self->cli, "clownfish-prefix");
 
     char *test_lucy_exe = chaz_Util_join("", "t", dir_sep, "test_lucy",
                                          exe_ext, NULL);
@@ -397,13 +399,6 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
         free(path);
     }
 
-    /* Clownfish header files */
-
-    var = chaz_MakeFile_add_var(self->makefile, "CLOWNFISH_HEADERS", NULL);
-    sfc.var = var;
-
-    chaz_Make_list_files(self->core_dir, "cfh", S_cfh_file_callback, &sfc);
-
     /* Rules */
 
     scratch = chaz_Util_join(" ", self->shared_lib_filename,
@@ -414,21 +409,7 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
     chaz_MakeFile_add_lemon_exe(self->makefile, self->lemon_dir);
     chaz_MakeFile_add_lemon_grammar(self->makefile, self->json_parser);
 
-    rule = chaz_MakeFile_add_rule(self->makefile, self->autogen_target, NULL);
-    chaz_MakeRule_add_prereq(rule, "$(CLOWNFISH_HEADERS)");
-    if (cfish_prefix == NULL) {
-        scratch = chaz_Util_join("", "cfc --source=", self->core_dir,
-                                 " --dest=autogen --header=cfc_header", NULL);
-    }
-    else {
-        scratch = chaz_Util_join("", cfish_prefix, dir_sep, "bin", dir_sep,
-                                 "cfc --source=", self->core_dir, " --include=",
-                                 cfish_prefix, dir_sep, "share", dir_sep,
-                                 "clownfish", dir_sep, "include",
-                                 " --dest=autogen --header=cfc_header", NULL);
-    }
-    chaz_MakeRule_add_command(rule, scratch);
-    free(scratch);
+    lucy_MakeFile_write_c_cfc_rules(self);
 
     /* Needed for parallel builds. */
     for (i = 0; self->autogen_src_files[i] != NULL; ++i) {
@@ -553,6 +534,39 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
 
     free(test_lucy_exe);
     free(test_command);
+}
+
+static void
+lucy_MakeFile_write_c_cfc_rules(lucy_MakeFile *self) {
+    SourceFileContext sfc;
+    chaz_MakeRule *rule;
+
+    const char *dir_sep      = chaz_OS_dir_sep();
+    const char *cfish_prefix = chaz_CLI_strval(self->cli, "clownfish-prefix");
+
+    char *cfc_command;
+
+    sfc.var = chaz_MakeFile_add_var(self->makefile, "CLOWNFISH_HEADERS", NULL);
+    chaz_Make_list_files(self->core_dir, "cfh", S_cfh_file_callback, &sfc);
+
+    rule = chaz_MakeFile_add_rule(self->makefile, self->autogen_target, NULL);
+    chaz_MakeRule_add_prereq(rule, "$(CLOWNFISH_HEADERS)");
+    if (cfish_prefix == NULL) {
+        cfc_command
+            = chaz_Util_join("", "cfc --source=", self->core_dir,
+                             " --dest=autogen --header=cfc_header", NULL);
+    }
+    else {
+        cfc_command
+            = chaz_Util_join("", cfish_prefix, dir_sep, "bin", dir_sep,
+                             "cfc --source=", self->core_dir, " --include=",
+                             cfish_prefix, dir_sep, "share", dir_sep,
+                             "clownfish", dir_sep, "include",
+                             " --dest=autogen --header=cfc_header", NULL);
+    }
+    chaz_MakeRule_add_command(rule, cfc_command);
+
+    free(cfc_command);
 }
 
 static void
