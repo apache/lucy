@@ -47,7 +47,7 @@ public class Lucy::Index::DataWriter inherits Clownfish::Obj {
     init(DataWriter *self, Schema *schema, Snapshot *snapshot,
          Segment *segment, PolyReader *polyreader);
 
-    /** Process a document, previously inverted by <code>inverter</code>.
+    /** Process a document, previously inverted by `inverter`.
      *
      * @param inverter An Inverter wrapping an inverted document.
      * @param doc_id Internal number assigned to this document within the

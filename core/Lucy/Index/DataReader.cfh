@@ -38,7 +38,7 @@ public class Lucy::Index::DataReader inherits Clownfish::Obj {
      * @param snapshot A Snapshot.
      * @param segments An array of Segments.
      * @param seg_tick The array index of the Segment object within the
-     * <code>segments</code> array that this particular DataReader is assigned
+     * `segments` array that this particular DataReader is assigned
      * to, if any.  A value of -1 indicates that no Segment should be
      * assigned.
      */

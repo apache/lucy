@@ -53,7 +53,7 @@ class Lucy::Store::InStream inherits Clownfish::Obj {
 
     /** Clone the instream, but specify a new offset, length, and possibly
      * filename.  Initial file position will be set to the top of the file
-     * (taking <code>offset</code> into account).
+     * (taking `offset` into account).
      *
      * @param filename An alias filename.  If NULL, the filename of the
      * underlying FileHandle will be used.
@@ -81,7 +81,7 @@ class Lucy::Store::InStream inherits Clownfish::Obj {
     public void
     Destroy(InStream *self);
 
-    /** Seek to <code>target</code>.
+    /** Seek to `target`.
      */
     final void
     Seek(InStream *self, int64_t target);
@@ -107,9 +107,9 @@ class Lucy::Store::InStream inherits Clownfish::Obj {
     void
     Fill(InStream *self, int64_t amount);
 
-    /** Get the InStream's buffer.  Check to see whether <code>request</code>
+    /** Get the InStream's buffer.  Check to see whether `request`
      * bytes are already in the buffer.  If not, fill the buffer with either
-     * <code>request</code> bytes or the number of bytes remaining before EOF,
+     * `request` bytes or the number of bytes remaining before EOF,
      * whichever is smaller.
      *
      * @param request Advisory byte size request.
@@ -125,7 +125,7 @@ class Lucy::Store::InStream inherits Clownfish::Obj {
     final void
     Advance_Buf(InStream *self, const char *buf);
 
-    /** Read <code>len</code> bytes from the InStream into <code>buf</code>.
+    /** Read `len` bytes from the InStream into `buf`.
      */
     final void
     Read_Bytes(InStream *self, char *buf, size_t len);
@@ -181,9 +181,9 @@ class Lucy::Store::InStream inherits Clownfish::Obj {
     final uint64_t
     Read_C64(InStream *self);
 
-    /** Read the bytes for a C32/C64 into <code>buf</code>.  Return the number
+    /** Read the bytes for a C32/C64 into `buf`.  Return the number
      * of bytes read.  The caller must ensure that sufficient space exists in
-     * <code>buf</code> (worst case is 10 bytes).
+     * `buf` (worst case is 10 bytes).
      */
     final int
     Read_Raw_C64(InStream *self, char *buf);

@@ -38,7 +38,7 @@ public abstract class Lucy::Search::Matcher inherits Clownfish::Obj {
     Next(Matcher *self);
 
     /** Advance the iterator to the first doc id greater than or equal to
-     * <code>target</code>. The default implementation simply calls Next()
+     * `target`. The default implementation simply calls Next()
      * over and over, but subclasses have the option of doing something more
      * efficient.
      *

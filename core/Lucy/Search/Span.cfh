@@ -44,32 +44,32 @@ public class Lucy::Search::Span inherits Clownfish::Obj {
     init(Span *self, int32_t offset, int32_t length,
          float weight = 0.0);
 
-    /** Accessor for <code>offset</code> attribute.
+    /** Accessor for `offset` attribute.
      */
     public int32_t
     Get_Offset(Span *self);
 
-    /** Setter for <code>offset</code> attribute.
+    /** Setter for `offset` attribute.
      */
     public void
     Set_Offset(Span *self, int32_t offset);
 
-    /** Accessor for <code>length</code> attribute.
+    /** Accessor for `length` attribute.
      */
     public int32_t
     Get_Length(Span *self);
 
-    /** Setter for <code>length</code> attribute.
+    /** Setter for `length` attribute.
      */
     public void
     Set_Length(Span *self, int32_t length);
 
-    /** Accessor for <code>weight</code> attribute.
+    /** Accessor for `weight` attribute.
      */
     public float
     Get_Weight(Span *self);
 
-    /** Setter for <code>weight</code> attribute.
+    /** Setter for `weight` attribute.
      */
     public void
     Set_Weight(Span *self, float weight);

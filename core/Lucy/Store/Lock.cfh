@@ -55,8 +55,8 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
     public abstract bool
     Shared(Lock *self);
 
-    /** Call Request() once per <code>interval</code> until Request() returns
-     * success or the <code>timeout</code> has been reached.
+    /** Call Request() once per `interval` until Request() returns
+     * success or the `timeout` has been reached.
      *
      * @return true on success, false on failure (sets Err_error).
      */
@@ -68,7 +68,7 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
      * The semantics of Request() differ depending on whether Shared() returns
      * true.  If the Lock is Shared(), then Request() should not fail if
      * another lock is held against the resource identified by
-     * <code>name</code> (though it might fail for other reasons).  If it is
+     * `name` (though it might fail for other reasons).  If it is
      * not Shared() -- i.e. it's an exclusive (write) lock -- then other locks
      * should cause Request() to fail.
      *

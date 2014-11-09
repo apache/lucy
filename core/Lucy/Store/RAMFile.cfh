@@ -38,12 +38,12 @@ class Lucy::Store::RAMFile inherits Clownfish::Obj {
     ByteBuf*
     Get_Contents(RAMFile *self);
 
-    /** Accessor for <code>read_only</code> property.
+    /** Accessor for `read_only` property.
      */
     bool
     Read_Only(RAMFile *self);
 
-    /** Set the object's <code>read_only</code> property.
+    /** Set the object's `read_only` property.
      */
     void
     Set_Read_Only(RAMFile *self, bool read_only);

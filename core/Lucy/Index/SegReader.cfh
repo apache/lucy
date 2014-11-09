@@ -46,7 +46,7 @@ public class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
      * Segment.
      * @param segments An array of Segment objects.
      * @param seg_tick The array index of the Segment object within
-     * <code>segments</code> that this particular SegReader is assigned to.
+     * `segments` that this particular SegReader is assigned to.
      */
     inert SegReader*
     init(SegReader *self, Schema *schema, Folder *folder,
@@ -55,11 +55,11 @@ public class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
     public void
     Destroy(SegReader *self);
 
-    /** Add a component to the SegReader.  Using the same <code>api</code> key
+    /** Add a component to the SegReader.  Using the same `api` key
      * twice is an error.
      *
      * @param api The name of the DataReader subclass that defines the
-     * interface implemented by <code>component</code>.
+     * interface implemented by `component`.
      * @param component A DataReader.
      */
     public void

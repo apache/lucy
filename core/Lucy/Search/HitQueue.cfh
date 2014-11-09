@@ -34,7 +34,7 @@ class Lucy::Search::HitQueue nickname HitQ
     new(Schema *schema = NULL, SortSpec *sort_spec = NULL, uint32_t wanted);
 
     /**
-     * @param schema A Schema.  Required if <code>sort_spec</code> supplied.
+     * @param schema A Schema.  Required if `sort_spec` supplied.
      * @param sort_spec A SortSpec.  If not supplied, the HitQueue will sort
      * by descending score first and ascending doc id second.
      * @param wanted Max elements the queue can hold.

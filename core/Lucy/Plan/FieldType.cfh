@@ -43,31 +43,31 @@ __END_C__
  * FieldType is an abstract class defining a set of traits and behaviors which
  * may be associated with one or more field names.
  *
- * Properties which are common to all field types include <code>boost</code>,
- * <code>indexed</code>, <code>stored</code>, <code>sortable</code>,
- * <code>binary</code>, and <code>similarity</code>.
+ * Properties which are common to all field types include `boost`,
+ * `indexed`, `stored`, `sortable`,
+ * `binary`, and `similarity`.
  *
- * The <code>boost</code> property is a floating point scoring multiplier
+ * The `boost` property is a floating point scoring multiplier
  * which defaults to 1.0.  Values greater than 1.0 cause the field to
  * contribute more to a document's score, lower values, less.
  *
- * The <code>indexed</code> property indicates whether the field should be
+ * The `indexed` property indicates whether the field should be
  * indexed (so that it can be searched).
  *
- * The <code>stored</code> property indicates whether to store the raw field
+ * The `stored` property indicates whether to store the raw field
  * value, so that it can be retrieved when a document turns up in a search.
  *
- * The <code>sortable</code> property indicates whether search results should
+ * The `sortable` property indicates whether search results should
  * be sortable based on the contents of the field.
  *
- * The <code>binary</code> property indicates whether the field contains
- * binary or text data.  Unlike most other properties, <code>binary</code> is
+ * The `binary` property indicates whether the field contains
+ * binary or text data.  Unlike most other properties, `binary` is
  * not settable.
  *
- * The <code>similarity</code> property is a
+ * The `similarity` property is a
  * L<Similarity|Lucy::Index::Similarity> object which defines matching
  * and scoring behavior for the field.  It is required if the field is
- * <code>indexed</code>.
+ * `indexed`.
  */
 public abstract class Lucy::Plan::FieldType nickname FType
     inherits Clownfish::Obj {
@@ -84,42 +84,42 @@ public abstract class Lucy::Plan::FieldType nickname FType
     init2(FieldType *self, float boost = 1.0, bool indexed = false,
           bool stored = false, bool sortable = false);
 
-    /** Setter for <code>boost</code>.
+    /** Setter for `boost`.
      */
     public void
     Set_Boost(FieldType *self, float boost);
 
-    /** Accessor for <code>boost</code>.
+    /** Accessor for `boost`.
      */
     public float
     Get_Boost(FieldType *self);
 
-    /** Setter for <code>indexed</code>.
+    /** Setter for `indexed`.
      */
     public void
     Set_Indexed(FieldType *self, bool indexed);
 
-    /** Accessor for <code>indexed</code>.
+    /** Accessor for `indexed`.
      */
     public bool
     Indexed(FieldType *self);
 
-    /** Setter for <code>stored</code>.
+    /** Setter for `stored`.
      */
     public void
     Set_Stored(FieldType *self, bool stored);
 
-    /** Accessor for <code>stored</code>.
+    /** Accessor for `stored`.
      */
     public bool
     Stored(FieldType *self);
 
-    /** Setter for <code>sortable</code>.
+    /** Setter for `sortable`.
      */
     public void
     Set_Sortable(FieldType *self, bool sortable);
 
-    /** Accessor for <code>sortable</code>.
+    /** Accessor for `sortable`.
      */
     public bool
     Sortable(FieldType *self);
@@ -130,7 +130,7 @@ public abstract class Lucy::Plan::FieldType nickname FType
     Binary(FieldType *self);
 
     /** Compare two values for the field.  The default implementation
-     * dispatches to the Compare_To() method of argument <code>a</code>.
+     * dispatches to the Compare_To() method of argument `a`.
      *
      * @return a negative number if a is "less than" b, 0 if they are "equal",
      * and a positive number if a is "greater than" b.

@@ -41,15 +41,15 @@ public abstract class Lucy::Index::DeletionsWriter nickname DelWriter
     /** Delete all documents in the index that index the supplied term.
      *
      * @param field The name of an indexed field. (If it is not spec'd as
-     * <code>indexed</code>, an error will occur.)
+     * `indexed`, an error will occur.)
      * @param term The term which identifies docs to be marked as deleted.  If
-     * <code>field</code> is associated with an Analyzer, <code>term</code>
+     * `field` is associated with an Analyzer, `term`
      * will be processed automatically (so don't pre-process it yourself).
      */
     public abstract void
     Delete_By_Term(DeletionsWriter *self, String *field, Obj *term);
 
-    /** Delete all documents in the index that match <code>query</code>.
+    /** Delete all documents in the index that match `query`.
      *
      * @param query A L<Query|Lucy::Search::Query>.
      */

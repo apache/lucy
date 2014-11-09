@@ -64,7 +64,7 @@ class Lucy::Analysis::Inversion inherits Clownfish::Obj {
     Invert(Inversion *self);
 
     /** Return a pointer to the next group of like Tokens.  The number of
-     * tokens in the cluster will be placed into <code>count</code>.
+     * tokens in the cluster will be placed into `count`.
      *
      * @param count The number of tokens in the cluster.
      */

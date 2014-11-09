@@ -54,18 +54,18 @@ public class Lucy::Index::IndexManager nickname IxManager
     Destroy(IndexManager *self);
 
     /**
-     * Setter for <code>folder</code> member.  Typical clients (Indexer,
+     * Setter for `folder` member.  Typical clients (Indexer,
      * IndexReader) will use this method to install their own Folder instance.
      */
     public void
     Set_Folder(IndexManager *self, Folder *folder = NULL);
 
-    /** Getter for <code>folder</code> member.
+    /** Getter for `folder` member.
      */
     public nullable Folder*
     Get_Folder(IndexManager *self);
 
-    /** Getter for <code>host</code> member.
+    /** Getter for `host` member.
      */
     public String*
     Get_Host(IndexManager *self);

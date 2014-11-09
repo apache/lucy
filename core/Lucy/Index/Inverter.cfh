@@ -48,13 +48,13 @@ class Lucy::Index::Inverter inherits Clownfish::Obj {
     public void
     Invert_Doc(Inverter *self, Doc *doc);
 
-    /** Set the object's <code>doc</code> member.  Calls Clear() as side
+    /** Set the object's `doc` member.  Calls Clear() as side
      * effect.
      */
     public void
     Set_Doc(Inverter *self, Doc *doc);
 
-    /** Set the object's <code>boost</code> member.
+    /** Set the object's `boost` member.
      */
     public void
     Set_Boost(Inverter *self, float boost);

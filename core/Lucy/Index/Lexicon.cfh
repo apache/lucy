@@ -42,7 +42,7 @@ public class Lucy::Index::Lexicon nickname Lex inherits Clownfish::Obj {
     Destroy(Lexicon *self);
 
     /** Seek the Lexicon to the first iterator state which is greater than or
-     * equal to <code>target</code>.  If <code>target</code> is NULL,
+     * equal to `target`.  If `target` is NULL,
      * reset the iterator.
      */
     public abstract void

@@ -24,10 +24,10 @@ parcel Lucy;
  * semantics of two methods.
  *
  * First, Obtain() will not fail if another lock is held against the resource
- * identified by <code>name</code> (though it might fail for other reasons).
+ * identified by `name` (though it might fail for other reasons).
  *
  * Second, Is_Locked() returns true so long as some lock, somewhere is holding
- * a lock on <code>name</code>.  That lock could be this instance, or it could
+ * a lock on `name`.  That lock could be this instance, or it could
  * be another -- so is entirely possible to call Release() successfully on a
  * SharedLock object yet still have Is_Locked() return true.
  *

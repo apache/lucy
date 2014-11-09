@@ -58,7 +58,7 @@ class Lucy::Highlight::HeatMap inherits Clownfish::Obj {
 
     /** If the two spans overlap or abut, return a bonus equal to their summed
      * scores; as they move further apart, tail the bonus down until it hits 0
-     * at the edge of the <code>window</code>.
+     * at the edge of the `window`.
      */
     float
     Calc_Proximity_Boost(HeatMap *self, Span *span1, Span *span2);

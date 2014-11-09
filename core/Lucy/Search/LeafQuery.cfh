@@ -40,12 +40,12 @@ public class Lucy::Search::LeafQuery inherits Lucy::Search::Query {
     public inert LeafQuery*
     init(LeafQuery *self, String *field = NULL, String *text);
 
-    /** Accessor for object's <code>field</code> attribute.
+    /** Accessor for object's `field` attribute.
      */
     public nullable String*
     Get_Field(LeafQuery *self);
 
-    /** Accessor for object's <code>text</code> attribute.
+    /** Accessor for object's `text` attribute.
      */
     public String*
     Get_Text(LeafQuery *self);

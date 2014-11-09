@@ -37,7 +37,7 @@ class Lucy::Search::QueryParser::QueryLexer inherits Clownfish::Obj {
     bool
     Heed_Colons(QueryLexer *self);
 
-    /** Enable/disable parsing of <code>fieldname:foo</code> constructs.
+    /** Enable/disable parsing of `fieldname:foo` constructs.
      */
     void
     Set_Heed_Colons(QueryLexer *self, bool heed_colons);

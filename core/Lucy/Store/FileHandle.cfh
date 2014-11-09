@@ -55,7 +55,7 @@ abstract class Lucy::Store::FileHandle nickname FH
     do_open(FileHandle *self, String *path = NULL, uint32_t flags);
 
     /** Ensure that the FileWindow's buffer provides access to file data for
-     * <code>len</code> bytes starting at <code>offset</code>.
+     * `len` bytes starting at `offset`.
      *
      * @param window A FileWindow.
      * @param offset File position to begin at.
@@ -99,7 +99,7 @@ abstract class Lucy::Store::FileHandle nickname FH
     Length(FileHandle *self);
 
     /** Advisory call alerting the FileHandle that it should prepare to occupy
-     * <code>len</code> bytes.  The default implementation is a no-op.
+     * `len` bytes.  The default implementation is a no-op.
      *
      * @return true on success, false on failure (sets Err_error).
      */
@@ -115,12 +115,12 @@ abstract class Lucy::Store::FileHandle nickname FH
     abstract bool
     Close(FileHandle *self);
 
-    /** Set the object's <code>path</code> attribute.
+    /** Set the object's `path` attribute.
      */
     void
     Set_Path(FileHandle *self, String *path);
 
-    /** Return the object's <code>path</code> attribute.
+    /** Return the object's `path` attribute.
      */
     nullable String*
     Get_Path(FileHandle *self);

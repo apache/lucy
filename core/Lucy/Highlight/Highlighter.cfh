@@ -53,7 +53,7 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
          String *field, uint32_t excerpt_length = 200);
 
     /** Take a HitDoc object and return a highlighted excerpt as a string if
-     * the HitDoc has a value for the specified <code>field</code>.
+     * the HitDoc has a value for the specified `field`.
      */
     public incremented String*
     Create_Excerpt(Highlighter *self, HitDoc *hit_doc);
@@ -114,7 +114,7 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
     Get_Query(Highlighter *self);
 
     /** Accessor for the Lucy::Search::Compiler object derived from
-     * <code>query</code> and <code>searcher</code>.
+     * `query` and `searcher`.
      */
     public Compiler*
     Get_Compiler(Highlighter *self);
@@ -131,7 +131,7 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
                 HeatMap *heat_map);
 
     /** Take the text in raw_excerpt, add highlight tags, encode, and place
-     * the result into <code>highlighted</code>.
+     * the result into `highlighted`.
      *
      * (Helper function for Create_Excerpt only exposed for testing purposes.)
      */

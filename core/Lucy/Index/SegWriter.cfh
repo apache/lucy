@@ -60,7 +60,7 @@ public class Lucy::Index::SegWriter inherits Lucy::Index::DataWriter {
      * registration simply makes the writer available via Fetch(), so you may
      * also want to call Add_Writer()).
      *
-     * @param api The name of the DataWriter api which <code>writer</code>
+     * @param api The name of the DataWriter api which `writer`
      * implements.
      * @param component A DataWriter.
      */
@@ -88,7 +88,7 @@ public class Lucy::Index::SegWriter inherits Lucy::Index::DataWriter {
     void
     Prep_Seg_Dir(SegWriter *self);
 
-    /** Add a document to the segment.  Inverts <code>doc</code>, increments
+    /** Add a document to the segment.  Inverts `doc`, increments
      * the Segment's internal document id, then calls Add_Inverted_Doc(),
      * feeding all sub-writers.
      */

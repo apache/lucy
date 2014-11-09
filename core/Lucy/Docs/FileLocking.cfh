@@ -27,13 +27,13 @@ parcel Lucy;
  * intervention becomes necessary.
  *
  * Both read and write applications accessing an index on a shared volume need
- * to identify themselves with a unique <code>host</code> id, e.g. hostname or
+ * to identify themselves with a unique `host` id, e.g. hostname or
  * ip address.  Knowing the host id makes it possible to tell which lockfiles
  * belong to other machines and therefore must not be removed when the
  * lockfile's pid number appears not to correspond to an active process.
  *
  * At index-time, the danger is that multiple indexing processes from
- * different machines which fail to specify a unique <code>host</code> id can
+ * different machines which fail to specify a unique `host` id can
  * delete each others' lockfiles and then attempt to modify the index at the
  * same time, causing index corruption.  The search-time problem is more
  * complex.
@@ -71,7 +71,7 @@ parcel Lucy;
  * directory (as are exclusive locks), reader applications must have write
  * access for read locking to work.  Stale lock files from crashed processes
  * are ordinarily cleared away the next time the same machine -- as identified
- * by the <code>host</code> parameter -- opens another IndexReader. (The
+ * by the `host` parameter -- opens another IndexReader. (The
  * classic technique of timing out lock files is not feasible because search
  * processes may lie dormant indefinitely.) However, please be aware that if
  * the last thing a given machine does is crash, lock files belonging to it

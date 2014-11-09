@@ -34,8 +34,8 @@ class Lucy::Index::SortCache inherits Clownfish::Obj {
          int32_t cardinality, int32_t doc_max, int32_t null_ord = -1,
          int32_t ord_width);
 
-    /** Return the value for ordinal <code>ord</code>, or NULL if the value
-     * for <code>ord</code> is NULL.
+    /** Return the value for ordinal `ord`, or NULL if the value
+     * for `ord` is NULL.
      */
     public abstract nullable incremented Obj*
     Value(SortCache *self, int32_t ord);
@@ -55,7 +55,7 @@ class Lucy::Index::SortCache inherits Clownfish::Obj {
     public int32_t
     Ordinal(SortCache *self, int32_t doc_id);
 
-    /** Attempt to find the ordinal of the supplied <code>term</code>.  If the
+    /** Attempt to find the ordinal of the supplied `term`.  If the
      * term cannot be found, return the ordinal of the term that would appear
      * immediately before it in sort order.
      *

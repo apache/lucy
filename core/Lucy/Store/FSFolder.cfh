@@ -36,12 +36,12 @@ public class Lucy::Store::FSFolder inherits Lucy::Store::Folder {
     public inert FSFolder*
     init(FSFolder *self, String *path);
 
-    /** Attempt to create the directory specified by <code>path</code>.
+    /** Attempt to create the directory specified by `path`.
      */
     public void
     Initialize(FSFolder *self);
 
-    /** Verify that <code>path</code> is a directory.  TODO: check
+    /** Verify that `path` is a directory.  TODO: check
      * permissions.
      */
     public bool

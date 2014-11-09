@@ -20,12 +20,12 @@ parcel Lucy;
  */
 inert class Lucy::Util::Sleep {
 
-    /** Sleep for <code>seconds</code> seconds.
+    /** Sleep for `seconds` seconds.
      */
     inert void
     sleep(uint32_t seconds);
 
-    /** Sleep for <code>milliseconds</code> milliseconds.
+    /** Sleep for `milliseconds` milliseconds.
      */
     inert void
     millisleep(uint32_t milliseconds);

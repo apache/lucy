@@ -43,7 +43,7 @@ class Lucy::Store::OutStream inherits Clownfish::Obj {
     inert nullable OutStream*
     do_open(OutStream *self, Obj *file);
 
-    /** Accessor for <code>path</code> member.
+    /** Accessor for `path` member.
      */
     String*
     Get_Path(OutStream *self);
@@ -54,7 +54,7 @@ class Lucy::Store::OutStream inherits Clownfish::Obj {
     Tell(OutStream *self);
 
     /** Write 0 or more null bytes to the OutStream until its file position is
-     * a multiple of <code>modulus</code>.
+     * a multiple of `modulus`.
      *
      * @return the new file position.
      */
@@ -72,12 +72,12 @@ class Lucy::Store::OutStream inherits Clownfish::Obj {
     Length(OutStream *self);
 
     /** Advisory call informing the OutStream that it should prepare to occupy
-     * <code>length</code> bytes.
+     * `length` bytes.
      */
     void
     Grow(OutStream *self, int64_t length);
 
-    /** Write <code>len</code> bytes from <code>buf</code> to the OutStream.
+    /** Write `len` bytes from `buf` to the OutStream.
      */
     final void
     Write_Bytes(OutStream *self, const void *buf, size_t len);

@@ -23,21 +23,21 @@ parcel Lucy;
  * tokenized into "three", "blind", "mice".
  *
  * Lucy::Analysis::RegexTokenizer decides where it should break up the text
- * based on a regular expression compiled from a supplied <code>pattern</code>
+ * based on a regular expression compiled from a supplied `pattern`
  * matching one token.  If our source string is...
  *
  *     "Eats, Shoots and Leaves."
  *
- * ... then a "whitespace tokenizer" with a <code>pattern</code> of
- * <code>"\\S+"</code> produces...
+ * ... then a "whitespace tokenizer" with a `pattern` of
+ * `"\\S+"` produces...
  *
  *     Eats,
  *     Shoots
  *     and
  *     Leaves.
  *
- * ... while a "word character tokenizer" with a <code>pattern</code> of
- * <code>"\\w+"</code> produces...
+ * ... while a "word character tokenizer" with a `pattern` of
+ * `"\\w+"` produces...
  *
  *     Eats
  *     Shoots
@@ -65,7 +65,7 @@ public class Lucy::Analysis::RegexTokenizer
     /**
      * @param pattern A string specifying a Perl-syntax regular expression
      * which should match one token.  The default value is
-     * <code>\w+(?:[\x{2019}']\w+)*</code>, which matches "it's" as well as
+     * `\w+(?:[\x{2019}']\w+)*`, which matches "it's" as well as
      * "it" and "O'Henry's" as well as "Henry".
      */
     public inert RegexTokenizer*
@@ -85,7 +85,7 @@ public class Lucy::Analysis::RegexTokenizer
                   Inversion *inversion);
 
     /** Set the compiled regular expression for matching a token.  Also sets
-     * <code>pattern</code> as a side effect.
+     * `pattern` as a side effect.
      */
     void
     Set_Token_RE(RegexTokenizer *self, void *token_re);

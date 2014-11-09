@@ -28,7 +28,7 @@ class Lucy::Test::Search::TestQueryParser nickname TestQP
     uint32_t num_hits;
 
     /** Note that unlike most Clownfish constructors, this routine will consume one
-     * reference count each for <code>tree</code>, and <code>expanded</code>.
+     * reference count each for `tree`, and `expanded`.
      */
     inert incremented TestQueryParser*
     new(const char *query_string = NULL, Query *tree = NULL,

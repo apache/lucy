@@ -35,7 +35,7 @@ inert class Lucy::Util::IndexFileNames nickname IxFileNames {
     inert incremented nullable String*
     latest_snapshot(Folder *folder);
 
-    /** Split the <code>path</code> on '/' and return the last component.
+    /** Split the `path` on '/' and return the last component.
      * Trailing slashes will be stripped.
      */
     inert incremented String*

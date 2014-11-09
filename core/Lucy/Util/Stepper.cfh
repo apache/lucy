@@ -43,8 +43,8 @@ class Lucy::Util::Stepper inherits Clownfish::Obj {
     public abstract void
     Reset(Stepper* self);
 
-    /** Update internal state to reflect <code>value</code> and write a frame
-     * to <code>outstream</code> that can be read using Read_Key_Frame().
+    /** Update internal state to reflect `value` and write a frame
+     * to `outstream` that can be read using Read_Key_Frame().
      *
      * @param outstream An OutStream.
      * @param value State information.
@@ -52,8 +52,8 @@ class Lucy::Util::Stepper inherits Clownfish::Obj {
     public abstract void
     Write_Key_Frame(Stepper *self, OutStream *outstream, Obj *value);
 
-    /** Update internal state to reflect <code>value</code> and write a frame
-     * to <code>outstream</code> that can be read using Read_Delta().
+    /** Update internal state to reflect `value` and write a frame
+     * to `outstream` that can be read using Read_Delta().
      *
      * @param outstream An OutStream.
      * @param value State information.
@@ -61,7 +61,7 @@ class Lucy::Util::Stepper inherits Clownfish::Obj {
     public abstract void
     Write_Delta(Stepper *self, OutStream *outstream, Obj *value);
 
-    /** Update intern state using information read from <code>instream</code>.
+    /** Update intern state using information read from `instream`.
      *
      * @param instream An InStream.
      */
@@ -69,7 +69,7 @@ class Lucy::Util::Stepper inherits Clownfish::Obj {
     Read_Key_Frame(Stepper *self, InStream *instream);
 
     /** Update state using a combination of information from
-     * <code>instream</code> and the current internal state.
+     * `instream` and the current internal state.
      */
     public abstract void
     Read_Delta(Stepper *self, InStream *instream);

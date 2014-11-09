@@ -44,7 +44,7 @@ public class Lucy::Index::PostingList nickname PList
     Get_Doc_Freq(PostingList *self);
 
     /** Prepare the PostingList object to iterate over matches for documents
-     * that match <code>target</code>.
+     * that match `target`.
      *
      * @param target The term to match.  If NULL, the iterator will be empty.
      */

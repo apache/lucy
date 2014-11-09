@@ -40,7 +40,7 @@ public class Lucy::Search::SortRule inherits Clownfish::Obj {
     /**
      * @param type Indicate whether to sort by score, field, etc.  (The
      * default is to sort by a field.)
-     * @param field The name of a <code>sortable</code> field.
+     * @param field The name of a `sortable` field.
      * @param reverse If true, reverse the order of the sort for this rule.
      */
     public inert incremented SortRule*

@@ -57,7 +57,7 @@ public abstract class Lucy::Search::Collector nickname Coll
     Set_Reader(Collector *self, SegReader *reader);
 
     /** Set the "base" document id, an offset which must be added to the
-     * <code>doc_id</code> supplied via Collect() to get the doc id for the
+     * `doc_id` supplied via Collect() to get the doc id for the
      * larger index.
      */
     public void

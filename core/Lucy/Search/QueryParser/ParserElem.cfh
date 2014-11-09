@@ -45,13 +45,13 @@ class Lucy::Search::QueryParser::ParserElem inherits Clownfish::Obj {
     uint32_t
     Get_Type(ParserElem *self);
 
-    /** Manipulate the value of <code>occur</code> so that the element becomes
+    /** Manipulate the value of `occur` so that the element becomes
      * forbidden.
      */
     void
     Negate(ParserElem *self);
 
-    /** Manipulate the value of <code>occur</code> so that the element becomes
+    /** Manipulate the value of `occur` so that the element becomes
      * required.
      */
     void

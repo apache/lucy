@@ -37,7 +37,7 @@ public class Lucy::Plan::BlobType inherits Lucy::Plan::FieldType {
     public bool
     Binary(BlobType *self);
 
-    /** Throws an error unless <code>sortable</code> is false.
+    /** Throws an error unless `sortable` is false.
      */
     public void
     Set_Sortable(BlobType *self, bool sortable);

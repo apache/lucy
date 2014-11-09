@@ -69,7 +69,7 @@ public class Lucy::Document::Doc inherits Clownfish::Obj {
     Get_Size(Doc *self);
 
     /** Retrieve the field's value, or NULL if the field is not present.  If
-     * the field is a text type, assign it to <code>target</code>.  Otherwise,
+     * the field is a text type, assign it to `target`.  Otherwise,
      * return the interior object.  Callers must check to verify the kind of
      * object returned.
      */

@@ -37,12 +37,12 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     public void
     Destroy(Folder *self);
 
-    /** Getter for <code>path</code> member var.
+    /** Getter for `path` member var.
      */
     public String*
     Get_Path(Folder *self);
 
-    /** Setter for <code>path</code> member var.
+    /** Setter for `path` member var.
      */
     void
     Set_Path(Folder *self, String *path);
@@ -106,18 +106,18 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     incremented VArray*
     List_R(Folder *self, String *path = NULL);
 
-    /** Indicate whether an entity exists at <code>path</code>.
+    /** Indicate whether an entity exists at `path`.
      *
      * @param path A relative filepath.
-     * @return true if <code>path</code> exists.
+     * @return true if `path` exists.
      */
     public bool
     Exists(Folder *self, String *path);
 
-    /** Indicate whether a directory exists at <code>path</code>.
+    /** Indicate whether a directory exists at `path`.
      *
      * @param path A relative filepath.
-     * @return true if <code>path</code> is a directory.
+     * @return true if `path` is a directory.
      */
     bool
     Is_Directory(Folder *self, String *path);
@@ -130,7 +130,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     public bool
     Delete(Folder *self, String *path);
 
-    /** Delete recursively, starting at <code>path</code>
+    /** Delete recursively, starting at `path`
      *
      * @param path A relative filepath specifying a file or subdirectory.
      * @return true if the whole tree is deleted successfully, false if any
@@ -140,7 +140,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     Delete_Tree(Folder *self, String *path);
 
     /** Rename a file or directory, or set Err_error and return false on
-     * failure.  If an entry exists at <code>to</code>, the results are
+     * failure.  If an entry exists at `to`, the results are
      * undefined.
      *
      * @param from The filepath prior to renaming.
@@ -150,8 +150,8 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     public abstract bool
     Rename(Folder *self, String *from, String *to);
 
-    /** Create a hard link at path <code>to</code> pointing at the existing
-     * file <code>from</code>, or set Err_error and return false on failure.
+    /** Create a hard link at path `to` pointing at the existing
+     * file `from`, or set Err_error and return false on failure.
      *
      * @return true on success, false on failure.
      */
@@ -175,15 +175,15 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * the last component.  E.g. the 'foo/bar' Folder for '/foo/bar/baz.txt',
      * the 'foo' Folder for 'foo/bar', etc.
      *
-     * If <code>path</code> is invalid, because an intermediate directory
+     * If `path` is invalid, because an intermediate directory
      * either doesn't exist or isn't a directory, return NULL.
      */
     nullable Folder*
     Enclosing_Folder(Folder *self, String *path);
 
-    /** Return the Folder at the subdirectory specified by <code>path</code>.
-     * If <code>path</code> is NULL or an empty string, return this Folder.
-     * If the entity at <code>path</code> either doesn't exist or isn't a
+    /** Return the Folder at the subdirectory specified by `path`.
+     * If `path` is NULL or an empty string, return this Folder.
+     * If the entity at `path` either doesn't exist or isn't a
      * subdirectory, return NULL.
      *
      * @param path A relative filepath specifying a subdirectory.
@@ -237,7 +237,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     Local_MkDir(Folder *self, String *name);
 
     /** Indicate whether a local entry exists for the supplied
-     * <code>name</code>.
+     * `name`.
      *
      * @param name The name of the local entry.
      */
@@ -245,7 +245,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     Local_Exists(Folder *self, String *name);
 
     /** Indicate whether a local subdirectory exists with the supplied
-     * <code>name</code>.
+     * `name`.
      *
      * @param name The name of the local subdirectory.
      */

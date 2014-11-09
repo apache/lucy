@@ -32,22 +32,22 @@ class Lucy::Search::TopDocs inherits Clownfish::Obj {
     inert TopDocs*
     init(TopDocs *self, VArray *match_docs, uint32_t total_hits);
 
-    /** Accessor for <code>match_docs</code> member.
+    /** Accessor for `match_docs` member.
      */
     VArray*
     Get_Match_Docs(TopDocs *self);
 
-    /** Setter for <code>match_docs</code> member.
+    /** Setter for `match_docs` member.
      */
     void
     Set_Match_Docs(TopDocs *self, VArray *match_docs);
 
-    /** Accessor for <code>total_hits</code> member.
+    /** Accessor for `total_hits` member.
      */
     uint32_t
     Get_Total_Hits(TopDocs *self);
 
-    /** Setter for <code>total_hits</code> member.
+    /** Setter for `total_hits` member.
      */
     void
     Set_Total_Hits(TopDocs *self, uint32_t total_hits);

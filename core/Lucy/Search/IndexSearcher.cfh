@@ -66,7 +66,7 @@ public class Lucy::Search::IndexSearcher nickname IxSearcher
     incremented DocVector*
     Fetch_Doc_Vec(IndexSearcher *self, int32_t doc_id);
 
-    /** Accessor for the object's <code>reader</code> member.
+    /** Accessor for the object's `reader` member.
      */
     public IndexReader*
     Get_Reader(IndexSearcher *self);

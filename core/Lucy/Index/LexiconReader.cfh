@@ -28,7 +28,7 @@ public abstract class Lucy::Index::LexiconReader nickname LexReader
         Snapshot *snapshot = NULL, VArray *segments = NULL,
         int32_t seg_tick = -1);
 
-    /** Return a new Lexicon for the given <code>field</code>.  Will return
+    /** Return a new Lexicon for the given `field`.  Will return
      * NULL if either the field is not indexed, or if no documents contain a
      * value for the field.
      *

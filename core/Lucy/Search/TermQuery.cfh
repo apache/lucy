@@ -38,12 +38,12 @@ public class Lucy::Search::TermQuery inherits Lucy::Search::Query {
     public inert TermQuery*
     init(TermQuery *self, String *field, Obj *term);
 
-    /** Accessor for object's <code>field</code> member.
+    /** Accessor for object's `field` member.
      */
     public String*
     Get_Field(TermQuery *self);
 
-    /** Accessor for object's <code>term</code> member.
+    /** Accessor for object's `term` member.
      */
     public Obj*
     Get_Term(TermQuery *self);

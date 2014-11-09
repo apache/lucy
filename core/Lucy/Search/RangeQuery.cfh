@@ -34,19 +34,19 @@ public class Lucy::Search::RangeQuery inherits Lucy::Search::Query {
     new(String *field, Obj *lower_term = NULL, Obj *upper_term = NULL,
         bool include_lower = true, bool include_upper = true);
 
-    /** Takes 5 parameters; <code>field</code> is required, as
-     * is at least one of either <code>lower_term</code> or
-     * <code>upper_term</code>.
+    /** Takes 5 parameters; `field` is required, as
+     * is at least one of either `lower_term` or
+     * `upper_term`.
      *
-     * @param field The name of a <code>sortable</code> field.
+     * @param field The name of a `sortable` field.
      * @param lower_term Lower delimiter.  If not supplied, all values
-     * less than <code>upper_term</code> will pass.
+     * less than `upper_term` will pass.
      * @param upper_term Upper delimiter.  If not supplied, all values greater
-     * than <code>lower_term</code> will pass.
+     * than `lower_term` will pass.
      * @param include_lower Indicates whether docs which match
-     * <code>lower_term</code> should be included in the results.
+     * `lower_term` should be included in the results.
      * @param include_upper Indicates whether docs which match
-     * <code>upper_term</code> should be included in the results.
+     * `upper_term` should be included in the results.
      */
     public inert RangeQuery*
     init(RangeQuery *self, String *field,

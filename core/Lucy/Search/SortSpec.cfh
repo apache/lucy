@@ -22,7 +22,7 @@ parcel Lucy;
  * you to indicate an alternate order via an array of
  * L<SortRules|Lucy::Search::SortRule>.
  *
- * Fields you wish to sort against must be <code>sortable</code>.
+ * Fields you wish to sort against must be `sortable`.
  *
  * For a stable sort (important when paging through results), add a
  * sort-by-doc rule as the last SortRule.

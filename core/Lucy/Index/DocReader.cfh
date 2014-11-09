@@ -29,7 +29,7 @@ public class Lucy::Index::DocReader inherits Lucy::Index::DataReader {
          Snapshot *snapshot = NULL, VArray *segments = NULL,
          int32_t seg_tick = -1);
 
-    /** Retrieve the document identified by <code>doc_id</code>.
+    /** Retrieve the document identified by `doc_id`.
      *
      * @return a HitDoc.
      */

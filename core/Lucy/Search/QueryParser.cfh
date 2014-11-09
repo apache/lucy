@@ -126,7 +126,7 @@ public class Lucy::Search::QueryParser nickname QParser
     /** Prevent certain Query structures from returning too many results.
      * Query objects built via Tree() and Expand() can generate "return the
      * world" result sets, such as in the case of
-     * <code>NOT a_term_not_in_the_index</code>; Prune() walks the hierarchy
+     * `NOT a_term_not_in_the_index`; Prune() walks the hierarchy
      * and eliminates such branches.
      *
      *      'NOT foo'               => [NOMATCH]
@@ -217,7 +217,7 @@ public class Lucy::Search::QueryParser nickname QParser
     bool
     Heed_Colons(QueryParser *self);
 
-    /** Enable/disable parsing of <code>fieldname:foo</code> constructs.
+    /** Enable/disable parsing of `fieldname:foo` constructs.
      */
     public void
     Set_Heed_Colons(QueryParser *self, bool heed_colons);

@@ -67,10 +67,10 @@ public class Lucy::Search::Searcher inherits Clownfish::Obj {
      * @param query Either a Query object or a query string.
      * @param offset The number of most-relevant hits to discard, typically
      * used when "paging" through hits N at a time.  Setting
-     * <code>offset</code> to 20 and <code>num_wanted</code> to 10 retrieves
+     * `offset` to 20 and `num_wanted` to 10 retrieves
      * hits 21-30, assuming that 30 hits can be found.
      * @param num_wanted The number of hits you would like to see after
-     * <code>offset</code> is taken into account.
+     * `offset` is taken into account.
      * @param sort_spec A L<Lucy::Search::SortSpec>, which will affect
      * how results are ranked and returned.
      */
@@ -106,7 +106,7 @@ public class Lucy::Search::Searcher inherits Clownfish::Obj {
     abstract incremented DocVector*
     Fetch_Doc_Vec(Searcher *self, int32_t doc_id);
 
-    /** Accessor for the object's <code>schema</code> member.
+    /** Accessor for the object's `schema` member.
      */
     public Schema*
     Get_Schema(Searcher *self);

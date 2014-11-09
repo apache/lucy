@@ -32,14 +32,14 @@ class Lucy::Object::I32Array nickname I32Arr inherits Clownfish::Obj {
     inert I32Array*
     init(I32Array *self, int32_t *ints, uint32_t size);
 
-    /** Set the value at <code>tick</code>, or throw an error if
-     * <code>tick</code> is out of bounds.
+    /** Set the value at `tick`, or throw an error if
+     * `tick` is out of bounds.
      */
     void
     Set(I32Array *self, uint32_t tick, int32_t value);
 
-    /** Return the value at <code>tick</code>, or throw an error if
-     * <code>tick</code> is out of bounds.
+    /** Return the value at `tick`, or throw an error if
+     * `tick` is out of bounds.
      */
     int32_t
     Get(I32Array *self, uint32_t tick);

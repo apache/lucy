@@ -44,7 +44,7 @@ abstract class Lucy::Store::DirHandle nickname DH
     abstract bool
     Close(DirHandle *self);
 
-    /** Return the object's <code>dir</code> attribute.
+    /** Return the object's `dir` attribute.
      */
     String*
     Get_Dir(DirHandle *self);
