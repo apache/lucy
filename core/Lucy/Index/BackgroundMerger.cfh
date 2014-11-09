@@ -23,7 +23,7 @@ parcel Lucy;
  * complete.  See L<Lucy::Docs::Cookbook::FastUpdates> for how to use
  * this class to control worst-case index update performance.
  *
- * As with L<Indexer|Lucy::Index::Indexer>, see
+ * As with [](cfish:Indexer), see
  * L<Lucy::Docs::FileLocking> if your index is on a shared volume.
  */
 public class Lucy::Index::BackgroundMerger nickname BGMerger
@@ -68,16 +68,16 @@ public class Lucy::Index::BackgroundMerger nickname BGMerger
     /** Commit any changes made to the index.  Until this is called, none of
      * the changes made during an indexing session are permanent.
      *
-     * Calls Prepare_Commit() implicitly if it has not already been called.
+     * Calls [](cfish:.Prepare_Commit) implicitly if it has not already been called.
      */
     public void
     Commit(BackgroundMerger *self);
 
-    /** Perform the expensive setup for Commit() in advance, so that Commit()
+    /** Perform the expensive setup for [](cfish:.Commit) in advance, so that [](cfish:.Commit)
      * completes quickly.
      *
-     * Towards the end of Prepare_Commit(), the BackgroundMerger attempts to
-     * re-acquire the write lock, which is then held until Commit() finishes
+     * Towards the end of [](cfish:.Prepare_Commit), the BackgroundMerger attempts to
+     * re-acquire the write lock, which is then held until [](cfish:.Commit) finishes
      * and releases it.
      */
     public void

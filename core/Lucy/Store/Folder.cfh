@@ -19,11 +19,11 @@ parcel Lucy;
 /** Abstract class representing a directory.
  *
  * A "file" within a Folder might be a real file on disk -- or it might be a
- * RAM buffer.  Similarly, Delete() might delete a file from the file system, or
+ * RAM buffer.  Similarly, [](cfish:.Delete) might delete a file from the file system, or
  * a key-value pair from a hash, or something else.
  *
  * The archetypal implementation of Folder,
- * L<FSFolder|Lucy::Store::FSFolder>, represents a directory on
+ * [](cfish:FSFolder), represents a directory on
  * the file system holding a collection of files.
  */
 public abstract class Lucy::Store::Folder inherits Clownfish::Obj {

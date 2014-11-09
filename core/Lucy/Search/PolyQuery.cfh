@@ -19,10 +19,10 @@ parcel Lucy;
 /** Base class for composite Query objects.
  *
  * PolyQuery serves as a shared base class for
- * L<ANDQuery|Lucy::Search::ANDQuery>,
- * L<ORQuery|Lucy::Search::ORQuery>,
- * L<NOTQuery|Lucy::Search::NOTQuery>, and
- * L<RequiredOptionalQuery|Lucy::Search::RequiredOptionalQuery>.  All of
+ * [](cfish:ANDQuery),
+ * [](cfish:ORQuery),
+ * [](cfish:NOTQuery), and
+ * [](cfish:RequiredOptionalQuery).  All of
  * these classes may serve as nodes in composite Query with a tree structure
  * which may be walked.
  */

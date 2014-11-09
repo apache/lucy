@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Normalize case, facilitating case-insensitive search.
  *
- * CaseFolder is DEPRECATED. Use L<Normalizer|Lucy::Analysis::Normalizer>
+ * CaseFolder is DEPRECATED. Use [](cfish:Normalizer)
  * instead.
  *
  * CaseFolder normalizes text according to Unicode case-folding rules, so that

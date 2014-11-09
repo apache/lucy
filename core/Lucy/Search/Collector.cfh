@@ -19,12 +19,12 @@ parcel Lucy;
 /** Process hits.
  *
  * A Collector decides what to do with the hits that a
- * L<Matcher|Lucy::Search::Matcher> iterates through, based on how the
- * abstract Collect() method is implemented.
+ * [](cfish:Matcher) iterates through, based on how the
+ * abstract [](cfish:.Collect) method is implemented.
  *
  * Collectors operate on individual segments, but must operate within the
  * context of a larger collection.  Each time the collector moves to a new
- * segment, Set_Reader(), Set_Base() and Set_Matcher() will be called, and the
+ * segment, [](cfish:.Set_Reader), [](cfish:.Set_Base) and [](cfish:.Set_Matcher) will be called, and the
  * collector must take the updated information into account.
  */
 
@@ -57,13 +57,13 @@ public abstract class Lucy::Search::Collector nickname Coll
     Set_Reader(Collector *self, SegReader *reader);
 
     /** Set the "base" document id, an offset which must be added to the
-     * `doc_id` supplied via Collect() to get the doc id for the
+     * `doc_id` supplied via [](cfish:.Collect) to get the doc id for the
      * larger index.
      */
     public void
     Set_Base(Collector *self, int32_t base);
 
-    /** Indicate whether the Collector will call Score() on its Matcher.
+    /** Indicate whether the Collector will call [](cfish:Matcher.Score) on its Matcher.
      */
     public abstract bool
     Need_Score(Collector *self);
@@ -77,7 +77,7 @@ public abstract class Lucy::Search::Collector nickname Coll
 /** Collector which records doc nums in a BitVector.
  *
  * BitCollector is a Collector which saves matching document ids in a
- * L<BitVector|Lucy::Object::BitVector>.  It is useful for recording the
+ * [](cfish:BitVector).  It is useful for recording the
  * entire set of documents which matches a query.
  */
 public class Lucy::Search::Collector::BitCollector nickname BitColl

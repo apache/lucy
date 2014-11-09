@@ -19,9 +19,9 @@ parcel Lucy;
 /** A simple analyzer chain.
  *
  * EasyAnalyzer is an analyzer chain consisting of a
- * L<StandardTokenizer|Lucy::Analysis::StandardTokenizer>, a
- * L<Normalizer|Lucy::Analysis::Normalizer>, and a
- * L<SnowballStemmer|Lucy::Analysis::SnowballStemmer>.
+ * [](cfish:StandardTokenizer), a
+ * [](cfish:Normalizer), and a
+ * [](cfish:SnowballStemmer).
  *
  * Supported languages:
  *

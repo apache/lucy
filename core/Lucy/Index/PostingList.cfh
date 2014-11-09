@@ -54,7 +54,7 @@ public class Lucy::Index::PostingList nickname PList
     abstract void
     Seek_Lex(PostingList *self, Lexicon *lexicon);
 
-    /** Invoke Post_Make_Matcher() for this PostingList's posting.
+    /** Invoke [](cfish:.Post_Make_Matcher) for this PostingList's posting.
      */
     abstract Matcher*
     Make_Matcher(PostingList *self, Similarity *similarity,

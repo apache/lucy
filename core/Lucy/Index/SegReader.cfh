@@ -24,7 +24,7 @@ parcel Lucy;
  * data at the segment level need to deal with the SegReader API directly.
  *
  * Nearly all of SegReader's functionality is implemented by pluggable
- * components spawned by L<Architecture|Lucy::Plan::Architecture>'s
+ * components spawned by [](cfish:Architecture)'s
  * factory methods.
  */
 

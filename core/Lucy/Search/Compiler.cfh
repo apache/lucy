@@ -19,24 +19,24 @@ parcel Lucy;
 /** Query-to-Matcher compiler.
  *
  * The purpose of the Compiler class is to take a specification in the form of
- * a L<Query|Lucy::Search::Query> object and compile a
- * L<Matcher|Lucy::Search::Matcher> object that can do real work.
+ * a [](cfish:Query) object and compile a
+ * [](cfish:Matcher) object that can do real work.
  *
  * The simplest Compiler subclasses -- such as those associated with
- * constant-scoring Query types -- might simply implement a Make_Matcher()
+ * constant-scoring Query types -- might simply implement a [](cfish:.Make_Matcher)
  * method which passes along information verbatim from the Query to the
  * Matcher's constructor.
  *
  * However it is common for the Compiler to perform some calculations which
  * affect it's "weight" -- a floating point multiplier that the Matcher will
  * factor into each document's score.  If that is the case, then the Compiler
- * subclass may wish to override Get_Weight(), Sum_Of_Squared_Weights(), and
- * Apply_Norm_Factor().
+ * subclass may wish to override [](cfish:.Get_Weight), [](cfish:.Sum_Of_Squared_Weights), and
+ * [](cfish:.Apply_Norm_Factor).
  *
  * Compiling a Matcher is a two stage process.
  *
  * The first stage takes place during the Compiler's construction, which is
- * where the Query object meets a L<Searcher|Lucy::Search::Searcher>
+ * where the Query object meets a [](cfish:Searcher)
  * object for the first time.  Searchers operate on a specific document
  * collection and they can tell you certain statistical information about the
  * collection -- such as how many total documents are in the collection, or
@@ -45,8 +45,8 @@ parcel Lucy;
  * TF/IDF weighting algorithm to adjust the Compiler's weight; custom
  * subclasses might do something similar.
  *
- * The second stage of compilation is Make_Matcher(), method, which is where
- * the Compiler meets a L<SegReader|Lucy::Index::SegReader> object.
+ * The second stage of compilation is [](cfish:.Make_Matcher), method, which is where
+ * the Compiler meets a [](cfish:SegReader) object.
  * SegReaders are associated with a single segment within a single index on a
  * single machine, and are thus lower-level than Searchers, which may
  * represent a document collection spread out over a search cluster
@@ -54,7 +54,7 @@ parcel Lucy;
  * use new information supplied by the SegReader -- such as whether a term is
  * missing from the local index even though it is present within the larger
  * collection represented by the Searcher -- when figuring out what to feed to
- * the Matchers's constructor, or whether Make_Matcher() should return a
+ * the Matchers's constructor, or whether [](cfish:.Make_Matcher) should return a
  * Matcher at all.
  */
 public class Lucy::Search::Compiler inherits Lucy::Search::Query {
@@ -78,7 +78,7 @@ public class Lucy::Search::Compiler inherits Lucy::Search::Query {
     /** Factory method returning a Matcher.
      *
      * @param reader A SegReader.
-     * @param need_score Indicate whether the Matcher must implement Score().
+     * @param need_score Indicate whether the Matcher must implement [](cfish:Matcher.Score).
      * @return a Matcher, or NULL if the Matcher would have matched no
      * documents.
      */
@@ -102,7 +102,7 @@ public class Lucy::Search::Compiler inherits Lucy::Search::Query {
     Get_Parent(Compiler *self);
 
     /** Compute and return a raw weighting factor.  (This quantity is used by
-     * Normalize()).  By default, simply returns 1.0.
+     * [](cfish:.Normalize)).  By default, simply returns 1.0.
      */
     public float
     Sum_Of_Squared_Weights(Compiler *self);
@@ -122,13 +122,13 @@ public class Lucy::Search::Compiler inherits Lucy::Search::Query {
 
     /**  Take a newly minted Compiler object and apply query-specific
      * normalization factors.  Should be invoked by Query subclasses during
-     * Make_Compiler() for top-level nodes.
+     * [](cfish:.Make_Compiler) for top-level nodes.
      *
      * For a TermQuery, the scoring formula is approximately:
      *
      *     (tf_d * idf_t / norm_d) * (tf_q * idf_t / norm_q)
      *
-     * Normalize() is theoretically concerned with applying the second half of
+     * [](cfish:.Normalize) is theoretically concerned with applying the second half of
      * that formula to a the Compiler's weight. What actually happens depends
      * on how the Compiler and Similarity methods called internally are
      * implemented.

@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Read postings data.
  *
- * PostingListReaders produce L<PostingList|Lucy::Index::PostingList>
+ * PostingListReaders produce [](cfish:PostingList)
  * objects which convey document matching information.
  */
 public class Lucy::Index::PostingListReader nickname PListReader
@@ -34,7 +34,7 @@ public class Lucy::Index::PostingListReader nickname PListReader
      *
      * @param field A field name.
      * @param term If supplied, the PostingList will be pre-located to this
-     * term using Seek().
+     * term using [](cfish:PostingList.Seek).
      */
     public abstract incremented nullable PostingList*
     Posting_List(PostingListReader *self, String *field = NULL,

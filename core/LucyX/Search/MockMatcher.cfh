@@ -29,7 +29,7 @@ class LucyX::Search::MockMatcher inherits Lucy::Search::Matcher {
     /**
      * @param doc_ids An array of matching doc ids.
      * @param scores Float scores corresponding to the doc ids array.  If not
-     * supplied, calling Score() will throw an exception.
+     * supplied, calling [](cfish:.Score) will throw an exception.
      */
     inert incremented MockMatcher*
     init(MockMatcher *self, I32Array *doc_ids, ByteBuf *scores = NULL);

@@ -20,10 +20,10 @@ parcel Lucy;
  *
  * Use the IndexSearcher class to perform search queries against an index.
  * (For searching multiple indexes at once, see
- * L<PolySearcher|Lucy::Search::PolySearcher>).
+ * [](cfish:PolySearcher)).
  *
  * IndexSearchers operate against a single point-in-time view or
- * L<Snapshot|Lucy::Index::Snapshot> of the index.  If an index is
+ * [](cfish:Snapshot) of the index.  If an index is
  * modified, a new IndexSearcher must be opened to access the changes.
  */
 public class Lucy::Search::IndexSearcher nickname IxSearcher

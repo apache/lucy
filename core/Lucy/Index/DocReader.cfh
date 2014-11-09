@@ -20,7 +20,7 @@ parcel Lucy;
  *
  * DocReader defines the interface by which documents (with all stored fields)
  * are retrieved from the index.  The default implementation returns
- * L<HitDoc|Lucy::Document::HitDoc> objects.
+ * [](cfish:HitDoc) objects.
  */
 public class Lucy::Index::DocReader inherits Lucy::Index::DataReader {
 

@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Query matching an ordered list of terms.
  *
- * ProximityQuery is a subclass of L<Lucy::Search::Query> for matching
+ * ProximityQuery is a subclass of [](cfish:Query) for matching
  * against an ordered sequence of terms.
  */
 

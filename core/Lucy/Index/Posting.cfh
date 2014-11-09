@@ -23,9 +23,9 @@ parcel Lucy;
  * academic definition of "posting".)
  *
  * Subclasses include
- * L<MatchPosting|Lucy::Index::Posting::MatchPosting>, the simplest
+ * [](cfish:MatchPosting), the simplest
  * posting format, and
- * L<ScorePosting|Lucy::Index::Posting::ScorePosting>, the default.
+ * [](cfish:ScorePosting), the default.
  */
 class Lucy::Index::Posting nickname Post inherits Lucy::Util::Stepper {
 

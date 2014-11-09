@@ -19,19 +19,19 @@ parcel Lucy;
 /** Abstract external sorter.
  *
  * SortExternal objects are sort pools which allow you to sort huge
- * collections of elements.  To achieve this, you Feed() all items into the
- * SortExternal object, Flip() it from write mode to read mode, then Fetch()
+ * collections of elements.  To achieve this, you [](cfish:.Feed) all items into the
+ * SortExternal object, [](cfish:.Flip) it from write mode to read mode, then [](cfish:.Fetch)
  * the elements one at a time in sorted order.
  *
  * It's expected that the total memory footprint of the buffered sortable
  * items will eventually exceed a specified threshold; at that point, the
- * SortExternal object will call the abstract method Flush().  It's expected
- * that Flush() implementations will empty out the current buffer, write a
+ * SortExternal object will call the abstract method [](cfish:.Flush).  It's expected
+ * that [](cfish:.Flush) implementations will empty out the current buffer, write a
  * sorted "run" to external storage, and add a new child SortExternal object
  * to the top level object's "runs" array to represent the flushed content.
  *
  * During the read phase, the child sortex objects retrieve elements from
- * external storage by calling the abstract method Refill().  The top-level
+ * external storage by calling the abstract method [](cfish:.Refill).  The top-level
  * SortExternal object then interleaves multiple sorted streams to produce a
  * single unified stream of sorted items.
  */
@@ -63,7 +63,7 @@ abstract class Lucy::Util::SortExternal nickname SortEx
      *
      * Presumably this entails sorting everything, writing the sorted elements
      * to disk, spawning a child object to represent those elements, and
-     * adding that child to the top-level object via Add_Run().
+     * adding that child to the top-level object via [](cfish:.Add_Run).
      */
     abstract void
     Flush(SortExternal *self);
@@ -79,13 +79,13 @@ abstract class Lucy::Util::SortExternal nickname SortEx
     Flip(SortExternal *self);
 
     /** Fetch the next sorted item from the sort pool.  Invalid prior to
-     * calling Flip(). Returns NULL when all elements have been exhausted.
+     * calling [](cfish:.Flip). Returns NULL when all elements have been exhausted.
      */
     incremented nullable Obj*
     Fetch(SortExternal *self);
 
     /** Preview the next item that Fetch will return, but don't pop it.
-     * Invalid prior to calling Flip().
+     * Invalid prior to calling [](cfish:.Flip).
      */
     nullable Obj*
     Peek(SortExternal *self);

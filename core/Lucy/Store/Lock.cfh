@@ -43,7 +43,7 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
      * consist solely of characters matching [-_.A-Za-z0-9].
      * @param host A unique per-machine identifier.
      * @param timeout Time in milliseconds to keep retrying before abandoning
-     * the attempt to Obtain() a lock.
+     * the attempt to [](cfish:.Obtain) a lock.
      * @param interval Time in milliseconds between retries.
      */
     public inert Lock*
@@ -55,7 +55,7 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
     public abstract bool
     Shared(Lock *self);
 
-    /** Call Request() once per `interval` until Request() returns
+    /** Call [](cfish:.Request) once per `interval` until [](cfish:.Request) returns
      * success or the `timeout` has been reached.
      *
      * @return true on success, false on failure (sets Err_error).
@@ -65,12 +65,12 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
 
     /** Make one attempt to acquire the lock.
      *
-     * The semantics of Request() differ depending on whether Shared() returns
-     * true.  If the Lock is Shared(), then Request() should not fail if
+     * The semantics of [](cfish:.Request) differ depending on whether [](cfish:.Shared) returns
+     * true.  If the Lock is [](cfish:.Shared), then [](cfish:.Request) should not fail if
      * another lock is held against the resource identified by
      * `name` (though it might fail for other reasons).  If it is
-     * not Shared() -- i.e. it's an exclusive (write) lock -- then other locks
-     * should cause Request() to fail.
+     * not [](cfish:.Shared) -- i.e. it's an exclusive (write) lock -- then other locks
+     * should cause [](cfish:.Request) to fail.
      *
      * @return true on success, false on failure (sets Err_error).
      */
@@ -157,7 +157,7 @@ class Lucy::Store::LockFileLock nickname LFLock
 
 /** Lock exception.
  *
- * LockErr is a subclass of L<Err|Clownfish::Err> which indicates
+ * LockErr is a subclass of [Err](cfish:cfish.Err) which indicates
  * that a file locking problem occurred.
  */
 public class Lucy::Store::LockErr inherits Clownfish::Err {

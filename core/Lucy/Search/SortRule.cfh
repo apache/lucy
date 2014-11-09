@@ -19,7 +19,7 @@ parcel Lucy;
 /** Element of a SortSpec.
  *
  * SortRules are the building blocks used to assemble
- * L<SortSpecs|Lucy::Search::SortSpec>; each SortRule defines a single
+ * [SortSpecs](cfish:SortSpec); each SortRule defines a single
  * level of sorting.  For example, sorting first by "category" then by score
  * requires a SortSpec with two SortRule elements.
  */

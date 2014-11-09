@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** Unicode normalization, case folding and accent stripping.
  *
- * Normalizer is an L<Analyzer|Lucy::Analysis::Analyzer> which normalizes
+ * Normalizer is an [](cfish:Analyzer) which normalizes
  * tokens to one of the Unicode normalization forms. Optionally, it
  * performs Unicode case folding and converts accented characters to their
  * base character.

@@ -19,7 +19,7 @@ parcel Lucy;
 
 /** Query which matches individual terms.
  *
- * TermQuery is a subclass of L<Lucy::Search::Query> for matching
+ * TermQuery is a subclass of [](cfish:Query) for matching
  * individual terms in a specific field.
  */
 

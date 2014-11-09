@@ -34,33 +34,33 @@ public class Lucy::Store::LockFactory nickname LockFact
     new(Folder *folder, String *host);
 
     /**
-     * @param folder A L<Lucy::Store::Folder>.
+     * @param folder A [](cfish:Folder).
      * @param host An identifier which should be unique per-machine.
      */
     public inert LockFactory*
     init(LockFactory *self, Folder *folder, String *host);
 
-    /** Return a Lock object, which, once Obtain() returns successfully,
+    /** Return a Lock object, which, once [](cfish:Lock.Obtain) returns successfully,
      * maintains an exclusive lock on a resource.
      *
      * @param name A file-system-friendly id which identifies the
      * resource to be locked.
      * @param timeout Time in milliseconds to keep retrying before abandoning
-     * the attempt to Obtain() a lock.
+     * the attempt to [](cfish:Lock.Obtain) a lock.
      * @param interval Time in milliseconds between retries.
      */
     public incremented Lock*
     Make_Lock(LockFactory *self, String *name, int32_t timeout = 0,
               int32_t interval = 100);
 
-    /** Return a Lock object for which Shared() returns true, and which
-     * maintains a non-exclusive lock on a resource once Obtain() returns
+    /** Return a Lock object for which [](cfish:Lock.Shared) returns true, and which
+     * maintains a non-exclusive lock on a resource once [](cfish:Lock.Obtain) returns
      * success.
      *
      * @param name A file-system-friendly id which identifies the
      * resource to be locked.
      * @param timeout Time in milliseconds to keep retrying before abandoning
-     * the attempt to Obtain() a lock.
+     * the attempt to [](cfish:Lock.Obtain) a lock.
      * @param interval Time in milliseconds between retries.
      */
     public incremented Lock*

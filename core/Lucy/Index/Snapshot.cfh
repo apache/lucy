@@ -22,7 +22,7 @@ parcel Lucy;
  * written, are never modified, a Snapshot defines a point-in-time view of the
  * data in an index.
  *
- * L<IndexReader|Lucy::Index::IndexReader> objects interpret the data
+ * [](cfish:IndexReader) objects interpret the data
  * associated with a single Snapshot.
  */
 
@@ -95,7 +95,7 @@ public class Lucy::Index::Snapshot inherits Clownfish::Obj {
     Set_Path(Snapshot *self, String *path);
 
     /** Get the path to the snapshot file.  Initially NULL; updated by
-     * Read_File(), Write_File(), and Set_Path().
+     * [](cfish:.Read_File), [](cfish:.Write_File), and [](cfish:.Set_Path).
      */
     public nullable String*
     Get_Path(Snapshot *self);

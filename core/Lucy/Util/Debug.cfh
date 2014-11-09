@@ -98,7 +98,7 @@ __C__
 
 /** Abort on error if test fails.
  *
- * Note: unlike the system assert(), this ASSERT() is #ifdef LUCY_DEBUG.
+ * Note: unlike the system assert(), this [](cfish:.ASSERT) is #ifdef LUCY_DEBUG.
  */
 #define LUCY_ASSERT(test , args...)                                    \
     do {                                                               \

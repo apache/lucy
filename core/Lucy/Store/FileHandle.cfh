@@ -125,7 +125,7 @@ abstract class Lucy::Store::FileHandle nickname FH
     nullable String*
     Get_Path(FileHandle *self);
 
-    /** Invokes Close(), but ignores whether it succeeds or fails.
+    /** Invokes [](cfish:.Close), but ignores whether it succeeds or fails.
      */
     public void
     Destroy(FileHandle *self);

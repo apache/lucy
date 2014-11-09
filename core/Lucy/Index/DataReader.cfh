@@ -19,7 +19,7 @@ parcel Lucy;
 /** Abstract base class for reading index data.
  *
  * DataReader is the companion class to
- * L<DataWriter|Lucy::Index::DataWriter>.  Every index component will
+ * [](cfish:DataWriter).  Every index component will
  * implement one of each.
  */
 

@@ -18,16 +18,16 @@ parcel Lucy;
 
 /** Multiple Analyzers in series.
  *
- * A PolyAnalyzer is a series of L<Analyzers|Lucy::Analysis::Analyzer>,
+ * A PolyAnalyzer is a series of [Analyzers](cfish:Analyzer),
  * each of which will be called upon to "analyze" text in turn.  You can
  * either provide the Analyzers yourself, or you can specify a supported
  * language, in which case a PolyAnalyzer consisting of a
- * L<CaseFolder|Lucy::Analysis::CaseFolder>, a
- * L<RegexTokenizer|Lucy::Analysis::RegexTokenizer>, and a
- * L<SnowballStemmer|Lucy::Analysis::SnowballStemmer> will be generated for you.
+ * [](cfish:CaseFolder), a
+ * [](cfish:RegexTokenizer), and a
+ * [](cfish:SnowballStemmer) will be generated for you.
  *
  * The language parameter is DEPRECATED. Use
- * L<EasyAnalyzer|Lucy::Analysis::EasyAnalyzer> instead.
+ * [](cfish:EasyAnalyzer) instead.
  *
  * Supported languages:
  *
@@ -56,7 +56,7 @@ public class Lucy::Analysis::PolyAnalyzer inherits Lucy::Analysis::Analyzer {
 
     /**
      * @param language An ISO code from the list of supported languages.
-     * DEPRECATED, use L<EasyAnalyzer|Lucy::Analysis::EasyAnalyzer> instead.
+     * DEPRECATED, use [](cfish:EasyAnalyzer) instead.
      * @param analyzers An array of Analyzers.  The order of the analyzers
      * matters.  Don't put a SnowballStemmer before a RegexTokenizer (can't stem whole
      * documents or paragraphs -- just individual words), or a SnowballStopFilter

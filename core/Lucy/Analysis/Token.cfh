@@ -39,7 +39,7 @@ parcel Lucy;
  * more or less importance to a particular token, as you might for emboldened
  * text within an HTML document, for example.  (Note: The field this token
  * belongs to must be spec'd to use a posting of type
- * L<Lucy::Index::Posting::RichPosting>.)
+ * [](cfish:RichPosting).)
  *
  * `pos_inc` is the POSition INCrement, measured in Tokens.  This
  * attribute, which defaults to 1, is a an advanced tool for manipulating

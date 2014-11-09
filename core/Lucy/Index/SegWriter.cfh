@@ -20,16 +20,16 @@ parcel Lucy;
 /** Write one segment of an index.
  *
  * SegWriter is a conduit through which information fed to Indexer passes.  It
- * manages L<Segment|Lucy::Index::Segment> and Inverter, invokes the
- * L<Analyzer|Lucy::Analysis::Analyzer> chain, and feeds low
- * level L<DataWriters|Lucy::Index::DataWriter> such as
+ * manages [](cfish:Segment) and Inverter, invokes the
+ * [](cfish:Analyzer) chain, and feeds low
+ * level [DataWriters](cfish:DataWriter) such as
  * PostingListWriter and DocWriter.
  *
  * The sub-components of a SegWriter are determined by
- * L<Architecture|Lucy::Plan::Architecture>.  DataWriter components
- * which are added to the stack of writers via Add_Writer() have
- * Add_Inverted_Doc() invoked for each document supplied to SegWriter's
- * Add_Doc().
+ * [](cfish:Architecture).  DataWriter components
+ * which are added to the stack of writers via [](cfish:.Add_Writer) have
+ * [](cfish:.Add_Inverted_Doc) invoked for each document supplied to SegWriter's
+ * [](cfish:.Add_Doc).
  */
 public class Lucy::Index::SegWriter inherits Lucy::Index::DataWriter {
 
@@ -57,8 +57,8 @@ public class Lucy::Index::SegWriter inherits Lucy::Index::DataWriter {
 
     /**
      * Register a DataWriter component with the SegWriter.  (Note that
-     * registration simply makes the writer available via Fetch(), so you may
-     * also want to call Add_Writer()).
+     * registration simply makes the writer available via [](cfish:.Fetch), so you may
+     * also want to call [](cfish:.Add_Writer)).
      *
      * @param api The name of the DataWriter api which `writer`
      * implements.
@@ -89,7 +89,7 @@ public class Lucy::Index::SegWriter inherits Lucy::Index::DataWriter {
     Prep_Seg_Dir(SegWriter *self);
 
     /** Add a document to the segment.  Inverts `doc`, increments
-     * the Segment's internal document id, then calls Add_Inverted_Doc(),
+     * the Segment's internal document id, then calls [](cfish:.Add_Inverted_Doc),
      * feeding all sub-writers.
      */
     public void

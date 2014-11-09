@@ -50,7 +50,7 @@ abstract class Lucy::Store::DirHandle nickname DH
     Get_Dir(DirHandle *self);
 
     /** Return the path of the current entry.  The value is only valid when
-     * Next() has returned successfully.
+     * [](cfish:.Next) has returned successfully.
      */
     incremented String*
     Get_Entry(DirHandle *self);
@@ -66,7 +66,7 @@ abstract class Lucy::Store::DirHandle nickname DH
     abstract bool
     Entry_Is_Symlink(DirHandle *self);
 
-    /** Invokes Close(), but ignores any errors.
+    /** Invokes [](cfish:.Close), but ignores any errors.
      */
     public void
     Destroy(DirHandle *self);

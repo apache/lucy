@@ -69,7 +69,7 @@ class Lucy::Index::SegPostingList nickname SegPList
     public void
     Seek(SegPostingList *self, Obj *target = NULL);
 
-    /** Optimized version of Seek(), designed to speed sequential access.
+    /** Optimized version of [](cfish:.Seek), designed to speed sequential access.
      */
     void
     Seek_Lex(SegPostingList *self, Lexicon *lexicon);

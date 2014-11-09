@@ -51,7 +51,7 @@ public abstract class Lucy::Index::DeletionsWriter nickname DelWriter
 
     /** Delete all documents in the index that match `query`.
      *
-     * @param query A L<Query|Lucy::Search::Query>.
+     * @param query A [](cfish:Query).
      */
     public abstract void
     Delete_By_Query(DeletionsWriter *self, Query *query);

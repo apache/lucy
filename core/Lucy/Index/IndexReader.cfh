@@ -19,7 +19,7 @@ parcel Lucy;
 /** Read from an inverted index.
  *
  * IndexReader is the interface through which
- * L<IndexSearcher|Lucy::Search::IndexSearcher> objects access the
+ * [](cfish:IndexSearcher) objects access the
  * content of an index.
  *
  * IndexReader objects always represent a point-in-time view of an index as it
@@ -28,10 +28,10 @@ parcel Lucy;
  * after the update process completes.
  *
  * IndexReaders are composites; most of the work is done by individual
- * L<DataReader|Lucy::Index::DataReader> sub-components, which may be
- * accessed via Fetch() and Obtain().  The most efficient and powerful access
+ * [](cfish:DataReader) sub-components, which may be
+ * accessed via [](cfish:.Fetch) and [](cfish:.Obtain).  The most efficient and powerful access
  * to index data happens at the segment level via
- * L<SegReader|Lucy::Index::SegReader>'s sub-components.
+ * [](cfish:SegReader)'s sub-components.
  */
 
 public class Lucy::Index::IndexReader nickname IxReader
@@ -57,7 +57,7 @@ public class Lucy::Index::IndexReader nickname IxReader
      * @param index Either a string filepath or a Folder.
      * @param snapshot A Snapshot.  If not supplied, the most recent snapshot
      * file will be used.
-     * @param manager An L<IndexManager|Lucy::Index::IndexManager>.
+     * @param manager An [](cfish:IndexManager).
      * Read-locking is off by default; supplying this argument turns it on.
      */
     public inert nullable IndexReader*

@@ -19,17 +19,17 @@ parcel Lucy;
 /** Shared (read) lock.
  *
  * SharedLock's interface is nearly identical to that of its parent class
- * L<Lucy::Store::Lock>, taking the same constructor arguments and
+ * [](cfish:Lock), taking the same constructor arguments and
  * implementing the same list of methods.  It differs from Lock only in the
  * semantics of two methods.
  *
- * First, Obtain() will not fail if another lock is held against the resource
+ * First, [](cfish:.Obtain) will not fail if another lock is held against the resource
  * identified by `name` (though it might fail for other reasons).
  *
- * Second, Is_Locked() returns true so long as some lock, somewhere is holding
+ * Second, [](cfish:.Is_Locked) returns true so long as some lock, somewhere is holding
  * a lock on `name`.  That lock could be this instance, or it could
- * be another -- so is entirely possible to call Release() successfully on a
- * SharedLock object yet still have Is_Locked() return true.
+ * be another -- so is entirely possible to call [](cfish:.Release) successfully on a
+ * SharedLock object yet still have [](cfish:.Is_Locked) return true.
  *
  * As currently implemented, SharedLock differs from Lock in that each caller
  * gets its own lockfile.  Lockfiles still have filenames which begin with the
@@ -51,7 +51,7 @@ class Lucy::Store::SharedLock nickname ShLock
      * @param name String identifying the resource to be locked.
      * @param host An identifier which should be unique per-machine.
      * @param timeout Time in milliseconds to keep retrying before abandoning
-     * the attempt to Obtain() a lock.
+     * the attempt to [](cfish:.Obtain) a lock.
      * @param interval Time in milliseconds between retries.
      */
     public inert SharedLock*

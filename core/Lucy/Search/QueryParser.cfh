@@ -19,9 +19,9 @@ parcel Lucy;
 /** Transform a string into a Query object.
  *
  * QueryParser accepts search strings as input and produces
- * L<Lucy::Search::Query> objects, suitable for feeding into
- * L<IndexSearcher|Lucy::Search::IndexSearcher> and other
- * L<Searcher|Lucy::Search::Searcher> subclasses.
+ * [](cfish:Query) objects, suitable for feeding into
+ * [](cfish:IndexSearcher) and other
+ * [](cfish:Searcher) subclasses.
  *
  * The following syntactical constructs are recognized by QueryParser:
  *
@@ -32,7 +32,7 @@ parcel Lucy;
  * * Logical groups, delimited by parentheses.
  * * Phrases, delimited by double quotes.
  *
- * Additionally, the following syntax can be enabled via Set_Heed_Colons():
+ * Additionally, the following syntax can be enabled via [](cfish:.Set_Heed_Colons):
  *
  * * Field-specific constructs, in the form of 'fieldname:termtext' or
  *   'fieldname:(foo bar)'.  (The field specified by 'fieldname:' will be
@@ -57,8 +57,8 @@ public class Lucy::Search::QueryParser nickname QParser
 
     /** Constructor.
      *
-     * @param schema A L<Schema|Lucy::Plan::Schema>.
-     * @param analyzer An L<Analyzer|Lucy::Analysis::Analyzer>.
+     * @param schema A [](cfish:Schema).
+     * @param analyzer An [](cfish:Analyzer).
      * Ordinarily, the analyzers specified by each field's definition will be
      * used, but if `analyzer` is supplied, it will override and be used for
      * all fields.  This can lead to mismatches between what is in the index
@@ -76,7 +76,7 @@ public class Lucy::Search::QueryParser nickname QParser
         String *default_boolop = NULL, VArray *fields = NULL);
 
     /** Build a Query object from the contents of a query string.  At present,
-     * implemented internally by calling Tree(), Expand(), and Prune().
+     * implemented internally by calling [](cfish:.Tree), [](cfish:.Expand), and [](cfish:.Prune).
      *
      * @param query_string The string to be parsed.  May be NULL.
      * @return a Query.
@@ -90,8 +90,8 @@ public class Lucy::Search::QueryParser nickname QParser
      * well.  Internal nodes will be objects which subclass PolyQuery:
      * ANDQuery, ORQuery, NOTQuery, and RequiredOptionalQuery.
      *
-     * The output of Tree() is an intermediate form which must be passed
-     * through Expand() before being used to feed a search.
+     * The output of [](cfish:.Tree) is an intermediate form which must be passed
+     * through [](cfish:.Expand) before being used to feed a search.
      *
      * @param query_string The string to be parsed.
      * @return a Query.
@@ -100,7 +100,7 @@ public class Lucy::Search::QueryParser nickname QParser
     Tree(QueryParser *self, String *query_string);
 
     /** Walk the hierarchy of a Query tree, descending through all PolyQuery
-     * nodes and calling Expand_Leaf() on any LeafQuery nodes encountered.
+     * nodes and calling [](cfish:.Expand_Leaf) on any LeafQuery nodes encountered.
      *
      * @param query A Query object.
      * @return A Query -- usually the same one that was supplied after
@@ -124,23 +124,23 @@ public class Lucy::Search::QueryParser nickname QParser
     Expand_Leaf(QueryParser *self, Query *query);
 
     /** Prevent certain Query structures from returning too many results.
-     * Query objects built via Tree() and Expand() can generate "return the
+     * Query objects built via [](cfish:.Tree) and [](cfish:.Expand) can generate "return the
      * world" result sets, such as in the case of
-     * `NOT a_term_not_in_the_index`; Prune() walks the hierarchy
+     * `NOT a_term_not_in_the_index`; [](cfish:.Prune) walks the hierarchy
      * and eliminates such branches.
      *
      *      'NOT foo'               => [NOMATCH]
      *      'foo OR NOT bar'        => 'foo'
      *      'foo OR (-bar AND -baz) => 'foo'
      *
-     * Prune() also eliminates some double-negative constructs -- even though
+     * [](cfish:.Prune) also eliminates some double-negative constructs -- even though
      * such constructs may not actually return the world:
      *
      *      'foo AND -(-bar)'      => 'foo'
      *
      * In this example, safety is taking precedence over logical consistency.
-     * If you want logical consistency instead, call Tree() then Expand(),
-     * skipping Prune().
+     * If you want logical consistency instead, call [](cfish:.Tree) then [](cfish:.Expand),
+     * skipping [](cfish:.Prune).
      *
      *
      * @param query A Query.

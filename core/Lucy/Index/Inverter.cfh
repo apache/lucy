@@ -42,13 +42,13 @@ class Lucy::Index::Inverter inherits Clownfish::Obj {
     inert Inverter*
     init(Inverter *self, Schema *schema, Segment *segment);
 
-    /** Invert the document, first calling Set_Doc(), then Add_Field() for
+    /** Invert the document, first calling [](cfish:.Set_Doc), then [](cfish:.Add_Field) for
      * each field in the Doc.
      */
     public void
     Invert_Doc(Inverter *self, Doc *doc);
 
-    /** Set the object's `doc` member.  Calls Clear() as side
+    /** Set the object's `doc` member.  Calls [](cfish:.Clear) as side
      * effect.
      */
     public void
@@ -63,7 +63,7 @@ class Lucy::Index::Inverter inherits Clownfish::Obj {
      * it.
      *
      * The InverterEntry's value should have already been set to the field's
-     * value when Add_Field() is called.
+     * value when [](cfish:.Add_Field) is called.
      */
     void
     Add_Field(Inverter *self, InverterEntry *entry);

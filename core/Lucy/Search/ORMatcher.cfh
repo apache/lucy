@@ -19,7 +19,7 @@ parcel Lucy;
 __C__
 #include "Lucy/Search/Matcher.h"
 
-/* A wrapper for a Matcher which caches the result of Matcher_Get_Doc_ID().
+/* A wrapper for a Matcher which caches the result of [](cfish:.Matcher_Get_Doc_ID).
  */
 typedef struct lucy_HeapedMatcherDoc {
     lucy_Matcher *matcher;

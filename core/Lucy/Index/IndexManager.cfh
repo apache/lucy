@@ -21,7 +21,7 @@ parcel Lucy;
  * IndexManager is an advanced-use class for controlling index locking,
  * updating, merging, and deletion behaviors.
  *
- * IndexManager and L<Architecture|Lucy::Plan::Architecture> are
+ * IndexManager and [](cfish:Architecture) are
  * complementary classes: Architecture is used to define traits and behaviors
  * which cannot change for the life of an index; IndexManager is used for
  * defining rules which may change from process to process.

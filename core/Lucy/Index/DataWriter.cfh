@@ -21,10 +21,10 @@ parcel Lucy;
  * DataWriter is an abstract base class for writing index data, generally in
  * segment-sized chunks. Each component of an index -- e.g. stored fields,
  * lexicon, postings, deletions -- is represented by a
- * DataWriter/L<DataReader|Lucy::Index::DataReader> pair.
+ * DataWriter/[](cfish:DataReader) pair.
  *
  * Components may be specified per index by subclassing
- * L<Architecture|Lucy::Plan::Architecture>.
+ * [](cfish:Architecture).
  */
 
 public class Lucy::Index::DataWriter inherits Clownfish::Obj {
@@ -83,7 +83,7 @@ public class Lucy::Index::DataWriter inherits Clownfish::Obj {
     /** Move content from an existing segment into the one currently being
      * written.
      *
-     * The default implementation calls Add_Segment() then Delete_Segment().
+     * The default implementation calls [](cfish:.Add_Segment) then [](cfish:.Delete_Segment).
      *
      * @param reader The SegReader containing content to merge, which must
      * represent a segment which is part of the the current snapshot.

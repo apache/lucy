@@ -51,7 +51,7 @@ public class Lucy::Plan::Schema inherits Clownfish::Obj {
      *
      * If this method has already been called for the supplied
      * `field`, it will merely test to verify that the supplied
-     * FieldType Equals() the existing one.
+     * FieldType [](cfish:.Equals) the existing one.
      *
      * @param name The name of the field.
      * @param type A FieldType.

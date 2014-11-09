@@ -53,8 +53,8 @@ class Lucy::Util::PriorityQueue nickname PriQ
     bool
     Insert(PriorityQueue *self, decremented Obj *element);
 
-    /** Equivalent to Insert(), except for the return value.  If the Queue has
-     * room, the element is inserted and Jostle() returns NULL.  If not, then
+    /** Equivalent to [](cfish:.Insert), except for the return value.  If the Queue has
+     * room, the element is inserted and [](cfish:.Jostle) returns NULL.  If not, then
      * the item which falls out of the bottom of the Queue is returned.
      */
     incremented nullable Obj*

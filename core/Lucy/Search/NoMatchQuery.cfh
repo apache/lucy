@@ -20,7 +20,7 @@ parcel Lucy;
  *
  * NoMatchQuery is a utility class representing a query which matches nothing.
  * Typical usage might include e.g. returning a NoMatchQuery when a
- * L<QueryParser|Lucy::Search::QueryParser> is asked to parse an empty
+ * [](cfish:QueryParser) is asked to parse an empty
  * string.
  */
 public class Lucy::Search::NoMatchQuery inherits Lucy::Search::Query {

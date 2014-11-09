@@ -119,8 +119,8 @@ class Lucy::Store::InStream inherits Clownfish::Obj {
     Buf(InStream *self, size_t request);
 
     /** Set the buf to a new value, checking for overrun.  The idiom is for
-     * the caller to call Buf(), use no more bytes than requested, then use
-     * Advance_Buf() to update the InStream object.
+     * the caller to call [](cfish:.Buf), use no more bytes than requested, then use
+     * [](cfish:.Advance_Buf) to update the InStream object.
      */
     final void
     Advance_Buf(InStream *self, const char *buf);

@@ -55,7 +55,7 @@ public class Lucy::Index::Lexicon nickname Lex inherits Clownfish::Obj {
     public abstract bool
     Next(Lexicon *self);
 
-    /** Reset the iterator.  Next() must be called to proceed to the first
+    /** Reset the iterator.  [](cfish:.Next) must be called to proceed to the first
      * element.
      */
     public abstract void

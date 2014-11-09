@@ -22,8 +22,8 @@ parcel Lucy;
  * postings, stored documents, deletions, and highlight data.  The readers and
  * writers for that data are spawned by Architecture.  Each component operates
  * at the segment level; Architecture's factory methods are used to build up
- * L<SegWriter|Lucy::Index::SegWriter> and
- * L<SegReader|Lucy::Index::SegReader>.
+ * [](cfish:SegWriter) and
+ * [](cfish:SegReader).
  */
 public class Lucy::Plan::Architecture nickname Arch inherits Clownfish::Obj {
 
@@ -42,7 +42,7 @@ public class Lucy::Plan::Architecture nickname Arch inherits Clownfish::Obj {
     public void
     Init_Seg_Writer(Architecture *self, SegWriter *writer);
 
-    /** Spawn a LexiconWriter and Register() it with the supplied SegWriter,
+    /** Spawn a LexiconWriter and [](cfish:SegWriter.Register) it with the supplied SegWriter,
      * but don't add it to the SegWriter's writer stack.
      *
      * @param writer A SegWriter.
@@ -50,7 +50,7 @@ public class Lucy::Plan::Architecture nickname Arch inherits Clownfish::Obj {
     public void
     Register_Lexicon_Writer(Architecture *self, SegWriter *writer);
 
-    /** Spawn a PostingListWriter and Register() it with the supplied
+    /** Spawn a PostingListWriter and [](cfish:SegWriter.Register) it with the supplied
      * SegWriter, adding it to the SegWriter's writer stack.  The SegWriter
      * must contain a previously registered LexiconWriter.
      *
@@ -59,7 +59,7 @@ public class Lucy::Plan::Architecture nickname Arch inherits Clownfish::Obj {
     public void
     Register_Posting_List_Writer(Architecture *self, SegWriter *writer);
 
-    /** Spawn a DataWriter and Register() it with the supplied SegWriter,
+    /** Spawn a DataWriter and [](cfish:SegWriter.Register) it with the supplied SegWriter,
      * adding it to the SegWriter's writer stack.
      *
      * @param writer A SegWriter.
@@ -67,7 +67,7 @@ public class Lucy::Plan::Architecture nickname Arch inherits Clownfish::Obj {
     public void
     Register_Doc_Writer(Architecture *self, SegWriter *writer);
 
-    /** Spawn a SortWriter and Register() it with the supplied SegWriter,
+    /** Spawn a SortWriter and [](cfish:SegWriter.Register) it with the supplied SegWriter,
      * adding it to the SegWriter's writer stack.
      *
      * @param writer A SegWriter.
@@ -75,7 +75,7 @@ public class Lucy::Plan::Architecture nickname Arch inherits Clownfish::Obj {
     public void
     Register_Sort_Writer(Architecture *self, SegWriter *writer);
 
-    /** Spawn a HighlightWriter and Register() it with the supplied SegWriter,
+    /** Spawn a HighlightWriter and [](cfish:SegWriter.Register) it with the supplied SegWriter,
      * adding it to the SegWriter's writer stack.
      *
      * @param writer A SegWriter.
@@ -83,8 +83,8 @@ public class Lucy::Plan::Architecture nickname Arch inherits Clownfish::Obj {
     public void
     Register_Highlight_Writer(Architecture *self, SegWriter *writer);
 
-    /** Spawn a DeletionsWriter and Register() it with the supplied SegWriter,
-     * also calling Set_Del_Writer().
+    /** Spawn a DeletionsWriter and [](cfish:SegWriter.Register) it with the supplied SegWriter,
+     * also calling [](cfish:SegWriter.Set_Del_Writer).
      *
      * @param writer A SegWriter.
      */
@@ -96,28 +96,28 @@ public class Lucy::Plan::Architecture nickname Arch inherits Clownfish::Obj {
     public void
     Init_Seg_Reader(Architecture *self, SegReader *reader);
 
-    /** Spawn a DocReader and Register() it with the supplied SegReader.
+    /** Spawn a DocReader and [](cfish:SegReader.Register) it with the supplied SegReader.
      *
      * @param reader A SegReader.
      */
     public void
     Register_Doc_Reader(Architecture *self, SegReader *reader);
 
-    /** Spawn a PostingListReader and Register() it with the supplied SegReader.
+    /** Spawn a PostingListReader and [](cfish:SegReader.Register) it with the supplied SegReader.
      *
      * @param reader A SegReader.
      */
     public void
     Register_Posting_List_Reader(Architecture *self, SegReader *reader);
 
-    /** Spawn a SortReader and Register() it with the supplied SegReader.
+    /** Spawn a SortReader and [](cfish:SegReader.Register) it with the supplied SegReader.
      *
      * @param reader A SegReader.
      */
     public void
     Register_Sort_Reader(Architecture *self, SegReader *reader);
 
-    /** Spawn a HighlightReader and Register() it with the supplied
+    /** Spawn a HighlightReader and [](cfish:SegReader.Register) it with the supplied
      * SegReader.
      *
      * @param reader A SegReader.
@@ -125,14 +125,14 @@ public class Lucy::Plan::Architecture nickname Arch inherits Clownfish::Obj {
     public void
     Register_Highlight_Reader(Architecture *self, SegReader *reader);
 
-    /** Spawn a LexiconReader and Register() it with the supplied SegReader.
+    /** Spawn a LexiconReader and [](cfish:SegReader.Register) it with the supplied SegReader.
      *
      * @param reader A SegReader.
      */
     public void
     Register_Lexicon_Reader(Architecture *self, SegReader *reader);
 
-    /** Spawn a DeletionsReader and Register() it with the supplied SegReader.
+    /** Spawn a DeletionsReader and [](cfish:SegReader.Register) it with the supplied SegReader.
      *
      * @param reader A SegReader.
      */

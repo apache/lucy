@@ -19,8 +19,8 @@ parcel Lucy;
 /** Base class for searching collections of documents.
  *
  * Abstract base class for objects which search.  Core subclasses include
- * L<Lucy::Search::IndexSearcher> and
- * L<Lucy::Search::PolySearcher>.
+ * [](cfish:IndexSearcher) and
+ * [](cfish:PolySearcher).
  */
 
 public class Lucy::Search::Searcher inherits Clownfish::Obj {
@@ -71,7 +71,7 @@ public class Lucy::Search::Searcher inherits Clownfish::Obj {
      * hits 21-30, assuming that 30 hits can be found.
      * @param num_wanted The number of hits you would like to see after
      * `offset` is taken into account.
-     * @param sort_spec A L<Lucy::Search::SortSpec>, which will affect
+     * @param sort_spec A [](cfish:SortSpec), which will affect
      * how results are ranked and returned.
      */
     public incremented Hits*
@@ -79,7 +79,7 @@ public class Lucy::Search::Searcher inherits Clownfish::Obj {
          uint32_t num_wanted = 10, SortSpec *sort_spec = NULL);
 
     /** Iterate over hits, feeding them into a
-     * L<Collector|Lucy::Search::Collector>.
+     * [](cfish:Collector).
      *
      * @param query A Query.
      * @param collector A Collector.

@@ -20,7 +20,7 @@ parcel Lucy;
  *
  * By default, searches return results in order of relevance; SortSpec allows
  * you to indicate an alternate order via an array of
- * L<SortRules|Lucy::Search::SortRule>.
+ * [SortRules](cfish:SortRule).
  *
  * Fields you wish to sort against must be `sortable`.
  *

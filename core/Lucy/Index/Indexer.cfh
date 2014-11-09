@@ -20,18 +20,18 @@ parcel Lucy;
  *
  * The Indexer class is Apache Lucy's primary tool for managing the content of
  * inverted indexes, which may later be searched using
- * L<IndexSearcher|Lucy::Search::IndexSearcher>.
+ * [](cfish:IndexSearcher).
  *
  * In general, only one Indexer at a time may write to an index safely.  If a
  * write lock cannot be secured, new() will throw an exception.
  *
  * If an index is located on a shared volume, each writer application must
  * identify itself by supplying an
- * L<IndexManager|Lucy::Index::IndexManager> with a unique
+ * [](cfish:IndexManager) with a unique
  * `host` id to Indexer's constructor or index corruption will
  * occur.  See L<Lucy::Docs::FileLocking> for a detailed discussion.
  *
- * Note: at present, Delete_By_Term() and Delete_By_Query() only affect
+ * Note: at present, [](cfish:.Delete_By_Term) and [](cfish:.Delete_By_Query) only affect
  * documents which had been previously committed to the index -- and not any
  * documents added this indexing session but not yet committed.  This may
  * change in a future update.
@@ -94,7 +94,7 @@ public class Lucy::Index::Indexer inherits Clownfish::Obj {
     /** Mark documents which contain the supplied term as deleted, so that
      * they will be excluded from search results and eventually removed
      * altogether.  The change is not apparent to search apps until after
-     * Commit() succeeds.
+     * [](cfish:.Commit) succeeds.
      *
      * @param field The name of an indexed field. (If it is not spec'd as
      * `indexed`, an error will occur.)
@@ -107,7 +107,7 @@ public class Lucy::Index::Indexer inherits Clownfish::Obj {
 
     /** Mark documents which match the supplied Query as deleted.
      *
-     * @param query A L<Query|Lucy::Search::Query>.
+     * @param query A [](cfish:Query).
      */
     public void
     Delete_By_Query(Indexer *self, Query *query);
@@ -123,20 +123,20 @@ public class Lucy::Index::Indexer inherits Clownfish::Obj {
      * while, as it can involve rewriting large amounts of data.
      *
      * Every Indexer session which changes index content and ends in a
-     * Commit() creates a new segment.  Once written, segments are never
+     * [](cfish:.Commit) creates a new segment.  Once written, segments are never
      * modified.  However, they are periodically recycled by feeding their
      * content into the segment currently being written.
      *
-     * The Optimize() method causes all existing index content to be fed back
-     * into the Indexer.  When Commit() completes after an Optimize(), the
-     * index will consist of one segment.  So Optimize() must be called
-     * before Commit().  Also, optimizing a fresh index created from scratch
+     * The [](cfish:.Optimize) method causes all existing index content to be fed back
+     * into the Indexer.  When [](cfish:.Commit) completes after an [](cfish:.Optimize), the
+     * index will consist of one segment.  So [](cfish:.Optimize) must be called
+     * before [](cfish:.Commit).  Also, optimizing a fresh index created from scratch
      * has no effect.
      *
      * Historically, there was a significant search-time performance benefit
      * to collapsing down to a single segment versus even two segments.  Now
      * the effect of collapsing is much less significant, and calling
-     * Optimize() is rarely justified.
+     * [](cfish:.Optimize) is rarely justified.
      */
     public void
     Optimize(Indexer *self);
@@ -144,15 +144,15 @@ public class Lucy::Index::Indexer inherits Clownfish::Obj {
     /** Commit any changes made to the index.  Until this is called, none of
      * the changes made during an indexing session are permanent.
      *
-     * Calling Commit() invalidates the Indexer, so if you want to make more
+     * Calling [](cfish:.Commit) invalidates the Indexer, so if you want to make more
      * changes you'll need a new one.
      */
     public void
     Commit(Indexer *self);
 
-    /** Perform the expensive setup for Commit() in advance, so that Commit()
-     * completes quickly.  (If Prepare_Commit() is not called explicitly by
-     * the user, Commit() will call it internally.)
+    /** Perform the expensive setup for [](cfish:.Commit) in advance, so that [](cfish:.Commit)
+     * completes quickly.  (If [](cfish:.Prepare_Commit) is not called explicitly by
+     * the user, [](cfish:.Commit) will call it internally.)
      */
     public void
     Prepare_Commit(Indexer *self);

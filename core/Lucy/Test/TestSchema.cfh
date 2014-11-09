@@ -19,7 +19,7 @@ parcel TestLucy;
 /** Schema for use by the test suite.
  *
  * Exposes problems faced by much larger indexes by using an TestArchitecture,
- * which returns absurdly low values for Index_Interval() and Skip_Interval().
+ * which returns absurdly low values for [](cfish:.Index_Interval) and [](cfish:.Skip_Interval).
  */
 
 class Lucy::Test::TestSchema inherits Lucy::Plan::Schema {

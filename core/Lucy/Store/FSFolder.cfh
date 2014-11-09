@@ -18,7 +18,7 @@ parcel Lucy;
 
 /** File System implementation of Folder.
  *
- * Implementation of L<Lucy::Store::Folder> using a single file system
+ * Implementation of [](cfish:Folder) using a single file system
  * directory and multiple files.
  */
 
