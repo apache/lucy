@@ -73,12 +73,12 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
     public incremented String*
     Highlight(Highlighter *self, String *text);
 
-    /** Setter.  The default value is "<strong>".
+    /** Setter.  The default value is "\<strong>".
      */
     public void
     Set_Pre_Tag(Highlighter *self, String *pre_tag);
 
-    /** Setter.  The default value is "</strong>".
+    /** Setter.  The default value is "\</strong>".
      */
     public void
     Set_Post_Tag(Highlighter *self, String *post_tag);
