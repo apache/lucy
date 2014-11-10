@@ -19,7 +19,7 @@ parcel Lucy;
 /** Judge how well a document matches a query.
  *
  * After determining whether a document matches a given query, a score must be
- * calculated which indicates how I<well> the document matches the query.  The
+ * calculated which indicates how *well* the document matches the query.  The
  * Similarity class is used to judge how "similar" the query and the document
  * are to each other; the closer the resemblance, they higher the document
  * scores.

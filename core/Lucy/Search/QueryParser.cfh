@@ -60,7 +60,7 @@ public class Lucy::Search::QueryParser nickname QParser
      * @param schema A L<Schema|Lucy::Plan::Schema>.
      * @param analyzer An L<Analyzer|Lucy::Analysis::Analyzer>.
      * Ordinarily, the analyzers specified by each field's definition will be
-     * used, but if C<analyzer> is supplied, it will override and be used for
+     * used, but if `analyzer` is supplied, it will override and be used for
      * all fields.  This can lead to mismatches between what is in the index
      * and what is being searched for, so use caution.
      * @param fields The names of the fields which will be searched against.

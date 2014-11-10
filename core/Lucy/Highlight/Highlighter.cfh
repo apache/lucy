@@ -44,7 +44,7 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
      * L<IndexSearcher|Lucy::Search::IndexSearcher>.
      * @param query Query object or a query string.
      * @param field The name of the field from which to draw the excerpt.  The
-     * field must marked as be C<highlightable> (see
+     * field must marked as be `highlightable` (see
      * L<FieldType|Lucy::Plan::FieldType>).
      * @param excerpt_length Maximum length of the excerpt, in characters.
      */
