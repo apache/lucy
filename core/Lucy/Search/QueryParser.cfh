@@ -25,18 +25,18 @@ parcel Lucy;
  *
  * The following syntactical constructs are recognized by QueryParser:
  *
- *     * Boolean operators 'AND', 'OR', and 'AND NOT'.
- *     * Prepented +plus and -minus, indicating that the labeled entity
- *       should be either required or forbidden -- be it a single word, a
- *       phrase, or a parenthetical group.
- *     * Logical groups, delimited by parentheses.
- *     * Phrases, delimited by double quotes.
+ * * Boolean operators 'AND', 'OR', and 'AND NOT'.
+ * * Prepented +plus and -minus, indicating that the labeled entity
+ *   should be either required or forbidden -- be it a single word, a
+ *   phrase, or a parenthetical group.
+ * * Logical groups, delimited by parentheses.
+ * * Phrases, delimited by double quotes.
  *
  * Additionally, the following syntax can be enabled via Set_Heed_Colons():
  *
- *     * Field-specific constructs, in the form of 'fieldname:termtext' or
- *       'fieldname:(foo bar)'.  (The field specified by 'fieldname:' will be
- *       used instead of the QueryParser's default fields).
+ * * Field-specific constructs, in the form of 'fieldname:termtext' or
+ *   'fieldname:(foo bar)'.  (The field specified by 'fieldname:' will be
+ *   used instead of the QueryParser's default fields).
  *
  *
  */

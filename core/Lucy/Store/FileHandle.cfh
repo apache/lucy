@@ -25,11 +25,11 @@ parcel Lucy;
  * Desired behaviors for a FileHandle are expressed via flags supplied to the
  * constructor:
  *
- *     * FH_READ_ONLY - Read only.
- *     * FH_WRITE_ONLY - Write only.
- *     * FH_CREATE - Create the file if it does not yet exist.
- *     * FH_EXCLUSIVE - The attempt to open the file should fail if the file
- *       already exists.
+ * * FH_READ_ONLY - Read only.
+ * * FH_WRITE_ONLY - Write only.
+ * * FH_CREATE - Create the file if it does not yet exist.
+ * * FH_EXCLUSIVE - The attempt to open the file should fail if the file
+ *   already exists.
  */
 
 abstract class Lucy::Store::FileHandle nickname FH
