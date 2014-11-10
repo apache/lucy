@@ -31,9 +31,9 @@ parcel Lucy;
  *
  *     ("walrus")
  *
- * SnowballStopFilter provides default stoplists for several languages, courtesy of
- * the Snowball project (<http://snowball.tartarus.org>), or you may supply
- * your own.
+ * SnowballStopFilter provides default stoplists for several languages,
+ * courtesy of the [Snowball project](http://snowball.tartarus.org), or you may
+ * supply your own.
  *
  *     |-----------------------|
  *     | ISO CODE | LANGUAGE   |
