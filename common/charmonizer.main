@@ -114,6 +114,8 @@ int main(int argc, const char **argv) {
     chaz_CLI_register(cli, "clownfish-prefix",
                       "prefix of Clownfish installation",
                       CHAZ_CLI_ARG_OPTIONAL);
+    chaz_CLI_register(cli, "enable-go", "enable Go bindings",
+                      CHAZ_CLI_NO_ARG);
     chaz_CLI_set_usage(cli, "Usage: charmonizer [OPTIONS] [-- [CFLAGS]]");
     if (!chaz_Probe_parse_cli_args(argc, argv, cli)) {
         chaz_Probe_die_usage();
@@ -242,6 +244,9 @@ lucy_MakeFile_new(chaz_CLI *cli) {
     if (chaz_CLI_defined(cli, "enable-perl")) {
         self->host_src_dir = "xs";
     }
+	else if (chaz_CLI_defined(cli, "enable-go")) {
+        self->host_src_dir = "../c/src";
+	}
     else {
         self->host_src_dir = "src";
     }
@@ -425,6 +430,8 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
                              self->static_lib_filename, NULL);
     chaz_MakeFile_add_rule(self->makefile, "all", scratch);
     free(scratch);
+
+    chaz_MakeFile_add_rule(self->makefile, "static", self->static_lib_filename);
 
     chaz_MakeFile_add_lemon_exe(self->makefile, self->lemon_dir);
     chaz_MakeFile_add_lemon_grammar(self->makefile, self->json_parser);
