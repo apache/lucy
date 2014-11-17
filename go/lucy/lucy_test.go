@@ -16,8 +16,17 @@
 
 package lucy_test
 
-import _ "git-wip-us.apache.org/repos/asf/lucy.git/go/lucy"
+import "git-wip-us.apache.org/repos/asf/lucy.git/go/lucy"
+import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 import "testing"
 
 func TestStuff(t *testing.T) {
+	lucy.NewSchema()
+}
+
+func TestOpenIndexer(t *testing.T) {
+	_, err := lucy.OpenIndexer(&lucy.OpenIndexerArgs{Index: "notalucyindex"})
+	if _, ok := err.(*clownfish.Err); !ok {
+		t.Error("Didn't catch exception opening indexer")
+	}
 }
