@@ -18,7 +18,7 @@ use warnings;
 
 package Lucy::Redacted;
 
-our $VERSION = '0.004001';
+our $VERSION = '0.004002';
 $VERSION = eval $VERSION;
 
 use Exporter 'import';

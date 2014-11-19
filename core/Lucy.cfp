@@ -1,7 +1,7 @@
 {
     "name": "Lucy",
-    "version": "v0.4.1",
+    "version": "v0.4.2",
     "prerequisites": {
-        "Clownfish": "v0.4.1"
+        "Clownfish": "v0.4.2"
     }
 }

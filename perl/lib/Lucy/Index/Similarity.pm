@@ -15,7 +15,7 @@
 
 package Lucy::Index::Similarity;
 use Lucy;
-our $VERSION = '0.004001';
+our $VERSION = '0.004002';
 $VERSION = eval $VERSION;
 
 1;

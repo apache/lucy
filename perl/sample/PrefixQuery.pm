@@ -21,7 +21,7 @@ use base qw( Lucy::Search::Query );
 use Carp;
 use Scalar::Util qw( blessed );
 
-our $VERSION = '0.004001';
+our $VERSION = '0.004002';
 $VERSION = eval $VERSION;
 
 # Inside-out member vars and hand-rolled accessors.
