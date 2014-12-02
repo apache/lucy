@@ -74,6 +74,8 @@ sub bind_i32array {
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy PACKAGE = Lucy::Object::I32Array
 
+#include "Clownfish/Util/Memory.h"
+
 SV*
 new(either_sv, ...)
     SV *either_sv;

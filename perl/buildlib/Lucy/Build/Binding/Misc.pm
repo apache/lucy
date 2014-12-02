@@ -153,6 +153,9 @@ sub bind_test {
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Test
 
+#include "Clownfish/TestHarness/TestFormatter.h"
+#include "Clownfish/TestHarness/TestSuite.h"
+
 bool
 run_tests(package)
     char *package;
