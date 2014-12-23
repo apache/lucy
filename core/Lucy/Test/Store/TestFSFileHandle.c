@@ -186,7 +186,7 @@ test_Close(TestBatchRunner *runner) {
     bool result = FSFH_Close(fh);
     TEST_FALSE(runner, result, "Failed Close() returns false");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Failed Close() sets Err_error");
+              "Failed Close() sets global error");
     FSFH_IVARS(fh)->fd = saved_fd;
 #endif /* _MSC_VER */
     DECREF(fh);

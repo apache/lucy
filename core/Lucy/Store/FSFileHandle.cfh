@@ -28,8 +28,8 @@ class Lucy::Store::FSFileHandle nickname FSFH
     int64_t  page_size;
     char    *buf;
 
-    /** Return a new FSFileHandle, or set Err_error and return NULL if
-     * something goes wrong.
+    /** Return a new FSFileHandle, or set the global error object returned by
+     * [](cfish:cfish.Err.get_error) and return NULL if something goes wrong.
      *
      * @param path Filepath.
      * @param flags FileHandle constructor flags.

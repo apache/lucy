@@ -39,7 +39,8 @@ abstract class Lucy::Store::DirHandle nickname DH
     Next(DirHandle *self);
 
     /** Attempt to close the DirHandle.  Returns true on success, sets
-     * Err_error and returns false on failure.
+     * the global error object returned by [](cfish:cfish.Err.get_error) and
+     * returns false on failure.
      */
     abstract bool
     Close(DirHandle *self);

@@ -132,7 +132,7 @@ test_MkDir_and_Is_Directory(TestBatchRunner *runner) {
     TEST_FALSE(runner, Folder_MkDir(folder, foo_bar_baz),
                "MkDir for deeply nested dir fails");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "MkDir for deeply nested dir sets Err_error");
+              "MkDir for deeply nested dir sets global error");
 
     TEST_TRUE(runner, Folder_MkDir(folder, foo_bar),
               "MkDir for nested dir");
@@ -143,7 +143,7 @@ test_MkDir_and_Is_Directory(TestBatchRunner *runner) {
     TEST_FALSE(runner, Folder_MkDir(folder, foo_bar),
                "Overwrite dir with MkDir fails");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Overwrite dir with MkDir sets Err_error");
+              "Overwrite dir with MkDir sets global error");
 
     fh = Folder_Open_FileHandle(folder, foo_boffo,
                                 FH_CREATE | FH_WRITE_ONLY);
@@ -152,7 +152,7 @@ test_MkDir_and_Is_Directory(TestBatchRunner *runner) {
     TEST_FALSE(runner, Folder_MkDir(folder, foo_boffo),
                "Overwrite file with MkDir fails");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Overwrite file with MkDir sets Err_error");
+              "Overwrite file with MkDir sets global error");
     TEST_FALSE(runner, Folder_Is_Directory(folder, foo_boffo),
                "Is_Directory() false for nested file");
 
@@ -284,14 +284,14 @@ test_Open_Dir(TestBatchRunner *runner) {
     TEST_TRUE(runner, dh == NULL,
               "Open_Dir on non-existent entry fails");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Open_Dir on non-existent entry sets Err_error");
+              "Open_Dir on non-existent entry sets global error");
 
     Err_set_error(NULL);
     dh = Folder_Open_Dir(folder, foo_foo);
     TEST_TRUE(runner, dh == NULL,
               "Open_Dir on non-existent nested entry fails");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Open_Dir on non-existent nested entry sets Err_error");
+              "Open_Dir on non-existent nested entry sets global error");
 
     DECREF(folder);
 }
@@ -318,7 +318,7 @@ test_Open_FileHandle(TestBatchRunner *runner) {
     TEST_TRUE(runner, fh == NULL,
               "Open_FileHandle on existing dir path fails");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Open_FileHandle on existing dir name sets Err_error");
+              "Open_FileHandle on existing dir name sets global error");
 
     Err_set_error(NULL);
     fh = Folder_Open_FileHandle(folder, foo_bar_baz_boffo,
@@ -326,7 +326,7 @@ test_Open_FileHandle(TestBatchRunner *runner) {
     TEST_TRUE(runner, fh == NULL,
               "Open_FileHandle for entry within non-existent dir fails");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Open_FileHandle for entry within non-existent dir sets Err_error");
+              "Open_FileHandle for entry within non-existent dir sets global error");
 
     DECREF(folder);
 }
@@ -353,21 +353,21 @@ test_Open_Out(TestBatchRunner *runner) {
     TEST_TRUE(runner, outstream == NULL,
               "Open_OutStream on existing file fails");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Open_Out on existing file sets Err_error");
+              "Open_Out on existing file sets global error");
 
     Err_set_error(NULL);
     outstream = Folder_Open_Out(folder, foo);
     TEST_TRUE(runner, outstream == NULL,
               "Open_OutStream on existing dir path fails");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Open_Out on existing dir name sets Err_error");
+              "Open_Out on existing dir name sets global error");
 
     Err_set_error(NULL);
     outstream = Folder_Open_Out(folder, foo_bar_baz_boffo);
     TEST_TRUE(runner, outstream == NULL,
               "Open_Out for entry within non-existent dir fails");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Open_Out for entry within non-existent dir sets Err_error");
+              "Open_Out for entry within non-existent dir sets global error");
 
     DECREF(folder);
 }
@@ -400,14 +400,14 @@ test_Open_In(TestBatchRunner *runner) {
     TEST_TRUE(runner, instream == NULL,
               "Open_InStream on existing dir path fails");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Open_In on existing dir name sets Err_error");
+              "Open_In on existing dir name sets global error");
 
     Err_set_error(NULL);
     instream = Folder_Open_In(folder, foo_bar_baz_boffo);
     TEST_TRUE(runner, instream == NULL,
               "Open_In for entry within non-existent dir fails");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Open_In for entry within non-existent dir sets Err_error");
+              "Open_In for entry within non-existent dir sets global error");
 
     DECREF(folder);
 }

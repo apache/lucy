@@ -96,7 +96,7 @@ test_open(TestBatchRunner *runner) {
     TEST_TRUE(runner, cf_reader == NULL,
               "Return NULL when cfmeta file missing");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Set Err_error when cfmeta file missing");
+              "Set global error when cfmeta file missing");
     DECREF(real_folder);
 
     Err_set_error(NULL);
@@ -106,7 +106,7 @@ test_open(TestBatchRunner *runner) {
     TEST_TRUE(runner, cf_reader == NULL,
               "Return NULL when cf.dat file missing");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Set Err_error when cf.dat file missing");
+              "Set global error when cf.dat file missing");
     DECREF(real_folder);
 
     Err_set_error(NULL);
@@ -119,7 +119,7 @@ test_open(TestBatchRunner *runner) {
     TEST_TRUE(runner, cf_reader == NULL,
               "Return NULL when format is invalid");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Set Err_error when format is invalid");
+              "Set global error when format is invalid");
 
     Err_set_error(NULL);
     Hash_Store_Utf8(metadata, "format", 6, (Obj*)Str_newf("%i32", 1000));
@@ -129,7 +129,7 @@ test_open(TestBatchRunner *runner) {
     TEST_TRUE(runner, cf_reader == NULL,
               "Return NULL when format is too recent");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Set Err_error when format too recent");
+              "Set global error when format too recent");
 
     Err_set_error(NULL);
     DECREF(Hash_Delete_Utf8(metadata, "format", 6));
@@ -139,7 +139,7 @@ test_open(TestBatchRunner *runner) {
     TEST_TRUE(runner, cf_reader == NULL,
               "Return NULL when format key is missing");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Set Err_error when format key is missing");
+              "Set global error when format key is missing");
 
     Hash_Store_Utf8(metadata, "format", 6,
                     (Obj*)Str_newf("%i32", CFWriter_current_file_format));
@@ -150,7 +150,7 @@ test_open(TestBatchRunner *runner) {
     TEST_TRUE(runner, cf_reader == NULL,
               "Return NULL when files key is missing");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Set Err_error when files key is missing");
+              "Set global error when files key is missing");
 
     DECREF(metadata);
     DECREF(real_folder);
@@ -182,13 +182,13 @@ test_Local_MkDir_and_Find_Folder(TestBatchRunner *runner) {
     TEST_FALSE(runner, CFReader_MkDir(cf_reader, stuff),
                "MkDir returns false when dir already exists");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "MkDir sets Err_error when dir already exists");
+              "MkDir sets global error when dir already exists");
 
     Err_set_error(NULL);
     TEST_FALSE(runner, CFReader_MkDir(cf_reader, foo),
                "MkDir returns false when virtual file exists");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "MkDir sets Err_error when virtual file exists");
+              "MkDir sets global error when virtual file exists");
 
     TEST_TRUE(runner,
               CFReader_Find_Folder(cf_reader, foo) == NULL,
@@ -295,7 +295,7 @@ test_Local_Open_FileHandle(TestBatchRunner *runner) {
     TEST_TRUE(runner, fh == NULL,
               "Local_Open_FileHandle for non-existent file returns NULL");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Local_Open_FileHandle for non-existent file sets Err_error");
+              "Local_Open_FileHandle for non-existent file sets global error");
 
     Err_set_error(NULL);
     fh = CFReader_Local_Open_FileHandle(cf_reader, foo,
@@ -303,7 +303,7 @@ test_Local_Open_FileHandle(TestBatchRunner *runner) {
     TEST_TRUE(runner, fh == NULL,
               "Local_Open_FileHandle for virtual file returns NULL");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Local_Open_FileHandle for virtual file sets Err_error");
+              "Local_Open_FileHandle for virtual file sets global error");
 
     DECREF(cf_reader);
     DECREF(real_folder);
@@ -337,7 +337,7 @@ test_Local_Open_In(TestBatchRunner *runner) {
     TEST_TRUE(runner, instream == NULL,
               "Local_Open_In for non-existent file returns NULL");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Local_Open_In for non-existent file sets Err_error");
+              "Local_Open_In for non-existent file sets global error");
 
     DECREF(cf_reader);
     DECREF(real_folder);

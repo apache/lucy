@@ -58,7 +58,8 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
     /** Call [](cfish:.Request) once per `interval` until [](cfish:.Request) returns
      * success or the `timeout` has been reached.
      *
-     * @return true on success, false on failure (sets Err_error).
+     * @return true on success, false on failure (sets the global error object
+     * returned by [](cfish:cfish.Err.get_error)).
      */
     public bool
     Obtain(Lock *self);
@@ -72,7 +73,8 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
      * not [](cfish:.Shared) -- i.e. it's an exclusive (write) lock -- then other locks
      * should cause [](cfish:.Request) to fail.
      *
-     * @return true on success, false on failure (sets Err_error).
+     * @return true on success, false on failure (sets the global error object
+     * returned by [](cfish:cfish.Err.get_error)).
      */
     public abstract bool
     Request(Lock *self);

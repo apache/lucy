@@ -32,8 +32,8 @@ class Lucy::Store::RAMFileHandle nickname RAMFH
     open(String *path = NULL, uint32_t flags, RAMFile *file = NULL);
 
     /**
-     * Return a new RAMFileHandle, or set Err_error and return NULL on
-     * failure.
+     * Return a new RAMFileHandle, or set the global error object returned by
+     * [](cfish:cfish.Err.get_error) and return NULL on failure.
      *
      * @param path Filepath.
      * @param flags FileHandle flags.

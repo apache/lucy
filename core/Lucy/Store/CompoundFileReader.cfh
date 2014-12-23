@@ -41,7 +41,8 @@ class Lucy::Store::CompoundFileReader nickname CFReader
     inert incremented nullable CompoundFileReader*
     open(Folder *folder);
 
-    /** Return a new CompoundFileReader or set Err_error and return NULL.
+    /** Return a new CompoundFileReader or set the global error object
+     * returned by [](cfish:cfish.Err.get_error) and return NULL.
      *
      * @param folder A folder containing compound files.
      */

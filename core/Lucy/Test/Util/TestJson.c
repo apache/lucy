@@ -47,7 +47,7 @@ test_tolerance(TestBatchRunner *runner) {
     TEST_TRUE(runner, not_json == NULL,
               "to_json returns NULL when fed invalid data type");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "to_json sets Err_error when fed invalid data type");
+              "to_json sets global error when fed invalid data type");
     DECREF(foo);
 }
 
@@ -216,7 +216,7 @@ test_spew_and_slurp(TestBatchRunner *runner) {
     result = Json_spew_json(dump, folder, foo);
     TEST_FALSE(runner, result, "Can't spew_json when file exists");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Failed spew_json sets Err_error");
+              "Failed spew_json sets global error");
 
     Err_set_error(NULL);
     String *bar = (String*)SSTR_WRAP_UTF8("bar", 3);
@@ -224,7 +224,7 @@ test_spew_and_slurp(TestBatchRunner *runner) {
     TEST_TRUE(runner, got == NULL,
               "slurp_json returns NULL when file doesn't exist");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Failed slurp_json sets Err_error");
+              "Failed slurp_json sets global error");
 
     String *boffo = (String*)SSTR_WRAP_UTF8("boffo", 5);
 
@@ -238,7 +238,7 @@ test_spew_and_slurp(TestBatchRunner *runner) {
     TEST_TRUE(runner, got == NULL,
               "slurp_json returns NULL when file doesn't contain valid JSON");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Failed slurp_json sets Err_error");
+              "Failed slurp_json sets global error");
     DECREF(got);
 
     DECREF(dump);
@@ -251,8 +251,8 @@ S_verify_bad_syntax(TestBatchRunner *runner, const char *bad, const char *mess) 
     Err_set_error(NULL);
     Obj *not_json = Json_from_json((String*)has_errors);
     TEST_TRUE(runner, not_json == NULL, "from_json returns NULL: %s", mess);
-    TEST_TRUE(runner, Err_get_error() != NULL, "from_json sets Err_error: %s",
-              mess);
+    TEST_TRUE(runner, Err_get_error() != NULL,
+              "from_json sets global error: %s", mess);
 }
 
 static void
@@ -332,7 +332,7 @@ test_max_depth(TestBatchRunner *runner) {
     TEST_TRUE(runner, not_json == NULL,
               "to_json returns NULL when fed recursing data");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "to_json sets Err_error when fed recursing data");
+              "to_json sets global error when fed recursing data");
     DECREF(Hash_Delete_Utf8(circular, "circular", 8));
     DECREF(circular);
 }
@@ -347,7 +347,7 @@ test_illegal_keys(TestBatchRunner *runner) {
     TEST_TRUE(runner, not_json == NULL,
               "to_json returns NULL when fed an illegal key");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "to_json sets Err_error when fed an illegal key");
+              "to_json sets global error when fed an illegal key");
     DECREF(key);
     DECREF(hash);
 }

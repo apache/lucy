@@ -178,7 +178,7 @@ test_Local_MkDir(TestBatchRunner *runner) {
     TEST_FALSE(runner, result,
                "Local_MkDir returns false when a dir already exists");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Local_MkDir sets Err_error when a dir already exists");
+              "Local_MkDir sets global error when a dir already exists");
     TEST_TRUE(runner, RAMFolder_Exists(folder, foo),
               "Existing dir untouched after failed Local_MkDir");
 
@@ -190,7 +190,7 @@ test_Local_MkDir(TestBatchRunner *runner) {
     TEST_FALSE(runner, result,
                "Local_MkDir returns false when a file already exists");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Local_MkDir sets Err_error when a file already exists");
+              "Local_MkDir sets global error when a file already exists");
     TEST_TRUE(runner, RAMFolder_Exists(folder, boffo) &&
               !RAMFolder_Local_Is_Directory(folder, boffo),
               "Existing file untouched after failed Local_MkDir");
@@ -230,7 +230,7 @@ test_Local_Open_FileHandle(TestBatchRunner *runner) {
                                          FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
     TEST_TRUE(runner, fh == NULL, "FH_EXLUSIVE flag prevents open");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "failure due to FH_EXLUSIVE flag sets Err_error");
+              "failure due to FH_EXLUSIVE flag sets global error");
 
     fh = RAMFolder_Local_Open_FileHandle(folder, boffo, FH_READ_ONLY);
     TEST_TRUE(runner, fh && FH_Is_A(fh, RAMFILEHANDLE),
@@ -242,7 +242,7 @@ test_Local_Open_FileHandle(TestBatchRunner *runner) {
     TEST_TRUE(runner, fh == NULL,
               "Can't open non-existent file for reading");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Opening non-existent file for reading sets Err_error");
+              "Opening non-existent file for reading sets global error");
 
     DECREF(folder);
 }
@@ -347,7 +347,7 @@ test_Rename(TestBatchRunner *runner) {
     result = RAMFolder_Rename(folder, foo_boffo, foo_bar);
     TEST_FALSE(runner, result, "Rename file clobbering dir fails");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Failed rename sets Err_error");
+              "Failed rename sets global error");
     TEST_TRUE(runner, RAMFolder_Exists(folder, foo_boffo),
               "File still exists at old path");
     TEST_TRUE(runner, RAMFolder_Exists(folder, foo_bar),
@@ -357,7 +357,7 @@ test_Rename(TestBatchRunner *runner) {
     result = RAMFolder_Rename(folder, foo_bar, foo_boffo);
     TEST_FALSE(runner, result, "Rename dir clobbering file fails");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Failed rename sets Err_error");
+              "Failed rename sets global error");
     TEST_TRUE(runner, RAMFolder_Exists(folder, foo_bar),
               "Dir still exists at old path");
     TEST_TRUE(runner, RAMFolder_Exists(folder, foo_boffo),
@@ -381,7 +381,7 @@ test_Rename(TestBatchRunner *runner) {
     result = RAMFolder_Rename(folder, foo_boffo, nope_nyet);
     TEST_FALSE(runner, result, "Rename into non-existent subdir fails");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Renaming into non-existent subdir sets Err_error");
+              "Renaming into non-existent subdir sets global error");
     TEST_TRUE(runner, RAMFolder_Exists(folder, foo_boffo),
               "Entry still exists at old path");
 
@@ -389,7 +389,7 @@ test_Rename(TestBatchRunner *runner) {
     result = RAMFolder_Rename(folder, nope_nyet, boffo);
     TEST_FALSE(runner, result, "Rename non-existent file fails");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Renaming non-existent source file sets Err_error");
+              "Renaming non-existent source file sets global error");
 
     DECREF(folder);
 }
@@ -476,7 +476,7 @@ test_Hard_Link(TestBatchRunner *runner) {
     result = RAMFolder_Rename(folder, foo_boffo, nope_nyet);
     TEST_FALSE(runner, result, "Hard_Link into non-existent subdir fails");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Hard_Link into non-existent subdir sets Err_error");
+              "Hard_Link into non-existent subdir sets global error");
     TEST_TRUE(runner, RAMFolder_Exists(folder, foo_boffo),
               "Entry still exists at old path");
 
@@ -484,7 +484,7 @@ test_Hard_Link(TestBatchRunner *runner) {
     result = RAMFolder_Rename(folder, nope_nyet, boffo);
     TEST_FALSE(runner, result, "Hard_Link non-existent source file fails");
     TEST_TRUE(runner, Err_get_error() != NULL,
-              "Hard_Link non-existent source file sets Err_error");
+              "Hard_Link non-existent source file sets global error");
 
     DECREF(folder);
 }

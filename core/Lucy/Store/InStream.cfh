@@ -44,7 +44,8 @@ class Lucy::Store::InStream inherits Clownfish::Obj {
     inert incremented nullable InStream*
     open(Obj *file);
 
-    /** Return a new InStream, or set Err_error and return NULL on failure.
+    /** Return a new InStream, or set the global error object returned by
+     * [](cfish:cfish.Err.get_error) and return NULL on failure.
      *
      * @param file A FileHandle, a file path, or a RAMFile.
      */

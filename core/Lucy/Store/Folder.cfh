@@ -47,7 +47,8 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     void
     Set_Path(Folder *self, String *path);
 
-    /** Open an OutStream, or set Err_error and return NULL on failure.
+    /** Open an OutStream, or set the global error object returned by
+     * [](cfish:cfish.Err.get_error) and return NULL on failure.
      *
      * @param path A relative filepath.
      * @return an OutStream.
@@ -55,7 +56,8 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     public incremented nullable OutStream*
     Open_Out(Folder *self,  String *path);
 
-    /** Open an InStream, or set Err_error and return NULL on failure.
+    /** Open an InStream, or set the global error object returned by
+     * [](cfish:cfish.Err.get_error) and return NULL on failure.
      *
      * @param path A relative filepath.
      * @return an InStream.
@@ -63,7 +65,8 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     public incremented nullable InStream*
     Open_In(Folder *self, String *path);
 
-    /** Open a FileHandle, or set Err_error and return NULL on failure.
+    /** Open a FileHandle, or set the global error object returned by
+     * [](cfish:cfish.Err.get_error) and return NULL on failure.
      *
      * @param path A relative filepath.
      * @param flags FileHandle flags.
@@ -72,7 +75,8 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     public incremented nullable FileHandle*
     Open_FileHandle(Folder *self, String *path, uint32_t flags);
 
-    /** Open a DirHandle or set Err_error and return NULL on failure.
+    /** Open a DirHandle or set the global error object returned by
+     * [](cfish:cfish.Err.get_error) and return NULL on failure.
      *
      * @param path Path to a subdirectory, relative to the Folder's path.  If
      * empty or NULL, returns a DirHandle for this Folder.
@@ -84,13 +88,15 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     /** Create a subdirectory.
      *
      * @param path A relative filepath.
-     * @return true on success, false on failure (sets Err_error).
+     * @return true on success, false on failure (sets the global error object
+     * returned by [](cfish:cfish.Err.get_error)).
      */
     public bool
     MkDir(Folder *self, String *path);
 
-    /** List all local entries within a directory.  Set Err_error and return
-     * NULL if something goes wrong.
+    /** List all local entries within a directory.  Set the global error
+     * object returned by [](cfish:cfish.Err.get_error) and return NULL if
+     * something goes wrong.
      *
      * @param path A relative filepath optionally specifying a subdirectory.
      * @return an unsorted array of filenames.
@@ -139,9 +145,9 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     public bool
     Delete_Tree(Folder *self, String *path);
 
-    /** Rename a file or directory, or set Err_error and return false on
-     * failure.  If an entry exists at `to`, the results are
-     * undefined.
+    /** Rename a file or directory, or set the global error object returned by
+     * [](cfish:cfish.Err.get_error) and return false on failure.  If an entry
+     * exists at `to`, the results are undefined.
      *
      * @param from The filepath prior to renaming.
      * @param to The filepath after renaming.
@@ -151,7 +157,8 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     Rename(Folder *self, String *from, String *to);
 
     /** Create a hard link at path `to` pointing at the existing
-     * file `from`, or set Err_error and return false on failure.
+     * file `from`, or set the global error object returned by
+     * [](cfish:cfish.Err.get_error) and return false on failure.
      *
      * @return true on success, false on failure.
      */
@@ -210,20 +217,21 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     public abstract void
     Close(Folder *self);
 
-    /** Open a FileHandle for a local file, or set Err_error and return NULL
-     * on failure.
+    /** Open a FileHandle for a local file, or set the global error object
+     * returned by [](cfish:cfish.Err.get_error) and return NULL on failure.
      */
     abstract incremented nullable FileHandle*
     Local_Open_FileHandle(Folder *self, String *name, uint32_t flags);
 
-    /** Open an InStream for a local file, or set Err_error and return NULL on
-     * failure.
+    /** Open an InStream for a local file, or set the global error object
+     * returned by [](cfish:cfish.Err.get_error) and return NULL on failure.
      */
     incremented nullable InStream*
     Local_Open_In(Folder *self, String *name);
 
     /** Open a DirHandle to iterate over the local entries in this Folder, or
-     * set Err_error and return NULL on failure.
+     * set the global error object returned by [](cfish:cfish.Err.get_error)
+     * and return NULL on failure.
      */
     abstract incremented nullable DirHandle*
     Local_Open_Dir(Folder *self);
@@ -231,7 +239,8 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     /** Create a local subdirectory.
      *
      * @param name The name of the subdirectory.
-     * @return true on success, false on failure (sets Err_error)
+     * @return true on success, false on failure (sets the global error object
+     * returned by [](cfish:cfish.Err.get_error))
      */
     abstract bool
     Local_MkDir(Folder *self, String *name);

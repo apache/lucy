@@ -39,8 +39,8 @@ LucyParseJsonFree(void *json_parser, void(*freemem)(void*));
 void
 LucyParseJsonTrace(FILE *trace, char *line_prefix);
 
-// Encode JSON for supplied "dump".  On failure, sets Err_error and returns
-// false.
+// Encode JSON for supplied "dump".  On failure, sets the global error object
+// and returns false.
 static bool
 S_to_json(Obj *dump, CharBuf *buf, int32_t depth);
 
@@ -84,7 +84,8 @@ static const size_t INDENTATION_LEN = sizeof(indentation) - 1;
 static void
 S_cat_whitespace(CharBuf *buf, int32_t depth);
 
-// Set Err_error, appending escaped JSON in the vicinity of the error.
+// Set the global error object, appending escaped JSON in the vicinity of the
+// error.
 static void
 S_set_error(CharBuf *buf, const char *json, const char *limit, int line,
             const char *func);
@@ -696,7 +697,7 @@ S_set_error(CharBuf *buf, const char *json, const char *limit, int line,
     String *mess = CB_Yield_String(buf);
     DECREF(buf);
 
-    // Set Err_error.
+    // Set global error object.
     Err_set_error(Err_new(mess));
 }
 

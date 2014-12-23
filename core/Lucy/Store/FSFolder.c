@@ -60,7 +60,7 @@ S_fullpath_ptr(FSFolder *self, String *path);
 static bool
 S_dir_ok(String *path);
 
-// Create a directory, or set Err_error and return false.
+// Create a directory, or set the global error object and return false.
 static bool
 S_create_dir(String *path);
 

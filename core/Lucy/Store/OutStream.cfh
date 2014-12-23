@@ -38,7 +38,8 @@ class Lucy::Store::OutStream inherits Clownfish::Obj {
     inert incremented nullable OutStream*
     open(Obj *file);
 
-    /** Return a new OutStream or set Err_error and return NULL on failure.
+    /** Return a new OutStream or set the global error object returned by
+     * [](cfish:cfish.Err.get_error) and return NULL on failure.
      */
     inert nullable OutStream*
     do_open(OutStream *self, Obj *file);

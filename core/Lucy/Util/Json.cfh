@@ -22,30 +22,32 @@ parcel Lucy;
  */
 class Lucy::Util::Json inherits Clownfish::Obj {
 
-    /** Encode `dump` as JSON.  Returns NULL and sets Err_error on
-     * failure.
+    /** Encode `dump` as JSON.  Returns NULL and sets the global error object
+     * returned by [](cfish:cfish.Err.get_error) on failure.
      */
     inert incremented nullable String*
     to_json(Obj *dump);
 
     /** Decode the supplied JSON and return a data structure made
-     * of Hashes, VArrays, and Strings.  Returns NULL and sets Err_error on
-     * failure.
+     * of Hashes, VArrays, and Strings.  Returns NULL and sets the global
+     * error object returned by [](cfish:cfish.Err.get_error) on failure.
      */
     inert incremented nullable Obj*
     from_json(String *json);
 
     /** Encode `dump` as JSON and attempt to write to the indicated
      * file.
-     * @return true if the write succeeds, false on failure (sets Err_error).
+     * @return true if the write succeeds, false on failure (sets the global
+     * error object returned by [](cfish:cfish.Err.get_error)).
      */
     inert bool
     spew_json(Obj *dump, Folder *folder, String *path);
 
     /** Decode the JSON in the file at `path` and return a data
      * structure made of Hashes, VArrays, and Strings.  Returns NULL and sets
-     * Err_error if the file can't be can't be opened or if the file doesn't
-     * contain valid JSON.
+     * the global error object returned by [](cfish:cfish.Err.get_error) if
+     * the file can't be can't be opened or if the file doesn't contain valid
+     * JSON.
      */
     inert incremented nullable Obj*
     slurp_json(Folder *folder, String *path);

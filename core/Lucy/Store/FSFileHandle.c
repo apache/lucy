@@ -60,7 +60,7 @@ SI_posix_flags(uint32_t fh_flags) {
 
 // Memory map a region of the file with shared (read-only) permissions.  If
 // the requested length is 0, return NULL.  If an error occurs, return NULL
-// and set Err_error.
+// and set the global error object.
 static CFISH_INLINE void*
 SI_map(FSFileHandle *self, FSFileHandleIVARS *ivars, int64_t offset,
        int64_t len);
@@ -143,7 +143,7 @@ FSFH_do_open(FSFileHandle *self, String *path, uint32_t flags) {
                 ivars->buf = (char*)SI_map(self, ivars, 0, ivars->len);
                 if (!ivars->buf) {
                     // An error occurred during SI_map, which has set
-                    // Err_error for us already.
+                    // the global error object for us already.
                     CFISH_DECREF(self);
                     return NULL;
                 }
