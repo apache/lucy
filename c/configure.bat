@@ -44,5 +44,5 @@ echo gcc ..\common\charmonizer.c -o charmonizer.exe
 gcc ..\common\charmonizer.c -o charmonizer.exe
 if errorlevel 1 exit /b 1
 echo Running charmonizer
-charmonizer.exe --cc=gcc --enable-c --enable-makefile %*
+charmonizer.exe --cc=gcc --host=c --enable-c --enable-makefile %*
 exit /b

@@ -301,6 +301,12 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_path,
 int
 chaz_CC_test_compile(const char *source);
 
+/* Attempt to compile and link the supplied source code and return true if
+ * the effort succeeds.
+ */
+int
+chaz_CC_test_link(const char *source);
+
 /* Attempt to compile the supplied source code.  If successful, capture the
  * output of the program and return a pointer to a newly allocated buffer.
  * If the compilation fails, return NULL.  The length of the captured
@@ -2262,7 +2268,7 @@ S_chaz_CLI_rebuild_help(chaz_CLI *self) {
     }
     strcat(self->help, "\n");
     if (self->num_opts) {
-        strcat(self->help, "\nOptional arguments:\n");
+        strcat(self->help, "\nArguments:\n");
         for (i = 0; i < self->num_opts; i++) {
             chaz_CLIOption *opt = &self->opts[i];
             size_t line_start = strlen(self->help);
@@ -2281,7 +2287,7 @@ S_chaz_CLI_rebuild_help(chaz_CLI *self) {
                     self->help[current_len++] = toupper(opt->name[j]);
                 }
                 if (opt->flags & CHAZ_CLI_ARG_OPTIONAL) {
-                    strcat(self->help, "]");
+                    self->help[current_len++] = ']';
                 }
                 self->help[current_len] = '\0';
             }
@@ -2520,6 +2526,15 @@ chaz_CLI_parse(chaz_CLI *self, int argc, const char *argv[]) {
     }
 
     free(name);
+
+    for (i = 0; i < self->num_opts; i++) {
+        chaz_CLIOption *opt = &self->opts[i];
+        if (!opt->defined && (opt->flags & CHAZ_CLI_ARG_REQUIRED)) {
+            S_chaz_CLI_error(self, "Option '%s' is required", opt->name);
+            return 0;
+        }
+    }
+
     return 1;
 }
 
@@ -2791,6 +2806,18 @@ chaz_CC_test_compile(const char *source) {
     chaz_Util_remove_and_verify(try_obj_name);
     free(try_obj_name);
     return compile_succeeded;
+}
+
+int
+chaz_CC_test_link(const char *source) {
+    int link_succeeded;
+    if (!chaz_Util_remove_and_verify(chaz_CC.try_exe_name)) {
+        chaz_Util_die("Failed to delete file '%s'", chaz_CC.try_exe_name);
+    }
+    link_succeeded = chaz_CC_compile_exe(CHAZ_CC_TRY_SOURCE_PATH,
+                                         CHAZ_CC_TRY_BASENAME, source);
+    chaz_Util_remove_and_verify(chaz_CC.try_exe_name);
+    return link_succeeded;
 }
 
 char*
@@ -5557,7 +5584,7 @@ chaz_Probe_parse_cli_args(int argc, const char *argv[], chaz_CLI *cli) {
     chaz_CLI_register(cli, "enable-makefile", NULL, CHAZ_CLI_NO_ARG);
     chaz_CLI_register(cli, "enable-coverage", NULL, CHAZ_CLI_NO_ARG);
     chaz_CLI_register(cli, "cc", "compiler command", CHAZ_CLI_ARG_REQUIRED);
-    chaz_CLI_register(cli, "cflags", NULL, CHAZ_CLI_ARG_REQUIRED);
+    chaz_CLI_register(cli, "cflags", NULL, CHAZ_CLI_ARG_OPTIONAL);
     chaz_CLI_register(cli, "make", "make command", 0);
 
     /* Parse options, exiting on failure. */
@@ -7789,6 +7816,8 @@ int main(int argc, const char **argv) {
     /* Initialize. */
     chaz_CLI *cli
         = chaz_CLI_new(argv[0], "charmonizer: Probe C build environment");
+    chaz_CLI_register(cli, "host", "specify host binding language",
+                      CHAZ_CLI_ARG_REQUIRED);
     chaz_CLI_register(cli, "clownfish-prefix",
                       "prefix of Clownfish installation",
                       CHAZ_CLI_ARG_OPTIONAL);

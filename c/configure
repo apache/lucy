@@ -45,5 +45,5 @@ echo $command
 $command || exit
 
 echo Running charmonizer
-./charmonizer --cc=$CC --enable-c --enable-makefile "$@"
+./charmonizer --cc=$CC --host=c --enable-c --enable-makefile "$@"
 
