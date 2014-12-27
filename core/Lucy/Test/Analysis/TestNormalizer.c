@@ -111,7 +111,8 @@ test_normalization(TestBatchRunner *runner) {
 
 static void
 test_utf8proc_normalization(TestBatchRunner *runner) {
-    SKIP(runner, "utf8proc can't handle control chars or Unicode non-chars");
+    SKIP(runner, 1,
+         "utf8proc can't handle control chars or Unicode non-chars");
     return;
 
     for (int32_t i = 0; i < 100; i++) {

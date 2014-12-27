@@ -376,14 +376,11 @@ static void
 test_query_parser_syntax(TestBatchRunner *runner) {
     if (!RegexTokenizer_is_available()) {
         for (uint32_t i = 0; leaf_test_funcs[i] != NULL; i++) {
-            SKIP(runner, "RegexTokenizer not available");
-            SKIP(runner, "RegexTokenizer not available");
-            SKIP(runner, "RegexTokenizer not available");
+            SKIP(runner, 3, "RegexTokenizer not available");
         }
 
         for (uint32_t i = 0; syntax_test_funcs[i] != NULL; i++) {
-            SKIP(runner, "RegexTokenizer not available");
-            SKIP(runner, "RegexTokenizer not available");
+            SKIP(runner, 2, "RegexTokenizer not available");
         }
 
         return;

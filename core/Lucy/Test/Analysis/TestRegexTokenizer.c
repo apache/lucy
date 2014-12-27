@@ -32,9 +32,7 @@ TestRegexTokenizer_new() {
 static void
 test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     if (!RegexTokenizer_is_available()) {
-        SKIP(runner, "RegexTokenizer not available");
-        SKIP(runner, "RegexTokenizer not available");
-        SKIP(runner, "RegexTokenizer not available");
+        SKIP(runner, 3, "RegexTokenizer not available");
         return;
     }
 
