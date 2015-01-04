@@ -81,9 +81,9 @@ public class Lucy::Index::Snapshot inherits Clownfish::Obj {
      * already exists.
      *
      * @param folder A Folder.
-     * @param path The path of the file to write.  If NULL, a file name will
-     * be chosen which supersedes the latest snapshot file in the index
-     * folder.
+     * @param path The path of the file to write.  If [](cfish:@null), a file
+     * name will be chosen which supersedes the latest snapshot file in the
+     * index folder.
      */
     public void
     Write_File(Snapshot *self, Folder *folder, String *path = NULL);
@@ -94,8 +94,8 @@ public class Lucy::Index::Snapshot inherits Clownfish::Obj {
     public void
     Set_Path(Snapshot *self, String *path);
 
-    /** Get the path to the snapshot file.  Initially NULL; updated by
-     * [](cfish:.Read_File), [](cfish:.Write_File), and [](cfish:.Set_Path).
+    /** Get the path to the snapshot file.  Initially [](cfish:@null); updated
+     * by [](cfish:.Read_File), [](cfish:.Write_File), and [](cfish:.Set_Path).
      */
     public nullable String*
     Get_Path(Snapshot *self);

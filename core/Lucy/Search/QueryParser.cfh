@@ -78,7 +78,7 @@ public class Lucy::Search::QueryParser nickname QParser
     /** Build a Query object from the contents of a query string.  At present,
      * implemented internally by calling [](cfish:.Tree), [](cfish:.Expand), and [](cfish:.Prune).
      *
-     * @param query_string The string to be parsed.  May be NULL.
+     * @param query_string The string to be parsed.  May be [](cfish:@null).
      * @return a Query.
      */
     public incremented Query*

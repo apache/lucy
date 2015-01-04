@@ -46,7 +46,8 @@ public class Lucy::Index::PostingList nickname PList
     /** Prepare the PostingList object to iterate over matches for documents
      * that match `target`.
      *
-     * @param target The term to match.  If NULL, the iterator will be empty.
+     * @param target The term to match.  If [](cfish:@null), the iterator will
+     * be empty.
      */
     public abstract void
     Seek(PostingList *self, Obj *target = NULL);

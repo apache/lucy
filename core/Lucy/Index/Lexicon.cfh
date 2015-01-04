@@ -42,7 +42,7 @@ public class Lucy::Index::Lexicon nickname Lex inherits Clownfish::Obj {
     Destroy(Lexicon *self);
 
     /** Seek the Lexicon to the first iterator state which is greater than or
-     * equal to `target`.  If `target` is NULL,
+     * equal to `target`.  If `target` is [](cfish:@null),
      * reset the iterator.
      */
     public abstract void
@@ -67,8 +67,8 @@ public class Lucy::Index::Lexicon nickname Lex inherits Clownfish::Obj {
     public abstract int32_t
     Doc_Freq(Lexicon *self);
 
-    /** Return the current term, or NULL if the iterator is not in a valid
-     * state.
+    /** Return the current term, or [](cfish:@null) if the iterator is not in a
+     * valid state.
      */
     public abstract nullable Obj*
     Get_Term(Lexicon *self);

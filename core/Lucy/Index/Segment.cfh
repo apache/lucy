@@ -97,8 +97,8 @@ public class Lucy::Index::Segment nickname Seg inherits Clownfish::Obj {
     public int32_t
     Field_Num(Segment *self, String *field);
 
-    /** Given a field number, return the name of its field, or NULL if the
-     * field name can't be found.
+    /** Given a field number, return the name of its field, or [](cfish:@null)
+     * if the field name can't be found.
      */
     public nullable String*
     Field_Name(Segment *self, int32_t field_num);

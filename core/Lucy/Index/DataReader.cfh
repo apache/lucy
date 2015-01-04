@@ -48,7 +48,7 @@ public class Lucy::Index::DataReader inherits Clownfish::Obj {
          int32_t seg_tick = -1);
 
     /** Create a reader which aggregates the output of several lower level
-     * readers.  Return NULL if such a reader is not valid.
+     * readers.  Return [](cfish:@null) if such a reader is not valid.
      *
      * @param readers An array of DataReaders.
      * @param offsets Doc id start offsets for each reader.

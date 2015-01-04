@@ -104,7 +104,8 @@ public class Lucy::Index::IndexReader nickname IxReader
     public DataReader*
     Obtain(IndexReader *self, String *api);
 
-    /** Fetch a component, or return NULL if the component can't be found.
+    /** Fetch a component, or return [](cfish:@null) if the component can't be
+     * found.
      *
      * @param api The name of the DataReader subclass that the desired
      * component must implement.

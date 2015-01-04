@@ -79,8 +79,8 @@ public class Lucy::Search::Compiler inherits Lucy::Search::Query {
      *
      * @param reader A SegReader.
      * @param need_score Indicate whether the Matcher must implement [](cfish:Matcher.Score).
-     * @return a Matcher, or NULL if the Matcher would have matched no
-     * documents.
+     * @return a Matcher, or [](cfish:@null) if the Matcher would have matched
+     * no documents.
      */
     public abstract incremented nullable Matcher*
     Make_Matcher(Compiler *self, SegReader *reader, bool need_score);
