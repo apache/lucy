@@ -20,11 +20,11 @@ parcel Lucy;
  *
  * Adding documents to an index is usually fast, but every once in a while the
  * index must be compacted and an update takes substantially longer to
- * complete.  See L<Lucy::Docs::Cookbook::FastUpdates> for how to use
- * this class to control worst-case index update performance.
+ * complete.  See [FastUpdates](Lucy::Docs::Cookbook::FastUpdates) for how to
+ * use this class to control worst-case index update performance.
  *
- * As with [](cfish:Indexer), see
- * L<Lucy::Docs::FileLocking> if your index is on a shared volume.
+ * As with [](cfish:Indexer), see [FileLocking](Lucy::Docs::FileLocking)
+ * if your index is on a shared volume.
  */
 public class Lucy::Index::BackgroundMerger nickname BGMerger
     inherits Clownfish::Obj {

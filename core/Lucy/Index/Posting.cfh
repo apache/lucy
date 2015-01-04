@@ -19,7 +19,7 @@ parcel Lucy;
 /** Vessel holding statistical data for a posting.
  *
  * A Posting, in Apache Lucy, is a vessel which stores information about a
- * term-document match.  (See L<Lucy::Docs::IRTheory> for the
+ * term-document match.  (See [IRTheory](Lucy::Docs::IRTheory) for the
  * academic definition of "posting".)
  *
  * Subclasses include

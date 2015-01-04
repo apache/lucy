@@ -21,8 +21,8 @@ parcel Lucy;
  * PostingList is an iterator which supplies a list of document ids that match
  * a given term.
  *
- * See L<Lucy::Docs::IRTheory> for definitions of "posting" and "posting
- * list".
+ * See [IRTheory](Lucy::Docs::IRTheory) for definitions of "posting" and
+ * "posting list".
  */
 public class Lucy::Index::PostingList nickname PList
     inherits Lucy::Search::Matcher {
