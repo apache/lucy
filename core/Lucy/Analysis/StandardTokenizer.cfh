@@ -24,7 +24,7 @@ parcel Lucy;
  *
  * Lucy::Analysis::StandardTokenizer breaks up the text at the word
  * boundaries defined in Unicode Standard Annex #29. It then returns those
- * words that start with an alphabetic or numeric character.
+ * words that contain alphabetic or numeric characters.
  */
 public class Lucy::Analysis::StandardTokenizer
     inherits Lucy::Analysis::Analyzer {

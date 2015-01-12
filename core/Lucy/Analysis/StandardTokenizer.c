@@ -31,7 +31,7 @@
  *
  * The tables are in a compressed format that uses a three-stage lookup
  * scheme. They're generated with the perl script gen_word_break_tables.pl
- * in devel/bin.
+ * in devel/bin. The WB_* constants must match the values used in the script.
  */
 
 #define WB_ASingle          1
@@ -137,9 +137,9 @@ StandardTokenizer_Tokenize_Utf8_IMP(StandardTokenizer *self, const char *text,
 /*
  * Parse a word consisting of a single codepoint followed by extend or
  * format characters. Used for Alphabetic characters that don't have the
- * ALetter word break property: ideographs, Hiragana, and "complex content".
- * Advances the iterator and returns the word break property of the current
- * character.
+ * ALetter word break property: ideographs, Hiragana, and "complex context".
+ * Advances the iterator and returns the word break property of the character
+ * following the word.
  */
 static int
 S_parse_single(const char *text, size_t len, lucy_StringIter *iter,
@@ -156,9 +156,12 @@ S_parse_single(const char *text, size_t len, lucy_StringIter *iter,
 }
 
 /*
- * Parse a word starting with an ALetter, Numeric, Katakana, or ExtendNumLet
- * character. Advances the iterator and returns the word break property of the
- * current character.
+ * Parse a word starting with an ALetter, Hebrew_Letter, Numeric, Katakana, or
+ * ExtendNumLet character. Advances the iterator and returns the word break
+ * property of the character following the word.
+ *
+ * TODO: Words consisting only of ExtendNumLet characters (General_Category
+ * Pc, typically underscores) should be ignored.
  */
 static int
 S_parse_word(const char *text, size_t len, lucy_StringIter *iter,
@@ -320,7 +323,7 @@ S_iter_advance(const char *text, lucy_StringIter *iter) {
 
 /*
  * Advances the iterator skipping over Extend and Format characters.
- * Returns the word break property of the current character.
+ * Returns the word break property of the following character.
  */
 static int
 S_skip_extend_format(const char *text, size_t len, lucy_StringIter *iter) {

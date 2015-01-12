@@ -95,7 +95,21 @@ my $alpha = UnicodeTable->read(
     map      => { Alphabetic => 1 },
 );
 
-# Set characters in Alphabetic but not in Word_Break to WB_ASingle = 1
+# Many characters don't have a Word_Break property and form a single word.
+# In order to include them in the tokenizing process, we use a custom
+# property "ASingle" with value 1.
+#
+# For now, this property is used for all Alphabetic characters without a
+# Word_Break property: Ideographic, Hiragana, and Complex_Context.
+#
+# There are also non-alphabetic, numeric characters without a WordBreak
+# property that possibly should be included:
+#
+# - Decimal numbers (General_Category Nd) with East_Asian_Width F (Fullwidth)
+# - Other numbers (General_Category No)
+#
+# These are ignored for now.
+
 for ( my $i = 0; $i < 0x30000; ++$i ) {
     if ( !$wb->lookup($i) && $alpha->lookup($i) ) {
         $wb->set( $i, 1 );
