@@ -35,8 +35,13 @@ sub bind_all {
 }
 
 sub bind_analyzer {
+    my @exposed = qw(
+        Split
+    );
+
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     $pod_spec->set_synopsis("    # Abstract base class.\n");
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",

@@ -65,6 +65,8 @@ public class Lucy::Plan::FullTextType inherits Lucy::Plan::TextType {
     public bool
     Highlightable(FullTextType *self);
 
+    /** Accessor for the type's analyzer.
+     */
     public Analyzer*
     Get_Analyzer(FullTextType *self);
 

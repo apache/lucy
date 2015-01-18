@@ -143,6 +143,45 @@ Now when we execute the query...
 ... we'll get a result set which is the intersection of the parsed query and
 the category query.
 
+=head1 Using TermQuery with full text fields
+
+When querying full text fields, the easiest way is to create query objects
+using QueryParser. But sometimes you want to create TermQuery for a single
+term in a FullTextType field directly. In this case, we have to run the
+search term through the field's analyzer to make sure it gets normalized in
+the same way as the field's content.
+
+    sub make_term_query {
+        my ($field, $term) = @_;
+
+        my $token;
+        my $type = $schema->fetch_type($field);
+
+        if ( $type->isa('Lucy::Plan::FullTextType') ) {
+            # Run the term through the full text analysis chain.
+            my $analyzer = $type->get_analyzer;
+            my $tokens   = $analyzer->split($term);
+
+            if ( @$tokens != 1 ) {
+                # If the term expands to more than one token, or no
+                # tokens at all, it will never match a token in the
+                # full text field.
+                return Lucy::Search::NoMatchQuery->new;
+            }
+
+            $token = $tokens->[0];
+        }
+        else {
+            # Exact match for other types.
+            $token = $term;
+        }
+
+        return Lucy::Search::TermQuery->new(
+            field => $field,
+            term  => $token,
+        );
+    }
+
 =head1 Congratulations!
 
 You've made it to the end of the tutorial.

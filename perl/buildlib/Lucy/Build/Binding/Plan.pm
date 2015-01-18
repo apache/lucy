@@ -184,6 +184,7 @@ sub bind_fulltexttype {
     my @exposed = qw(
         Set_Highlightable
         Highlightable
+        Get_Analyzer
     );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
