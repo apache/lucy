@@ -599,6 +599,10 @@ chaz_HeadCheck_check_header(const char *header_name);
 int
 chaz_HeadCheck_check_many_headers(const char **header_names);
 
+/* Return true if the symbol is defined (possibly as a macro). */
+int
+chaz_HeadCheck_defines_symbol(const char *symbol, const char *includes);
+
 /* Return true if the member is present in the struct. */
 int
 chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
@@ -2305,6 +2309,18 @@ S_chaz_CLI_rebuild_help(chaz_CLI *self) {
     strcat(self->help, "\n");
 }
 
+static chaz_CLIOption*
+S_find_opt(chaz_CLI *self, const char *name) {
+    int i;
+    for (i = 0; i < self->num_opts; i++) {
+        chaz_CLIOption *opt = &self->opts[i];
+        if (strcmp(opt->name, name) == 0) {
+            return opt;
+        }
+    }
+    return NULL;
+}
+
 chaz_CLI*
 chaz_CLI_new(const char *name, const char *description) {
     chaz_CLI *self  = calloc(1, sizeof(chaz_CLI));
@@ -2390,81 +2406,78 @@ chaz_CLI_register(chaz_CLI *self, const char *name, const char *help,
 
 int
 chaz_CLI_set(chaz_CLI *self, const char *name, const char *value) {
-    int i;
-    for (i = 0; i < self->num_opts; i++) {
-        chaz_CLIOption *opt = &self->opts[i];
-        if (strcmp(opt->name, name) == 0) {
-            if (opt->defined) {
-                S_chaz_CLI_error(self, "'%s' specified multiple times", name);
-                return 0;
-            }
-            opt->defined = 1;
-            if (value != NULL) {
-                opt->value = chaz_Util_strdup(value);
-            }
-            return 1;
+    chaz_CLIOption *opt = S_find_opt(self, name);
+    if (opt == NULL) {
+        S_chaz_CLI_error(self, "Attempt to set unknown option: '%s'", name);
+        return 0;
+    }
+    if (opt->defined) {
+        S_chaz_CLI_error(self, "'%s' specified multiple times", name);
+        return 0;
+    }
+    opt->defined = 1;
+    if (opt->flags == CHAZ_CLI_NO_ARG) {
+        if (value != NULL) {
+            S_chaz_CLI_error(self, "'%s' expects no value", name);
+            return 0;
         }
     }
-    S_chaz_CLI_error(self, "Attempt to set unknown option: '%s'", name);
-    return 0;
+    else {
+        if (value == NULL) {
+            S_chaz_CLI_error(self, "'%s' expects a value", name);
+            return 0;
+        }
+        opt->value = chaz_Util_strdup(value);
+    }
+    return 1;
 }
 
 int
 chaz_CLI_unset(chaz_CLI *self, const char *name) {
-    int i;
-    for (i = 0; i < self->num_opts; i++) {
-        chaz_CLIOption *opt = &self->opts[i];
-        if (strcmp(opt->name, name) == 0) {
-            free(opt->value);
-            opt->value = NULL;
-            opt->defined = 0;
-            return 1;
-        }
+    chaz_CLIOption *opt = S_find_opt(self, name);
+    if (opt == NULL) {
+        S_chaz_CLI_error(self, "Attempt to unset unknown option: '%s'", name);
+        return 0;
     }
-    S_chaz_CLI_error(self, "Attempt to unset unknown option: '%s'", name);
-    return 0;
+    free(opt->value);
+    opt->value = NULL;
+    opt->defined = 0;
+    return 1;
 }
 
 int
 chaz_CLI_defined(chaz_CLI *self, const char *name) {
-    int i;
-    for (i = 0; i < self->num_opts; i++) {
-        chaz_CLIOption *opt = &self->opts[i];
-        if (strcmp(opt->name, name) == 0) {
-            return opt->defined;
-        }
+    chaz_CLIOption *opt = S_find_opt(self, name);
+    if (opt == NULL) {
+        S_chaz_CLI_error(self, "Inquiry for unknown option: '%s'", name);
+        return 0;
     }
-    S_chaz_CLI_error(self, "Inquiry for unknown option: '%s'", name);
-    return 0;
+    return opt->defined;
 }
 
 long
 chaz_CLI_longval(chaz_CLI *self, const char *name) {
-    int i;
-    for (i = 0; i < self->num_opts; i++) {
-        chaz_CLIOption *opt = &self->opts[i];
-        if (strcmp(opt->name, name) == 0) {
-            if (!opt->defined || !opt->value) {
-                return 0;
-            }
-            return strtol(opt->value, NULL, 10);
-        }
+    chaz_CLIOption *opt = S_find_opt(self, name);
+    if (opt == NULL) {
+        S_chaz_CLI_error(self, "Longval request for unknown option: '%s'",
+                         name);
+        return 0;
     }
-    S_chaz_CLI_error(self, "Longval request for unknown option: '%s'", name);
-    return 0;
+    if (!opt->defined || !opt->value) {
+        return 0;
+    }
+    return strtol(opt->value, NULL, 10);
 }
 
 const char*
 chaz_CLI_strval(chaz_CLI *self, const char *name) {
-    int i;
-    for (i = 0; i < self->num_opts; i++) {
-        chaz_CLIOption *opt = &self->opts[i];
-        if (strcmp(opt->name, name) == 0) {
-            return opt->value;
-        }
+    chaz_CLIOption *opt = S_find_opt(self, name);
+    if (opt == NULL) {
+        S_chaz_CLI_error(self, "Strval request for unknown option: '%s'",
+                         name);
+        return 0;
     }
-    S_chaz_CLI_error(self, "Strval request for unknown option: '%s'", name);
-    return 0;
+    return opt->value;
 }
 
 int
@@ -2477,7 +2490,6 @@ chaz_CLI_parse(chaz_CLI *self, int argc, const char *argv[]) {
     for (i = 1; i < argc; i++) {
         const char *arg = argv[i];
         size_t name_len = 0;
-        int has_equals = 0;
         const char *value = NULL;
 
         /* Stop processing if we see `-` or `--`. */
@@ -2517,6 +2529,21 @@ chaz_CLI_parse(chaz_CLI *self, int argc, const char *argv[]) {
         }
         memcpy(name, arg + 2, name_len);
         name[name_len] = '\0';
+
+        if (value == NULL && i + 1 < argc) {
+            /* Support both '--opt=val' and '--opt val' styles. */
+            chaz_CLIOption *opt = S_find_opt(self, name);
+            if (opt == NULL) {
+                S_chaz_CLI_error(self, "Attempt to set unknown option: '%s'",
+                                 name);
+                free(name);
+                return 0;
+            }
+            if (opt->flags != CHAZ_CLI_NO_ARG) {
+                i++;
+                value = argv[i];
+            }
+        }
 
         /* Attempt to set the option. */
         if (!chaz_CLI_set(self, name, value)) {
@@ -4205,6 +4232,34 @@ chaz_HeadCheck_check_many_headers(const char **header_names) {
 }
 
 int
+chaz_HeadCheck_defines_symbol(const char *symbol, const char *includes) {
+    /*
+     * Casting function pointers to object pointers like 'char*' is a C
+     * extension, so for a bullet-proof check, a separate test for functions
+     * might be necessary.
+     */
+    static const char defines_code[] =
+        CHAZ_QUOTE(  %s                                            )
+        CHAZ_QUOTE(  int main() {                                  )
+        CHAZ_QUOTE(  #ifdef %s                                     )
+        CHAZ_QUOTE(      return 0;                                 )
+        CHAZ_QUOTE(  #else                                         )
+        CHAZ_QUOTE(      return *(char*)&%s;                       )
+        CHAZ_QUOTE(  #endif                                        )
+        CHAZ_QUOTE(  }                                             );
+    long needed = sizeof(defines_code)
+                  + 2 * strlen(symbol)
+                  + strlen(includes)
+                  + 10;
+    char *buf = (char*)malloc(needed);
+    int retval;
+    sprintf(buf, defines_code, includes, symbol, symbol);
+    retval = chaz_CC_test_compile(buf);
+    free(buf);
+    return retval;
+}
+
+int
 chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
                                const char *includes) {
     static const char contains_code[] =
@@ -5115,7 +5170,7 @@ static struct {
     char shared_lib_ext[7];
     char local_command_start[3];
     int  shell_type;
-} chaz_OS = { "", "", "", "", "", "", 0 };
+} chaz_OS = { "", "", "", "", "", "", "", 0 };
 
 void
 chaz_OS_init(void) {
@@ -5574,7 +5629,6 @@ chaz_Util_can_open_file(const char *file_path) {
 int
 chaz_Probe_parse_cli_args(int argc, const char *argv[], chaz_CLI *cli) {
     int i;
-    int output_enabled = 0;
 
     /* Register Charmonizer-specific options. */
     chaz_CLI_register(cli, "enable-c", "generate charmony.h", CHAZ_CLI_NO_ARG);
@@ -5953,7 +6007,6 @@ chaz_DirManip_try_rmdir(void) {
 void
 chaz_DirManip_run(void) {
     const char *dir_sep = chaz_OS_dir_sep();
-    int remove_zaps_dirs = false;
     int has_dirent_h = chaz_HeadCheck_check_header("dirent.h");
     int has_direct_h = chaz_HeadCheck_check_header("direct.h");
     int has_dirent_d_namlen = false;
@@ -6025,7 +6078,6 @@ chaz_DirManip_run(void) {
     /* See whether remove works on directories. */
     chaz_OS_mkdir("_charm_test_remove_me");
     if (0 == remove("_charm_test_remove_me")) {
-        remove_zaps_dirs = true;
         chaz_ConfWriter_add_def("REMOVE_ZAPS_DIRS", NULL);
     }
     chaz_OS_rmdir("_charm_test_remove_me");
@@ -6567,7 +6619,6 @@ chaz_Integers_run(void) {
     int has___int64       = false;
     int has_inttypes      = chaz_HeadCheck_check_header("inttypes.h");
     int has_stdint        = chaz_HeadCheck_check_header("stdint.h");
-    int can_convert_u64_to_double = true;
     char i32_t_type[10];
     char i32_t_postfix[10];
     char u32_t_postfix[10];
@@ -7315,13 +7366,8 @@ chaz_Memory_probe_alloca(void) {
         CHAZ_QUOTE(      void *foo = %s(1);         )
         CHAZ_QUOTE(      return 0;                  )
         CHAZ_QUOTE(  }                              );
-    int has_sys_mman_h = false;
-    int has_alloca_h   = false;
-    int has_malloc_h   = false;
-    int need_stdlib_h  = false;
     int has_alloca     = false;
     int has_builtin_alloca    = false;
-    int has_underscore_alloca = false;
     char code_buf[sizeof(alloca_code) + 100];
 
     {
@@ -7334,7 +7380,6 @@ chaz_Memory_probe_alloca(void) {
             NULL
         };
         if (chaz_HeadCheck_check_many_headers((const char**)mman_headers)) {
-            has_sys_mman_h = true;
             chaz_ConfWriter_add_def("HAS_SYS_MMAN_H", NULL);
         }
     }
@@ -7342,8 +7387,7 @@ chaz_Memory_probe_alloca(void) {
     /* Unixen. */
     sprintf(code_buf, alloca_code, "alloca.h", "alloca");
     if (chaz_CC_test_compile(code_buf)) {
-        has_alloca_h = true;
-        has_alloca   = true;
+        has_alloca = true;
         chaz_ConfWriter_add_def("HAS_ALLOCA_H", NULL);
         chaz_ConfWriter_add_def("alloca", "alloca");
     }
@@ -7355,8 +7399,7 @@ chaz_Memory_probe_alloca(void) {
          */
         sprintf(code_buf, alloca_code, "stdlib.h", "alloca");
         if (chaz_CC_test_compile(code_buf)) {
-            has_alloca    = true;
-            need_stdlib_h = true;
+            has_alloca = true;
             chaz_ConfWriter_add_def("ALLOCA_IN_STDLIB_H", NULL);
             chaz_ConfWriter_add_def("alloca", "alloca");
         }
@@ -7374,8 +7417,7 @@ chaz_Memory_probe_alloca(void) {
     if (!(has_alloca || has_builtin_alloca)) {
         sprintf(code_buf, alloca_code, "malloc.h", "alloca");
         if (chaz_CC_test_compile(code_buf)) {
-            has_malloc_h = true;
-            has_alloca   = true;
+            has_alloca = true;
             chaz_ConfWriter_add_def("HAS_MALLOC_H", NULL);
             chaz_ConfWriter_add_def("alloca", "alloca");
         }
@@ -7383,8 +7425,6 @@ chaz_Memory_probe_alloca(void) {
     if (!(has_alloca || has_builtin_alloca)) {
         sprintf(code_buf, alloca_code, "malloc.h", "_alloca");
         if (chaz_CC_test_compile(code_buf)) {
-            has_malloc_h = true;
-            has_underscore_alloca = true;
             chaz_ConfWriter_add_def("HAS_MALLOC_H", NULL);
             chaz_ConfWriter_add_def("chy_alloca", "_alloca");
         }
@@ -7670,9 +7710,7 @@ void
 chaz_VariadicMacros_run(void) {
     char *output;
     size_t output_len;
-    int has_varmacros      = false;
-    int has_iso_varmacros  = false;
-    int has_gnuc_varmacros = false;
+    int has_varmacros = false;
 
     chaz_ConfWriter_start_module("VariadicMacros");
 
@@ -7680,7 +7718,6 @@ chaz_VariadicMacros_run(void) {
     output = chaz_CC_capture_output(chaz_VariadicMacros_iso_code, &output_len);
     if (output != NULL) {
         has_varmacros = true;
-        has_iso_varmacros = true;
         chaz_ConfWriter_add_def("HAS_VARIADIC_MACROS", NULL);
         chaz_ConfWriter_add_def("HAS_ISO_VARIADIC_MACROS", NULL);
         free(output);
@@ -7689,7 +7726,6 @@ chaz_VariadicMacros_run(void) {
     /* Test for GNU-style variadic macros. */
     output = chaz_CC_capture_output(chaz_VariadicMacros_gnuc_code, &output_len);
     if (output != NULL) {
-        has_gnuc_varmacros = true;
         if (has_varmacros == false) {
             has_varmacros = true;
             chaz_ConfWriter_add_def("HAS_VARIADIC_MACROS", NULL);
