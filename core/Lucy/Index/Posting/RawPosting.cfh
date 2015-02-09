@@ -50,15 +50,6 @@ class Lucy::Index::RawPosting nickname RawPost
     new(void *pre_allocated_memory, int32_t doc_id, uint32_t freq,
         const char *term_text, size_t term_text_len);
 
-    uint32_t
-    Get_RefCount(RawPosting* self);
-
-    incremented RawPosting*
-    Inc_RefCount(RawPosting* self);
-
-    uint32_t
-    Dec_RefCount(RawPosting* self);
-
     public int32_t
     Compare_To(RawPosting *self, Obj *other);
 
