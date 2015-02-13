@@ -139,13 +139,9 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
         if (Obj_Is_A(obj, INTNUM)) {
             if (Obj_Is_A(obj, BOOLNUM)) {
                 bool value = !!InStream_Read_U8(instream);
-                BoolNum *self = (BoolNum*)obj;
-                if (self && self != CFISH_TRUE && self != CFISH_FALSE) {
-                    Bool_Dec_RefCount_t super_decref
-                        = SUPER_METHOD_PTR(BOOLNUM, CFISH_Bool_Dec_RefCount);
-                    super_decref(self);
-                }
-                obj = value ? (Obj*)CFISH_TRUE : (Obj*)CFISH_FALSE;
+                Obj *result = value ? INCREF(CFISH_TRUE) : INCREF(CFISH_FALSE);
+                DECREF(obj);
+                obj = result;
             }
             else if (Obj_Is_A(obj, INTEGER32)) {
                 int32_t value = (int32_t)InStream_Read_C32(instream);

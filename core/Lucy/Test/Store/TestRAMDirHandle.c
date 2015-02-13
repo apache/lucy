@@ -73,9 +73,9 @@ test_all(TestBatchRunner *runner) {
     TEST_FALSE(runner, boffo_was_dir,
                "File correctly identified by Entry_Is_Dir");
 
-    uint32_t refcount = RAMFolder_Get_RefCount(folder);
+    uint32_t refcount = REFCOUNT_NN(folder);
     RAMDH_Close(dh);
-    TEST_INT_EQ(runner, RAMFolder_Get_RefCount(folder), refcount - 1,
+    TEST_INT_EQ(runner, REFCOUNT_NN(folder), refcount - 1,
                 "Folder reference released by Close()");
 
     DECREF(dh);

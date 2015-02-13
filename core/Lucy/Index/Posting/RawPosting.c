@@ -42,6 +42,9 @@ RawPost_new(void *pre_allocated_memory, int32_t doc_id, uint32_t freq,
     ivars->aux_len     = 0;
     memcpy(&ivars->blob, term_text, term_text_len);
 
+    // Leak a refcount on purpose.
+    INCREF(self);
+
     return self;
 }
 
@@ -71,23 +74,6 @@ RawPost_Compare_To_IMP(RawPosting *self, Obj *other) {
     }
 
     return comparison;
-}
-
-uint32_t
-RawPost_Get_RefCount_IMP(RawPosting* self) {
-    UNUSED_VAR(self);
-    return 1;
-}
-
-RawPosting*
-RawPost_Inc_RefCount_IMP(RawPosting* self) {
-    return self;
-}
-
-uint32_t
-RawPost_Dec_RefCount_IMP(RawPosting* self) {
-    UNUSED_VAR(self);
-    return 1;
 }
 
 /***************************************************************************/
