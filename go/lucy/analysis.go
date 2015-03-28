@@ -28,7 +28,7 @@ import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
 type Analyzer interface {
 	clownfish.Obj
-	ToAnalyzerPtr() unsafe.Pointer
+	ToAnalyzerPtr() uintptr
 }
 
 type EasyAnalyzer struct {
@@ -38,7 +38,7 @@ type EasyAnalyzer struct {
 func NewEasyAnalyzer(language string) *EasyAnalyzer {
 	lang := clownfish.NewString(language)
 	obj := &EasyAnalyzer{
-		C.lucy_EasyAnalyzer_new((*C.cfish_String)(lang.ToPtr())),
+		C.lucy_EasyAnalyzer_new((*C.cfish_String)(unsafe.Pointer(lang.ToPtr()))),
 	}
 	runtime.SetFinalizer(obj, (*EasyAnalyzer).finalize)
 	return obj
@@ -49,10 +49,10 @@ func (obj *EasyAnalyzer) finalize() {
 	obj.ref = nil
 }
 
-func (obj *EasyAnalyzer) ToPtr() unsafe.Pointer {
-	return unsafe.Pointer(obj.ref)
+func (obj *EasyAnalyzer) ToPtr() uintptr {
+	return uintptr(unsafe.Pointer(obj.ref))
 }
 
-func (obj *EasyAnalyzer) ToAnalyzerPtr() unsafe.Pointer {
+func (obj *EasyAnalyzer) ToAnalyzerPtr() uintptr {
 	return obj.ToPtr()
 }

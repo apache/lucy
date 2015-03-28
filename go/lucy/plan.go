@@ -32,7 +32,7 @@ type Schema struct {
 
 type FieldType interface {
 	clownfish.Obj
-	ToFieldTypePtr() unsafe.Pointer
+	ToFieldTypePtr() uintptr
 }
 
 type FullTextType struct {
@@ -54,13 +54,16 @@ func (obj *Schema) finalize() {
 
 func (obj *Schema) SpecField(field string, fieldType FieldType) {
 	fieldCF := clownfish.NewString(field)
-	C.LUCY_Schema_Spec_Field(obj.ref, (*C.cfish_String)(fieldCF.ToPtr()),
-		(*C.lucy_FieldType)(fieldType.ToFieldTypePtr()))
+	C.LUCY_Schema_Spec_Field(obj.ref,
+		(*C.cfish_String)(unsafe.Pointer(fieldCF.ToPtr())),
+		(*C.lucy_FieldType)(unsafe.Pointer(fieldType.ToFieldTypePtr())))
 }
 
 func NewFullTextType(analyzer Analyzer) *FullTextType {
 	obj := &FullTextType{
-		C.lucy_FullTextType_new((*C.lucy_Analyzer)(analyzer.ToAnalyzerPtr())),
+		C.lucy_FullTextType_new(
+			(*C.lucy_Analyzer)(unsafe.Pointer(analyzer.ToAnalyzerPtr())),
+		),
 	}
 	runtime.SetFinalizer(obj, (*FullTextType).finalize)
 	return obj
@@ -71,10 +74,10 @@ func (obj *FullTextType) finalize() {
 	obj.ref = nil
 }
 
-func (obj *FullTextType) ToPtr() unsafe.Pointer {
-	return unsafe.Pointer(obj.ref)
+func (obj *FullTextType) ToPtr() uintptr {
+	return uintptr(unsafe.Pointer(obj.ref))
 }
 
-func (obj *FullTextType) ToFieldTypePtr() unsafe.Pointer {
+func (obj *FullTextType) ToFieldTypePtr() uintptr {
 	return obj.ToPtr()
 }

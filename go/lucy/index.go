@@ -75,7 +75,8 @@ func OpenIndexer(args *OpenIndexerArgs) (obj *Indexer, err error) {
 	}
 	err = clownfish.TrapErr(func() {
 		obj = &Indexer{
-			C.lucy_Indexer_new(schemaC, (*C.cfish_Obj)(ixLoc.ToPtr()),
+			C.lucy_Indexer_new(schemaC,
+				(*C.cfish_Obj)(unsafe.Pointer(ixLoc.ToPtr())),
 				managerC, C.int32_t(flags)),
 			nil,
 		}
@@ -124,8 +125,9 @@ func (obj *Indexer) AddDoc(doc interface{}) error {
 		value := docValue.Field(i).String()
 		fieldC := obj.findFieldC(field)
 		valueC := clownfish.NewString(value)
-		C.CFISH_Hash_Store(docFields, (*C.cfish_Obj)(fieldC.ToPtr()),
-			C.cfish_inc_refcount(valueC.ToPtr()))
+		C.CFISH_Hash_Store(docFields,
+			(*C.cfish_Obj)(unsafe.Pointer(fieldC.ToPtr())),
+			C.cfish_inc_refcount(unsafe.Pointer(valueC.ToPtr())))
 	}
 
 	// TODO create an additional method AddDocWithBoost which allows the

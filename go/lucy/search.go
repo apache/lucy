@@ -37,12 +37,12 @@ import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
 type Query interface {
 	clownfish.Obj
-	ToQueryPtr() unsafe.Pointer
+	ToQueryPtr() uintptr
 }
 
 type Searcher interface {
 	clownfish.Obj
-	ToSearcherPtr() unsafe.Pointer
+	ToSearcherPtr() uintptr
 	Hits(query interface{}, offset uint32, numWanted uint32, sortSpec *SortSpec) (*Hits, error)
 }
 
@@ -64,7 +64,7 @@ func OpenIndexSearcher(index interface{}) (obj *IndexSearcher, err error) {
 	switch index.(type) {
 	case string:
 		ixLoc := clownfish.NewString(index.(string))
-		indexC = (*C.cfish_Obj)(ixLoc.ToPtr())
+		indexC = (*C.cfish_Obj)(unsafe.Pointer(ixLoc.ToPtr()))
 	default:
 		panic("TODO: support Folder")
 	}
@@ -86,11 +86,11 @@ func (obj *IndexSearcher) Close() error {
 	})
 }
 
-func (obj *IndexSearcher) ToPtr() unsafe.Pointer {
-	return unsafe.Pointer(obj.ref)
+func (obj *IndexSearcher) ToPtr() uintptr {
+	return uintptr(unsafe.Pointer(obj.ref))
 }
 
-func (obj *IndexSearcher) ToSearcherPtr() unsafe.Pointer {
+func (obj *IndexSearcher) ToSearcherPtr() uintptr {
 	return obj.ToPtr()
 }
 
@@ -106,7 +106,7 @@ func (obj *IndexSearcher) Hits(query interface{}, offset uint32, numWanted uint3
 		queryStringC := clownfish.NewString(query.(string))
 		err = clownfish.TrapErr(func() {
 			hitsC = C.LUCY_IxSearcher_Hits(obj.ref,
-				(*C.cfish_Obj)(queryStringC.ToPtr()),
+				(*C.cfish_Obj)(unsafe.Pointer(queryStringC.ToPtr())),
 				C.uint32_t(offset), C.uint32_t(numWanted), sortSpecC)
 		})
 	default:
