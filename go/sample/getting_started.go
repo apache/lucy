@@ -41,7 +41,7 @@ func main() {
 	performSearch(searcher, `"fugiat nulla"`)
 }
 
-func createSchema() *lucy.Schema {
+func createSchema() lucy.Schema {
 	// Create a new schema.
 	schema := lucy.NewSchema()
 
@@ -84,7 +84,7 @@ var docs []MyDoc = []MyDoc{
 	},
 }
 
-func indexDocuments(schema *lucy.Schema, index string) {
+func indexDocuments(schema lucy.Schema, index string) {
 	indexerArgs := &lucy.OpenIndexerArgs{
 		Schema:   schema,
 		Index:    index,

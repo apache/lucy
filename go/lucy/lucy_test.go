@@ -26,7 +26,7 @@ func TestStuff(t *testing.T) {
 
 func TestOpenIndexer(t *testing.T) {
 	_, err := lucy.OpenIndexer(&lucy.OpenIndexerArgs{Index: "notalucyindex"})
-	if _, ok := err.(*clownfish.Err); !ok {
+	if _, ok := err.(clownfish.Err); !ok {
 		t.Error("Didn't catch exception opening indexer")
 	}
 }
