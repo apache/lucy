@@ -457,8 +457,7 @@ test_sort_spec(TestBatchRunner *runner) {
     DECREF(results);
 
 #ifdef LUCY_VALGRIND
-    SKIP(runner, "known leaks");
-    SKIP(runner, "known leaks");
+    SKIP(runner, 2, "known leaks");
 #else
     Err *error;
     SortContext sort_ctx;

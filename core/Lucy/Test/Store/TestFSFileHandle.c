@@ -177,8 +177,7 @@ test_Close(TestBatchRunner *runner) {
     fh = FSFH_open(test_filename,
                    FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
 #ifdef _MSC_VER
-    SKIP(runner, "LUCY-155");
-    SKIP(runner, "LUCY-155");
+    SKIP(runner, 2, "LUCY-155");
 #else
     int saved_fd = FSFH_IVARS(fh)->fd;
     FSFH_IVARS(fh)->fd = -1;

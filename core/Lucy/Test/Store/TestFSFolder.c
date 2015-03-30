@@ -142,11 +142,7 @@ test_protect_symlinks(TestBatchRunner *runner) {
     DECREF(folder);
     S_tear_down();
 #else
-    SKIP(runner, "Tests requiring symlink() disabled");
-    SKIP(runner, "Tests requiring symlink() disabled");
-    SKIP(runner, "Tests requiring symlink() disabled");
-    SKIP(runner, "Tests requiring symlink() disabled");
-    SKIP(runner, "Tests requiring symlink() disabled");
+    SKIP(runner, 5, "Tests requiring symlink() disabled");
 #endif // ENABLE_SYMLINK_TESTS
 }
 
