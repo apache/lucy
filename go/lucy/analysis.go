@@ -28,7 +28,6 @@ import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
 type Analyzer interface {
 	clownfish.Obj
-	ToAnalyzerPtr() uintptr
 }
 
 type implAnalyzer struct {
@@ -62,8 +61,4 @@ func (obj *implEasyAnalyzer) finalize() {
 
 func (obj *implEasyAnalyzer) ToPtr() uintptr {
 	return uintptr(unsafe.Pointer(obj.ref))
-}
-
-func (obj *implEasyAnalyzer) ToAnalyzerPtr() uintptr {
-	return obj.ToPtr()
 }

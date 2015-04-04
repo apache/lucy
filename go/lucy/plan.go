@@ -37,7 +37,6 @@ type implSchema struct {
 
 type FieldType interface {
 	clownfish.Obj
-	ToFieldTypePtr() uintptr
 }
 
 type implFieldType struct {
@@ -100,6 +99,3 @@ func (obj *implFullTextType) ToPtr() uintptr {
 	return uintptr(unsafe.Pointer(obj.ref))
 }
 
-func (obj *implFullTextType) ToFieldTypePtr() uintptr {
-	return obj.ToPtr()
-}

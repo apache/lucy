@@ -37,7 +37,6 @@ import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
 type Query interface {
 	clownfish.Obj
-	ToQueryPtr() uintptr
 }
 
 type implQuery struct {
@@ -46,7 +45,6 @@ type implQuery struct {
 
 type Searcher interface {
 	clownfish.Obj
-	ToSearcherPtr() uintptr
 	Hits(query interface{}, offset uint32, numWanted uint32, sortSpec SortSpec) (Hits, error)
 	Close() error
 }
@@ -113,10 +111,6 @@ func (obj *implIndexSearcher) Close() error {
 
 func (obj *implIndexSearcher) ToPtr() uintptr {
 	return uintptr(unsafe.Pointer(obj.ref))
-}
-
-func (obj *implIndexSearcher) ToSearcherPtr() uintptr {
-	return obj.ToPtr()
 }
 
 func (obj *implIndexSearcher) Hits(query interface{}, offset uint32, numWanted uint32,
