@@ -70,17 +70,17 @@ func (obj *implSchema) finalize() {
 func (obj *implSchema) SpecField(field string, fieldType FieldType) {
 	fieldCF := clownfish.NewString(field)
 	C.LUCY_Schema_Spec_Field(obj.ref,
-		(*C.cfish_String)(unsafe.Pointer(fieldCF.ToPtr())),
-		(*C.lucy_FieldType)(unsafe.Pointer(fieldType.ToPtr())))
+		(*C.cfish_String)(unsafe.Pointer(fieldCF.TOPTR())),
+		(*C.lucy_FieldType)(unsafe.Pointer(fieldType.TOPTR())))
 }
 
-func (obj *implSchema) ToPtr() uintptr {
+func (obj *implSchema) TOPTR() uintptr {
 	return uintptr(unsafe.Pointer(obj.ref))
 }
 
 func NewFullTextType(analyzer Analyzer) FullTextType {
 	cfObj := C.lucy_FullTextType_new(
-		(*C.lucy_Analyzer)(unsafe.Pointer(analyzer.ToPtr())))
+		(*C.lucy_Analyzer)(unsafe.Pointer(analyzer.TOPTR())))
 	return WRAPFullTextType(unsafe.Pointer(cfObj))
 }
 
@@ -95,7 +95,7 @@ func (obj *implFullTextType) finalize() {
 	obj.ref = nil
 }
 
-func (obj *implFullTextType) ToPtr() uintptr {
+func (obj *implFullTextType) TOPTR() uintptr {
 	return uintptr(unsafe.Pointer(obj.ref))
 }
 

@@ -65,7 +65,7 @@ type OpenIndexerArgs struct {
 func OpenIndexer(args *OpenIndexerArgs) (obj Indexer, err error) {
 	var schemaC *C.lucy_Schema = nil
 	if args.Schema != nil {
-		schemaC = (*C.lucy_Schema)(unsafe.Pointer(args.Schema.ToPtr()))
+		schemaC = (*C.lucy_Schema)(unsafe.Pointer(args.Schema.TOPTR()))
 	}
 	switch args.Index.(type) {
 	case string:
@@ -75,7 +75,7 @@ func OpenIndexer(args *OpenIndexerArgs) (obj Indexer, err error) {
 	ixLoc := clownfish.NewString(args.Index.(string))
 	var managerC *C.lucy_IndexManager = nil
 	if args.Manager != nil {
-		managerC = (*C.lucy_IndexManager)(unsafe.Pointer(args.Manager.ToPtr()))
+		managerC = (*C.lucy_IndexManager)(unsafe.Pointer(args.Manager.TOPTR()))
 	}
 	var flags int32
 	if args.Create {
@@ -86,7 +86,7 @@ func OpenIndexer(args *OpenIndexerArgs) (obj Indexer, err error) {
 	}
 	err = clownfish.TrapErr(func() {
 		cfObj := C.lucy_Indexer_new(schemaC,
-			(*C.cfish_Obj)(unsafe.Pointer(ixLoc.ToPtr())),
+			(*C.cfish_Obj)(unsafe.Pointer(ixLoc.TOPTR())),
 			managerC, C.int32_t(flags))
 		obj = WRAPIndexer(unsafe.Pointer(cfObj))
 	})
@@ -141,7 +141,7 @@ func (obj *implIndexer) AddDoc(doc interface{}) error {
 		valueC := clownfish.NewString(value)
 		C.CFISH_Hash_Store(docFields,
 			(*C.cfish_Obj)(unsafe.Pointer(fieldC)),
-			C.cfish_inc_refcount(unsafe.Pointer(valueC.ToPtr())))
+			C.cfish_inc_refcount(unsafe.Pointer(valueC.TOPTR())))
 	}
 
 	// TODO create an additional method AddDocWithBoost which allows the
@@ -173,7 +173,7 @@ func (obj *implIndexer) findFieldC(name string) *C.cfish_String {
 			}
 		}
 	}
-	return (*C.cfish_String)(unsafe.Pointer(f.ToPtr()))
+	return (*C.cfish_String)(unsafe.Pointer(f.TOPTR()))
 }
 
 func (obj *implIndexer) Commit() error {
@@ -182,10 +182,10 @@ func (obj *implIndexer) Commit() error {
 	})
 }
 
-func (obj *implIndexer) ToPtr() uintptr {
+func (obj *implIndexer) TOPTR() uintptr {
 	return uintptr(unsafe.Pointer(obj.ref))
 }
 
-func (obj *implIndexManager) ToPtr() uintptr {
+func (obj *implIndexManager) TOPTR() uintptr {
 	return uintptr(unsafe.Pointer(obj.ref))
 }

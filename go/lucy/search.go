@@ -81,7 +81,7 @@ func OpenIndexSearcher(index interface{}) (obj IndexSearcher, err error) {
 	switch index.(type) {
 	case string:
 		ixLoc := clownfish.NewString(index.(string))
-		indexC = (*C.cfish_Obj)(unsafe.Pointer(ixLoc.ToPtr()))
+		indexC = (*C.cfish_Obj)(unsafe.Pointer(ixLoc.TOPTR()))
 	default:
 		panic("TODO: support Folder")
 	}
@@ -109,7 +109,7 @@ func (obj *implIndexSearcher) Close() error {
 	})
 }
 
-func (obj *implIndexSearcher) ToPtr() uintptr {
+func (obj *implIndexSearcher) TOPTR() uintptr {
 	return uintptr(unsafe.Pointer(obj.ref))
 }
 
@@ -117,14 +117,14 @@ func (obj *implIndexSearcher) Hits(query interface{}, offset uint32, numWanted u
 	sortSpec SortSpec) (hits Hits, err error) {
 	var sortSpecC *C.lucy_SortSpec
 	if sortSpec != nil {
-		sortSpecC = (*C.lucy_SortSpec)(unsafe.Pointer(sortSpec.ToPtr()))
+		sortSpecC = (*C.lucy_SortSpec)(unsafe.Pointer(sortSpec.TOPTR()))
 	}
 	switch query.(type) {
 	case string:
 		queryStringC := clownfish.NewString(query.(string))
 		err = clownfish.TrapErr(func() {
 			hitsC := C.LUCY_IxSearcher_Hits(obj.ref,
-				(*C.cfish_Obj)(unsafe.Pointer(queryStringC.ToPtr())),
+				(*C.cfish_Obj)(unsafe.Pointer(queryStringC.TOPTR())),
 				C.uint32_t(offset), C.uint32_t(numWanted), sortSpecC)
 			hits = WRAPHits(unsafe.Pointer(hitsC))
 		})
@@ -140,7 +140,7 @@ func WRAPHits(ptr unsafe.Pointer) Hits {
 	return obj
 }
 
-func (obj *implHits) ToPtr() uintptr {
+func (obj *implHits) TOPTR() uintptr {
 	return uintptr(unsafe.Pointer(obj.ref))
 }
 

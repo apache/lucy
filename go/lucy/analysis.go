@@ -44,7 +44,7 @@ type implEasyAnalyzer struct {
 
 func NewEasyAnalyzer(language string) EasyAnalyzer {
 	lang := clownfish.NewString(language)
-	cfObj := C.lucy_EasyAnalyzer_new((*C.cfish_String)(unsafe.Pointer(lang.ToPtr())))
+	cfObj := C.lucy_EasyAnalyzer_new((*C.cfish_String)(unsafe.Pointer(lang.TOPTR())))
 	return WRAPEasyAnalyzer(unsafe.Pointer(cfObj))
 }
 
@@ -59,6 +59,6 @@ func (obj *implEasyAnalyzer) finalize() {
 	obj.ref = nil
 }
 
-func (obj *implEasyAnalyzer) ToPtr() uintptr {
+func (obj *implEasyAnalyzer) TOPTR() uintptr {
 	return uintptr(unsafe.Pointer(obj.ref))
 }
