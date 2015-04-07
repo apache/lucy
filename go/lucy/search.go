@@ -37,87 +37,114 @@ import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
 type Query interface {
 	clownfish.Obj
-	ToQueryPtr() unsafe.Pointer
+}
+
+type implQuery struct {
+	ref *C.lucy_Query
 }
 
 type Searcher interface {
 	clownfish.Obj
-	ToSearcherPtr() unsafe.Pointer
-	Hits(query interface{}, offset uint32, numWanted uint32, sortSpec *SortSpec) (*Hits, error)
+	Hits(query interface{}, offset uint32, numWanted uint32, sortSpec SortSpec) (Hits, error)
+	Close() error
 }
 
-type Hits struct {
+type Hits interface {
+	clownfish.Obj
+	Next(hit interface{}) bool
+	Error() error
+}
+
+type implHits struct {
 	ref *C.lucy_Hits
 	err error
 }
 
-type SortSpec struct {
+type SortSpec interface {
+	clownfish.Obj
+}
+
+type implSortSpec struct {
 	ref *C.lucy_SortSpec
 }
 
-type IndexSearcher struct {
+type IndexSearcher interface {
+	Searcher
+}
+
+type implIndexSearcher struct {
 	ref *C.lucy_IndexSearcher
 }
 
-func OpenIndexSearcher(index interface{}) (obj *IndexSearcher, err error) {
+func OpenIndexSearcher(index interface{}) (obj IndexSearcher, err error) {
 	var indexC *C.cfish_Obj
 	switch index.(type) {
 	case string:
 		ixLoc := clownfish.NewString(index.(string))
-		indexC = (*C.cfish_Obj)(ixLoc.ToPtr())
+		indexC = (*C.cfish_Obj)(unsafe.Pointer(ixLoc.TOPTR()))
 	default:
 		panic("TODO: support Folder")
 	}
 	err = clownfish.TrapErr(func() {
-		obj = &IndexSearcher{C.lucy_IxSearcher_new(indexC)}
+		cfObj := C.lucy_IxSearcher_new(indexC)
+		obj = WRAPIndexSearcher(unsafe.Pointer(cfObj))
 	})
-	runtime.SetFinalizer(obj, (*IndexSearcher).finalize)
 	return obj, err
 }
 
-func (obj *IndexSearcher) finalize() {
+func WRAPIndexSearcher(ptr unsafe.Pointer) IndexSearcher {
+	obj := &implIndexSearcher{(*C.lucy_IndexSearcher)(ptr)}
+	runtime.SetFinalizer(obj, (*implIndexSearcher).finalize)
+	return obj
+}
+
+func (obj *implIndexSearcher) finalize() {
 	C.cfish_dec_refcount(unsafe.Pointer(obj.ref))
 	obj.ref = nil
 }
 
-func (obj *IndexSearcher) Close() error {
+func (obj *implIndexSearcher) Close() error {
 	return clownfish.TrapErr(func() {
 		C.LUCY_IxSearcher_Close(obj.ref)
 	})
 }
 
-func (obj *IndexSearcher) ToPtr() unsafe.Pointer {
-	return unsafe.Pointer(obj.ref)
+func (obj *implIndexSearcher) TOPTR() uintptr {
+	return uintptr(unsafe.Pointer(obj.ref))
 }
 
-func (obj *IndexSearcher) ToSearcherPtr() unsafe.Pointer {
-	return obj.ToPtr()
-}
-
-func (obj *IndexSearcher) Hits(query interface{}, offset uint32, numWanted uint32,
-	sortSpec *SortSpec) (hits *Hits, err error) {
-	var hitsC *C.lucy_Hits
+func (obj *implIndexSearcher) Hits(query interface{}, offset uint32, numWanted uint32,
+	sortSpec SortSpec) (hits Hits, err error) {
 	var sortSpecC *C.lucy_SortSpec
 	if sortSpec != nil {
-		sortSpecC = sortSpec.ref
+		sortSpecC = (*C.lucy_SortSpec)(unsafe.Pointer(sortSpec.TOPTR()))
 	}
 	switch query.(type) {
 	case string:
 		queryStringC := clownfish.NewString(query.(string))
 		err = clownfish.TrapErr(func() {
-			hitsC = C.LUCY_IxSearcher_Hits(obj.ref,
-				(*C.cfish_Obj)(queryStringC.ToPtr()),
+			hitsC := C.LUCY_IxSearcher_Hits(obj.ref,
+				(*C.cfish_Obj)(unsafe.Pointer(queryStringC.TOPTR())),
 				C.uint32_t(offset), C.uint32_t(numWanted), sortSpecC)
+			hits = WRAPHits(unsafe.Pointer(hitsC))
 		})
 	default:
 		panic("TODO: support Query objects")
 	}
-	hits = &Hits{hitsC, nil}
-	runtime.SetFinalizer(hits, (*Hits).finalize)
 	return hits, err
 }
 
-func (obj *Hits) Next(hit interface{}) bool {
+func WRAPHits(ptr unsafe.Pointer) Hits {
+	obj := &implHits{(*C.lucy_Hits)(ptr), nil}
+	runtime.SetFinalizer(obj, (*implHits).finalize)
+	return obj
+}
+
+func (obj *implHits) TOPTR() uintptr {
+	return uintptr(unsafe.Pointer(obj.ref))
+}
+
+func (obj *implHits) Next(hit interface{}) bool {
 	// TODO: accept a HitDoc object and populate score.
 
 	// Get reflection value and type for the supplied struct.
@@ -133,7 +160,7 @@ func (obj *Hits) Next(hit interface{}) bool {
 	if hitValue == (reflect.Value{}) {
 		mess := fmt.Sprintf("Arg not writeable struct pointer: %v",
 			reflect.TypeOf(hit))
-		obj.err = clownfish.NewError(mess)
+		obj.err = clownfish.NewErr(mess)
 		return false
 	}
 
@@ -169,11 +196,11 @@ func (obj *Hits) Next(hit interface{}) bool {
 	return true
 }
 
-func (obj *Hits) finalize() {
+func (obj *implHits) finalize() {
 	C.cfish_dec_refcount(unsafe.Pointer(obj.ref))
 	obj.ref = nil
 }
 
-func (obj *Hits) Error() error {
+func (obj *implHits) Error() error {
 	return obj.err
 }

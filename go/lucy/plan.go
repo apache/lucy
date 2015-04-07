@@ -26,55 +26,76 @@ import "unsafe"
 
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
-type Schema struct {
+type Schema interface {
+	clownfish.Obj
+	SpecField(field string, fieldType FieldType)
+}
+
+type implSchema struct {
 	ref *C.lucy_Schema
 }
 
 type FieldType interface {
 	clownfish.Obj
-	ToFieldTypePtr() unsafe.Pointer
 }
 
-type FullTextType struct {
+type implFieldType struct {
+	ref *C.lucy_FieldType
+}
+
+type FullTextType interface {
+	FieldType
+}
+
+type implFullTextType struct {
 	ref *C.lucy_FullTextType
 }
 
-func NewSchema() *Schema {
-	obj := &Schema{
-		C.lucy_Schema_new(),
-	}
-	runtime.SetFinalizer(obj, (*Schema).finalize)
+func NewSchema() Schema {
+	cfObj := C.lucy_Schema_new()
+	return WRAPSchema(unsafe.Pointer(cfObj))
+}
+
+func WRAPSchema(ptr unsafe.Pointer) Schema {
+	obj := &implSchema{(*C.lucy_Schema)(ptr)}
+	runtime.SetFinalizer(obj, (*implSchema).finalize)
 	return obj
 }
 
-func (obj *Schema) finalize() {
+func (obj *implSchema) finalize() {
 	C.cfish_dec_refcount(unsafe.Pointer(obj.ref))
 	obj.ref = nil
 }
 
-func (obj *Schema) SpecField(field string, fieldType FieldType) {
+func (obj *implSchema) SpecField(field string, fieldType FieldType) {
 	fieldCF := clownfish.NewString(field)
-	C.LUCY_Schema_Spec_Field(obj.ref, (*C.cfish_String)(fieldCF.ToPtr()),
-		(*C.lucy_FieldType)(fieldType.ToFieldTypePtr()))
+	C.LUCY_Schema_Spec_Field(obj.ref,
+		(*C.cfish_String)(unsafe.Pointer(fieldCF.TOPTR())),
+		(*C.lucy_FieldType)(unsafe.Pointer(fieldType.TOPTR())))
 }
 
-func NewFullTextType(analyzer Analyzer) *FullTextType {
-	obj := &FullTextType{
-		C.lucy_FullTextType_new((*C.lucy_Analyzer)(analyzer.ToAnalyzerPtr())),
-	}
-	runtime.SetFinalizer(obj, (*FullTextType).finalize)
+func (obj *implSchema) TOPTR() uintptr {
+	return uintptr(unsafe.Pointer(obj.ref))
+}
+
+func NewFullTextType(analyzer Analyzer) FullTextType {
+	cfObj := C.lucy_FullTextType_new(
+		(*C.lucy_Analyzer)(unsafe.Pointer(analyzer.TOPTR())))
+	return WRAPFullTextType(unsafe.Pointer(cfObj))
+}
+
+func WRAPFullTextType(ptr unsafe.Pointer) FullTextType {
+	obj := &implFullTextType{(*C.lucy_FullTextType)(ptr)}
+	runtime.SetFinalizer(obj, (*implFullTextType).finalize)
 	return obj
 }
 
-func (obj *FullTextType) finalize() {
+func (obj *implFullTextType) finalize() {
 	C.cfish_dec_refcount(unsafe.Pointer(obj.ref))
 	obj.ref = nil
 }
 
-func (obj *FullTextType) ToPtr() unsafe.Pointer {
-	return unsafe.Pointer(obj.ref)
+func (obj *implFullTextType) TOPTR() uintptr {
+	return uintptr(unsafe.Pointer(obj.ref))
 }
 
-func (obj *FullTextType) ToFieldTypePtr() unsafe.Pointer {
-	return obj.ToPtr()
-}

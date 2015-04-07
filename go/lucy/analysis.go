@@ -28,31 +28,37 @@ import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
 type Analyzer interface {
 	clownfish.Obj
-	ToAnalyzerPtr() unsafe.Pointer
 }
 
-type EasyAnalyzer struct {
+type implAnalyzer struct {
+	ref *C.lucy_Analyzer
+}
+
+type EasyAnalyzer interface {
+	Analyzer
+}
+
+type implEasyAnalyzer struct {
 	ref *C.lucy_EasyAnalyzer
 }
 
-func NewEasyAnalyzer(language string) *EasyAnalyzer {
+func NewEasyAnalyzer(language string) EasyAnalyzer {
 	lang := clownfish.NewString(language)
-	obj := &EasyAnalyzer{
-		C.lucy_EasyAnalyzer_new((*C.cfish_String)(lang.ToPtr())),
-	}
-	runtime.SetFinalizer(obj, (*EasyAnalyzer).finalize)
+	cfObj := C.lucy_EasyAnalyzer_new((*C.cfish_String)(unsafe.Pointer(lang.TOPTR())))
+	return WRAPEasyAnalyzer(unsafe.Pointer(cfObj))
+}
+
+func WRAPEasyAnalyzer(ptr unsafe.Pointer) EasyAnalyzer {
+	obj := &implEasyAnalyzer{(*C.lucy_EasyAnalyzer)(ptr)}
+	runtime.SetFinalizer(obj, (*implEasyAnalyzer).finalize)
 	return obj
 }
 
-func (obj *EasyAnalyzer) finalize() {
+func (obj *implEasyAnalyzer) finalize() {
 	C.cfish_dec_refcount(unsafe.Pointer(obj.ref))
 	obj.ref = nil
 }
 
-func (obj *EasyAnalyzer) ToPtr() unsafe.Pointer {
-	return unsafe.Pointer(obj.ref)
-}
-
-func (obj *EasyAnalyzer) ToAnalyzerPtr() unsafe.Pointer {
-	return obj.ToPtr()
+func (obj *implEasyAnalyzer) TOPTR() uintptr {
+	return uintptr(unsafe.Pointer(obj.ref))
 }
