@@ -87,7 +87,7 @@ CODE:
     bool           args_ok;
 
     args_ok
-        = XSBind_allot_params(&(ST(0)), 1, items,
+        = XSBind_allot_params(aTHX_ &(ST(0)), 1, items,
                               ALLOT_SV(&ints_sv, "ints", 4, true),
                               NULL);
     if (!args_ok) {
@@ -104,11 +104,11 @@ CODE:
 
         for (i = 0; i < size; i++) {
             SV **const sv_ptr = av_fetch(ints_av, i, 0);
-            ints[i] = (sv_ptr && XSBind_sv_defined(*sv_ptr))
+            ints[i] = (sv_ptr && XSBind_sv_defined(aTHX_ *sv_ptr))
                       ? SvIV(*sv_ptr)
                       : 0;
         }
-        self = (lucy_I32Array*)XSBind_new_blank_obj(either_sv);
+        self = (lucy_I32Array*)XSBind_new_blank_obj(aTHX_ either_sv);
         lucy_I32Arr_init(self, ints, size);
     }
     else {

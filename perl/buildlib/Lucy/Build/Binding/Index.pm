@@ -304,7 +304,7 @@ set_race_condition_debug1(val_sv)
 PPCODE:
     CFISH_DECREF(lucy_PolyReader_race_condition_debug1);
     lucy_PolyReader_race_condition_debug1 = (cfish_String*)
-        XSBind_maybe_sv_to_cfish_obj(val_sv, CFISH_STRING, NULL);
+        XSBind_maybe_sv_to_cfish_obj(aTHX_ val_sv, CFISH_STRING, NULL);
     if (lucy_PolyReader_race_condition_debug1) {
         (void)CFISH_INCREF(lucy_PolyReader_race_condition_debug1);
     }
@@ -471,7 +471,7 @@ PPCODE:
     }
     else if (items > 2) {
         bool args_ok
-            = XSBind_allot_params(&(ST(0)), 1, items,
+            = XSBind_allot_params(aTHX_ &(ST(0)), 1, items,
                                   ALLOT_SV(&doc_sv, "doc", 3, true),
                                   ALLOT_F32(&boost, "boost", 5, false),
                                   NULL);
@@ -490,7 +490,7 @@ PPCODE:
         IV tmp = SvIV(SvRV(doc_sv));
         doc = INT2PTR(lucy_Doc*, tmp);
     }
-    else if (XSBind_sv_defined(doc_sv) && SvROK(doc_sv)) {
+    else if (XSBind_sv_defined(aTHX_ doc_sv) && SvROK(doc_sv)) {
         HV *maybe_fields = (HV*)SvRV(doc_sv);
         if (SvTYPE((SV*)maybe_fields) == SVt_PVHV) {
             doc = LUCY_Indexer_Get_Stock_Doc(self);
@@ -929,7 +929,7 @@ CODE:
 {
     int32_t ord = 0;
     bool args_ok
-        = XSBind_allot_params(&(ST(0)), 1, items,
+        = XSBind_allot_params(aTHX_ &(ST(0)), 1, items,
                               ALLOT_I32(&ord, "ord", 3, false),
                               NULL);
     if (!args_ok) {
@@ -937,7 +937,7 @@ CODE:
     }
     {
         cfish_Obj *value = LUCY_SortCache_Value(self, ord);
-        RETVAL = XSBind_cfish_to_perl(value);
+        RETVAL = XSBind_cfish_to_perl(aTHX_ value);
         CFISH_DECREF(value);
     }
 }

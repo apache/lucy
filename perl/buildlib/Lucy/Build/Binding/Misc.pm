@@ -45,7 +45,7 @@ to_clownfish(sv)
     SV *sv;
 CODE:
 {
-    cfish_Obj *obj = XSBind_perl_to_cfish(sv);
+    cfish_Obj *obj = XSBind_perl_to_cfish(aTHX_ sv);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(obj);
 }
 OUTPUT: RETVAL
@@ -58,7 +58,7 @@ CODE:
     if (sv_isobject(sv) && sv_derived_from(sv, "Clownfish::Obj")) {
         IV tmp = SvIV(SvRV(sv));
         cfish_Obj* obj = INT2PTR(cfish_Obj*, tmp);
-        RETVAL = XSBind_cfish_to_perl(obj);
+        RETVAL = XSBind_cfish_to_perl(aTHX_ obj);
     }
     else {
         RETVAL = newSVsv(sv);
@@ -84,7 +84,7 @@ PPCODE:
         LUCY_OutStream_Close(target);
         serialized_bb
             = LUCY_RAMFile_Get_Contents(LUCY_RAMFH_Get_File(file_handle));
-        retval = XSBind_bb_to_sv(serialized_bb);
+        retval = XSBind_bb_to_sv(aTHX_ serialized_bb);
         CFISH_DECREF(file_handle);
         CFISH_DECREF(target);
 

@@ -125,13 +125,13 @@ CODE:
     if (items > 1) {
         SV *text_sv = NULL;
         bool args_ok
-            = XSBind_allot_params(&(ST(0)), 1, items,
+            = XSBind_allot_params(aTHX_ &(ST(0)), 1, items,
                                   ALLOT_SV(&text_sv, "text", 4, false),
                                   NULL);
         if (!args_ok) {
             CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
         }
-        if (XSBind_sv_defined(text_sv)) {
+        if (XSBind_sv_defined(aTHX_ text_sv)) {
             STRLEN len;
             char *text = SvPVutf8(text_sv, len);
             starter_token = lucy_Token_new(text, len, 0, len, 1.0, 1);
@@ -363,7 +363,7 @@ CODE:
     bool        args_ok;
 
     args_ok
-        = XSBind_allot_params(&(ST(0)), 1, items,
+        = XSBind_allot_params(aTHX_ &(ST(0)), 1, items,
                               ALLOT_SV(&text_sv, "text", 4, true),
                               ALLOT_U32(&start_off, "start_offset", 12, true),
                               ALLOT_U32(&end_off, "end_offset", 10, true),
@@ -375,7 +375,7 @@ CODE:
     }
 
     text = SvPVutf8(text_sv, len);
-    self = (lucy_Token*)XSBind_new_blank_obj(either_sv);
+    self = (lucy_Token*)XSBind_new_blank_obj(aTHX_ either_sv);
     lucy_Token_init(self, text, len, start_off, end_off, boost,
                     pos_inc);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);

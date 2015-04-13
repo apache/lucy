@@ -154,7 +154,7 @@ latest_snapshot(folder)
 CODE:
 {
     cfish_String *latest = lucy_IxFileNames_latest_snapshot(folder);
-    RETVAL = XSBind_str_to_sv(latest);
+    RETVAL = XSBind_str_to_sv(aTHX_ latest);
     CFISH_DECREF(latest);
 }
 OUTPUT: RETVAL

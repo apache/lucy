@@ -29,7 +29,7 @@
 #include "Clownfish/Util/StringHelper.h"
 
 static lucy_InverterEntry*
-S_fetch_entry(lucy_Inverter *self, HE *hash_entry) {
+S_fetch_entry(pTHX_ lucy_Inverter *self, HE *hash_entry) {
     lucy_InverterIVARS *const ivars = lucy_Inverter_IVARS(self);
     lucy_Schema *const schema = ivars->schema;
     char *key;
@@ -79,6 +79,7 @@ S_fetch_entry(lucy_Inverter *self, HE *hash_entry) {
 
 void
 LUCY_Inverter_Invert_Doc_IMP(lucy_Inverter *self, lucy_Doc *doc) {
+    dTHX;
     HV  *const fields = (HV*)LUCY_Doc_Get_Fields(doc);
     I32  num_keys     = hv_iterinit(fields);
 
@@ -88,7 +89,7 @@ LUCY_Inverter_Invert_Doc_IMP(lucy_Inverter *self, lucy_Doc *doc) {
     // Extract and invert the doc's fields.
     while (num_keys--) {
         HE *hash_entry = hv_iternext(fields);
-        lucy_InverterEntry *inv_entry = S_fetch_entry(self, hash_entry);
+        lucy_InverterEntry *inv_entry = S_fetch_entry(aTHX_ self, hash_entry);
         SV *value_sv = HeVAL(hash_entry);
         lucy_InverterEntryIVARS *const entry_ivars
             = lucy_InvEntry_IVARS(inv_entry);

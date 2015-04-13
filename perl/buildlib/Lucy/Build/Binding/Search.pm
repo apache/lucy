@@ -434,7 +434,7 @@ CODE:
     bool args_ok;
 
     args_ok
-        = XSBind_allot_params(&(ST(0)), 1, items,
+        = XSBind_allot_params(aTHX_ &(ST(0)), 1, items,
                               ALLOT_SV(&type_sv, "type", 4, true),
                               ALLOT_SV(&value_sv, "value", 5, false),
                               NULL);
@@ -467,23 +467,26 @@ CODE:
     }
     else if (strcmp(type_str, "FIELD") == 0) {
         type = LUCY_QPARSER_TOKEN_FIELD; 
-        value = CFISH_CERTIFY(XSBind_perl_to_cfish(value_sv), CFISH_STRING);
+        value = CFISH_CERTIFY(XSBind_perl_to_cfish(aTHX_ value_sv),
+                              CFISH_STRING);
     }
     else if (strcmp(type_str, "STRING") == 0) {
         type = LUCY_QPARSER_TOKEN_STRING; 
-        value = CFISH_CERTIFY(XSBind_perl_to_cfish(value_sv), CFISH_STRING);
+        value = CFISH_CERTIFY(XSBind_perl_to_cfish(aTHX_ value_sv),
+                              CFISH_STRING);
     }
     else if (strcmp(type_str, "QUERY") == 0) {
         type = LUCY_QPARSER_TOKEN_QUERY; 
-        value = CFISH_CERTIFY(XSBind_perl_to_cfish(value_sv), LUCY_QUERY);
+        value = CFISH_CERTIFY(XSBind_perl_to_cfish(aTHX_ value_sv),
+                              LUCY_QUERY);
     }
     else {
         CFISH_THROW(CFISH_ERR, "Bad type: '%s'", type_str);
     }
 
-    self = (lucy_ParserElem*)XSBind_new_blank_obj(either_sv);
+    self = (lucy_ParserElem*)XSBind_new_blank_obj(aTHX_ either_sv);
     self = lucy_ParserElem_init(self, type, value);
-    RETVAL = XSBind_cfish_to_perl((cfish_Obj*)self);
+    RETVAL = XSBind_cfish_to_perl(aTHX_ (cfish_Obj*)self);
     CFISH_DECREF(self);
 }
 OUTPUT: RETVAL

@@ -25,13 +25,14 @@
 #include "Clownfish/Util/StringHelper.h"
 
 static SV*
-S_compile_token_re(cfish_String *pattern);
+S_compile_token_re(pTHX_ cfish_String *pattern);
 
 static void
-S_set_token_re_but_not_pattern(lucy_RegexTokenizer *self, void *token_re);
+S_set_token_re_but_not_pattern(pTHX_ lucy_RegexTokenizer *self,
+                               void *token_re);
 
 static void
-S_set_pattern_from_token_re(lucy_RegexTokenizer *self, void *token_re);
+S_set_pattern_from_token_re(pTHX_ lucy_RegexTokenizer *self, void *token_re);
 
 bool
 lucy_RegexTokenizer_is_available(void) {
@@ -59,21 +60,22 @@ lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
     }
 
     // Acquire a compiled regex engine for matching one token.
-    SV *token_re_sv = S_compile_token_re(ivars->pattern);
-    S_set_token_re_but_not_pattern(self, SvRV(token_re_sv));
+    dTHX;
+    SV *token_re_sv = S_compile_token_re(aTHX_ ivars->pattern);
+    S_set_token_re_but_not_pattern(aTHX_ self, SvRV(token_re_sv));
     SvREFCNT_dec(token_re_sv);
 
     return self;
 }
 
 static SV*
-S_compile_token_re(cfish_String *pattern) {
+S_compile_token_re(pTHX_ cfish_String *pattern) {
     dSP;
     ENTER;
     SAVETMPS;
     EXTEND(SP, 1);
     PUSHMARK(SP);
-    XPUSHs(XSBind_str_to_sv(pattern));
+    XPUSHs(XSBind_str_to_sv(aTHX_ pattern));
     PUTBACK;
     call_pv("Lucy::Analysis::RegexTokenizer::_compile_token_re", G_SCALAR);
     SPAGAIN;
@@ -86,7 +88,8 @@ S_compile_token_re(cfish_String *pattern) {
 }
 
 static void
-S_set_token_re_but_not_pattern(lucy_RegexTokenizer *self, void *token_re) {
+S_set_token_re_but_not_pattern(pTHX_ lucy_RegexTokenizer *self,
+                               void *token_re) {
     lucy_RegexTokenizerIVARS *const ivars = lucy_RegexTokenizer_IVARS(self);
 #if (PERL_VERSION > 10)
     REGEXP *rx = SvRX((SV*)token_re);
@@ -110,7 +113,7 @@ S_set_token_re_but_not_pattern(lucy_RegexTokenizer *self, void *token_re) {
 }
 
 static void
-S_set_pattern_from_token_re(lucy_RegexTokenizer *self, void *token_re) {
+S_set_pattern_from_token_re(pTHX_ lucy_RegexTokenizer *self, void *token_re) {
     lucy_RegexTokenizerIVARS *const ivars = lucy_RegexTokenizer_IVARS(self);
     SV *rv = newRV((SV*)token_re);
     STRLEN len = 0;
@@ -123,13 +126,15 @@ S_set_pattern_from_token_re(lucy_RegexTokenizer *self, void *token_re) {
 void
 LUCY_RegexTokenizer_Set_Token_RE_IMP(lucy_RegexTokenizer *self,
                                      void *token_re) {
-    S_set_token_re_but_not_pattern(self, token_re);
+    dTHX;
+    S_set_token_re_but_not_pattern(aTHX_ self, token_re);
     // Set pattern as a side effect.
-    S_set_pattern_from_token_re(self, token_re);
+    S_set_pattern_from_token_re(aTHX_ self, token_re);
 }
 
 void
 LUCY_RegexTokenizer_Destroy_IMP(lucy_RegexTokenizer *self) {
+    dTHX;
     lucy_RegexTokenizerIVARS *const ivars = lucy_RegexTokenizer_IVARS(self);
     CFISH_DECREF(ivars->pattern);
     ReREFCNT_dec(((REGEXP*)ivars->token_re));
@@ -140,6 +145,7 @@ void
 LUCY_RegexTokenizer_Tokenize_Utf8_IMP(lucy_RegexTokenizer *self,
                                       const char *string, size_t string_len,
                                       lucy_Inversion *inversion) {
+    dTHX;
     lucy_RegexTokenizerIVARS *const ivars = lucy_RegexTokenizer_IVARS(self);
     uint32_t   num_code_points = 0;
     SV        *wrapper    = sv_newmortal();

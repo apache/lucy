@@ -29,6 +29,7 @@
 
 lucy_HitDoc*
 LUCY_DefDocReader_Fetch_Doc_IMP(lucy_DefaultDocReader *self, int32_t doc_id) {
+    dTHX;
     lucy_DefaultDocReaderIVARS *const ivars = lucy_DefDocReader_IVARS(self);
     lucy_Schema   *const schema = ivars->schema;
     lucy_InStream *const dat_in = ivars->dat_in;

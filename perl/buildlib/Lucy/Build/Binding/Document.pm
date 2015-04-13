@@ -65,7 +65,7 @@ CODE:
     bool      args_ok;
 
     args_ok
-        = XSBind_allot_params(&(ST(0)), 1, items,
+        = XSBind_allot_params(aTHX_ &(ST(0)), 1, items,
                               ALLOT_SV(&fields_sv, "fields", 6, false),
                               ALLOT_I32(&doc_id, "doc_id", 6, false),
                               NULL);
@@ -73,7 +73,7 @@ CODE:
         CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
     }
 
-    if (fields_sv && XSBind_sv_defined(fields_sv)) {
+    if (fields_sv && XSBind_sv_defined(aTHX_ fields_sv)) {
         if (SvROK(fields_sv)) {
             fields = (HV*)SvRV(fields_sv);
         }
@@ -82,7 +82,7 @@ CODE:
         }
     }
 
-    self = (lucy_Doc*)XSBind_new_blank_obj(either_sv);
+    self = (lucy_Doc*)XSBind_new_blank_obj(aTHX_ either_sv);
     lucy_Doc_init(self, fields, doc_id);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
@@ -150,7 +150,7 @@ CODE:
     bool         args_ok;
 
     args_ok
-        = XSBind_allot_params(&(ST(0)), 1, items,
+        = XSBind_allot_params(aTHX_ &(ST(0)), 1, items,
                               ALLOT_SV(&fields_sv, "fields", 6, false),
                               ALLOT_I32(&doc_id, "doc_id", 6, false),
                               ALLOT_F32(&score, "score", 5, false),
@@ -159,7 +159,7 @@ CODE:
         CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
     }
 
-    if (fields_sv && XSBind_sv_defined(fields_sv)) {
+    if (fields_sv && XSBind_sv_defined(aTHX_ fields_sv)) {
         if (SvROK(fields_sv)) {
             fields = (HV*)SvRV(fields_sv);
         }
@@ -168,7 +168,7 @@ CODE:
         }
     }
 
-    self = (lucy_HitDoc*)XSBind_new_blank_obj(either_sv);
+    self = (lucy_HitDoc*)XSBind_new_blank_obj(aTHX_ either_sv);
     lucy_HitDoc_init(self, fields, doc_id, score);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(self);
 }
