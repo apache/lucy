@@ -130,7 +130,7 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
                             (Obj*)Str_newf("%i64", offset));
             Hash_Store_Utf8(file_data, "length", 6,
                             (Obj*)Str_newf("%i64", len));
-            Hash_Store(sub_files, (Obj*)infilename, (Obj*)file_data);
+            Hash_Store(sub_files, infilename, (Obj*)file_data);
             VA_Push(merged, INCREF(infilename));
 
             // Add filler NULL bytes so that every sub-file begins on a file
@@ -158,7 +158,7 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
     String *merged_file;
     Obj    *ignore;
     Hash_Iterate(sub_files);
-    while (Hash_Next(sub_files, (Obj**)&merged_file, &ignore)) {
+    while (Hash_Next(sub_files, &merged_file, &ignore)) {
         if (!Folder_Delete(folder, merged_file)) {
             String *mess = MAKE_MESS("Can't delete '%o'", merged_file);
             DECREF(sub_files);

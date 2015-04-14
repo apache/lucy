@@ -220,15 +220,14 @@ SortWriter_Finish_IMP(SortWriter *self) {
             String *field = Seg_Field_Name(ivars->segment, i);
             SortFieldWriter_Flip(field_writer);
             int32_t count = SortFieldWriter_Finish(field_writer);
-            Hash_Store(ivars->counts, (Obj*)field,
-                       (Obj*)Str_newf("%i32", count));
+            Hash_Store(ivars->counts, field, (Obj*)Str_newf("%i32", count));
             int32_t null_ord = SortFieldWriter_Get_Null_Ord(field_writer);
             if (null_ord != -1) {
-                Hash_Store(ivars->null_ords, (Obj*)field,
+                Hash_Store(ivars->null_ords, field,
                            (Obj*)Str_newf("%i32", null_ord));
             }
             int32_t ord_width = SortFieldWriter_Get_Ord_Width(field_writer);
-            Hash_Store(ivars->ord_widths, (Obj*)field,
+            Hash_Store(ivars->ord_widths, field,
                        (Obj*)Str_newf("%i32", ord_width));
         }
 

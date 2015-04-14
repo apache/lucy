@@ -425,7 +425,7 @@ Folder_Consolidate_IMP(Folder *self, String *path) {
             if (!cf_reader) { RETHROW(INCREF(Err_get_error())); }
             Hash *entries = Folder_IVARS(enclosing_folder)->entries;
             String *name = IxFileNames_local_part(path);
-            Hash_Store(entries, (Obj*)name, (Obj*)cf_reader);
+            Hash_Store(entries, name, (Obj*)cf_reader);
             DECREF(name);
         }
     }

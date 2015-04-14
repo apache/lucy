@@ -96,10 +96,10 @@ FilePurger_Purge_IMP(FilePurger *self) {
         VA_Sort(purgables, NULL, NULL);
         for (uint32_t i = VA_Get_Size(purgables); i--;) {
             String *entry = (String*)VA_Fetch(purgables, i);
-            if (Hash_Fetch(ivars->disallowed, (Obj*)entry)) { continue; }
+            if (Hash_Fetch(ivars->disallowed, entry)) { continue; }
             if (!Folder_Delete(folder, entry)) {
                 if (Folder_Exists(folder, entry)) {
-                    Hash_Store(failures, (Obj*)entry, (Obj*)CFISH_TRUE);
+                    Hash_Store(failures, entry, (Obj*)CFISH_TRUE);
                 }
             }
         }
@@ -113,7 +113,7 @@ FilePurger_Purge_IMP(FilePurger *self) {
                 VArray *entries = Snapshot_List(snapshot);
                 for (uint32_t j = VA_Get_Size(entries); j--;) {
                     String *entry = (String*)VA_Fetch(entries, j);
-                    if (Hash_Fetch(failures, (Obj*)entry)) {
+                    if (Hash_Fetch(failures, entry)) {
                         snapshot_has_failures = true;
                         break;
                     }
@@ -162,13 +162,13 @@ S_zap_dead_merge(FilePurger *self, Hash *candidates) {
                     THROW(ERR, "Can't open segment dir '%o'", cutoff_seg);
                 }
 
-                Hash_Store(candidates, (Obj*)cutoff_seg, (Obj*)CFISH_TRUE);
-                Hash_Store(candidates, (Obj*)merge_json, (Obj*)CFISH_TRUE);
+                Hash_Store(candidates, cutoff_seg, (Obj*)CFISH_TRUE);
+                Hash_Store(candidates, (String*)merge_json, (Obj*)CFISH_TRUE);
                 while (DH_Next(dh)) {
                     // TODO: recursively delete subdirs within seg dir.
                     String *entry = DH_Get_Entry(dh);
                     String *filepath = Str_newf("%o/%o", cutoff_seg, entry);
-                    Hash_Store(candidates, (Obj*)filepath, (Obj*)CFISH_TRUE);
+                    Hash_Store(candidates, filepath, (Obj*)CFISH_TRUE);
                     DECREF(filepath);
                     DECREF(entry);
                 }
@@ -240,7 +240,7 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
                 // candidates for deletion.
                 for (uint32_t i = 0, max = VA_Get_Size(referenced); i < max; i++) {
                     String *file = (String*)VA_Fetch(referenced, i);
-                    Hash_Store(candidates, (Obj*)file, (Obj*)CFISH_TRUE);
+                    Hash_Store(candidates, file, (Obj*)CFISH_TRUE);
                 }
                 VA_Push(snapshots, INCREF(snapshot));
             }
@@ -260,7 +260,7 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
     // Eliminate any current files from the list of files to be purged.
     for (uint32_t i = 0, max = VA_Get_Size(spared); i < max; i++) {
         String *filename = (String*)VA_Fetch(spared, i);
-        DECREF(Hash_Delete(candidates, (Obj*)filename));
+        DECREF(Hash_Delete(candidates, filename));
     }
 
     // Pass back purgables and Snapshots.
@@ -276,12 +276,12 @@ S_find_all_referenced(Folder *folder, VArray *entries) {
     Hash *uniqued = Hash_new(VA_Get_Size(entries));
     for (uint32_t i = 0, max = VA_Get_Size(entries); i < max; i++) {
         String *entry = (String*)VA_Fetch(entries, i);
-        Hash_Store(uniqued, (Obj*)entry, (Obj*)CFISH_TRUE);
+        Hash_Store(uniqued, entry, (Obj*)CFISH_TRUE);
         if (Folder_Is_Directory(folder, entry)) {
             VArray *contents = Folder_List_R(folder, entry);
             for (uint32_t j = VA_Get_Size(contents); j--;) {
                 String *sub_entry = (String*)VA_Fetch(contents, j);
-                Hash_Store(uniqued, (Obj*)sub_entry, (Obj*)CFISH_TRUE);
+                Hash_Store(uniqued, sub_entry, (Obj*)CFISH_TRUE);
             }
             DECREF(contents);
         }

@@ -120,11 +120,11 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
         starts[i] = ivars->doc_max;
         ivars->doc_max += SegReader_Doc_Max(seg_reader);
         Hash_Iterate(components);
-        while (Hash_Next(components, (Obj**)&api, (Obj**)&component)) {
-            VArray *readers = (VArray*)Hash_Fetch(data_readers, (Obj*)api);
+        while (Hash_Next(components, &api, (Obj**)&component)) {
+            VArray *readers = (VArray*)Hash_Fetch(data_readers, api);
             if (!readers) {
                 readers = VA_new(num_sub_readers);
-                Hash_Store(data_readers, (Obj*)api, (Obj*)readers);
+                Hash_Store(data_readers, api, (Obj*)readers);
             }
             VA_Store(readers, i, INCREF(component));
         }
@@ -134,21 +134,21 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
     String *api;
     VArray *readers;
     Hash_Iterate(data_readers);
-    while (Hash_Next(data_readers, (Obj**)&api, (Obj**)&readers)) {
+    while (Hash_Next(data_readers, &api, (Obj**)&readers)) {
         DataReader *datareader
             = (DataReader*)CERTIFY(S_first_non_null(readers), DATAREADER);
         DataReader *aggregator
             = DataReader_Aggregator(datareader, readers, ivars->offsets);
         if (aggregator) {
             CERTIFY(aggregator, DATAREADER);
-            Hash_Store(ivars->components, (Obj*)api, (Obj*)aggregator);
+            Hash_Store(ivars->components, api, (Obj*)aggregator);
         }
     }
     DECREF(data_readers);
 
     DeletionsReader *del_reader
         = (DeletionsReader*)Hash_Fetch(
-              ivars->components, (Obj*)Class_Get_Name(DELETIONSREADER));
+              ivars->components, Class_Get_Name(DELETIONSREADER));
     ivars->del_count = del_reader ? DelReader_Del_Count(del_reader) : 0;
 }
 

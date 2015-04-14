@@ -160,13 +160,13 @@ Seg_Write_File_IMP(Segment *self, Folder *folder) {
 int32_t
 Seg_Add_Field_IMP(Segment *self, String *field) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
-    Integer32 *num = (Integer32*)Hash_Fetch(ivars->by_name, (Obj*)field);
+    Integer32 *num = (Integer32*)Hash_Fetch(ivars->by_name, field);
     if (num) {
         return Int32_Get_Value(num);
     }
     else {
         int32_t field_num = VA_Get_Size(ivars->by_num);
-        Hash_Store(ivars->by_name, (Obj*)field, (Obj*)Int32_new(field_num));
+        Hash_Store(ivars->by_name, field, (Obj*)Int32_new(field_num));
         VA_Push(ivars->by_num, (Obj*)Str_Clone(field));
         return field_num;
     }
@@ -202,10 +202,10 @@ Seg_Increment_Count_IMP(Segment *self, int64_t increment) {
 void
 Seg_Store_Metadata_IMP(Segment *self, String *key, Obj *value) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
-    if (Hash_Fetch(ivars->metadata, (Obj*)key)) {
+    if (Hash_Fetch(ivars->metadata, key)) {
         THROW(ERR, "Metadata key '%o' already registered", key);
     }
-    Hash_Store(ivars->metadata, (Obj*)key, value);
+    Hash_Store(ivars->metadata, key, value);
 }
 
 void
@@ -218,7 +218,7 @@ Seg_Store_Metadata_Utf8_IMP(Segment *self, const char *key, size_t key_len,
 Obj*
 Seg_Fetch_Metadata_IMP(Segment *self, String *key) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
-    return Hash_Fetch(ivars->metadata, (Obj*)key);
+    return Hash_Fetch(ivars->metadata, key);
 }
 
 Obj*
@@ -257,7 +257,7 @@ Seg_Field_Num_IMP(Segment *self, String *field) {
     }
     else {
         SegmentIVARS *const ivars = Seg_IVARS(self);
-        Integer32 *num = (Integer32*)Hash_Fetch(ivars->by_name, (Obj*)field);
+        Integer32 *num = (Integer32*)Hash_Fetch(ivars->by_name, field);
         return num ? Int32_Get_Value(num) : 0;
     }
 }

@@ -172,8 +172,7 @@ DefDelReader_Read_Deletions_IMP(DefaultDeletionsReader *self) {
         if (metadata) {
             Hash *files = (Hash*)CERTIFY(
                               Hash_Fetch_Utf8(metadata, "files", 5), HASH);
-            Hash *seg_files_data
-                = (Hash*)Hash_Fetch(files, (Obj*)my_seg_name);
+            Hash *seg_files_data = (Hash*)Hash_Fetch(files, my_seg_name);
             if (seg_files_data) {
                 Obj *count = (Obj*)CERTIFY(
                                  Hash_Fetch_Utf8(seg_files_data, "count", 5),

@@ -60,7 +60,7 @@ Doc_Get_Size_IMP(Doc *self) {
 void
 Doc_Store_IMP(Doc *self, String *field, Obj *value) {
     Hash *hash = (Hash*)Doc_IVARS(self)->fields;
-    Hash_Store(hash, (Obj *)field, INCREF(value));
+    Hash_Store(hash, field, INCREF(value));
 }
 
 void
@@ -82,7 +82,7 @@ Doc_Deserialize_IMP(Doc *self, InStream *instream) {
 Obj*
 Doc_Extract_IMP(Doc *self, String *field) {
     Hash *hash = (Hash*)Doc_IVARS(self)->fields;
-    return INCREF(Hash_Fetch(hash, (Obj *)field));
+    return INCREF(Hash_Fetch(hash, field));
 }
 
 void*

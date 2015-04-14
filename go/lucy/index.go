@@ -140,7 +140,7 @@ func (obj *implIndexer) AddDoc(doc interface{}) error {
 		fieldC := obj.findFieldC(field)
 		valueC := clownfish.NewString(value)
 		C.CFISH_Hash_Store(docFields,
-			(*C.cfish_Obj)(unsafe.Pointer(fieldC)),
+			(*C.cfish_String)(unsafe.Pointer(fieldC)),
 			C.cfish_inc_refcount(unsafe.Pointer(valueC.TOPTR())))
 	}
 

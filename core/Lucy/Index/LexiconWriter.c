@@ -160,9 +160,8 @@ LexWriter_Finish_Field_IMP(LexiconWriter *self, int32_t field_num) {
     String *field = Seg_Field_Name(ivars->segment, field_num);
 
     // Store count of terms for this field as metadata.
-    Hash_Store(ivars->counts, (Obj*)field,
-               (Obj*)Str_newf("%i32", ivars->count));
-    Hash_Store(ivars->ix_counts, (Obj*)field,
+    Hash_Store(ivars->counts, field, (Obj*)Str_newf("%i32", ivars->count));
+    Hash_Store(ivars->ix_counts, field,
                (Obj*)Str_newf("%i32", ivars->ix_count));
 
     // Close streams.

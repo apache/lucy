@@ -125,7 +125,7 @@ test_offsets(TestBatchRunner *runner) {
     TEST_TRUE(runner, Hash_Get_Size(files) > 0, "Multiple files");
 
     Hash_Iterate(files);
-    while (Hash_Next(files, (Obj**)&file, &filestats)) {
+    while (Hash_Next(files, &file, &filestats)) {
         Hash *stats = (Hash*)CERTIFY(filestats, HASH);
         Obj *offset = CERTIFY(Hash_Fetch_Utf8(stats, "offset", 6), OBJ);
         int64_t offs = Obj_To_I64(offset);

@@ -70,7 +70,7 @@ test_stemming(TestBatchRunner *runner) {
     String *iso;
     Hash *lang_data;
     Hash_Iterate(tests);
-    while (Hash_Next(tests, (Obj**)&iso, (Obj**)&lang_data)) {
+    while (Hash_Next(tests, &iso, (Obj**)&lang_data)) {
         VArray *words = (VArray*)Hash_Fetch_Utf8(lang_data, "words", 5);
         VArray *stems = (VArray*)Hash_Fetch_Utf8(lang_data, "stems", 5);
         SnowballStemmer *stemmer = SnowStemmer_new(iso);

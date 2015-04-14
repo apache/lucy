@@ -159,7 +159,7 @@ S_lazy_init_sort_cache(DefaultSortReader *self, String *field) {
     DefaultSortReaderIVARS *const ivars = DefSortReader_IVARS(self);
 
     // See if we have any values.
-    Obj *count_obj = Hash_Fetch(ivars->counts, (Obj*)field);
+    Obj *count_obj = Hash_Fetch(ivars->counts, field);
     int32_t count = count_obj ? (int32_t)Obj_To_I64(count_obj) : 0;
     if (!count) { return NULL; }
 
@@ -204,9 +204,9 @@ S_lazy_init_sort_cache(DefaultSortReader *self, String *field) {
               field, Err_get_error());
     }
 
-    Obj     *null_ord_obj = Hash_Fetch(ivars->null_ords, (Obj*)field);
+    Obj     *null_ord_obj = Hash_Fetch(ivars->null_ords, field);
     int32_t  null_ord = null_ord_obj ? (int32_t)Obj_To_I64(null_ord_obj) : -1;
-    Obj     *ord_width_obj = Hash_Fetch(ivars->ord_widths, (Obj*)field);
+    Obj     *ord_width_obj = Hash_Fetch(ivars->ord_widths, field);
     int32_t  ord_width = ord_width_obj
                          ? (int32_t)Obj_To_I64(ord_width_obj)
                          : S_calc_ord_width(count);
@@ -242,7 +242,7 @@ S_lazy_init_sort_cache(DefaultSortReader *self, String *field) {
         default:
             THROW(ERR, "No SortCache class for %o", type);
     }
-    Hash_Store(ivars->caches, (Obj*)field, (Obj*)cache);
+    Hash_Store(ivars->caches, field, (Obj*)cache);
 
     if (ivars->format == 2) { // bug compatibility
         SortCache_Set_Native_Ords(cache, true);
@@ -262,7 +262,7 @@ DefSortReader_Fetch_Sort_Cache_IMP(DefaultSortReader *self,
 
     if (field) {
         DefaultSortReaderIVARS *const ivars = DefSortReader_IVARS(self);
-        cache = (SortCache*)Hash_Fetch(ivars->caches, (Obj*)field);
+        cache = (SortCache*)Hash_Fetch(ivars->caches, field);
         if (!cache) {
             cache = S_lazy_init_sort_cache(self, field);
         }

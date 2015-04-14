@@ -148,12 +148,12 @@ S_add_text_field(Schema *self, String *field, FieldType *type) {
     Analyzer     *analyzer  = FullTextType_Get_Analyzer(fttype);
 
     // Cache helpers.
-    Hash_Store(ivars->sims, (Obj*)field, (Obj*)sim);
-    Hash_Store(ivars->analyzers, (Obj*)field, INCREF(analyzer));
+    Hash_Store(ivars->sims, field, (Obj*)sim);
+    Hash_Store(ivars->analyzers, field, INCREF(analyzer));
     S_add_unique(ivars->uniq_analyzers, (Obj*)analyzer);
 
     // Store FieldType.
-    Hash_Store(ivars->types, (Obj*)field, INCREF(type));
+    Hash_Store(ivars->types, field, INCREF(type));
 }
 
 static void
@@ -163,37 +163,37 @@ S_add_string_field(Schema *self, String *field, FieldType *type) {
     Similarity *sim         = StringType_Make_Similarity(string_type);
 
     // Cache helpers.
-    Hash_Store(ivars->sims, (Obj*)field, (Obj*)sim);
+    Hash_Store(ivars->sims, field, (Obj*)sim);
 
     // Store FieldType.
-    Hash_Store(ivars->types, (Obj*)field, INCREF(type));
+    Hash_Store(ivars->types, field, INCREF(type));
 }
 
 static void
 S_add_blob_field(Schema *self, String *field, FieldType *type) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     BlobType *blob_type = (BlobType*)CERTIFY(type, BLOBTYPE);
-    Hash_Store(ivars->types, (Obj*)field, INCREF(blob_type));
+    Hash_Store(ivars->types, field, INCREF(blob_type));
 }
 
 static void
 S_add_numeric_field(Schema *self, String *field, FieldType *type) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     NumericType *num_type = (NumericType*)CERTIFY(type, NUMERICTYPE);
-    Hash_Store(ivars->types, (Obj*)field, INCREF(num_type));
+    Hash_Store(ivars->types, field, INCREF(num_type));
 }
 
 FieldType*
 Schema_Fetch_Type_IMP(Schema *self, String *field) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
-    return (FieldType*)Hash_Fetch(ivars->types, (Obj*)field);
+    return (FieldType*)Hash_Fetch(ivars->types, field);
 }
 
 Analyzer*
 Schema_Fetch_Analyzer_IMP(Schema *self, String *field) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     return field
-           ? (Analyzer*)Hash_Fetch(ivars->analyzers, (Obj*)field)
+           ? (Analyzer*)Hash_Fetch(ivars->analyzers, field)
            : NULL;
 }
 
@@ -202,7 +202,7 @@ Schema_Fetch_Sim_IMP(Schema *self, String *field) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     Similarity *sim = NULL;
     if (field != NULL) {
-        sim = (Similarity*)Hash_Fetch(ivars->sims, (Obj*)field);
+        sim = (Similarity*)Hash_Fetch(ivars->sims, field);
     }
     return sim;
 }
@@ -264,7 +264,7 @@ Schema_Dump_IMP(Schema *self) {
     // Dump FieldTypes.
     Hash_Store_Utf8(dump, "fields", 6, (Obj*)type_dumps);
     Hash_Iterate(ivars->types);
-    while (Hash_Next(ivars->types, (Obj**)&field, (Obj**)&type)) {
+    while (Hash_Next(ivars->types, &field, (Obj**)&type)) {
         Class *type_class = FType_Get_Class(type);
 
         // Dump known types to simplified format.
@@ -279,15 +279,15 @@ Schema_Dump_IMP(Schema *self) {
             Hash_Store_Utf8(type_dump, "analyzer", 8,
                             (Obj*)Str_newf("%u32", tick));
 
-            Hash_Store(type_dumps, (Obj*)field, (Obj*)type_dump);
+            Hash_Store(type_dumps, field, (Obj*)type_dump);
         }
         else if (type_class == STRINGTYPE || type_class == BLOBTYPE) {
             Hash *type_dump = FType_Dump_For_Schema(type);
-            Hash_Store(type_dumps, (Obj*)field, (Obj*)type_dump);
+            Hash_Store(type_dumps, field, (Obj*)type_dump);
         }
         // Unknown FieldType type, so punt.
         else {
-            Hash_Store(type_dumps, (Obj*)field, FType_Dump(type));
+            Hash_Store(type_dumps, field, FType_Dump(type));
         }
     }
 
@@ -325,7 +325,7 @@ Schema_Load_IMP(Schema *self, Obj *dump) {
     VA_Grow(loaded_ivars->uniq_analyzers, VA_Get_Size(analyzers));
 
     Hash_Iterate(type_dumps);
-    while (Hash_Next(type_dumps, (Obj**)&field, (Obj**)&type_dump)) {
+    while (Hash_Next(type_dumps, &field, (Obj**)&type_dump)) {
         String *type_str;
         CERTIFY(type_dump, HASH);
         type_str = (String*)Hash_Fetch_Utf8(type_dump, "type", 4);
@@ -412,7 +412,7 @@ Schema_Eat_IMP(Schema *self, Schema *other) {
     FieldType *type;
     SchemaIVARS *const ovars = Schema_IVARS(other);
     Hash_Iterate(ovars->types);
-    while (Hash_Next(ovars->types, (Obj**)&field, (Obj**)&type)) {
+    while (Hash_Next(ovars->types, &field, (Obj**)&type)) {
         Schema_Spec_Field(self, field, type);
     }
 }

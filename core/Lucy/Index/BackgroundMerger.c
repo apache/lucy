@@ -238,7 +238,7 @@ S_maybe_merge(BackgroundMerger *self) {
                                 SegReader_Doc_Max(seg_reader),
                                 (int32_t)doc_count);
 
-        Hash_Store(ivars->doc_maps, (Obj*)seg_name, (Obj*)doc_map);
+        Hash_Store(ivars->doc_maps, seg_name, (Obj*)doc_map);
         SegWriter_Merge_Segment(ivars->seg_writer, seg_reader, doc_map);
         DECREF(deletions);
     }
@@ -263,7 +263,7 @@ S_merge_updated_deletions(BackgroundMerger *self) {
     for (uint32_t i = 0, max = VA_Get_Size(new_seg_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(new_seg_readers, i);
         String    *seg_name   = SegReader_Get_Seg_Name(seg_reader);
-        Hash_Store(new_segs, (Obj*)seg_name, INCREF(seg_reader));
+        Hash_Store(new_segs, seg_name, INCREF(seg_reader));
     }
 
     for (uint32_t i = 0, max = VA_Get_Size(old_seg_readers); i < max; i++) {
@@ -271,10 +271,10 @@ S_merge_updated_deletions(BackgroundMerger *self) {
         String    *seg_name   = SegReader_Get_Seg_Name(seg_reader);
 
         // If this segment was merged away...
-        if (Hash_Fetch(ivars->doc_maps, (Obj*)seg_name)) {
+        if (Hash_Fetch(ivars->doc_maps, seg_name)) {
             SegReader *new_seg_reader
                 = (SegReader*)CERTIFY(
-                      Hash_Fetch(new_segs, (Obj*)seg_name),
+                      Hash_Fetch(new_segs, seg_name),
                       SEGREADER);
             int32_t old_del_count = SegReader_Del_Count(seg_reader);
             int32_t new_del_count = SegReader_Del_Count(new_seg_reader);
@@ -287,7 +287,7 @@ S_merge_updated_deletions(BackgroundMerger *self) {
                 if (!updated_deletions) {
                     updated_deletions = Hash_new(max);
                 }
-                Hash_Store(updated_deletions, (Obj*)seg_name,
+                Hash_Store(updated_deletions, seg_name,
                            (Obj*)DelReader_Iterator(del_reader));
             }
         }
@@ -333,12 +333,10 @@ S_merge_updated_deletions(BackgroundMerger *self) {
         if (offset == INT32_MAX) { THROW(ERR, "Failed sanity check"); }
 
         Hash_Iterate(updated_deletions);
-        while (Hash_Next(updated_deletions,
-                         (Obj**)&seg_name, (Obj**)&deletions)
-              ) {
+        while (Hash_Next(updated_deletions, &seg_name, (Obj**)&deletions)) {
             I32Array *doc_map
                 = (I32Array*)CERTIFY(
-                      Hash_Fetch(ivars->doc_maps, (Obj*)seg_name),
+                      Hash_Fetch(ivars->doc_maps, seg_name),
                       I32ARRAY);
             int32_t del;
             while (0 != (del = Matcher_Next(deletions))) {

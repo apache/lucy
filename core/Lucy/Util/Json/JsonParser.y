@@ -85,28 +85,28 @@ empty_object(A) ::= LEFT_CURLY_BRACKET RIGHT_CURLY_BRACKET.
 single_pair_object(A) ::= LEFT_CURLY_BRACKET STRING(B) COLON value(C) RIGHT_CURLY_BRACKET.
 {
     A = cfish_Hash_new(1);
-    CFISH_Hash_Store(A, (cfish_Obj*)B, C);
+    CFISH_Hash_Store(A, (cfish_String*)B, C);
     CFISH_DECREF(B);
 }
 
 multi_pair_object(A) ::= LEFT_CURLY_BRACKET key_value_pair_list(B) STRING(C) COLON value(D) RIGHT_CURLY_BRACKET.
 {
     A = B;
-    CFISH_Hash_Store(A, (cfish_Obj*)C, D);
+    CFISH_Hash_Store(A, (cfish_String*)C, D);
     CFISH_DECREF(C);
 }
 
 key_value_pair_list(A) ::= key_value_pair_list(B) STRING(C) COLON value(D) COMMA.
 { 
     A = B; 
-    CFISH_Hash_Store(A, (cfish_Obj*)C, D);
+    CFISH_Hash_Store(A, (cfish_String*)C, D);
     CFISH_DECREF(C);
 }
 
 key_value_pair_list(A) ::= STRING(B) COLON value(C) COMMA.
 {
     A = cfish_Hash_new(0);
-    CFISH_Hash_Store(A, (cfish_Obj*)B, C);
+    CFISH_Hash_Store(A, (cfish_String*)B, C);
     CFISH_DECREF(B);
 }
 

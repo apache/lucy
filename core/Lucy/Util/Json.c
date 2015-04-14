@@ -350,10 +350,10 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
         // Spread pairs across multiple lines.
         CB_Cat_Trusted_Utf8(buf, "{", 1);
         for (size_t i = 0; i < size; i++) {
-            Obj *key = VA_Fetch(keys, i);
+            String *key = (String*)VA_Fetch(keys, i);
             CB_Cat_Trusted_Utf8(buf, "\n", 1);
             S_cat_whitespace(buf, depth + 1);
-            S_append_json_string((String*)key, buf);
+            S_append_json_string(key, buf);
             CB_Cat_Trusted_Utf8(buf, ": ", 2);
             if (!S_to_json(Hash_Fetch(hash, key), buf, depth + 1)) {
                 DECREF(keys);

@@ -65,16 +65,16 @@ SegWriter_Register_IMP(SegWriter *self, String *api,
                        DataWriter *component) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
     CERTIFY(component, DATAWRITER);
-    if (Hash_Fetch(ivars->by_api, (Obj*)api)) {
+    if (Hash_Fetch(ivars->by_api, api)) {
         THROW(ERR, "API %o already registered", api);
     }
-    Hash_Store(ivars->by_api, (Obj*)api, (Obj*)component);
+    Hash_Store(ivars->by_api, api, (Obj*)component);
 }
 
 Obj*
 SegWriter_Fetch_IMP(SegWriter *self, String *api) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
-    return Hash_Fetch(ivars->by_api, (Obj*)api);
+    return Hash_Fetch(ivars->by_api, api);
 }
 
 void

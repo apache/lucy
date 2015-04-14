@@ -93,8 +93,7 @@ test_hash(TestBatchRunner *runner) {
     for (uint32_t i = 0; i < 10; i++) {
         String *str = TestUtils_random_string(rand() % 1200);
         Integer32 *num = Int32_new(i);
-        Hash_Store(wanted, (Obj*)str, (Obj*)num);
-        Hash_Store(wanted, (Obj*)num, (Obj*)str);
+        Hash_Store(wanted, str, (Obj*)num);
     }
 
     {

@@ -337,24 +337,9 @@ test_max_depth(TestBatchRunner *runner) {
     DECREF(circular);
 }
 
-static void
-test_illegal_keys(TestBatchRunner *runner) {
-    Hash *hash = Hash_new(0);
-    Float64 *key = Float64_new(1.1);
-    Hash_Store(hash, (Obj*)key, (Obj*)Str_newf("blah"));
-    Err_set_error(NULL);
-    String *not_json = Json_to_json((Obj*)hash);
-    TEST_TRUE(runner, not_json == NULL,
-              "to_json returns NULL when fed an illegal key");
-    TEST_TRUE(runner, Err_get_error() != NULL,
-              "to_json sets global error when fed an illegal key");
-    DECREF(key);
-    DECREF(hash);
-}
-
 void
 TestJson_Run_IMP(TestJson *self, TestBatchRunner *runner) {
-    uint32_t num_tests = 107;
+    uint32_t num_tests = 105;
 #ifndef LUCY_VALGRIND
     num_tests += 28; // FIXME: syntax errors leak memory.
 #endif
@@ -371,7 +356,6 @@ TestJson_Run_IMP(TestJson *self, TestBatchRunner *runner) {
     test_integers(runner);
     test_floats(runner);
     test_max_depth(runner);
-    test_illegal_keys(runner);
 
 #ifndef LUCY_VALGRIND
     test_syntax_errors(runner);

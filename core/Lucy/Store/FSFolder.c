@@ -140,7 +140,7 @@ FSFolder_Local_Open_Dir_IMP(FSFolder *self) {
 bool
 FSFolder_Local_Exists_IMP(FSFolder *self, String *name) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
-    if (Hash_Fetch(ivars->entries, (Obj*)name)) {
+    if (Hash_Fetch(ivars->entries, name)) {
         return true;
     }
     else if (!S_is_local_entry(name)) {
@@ -163,7 +163,7 @@ FSFolder_Local_Is_Directory_IMP(FSFolder *self, String *name) {
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
 
     // Check for a cached object, then fall back to a system call.
-    Obj *elem = Hash_Fetch(ivars->entries, (Obj*)name);
+    Obj *elem = Hash_Fetch(ivars->entries, name);
     if (elem && Obj_Is_A(elem, FOLDER)) {
         return true;
     }
@@ -210,7 +210,7 @@ FSFolder_Local_Delete_IMP(FSFolder *self, String *name) {
 #else
     bool result = !rmdir(path_ptr) || !remove(path_ptr);
 #endif
-    DECREF(Hash_Delete(ivars->entries, (Obj*)name));
+    DECREF(Hash_Delete(ivars->entries, name));
     FREEMEM(path_ptr);
     return result;
 }
@@ -237,7 +237,7 @@ FSFolder_Local_Find_Folder_IMP(FSFolder *self, String *name) {
         // Don't allow access outside of the main dir.
         return NULL;
     }
-    else if (NULL != (subfolder = (Folder*)Hash_Fetch(ivars->entries, (Obj*)name))) {
+    else if (NULL != (subfolder = (Folder*)Hash_Fetch(ivars->entries, name))) {
         if (Folder_Is_A(subfolder, FOLDER)) {
             return subfolder;
         }
@@ -263,7 +263,7 @@ FSFolder_Local_Find_Folder_IMP(FSFolder *self, String *name) {
                 subfolder = (Folder*)cf_reader;
             }
         }
-        Hash_Store(ivars->entries, (Obj*)name, (Obj*)subfolder);
+        Hash_Store(ivars->entries, name, (Obj*)subfolder);
     }
     DECREF(fullpath);
 

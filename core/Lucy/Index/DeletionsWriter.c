@@ -111,7 +111,7 @@ DefDelWriter_init(DefaultDeletionsWriter *self, Schema *schema,
         }
         VA_Store(ivars->bit_vecs, i, (Obj*)bit_vec);
         Hash_Store(ivars->name_to_tick,
-                   (Obj*)SegReader_Get_Seg_Name(seg_reader),
+                   SegReader_Get_Seg_Name(seg_reader),
                    (Obj*)Int32_new(i));
     }
 
@@ -191,7 +191,7 @@ DefDelWriter_Metadata_IMP(DefaultDeletionsWriter *self) {
                             (Obj*)Str_newf("%u32", (uint32_t)BitVec_Count(deldocs)));
             Hash_Store_Utf8(mini_meta, "filename", 8,
                             (Obj*)S_del_filename(self, seg_reader));
-            Hash_Store(files, (Obj*)Seg_Get_Name(segment), (Obj*)mini_meta);
+            Hash_Store(files, Seg_Get_Name(segment), (Obj*)mini_meta);
         }
     }
     Hash_Store_Utf8(metadata, "files", 5, (Obj*)files);
@@ -213,7 +213,7 @@ DefDelWriter_Seg_Deletions_IMP(DefaultDeletionsWriter *self,
     Segment *segment      = SegReader_Get_Segment(seg_reader);
     String  *seg_name     = Seg_Get_Name(segment);
     Integer32 *tick_obj   = (Integer32*)Hash_Fetch(ivars->name_to_tick,
-                                                   (Obj*)seg_name);
+                                                   seg_name);
     int32_t tick          = tick_obj ? Int32_Get_Value(tick_obj) : 0;
     SegReader *candidate  = tick_obj
                             ? (SegReader*)VA_Fetch(ivars->seg_readers, tick)
@@ -240,7 +240,7 @@ DefDelWriter_Seg_Del_Count_IMP(DefaultDeletionsWriter *self,
                                String *seg_name) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     Integer32 *tick
-        = (Integer32*)Hash_Fetch(ivars->name_to_tick, (Obj*)seg_name);
+        = (Integer32*)Hash_Fetch(ivars->name_to_tick, seg_name);
     BitVector *deldocs = tick
                          ? (BitVector*)VA_Fetch(ivars->bit_vecs, Int32_Get_Value(tick))
                          : NULL;
@@ -353,7 +353,7 @@ DefDelWriter_Merge_Segment_IMP(DefaultDeletionsWriter *self,
             String *seg;
             Hash *mini_meta;
             Hash_Iterate(files);
-            while (Hash_Next(files, (Obj**)&seg, (Obj**)&mini_meta)) {
+            while (Hash_Next(files, &seg, (Obj**)&mini_meta)) {
 
                 /* Find the segment the deletions from the SegReader
                  * we're adding correspond to.  If it's gone, we don't

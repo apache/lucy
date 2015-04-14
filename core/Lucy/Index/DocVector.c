@@ -76,13 +76,13 @@ void
 DocVec_Add_Field_Buf_IMP(DocVector *self, String *field,
                          ByteBuf *field_buf) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
-    Hash_Store(ivars->field_bufs, (Obj*)field, INCREF(field_buf));
+    Hash_Store(ivars->field_bufs, field, INCREF(field_buf));
 }
 
 ByteBuf*
 DocVec_Field_Buf_IMP(DocVector *self, String *field) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
-    return (ByteBuf*)Hash_Fetch(ivars->field_bufs, (Obj*)field);
+    return (ByteBuf*)Hash_Fetch(ivars->field_bufs, field);
 }
 
 VArray*
@@ -95,22 +95,21 @@ TermVector*
 DocVec_Term_Vector_IMP(DocVector *self, String *field,
                        String *term_text) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
-    Hash *field_vector = (Hash*)Hash_Fetch(ivars->field_vectors, (Obj*)field);
+    Hash *field_vector = (Hash*)Hash_Fetch(ivars->field_vectors, field);
 
     // If no cache hit, try to fill cache.
     if (field_vector == NULL) {
-        ByteBuf *field_buf
-            = (ByteBuf*)Hash_Fetch(ivars->field_bufs, (Obj*)field);
+        ByteBuf *field_buf = (ByteBuf*)Hash_Fetch(ivars->field_bufs, field);
 
         // Bail if there's no content or the field isn't highlightable.
         if (field_buf == NULL) { return NULL; }
 
         field_vector = S_extract_tv_cache(field_buf);
-        Hash_Store(ivars->field_vectors, (Obj*)field, (Obj*)field_vector);
+        Hash_Store(ivars->field_vectors, field, (Obj*)field_vector);
     }
 
     // Get a buf for the term text or bail.
-    ByteBuf *tv_buf = (ByteBuf*)Hash_Fetch(field_vector, (Obj*)term_text);
+    ByteBuf *tv_buf = (ByteBuf*)Hash_Fetch(field_vector, term_text);
     if (tv_buf == NULL) {
         return NULL;
     }
@@ -148,8 +147,7 @@ S_extract_tv_cache(ByteBuf *field_buf) {
 
         // Store the $text => $posdata pair in the output hash.
         String *text = CB_To_String(text_buf);
-        Hash_Store(tv_cache, (Obj*)text,
-                   (Obj*)BB_new_bytes(bookmark_ptr, len));
+        Hash_Store(tv_cache, text, (Obj*)BB_new_bytes(bookmark_ptr, len));
         DECREF(text);
     }
     DECREF(text_buf);

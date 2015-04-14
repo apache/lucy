@@ -56,15 +56,14 @@ RAMFolder_Check_IMP(RAMFolder *self) {
 bool
 RAMFolder_Local_MkDir_IMP(RAMFolder *self, String *name) {
     RAMFolderIVARS *const ivars = RAMFolder_IVARS(self);
-    if (Hash_Fetch(ivars->entries, (Obj*)name)) {
+    if (Hash_Fetch(ivars->entries, name)) {
         Err_set_error(Err_new(Str_newf("Can't MkDir, '%o' already exists",
                                        name)));
         return false;
     }
     else {
         String *fullpath = S_fullpath(self, name);
-        Hash_Store(ivars->entries, (Obj*)name,
-                   (Obj*)RAMFolder_new(fullpath));
+        Hash_Store(ivars->entries, name, (Obj*)RAMFolder_new(fullpath));
         DECREF(fullpath);
         return true;
     }
@@ -76,7 +75,7 @@ RAMFolder_Local_Open_FileHandle_IMP(RAMFolder *self, String *name,
     RAMFolderIVARS *const ivars = RAMFolder_IVARS(self);
     RAMFileHandle *fh;
     String *fullpath = S_fullpath(self, name);
-    RAMFile *file = (RAMFile*)Hash_Fetch(ivars->entries, (Obj*)name);
+    RAMFile *file = (RAMFile*)Hash_Fetch(ivars->entries, name);
     bool can_create
         = (flags & (FH_WRITE_ONLY | FH_CREATE)) == (FH_WRITE_ONLY | FH_CREATE)
           ? true : false;
@@ -101,7 +100,7 @@ RAMFolder_Local_Open_FileHandle_IMP(RAMFolder *self, String *name,
     if (fh) {
         if (!file) {
             file = RAMFH_Get_File(fh);
-            Hash_Store(ivars->entries, (Obj*)name, INCREF(file));
+            Hash_Store(ivars->entries, name, INCREF(file));
         }
     }
     else {
@@ -124,13 +123,13 @@ RAMFolder_Local_Open_Dir_IMP(RAMFolder *self) {
 bool
 RAMFolder_Local_Exists_IMP(RAMFolder *self, String *name) {
     RAMFolderIVARS *const ivars = RAMFolder_IVARS(self);
-    return !!Hash_Fetch(ivars->entries, (Obj*)name);
+    return !!Hash_Fetch(ivars->entries, name);
 }
 
 bool
 RAMFolder_Local_Is_Directory_IMP(RAMFolder *self, String *name) {
     RAMFolderIVARS *const ivars = RAMFolder_IVARS(self);
-    Obj *entry = Hash_Fetch(ivars->entries, (Obj*)name);
+    Obj *entry = Hash_Fetch(ivars->entries, name);
     if (entry && Obj_Is_A(entry, FOLDER)) { return true; }
     return false;
 }
@@ -186,8 +185,7 @@ S_rename_or_hard_link(RAMFolder *self, String* from, String *to,
     }
 
     // Find the original element.
-    elem = Hash_Fetch(RAMFolder_IVARS(inner_from_folder)->entries,
-                      (Obj*)from_name);
+    elem = Hash_Fetch(RAMFolder_IVARS(inner_from_folder)->entries, from_name);
     if (!elem) {
         if (Folder_Is_A(from_folder, COMPOUNDFILEREADER)
             && Folder_Local_Exists(from_folder, from_name)
@@ -204,7 +202,7 @@ S_rename_or_hard_link(RAMFolder *self, String* from, String *to,
     // Execute the rename/hard-link.
     if (op == OP_RENAME) {
         Obj *existing = Hash_Fetch(RAMFolder_IVARS(inner_to_folder)->entries,
-                                   (Obj*)to_name);
+                                   to_name);
         if (existing) {
             bool conflict = false;
 
@@ -237,9 +235,9 @@ S_rename_or_hard_link(RAMFolder *self, String* from, String *to,
         // Perform the store first, then the delete. Inform Folder objects
         // about the relocation.
         Hash_Store(RAMFolder_IVARS(inner_to_folder)->entries,
-                   (Obj*)to_name, INCREF(elem));
+                   to_name, INCREF(elem));
         DECREF(Hash_Delete(RAMFolder_IVARS(inner_from_folder)->entries,
-                           (Obj*)from_name));
+                           from_name));
         if (Obj_Is_A(elem, FOLDER)) {
             String *newpath = S_fullpath(inner_to_folder, to_name);
             Folder_Set_Path((Folder*)elem, newpath);
@@ -255,14 +253,14 @@ S_rename_or_hard_link(RAMFolder *self, String* from, String *to,
         else {
             Obj *existing
                 = Hash_Fetch(RAMFolder_IVARS(inner_to_folder)->entries,
-                             (Obj*)to_name);
+                             to_name);
             if (existing) {
                 Err_set_error(Err_new(Str_newf("'%o' already exists", to)));
                 return false;
             }
             else {
                 Hash_Store(RAMFolder_IVARS(inner_to_folder)->entries,
-                           (Obj*)to_name, INCREF(elem));
+                           to_name, INCREF(elem));
             }
         }
     }
@@ -306,7 +304,7 @@ RAMFolder_Hard_Link_IMP(RAMFolder *self, String *from,
 bool
 RAMFolder_Local_Delete_IMP(RAMFolder *self, String *name) {
     RAMFolderIVARS *const ivars = RAMFolder_IVARS(self);
-    Obj *entry = Hash_Fetch(ivars->entries, (Obj*)name);
+    Obj *entry = Hash_Fetch(ivars->entries, name);
     if (entry) {
         if (Obj_Is_A(entry, RAMFILE)) {
             ;
@@ -329,7 +327,7 @@ RAMFolder_Local_Delete_IMP(RAMFolder *self, String *name) {
         else {
             return false;
         }
-        DECREF(Hash_Delete(ivars->entries, (Obj*)name));
+        DECREF(Hash_Delete(ivars->entries, name));
         return true;
     }
     else {
@@ -340,7 +338,7 @@ RAMFolder_Local_Delete_IMP(RAMFolder *self, String *name) {
 Folder*
 RAMFolder_Local_Find_Folder_IMP(RAMFolder *self, String *path) {
     RAMFolderIVARS *const ivars = RAMFolder_IVARS(self);
-    Folder *local_folder = (Folder*)Hash_Fetch(ivars->entries, (Obj*)path);
+    Folder *local_folder = (Folder*)Hash_Fetch(ivars->entries, path);
     if (local_folder && Folder_Is_A(local_folder, FOLDER)) {
         return local_folder;
     }

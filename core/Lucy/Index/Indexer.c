@@ -437,13 +437,13 @@ S_maybe_merge(Indexer *self, VArray *seg_readers) {
         SegReader *seg_reader
             = (SegReader*)CERTIFY(VA_Fetch(to_merge, i), SEGREADER);
         String *seg_name = SegReader_Get_Seg_Name(seg_reader);
-        if (Hash_Fetch(seen, (Obj*)seg_name)) {
+        if (Hash_Fetch(seen, seg_name)) {
             DECREF(seen);
             DECREF(to_merge);
             THROW(ERR, "Recycle() tried to merge segment '%o' twice",
                   seg_name);
         }
-        Hash_Store(seen, (Obj*)seg_name, (Obj*)CFISH_TRUE);
+        Hash_Store(seen, seg_name, (Obj*)CFISH_TRUE);
     }
     DECREF(seen);
 

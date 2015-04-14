@@ -145,7 +145,7 @@ SnowStop_gen_stoplist(String *language) {
     for (uint32_t i = 0; words[i] != NULL; i++) {
         char *word = (char*)words[i];
         String *stop = Str_new_wrap_trusted_utf8(word, strlen(word));
-        Hash_Store(stoplist, (Obj*)stop, (Obj*)CFISH_TRUE);
+        Hash_Store(stoplist, stop, (Obj*)CFISH_TRUE);
         DECREF(stop);
     }
     return (Hash*)stoplist;

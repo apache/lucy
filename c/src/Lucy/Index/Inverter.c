@@ -69,9 +69,9 @@ Inverter_Invert_Doc_IMP(Inverter *self, Doc *doc) {
 
     // Extract and invert the doc's fields.
     while (num_keys--) {
-        Obj *key, *obj;
-        Hash_Next(fields, &key, &obj);
-        String *field = (String*)CERTIFY(key, STRING);
+        String *field;
+        Obj    *obj;
+        Hash_Next(fields, &field, &obj);
         InverterEntry *inventry = S_fetch_entry(ivars, field);
         InverterEntryIVARS *inventry_ivars = InvEntry_IVARS(inventry);
         FieldType *type = inventry_ivars->type;

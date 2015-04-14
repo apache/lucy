@@ -62,13 +62,13 @@ Snapshot_Destroy_IMP(Snapshot *self) {
 void
 Snapshot_Add_Entry_IMP(Snapshot *self, String *entry) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
-    Hash_Store(ivars->entries, (Obj*)entry, (Obj*)CFISH_TRUE);
+    Hash_Store(ivars->entries, entry, (Obj*)CFISH_TRUE);
 }
 
 bool
 Snapshot_Delete_Entry_IMP(Snapshot *self, String *entry) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
-    Obj *val = Hash_Delete(ivars->entries, (Obj*)entry);
+    Obj *val = Hash_Delete(ivars->entries, entry);
     if (val) {
         DECREF(val);
         return true;
@@ -140,7 +140,7 @@ Snapshot_Read_File_IMP(Snapshot *self, Folder *folder, String *path) {
         for (uint32_t i = 0, max = VA_Get_Size(list); i < max; i++) {
             String *entry
                 = (String*)CERTIFY(VA_Fetch(list, i), STRING);
-            Hash_Store(ivars->entries, (Obj*)entry, (Obj*)CFISH_TRUE);
+            Hash_Store(ivars->entries, entry, (Obj*)CFISH_TRUE);
         }
 
         DECREF(list);

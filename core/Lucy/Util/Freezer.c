@@ -288,62 +288,32 @@ Freezer_read_varray(InStream *instream) {
 
 void
 Freezer_serialize_hash(Hash *hash, OutStream *outstream) {
-    Obj *key;
-    Obj *val;
-    uint32_t string_count = 0;
+    String *key;
+    Obj    *val;
     uint32_t hash_size = Hash_Get_Size(hash);
     OutStream_Write_C32(outstream, hash_size);
 
-    // Write String keys first.  String keys are the common case; grouping
-    // them together is a form of run-length-encoding and saves space, since
-    // we omit the per-key class name.
     Hash_Iterate(hash);
     while (Hash_Next(hash, &key, &val)) {
-        if (Obj_Is_A(key, STRING)) { string_count++; }
-    }
-    OutStream_Write_C32(outstream, string_count);
-    Hash_Iterate(hash);
-    while (Hash_Next(hash, &key, &val)) {
-        if (Obj_Is_A(key, STRING)) {
-            Freezer_serialize_string((String*)key, outstream);
-            FREEZE(val, outstream);
-        }
-    }
-
-    // Punt on the classes of the remaining keys.
-    Hash_Iterate(hash);
-    while (Hash_Next(hash, &key, &val)) {
-        if (!Obj_Is_A(key, STRING)) {
-            FREEZE(key, outstream);
-            FREEZE(val, outstream);
-        }
+        Freezer_serialize_string(key, outstream);
+        FREEZE(val, outstream);
     }
 }
 
 Hash*
 Freezer_deserialize_hash(Hash *hash, InStream *instream) {
-    uint32_t size        = InStream_Read_C32(instream);
-    uint32_t num_strings = InStream_Read_C32(instream);
-    uint32_t num_other   = size - num_strings;
+    uint32_t size = InStream_Read_C32(instream);
 
     Hash_init(hash, size);
 
-    // Read key-value pairs with String keys.
-    while (num_strings--) {
+    while (size--) {
         uint32_t len = InStream_Read_C32(instream);
         char *key_buf = (char*)MALLOCATE(len + 1);
         InStream_Read_Bytes(instream, key_buf, len);
         key_buf[len] = '\0';
         String *key = Str_new_steal_utf8(key_buf, len);
-        Hash_Store(hash, (Obj*)key, THAW(instream));
+        Hash_Store(hash, key, THAW(instream));
         DECREF(key);
-    }
-
-    // Read remaining key/value pairs.
-    while (num_other--) {
-        Obj *k = THAW(instream);
-        Hash_Store(hash, k, THAW(instream));
-        DECREF(k);
     }
 
     return hash;
@@ -369,15 +339,12 @@ S_dump_array(VArray *array) {
 
 Obj*
 S_dump_hash(Hash *hash) {
-    Hash *dump = Hash_new(Hash_Get_Size(hash));
-    Obj *key;
-    Obj *value;
+    Hash   *dump = Hash_new(Hash_Get_Size(hash));
+    String *key;
+    Obj    *value;
 
     Hash_Iterate(hash);
     while (Hash_Next(hash, &key, &value)) {
-        // Since JSON only supports text hash keys, dump() can only support
-        // text hash keys.
-        CERTIFY(key, STRING);
         Hash_Store(dump, key, Freezer_dump(value));
     }
 
@@ -480,9 +447,9 @@ S_load_from_hash(Hash *dump) {
     }
 
     // It's an ordinary Hash.
-    Hash *loaded = Hash_new(Hash_Get_Size(dump));
-    Obj *key;
-    Obj *value;
+    Hash   *loaded = Hash_new(Hash_Get_Size(dump));
+    String *key;
+    Obj    *value;
     Hash_Iterate(dump);
     while (Hash_Next(dump, &key, &value)) {
         Hash_Store(loaded, key, Freezer_load(value));
