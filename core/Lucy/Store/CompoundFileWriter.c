@@ -155,16 +155,16 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
     DECREF(files);
     DECREF(metadata);
     /*
-    String *merged_file;
-    Obj    *ignore;
-    Hash_Iterate(sub_files);
-    while (Hash_Next(sub_files, &merged_file, &ignore)) {
+    HashIterator *iter = HashIter_new(sub_files);
+    while (HashIter_Next(iter)) {
+        String *merged_file = HashIter_Get_Key(iter);
         if (!Folder_Delete(folder, merged_file)) {
             String *mess = MAKE_MESS("Can't delete '%o'", merged_file);
             DECREF(sub_files);
             Err_throw_mess(ERR, mess);
         }
     }
+    DECREF(iter);
     */
     DECREF(sub_files);
     for (uint32_t i = 0, max = VA_Get_Size(merged); i < max; i++) {

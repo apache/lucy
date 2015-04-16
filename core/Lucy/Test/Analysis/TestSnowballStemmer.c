@@ -18,6 +18,7 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/HashIterator.h"
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Analysis/TestSnowballStemmer.h"
@@ -67,10 +68,10 @@ test_stemming(TestBatchRunner *runner) {
     Hash *tests = (Hash*)Json_slurp_json((Folder*)modules_folder, path);
     if (!tests) { RETHROW(Err_get_error()); }
 
-    String *iso;
-    Hash *lang_data;
-    Hash_Iterate(tests);
-    while (Hash_Next(tests, &iso, (Obj**)&lang_data)) {
+    HashIterator *iter = HashIter_new(tests);
+    while (HashIter_Next(iter)) {
+        String *iso       = HashIter_Get_Key(iter);
+        Hash   *lang_data = (Hash*)HashIter_Get_Value(iter);
         VArray *words = (VArray*)Hash_Fetch_Utf8(lang_data, "words", 5);
         VArray *stems = (VArray*)Hash_Fetch_Utf8(lang_data, "stems", 5);
         SnowballStemmer *stemmer = SnowStemmer_new(iso);
@@ -88,6 +89,7 @@ test_stemming(TestBatchRunner *runner) {
         }
         DECREF(stemmer);
     }
+    DECREF(iter);
 
     DECREF(tests);
     DECREF(modules_folder);

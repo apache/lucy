@@ -19,6 +19,7 @@
 #include <ctype.h>
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/HashIterator.h"
 #include "Lucy/Plan/Schema.h"
 #include "Lucy/Analysis/Analyzer.h"
 #include "Lucy/Index/Similarity.h"
@@ -252,8 +253,6 @@ Schema_Dump_IMP(Schema *self) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
     Hash *dump = Hash_new(0);
     Hash *type_dumps = Hash_new(Hash_Get_Size(ivars->types));
-    String *field;
-    FieldType *type;
 
     // Record class name, store dumps of unique Analyzers.
     Hash_Store_Utf8(dump, "_class", 6,
@@ -263,9 +262,11 @@ Schema_Dump_IMP(Schema *self) {
 
     // Dump FieldTypes.
     Hash_Store_Utf8(dump, "fields", 6, (Obj*)type_dumps);
-    Hash_Iterate(ivars->types);
-    while (Hash_Next(ivars->types, &field, (Obj**)&type)) {
-        Class *type_class = FType_Get_Class(type);
+    HashIterator *iter = HashIter_new(ivars->types);
+    while (HashIter_Next(iter)) {
+        String    *field      = HashIter_Get_Key(iter);
+        FieldType *type       = (FieldType*)HashIter_Get_Value(iter);
+        Class     *type_class = FType_Get_Class(type);
 
         // Dump known types to simplified format.
         if (type_class == FULLTEXTTYPE) {
@@ -290,6 +291,7 @@ Schema_Dump_IMP(Schema *self) {
             Hash_Store(type_dumps, field, FType_Dump(type));
         }
     }
+    DECREF(iter);
 
     return dump;
 }
@@ -315,8 +317,6 @@ Schema_Load_IMP(Schema *self, Obj *dump) {
         = (VArray*)CERTIFY(Hash_Fetch_Utf8(source, "analyzers", 9), VARRAY);
     VArray *analyzers
         = (VArray*)Freezer_load((Obj*)analyzer_dumps);
-    String *field;
-    Hash   *type_dump;
     UNUSED_VAR(self);
 
     // Start with a blank Schema.
@@ -324,11 +324,11 @@ Schema_Load_IMP(Schema *self, Obj *dump) {
     SchemaIVARS *const loaded_ivars = Schema_IVARS(loaded);
     VA_Grow(loaded_ivars->uniq_analyzers, VA_Get_Size(analyzers));
 
-    Hash_Iterate(type_dumps);
-    while (Hash_Next(type_dumps, &field, (Obj**)&type_dump)) {
-        String *type_str;
-        CERTIFY(type_dump, HASH);
-        type_str = (String*)Hash_Fetch_Utf8(type_dump, "type", 4);
+    HashIterator *iter = HashIter_new(type_dumps);
+    while (HashIter_Next(iter)) {
+        String *field     = HashIter_Get_Key(iter);
+        Hash   *type_dump = (Hash*)CERTIFY(HashIter_Get_Value(iter), HASH);
+        String *type_str  = (String*)Hash_Fetch_Utf8(type_dump, "type", 4);
         if (type_str) {
             if (Str_Equals_Utf8(type_str, "fulltext", 8)) {
                 // Replace the "analyzer" tick with the real thing.
@@ -395,6 +395,7 @@ Schema_Load_IMP(Schema *self, Obj *dump) {
             DECREF(type);
         }
     }
+    DECREF(iter);
 
     DECREF(analyzers);
 
@@ -408,13 +409,14 @@ Schema_Eat_IMP(Schema *self, Schema *other) {
               Schema_Get_Class_Name(self), Schema_Get_Class_Name(other));
     }
 
-    String *field;
-    FieldType *type;
     SchemaIVARS *const ovars = Schema_IVARS(other);
-    Hash_Iterate(ovars->types);
-    while (Hash_Next(ovars->types, &field, (Obj**)&type)) {
+    HashIterator *iter = HashIter_new(ovars->types);
+    while (HashIter_Next(iter)) {
+        String    *field = HashIter_Get_Key(iter);
+        FieldType *type  = (FieldType*)HashIter_Get_Value(iter);
         Schema_Spec_Field(self, field, type);
     }
+    DECREF(iter);
 }
 
 void

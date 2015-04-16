@@ -17,6 +17,7 @@
 #define C_LUCY_INDEXREADER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/HashIterator.h"
 #include "Lucy/Index/IndexReader.h"
 #include "Lucy/Index/DocVector.h"
 #include "Lucy/Index/IndexManager.h"
@@ -70,14 +71,14 @@ void
 IxReader_Close_IMP(IndexReader *self) {
     IndexReaderIVARS *const ivars = IxReader_IVARS(self);
     if (ivars->components) {
-        String *key;
-        DataReader *component;
-        Hash_Iterate(ivars->components);
-        while (Hash_Next(ivars->components, &key, (Obj**)&component)) {
+        HashIterator *iter = HashIter_new(ivars->components);
+        while (HashIter_Next(iter)) {
+            DataReader *component = (DataReader*)HashIter_Get_Value(iter);
             if (Obj_Is_A((Obj*)component, DATAREADER)) {
                 DataReader_Close(component);
             }
         }
+        DECREF(iter);
         Hash_Clear(ivars->components);
     }
     if (ivars->read_lock) {

@@ -17,6 +17,7 @@
 #define C_LUCY_FREEZER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/HashIterator.h"
 #include "Lucy/Util/Freezer.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
@@ -288,16 +289,17 @@ Freezer_read_varray(InStream *instream) {
 
 void
 Freezer_serialize_hash(Hash *hash, OutStream *outstream) {
-    String *key;
-    Obj    *val;
     uint32_t hash_size = Hash_Get_Size(hash);
     OutStream_Write_C32(outstream, hash_size);
 
-    Hash_Iterate(hash);
-    while (Hash_Next(hash, &key, &val)) {
+    HashIterator *iter = HashIter_new(hash);
+    while (HashIter_Next(iter)) {
+        String *key = HashIter_Get_Key(iter);
+        Obj    *val = HashIter_Get_Value(iter);
         Freezer_serialize_string(key, outstream);
         FREEZE(val, outstream);
     }
+    DECREF(iter);
 }
 
 Hash*
@@ -339,14 +341,15 @@ S_dump_array(VArray *array) {
 
 Obj*
 S_dump_hash(Hash *hash) {
-    Hash   *dump = Hash_new(Hash_Get_Size(hash));
-    String *key;
-    Obj    *value;
+    Hash *dump = Hash_new(Hash_Get_Size(hash));
 
-    Hash_Iterate(hash);
-    while (Hash_Next(hash, &key, &value)) {
+    HashIterator *iter = HashIter_new(hash);
+    while (HashIter_Next(iter)) {
+        String *key   = HashIter_Get_Key(iter);
+        Obj    *value = HashIter_Get_Value(iter);
         Hash_Store(dump, key, Freezer_dump(value));
     }
+    DECREF(iter);
 
     return (Obj*)dump;
 }
@@ -447,13 +450,15 @@ S_load_from_hash(Hash *dump) {
     }
 
     // It's an ordinary Hash.
-    Hash   *loaded = Hash_new(Hash_Get_Size(dump));
-    String *key;
-    Obj    *value;
-    Hash_Iterate(dump);
-    while (Hash_Next(dump, &key, &value)) {
+    Hash *loaded = Hash_new(Hash_Get_Size(dump));
+
+    HashIterator *iter = HashIter_new(dump);
+    while (HashIter_Next(iter)) {
+        String *key   = HashIter_Get_Key(iter);
+        Obj    *value = HashIter_Get_Value(iter);
         Hash_Store(loaded, key, Freezer_load(value));
     }
+    DECREF(iter);
 
     return (Obj*)loaded;
 

@@ -24,6 +24,7 @@
 #include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"
+#include "Clownfish/HashIterator.h"
 #include "Clownfish/Num.h"
 #include "Clownfish/VArray.h"
 #include "Lucy/Document/Doc.h"
@@ -62,16 +63,16 @@ void
 Inverter_Invert_Doc_IMP(Inverter *self, Doc *doc) {
     InverterIVARS *const ivars = Inverter_IVARS(self);
     Hash *const fields = (Hash*)Doc_Get_Fields(doc);
-    uint32_t   num_keys     = Hash_Iterate(fields);
 
     // Prepare for the new doc.
     Inverter_Set_Doc(self, doc);
 
     // Extract and invert the doc's fields.
-    while (num_keys--) {
-        String *field;
-        Obj    *obj;
-        Hash_Next(fields, &field, &obj);
+    HashIterator *iter = HashIter_new(fields);
+    while (HashIter_Next(iter)) {
+        String *field = HashIter_Get_Key(iter);
+        Obj    *obj   = HashIter_Get_Value(iter);
+
         InverterEntry *inventry = S_fetch_entry(ivars, field);
         InverterEntryIVARS *inventry_ivars = InvEntry_IVARS(inventry);
         FieldType *type = inventry_ivars->type;
@@ -122,6 +123,7 @@ Inverter_Invert_Doc_IMP(Inverter *self, Doc *doc) {
 
         Inverter_Add_Field(self, inventry);
     }
+    DECREF(iter);
 }
 
 

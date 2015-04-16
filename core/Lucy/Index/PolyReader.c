@@ -17,6 +17,7 @@
 #define C_LUCY_POLYREADER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/HashIterator.h"
 #include "Lucy/Index/PolyReader.h"
 #include "Lucy/Document/HitDoc.h"
 #include "Lucy/Index/DeletionsReader.h"
@@ -115,12 +116,12 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
     for (uint32_t i = 0; i < num_sub_readers; i++) {
         SegReader *seg_reader = (SegReader*)VA_Fetch(sub_readers, i);
         Hash *components = SegReader_Get_Components(seg_reader);
-        String *api;
-        DataReader *component;
         starts[i] = ivars->doc_max;
         ivars->doc_max += SegReader_Doc_Max(seg_reader);
-        Hash_Iterate(components);
-        while (Hash_Next(components, &api, (Obj**)&component)) {
+        HashIterator *iter = HashIter_new(components);
+        while (HashIter_Next(iter)) {
+            String     *api       = HashIter_Get_Key(iter);
+            DataReader *component = (DataReader*)HashIter_Get_Value(iter);
             VArray *readers = (VArray*)Hash_Fetch(data_readers, api);
             if (!readers) {
                 readers = VA_new(num_sub_readers);
@@ -128,13 +129,14 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
             }
             VA_Store(readers, i, INCREF(component));
         }
+        DECREF(iter);
     }
     ivars->offsets = I32Arr_new_steal(starts, num_sub_readers);
 
-    String *api;
-    VArray *readers;
-    Hash_Iterate(data_readers);
-    while (Hash_Next(data_readers, &api, (Obj**)&readers)) {
+    HashIterator *iter = HashIter_new(data_readers);
+    while (HashIter_Next(iter)) {
+        String *api     = HashIter_Get_Key(iter);
+        VArray *readers = (VArray*)HashIter_Get_Value(iter);
         DataReader *datareader
             = (DataReader*)CERTIFY(S_first_non_null(readers), DATAREADER);
         DataReader *aggregator
@@ -144,6 +146,7 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
             Hash_Store(ivars->components, api, (Obj*)aggregator);
         }
     }
+    DECREF(iter);
     DECREF(data_readers);
 
     DeletionsReader *del_reader

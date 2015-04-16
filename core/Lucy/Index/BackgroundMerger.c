@@ -17,6 +17,7 @@
 #define C_LUCY_BACKGROUNDMERGER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/HashIterator.h"
 #include "Lucy/Index/BackgroundMerger.h"
 #include "Lucy/Index/DeletionsReader.h"
 #include "Lucy/Index/DeletionsWriter.h"
@@ -315,8 +316,6 @@ S_merge_updated_deletions(BackgroundMerger *self) {
         int64_t  merge_seg_num = Seg_Get_Number(ivars->segment);
         uint32_t seg_tick      = INT32_MAX;
         int32_t  offset        = INT32_MAX;
-        String  *seg_name      = NULL;
-        Matcher *deletions     = NULL;
 
         SegWriter_Prep_Seg_Dir(seg_writer);
 
@@ -332,8 +331,11 @@ S_merge_updated_deletions(BackgroundMerger *self) {
         }
         if (offset == INT32_MAX) { THROW(ERR, "Failed sanity check"); }
 
-        Hash_Iterate(updated_deletions);
-        while (Hash_Next(updated_deletions, &seg_name, (Obj**)&deletions)) {
+        HashIterator *iter = HashIter_new(updated_deletions);
+        while (HashIter_Next(iter)) {
+            String  *seg_name  = HashIter_Get_Key(iter);
+            Matcher *deletions = (Matcher*)HashIter_Get_Value(iter);
+
             I32Array *doc_map
                 = (I32Array*)CERTIFY(
                       Hash_Fetch(ivars->doc_maps, seg_name),
@@ -351,6 +353,7 @@ S_merge_updated_deletions(BackgroundMerger *self) {
                 }
             }
         }
+        DECREF(iter);
 
         // Finish the segment and clean up.
         DelWriter_Finish(del_writer);

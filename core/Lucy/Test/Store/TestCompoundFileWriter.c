@@ -19,6 +19,7 @@
 
 #include "charmony.h"
 
+#include "Clownfish/HashIterator.h"
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestCompoundFileWriter.h"
@@ -118,17 +119,16 @@ test_offsets(TestBatchRunner *runner) {
     files = (Hash*)CERTIFY(
                 Hash_Fetch_Utf8(cf_metadata, "files", 5), HASH);
 
-    String *file;
-    Obj     *filestats;
     bool     offsets_ok = true;
 
     TEST_TRUE(runner, Hash_Get_Size(files) > 0, "Multiple files");
 
-    Hash_Iterate(files);
-    while (Hash_Next(files, &file, &filestats)) {
-        Hash *stats = (Hash*)CERTIFY(filestats, HASH);
-        Obj *offset = CERTIFY(Hash_Fetch_Utf8(stats, "offset", 6), OBJ);
-        int64_t offs = Obj_To_I64(offset);
+    HashIterator *iter = HashIter_new(files);
+    while (HashIter_Next(iter)) {
+        String *file   = HashIter_Get_Key(iter);
+        Hash   *stats  = (Hash*)CERTIFY(HashIter_Get_Value(iter), HASH);
+        Obj    *offset = CERTIFY(Hash_Fetch_Utf8(stats, "offset", 6), OBJ);
+        int64_t offs   = Obj_To_I64(offset);
         if (offs % 8 != 0) {
             offsets_ok = false;
             FAIL(runner, "Offset %" PRId64 " for %s not a multiple of 8",
@@ -136,6 +136,7 @@ test_offsets(TestBatchRunner *runner) {
             break;
         }
     }
+    DECREF(iter);
     if (offsets_ok) {
         PASS(runner, "All offsets are multiples of 8");
     }

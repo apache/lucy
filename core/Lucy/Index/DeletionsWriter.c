@@ -20,6 +20,7 @@
 
 #include <math.h>
 
+#include "Clownfish/HashIterator.h"
 #include "Lucy/Index/DeletionsWriter.h"
 #include "Lucy/Index/DeletionsReader.h"
 #include "Lucy/Index/IndexReader.h"
@@ -350,10 +351,10 @@ DefDelWriter_Merge_Segment_IMP(DefaultDeletionsWriter *self,
         VArray *seg_readers = ivars->seg_readers;
         Hash   *files = (Hash*)Hash_Fetch_Utf8(del_meta, "files", 5);
         if (files) {
-            String *seg;
-            Hash *mini_meta;
-            Hash_Iterate(files);
-            while (Hash_Next(files, &seg, (Obj**)&mini_meta)) {
+            HashIterator *iter = HashIter_new(files);
+            while (HashIter_Next(iter)) {
+                String *seg       = HashIter_Get_Key(iter);
+                Hash   *mini_meta = (Hash*)HashIter_Get_Value(iter);
 
                 /* Find the segment the deletions from the SegReader
                  * we're adding correspond to.  If it's gone, we don't
@@ -381,6 +382,7 @@ DefDelWriter_Merge_Segment_IMP(DefaultDeletionsWriter *self,
                     }
                 }
             }
+            DECREF(iter);
         }
     }
 }
