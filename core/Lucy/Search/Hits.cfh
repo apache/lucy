@@ -24,7 +24,7 @@ public class Lucy::Search::Hits inherits Clownfish::Obj {
 
     Searcher   *searcher;
     TopDocs    *top_docs;
-    VArray     *match_docs;
+    Vector     *match_docs;
     uint32_t    offset;
 
     inert incremented Hits*

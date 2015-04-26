@@ -21,7 +21,7 @@ class Lucy::Index::DeletionsReader nickname DelReader
 
     inert DeletionsReader*
     init(DeletionsReader *self, Schema *schema = NULL, Folder *folder = NULL,
-         Snapshot *snapshot = NULL, VArray *segments = NULL,
+         Snapshot *snapshot = NULL, Vector *segments = NULL,
          int32_t seg_tick = -1);
 
     /** Return the number of docs which have been marked as deleted in this
@@ -37,21 +37,21 @@ class Lucy::Index::DeletionsReader nickname DelReader
     Iterator(DeletionsReader *self);
 
     public incremented nullable DeletionsReader*
-    Aggregator(DeletionsReader *self, VArray *readers, I32Array *offsets);
+    Aggregator(DeletionsReader *self, Vector *readers, I32Array *offsets);
 }
 
 class Lucy::Index::PolyDeletionsReader nickname PolyDelReader
     inherits Lucy::Index::DeletionsReader {
 
-    VArray   *readers;
+    Vector   *readers;
     I32Array *offsets;
     int32_t   del_count;
 
     inert incremented PolyDeletionsReader*
-    new(VArray *readers, I32Array *offsets);
+    new(Vector *readers, I32Array *offsets);
 
     inert PolyDeletionsReader*
-    init(PolyDeletionsReader *self, VArray *readers, I32Array *offsets);
+    init(PolyDeletionsReader *self, Vector *readers, I32Array *offsets);
 
     int32_t
     Del_Count(PolyDeletionsReader *self);
@@ -73,12 +73,12 @@ class Lucy::Index::DefaultDeletionsReader nickname DefDelReader
     int32_t    del_count;
 
     inert incremented DefaultDeletionsReader*
-    new(Schema *schema, Folder *folder, Snapshot *snapshot, VArray *segments,
+    new(Schema *schema, Folder *folder, Snapshot *snapshot, Vector *segments,
         int32_t seg_tick);
 
     inert DefaultDeletionsReader*
     init(DefaultDeletionsReader *self, Schema *schema, Folder *folder,
-         Snapshot *snapshot, VArray *segments, int32_t seg_tick);
+         Snapshot *snapshot, Vector *segments, int32_t seg_tick);
 
     int32_t
     Del_Count(DefaultDeletionsReader *self);

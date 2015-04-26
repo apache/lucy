@@ -34,7 +34,7 @@ static SeriesMatcher*
 S_make_series_matcher(I32Array *doc_ids, I32Array *offsets, int32_t doc_max) {
     int32_t  num_doc_ids  = I32Arr_Get_Size(doc_ids);
     int32_t  num_matchers = I32Arr_Get_Size(offsets);
-    VArray  *matchers     = VA_new(num_matchers);
+    Vector  *matchers     = Vec_new(num_matchers);
     int32_t  tick         = 0;
     int32_t  i;
 
@@ -51,7 +51,7 @@ S_make_series_matcher(I32Array *doc_ids, I32Array *offsets, int32_t doc_max) {
             else               { tick++; }
             BitVec_Set(bit_vec, doc_id - offset);
         }
-        VA_Push(matchers, (Obj*)BitVecMatcher_new(bit_vec));
+        Vec_Push(matchers, (Obj*)BitVecMatcher_new(bit_vec));
         DECREF(bit_vec);
     }
 

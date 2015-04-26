@@ -26,7 +26,7 @@
 #include "Clownfish/Hash.h"
 #include "Clownfish/HashIterator.h"
 #include "Clownfish/Num.h"
-#include "Clownfish/VArray.h"
+#include "Clownfish/Vector.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Index/Segment.h"
 #include "Lucy/Plan/FieldType.h"
@@ -51,10 +51,10 @@ S_fetch_entry(InverterIVARS *ivars, String *field) {
     }
 
     InverterEntry *entry
-        = (InverterEntry*)VA_Fetch(ivars->entry_pool, field_num);
+        = (InverterEntry*)Vec_Fetch(ivars->entry_pool, field_num);
     if (!entry) {
         entry = InvEntry_new(schema, (String*)field, field_num);
-        VA_Store(ivars->entry_pool, field_num, (Obj*)entry);
+        Vec_Store(ivars->entry_pool, field_num, (Obj*)entry);
     }
     return entry;
 }

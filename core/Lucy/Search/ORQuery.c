@@ -29,13 +29,13 @@
 #include "Lucy/Store/OutStream.h"
 
 ORQuery*
-ORQuery_new(VArray *children) {
+ORQuery_new(Vector *children) {
     ORQuery *self = (ORQuery*)Class_Make_Obj(ORQUERY);
     return ORQuery_init(self, children);
 }
 
 ORQuery*
-ORQuery_init(ORQuery *self, VArray *children) {
+ORQuery_init(ORQuery *self, Vector *children) {
     return (ORQuery*)PolyQuery_init((PolyQuery*)self, children);
 }
 
@@ -61,13 +61,13 @@ ORQuery_Equals_IMP(ORQuery *self, Obj *other) {
 String*
 ORQuery_To_String_IMP(ORQuery *self) {
     ORQueryIVARS *const ivars = ORQuery_IVARS(self);
-    uint32_t num_kids = VA_Get_Size(ivars->children);
+    uint32_t num_kids = Vec_Get_Size(ivars->children);
     if (!num_kids) { return Str_new_from_trusted_utf8("()", 2); }
     else {
         CharBuf *buf = CB_new_from_trusted_utf8("(", 1);
         uint32_t last_kid = num_kids - 1;
         for (uint32_t i = 0; i < num_kids; i++) {
-            String *kid_string = Obj_To_String(VA_Fetch(ivars->children, i));
+            String *kid_string = Obj_To_String(Vec_Fetch(ivars->children, i));
             CB_Cat(buf, kid_string);
             DECREF(kid_string);
             if (i == last_kid) {
@@ -103,23 +103,23 @@ Matcher*
 ORCompiler_Make_Matcher_IMP(ORCompiler *self, SegReader *reader,
                             bool need_score) {
     ORCompilerIVARS *const ivars = ORCompiler_IVARS(self);
-    uint32_t num_kids = VA_Get_Size(ivars->children);
+    uint32_t num_kids = Vec_Get_Size(ivars->children);
 
     if (num_kids == 1) {
         // No need for an ORMatcher wrapper.
-        Compiler *only_child = (Compiler*)VA_Fetch(ivars->children, 0);
+        Compiler *only_child = (Compiler*)Vec_Fetch(ivars->children, 0);
         return Compiler_Make_Matcher(only_child, reader, need_score);
     }
     else {
-        VArray *submatchers = VA_new(num_kids);
+        Vector *submatchers = Vec_new(num_kids);
         uint32_t num_submatchers = 0;
 
         // Accumulate sub-matchers.
         for (uint32_t i = 0; i < num_kids; i++) {
-            Compiler *child = (Compiler*)VA_Fetch(ivars->children, i);
+            Compiler *child = (Compiler*)Vec_Fetch(ivars->children, i);
             Matcher *submatcher
                 = Compiler_Make_Matcher(child, reader, need_score);
-            VA_Push(submatchers, (Obj*)submatcher);
+            Vec_Push(submatchers, (Obj*)submatcher);
             if (submatcher != NULL) {
                 num_submatchers++;
             }

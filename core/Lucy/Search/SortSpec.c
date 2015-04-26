@@ -28,17 +28,17 @@
 #include "Clownfish/Util/SortUtils.h"
 
 SortSpec*
-SortSpec_new(VArray *rules) {
+SortSpec_new(Vector *rules) {
     SortSpec *self = (SortSpec*)Class_Make_Obj(SORTSPEC);
     return SortSpec_init(self, rules);
 }
 
 SortSpec*
-SortSpec_init(SortSpec *self, VArray *rules) {
+SortSpec_init(SortSpec *self, Vector *rules) {
     SortSpecIVARS *const ivars = SortSpec_IVARS(self);
-    ivars->rules = VA_Clone(rules);
-    for (int32_t i = 0, max = VA_Get_Size(rules); i < max; i++) {
-        SortRule *rule = (SortRule*)VA_Fetch(rules, i);
+    ivars->rules = Vec_Clone(rules);
+    for (int32_t i = 0, max = Vec_Get_Size(rules); i < max; i++) {
+        SortRule *rule = (SortRule*)Vec_Fetch(rules, i);
         CERTIFY(rule, SORTRULE);
     }
     return self;
@@ -54,12 +54,12 @@ SortSpec_Destroy_IMP(SortSpec *self) {
 SortSpec*
 SortSpec_Deserialize_IMP(SortSpec *self, InStream *instream) {
     uint32_t num_rules = InStream_Read_C32(instream);
-    VArray *rules = VA_new(num_rules);
+    Vector *rules = Vec_new(num_rules);
 
     // Add rules.
     for (uint32_t i = 0; i < num_rules; i++) {
         SortRule *blank = (SortRule*)Class_Make_Obj(SORTRULE);
-        VA_Push(rules, (Obj*)SortRule_Deserialize(blank, instream));
+        Vec_Push(rules, (Obj*)SortRule_Deserialize(blank, instream));
     }
     SortSpec_init(self, rules);
     DECREF(rules);
@@ -67,7 +67,7 @@ SortSpec_Deserialize_IMP(SortSpec *self, InStream *instream) {
     return self;
 }
 
-VArray*
+Vector*
 SortSpec_Get_Rules_IMP(SortSpec *self) {
     return SortSpec_IVARS(self)->rules;
 }
@@ -75,10 +75,10 @@ SortSpec_Get_Rules_IMP(SortSpec *self) {
 void
 SortSpec_Serialize_IMP(SortSpec *self, OutStream *target) {
     SortSpecIVARS *const ivars = SortSpec_IVARS(self);
-    uint32_t num_rules = VA_Get_Size(ivars->rules);
+    uint32_t num_rules = Vec_Get_Size(ivars->rules);
     OutStream_Write_C32(target, num_rules);
     for (uint32_t i = 0; i < num_rules; i++) {
-        SortRule *rule = (SortRule*)VA_Fetch(ivars->rules, i);
+        SortRule *rule = (SortRule*)Vec_Fetch(ivars->rules, i);
         SortRule_Serialize(rule, target);
     }
 }

@@ -31,7 +31,7 @@ TestHeatMap_new() {
 
 static void
 test_calc_proximity_boost(TestBatchRunner *runner) {
-    VArray  *spans    = VA_new(0);
+    Vector  *spans    = Vec_new(0);
     HeatMap *heat_map = HeatMap_new(spans, 133);
     Span    *span1    = Span_new(  0, 10, 1.0f);
     Span    *span2    = Span_new( 10, 10, 1.0f);
@@ -61,102 +61,102 @@ test_calc_proximity_boost(TestBatchRunner *runner) {
 
 static void
 test_flatten_spans(TestBatchRunner *runner) {
-    VArray  *spans    = VA_new(8);
-    VArray  *wanted   = VA_new(8);
+    Vector  *spans    = Vec_new(8);
+    Vector  *wanted   = Vec_new(8);
     HeatMap *heat_map = HeatMap_new(spans, 133);
 
-    VArray *flattened, *boosts;
+    Vector *flattened, *boosts;
 
-    VA_Push(spans, (Obj*)Span_new(10, 10, 1.0f));
-    VA_Push(spans, (Obj*)Span_new(16, 14, 2.0f));
+    Vec_Push(spans, (Obj*)Span_new(10, 10, 1.0f));
+    Vec_Push(spans, (Obj*)Span_new(16, 14, 2.0f));
     flattened = HeatMap_Flatten_Spans(heat_map, spans);
-    VA_Push(wanted, (Obj*)Span_new(10,  6, 1.0f));
-    VA_Push(wanted, (Obj*)Span_new(16,  4, 3.0f));
-    VA_Push(wanted, (Obj*)Span_new(20, 10, 2.0f));
-    TEST_TRUE(runner, VA_Equals(flattened, (Obj*)wanted),
+    Vec_Push(wanted, (Obj*)Span_new(10,  6, 1.0f));
+    Vec_Push(wanted, (Obj*)Span_new(16,  4, 3.0f));
+    Vec_Push(wanted, (Obj*)Span_new(20, 10, 2.0f));
+    TEST_TRUE(runner, Vec_Equals(flattened, (Obj*)wanted),
               "flatten two overlapping spans");
-    VA_Clear(wanted);
+    Vec_Clear(wanted);
     boosts = HeatMap_Generate_Proximity_Boosts(heat_map, spans);
-    VA_Push(wanted, (Obj*)Span_new(10, 20, 3.0f));
-    TEST_TRUE(runner, VA_Equals(boosts, (Obj*)wanted),
+    Vec_Push(wanted, (Obj*)Span_new(10, 20, 3.0f));
+    TEST_TRUE(runner, Vec_Equals(boosts, (Obj*)wanted),
               "prox boosts for overlap");
-    VA_Clear(wanted);
-    VA_Clear(spans);
+    Vec_Clear(wanted);
+    Vec_Clear(spans);
     DECREF(boosts);
     DECREF(flattened);
 
-    VA_Push(spans, (Obj*)Span_new(10, 10, 1.0f));
-    VA_Push(spans, (Obj*)Span_new(16, 14, 2.0f));
-    VA_Push(spans, (Obj*)Span_new(50,  1, 1.0f));
+    Vec_Push(spans, (Obj*)Span_new(10, 10, 1.0f));
+    Vec_Push(spans, (Obj*)Span_new(16, 14, 2.0f));
+    Vec_Push(spans, (Obj*)Span_new(50,  1, 1.0f));
     flattened = HeatMap_Flatten_Spans(heat_map, spans);
-    VA_Push(wanted, (Obj*)Span_new(10,  6, 1.0f));
-    VA_Push(wanted, (Obj*)Span_new(16,  4, 3.0f));
-    VA_Push(wanted, (Obj*)Span_new(20, 10, 2.0f));
-    VA_Push(wanted, (Obj*)Span_new(50,  1, 1.0f));
-    TEST_TRUE(runner, VA_Equals(flattened, (Obj*)wanted),
+    Vec_Push(wanted, (Obj*)Span_new(10,  6, 1.0f));
+    Vec_Push(wanted, (Obj*)Span_new(16,  4, 3.0f));
+    Vec_Push(wanted, (Obj*)Span_new(20, 10, 2.0f));
+    Vec_Push(wanted, (Obj*)Span_new(50,  1, 1.0f));
+    TEST_TRUE(runner, Vec_Equals(flattened, (Obj*)wanted),
               "flatten two overlapping spans, leave hole, then third span");
-    VA_Clear(wanted);
+    Vec_Clear(wanted);
     boosts = HeatMap_Generate_Proximity_Boosts(heat_map, spans);
-    TEST_TRUE(runner, VA_Get_Size(boosts) == 2 + 1,
+    TEST_TRUE(runner, Vec_Get_Size(boosts) == 2 + 1,
               "boosts generated for each unique pair, since all were in range");
-    VA_Clear(spans);
+    Vec_Clear(spans);
     DECREF(boosts);
     DECREF(flattened);
 
-    VA_Push(spans, (Obj*)Span_new(10, 10, 1.0f));
-    VA_Push(spans, (Obj*)Span_new(14,  4, 4.0f));
-    VA_Push(spans, (Obj*)Span_new(16, 14, 2.0f));
+    Vec_Push(spans, (Obj*)Span_new(10, 10, 1.0f));
+    Vec_Push(spans, (Obj*)Span_new(14,  4, 4.0f));
+    Vec_Push(spans, (Obj*)Span_new(16, 14, 2.0f));
     flattened = HeatMap_Flatten_Spans(heat_map, spans);
-    VA_Push(wanted, (Obj*)Span_new(10,  4, 1.0f));
-    VA_Push(wanted, (Obj*)Span_new(14,  2, 5.0f));
-    VA_Push(wanted, (Obj*)Span_new(16,  2, 7.0f));
-    VA_Push(wanted, (Obj*)Span_new(18,  2, 3.0f));
-    VA_Push(wanted, (Obj*)Span_new(20, 10, 2.0f));
-    TEST_TRUE(runner, VA_Equals(flattened, (Obj*)wanted),
+    Vec_Push(wanted, (Obj*)Span_new(10,  4, 1.0f));
+    Vec_Push(wanted, (Obj*)Span_new(14,  2, 5.0f));
+    Vec_Push(wanted, (Obj*)Span_new(16,  2, 7.0f));
+    Vec_Push(wanted, (Obj*)Span_new(18,  2, 3.0f));
+    Vec_Push(wanted, (Obj*)Span_new(20, 10, 2.0f));
+    TEST_TRUE(runner, Vec_Equals(flattened, (Obj*)wanted),
               "flatten three overlapping spans");
-    VA_Clear(wanted);
+    Vec_Clear(wanted);
     boosts = HeatMap_Generate_Proximity_Boosts(heat_map, spans);
-    TEST_TRUE(runner, VA_Get_Size(boosts) == 2 + 1,
+    TEST_TRUE(runner, Vec_Get_Size(boosts) == 2 + 1,
               "boosts generated for each unique pair, since all were in range");
-    VA_Clear(spans);
+    Vec_Clear(spans);
     DECREF(boosts);
     DECREF(flattened);
 
-    VA_Push(spans, (Obj*)Span_new(10, 10,  1.0f));
-    VA_Push(spans, (Obj*)Span_new(16, 14,  4.0f));
-    VA_Push(spans, (Obj*)Span_new(16, 14,  2.0f));
-    VA_Push(spans, (Obj*)Span_new(30, 10, 10.0f));
+    Vec_Push(spans, (Obj*)Span_new(10, 10,  1.0f));
+    Vec_Push(spans, (Obj*)Span_new(16, 14,  4.0f));
+    Vec_Push(spans, (Obj*)Span_new(16, 14,  2.0f));
+    Vec_Push(spans, (Obj*)Span_new(30, 10, 10.0f));
     flattened = HeatMap_Flatten_Spans(heat_map, spans);
-    VA_Push(wanted, (Obj*)Span_new(10,  6,  1.0f));
-    VA_Push(wanted, (Obj*)Span_new(16,  4,  7.0f));
-    VA_Push(wanted, (Obj*)Span_new(20, 10,  6.0f));
-    VA_Push(wanted, (Obj*)Span_new(30, 10, 10.0f));
-    TEST_TRUE(runner, VA_Equals(flattened, (Obj*)wanted),
+    Vec_Push(wanted, (Obj*)Span_new(10,  6,  1.0f));
+    Vec_Push(wanted, (Obj*)Span_new(16,  4,  7.0f));
+    Vec_Push(wanted, (Obj*)Span_new(20, 10,  6.0f));
+    Vec_Push(wanted, (Obj*)Span_new(30, 10, 10.0f));
+    TEST_TRUE(runner, Vec_Equals(flattened, (Obj*)wanted),
               "flatten 4 spans, middle two have identical range");
-    VA_Clear(wanted);
+    Vec_Clear(wanted);
     boosts = HeatMap_Generate_Proximity_Boosts(heat_map, spans);
-    TEST_TRUE(runner, VA_Get_Size(boosts) == 3 + 2 + 1,
+    TEST_TRUE(runner, Vec_Get_Size(boosts) == 3 + 2 + 1,
               "boosts generated for each unique pair, since all were in range");
-    VA_Clear(spans);
+    Vec_Clear(spans);
     DECREF(boosts);
     DECREF(flattened);
 
-    VA_Push(spans, (Obj*)Span_new( 10, 10,  1.0f));
-    VA_Push(spans, (Obj*)Span_new( 16,  4,  4.0f));
-    VA_Push(spans, (Obj*)Span_new( 16, 14,  2.0f));
-    VA_Push(spans, (Obj*)Span_new(230, 10, 10.0f));
+    Vec_Push(spans, (Obj*)Span_new( 10, 10,  1.0f));
+    Vec_Push(spans, (Obj*)Span_new( 16,  4,  4.0f));
+    Vec_Push(spans, (Obj*)Span_new( 16, 14,  2.0f));
+    Vec_Push(spans, (Obj*)Span_new(230, 10, 10.0f));
     flattened = HeatMap_Flatten_Spans(heat_map, spans);
-    VA_Push(wanted, (Obj*)Span_new( 10,  6,  1.0f));
-    VA_Push(wanted, (Obj*)Span_new( 16,  4,  7.0f));
-    VA_Push(wanted, (Obj*)Span_new( 20, 10,  2.0f));
-    VA_Push(wanted, (Obj*)Span_new(230, 10, 10.0f));
-    TEST_TRUE(runner, VA_Equals(flattened, (Obj*)wanted),
+    Vec_Push(wanted, (Obj*)Span_new( 10,  6,  1.0f));
+    Vec_Push(wanted, (Obj*)Span_new( 16,  4,  7.0f));
+    Vec_Push(wanted, (Obj*)Span_new( 20, 10,  2.0f));
+    Vec_Push(wanted, (Obj*)Span_new(230, 10, 10.0f));
+    TEST_TRUE(runner, Vec_Equals(flattened, (Obj*)wanted),
               "flatten 4 spans, middle two have identical starts but different ends");
-    VA_Clear(wanted);
+    Vec_Clear(wanted);
     boosts = HeatMap_Generate_Proximity_Boosts(heat_map, spans);
-    TEST_TRUE(runner, VA_Get_Size(boosts) == 2 + 1,
+    TEST_TRUE(runner, Vec_Get_Size(boosts) == 2 + 1,
               "boosts not generated for out of range span");
-    VA_Clear(spans);
+    Vec_Clear(spans);
     DECREF(boosts);
     DECREF(flattened);
 

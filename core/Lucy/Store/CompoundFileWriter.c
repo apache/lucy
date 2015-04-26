@@ -96,8 +96,8 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
     Folder    *folder       = ivars->folder;
     Hash      *metadata     = Hash_new(0);
     Hash      *sub_files    = Hash_new(0);
-    VArray    *files        = Folder_List(folder, NULL);
-    VArray    *merged       = VA_new(VA_Get_Size(files));
+    Vector    *files        = Folder_List(folder, NULL);
+    Vector    *merged       = Vec_new(Vec_Get_Size(files));
     String    *cf_file      = (String*)SSTR_WRAP_UTF8("cf.dat", 6);
     OutStream *outstream    = Folder_Open_Out(folder, (String*)cf_file);
     bool       rename_success;
@@ -109,9 +109,9 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
     Hash_Store_Utf8(metadata, "format", 6,
                     (Obj*)Str_newf("%i32", CFWriter_current_file_format));
 
-    VA_Sort(files);
-    for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
-        String *infilename = (String*)VA_Fetch(files, i);
+    Vec_Sort(files);
+    for (uint32_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
+        String *infilename = (String*)Vec_Fetch(files, i);
 
         if (!Str_Ends_With_Utf8(infilename, ".json", 5)) {
             InStream *instream   = Folder_Open_In(folder, infilename);
@@ -131,7 +131,7 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
             Hash_Store_Utf8(file_data, "length", 6,
                             (Obj*)Str_newf("%i64", len));
             Hash_Store(sub_files, infilename, (Obj*)file_data);
-            VA_Push(merged, INCREF(infilename));
+            Vec_Push(merged, INCREF(infilename));
 
             // Add filler NULL bytes so that every sub-file begins on a file
             // position multiple of 8.
@@ -167,8 +167,8 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
     DECREF(iter);
     */
     DECREF(sub_files);
-    for (uint32_t i = 0, max = VA_Get_Size(merged); i < max; i++) {
-        String *merged_file = (String*)VA_Fetch(merged, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(merged); i < max; i++) {
+        String *merged_file = (String*)Vec_Fetch(merged, i);
         if (!Folder_Delete(folder, merged_file)) {
             String *mess = MAKE_MESS("Can't delete '%o'", merged_file);
             DECREF(merged);

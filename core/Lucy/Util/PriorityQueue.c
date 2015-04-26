@@ -147,16 +147,16 @@ PriQ_Pop_IMP(PriorityQueue *self) {
     }
 }
 
-VArray*
+Vector*
 PriQ_Pop_All_IMP(PriorityQueue *self) {
     PriorityQueueIVARS *const ivars = PriQ_IVARS(self);
-    VArray *retval = VA_new(ivars->size);
+    Vector *retval = Vec_new(ivars->size);
 
     // Map the queue nodes onto the array in reverse order.
     if (ivars->size) {
         for (uint32_t i = ivars->size; i--;) {
             Obj *const elem = PriQ_Pop(self);
-            VA_Store(retval, i, elem);
+            Vec_Store(retval, i, elem);
         }
     }
 

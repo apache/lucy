@@ -28,7 +28,7 @@ parcel Lucy;
  */
 public class Lucy::Index::PolyReader inherits Lucy::Index::IndexReader {
 
-    VArray   *sub_readers;
+    Vector   *sub_readers;
     int32_t   doc_max;
     int32_t   del_count;
     I32Array *offsets;
@@ -49,12 +49,12 @@ public class Lucy::Index::PolyReader inherits Lucy::Index::IndexReader {
 
     public inert incremented PolyReader*
     new(Schema *schema = NULL, Folder *folder, Snapshot *snapshot = NULL,
-        IndexManager *manager = NULL, VArray *sub_readers = NULL);
+        IndexManager *manager = NULL, Vector *sub_readers = NULL);
 
     public inert PolyReader*
     init(PolyReader *self, Schema *schema = NULL, Folder *folder,
          Snapshot *snapshot = NULL, IndexManager *manager = NULL,
-         VArray *sub_readers = NULL);
+         Vector *sub_readers = NULL);
 
     inert String  *race_condition_debug1;
     inert int32_t  debug1_num_passes;
@@ -76,10 +76,10 @@ public class Lucy::Index::PolyReader inherits Lucy::Index::IndexReader {
     public incremented I32Array*
     Offsets(PolyReader *self);
 
-    public incremented VArray*
+    public incremented Vector*
     Seg_Readers(PolyReader *self);
 
-    VArray*
+    Vector*
     Get_Seg_Readers(PolyReader *self);
 
     public void

@@ -26,14 +26,14 @@
 #include "Lucy/Search/Compiler.h"
 
 PhraseMatcher*
-PhraseMatcher_new(Similarity *sim, VArray *plists, Compiler *compiler) {
+PhraseMatcher_new(Similarity *sim, Vector *plists, Compiler *compiler) {
     PhraseMatcher *self = (PhraseMatcher*)Class_Make_Obj(PHRASEMATCHER);
     return PhraseMatcher_init(self, sim, plists, compiler);
 
 }
 
 PhraseMatcher*
-PhraseMatcher_init(PhraseMatcher *self, Similarity *similarity, VArray *plists,
+PhraseMatcher_init(PhraseMatcher *self, Similarity *similarity, Vector *plists,
                    Compiler *compiler) {
     Matcher_init((Matcher*)self);
     PhraseMatcherIVARS *const ivars = PhraseMatcher_IVARS(self);
@@ -45,13 +45,13 @@ PhraseMatcher_init(PhraseMatcher *self, Similarity *similarity, VArray *plists,
     ivars->first_time       = true;
     ivars->more             = true;
 
-    // Extract PostingLists out of VArray into local C array for quick access.
-    ivars->num_elements = VA_Get_Size(plists);
+    // Extract PostingLists out of Vector into local C array for quick access.
+    ivars->num_elements = Vec_Get_Size(plists);
     ivars->plists = (PostingList**)MALLOCATE(
                        ivars->num_elements * sizeof(PostingList*));
     for (size_t i = 0; i < ivars->num_elements; i++) {
         PostingList *const plist
-            = (PostingList*)CERTIFY(VA_Fetch(plists, i), POSTINGLIST);
+            = (PostingList*)CERTIFY(Vec_Fetch(plists, i), POSTINGLIST);
         if (plist == NULL) {
             THROW(ERR, "Missing element %u32", i);
         }

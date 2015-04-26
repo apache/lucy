@@ -31,7 +31,7 @@ class Lucy::Search::QueryParser::QueryLexer inherits Clownfish::Obj {
      * @param query_string The string to be parsed.  May be NULL.
      * @return an array of ParserElems.
      */
-    incremented VArray*
+    incremented Vector*
     Tokenize(QueryLexer *self, String *query_string = NULL);
 
     bool

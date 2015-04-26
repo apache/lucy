@@ -28,7 +28,7 @@ public class Lucy::Index::DataReader inherits Clownfish::Obj {
     Schema      *schema;
     Folder      *folder;
     Snapshot    *snapshot;
-    VArray      *segments;
+    Vector      *segments;
     Segment     *segment;
     int32_t      seg_tick;
 
@@ -44,7 +44,7 @@ public class Lucy::Index::DataReader inherits Clownfish::Obj {
      */
     public inert DataReader*
     init(DataReader *self, Schema *schema = NULL, Folder *folder = NULL,
-         Snapshot *snapshot = NULL, VArray *segments = NULL,
+         Snapshot *snapshot = NULL, Vector *segments = NULL,
          int32_t seg_tick = -1);
 
     /** Create a reader which aggregates the output of several lower level
@@ -54,7 +54,7 @@ public class Lucy::Index::DataReader inherits Clownfish::Obj {
      * @param offsets Doc id start offsets for each reader.
      */
     public abstract incremented nullable DataReader*
-    Aggregator(DataReader *self, VArray *readers, I32Array *offsets);
+    Aggregator(DataReader *self, Vector *readers, I32Array *offsets);
 
     /** Accessor for "schema" member var.
      */
@@ -73,7 +73,7 @@ public class Lucy::Index::DataReader inherits Clownfish::Obj {
 
     /** Accessor for "segments" member var.
      */
-    public nullable VArray*
+    public nullable Vector*
     Get_Segments(DataReader *self);
 
     /** Accessor for "segment" member var.

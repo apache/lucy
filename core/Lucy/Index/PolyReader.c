@@ -48,7 +48,7 @@ S_release_deletion_lock(PolyReader *self);
 // Try to open all SegReaders.
 struct try_open_elements_context {
     PolyReader *self;
-    VArray     *seg_readers;
+    Vector     *seg_readers;
 };
 void
 S_try_open_elements(void *context);
@@ -67,7 +67,7 @@ struct try_open_segreader_context {
     Schema    *schema;
     Folder    *folder;
     Snapshot  *snapshot;
-    VArray    *segments;
+    Vector    *segments;
     int32_t    seg_tick;
     SegReader *result;
 };
@@ -79,7 +79,7 @@ S_derive_folder(Obj *index);
 
 PolyReader*
 PolyReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
-               IndexManager *manager, VArray *sub_readers) {
+               IndexManager *manager, Vector *sub_readers) {
     PolyReader *self = (PolyReader*)Class_Make_Obj(POLYREADER);
     return PolyReader_init(self, schema, folder, snapshot, manager,
                            sub_readers);
@@ -92,29 +92,29 @@ PolyReader_open(Obj *index, Snapshot *snapshot, IndexManager *manager) {
 }
 
 static Obj*
-S_first_non_null(VArray *array) {
-    for (uint32_t i = 0, max = VA_Get_Size(array); i < max; i++) {
-        Obj *thing = VA_Fetch(array, i);
+S_first_non_null(Vector *array) {
+    for (uint32_t i = 0, max = Vec_Get_Size(array); i < max; i++) {
+        Obj *thing = Vec_Fetch(array, i);
         if (thing) { return thing; }
     }
     return NULL;
 }
 
 static void
-S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
+S_init_sub_readers(PolyReader *self, Vector *sub_readers) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
-    uint32_t  num_sub_readers = VA_Get_Size(sub_readers);
+    uint32_t  num_sub_readers = Vec_Get_Size(sub_readers);
     int32_t *starts = (int32_t*)MALLOCATE(num_sub_readers * sizeof(int32_t));
     Hash  *data_readers = Hash_new(0);
 
     DECREF(ivars->sub_readers);
     DECREF(ivars->offsets);
-    ivars->sub_readers       = (VArray*)INCREF(sub_readers);
+    ivars->sub_readers       = (Vector*)INCREF(sub_readers);
 
     // Accumulate doc_max, subreader start offsets, and DataReaders.
     ivars->doc_max = 0;
     for (uint32_t i = 0; i < num_sub_readers; i++) {
-        SegReader *seg_reader = (SegReader*)VA_Fetch(sub_readers, i);
+        SegReader *seg_reader = (SegReader*)Vec_Fetch(sub_readers, i);
         Hash *components = SegReader_Get_Components(seg_reader);
         starts[i] = ivars->doc_max;
         ivars->doc_max += SegReader_Doc_Max(seg_reader);
@@ -122,12 +122,12 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
         while (HashIter_Next(iter)) {
             String     *api       = HashIter_Get_Key(iter);
             DataReader *component = (DataReader*)HashIter_Get_Value(iter);
-            VArray *readers = (VArray*)Hash_Fetch(data_readers, api);
+            Vector *readers = (Vector*)Hash_Fetch(data_readers, api);
             if (!readers) {
-                readers = VA_new(num_sub_readers);
+                readers = Vec_new(num_sub_readers);
                 Hash_Store(data_readers, api, (Obj*)readers);
             }
-            VA_Store(readers, i, INCREF(component));
+            Vec_Store(readers, i, INCREF(component));
         }
         DECREF(iter);
     }
@@ -136,7 +136,7 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
     HashIterator *iter = HashIter_new(data_readers);
     while (HashIter_Next(iter)) {
         String *api     = HashIter_Get_Key(iter);
-        VArray *readers = (VArray*)HashIter_Get_Value(iter);
+        Vector *readers = (Vector*)HashIter_Get_Value(iter);
         DataReader *datareader
             = (DataReader*)CERTIFY(S_first_non_null(readers), DATAREADER);
         DataReader *aggregator
@@ -158,18 +158,18 @@ S_init_sub_readers(PolyReader *self, VArray *sub_readers) {
 PolyReader*
 PolyReader_init(PolyReader *self, Schema *schema, Folder *folder,
                 Snapshot *snapshot, IndexManager *manager,
-                VArray *sub_readers) {
+                Vector *sub_readers) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
     ivars->doc_max    = 0;
     ivars->del_count  = 0;
 
     if (sub_readers) {
-        uint32_t num_segs = VA_Get_Size(sub_readers);
-        VArray *segments = VA_new(num_segs);
+        uint32_t num_segs = Vec_Get_Size(sub_readers);
+        Vector *segments = Vec_new(num_segs);
         for (uint32_t i = 0; i < num_segs; i++) {
             SegReader *seg_reader
-                = (SegReader*)CERTIFY(VA_Fetch(sub_readers, i), SEGREADER);
-            VA_Push(segments, INCREF(SegReader_Get_Segment(seg_reader)));
+                = (SegReader*)CERTIFY(Vec_Fetch(sub_readers, i), SEGREADER);
+            Vec_Push(segments, INCREF(SegReader_Get_Segment(seg_reader)));
         }
         IxReader_init((IndexReader*)self, schema, folder, snapshot,
                       segments, -1, manager);
@@ -179,7 +179,7 @@ PolyReader_init(PolyReader *self, Schema *schema, Folder *folder,
     else {
         IxReader_init((IndexReader*)self, schema, folder, snapshot,
                       NULL, -1, manager);
-        ivars->sub_readers = VA_new(0);
+        ivars->sub_readers = Vec_new(0);
         ivars->offsets = I32Arr_new_steal(NULL, 0);
     }
 
@@ -191,8 +191,8 @@ PolyReader_Close_IMP(PolyReader *self) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
     PolyReader_Close_t super_close
         = SUPER_METHOD_PTR(POLYREADER, LUCY_PolyReader_Close);
-    for (uint32_t i = 0, max = VA_Get_Size(ivars->sub_readers); i < max; i++) {
-        SegReader *seg_reader = (SegReader*)VA_Fetch(ivars->sub_readers, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(ivars->sub_readers); i < max; i++) {
+        SegReader *seg_reader = (SegReader*)Vec_Fetch(ivars->sub_readers, i);
         SegReader_Close(seg_reader);
     }
     super_close(self);
@@ -227,15 +227,15 @@ S_try_open_elements(void *context) {
         = (struct try_open_elements_context*)context;
     PolyReader *self              = args->self;
     PolyReaderIVARS *const ivars  = PolyReader_IVARS(self);
-    VArray     *files             = Snapshot_List(ivars->snapshot);
+    Vector     *files             = Snapshot_List(ivars->snapshot);
     Folder     *folder            = PolyReader_Get_Folder(self);
     uint32_t    num_segs          = 0;
     uint64_t    latest_schema_gen = 0;
     String     *schema_file       = NULL;
 
     // Find schema file, count segments.
-    for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
-        String *entry = (String*)VA_Fetch(files, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
+        String *entry = (String*)Vec_Fetch(files, i);
 
         if (Seg_valid_seg_name(entry)) {
             num_segs++;
@@ -271,9 +271,9 @@ S_try_open_elements(void *context) {
         }
     }
 
-    VArray *segments = VA_new(num_segs);
-    for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
-        String *entry = (String*)VA_Fetch(files, i);
+    Vector *segments = Vec_new(num_segs);
+    for (uint32_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
+        String *entry = (String*)Vec_Fetch(files, i);
 
         // Create a Segment for each segmeta.
         if (Seg_valid_seg_name(entry)) {
@@ -284,7 +284,7 @@ S_try_open_elements(void *context) {
             // deleted and a new snapshot file has been written so we need to
             // retry).
             if (Seg_Read_File(segment, folder)) {
-                VA_Push(segments, (Obj*)segment);
+                Vec_Push(segments, (Obj*)segment);
             }
             else {
                 String *mess = MAKE_MESS("Failed to read %o", entry);
@@ -297,7 +297,7 @@ S_try_open_elements(void *context) {
     }
 
     // Sort the segments by age.
-    VA_Sort(segments);
+    Vec_Sort(segments);
 
     // Open individual SegReaders.
     struct try_open_segreader_context seg_context;
@@ -306,7 +306,7 @@ S_try_open_elements(void *context) {
     seg_context.snapshot = PolyReader_Get_Snapshot(self);
     seg_context.segments = segments;
     seg_context.result   = NULL;
-    args->seg_readers = VA_new(num_segs);
+    args->seg_readers = Vec_new(num_segs);
     Err *error = NULL;
     for (uint32_t seg_tick = 0; seg_tick < num_segs; seg_tick++) {
         seg_context.seg_tick = seg_tick;
@@ -314,7 +314,7 @@ S_try_open_elements(void *context) {
         if (error) {
             break;
         }
-        VA_Push(args->seg_readers, (Obj*)seg_context.result);
+        Vec_Push(args->seg_readers, (Obj*)seg_context.result);
         seg_context.result = NULL;
     }
 
@@ -440,7 +440,7 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
             }
         }
         else { // Succeeded.
-            S_init_sub_readers(self, (VArray*)context.seg_readers);
+            S_init_sub_readers(self, (Vector*)context.seg_readers);
             DECREF(context.seg_readers);
             DECREF(target_snap_file);
             break;
@@ -537,13 +537,13 @@ PolyReader_Offsets_IMP(PolyReader *self) {
     return (I32Array*)INCREF(ivars->offsets);
 }
 
-VArray*
+Vector*
 PolyReader_Seg_Readers_IMP(PolyReader *self) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
-    return (VArray*)VA_Clone(ivars->sub_readers);
+    return (Vector*)Vec_Clone(ivars->sub_readers);
 }
 
-VArray*
+Vector*
 PolyReader_Get_Seg_Readers_IMP(PolyReader *self) {
     return PolyReader_IVARS(self)->sub_readers;
 }

@@ -67,7 +67,7 @@ class Lucy::Util::PriorityQueue nickname PriQ
 
     /** Empty out the PriorityQueue into a sorted array.
      */
-    incremented VArray*
+    incremented Vector*
     Pop_All(PriorityQueue *self);
 
     /** Return the least item in the queue, but don't remove it.

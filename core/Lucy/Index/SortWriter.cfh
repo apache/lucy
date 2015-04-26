@@ -28,7 +28,7 @@ parcel Lucy;
 
 class Lucy::Index::SortWriter inherits Lucy::Index::DataWriter {
 
-    VArray     *field_writers;
+    Vector     *field_writers;
     Hash       *counts;
     Hash       *null_ords;
     Hash       *ord_widths;

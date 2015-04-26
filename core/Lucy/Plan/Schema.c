@@ -36,7 +36,7 @@
 // Scan the array to see if an object testing as Equal is present.  If not,
 // push the elem onto the end of the array.
 static void
-S_add_unique(VArray *array, Obj *elem);
+S_add_unique(Vector *array, Obj *elem);
 
 static void
 S_add_text_field(Schema *self, String *field, FieldType *type);
@@ -60,8 +60,8 @@ Schema_init(Schema *self) {
     ivars->analyzers      = Hash_new(0);
     ivars->types          = Hash_new(0);
     ivars->sims           = Hash_new(0);
-    ivars->uniq_analyzers = VA_new(2);
-    VA_Resize(ivars->uniq_analyzers, 1);
+    ivars->uniq_analyzers = Vec_new(2);
+    Vec_Resize(ivars->uniq_analyzers, 1);
 
     // Assign.
     ivars->arch = Schema_Architecture(self);
@@ -83,17 +83,17 @@ Schema_Destroy_IMP(Schema *self) {
 }
 
 static void
-S_add_unique(VArray *array, Obj *elem) {
+S_add_unique(Vector *array, Obj *elem) {
     if (!elem) { return; }
-    for (uint32_t i = 0, max = VA_Get_Size(array); i < max; i++) {
-        Obj *candidate = VA_Fetch(array, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(array); i < max; i++) {
+        Obj *candidate = Vec_Fetch(array, i);
         if (!candidate) { continue; }
         if (elem == candidate) { return; }
         if (Obj_Get_Class(elem) == Obj_Get_Class(candidate)) {
             if (Obj_Equals(elem, candidate)) { return; }
         }
     }
-    VA_Push(array, INCREF(elem));
+    Vec_Push(array, INCREF(elem));
 }
 
 bool
@@ -224,15 +224,15 @@ Schema_Get_Similarity_IMP(Schema *self) {
     return Schema_IVARS(self)->sim;
 }
 
-VArray*
+Vector*
 Schema_All_Fields_IMP(Schema *self) {
     return Hash_Keys(Schema_IVARS(self)->types);
 }
 
 uint32_t
-S_find_in_array(VArray *array, Obj *obj) {
-    for (uint32_t i = 0, max = VA_Get_Size(array); i < max; i++) {
-        Obj *candidate = VA_Fetch(array, i);
+S_find_in_array(Vector *array, Obj *obj) {
+    for (uint32_t i = 0, max = Vec_Get_Size(array); i < max; i++) {
+        Obj *candidate = Vec_Fetch(array, i);
         if (obj == NULL && candidate == NULL) {
             return i;
         }
@@ -313,16 +313,16 @@ Schema_Load_IMP(Schema *self, Obj *dump) {
     Schema *loaded = (Schema*)Class_Make_Obj(klass);
     Hash *type_dumps
         = (Hash*)CERTIFY(Hash_Fetch_Utf8(source, "fields", 6), HASH);
-    VArray *analyzer_dumps
-        = (VArray*)CERTIFY(Hash_Fetch_Utf8(source, "analyzers", 9), VARRAY);
-    VArray *analyzers
-        = (VArray*)Freezer_load((Obj*)analyzer_dumps);
+    Vector *analyzer_dumps
+        = (Vector*)CERTIFY(Hash_Fetch_Utf8(source, "analyzers", 9), VECTOR);
+    Vector *analyzers
+        = (Vector*)Freezer_load((Obj*)analyzer_dumps);
     UNUSED_VAR(self);
 
     // Start with a blank Schema.
     Schema_init(loaded);
     SchemaIVARS *const loaded_ivars = Schema_IVARS(loaded);
-    VA_Grow(loaded_ivars->uniq_analyzers, VA_Get_Size(analyzers));
+    Vec_Grow(loaded_ivars->uniq_analyzers, Vec_Get_Size(analyzers));
 
     HashIterator *iter = HashIter_new(type_dumps);
     while (HashIter_Next(iter)) {
@@ -335,7 +335,7 @@ Schema_Load_IMP(Schema *self, Obj *dump) {
                 Obj *tick
                     = CERTIFY(Hash_Fetch_Utf8(type_dump, "analyzer", 8), OBJ);
                 Analyzer *analyzer
-                    = (Analyzer*)VA_Fetch(analyzers,
+                    = (Analyzer*)Vec_Fetch(analyzers,
                                           (uint32_t)Obj_To_I64(tick));
                 if (!analyzer) {
                     THROW(ERR, "Can't find analyzer for '%o'", field);

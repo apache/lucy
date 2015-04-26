@@ -23,7 +23,7 @@ package lucy
 #include "Lucy/Plan/Schema.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/String.h"
-#include "Clownfish/VArray.h"
+#include "Clownfish/Vector.h"
 #include "Clownfish/Err.h"
 */
 import "C"
@@ -163,8 +163,8 @@ func (obj *implIndexer) findFieldC(name string) *C.cfish_String {
 		schema := C.LUCY_Indexer_Get_Schema(obj.ref)
 		fieldList := C.LUCY_Schema_All_Fields(schema)
 		defer C.cfish_dec_refcount(unsafe.Pointer(fieldList))
-		for i := 0; i < int(C.CFISH_VA_Get_Size(fieldList)); i++ {
-			cfString := unsafe.Pointer(C.CFISH_VA_Fetch(fieldList, C.uint32_t(i)))
+		for i := 0; i < int(C.CFISH_Vec_Get_Size(fieldList)); i++ {
+			cfString := unsafe.Pointer(C.CFISH_Vec_Fetch(fieldList, C.uint32_t(i)))
 			field := clownfish.CFStringToGo(cfString)
 			if strings.EqualFold(name, field) {
 				C.cfish_inc_refcount(cfString)

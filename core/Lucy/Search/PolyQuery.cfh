@@ -28,13 +28,13 @@ parcel Lucy;
  */
 public abstract class Lucy::Search::PolyQuery inherits Lucy::Search::Query {
 
-    VArray    *children;
+    Vector    *children;
 
     /**
      * @param children An array of child Queries.
      */
     public inert PolyQuery*
-    init(PolyQuery *self, VArray *children = NULL);
+    init(PolyQuery *self, Vector *children = NULL);
 
     /** Add a child Query node.
      */
@@ -42,9 +42,9 @@ public abstract class Lucy::Search::PolyQuery inherits Lucy::Search::Query {
     Add_Child(PolyQuery *self, Query *query);
 
     void
-    Set_Children(PolyQuery *self, VArray *children);
+    Set_Children(PolyQuery *self, Vector *children);
 
-    VArray*
+    Vector*
     Get_Children(PolyQuery *self);
 
     public void
@@ -68,7 +68,7 @@ public abstract class Lucy::Search::PolyQuery inherits Lucy::Search::Query {
 
 class Lucy::Search::PolyCompiler inherits Lucy::Search::Compiler {
 
-    VArray *children;
+    Vector *children;
 
     inert incremented PolyCompiler*
     new(PolyQuery *parent, Searcher *searcher, float boost);
@@ -86,7 +86,7 @@ class Lucy::Search::PolyCompiler inherits Lucy::Search::Compiler {
     public void
     Apply_Norm_Factor(PolyCompiler *self, float factor);
 
-    public incremented VArray*
+    public incremented Vector*
     Highlight_Spans(PolyCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, String *field);
 

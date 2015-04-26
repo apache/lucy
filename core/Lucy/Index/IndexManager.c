@@ -68,11 +68,11 @@ IxManager_Destroy_IMP(IndexManager *self) {
 
 int64_t
 IxManager_Highest_Seg_Num_IMP(IndexManager *self, Snapshot *snapshot) {
-    VArray *files = Snapshot_List(snapshot);
+    Vector *files = Snapshot_List(snapshot);
     uint64_t highest_seg_num = 0;
     UNUSED_VAR(self);
-    for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
-        String *file = (String*)VA_Fetch(files, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
+        String *file = (String*)Vec_Fetch(files, i);
         if (Seg_valid_seg_name(file)) {
             uint64_t seg_num = IxFileNames_extract_gen(file);
             if (seg_num > highest_seg_num) { highest_seg_num = seg_num; }
@@ -131,27 +131,27 @@ S_fibonacci(uint32_t n) {
     return result;
 }
 
-VArray*
+Vector*
 IxManager_Recycle_IMP(IndexManager *self, PolyReader *reader,
                       DeletionsWriter *del_writer, int64_t cutoff,
                       bool optimize) {
-    VArray *seg_readers = PolyReader_Get_Seg_Readers(reader);
-    size_t num_seg_readers = VA_Get_Size(seg_readers);
+    Vector *seg_readers = PolyReader_Get_Seg_Readers(reader);
+    size_t num_seg_readers = Vec_Get_Size(seg_readers);
     SegReader **candidates
         = (SegReader**)MALLOCATE(num_seg_readers * sizeof(SegReader*));
     size_t num_candidates = 0;
     for (size_t i = 0; i < num_seg_readers; i++) {
-        SegReader *seg_reader = (SegReader*)VA_Fetch(seg_readers, i);
+        SegReader *seg_reader = (SegReader*)Vec_Fetch(seg_readers, i);
         if (SegReader_Get_Seg_Num(seg_reader) > cutoff) {
             candidates[num_candidates++] = seg_reader;
         }
     }
 
-    VArray *recyclables = VA_new(num_candidates);
+    Vector *recyclables = Vec_new(num_candidates);
 
     if (optimize) {
         for (size_t i = 0; i < num_candidates; i++) {
-            VA_Push(recyclables, INCREF(candidates[i]));
+            Vec_Push(recyclables, INCREF(candidates[i]));
         }
         FREEMEM(candidates);
         return recyclables;
@@ -170,7 +170,7 @@ IxManager_Recycle_IMP(IndexManager *self, PolyReader *reader,
 
     // Move SegReaders to be recycled.
     for (uint32_t i = 0; i < threshold; i++) {
-        VA_Store(recyclables, i, INCREF(candidates[i]));
+        Vec_Store(recyclables, i, INCREF(candidates[i]));
     }
 
     // Find segments where at least 10% of all docs have been deleted.
@@ -181,7 +181,7 @@ IxManager_Recycle_IMP(IndexManager *self, PolyReader *reader,
         double num_deletions = DelWriter_Seg_Del_Count(del_writer, seg_name);
         double del_proportion = num_deletions / doc_max;
         if (del_proportion >= 0.1) {
-            VA_Push(recyclables, INCREF(seg_reader));
+            Vec_Push(recyclables, INCREF(seg_reader));
         }
     }
 

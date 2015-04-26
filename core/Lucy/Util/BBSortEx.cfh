@@ -22,16 +22,16 @@ parcel Lucy;
 class Lucy::Util::BBSortEx
     inherits Lucy::Util::SortExternal {
 
-    VArray   *external;
+    Vector   *external;
     uint32_t  external_tick;
     uint32_t  mem_consumed;
 
     inert BBSortEx*
-    new(uint32_t mem_thresh = 0x1000000, VArray *external = NULL);
+    new(uint32_t mem_thresh = 0x1000000, Vector *external = NULL);
 
     inert BBSortEx*
     init(BBSortEx *self, uint32_t mem_thresh = 0x1000000,
-        VArray *external = NULL);
+        Vector *external = NULL);
 
     void
     Feed(BBSortEx *self, decremented Obj *item);
@@ -51,7 +51,7 @@ class Lucy::Util::BBSortEx
     int
     Compare(BBSortEx *self, void *va, void *vb);
 
-    incremented VArray*
+    incremented Vector*
     Peek_Cache(BBSortEx *self);
 
     incremented nullable Obj*

@@ -25,7 +25,7 @@
 #include <string.h>
 #include <assert.h>
 #include "Clownfish/Hash.h"
-#include "Clownfish/VArray.h"
+#include "Clownfish/Vector.h"
 #include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Lucy/Util/Json.h"
@@ -111,11 +111,11 @@ key_value_pair_list(A) ::= STRING(B) COLON value(C) COMMA.
 }
 
 /* Arrays. */
-%type array                     { cfish_VArray* }
-%type empty_array               { cfish_VArray* }
-%type single_elem_array         { cfish_VArray* }
-%type multi_elem_array          { cfish_VArray* }
-%type array_elem_list           { cfish_VArray* }
+%type array                     { cfish_Vector* }
+%type empty_array               { cfish_Vector* }
+%type single_elem_array         { cfish_Vector* }
+%type multi_elem_array          { cfish_Vector* }
+%type array_elem_list           { cfish_Vector* }
 %destructor array               { CFISH_DECREF($$); }
 %destructor single_elem_array   { CFISH_DECREF($$); }
 %destructor multi_elem_array    { CFISH_DECREF($$); }
@@ -127,30 +127,30 @@ array(A) ::= multi_elem_array(B).  { A = B; }
 
 empty_array(A) ::= LEFT_SQUARE_BRACKET RIGHT_SQUARE_BRACKET.
 {
-    A = cfish_VA_new(0);
+    A = cfish_Vec_new(0);
 }
 
 single_elem_array(A) ::= LEFT_SQUARE_BRACKET value(B) RIGHT_SQUARE_BRACKET.
 {
-    A = cfish_VA_new(1);
-    CFISH_VA_Push(A, B);
+    A = cfish_Vec_new(1);
+    CFISH_Vec_Push(A, B);
 }
 
 multi_elem_array(A) ::= LEFT_SQUARE_BRACKET array_elem_list(B) value(C) RIGHT_SQUARE_BRACKET.
 {
     A = B;
-    CFISH_VA_Push(A, C);
+    CFISH_Vec_Push(A, C);
 }
 
 array_elem_list(A) ::= array_elem_list(B) value(C) COMMA. 
 { 
     A = B; 
-    CFISH_VA_Push(A, C);
+    CFISH_Vec_Push(A, C);
 }
 
 array_elem_list(A) ::= value(B) COMMA.
 {
-    A = cfish_VA_new(1);
-    CFISH_VA_Push(A, B);
+    A = cfish_Vec_new(1);
+    CFISH_Vec_Push(A, B);
 }
 

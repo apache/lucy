@@ -46,13 +46,13 @@ class Lucy::Search::ORMatcher inherits Lucy::Search::PolyMatcher {
     uint32_t                max_size;
 
     inert incremented ORMatcher*
-    new(VArray *children);
+    new(Vector *children);
 
     /**
      * @param children An array of Matchers.
      */
     inert incremented ORMatcher*
-    init(ORMatcher *self, VArray *children);
+    init(ORMatcher *self, Vector *children);
 
     public void
     Destroy(ORMatcher *self);
@@ -79,10 +79,10 @@ class Lucy::Search::ORScorer inherits Lucy::Search::ORMatcher {
     int32_t           doc_id;
 
     inert incremented ORScorer*
-    new(VArray *children, Similarity *similarity);
+    new(Vector *children, Similarity *similarity);
 
     inert ORScorer*
-    init(ORScorer *self, VArray *children, Similarity *similarity);
+    init(ORScorer *self, Vector *children, Similarity *similarity);
 
     public void
     Destroy(ORScorer *self);

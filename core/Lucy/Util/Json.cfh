@@ -29,7 +29,7 @@ class Lucy::Util::Json inherits Clownfish::Obj {
     to_json(Obj *dump);
 
     /** Decode the supplied JSON and return a data structure made
-     * of Hashes, VArrays, and Strings.  Returns NULL and sets the global
+     * of Hashes, Vectors, and Strings.  Returns NULL and sets the global
      * error object returned by [](cfish:cfish.Err.get_error) on failure.
      */
     inert incremented nullable Obj*
@@ -44,7 +44,7 @@ class Lucy::Util::Json inherits Clownfish::Obj {
     spew_json(Obj *dump, Folder *folder, String *path);
 
     /** Decode the JSON in the file at `path` and return a data
-     * structure made of Hashes, VArrays, and Strings.  Returns NULL and sets
+     * structure made of Hashes, Vectors, and Strings.  Returns NULL and sets
      * the global error object returned by [](cfish:cfish.Err.get_error) if
      * the file can't be can't be opened or if the file doesn't contain valid
      * JSON.

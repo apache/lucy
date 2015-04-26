@@ -85,7 +85,7 @@ DocVec_Field_Buf_IMP(DocVector *self, String *field) {
     return (ByteBuf*)Hash_Fetch(ivars->field_bufs, field);
 }
 
-VArray*
+Vector*
 DocVec_Field_Names_IMP(DocVector *self) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
     return Hash_Keys(ivars->field_bufs);

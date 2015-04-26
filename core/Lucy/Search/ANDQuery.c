@@ -33,25 +33,25 @@
 #include "Lucy/Util/Freezer.h"
 
 ANDQuery*
-ANDQuery_new(VArray *children) {
+ANDQuery_new(Vector *children) {
     ANDQuery *self = (ANDQuery*)Class_Make_Obj(ANDQUERY);
     return ANDQuery_init(self, children);
 }
 
 ANDQuery*
-ANDQuery_init(ANDQuery *self, VArray *children) {
+ANDQuery_init(ANDQuery *self, Vector *children) {
     return (ANDQuery*)PolyQuery_init((PolyQuery*)self, children);
 }
 
 String*
 ANDQuery_To_String_IMP(ANDQuery *self) {
     ANDQueryIVARS *const ivars = ANDQuery_IVARS(self);
-    uint32_t num_kids = VA_Get_Size(ivars->children);
+    uint32_t num_kids = Vec_Get_Size(ivars->children);
     if (!num_kids) { return Str_new_from_trusted_utf8("()", 2); }
     else {
         CharBuf *buf = CB_new_from_trusted_utf8("(", 1);
         for (uint32_t i = 0; i < num_kids; i++) {
-            String *kid_string = Obj_To_String(VA_Fetch(ivars->children, i));
+            String *kid_string = Obj_To_String(Vec_Fetch(ivars->children, i));
             CB_Cat(buf, kid_string);
             DECREF(kid_string);
             if (i == num_kids - 1) {
@@ -107,18 +107,18 @@ Matcher*
 ANDCompiler_Make_Matcher_IMP(ANDCompiler *self, SegReader *reader,
                              bool need_score) {
     ANDCompilerIVARS *const ivars = ANDCompiler_IVARS(self);
-    uint32_t num_kids = VA_Get_Size(ivars->children);
+    uint32_t num_kids = Vec_Get_Size(ivars->children);
 
     if (num_kids == 1) {
-        Compiler *only_child = (Compiler*)VA_Fetch(ivars->children, 0);
+        Compiler *only_child = (Compiler*)Vec_Fetch(ivars->children, 0);
         return Compiler_Make_Matcher(only_child, reader, need_score);
     }
     else {
-        VArray *child_matchers = VA_new(num_kids);
+        Vector *child_matchers = Vec_new(num_kids);
 
         // Add child matchers one by one.
         for (uint32_t i = 0; i < num_kids; i++) {
-            Compiler *child = (Compiler*)VA_Fetch(ivars->children, i);
+            Compiler *child = (Compiler*)Vec_Fetch(ivars->children, i);
             Matcher *child_matcher
                 = Compiler_Make_Matcher(child, reader, need_score);
 
@@ -128,7 +128,7 @@ ANDCompiler_Make_Matcher_IMP(ANDCompiler *self, SegReader *reader,
                 return NULL;
             }
             else {
-                VA_Push(child_matchers, (Obj*)child_matcher);
+                Vec_Push(child_matchers, (Obj*)child_matcher);
             }
         }
 

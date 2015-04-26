@@ -74,11 +74,11 @@ static void
 test_normalization(TestBatchRunner *runner) {
     FSFolder *modules_folder = TestUtils_modules_folder();
     String *path = Str_newf("unicode/utf8proc/tests.json");
-    VArray *tests = (VArray*)Json_slurp_json((Folder*)modules_folder, path);
+    Vector *tests = (Vector*)Json_slurp_json((Folder*)modules_folder, path);
     if (!tests) { RETHROW(Err_get_error()); }
 
-    for (uint32_t i = 0, max = VA_Get_Size(tests); i < max; i++) {
-        Hash *test = (Hash*)VA_Fetch(tests, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(tests); i < max; i++) {
+        Hash *test = (Hash*)Vec_Fetch(tests, i);
         String *form = (String*)Hash_Fetch_Utf8(
                             test, "normalization_form", 18);
         bool case_fold = Bool_Get_Value((BoolNum*)Hash_Fetch_Utf8(
@@ -86,16 +86,16 @@ test_normalization(TestBatchRunner *runner) {
         bool strip_accents = Bool_Get_Value((BoolNum*)Hash_Fetch_Utf8(
                                                   test, "strip_accents", 13));
         Normalizer *normalizer = Normalizer_new(form, case_fold, strip_accents);
-        VArray *words = (VArray*)Hash_Fetch_Utf8(test, "words", 5);
-        VArray *norms = (VArray*)Hash_Fetch_Utf8(test, "norms", 5);
-        for (uint32_t j = 0, max = VA_Get_Size(words); j < max; j++) {
-            String *word = (String*)VA_Fetch(words, j);
-            VArray *got  = Normalizer_Split(normalizer, word);
-            String *norm = (String*)VA_Fetch(got, 0);
+        Vector *words = (Vector*)Hash_Fetch_Utf8(test, "words", 5);
+        Vector *norms = (Vector*)Hash_Fetch_Utf8(test, "norms", 5);
+        for (uint32_t j = 0, max = Vec_Get_Size(words); j < max; j++) {
+            String *word = (String*)Vec_Fetch(words, j);
+            Vector *got  = Normalizer_Split(normalizer, word);
+            String *norm = (String*)Vec_Fetch(got, 0);
             TEST_TRUE(runner,
                       norm
                       && Str_Is_A(norm, STRING)
-                      && Str_Equals(norm, VA_Fetch(norms, j)),
+                      && Str_Equals(norm, Vec_Fetch(norms, j)),
                       "Normalize %s %d %d: %s", Str_Get_Ptr8(form),
                       case_fold, strip_accents, Str_Get_Ptr8(word)
                      );

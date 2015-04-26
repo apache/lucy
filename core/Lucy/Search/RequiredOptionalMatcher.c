@@ -32,9 +32,9 @@ ReqOptMatcher_new(Similarity *similarity, Matcher *required_matcher,
 RequiredOptionalMatcher*
 ReqOptMatcher_init(RequiredOptionalMatcher *self, Similarity *similarity,
                    Matcher *required_matcher, Matcher *optional_matcher) {
-    VArray *children = VA_new(2);
-    VA_Push(children, INCREF(required_matcher));
-    VA_Push(children, INCREF(optional_matcher));
+    Vector *children = Vec_new(2);
+    Vec_Push(children, INCREF(required_matcher));
+    Vec_Push(children, INCREF(optional_matcher));
     PolyMatcher_init((PolyMatcher*)self, children, similarity);
     RequiredOptionalMatcherIVARS *const ivars = ReqOptMatcher_IVARS(self);
 

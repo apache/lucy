@@ -32,7 +32,7 @@
 
 PostingListReader*
 PListReader_init(PostingListReader *self, Schema *schema, Folder *folder,
-                 Snapshot *snapshot, VArray *segments, int32_t seg_tick) {
+                 Snapshot *snapshot, Vector *segments, int32_t seg_tick) {
     DataReader_init((DataReader*)self, schema, folder, snapshot, segments,
                     seg_tick);
     ABSTRACT_CLASS_CHECK(self, POSTINGLISTREADER);
@@ -40,7 +40,7 @@ PListReader_init(PostingListReader *self, Schema *schema, Folder *folder,
 }
 
 PostingListReader*
-PListReader_Aggregator_IMP(PostingListReader *self, VArray *readers,
+PListReader_Aggregator_IMP(PostingListReader *self, Vector *readers,
                            I32Array *offsets) {
     UNUSED_VAR(self);
     UNUSED_VAR(readers);
@@ -50,7 +50,7 @@ PListReader_Aggregator_IMP(PostingListReader *self, VArray *readers,
 
 DefaultPostingListReader*
 DefPListReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
-                   VArray *segments, int32_t seg_tick,
+                   Vector *segments, int32_t seg_tick,
                    LexiconReader *lex_reader) {
     DefaultPostingListReader *self
         = (DefaultPostingListReader*)Class_Make_Obj(DEFAULTPOSTINGLISTREADER);
@@ -60,7 +60,7 @@ DefPListReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
 
 DefaultPostingListReader*
 DefPListReader_init(DefaultPostingListReader *self, Schema *schema,
-                    Folder *folder, Snapshot *snapshot, VArray *segments,
+                    Folder *folder, Snapshot *snapshot, Vector *segments,
                     int32_t seg_tick, LexiconReader *lex_reader) {
     PListReader_init((PostingListReader*)self, schema, folder, snapshot,
                      segments, seg_tick);

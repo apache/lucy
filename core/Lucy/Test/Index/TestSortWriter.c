@@ -201,8 +201,8 @@ test_sort_writer(TestBatchRunner *runner) {
 
     {
         PolyReader *poly_reader = PolyReader_open((Obj*)folder, NULL, NULL);
-        VArray     *seg_readers = PolyReader_Get_Seg_Readers(poly_reader);
-        SegReader  *seg_reader  = (SegReader*)VA_Fetch(seg_readers, 0);
+        Vector     *seg_readers = PolyReader_Get_Seg_Readers(poly_reader);
+        SegReader  *seg_reader  = (SegReader*)Vec_Fetch(seg_readers, 0);
 
         S_test_sort_cache(runner, folder, seg_reader, "1", true,  name_str);
         S_test_sort_cache(runner, folder, seg_reader, "1", true,  speed_str);
@@ -241,10 +241,10 @@ test_sort_writer(TestBatchRunner *runner) {
     }
 
     {
-        VArray *filenames = RAMFolder_List_R(folder, NULL);
+        Vector *filenames = RAMFolder_List_R(folder, NULL);
         int num_old_seg_files = 0;
-        for (uint32_t i = 0, size = VA_Get_Size(filenames); i < size; ++i) {
-            String *filename = (String*)VA_Fetch(filenames, i);
+        for (uint32_t i = 0, size = Vec_Get_Size(filenames); i < size; ++i) {
+            String *filename = (String*)Vec_Fetch(filenames, i);
             if (Str_Find_Utf8(filename, "seg_1", 5) >= 0
                 || Str_Find_Utf8(filename, "seg_2", 5) >= 0
                ) {
@@ -258,8 +258,8 @@ test_sort_writer(TestBatchRunner *runner) {
 
     {
         PolyReader *poly_reader = PolyReader_open((Obj*)folder, NULL, NULL);
-        VArray     *seg_readers = PolyReader_Get_Seg_Readers(poly_reader);
-        SegReader  *seg_reader  = (SegReader*)VA_Fetch(seg_readers, 0);
+        Vector     *seg_readers = PolyReader_Get_Seg_Readers(poly_reader);
+        SegReader  *seg_reader  = (SegReader*)Vec_Fetch(seg_readers, 0);
 
         S_test_sort_cache(runner, folder, seg_reader, "3", true, name_str);
         S_test_sort_cache(runner, folder, seg_reader, "3", true, speed_str);
@@ -300,7 +300,7 @@ NMIxManager_init(NonMergingIndexManager *self) {
     return self;
 }
 
-VArray*
+Vector*
 NMIxManager_Recycle_IMP(NonMergingIndexManager *self, PolyReader *reader,
                         lucy_DeletionsWriter *del_writer, int64_t cutoff,
                         bool optimize) {
@@ -309,7 +309,7 @@ NMIxManager_Recycle_IMP(NonMergingIndexManager *self, PolyReader *reader,
     UNUSED_VAR(del_writer);
     UNUSED_VAR(cutoff);
     UNUSED_VAR(optimize);
-    return VA_new(0);
+    return Vec_new(0);
 }
 
 

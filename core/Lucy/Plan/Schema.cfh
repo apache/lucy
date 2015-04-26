@@ -32,7 +32,7 @@ public class Lucy::Plan::Schema inherits Clownfish::Obj {
     Hash              *types;
     Hash              *sims;
     Hash              *analyzers;
-    VArray            *uniq_analyzers;
+    Vector            *uniq_analyzers;
 
     public inert incremented Schema*
     new();
@@ -84,7 +84,7 @@ public class Lucy::Plan::Schema inherits Clownfish::Obj {
 
     /** Return all the Schema's field names as an array.
      */
-    public incremented VArray*
+    public incremented Vector*
     All_Fields(Schema *self);
 
     /** Return the Schema instance's internal Architecture object.

@@ -30,7 +30,7 @@
 // Place unused files into purgables array and obsolete Snapshots into
 // snapshots array.
 static void
-S_discover_unused(FilePurger *self, VArray **purgables, VArray **snapshots);
+S_discover_unused(FilePurger *self, Vector **purgables, Vector **snapshots);
 
 // Clean up after a failed background merge session, adding all dead files to
 // the list of candidates to be zapped.
@@ -38,8 +38,8 @@ static void
 S_zap_dead_merge(FilePurger *self, Hash *candidates);
 
 // Return an array of recursively expanded filepath entries.
-static VArray*
-S_find_all_referenced(Folder *folder, VArray *entries);
+static Vector*
+S_find_all_referenced(Folder *folder, Vector *entries);
 
 FilePurger*
 FilePurger_new(Folder *folder, Snapshot *snapshot, IndexManager *manager) {
@@ -85,17 +85,17 @@ FilePurger_Purge_IMP(FilePurger *self) {
     if (Lock_Obtain(deletion_lock)) {
         Folder *folder   = ivars->folder;
         Hash   *failures = Hash_new(0);
-        VArray *purgables;
-        VArray *snapshots;
+        Vector *purgables;
+        Vector *snapshots;
 
         S_discover_unused(self, &purgables, &snapshots);
 
         // Attempt to delete entries -- if failure, no big deal, just try
         // again later.  Proceed in reverse lexical order so that directories
         // get deleted after they've been emptied.
-        VA_Sort(purgables);
-        for (uint32_t i = VA_Get_Size(purgables); i--;) {
-            String *entry = (String*)VA_Fetch(purgables, i);
+        Vec_Sort(purgables);
+        for (uint32_t i = Vec_Get_Size(purgables); i--;) {
+            String *entry = (String*)Vec_Fetch(purgables, i);
             if (Hash_Fetch(ivars->disallowed, entry)) { continue; }
             if (!Folder_Delete(folder, entry)) {
                 if (Folder_Exists(folder, entry)) {
@@ -104,15 +104,15 @@ FilePurger_Purge_IMP(FilePurger *self) {
             }
         }
 
-        for (uint32_t i = 0, max = VA_Get_Size(snapshots); i < max; i++) {
-            Snapshot *snapshot = (Snapshot*)VA_Fetch(snapshots, i);
+        for (uint32_t i = 0, max = Vec_Get_Size(snapshots); i < max; i++) {
+            Snapshot *snapshot = (Snapshot*)Vec_Fetch(snapshots, i);
             bool snapshot_has_failures = false;
             if (Hash_Get_Size(failures)) {
                 // Only delete snapshot files if all of their entries were
                 // successfully deleted.
-                VArray *entries = Snapshot_List(snapshot);
-                for (uint32_t j = VA_Get_Size(entries); j--;) {
-                    String *entry = (String*)VA_Fetch(entries, j);
+                Vector *entries = Snapshot_List(snapshot);
+                for (uint32_t j = Vec_Get_Size(entries); j--;) {
+                    String *entry = (String*)Vec_Fetch(entries, j);
                     if (Hash_Fetch(failures, entry)) {
                         snapshot_has_failures = true;
                         break;
@@ -185,25 +185,25 @@ S_zap_dead_merge(FilePurger *self, Hash *candidates) {
 }
 
 static void
-S_discover_unused(FilePurger *self, VArray **purgables_ptr,
-                  VArray **snapshots_ptr) {
+S_discover_unused(FilePurger *self, Vector **purgables_ptr,
+                  Vector **snapshots_ptr) {
     FilePurgerIVARS *const ivars = FilePurger_IVARS(self);
     Folder      *folder       = ivars->folder;
     DirHandle   *dh           = Folder_Open_Dir(folder, NULL);
     if (!dh) { RETHROW(INCREF(Err_get_error())); }
-    VArray      *spared       = VA_new(1);
-    VArray      *snapshots    = VA_new(1);
+    Vector      *spared       = Vec_new(1);
+    Vector      *snapshots    = Vec_new(1);
     String      *snapfile     = NULL;
 
     // Start off with the list of files in the current snapshot.
     if (ivars->snapshot) {
-        VArray *entries    = Snapshot_List(ivars->snapshot);
-        VArray *referenced = S_find_all_referenced(folder, entries);
-        VA_Push_All(spared, referenced);
+        Vector *entries    = Snapshot_List(ivars->snapshot);
+        Vector *referenced = S_find_all_referenced(folder, entries);
+        Vec_Push_All(spared, referenced);
         DECREF(entries);
         DECREF(referenced);
         snapfile = Snapshot_Get_Path(ivars->snapshot);
-        if (snapfile) { VA_Push(spared, INCREF(snapfile)); }
+        if (snapfile) { Vec_Push(spared, INCREF(snapfile)); }
     }
 
     Hash *candidates = Hash_new(64);
@@ -217,8 +217,8 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
                 = Snapshot_Read_File(Snapshot_new(), folder, entry);
             Lock *lock
                 = IxManager_Make_Snapshot_Read_Lock(ivars->manager, entry);
-            VArray *snap_list  = Snapshot_List(snapshot);
-            VArray *referenced = S_find_all_referenced(folder, snap_list);
+            Vector *snap_list  = Snapshot_List(snapshot);
+            Vector *referenced = S_find_all_referenced(folder, snap_list);
 
             // DON'T obtain the lock -- only see whether another
             // entity holds a lock on the snapshot file.
@@ -228,21 +228,21 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
             if (lock && Lock_Is_Locked(lock)) {
                 // The snapshot file is locked, which means someone's using
                 // that version of the index -- protect all of its entries.
-                uint32_t new_size = VA_Get_Size(spared)
-                                    + VA_Get_Size(referenced)
+                uint32_t new_size = Vec_Get_Size(spared)
+                                    + Vec_Get_Size(referenced)
                                     + 1;
-                VA_Grow(spared, new_size);
-                VA_Push(spared, (Obj*)Str_Clone(entry));
-                VA_Push_All(spared, referenced);
+                Vec_Grow(spared, new_size);
+                Vec_Push(spared, (Obj*)Str_Clone(entry));
+                Vec_Push_All(spared, referenced);
             }
             else {
                 // No one's using this snapshot, so all of its entries are
                 // candidates for deletion.
-                for (uint32_t i = 0, max = VA_Get_Size(referenced); i < max; i++) {
-                    String *file = (String*)VA_Fetch(referenced, i);
+                for (uint32_t i = 0, max = Vec_Get_Size(referenced); i < max; i++) {
+                    String *file = (String*)Vec_Fetch(referenced, i);
                     Hash_Store(candidates, file, (Obj*)CFISH_TRUE);
                 }
-                VA_Push(snapshots, INCREF(snapshot));
+                Vec_Push(snapshots, INCREF(snapshot));
             }
 
             DECREF(referenced);
@@ -258,8 +258,8 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
     S_zap_dead_merge(self, candidates);
 
     // Eliminate any current files from the list of files to be purged.
-    for (uint32_t i = 0, max = VA_Get_Size(spared); i < max; i++) {
-        String *filename = (String*)VA_Fetch(spared, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(spared); i < max; i++) {
+        String *filename = (String*)Vec_Fetch(spared, i);
         DECREF(Hash_Delete(candidates, filename));
     }
 
@@ -271,22 +271,22 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
     DECREF(spared);
 }
 
-static VArray*
-S_find_all_referenced(Folder *folder, VArray *entries) {
-    Hash *uniqued = Hash_new(VA_Get_Size(entries));
-    for (uint32_t i = 0, max = VA_Get_Size(entries); i < max; i++) {
-        String *entry = (String*)VA_Fetch(entries, i);
+static Vector*
+S_find_all_referenced(Folder *folder, Vector *entries) {
+    Hash *uniqued = Hash_new(Vec_Get_Size(entries));
+    for (uint32_t i = 0, max = Vec_Get_Size(entries); i < max; i++) {
+        String *entry = (String*)Vec_Fetch(entries, i);
         Hash_Store(uniqued, entry, (Obj*)CFISH_TRUE);
         if (Folder_Is_Directory(folder, entry)) {
-            VArray *contents = Folder_List_R(folder, entry);
-            for (uint32_t j = VA_Get_Size(contents); j--;) {
-                String *sub_entry = (String*)VA_Fetch(contents, j);
+            Vector *contents = Folder_List_R(folder, entry);
+            for (uint32_t j = Vec_Get_Size(contents); j--;) {
+                String *sub_entry = (String*)Vec_Fetch(contents, j);
                 Hash_Store(uniqued, sub_entry, (Obj*)CFISH_TRUE);
             }
             DECREF(contents);
         }
     }
-    VArray *referenced = Hash_Keys(uniqued);
+    Vector *referenced = Hash_Keys(uniqued);
     DECREF(uniqued);
     return referenced;
 }

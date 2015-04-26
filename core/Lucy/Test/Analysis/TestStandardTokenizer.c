@@ -61,32 +61,32 @@ test_tokenizer(TestBatchRunner *runner) {
                               "a"
                               "/",
                               35);
-    VArray *got = StandardTokenizer_Split(tokenizer, (String*)word);
-    String *token = (String*)VA_Fetch(got, 0);
+    Vector *got = StandardTokenizer_Split(tokenizer, (String*)word);
+    String *token = (String*)Vec_Fetch(got, 0);
     TEST_TRUE(runner,
               token
               && Str_Is_A(token, STRING)
               && Str_Equals_Utf8(token, "tha\xcc\x82t's", 8),
               "Token: %s", Str_Get_Ptr8(token));
-    token = (String*)VA_Fetch(got, 1);
+    token = (String*)Vec_Fetch(got, 1);
     TEST_TRUE(runner,
               token
               && Str_Is_A(token, STRING)
               && Str_Equals_Utf8(token, "1,02\xC2\xADZ4.38", 11),
               "Token: %s", Str_Get_Ptr8(token));
-    token = (String*)VA_Fetch(got, 2);
+    token = (String*)Vec_Fetch(got, 2);
     TEST_TRUE(runner,
               token
               && Str_Is_A(token, STRING)
               && Str_Equals_Utf8(token, "\xE0\xB8\x81\xC2\xAD\xC2\xAD", 7),
               "Token: %s", Str_Get_Ptr8(token));
-    token = (String*)VA_Fetch(got, 3);
+    token = (String*)Vec_Fetch(got, 3);
     TEST_TRUE(runner,
               token
               && Str_Is_A(token, STRING)
               && Str_Equals_Utf8(token, "\xF0\xA0\x80\x80", 4),
               "Token: %s", Str_Get_Ptr8(token));
-    token = (String*)VA_Fetch(got, 4);
+    token = (String*)Vec_Fetch(got, 4);
     TEST_TRUE(runner,
               token
               && Str_Is_A(token, STRING)
@@ -96,15 +96,15 @@ test_tokenizer(TestBatchRunner *runner) {
 
     FSFolder *modules_folder = TestUtils_modules_folder();
     String *path = Str_newf("unicode/ucd/WordBreakTest.json");
-    VArray *tests = (VArray*)Json_slurp_json((Folder*)modules_folder, path);
+    Vector *tests = (Vector*)Json_slurp_json((Folder*)modules_folder, path);
     if (!tests) { RETHROW(Err_get_error()); }
 
-    for (uint32_t i = 0, max = VA_Get_Size(tests); i < max; i++) {
-        Hash *test = (Hash*)VA_Fetch(tests, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(tests); i < max; i++) {
+        Hash *test = (Hash*)Vec_Fetch(tests, i);
         String *text = (String*)Hash_Fetch_Utf8(test, "text", 4);
-        VArray *wanted = (VArray*)Hash_Fetch_Utf8(test, "words", 5);
-        VArray *got = StandardTokenizer_Split(tokenizer, text);
-        TEST_TRUE(runner, VA_Equals(wanted, (Obj*)got), "UCD test #%d", i + 1);
+        Vector *wanted = (Vector*)Hash_Fetch_Utf8(test, "words", 5);
+        Vector *got = StandardTokenizer_Split(tokenizer, text);
+        TEST_TRUE(runner, Vec_Equals(wanted, (Obj*)got), "UCD test #%d", i + 1);
         DECREF(got);
     }
 

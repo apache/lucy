@@ -23,13 +23,13 @@ class Lucy::Search::MatchDoc inherits Clownfish::Obj {
 
     int32_t  doc_id;
     float    score;
-    VArray  *values;
+    Vector  *values;
 
     inert incremented MatchDoc*
-    new(int32_t doc_id, float score, VArray *values = NULL);
+    new(int32_t doc_id, float score, Vector *values = NULL);
 
     inert MatchDoc*
-    init(MatchDoc *self, int32_t doc_id, float score, VArray *values = NULL);
+    init(MatchDoc *self, int32_t doc_id, float score, Vector *values = NULL);
 
     public void
     Serialize(MatchDoc *self, OutStream *outstream);
@@ -49,11 +49,11 @@ class Lucy::Search::MatchDoc inherits Clownfish::Obj {
     void
     Set_Score(MatchDoc *self, float score);
 
-    nullable VArray*
+    nullable Vector*
     Get_Values(MatchDoc *self);
 
     void
-    Set_Values(MatchDoc *self, VArray *values);
+    Set_Values(MatchDoc *self, Vector *values);
 
     public void
     Destroy(MatchDoc *self);

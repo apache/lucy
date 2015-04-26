@@ -23,7 +23,7 @@ abstract class Lucy::Index::SortReader
 
     inert SortReader*
     init(SortReader *self, Schema *schema = NULL, Folder *folder = NULL,
-         Snapshot *snapshot = NULL, VArray *segments = NULL,
+         Snapshot *snapshot = NULL, Vector *segments = NULL,
          int32_t seg_tick = -1);
 
     abstract nullable SortCache*
@@ -33,7 +33,7 @@ abstract class Lucy::Index::SortReader
      * the default implementation.
      */
     public incremented nullable DataReader*
-    Aggregator(SortReader *self, VArray *readers, I32Array *offsets);
+    Aggregator(SortReader *self, Vector *readers, I32Array *offsets);
 
 }
 
@@ -47,12 +47,12 @@ class Lucy::Index::DefaultSortReader nickname DefSortReader
     int32_t format;
 
     inert incremented DefaultSortReader*
-    new(Schema *schema, Folder *folder, Snapshot *snapshot, VArray *segments,
+    new(Schema *schema, Folder *folder, Snapshot *snapshot, Vector *segments,
         int32_t seg_tick);
 
     inert DefaultSortReader*
     init(DefaultSortReader *self, Schema *schema, Folder *folder,
-         Snapshot *snapshot, VArray *segments, int32_t seg_tick);
+         Snapshot *snapshot, Vector *segments, int32_t seg_tick);
 
     nullable SortCache*
     Fetch_Sort_Cache(DefaultSortReader *self, String *field);

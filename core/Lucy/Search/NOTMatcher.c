@@ -30,8 +30,8 @@ NOTMatcher_new(Matcher *negated_matcher, int32_t doc_max) {
 NOTMatcher*
 NOTMatcher_init(NOTMatcher *self, Matcher *negated_matcher, int32_t doc_max) {
     NOTMatcherIVARS *const ivars = NOTMatcher_IVARS(self);
-    VArray *children = VA_new(1);
-    VA_Push(children, INCREF(negated_matcher));
+    Vector *children = Vec_new(1);
+    Vec_Push(children, INCREF(negated_matcher));
     PolyMatcher_init((PolyMatcher*)self, children, NULL);
 
     // Init.

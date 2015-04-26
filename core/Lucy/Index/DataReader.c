@@ -25,12 +25,12 @@
 
 DataReader*
 DataReader_init(DataReader *self, Schema *schema, Folder *folder,
-                Snapshot *snapshot, VArray *segments, int32_t seg_tick) {
+                Snapshot *snapshot, Vector *segments, int32_t seg_tick) {
     DataReaderIVARS *const ivars = DataReader_IVARS(self);
     ivars->schema   = (Schema*)INCREF(schema);
     ivars->folder   = (Folder*)INCREF(folder);
     ivars->snapshot = (Snapshot*)INCREF(snapshot);
-    ivars->segments = (VArray*)INCREF(segments);
+    ivars->segments = (Vector*)INCREF(segments);
     ivars->seg_tick = seg_tick;
     if (seg_tick != -1) {
         if (!segments) {
@@ -38,7 +38,7 @@ DataReader_init(DataReader *self, Schema *schema, Folder *folder,
                   seg_tick);
         }
         else {
-            Segment *segment = (Segment*)VA_Fetch(segments, seg_tick);
+            Segment *segment = (Segment*)Vec_Fetch(segments, seg_tick);
             if (!segment) {
                 THROW(ERR, "No segment at seg_tick %i32", seg_tick);
             }
@@ -79,7 +79,7 @@ DataReader_Get_Snapshot_IMP(DataReader *self) {
     return DataReader_IVARS(self)->snapshot;
 }
 
-VArray*
+Vector*
 DataReader_Get_Segments_IMP(DataReader *self) {
     return DataReader_IVARS(self)->segments;
 }

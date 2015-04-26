@@ -25,19 +25,19 @@ parcel Lucy;
 public class Lucy::Search::PolySearcher
     inherits Lucy::Search::Searcher {
 
-    VArray    *searchers;
+    Vector    *searchers;
     I32Array  *starts;
     int32_t    doc_max;
 
     inert incremented PolySearcher*
-    new(Schema *schema, VArray *searchers);
+    new(Schema *schema, Vector *searchers);
 
     /**
      * @param schema A Schema.
      * @param searchers An array of Searchers.
      */
     public inert PolySearcher*
-    init(PolySearcher *self, Schema *schema, VArray *searchers);
+    init(PolySearcher *self, Schema *schema, Vector *searchers);
 
     public void
     Destroy(PolySearcher *self);

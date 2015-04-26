@@ -21,17 +21,17 @@ parcel Lucy;
 
 class Lucy::Search::PolyMatcher inherits Lucy::Search::Matcher {
 
-    VArray       *children;
+    Vector       *children;
     Similarity   *sim;
     uint32_t      num_kids;
     uint32_t      matching_kids;
     float        *coord_factors;
 
     inert incremented PolyMatcher*
-    new(VArray *children, Similarity *similarity);
+    new(Vector *children, Similarity *similarity);
 
     inert PolyMatcher*
-    init(PolyMatcher *self, VArray *children, Similarity *similarity);
+    init(PolyMatcher *self, Vector *children, Similarity *similarity);
 
     public void
     Destroy(PolyMatcher *self);

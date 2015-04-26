@@ -23,24 +23,24 @@ parcel Lucy;
  */
 class Lucy::Search::TopDocs inherits Clownfish::Obj {
 
-    VArray *match_docs;
+    Vector *match_docs;
     uint32_t   total_hits;
 
     inert incremented TopDocs*
-    new(VArray *match_docs, uint32_t total_hits);
+    new(Vector *match_docs, uint32_t total_hits);
 
     inert TopDocs*
-    init(TopDocs *self, VArray *match_docs, uint32_t total_hits);
+    init(TopDocs *self, Vector *match_docs, uint32_t total_hits);
 
     /** Accessor for `match_docs` member.
      */
-    VArray*
+    Vector*
     Get_Match_Docs(TopDocs *self);
 
     /** Setter for `match_docs` member.
      */
     void
-    Set_Match_Docs(TopDocs *self, VArray *match_docs);
+    Set_Match_Docs(TopDocs *self, Vector *match_docs);
 
     /** Accessor for `total_hits` member.
      */

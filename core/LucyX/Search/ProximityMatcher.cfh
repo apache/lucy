@@ -35,11 +35,11 @@ class LucyX::Search::ProximityMatcher inherits Lucy::Search::Matcher {
     uint32_t        within;
 
     inert incremented ProximityMatcher*
-    new(Similarity *similarity, VArray *posting_lists, Compiler *compiler,
+    new(Similarity *similarity, Vector *posting_lists, Compiler *compiler,
         uint32_t within);
 
     inert ProximityMatcher*
-    init(ProximityMatcher *self, Similarity *similarity, VArray *posting_lists,
+    init(ProximityMatcher *self, Similarity *similarity, Vector *posting_lists,
          Compiler *compiler, uint32_t within);
 
     public void

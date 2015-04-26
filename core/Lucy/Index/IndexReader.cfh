@@ -44,7 +44,7 @@ public class Lucy::Index::IndexReader nickname IxReader
 
     public inert nullable IndexReader*
     init(IndexReader *self, Schema *schema = NULL, Folder *folder,
-         Snapshot *snapshot = NULL, VArray *segments = NULL,
+         Snapshot *snapshot = NULL, Vector *segments = NULL,
          int32_t seg_tick = -1, IndexManager *manager = NULL);
 
     public inert incremented nullable IndexReader*
@@ -93,7 +93,7 @@ public class Lucy::Index::IndexReader nickname IxReader
     /** Return an array of all the SegReaders represented within the
      * IndexReader.
      */
-    public abstract incremented VArray*
+    public abstract incremented Vector*
     Seg_Readers(IndexReader *self);
 
     /** Fetch a component, or throw an error if the component can't be found.

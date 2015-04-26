@@ -74,12 +74,12 @@ test_bbsortex(TestBatchRunner *runner) {
     BBSortEx_Sort_Buffer(sortex);
 
     {
-        VArray *cache  = BBSortEx_Peek_Cache(sortex);
-        VArray *wanted = VA_new(3);
-        VA_Push(wanted, INCREF(b_bb));
-        VA_Push(wanted, INCREF(c_bb));
-        VA_Push(wanted, INCREF(d_bb));
-        TEST_TRUE(runner, VA_Equals(cache, (Obj*)wanted), "sort cache");
+        Vector *cache  = BBSortEx_Peek_Cache(sortex);
+        Vector *wanted = Vec_new(3);
+        Vec_Push(wanted, INCREF(b_bb));
+        Vec_Push(wanted, INCREF(c_bb));
+        Vec_Push(wanted, INCREF(d_bb));
+        TEST_TRUE(runner, Vec_Equals(cache, (Obj*)wanted), "sort cache");
         DECREF(wanted);
         DECREF(cache);
     }
@@ -89,31 +89,31 @@ test_bbsortex(TestBatchRunner *runner) {
                 "cache flushed automatically when mem_thresh crossed");
     TEST_INT_EQ(runner, BBSortEx_Get_Num_Runs(sortex), 1, "run added");
 
-    VArray *external = VA_new(3);
-    VA_Push(external, INCREF(x_bb));
-    VA_Push(external, INCREF(y_bb));
-    VA_Push(external, INCREF(z_bb));
+    Vector *external = Vec_new(3);
+    Vec_Push(external, INCREF(x_bb));
+    Vec_Push(external, INCREF(y_bb));
+    Vec_Push(external, INCREF(z_bb));
     BBSortEx *run = BBSortEx_new(0x1000000, external);
     BBSortEx_Add_Run(sortex, (SortExternal*)run);
     BBSortEx_Flip(sortex);
 
     {
-        VArray *got = VA_new(7);
+        Vector *got = Vec_new(7);
         Obj *object;
         while (NULL != (object = BBSortEx_Fetch(sortex))) {
-            VA_Push(got, object);
+            Vec_Push(got, object);
         }
 
-        VArray *wanted = VA_new(7);
-        VA_Push(wanted, INCREF(a_bb));
-        VA_Push(wanted, INCREF(b_bb));
-        VA_Push(wanted, INCREF(c_bb));
-        VA_Push(wanted, INCREF(d_bb));
-        VA_Push(wanted, INCREF(x_bb));
-        VA_Push(wanted, INCREF(y_bb));
-        VA_Push(wanted, INCREF(z_bb));
+        Vector *wanted = Vec_new(7);
+        Vec_Push(wanted, INCREF(a_bb));
+        Vec_Push(wanted, INCREF(b_bb));
+        Vec_Push(wanted, INCREF(c_bb));
+        Vec_Push(wanted, INCREF(d_bb));
+        Vec_Push(wanted, INCREF(x_bb));
+        Vec_Push(wanted, INCREF(y_bb));
+        Vec_Push(wanted, INCREF(z_bb));
 
-        TEST_TRUE(runner, VA_Equals(got, (Obj*)wanted), "Add_Run");
+        TEST_TRUE(runner, Vec_Equals(got, (Obj*)wanted), "Add_Run");
 
         DECREF(wanted);
         DECREF(got);
@@ -138,14 +138,14 @@ test_clear_buffer(TestBatchRunner *runner) {
     Obj *object = BBSortEx_Peek(sortex);
     TEST_TRUE(runner, BB_Equals(a_bb, object), "Peek");
 
-    VArray *got = VA_new(2);
+    Vector *got = Vec_new(2);
     while (NULL != (object = BBSortEx_Fetch(sortex))) {
-        VA_Push(got, object);
+        Vec_Push(got, object);
     }
-    VArray *wanted = VA_new(2);
-    VA_Push(wanted, INCREF(a_bb));
-    VA_Push(wanted, INCREF(b_bb));
-    TEST_TRUE(runner, VA_Equals(got, (Obj*)wanted),
+    Vector *wanted = Vec_new(2);
+    Vec_Push(wanted, INCREF(a_bb));
+    Vec_Push(wanted, INCREF(b_bb));
+    TEST_TRUE(runner, Vec_Equals(got, (Obj*)wanted),
               "elements cleared via Clear_Buffer truly cleared");
 
     DECREF(wanted);
@@ -154,14 +154,14 @@ test_clear_buffer(TestBatchRunner *runner) {
 }
 
 static void
-S_test_sort(TestBatchRunner *runner, VArray *bytebufs, uint32_t mem_thresh,
+S_test_sort(TestBatchRunner *runner, Vector *bytebufs, uint32_t mem_thresh,
             const char *test_name) {
-    int        size     = (int)VA_Get_Size(bytebufs);
+    int        size     = (int)Vec_Get_Size(bytebufs);
     BBSortEx  *sortex   = BBSortEx_new(mem_thresh, NULL);
     ByteBuf  **shuffled = (ByteBuf**)MALLOCATE(size * sizeof(ByteBuf*));
 
     for (int i = 0; i < size; ++i) {
-        shuffled[i] = (ByteBuf*)CERTIFY(VA_Fetch(bytebufs, i), BYTEBUF);
+        shuffled[i] = (ByteBuf*)CERTIFY(Vec_Fetch(bytebufs, i), BYTEBUF);
     }
     for (int i = size - 1; i > 0; --i) {
         int shuffle_pos = rand() % (i + 1);
@@ -174,12 +174,12 @@ S_test_sort(TestBatchRunner *runner, VArray *bytebufs, uint32_t mem_thresh,
     }
 
     BBSortEx_Flip(sortex);
-    VArray *got = VA_new(size);
+    Vector *got = Vec_new(size);
     Obj *object;
     while (NULL != (object = BBSortEx_Fetch(sortex))) {
-        VA_Push(got, object);
+        Vec_Push(got, object);
     }
-    TEST_TRUE(runner, VA_Equals(got, (Obj*)bytebufs), test_name);
+    TEST_TRUE(runner, Vec_Equals(got, (Obj*)bytebufs), test_name);
 
     FREEMEM(shuffled);
     DECREF(got);
@@ -190,13 +190,13 @@ static void
 S_test_sort_letters(TestBatchRunner *runner, const char *letters,
                     uint32_t mem_thresh, const char *test_name) {
     size_t  num_letters = strlen(letters);
-    VArray *bytebufs    = VA_new(num_letters);
+    Vector *bytebufs    = Vec_new(num_letters);
 
     for (size_t i = 0; i < num_letters; ++i) {
         char ch = letters[i];
         size_t size = ch == '_' ? 0 : 1;
         ByteBuf *bytebuf = BB_new_bytes(&ch, size);
-        VA_Push(bytebufs, (Obj*)bytebuf);
+        Vec_Push(bytebufs, (Obj*)bytebuf);
     }
 
     S_test_sort(runner, bytebufs, mem_thresh, test_name);
@@ -230,7 +230,7 @@ test_sort_nothing(TestBatchRunner *runner) {
 static void
 test_sort_packed_ints(TestBatchRunner *runner) {
     size_t  num_ints = 11001;
-    VArray *bytebufs = VA_new(num_ints);
+    Vector *bytebufs = Vec_new(num_ints);
 
     for (uint32_t i = 0; i < num_ints; ++i) {
         char buf[4];
@@ -239,7 +239,7 @@ test_sort_packed_ints(TestBatchRunner *runner) {
         buf[2] = i >> 8;
         buf[3] = i;
         ByteBuf *bytebuf = BB_new_bytes(&buf, 4);
-        VA_Push(bytebufs, (Obj*)bytebuf);
+        Vec_Push(bytebufs, (Obj*)bytebuf);
     }
 
     S_test_sort(runner, bytebufs, 5000, "Sorting packed integers...");
@@ -250,7 +250,7 @@ test_sort_packed_ints(TestBatchRunner *runner) {
 static void
 test_sort_random_strings(TestBatchRunner *runner) {
     size_t  num_strings = 1001;
-    VArray *bytebufs    = VA_new(num_strings);
+    Vector *bytebufs    = Vec_new(num_strings);
 
     for (uint32_t i = 0; i < num_strings; ++i) {
         char buf[1201];
@@ -259,10 +259,10 @@ test_sort_random_strings(TestBatchRunner *runner) {
             buf[i] = rand();
         }
         ByteBuf *bytebuf = BB_new_bytes(&buf, size);
-        VA_Push(bytebufs, (Obj*)bytebuf);
+        Vec_Push(bytebufs, (Obj*)bytebuf);
     }
 
-    VA_Sort(bytebufs);
+    Vec_Sort(bytebufs);
     S_test_sort(runner, bytebufs, 15000,
                 "Random binary strings of random length");
 
@@ -271,11 +271,11 @@ test_sort_random_strings(TestBatchRunner *runner) {
 
 static void
 test_run(TestBatchRunner *runner) {
-    VArray *letters = VA_new(26);
+    Vector *letters = Vec_new(26);
     for (int i = 0; i < 26; ++i) {
         char ch = 'a' + i;
         ByteBuf *bytebuf = BB_new_bytes(&ch, 1);
-        VA_Push(letters, (Obj*)bytebuf);
+        Vec_Push(letters, (Obj*)bytebuf);
     }
     BBSortEx *run = BBSortEx_new(0x1000000, letters);
     BBSortEx_Set_Mem_Thresh(run, 5);
@@ -288,14 +288,14 @@ test_run(TestBatchRunner *runner) {
     ByteBuf *wanted = BB_new_bytes("e", 1);
     TEST_TRUE(runner, BB_Equals(wanted, endpost), "Peek_Last");
 
-    VArray *elems = VA_new(26);
+    Vector *elems = Vec_new(26);
     do {
         while (BBSortEx_Buffer_Count(run) > 0) {
             Obj *object = BBSortEx_Fetch(run);
-            VA_Push(elems, object);
+            Vec_Push(elems, object);
         }
     } while (BBSortEx_Refill(run) > 0);
-    TEST_TRUE(runner, VA_Equals(elems, (Obj*)letters), "retrieve all elems");
+    TEST_TRUE(runner, Vec_Equals(elems, (Obj*)letters), "retrieve all elems");
 
     DECREF(elems);
     DECREF(wanted);

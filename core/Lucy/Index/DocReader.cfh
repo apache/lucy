@@ -26,7 +26,7 @@ public class Lucy::Index::DocReader inherits Lucy::Index::DataReader {
 
     inert DocReader*
     init(DocReader *self, Schema *schema = NULL, Folder *folder = NULL,
-         Snapshot *snapshot = NULL, VArray *segments = NULL,
+         Snapshot *snapshot = NULL, Vector *segments = NULL,
          int32_t seg_tick = -1);
 
     /** Retrieve the document identified by `doc_id`.
@@ -43,21 +43,21 @@ public class Lucy::Index::DocReader inherits Lucy::Index::DataReader {
      * @param offsets Doc id start offsets for each reader.
      */
     public incremented nullable DocReader*
-    Aggregator(DocReader *self, VArray *readers, I32Array *offsets);
+    Aggregator(DocReader *self, Vector *readers, I32Array *offsets);
 }
 
 /** Aggregate multiple DocReaders.
  */
 class Lucy::Index::PolyDocReader inherits Lucy::Index::DocReader {
 
-    VArray   *readers;
+    Vector   *readers;
     I32Array *offsets;
 
     inert incremented PolyDocReader*
-    new(VArray *readers, I32Array *offsets);
+    new(Vector *readers, I32Array *offsets);
 
     inert PolyDocReader*
-    init(PolyDocReader *self, VArray *readers, I32Array *offsets);
+    init(PolyDocReader *self, Vector *readers, I32Array *offsets);
 
     public incremented HitDoc*
     Fetch_Doc(PolyDocReader *self, int32_t doc_id);
@@ -76,12 +76,12 @@ class Lucy::Index::DefaultDocReader nickname DefDocReader
     InStream    *ix_in;
 
     inert incremented DefaultDocReader*
-    new(Schema *schema, Folder *folder, Snapshot *snapshot, VArray *segments,
+    new(Schema *schema, Folder *folder, Snapshot *snapshot, Vector *segments,
         int32_t seg_tick);
 
     inert DefaultDocReader*
     init(DefaultDocReader *self, Schema *schema, Folder *folder,
-         Snapshot *snapshot, VArray *segments, int32_t seg_tick);
+         Snapshot *snapshot, Vector *segments, int32_t seg_tick);
 
     public incremented HitDoc*
     Fetch_Doc(DefaultDocReader *self, int32_t doc_id);

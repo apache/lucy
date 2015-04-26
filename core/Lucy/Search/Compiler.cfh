@@ -147,7 +147,7 @@ public class Lucy::Search::Compiler inherits Lucy::Search::Query {
      * @param doc_vec A DocVector.
      * @param field The name of the field.
      */
-    public incremented VArray*
+    public incremented Vector*
     Highlight_Spans(Compiler *self, Searcher *searcher,
                     DocVector *doc_vec, String *field);
 

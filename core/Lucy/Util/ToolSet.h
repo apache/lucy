@@ -43,7 +43,7 @@ extern "C" {
 #include "Clownfish/Hash.h"
 #include "Lucy/Object/I32Array.h"
 #include "Clownfish/Num.h"
-#include "Clownfish/VArray.h"
+#include "Clownfish/Vector.h"
 #include "Clownfish/Class.h"
 #include "Clownfish/Util/NumberUtils.h"
 #include "Clownfish/Util/Memory.h"

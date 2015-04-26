@@ -24,11 +24,11 @@ parcel Lucy;
 
 class Lucy::Highlight::HeatMap inherits Clownfish::Obj {
 
-    VArray   *spans;
+    Vector   *spans;
     uint32_t  window;
 
     inert incremented HeatMap*
-    new(VArray *spans, uint32_t window = 133);
+    new(Vector *spans, uint32_t window = 133);
 
     /**
      * @param spans An array of Spans, which need not be sorted and will not
@@ -37,7 +37,7 @@ class Lucy::Highlight::HeatMap inherits Clownfish::Obj {
      * reinforce each other.
      */
     public inert HeatMap*
-    init(HeatMap *self, VArray *spans, uint32_t window = 133);
+    init(HeatMap *self, Vector *spans, uint32_t window = 133);
 
     /** Reduce/slice overlapping spans.  Say we have two spans:
      *
@@ -53,8 +53,8 @@ class Lucy::Highlight::HeatMap inherits Clownfish::Obj {
      * @param spans An array of Spans, which must be sorted by offset then
      * length.
      */
-    incremented VArray*
-    Flatten_Spans(HeatMap *self, VArray *spans);
+    incremented Vector*
+    Flatten_Spans(HeatMap *self, Vector *spans);
 
     /** If the two spans overlap or abut, return a bonus equal to their summed
      * scores; as they move further apart, tail the bonus down until it hits 0
@@ -69,10 +69,10 @@ class Lucy::Highlight::HeatMap inherits Clownfish::Obj {
      * @param spans An array of Spans, which must be sorted by offset then
      * length.
      */
-    incremented VArray*
-    Generate_Proximity_Boosts(HeatMap *self, VArray *spans);
+    incremented Vector*
+    Generate_Proximity_Boosts(HeatMap *self, Vector *spans);
 
-    VArray*
+    Vector*
     Get_Spans(HeatMap *self);
 
     public void

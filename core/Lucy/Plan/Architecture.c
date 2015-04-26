@@ -173,7 +173,7 @@ void
 Arch_Register_Doc_Reader_IMP(Architecture *self, SegReader *reader) {
     Schema     *schema   = SegReader_Get_Schema(reader);
     Folder     *folder   = SegReader_Get_Folder(reader);
-    VArray     *segments = SegReader_Get_Segments(reader);
+    Vector     *segments = SegReader_Get_Segments(reader);
     Snapshot   *snapshot = SegReader_Get_Snapshot(reader);
     int32_t     seg_tick = SegReader_Get_Seg_Tick(reader);
     DefaultDocReader *doc_reader
@@ -187,7 +187,7 @@ void
 Arch_Register_Posting_List_Reader_IMP(Architecture *self, SegReader *reader) {
     Schema    *schema   = SegReader_Get_Schema(reader);
     Folder    *folder   = SegReader_Get_Folder(reader);
-    VArray    *segments = SegReader_Get_Segments(reader);
+    Vector    *segments = SegReader_Get_Segments(reader);
     Snapshot  *snapshot = SegReader_Get_Snapshot(reader);
     int32_t    seg_tick = SegReader_Get_Seg_Tick(reader);
     LexiconReader *lex_reader = (LexiconReader*)SegReader_Obtain(
@@ -204,7 +204,7 @@ void
 Arch_Register_Lexicon_Reader_IMP(Architecture *self, SegReader *reader) {
     Schema    *schema   = SegReader_Get_Schema(reader);
     Folder    *folder   = SegReader_Get_Folder(reader);
-    VArray    *segments = SegReader_Get_Segments(reader);
+    Vector    *segments = SegReader_Get_Segments(reader);
     Snapshot  *snapshot = SegReader_Get_Snapshot(reader);
     int32_t    seg_tick = SegReader_Get_Seg_Tick(reader);
     DefaultLexiconReader *lex_reader
@@ -218,7 +218,7 @@ void
 Arch_Register_Sort_Reader_IMP(Architecture *self, SegReader *reader) {
     Schema     *schema   = SegReader_Get_Schema(reader);
     Folder     *folder   = SegReader_Get_Folder(reader);
-    VArray     *segments = SegReader_Get_Segments(reader);
+    Vector     *segments = SegReader_Get_Segments(reader);
     Snapshot   *snapshot = SegReader_Get_Snapshot(reader);
     int32_t     seg_tick = SegReader_Get_Seg_Tick(reader);
     DefaultSortReader *sort_reader
@@ -232,7 +232,7 @@ void
 Arch_Register_Highlight_Reader_IMP(Architecture *self, SegReader *reader) {
     Schema     *schema   = SegReader_Get_Schema(reader);
     Folder     *folder   = SegReader_Get_Folder(reader);
-    VArray     *segments = SegReader_Get_Segments(reader);
+    Vector     *segments = SegReader_Get_Segments(reader);
     Snapshot   *snapshot = SegReader_Get_Snapshot(reader);
     int32_t     seg_tick = SegReader_Get_Seg_Tick(reader);
     DefaultHighlightReader* hl_reader
@@ -246,7 +246,7 @@ void
 Arch_Register_Deletions_Reader_IMP(Architecture *self, SegReader *reader) {
     Schema     *schema   = SegReader_Get_Schema(reader);
     Folder     *folder   = SegReader_Get_Folder(reader);
-    VArray     *segments = SegReader_Get_Segments(reader);
+    Vector     *segments = SegReader_Get_Segments(reader);
     Snapshot   *snapshot = SegReader_Get_Snapshot(reader);
     int32_t     seg_tick = SegReader_Get_Seg_Tick(reader);
     DefaultDeletionsReader* del_reader

@@ -44,7 +44,7 @@ abstract class Lucy::Util::SortExternal nickname SortEx
     uint32_t       buf_tick;
     Obj          **scratch;
     uint32_t       scratch_cap;
-    VArray        *runs;
+    Vector        *runs;
     uint32_t       num_slices;
     Obj         ***slice_starts;
     uint32_t      *slice_sizes;

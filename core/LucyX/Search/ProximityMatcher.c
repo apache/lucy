@@ -27,7 +27,7 @@
 
 
 ProximityMatcher*
-ProximityMatcher_new(Similarity *sim, VArray *plists, Compiler *compiler,
+ProximityMatcher_new(Similarity *sim, Vector *plists, Compiler *compiler,
                      uint32_t within) {
     ProximityMatcher *self =
         (ProximityMatcher*)Class_Make_Obj(PROXIMITYMATCHER);
@@ -37,7 +37,7 @@ ProximityMatcher_new(Similarity *sim, VArray *plists, Compiler *compiler,
 
 ProximityMatcher*
 ProximityMatcher_init(ProximityMatcher *self, Similarity *similarity,
-                      VArray *plists, Compiler *compiler, uint32_t within) {
+                      Vector *plists, Compiler *compiler, uint32_t within) {
     Matcher_init((Matcher*)self);
     ProximityMatcherIVARS *const ivars = ProximityMatcher_IVARS(self);
 
@@ -49,13 +49,13 @@ ProximityMatcher_init(ProximityMatcher *self, Similarity *similarity,
     ivars->more             = true;
     ivars->within           = within;
 
-    // Extract PostingLists out of VArray into local C array for quick access.
-    ivars->num_elements = VA_Get_Size(plists);
+    // Extract PostingLists out of Vector into local C array for quick access.
+    ivars->num_elements = Vec_Get_Size(plists);
     ivars->plists = (PostingList**)MALLOCATE(
                        ivars->num_elements * sizeof(PostingList*));
     for (size_t i = 0; i < ivars->num_elements; i++) {
         PostingList *const plist
-            = (PostingList*)CERTIFY(VA_Fetch(plists, i), POSTINGLIST);
+            = (PostingList*)CERTIFY(Vec_Fetch(plists, i), POSTINGLIST);
         if (plist == NULL) {
             THROW(ERR, "Missing element %u32", i);
         }

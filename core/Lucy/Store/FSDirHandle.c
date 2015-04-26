@@ -25,7 +25,7 @@
 
 #include "Lucy/Util/ToolSet.h"
 #include "Clownfish/Err.h"
-#include "Clownfish/VArray.h"
+#include "Clownfish/Vector.h"
 #include "Lucy/Store/FSDirHandle.h"
 
 #ifdef CHY_HAS_SYS_TYPES_H

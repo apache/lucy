@@ -32,7 +32,7 @@ public class Lucy::Search::IndexSearcher nickname IxSearcher
     IndexReader       *reader;
     DocReader         *doc_reader;
     HighlightReader   *hl_reader;
-    VArray            *seg_readers;
+    Vector            *seg_readers;
     I32Array          *seg_starts;
 
     inert incremented IndexSearcher*

@@ -26,14 +26,14 @@ class Lucy::Index::PolyLexicon nickname PolyLex
 
     Obj            *term;
     SegLexQueue    *lex_q;
-    VArray         *seg_lexicons;
+    Vector         *seg_lexicons;
     int32_t         size;
 
     inert incremented PolyLexicon*
-    new(String *field, VArray *sub_readers);
+    new(String *field, Vector *sub_readers);
 
     inert PolyLexicon*
-    init(PolyLexicon *self, String *field, VArray *sub_readers);
+    init(PolyLexicon *self, String *field, Vector *sub_readers);
 
     public void
     Seek(PolyLexicon *self, Obj *target = NULL);

@@ -39,17 +39,17 @@
 #include "Lucy/Store/RAMFile.h"
 #include "Lucy/Util/Freezer.h"
 
-VArray*
+Vector*
 TestUtils_doc_set() {
-    VArray *docs = VA_new(10);
+    Vector *docs = Vec_new(10);
 
-    VA_Push(docs, (Obj*)TestUtils_get_str("x"));
-    VA_Push(docs, (Obj*)TestUtils_get_str("y"));
-    VA_Push(docs, (Obj*)TestUtils_get_str("z"));
-    VA_Push(docs, (Obj*)TestUtils_get_str("x a"));
-    VA_Push(docs, (Obj*)TestUtils_get_str("x a b"));
-    VA_Push(docs, (Obj*)TestUtils_get_str("x a b c"));
-    VA_Push(docs, (Obj*)TestUtils_get_str("x foo a b c d"));
+    Vec_Push(docs, (Obj*)TestUtils_get_str("x"));
+    Vec_Push(docs, (Obj*)TestUtils_get_str("y"));
+    Vec_Push(docs, (Obj*)TestUtils_get_str("z"));
+    Vec_Push(docs, (Obj*)TestUtils_get_str("x a"));
+    Vec_Push(docs, (Obj*)TestUtils_get_str("x a b"));
+    Vec_Push(docs, (Obj*)TestUtils_get_str("x a b c"));
+    Vec_Push(docs, (Obj*)TestUtils_get_str("x foo a b c d"));
 
     return docs;
 }
@@ -59,11 +59,11 @@ TestUtils_make_poly_query(uint32_t boolop, ...) {
     va_list args;
     Query *child;
     PolyQuery *retval;
-    VArray *children = VA_new(0);
+    Vector *children = Vec_new(0);
 
     va_start(args, boolop);
     while (NULL != (child = va_arg(args, Query*))) {
-        VA_Push(children, (Obj*)child);
+        Vec_Push(children, (Obj*)child);
     }
     va_end(args);
 
@@ -85,13 +85,13 @@ PhraseQuery*
 TestUtils_make_phrase_query(const char *field, ...) {
     String *field_str = (String*)SSTR_WRAP_UTF8(field, strlen(field));
     va_list args;
-    VArray *terms = VA_new(0);
+    Vector *terms = Vec_new(0);
     PhraseQuery *query;
     char *term_str;
 
     va_start(args, field);
     while (NULL != (term_str = va_arg(args, char*))) {
-        VA_Push(terms, (Obj*)TestUtils_get_str(term_str));
+        Vec_Push(terms, (Obj*)TestUtils_get_str(term_str));
     }
     va_end(args);
 
@@ -129,37 +129,37 @@ TestUtils_make_range_query(const char *field, const char *lower_term,
 
 void
 TestUtils_test_analyzer(TestBatchRunner *runner, Analyzer *analyzer,
-                        String *source, VArray *expected,
+                        String *source, Vector *expected,
                         const char *message) {
     Token *seed = Token_new(Str_Get_Ptr8(source), Str_Get_Size(source),
                             0, 0, 1.0f, 1);
     Inversion *starter = Inversion_new(seed);
     Inversion *transformed = Analyzer_Transform(analyzer, starter);
-    VArray *got = VA_new(1);
+    Vector *got = Vec_new(1);
     Token *token;
     while (NULL != (token = Inversion_Next(transformed))) {
         String *token_text
             = Str_new_from_utf8(Token_Get_Text(token), Token_Get_Len(token));
-        VA_Push(got, (Obj*)token_text);
+        Vec_Push(got, (Obj*)token_text);
     }
-    TEST_TRUE(runner, VA_Equals(expected, (Obj*)got),
+    TEST_TRUE(runner, Vec_Equals(expected, (Obj*)got),
               "Transform(): %s", message);
     DECREF(transformed);
 
     transformed = Analyzer_Transform_Text(analyzer, source);
-    VA_Clear(got);
+    Vec_Clear(got);
     while (NULL != (token = Inversion_Next(transformed))) {
         String *token_text
             = Str_new_from_utf8(Token_Get_Text(token), Token_Get_Len(token));
-        VA_Push(got, (Obj*)token_text);
+        Vec_Push(got, (Obj*)token_text);
     }
-    TEST_TRUE(runner, VA_Equals(expected, (Obj*)got),
+    TEST_TRUE(runner, Vec_Equals(expected, (Obj*)got),
               "Transform_Text(): %s", message);
     DECREF(transformed);
 
     DECREF(got);
     got = Analyzer_Split(analyzer, source);
-    TEST_TRUE(runner, VA_Equals(expected, (Obj*)got), "Split(): %s", message);
+    TEST_TRUE(runner, Vec_Equals(expected, (Obj*)got), "Split(): %s", message);
 
     DECREF(got);
     DECREF(starter);

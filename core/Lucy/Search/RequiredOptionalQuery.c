@@ -37,42 +37,42 @@ ReqOptQuery_init(RequiredOptionalQuery *self, Query *required_query,
                  Query *optional_query) {
     PolyQuery_init((PolyQuery*)self, NULL);
     RequiredOptionalQueryIVARS *const ivars = ReqOptQuery_IVARS(self);
-    VA_Push(ivars->children, INCREF(required_query));
-    VA_Push(ivars->children, INCREF(optional_query));
+    Vec_Push(ivars->children, INCREF(required_query));
+    Vec_Push(ivars->children, INCREF(optional_query));
     return self;
 }
 
 Query*
 ReqOptQuery_Get_Required_Query_IMP(RequiredOptionalQuery *self) {
     RequiredOptionalQueryIVARS *const ivars = ReqOptQuery_IVARS(self);
-    return (Query*)VA_Fetch(ivars->children, 0);
+    return (Query*)Vec_Fetch(ivars->children, 0);
 }
 
 void
 ReqOptQuery_Set_Required_Query_IMP(RequiredOptionalQuery *self,
                                    Query *required_query) {
     RequiredOptionalQueryIVARS *const ivars = ReqOptQuery_IVARS(self);
-    VA_Store(ivars->children, 0, INCREF(required_query));
+    Vec_Store(ivars->children, 0, INCREF(required_query));
 }
 
 Query*
 ReqOptQuery_Get_Optional_Query_IMP(RequiredOptionalQuery *self) {
     RequiredOptionalQueryIVARS *const ivars = ReqOptQuery_IVARS(self);
-    return (Query*)VA_Fetch(ivars->children, 1);
+    return (Query*)Vec_Fetch(ivars->children, 1);
 }
 
 void
 ReqOptQuery_Set_Optional_Query_IMP(RequiredOptionalQuery *self,
                                    Query *optional_query) {
     RequiredOptionalQueryIVARS *const ivars = ReqOptQuery_IVARS(self);
-    VA_Store(ivars->children, 1, INCREF(optional_query));
+    Vec_Store(ivars->children, 1, INCREF(optional_query));
 }
 
 String*
 ReqOptQuery_To_String_IMP(RequiredOptionalQuery *self) {
     RequiredOptionalQueryIVARS *const ivars = ReqOptQuery_IVARS(self);
-    String *req_string = Obj_To_String(VA_Fetch(ivars->children, 0));
-    String *opt_string = Obj_To_String(VA_Fetch(ivars->children, 1));
+    String *req_string = Obj_To_String(Vec_Fetch(ivars->children, 0));
+    String *opt_string = Obj_To_String(Vec_Fetch(ivars->children, 1));
     String *retval = Str_newf("(+%o %o)", req_string, opt_string);
     DECREF(opt_string);
     DECREF(req_string);
@@ -126,8 +126,8 @@ ReqOptCompiler_Make_Matcher_IMP(RequiredOptionalCompiler *self,
     RequiredOptionalCompilerIVARS *const ivars = ReqOptCompiler_IVARS(self);
     Schema     *schema       = SegReader_Get_Schema(reader);
     Similarity *sim          = Schema_Get_Similarity(schema);
-    Compiler   *req_compiler = (Compiler*)VA_Fetch(ivars->children, 0);
-    Compiler   *opt_compiler = (Compiler*)VA_Fetch(ivars->children, 1);
+    Compiler   *req_compiler = (Compiler*)Vec_Fetch(ivars->children, 0);
+    Compiler   *opt_compiler = (Compiler*)Vec_Fetch(ivars->children, 1);
     Matcher *req_matcher
         = Compiler_Make_Matcher(req_compiler, reader, need_score);
     Matcher *opt_matcher

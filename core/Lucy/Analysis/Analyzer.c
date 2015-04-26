@@ -40,17 +40,17 @@ Analyzer_Transform_Text_IMP(Analyzer *self, String *text) {
     return retval;
 }
 
-VArray*
+Vector*
 Analyzer_Split_IMP(Analyzer *self, String *text) {
     Inversion  *inversion = Analyzer_Transform_Text(self, text);
-    VArray     *out       = VA_new(0);
+    Vector     *out       = Vec_new(0);
     Token      *token;
 
     while ((token = Inversion_Next(inversion)) != NULL) {
         TokenIVARS *const token_ivars = Token_IVARS(token);
         String *string
             = Str_new_from_trusted_utf8(token_ivars->text, token_ivars->len);
-        VA_Push(out, (Obj*)string);
+        Vec_Push(out, (Obj*)string);
     }
 
     DECREF(inversion);

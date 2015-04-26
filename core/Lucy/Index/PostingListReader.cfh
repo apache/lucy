@@ -27,7 +27,7 @@ public class Lucy::Index::PostingListReader nickname PListReader
     inert PostingListReader*
     init(PostingListReader *self, Schema *schema = NULL,
          Folder *folder = NULL, Snapshot *snapshot = NULL,
-         VArray *segments = NULL, int32_t seg_tick = -1);
+         Vector *segments = NULL, int32_t seg_tick = -1);
 
     /** Returns a PostingList, or [](cfish:@null) if either `field` is
      * [](cfish:@null) or `field` is not present in any documents.
@@ -47,7 +47,7 @@ public class Lucy::Index::PostingListReader nickname PListReader
      * segment level.
      */
     public incremented nullable PostingListReader*
-    Aggregator(PostingListReader *self, VArray *readers, I32Array *offsets);
+    Aggregator(PostingListReader *self, Vector *readers, I32Array *offsets);
 }
 
 class Lucy::Index::DefaultPostingListReader nickname DefPListReader
@@ -56,12 +56,12 @@ class Lucy::Index::DefaultPostingListReader nickname DefPListReader
     LexiconReader *lex_reader;
 
     inert incremented DefaultPostingListReader*
-    new(Schema *schema, Folder *folder, Snapshot *snapshot, VArray *segments,
+    new(Schema *schema, Folder *folder, Snapshot *snapshot, Vector *segments,
         int32_t seg_tick, LexiconReader *lex_reader);
 
     inert DefaultPostingListReader*
     init(DefaultPostingListReader *self, Schema *schema, Folder *folder,
-         Snapshot *snapshot, VArray *segments, int32_t seg_tick,
+         Snapshot *snapshot, Vector *segments, int32_t seg_tick,
          LexiconReader *lex_reader);
 
     public incremented nullable SegPostingList*

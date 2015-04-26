@@ -194,9 +194,9 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
     ivars->segment = Seg_new(new_seg_num);
 
     // Add all known fields to Segment.
-    VArray *fields = Schema_All_Fields(schema);
-    for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
-        Seg_Add_Field(ivars->segment, (String*)VA_Fetch(fields, i));
+    Vector *fields = Schema_All_Fields(schema);
+    for (uint32_t i = 0, max = Vec_Get_Size(fields); i < max; i++) {
+        Seg_Add_Field(ivars->segment, (String*)Vec_Fetch(fields, i));
     }
     DECREF(fields);
 
@@ -288,8 +288,8 @@ Indexer_Delete_By_Term_IMP(Indexer *self, String *field, Obj *term) {
     if (FType_Is_A(type, FULLTEXTTYPE)) {
         CERTIFY(term, STRING);
         Analyzer *analyzer = Schema_Fetch_Analyzer(schema, field);
-        VArray *terms = Analyzer_Split(analyzer, (String*)term);
-        Obj *analyzed_term = VA_Fetch(terms, 0);
+        Vector *terms = Analyzer_Split(analyzer, (String*)term);
+        Obj *analyzed_term = Vec_Fetch(terms, 0);
         if (analyzed_term) {
             DelWriter_Delete_By_Term(ivars->del_writer, field,
                                      analyzed_term);
@@ -336,22 +336,22 @@ Indexer_Add_Index_IMP(Indexer *self, Obj *index) {
     else {
         Schema *schema       = ivars->schema;
         Schema *other_schema = IxReader_Get_Schema(reader);
-        VArray *other_fields = Schema_All_Fields(other_schema);
-        VArray *seg_readers  = IxReader_Seg_Readers(reader);
+        Vector *other_fields = Schema_All_Fields(other_schema);
+        Vector *seg_readers  = IxReader_Seg_Readers(reader);
 
         // Validate schema compatibility and add fields.
         Schema_Eat(schema, other_schema);
 
         // Add fields to Segment.
-        for (uint32_t i = 0, max = VA_Get_Size(other_fields); i < max; i++) {
-            String *other_field = (String*)VA_Fetch(other_fields, i);
+        for (uint32_t i = 0, max = Vec_Get_Size(other_fields); i < max; i++) {
+            String *other_field = (String*)Vec_Fetch(other_fields, i);
             Seg_Add_Field(ivars->segment, other_field);
         }
         DECREF(other_fields);
 
         // Add all segments.
-        for (uint32_t i = 0, max = VA_Get_Size(seg_readers); i < max; i++) {
-            SegReader *seg_reader = (SegReader*)VA_Fetch(seg_readers, i);
+        for (uint32_t i = 0, max = Vec_Get_Size(seg_readers); i < max; i++) {
+            SegReader *seg_reader = (SegReader*)Vec_Fetch(seg_readers, i);
             DeletionsReader *del_reader
                 = (DeletionsReader*)SegReader_Fetch(
                       seg_reader, Class_Get_Name(DELETIONSREADER));
@@ -380,10 +380,10 @@ Indexer_Optimize_IMP(Indexer *self) {
 
 static String*
 S_find_schema_file(Snapshot *snapshot) {
-    VArray *files = Snapshot_List(snapshot);
+    Vector *files = Snapshot_List(snapshot);
     String *retval = NULL;
-    for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
-        String *file = (String*)VA_Fetch(files, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
+        String *file = (String*)Vec_Fetch(files, i);
         if (Str_Starts_With_Utf8(file, "schema_", 7)
             && Str_Ends_With_Utf8(file, ".json", 5)
            ) {
@@ -396,10 +396,10 @@ S_find_schema_file(Snapshot *snapshot) {
 }
 
 static bool
-S_maybe_merge(Indexer *self, VArray *seg_readers) {
+S_maybe_merge(Indexer *self, Vector *seg_readers) {
     IndexerIVARS *const ivars = Indexer_IVARS(self);
     bool      merge_happened  = false;
-    uint32_t  num_seg_readers = VA_Get_Size(seg_readers);
+    uint32_t  num_seg_readers = Vec_Get_Size(seg_readers);
     Lock     *merge_lock      = IxManager_Make_Merge_Lock(ivars->manager);
     bool      got_merge_lock  = Lock_Obtain(merge_lock);
     int64_t   cutoff;
@@ -429,13 +429,13 @@ S_maybe_merge(Indexer *self, VArray *seg_readers) {
 
     // Get a list of segments to recycle.  Validate and confirm that there are
     // no dupes in the list.
-    VArray *to_merge = IxManager_Recycle(ivars->manager, ivars->polyreader,
+    Vector *to_merge = IxManager_Recycle(ivars->manager, ivars->polyreader,
                                          ivars->del_writer, cutoff, ivars->optimize);
 
-    Hash *seen = Hash_new(VA_Get_Size(to_merge));
-    for (uint32_t i = 0, max = VA_Get_Size(to_merge); i < max; i++) {
+    Hash *seen = Hash_new(Vec_Get_Size(to_merge));
+    for (uint32_t i = 0, max = Vec_Get_Size(to_merge); i < max; i++) {
         SegReader *seg_reader
-            = (SegReader*)CERTIFY(VA_Fetch(to_merge, i), SEGREADER);
+            = (SegReader*)CERTIFY(Vec_Fetch(to_merge, i), SEGREADER);
         String *seg_name = SegReader_Get_Seg_Name(seg_reader);
         if (Hash_Fetch(seen, seg_name)) {
             DECREF(seen);
@@ -448,8 +448,8 @@ S_maybe_merge(Indexer *self, VArray *seg_readers) {
     DECREF(seen);
 
     // Consolidate segments if either sparse or optimizing forced.
-    for (uint32_t i = 0, max = VA_Get_Size(to_merge); i < max; i++) {
-        SegReader *seg_reader = (SegReader*)VA_Fetch(to_merge, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(to_merge); i < max; i++) {
+        SegReader *seg_reader = (SegReader*)Vec_Fetch(to_merge, i);
         int64_t seg_num = SegReader_Get_Seg_Num(seg_reader);
         Matcher *deletions
             = DelWriter_Seg_Deletions(ivars->del_writer, seg_reader);
@@ -470,7 +470,7 @@ S_maybe_merge(Indexer *self, VArray *seg_readers) {
     // Write out new deletions.
     if (DelWriter_Updated(ivars->del_writer)) {
         // Only write out if they haven't all been applied.
-        if (VA_Get_Size(to_merge) != num_seg_readers) {
+        if (Vec_Get_Size(to_merge) != num_seg_readers) {
             DelWriter_Finish(ivars->del_writer);
         }
     }
@@ -482,8 +482,8 @@ S_maybe_merge(Indexer *self, VArray *seg_readers) {
 void
 Indexer_Prepare_Commit_IMP(Indexer *self) {
     IndexerIVARS *const ivars = Indexer_IVARS(self);
-    VArray   *seg_readers     = PolyReader_Get_Seg_Readers(ivars->polyreader);
-    uint32_t  num_seg_readers = VA_Get_Size(seg_readers);
+    Vector   *seg_readers     = PolyReader_Get_Seg_Readers(ivars->polyreader);
+    uint32_t  num_seg_readers = Vec_Get_Size(seg_readers);
     bool      merge_happened  = false;
 
     if (!ivars->write_lock || ivars->prepared) {

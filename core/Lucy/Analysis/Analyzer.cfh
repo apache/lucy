@@ -46,7 +46,7 @@ public abstract class Lucy::Analysis::Analyzer inherits Clownfish::Obj {
 
     /** Analyze text and return an array of token texts.
      */
-    public incremented VArray*
+    public incremented Vector*
     Split(Analyzer *self, String *text);
 
     public incremented Obj*

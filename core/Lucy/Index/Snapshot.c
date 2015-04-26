@@ -24,8 +24,8 @@
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/Json.h"
 
-static VArray*
-S_clean_segment_contents(VArray *orig);
+static Vector*
+S_clean_segment_contents(Vector *orig);
 
 int32_t Snapshot_current_file_format = 2;
 static int32_t Snapshot_current_file_subformat = 1;
@@ -78,7 +78,7 @@ Snapshot_Delete_Entry_IMP(Snapshot *self, String *entry) {
     }
 }
 
-VArray*
+Vector*
 Snapshot_List_IMP(Snapshot *self) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
     return Hash_Keys(ivars->entries);
@@ -128,18 +128,18 @@ Snapshot_Read_File_IMP(Snapshot *self, Folder *folder, String *path) {
         }
 
         // Build up list of entries.
-        VArray *list = (VArray*)INCREF(CERTIFY(
+        Vector *list = (Vector*)INCREF(CERTIFY(
                            Hash_Fetch_Utf8(snap_data, "entries", 7),
-                           VARRAY));
+                           VECTOR));
         if (format == 1 || (format == 2 && subformat < 1)) {
-            VArray *cleaned = S_clean_segment_contents(list);
+            Vector *cleaned = S_clean_segment_contents(list);
             DECREF(list);
             list = cleaned;
         }
         Hash_Clear(ivars->entries);
-        for (uint32_t i = 0, max = VA_Get_Size(list); i < max; i++) {
+        for (uint32_t i = 0, max = Vec_Get_Size(list); i < max; i++) {
             String *entry
-                = (String*)CERTIFY(VA_Fetch(list, i), STRING);
+                = (String*)CERTIFY(Vec_Fetch(list, i), STRING);
             Hash_Store(ivars->entries, entry, (Obj*)CFISH_TRUE);
         }
 
@@ -150,20 +150,20 @@ Snapshot_Read_File_IMP(Snapshot *self, Folder *folder, String *path) {
     return self;
 }
 
-static VArray*
-S_clean_segment_contents(VArray *orig) {
+static Vector*
+S_clean_segment_contents(Vector *orig) {
     // Since Snapshot format 2, no DataReader has depended on individual files
     // within segment directories being listed.  Filter these files because
     // they cause a problem with FilePurger.
-    VArray *cleaned = VA_new(VA_Get_Size(orig));
-    for (uint32_t i = 0, max = VA_Get_Size(orig); i < max; i++) {
-        String *name = (String*)VA_Fetch(orig, i);
+    Vector *cleaned = Vec_new(Vec_Get_Size(orig));
+    for (uint32_t i = 0, max = Vec_Get_Size(orig); i < max; i++) {
+        String *name = (String*)Vec_Fetch(orig, i);
         if (!Seg_valid_seg_name(name)) {
             if (Str_Starts_With_Utf8(name, "seg_", 4)) {
                 continue;  // Skip this file.
             }
         }
-        VA_Push(cleaned, INCREF(name));
+        Vec_Push(cleaned, INCREF(name));
     }
     return cleaned;
 }
@@ -173,7 +173,7 @@ void
 Snapshot_Write_File_IMP(Snapshot *self, Folder *folder, String *path) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
     Hash   *all_data = Hash_new(0);
-    VArray *list     = Snapshot_List(self);
+    Vector *list     = Snapshot_List(self);
 
     // Update path.
     DECREF(ivars->path);
@@ -195,7 +195,7 @@ Snapshot_Write_File_IMP(Snapshot *self, Folder *folder, String *path) {
     }
 
     // Sort, then store file names.
-    VA_Sort(list);
+    Vec_Sort(list);
     Hash_Store_Utf8(all_data, "entries", 7, (Obj*)list);
 
     // Create a JSON-izable data structure.

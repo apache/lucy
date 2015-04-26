@@ -52,8 +52,8 @@ static void
 test_analysis(TestBatchRunner *runner) {
     CaseFolder *case_folder = CaseFolder_new();
     String *source = Str_newf("caPiTal ofFensE");
-    VArray *wanted = VA_new(1);
-    VA_Push(wanted, (Obj*)Str_newf("capital offense"));
+    Vector *wanted = Vec_new(1);
+    Vec_Push(wanted, (Obj*)Str_newf("capital offense"));
     TestUtils_test_analyzer(runner, (Analyzer*)case_folder, source, wanted,
                             "lowercase plain text");
     DECREF(wanted);

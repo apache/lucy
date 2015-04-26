@@ -23,7 +23,7 @@ package NonMergingIndexManager;
 use base qw( Lucy::Index::IndexManager );
 
 sub recycle {
-    return Clownfish::VArray->new;
+    return Clownfish::Vector->new;
 }
 
 # BiggerSchema is like TestSchema, but it has an extra field named "aux".

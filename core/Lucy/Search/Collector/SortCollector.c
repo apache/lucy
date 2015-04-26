@@ -74,21 +74,21 @@ SortColl_new(Schema *schema, SortSpec *sort_spec, uint32_t wanted) {
 }
 
 // Default to sort-by-score-then-doc-id.
-static VArray*
+static Vector*
 S_default_sort_rules() {
-    VArray *rules = VA_new(1);
-    VA_Push(rules, (Obj*)SortRule_new(SortRule_SCORE, NULL, false));
-    VA_Push(rules, (Obj*)SortRule_new(SortRule_DOC_ID, NULL, false));
+    Vector *rules = Vec_new(1);
+    Vec_Push(rules, (Obj*)SortRule_new(SortRule_SCORE, NULL, false));
+    Vec_Push(rules, (Obj*)SortRule_new(SortRule_DOC_ID, NULL, false));
     return rules;
 }
 
 SortCollector*
 SortColl_init(SortCollector *self, Schema *schema, SortSpec *sort_spec,
               uint32_t wanted) {
-    VArray *rules = sort_spec
-                    ? (VArray*)INCREF(SortSpec_Get_Rules(sort_spec))
+    Vector *rules = sort_spec
+                    ? (Vector*)INCREF(SortSpec_Get_Rules(sort_spec))
                     : S_default_sort_rules();
-    uint32_t num_rules = VA_Get_Size(rules);
+    uint32_t num_rules = Vec_Get_Size(rules);
 
     // Validate.
     if (sort_spec && !schema) {
@@ -123,7 +123,7 @@ SortColl_init(SortCollector *self, Schema *schema, SortSpec *sort_spec,
     ivars->need_score  = false;
     ivars->need_values = false;
     for (uint32_t i = 0; i < num_rules; i++) {
-        SortRule *rule   = (SortRule*)VA_Fetch(rules, i);
+        SortRule *rule   = (SortRule*)Vec_Fetch(rules, i);
         int32_t rule_type  = SortRule_Get_Type(rule);
         ivars->actions[i] = S_derive_action(rule, NULL);
         if (rule_type == SortRule_SCORE) {
@@ -156,7 +156,7 @@ SortColl_init(SortCollector *self, Schema *schema, SortSpec *sort_spec,
 
 
     // Prepare a MatchDoc-in-waiting.
-    VArray *values = ivars->need_values ? VA_new(num_rules) : NULL;
+    Vector *values = ivars->need_values ? Vec_new(num_rules) : NULL;
     float   score  = ivars->need_score  ? CHY_F32_NEGINF : CHY_F32_NAN;
     ivars->bumped = MatchDoc_new(INT32_MAX, score, values);
     DECREF(values);
@@ -240,7 +240,7 @@ SortColl_Set_Reader_IMP(SortCollector *self, SegReader *reader) {
     // Obtain sort caches. Derive actions array for this segment.
     if (ivars->need_values && sort_reader) {
         for (uint32_t i = 0, max = ivars->num_rules; i < max; i++) {
-            SortRule  *rule  = (SortRule*)VA_Fetch(ivars->rules, i);
+            SortRule  *rule  = (SortRule*)Vec_Fetch(ivars->rules, i);
             String    *field = SortRule_Get_Field(rule);
             SortCache *cache = field
                                ? SortReader_Fetch_Sort_Cache(sort_reader, field)
@@ -258,7 +258,7 @@ SortColl_Set_Reader_IMP(SortCollector *self, SegReader *reader) {
     super_set_reader(self, reader);
 }
 
-VArray*
+Vector*
 SortColl_Pop_Match_Docs_IMP(SortCollector *self) {
     SortCollectorIVARS *const ivars = SortColl_IVARS(self);
     return HitQ_Pop_All(ivars->hit_q);
@@ -293,16 +293,16 @@ SortColl_Collect_IMP(SortCollector *self, int32_t doc_id) {
 
         // Fetch values so that cross-segment sorting can work.
         if (ivars->need_values) {
-            VArray *values = match_doc_ivars->values;
+            Vector *values = match_doc_ivars->values;
 
             for (uint32_t i = 0, max = ivars->num_rules; i < max; i++) {
                 SortCache *cache   = ivars->sort_caches[i];
-                Obj       *old_val = VA_Delete(values, i);
+                Obj       *old_val = Vec_Delete(values, i);
                 DECREF(old_val);
                 if (cache) {
                     int32_t ord = SortCache_Ordinal(cache, doc_id);
                     Obj *val = SortCache_Value(cache, ord);
-                    if (val) { VA_Store(values, i, (Obj*)val); }
+                    if (val) { Vec_Store(values, i, (Obj*)val); }
                 }
             }
         }
@@ -328,8 +328,8 @@ SortColl_Collect_IMP(SortCollector *self, int32_t doc_id) {
         }
         else {
             // The queue isn't full yet, so create a fresh MatchDoc.
-            VArray *values = ivars->need_values
-                             ? VA_new(ivars->num_rules)
+            Vector *values = ivars->need_values
+                             ? Vec_new(ivars->num_rules)
                              : NULL;
             float fake_score = ivars->need_score
                                ? CHY_F32_NEGINF

@@ -47,8 +47,8 @@ HitQ_init(HitQueue *self, Schema *schema, SortSpec *sort_spec,
           uint32_t wanted) {
     HitQueueIVARS *const ivars = HitQ_IVARS(self);
     if (sort_spec) {
-        VArray   *rules      = SortSpec_Get_Rules(sort_spec);
-        uint32_t  num_rules  = VA_Get_Size(rules);
+        Vector   *rules      = SortSpec_Get_Rules(sort_spec);
+        uint32_t  num_rules  = Vec_Get_Size(rules);
         uint32_t  action_num = 0;
 
         if (!schema) {
@@ -61,7 +61,7 @@ HitQ_init(HitQueue *self, Schema *schema, SortSpec *sort_spec,
         ivars->field_types = (FieldType**)CALLOCATE(num_rules, sizeof(FieldType*));
 
         for (uint32_t i = 0; i < num_rules; i++) {
-            SortRule *rule      = (SortRule*)VA_Fetch(rules, i);
+            SortRule *rule      = (SortRule*)Vec_Fetch(rules, i);
             int32_t   rule_type = SortRule_Get_Type(rule);
             bool      reverse   = SortRule_Get_Reverse(rule);
 
@@ -126,7 +126,7 @@ HitQ_Jostle_IMP(HitQueue *self, Obj *element) {
         = SUPER_METHOD_PTR(HITQUEUE, LUCY_HitQ_Jostle);
     if (ivars->need_values) {
         MatchDocIVARS *const match_doc_ivars = MatchDoc_IVARS(match_doc);
-        CERTIFY(match_doc_ivars->values, VARRAY);
+        CERTIFY(match_doc_ivars->values, VECTOR);
     }
     return super_jostle(self, element);
 }
@@ -134,8 +134,8 @@ HitQ_Jostle_IMP(HitQueue *self, Obj *element) {
 static CFISH_INLINE int32_t
 SI_compare_by_value(HitQueueIVARS *ivars, uint32_t tick,
                     MatchDocIVARS *a_ivars, MatchDocIVARS *b_ivars) {
-    Obj *a_val = VA_Fetch(a_ivars->values, tick);
-    Obj *b_val = VA_Fetch(b_ivars->values, tick);
+    Obj *a_val = Vec_Fetch(a_ivars->values, tick);
+    Obj *b_val = Vec_Fetch(b_ivars->values, tick);
     FieldType *field_type = ivars->field_types[tick];
     return FType_null_back_compare_values(field_type, a_val, b_val);
 }

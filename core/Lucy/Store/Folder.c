@@ -170,25 +170,25 @@ Folder_Delete_Tree_IMP(Folder *self, String *path) {
                 = Folder_Local_Find_Folder(enclosing_folder, local);
             DirHandle *dh = Folder_Local_Open_Dir(inner_folder);
             if (dh) {
-                VArray *files = VA_new(20);
-                VArray *dirs  = VA_new(20);
+                Vector *files = Vec_new(20);
+                Vector *dirs  = Vec_new(20);
                 while (DH_Next(dh)) {
                     String *entry = DH_Get_Entry(dh);
-                    VA_Push(files, (Obj*)Str_Clone(entry));
+                    Vec_Push(files, (Obj*)Str_Clone(entry));
                     if (DH_Entry_Is_Dir(dh) && !DH_Entry_Is_Symlink(dh)) {
-                        VA_Push(dirs, (Obj*)Str_Clone(entry));
+                        Vec_Push(dirs, (Obj*)Str_Clone(entry));
                     }
                     DECREF(entry);
                 }
-                for (uint32_t i = 0, max = VA_Get_Size(dirs); i < max; i++) {
-                    String *name = (String*)VA_Fetch(files, i);
+                for (uint32_t i = 0, max = Vec_Get_Size(dirs); i < max; i++) {
+                    String *name = (String*)Vec_Fetch(files, i);
                     bool success = Folder_Delete_Tree(inner_folder, name);
                     if (!success && Folder_Local_Exists(inner_folder, name)) {
                         break;
                     }
                 }
-                for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
-                    String *name = (String*)VA_Fetch(files, i);
+                for (uint32_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
+                    String *name = (String*)Vec_Fetch(files, i);
                     bool success = Folder_Local_Delete(inner_folder, name);
                     if (!success && Folder_Local_Exists(inner_folder, name)) {
                         break;
@@ -220,7 +220,7 @@ S_is_updir(String *path) {
 }
 
 static void
-S_add_to_file_list(Folder *self, VArray *list, String *dir,
+S_add_to_file_list(Folder *self, Vector *list, String *dir,
                    String *path) {
     DirHandle *dh = Folder_Open_Dir(self, dir);
 
@@ -234,10 +234,10 @@ S_add_to_file_list(Folder *self, VArray *list, String *dir,
             String *relpath = path && Str_Get_Size(path)
                               ? Str_newf("%o/%o", path, entry)
                               : Str_Clone(entry);
-            if (VA_Get_Size(list) == VA_Get_Capacity(list)) {
-                VA_Grow(list, VA_Get_Size(list) * 2);
+            if (Vec_Get_Size(list) == Vec_Get_Capacity(list)) {
+                Vec_Grow(list, Vec_Get_Size(list) * 2);
             }
-            VA_Push(list, (Obj*)relpath);
+            Vec_Push(list, (Obj*)relpath);
 
             if (DH_Entry_Is_Dir(dh) && !DH_Entry_Is_Symlink(dh)) {
                 String *subdir = Str_Get_Size(dir)
@@ -331,16 +331,16 @@ Folder_Is_Directory_IMP(Folder *self, String *path) {
     return retval;
 }
 
-VArray*
+Vector*
 Folder_List_IMP(Folder *self, String *path) {
     Folder *local_folder = Folder_Find_Folder(self, path);
-    VArray *list = NULL;
+    Vector *list = NULL;
     DirHandle *dh = Folder_Local_Open_Dir(local_folder);
     if (dh) {
-        list = VA_new(32);
+        list = Vec_new(32);
         while (DH_Next(dh)) {
             String *entry = DH_Get_Entry(dh);
-            VA_Push(list, (Obj*)Str_Clone(entry));
+            Vec_Push(list, (Obj*)Str_Clone(entry));
             DECREF(entry);
         }
         DECREF(dh);
@@ -351,10 +351,10 @@ Folder_List_IMP(Folder *self, String *path) {
     return list;
 }
 
-VArray*
+Vector*
 Folder_List_R_IMP(Folder *self, String *path) {
     Folder *local_folder = Folder_Find_Folder(self, path);
-    VArray *list =  VA_new(0);
+    Vector *list =  Vec_new(0);
     if (local_folder) {
         String *dir = Str_new_from_trusted_utf8("", 0);
         S_add_to_file_list(local_folder, list, dir, path);

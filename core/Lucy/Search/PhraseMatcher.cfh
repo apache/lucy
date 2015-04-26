@@ -34,10 +34,10 @@ class Lucy::Search::PhraseMatcher inherits Lucy::Search::Matcher {
     bool            more;
 
     inert incremented PhraseMatcher*
-    new(Similarity *similarity, VArray *posting_lists, Compiler *compiler);
+    new(Similarity *similarity, Vector *posting_lists, Compiler *compiler);
 
     inert PhraseMatcher*
-    init(PhraseMatcher *self, Similarity *similarity, VArray *posting_lists,
+    init(PhraseMatcher *self, Similarity *similarity, Vector *posting_lists,
          Compiler *compiler);
 
     public void

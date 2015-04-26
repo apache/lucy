@@ -25,7 +25,7 @@ class Lucy::Index::HighlightReader nickname HLReader
 
     inert HighlightReader*
     init(HighlightReader *self, Schema *schema = NULL, Folder *folder = NULL,
-         Snapshot *snapshot = NULL, VArray *segments = NULL,
+         Snapshot *snapshot = NULL, Vector *segments = NULL,
          int32_t seg_tick = -1);
 
     /** Return the DocVector object for the given doc id.
@@ -34,20 +34,20 @@ class Lucy::Index::HighlightReader nickname HLReader
     Fetch_Doc_Vec(HighlightReader *self, int32_t doc_id);
 
     public incremented nullable HighlightReader*
-    Aggregator(HighlightReader *self, VArray *readers, I32Array *offsets);
+    Aggregator(HighlightReader *self, Vector *readers, I32Array *offsets);
 }
 
 class Lucy::Index::PolyHighlightReader nickname PolyHLReader
     inherits Lucy::Index::HighlightReader {
 
-    VArray   *readers;
+    Vector   *readers;
     I32Array *offsets;
 
     inert incremented PolyHighlightReader*
-    new(VArray *readers, I32Array *offsets);
+    new(Vector *readers, I32Array *offsets);
 
     inert PolyHighlightReader*
-    init(PolyHighlightReader *self, VArray *readers, I32Array *offsets);
+    init(PolyHighlightReader *self, Vector *readers, I32Array *offsets);
 
     public incremented DocVector*
     Fetch_Doc_Vec(PolyHighlightReader *self, int32_t doc_id);
@@ -68,12 +68,12 @@ class Lucy::Index::DefaultHighlightReader nickname DefHLReader
     /** Constructors.
      */
     inert incremented DefaultHighlightReader*
-    new(Schema *schema, Folder *folder, Snapshot *snapshot, VArray *segments,
+    new(Schema *schema, Folder *folder, Snapshot *snapshot, Vector *segments,
         int32_t seg_tick);
 
     inert DefaultHighlightReader*
     init(DefaultHighlightReader *self, Schema *schema, Folder *folder,
-         Snapshot *snapshot, VArray *segments, int32_t seg_tick);
+         Snapshot *snapshot, Vector *segments, int32_t seg_tick);
 
     /** Return the DocVector object for the given doc id.
      */

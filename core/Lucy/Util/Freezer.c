@@ -57,8 +57,8 @@ Freezer_serialize(Obj *obj, OutStream *outstream) {
     else if (Obj_Is_A(obj, BYTEBUF)) {
         Freezer_serialize_bytebuf((ByteBuf*)obj, outstream);
     }
-    else if (Obj_Is_A(obj, VARRAY)) {
-        Freezer_serialize_varray((VArray*)obj, outstream);
+    else if (Obj_Is_A(obj, VECTOR)) {
+        Freezer_serialize_varray((Vector*)obj, outstream);
     }
     else if (Obj_Is_A(obj, HASH)) {
         Freezer_serialize_hash((Hash*)obj, outstream);
@@ -130,8 +130,8 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
     else if (Obj_Is_A(obj, BYTEBUF)) {
         obj = (Obj*)Freezer_deserialize_bytebuf((ByteBuf*)obj, instream);
     }
-    else if (Obj_Is_A(obj, VARRAY)) {
-        obj = (Obj*)Freezer_deserialize_varray((VArray*)obj, instream);
+    else if (Obj_Is_A(obj, VECTOR)) {
+        obj = (Obj*)Freezer_deserialize_varray((Vector*)obj, instream);
     }
     else if (Obj_Is_A(obj, HASH)) {
         obj = (Obj*)Freezer_deserialize_hash((Hash*)obj, instream);
@@ -250,12 +250,12 @@ Freezer_read_bytebuf(InStream *instream) {
 }
 
 void
-Freezer_serialize_varray(VArray *array, OutStream *outstream) {
+Freezer_serialize_varray(Vector *array, OutStream *outstream) {
     uint32_t last_valid_tick = 0;
-    size_t size = VA_Get_Size(array);
+    size_t size = Vec_Get_Size(array);
     OutStream_Write_C32(outstream, size);
     for (uint32_t i = 0; i < size; i++) {
-        Obj *elem = VA_Fetch(array, i);
+        Obj *elem = Vec_Fetch(array, i);
         if (elem) {
             OutStream_Write_C32(outstream, i - last_valid_tick);
             FREEZE(elem, outstream);
@@ -266,24 +266,24 @@ Freezer_serialize_varray(VArray *array, OutStream *outstream) {
     OutStream_Write_C32(outstream, size - last_valid_tick);
 }
 
-VArray*
-Freezer_deserialize_varray(VArray *array, InStream *instream) {
+Vector*
+Freezer_deserialize_varray(Vector *array, InStream *instream) {
     uint32_t size = InStream_Read_C32(instream);
-    VA_init(array, size);
+    Vec_init(array, size);
     for (uint32_t tick = InStream_Read_C32(instream);
          tick < size;
          tick += InStream_Read_C32(instream)
         ) {
         Obj *obj = THAW(instream);
-        VA_Store(array, tick, obj);
+        Vec_Store(array, tick, obj);
     }
-    VA_Resize(array, size);
+    Vec_Resize(array, size);
     return array;
 }
 
-VArray*
+Vector*
 Freezer_read_varray(InStream *instream) {
-    VArray *array = (VArray*)Class_Make_Obj(VARRAY);
+    Vector *array = (Vector*)Class_Make_Obj(VECTOR);
     return Freezer_deserialize_varray(array, instream);
 }
 
@@ -328,12 +328,12 @@ Freezer_read_hash(InStream *instream) {
 }
 
 static Obj*
-S_dump_array(VArray *array) {
-    VArray *dump = VA_new(VA_Get_Size(array));
-    for (uint32_t i = 0, max = VA_Get_Size(array); i < max; i++) {
-        Obj *elem = VA_Fetch(array, i);
+S_dump_array(Vector *array) {
+    Vector *dump = Vec_new(Vec_Get_Size(array));
+    for (uint32_t i = 0, max = Vec_Get_Size(array); i < max; i++) {
+        Obj *elem = Vec_Fetch(array, i);
         if (elem) {
-            VA_Store(dump, i, Freezer_dump(elem));
+            Vec_Store(dump, i, Freezer_dump(elem));
         }
     }
     return (Obj*)dump;
@@ -359,8 +359,8 @@ Freezer_dump(Obj *obj) {
     if (Obj_Is_A(obj, STRING)) {
         return (Obj*)Obj_To_String(obj);
     }
-    else if (Obj_Is_A(obj, VARRAY)) {
-        return S_dump_array((VArray*)obj);
+    else if (Obj_Is_A(obj, VECTOR)) {
+        return S_dump_array((Vector*)obj);
     }
     else if (Obj_Is_A(obj, HASH)) {
         return S_dump_hash((Hash*)obj);
@@ -466,13 +466,13 @@ S_load_from_hash(Hash *dump) {
 
 
 Obj*
-S_load_from_array(VArray *dump) {
-    VArray *loaded = VA_new(VA_Get_Size(dump));
+S_load_from_array(Vector *dump) {
+    Vector *loaded = Vec_new(Vec_Get_Size(dump));
 
-    for (uint32_t i = 0, max = VA_Get_Size(dump); i < max; i++) {
-        Obj *elem_dump = VA_Fetch(dump, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(dump); i < max; i++) {
+        Obj *elem_dump = Vec_Fetch(dump, i);
         if (elem_dump) {
-            VA_Store(loaded, i, Freezer_load(elem_dump));
+            Vec_Store(loaded, i, Freezer_load(elem_dump));
         }
     }
 
@@ -484,8 +484,8 @@ Freezer_load(Obj *obj) {
     if (Obj_Is_A(obj, HASH)) {
         return S_load_from_hash((Hash*)obj);
     }
-    else if (Obj_Is_A(obj, VARRAY)) {
-        return S_load_from_array((VArray*)obj);
+    else if (Obj_Is_A(obj, VECTOR)) {
+        return S_load_from_array((Vector*)obj);
     }
     else {
         return Obj_Clone(obj);

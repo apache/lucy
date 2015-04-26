@@ -37,7 +37,7 @@ public class Lucy::Index::Segment nickname Seg inherits Clownfish::Obj {
     int64_t      count;
     int64_t      number;
     Hash        *by_name;   /* field numbers by name */
-    VArray      *by_num;    /* field names by num */
+    Vector      *by_num;    /* field names by num */
     Hash        *metadata;
 
     inert incremented Segment*

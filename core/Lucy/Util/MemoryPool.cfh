@@ -30,7 +30,7 @@ class Lucy::Util::MemoryPool nickname MemPool
     inherits Clownfish::Obj {
 
     uint32_t     arena_size;
-    VArray      *arenas;
+    Vector      *arenas;
     int32_t      tick;
     char        *buf;
     char        *last_buf;

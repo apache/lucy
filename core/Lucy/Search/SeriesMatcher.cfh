@@ -21,7 +21,7 @@ parcel Lucy;
 class Lucy::Search::SeriesMatcher inherits Lucy::Search::Matcher {
 
     I32Array  *offsets;
-    VArray    *matchers;
+    Vector    *matchers;
     Matcher   *current_matcher;
     int32_t    doc_id;
     int32_t    tick;
@@ -30,10 +30,10 @@ class Lucy::Search::SeriesMatcher inherits Lucy::Search::Matcher {
     int32_t    next_offset;
 
     public inert incremented SeriesMatcher*
-    new(VArray *matchers, I32Array *offsets);
+    new(Vector *matchers, I32Array *offsets);
 
     public inert SeriesMatcher*
-    init(SeriesMatcher *self, VArray *matchers, I32Array *offsets);
+    init(SeriesMatcher *self, Vector *matchers, I32Array *offsets);
 
     public int32_t
     Next(SeriesMatcher *self);

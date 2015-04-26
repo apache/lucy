@@ -23,17 +23,17 @@
 #include "Lucy/Util/Freezer.h"
 
 MatchDoc*
-MatchDoc_new(int32_t doc_id, float score, VArray *values) {
+MatchDoc_new(int32_t doc_id, float score, Vector *values) {
     MatchDoc *self = (MatchDoc*)Class_Make_Obj(MATCHDOC);
     return MatchDoc_init(self, doc_id, score, values);
 }
 
 MatchDoc*
-MatchDoc_init(MatchDoc *self, int32_t doc_id, float score, VArray *values) {
+MatchDoc_init(MatchDoc *self, int32_t doc_id, float score, Vector *values) {
     MatchDocIVARS *const ivars = MatchDoc_IVARS(self);
     ivars->doc_id      = doc_id;
     ivars->score       = score;
-    ivars->values      = (VArray*)INCREF(values);
+    ivars->values      = (Vector*)INCREF(values);
     return self;
 }
 
@@ -74,7 +74,7 @@ MatchDoc_Get_Score_IMP(MatchDoc *self) {
     return MatchDoc_IVARS(self)->score;
 }
 
-VArray*
+Vector*
 MatchDoc_Get_Values_IMP(MatchDoc *self) {
     return MatchDoc_IVARS(self)->values;
 }
@@ -90,10 +90,10 @@ MatchDoc_Set_Score_IMP(MatchDoc *self, float score) {
 }
 
 void
-MatchDoc_Set_Values_IMP(MatchDoc *self, VArray *values) {
+MatchDoc_Set_Values_IMP(MatchDoc *self, Vector *values) {
     MatchDocIVARS *const ivars = MatchDoc_IVARS(self);
     DECREF(ivars->values);
-    ivars->values = (VArray*)INCREF(values);
+    ivars->values = (Vector*)INCREF(values);
 }
 
 

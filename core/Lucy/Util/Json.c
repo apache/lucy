@@ -143,7 +143,7 @@ Json_spew_json(Obj *dump, Folder *folder, String *path) {
 String*
 Json_to_json(Obj *dump) {
     // Validate object type, only allowing hashes and arrays per JSON spec.
-    if (!dump || !(Obj_Is_A(dump, HASH) || Obj_Is_A(dump, VARRAY))) {
+    if (!dump || !(Obj_Is_A(dump, HASH) || Obj_Is_A(dump, VECTOR))) {
         if (!tolerant) {
             String *class_name = dump ? Obj_Get_Class_Name(dump) : NULL;
             String *mess = MAKE_MESS("Illegal top-level object type: %o",
@@ -287,17 +287,17 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
     else if (Obj_Is_A(dump, FLOATNUM)) {
         CB_catf(buf, "%f64", Obj_To_F64(dump));
     }
-    else if (Obj_Is_A(dump, VARRAY)) {
-        VArray *array = (VArray*)dump;
-        size_t size = VA_Get_Size(array);
+    else if (Obj_Is_A(dump, VECTOR)) {
+        Vector *array = (Vector*)dump;
+        size_t size = Vec_Get_Size(array);
         if (size == 0) {
             // Put empty array on single line.
             CB_Cat_Trusted_Utf8(buf, "[]", 2);
             return true;
         }
         else if (size == 1) {
-            Obj *elem = VA_Fetch(array, 0);
-            if (!(Obj_Is_A(elem, HASH) || Obj_Is_A(elem, VARRAY))) {
+            Obj *elem = Vec_Fetch(array, 0);
+            if (!(Obj_Is_A(elem, HASH) || Obj_Is_A(elem, VECTOR))) {
                 // Put array containing single scalar element on one line.
                 CB_Cat_Trusted_Utf8(buf, "[", 1);
                 if (!S_to_json(elem, buf, depth + 1)) {
@@ -312,7 +312,7 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
         for (size_t i = 0; i < size; i++) {
             CB_Cat_Trusted_Utf8(buf, "\n", 1);
             S_cat_whitespace(buf, depth + 1);
-            if (!S_to_json(VA_Fetch(array, i), buf, depth + 1)) {
+            if (!S_to_json(Vec_Fetch(array, i), buf, depth + 1)) {
                 return false;
             }
             if (i + 1 < size) {
@@ -334,9 +334,9 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
         }
 
         // Validate that all keys are strings, then sort.
-        VArray *keys = Hash_Keys(hash);
+        Vector *keys = Hash_Keys(hash);
         for (size_t i = 0; i < size; i++) {
-            Obj *key = VA_Fetch(keys, i);
+            Obj *key = Vec_Fetch(keys, i);
             if (!key || !Obj_Is_A(key, STRING)) {
                 DECREF(keys);
                 String *key_class = key ? Obj_Get_Class_Name(key) : NULL;
@@ -345,12 +345,12 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
                 return false;
             }
         }
-        VA_Sort(keys);
+        Vec_Sort(keys);
 
         // Spread pairs across multiple lines.
         CB_Cat_Trusted_Utf8(buf, "{", 1);
         for (size_t i = 0; i < size; i++) {
-            String *key = (String*)VA_Fetch(keys, i);
+            String *key = (String*)Vec_Fetch(keys, i);
             CB_Cat_Trusted_Utf8(buf, "\n", 1);
             S_cat_whitespace(buf, depth + 1);
             S_append_json_string(key, buf);

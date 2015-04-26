@@ -65,8 +65,8 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
     String *raw_excerpt;
 
     String *field_val = (String *)SSTR_WRAP_UTF8("Ook.  Urk.  Ick.  ", 18);
-    VArray *spans = VA_new(1);
-    VA_Push(spans, (Obj*)Span_new(0, 18, 1.0f));
+    Vector *spans = Vec_new(1);
+    Vec_Push(spans, (Obj*)Span_new(0, 18, 1.0f));
     HeatMap *heat_map = HeatMap_new(spans, 133);
     DECREF(spans);
     raw_excerpt = Highlighter_Raw_Excerpt(highlighter, field_val, &top,
@@ -80,8 +80,8 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
     DECREF(raw_excerpt);
     DECREF(heat_map);
 
-    spans = VA_new(1);
-    VA_Push(spans, (Obj*)Span_new(6, 12, 1.0f));
+    spans = Vec_new(1);
+    Vec_Push(spans, (Obj*)Span_new(6, 12, 1.0f));
     heat_map = HeatMap_new(spans, 133);
     DECREF(spans);
     raw_excerpt = Highlighter_Raw_Excerpt(highlighter, field_val, &top,
@@ -96,8 +96,8 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
     DECREF(heat_map);
 
     field_val = (String *)SSTR_WRAP_UTF8("Ook urk ick i.", 14);
-    spans     = VA_new(1);
-    VA_Push(spans, (Obj*)Span_new(12, 1, 1.0f));
+    spans     = Vec_new(1);
+    Vec_Push(spans, (Obj*)Span_new(12, 1, 1.0f));
     heat_map = HeatMap_new(spans, 133);
     DECREF(spans);
     raw_excerpt = Highlighter_Raw_Excerpt(highlighter, field_val, &top,
@@ -112,8 +112,8 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
     DECREF(raw_excerpt);
 
     field_val = (String *)SSTR_WRAP_UTF8("Urk.  Iz no good.", 17);
-    spans     = VA_new(1);
-    VA_Push(spans, (Obj*)Span_new(6, 2, 1.0f));
+    spans     = Vec_new(1);
+    Vec_Push(spans, (Obj*)Span_new(6, 2, 1.0f));
     heat_map = HeatMap_new(spans, 133);
     DECREF(spans);
     raw_excerpt = Highlighter_Raw_Excerpt(highlighter, field_val, &top,
@@ -131,8 +131,8 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
 
     field_val = (String *)SSTR_WRAP_UTF8("abc/def/ghi/jkl/mno", 19);
 
-    spans = VA_new(1);
-    VA_Push(spans, (Obj*)Span_new(0, 3, 1.0f));
+    spans = Vec_new(1);
+    Vec_Push(spans, (Obj*)Span_new(0, 3, 1.0f));
     heat_map = HeatMap_new(spans, 133);
     DECREF(spans);
     raw_excerpt = Highlighter_Raw_Excerpt(highlighter, field_val, &top,
@@ -143,8 +143,8 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
     DECREF(heat_map);
     DECREF(raw_excerpt);
 
-    spans = VA_new(1);
-    VA_Push(spans, (Obj*)Span_new(8, 3, 1.0f));
+    spans = Vec_new(1);
+    Vec_Push(spans, (Obj*)Span_new(8, 3, 1.0f));
     heat_map = HeatMap_new(spans, 133);
     DECREF(spans);
     raw_excerpt = Highlighter_Raw_Excerpt(highlighter, field_val, &top,
@@ -164,8 +164,8 @@ test_Highlight_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) 
     Highlighter *highlighter = Highlighter_new(searcher, query, content, 3);
     String *highlighted;
 
-    VArray *spans = VA_new(1);
-    VA_Push(spans, (Obj*)Span_new(2, 1, 0.0f));
+    Vector *spans = Vec_new(1);
+    Vec_Push(spans, (Obj*)Span_new(2, 1, 0.0f));
     String *raw_excerpt = (String *)SSTR_WRAP_UTF8("a b c", 5);
     highlighted = Highlighter_Highlight_Excerpt(highlighter, spans,
                                                 raw_excerpt, 0);
@@ -175,9 +175,9 @@ test_Highlight_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) 
     DECREF(highlighted);
     DECREF(spans);
 
-    spans = VA_new(2);
-    VA_Push(spans, (Obj*)Span_new(0, 1, 1.0f));
-    VA_Push(spans, (Obj*)Span_new(10, 10, 1.0f));
+    spans = Vec_new(2);
+    Vec_Push(spans, (Obj*)Span_new(0, 1, 1.0f));
+    Vec_Push(spans, (Obj*)Span_new(10, 10, 1.0f));
     raw_excerpt = (String *)SSTR_WRAP_UTF8(PHI, 2);
     highlighted = Highlighter_Highlight_Excerpt(highlighter, spans,
                                                 raw_excerpt, 0);
@@ -187,8 +187,8 @@ test_Highlight_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) 
     DECREF(highlighted);
     DECREF(spans);
 
-    spans = VA_new(1);
-    VA_Push(spans, (Obj*)Span_new(3, 1, 1.0f));
+    spans = Vec_new(1);
+    Vec_Push(spans, (Obj*)Span_new(3, 1, 1.0f));
     raw_excerpt = (String *)SSTR_WRAP_UTF8(PHI " " PHI " " PHI, 8);
     highlighted = Highlighter_Highlight_Excerpt(highlighter, spans,
                                                 raw_excerpt, 1);
@@ -199,11 +199,11 @@ test_Highlight_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) 
     DECREF(highlighted);
     DECREF(spans);
 
-    spans = VA_new(4);
-    VA_Push(spans, (Obj*)Span_new(2, 10, 1.0f));
-    VA_Push(spans, (Obj*)Span_new(2,  4, 1.0f));
-    VA_Push(spans, (Obj*)Span_new(8,  9, 1.0f));
-    VA_Push(spans, (Obj*)Span_new(8,  4, 1.0f));
+    spans = Vec_new(4);
+    Vec_Push(spans, (Obj*)Span_new(2, 10, 1.0f));
+    Vec_Push(spans, (Obj*)Span_new(2,  4, 1.0f));
+    Vec_Push(spans, (Obj*)Span_new(8,  9, 1.0f));
+    Vec_Push(spans, (Obj*)Span_new(8,  4, 1.0f));
     raw_excerpt = (String *)SSTR_WRAP_UTF8(PHI " Oook. Urk. Ick. " PHI, 21);
     highlighted = Highlighter_Highlight_Excerpt(highlighter, spans,
                                                 raw_excerpt, 0);

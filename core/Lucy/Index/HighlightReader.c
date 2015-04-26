@@ -33,7 +33,7 @@
 
 HighlightReader*
 HLReader_init(HighlightReader *self, Schema *schema, Folder *folder,
-              Snapshot *snapshot, VArray *segments, int32_t seg_tick) {
+              Snapshot *snapshot, Vector *segments, int32_t seg_tick) {
     DataReader_init((DataReader*)self, schema, folder, snapshot, segments,
                     seg_tick);
     ABSTRACT_CLASS_CHECK(self, HIGHLIGHTREADER);
@@ -41,28 +41,28 @@ HLReader_init(HighlightReader *self, Schema *schema, Folder *folder,
 }
 
 HighlightReader*
-HLReader_Aggregator_IMP(HighlightReader *self, VArray *readers,
+HLReader_Aggregator_IMP(HighlightReader *self, Vector *readers,
                         I32Array *offsets) {
     UNUSED_VAR(self);
     return (HighlightReader*)PolyHLReader_new(readers, offsets);
 }
 
 PolyHighlightReader*
-PolyHLReader_new(VArray *readers, I32Array *offsets) {
+PolyHLReader_new(Vector *readers, I32Array *offsets) {
     PolyHighlightReader *self
         = (PolyHighlightReader*)Class_Make_Obj(POLYHIGHLIGHTREADER);
     return PolyHLReader_init(self, readers, offsets);
 }
 
 PolyHighlightReader*
-PolyHLReader_init(PolyHighlightReader *self, VArray *readers,
+PolyHLReader_init(PolyHighlightReader *self, Vector *readers,
                   I32Array *offsets) {
     HLReader_init((HighlightReader*)self, NULL, NULL, NULL, NULL, -1);
     PolyHighlightReaderIVARS *const ivars = PolyHLReader_IVARS(self);
-    for (uint32_t i = 0, max = VA_Get_Size(readers); i < max; i++) {
-        CERTIFY(VA_Fetch(readers, i), HIGHLIGHTREADER);
+    for (uint32_t i = 0, max = Vec_Get_Size(readers); i < max; i++) {
+        CERTIFY(Vec_Fetch(readers, i), HIGHLIGHTREADER);
     }
-    ivars->readers = (VArray*)INCREF(readers);
+    ivars->readers = (Vector*)INCREF(readers);
     ivars->offsets = (I32Array*)INCREF(offsets);
     return self;
 }
@@ -71,9 +71,9 @@ void
 PolyHLReader_Close_IMP(PolyHighlightReader *self) {
     PolyHighlightReaderIVARS *const ivars = PolyHLReader_IVARS(self);
     if (ivars->readers) {
-        for (uint32_t i = 0, max = VA_Get_Size(ivars->readers); i < max; i++) {
+        for (uint32_t i = 0, max = Vec_Get_Size(ivars->readers); i < max; i++) {
             HighlightReader *sub_reader
-                = (HighlightReader*)VA_Fetch(ivars->readers, i);
+                = (HighlightReader*)Vec_Fetch(ivars->readers, i);
             if (sub_reader) { HLReader_Close(sub_reader); }
         }
         DECREF(ivars->readers);
@@ -97,14 +97,14 @@ PolyHLReader_Fetch_Doc_Vec_IMP(PolyHighlightReader *self, int32_t doc_id) {
     uint32_t seg_tick = PolyReader_sub_tick(ivars->offsets, doc_id);
     int32_t  offset   = I32Arr_Get(ivars->offsets, seg_tick);
     HighlightReader *sub_reader
-        = (HighlightReader*)VA_Fetch(ivars->readers, seg_tick);
+        = (HighlightReader*)Vec_Fetch(ivars->readers, seg_tick);
     if (!sub_reader) { THROW(ERR, "Invalid doc_id: %i32", doc_id); }
     return HLReader_Fetch_Doc_Vec(sub_reader, doc_id - offset);
 }
 
 DefaultHighlightReader*
 DefHLReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
-                VArray *segments, int32_t seg_tick) {
+                Vector *segments, int32_t seg_tick) {
     DefaultHighlightReader *self = (DefaultHighlightReader*)Class_Make_Obj(
                                        DEFAULTHIGHLIGHTREADER);
     return DefHLReader_init(self, schema, folder, snapshot, segments,
@@ -113,7 +113,7 @@ DefHLReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
 
 DefaultHighlightReader*
 DefHLReader_init(DefaultHighlightReader *self, Schema *schema,
-                 Folder *folder, Snapshot *snapshot, VArray *segments,
+                 Folder *folder, Snapshot *snapshot, Vector *segments,
                  int32_t seg_tick) {
     HLReader_init((HighlightReader*)self, schema, folder, snapshot,
                   segments, seg_tick);

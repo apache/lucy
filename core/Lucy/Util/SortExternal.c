@@ -52,7 +52,7 @@ SortEx_init(SortExternal *self) {
     ivars->buf_tick     = 0;
     ivars->scratch      = NULL;
     ivars->scratch_cap  = 0;
-    ivars->runs         = VA_new(0);
+    ivars->runs         = Vec_new(0);
     ivars->slice_sizes  = NULL;
     ivars->slice_starts = NULL;
     ivars->num_slices   = 0;
@@ -157,8 +157,8 @@ SortEx_Flip_IMP(SortExternal *self) {
 void
 SortEx_Add_Run_IMP(SortExternal *self, SortExternal *run) {
     SortExternalIVARS *const ivars = SortEx_IVARS(self);
-    VA_Push(ivars->runs, (Obj*)run);
-    uint32_t num_runs = VA_Get_Size(ivars->runs);
+    Vec_Push(ivars->runs, (Obj*)run);
+    uint32_t num_runs = Vec_Get_Size(ivars->runs);
     ivars->slice_sizes
         = (uint32_t*)REALLOCATE(ivars->slice_sizes,
                                 num_runs * sizeof(uint32_t));
@@ -192,8 +192,8 @@ SortEx_Shrink_IMP(SortExternal *self) {
     FREEMEM(ivars->scratch);
     ivars->scratch = NULL;
 
-    for (uint32_t i = 0, max = VA_Get_Size(ivars->runs); i < max; i++) {
-        SortExternal *run = (SortExternal*)VA_Fetch(ivars->runs, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(ivars->runs); i < max; i++) {
+        SortExternal *run = (SortExternal*)Vec_Fetch(ivars->runs, i);
         SortEx_Shrink(run);
     }
 }
@@ -205,18 +205,18 @@ S_refill_buffer(SortExternal *self, SortExternalIVARS *ivars) {
 
     // Make sure all runs have at least one item in the buffer.
     uint32_t i = 0;
-    while (i < VA_Get_Size(ivars->runs)) {
-        SortExternal *const run = (SortExternal*)VA_Fetch(ivars->runs, i);
+    while (i < Vec_Get_Size(ivars->runs)) {
+        SortExternal *const run = (SortExternal*)Vec_Fetch(ivars->runs, i);
         if (SortEx_Buffer_Count(run) > 0 || SortEx_Refill(run) > 0) {
             i++; // Run has some elements, so keep.
         }
         else {
-            VA_Excise(ivars->runs, i, 1);
+            Vec_Excise(ivars->runs, i, 1);
         }
     }
 
     // Absorb as many elems as possible from all runs into main buffer.
-    if (VA_Get_Size(ivars->runs)) {
+    if (Vec_Get_Size(ivars->runs)) {
         Obj **endpost = S_find_endpost(self, ivars);
         S_absorb_slices(self, ivars, endpost);
     }
@@ -226,9 +226,9 @@ static Obj**
 S_find_endpost(SortExternal *self, SortExternalIVARS *ivars) {
     Obj **endpost = NULL;
 
-    for (uint32_t i = 0, max = VA_Get_Size(ivars->runs); i < max; i++) {
+    for (uint32_t i = 0, max = Vec_Get_Size(ivars->runs); i < max; i++) {
         // Get a run and retrieve the last item in its buffer.
-        SortExternal *const run = (SortExternal*)VA_Fetch(ivars->runs, i);
+        SortExternal *const run = (SortExternal*)Vec_Fetch(ivars->runs, i);
         SortExternalIVARS *const run_ivars = SortEx_IVARS(run);
         const uint32_t tick = run_ivars->buf_max - 1;
         if (tick >= run_ivars->buf_cap || run_ivars->buf_max < 1) {
@@ -257,7 +257,7 @@ S_find_endpost(SortExternal *self, SortExternalIVARS *ivars) {
 static void
 S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
                 Obj **endpost) {
-    uint32_t    num_runs     = VA_Get_Size(ivars->runs);
+    uint32_t    num_runs     = Vec_Get_Size(ivars->runs);
     Obj      ***slice_starts = ivars->slice_starts;
     uint32_t   *slice_sizes  = ivars->slice_sizes;
     Class      *klass        = SortEx_Get_Class(self);
@@ -268,7 +268,7 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
 
     // Move all the elements in range into the main buffer as slices.
     for (uint32_t i = 0; i < num_runs; i++) {
-        SortExternal *const run = (SortExternal*)VA_Fetch(ivars->runs, i);
+        SortExternal *const run = (SortExternal*)Vec_Fetch(ivars->runs, i);
         SortExternalIVARS *const run_ivars = SortEx_IVARS(run);
         uint32_t slice_size = S_find_slice_size(run, run_ivars, endpost);
 

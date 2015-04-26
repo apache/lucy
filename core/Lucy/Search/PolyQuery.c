@@ -29,13 +29,13 @@
 #include "Lucy/Util/Freezer.h"
 
 PolyQuery*
-PolyQuery_init(PolyQuery *self, VArray *children) {
-    const uint32_t num_kids = children ? VA_Get_Size(children) : 0;
+PolyQuery_init(PolyQuery *self, Vector *children) {
+    const uint32_t num_kids = children ? Vec_Get_Size(children) : 0;
     Query_init((Query*)self, 1.0f);
     PolyQueryIVARS *const ivars = PolyQuery_IVARS(self);
-    ivars->children = VA_new(num_kids);
+    ivars->children = Vec_new(num_kids);
     for (uint32_t i = 0; i < num_kids; i++) {
-        PolyQuery_Add_Child(self, (Query*)VA_Fetch(children, i));
+        PolyQuery_Add_Child(self, (Query*)Vec_Fetch(children, i));
     }
     return self;
 }
@@ -51,17 +51,17 @@ void
 PolyQuery_Add_Child_IMP(PolyQuery *self, Query *query) {
     CERTIFY(query, QUERY);
     PolyQueryIVARS *const ivars = PolyQuery_IVARS(self);
-    VA_Push(ivars->children, INCREF(query));
+    Vec_Push(ivars->children, INCREF(query));
 }
 
 void
-PolyQuery_Set_Children_IMP(PolyQuery *self, VArray *children) {
+PolyQuery_Set_Children_IMP(PolyQuery *self, Vector *children) {
     PolyQueryIVARS *const ivars = PolyQuery_IVARS(self);
     DECREF(ivars->children);
-    ivars->children = (VArray*)INCREF(children);
+    ivars->children = (Vector*)INCREF(children);
 }
 
-VArray*
+Vector*
 PolyQuery_Get_Children_IMP(PolyQuery *self) {
     return PolyQuery_IVARS(self)->children;
 }
@@ -69,11 +69,11 @@ PolyQuery_Get_Children_IMP(PolyQuery *self) {
 void
 PolyQuery_Serialize_IMP(PolyQuery *self, OutStream *outstream) {
     PolyQueryIVARS *const ivars = PolyQuery_IVARS(self);
-    const uint32_t num_kids = VA_Get_Size(ivars->children);
+    const uint32_t num_kids = Vec_Get_Size(ivars->children);
     OutStream_Write_F32(outstream, ivars->boost);
     OutStream_Write_U32(outstream, num_kids);
     for (uint32_t i = 0; i < num_kids; i++) {
-        Query *child = (Query*)VA_Fetch(ivars->children, i);
+        Query *child = (Query*)Vec_Fetch(ivars->children, i);
         FREEZE(child, outstream);
     }
 }
@@ -85,9 +85,9 @@ PolyQuery_Deserialize_IMP(PolyQuery *self, InStream *instream) {
     PolyQuery_init(self, NULL);
     PolyQueryIVARS *const ivars = PolyQuery_IVARS(self);
     PolyQuery_Set_Boost(self, boost);
-    VA_Grow(ivars->children, num_children);
+    Vec_Grow(ivars->children, num_children);
     while (num_children--) {
-        VA_Push(ivars->children, THAW(instream));
+        Vec_Push(ivars->children, THAW(instream));
     }
     return self;
 }
@@ -110,7 +110,7 @@ PolyQuery_Load_IMP(PolyQuery *self, Obj *dump) {
     PolyQuery *loaded = (PolyQuery*)super_load(self, dump);
     Obj *children = CERTIFY(Hash_Fetch_Utf8(source, "children", 8), OBJ);
     PolyQuery_IVARS(loaded)->children
-        = (VArray*)CERTIFY(Freezer_load(children), VARRAY);
+        = (Vector*)CERTIFY(Freezer_load(children), VECTOR);
     return (Obj*)loaded;
 }
 
@@ -121,7 +121,7 @@ PolyQuery_Equals_IMP(PolyQuery *self, Obj *other) {
     PolyQueryIVARS *const ivars = PolyQuery_IVARS(self);
     PolyQueryIVARS *const ovars = PolyQuery_IVARS((PolyQuery*)other);
     if (ivars->boost != ovars->boost)                       { return false; }
-    if (!VA_Equals(ovars->children, (Obj*)ivars->children)) { return false; }
+    if (!Vec_Equals(ovars->children, (Obj*)ivars->children)) { return false; }
     return true;
 }
 
@@ -133,18 +133,18 @@ PolyCompiler_init(PolyCompiler *self, PolyQuery *parent,
                   Searcher *searcher, float boost) {
     PolyCompilerIVARS *const ivars = PolyCompiler_IVARS(self);
     PolyQueryIVARS *const parent_ivars = PolyQuery_IVARS(parent);
-    const uint32_t num_kids = VA_Get_Size(parent_ivars->children);
+    const uint32_t num_kids = Vec_Get_Size(parent_ivars->children);
 
     Compiler_init((Compiler*)self, (Query*)parent, searcher, NULL, boost);
-    ivars->children = VA_new(num_kids);
+    ivars->children = Vec_new(num_kids);
 
     // Iterate over the children, creating a Compiler for each one.
     for (uint32_t i = 0; i < num_kids; i++) {
-        Query *child_query = (Query*)VA_Fetch(parent_ivars->children, i);
+        Query *child_query = (Query*)Vec_Fetch(parent_ivars->children, i);
         float sub_boost = boost * Query_Get_Boost(child_query);
         Compiler *child_compiler
             = Query_Make_Compiler(child_query, searcher, sub_boost, true);
-        VA_Push(ivars->children, (Obj*)child_compiler);
+        Vec_Push(ivars->children, (Obj*)child_compiler);
     }
 
     return self;
@@ -163,8 +163,8 @@ PolyCompiler_Sum_Of_Squared_Weights_IMP(PolyCompiler *self) {
     float sum      = 0;
     float my_boost = PolyCompiler_Get_Boost(self);
 
-    for (uint32_t i = 0, max = VA_Get_Size(ivars->children); i < max; i++) {
-        Compiler *child = (Compiler*)VA_Fetch(ivars->children, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(ivars->children); i < max; i++) {
+        Compiler *child = (Compiler*)Vec_Fetch(ivars->children, i);
         sum += Compiler_Sum_Of_Squared_Weights(child);
     }
 
@@ -177,23 +177,23 @@ PolyCompiler_Sum_Of_Squared_Weights_IMP(PolyCompiler *self) {
 void
 PolyCompiler_Apply_Norm_Factor_IMP(PolyCompiler *self, float factor) {
     PolyCompilerIVARS *const ivars = PolyCompiler_IVARS(self);
-    for (uint32_t i = 0, max = VA_Get_Size(ivars->children); i < max; i++) {
-        Compiler *child = (Compiler*)VA_Fetch(ivars->children, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(ivars->children); i < max; i++) {
+        Compiler *child = (Compiler*)Vec_Fetch(ivars->children, i);
         Compiler_Apply_Norm_Factor(child, factor);
     }
 }
 
-VArray*
+Vector*
 PolyCompiler_Highlight_Spans_IMP(PolyCompiler *self, Searcher *searcher,
                                  DocVector *doc_vec, String *field) {
     PolyCompilerIVARS *const ivars = PolyCompiler_IVARS(self);
-    VArray *spans = VA_new(0);
-    for (uint32_t i = 0, max = VA_Get_Size(ivars->children); i < max; i++) {
-        Compiler *child = (Compiler*)VA_Fetch(ivars->children, i);
-        VArray *child_spans = Compiler_Highlight_Spans(child, searcher,
+    Vector *spans = Vec_new(0);
+    for (uint32_t i = 0, max = Vec_Get_Size(ivars->children); i < max; i++) {
+        Compiler *child = (Compiler*)Vec_Fetch(ivars->children, i);
+        Vector *child_spans = Compiler_Highlight_Spans(child, searcher,
                                                        doc_vec, field);
         if (child_spans) {
-            VA_Push_All(spans, child_spans);
+            Vec_Push_All(spans, child_spans);
             DECREF(child_spans);
         }
     }

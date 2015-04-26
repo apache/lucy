@@ -69,10 +69,10 @@ S_fetch_entry(pTHX_ lucy_Inverter *self, HE *hash_entry) {
     }
 
     lucy_InverterEntry *entry
-        = (lucy_InverterEntry*)CFISH_VA_Fetch(ivars->entry_pool, field_num);
+        = (lucy_InverterEntry*)CFISH_Vec_Fetch(ivars->entry_pool, field_num);
     if (!entry) {
         entry = lucy_InvEntry_new(schema, (cfish_String*)field, field_num);
-        CFISH_VA_Store(ivars->entry_pool, field_num, (cfish_Obj*)entry);
+        CFISH_Vec_Store(ivars->entry_pool, field_num, (cfish_Obj*)entry);
     }
     return entry;
 }

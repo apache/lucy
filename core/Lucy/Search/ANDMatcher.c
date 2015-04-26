@@ -21,13 +21,13 @@
 #include "Lucy/Index/Similarity.h"
 
 ANDMatcher*
-ANDMatcher_new(VArray *children, Similarity *sim) {
+ANDMatcher_new(Vector *children, Similarity *sim) {
     ANDMatcher *self = (ANDMatcher*)Class_Make_Obj(ANDMATCHER);
     return ANDMatcher_init(self, children, sim);
 }
 
 ANDMatcher*
-ANDMatcher_init(ANDMatcher *self, VArray *children, Similarity *sim) {
+ANDMatcher_init(ANDMatcher *self, Vector *children, Similarity *sim) {
     ANDMatcherIVARS *const ivars = ANDMatcher_IVARS(self);
 
     // Init.
@@ -38,7 +38,7 @@ ANDMatcher_init(ANDMatcher *self, VArray *children, Similarity *sim) {
     ivars->more         = ivars->num_kids ? true : false;
     ivars->kids         = (Matcher**)MALLOCATE(ivars->num_kids * sizeof(Matcher*));
     for (uint32_t i = 0; i < ivars->num_kids; i++) {
-        Matcher *child = (Matcher*)VA_Fetch(children, i);
+        Matcher *child = (Matcher*)Vec_Fetch(children, i);
         ivars->kids[i] = child;
         if (!Matcher_Next(child)) { ivars->more = false; }
     }

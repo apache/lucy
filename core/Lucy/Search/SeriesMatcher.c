@@ -20,13 +20,13 @@
 #include "Lucy/Search/SeriesMatcher.h"
 
 SeriesMatcher*
-SeriesMatcher_new(VArray *matchers, I32Array *offsets) {
+SeriesMatcher_new(Vector *matchers, I32Array *offsets) {
     SeriesMatcher *self = (SeriesMatcher*)Class_Make_Obj(SERIESMATCHER);
     return SeriesMatcher_init(self, matchers, offsets);
 }
 
 SeriesMatcher*
-SeriesMatcher_init(SeriesMatcher *self, VArray *matchers, I32Array *offsets) {
+SeriesMatcher_init(SeriesMatcher *self, Vector *matchers, I32Array *offsets) {
     Matcher_init((Matcher*)self);
     SeriesMatcherIVARS *const ivars = SeriesMatcher_IVARS(self);
 
@@ -38,7 +38,7 @@ SeriesMatcher_init(SeriesMatcher *self, VArray *matchers, I32Array *offsets) {
     ivars->tick            = 0;
 
     // Assign.
-    ivars->matchers        = (VArray*)INCREF(matchers);
+    ivars->matchers        = (Vector*)INCREF(matchers);
     ivars->offsets         = (I32Array*)INCREF(offsets);
 
     // Derive.
@@ -72,7 +72,7 @@ SeriesMatcher_Advance_IMP(SeriesMatcher *self, int32_t target) {
                     = ivars->tick + 1 == ivars->num_matchers
                       ? INT32_MAX
                       : I32Arr_Get(ivars->offsets, ivars->tick + 1);
-                ivars->current_matcher = (Matcher*)VA_Fetch(ivars->matchers,
+                ivars->current_matcher = (Matcher*)Vec_Fetch(ivars->matchers,
                                                            ivars->tick);
                 ivars->current_offset = ivars->next_offset;
                 ivars->next_offset = next_offset;

@@ -71,9 +71,9 @@ build_index() {
     Hash_Store_Utf8(stop_list, "x", 1, (Obj*)CFISH_TRUE);
     SnowballStopFilter *stop_filter = SnowStop_new(NULL, stop_list);
 
-    VArray *analyzers = VA_new(0);
-    VA_Push(analyzers, (Obj*)word_tokenizer);
-    VA_Push(analyzers, (Obj*)stop_filter);
+    Vector *analyzers = Vec_new(0);
+    Vec_Push(analyzers, (Obj*)word_tokenizer);
+    Vec_Push(analyzers, (Obj*)stop_filter);
     PolyAnalyzer *fancy_analyzer = PolyAnalyzer_new(NULL, analyzers);
 
     FullTextType *fancy = FullTextType_new((Analyzer*)fancy_analyzer);
@@ -90,9 +90,9 @@ build_index() {
     Indexer   *indexer = Indexer_new(schema, (Obj*)folder, NULL, 0);
 
     // Index documents.
-    VArray *doc_set = TestUtils_doc_set();
-    for (uint32_t i = 0; i < VA_Get_Size(doc_set); ++i) {
-        String *content_string = (String*)VA_Fetch(doc_set, i);
+    Vector *doc_set = TestUtils_doc_set();
+    for (uint32_t i = 0; i < Vec_Get_Size(doc_set); ++i) {
+        String *content_string = (String*)Vec_Fetch(doc_set, i);
         Doc *doc = Doc_new(NULL, 0);
         Doc_Store(doc, plain_str, (Obj*)content_string);
         Doc_Store(doc, fancy_str, (Obj*)content_string);
