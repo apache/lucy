@@ -30,7 +30,7 @@ HeatMap_new(VArray *spans, uint32_t window) {
 HeatMap*
 HeatMap_init(HeatMap *self, VArray *spans, uint32_t window) {
     HeatMapIVARS *const ivars = HeatMap_IVARS(self);
-    VArray *spans_copy = VA_Shallow_Copy(spans);
+    VArray *spans_copy = VA_Clone(spans);
     VArray *spans_plus_boosts;
 
     ivars->spans  = NULL;

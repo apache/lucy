@@ -119,7 +119,7 @@ QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
                            : Str_new_from_trusted_utf8("OR", 2);
 
     if (fields) {
-        ivars->fields = VA_Shallow_Copy(fields);
+        ivars->fields = VA_Clone(fields);
         for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
             CERTIFY(VA_Fetch(fields, i), STRING);
         }
@@ -596,7 +596,7 @@ S_compose_subquery(QueryParser *self, VArray *elems, bool enclosed) {
         // Bind all mandatory matchers together in one Query.
         if (num_required || num_negated) {
             if (enclosed || num_required + num_negated > 1) {
-                VArray *children = VA_Shallow_Copy(required);
+                VArray *children = VA_Clone(required);
                 VA_Push_All(children, negated);
                 req_query = QParser_Make_AND_Query(self, children);
                 DECREF(children);

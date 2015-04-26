@@ -540,7 +540,7 @@ PolyReader_Offsets_IMP(PolyReader *self) {
 VArray*
 PolyReader_Seg_Readers_IMP(PolyReader *self) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
-    return (VArray*)VA_Shallow_Copy(ivars->sub_readers);
+    return (VArray*)VA_Clone(ivars->sub_readers);
 }
 
 VArray*

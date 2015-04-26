@@ -36,7 +36,7 @@ SortSpec_new(VArray *rules) {
 SortSpec*
 SortSpec_init(SortSpec *self, VArray *rules) {
     SortSpecIVARS *const ivars = SortSpec_IVARS(self);
-    ivars->rules = VA_Shallow_Copy(rules);
+    ivars->rules = VA_Clone(rules);
     for (int32_t i = 0, max = VA_Get_Size(rules); i < max; i++) {
         SortRule *rule = (SortRule*)VA_Fetch(rules, i);
         CERTIFY(rule, SORTRULE);
