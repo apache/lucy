@@ -297,7 +297,7 @@ S_try_open_elements(void *context) {
     }
 
     // Sort the segments by age.
-    VA_Sort(segments, NULL, NULL);
+    VA_Sort(segments);
 
     // Open individual SegReaders.
     struct try_open_segreader_context seg_context;

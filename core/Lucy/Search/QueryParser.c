@@ -123,7 +123,7 @@ QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
         for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
             CERTIFY(VA_Fetch(fields, i), STRING);
         }
-        VA_Sort(ivars->fields, NULL, NULL);
+        VA_Sort(ivars->fields);
     }
     else {
         VArray *all_fields = Schema_All_Fields(schema);
@@ -138,7 +138,7 @@ QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
         }
         DECREF(all_fields);
     }
-    VA_Sort(ivars->fields, NULL, NULL);
+    VA_Sort(ivars->fields);
 
     // Derive default "occur" from default boolean operator.
     if (Str_Equals_Utf8(ivars->default_boolop, "OR", 2)) {

@@ -93,7 +93,7 @@ FilePurger_Purge_IMP(FilePurger *self) {
         // Attempt to delete entries -- if failure, no big deal, just try
         // again later.  Proceed in reverse lexical order so that directories
         // get deleted after they've been emptied.
-        VA_Sort(purgables, NULL, NULL);
+        VA_Sort(purgables);
         for (uint32_t i = VA_Get_Size(purgables); i--;) {
             String *entry = (String*)VA_Fetch(purgables, i);
             if (Hash_Fetch(ivars->disallowed, entry)) { continue; }

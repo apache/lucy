@@ -322,7 +322,7 @@ S_add_random_objects(Indexer **indexer, Schema *schema, RAMFolder *folder,
         }
     }
 
-    VA_Sort(objects, NULL, NULL);
+    VA_Sort(objects);
 
     for (int i = 0; i < 100; ++i) {
         Obj *obj = VA_Fetch(objects, i);

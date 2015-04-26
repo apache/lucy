@@ -195,7 +195,7 @@ Snapshot_Write_File_IMP(Snapshot *self, Folder *folder, String *path) {
     }
 
     // Sort, then store file names.
-    VA_Sort(list, NULL, NULL);
+    VA_Sort(list);
     Hash_Store_Utf8(all_data, "entries", 7, (Obj*)list);
 
     // Create a JSON-izable data structure.

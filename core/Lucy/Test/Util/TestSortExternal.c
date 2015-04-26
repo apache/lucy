@@ -262,7 +262,7 @@ test_sort_random_strings(TestBatchRunner *runner) {
         VA_Push(bytebufs, (Obj*)bytebuf);
     }
 
-    VA_Sort(bytebufs, NULL, NULL);
+    VA_Sort(bytebufs);
     S_test_sort(runner, bytebufs, 15000,
                 "Random binary strings of random length");
 

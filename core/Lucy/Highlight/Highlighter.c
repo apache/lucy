@@ -170,7 +170,7 @@ Highlighter_Create_Excerpt_IMP(Highlighter *self, HitDoc *hit_doc) {
             = Compiler_Highlight_Spans(ivars->compiler, ivars->searcher,
                                        doc_vec, ivars->field);
         VArray *score_spans = maybe_spans ? maybe_spans : VA_new(0);
-        VA_Sort(score_spans, NULL, NULL);
+        VA_Sort(score_spans);
         HeatMap *heat_map
             = HeatMap_new(score_spans, (ivars->excerpt_length * 2) / 3);
 

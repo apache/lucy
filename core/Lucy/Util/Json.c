@@ -345,7 +345,7 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
                 return false;
             }
         }
-        VA_Sort(keys, NULL, NULL);
+        VA_Sort(keys);
 
         // Spread pairs across multiple lines.
         CB_Cat_Trusted_Utf8(buf, "{", 1);

@@ -109,7 +109,7 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
     Hash_Store_Utf8(metadata, "format", 6,
                     (Obj*)Str_newf("%i32", CFWriter_current_file_format));
 
-    VA_Sort(files, NULL, NULL);
+    VA_Sort(files);
     for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
         String *infilename = (String*)VA_Fetch(files, i);
 

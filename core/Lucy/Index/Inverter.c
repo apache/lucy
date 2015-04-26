@@ -77,7 +77,7 @@ Inverter_Iterate_IMP(Inverter *self) {
     InverterIVARS *const ivars = Inverter_IVARS(self);
     ivars->tick = -1;
     if (!ivars->sorted) {
-        VA_Sort(ivars->entries, NULL, NULL);
+        VA_Sort(ivars->entries);
         ivars->sorted = true;
     }
     return VA_Get_Size(ivars->entries);

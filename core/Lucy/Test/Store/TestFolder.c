@@ -242,7 +242,7 @@ test_List(TestBatchRunner *runner) {
     DECREF(fh);
 
     list = Folder_List(folder, NULL);
-    VA_Sort(list, NULL, NULL);
+    VA_Sort(list);
     TEST_INT_EQ(runner, VA_Get_Size(list), 3, "List");
     elem = (String*)DOWNCAST(VA_Fetch(list, 0), STRING);
     TEST_TRUE(runner, elem && Str_Equals(elem, (Obj*)banana),
