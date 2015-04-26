@@ -295,7 +295,7 @@ S_parse_subquery(QueryParser *self, VArray *elems, String *default_field,
         ParserElem *first = (ParserElem*)VA_Fetch(elems, 0);
         if (ParserElem_Get_Type(first) == TOKEN_OPEN_PAREN) {
             enclosed = true;
-            DECREF(VA_Shift(elems));
+            VA_Excise(elems, 0, 1);
             DECREF(VA_Pop(elems));
         }
     }
