@@ -18,6 +18,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Util/SortExternal.h"
+#include "Clownfish/Util/SortUtils.h"
 
 // Refill the main buffer, drawing from the buffers of all runs.
 static void

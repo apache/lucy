@@ -18,6 +18,7 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Util/SortUtils.h"
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Clownfish/TestHarness/TestUtils.h"
 #include "Lucy/Test.h"
