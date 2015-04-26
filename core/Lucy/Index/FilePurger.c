@@ -199,7 +199,7 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
     if (ivars->snapshot) {
         VArray *entries    = Snapshot_List(ivars->snapshot);
         VArray *referenced = S_find_all_referenced(folder, entries);
-        VA_Push_VArray(spared, referenced);
+        VA_Push_All(spared, referenced);
         DECREF(entries);
         DECREF(referenced);
         snapfile = Snapshot_Get_Path(ivars->snapshot);
@@ -233,7 +233,7 @@ S_discover_unused(FilePurger *self, VArray **purgables_ptr,
                                     + 1;
                 VA_Grow(spared, new_size);
                 VA_Push(spared, (Obj*)Str_Clone(entry));
-                VA_Push_VArray(spared, referenced);
+                VA_Push_All(spared, referenced);
             }
             else {
                 // No one's using this snapshot, so all of its entries are

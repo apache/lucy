@@ -38,7 +38,7 @@ HeatMap_init(HeatMap *self, VArray *spans, uint32_t window) {
 
     VA_Sort(spans_copy, NULL, NULL);
     spans_plus_boosts = HeatMap_Generate_Proximity_Boosts(self, spans_copy);
-    VA_Push_VArray(spans_plus_boosts, spans_copy);
+    VA_Push_All(spans_plus_boosts, spans_copy);
     VA_Sort(spans_plus_boosts, NULL, NULL);
     ivars->spans = HeatMap_Flatten_Spans(self, spans_plus_boosts);
 

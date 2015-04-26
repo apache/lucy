@@ -597,7 +597,7 @@ S_compose_subquery(QueryParser *self, VArray *elems, bool enclosed) {
         if (num_required || num_negated) {
             if (enclosed || num_required + num_negated > 1) {
                 VArray *children = VA_Shallow_Copy(required);
-                VA_Push_VArray(children, negated);
+                VA_Push_All(children, negated);
                 req_query = QParser_Make_AND_Query(self, children);
                 DECREF(children);
             }

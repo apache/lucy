@@ -193,7 +193,7 @@ PolyCompiler_Highlight_Spans_IMP(PolyCompiler *self, Searcher *searcher,
         VArray *child_spans = Compiler_Highlight_Spans(child, searcher,
                                                        doc_vec, field);
         if (child_spans) {
-            VA_Push_VArray(spans, child_spans);
+            VA_Push_All(spans, child_spans);
             DECREF(child_spans);
         }
     }
