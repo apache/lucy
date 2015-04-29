@@ -19,7 +19,8 @@
 
 #include "Lucy/Highlight/HeatMap.h"
 #include "Lucy/Search/Span.h"
-#include "Clownfish/Util/SortUtils.h"
+
+#include <stdlib.h>
 
 HeatMap*
 HeatMap_new(Vector *spans, uint32_t window) {
@@ -56,8 +57,7 @@ HeatMap_Destroy_IMP(HeatMap *self) {
 }
 
 static int
-S_compare_i32(void *context, const void *va, const void *vb) {
-    UNUSED_VAR(context);
+S_compare_i32(const void *va, const void *vb) {
     return *(int32_t*)va - *(int32_t*)vb;
 }
 
@@ -74,8 +74,7 @@ S_flattened_but_empty_spans(Vector *spans) {
         bounds[i]             = Span_Get_Offset(span);
         bounds[i + num_spans] = Span_Get_Offset(span) + Span_Get_Length(span);
     }
-    Sort_quicksort(bounds, num_spans * 2, sizeof(uint32_t),
-                   S_compare_i32, NULL);
+    qsort(bounds, num_spans * 2, sizeof(uint32_t), S_compare_i32);
     uint32_t num_bounds = 0;
     int32_t  last       = INT32_MAX;
     for (uint32_t i = 0; i < num_spans * 2; i++) {

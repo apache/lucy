@@ -29,8 +29,9 @@
 #include "Lucy/Store/LockFactory.h"
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/Json.h"
-#include "Clownfish/Util/SortUtils.h"
 #include "Clownfish/Util/StringHelper.h"
+
+#include <stdlib.h>
 
 IndexManager*
 IxManager_new(String *host, LockFactory *lock_factory) {
@@ -109,10 +110,9 @@ IxManager_Make_Snapshot_Filename_IMP(IndexManager *self) {
 }
 
 static int
-S_compare_doc_count(void *context, const void *va, const void *vb) {
+S_compare_doc_count(const void *va, const void *vb) {
     SegReader *a = *(SegReader**)va;
     SegReader *b = *(SegReader**)vb;
-    UNUSED_VAR(context);
     return SegReader_Doc_Count(a) - SegReader_Doc_Count(b);
 }
 
@@ -158,8 +158,7 @@ IxManager_Recycle_IMP(IndexManager *self, PolyReader *reader,
     }
 
     // Sort by ascending size in docs, choose sparsely populated segments.
-    Sort_quicksort(candidates, num_candidates, sizeof(SegReader*),
-                   S_compare_doc_count, NULL);
+    qsort(candidates, num_candidates, sizeof(SegReader*), S_compare_doc_count);
     int32_t *counts = (int32_t*)MALLOCATE(num_candidates * sizeof(int32_t));
     for (uint32_t i = 0; i < num_candidates; i++) {
         counts[i] = SegReader_Doc_Count(candidates[i]);

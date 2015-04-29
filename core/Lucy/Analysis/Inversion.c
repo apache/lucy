@@ -20,7 +20,8 @@
 
 #include "Lucy/Analysis/Inversion.h"
 #include "Lucy/Analysis/Token.h"
-#include "Clownfish/Util/SortUtils.h"
+
+#include <stdlib.h>
 
 // After inversion, record how many like tokens occur in each group.
 static void
@@ -162,8 +163,7 @@ Inversion_Invert_IMP(Inversion *self) {
     }
 
     // Sort the tokens lexically, and hand off to cluster counting routine.
-    Sort_quicksort(ivars->tokens, ivars->size, sizeof(Token*), Token_compare,
-                   NULL);
+    qsort(ivars->tokens, ivars->size, sizeof(Token*), Token_compare);
     S_count_clusters(self, ivars);
 }
 

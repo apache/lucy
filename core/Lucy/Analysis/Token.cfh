@@ -68,10 +68,10 @@ class Lucy::Analysis::Token inherits Clownfish::Obj {
          uint32_t start_offset, uint32_t end_offset,
          float boost = 1.0, int32_t pos_inc = 1);
 
-    /** Sort_quicksort-compatible comparison routine.
+    /** qsort-compatible comparison routine.
      */
     inert int
-    compare(void *context, const void *va, const void *vb);
+    compare(const void *va, const void *vb);
 
     uint32_t
     Get_Start_Offset(Token *self);
