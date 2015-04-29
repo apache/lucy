@@ -44,7 +44,7 @@ MemoryPool*
 MemPool_init(MemoryPool *self, uint32_t arena_size) {
     MemoryPoolIVARS *const ivars = MemPool_IVARS(self);
     ivars->arena_size = arena_size == 0 ? DEFAULT_BUF_SIZE : arena_size;
-    ivars->arenas     = VA_new(16);
+    ivars->arenas     = Vec_new(16);
     ivars->tick       = -1;
     ivars->buf        = NULL;
     ivars->limit      = NULL;
@@ -68,9 +68,9 @@ S_init_arena(MemoryPool *self, MemoryPoolIVARS *ivars, size_t amount) {
     // Indicate which arena we're using at present.
     ivars->tick++;
 
-    if (ivars->tick < (int32_t)VA_Get_Size(ivars->arenas)) {
+    if (ivars->tick < (int32_t)Vec_Get_Size(ivars->arenas)) {
         // In recycle mode, use previously acquired memory.
-        bb = (ByteBuf*)VA_Fetch(ivars->arenas, ivars->tick);
+        bb = (ByteBuf*)Vec_Fetch(ivars->arenas, ivars->tick);
         if (amount >= BB_Get_Size(bb)) {
             BB_Grow(bb, amount);
             BB_Set_Size(bb, amount);
@@ -83,13 +83,13 @@ S_init_arena(MemoryPool *self, MemoryPoolIVARS *ivars, size_t amount) {
                           : ivars->arena_size;
         char *ptr = (char*)MALLOCATE(buf_size);
         bb = BB_new_steal_bytes(ptr, buf_size - 1, buf_size);
-        VA_Push(ivars->arenas, (Obj*)bb);
+        Vec_Push(ivars->arenas, (Obj*)bb);
     }
 
     // Recalculate consumption to take into account blocked off space.
     ivars->consumed = 0;
     for (int32_t i = 0; i < ivars->tick; i++) {
-        ByteBuf *bb = (ByteBuf*)VA_Fetch(ivars->arenas, i);
+        ByteBuf *bb = (ByteBuf*)Vec_Fetch(ivars->arenas, i);
         ivars->consumed += BB_Get_Size(bb);
     }
 
@@ -149,7 +149,7 @@ void
 MemPool_Release_All_IMP(MemoryPool *self) {
     MemoryPoolIVARS *const ivars = MemPool_IVARS(self);
     DECREF(ivars->arenas);
-    ivars->arenas   = VA_new(16);
+    ivars->arenas   = Vec_new(16);
     ivars->tick     = -1;
     ivars->buf      = NULL;
     ivars->last_buf = NULL;

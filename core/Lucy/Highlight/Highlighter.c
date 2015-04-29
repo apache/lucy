@@ -166,11 +166,11 @@ Highlighter_Create_Excerpt_IMP(Highlighter *self, HitDoc *hit_doc) {
         DocVector *doc_vec
             = Searcher_Fetch_Doc_Vec(ivars->searcher,
                                      HitDoc_Get_Doc_ID(hit_doc));
-        VArray *maybe_spans
+        Vector *maybe_spans
             = Compiler_Highlight_Spans(ivars->compiler, ivars->searcher,
                                        doc_vec, ivars->field);
-        VArray *score_spans = maybe_spans ? maybe_spans : VA_new(0);
-        VA_Sort(score_spans, NULL, NULL);
+        Vector *score_spans = maybe_spans ? maybe_spans : Vec_new(0);
+        Vec_Sort(score_spans);
         HeatMap *heat_map
             = HeatMap_new(score_spans, (ivars->excerpt_length * 2) / 3);
 
@@ -197,9 +197,9 @@ static int32_t
 S_hottest(HeatMap *heat_map) {
     float max_score = 0.0f;
     int32_t retval = 0;
-    VArray *spans = HeatMap_Get_Spans(heat_map);
-    for (uint32_t i = VA_Get_Size(spans); i--;) {
-        Span *span = (Span*)VA_Fetch(spans, i);
+    Vector *spans = HeatMap_Get_Spans(heat_map);
+    for (uint32_t i = Vec_Get_Size(spans); i--;) {
+        Span *span = (Span*)Vec_Fetch(spans, i);
         if (Span_Get_Weight(span) >= max_score) {
             retval = Span_Get_Offset(span);
             max_score = Span_Get_Weight(span);
@@ -465,7 +465,7 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, String *field_val,
 }
 
 String*
-Highlighter_Highlight_Excerpt_IMP(Highlighter *self, VArray *spans,
+Highlighter_Highlight_Excerpt_IMP(Highlighter *self, Vector *spans,
                                   String *raw_excerpt, int32_t top) {
     int32_t         hl_start        = 0;
     int32_t         hl_end          = 0;
@@ -475,8 +475,8 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, VArray *spans,
     CharBuf        *encode_buf      = NULL;
     int32_t         raw_excerpt_end = top + Str_Length(raw_excerpt);
 
-    for (uint32_t i = 0, max = VA_Get_Size(spans); i < max; i++) {
-        Span *span = (Span*)VA_Fetch(spans, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(spans); i < max; i++) {
+        Span *span = (Span*)Vec_Fetch(spans, i);
         int32_t offset = Span_Get_Offset(span);
         if (offset < top) {
             continue;

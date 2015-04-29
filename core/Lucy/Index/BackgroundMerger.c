@@ -125,10 +125,10 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager) {
     // Create new Segment.
     int64_t new_seg_num
         = IxManager_Highest_Seg_Num(ivars->manager, ivars->snapshot) + 1;
-    VArray *fields = Schema_All_Fields(ivars->schema);
+    Vector *fields = Schema_All_Fields(ivars->schema);
     ivars->segment = Seg_new(new_seg_num);
-    for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
-        Seg_Add_Field(ivars->segment, (String*)VA_Fetch(fields, i));
+    for (uint32_t i = 0, max = Vec_Get_Size(fields); i < max; i++) {
+        Seg_Add_Field(ivars->segment, (String*)Vec_Fetch(fields, i));
     }
     DECREF(fields);
 
@@ -206,14 +206,14 @@ BGMerger_Optimize_IMP(BackgroundMerger *self) {
 static uint32_t
 S_maybe_merge(BackgroundMerger *self) {
     BackgroundMergerIVARS *const ivars = BGMerger_IVARS(self);
-    VArray *to_merge = IxManager_Recycle(ivars->manager, ivars->polyreader,
+    Vector *to_merge = IxManager_Recycle(ivars->manager, ivars->polyreader,
                                          ivars->del_writer, 0, ivars->optimize);
-    int32_t num_to_merge = VA_Get_Size(to_merge);
+    int32_t num_to_merge = Vec_Get_Size(to_merge);
 
     // There's no point in merging one segment if it has no deletions, because
     // we'd just be rewriting it. */
     if (num_to_merge == 1) {
-        SegReader *seg_reader = (SegReader*)VA_Fetch(to_merge, 0);
+        SegReader *seg_reader = (SegReader*)Vec_Fetch(to_merge, 0);
         if (!SegReader_Del_Count(seg_reader)) {
             DECREF(to_merge);
             return 0;
@@ -229,7 +229,7 @@ S_maybe_merge(BackgroundMerger *self) {
 
     // Consolidate segments.
     for (uint32_t i = 0, max = num_to_merge; i < max; i++) {
-        SegReader *seg_reader = (SegReader*)VA_Fetch(to_merge, i);
+        SegReader *seg_reader = (SegReader*)Vec_Fetch(to_merge, i);
         String    *seg_name   = SegReader_Get_Seg_Name(seg_reader);
         int64_t    doc_count  = Seg_Get_Count(ivars->segment);
         Matcher *deletions
@@ -255,20 +255,20 @@ S_merge_updated_deletions(BackgroundMerger *self) {
 
     PolyReader *new_polyreader
         = PolyReader_open((Obj*)ivars->folder, NULL, NULL);
-    VArray *new_seg_readers
+    Vector *new_seg_readers
         = PolyReader_Get_Seg_Readers(new_polyreader);
-    VArray *old_seg_readers
+    Vector *old_seg_readers
         = PolyReader_Get_Seg_Readers(ivars->polyreader);
-    Hash *new_segs = Hash_new(VA_Get_Size(new_seg_readers));
+    Hash *new_segs = Hash_new(Vec_Get_Size(new_seg_readers));
 
-    for (uint32_t i = 0, max = VA_Get_Size(new_seg_readers); i < max; i++) {
-        SegReader *seg_reader = (SegReader*)VA_Fetch(new_seg_readers, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(new_seg_readers); i < max; i++) {
+        SegReader *seg_reader = (SegReader*)Vec_Fetch(new_seg_readers, i);
         String    *seg_name   = SegReader_Get_Seg_Name(seg_reader);
         Hash_Store(new_segs, seg_name, INCREF(seg_reader));
     }
 
-    for (uint32_t i = 0, max = VA_Get_Size(old_seg_readers); i < max; i++) {
-        SegReader *seg_reader = (SegReader*)VA_Fetch(old_seg_readers, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(old_seg_readers); i < max; i++) {
+        SegReader *seg_reader = (SegReader*)Vec_Fetch(old_seg_readers, i);
         String    *seg_name   = SegReader_Get_Seg_Name(seg_reader);
 
         // If this segment was merged away...
@@ -303,7 +303,7 @@ S_merge_updated_deletions(BackgroundMerger *self) {
     else {
         PolyReader *merge_polyreader
             = PolyReader_open((Obj*)ivars->folder, ivars->snapshot, NULL);
-        VArray *merge_seg_readers
+        Vector *merge_seg_readers
             = PolyReader_Get_Seg_Readers(merge_polyreader);
         Snapshot *latest_snapshot
             = Snapshot_Read_File(Snapshot_new(), ivars->folder, NULL);
@@ -319,9 +319,9 @@ S_merge_updated_deletions(BackgroundMerger *self) {
 
         SegWriter_Prep_Seg_Dir(seg_writer);
 
-        for (uint32_t i = 0, max = VA_Get_Size(merge_seg_readers); i < max; i++) {
+        for (uint32_t i = 0, max = Vec_Get_Size(merge_seg_readers); i < max; i++) {
             SegReader *seg_reader
-                = (SegReader*)VA_Fetch(merge_seg_readers, i);
+                = (SegReader*)Vec_Fetch(merge_seg_readers, i);
             if (SegReader_Get_Seg_Num(seg_reader) == merge_seg_num) {
                 I32Array *offsets = PolyReader_Offsets(merge_polyreader);
                 seg_tick = i;
@@ -371,8 +371,8 @@ S_merge_updated_deletions(BackgroundMerger *self) {
 void
 BGMerger_Prepare_Commit_IMP(BackgroundMerger *self) {
     BackgroundMergerIVARS *const ivars = BGMerger_IVARS(self);
-    VArray   *seg_readers     = PolyReader_Get_Seg_Readers(ivars->polyreader);
-    uint32_t  num_seg_readers = VA_Get_Size(seg_readers);
+    Vector   *seg_readers     = PolyReader_Get_Seg_Readers(ivars->polyreader);
+    uint32_t  num_seg_readers = Vec_Get_Size(seg_readers);
     uint32_t  segs_merged     = 0;
 
     if (ivars->prepared) {
@@ -442,9 +442,9 @@ BGMerger_Prepare_Commit_IMP(BackgroundMerger *self) {
             // Add the fresh content to our snapshot. (It's important to
             // run this AFTER S_merge_updated_deletions, because otherwise
             // we couldn't tell whether the deletion counts changed.)
-            VArray *files = Snapshot_List(latest_snapshot);
-            for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
-                String *file = (String*)VA_Fetch(files, i);
+            Vector *files = Snapshot_List(latest_snapshot);
+            for (uint32_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
+                String *file = (String*)Vec_Fetch(files, i);
                 if (Str_Starts_With_Utf8(file, "seg_", 4)) {
                     int64_t gen = (int64_t)IxFileNames_extract_gen(file);
                     if (gen > ivars->cutoff) {

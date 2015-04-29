@@ -21,18 +21,18 @@
 #include "Lucy/Index/Similarity.h"
 
 PolyMatcher*
-PolyMatcher_new(VArray *children, Similarity *sim) {
+PolyMatcher_new(Vector *children, Similarity *sim) {
     PolyMatcher *self = (PolyMatcher*)Class_Make_Obj(POLYMATCHER);
     return PolyMatcher_init(self, children, sim);
 }
 
 PolyMatcher*
-PolyMatcher_init(PolyMatcher *self, VArray *children, Similarity *similarity) {
+PolyMatcher_init(PolyMatcher *self, Vector *children, Similarity *similarity) {
     Matcher_init((Matcher*)self);
     PolyMatcherIVARS *const ivars = PolyMatcher_IVARS(self);
-    ivars->num_kids = VA_Get_Size(children);
+    ivars->num_kids = Vec_Get_Size(children);
     ivars->sim      = (Similarity*)INCREF(similarity);
-    ivars->children = (VArray*)INCREF(children);
+    ivars->children = (Vector*)INCREF(children);
     ivars->coord_factors = (float*)MALLOCATE((ivars->num_kids + 1) * sizeof(float));
     for (uint32_t i = 0; i <= ivars->num_kids; i++) {
         ivars->coord_factors[i] = similarity

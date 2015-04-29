@@ -43,17 +43,17 @@
 // Shared initialization routine which assumes that it's ok to assume control
 // over [field] and [terms], eating their refcounts.
 static PhraseQuery*
-S_do_init(PhraseQuery *self, String *field, VArray *terms, float boost);
+S_do_init(PhraseQuery *self, String *field, Vector *terms, float boost);
 
 PhraseQuery*
-PhraseQuery_new(String *field, VArray *terms) {
+PhraseQuery_new(String *field, Vector *terms) {
     PhraseQuery *self = (PhraseQuery*)Class_Make_Obj(PHRASEQUERY);
     return PhraseQuery_init(self, field, terms);
 }
 
 PhraseQuery*
-PhraseQuery_init(PhraseQuery *self, String *field, VArray *terms) {
-    return S_do_init(self, Str_Clone(field), VA_Clone(terms), 1.0f);
+PhraseQuery_init(PhraseQuery *self, String *field, Vector *terms) {
+    return S_do_init(self, Str_Clone(field), Vec_Clone(terms), 1.0f);
 }
 
 void
@@ -65,11 +65,11 @@ PhraseQuery_Destroy_IMP(PhraseQuery *self) {
 }
 
 static PhraseQuery*
-S_do_init(PhraseQuery *self, String *field, VArray *terms, float boost) {
+S_do_init(PhraseQuery *self, String *field, Vector *terms, float boost) {
     Query_init((Query*)self, boost);
     PhraseQueryIVARS *const ivars = PhraseQuery_IVARS(self);
-    for (uint32_t i = 0, max = VA_Get_Size(terms); i < max; i++) {
-        CERTIFY(VA_Fetch(terms, i), OBJ);
+    for (uint32_t i = 0, max = Vec_Get_Size(terms); i < max; i++) {
+        CERTIFY(Vec_Fetch(terms, i), OBJ);
     }
     ivars->field = field;
     ivars->terms = terms;
@@ -88,7 +88,7 @@ PhraseQuery*
 PhraseQuery_Deserialize_IMP(PhraseQuery *self, InStream *instream) {
     float boost = InStream_Read_F32(instream);
     String *field = Freezer_read_string(instream);
-    VArray *terms = Freezer_read_varray(instream);
+    Vector *terms = Freezer_read_varray(instream);
     return S_do_init(self, field, terms, boost);
 }
 
@@ -115,7 +115,7 @@ PhraseQuery_Load_IMP(PhraseQuery *self, Obj *dump) {
         = (String*)CERTIFY(Freezer_load(field), STRING);
     Obj *terms = CERTIFY(Hash_Fetch_Utf8(source, "terms", 5), OBJ);
     loaded_ivars->terms
-        = (VArray*)CERTIFY(Freezer_load(terms), VARRAY);
+        = (Vector*)CERTIFY(Freezer_load(terms), VECTOR);
     return (Obj*)loaded;
 }
 
@@ -131,18 +131,18 @@ PhraseQuery_Equals_IMP(PhraseQuery *self, Obj *other) {
     if (ivars->field && !Str_Equals(ivars->field, (Obj*)ovars->field)) {
         return false;
     }
-    if (!VA_Equals(ovars->terms, (Obj*)ivars->terms)) { return false; }
+    if (!Vec_Equals(ovars->terms, (Obj*)ivars->terms)) { return false; }
     return true;
 }
 
 String*
 PhraseQuery_To_String_IMP(PhraseQuery *self) {
     PhraseQueryIVARS *const ivars = PhraseQuery_IVARS(self);
-    uint32_t  num_terms = VA_Get_Size(ivars->terms);
+    uint32_t  num_terms = Vec_Get_Size(ivars->terms);
     CharBuf  *buf       = CB_new_from_str(ivars->field);
     CB_Cat_Trusted_Utf8(buf, ":\"", 2);
     for (uint32_t i = 0; i < num_terms; i++) {
-        Obj    *term        = VA_Fetch(ivars->terms, i);
+        Obj    *term        = Vec_Fetch(ivars->terms, i);
         String *term_string = Obj_To_String(term);
         CB_Cat(buf, term_string);
         DECREF(term_string);
@@ -160,9 +160,9 @@ Compiler*
 PhraseQuery_Make_Compiler_IMP(PhraseQuery *self, Searcher *searcher,
                               float boost, bool subordinate) {
     PhraseQueryIVARS *const ivars = PhraseQuery_IVARS(self);
-    if (VA_Get_Size(ivars->terms) == 1) {
+    if (Vec_Get_Size(ivars->terms) == 1) {
         // Optimize for one-term "phrases".
-        Obj *term = VA_Fetch(ivars->terms, 0);
+        Obj *term = Vec_Fetch(ivars->terms, 0);
         TermQuery *term_query = TermQuery_new(ivars->field, term);
         TermCompiler *term_compiler;
         TermQuery_Set_Boost(term_query, ivars->boost);
@@ -187,7 +187,7 @@ PhraseQuery_Get_Field_IMP(PhraseQuery *self) {
     return PhraseQuery_IVARS(self)->field;
 }
 
-VArray*
+Vector*
 PhraseQuery_Get_Terms_IMP(PhraseQuery *self) {
     return PhraseQuery_IVARS(self)->terms;
 }
@@ -207,7 +207,7 @@ PhraseCompiler_init(PhraseCompiler *self, PhraseQuery *parent,
     PhraseQueryIVARS *const parent_ivars = PhraseQuery_IVARS(parent);
     Schema     *schema = Searcher_Get_Schema(searcher);
     Similarity *sim    = Schema_Fetch_Sim(schema, parent_ivars->field);
-    VArray     *terms  = parent_ivars->terms;
+    Vector     *terms  = parent_ivars->terms;
 
     // Try harder to find a Similarity if necessary.
     if (!sim) { sim = Schema_Get_Similarity(schema); }
@@ -217,8 +217,8 @@ PhraseCompiler_init(PhraseCompiler *self, PhraseQuery *parent,
 
     // Store IDF for the phrase.
     ivars->idf = 0;
-    for (uint32_t i = 0, max = VA_Get_Size(terms); i < max; i++) {
-        Obj     *term     = VA_Fetch(terms, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(terms); i < max; i++) {
+        Obj     *term     = Vec_Fetch(terms, i);
         int32_t  doc_max  = Searcher_Doc_Max(searcher);
         int32_t  doc_freq = Searcher_Doc_Freq(searcher, parent_ivars->field, term);
         ivars->idf += Sim_IDF(sim, doc_freq, doc_max);
@@ -298,8 +298,8 @@ PhraseCompiler_Make_Matcher_IMP(PhraseCompiler *self, SegReader *reader,
     PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
     PhraseQueryIVARS *const parent_ivars
         = PhraseQuery_IVARS((PhraseQuery*)ivars->parent);
-    VArray *const      terms     = parent_ivars->terms;
-    uint32_t           num_terms = VA_Get_Size(terms);
+    Vector *const      terms     = parent_ivars->terms;
+    uint32_t           num_terms = Vec_Get_Size(terms);
 
     // Bail if there are no terms.
     if (!num_terms) { return NULL; }
@@ -320,9 +320,9 @@ PhraseCompiler_Make_Matcher_IMP(PhraseCompiler *self, SegReader *reader,
     if (!plist_reader) { return NULL; }
 
     // Look up each term.
-    VArray  *plists = VA_new(num_terms);
+    Vector  *plists = Vec_new(num_terms);
     for (uint32_t i = 0; i < num_terms; i++) {
-        Obj *term = VA_Fetch(terms, i);
+        Obj *term = Vec_Fetch(terms, i);
         PostingList *plist
             = PListReader_Posting_List(plist_reader, parent_ivars->field, term);
 
@@ -332,7 +332,7 @@ PhraseCompiler_Make_Matcher_IMP(PhraseCompiler *self, SegReader *reader,
             DECREF(plists);
             return NULL;
         }
-        VA_Push(plists, (Obj*)plist);
+        Vec_Push(plists, (Obj*)plist);
     }
 
     Matcher *retval
@@ -341,26 +341,26 @@ PhraseCompiler_Make_Matcher_IMP(PhraseCompiler *self, SegReader *reader,
     return retval;
 }
 
-VArray*
+Vector*
 PhraseCompiler_Highlight_Spans_IMP(PhraseCompiler *self, Searcher *searcher,
                                    DocVector *doc_vec, String *field) {
     PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
     PhraseQueryIVARS *const parent_ivars
         = PhraseQuery_IVARS((PhraseQuery*)ivars->parent);
-    VArray *const      terms     = parent_ivars->terms;
-    VArray *const      spans     = VA_new(0);
-    const uint32_t     num_terms = VA_Get_Size(terms);
+    Vector *const      terms     = parent_ivars->terms;
+    Vector *const      spans     = Vec_new(0);
+    const uint32_t     num_terms = Vec_Get_Size(terms);
     UNUSED_VAR(searcher);
 
     // Bail if no terms or field doesn't match.
     if (!num_terms) { return spans; }
     if (!Str_Equals(field, (Obj*)parent_ivars->field)) { return spans; }
 
-    VArray *term_vectors    = VA_new(num_terms);
+    Vector *term_vectors    = Vec_new(num_terms);
     BitVector *posit_vec       = BitVec_new(0);
     BitVector *other_posit_vec = BitVec_new(0);
     for (uint32_t i = 0; i < num_terms; i++) {
-        Obj *term = VA_Fetch(terms, i);
+        Obj *term = Vec_Fetch(terms, i);
         TermVector *term_vector
             = DocVec_Term_Vector(doc_vec, field, (String*)term);
 
@@ -369,7 +369,7 @@ PhraseCompiler_Highlight_Spans_IMP(PhraseCompiler *self, Searcher *searcher,
             break;
         }
 
-        VA_Push(term_vectors, (Obj*)term_vector);
+        Vec_Push(term_vectors, (Obj*)term_vector);
 
         if (i == 0) {
             // Set initial positions from first term.
@@ -394,11 +394,11 @@ PhraseCompiler_Highlight_Spans_IMP(PhraseCompiler *self, Searcher *searcher,
     }
 
     // Proceed only if all terms are present.
-    uint32_t num_tvs = VA_Get_Size(term_vectors);
+    uint32_t num_tvs = Vec_Get_Size(term_vectors);
     if (num_tvs == num_terms) {
-        TermVector *first_tv = (TermVector*)VA_Fetch(term_vectors, 0);
+        TermVector *first_tv = (TermVector*)Vec_Fetch(term_vectors, 0);
         TermVector *last_tv
-            = (TermVector*)VA_Fetch(term_vectors, num_tvs - 1);
+            = (TermVector*)Vec_Fetch(term_vectors, num_tvs - 1);
         I32Array *tv_start_positions = TV_Get_Positions(first_tv);
         I32Array *tv_end_positions   = TV_Get_Positions(last_tv);
         I32Array *tv_start_offsets   = TV_Get_Start_Offsets(first_tv);
@@ -429,7 +429,7 @@ PhraseCompiler_Highlight_Spans_IMP(PhraseCompiler *self, Searcher *searcher,
                 }
             }
 
-            VA_Push(spans, (Obj*)Span_new(start_offset,
+            Vec_Push(spans, (Obj*)Span_new(start_offset,
                                           end_offset - start_offset, weight));
 
             i++, j++;

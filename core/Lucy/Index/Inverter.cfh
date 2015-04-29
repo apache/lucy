@@ -28,8 +28,8 @@ class Lucy::Index::Inverter inherits Clownfish::Obj {
     Schema        *schema;
     Segment       *segment;
     Doc           *doc;
-    VArray        *entries;    /* Entries for the current Doc. */
-    VArray        *entry_pool; /* Cached entry per field. */
+    Vector        *entries;    /* Entries for the current Doc. */
+    Vector        *entry_pool; /* Cached entry per field. */
     InverterEntry *current;    /* Current entry while iterating. */
     InverterEntry *blank;      /* Used when iterator is exhausted. */
     float          boost;

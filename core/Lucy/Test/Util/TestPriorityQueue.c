@@ -72,16 +72,16 @@ test_Peek_and_Pop_All(TestBatchRunner *runner) {
     TEST_INT_EQ(runner, (long)Float64_Get_Value(val), 1,
                 "peek at the least item in the queue");
 
-    VArray  *got = NumPriQ_Pop_All(pq);
-    val = (Float64*)CERTIFY(VA_Fetch(got, 0), FLOAT64);
+    Vector  *got = NumPriQ_Pop_All(pq);
+    val = (Float64*)CERTIFY(Vec_Fetch(got, 0), FLOAT64);
     TEST_INT_EQ(runner, (long)Float64_Get_Value(val), 20, "pop_all");
-    val = (Float64*)CERTIFY(VA_Fetch(got, 1), FLOAT64);
+    val = (Float64*)CERTIFY(Vec_Fetch(got, 1), FLOAT64);
     TEST_INT_EQ(runner, (long)Float64_Get_Value(val), 10, "pop_all");
-    val = (Float64*)CERTIFY(VA_Fetch(got, 2), FLOAT64);
+    val = (Float64*)CERTIFY(Vec_Fetch(got, 2), FLOAT64);
     TEST_INT_EQ(runner, (long)Float64_Get_Value(val),  3, "pop_all");
-    val = (Float64*)CERTIFY(VA_Fetch(got, 3), FLOAT64);
+    val = (Float64*)CERTIFY(Vec_Fetch(got, 3), FLOAT64);
     TEST_INT_EQ(runner, (long)Float64_Get_Value(val),  2, "pop_all");
-    val = (Float64*)CERTIFY(VA_Fetch(got, 4), FLOAT64);
+    val = (Float64*)CERTIFY(Vec_Fetch(got, 4), FLOAT64);
     TEST_INT_EQ(runner, (long)Float64_Get_Value(val),  1, "pop_all");
 
     DECREF(got);

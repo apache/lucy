@@ -70,11 +70,11 @@ QueryLexer_Set_Heed_Colons_IMP(QueryLexer *self, bool heed_colons) {
     QueryLexer_IVARS(self)->heed_colons = heed_colons;
 }
 
-VArray*
+Vector*
 QueryLexer_Tokenize_IMP(QueryLexer *self, String *query_string) {
     QueryLexerIVARS *const ivars = QueryLexer_IVARS(self);
 
-    VArray *elems = VA_new(0);
+    Vector *elems = Vec_new(0);
     if (!query_string) { return elems; }
 
     StringIterator *iter = Str_Top(query_string);
@@ -90,7 +90,7 @@ QueryLexer_Tokenize_IMP(QueryLexer *self, String *query_string) {
         if (ivars->heed_colons) {
             ParserElem *elem = S_consume_field(iter);
             if (elem) {
-                VA_Push(elems, (Obj*)elem);
+                Vec_Push(elems, (Obj*)elem);
             }
         }
 
@@ -152,7 +152,7 @@ QueryLexer_Tokenize_IMP(QueryLexer *self, String *query_string) {
                 elem = S_consume_text(iter);
                 break;
         }
-        VA_Push(elems, (Obj*)elem);
+        Vec_Push(elems, (Obj*)elem);
     }
 
     DECREF(iter);

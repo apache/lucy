@@ -24,6 +24,8 @@
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Object/TestBitVector.h"
 
+#include <stdlib.h>
+
 TestBitVector*
 TestBitVector_new() {
     return (TestBitVector*)Class_Make_Obj(TESTBITVECTOR);
@@ -385,10 +387,9 @@ test_Clone(TestBatchRunner *runner) {
 }
 
 static int
-S_compare_u64s(void *context, const void *va, const void *vb) {
+S_compare_u64s(const void *va, const void *vb) {
     uint64_t a = *(uint64_t*)va;
     uint64_t b = *(uint64_t*)vb;
-    UNUSED_VAR(context);
     return a == b ? 0 : a < b ? -1 : 1;
 }
 
@@ -401,8 +402,7 @@ test_To_Array(TestBatchRunner *runner) {
     long       i;
 
     // Unique the random ints.
-    Sort_quicksort(source_ints, 20, sizeof(uint64_t),
-                   S_compare_u64s, NULL);
+    qsort(source_ints, 20, sizeof(uint64_t), S_compare_u64s);
     for (i = 0; i < 19; i++) {
         if (source_ints[i] != source_ints[i + 1]) {
             source_ints[num_unique] = source_ints[i];

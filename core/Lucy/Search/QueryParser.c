@@ -54,58 +54,58 @@
 
 // Helper function for Tree().
 static Query*
-S_parse_subquery(QueryParser *self, VArray *elems, String *default_field,
+S_parse_subquery(QueryParser *self, Vector *elems, String *default_field,
                  bool enclosed);
 
 // Drop unmatched right parens and add matching right parens at end to
 // close paren groups implicitly.
 static void
-S_balance_parens(QueryParser *self, VArray *elems);
+S_balance_parens(QueryParser *self, Vector *elems);
 
 // Work from the inside out, reducing the leftmost, innermost paren groups
 // first, until the array of elems contains no parens.
 static void
-S_parse_subqueries(QueryParser *self, VArray *elems);
+S_parse_subqueries(QueryParser *self, Vector *elems);
 
 static void
-S_compose_inner_queries(QueryParser *self, VArray *elems,
+S_compose_inner_queries(QueryParser *self, Vector *elems,
                         String *default_field);
 
 // Apply +, -, NOT.
 static void
-S_apply_plusses_and_negations(QueryParser *self, VArray *elems);
+S_apply_plusses_and_negations(QueryParser *self, Vector *elems);
 
 // Wrap negated queries with NOTQuery objects.
 static void
-S_compose_not_queries(QueryParser *self, VArray *elems);
+S_compose_not_queries(QueryParser *self, Vector *elems);
 
 // Silently discard non-sensical combos of AND and OR, e.g.
 // 'OR a AND AND OR b AND'.
 static void
-S_winnow_boolops(QueryParser *self, VArray *elems);
+S_winnow_boolops(QueryParser *self, Vector *elems);
 
 // Join ANDQueries.
 static void
-S_compose_and_queries(QueryParser *self, VArray *elems);
+S_compose_and_queries(QueryParser *self, Vector *elems);
 
 // Join ORQueries.
 static void
-S_compose_or_queries(QueryParser *self, VArray *elems);
+S_compose_or_queries(QueryParser *self, Vector *elems);
 
 // Derive a single subquery from all Query objects in the clause.
 static Query*
-S_compose_subquery(QueryParser *self, VArray *elems, bool enclosed);
+S_compose_subquery(QueryParser *self, Vector *elems, bool enclosed);
 
 QueryParser*
 QParser_new(Schema *schema, Analyzer *analyzer, String *default_boolop,
-            VArray *fields) {
+            Vector *fields) {
     QueryParser *self = (QueryParser*)Class_Make_Obj(QUERYPARSER);
     return QParser_init(self, schema, analyzer, default_boolop, fields);
 }
 
 QueryParser*
 QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
-             String *default_boolop, VArray *fields) {
+             String *default_boolop, Vector *fields) {
     QueryParserIVARS *const ivars = QParser_IVARS(self);
     // Init.
     ivars->heed_colons = false;
@@ -119,26 +119,26 @@ QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
                            : Str_new_from_trusted_utf8("OR", 2);
 
     if (fields) {
-        ivars->fields = VA_Shallow_Copy(fields);
-        for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
-            CERTIFY(VA_Fetch(fields, i), STRING);
+        ivars->fields = Vec_Clone(fields);
+        for (uint32_t i = 0, max = Vec_Get_Size(fields); i < max; i++) {
+            CERTIFY(Vec_Fetch(fields, i), STRING);
         }
-        VA_Sort(ivars->fields, NULL, NULL);
+        Vec_Sort(ivars->fields);
     }
     else {
-        VArray *all_fields = Schema_All_Fields(schema);
-        uint32_t num_fields = VA_Get_Size(all_fields);
-        ivars->fields = VA_new(num_fields);
+        Vector *all_fields = Schema_All_Fields(schema);
+        uint32_t num_fields = Vec_Get_Size(all_fields);
+        ivars->fields = Vec_new(num_fields);
         for (uint32_t i = 0; i < num_fields; i++) {
-            String *field = (String*)VA_Fetch(all_fields, i);
+            String *field = (String*)Vec_Fetch(all_fields, i);
             FieldType *type = Schema_Fetch_Type(schema, field);
             if (type && FType_Indexed(type)) {
-                VA_Push(ivars->fields, INCREF(field));
+                Vec_Push(ivars->fields, INCREF(field));
             }
         }
         DECREF(all_fields);
     }
-    VA_Sort(ivars->fields, NULL, NULL);
+    Vec_Sort(ivars->fields);
 
     // Derive default "occur" from default boolean operator.
     if (Str_Equals_Utf8(ivars->default_boolop, "OR", 2)) {
@@ -180,7 +180,7 @@ QParser_Get_Default_BoolOp_IMP(QueryParser *self) {
     return QParser_IVARS(self)->default_boolop;
 }
 
-VArray*
+Vector*
 QParser_Get_Fields_IMP(QueryParser *self) {
     return QParser_IVARS(self)->fields;
 }
@@ -215,7 +215,7 @@ QParser_Parse_IMP(QueryParser *self, String *query_string) {
 Query*
 QParser_Tree_IMP(QueryParser *self, String *query_string) {
     QueryParserIVARS *const ivars = QParser_IVARS(self);
-    VArray *elems = QueryLexer_Tokenize(ivars->lexer, query_string);
+    Vector *elems = QueryLexer_Tokenize(ivars->lexer, query_string);
     S_balance_parens(self, elems);
     S_parse_subqueries(self, elems);
     Query *query = S_parse_subquery(self, elems, NULL, false);
@@ -224,7 +224,7 @@ QParser_Tree_IMP(QueryParser *self, String *query_string) {
 }
 
 static void
-S_parse_subqueries(QueryParser *self, VArray *elems) {
+S_parse_subqueries(QueryParser *self, Vector *elems) {
     const int32_t default_occur = QParser_IVARS(self)->default_occur;
     while (1) {
         // Work from the inside out, starting with the leftmost innermost
@@ -232,8 +232,8 @@ S_parse_subqueries(QueryParser *self, VArray *elems) {
         size_t left = SIZE_MAX;
         size_t right = SIZE_MAX;
         String *field = NULL;
-        for (size_t i = 0, max = VA_Get_Size(elems); i < max; i++) {
-            ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
+        for (size_t i = 0, max = Vec_Get_Size(elems); i < max; i++) {
+            ParserElem *elem = (ParserElem*)Vec_Fetch(elems, i);
             uint32_t type = ParserElem_Get_Type(elem);
             if (type == TOKEN_OPEN_PAREN) {
                 left = i;
@@ -244,7 +244,7 @@ S_parse_subqueries(QueryParser *self, VArray *elems) {
             }
             else if (type == TOKEN_FIELD && i < max - 1) {
                 // If a field applies to an enclosing paren, pass it along.
-                ParserElem *next_elem = (ParserElem*)VA_Fetch(elems, i + 1);
+                ParserElem *next_elem = (ParserElem*)Vec_Fetch(elems, i + 1);
                 uint32_t next_type = ParserElem_Get_Type(next_elem);
                 if (next_type == TOKEN_OPEN_PAREN) {
                     field = (String*)ParserElem_As(elem, STRING);
@@ -258,7 +258,7 @@ S_parse_subqueries(QueryParser *self, VArray *elems) {
         }
 
         // Create the subquery.
-        VArray *sub_elems = VA_Slice(elems, left + 1, right - left - 1);
+        Vector *sub_elems = Vec_Slice(elems, left + 1, right - left - 1);
         Query *subquery = S_parse_subquery(self, sub_elems, field, true);
         ParserElem *new_elem = ParserElem_new(TOKEN_QUERY, (Obj*)subquery);
         if (default_occur == MUST) {
@@ -269,34 +269,34 @@ S_parse_subqueries(QueryParser *self, VArray *elems) {
         // Replace the elements used to create the subquery with the subquery
         // itself.
         if (left > 0) {
-            ParserElem *maybe_field = (ParserElem*)VA_Fetch(elems, left - 1);
+            ParserElem *maybe_field = (ParserElem*)Vec_Fetch(elems, left - 1);
             uint32_t maybe_field_type = ParserElem_Get_Type(maybe_field);
             if (maybe_field_type == TOKEN_FIELD) {
                 left -= 1;
             }
         }
-        VA_Excise(elems, left + 1, right - left);
-        VA_Store(elems, left, (Obj*)new_elem);
+        Vec_Excise(elems, left + 1, right - left);
+        Vec_Store(elems, left, (Obj*)new_elem);
     }
 }
 
 static void
-S_discard_elems(VArray *elems, uint32_t type) {
-    for (size_t i = VA_Get_Size(elems); i--;) {
-        ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
-        if (ParserElem_Get_Type(elem) == type) { VA_Excise(elems, i, 1); }
+S_discard_elems(Vector *elems, uint32_t type) {
+    for (size_t i = Vec_Get_Size(elems); i--;) {
+        ParserElem *elem = (ParserElem*)Vec_Fetch(elems, i);
+        if (ParserElem_Get_Type(elem) == type) { Vec_Excise(elems, i, 1); }
     }
 }
 
 static Query*
-S_parse_subquery(QueryParser *self, VArray *elems, String *default_field,
+S_parse_subquery(QueryParser *self, Vector *elems, String *default_field,
                  bool enclosed) {
-    if (VA_Get_Size(elems)) {
-        ParserElem *first = (ParserElem*)VA_Fetch(elems, 0);
+    if (Vec_Get_Size(elems)) {
+        ParserElem *first = (ParserElem*)Vec_Fetch(elems, 0);
         if (ParserElem_Get_Type(first) == TOKEN_OPEN_PAREN) {
             enclosed = true;
-            DECREF(VA_Shift(elems));
-            DECREF(VA_Pop(elems));
+            Vec_Excise(elems, 0, 1);
+            DECREF(Vec_Pop(elems));
         }
     }
     S_compose_inner_queries(self, elems, default_field);
@@ -308,16 +308,16 @@ S_parse_subquery(QueryParser *self, VArray *elems, String *default_field,
     S_discard_elems(elems, TOKEN_NOT);
     S_compose_not_queries(self, elems);
     S_winnow_boolops(self, elems);
-    if (VA_Get_Size(elems) > 2) {
+    if (Vec_Get_Size(elems) > 2) {
         S_compose_and_queries(self, elems);
         // Don't double wrap '(a AND b)'.
-        if (VA_Get_Size(elems) == 1) { enclosed = false; }
+        if (Vec_Get_Size(elems) == 1) { enclosed = false; }
     }
     S_discard_elems(elems, TOKEN_AND);
-    if (VA_Get_Size(elems) > 2) {
+    if (Vec_Get_Size(elems) > 2) {
         S_compose_or_queries(self, elems);
         // Don't double wrap '(a OR b)'.
-        if (VA_Get_Size(elems) == 1) { enclosed = false; }
+        if (Vec_Get_Size(elems) == 1) { enclosed = false; }
     }
     S_discard_elems(elems, TOKEN_OR);
     Query *retval = S_compose_subquery(self, elems, enclosed);
@@ -326,13 +326,13 @@ S_parse_subquery(QueryParser *self, VArray *elems, String *default_field,
 }
 
 static void
-S_balance_parens(QueryParser *self, VArray *elems) {
+S_balance_parens(QueryParser *self, Vector *elems) {
     UNUSED_VAR(self);
     // Count paren balance, eliminate unbalanced right parens.
     int64_t paren_depth = 0;
     size_t i = 0;
-    while (i < VA_Get_Size(elems)) {
-        ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
+    while (i < Vec_Get_Size(elems)) {
+        ParserElem *elem = (ParserElem*)Vec_Fetch(elems, i);
         if (ParserElem_Get_Type(elem) == TOKEN_OPEN_PAREN) {
             paren_depth++;
         }
@@ -341,7 +341,7 @@ S_balance_parens(QueryParser *self, VArray *elems) {
                 paren_depth--;
             }
             else {
-                VA_Excise(elems, i, 1);
+                Vec_Excise(elems, i, 1);
                 continue;
             }
         }
@@ -351,25 +351,25 @@ S_balance_parens(QueryParser *self, VArray *elems) {
     // Insert implicit parens.
     while (paren_depth--) {
         ParserElem *elem = ParserElem_new(TOKEN_CLOSE_PAREN, NULL);
-        VA_Push(elems, (Obj*)elem);
+        Vec_Push(elems, (Obj*)elem);
     }
 }
 
 static void
-S_compose_inner_queries(QueryParser *self, VArray *elems,
+S_compose_inner_queries(QueryParser *self, Vector *elems,
                         String *default_field) {
     const int32_t default_occur = QParser_IVARS(self)->default_occur;
 
     // Generate all queries.  Apply any fields.
-    for (uint32_t i = VA_Get_Size(elems); i--;) {
+    for (uint32_t i = Vec_Get_Size(elems); i--;) {
         String *field = default_field;
-        ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
+        ParserElem *elem = (ParserElem*)Vec_Fetch(elems, i);
 
         // Apply field.
         if (i > 0) {
             // Field specifier must immediately precede any query.
             ParserElem* maybe_field_elem
-                = (ParserElem*)VA_Fetch(elems, i - 1);
+                = (ParserElem*)Vec_Fetch(elems, i - 1);
             if (ParserElem_Get_Type(maybe_field_elem) == TOKEN_FIELD) {
                 field = (String*)ParserElem_As(maybe_field_elem, STRING);
             }
@@ -383,19 +383,19 @@ S_compose_inner_queries(QueryParser *self, VArray *elems,
             if (default_occur == MUST) {
                 ParserElem_Require(new_elem);
             }
-            VA_Store(elems, i, (Obj*)new_elem);
+            Vec_Store(elems, i, (Obj*)new_elem);
         }
     }
 }
 
 static void
-S_apply_plusses_and_negations(QueryParser *self, VArray *elems) {
+S_apply_plusses_and_negations(QueryParser *self, Vector *elems) {
     UNUSED_VAR(self);
-    for (uint32_t i = VA_Get_Size(elems); i--;) {
-        ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
+    for (uint32_t i = Vec_Get_Size(elems); i--;) {
+        ParserElem *elem = (ParserElem*)Vec_Fetch(elems, i);
         if (ParserElem_Get_Type(elem) == TOKEN_QUERY) {
             for (uint32_t j = i; j--;) {
-                ParserElem *prev = (ParserElem*)VA_Fetch(elems, j);
+                ParserElem *prev = (ParserElem*)Vec_Fetch(elems, j);
                 uint32_t prev_type = ParserElem_Get_Type(prev);
                 if (prev_type == TOKEN_MINUS || prev_type == TOKEN_NOT) {
                     ParserElem_Negate(elem);
@@ -412,9 +412,9 @@ S_apply_plusses_and_negations(QueryParser *self, VArray *elems) {
 }
 
 static void
-S_compose_not_queries(QueryParser *self, VArray *elems) {
-    for (uint32_t i = 0, max = VA_Get_Size(elems); i < max; i++) {
-        ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
+S_compose_not_queries(QueryParser *self, Vector *elems) {
+    for (uint32_t i = 0, max = Vec_Get_Size(elems); i < max; i++) {
+        ParserElem *elem = (ParserElem*)Vec_Fetch(elems, i);
         if (ParserElem_Get_Type(elem) == TOKEN_QUERY
             && ParserElem_Negated(elem)
            ) {
@@ -427,59 +427,59 @@ S_compose_not_queries(QueryParser *self, VArray *elems) {
 }
 
 static void
-S_winnow_boolops(QueryParser *self, VArray *elems) {
+S_winnow_boolops(QueryParser *self, Vector *elems) {
     UNUSED_VAR(self);
-    for (uint32_t i = 0; i < VA_Get_Size(elems); i++) {
-        ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
+    for (uint32_t i = 0; i < Vec_Get_Size(elems); i++) {
+        ParserElem *elem = (ParserElem*)Vec_Fetch(elems, i);
         if (ParserElem_Get_Type(elem) != TOKEN_QUERY) {
             uint32_t num_to_zap = 0;
-            ParserElem *preceding = (ParserElem*)VA_Fetch(elems, i - 1);
-            ParserElem *following = (ParserElem*)VA_Fetch(elems, i + 1);
+            ParserElem *preceding = (ParserElem*)Vec_Fetch(elems, i - 1);
+            ParserElem *following = (ParserElem*)Vec_Fetch(elems, i + 1);
             if (!preceding || ParserElem_Get_Type(preceding) != TOKEN_QUERY) {
                 num_to_zap = 1;
             }
             if (!following || ParserElem_Get_Type(following) != TOKEN_QUERY) {
                 num_to_zap = 1;
             }
-            for (uint32_t j = i + 1, jmax = VA_Get_Size(elems); j < jmax; j++) {
-                ParserElem *maybe = (ParserElem*)VA_Fetch(elems, j);
+            for (uint32_t j = i + 1, jmax = Vec_Get_Size(elems); j < jmax; j++) {
+                ParserElem *maybe = (ParserElem*)Vec_Fetch(elems, j);
                 if (ParserElem_Get_Type(maybe) == TOKEN_QUERY) { break; }
                 else { num_to_zap++; }
             }
-            if (num_to_zap) { VA_Excise(elems, i, num_to_zap); }
+            if (num_to_zap) { Vec_Excise(elems, i, num_to_zap); }
         }
     }
 }
 
 // Apply AND.
 static void
-S_compose_and_queries(QueryParser *self, VArray *elems) {
+S_compose_and_queries(QueryParser *self, Vector *elems) {
     const int32_t default_occur = QParser_IVARS(self)->default_occur;
 
-    for (uint32_t i = 0; i + 2 < VA_Get_Size(elems); i++) {
-        ParserElem *elem = (ParserElem*)VA_Fetch(elems, i + 1);
+    for (uint32_t i = 0; i + 2 < Vec_Get_Size(elems); i++) {
+        ParserElem *elem = (ParserElem*)Vec_Fetch(elems, i + 1);
         if (ParserElem_Get_Type(elem) == TOKEN_AND) {
-            ParserElem   *preceding  = (ParserElem*)VA_Fetch(elems, i);
-            VArray       *children   = VA_new(2);
+            ParserElem   *preceding  = (ParserElem*)Vec_Fetch(elems, i);
+            Vector       *children   = Vec_new(2);
             uint32_t      num_to_zap = 0;
 
             // Add first clause.
             Query *preceding_query = (Query*)ParserElem_As(preceding, QUERY);
-            VA_Push(children, INCREF(preceding_query));
+            Vec_Push(children, INCREF(preceding_query));
 
             // Add following clauses.
-            for (uint32_t j = i + 1, jmax = VA_Get_Size(elems);
+            for (uint32_t j = i + 1, jmax = Vec_Get_Size(elems);
                  j < jmax;
                  j += 2, num_to_zap += 2
                 ) {
-                ParserElem *maybe_and = (ParserElem*)VA_Fetch(elems, j);
-                ParserElem *following = (ParserElem*)VA_Fetch(elems, j + 1);
+                ParserElem *maybe_and = (ParserElem*)Vec_Fetch(elems, j);
+                ParserElem *following = (ParserElem*)Vec_Fetch(elems, j + 1);
                 if (ParserElem_Get_Type(maybe_and) != TOKEN_AND) {
                     break;
                 }
                 else if (ParserElem_Get_Type(following) == TOKEN_QUERY) {
                     Query *next = (Query*)ParserElem_As(following, QUERY);
-                    VA_Push(children, INCREF(next));
+                    Vec_Push(children, INCREF(next));
                 }
                 else {
                     THROW(ERR, "Unexpected type: %u32",
@@ -494,39 +494,39 @@ S_compose_and_queries(QueryParser *self, VArray *elems) {
             DECREF(and_query);
             DECREF(children);
 
-            VA_Excise(elems, i + 1, num_to_zap);
+            Vec_Excise(elems, i + 1, num_to_zap);
         }
     }
 }
 
 static void
-S_compose_or_queries(QueryParser *self, VArray *elems) {
+S_compose_or_queries(QueryParser *self, Vector *elems) {
     const int32_t default_occur = QParser_IVARS(self)->default_occur;
 
-    for (uint32_t i = 0; i + 2 < VA_Get_Size(elems); i++) {
-        ParserElem *elem = (ParserElem*)VA_Fetch(elems, i + 1);
+    for (uint32_t i = 0; i + 2 < Vec_Get_Size(elems); i++) {
+        ParserElem *elem = (ParserElem*)Vec_Fetch(elems, i + 1);
         if (ParserElem_Get_Type(elem) == TOKEN_OR) {
-            ParserElem   *preceding  = (ParserElem*)VA_Fetch(elems, i);
-            VArray       *children   = VA_new(2);
+            ParserElem   *preceding  = (ParserElem*)Vec_Fetch(elems, i);
+            Vector       *children   = Vec_new(2);
             uint32_t      num_to_zap = 0;
 
             // Add first clause.
             Query *preceding_query = (Query*)ParserElem_As(preceding, QUERY);
-            VA_Push(children, INCREF(preceding_query));
+            Vec_Push(children, INCREF(preceding_query));
 
             // Add following clauses.
-            for (uint32_t j = i + 1, jmax = VA_Get_Size(elems);
+            for (uint32_t j = i + 1, jmax = Vec_Get_Size(elems);
                  j < jmax;
                  j += 2, num_to_zap += 2
                 ) {
-                ParserElem *maybe_or  = (ParserElem*)VA_Fetch(elems, j);
-                ParserElem *following = (ParserElem*)VA_Fetch(elems, j + 1);
+                ParserElem *maybe_or  = (ParserElem*)Vec_Fetch(elems, j);
+                ParserElem *following = (ParserElem*)Vec_Fetch(elems, j + 1);
                 if (ParserElem_Get_Type(maybe_or) != TOKEN_OR) {
                     break;
                 }
                 else if (ParserElem_Get_Type(following) == TOKEN_QUERY) {
                     Query *next = (Query*)ParserElem_As(following, QUERY);
-                    VA_Push(children, INCREF(next));
+                    Vec_Push(children, INCREF(next));
                 }
                 else {
                     THROW(ERR, "Unexpected type: %u32",
@@ -541,17 +541,17 @@ S_compose_or_queries(QueryParser *self, VArray *elems) {
             DECREF(or_query);
             DECREF(children);
 
-            VA_Excise(elems, i + 1, num_to_zap);
+            Vec_Excise(elems, i + 1, num_to_zap);
         }
     }
 }
 
 static Query*
-S_compose_subquery(QueryParser *self, VArray *elems, bool enclosed) {
+S_compose_subquery(QueryParser *self, Vector *elems, bool enclosed) {
     const int32_t default_occur = QParser_IVARS(self)->default_occur;
     Query *retval;
 
-    if (VA_Get_Size(elems) == 0) {
+    if (Vec_Get_Size(elems) == 0) {
         // No elems means no query. Maybe the search string was something
         // like 'NOT AND'
         if (enclosed) {
@@ -563,56 +563,56 @@ S_compose_subquery(QueryParser *self, VArray *elems, bool enclosed) {
             retval = (Query*)NoMatchQuery_new();
         }
     }
-    else if (VA_Get_Size(elems) == 1 && !enclosed) {
-        ParserElem *elem = (ParserElem*)VA_Fetch(elems, 0);
+    else if (Vec_Get_Size(elems) == 1 && !enclosed) {
+        ParserElem *elem = (ParserElem*)Vec_Fetch(elems, 0);
         Query *query = (Query*)ParserElem_As(elem, QUERY);
         retval = (Query*)INCREF(query);
     }
     else {
-        uint32_t  num_elems = VA_Get_Size(elems);
-        VArray   *required  = VA_new(num_elems);
-        VArray   *optional  = VA_new(num_elems);
-        VArray   *negated   = VA_new(num_elems);
+        uint32_t  num_elems = Vec_Get_Size(elems);
+        Vector   *required  = Vec_new(num_elems);
+        Vector   *optional  = Vec_new(num_elems);
+        Vector   *negated   = Vec_new(num_elems);
         Query    *req_query = NULL;
         Query    *opt_query = NULL;
 
         // Demux elems into bins.
         for (uint32_t i = 0; i < num_elems; i++) {
-            ParserElem *elem = (ParserElem*)VA_Fetch(elems, i);
+            ParserElem *elem = (ParserElem*)Vec_Fetch(elems, i);
             if (ParserElem_Required(elem)) {
-                VA_Push(required, INCREF(ParserElem_As(elem, QUERY)));
+                Vec_Push(required, INCREF(ParserElem_As(elem, QUERY)));
             }
             else if (ParserElem_Optional(elem)) {
-                VA_Push(optional, INCREF(ParserElem_As(elem, QUERY)));
+                Vec_Push(optional, INCREF(ParserElem_As(elem, QUERY)));
             }
             else if (ParserElem_Negated(elem)) {
-                VA_Push(negated, INCREF(ParserElem_As(elem, QUERY)));
+                Vec_Push(negated, INCREF(ParserElem_As(elem, QUERY)));
             }
         }
-        uint32_t num_required = VA_Get_Size(required);
-        uint32_t num_negated  = VA_Get_Size(negated);
-        uint32_t num_optional = VA_Get_Size(optional);
+        uint32_t num_required = Vec_Get_Size(required);
+        uint32_t num_negated  = Vec_Get_Size(negated);
+        uint32_t num_optional = Vec_Get_Size(optional);
 
         // Bind all mandatory matchers together in one Query.
         if (num_required || num_negated) {
             if (enclosed || num_required + num_negated > 1) {
-                VArray *children = VA_Shallow_Copy(required);
-                VA_Push_VArray(children, negated);
+                Vector *children = Vec_Clone(required);
+                Vec_Push_All(children, negated);
                 req_query = QParser_Make_AND_Query(self, children);
                 DECREF(children);
             }
             else if (num_required) {
-                req_query = (Query*)INCREF(VA_Fetch(required, 0));
+                req_query = (Query*)INCREF(Vec_Fetch(required, 0));
             }
             else if (num_negated) {
-                req_query = (Query*)INCREF(VA_Fetch(negated, 0));
+                req_query = (Query*)INCREF(Vec_Fetch(negated, 0));
             }
         }
 
         // Bind all optional matchers together in one Query.
         if (num_optional) {
             if (!enclosed && num_optional == 1) {
-                opt_query = (Query*)INCREF(VA_Fetch(optional, 0));
+                opt_query = (Query*)INCREF(Vec_Fetch(optional, 0));
             }
             else {
                 opt_query = QParser_Make_OR_Query(self, optional);
@@ -627,9 +627,9 @@ S_compose_subquery(QueryParser *self, VArray *elems, bool enclosed) {
             }
             else {
                 // req_query has only negated queries.
-                VArray *children = VA_new(2);
-                VA_Push(children, INCREF(req_query));
-                VA_Push(children, INCREF(opt_query));
+                Vector *children = Vec_new(2);
+                Vec_Push(children, INCREF(req_query));
+                Vec_Push(children, INCREF(opt_query));
                 retval = QParser_Make_AND_Query(self, children);
                 DECREF(children);
             }
@@ -667,9 +667,9 @@ S_has_valid_clauses(Query *query) {
     }
     else if (Query_Is_A(query, ORQUERY) || Query_Is_A(query, ANDQUERY)) {
         PolyQuery *polyquery = (PolyQuery*)query;
-        VArray    *children  = PolyQuery_Get_Children(polyquery);
-        for (uint32_t i = 0, max = VA_Get_Size(children); i < max; i++) {
-            Query *child = (Query*)VA_Fetch(children, i);
+        Vector    *children  = PolyQuery_Get_Children(polyquery);
+        for (uint32_t i = 0, max = Vec_Get_Size(children); i < max; i++) {
+            Query *child = (Query*)Vec_Fetch(children, i);
             if (S_has_valid_clauses(child)) {
                 return true;
             }
@@ -695,11 +695,11 @@ S_do_prune(QueryParser *self, Query *query) {
     }
     else if (Query_Is_A(query, POLYQUERY)) {
         PolyQuery *polyquery = (PolyQuery*)query;
-        VArray    *children  = PolyQuery_Get_Children(polyquery);
+        Vector    *children  = PolyQuery_Get_Children(polyquery);
 
         // Recurse.
-        for (uint32_t i = 0, max = VA_Get_Size(children); i < max; i++) {
-            Query *child = (Query*)VA_Fetch(children, i);
+        for (uint32_t i = 0, max = Vec_Get_Size(children); i < max; i++) {
+            Query *child = (Query*)Vec_Fetch(children, i);
             S_do_prune(self, child);
         }
 
@@ -707,19 +707,19 @@ S_do_prune(QueryParser *self, Query *query) {
             || PolyQuery_Is_A(polyquery, ORQUERY)
            ) {
             // Don't allow 'foo OR (-bar)'.
-            VArray *children = PolyQuery_Get_Children(polyquery);
-            for (uint32_t i = 0, max = VA_Get_Size(children); i < max; i++) {
-                Query *child = (Query*)VA_Fetch(children, i);
+            Vector *children = PolyQuery_Get_Children(polyquery);
+            for (uint32_t i = 0, max = Vec_Get_Size(children); i < max; i++) {
+                Query *child = (Query*)Vec_Fetch(children, i);
                 if (!S_has_valid_clauses(child)) {
-                    VA_Store(children, i, (Obj*)NoMatchQuery_new());
+                    Vec_Store(children, i, (Obj*)NoMatchQuery_new());
                 }
             }
         }
         else if (PolyQuery_Is_A(polyquery, ANDQUERY)) {
             // Don't allow '(-bar AND -baz)'.
             if (!S_has_valid_clauses((Query*)polyquery)) {
-                VArray *children = PolyQuery_Get_Children(polyquery);
-                VA_Clear(children);
+                Vector *children = PolyQuery_Get_Children(polyquery);
+                Vec_Clear(children);
             }
         }
     }
@@ -748,34 +748,34 @@ QParser_Expand_IMP(QueryParser *self, Query *query) {
     }
     else if (Query_Is_A(query, ORQUERY) || Query_Is_A(query, ANDQUERY)) {
         PolyQuery *polyquery = (PolyQuery*)query;
-        VArray *children = PolyQuery_Get_Children(polyquery);
-        VArray *new_kids = VA_new(VA_Get_Size(children));
+        Vector *children = PolyQuery_Get_Children(polyquery);
+        Vector *new_kids = Vec_new(Vec_Get_Size(children));
 
-        for (uint32_t i = 0, max = VA_Get_Size(children); i < max; i++) {
-            Query *child = (Query*)VA_Fetch(children, i);
+        for (uint32_t i = 0, max = Vec_Get_Size(children); i < max; i++) {
+            Query *child = (Query*)Vec_Fetch(children, i);
             Query *new_child = QParser_Expand(self, child); // recurse
             if (new_child) {
                 if (Query_Is_A(new_child, NOMATCHQUERY)) {
                     bool fails = NoMatchQuery_Get_Fails_To_Match(
                                        (NoMatchQuery*)new_child);
                     if (fails) {
-                        VA_Push(new_kids, (Obj*)new_child);
+                        Vec_Push(new_kids, (Obj*)new_child);
                     }
                     else {
                         DECREF(new_child);
                     }
                 }
                 else {
-                    VA_Push(new_kids, (Obj*)new_child);
+                    Vec_Push(new_kids, (Obj*)new_child);
                 }
             }
         }
 
-        if (VA_Get_Size(new_kids) == 0) {
+        if (Vec_Get_Size(new_kids) == 0) {
             retval = (Query*)NoMatchQuery_new();
         }
-        else if (VA_Get_Size(new_kids) == 1) {
-            retval = (Query*)INCREF(VA_Fetch(new_kids, 0));
+        else if (Vec_Get_Size(new_kids) == 1) {
+            retval = (Query*)INCREF(Vec_Fetch(new_kids, 0));
         }
         else {
             PolyQuery_Set_Children(polyquery, new_kids);
@@ -888,56 +888,56 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
     String *source_text = StrIter_substring(top, tail);
 
     // Either use LeafQuery's field or default to Parser's list.
-    VArray *fields;
+    Vector *fields;
     if (LeafQuery_Get_Field(leaf_query)) {
-        fields = VA_new(1);
-        VA_Push(fields, INCREF(LeafQuery_Get_Field(leaf_query)));
+        fields = Vec_new(1);
+        Vec_Push(fields, INCREF(LeafQuery_Get_Field(leaf_query)));
     }
     else {
-        fields = (VArray*)INCREF(ivars->fields);
+        fields = (Vector*)INCREF(ivars->fields);
     }
 
     CharBuf *unescape_buf = CB_new(Str_Get_Size(source_text));
-    VArray  *queries      = VA_new(VA_Get_Size(fields));
-    for (uint32_t i = 0, max = VA_Get_Size(fields); i < max; i++) {
-        String   *field    = (String*)VA_Fetch(fields, i);
+    Vector  *queries      = Vec_new(Vec_Get_Size(fields));
+    for (uint32_t i = 0, max = Vec_Get_Size(fields); i < max; i++) {
+        String   *field    = (String*)Vec_Fetch(fields, i);
         Analyzer *analyzer = ivars->analyzer
                              ? ivars->analyzer
                              : Schema_Fetch_Analyzer(schema, field);
 
         if (!analyzer) {
-            VA_Push(queries,
+            Vec_Push(queries,
                     (Obj*)QParser_Make_Term_Query(self, field,
                                                   (Obj*)source_text));
         }
         else {
             // Extract token texts.
             String *split_source = S_unescape(self, source_text, unescape_buf);
-            VArray *maybe_texts = Analyzer_Split(analyzer, split_source);
-            uint32_t num_maybe_texts = VA_Get_Size(maybe_texts);
-            VArray *token_texts = VA_new(num_maybe_texts);
+            Vector *maybe_texts = Analyzer_Split(analyzer, split_source);
+            uint32_t num_maybe_texts = Vec_Get_Size(maybe_texts);
+            Vector *token_texts = Vec_new(num_maybe_texts);
 
             // Filter out zero-length token texts.
             for (uint32_t j = 0; j < num_maybe_texts; j++) {
-                String *token_text = (String*)VA_Fetch(maybe_texts, j);
+                String *token_text = (String*)Vec_Fetch(maybe_texts, j);
                 if (Str_Get_Size(token_text)) {
-                    VA_Push(token_texts, INCREF(token_text));
+                    Vec_Push(token_texts, INCREF(token_text));
                 }
             }
 
-            if (VA_Get_Size(token_texts) == 0) {
+            if (Vec_Get_Size(token_texts) == 0) {
                 /* Query might include stop words.  Who knows? */
                 ambiguous = true;
             }
 
             // Add either a TermQuery or a PhraseQuery.
-            if (is_phrase || VA_Get_Size(token_texts) > 1) {
-                VA_Push(queries, (Obj*)
+            if (is_phrase || Vec_Get_Size(token_texts) > 1) {
+                Vec_Push(queries, (Obj*)
                         QParser_Make_Phrase_Query(self, field, token_texts));
             }
-            else if (VA_Get_Size(token_texts) == 1) {
-                VA_Push(queries,
-                        (Obj*)QParser_Make_Term_Query(self, field, VA_Fetch(token_texts, 0)));
+            else if (Vec_Get_Size(token_texts) == 1) {
+                Vec_Push(queries,
+                        (Obj*)QParser_Make_Term_Query(self, field, Vec_Fetch(token_texts, 0)));
             }
 
             DECREF(token_texts);
@@ -947,14 +947,14 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
     }
 
     Query *retval;
-    if (VA_Get_Size(queries) == 0) {
+    if (Vec_Get_Size(queries) == 0) {
         retval = (Query*)NoMatchQuery_new();
         if (ambiguous) {
             NoMatchQuery_Set_Fails_To_Match((NoMatchQuery*)retval, false);
         }
     }
-    else if (VA_Get_Size(queries) == 1) {
-        retval = (Query*)INCREF(VA_Fetch(queries, 0));
+    else if (Vec_Get_Size(queries) == 1) {
+        retval = (Query*)INCREF(Vec_Fetch(queries, 0));
     }
     else {
         retval = QParser_Make_OR_Query(self, queries);
@@ -980,19 +980,19 @@ QParser_Make_Term_Query_IMP(QueryParser *self, String *field,
 
 Query*
 QParser_Make_Phrase_Query_IMP(QueryParser *self, String *field,
-                              VArray *terms) {
+                              Vector *terms) {
     UNUSED_VAR(self);
     return (Query*)PhraseQuery_new(field, terms);
 }
 
 Query*
-QParser_Make_OR_Query_IMP(QueryParser *self, VArray *children) {
+QParser_Make_OR_Query_IMP(QueryParser *self, Vector *children) {
     UNUSED_VAR(self);
     return (Query*)ORQuery_new(children);
 }
 
 Query*
-QParser_Make_AND_Query_IMP(QueryParser *self, VArray *children) {
+QParser_Make_AND_Query_IMP(QueryParser *self, Vector *children) {
     UNUSED_VAR(self);
     return (Query*)ANDQuery_new(children);
 }

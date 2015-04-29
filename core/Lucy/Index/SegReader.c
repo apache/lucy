@@ -35,14 +35,14 @@ S_try_init_components(void *context);
 
 SegReader*
 SegReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
-              VArray *segments, int32_t seg_tick) {
+              Vector *segments, int32_t seg_tick) {
     SegReader *self = (SegReader*)Class_Make_Obj(SEGREADER);
     return SegReader_init(self, schema, folder, snapshot, segments, seg_tick);
 }
 
 SegReader*
 SegReader_init(SegReader *self, Schema *schema, Folder *folder,
-               Snapshot *snapshot, VArray *segments, int32_t seg_tick) {
+               Snapshot *snapshot, Vector *segments, int32_t seg_tick) {
     Segment *segment;
 
     IxReader_init((IndexReader*)self, schema, folder, snapshot, segments,
@@ -127,10 +127,10 @@ SegReader_Offsets_IMP(SegReader *self) {
     return I32Arr_new_steal(ints, 1);
 }
 
-VArray*
+Vector*
 SegReader_Seg_Readers_IMP(SegReader *self) {
-    VArray *seg_readers = VA_new(1);
-    VA_Push(seg_readers, INCREF(self));
+    Vector *seg_readers = Vec_new(1);
+    Vec_Push(seg_readers, INCREF(self));
     return seg_readers;
 }
 

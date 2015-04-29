@@ -36,10 +36,10 @@ test_Add_and_Delete(TestBatchRunner *runner) {
 
     Snapshot_Add_Entry(snapshot, foo);
     Snapshot_Add_Entry(snapshot, foo); // redundant
-    VArray *entries = Snapshot_List(snapshot);
+    Vector *entries = Snapshot_List(snapshot);
     TEST_INT_EQ(runner, Snapshot_Num_Entries(snapshot), 1,
                 "One entry added");
-    TEST_TRUE(runner, Str_Equals(foo, VA_Fetch(entries, 0)), "correct entry");
+    TEST_TRUE(runner, Str_Equals(foo, Vec_Fetch(entries, 0)), "correct entry");
     DECREF(entries);
 
     Snapshot_Add_Entry(snapshot, bar);
@@ -89,9 +89,9 @@ test_Read_File_and_Write_File(TestBatchRunner *runner) {
     Snapshot *read_retval = Snapshot_Read_File(dupe, folder, snap);
     TEST_TRUE(runner, dupe == read_retval, "Read_File() returns the object");
 
-    VArray *orig_list = Snapshot_List(snapshot);
-    VArray *dupe_list = Snapshot_List(dupe);
-    TEST_TRUE(runner, VA_Equals(orig_list, (Obj*)dupe_list),
+    Vector *orig_list = Snapshot_List(snapshot);
+    Vector *dupe_list = Snapshot_List(dupe);
+    TEST_TRUE(runner, Vec_Equals(orig_list, (Obj*)dupe_list),
               "Round trip through Write_File() and Read_File()");
 
     DECREF(orig_list);

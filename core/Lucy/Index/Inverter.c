@@ -50,8 +50,8 @@ Inverter_init(Inverter *self, Schema *schema, Segment *segment) {
     ivars->current    = ivars->blank;
 
     // Derive.
-    ivars->entry_pool = VA_new(Schema_Num_Fields(schema));
-    ivars->entries    = VA_new(Schema_Num_Fields(schema));
+    ivars->entry_pool = Vec_new(Schema_Num_Fields(schema));
+    ivars->entries    = Vec_new(Schema_Num_Fields(schema));
 
     // Assign.
     ivars->schema  = (Schema*)INCREF(schema);
@@ -77,16 +77,16 @@ Inverter_Iterate_IMP(Inverter *self) {
     InverterIVARS *const ivars = Inverter_IVARS(self);
     ivars->tick = -1;
     if (!ivars->sorted) {
-        VA_Sort(ivars->entries, NULL, NULL);
+        Vec_Sort(ivars->entries);
         ivars->sorted = true;
     }
-    return VA_Get_Size(ivars->entries);
+    return Vec_Get_Size(ivars->entries);
 }
 
 int32_t
 Inverter_Next_IMP(Inverter *self) {
     InverterIVARS *const ivars = Inverter_IVARS(self);
-    ivars->current = (InverterEntry*)VA_Fetch(ivars->entries, ++ivars->tick);
+    ivars->current = (InverterEntry*)Vec_Fetch(ivars->entries, ++ivars->tick);
     if (!ivars->current) { ivars->current = ivars->blank; } // Exhausted.
     return InvEntry_IVARS(ivars->current)->field_num;
 }
@@ -175,17 +175,17 @@ Inverter_Add_Field_IMP(Inverter *self, InverterEntry *entry) {
     }
 
     // Prime the iterator.
-    VA_Push(ivars->entries, INCREF(entry));
+    Vec_Push(ivars->entries, INCREF(entry));
     ivars->sorted = false;
 }
 
 void
 Inverter_Clear_IMP(Inverter *self) {
     InverterIVARS *const ivars = Inverter_IVARS(self);
-    for (uint32_t i = 0, max = VA_Get_Size(ivars->entries); i < max; i++) {
-        InvEntry_Clear(VA_Fetch(ivars->entries, i));
+    for (uint32_t i = 0, max = Vec_Get_Size(ivars->entries); i < max; i++) {
+        InvEntry_Clear(Vec_Fetch(ivars->entries, i));
     }
-    VA_Clear(ivars->entries);
+    Vec_Clear(ivars->entries);
     ivars->tick = -1;
     DECREF(ivars->doc);
     ivars->doc = NULL;

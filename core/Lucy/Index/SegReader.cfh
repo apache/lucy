@@ -37,7 +37,7 @@ public class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
 
     inert incremented SegReader*
     new(Schema *schema, Folder *folder, Snapshot *snapshot = NULL,
-        VArray *segments, int32_t seg_tick);
+        Vector *segments, int32_t seg_tick);
 
     /**
      * @param schema A Schema.
@@ -50,7 +50,7 @@ public class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
      */
     inert SegReader*
     init(SegReader *self, Schema *schema, Folder *folder,
-         Snapshot *snapshot = NULL, VArray *segments, int32_t seg_tick);
+         Snapshot *snapshot = NULL, Vector *segments, int32_t seg_tick);
 
     public void
     Destroy(SegReader *self);
@@ -88,7 +88,7 @@ public class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
     public incremented I32Array*
     Offsets(SegReader *self);
 
-    public incremented VArray*
+    public incremented Vector*
     Seg_Readers(SegReader *self);
 }
 

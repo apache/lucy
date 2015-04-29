@@ -30,16 +30,16 @@ parcel Lucy;
 
 public class Lucy::Search::SortSpec inherits Clownfish::Obj {
 
-    VArray        *rules;
+    Vector        *rules;
 
     public inert SortSpec*
-    new(VArray *rules);
+    new(Vector *rules);
 
     /**
      * @param rules An array of SortRules.
      */
     public inert SortSpec*
-    init(SortSpec *self, VArray *rules);
+    init(SortSpec *self, Vector *rules);
 
     public incremented SortSpec*
     Deserialize(decremented SortSpec *self, InStream *instream);
@@ -47,7 +47,7 @@ public class Lucy::Search::SortSpec inherits Clownfish::Obj {
     public void
     Serialize(SortSpec *self, OutStream *outstream);
 
-    VArray*
+    Vector*
     Get_Rules(SortSpec *self);
 
     public void

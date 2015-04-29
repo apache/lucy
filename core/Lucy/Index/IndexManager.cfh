@@ -83,7 +83,7 @@ public class Lucy::Index::IndexManager nickname IxManager
      * @param optimize A boolean indicating whether to spend extra time
      * optimizing the index for search-time performance.
      */
-    public incremented VArray*
+    public incremented Vector*
     Recycle(IndexManager *self, PolyReader *reader,
             DeletionsWriter *del_writer, int64_t cutoff,
             bool optimize = false);

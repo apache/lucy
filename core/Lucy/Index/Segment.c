@@ -41,11 +41,11 @@ Seg_init(Segment *self, int64_t number) {
     // Init.
     ivars->metadata  = Hash_new(0);
     ivars->count     = 0;
-    ivars->by_num    = VA_new(2);
+    ivars->by_num    = Vec_new(2);
     ivars->by_name   = Hash_new(0);
 
     // Start field numbers at 1, not 0.
-    VA_Push(ivars->by_num, (Obj*)Str_newf(""));
+    Vec_Push(ivars->by_num, (Obj*)Str_newf(""));
 
     // Assign.
     ivars->number = number;
@@ -116,9 +116,9 @@ Seg_Read_File_IMP(Segment *self, Folder *folder) {
     else { ivars->count = Obj_To_I64(count); }
 
     // Get list of field nums.
-    VArray *source_by_num = (VArray*)Hash_Fetch_Utf8(my_metadata,
+    Vector *source_by_num = (Vector*)Hash_Fetch_Utf8(my_metadata,
                                                      "field_names", 11);
-    uint32_t num_fields = source_by_num ? VA_Get_Size(source_by_num) : 0;
+    uint32_t num_fields = source_by_num ? Vec_Get_Size(source_by_num) : 0;
     if (source_by_num == NULL) {
         THROW(ERR, "Failed to extract 'field_names' from metadata");
     }
@@ -126,12 +126,12 @@ Seg_Read_File_IMP(Segment *self, Folder *folder) {
     // Init.
     DECREF(ivars->by_num);
     DECREF(ivars->by_name);
-    ivars->by_num  = VA_new(num_fields);
+    ivars->by_num  = Vec_new(num_fields);
     ivars->by_name = Hash_new(num_fields);
 
     // Copy the list of fields from the source.
     for (uint32_t i = 0; i < num_fields; i++) {
-        String *name = (String*)VA_Fetch(source_by_num, i);
+        String *name = (String*)Vec_Fetch(source_by_num, i);
         Seg_Add_Field(self, name);
     }
 
@@ -165,9 +165,9 @@ Seg_Add_Field_IMP(Segment *self, String *field) {
         return Int32_Get_Value(num);
     }
     else {
-        int32_t field_num = VA_Get_Size(ivars->by_num);
+        int32_t field_num = Vec_Get_Size(ivars->by_num);
         Hash_Store(ivars->by_name, field, (Obj*)Int32_new(field_num));
-        VA_Push(ivars->by_num, (Obj*)Str_Clone(field));
+        Vec_Push(ivars->by_num, (Obj*)Str_Clone(field));
         return field_num;
     }
 }
@@ -246,7 +246,7 @@ String*
 Seg_Field_Name_IMP(Segment *self, int32_t field_num) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
     return field_num
-           ? (String*)VA_Fetch(ivars->by_num, field_num)
+           ? (String*)Vec_Fetch(ivars->by_num, field_num)
            : NULL;
 }
 

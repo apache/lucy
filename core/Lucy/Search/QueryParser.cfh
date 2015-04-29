@@ -46,14 +46,14 @@ public class Lucy::Search::QueryParser nickname QParser
     Schema     *schema;
     Analyzer   *analyzer;
     String     *default_boolop;
-    VArray     *fields;
+    Vector     *fields;
     QueryLexer *lexer;
     bool        heed_colons;
     int32_t     default_occur;
 
     inert incremented QueryParser*
     new(Schema *schema, Analyzer *analyzer = NULL,
-        String *default_boolop = NULL, VArray *fields = NULL);
+        String *default_boolop = NULL, Vector *fields = NULL);
 
     /** Constructor.
      *
@@ -73,7 +73,7 @@ public class Lucy::Search::QueryParser nickname QParser
      */
     public inert QueryParser*
     init(QueryParser *self, Schema *schema, Analyzer *analyzer = NULL,
-        String *default_boolop = NULL, VArray *fields = NULL);
+        String *default_boolop = NULL, Vector *fields = NULL);
 
     /** Build a Query object from the contents of a query string.  At present,
      * implemented internally by calling [](cfish:.Tree), [](cfish:.Expand), and [](cfish:.Prune).
@@ -166,7 +166,7 @@ public class Lucy::Search::QueryParser nickname QParser
      * @return A Query.
      */
     public incremented Query*
-    Make_Phrase_Query(QueryParser *self, String *field, VArray *terms);
+    Make_Phrase_Query(QueryParser *self, String *field, Vector *terms);
 
     /** Factory method creating an ORQuery.
      *
@@ -174,7 +174,7 @@ public class Lucy::Search::QueryParser nickname QParser
      * @return A Query.
      */
     public incremented Query*
-    Make_OR_Query(QueryParser *self, VArray *children = NULL);
+    Make_OR_Query(QueryParser *self, Vector *children = NULL);
 
     /** Factory method creating an ANDQuery.
      *
@@ -182,7 +182,7 @@ public class Lucy::Search::QueryParser nickname QParser
      * @return A Query.
      */
     public incremented Query*
-    Make_AND_Query(QueryParser *self, VArray *children = NULL);
+    Make_AND_Query(QueryParser *self, Vector *children = NULL);
 
     /** Factory method creating a NOTQuery.
      *
@@ -211,7 +211,7 @@ public class Lucy::Search::QueryParser nickname QParser
     String*
     Get_Default_BoolOp(QueryParser *self);
 
-    VArray*
+    Vector*
     Get_Fields(QueryParser *self);
 
     bool

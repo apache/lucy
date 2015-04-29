@@ -100,10 +100,10 @@ public abstract class Lucy::Index::DeletionsWriter nickname DelWriter
 class Lucy::Index::DefaultDeletionsWriter nickname DefDelWriter
     inherits Lucy::Index::DeletionsWriter {
 
-    VArray        *seg_readers;
+    Vector        *seg_readers;
     Hash          *name_to_tick;
     I32Array      *seg_starts;
-    VArray        *bit_vecs;
+    Vector        *bit_vecs;
     bool          *updated;
     IndexSearcher *searcher;
 

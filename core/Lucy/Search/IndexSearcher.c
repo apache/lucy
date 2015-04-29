@@ -119,7 +119,7 @@ IxSearcher_Top_Docs_IMP(IndexSearcher *self, Query *query, uint32_t num_wanted,
     uint32_t       wanted    = num_wanted > doc_max ? doc_max : num_wanted;
     SortCollector *collector = SortColl_new(schema, sort_spec, wanted);
     IxSearcher_Collect(self, query, (Collector*)collector);
-    VArray  *match_docs = SortColl_Pop_Match_Docs(collector);
+    Vector  *match_docs = SortColl_Pop_Match_Docs(collector);
     int32_t  total_hits = SortColl_Get_Total_Hits(collector);
     TopDocs *retval     = TopDocs_new(match_docs, total_hits);
     DECREF(collector);
@@ -130,7 +130,7 @@ IxSearcher_Top_Docs_IMP(IndexSearcher *self, Query *query, uint32_t num_wanted,
 void
 IxSearcher_Collect_IMP(IndexSearcher *self, Query *query, Collector *collector) {
     IndexSearcherIVARS *const ivars = IxSearcher_IVARS(self);
-    VArray   *const seg_readers = ivars->seg_readers;
+    Vector   *const seg_readers = ivars->seg_readers;
     I32Array *const seg_starts  = ivars->seg_starts;
     bool      need_score        = Coll_Need_Score(collector);
     Compiler *compiler = Query_Is_A(query, COMPILER)
@@ -139,8 +139,8 @@ IxSearcher_Collect_IMP(IndexSearcher *self, Query *query, Collector *collector) 
                                                Query_Get_Boost(query), false);
 
     // Accumulate hits into the Collector.
-    for (uint32_t i = 0, max = VA_Get_Size(seg_readers); i < max; i++) {
-        SegReader *seg_reader = (SegReader*)VA_Fetch(seg_readers, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(seg_readers); i < max; i++) {
+        SegReader *seg_reader = (SegReader*)Vec_Fetch(seg_readers, i);
         DeletionsReader *del_reader = (DeletionsReader*)SegReader_Fetch(
                                           seg_reader,
                                           Class_Get_Name(DELETIONSREADER));

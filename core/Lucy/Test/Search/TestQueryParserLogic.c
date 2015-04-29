@@ -860,14 +860,14 @@ static Folder*
 S_create_index() {
     Schema     *schema  = (Schema*)TestSchema_new(false);
     RAMFolder  *folder  = RAMFolder_new(NULL);
-    VArray     *doc_set = TestUtils_doc_set();
+    Vector     *doc_set = TestUtils_doc_set();
     Indexer    *indexer = Indexer_new(schema, (Obj*)folder, NULL, 0);
     uint32_t i, max;
 
     String *field = (String*)SSTR_WRAP_UTF8("content", 7);
-    for (i = 0, max = VA_Get_Size(doc_set); i < max; i++) {
+    for (i = 0, max = Vec_Get_Size(doc_set); i < max; i++) {
         Doc *doc = Doc_new(NULL, 0);
-        Doc_Store(doc, field, VA_Fetch(doc_set, i));
+        Doc_Store(doc, field, Vec_Fetch(doc_set, i));
         Indexer_Add_Doc(indexer, doc, 1.0f);
         DECREF(doc);
     }

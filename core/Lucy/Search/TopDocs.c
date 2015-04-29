@@ -27,15 +27,15 @@
 #include "Lucy/Util/Freezer.h"
 
 TopDocs*
-TopDocs_new(VArray *match_docs, uint32_t total_hits) {
+TopDocs_new(Vector *match_docs, uint32_t total_hits) {
     TopDocs *self = (TopDocs*)Class_Make_Obj(TOPDOCS);
     return TopDocs_init(self, match_docs, total_hits);
 }
 
 TopDocs*
-TopDocs_init(TopDocs *self, VArray *match_docs, uint32_t total_hits) {
+TopDocs_init(TopDocs *self, Vector *match_docs, uint32_t total_hits) {
     TopDocsIVARS *const ivars = TopDocs_IVARS(self);
-    ivars->match_docs = (VArray*)INCREF(match_docs);
+    ivars->match_docs = (Vector*)INCREF(match_docs);
     ivars->total_hits = total_hits;
     return self;
 }
@@ -62,7 +62,7 @@ TopDocs_Deserialize_IMP(TopDocs *self, InStream *instream) {
     return self;
 }
 
-VArray*
+Vector*
 TopDocs_Get_Match_Docs_IMP(TopDocs *self) {
     return TopDocs_IVARS(self)->match_docs;
 }
@@ -73,10 +73,10 @@ TopDocs_Get_Total_Hits_IMP(TopDocs *self) {
 }
 
 void
-TopDocs_Set_Match_Docs_IMP(TopDocs *self, VArray *match_docs) {
+TopDocs_Set_Match_Docs_IMP(TopDocs *self, Vector *match_docs) {
     TopDocsIVARS *const ivars = TopDocs_IVARS(self);
     DECREF(ivars->match_docs);
-    ivars->match_docs = (VArray*)INCREF(match_docs);
+    ivars->match_docs = (Vector*)INCREF(match_docs);
 }
 void
 TopDocs_Set_Total_Hits_IMP(TopDocs *self, uint32_t total_hits) {

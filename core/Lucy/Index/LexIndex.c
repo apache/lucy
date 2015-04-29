@@ -158,7 +158,7 @@ LexIndex_Seek_IMP(LexIndex *self, Obj *target) {
                   Obj_Get_Class_Name(target), Class_Get_Name(STRING));
         }
         /* TODO:
-        Obj *first_obj = VA_Fetch(terms, 0);
+        Obj *first_obj = Vec_Fetch(terms, 0);
         if (!Obj_Is_A(target, Obj_Get_Class(first_obj))) {
             THROW(ERR, "Target is a %o, and not comparable to a %o",
                 Obj_Get_Class_Name(target), Obj_Get_Class_Name(first_obj));

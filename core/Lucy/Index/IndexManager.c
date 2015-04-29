@@ -31,6 +31,8 @@
 #include "Lucy/Util/Json.h"
 #include "Clownfish/Util/StringHelper.h"
 
+#include <stdlib.h>
+
 IndexManager*
 IxManager_new(String *host, LockFactory *lock_factory) {
     IndexManager *self = (IndexManager*)Class_Make_Obj(INDEXMANAGER);
@@ -67,11 +69,11 @@ IxManager_Destroy_IMP(IndexManager *self) {
 
 int64_t
 IxManager_Highest_Seg_Num_IMP(IndexManager *self, Snapshot *snapshot) {
-    VArray *files = Snapshot_List(snapshot);
+    Vector *files = Snapshot_List(snapshot);
     uint64_t highest_seg_num = 0;
     UNUSED_VAR(self);
-    for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
-        String *file = (String*)VA_Fetch(files, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
+        String *file = (String*)Vec_Fetch(files, i);
         if (Seg_valid_seg_name(file)) {
             uint64_t seg_num = IxFileNames_extract_gen(file);
             if (seg_num > highest_seg_num) { highest_seg_num = seg_num; }
@@ -108,18 +110,10 @@ IxManager_Make_Snapshot_Filename_IMP(IndexManager *self) {
 }
 
 static int
-S_compare_doc_count(void *context, const void *va, const void *vb) {
+S_compare_doc_count(const void *va, const void *vb) {
     SegReader *a = *(SegReader**)va;
     SegReader *b = *(SegReader**)vb;
-    UNUSED_VAR(context);
     return SegReader_Doc_Count(a) - SegReader_Doc_Count(b);
-}
-
-static bool
-S_check_cutoff(VArray *array, uint32_t tick, void *data) {
-    SegReader *seg_reader = (SegReader*)VA_Fetch(array, tick);
-    int64_t cutoff = *(int64_t*)data;
-    return SegReader_Get_Seg_Num(seg_reader) > cutoff;
 }
 
 static uint32_t
@@ -137,27 +131,37 @@ S_fibonacci(uint32_t n) {
     return result;
 }
 
-VArray*
+Vector*
 IxManager_Recycle_IMP(IndexManager *self, PolyReader *reader,
                       DeletionsWriter *del_writer, int64_t cutoff,
                       bool optimize) {
-    VArray *seg_readers = PolyReader_Get_Seg_Readers(reader);
-    VArray *candidates  = VA_Gather(seg_readers, S_check_cutoff, &cutoff);
-    VArray *recyclables = VA_new(VA_Get_Size(candidates));
-    const uint32_t num_candidates = VA_Get_Size(candidates);
+    Vector *seg_readers = PolyReader_Get_Seg_Readers(reader);
+    size_t num_seg_readers = Vec_Get_Size(seg_readers);
+    SegReader **candidates
+        = (SegReader**)MALLOCATE(num_seg_readers * sizeof(SegReader*));
+    size_t num_candidates = 0;
+    for (size_t i = 0; i < num_seg_readers; i++) {
+        SegReader *seg_reader = (SegReader*)Vec_Fetch(seg_readers, i);
+        if (SegReader_Get_Seg_Num(seg_reader) > cutoff) {
+            candidates[num_candidates++] = seg_reader;
+        }
+    }
+
+    Vector *recyclables = Vec_new(num_candidates);
 
     if (optimize) {
-        DECREF(recyclables);
-        return candidates;
+        for (size_t i = 0; i < num_candidates; i++) {
+            Vec_Push(recyclables, INCREF(candidates[i]));
+        }
+        FREEMEM(candidates);
+        return recyclables;
     }
 
     // Sort by ascending size in docs, choose sparsely populated segments.
-    VA_Sort(candidates, S_compare_doc_count, NULL);
+    qsort(candidates, num_candidates, sizeof(SegReader*), S_compare_doc_count);
     int32_t *counts = (int32_t*)MALLOCATE(num_candidates * sizeof(int32_t));
     for (uint32_t i = 0; i < num_candidates; i++) {
-        SegReader *seg_reader
-            = (SegReader*)CERTIFY(VA_Fetch(candidates, i), SEGREADER);
-        counts[i] = SegReader_Doc_Count(seg_reader);
+        counts[i] = SegReader_Doc_Count(candidates[i]);
     }
     I32Array *doc_counts = I32Arr_new_steal(counts, num_candidates);
     uint32_t threshold = IxManager_Choose_Sparse(self, doc_counts);
@@ -165,25 +169,22 @@ IxManager_Recycle_IMP(IndexManager *self, PolyReader *reader,
 
     // Move SegReaders to be recycled.
     for (uint32_t i = 0; i < threshold; i++) {
-        VA_Store(recyclables, i, VA_Delete(candidates, i));
+        Vec_Store(recyclables, i, INCREF(candidates[i]));
     }
 
     // Find segments where at least 10% of all docs have been deleted.
     for (uint32_t i = threshold; i < num_candidates; i++) {
-        SegReader *seg_reader = (SegReader*)VA_Delete(candidates, i);
+        SegReader *seg_reader = candidates[i];
         String    *seg_name   = SegReader_Get_Seg_Name(seg_reader);
         double doc_max = SegReader_Doc_Max(seg_reader);
         double num_deletions = DelWriter_Seg_Del_Count(del_writer, seg_name);
         double del_proportion = num_deletions / doc_max;
         if (del_proportion >= 0.1) {
-            VA_Push(recyclables, (Obj*)seg_reader);
-        }
-        else {
-            DECREF(seg_reader);
+            Vec_Push(recyclables, INCREF(seg_reader));
         }
     }
 
-    DECREF(candidates);
+    FREEMEM(candidates);
     return recyclables;
 }
 

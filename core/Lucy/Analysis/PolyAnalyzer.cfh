@@ -49,10 +49,10 @@ parcel Lucy;
  */
 public class Lucy::Analysis::PolyAnalyzer inherits Lucy::Analysis::Analyzer {
 
-    VArray  *analyzers;
+    Vector  *analyzers;
 
     inert incremented PolyAnalyzer*
-    new(String *language = NULL, VArray *analyzers = NULL);
+    new(String *language = NULL, Vector *analyzers = NULL);
 
     /**
      * @param language An ISO code from the list of supported languages.
@@ -66,11 +66,11 @@ public class Lucy::Analysis::PolyAnalyzer inherits Lucy::Analysis::Analyzer {
      */
     public inert PolyAnalyzer*
     init(PolyAnalyzer *self, String *language = NULL,
-         VArray *analyzers = NULL);
+         Vector *analyzers = NULL);
 
     /** Getter for "analyzers" member.
      */
-    public VArray*
+    public Vector*
     Get_Analyzers(PolyAnalyzer *self);
 
     public incremented Inversion*

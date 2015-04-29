@@ -33,7 +33,7 @@
 
 DeletionsReader*
 DelReader_init(DeletionsReader *self, Schema *schema, Folder *folder,
-               Snapshot *snapshot, VArray *segments, int32_t seg_tick) {
+               Snapshot *snapshot, Vector *segments, int32_t seg_tick) {
     DataReader_init((DataReader*)self, schema, folder, snapshot, segments,
                     seg_tick);
     ABSTRACT_CLASS_CHECK(self, DELETIONSREADER);
@@ -41,31 +41,31 @@ DelReader_init(DeletionsReader *self, Schema *schema, Folder *folder,
 }
 
 DeletionsReader*
-DelReader_Aggregator_IMP(DeletionsReader *self, VArray *readers,
+DelReader_Aggregator_IMP(DeletionsReader *self, Vector *readers,
                          I32Array *offsets) {
     UNUSED_VAR(self);
     return (DeletionsReader*)PolyDelReader_new(readers, offsets);
 }
 
 PolyDeletionsReader*
-PolyDelReader_new(VArray *readers, I32Array *offsets) {
+PolyDelReader_new(Vector *readers, I32Array *offsets) {
     PolyDeletionsReader *self
         = (PolyDeletionsReader*)Class_Make_Obj(POLYDELETIONSREADER);
     return PolyDelReader_init(self, readers, offsets);
 }
 
 PolyDeletionsReader*
-PolyDelReader_init(PolyDeletionsReader *self, VArray *readers,
+PolyDelReader_init(PolyDeletionsReader *self, Vector *readers,
                    I32Array *offsets) {
     DelReader_init((DeletionsReader*)self, NULL, NULL, NULL, NULL, -1);
     PolyDeletionsReaderIVARS *const ivars = PolyDelReader_IVARS(self);
     ivars->del_count = 0;
-    for (uint32_t i = 0, max = VA_Get_Size(readers); i < max; i++) {
+    for (uint32_t i = 0, max = Vec_Get_Size(readers); i < max; i++) {
         DeletionsReader *reader = (DeletionsReader*)CERTIFY(
-                                      VA_Fetch(readers, i), DELETIONSREADER);
+                                      Vec_Fetch(readers, i), DELETIONSREADER);
         ivars->del_count += DelReader_Del_Count(reader);
     }
-    ivars->readers = (VArray*)INCREF(readers);
+    ivars->readers = (Vector*)INCREF(readers);
     ivars->offsets = (I32Array*)INCREF(offsets);
     return self;
 }
@@ -74,12 +74,12 @@ void
 PolyDelReader_Close_IMP(PolyDeletionsReader *self) {
     PolyDeletionsReaderIVARS *const ivars = PolyDelReader_IVARS(self);
     if (ivars->readers) {
-        for (uint32_t i = 0, max = VA_Get_Size(ivars->readers); i < max; i++) {
+        for (uint32_t i = 0, max = Vec_Get_Size(ivars->readers); i < max; i++) {
             DeletionsReader *reader
-                = (DeletionsReader*)VA_Fetch(ivars->readers, i);
+                = (DeletionsReader*)Vec_Fetch(ivars->readers, i);
             if (reader) { DelReader_Close(reader); }
         }
-        VA_Clear(ivars->readers);
+        Vec_Clear(ivars->readers);
     }
 }
 
@@ -101,13 +101,13 @@ PolyDelReader_Iterator_IMP(PolyDeletionsReader *self) {
     PolyDeletionsReaderIVARS *const ivars = PolyDelReader_IVARS(self);
     SeriesMatcher *deletions = NULL;
     if (ivars->del_count) {
-        uint32_t num_readers = VA_Get_Size(ivars->readers);
-        VArray *matchers = VA_new(num_readers);
+        uint32_t num_readers = Vec_Get_Size(ivars->readers);
+        Vector *matchers = Vec_new(num_readers);
         for (uint32_t i = 0; i < num_readers; i++) {
             DeletionsReader *reader
-                = (DeletionsReader*)VA_Fetch(ivars->readers, i);
+                = (DeletionsReader*)Vec_Fetch(ivars->readers, i);
             Matcher *matcher = DelReader_Iterator(reader);
-            if (matcher) { VA_Store(matchers, i, (Obj*)matcher); }
+            if (matcher) { Vec_Store(matchers, i, (Obj*)matcher); }
         }
         deletions = SeriesMatcher_new(matchers, ivars->offsets);
         DECREF(matchers);
@@ -117,7 +117,7 @@ PolyDelReader_Iterator_IMP(PolyDeletionsReader *self) {
 
 DefaultDeletionsReader*
 DefDelReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
-                 VArray *segments, int32_t seg_tick) {
+                 Vector *segments, int32_t seg_tick) {
     DefaultDeletionsReader *self
         = (DefaultDeletionsReader*)Class_Make_Obj(DEFAULTDELETIONSREADER);
     return DefDelReader_init(self, schema, folder, snapshot, segments,
@@ -126,7 +126,7 @@ DefDelReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
 
 DefaultDeletionsReader*
 DefDelReader_init(DefaultDeletionsReader *self, Schema *schema,
-                  Folder *folder, Snapshot *snapshot, VArray *segments,
+                  Folder *folder, Snapshot *snapshot, Vector *segments,
                   int32_t seg_tick) {
     DelReader_init((DeletionsReader*)self, schema, folder, snapshot, segments,
                    seg_tick);
@@ -156,7 +156,7 @@ DefDelReader_Destroy_IMP(DefaultDeletionsReader *self) {
 BitVector*
 DefDelReader_Read_Deletions_IMP(DefaultDeletionsReader *self) {
     DefaultDeletionsReaderIVARS *const ivars = DefDelReader_IVARS(self);
-    VArray  *segments    = DefDelReader_Get_Segments(self);
+    Vector  *segments    = DefDelReader_Get_Segments(self);
     Segment *segment     = DefDelReader_Get_Segment(self);
     String  *my_seg_name = Seg_Get_Name(segment);
     String  *del_file    = NULL;
@@ -165,8 +165,8 @@ DefDelReader_Read_Deletions_IMP(DefaultDeletionsReader *self) {
     // Start with deletions files in the most recently added segments and work
     // backwards.  The first one we find which addresses our segment is the
     // one we need.
-    for (int32_t i = VA_Get_Size(segments) - 1; i >= 0; i--) {
-        Segment *other_seg = (Segment*)VA_Fetch(segments, i);
+    for (int32_t i = Vec_Get_Size(segments) - 1; i >= 0; i--) {
+        Segment *other_seg = (Segment*)Vec_Fetch(segments, i);
         Hash *metadata
             = (Hash*)Seg_Fetch_Metadata_Utf8(other_seg, "deletions", 9);
         if (metadata) {

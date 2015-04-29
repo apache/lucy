@@ -28,7 +28,7 @@ class Lucy::Search::Collector::SortCollector nickname SortColl
     uint32_t        total_hits;
     HitQueue       *hit_q;
     MatchDoc       *bumped;
-    VArray         *rules;
+    Vector         *rules;
     SortCache     **sort_caches;
     const void    **ord_arrays;
     uint8_t        *actions;
@@ -62,7 +62,7 @@ class Lucy::Search::Collector::SortCollector nickname SortColl
 
     /** Empty out the HitQueue and return an array of sorted MatchDocs.
      */
-    incremented VArray*
+    incremented Vector*
     Pop_Match_Docs(SortCollector *self);
 
     /** Accessor for "total_hits" member, which tracks the number of times

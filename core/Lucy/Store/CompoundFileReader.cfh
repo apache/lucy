@@ -93,7 +93,7 @@ class Lucy::Store::CFReaderDirHandle nickname CFReaderDH
     inherits Lucy::Store::DirHandle {
 
     CompoundFileReader *cf_reader;
-    VArray             *elems;
+    Vector             *elems;
     int32_t             tick;
 
     inert incremented CFReaderDirHandle*

@@ -30,13 +30,13 @@ TestJson_new() {
     return (TestJson*)Class_Make_Obj(TESTJSON);
 }
 
-// Create a test data structure including at least one each of Hash, VArray,
+// Create a test data structure including at least one each of Hash, Vector,
 // and String.
 static Obj*
 S_make_dump() {
     Hash *dump = Hash_new(0);
     Hash_Store_Utf8(dump, "foo", 3, (Obj*)Str_newf("foo"));
-    Hash_Store_Utf8(dump, "stuff", 5, (Obj*)VA_new(0));
+    Hash_Store_Utf8(dump, "stuff", 5, (Obj*)Vec_new(0));
     return (Obj*)dump;
 }
 
@@ -279,11 +279,11 @@ test_syntax_errors(TestBatchRunner *runner) {
 static void
 S_round_trip_integer(TestBatchRunner *runner, int64_t value) {
     Integer64 *num = Int64_new(value);
-    VArray *array = VA_new(1);
-    VA_Store(array, 0, (Obj*)num);
+    Vector *array = Vec_new(1);
+    Vec_Store(array, 0, (Obj*)num);
     String *json = Json_to_json((Obj*)array);
     Obj *dump = Json_from_json(json);
-    TEST_TRUE(runner, VA_Equals(array, dump), "Round trip integer %ld",
+    TEST_TRUE(runner, Vec_Equals(array, dump), "Round trip integer %ld",
               (long)value);
     DECREF(dump);
     DECREF(json);
@@ -301,11 +301,11 @@ test_integers(TestBatchRunner *runner) {
 static void
 S_round_trip_float(TestBatchRunner *runner, double value, double max_diff) {
     Float64 *num = Float64_new(value);
-    VArray *array = VA_new(1);
-    VA_Store(array, 0, (Obj*)num);
+    Vector *array = Vec_new(1);
+    Vec_Store(array, 0, (Obj*)num);
     String *json = Json_to_json((Obj*)array);
-    Obj *dump = CERTIFY(Json_from_json(json), VARRAY);
-    Float64 *got = (Float64*)CERTIFY(VA_Fetch((VArray*)dump, 0), FLOAT64);
+    Obj *dump = CERTIFY(Json_from_json(json), VECTOR);
+    Float64 *got = (Float64*)CERTIFY(Vec_Fetch((Vector*)dump, 0), FLOAT64);
     double diff = Float64_Get_Value(num) - Float64_Get_Value(got);
     if (diff < 0) { diff = 0 - diff; }
     TEST_TRUE(runner, diff <= max_diff, "Round trip float %f", value);

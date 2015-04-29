@@ -136,7 +136,7 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
      * (Helper function for Create_Excerpt only exposed for testing purposes.)
      */
     String*
-    Highlight_Excerpt(Highlighter *self, VArray *spans, String *raw_excerpt,
+    Highlight_Excerpt(Highlighter *self, Vector *spans, String *raw_excerpt,
                       int32_t top);
 
     public void

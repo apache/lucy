@@ -95,14 +95,14 @@ Compiler_Normalize_IMP(Compiler *self) {
     Compiler_Apply_Norm_Factor(self, factor);
 }
 
-VArray*
+Vector*
 Compiler_Highlight_Spans_IMP(Compiler *self, Searcher *searcher,
                              DocVector *doc_vec, String *field) {
     UNUSED_VAR(self);
     UNUSED_VAR(searcher);
     UNUSED_VAR(doc_vec);
     UNUSED_VAR(field);
-    return VA_new(0);
+    return Vec_new(0);
 }
 
 String*

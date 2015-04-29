@@ -169,7 +169,7 @@ $hit_q = Lucy::Search::HitQueue->new(
 
 for my $doc_id ( shuffle( 1 .. 100 ) ) {
     my $fields = $docs[ $doc_id - 1 ];
-    my $values = Clownfish::VArray->new( capacity => 1 );
+    my $values = Clownfish::Vector->new( capacity => 1 );
     $values->push( Clownfish::String->new( $fields->{number} ) );
     my $match_doc = Lucy::Search::MatchDoc->new(
         doc_id => $doc_id,

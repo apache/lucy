@@ -26,17 +26,17 @@
 #include "Lucy/Store/OutStream.h"
 
 BBSortEx*
-BBSortEx_new(uint32_t mem_threshold, VArray *external) {
+BBSortEx_new(uint32_t mem_threshold, Vector *external) {
     BBSortEx *self = (BBSortEx*)Class_Make_Obj(BBSORTEX);
     return BBSortEx_init(self, mem_threshold, external);
 }
 
 BBSortEx*
-BBSortEx_init(BBSortEx *self, uint32_t mem_threshold, VArray *external) {
+BBSortEx_init(BBSortEx *self, uint32_t mem_threshold, Vector *external) {
     SortEx_init((SortExternal*)self);
     BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
     ivars->external_tick = 0;
-    ivars->external = (VArray*)INCREF(external);
+    ivars->external = (Vector*)INCREF(external);
     ivars->mem_consumed = 0;
     BBSortEx_Set_Mem_Thresh(self, mem_threshold);
     return self;
@@ -78,15 +78,15 @@ BBSortEx_Flush_IMP(BBSortEx *self) {
     BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
     uint32_t     buf_count = ivars->buf_max - ivars->buf_tick;
     Obj        **buffer = ivars->buffer;
-    VArray      *elems;
+    Vector      *elems;
 
     if (!buf_count) { return; }
-    else            { elems = VA_new(buf_count); }
+    else            { elems = Vec_new(buf_count); }
 
     // Sort, then create a new run.
     BBSortEx_Sort_Buffer(self);
     for (uint32_t i = ivars->buf_tick; i < ivars->buf_max; i++) {
-        VA_Push(elems, buffer[i]);
+        Vec_Push(elems, buffer[i]);
     }
     BBSortEx *run = BBSortEx_new(0, elems);
     DECREF(elems);
@@ -117,11 +117,11 @@ BBSortEx_Refill_IMP(BBSortEx *self) {
             ivars->mem_consumed = 0;
             break;
         }
-        else if (ivars->external_tick >= VA_Get_Size(ivars->external)) {
+        else if (ivars->external_tick >= Vec_Get_Size(ivars->external)) {
             break;
         }
         else {
-            elem = (ByteBuf*)VA_Fetch(ivars->external, ivars->external_tick);
+            elem = (ByteBuf*)Vec_Fetch(ivars->external, ivars->external_tick);
             ivars->external_tick++;
             // Should be + sizeof(ByteBuf), but that's ok.
             ivars->mem_consumed += BB_Get_Size(elem);
@@ -146,7 +146,7 @@ BBSortEx_Flip_IMP(BBSortEx *self) {
     BBSortEx_Flush(self);
 
     // Recalculate the approximate mem allowed for each run.
-    uint32_t num_runs = VA_Get_Size(ivars->runs);
+    uint32_t num_runs = Vec_Get_Size(ivars->runs);
     if (num_runs) {
         run_mem_thresh = (ivars->mem_thresh / 2) / num_runs;
         if (run_mem_thresh < 65536) {
@@ -155,7 +155,7 @@ BBSortEx_Flip_IMP(BBSortEx *self) {
     }
 
     for (uint32_t i = 0; i < num_runs; i++) {
-        BBSortEx *run = (BBSortEx*)VA_Fetch(ivars->runs, i);
+        BBSortEx *run = (BBSortEx*)Vec_Fetch(ivars->runs, i);
         BBSortEx_Set_Mem_Thresh(run, run_mem_thresh);
     }
 
@@ -169,15 +169,15 @@ BBSortEx_Compare_IMP(BBSortEx *self, void *va, void *vb) {
     return BB_compare((ByteBuf**)va, (ByteBuf**)vb);
 }
 
-VArray*
+Vector*
 BBSortEx_Peek_Cache_IMP(BBSortEx *self) {
     BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
     uint32_t   count  = ivars->buf_max - ivars->buf_tick;
     Obj      **buffer = ivars->buffer;
-    VArray    *retval = VA_new(count);
+    Vector    *retval = Vec_new(count);
 
     for (uint32_t i = ivars->buf_tick; i < ivars->buf_max; ++i) {
-        VA_Push(retval, INCREF(buffer[i]));
+        Vec_Push(retval, INCREF(buffer[i]));
     }
 
     return retval;
@@ -194,7 +194,7 @@ BBSortEx_Peek_Last_IMP(BBSortEx *self) {
 uint32_t
 BBSortEx_Get_Num_Runs_IMP(BBSortEx *self) {
     BBSortExIVARS *const ivars = BBSortEx_IVARS(self);
-    return VA_Get_Size(ivars->runs);
+    return Vec_Get_Size(ivars->runs);
 }
 
 

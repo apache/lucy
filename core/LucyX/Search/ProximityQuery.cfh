@@ -25,18 +25,18 @@ parcel Lucy;
 public class LucyX::Search::ProximityQuery inherits Lucy::Search::Query {
 
     String        *field;
-    VArray        *terms;
+    Vector        *terms;
     uint32_t       within;
 
     inert incremented ProximityQuery*
-    new(String *field, VArray *terms, uint32_t within);
+    new(String *field, Vector *terms, uint32_t within);
 
     /**
      * @param field The field that the phrase must occur in.
      * @param terms The ordered array of terms that must match.
      */
     public inert ProximityQuery*
-    init(ProximityQuery *self, String *field, VArray *terms, uint32_t within);
+    init(ProximityQuery *self, String *field, Vector *terms, uint32_t within);
 
     /** Accessor for object's field attribute.
      */
@@ -45,7 +45,7 @@ public class LucyX::Search::ProximityQuery inherits Lucy::Search::Query {
 
     /** Accessor for object's array of terms.
      */
-    public VArray*
+    public Vector*
     Get_Terms(ProximityQuery *self);
 
     /** Accessor for object's within attribute.
@@ -107,7 +107,7 @@ class LucyX::Search::ProximityCompiler
     public void
     Apply_Norm_Factor(ProximityCompiler *self, float factor);
 
-    public incremented VArray*
+    public incremented Vector*
     Highlight_Spans(ProximityCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, String *field);
 

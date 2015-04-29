@@ -50,8 +50,8 @@ static void
 test_analysis(TestBatchRunner *runner) {
     DummyAnalyzer *analyzer = DummyAnalyzer_new();
     String *source = Str_newf("foo bar baz");
-    VArray *wanted = VA_new(1);
-    VA_Push(wanted, (Obj*)Str_newf("foo bar baz"));
+    Vector *wanted = Vec_new(1);
+    Vec_Push(wanted, (Obj*)Str_newf("foo bar baz"));
     TestUtils_test_analyzer(runner, (Analyzer*)analyzer, source, wanted,
                             "test basic analysis");
     DECREF(wanted);

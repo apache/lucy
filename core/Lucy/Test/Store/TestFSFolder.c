@@ -117,10 +117,10 @@ test_protect_symlinks(TestBatchRunner *runner) {
         FSFolder_Delete_Tree(folder, bar);
     }
     else {
-        VArray *list = FSFolder_List_R(folder, NULL);
+        Vector *list = FSFolder_List_R(folder, NULL);
         bool saw_bazooka_boffo = false;
-        for (uint32_t i = 0, max = VA_Get_Size(list); i < max; i++) {
-            String *entry = (String*)VA_Fetch(list, i);
+        for (uint32_t i = 0, max = Vec_Get_Size(list); i < max; i++) {
+            String *entry = (String*)Vec_Fetch(list, i);
             if (Str_Ends_With_Utf8(entry, "bazooka/boffo", 13)) {
                 saw_bazooka_boffo = true;
             }

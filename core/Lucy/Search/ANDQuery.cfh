@@ -25,13 +25,13 @@ parcel Lucy;
 public class Lucy::Search::ANDQuery inherits Lucy::Search::PolyQuery {
 
     inert incremented ANDQuery*
-    new(VArray *children = NULL);
+    new(Vector *children = NULL);
 
     /**
      * @param children An array of child Queries.
      */
     public inert ANDQuery*
-    init(ANDQuery *self, VArray *children = NULL);
+    init(ANDQuery *self, Vector *children = NULL);
 
     public incremented Compiler*
     Make_Compiler(ANDQuery *self, Searcher *searcher, float boost,

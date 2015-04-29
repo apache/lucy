@@ -230,7 +230,7 @@ static void
 test_List(TestBatchRunner *runner) {
     Folder     *folder = (Folder*)RAMFolder_new(NULL);
     FileHandle *fh;
-    VArray     *list;
+    Vector     *list;
     String     *elem;
 
     Folder_MkDir(folder, foo);
@@ -242,21 +242,21 @@ test_List(TestBatchRunner *runner) {
     DECREF(fh);
 
     list = Folder_List(folder, NULL);
-    VA_Sort(list, NULL, NULL);
-    TEST_INT_EQ(runner, VA_Get_Size(list), 3, "List");
-    elem = (String*)DOWNCAST(VA_Fetch(list, 0), STRING);
+    Vec_Sort(list);
+    TEST_INT_EQ(runner, Vec_Get_Size(list), 3, "List");
+    elem = (String*)DOWNCAST(Vec_Fetch(list, 0), STRING);
     TEST_TRUE(runner, elem && Str_Equals(elem, (Obj*)banana),
               "List first file");
-    elem = (String*)DOWNCAST(VA_Fetch(list, 1), STRING);
+    elem = (String*)DOWNCAST(Vec_Fetch(list, 1), STRING);
     TEST_TRUE(runner, elem && Str_Equals(elem, (Obj*)boffo),
               "List second file");
-    elem = (String*)DOWNCAST(VA_Fetch(list, 2), STRING);
+    elem = (String*)DOWNCAST(Vec_Fetch(list, 2), STRING);
     TEST_TRUE(runner, elem && Str_Equals(elem, (Obj*)foo), "List dir");
     DECREF(list);
 
     list = Folder_List(folder, foo_bar);
-    TEST_INT_EQ(runner, VA_Get_Size(list), 1, "List subdirectory contents");
-    elem = (String*)DOWNCAST(VA_Fetch(list, 0), STRING);
+    TEST_INT_EQ(runner, Vec_Get_Size(list), 1, "List subdirectory contents");
+    elem = (String*)DOWNCAST(Vec_Fetch(list, 0), STRING);
     TEST_TRUE(runner, elem && Str_Equals(elem, (Obj*)baz),
               "Just the filename");
     DECREF(list);

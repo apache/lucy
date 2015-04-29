@@ -26,18 +26,18 @@
 
 // Empty out, then refill the Queue, seeking all elements to [target].
 static void
-S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target);
+S_refresh_lex_q(SegLexQueue *lex_q, Vector *seg_lexicons, Obj *target);
 
 PolyLexicon*
-PolyLex_new(String *field, VArray *sub_readers) {
+PolyLex_new(String *field, Vector *sub_readers) {
     PolyLexicon *self = (PolyLexicon*)Class_Make_Obj(POLYLEXICON);
     return PolyLex_init(self, field, sub_readers);
 }
 
 PolyLexicon*
-PolyLex_init(PolyLexicon *self, String *field, VArray *sub_readers) {
-    uint32_t  num_sub_readers = VA_Get_Size(sub_readers);
-    VArray   *seg_lexicons    = VA_new(num_sub_readers);
+PolyLex_init(PolyLexicon *self, String *field, Vector *sub_readers) {
+    uint32_t  num_sub_readers = Vec_Get_Size(sub_readers);
+    Vector   *seg_lexicons    = Vec_new(num_sub_readers);
 
     // Init.
     Lex_init((Lexicon*)self, field);
@@ -47,11 +47,11 @@ PolyLex_init(PolyLexicon *self, String *field, VArray *sub_readers) {
 
     // Derive.
     for (uint32_t i = 0; i < num_sub_readers; i++) {
-        LexiconReader *lex_reader = (LexiconReader*)VA_Fetch(sub_readers, i);
+        LexiconReader *lex_reader = (LexiconReader*)Vec_Fetch(sub_readers, i);
         if (lex_reader && CERTIFY(lex_reader, LEXICONREADER)) {
             Lexicon *seg_lexicon = LexReader_Lexicon(lex_reader, field, NULL);
             if (seg_lexicon != NULL) {
-                VA_Push(seg_lexicons, (Obj*)seg_lexicon);
+                Vec_Push(seg_lexicons, (Obj*)seg_lexicon);
             }
         }
     }
@@ -72,7 +72,7 @@ PolyLex_Destroy_IMP(PolyLexicon *self) {
 }
 
 static void
-S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target) {
+S_refresh_lex_q(SegLexQueue *lex_q, Vector *seg_lexicons, Obj *target) {
     // Empty out the queue.
     while (1) {
         SegLexicon *seg_lex = (SegLexicon*)SegLexQ_Pop(lex_q);
@@ -81,9 +81,9 @@ S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target) {
     }
 
     // Refill the queue.
-    for (uint32_t i = 0, max = VA_Get_Size(seg_lexicons); i < max; i++) {
+    for (uint32_t i = 0, max = Vec_Get_Size(seg_lexicons); i < max; i++) {
         SegLexicon *const seg_lexicon
-            = (SegLexicon*)VA_Fetch(seg_lexicons, i);
+            = (SegLexicon*)Vec_Fetch(seg_lexicons, i);
         SegLex_Seek(seg_lexicon, target);
         if (SegLex_Get_Term(seg_lexicon) != NULL) {
             SegLexQ_Insert(lex_q, INCREF(seg_lexicon));
@@ -94,8 +94,8 @@ S_refresh_lex_q(SegLexQueue *lex_q, VArray *seg_lexicons, Obj *target) {
 void
 PolyLex_Reset_IMP(PolyLexicon *self) {
     PolyLexiconIVARS *const ivars = PolyLex_IVARS(self);
-    VArray *seg_lexicons = ivars->seg_lexicons;
-    uint32_t num_segs = VA_Get_Size(seg_lexicons);
+    Vector *seg_lexicons = ivars->seg_lexicons;
+    uint32_t num_segs = Vec_Get_Size(seg_lexicons);
     SegLexQueue *lex_q = ivars->lex_q;
 
     // Empty out the queue.
@@ -108,7 +108,7 @@ PolyLex_Reset_IMP(PolyLexicon *self) {
     // Fill the queue with valid SegLexicons.
     for (uint32_t i = 0; i < num_segs; i++) {
         SegLexicon *const seg_lexicon
-            = (SegLexicon*)VA_Fetch(seg_lexicons, i);
+            = (SegLexicon*)Vec_Fetch(seg_lexicons, i);
         SegLex_Reset(seg_lexicon);
         if (SegLex_Next(seg_lexicon)) {
             SegLexQ_Insert(ivars->lex_q, INCREF(seg_lexicon));
@@ -157,7 +157,7 @@ PolyLex_Next_IMP(PolyLexicon *self) {
 void
 PolyLex_Seek_IMP(PolyLexicon *self, Obj *target) {
     PolyLexiconIVARS *const ivars = PolyLex_IVARS(self);
-    VArray *seg_lexicons = ivars->seg_lexicons;
+    Vector *seg_lexicons = ivars->seg_lexicons;
     SegLexQueue *lex_q = ivars->lex_q;
 
     if (target == NULL) {
@@ -192,7 +192,7 @@ PolyLex_Get_Term_IMP(PolyLexicon *self) {
 uint32_t
 PolyLex_Get_Num_Seg_Lexicons_IMP(PolyLexicon *self) {
     PolyLexiconIVARS *const ivars = PolyLex_IVARS(self);
-    return VA_Get_Size(ivars->seg_lexicons);
+    return Vec_Get_Size(ivars->seg_lexicons);
 }
 
 SegLexQueue*

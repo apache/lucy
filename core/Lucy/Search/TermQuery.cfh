@@ -99,7 +99,7 @@ class Lucy::Search::TermCompiler inherits Lucy::Search::Compiler {
     public void
     Apply_Norm_Factor(TermCompiler *self, float factor);
 
-    public incremented VArray*
+    public incremented Vector*
     Highlight_Spans(TermCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, String *field);
 

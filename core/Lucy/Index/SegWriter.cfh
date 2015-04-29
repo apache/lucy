@@ -34,7 +34,7 @@ parcel Lucy;
 public class Lucy::Index::SegWriter inherits Lucy::Index::DataWriter {
 
     Inverter          *inverter;
-    VArray            *writers;
+    Vector            *writers;
     Hash              *by_api;
     DeletionsWriter   *del_writer;
 

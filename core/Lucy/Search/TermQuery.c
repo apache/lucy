@@ -282,14 +282,14 @@ TermCompiler_Make_Matcher_IMP(TermCompiler *self, SegReader *reader,
     }
 }
 
-VArray*
+Vector*
 TermCompiler_Highlight_Spans_IMP(TermCompiler *self, Searcher *searcher,
                                  DocVector *doc_vec, String *field) {
 
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
     TermQueryIVARS *const parent_ivars
         = TermQuery_IVARS((TermQuery*)ivars->parent);
-    VArray *spans = VA_new(0);
+    Vector *spans = Vec_new(0);
     TermVector *term_vector;
     I32Array *starts, *ends;
     UNUSED_VAR(searcher);
@@ -306,7 +306,7 @@ TermCompiler_Highlight_Spans_IMP(TermCompiler *self, Searcher *searcher,
     for (uint32_t i = 0, max = I32Arr_Get_Size(starts); i < max; i++) {
         int32_t start  = I32Arr_Get(starts, i);
         int32_t length = I32Arr_Get(ends, i) - start;
-        VA_Push(spans,
+        Vec_Push(spans,
                 (Obj*)Span_new(start, length, TermCompiler_Get_Weight(self)));
     }
 

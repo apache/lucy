@@ -22,7 +22,7 @@ class Lucy::Store::RAMDirHandle nickname RAMDH
     inherits Lucy::Store::DirHandle {
 
     RAMFolder *folder;
-    VArray    *elems;
+    Vector    *elems;
     int32_t    tick;
 
     inert incremented RAMDirHandle*

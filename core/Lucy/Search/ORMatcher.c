@@ -64,20 +64,20 @@ static void
 S_sift_down(ORMatcher *self, ORMatcherIVARS *ivars);
 
 ORMatcher*
-ORMatcher_new(VArray *children) {
+ORMatcher_new(Vector *children) {
     ORMatcher *self = (ORMatcher*)Class_Make_Obj(ORMATCHER);
     return ORMatcher_init(self, children);
 }
 
 static ORMatcher*
-S_ormatcher_init2(ORMatcher *self, ORMatcherIVARS *ivars, VArray *children,
+S_ormatcher_init2(ORMatcher *self, ORMatcherIVARS *ivars, Vector *children,
                   Similarity *sim) {
     // Init.
     PolyMatcher_init((PolyMatcher*)self, children, sim);
     ivars->size = 0;
 
     // Derive.
-    ivars->max_size = VA_Get_Size(children);
+    ivars->max_size = Vec_Get_Size(children);
 
     // Allocate.
     ivars->heap = (HeapedMatcherDoc**)CALLOCATE(ivars->max_size + 1, sizeof(HeapedMatcherDoc*));
@@ -95,7 +95,7 @@ S_ormatcher_init2(ORMatcher *self, ORMatcherIVARS *ivars, VArray *children,
 
     // Prime queue.
     for (uint32_t i = 0; i < ivars->max_size; i++) {
-        Matcher *matcher = (Matcher*)VA_Fetch(children, i);
+        Matcher *matcher = (Matcher*)Vec_Fetch(children, i);
         if (matcher) {
             S_add_element(self, ivars, (Matcher*)INCREF(matcher), 0);
         }
@@ -105,7 +105,7 @@ S_ormatcher_init2(ORMatcher *self, ORMatcherIVARS *ivars, VArray *children,
 }
 
 ORMatcher*
-ORMatcher_init(ORMatcher *self, VArray *children) {
+ORMatcher_init(ORMatcher *self, Vector *children) {
     ORMatcherIVARS *const ivars = ORMatcher_IVARS(self);
     return S_ormatcher_init2(self, ivars, children, NULL);
 }
@@ -293,13 +293,13 @@ static int32_t
 S_advance_after_current(ORScorer *self, ORScorerIVARS *ivars);
 
 ORScorer*
-ORScorer_new(VArray *children, Similarity *sim) {
+ORScorer_new(Vector *children, Similarity *sim) {
     ORScorer *self = (ORScorer*)Class_Make_Obj(ORSCORER);
     return ORScorer_init(self, children, sim);
 }
 
 ORScorer*
-ORScorer_init(ORScorer *self, VArray *children, Similarity *sim) {
+ORScorer_init(ORScorer *self, Vector *children, Similarity *sim) {
     ORScorerIVARS *const ivars = ORScorer_IVARS(self);
     S_ormatcher_init2((ORMatcher*)self, (ORMatcherIVARS*)ivars, children, sim);
     ivars->doc_id = 0;

@@ -148,20 +148,20 @@ test_num(TestBatchRunner *runner) {
 
 static void
 test_varray(TestBatchRunner *runner) {
-    VArray *array = VA_new(0);
-    VA_Store(array, 1, (Obj*)Str_newf("foo"));
-    VA_Store(array, 3, (Obj*)Str_newf("bar"));
+    Vector *array = Vec_new(0);
+    Vec_Store(array, 1, (Obj*)Str_newf("foo"));
+    Vec_Store(array, 3, (Obj*)Str_newf("bar"));
 
     {
         Obj *got = S_freeze_thaw((Obj*)array);
-        TEST_TRUE(runner, got && VA_Equals(array, got),
+        TEST_TRUE(runner, got && Vec_Equals(array, got),
                   "Round trip through FREEZE/THAW");
         DECREF(got);
     }
 
     {
         Obj *got = S_dump_load((Obj*)array);
-        TEST_TRUE(runner, got && VA_Equals(array, got),
+        TEST_TRUE(runner, got && Vec_Equals(array, got),
                   "Dump => Load round trip");
         DECREF(got);
     }

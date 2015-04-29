@@ -31,7 +31,7 @@
 
 SortReader*
 SortReader_init(SortReader *self, Schema *schema, Folder *folder,
-                Snapshot *snapshot, VArray *segments, int32_t seg_tick) {
+                Snapshot *snapshot, Vector *segments, int32_t seg_tick) {
     DataReader_init((DataReader*)self, schema, folder, snapshot, segments,
                     seg_tick);
     ABSTRACT_CLASS_CHECK(self, SORTREADER);
@@ -39,7 +39,7 @@ SortReader_init(SortReader *self, Schema *schema, Folder *folder,
 }
 
 DataReader*
-SortReader_Aggregator_IMP(SortReader *self, VArray *readers,
+SortReader_Aggregator_IMP(SortReader *self, Vector *readers,
                           I32Array *offsets) {
     UNUSED_VAR(self);
     UNUSED_VAR(readers);
@@ -49,7 +49,7 @@ SortReader_Aggregator_IMP(SortReader *self, VArray *readers,
 
 DefaultSortReader*
 DefSortReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
-                  VArray *segments, int32_t seg_tick) {
+                  Vector *segments, int32_t seg_tick) {
     DefaultSortReader *self
         = (DefaultSortReader*)Class_Make_Obj(DEFAULTSORTREADER);
     return DefSortReader_init(self, schema, folder, snapshot, segments,
@@ -58,7 +58,7 @@ DefSortReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
 
 DefaultSortReader*
 DefSortReader_init(DefaultSortReader *self, Schema *schema, Folder *folder,
-                   Snapshot *snapshot, VArray *segments, int32_t seg_tick) {
+                   Snapshot *snapshot, Vector *segments, int32_t seg_tick) {
     DataReader_init((DataReader*)self, schema, folder, snapshot, segments,
                     seg_tick);
     DefaultSortReaderIVARS *const ivars = DefSortReader_IVARS(self);

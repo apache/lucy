@@ -76,10 +76,10 @@ test_analysis(TestBatchRunner *runner) {
     SnowballStemmer    *stemmer     = SnowStemmer_new(EN);
 
     {
-        VArray       *analyzers    = VA_new(0);
+        Vector       *analyzers    = Vec_new(0);
         PolyAnalyzer *polyanalyzer = PolyAnalyzer_new(NULL, analyzers);
-        VArray       *expected     = VA_new(1);
-        VA_Push(expected, INCREF(source_text));
+        Vector       *expected     = Vec_new(1);
+        Vec_Push(expected, INCREF(source_text));
         TestUtils_test_analyzer(runner, (Analyzer*)polyanalyzer, source_text,
                                 expected, "No sub analyzers");
         DECREF(expected);
@@ -88,11 +88,11 @@ test_analysis(TestBatchRunner *runner) {
     }
 
     {
-        VArray       *analyzers    = VA_new(0);
-        VA_Push(analyzers, INCREF(normalizer));
+        Vector       *analyzers    = Vec_new(0);
+        Vec_Push(analyzers, INCREF(normalizer));
         PolyAnalyzer *polyanalyzer = PolyAnalyzer_new(NULL, analyzers);
-        VArray       *expected     = VA_new(1);
-        VA_Push(expected, (Obj*)Str_newf("eats, shoots and leaves."));
+        Vector       *expected     = Vec_new(1);
+        Vec_Push(expected, (Obj*)Str_newf("eats, shoots and leaves."));
         TestUtils_test_analyzer(runner, (Analyzer*)polyanalyzer, source_text,
                                 expected, "With Normalizer");
         DECREF(expected);
@@ -101,15 +101,15 @@ test_analysis(TestBatchRunner *runner) {
     }
 
     {
-        VArray       *analyzers    = VA_new(0);
-        VA_Push(analyzers, INCREF(normalizer));
-        VA_Push(analyzers, INCREF(tokenizer));
+        Vector       *analyzers    = Vec_new(0);
+        Vec_Push(analyzers, INCREF(normalizer));
+        Vec_Push(analyzers, INCREF(tokenizer));
         PolyAnalyzer *polyanalyzer = PolyAnalyzer_new(NULL, analyzers);
-        VArray       *expected     = VA_new(1);
-        VA_Push(expected, (Obj*)Str_newf("eats"));
-        VA_Push(expected, (Obj*)Str_newf("shoots"));
-        VA_Push(expected, (Obj*)Str_newf("and"));
-        VA_Push(expected, (Obj*)Str_newf("leaves"));
+        Vector       *expected     = Vec_new(1);
+        Vec_Push(expected, (Obj*)Str_newf("eats"));
+        Vec_Push(expected, (Obj*)Str_newf("shoots"));
+        Vec_Push(expected, (Obj*)Str_newf("and"));
+        Vec_Push(expected, (Obj*)Str_newf("leaves"));
         TestUtils_test_analyzer(runner, (Analyzer*)polyanalyzer, source_text,
                                 expected, "With StandardTokenizer");
         DECREF(expected);
@@ -118,15 +118,15 @@ test_analysis(TestBatchRunner *runner) {
     }
 
     {
-        VArray       *analyzers    = VA_new(0);
-        VA_Push(analyzers, INCREF(normalizer));
-        VA_Push(analyzers, INCREF(tokenizer));
-        VA_Push(analyzers, INCREF(stopfilter));
+        Vector       *analyzers    = Vec_new(0);
+        Vec_Push(analyzers, INCREF(normalizer));
+        Vec_Push(analyzers, INCREF(tokenizer));
+        Vec_Push(analyzers, INCREF(stopfilter));
         PolyAnalyzer *polyanalyzer = PolyAnalyzer_new(NULL, analyzers);
-        VArray       *expected     = VA_new(1);
-        VA_Push(expected, (Obj*)Str_newf("eats"));
-        VA_Push(expected, (Obj*)Str_newf("shoots"));
-        VA_Push(expected, (Obj*)Str_newf("leaves"));
+        Vector       *expected     = Vec_new(1);
+        Vec_Push(expected, (Obj*)Str_newf("eats"));
+        Vec_Push(expected, (Obj*)Str_newf("shoots"));
+        Vec_Push(expected, (Obj*)Str_newf("leaves"));
         TestUtils_test_analyzer(runner, (Analyzer*)polyanalyzer, source_text,
                                 expected, "With SnowballStopFilter");
         DECREF(expected);
@@ -135,16 +135,16 @@ test_analysis(TestBatchRunner *runner) {
     }
 
     {
-        VArray       *analyzers    = VA_new(0);
-        VA_Push(analyzers, INCREF(normalizer));
-        VA_Push(analyzers, INCREF(tokenizer));
-        VA_Push(analyzers, INCREF(stopfilter));
-        VA_Push(analyzers, INCREF(stemmer));
+        Vector       *analyzers    = Vec_new(0);
+        Vec_Push(analyzers, INCREF(normalizer));
+        Vec_Push(analyzers, INCREF(tokenizer));
+        Vec_Push(analyzers, INCREF(stopfilter));
+        Vec_Push(analyzers, INCREF(stemmer));
         PolyAnalyzer *polyanalyzer = PolyAnalyzer_new(NULL, analyzers);
-        VArray       *expected     = VA_new(1);
-        VA_Push(expected, (Obj*)Str_newf("eat"));
-        VA_Push(expected, (Obj*)Str_newf("shoot"));
-        VA_Push(expected, (Obj*)Str_newf("leav"));
+        Vector       *expected     = Vec_new(1);
+        Vec_Push(expected, (Obj*)Str_newf("eat"));
+        Vec_Push(expected, (Obj*)Str_newf("shoot"));
+        Vec_Push(expected, (Obj*)Str_newf("leav"));
         TestUtils_test_analyzer(runner, (Analyzer*)polyanalyzer, source_text,
                                 expected, "With SnowballStemmer");
         DECREF(expected);
@@ -161,7 +161,7 @@ test_analysis(TestBatchRunner *runner) {
 
 static void
 test_Get_Analyzers(TestBatchRunner *runner) {
-    VArray *analyzers = VA_new(0);
+    Vector *analyzers = Vec_new(0);
     PolyAnalyzer *analyzer = PolyAnalyzer_new(NULL, analyzers);
     TEST_TRUE(runner, PolyAnalyzer_Get_Analyzers(analyzer) == analyzers,
               "Get_Analyzers()");

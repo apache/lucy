@@ -44,19 +44,19 @@ NOTQuery_init(NOTQuery *self, Query *negated_query) {
 Query*
 NOTQuery_Get_Negated_Query_IMP(NOTQuery *self) {
     NOTQueryIVARS *const ivars = NOTQuery_IVARS(self);
-    return (Query*)VA_Fetch(ivars->children, 0);
+    return (Query*)Vec_Fetch(ivars->children, 0);
 }
 
 void
 NOTQuery_Set_Negated_Query_IMP(NOTQuery *self, Query *negated_query) {
     NOTQueryIVARS *const ivars = NOTQuery_IVARS(self);
-    VA_Store(ivars->children, 0, INCREF(negated_query));
+    Vec_Store(ivars->children, 0, INCREF(negated_query));
 }
 
 String*
 NOTQuery_To_String_IMP(NOTQuery *self) {
     NOTQueryIVARS *const ivars = NOTQuery_IVARS(self);
-    String *neg_string = Obj_To_String(VA_Fetch(ivars->children, 0));
+    String *neg_string = Obj_To_String(Vec_Fetch(ivars->children, 0));
     String *retval = Str_newf("-%o", neg_string);
     DECREF(neg_string);
     return retval;
@@ -103,14 +103,14 @@ NOTCompiler_Sum_Of_Squared_Weights_IMP(NOTCompiler *self) {
     return 0.0f;
 }
 
-VArray*
+Vector*
 NOTCompiler_Highlight_Spans_IMP(NOTCompiler *self, Searcher *searcher,
                                 DocVector *doc_vec, String *field) {
     UNUSED_VAR(self);
     UNUSED_VAR(searcher);
     UNUSED_VAR(doc_vec);
     UNUSED_VAR(field);
-    return VA_new(0);
+    return Vec_new(0);
 }
 
 Matcher*
@@ -118,7 +118,7 @@ NOTCompiler_Make_Matcher_IMP(NOTCompiler *self, SegReader *reader,
                              bool need_score) {
     NOTCompilerIVARS *const ivars = NOTCompiler_IVARS(self);
     Compiler *negated_compiler
-        = (Compiler*)CERTIFY(VA_Fetch(ivars->children, 0), COMPILER);
+        = (Compiler*)CERTIFY(Vec_Fetch(ivars->children, 0), COMPILER);
     Matcher *negated_matcher
         = Compiler_Make_Matcher(negated_compiler, reader, false);
     UNUSED_VAR(need_score);

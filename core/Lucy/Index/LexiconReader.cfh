@@ -25,7 +25,7 @@ public abstract class Lucy::Index::LexiconReader nickname LexReader
 
     inert LexiconReader*
     init(LexiconReader *self, Schema *schema = NULL, Folder *folder = NULL,
-        Snapshot *snapshot = NULL, VArray *segments = NULL,
+        Snapshot *snapshot = NULL, Vector *segments = NULL,
         int32_t seg_tick = -1);
 
     /** Return a new Lexicon for the given `field`.  Will return
@@ -56,20 +56,20 @@ public abstract class Lucy::Index::LexiconReader nickname LexReader
      * @param offsets Doc id start offsets for each reader.
      */
     public incremented nullable LexiconReader*
-    Aggregator(LexiconReader *self, VArray *readers, I32Array *offsets);
+    Aggregator(LexiconReader *self, Vector *readers, I32Array *offsets);
 }
 
 class Lucy::Index::PolyLexiconReader nickname PolyLexReader
     inherits Lucy::Index::LexiconReader {
 
-    VArray   *readers;
+    Vector   *readers;
     I32Array *offsets;
 
     inert incremented PolyLexiconReader*
-    new(VArray *readers, I32Array *offsets);
+    new(Vector *readers, I32Array *offsets);
 
     inert PolyLexiconReader*
-    init(PolyLexiconReader *self, VArray *readers, I32Array *offsets);
+    init(PolyLexiconReader *self, Vector *readers, I32Array *offsets);
 
     public incremented nullable Lexicon*
     Lexicon(PolyLexiconReader *self, String *field, Obj *term = NULL);
@@ -87,15 +87,15 @@ class Lucy::Index::PolyLexiconReader nickname PolyLexReader
 class Lucy::Index::DefaultLexiconReader nickname DefLexReader
     inherits Lucy::Index::LexiconReader {
 
-    VArray *lexicons;
+    Vector *lexicons;
 
     inert incremented DefaultLexiconReader*
-    new(Schema *schema, Folder *folder, Snapshot *snapshot, VArray *segments,
+    new(Schema *schema, Folder *folder, Snapshot *snapshot, Vector *segments,
         int32_t seg_tick);
 
     inert DefaultLexiconReader*
     init(DefaultLexiconReader *self, Schema *schema, Folder *folder,
-         Snapshot *snapshot, VArray *segments, int32_t seg_tick);
+         Snapshot *snapshot, Vector *segments, int32_t seg_tick);
 
     public incremented nullable Lexicon*
     Lexicon(DefaultLexiconReader *self, String *field,

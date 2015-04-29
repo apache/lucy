@@ -31,7 +31,7 @@
 
 LexiconReader*
 LexReader_init(LexiconReader *self, Schema *schema, Folder *folder,
-               Snapshot *snapshot, VArray *segments, int32_t seg_tick) {
+               Snapshot *snapshot, Vector *segments, int32_t seg_tick) {
     DataReader_init((DataReader*)self, schema, folder, snapshot, segments,
                     seg_tick);
     ABSTRACT_CLASS_CHECK(self, LEXICONREADER);
@@ -39,31 +39,31 @@ LexReader_init(LexiconReader *self, Schema *schema, Folder *folder,
 }
 
 LexiconReader*
-LexReader_Aggregator_IMP(LexiconReader *self, VArray *readers,
+LexReader_Aggregator_IMP(LexiconReader *self, Vector *readers,
                          I32Array *offsets) {
     UNUSED_VAR(self);
     return (LexiconReader*)PolyLexReader_new(readers, offsets);
 }
 
 PolyLexiconReader*
-PolyLexReader_new(VArray *readers, I32Array *offsets) {
+PolyLexReader_new(Vector *readers, I32Array *offsets) {
     PolyLexiconReader *self
         = (PolyLexiconReader*)Class_Make_Obj(POLYLEXICONREADER);
     return PolyLexReader_init(self, readers, offsets);
 }
 
 PolyLexiconReader*
-PolyLexReader_init(PolyLexiconReader *self, VArray *readers,
+PolyLexReader_init(PolyLexiconReader *self, Vector *readers,
                    I32Array *offsets) {
     Schema *schema = NULL;
-    for (uint32_t i = 0, max = VA_Get_Size(readers); i < max; i++) {
+    for (uint32_t i = 0, max = Vec_Get_Size(readers); i < max; i++) {
         LexiconReader *reader
-            = (LexiconReader*)CERTIFY(VA_Fetch(readers, i), LEXICONREADER);
+            = (LexiconReader*)CERTIFY(Vec_Fetch(readers, i), LEXICONREADER);
         if (!schema) { schema = LexReader_Get_Schema(reader); }
     }
     LexReader_init((LexiconReader*)self, schema, NULL, NULL, NULL, -1);
     PolyLexiconReaderIVARS *const ivars = PolyLexReader_IVARS(self);
-    ivars->readers = (VArray*)INCREF(readers);
+    ivars->readers = (Vector*)INCREF(readers);
     ivars->offsets = (I32Array*)INCREF(offsets);
     return self;
 }
@@ -72,12 +72,12 @@ void
 PolyLexReader_Close_IMP(PolyLexiconReader *self) {
     PolyLexiconReaderIVARS *const ivars = PolyLexReader_IVARS(self);
     if (ivars->readers) {
-        for (uint32_t i = 0, max = VA_Get_Size(ivars->readers); i < max; i++) {
+        for (uint32_t i = 0, max = Vec_Get_Size(ivars->readers); i < max; i++) {
             LexiconReader *reader
-                = (LexiconReader*)VA_Fetch(ivars->readers, i);
+                = (LexiconReader*)Vec_Fetch(ivars->readers, i);
             if (reader) { LexReader_Close(reader); }
         }
-        VA_Clear(ivars->readers);
+        Vec_Clear(ivars->readers);
     }
 }
 
@@ -116,8 +116,8 @@ PolyLexReader_Doc_Freq_IMP(PolyLexiconReader *self, String *field,
                            Obj *term) {
     PolyLexiconReaderIVARS *const ivars = PolyLexReader_IVARS(self);
     uint32_t doc_freq = 0;
-    for (uint32_t i = 0, max = VA_Get_Size(ivars->readers); i < max; i++) {
-        LexiconReader *reader = (LexiconReader*)VA_Fetch(ivars->readers, i);
+    for (uint32_t i = 0, max = Vec_Get_Size(ivars->readers); i < max; i++) {
+        LexiconReader *reader = (LexiconReader*)Vec_Fetch(ivars->readers, i);
         if (reader) {
             doc_freq += LexReader_Doc_Freq(reader, field, term);
         }
@@ -127,7 +127,7 @@ PolyLexReader_Doc_Freq_IMP(PolyLexiconReader *self, String *field,
 
 DefaultLexiconReader*
 DefLexReader_new(Schema *schema, Folder *folder, Snapshot *snapshot,
-                 VArray *segments, int32_t seg_tick) {
+                 Vector *segments, int32_t seg_tick) {
     DefaultLexiconReader *self
         = (DefaultLexiconReader*)Class_Make_Obj(DEFAULTLEXICONREADER);
     return DefLexReader_init(self, schema, folder, snapshot, segments,
@@ -158,7 +158,7 @@ S_has_data(Schema *schema, Folder *folder, Segment *segment, String *field) {
 
 DefaultLexiconReader*
 DefLexReader_init(DefaultLexiconReader *self, Schema *schema, Folder *folder,
-                  Snapshot *snapshot, VArray *segments, int32_t seg_tick) {
+                  Snapshot *snapshot, Vector *segments, int32_t seg_tick) {
 
     // Init.
     LexReader_init((LexiconReader*)self, schema, folder, snapshot, segments,
@@ -167,12 +167,12 @@ DefLexReader_init(DefaultLexiconReader *self, Schema *schema, Folder *folder,
     Segment *segment = DefLexReader_Get_Segment(self);
 
     // Build an array of SegLexicon objects.
-    ivars->lexicons = VA_new(Schema_Num_Fields(schema));
+    ivars->lexicons = Vec_new(Schema_Num_Fields(schema));
     for (uint32_t i = 1, max = Schema_Num_Fields(schema) + 1; i < max; i++) {
         String *field = Seg_Field_Name(segment, i);
         if (field && S_has_data(schema, folder, segment, field)) {
             SegLexicon *lexicon = SegLex_new(schema, folder, segment, field);
-            VA_Store(ivars->lexicons, i, (Obj*)lexicon);
+            Vec_Store(ivars->lexicons, i, (Obj*)lexicon);
         }
     }
 
@@ -198,7 +198,7 @@ DefLexReader_Lexicon_IMP(DefaultLexiconReader *self, String *field,
                          Obj *term) {
     DefaultLexiconReaderIVARS *const ivars = DefLexReader_IVARS(self);
     int32_t     field_num = Seg_Field_Num(ivars->segment, field);
-    SegLexicon *orig      = (SegLexicon*)VA_Fetch(ivars->lexicons, field_num);
+    SegLexicon *orig      = (SegLexicon*)Vec_Fetch(ivars->lexicons, field_num);
     SegLexicon *lexicon   = NULL;
 
     if (orig) { // i.e. has data
@@ -216,7 +216,7 @@ S_find_tinfo(DefaultLexiconReader *self, String *field, Obj *target) {
     if (field != NULL && target != NULL) {
         int32_t field_num = Seg_Field_Num(ivars->segment, field);
         SegLexicon *lexicon
-            = (SegLexicon*)VA_Fetch(ivars->lexicons, field_num);
+            = (SegLexicon*)Vec_Fetch(ivars->lexicons, field_num);
 
         if (lexicon) {
             // Iterate until the result is ge the term.

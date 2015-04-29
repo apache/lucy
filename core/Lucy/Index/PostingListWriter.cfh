@@ -26,7 +26,7 @@ class Lucy::Index::PostingListWriter nickname PListWriter
     inherits Lucy::Index::DataWriter {
 
     LexiconWriter   *lex_writer;
-    VArray          *pools;
+    Vector          *pools;
     MemoryPool      *mem_pool;
     OutStream       *lex_temp_out;
     OutStream       *post_temp_out;

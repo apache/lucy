@@ -88,12 +88,12 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder) {
 
     // Strip directory name from filepaths for old format.
     if (ivars->format == 1) {
-        VArray *files = Hash_Keys(ivars->records);
+        Vector *files = Hash_Keys(ivars->records);
         String *folder_name = IxFileNames_local_part(Folder_Get_Path(folder));
         size_t folder_name_len = Str_Length(folder_name);
 
-        for (uint32_t i = 0, max = VA_Get_Size(files); i < max; i++) {
-            String *orig = (String*)VA_Fetch(files, i);
+        for (uint32_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
+            String *orig = (String*)Vec_Fetch(files, i);
             if (Str_Starts_With(orig, folder_name)) {
                 Obj *record = Hash_Delete(ivars->records, orig);
                 size_t offset = folder_name_len + sizeof(CHY_DIR_SEP) - 1;
@@ -290,7 +290,7 @@ CFReaderDH_init(CFReaderDirHandle *self, CompoundFileReader *cf_reader) {
     DirHandle *dh = Folder_Local_Open_Dir(real_folder);
     while (DH_Next(dh)) {
         String *entry = DH_Get_Entry(dh);
-        VA_Push(ivars->elems, (Obj*)Str_Clone(entry));
+        Vec_Push(ivars->elems, (Obj*)Str_Clone(entry));
         DECREF(entry);
     }
     DECREF(dh);
@@ -316,9 +316,9 @@ CFReaderDH_Next_IMP(CFReaderDirHandle *self) {
     CFReaderDirHandleIVARS *const ivars = CFReaderDH_IVARS(self);
     if (ivars->elems) {
         ivars->tick++;
-        if (ivars->tick < (int32_t)VA_Get_Size(ivars->elems)) {
+        if (ivars->tick < (int32_t)Vec_Get_Size(ivars->elems)) {
             String *path = (String*)CERTIFY(
-                                VA_Fetch(ivars->elems, ivars->tick), STRING);
+                                Vec_Fetch(ivars->elems, ivars->tick), STRING);
             DECREF(ivars->entry);
             ivars->entry = (String*)INCREF(path);
             return true;
@@ -335,7 +335,7 @@ bool
 CFReaderDH_Entry_Is_Dir_IMP(CFReaderDirHandle *self) {
     CFReaderDirHandleIVARS *const ivars = CFReaderDH_IVARS(self);
     if (ivars->elems) {
-        String *name = (String*)VA_Fetch(ivars->elems, ivars->tick);
+        String *name = (String*)Vec_Fetch(ivars->elems, ivars->tick);
         if (name) {
             return CFReader_Local_Is_Directory(ivars->cf_reader, name);
         }

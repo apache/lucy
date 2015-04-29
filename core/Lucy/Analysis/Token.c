@@ -58,14 +58,13 @@ Token_Destroy_IMP(Token *self) {
 }
 
 int
-Token_compare(void *context, const void *va, const void *vb) {
+Token_compare(const void *va, const void *vb) {
     Token *const token_a = *((Token**)va);
     Token *const token_b = *((Token**)vb);
     TokenIVARS *const a = Token_IVARS(token_a);
     TokenIVARS *const b = Token_IVARS(token_b);
     size_t min_len = a->len < b->len ? a->len : b->len;
     int comparison = memcmp(a->text, b->text, min_len);
-    UNUSED_VAR(context);
 
     if (comparison == 0) {
         if (a->len != b->len) {

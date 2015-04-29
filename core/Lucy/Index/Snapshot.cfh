@@ -44,7 +44,7 @@ public class Lucy::Index::Snapshot inherits Clownfish::Obj {
 
     /** Return an array of all entries.
      */
-    public incremented VArray*
+    public incremented Vector*
     List(Snapshot *self);
 
     /** Return the number of entries (including directories).
