@@ -164,7 +164,7 @@ func (obj *implIndexer) findFieldC(name string) *C.cfish_String {
 		fieldList := C.LUCY_Schema_All_Fields(schema)
 		defer C.cfish_dec_refcount(unsafe.Pointer(fieldList))
 		for i := 0; i < int(C.CFISH_Vec_Get_Size(fieldList)); i++ {
-			cfString := unsafe.Pointer(C.CFISH_Vec_Fetch(fieldList, C.uint32_t(i)))
+			cfString := unsafe.Pointer(C.CFISH_Vec_Fetch(fieldList, C.size_t(i)))
 			field := clownfish.CFStringToGo(cfString)
 			if strings.EqualFold(name, field) {
 				C.cfish_inc_refcount(cfString)
