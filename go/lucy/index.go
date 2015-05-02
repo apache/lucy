@@ -29,7 +29,6 @@ package lucy
 import "C"
 import "fmt"
 import "reflect"
-import "runtime"
 import "strings"
 import "unsafe"
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
@@ -41,8 +40,8 @@ type Indexer interface {
 	Commit() error
 }
 
-type implIndexer struct {
-	ref        *C.lucy_Indexer
+type IndexerIMP struct {
+	clownfish.ObjIMP
 	fieldNames map[string]clownfish.String
 }
 
@@ -50,8 +49,8 @@ type IndexManager interface {
 	clownfish.Obj
 }
 
-type implIndexManager struct {
-	ref *C.lucy_IndexManager
+type IndexManagerIMP struct {
+	clownfish.ObjIMP
 }
 
 type OpenIndexerArgs struct {
@@ -94,26 +93,19 @@ func OpenIndexer(args *OpenIndexerArgs) (obj Indexer, err error) {
 }
 
 func WRAPIndexer(ptr unsafe.Pointer) Indexer {
-	obj := &implIndexer{(*C.lucy_Indexer)(ptr), nil}
-	runtime.SetFinalizer(obj, (*implIndexer).finalize)
+	obj := &IndexerIMP{}
+	obj.INITOBJ(ptr);
 	return obj
 }
 
-func (obj *implIndexer) finalize() {
-	obj.Close()
-}
-
-func (obj *implIndexer) Close() error {
+func (obj *IndexerIMP) Close() error {
 	// TODO: implement Close in core Lucy rather than bindings.
-	if obj.ref != nil {
-		C.cfish_dec_refcount(unsafe.Pointer(obj.ref))
-		obj.ref = nil
-	}
 	return nil // TODO catch errors
 }
 
-func (obj *implIndexer) AddDoc(doc interface{}) error {
-	stockDoc := C.LUCY_Indexer_Get_Stock_Doc(obj.ref)
+func (obj *IndexerIMP) AddDoc(doc interface{}) error {
+	self := ((*C.lucy_Indexer)(unsafe.Pointer(obj.TOPTR())))
+	stockDoc := C.LUCY_Indexer_Get_Stock_Doc(self)
 	docFields := (*C.cfish_Hash)(C.LUCY_Doc_Get_Fields(stockDoc))
 	C.CFISH_Hash_Clear(docFields)
 
@@ -148,19 +140,20 @@ func (obj *implIndexer) AddDoc(doc interface{}) error {
 	// client to supply `boost`.
 	boost := 1.0
 	err := clownfish.TrapErr(func() {
-		C.LUCY_Indexer_Add_Doc(obj.ref, stockDoc, C.float(boost))
+		C.LUCY_Indexer_Add_Doc(self, stockDoc, C.float(boost))
 	})
 
 	return err
 }
 
-func (obj *implIndexer) findFieldC(name string) *C.cfish_String {
+func (obj *IndexerIMP) findFieldC(name string) *C.cfish_String {
+	self := ((*C.lucy_Indexer)(unsafe.Pointer(obj.TOPTR())))
 	if obj.fieldNames == nil {
 		obj.fieldNames = make(map[string]clownfish.String)
 	}
 	f, ok := obj.fieldNames[name]
 	if !ok {
-		schema := C.LUCY_Indexer_Get_Schema(obj.ref)
+		schema := C.LUCY_Indexer_Get_Schema(self)
 		fieldList := C.LUCY_Schema_All_Fields(schema)
 		defer C.cfish_dec_refcount(unsafe.Pointer(fieldList))
 		for i := 0; i < int(C.CFISH_Vec_Get_Size(fieldList)); i++ {
@@ -176,16 +169,9 @@ func (obj *implIndexer) findFieldC(name string) *C.cfish_String {
 	return (*C.cfish_String)(unsafe.Pointer(f.TOPTR()))
 }
 
-func (obj *implIndexer) Commit() error {
+func (obj *IndexerIMP) Commit() error {
+	self := ((*C.lucy_Indexer)(unsafe.Pointer(obj.TOPTR())))
 	return clownfish.TrapErr(func() {
-		C.LUCY_Indexer_Commit(obj.ref)
+		C.LUCY_Indexer_Commit(self)
 	})
-}
-
-func (obj *implIndexer) TOPTR() uintptr {
-	return uintptr(unsafe.Pointer(obj.ref))
-}
-
-func (obj *implIndexManager) TOPTR() uintptr {
-	return uintptr(unsafe.Pointer(obj.ref))
 }

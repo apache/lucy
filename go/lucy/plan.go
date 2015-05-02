@@ -21,7 +21,6 @@ package lucy
 #include "Lucy/Plan/FullTextType.h"
 */
 import "C"
-import "runtime"
 import "unsafe"
 
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
@@ -31,24 +30,24 @@ type Schema interface {
 	SpecField(field string, fieldType FieldType)
 }
 
-type implSchema struct {
-	ref *C.lucy_Schema
+type SchemaIMP struct {
+	clownfish.ObjIMP
 }
 
 type FieldType interface {
 	clownfish.Obj
 }
 
-type implFieldType struct {
-	ref *C.lucy_FieldType
+type FieldTypeIMP struct {
+	clownfish.ObjIMP
 }
 
 type FullTextType interface {
 	FieldType
 }
 
-type implFullTextType struct {
-	ref *C.lucy_FullTextType
+type FullTextTypeIMP struct {
+	FieldTypeIMP
 }
 
 func NewSchema() Schema {
@@ -57,25 +56,17 @@ func NewSchema() Schema {
 }
 
 func WRAPSchema(ptr unsafe.Pointer) Schema {
-	obj := &implSchema{(*C.lucy_Schema)(ptr)}
-	runtime.SetFinalizer(obj, (*implSchema).finalize)
+	obj := &SchemaIMP{}
+	obj.INITOBJ(ptr);
 	return obj
 }
 
-func (obj *implSchema) finalize() {
-	C.cfish_dec_refcount(unsafe.Pointer(obj.ref))
-	obj.ref = nil
-}
-
-func (obj *implSchema) SpecField(field string, fieldType FieldType) {
+func (obj *SchemaIMP) SpecField(field string, fieldType FieldType) {
+	self := ((*C.lucy_Schema)(unsafe.Pointer(obj.TOPTR())))
 	fieldCF := clownfish.NewString(field)
-	C.LUCY_Schema_Spec_Field(obj.ref,
+	C.LUCY_Schema_Spec_Field(self,
 		(*C.cfish_String)(unsafe.Pointer(fieldCF.TOPTR())),
 		(*C.lucy_FieldType)(unsafe.Pointer(fieldType.TOPTR())))
-}
-
-func (obj *implSchema) TOPTR() uintptr {
-	return uintptr(unsafe.Pointer(obj.ref))
 }
 
 func NewFullTextType(analyzer Analyzer) FullTextType {
@@ -85,17 +76,7 @@ func NewFullTextType(analyzer Analyzer) FullTextType {
 }
 
 func WRAPFullTextType(ptr unsafe.Pointer) FullTextType {
-	obj := &implFullTextType{(*C.lucy_FullTextType)(ptr)}
-	runtime.SetFinalizer(obj, (*implFullTextType).finalize)
+	obj := &FullTextTypeIMP{}
+	obj.INITOBJ(ptr);
 	return obj
 }
-
-func (obj *implFullTextType) finalize() {
-	C.cfish_dec_refcount(unsafe.Pointer(obj.ref))
-	obj.ref = nil
-}
-
-func (obj *implFullTextType) TOPTR() uintptr {
-	return uintptr(unsafe.Pointer(obj.ref))
-}
-

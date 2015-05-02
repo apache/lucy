@@ -21,7 +21,6 @@ package lucy
 #include "Lucy/Analysis/EasyAnalyzer.h"
 */
 import "C"
-import "runtime"
 import "unsafe"
 
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
@@ -30,16 +29,16 @@ type Analyzer interface {
 	clownfish.Obj
 }
 
-type implAnalyzer struct {
-	ref *C.lucy_Analyzer
+type AnalyzerIMP struct {
+	clownfish.ObjIMP
 }
 
 type EasyAnalyzer interface {
 	Analyzer
 }
 
-type implEasyAnalyzer struct {
-	ref *C.lucy_EasyAnalyzer
+type EasyAnalyzerIMP struct {
+	AnalyzerIMP
 }
 
 func NewEasyAnalyzer(language string) EasyAnalyzer {
@@ -49,16 +48,7 @@ func NewEasyAnalyzer(language string) EasyAnalyzer {
 }
 
 func WRAPEasyAnalyzer(ptr unsafe.Pointer) EasyAnalyzer {
-	obj := &implEasyAnalyzer{(*C.lucy_EasyAnalyzer)(ptr)}
-	runtime.SetFinalizer(obj, (*implEasyAnalyzer).finalize)
+	obj := &EasyAnalyzerIMP{}
+	obj.INITOBJ(ptr);
 	return obj
-}
-
-func (obj *implEasyAnalyzer) finalize() {
-	C.cfish_dec_refcount(unsafe.Pointer(obj.ref))
-	obj.ref = nil
-}
-
-func (obj *implEasyAnalyzer) TOPTR() uintptr {
-	return uintptr(unsafe.Pointer(obj.ref))
 }
