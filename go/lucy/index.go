@@ -45,14 +45,6 @@ type IndexerIMP struct {
 	fieldNames map[string]clownfish.String
 }
 
-type IndexManager interface {
-	clownfish.Obj
-}
-
-type IndexManagerIMP struct {
-	clownfish.ObjIMP
-}
-
 type OpenIndexerArgs struct {
 	Schema   Schema
 	Index    interface{}
@@ -90,12 +82,6 @@ func OpenIndexer(args *OpenIndexerArgs) (obj Indexer, err error) {
 		obj = WRAPIndexer(unsafe.Pointer(cfObj))
 	})
 	return obj, err
-}
-
-func WRAPIndexer(ptr unsafe.Pointer) Indexer {
-	obj := &IndexerIMP{}
-	obj.INITOBJ(ptr);
-	return obj
 }
 
 func (obj *IndexerIMP) Close() error {

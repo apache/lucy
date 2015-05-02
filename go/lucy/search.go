@@ -34,22 +34,10 @@ import "unsafe"
 
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
-type Query interface {
-	clownfish.Obj
-}
-
-type QueryIMP struct {
-	clownfish.ObjIMP
-}
-
 type Searcher interface {
 	clownfish.Obj
 	Hits(query interface{}, offset uint32, numWanted uint32, sortSpec SortSpec) (Hits, error)
 	Close() error
-}
-
-type SearcherIMP struct {
-	clownfish.ObjIMP
 }
 
 type Hits interface {
@@ -61,22 +49,6 @@ type Hits interface {
 type HitsIMP struct {
 	clownfish.ObjIMP
 	err error
-}
-
-type SortSpec interface {
-	clownfish.Obj
-}
-
-type SortSpecIMP struct {
-	clownfish.ObjIMP
-}
-
-type IndexSearcher interface {
-	Searcher
-}
-
-type IndexSearcherIMP struct {
-	SearcherIMP
 }
 
 func OpenIndexSearcher(index interface{}) (obj IndexSearcher, err error) {
@@ -93,12 +65,6 @@ func OpenIndexSearcher(index interface{}) (obj IndexSearcher, err error) {
 		obj = WRAPIndexSearcher(unsafe.Pointer(cfObj))
 	})
 	return obj, err
-}
-
-func WRAPIndexSearcher(ptr unsafe.Pointer) IndexSearcher {
-	obj := &IndexSearcherIMP{}
-	obj.INITOBJ(ptr);
-	return obj
 }
 
 func (obj *IndexSearcherIMP) Close() error {
@@ -128,12 +94,6 @@ func (obj *IndexSearcherIMP) Hits(query interface{}, offset uint32, numWanted ui
 		panic("TODO: support Query objects")
 	}
 	return hits, err
-}
-
-func WRAPHits(ptr unsafe.Pointer) Hits {
-	obj := &HitsIMP{}
-	obj.INITOBJ(ptr);
-	return obj
 }
 
 func (obj *HitsIMP) Next(hit interface{}) bool {

@@ -25,30 +25,8 @@ import "unsafe"
 
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
-type Analyzer interface {
-	clownfish.Obj
-}
-
-type AnalyzerIMP struct {
-	clownfish.ObjIMP
-}
-
-type EasyAnalyzer interface {
-	Analyzer
-}
-
-type EasyAnalyzerIMP struct {
-	AnalyzerIMP
-}
-
 func NewEasyAnalyzer(language string) EasyAnalyzer {
 	lang := clownfish.NewString(language)
 	cfObj := C.lucy_EasyAnalyzer_new((*C.cfish_String)(unsafe.Pointer(lang.TOPTR())))
 	return WRAPEasyAnalyzer(unsafe.Pointer(cfObj))
-}
-
-func WRAPEasyAnalyzer(ptr unsafe.Pointer) EasyAnalyzer {
-	obj := &EasyAnalyzerIMP{}
-	obj.INITOBJ(ptr);
-	return obj
 }
