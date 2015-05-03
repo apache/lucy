@@ -34,18 +34,6 @@ import "unsafe"
 
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
-type Searcher interface {
-	clownfish.Obj
-	Hits(query interface{}, offset uint32, numWanted uint32, sortSpec SortSpec) (Hits, error)
-	Close() error
-}
-
-type Hits interface {
-	clownfish.Obj
-	Next(hit interface{}) bool
-	Error() error
-}
-
 type HitsIMP struct {
 	clownfish.ObjIMP
 	err error
@@ -68,15 +56,24 @@ func OpenIndexSearcher(index interface{}) (obj IndexSearcher, err error) {
 }
 
 func (obj *IndexSearcherIMP) Close() error {
-	self := ((*C.lucy_IndexSearcher)(unsafe.Pointer(obj.TOPTR())))
-	return clownfish.TrapErr(func() {
-		C.LUCY_IxSearcher_Close(self)
-	})
+	return doClose(obj)
 }
 
 func (obj *IndexSearcherIMP) Hits(query interface{}, offset uint32, numWanted uint32,
 	sortSpec SortSpec) (hits Hits, err error) {
-	self := ((*C.lucy_IndexSearcher)(unsafe.Pointer(obj.TOPTR())))
+	return doHits(obj, query, offset, numWanted, sortSpec)
+}
+
+func doClose(obj Searcher) error {
+	self := ((*C.lucy_Searcher)(unsafe.Pointer(obj.TOPTR())))
+	return clownfish.TrapErr(func() {
+		C.LUCY_Searcher_Close(self)
+	})
+}
+
+func doHits(obj Searcher, query interface{}, offset uint32, numWanted uint32,
+	sortSpec SortSpec) (hits Hits, err error) {
+	self := ((*C.lucy_Searcher)(unsafe.Pointer(obj.TOPTR())))
 	var sortSpecC *C.lucy_SortSpec
 	if sortSpec != nil {
 		sortSpecC = (*C.lucy_SortSpec)(unsafe.Pointer(sortSpec.TOPTR()))
@@ -85,7 +82,7 @@ func (obj *IndexSearcherIMP) Hits(query interface{}, offset uint32, numWanted ui
 	case string:
 		queryStringC := clownfish.NewString(query.(string))
 		err = clownfish.TrapErr(func() {
-			hitsC := C.LUCY_IxSearcher_Hits(self,
+			hitsC := C.LUCY_Searcher_Hits(self,
 				(*C.cfish_Obj)(unsafe.Pointer(queryStringC.TOPTR())),
 				C.uint32_t(offset), C.uint32_t(numWanted), sortSpecC)
 			hits = WRAPHits(unsafe.Pointer(hitsC))
@@ -94,6 +91,24 @@ func (obj *IndexSearcherIMP) Hits(query interface{}, offset uint32, numWanted ui
 		panic("TODO: support Query objects")
 	}
 	return hits, err
+}
+
+func (obj *SearcherIMP) Close() error {
+	return doClose(obj)
+}
+
+func (obj *SearcherIMP) Hits(query interface{}, offset uint32, numWanted uint32,
+	sortSpec SortSpec) (hits Hits, err error) {
+	return doHits(obj, query, offset, numWanted, sortSpec)
+}
+
+func (obj *PolySearcherIMP) Close() error {
+	return doClose(obj)
+}
+
+func (obj *PolySearcherIMP) Hits(query interface{}, offset uint32, numWanted uint32,
+	sortSpec SortSpec) (hits Hits, err error) {
+	return doHits(obj, query, offset, numWanted, sortSpec)
 }
 
 func (obj *HitsIMP) Next(hit interface{}) bool {

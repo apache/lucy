@@ -33,13 +33,6 @@ import "strings"
 import "unsafe"
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
-type Indexer interface {
-	clownfish.Obj
-	Close() error
-	AddDoc(doc interface{}) error
-	Commit() error
-}
-
 type IndexerIMP struct {
 	clownfish.ObjIMP
 	fieldNames map[string]clownfish.String

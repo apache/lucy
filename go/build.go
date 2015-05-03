@@ -128,10 +128,37 @@ func runCFC() {
 		goBinding.SetHeader(autogenHeader)
 		goBinding.SetSuppressInit(true)
 		parcel := cfc.FetchParcel("Lucy")
+		specClasses(parcel)
 		packageDir := path.Join(buildDir, "lucy")
 		goBinding.WriteBindings(parcel, packageDir)
 		hierarchy.WriteLog()
 	}
+}
+
+func specClasses(parcel *cfc.Parcel) {
+	indexerBinding := cfc.NewGoClass(parcel, "Lucy::Index::Indexer")
+	indexerBinding.SpecMethod("", "Close() error")
+	indexerBinding.SpecMethod("Add_Doc", "AddDoc(doc interface{}) error")
+	indexerBinding.SpecMethod("Commit", "Commit() error")
+	indexerBinding.SetSuppressStruct(true)
+	indexerBinding.Register()
+
+	schemaBinding := cfc.NewGoClass(parcel, "Lucy::Plan::Schema")
+	schemaBinding.SpecMethod("Spec_Field",
+		"SpecField(field string, fieldType FieldType)")
+	schemaBinding.Register()
+
+	searcherBinding := cfc.NewGoClass(parcel, "Lucy::Search::Searcher")
+	searcherBinding.SpecMethod("Hits",
+		"Hits(query interface{}, offset uint32, numWanted uint32, sortSpec SortSpec) (Hits, error)")
+	searcherBinding.SpecMethod("Close", "Close() error")
+	searcherBinding.Register()
+
+	hitsBinding := cfc.NewGoClass(parcel, "Lucy::Search::Hits")
+	hitsBinding.SpecMethod("Next", "Next(hit interface{}) bool")
+	hitsBinding.SpecMethod("", "Error() error")
+	hitsBinding.SetSuppressStruct(true)
+	hitsBinding.Register()
 }
 
 func build() {

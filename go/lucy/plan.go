@@ -25,11 +25,6 @@ import "unsafe"
 
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
-type Schema interface {
-	clownfish.Obj
-	SpecField(field string, fieldType FieldType)
-}
-
 func NewSchema() Schema {
 	cfObj := C.lucy_Schema_new()
 	return WRAPSchema(unsafe.Pointer(cfObj))
