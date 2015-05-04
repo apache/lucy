@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 
+#include "Clownfish/Blob.h"
 #include "Lucy/Index/HighlightWriter.h"
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
@@ -129,15 +130,15 @@ HLWriter_Add_Inverted_Doc_IMP(HighlightWriter *self, Inverter *inverter,
            ) {
             String    *field     = Inverter_Get_Field_Name(inverter);
             Inversion *inversion = Inverter_Get_Inversion(inverter);
-            ByteBuf   *tv_buf    = HLWriter_TV_Buf(self, inversion);
+            Blob      *tv_buf    = HLWriter_TV_Buf(self, inversion);
             Freezer_serialize_string(field, dat_out);
-            Freezer_serialize_bytebuf(tv_buf, dat_out);
+            Freezer_serialize_blob(tv_buf, dat_out);
             DECREF(tv_buf);
         }
     }
 }
 
-ByteBuf*
+Blob*
 HLWriter_TV_Buf_IMP(HighlightWriter *self, Inversion *inversion) {
     const char *last_text = "";
     size_t      last_len = 0;
@@ -204,7 +205,9 @@ HLWriter_TV_Buf_IMP(HighlightWriter *self, Inversion *inversion) {
     char *dest = BB_Get_Buf(tv_buf);
     NumUtil_encode_padded_c32(num_postings, &dest);
 
-    return tv_buf;
+    Blob *blob = BB_Yield_Blob(tv_buf);
+    DECREF(tv_buf);
+    return blob;
 }
 
 void

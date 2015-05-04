@@ -19,6 +19,7 @@
 
 #include "Lucy/Index/DocVector.h"
 
+#include "Clownfish/Blob.h"
 #include "Clownfish/CharBuf.h"
 #include "Lucy/Index/TermVector.h"
 #include "Lucy/Store/InStream.h"
@@ -28,7 +29,7 @@
 // Extract a document's compressed TermVector data into (term_text =>
 // compressed positional data) pairs.
 static Hash*
-S_extract_tv_cache(ByteBuf *field_buf);
+S_extract_tv_cache(Blob *field_buf);
 
 // Pull a TermVector object out from compressed positional data.
 static TermVector*
@@ -74,15 +75,15 @@ DocVec_Destroy_IMP(DocVector *self) {
 
 void
 DocVec_Add_Field_Buf_IMP(DocVector *self, String *field,
-                         ByteBuf *field_buf) {
+                         Blob *field_buf) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
     Hash_Store(ivars->field_bufs, field, INCREF(field_buf));
 }
 
-ByteBuf*
+Blob*
 DocVec_Field_Buf_IMP(DocVector *self, String *field) {
     DocVectorIVARS *const ivars = DocVec_IVARS(self);
-    return (ByteBuf*)Hash_Fetch(ivars->field_bufs, field);
+    return (Blob*)Hash_Fetch(ivars->field_bufs, field);
 }
 
 Vector*
@@ -99,7 +100,7 @@ DocVec_Term_Vector_IMP(DocVector *self, String *field,
 
     // If no cache hit, try to fill cache.
     if (field_vector == NULL) {
-        ByteBuf *field_buf = (ByteBuf*)Hash_Fetch(ivars->field_bufs, field);
+        Blob *field_buf = (Blob*)Hash_Fetch(ivars->field_bufs, field);
 
         // Bail if there's no content or the field isn't highlightable.
         if (field_buf == NULL) { return NULL; }
@@ -118,9 +119,9 @@ DocVec_Term_Vector_IMP(DocVector *self, String *field,
 }
 
 static Hash*
-S_extract_tv_cache(ByteBuf *field_buf) {
+S_extract_tv_cache(Blob *field_buf) {
     Hash       *tv_cache  = Hash_new(0);
-    const char *tv_string = BB_Get_Buf(field_buf);
+    const char *tv_string = Blob_Get_Buf(field_buf);
     int32_t     num_terms = NumUtil_decode_c32(&tv_string);
     CharBuf    *text_buf  = CB_new(0);
 

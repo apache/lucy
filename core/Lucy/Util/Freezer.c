@@ -17,6 +17,7 @@
 #define C_LUCY_FREEZER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Blob.h"
 #include "Clownfish/HashIterator.h"
 #include "Lucy/Util/Freezer.h"
 #include "Lucy/Store/InStream.h"
@@ -54,8 +55,8 @@ Freezer_serialize(Obj *obj, OutStream *outstream) {
     if (Obj_Is_A(obj, STRING)) {
         Freezer_serialize_string((String*)obj, outstream);
     }
-    else if (Obj_Is_A(obj, BYTEBUF)) {
-        Freezer_serialize_bytebuf((ByteBuf*)obj, outstream);
+    else if (Obj_Is_A(obj, BLOB)) {
+        Freezer_serialize_blob((Blob*)obj, outstream);
     }
     else if (Obj_Is_A(obj, VECTOR)) {
         Freezer_serialize_varray((Vector*)obj, outstream);
@@ -127,8 +128,8 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
     if (Obj_Is_A(obj, STRING)) {
         obj = (Obj*)Freezer_deserialize_string((String*)obj, instream);
     }
-    else if (Obj_Is_A(obj, BYTEBUF)) {
-        obj = (Obj*)Freezer_deserialize_bytebuf((ByteBuf*)obj, instream);
+    else if (Obj_Is_A(obj, BLOB)) {
+        obj = (Obj*)Freezer_deserialize_blob((Blob*)obj, instream);
     }
     else if (Obj_Is_A(obj, VECTOR)) {
         obj = (Obj*)Freezer_deserialize_varray((Vector*)obj, instream);
@@ -229,24 +230,24 @@ Freezer_read_string(InStream *instream) {
 }
 
 void
-Freezer_serialize_bytebuf(ByteBuf *bytebuf, OutStream *outstream) {
-    size_t size = BB_Get_Size(bytebuf);
+Freezer_serialize_blob(Blob *blob, OutStream *outstream) {
+    size_t size = Blob_Get_Size(blob);
     OutStream_Write_C32(outstream, size);
-    OutStream_Write_Bytes(outstream, BB_Get_Buf(bytebuf), size);
+    OutStream_Write_Bytes(outstream, Blob_Get_Buf(blob), size);
 }
 
-ByteBuf*
-Freezer_deserialize_bytebuf(ByteBuf *bytebuf, InStream *instream) {
+Blob*
+Freezer_deserialize_blob(Blob *blob, InStream *instream) {
     size_t size = InStream_Read_C32(instream);
     char   *buf = (char*)MALLOCATE(size);
     InStream_Read_Bytes(instream, buf, size);
-    return BB_init_steal_bytes(bytebuf, buf, size, size);
+    return Blob_init_steal(blob, buf, size);
 }
 
-ByteBuf*
-Freezer_read_bytebuf(InStream *instream) {
-    ByteBuf *bytebuf = (ByteBuf*)Class_Make_Obj(BYTEBUF);
-    return Freezer_deserialize_bytebuf(bytebuf, instream);
+Blob*
+Freezer_read_blob(InStream *instream) {
+    Blob *blob = (Blob*)Class_Make_Obj(BLOB);
+    return Freezer_deserialize_blob(blob, instream);
 }
 
 void

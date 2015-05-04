@@ -18,6 +18,7 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Blob.h"
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Clownfish/TestHarness/TestUtils.h"
 #include "Lucy/Test/Util/TestFreezer.h"
@@ -67,10 +68,10 @@ S_dump_load(Obj *object) {
 }
 
 static void
-test_bytebuf(TestBatchRunner *runner) {
-    ByteBuf *wanted = BB_new_bytes("foobar", 6);
-    ByteBuf *got    = (ByteBuf*)S_freeze_thaw((Obj*)wanted);
-    TEST_TRUE(runner, got && BB_Equals(wanted, (Obj*)got),
+test_blob(TestBatchRunner *runner) {
+    Blob *wanted = Blob_new("foobar", 6);
+    Blob *got    = (Blob*)S_freeze_thaw((Obj*)wanted);
+    TEST_TRUE(runner, got && Blob_Equals(wanted, (Obj*)got),
               "Serialization round trip");
     DECREF(wanted);
     DECREF(got);
@@ -172,7 +173,7 @@ test_varray(TestBatchRunner *runner) {
 void
 TestFreezer_Run_IMP(TestFreezer *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 11);
-    test_bytebuf(runner);
+    test_blob(runner);
     test_string(runner);
     test_hash(runner);
     test_num(runner);

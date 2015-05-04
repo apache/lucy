@@ -39,12 +39,12 @@ class Lucy::Index::DocVector nickname DocVec
     /** Add a compressed, encoded TermVector to the object.
      */
     void
-    Add_Field_Buf(DocVector *self, String *field, ByteBuf *field_buf);
+    Add_Field_Buf(DocVector *self, String *field, Blob *field_buf);
 
     /** Return the compressed, encoded TermVector associated with a particular
      * field.
      */
-    ByteBuf*
+    Blob*
     Field_Buf(DocVector *self, String *field);
 
     public void

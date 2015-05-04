@@ -35,7 +35,7 @@ class Lucy::Index::HighlightWriter nickname HLWriter
     init(HighlightWriter *self, Schema *schema, Snapshot *snapshot,
          Segment *segment, PolyReader *polyreader);
 
-    incremented ByteBuf*
+    incremented Blob*
     TV_Buf(HighlightWriter *self, Inversion *inversion);
 
     public void
