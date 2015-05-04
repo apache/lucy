@@ -33,8 +33,7 @@ S_extract_tv_cache(Blob *field_buf);
 
 // Pull a TermVector object out from compressed positional data.
 static TermVector*
-S_extract_tv_from_tv_buf(String *field, String *term_text,
-                         ByteBuf *tv_buf);
+S_extract_tv_from_tv_buf(String *field, String *term_text, Blob *tv_buf);
 
 DocVector*
 DocVec_new() {
@@ -110,7 +109,7 @@ DocVec_Term_Vector_IMP(DocVector *self, String *field,
     }
 
     // Get a buf for the term text or bail.
-    ByteBuf *tv_buf = (ByteBuf*)Hash_Fetch(field_vector, term_text);
+    Blob *tv_buf = (Blob*)Hash_Fetch(field_vector, term_text);
     if (tv_buf == NULL) {
         return NULL;
     }
@@ -148,7 +147,7 @@ S_extract_tv_cache(Blob *field_buf) {
 
         // Store the $text => $posdata pair in the output hash.
         String *text = CB_To_String(text_buf);
-        Hash_Store(tv_cache, text, (Obj*)BB_new_bytes(bookmark_ptr, len));
+        Hash_Store(tv_cache, text, (Obj*)Blob_new(bookmark_ptr, len));
         DECREF(text);
     }
     DECREF(text_buf);
@@ -157,11 +156,10 @@ S_extract_tv_cache(Blob *field_buf) {
 }
 
 static TermVector*
-S_extract_tv_from_tv_buf(String *field, String *term_text,
-                         ByteBuf *tv_buf) {
+S_extract_tv_from_tv_buf(String *field, String *term_text, Blob *tv_buf) {
     TermVector *retval      = NULL;
-    const char *posdata     = BB_Get_Buf(tv_buf);
-    const char *posdata_end = posdata + BB_Get_Size(tv_buf);
+    const char *posdata     = Blob_Get_Buf(tv_buf);
+    const char *posdata_end = posdata + Blob_Get_Size(tv_buf);
     int32_t    *positions   = NULL;
     int32_t    *starts      = NULL;
     int32_t    *ends        = NULL;
