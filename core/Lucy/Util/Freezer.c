@@ -384,7 +384,7 @@ Freezer_dump(Obj *obj) {
         return Query_Dump((Query*)obj);
     }
     else {
-        return (Obj*)Obj_To_String(obj);
+        return (Obj*)Obj_Clone(obj);
     }
 }
 
