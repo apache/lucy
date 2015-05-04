@@ -20,7 +20,7 @@
 #define LUCY_USE_SHORT_NAMES
 
 #include "Lucy/Index/Inverter.h"
-#include "Clownfish/ByteBuf.h"
+#include "Clownfish/Blob.h"
 #include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"
@@ -86,11 +86,9 @@ Inverter_Invert_Doc_IMP(Inverter *self, Doc *doc) {
                     break;
                 }
             case FType_BLOB: {
-                    ByteBuf *byte_buf
-                        = (ByteBuf*)CERTIFY(obj, BYTEBUF);
-                    ViewByteBuf *value
-                        = (ViewByteBuf*)inventry_ivars->value;
-                    ViewBB_Assign(value, byte_buf);
+                    Blob *blob = (Blob*)CERTIFY(obj, BLOB);
+                    DECREF(inventry_ivars->value);
+                    inventry_ivars->value = INCREF(blob);
                     break;
                 }
             case FType_INT32: {

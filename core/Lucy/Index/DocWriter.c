@@ -17,6 +17,7 @@
 #define C_LUCY_DOCWRITER
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Blob.h"
 #include "Lucy/Index/DocWriter.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Index/DocReader.h"
@@ -122,8 +123,8 @@ DocWriter_Add_Inverted_Doc_IMP(DocWriter *self, Inverter *inverter,
                     break;
                 }
                 case FType_BLOB: {
-                    const char *buf  = BB_Get_Buf((ByteBuf*)value);
-                    size_t      size = BB_Get_Size((ByteBuf*)value);
+                    const char *buf  = Blob_Get_Buf((Blob*)value);
+                    size_t      size = Blob_Get_Size((Blob*)value);
                     OutStream_Write_C32(dat_out, size);
                     OutStream_Write_Bytes(dat_out, buf, size);
                     break;

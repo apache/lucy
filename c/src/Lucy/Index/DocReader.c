@@ -20,7 +20,7 @@
 #define LUCY_USE_SHORT_NAMES
 
 #include "Lucy/Index/DocReader.h"
-#include "Clownfish/ByteBuf.h"
+#include "Clownfish/Blob.h"
 #include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"
@@ -83,8 +83,7 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
                     uint32_t value_len = InStream_Read_C32(dat_in);
                     char *buf = (char*)MALLOCATE(value_len);
                     InStream_Read_Bytes(dat_in, buf, value_len);
-                    value = (Obj*)BB_new_steal_bytes(
-                                buf, value_len, value_len);
+                    value = (Obj*)Blob_new_steal(buf, value_len);
                     break;
                 }
             case FType_FLOAT32:

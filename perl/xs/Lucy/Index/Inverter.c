@@ -20,7 +20,7 @@
 #include "Lucy/Index/Inverter.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Index/Segment.h"
-#include "Clownfish/ByteBuf.h"
+#include "Clownfish/Blob.h"
 #include "Lucy/Plan/FieldType.h"
 #include "Lucy/Plan/BlobType.h"
 #include "Lucy/Plan/NumericType.h"
@@ -109,9 +109,9 @@ LUCY_Inverter_Invert_Doc_IMP(lucy_Inverter *self, lucy_Doc *doc) {
             case lucy_FType_BLOB: {
                     STRLEN val_len;
                     char *val_ptr = SvPV(value_sv, val_len);
-                    cfish_ViewByteBuf *value
-                        = (cfish_ViewByteBuf*)entry_ivars->value;
-                    CFISH_ViewBB_Assign_Bytes(value, val_ptr, val_len);
+                    CFISH_DECREF(entry_ivars->value);
+                    entry_ivars->value
+                        = (cfish_Obj*)cfish_Blob_new_wrap(val_ptr, val_len);
                     break;
                 }
             case lucy_FType_INT32: {

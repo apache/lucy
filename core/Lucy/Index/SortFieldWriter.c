@@ -35,6 +35,7 @@
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Clownfish/Blob.h"
 #include "Clownfish/Util/Memory.h"
 #include "Clownfish/Util/SortUtils.h"
 
@@ -126,7 +127,7 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
         ivars->var_width = true;
     }
     else if (ivars->prim_id == FType_BLOB) {
-        ivars->mem_per_entry += Class_Get_Obj_Alloc_Size(BYTEBUF);
+        ivars->mem_per_entry += Class_Get_Obj_Alloc_Size(BLOB);
         ivars->var_width = true;
     }
     else {
@@ -180,7 +181,7 @@ SortFieldWriter_Add_IMP(SortFieldWriter *self, int32_t doc_id, Obj *value) {
         Counter_Add(counter, size);
     }
     else if (ivars->prim_id == FType_BLOB) {
-        int64_t size = BB_Get_Size((ByteBuf*)value) + 1;
+        int64_t size = Blob_Get_Size((Blob*)value) + 1;
         size = SI_increase_to_word_multiple(size);
         Counter_Add(counter, size);
     }
@@ -266,11 +267,11 @@ S_write_val(Obj *val, int8_t prim_id, OutStream *ix_out, OutStream *dat_out,
                     break;
                 }
             case FType_BLOB: {
-                    ByteBuf *byte_buf = (ByteBuf*)val;
+                    Blob *blob = (Blob*)val;
                     int64_t dat_pos = OutStream_Tell(dat_out) - dat_start;
                     OutStream_Write_I64(ix_out, dat_pos);
-                    OutStream_Write_Bytes(dat_out, BB_Get_Buf(byte_buf),
-                                          BB_Get_Size(byte_buf));
+                    OutStream_Write_Bytes(dat_out, Blob_Get_Buf(blob),
+                                          Blob_Get_Size(blob));
                     break;
                 }
             case FType_INT32: {

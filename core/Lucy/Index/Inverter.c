@@ -218,7 +218,7 @@ InvEntry_init(InverterEntry *self, Schema *schema, String *field,
                 ivars->value = NULL;
                 break;
             case FType_BLOB:
-                ivars->value = (Obj*)ViewBB_new(NULL, 0);
+                ivars->value = NULL;
                 break;
             case FType_INT32:
                 ivars->value = (Obj*)Int32_new(0);
