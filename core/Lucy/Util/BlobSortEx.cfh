@@ -16,52 +16,52 @@
 
 parcel Lucy;
 
-/** SortExternal for ByteBufs.
+/** SortExternal for Blobs.
  */
 
-class Lucy::Util::BBSortEx
+class Lucy::Util::BlobSortEx
     inherits Lucy::Util::SortExternal {
 
     Vector   *external;
     uint32_t  external_tick;
     uint32_t  mem_consumed;
 
-    inert BBSortEx*
+    inert BlobSortEx*
     new(uint32_t mem_thresh = 0x1000000, Vector *external = NULL);
 
-    inert BBSortEx*
-    init(BBSortEx *self, uint32_t mem_thresh = 0x1000000,
+    inert BlobSortEx*
+    init(BlobSortEx *self, uint32_t mem_thresh = 0x1000000,
         Vector *external = NULL);
 
     void
-    Feed(BBSortEx *self, decremented Obj *item);
+    Feed(BlobSortEx *self, decremented Obj *item);
 
     void
-    Flush(BBSortEx *self);
+    Flush(BlobSortEx *self);
 
     uint32_t
-    Refill(BBSortEx *self);
+    Refill(BlobSortEx *self);
 
     void
-    Clear_Buffer(BBSortEx *self);
+    Clear_Buffer(BlobSortEx *self);
 
     void
-    Flip(BBSortEx *self);
+    Flip(BlobSortEx *self);
 
     int
-    Compare(BBSortEx *self, void *va, void *vb);
+    Compare(BlobSortEx *self, void *va, void *vb);
 
     incremented Vector*
-    Peek_Cache(BBSortEx *self);
+    Peek_Cache(BlobSortEx *self);
 
     incremented nullable Obj*
-    Peek_Last(BBSortEx *self);
+    Peek_Last(BlobSortEx *self);
 
     uint32_t
-    Get_Num_Runs(BBSortEx *self);
+    Get_Num_Runs(BlobSortEx *self);
 
     public void
-    Destroy(BBSortEx *self);
+    Destroy(BlobSortEx *self);
 }
 
 

@@ -23,12 +23,12 @@ use bytes qw();
 
 my ( $sortex, $buffer, @orig, @sort_output );
 
-$sortex = Lucy::Util::BBSortEx->new( mem_thresh => 4 );
-$sortex->feed( new_bytebuf('c') );
+$sortex = Lucy::Util::BlobSortEx->new( mem_thresh => 4 );
+$sortex->feed( new_blob('c') );
 is( $sortex->buffer_count, 1, "feed elem into buffer" );
 
-$sortex->feed( new_bytebuf('b') );
-$sortex->feed( new_bytebuf('d') );
+$sortex->feed( new_blob('b') );
+$sortex->feed( new_blob('d') );
 $sortex->sort_buffer;
 SKIP: {
     skip( "Restore when porting test to C", 1 );
@@ -36,13 +36,13 @@ SKIP: {
     is_deeply( $buffer, [qw( b c d )], "sort buffer" );
 }
 
-$sortex->feed( new_bytebuf('a') );
+$sortex->feed( new_blob('a') );
 is( $sortex->buffer_count, 0,
     "buffer flushed automatically when mem_thresh crossed" );
 #is( $sortex->get_num_runs, 1, "run added" );
 
-my @bytebufs = map { new_bytebuf($_) } qw( x y z );
-my $run = Lucy::Util::BBSortEx->new( external => \@bytebufs );
+my @blobs = map { new_blob($_) } qw( x y z );
+my $run = Lucy::Util::BlobSortEx->new( external => \@blobs );
 $sortex->add_run($run);
 $sortex->flip;
 @orig = qw( a b c d x y z );
@@ -53,12 +53,12 @@ is_deeply( \@sort_output, \@orig, "Add_Run" );
 @orig        = ();
 @sort_output = ();
 
-$sortex = Lucy::Util::BBSortEx->new( mem_thresh => 4 );
-$sortex->feed( new_bytebuf('c') );
+$sortex = Lucy::Util::BlobSortEx->new( mem_thresh => 4 );
+$sortex->feed( new_blob('c') );
 $sortex->clear_buffer;
 is( $sortex->buffer_count, 0, "Clear_Buffer" );
-$sortex->feed( new_bytebuf('b') );
-$sortex->feed( new_bytebuf('a') );
+$sortex->feed( new_blob('b') );
+$sortex->feed( new_blob('a') );
 $sortex->flush;
 $sortex->flip;
 @orig = qw( a b );
@@ -72,9 +72,9 @@ is_deeply( \@sort_output, \@orig,
 @orig        = ();
 @sort_output = ();
 
-$sortex = Lucy::Util::BBSortEx->new;
+$sortex = Lucy::Util::BlobSortEx->new;
 @orig   = ( 'a' .. 'z' );
-$sortex->feed( new_bytebuf($_) ) for shuffle(@orig);
+$sortex->feed( new_blob($_) ) for shuffle(@orig);
 $sortex->flip;
 while ( defined( my $result = $sortex->fetch ) ) {
     push @sort_output, $result;
@@ -83,9 +83,9 @@ is_deeply( \@sort_output, \@orig, "sort letters" );
 @orig        = ();
 @sort_output = ();
 
-$sortex = Lucy::Util::BBSortEx->new;
+$sortex = Lucy::Util::BlobSortEx->new;
 @orig   = qw( a a a b c d x x x x x x y y );
-$sortex->feed( new_bytebuf($_) ) for shuffle(@orig);
+$sortex->feed( new_blob($_) ) for shuffle(@orig);
 $sortex->flip;
 while ( defined( my $result = $sortex->fetch ) ) {
     push @sort_output, $result;
@@ -94,9 +94,9 @@ is_deeply( \@sort_output, \@orig, "sort repeated letters" );
 @orig        = ();
 @sort_output = ();
 
-$sortex = Lucy::Util::BBSortEx->new;
+$sortex = Lucy::Util::BlobSortEx->new;
 @orig = ( '', '', 'a' .. 'z' );
-$sortex->feed( new_bytebuf($_) ) for shuffle(@orig);
+$sortex->feed( new_blob($_) ) for shuffle(@orig);
 $sortex->flip;
 while ( defined( my $result = $sortex->fetch ) ) {
     push @sort_output, $result;
@@ -105,9 +105,9 @@ is_deeply( \@sort_output, \@orig, "sort letters and empty strings" );
 @orig        = ();
 @sort_output = ();
 
-$sortex = Lucy::Util::BBSortEx->new( mem_thresh => 30 );
+$sortex = Lucy::Util::BlobSortEx->new( mem_thresh => 30 );
 @orig = 'a' .. 'z';
-$sortex->feed( new_bytebuf($_) ) for shuffle(@orig);
+$sortex->feed( new_blob($_) ) for shuffle(@orig);
 $sortex->flip;
 while ( defined( my $result = $sortex->fetch ) ) {
     push @sort_output, $result;
@@ -116,9 +116,9 @@ is_deeply( \@sort_output, \@orig, "... with an absurdly low mem_thresh" );
 @orig        = ();
 @sort_output = ();
 
-$sortex = Lucy::Util::BBSortEx->new( mem_thresh => 1 );
+$sortex = Lucy::Util::BlobSortEx->new( mem_thresh => 1 );
 @orig = 'a' .. 'z';
-$sortex->feed( new_bytebuf($_) ) for shuffle(@orig);
+$sortex->feed( new_blob($_) ) for shuffle(@orig);
 $sortex->flip;
 while ( defined( my $result = $sortex->fetch ) ) {
     push @sort_output, $result;
@@ -127,15 +127,15 @@ is_deeply( \@sort_output, \@orig, "... with an even lower mem_thresh" );
 @orig        = ();
 @sort_output = ();
 
-$sortex = Lucy::Util::BBSortEx->new;
+$sortex = Lucy::Util::BlobSortEx->new;
 $sortex->flip;
 @sort_output = $sortex->fetch;
 is_deeply( \@sort_output, [undef], "Sorting nothing returns undef" );
 @sort_output = ();
 
-$sortex = Lucy::Util::BBSortEx->new( mem_thresh => 5_000 );
+$sortex = Lucy::Util::BlobSortEx->new( mem_thresh => 5_000 );
 @orig = map { pack( 'N', $_ ) } ( 0 .. 11_000 );
-$sortex->feed( new_bytebuf($_) ) for shuffle(@orig);
+$sortex->feed( new_blob($_) ) for shuffle(@orig);
 $sortex->flip;
 while ( defined( my $item = $sortex->fetch ) ) {
     push @sort_output, $item;
@@ -143,7 +143,7 @@ while ( defined( my $item = $sortex->fetch ) ) {
 is_deeply( \@sort_output, \@orig, "Sorting packed integers..." );
 @sort_output = ();
 
-$sortex = Lucy::Util::BBSortEx->new( mem_thresh => 15_000 );
+$sortex = Lucy::Util::BlobSortEx->new( mem_thresh => 15_000 );
 @orig = ();
 for my $iter ( 0 .. 1_000 ) {
     my $string = '';
@@ -152,7 +152,7 @@ for my $iter ( 0 .. 1_000 ) {
     }
     push @orig, $string;
 }
-$sortex->feed( new_bytebuf($_) ) for shuffle(@orig);
+$sortex->feed( new_blob($_) ) for shuffle(@orig);
 @orig = sort @orig;
 $sortex->flip;
 while ( defined( my $item = $sortex->fetch ) ) {
@@ -161,5 +161,5 @@ while ( defined( my $item = $sortex->fetch ) ) {
 is_deeply( \@sort_output, \@orig, "Random binary strings of random length" );
 @sort_output = ();
 
-sub new_bytebuf { Clownfish::ByteBuf->new(shift) }
+sub new_blob { Clownfish::Blob->new(shift) }
 
