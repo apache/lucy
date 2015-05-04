@@ -119,8 +119,8 @@ PPCODE:
         = cfish_Class_singleton((cfish_String*)class_name_str, NULL);
     STRLEN len;
     char *ptr = SvPV(serialized_sv, len);
-    cfish_ViewByteBuf *contents = cfish_ViewBB_new(ptr, len);
-    lucy_RAMFile *ram_file = lucy_RAMFile_new((cfish_ByteBuf*)contents, true);
+    cfish_ByteBuf *contents = cfish_BB_new_bytes(ptr, len);
+    lucy_RAMFile *ram_file = lucy_RAMFile_new(contents, true);
     lucy_RAMFileHandle *file_handle
         = lucy_RAMFH_open(NULL, LUCY_FH_READ_ONLY, ram_file);
     lucy_InStream *instream = lucy_InStream_open((cfish_Obj*)file_handle);
