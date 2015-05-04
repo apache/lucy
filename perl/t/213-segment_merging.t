@@ -164,7 +164,7 @@ is( num_segmeta($index_loc), 1, "merged segment files successfully deleted" );
             schema  => $schema,
             manager => NonMergingIndexManager->new,
         );
-        $indexer->add_doc( { content => $number++ } ) for 1 .. 20;
+        $indexer->add_doc( { content => $number++ } ) for 1 .. 100;
         $indexer->commit;
     }
     my $indexer = Lucy::Index::Indexer->new(
@@ -172,7 +172,7 @@ is( num_segmeta($index_loc), 1, "merged segment files successfully deleted" );
         schema => $schema,
     );
     $indexer->delete_by_term( field => 'content', term => $_ )
-        for ( 3, 23, 24, 25 );
+        for ( 3, 103..113 );
     $indexer->commit;
 
     ok( $folder->exists("seg_1/segmeta.json"),
