@@ -30,7 +30,7 @@ sub new {
     if ( ref( $args{scores} ) eq 'ARRAY' ) {
         confess("Mismatch between scores and doc_ids array sizes")
             unless scalar @{ $args{scores} } == $size;
-        $scores = Clownfish::ByteBuf->new(
+        $scores = Clownfish::Blob->new(
             pack( "f$size", @{ $args{scores} } ) );
     }
 

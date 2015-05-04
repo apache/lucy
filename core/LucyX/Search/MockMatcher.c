@@ -18,21 +18,22 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "LucyX/Search/MockMatcher.h"
+#include "Clownfish/Blob.h"
 
 MockMatcher*
-MockMatcher_new(I32Array *doc_ids, ByteBuf *scores) {
+MockMatcher_new(I32Array *doc_ids, Blob *scores) {
     MockMatcher *self = (MockMatcher*)Class_Make_Obj(MOCKMATCHER);
     return MockMatcher_init(self, doc_ids, scores);
 }
 
 MockMatcher*
-MockMatcher_init(MockMatcher *self, I32Array *doc_ids, ByteBuf *scores) {
+MockMatcher_init(MockMatcher *self, I32Array *doc_ids, Blob *scores) {
     Matcher_init((Matcher*)self);
     MockMatcherIVARS *const ivars = MockMatcher_IVARS(self);
     ivars->tick    = -1;
     ivars->size    = I32Arr_Get_Size(doc_ids);
     ivars->doc_ids = (I32Array*)INCREF(doc_ids);
-    ivars->scores  = (ByteBuf*)INCREF(scores);
+    ivars->scores  = (Blob*)INCREF(scores);
     return self;
 }
 
@@ -60,7 +61,7 @@ MockMatcher_Score_IMP(MockMatcher* self) {
     if (!ivars->scores) {
         THROW(ERR, "Can't call Score() unless scores supplied");
     }
-    const float *raw_scores = (const float*)BB_Get_Buf(ivars->scores);
+    const float *raw_scores = (const float*)Blob_Get_Buf(ivars->scores);
     return raw_scores[ivars->tick];
 }
 

@@ -20,11 +20,11 @@ class LucyX::Search::MockMatcher inherits Lucy::Search::Matcher {
 
     size_t    size;
     I32Array *doc_ids;
-    ByteBuf  *scores;
+    Blob     *scores;
     int32_t   tick;
 
     inert incremented MockMatcher*
-    new(I32Array *doc_ids, ByteBuf *scores = NULL);
+    new(I32Array *doc_ids, Blob *scores = NULL);
 
     /**
      * @param doc_ids An array of matching doc ids.
@@ -32,7 +32,7 @@ class LucyX::Search::MockMatcher inherits Lucy::Search::Matcher {
      * supplied, calling [](cfish:.Score) will throw an exception.
      */
     inert incremented MockMatcher*
-    init(MockMatcher *self, I32Array *doc_ids, ByteBuf *scores = NULL);
+    init(MockMatcher *self, I32Array *doc_ids, Blob *scores = NULL);
 
     public void
     Destroy(MockMatcher *self);
