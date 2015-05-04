@@ -77,6 +77,7 @@
 #include "Lucy/Test/Store/TestRAMFileHandle.h"
 #include "Lucy/Test/Store/TestRAMFolder.h"
 #include "Lucy/Test/TestSchema.h"
+#include "Lucy/Test/Util/TestFreezer.h"
 #include "Lucy/Test/Util/TestIndexFileNames.h"
 #include "Lucy/Test/Util/TestJson.h"
 #include "Lucy/Test/Util/TestMemoryPool.h"
@@ -93,6 +94,7 @@ Test_create_test_suite() {
     TestSuite_Add_Batch(suite, (TestBatch*)TestMemPool_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestIxFileNames_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestJson_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestFreezer_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestI32Arr_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestRAMFH_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestFSFH_new());
