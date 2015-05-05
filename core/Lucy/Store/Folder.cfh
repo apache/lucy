@@ -170,7 +170,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @param path A relative filepath.
      * @param return the file's contents.
      */
-    public incremented ByteBuf*
+    public incremented Blob*
     Slurp_File(Folder *self, String *path);
 
     /** Collapse the contents of the directory into a compound file.

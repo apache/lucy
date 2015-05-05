@@ -18,6 +18,7 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
+#include "Clownfish/Blob.h"
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestFolder.h"
@@ -506,13 +507,13 @@ test_Slurp_File(TestBatchRunner *runner) {
     Folder *folder = (Folder*)RAMFolder_new(NULL);
     FileHandle *fh = Folder_Open_FileHandle(folder, foo,
                                             FH_CREATE | FH_WRITE_ONLY);
-    ByteBuf *contents;
+    Blob *contents;
 
     FH_Write(fh, "stuff", 5);
     FH_Close(fh);
     DECREF(fh);
     contents = Folder_Slurp_File(folder, foo);
-    TEST_TRUE(runner, BB_Equals_Bytes(contents, "stuff", 5), "Slurp_File");
+    TEST_TRUE(runner, Blob_Equals_Bytes(contents, "stuff", 5), "Slurp_File");
 
     DECREF(contents);
     DECREF(folder);

@@ -21,6 +21,7 @@
 
 #include "charmony.h"
 
+#include "Clownfish/Blob.h"
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/CompoundFileReader.h"
 #include "Lucy/Store/CompoundFileWriter.h"
@@ -363,10 +364,10 @@ Folder_List_R_IMP(Folder *self, String *path) {
     return list;
 }
 
-ByteBuf*
+Blob*
 Folder_Slurp_File_IMP(Folder *self, String *path) {
     InStream *instream = Folder_Open_In(self, path);
-    ByteBuf  *retval   = NULL;
+    Blob     *retval   = NULL;
 
     if (!instream) {
         RETHROW(INCREF(Err_get_error()));
@@ -385,7 +386,7 @@ Folder_Slurp_File_IMP(Folder *self, String *path) {
             char *ptr = (char*)MALLOCATE((size_t)size + 1);
             InStream_Read_Bytes(instream, ptr, size);
             ptr[size] = '\0';
-            retval = BB_new_steal_bytes(ptr, size, size + 1);
+            retval = Blob_new_steal(ptr, size);
             InStream_Close(instream);
             DECREF(instream);
         }
