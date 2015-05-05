@@ -95,6 +95,7 @@ test_hash(TestBatchRunner *runner) {
         String *str = TestUtils_random_string(rand() % 1200);
         Integer32 *num = Int32_new(i);
         Hash_Store(wanted, str, (Obj*)num);
+        DECREF(str);
     }
 
     {

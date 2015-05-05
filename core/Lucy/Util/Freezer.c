@@ -142,6 +142,8 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
             if (Obj_Is_A(obj, BOOLNUM)) {
                 bool value = !!InStream_Read_U8(instream);
                 Obj *result = value ? INCREF(CFISH_TRUE) : INCREF(CFISH_FALSE);
+                // FIXME: This DECREF is essentially a no-op causing a
+                // memory leak.
                 DECREF(obj);
                 obj = result;
             }
