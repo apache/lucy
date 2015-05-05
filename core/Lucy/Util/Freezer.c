@@ -383,8 +383,11 @@ Freezer_dump(Obj *obj) {
     else if (Obj_Is_A(obj, QUERY)) {
         return Query_Dump((Query*)obj);
     }
+    else if (Obj_Is_A(obj, NUM)) {
+        return Obj_Clone(obj);
+    }
     else {
-        return (Obj*)Obj_Clone(obj);
+        return (Obj*)Obj_To_String(obj);
     }
 }
 
