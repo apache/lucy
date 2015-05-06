@@ -29,7 +29,6 @@ package lucy
 import "C"
 import "fmt"
 import "reflect"
-import "runtime"
 import "strings"
 import "unsafe"
 
@@ -39,8 +38,8 @@ type Query interface {
 	clownfish.Obj
 }
 
-type implQuery struct {
-	ref *C.lucy_Query
+type QueryIMP struct {
+	clownfish.ObjIMP
 }
 
 type Searcher interface {
@@ -49,14 +48,18 @@ type Searcher interface {
 	Close() error
 }
 
+type SearcherIMP struct {
+	clownfish.ObjIMP
+}
+
 type Hits interface {
 	clownfish.Obj
 	Next(hit interface{}) bool
 	Error() error
 }
 
-type implHits struct {
-	ref *C.lucy_Hits
+type HitsIMP struct {
+	clownfish.ObjIMP
 	err error
 }
 
@@ -64,16 +67,16 @@ type SortSpec interface {
 	clownfish.Obj
 }
 
-type implSortSpec struct {
-	ref *C.lucy_SortSpec
+type SortSpecIMP struct {
+	clownfish.ObjIMP
 }
 
 type IndexSearcher interface {
 	Searcher
 }
 
-type implIndexSearcher struct {
-	ref *C.lucy_IndexSearcher
+type IndexSearcherIMP struct {
+	SearcherIMP
 }
 
 func OpenIndexSearcher(index interface{}) (obj IndexSearcher, err error) {
@@ -93,28 +96,21 @@ func OpenIndexSearcher(index interface{}) (obj IndexSearcher, err error) {
 }
 
 func WRAPIndexSearcher(ptr unsafe.Pointer) IndexSearcher {
-	obj := &implIndexSearcher{(*C.lucy_IndexSearcher)(ptr)}
-	runtime.SetFinalizer(obj, (*implIndexSearcher).finalize)
+	obj := &IndexSearcherIMP{}
+	obj.INITOBJ(ptr);
 	return obj
 }
 
-func (obj *implIndexSearcher) finalize() {
-	C.cfish_dec_refcount(unsafe.Pointer(obj.ref))
-	obj.ref = nil
-}
-
-func (obj *implIndexSearcher) Close() error {
+func (obj *IndexSearcherIMP) Close() error {
+	self := ((*C.lucy_IndexSearcher)(unsafe.Pointer(obj.TOPTR())))
 	return clownfish.TrapErr(func() {
-		C.LUCY_IxSearcher_Close(obj.ref)
+		C.LUCY_IxSearcher_Close(self)
 	})
 }
 
-func (obj *implIndexSearcher) TOPTR() uintptr {
-	return uintptr(unsafe.Pointer(obj.ref))
-}
-
-func (obj *implIndexSearcher) Hits(query interface{}, offset uint32, numWanted uint32,
+func (obj *IndexSearcherIMP) Hits(query interface{}, offset uint32, numWanted uint32,
 	sortSpec SortSpec) (hits Hits, err error) {
+	self := ((*C.lucy_IndexSearcher)(unsafe.Pointer(obj.TOPTR())))
 	var sortSpecC *C.lucy_SortSpec
 	if sortSpec != nil {
 		sortSpecC = (*C.lucy_SortSpec)(unsafe.Pointer(sortSpec.TOPTR()))
@@ -123,7 +119,7 @@ func (obj *implIndexSearcher) Hits(query interface{}, offset uint32, numWanted u
 	case string:
 		queryStringC := clownfish.NewString(query.(string))
 		err = clownfish.TrapErr(func() {
-			hitsC := C.LUCY_IxSearcher_Hits(obj.ref,
+			hitsC := C.LUCY_IxSearcher_Hits(self,
 				(*C.cfish_Obj)(unsafe.Pointer(queryStringC.TOPTR())),
 				C.uint32_t(offset), C.uint32_t(numWanted), sortSpecC)
 			hits = WRAPHits(unsafe.Pointer(hitsC))
@@ -135,16 +131,13 @@ func (obj *implIndexSearcher) Hits(query interface{}, offset uint32, numWanted u
 }
 
 func WRAPHits(ptr unsafe.Pointer) Hits {
-	obj := &implHits{(*C.lucy_Hits)(ptr), nil}
-	runtime.SetFinalizer(obj, (*implHits).finalize)
+	obj := &HitsIMP{}
+	obj.INITOBJ(ptr);
 	return obj
 }
 
-func (obj *implHits) TOPTR() uintptr {
-	return uintptr(unsafe.Pointer(obj.ref))
-}
-
-func (obj *implHits) Next(hit interface{}) bool {
+func (obj *HitsIMP) Next(hit interface{}) bool {
+	self := ((*C.lucy_Hits)(unsafe.Pointer(obj.TOPTR())))
 	// TODO: accept a HitDoc object and populate score.
 
 	// Get reflection value and type for the supplied struct.
@@ -166,7 +159,7 @@ func (obj *implHits) Next(hit interface{}) bool {
 
 	var docC *C.lucy_HitDoc
 	errCallingNext := clownfish.TrapErr(func() {
-		docC = C.LUCY_Hits_Next(obj.ref)
+		docC = C.LUCY_Hits_Next(self)
 	})
 	if errCallingNext != nil {
 		obj.err = errCallingNext
@@ -196,11 +189,6 @@ func (obj *implHits) Next(hit interface{}) bool {
 	return true
 }
 
-func (obj *implHits) finalize() {
-	C.cfish_dec_refcount(unsafe.Pointer(obj.ref))
-	obj.ref = nil
-}
-
-func (obj *implHits) Error() error {
+func (obj *HitsIMP) Error() error {
 	return obj.err
 }
