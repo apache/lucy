@@ -17,16 +17,14 @@
 package lucy
 
 /*
-#include "Lucy/Analysis/Analyzer.h"
-#include "Lucy/Analysis/EasyAnalyzer.h"
+#include "Lucy/Store/Lock.h"
 */
 import "C"
 import "unsafe"
 
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
-func NewEasyAnalyzer(language string) EasyAnalyzer {
-	lang := clownfish.NewString(language)
-	cfObj := C.lucy_EasyAnalyzer_new((*C.cfish_String)(unsafe.Pointer(lang.TOPTR())))
-	return WRAPEasyAnalyzer(unsafe.Pointer(cfObj))
+func (e *LockErrIMP) Error() string {
+	self := ((*C.lucy_LockErr)(unsafe.Pointer(e.TOPTR())))
+	return clownfish.CFStringToGo(unsafe.Pointer(C.LUCY_LockErr_Get_Mess(self)))
 }

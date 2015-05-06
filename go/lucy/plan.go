@@ -25,40 +25,9 @@ import "unsafe"
 
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
-type Schema interface {
-	clownfish.Obj
-	SpecField(field string, fieldType FieldType)
-}
-
-type SchemaIMP struct {
-	clownfish.ObjIMP
-}
-
-type FieldType interface {
-	clownfish.Obj
-}
-
-type FieldTypeIMP struct {
-	clownfish.ObjIMP
-}
-
-type FullTextType interface {
-	FieldType
-}
-
-type FullTextTypeIMP struct {
-	FieldTypeIMP
-}
-
 func NewSchema() Schema {
 	cfObj := C.lucy_Schema_new()
 	return WRAPSchema(unsafe.Pointer(cfObj))
-}
-
-func WRAPSchema(ptr unsafe.Pointer) Schema {
-	obj := &SchemaIMP{}
-	obj.INITOBJ(ptr);
-	return obj
 }
 
 func (obj *SchemaIMP) SpecField(field string, fieldType FieldType) {
@@ -73,10 +42,4 @@ func NewFullTextType(analyzer Analyzer) FullTextType {
 	cfObj := C.lucy_FullTextType_new(
 		(*C.lucy_Analyzer)(unsafe.Pointer(analyzer.TOPTR())))
 	return WRAPFullTextType(unsafe.Pointer(cfObj))
-}
-
-func WRAPFullTextType(ptr unsafe.Pointer) FullTextType {
-	obj := &FullTextTypeIMP{}
-	obj.INITOBJ(ptr);
-	return obj
 }
