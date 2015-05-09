@@ -33,6 +33,7 @@
 #include "Lucy/Search/Matcher.h"
 #include "Lucy/Search/SortRule.h"
 #include "Lucy/Search/SortSpec.h"
+#include "Lucy/Util/NumberUtils.h"
 
 #define COMPARE_BY_SCORE             0x1
 #define COMPARE_BY_SCORE_REV         0x2

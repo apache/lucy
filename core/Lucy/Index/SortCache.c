@@ -19,6 +19,7 @@
 
 #include "Lucy/Index/SortCache.h"
 #include "Lucy/Plan/FieldType.h"
+#include "Lucy/Util/NumberUtils.h"
 
 SortCache*
 SortCache_init(SortCache *self, String *field, FieldType *type,

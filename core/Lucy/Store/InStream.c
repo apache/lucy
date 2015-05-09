@@ -25,6 +25,7 @@
 #include "Lucy/Store/FileWindow.h"
 #include "Lucy/Store/RAMFile.h"
 #include "Lucy/Store/RAMFileHandle.h"
+#include "Lucy/Util/NumberUtils.h"
 
 // Inlined version of InStream_Tell.
 static CFISH_INLINE int64_t

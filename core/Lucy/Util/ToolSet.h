@@ -45,7 +45,6 @@ extern "C" {
 #include "Clownfish/Num.h"
 #include "Clownfish/Vector.h"
 #include "Clownfish/Class.h"
-#include "Clownfish/Util/NumberUtils.h"
 #include "Clownfish/Util/Memory.h"
 #include "Clownfish/Util/StringHelper.h"
 

@@ -25,6 +25,7 @@
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/Freezer.h"
+#include "Lucy/Util/NumberUtils.h"
 
 // Extract a document's compressed TermVector data into (term_text =>
 // compressed positional data) pairs.

@@ -32,6 +32,7 @@
 #include "Lucy/Search/Matcher.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Util/MemoryPool.h"
+#include "Lucy/Util/NumberUtils.h"
 
 #define FIELD_BOOST_LEN  1
 #define FREQ_MAX_LEN     C32_MAX_BYTES

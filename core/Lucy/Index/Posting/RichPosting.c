@@ -31,6 +31,7 @@
 #include "Lucy/Search/Compiler.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Util/MemoryPool.h"
+#include "Lucy/Util/NumberUtils.h"
 
 #define FREQ_MAX_LEN     C32_MAX_BYTES
 #define MAX_RAW_POSTING_LEN(_raw_posting_size, _text_len, _freq) \

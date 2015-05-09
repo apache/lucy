@@ -33,7 +33,6 @@
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Store/RAMFile.h"
 #include "Lucy/Store/RAMFileHandle.h"
-#include "Clownfish/Util/NumberUtils.h"
 
 TestIOChunks*
 TestIOChunks_new() {

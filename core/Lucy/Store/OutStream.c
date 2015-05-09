@@ -26,6 +26,7 @@
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/RAMFile.h"
 #include "Lucy/Store/RAMFileHandle.h"
+#include "Lucy/Util/NumberUtils.h"
 
 // Inlined version of OutStream_Write_Bytes.
 static CFISH_INLINE void

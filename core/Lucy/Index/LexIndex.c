@@ -26,6 +26,7 @@
 #include "Lucy/Plan/Schema.h"
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/InStream.h"
+#include "Lucy/Util/NumberUtils.h"
 
 // Read the data we've arrived at after a seek operation.
 static void

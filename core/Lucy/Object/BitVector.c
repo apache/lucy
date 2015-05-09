@@ -20,6 +20,7 @@
 #include <math.h>
 
 #include "Lucy/Object/BitVector.h"
+#include "Lucy/Util/NumberUtils.h"
 
 // Shared subroutine for performing both OR and XOR ops.
 #define DO_OR 1
