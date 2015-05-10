@@ -247,9 +247,9 @@ test_spew_and_slurp(TestBatchRunner *runner) {
 
 static void
 S_verify_bad_syntax(TestBatchRunner *runner, const char *bad, const char *mess) {
-    StackString *has_errors = SSTR_WRAP_UTF8(bad, strlen(bad));
+    String *has_errors = SSTR_WRAP_UTF8(bad, strlen(bad));
     Err_set_error(NULL);
-    Obj *not_json = Json_from_json((String*)has_errors);
+    Obj *not_json = Json_from_json(has_errors);
     TEST_TRUE(runner, not_json == NULL, "from_json returns NULL: %s", mess);
     TEST_TRUE(runner, Err_get_error() != NULL,
               "from_json sets global error: %s", mess);

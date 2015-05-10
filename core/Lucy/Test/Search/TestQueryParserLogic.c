@@ -890,9 +890,9 @@ TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
     IndexSearcher *searcher   = IxSearcher_new((Obj*)folder);
     QueryParser   *or_parser  = QParser_new(IxSearcher_Get_Schema(searcher),
                                             NULL, NULL, NULL);
-    StackString *AND        = SSTR_WRAP_UTF8("AND", 3);
+    String        *AND        = SSTR_WRAP_UTF8("AND", 3);
     QueryParser   *and_parser = QParser_new(IxSearcher_Get_Schema(searcher),
-                                            NULL, (String*)AND, NULL);
+                                            NULL, AND, NULL);
     QParser_Set_Heed_Colons(or_parser, true);
     QParser_Set_Heed_Colons(and_parser, true);
 

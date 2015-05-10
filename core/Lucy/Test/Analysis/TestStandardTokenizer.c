@@ -51,7 +51,7 @@ static void
 test_tokenizer(TestBatchRunner *runner) {
     StandardTokenizer *tokenizer = StandardTokenizer_new();
 
-    StackString *word = SSTR_WRAP_UTF8(
+    String *word = SSTR_WRAP_UTF8(
                               " ."
                               "tha\xCC\x82t's"
                               ":"
@@ -61,7 +61,7 @@ test_tokenizer(TestBatchRunner *runner) {
                               "a"
                               "/",
                               35);
-    Vector *got = StandardTokenizer_Split(tokenizer, (String*)word);
+    Vector *got = StandardTokenizer_Split(tokenizer, word);
     String *token = (String*)Vec_Fetch(got, 0);
     TEST_TRUE(runner,
               token

@@ -265,8 +265,8 @@ Folder_Open_Dir_IMP(Folder *self, String *path) {
         folder = Folder_Find_Folder(self, path);
     }
     else {
-        StackString *empty = SSTR_BLANK();
-        folder = Folder_Find_Folder(self, (String*)empty);
+        String *empty = SSTR_BLANK();
+        folder = Folder_Find_Folder(self, empty);
     }
     if (!folder) {
         Err_set_error(Err_new(Str_newf("Invalid path: '%o'", path)));

@@ -38,11 +38,11 @@ S_no_op_method(const void *vself) {
 
 static FileHandle*
 S_new_filehandle() {
-    StackString *class_name = SSTR_WRAP_UTF8("TestFileHandle", 14);
+    String *class_name = SSTR_WRAP_UTF8("TestFileHandle", 14);
     FileHandle *fh;
-    Class *klass = Class_fetch_class((String*)class_name);
+    Class *klass = Class_fetch_class(class_name);
     if (!klass) {
-        klass = Class_singleton((String*)class_name, FILEHANDLE);
+        klass = Class_singleton(class_name, FILEHANDLE);
     }
     Class_Override(klass, S_no_op_method, LUCY_FH_Close_OFFSET);
     fh = (FileHandle*)Class_Make_Obj(klass);
@@ -53,11 +53,11 @@ void
 TestFH_Run_IMP(TestFileHandle *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 2);
 
-    FileHandle    *fh    = S_new_filehandle();
-    StackString *foo   = SSTR_WRAP_UTF8("foo", 3);
+    FileHandle *fh  = S_new_filehandle();
+    String     *foo = SSTR_WRAP_UTF8("foo", 3);
 
     TEST_TRUE(runner, Str_Equals_Utf8(FH_Get_Path(fh), "", 0), "Get_Path");
-    FH_Set_Path(fh, (String*)foo);
+    FH_Set_Path(fh, foo);
     TEST_TRUE(runner, Str_Equals(FH_Get_Path(fh), (Obj*)foo), "Set_Path");
 
     DECREF(fh);

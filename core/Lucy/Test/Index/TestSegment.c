@@ -32,27 +32,27 @@ TestSeg_new() {
 static void
 test_fields(TestBatchRunner *runner) {
     Segment *segment = Seg_new(1);
-    StackString *foo = SSTR_WRAP_UTF8("foo", 3);
-    StackString *bar = SSTR_WRAP_UTF8("bar", 3);
-    StackString *baz = SSTR_WRAP_UTF8("baz", 3);
+    String *foo = SSTR_WRAP_UTF8("foo", 3);
+    String *bar = SSTR_WRAP_UTF8("bar", 3);
+    String *baz = SSTR_WRAP_UTF8("baz", 3);
     int32_t field_num;
 
-    field_num = Seg_Add_Field(segment, (String*)foo);
+    field_num = Seg_Add_Field(segment, foo);
     TEST_TRUE(runner, field_num == 1,
               "Add_Field returns field number, and field numbers start at 1");
-    field_num = Seg_Add_Field(segment, (String*)bar);
+    field_num = Seg_Add_Field(segment, bar);
     TEST_TRUE(runner, field_num == 2, "add a second field");
-    field_num = Seg_Add_Field(segment, (String*)foo);
+    field_num = Seg_Add_Field(segment, foo);
     TEST_TRUE(runner, field_num == 1,
               "Add_Field returns existing field number if field is already known");
 
-    TEST_TRUE(runner, SStr_Equals(bar, (Obj*)Seg_Field_Name(segment, 2)),
+    TEST_TRUE(runner, Str_Equals(bar, (Obj*)Seg_Field_Name(segment, 2)),
               "Field_Name");
     TEST_TRUE(runner, Seg_Field_Name(segment, 3) == NULL,
               "Field_Name returns NULL for unknown field number");
-    TEST_TRUE(runner, Seg_Field_Num(segment, (String*)bar) == 2,
+    TEST_TRUE(runner, Seg_Field_Num(segment, bar) == 2,
               "Field_Num");
-    TEST_TRUE(runner, Seg_Field_Num(segment, (String*)baz) == 0,
+    TEST_TRUE(runner, Seg_Field_Num(segment, baz) == 0,
               "Field_Num returns 0 for unknown field name");
 
     DECREF(segment);
@@ -126,8 +126,8 @@ test_Write_File_and_Read_File(TestBatchRunner *runner) {
     Segment   *segment = Seg_new(100);
     Segment   *got     = Seg_new(100);
     String    *meta;
-    String    *flotsam = (String*)SSTR_WRAP_UTF8("flotsam", 7);
-    String    *jetsam  = (String*)SSTR_WRAP_UTF8("jetsam", 6);
+    String    *flotsam = SSTR_WRAP_UTF8("flotsam", 7);
+    String    *jetsam  = SSTR_WRAP_UTF8("jetsam", 6);
 
     Seg_Set_Count(segment, 111);
     Seg_Store_Metadata_Utf8(segment, "foo", 3, (Obj*)Str_newf("bar"));

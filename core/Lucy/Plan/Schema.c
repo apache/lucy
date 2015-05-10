@@ -422,11 +422,11 @@ Schema_Eat_IMP(Schema *self, Schema *other) {
 void
 Schema_Write_IMP(Schema *self, Folder *folder, String *filename) {
     Hash *dump = Schema_Dump(self);
-    StackString *schema_temp = SSTR_WRAP_UTF8("schema.temp", 11);
+    String *schema_temp = SSTR_WRAP_UTF8("schema.temp", 11);
     bool success;
-    Folder_Delete(folder, (String*)schema_temp); // Just in case.
-    Json_spew_json((Obj*)dump, folder, (String*)schema_temp);
-    success = Folder_Rename(folder, (String*)schema_temp, filename);
+    Folder_Delete(folder, schema_temp); // Just in case.
+    Json_spew_json((Obj*)dump, folder, schema_temp);
+    success = Folder_Rename(folder, schema_temp, filename);
     DECREF(dump);
     if (!success) { RETHROW(INCREF(Err_get_error())); }
 }

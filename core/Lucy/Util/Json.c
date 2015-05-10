@@ -691,8 +691,8 @@ S_set_error(CharBuf *buf, const char *json, const char *limit, int line,
     else if (len < 0) {
         len = 0; // sanity check
     }
-    StackString *snippet = SSTR_WRAP_UTF8(json, (size_t)len);
-    S_append_json_string((String*)snippet, buf);
+    String *snippet = SSTR_WRAP_UTF8(json, (size_t)len);
+    S_append_json_string(snippet, buf);
 
     String *mess = CB_Yield_String(buf);
     DECREF(buf);

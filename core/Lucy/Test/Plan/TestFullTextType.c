@@ -88,17 +88,14 @@ static void
 test_Compare_Values(TestBatchRunner *runner) {
     StandardTokenizer *tokenizer = StandardTokenizer_new();
     FullTextType      *type      = FullTextType_new((Analyzer*)tokenizer);
-    StackString       *a         = SSTR_WRAP_UTF8("a", 1);
-    StackString       *b         = SSTR_WRAP_UTF8("b", 1);
+    Obj *a = (Obj*)SSTR_WRAP_UTF8("a", 1);
+    Obj *b = (Obj*)SSTR_WRAP_UTF8("b", 1);
 
-    TEST_TRUE(runner,
-              FullTextType_Compare_Values(type, (Obj*)a, (Obj*)b) < 0,
+    TEST_TRUE(runner, FullTextType_Compare_Values(type, a, b) < 0,
               "a less than b");
-    TEST_TRUE(runner,
-              FullTextType_Compare_Values(type, (Obj*)b, (Obj*)a) > 0,
+    TEST_TRUE(runner, FullTextType_Compare_Values(type, b, a) > 0,
               "b greater than a");
-    TEST_TRUE(runner,
-              FullTextType_Compare_Values(type, (Obj*)b, (Obj*)b) == 0,
+    TEST_TRUE(runner, FullTextType_Compare_Values(type, b, b) == 0,
               "b equals b");
 
     DECREF(type);

@@ -211,8 +211,8 @@ Seg_Store_Metadata_IMP(Segment *self, String *key, Obj *value) {
 void
 Seg_Store_Metadata_Utf8_IMP(Segment *self, const char *key, size_t key_len,
                             Obj *value) {
-    StackString *k = SSTR_WRAP_UTF8((char*)key, key_len);
-    Seg_Store_Metadata(self, (String*)k, value);
+    String *k = SSTR_WRAP_UTF8((char*)key, key_len);
+    Seg_Store_Metadata(self, k, value);
 }
 
 Obj*

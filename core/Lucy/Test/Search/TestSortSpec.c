@@ -432,7 +432,7 @@ test_sort_spec(TestBatchRunner *runner) {
     for (int i = 0; i < 100; ++i) {
         char name_buf[3];
         sprintf(name_buf, "%02d", nums[i]);
-        StackString *name = SSTR_WRAP_UTF8(name_buf, 2);
+        String *name = SSTR_WRAP_UTF8(name_buf, 2);
         S_add_doc(indexer, (Obj*)name, num_str, NULL);
         if (i % 10 == 0) {
             S_refresh_indexer(&indexer, schema, folder);

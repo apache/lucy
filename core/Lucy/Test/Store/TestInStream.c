@@ -96,8 +96,8 @@ test_refill(TestBatchRunner *runner) {
 
 static void
 test_Clone_and_Reopen(TestBatchRunner *runner) {
-    StackString *foo       = SSTR_WRAP_UTF8("foo", 3);
-    StackString *bar       = SSTR_WRAP_UTF8("bar", 3);
+    String        *foo       = SSTR_WRAP_UTF8("foo", 3);
+    String        *bar       = SSTR_WRAP_UTF8("bar", 3);
     RAMFile       *file      = RAMFile_new(NULL, false);
     OutStream     *outstream = OutStream_open((Obj*)file);
     RAMFileHandle *fh;
@@ -110,7 +110,7 @@ test_Clone_and_Reopen(TestBatchRunner *runner) {
     }
     OutStream_Close(outstream);
 
-    fh = RAMFH_open((String*)foo, FH_READ_ONLY, file);
+    fh = RAMFH_open(foo, FH_READ_ONLY, file);
     instream = InStream_open((Obj*)fh);
     InStream_Seek(instream, 1);
     TEST_TRUE(runner, Str_Equals(InStream_Get_Filename(instream), (Obj*)foo),
@@ -124,7 +124,7 @@ test_Clone_and_Reopen(TestBatchRunner *runner) {
     TEST_TRUE(runner, InStream_Read_U8(instream) == InStream_Read_U8(clone),
               "Clones start at same file position");
 
-    reopened = InStream_Reopen(instream, (String*)bar, 25, 1);
+    reopened = InStream_Reopen(instream, bar, 25, 1);
     TEST_TRUE(runner, Str_Equals(InStream_Get_Filename(reopened), (Obj*)bar),
               "Reopened InStreams take new filename");
     TEST_TRUE(runner, InStream_Read_U8(reopened) == 'z',

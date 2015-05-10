@@ -37,8 +37,8 @@ DummyFieldType_new() {
 
 static FieldType*
 S_alt_field_type() {
-    StackString *name = SSTR_WRAP_UTF8("DummyFieldType2", 15);
-    Class *klass = Class_singleton((String*)name, DUMMYFIELDTYPE);
+    String *name = SSTR_WRAP_UTF8("DummyFieldType2", 15);
+    Class *klass = Class_singleton(name, DUMMYFIELDTYPE);
     FieldType *self = (FieldType*)Class_Make_Obj(klass);
     return FType_init(self);
 }
@@ -83,18 +83,15 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 
 static void
 test_Compare_Values(TestBatchRunner *runner) {
-    FieldType     *type = (FieldType*)DummyFieldType_new();
-    StackString *a    = SSTR_WRAP_UTF8("a", 1);
-    StackString *b    = SSTR_WRAP_UTF8("b", 1);
+    FieldType *type = (FieldType*)DummyFieldType_new();
+    Obj       *a    = (Obj*)SSTR_WRAP_UTF8("a", 1);
+    Obj       *b    = (Obj*)SSTR_WRAP_UTF8("b", 1);
 
-    TEST_TRUE(runner,
-              FType_Compare_Values(type, (Obj*)a, (Obj*)b) < 0,
+    TEST_TRUE(runner, FType_Compare_Values(type, a, b) < 0,
               "a less than b");
-    TEST_TRUE(runner,
-              FType_Compare_Values(type, (Obj*)b, (Obj*)a) > 0,
+    TEST_TRUE(runner, FType_Compare_Values(type, b, a) > 0,
               "b greater than a");
-    TEST_TRUE(runner,
-              FType_Compare_Values(type, (Obj*)b, (Obj*)b) == 0,
+    TEST_TRUE(runner, FType_Compare_Values(type, b, b) == 0,
               "b equals b");
 
     DECREF(type);

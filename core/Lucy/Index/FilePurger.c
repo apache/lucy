@@ -155,7 +155,7 @@ S_zap_dead_merge(FilePurger *self, Hash *candidates) {
         if (cutoff) {
             String *cutoff_seg = Seg_num_to_name(Obj_To_I64(cutoff));
             if (Folder_Exists(ivars->folder, cutoff_seg)) {
-                StackString *merge_json = SSTR_WRAP_UTF8("merge.json", 10);
+                String *merge_json = SSTR_WRAP_UTF8("merge.json", 10);
                 DirHandle *dh = Folder_Open_Dir(ivars->folder, cutoff_seg);
 
                 if (!dh) {
@@ -163,7 +163,7 @@ S_zap_dead_merge(FilePurger *self, Hash *candidates) {
                 }
 
                 Hash_Store(candidates, cutoff_seg, (Obj*)CFISH_TRUE);
-                Hash_Store(candidates, (String*)merge_json, (Obj*)CFISH_TRUE);
+                Hash_Store(candidates, merge_json, (Obj*)CFISH_TRUE);
                 while (DH_Next(dh)) {
                     // TODO: recursively delete subdirs within seg dir.
                     String *entry = DH_Get_Entry(dh);

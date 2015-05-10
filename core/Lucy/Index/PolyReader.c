@@ -384,10 +384,10 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
 
         // Testing only.
         if (PolyReader_race_condition_debug1) {
-            StackString *temp = SSTR_WRAP_UTF8("temp", 4);
-            if (Folder_Exists(folder, (String*)temp)) {
-                bool success = Folder_Rename(folder, (String*)temp,
-                                               PolyReader_race_condition_debug1);
+            String *temp = SSTR_WRAP_UTF8("temp", 4);
+            if (Folder_Exists(folder, temp)) {
+                bool success = Folder_Rename(folder, temp,
+                                             PolyReader_race_condition_debug1);
                 if (!success) { RETHROW(INCREF(Err_get_error())); }
             }
             PolyReader_debug1_num_passes++;

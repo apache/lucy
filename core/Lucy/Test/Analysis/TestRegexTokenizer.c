@@ -36,12 +36,10 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
         return;
     }
 
-    StackString *word_char_pattern  = SSTR_WRAP_UTF8("\\w+", 3);
-    StackString *whitespace_pattern = SSTR_WRAP_UTF8("\\S+", 3);
     RegexTokenizer *word_char_tokenizer
-        = RegexTokenizer_new((String*)word_char_pattern);
+        = RegexTokenizer_new(SSTR_WRAP_UTF8("\\w+", 3));
     RegexTokenizer *whitespace_tokenizer
-        = RegexTokenizer_new((String*)whitespace_pattern);
+        = RegexTokenizer_new(SSTR_WRAP_UTF8("\\S+", 3));
     Obj *word_char_dump  = RegexTokenizer_Dump(word_char_tokenizer);
     Obj *whitespace_dump = RegexTokenizer_Dump(whitespace_tokenizer);
     RegexTokenizer *word_char_clone
