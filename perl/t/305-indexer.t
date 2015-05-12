@@ -66,7 +66,7 @@ do {
         qq|
         {  
             "host": "somebody_else",
-            "pid": $pid,
+            "pid": "$pid",
             "name": "write"
         }|
     );

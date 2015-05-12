@@ -275,15 +275,17 @@ LFLock_Maybe_Delete_File_IMP(LockFileLock *self, String *path,
         if (hash != NULL && Obj_Is_A((Obj*)hash, HASH)) {
             String *pid_buf = (String*)Hash_Fetch_Utf8(hash, "pid", 3);
             String *host    = (String*)Hash_Fetch_Utf8(hash, "host", 4);
-            String *name
-                = (String*)Hash_Fetch_Utf8(hash, "name", 4);
+            String *name    = (String*)Hash_Fetch_Utf8(hash, "name", 4);
 
             // Match hostname and lock name.
             if (host != NULL
+                && Str_Is_A(host, STRING)
                 && Str_Equals(host, (Obj*)ivars->host)
                 && name != NULL
+                && Str_Is_A(name, STRING)
                 && Str_Equals(name, (Obj*)ivars->name)
                 && pid_buf != NULL
+                && Str_Is_A(pid_buf, STRING)
                ) {
                 // Verify that pid is either mine or dead.
                 int pid = (int)Str_To_I64(pid_buf);
