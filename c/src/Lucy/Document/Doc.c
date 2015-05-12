@@ -85,13 +85,6 @@ Doc_Extract_IMP(Doc *self, String *field) {
     return INCREF(Hash_Fetch(hash, field));
 }
 
-void*
-Doc_To_Host_IMP(Doc *self) {
-    UNUSED_VAR(self);
-    THROW(ERR, "TODO");
-    UNREACHABLE_RETURN(void*);
-}
-
 Hash*
 Doc_Dump_IMP(Doc *self) {
     UNUSED_VAR(self);

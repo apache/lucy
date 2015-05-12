@@ -171,16 +171,6 @@ LUCY_Doc_Extract_IMP(lucy_Doc *self, cfish_String *field) {
     return retval;
 }
 
-void*
-LUCY_Doc_To_Host_IMP(lucy_Doc *self) {
-    dTHX;
-    LUCY_Doc_To_Host_t super_to_host
-        = CFISH_SUPER_METHOD_PTR(LUCY_DOC, LUCY_Doc_To_Host);
-    SV *perl_obj = (SV*)super_to_host(self);
-    XSBind_enable_overload(aTHX_ perl_obj);
-    return perl_obj;
-}
-
 cfish_Hash*
 LUCY_Doc_Dump_IMP(lucy_Doc *self) {
     dTHX;

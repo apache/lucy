@@ -93,9 +93,6 @@ public class Lucy::Document::Doc inherits Clownfish::Obj {
     public incremented Doc*
     Load(Doc *self, Obj *dump);
 
-    void*
-    To_Host(Doc *self);
-
     public void
     Destroy(Doc *self);
 }
