@@ -65,7 +65,7 @@ void
 TextTermStepper_Set_Value_IMP(TextTermStepper *self, Obj *value) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
     CERTIFY(value, STRING);
-    Obj_Mimic(ivars->value, value);
+    CB_Mimic((CharBuf*)ivars->value, value);
     // Invalidate string.
     DECREF(ivars->string);
     ivars->string = NULL;
