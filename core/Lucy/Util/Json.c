@@ -282,10 +282,10 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
         S_append_json_string((String*)dump, buf);
     }
     else if (Obj_Is_A(dump, INTNUM)) {
-        CB_catf(buf, "%i64", Obj_To_I64(dump));
+        CB_catf(buf, "%i64", IntNum_To_I64((IntNum*)dump));
     }
     else if (Obj_Is_A(dump, FLOATNUM)) {
-        CB_catf(buf, "%f64", Obj_To_F64(dump));
+        CB_catf(buf, "%f64", FloatNum_To_F64((FloatNum*)dump));
     }
     else if (Obj_Is_A(dump, VECTOR)) {
         Vector *array = (Vector*)dump;
