@@ -28,6 +28,7 @@
 #include "Lucy/Plan/Schema.h"
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/InStream.h"
+#include "Lucy/Util/Json.h"
 
 DocReader*
 DocReader_init(DocReader *self, Schema *schema, Folder *folder,
@@ -150,7 +151,7 @@ DefDocReader_init(DefaultDocReader *self, Schema *schema, Folder *folder,
         // Check format.
         if (!format) { THROW(ERR, "Missing 'format' var"); }
         else {
-            int64_t format_val = Obj_To_I64(format);
+            int64_t format_val = Json_obj_to_i64(format);
             if (format_val < DocWriter_current_file_format) {
                 THROW(ERR, "Obsolete doc storage format %i64; "
                       "Index regeneration is required", format_val);

@@ -20,6 +20,7 @@
 #include "Lucy/Plan/StringType.h"
 #include "Lucy/Index/Posting/ScorePosting.h"
 #include "Lucy/Index/Similarity.h"
+#include "Lucy/Util/Json.h"
 
 StringType*
 StringType_new() {
@@ -101,10 +102,10 @@ StringType_Load_IMP(StringType *self, Obj *dump) {
     Obj *sortable_dump   = Hash_Fetch_Utf8(source, "sortable", 8);
     UNUSED_VAR(self);
 
-    float boost    = boost_dump    ? (float)Obj_To_F64(boost_dump) : 1.0f;
-    bool  indexed  = indexed_dump  ? Obj_To_Bool(indexed_dump)     : true;
-    bool  stored   = stored_dump   ? Obj_To_Bool(stored_dump)      : true;
-    bool  sortable = sortable_dump ? Obj_To_Bool(sortable_dump)    : false;
+    float boost    = boost_dump    ? (float)Json_obj_to_f64(boost_dump) : 1.0f;
+    bool  indexed  = indexed_dump  ? Json_obj_to_bool(indexed_dump)     : true;
+    bool  stored   = stored_dump   ? Json_obj_to_bool(stored_dump)      : true;
+    bool  sortable = sortable_dump ? Json_obj_to_bool(sortable_dump)    : false;
 
     return StringType_init2(loaded, boost, indexed, stored, sortable);
 }

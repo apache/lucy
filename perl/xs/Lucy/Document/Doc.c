@@ -19,6 +19,7 @@
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Util/Json.h"
 #include "Clownfish/Util/Memory.h"
 
 lucy_Doc*
@@ -191,7 +192,7 @@ LUCY_Doc_Load_IMP(lucy_Doc *self, cfish_Obj *dump) {
     CFISH_UNUSED_VAR(self);
 
     lucy_DocIVARS *const loaded_ivars = lucy_Doc_IVARS(loaded);
-    loaded_ivars->doc_id = (int32_t)CFISH_Obj_To_I64(doc_id);
+    loaded_ivars->doc_id = (int32_t)lucy_Json_obj_to_i64(doc_id);
     loaded_ivars->fields  = SvREFCNT_inc(SvRV(fields_sv));
     SvREFCNT_dec(fields_sv);
 

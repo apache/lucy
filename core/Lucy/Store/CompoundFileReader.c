@@ -51,7 +51,7 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder) {
     }
     else {
         Obj *format = Hash_Fetch_Utf8(metadata, "format", 6);
-        ivars->format = format ? (int32_t)Obj_To_I64(format) : 0;
+        ivars->format = format ? (int32_t)Json_obj_to_i64(format) : 0;
         ivars->records = (Hash*)INCREF(Hash_Fetch_Utf8(metadata, "files", 5));
         if (ivars->format < 1) {
             error = Err_new(Str_newf("Corrupt %o file: Missing or invalid 'format'",
@@ -206,13 +206,13 @@ CFReader_Local_Open_In_IMP(CompoundFileReader *self, String *name) {
         else if (Str_Get_Size(ivars->path)) {
             String *fullpath = Str_newf("%o/%o", ivars->path, name);
             InStream *instream = InStream_Reopen(ivars->instream, fullpath,
-                                                 Obj_To_I64(offset), Obj_To_I64(len));
+                                                 Json_obj_to_i64(offset), Json_obj_to_i64(len));
             DECREF(fullpath);
             return instream;
         }
         else {
-            return InStream_Reopen(ivars->instream, name, Obj_To_I64(offset),
-                                   Obj_To_I64(len));
+            return InStream_Reopen(ivars->instream, name, Json_obj_to_i64(offset),
+                                   Json_obj_to_i64(len));
         }
     }
 }

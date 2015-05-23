@@ -22,6 +22,7 @@
 #include "Lucy/Analysis/Normalizer.h"
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
+#include "Lucy/Util/Json.h"
 
 #include "utf8proc.h"
 
@@ -154,9 +155,9 @@ Normalizer_Load_IMP(Normalizer *self, Obj *dump) {
     Obj *obj = Hash_Fetch_Utf8(source, "normalization_form", 18);
     String *form = (String*)CERTIFY(obj, STRING);
     obj = Hash_Fetch_Utf8(source, "case_fold", 9);
-    bool case_fold = Obj_To_Bool(CERTIFY(obj, OBJ));
+    bool case_fold = Json_obj_to_bool(CERTIFY(obj, OBJ));
     obj = Hash_Fetch_Utf8(source, "strip_accents", 13);
-    bool strip_accents = Obj_To_Bool(CERTIFY(obj, OBJ));
+    bool strip_accents = Json_obj_to_bool(CERTIFY(obj, OBJ));
 
     return Normalizer_init(loaded, form, case_fold, strip_accents);
 }

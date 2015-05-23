@@ -39,6 +39,7 @@
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/Freezer.h"
+#include "Lucy/Util/Json.h"
 
 // Shared initialization routine which assumes that it's ok to assume control
 // over [field] and [terms], eating their refcounts.
@@ -123,7 +124,7 @@ ProximityQuery_Load_IMP(ProximityQuery *self, Obj *dump) {
     Obj *terms = CERTIFY(Hash_Fetch_Utf8(source, "terms", 5), OBJ);
     loaded_ivars->terms = (Vector*)CERTIFY(Freezer_load(terms), VECTOR);
     Obj *within = CERTIFY(Hash_Fetch_Utf8(source, "within", 6), OBJ);
-    loaded_ivars->within = (uint32_t)Obj_To_I64(within);
+    loaded_ivars->within = (uint32_t)Json_obj_to_i64(within);
     return (Obj*)loaded;
 }
 

@@ -30,6 +30,7 @@
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Util/IndexFileNames.h"
+#include "Lucy/Util/Json.h"
 
 DeletionsReader*
 DelReader_init(DeletionsReader *self, Schema *schema, Folder *folder,
@@ -177,7 +178,7 @@ DefDelReader_Read_Deletions_IMP(DefaultDeletionsReader *self) {
                 Obj *count = (Obj*)CERTIFY(
                                  Hash_Fetch_Utf8(seg_files_data, "count", 5),
                                  OBJ);
-                del_count = (int32_t)Obj_To_I64(count);
+                del_count = (int32_t)Json_obj_to_i64(count);
                 del_file  = (String*)CERTIFY(
                                 Hash_Fetch_Utf8(seg_files_data, "filename", 8),
                                 STRING);

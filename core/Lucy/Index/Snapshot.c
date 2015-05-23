@@ -115,10 +115,10 @@ Snapshot_Read_File_IMP(Snapshot *self, Folder *folder, String *path) {
             = (Hash*)CERTIFY(Json_slurp_json(folder, ivars->path), HASH);
         Obj *format_obj
             = CERTIFY(Hash_Fetch_Utf8(snap_data, "format", 6), OBJ);
-        int32_t format = (int32_t)Obj_To_I64(format_obj);
+        int32_t format = (int32_t)Json_obj_to_i64(format_obj);
         Obj *subformat_obj = Hash_Fetch_Utf8(snap_data, "subformat", 9);
         int32_t subformat = subformat_obj
-                            ? (int32_t)Obj_To_I64(subformat_obj)
+                            ? (int32_t)Json_obj_to_i64(subformat_obj)
                             : 0;
 
         // Verify that we can read the index properly.

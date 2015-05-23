@@ -31,6 +31,7 @@
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Util/Freezer.h"
+#include "Lucy/Util/Json.h"
 
 HighlightReader*
 HLReader_init(HighlightReader *self, Schema *schema, Folder *folder,
@@ -130,9 +131,9 @@ DefHLReader_init(DefaultHighlightReader *self, Schema *schema,
         Obj *format = Hash_Fetch_Utf8(metadata, "format", 6);
         if (!format) { THROW(ERR, "Missing 'format' var"); }
         else {
-            if (Obj_To_I64(format) != HLWriter_current_file_format) {
+            if (Json_obj_to_i64(format) != HLWriter_current_file_format) {
                 THROW(ERR, "Unsupported highlight data format: %i64",
-                      Obj_To_I64(format));
+                      Json_obj_to_i64(format));
             }
         }
     }

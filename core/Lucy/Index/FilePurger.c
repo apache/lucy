@@ -26,6 +26,7 @@
 #include "Lucy/Store/DirHandle.h"
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/Lock.h"
+#include "Lucy/Util/Json.h"
 
 // Place unused files into purgables array and obsolete Snapshots into
 // snapshots array.
@@ -153,7 +154,7 @@ S_zap_dead_merge(FilePurger *self, Hash *candidates) {
                        : NULL;
 
         if (cutoff) {
-            String *cutoff_seg = Seg_num_to_name(Obj_To_I64(cutoff));
+            String *cutoff_seg = Seg_num_to_name(Json_obj_to_i64(cutoff));
             if (Folder_Exists(ivars->folder, cutoff_seg)) {
                 String *merge_json = SSTR_WRAP_UTF8("merge.json", 10);
                 DirHandle *dh = Folder_Open_Dir(ivars->folder, cutoff_seg);
