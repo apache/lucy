@@ -60,11 +60,7 @@ LUCY_Doc_Store_IMP(lucy_Doc *self, cfish_String *field, cfish_Obj *value) {
     const char *key      = CFISH_Str_Get_Ptr8(field);
     size_t      key_size = CFISH_Str_Get_Size(field);
     SV *key_sv = newSVpvn(key, key_size);
-    SV *val_sv = value == NULL
-                 ? newSV(0)
-                 : CFISH_Obj_Is_A(value, CFISH_STRING)
-                 ? XSBind_str_to_sv(aTHX_ (cfish_String*)value)
-                 : (SV*)CFISH_Obj_To_Host(value);
+    SV *val_sv = XSBind_cfish_to_perl(aTHX_ value);
     SvUTF8_on(key_sv);
     (void)hv_store_ent((HV*)ivars->fields, key_sv, val_sv, 0);
     // TODO: make this a thread-local instead of creating it every time?
@@ -155,17 +151,8 @@ LUCY_Doc_Extract_IMP(lucy_Doc *self, cfish_String *field) {
     SV **sv_ptr = hv_fetch((HV*)ivars->fields, CFISH_Str_Get_Ptr8(field),
                            CFISH_Str_Get_Size(field), 0);
 
-    if (sv_ptr && XSBind_sv_defined(aTHX_ *sv_ptr)) {
-        SV *const sv = *sv_ptr;
-        if (sv_isobject(sv) && sv_derived_from(sv, "Clownfish::Obj")) {
-            IV tmp = SvIV(SvRV(sv));
-            retval = CFISH_INCREF(INT2PTR(cfish_Obj*, tmp));
-        }
-        else {
-            STRLEN size;
-            char *ptr = SvPVutf8(sv, size);
-            retval = (cfish_Obj*)cfish_Str_new_wrap_trusted_utf8(ptr, size);
-        }
+    if (sv_ptr) {
+        retval = XSBind_perl_to_cfish(aTHX_ *sv_ptr);
     }
 
     return retval;
