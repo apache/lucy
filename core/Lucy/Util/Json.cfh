@@ -57,6 +57,24 @@ class Lucy::Util::Json inherits Clownfish::Obj {
      */
     inert void
     set_tolerant(bool tolerant);
+
+    /** Extract an integer value from an object that is part of a JSON
+     * structure. Throws an error if the object isn't a String or Num.
+     */
+    inert int64_t
+    obj_to_i64(Obj *obj);
+
+    /** Extract a float value from an object that is part of a JSON
+     * structure. Throws an error if the object isn't a String or Num.
+     */
+    inert double
+    obj_to_f64(Obj *obj);
+
+    /** Extract a bool value from an object that is part of a JSON
+     * structure. Throws an error if the object isn't a String or Num.
+     */
+    inert bool
+    obj_to_bool(Obj *obj);
 }
 
 

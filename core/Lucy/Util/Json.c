@@ -701,3 +701,66 @@ S_set_error(CharBuf *buf, const char *json, const char *limit, int line,
     Err_set_error(Err_new(mess));
 }
 
+int64_t
+Json_obj_to_i64(Obj *obj) {
+    int64_t retval = 0;
+
+    if (!obj) {
+        THROW(ERR, "Can't extract integer from NULL");
+    }
+    else if (Obj_Is_A(obj, STRING)) {
+        retval = Str_To_I64((String*)obj);
+    }
+    else if (Obj_Is_A(obj, NUM)) {
+        retval = Num_To_I64((Num*)obj);
+    }
+    else {
+        THROW(ERR, "Can't extract integer from object of type %o",
+              Obj_Get_Class_Name(obj));
+    }
+
+    return retval;
+}
+
+double
+Json_obj_to_f64(Obj *obj) {
+    double retval = 0;
+
+    if (!obj) {
+        THROW(ERR, "Can't extract float from NULL");
+    }
+    else if (Obj_Is_A(obj, STRING)) {
+        retval = Str_To_F64((String*)obj);
+    }
+    else if (Obj_Is_A(obj, NUM)) {
+        retval = Num_To_F64((Num*)obj);
+    }
+    else {
+        THROW(ERR, "Can't extract float from object of type %o",
+              Obj_Get_Class_Name(obj));
+    }
+
+    return retval;
+}
+
+bool
+Json_obj_to_bool(Obj *obj) {
+    bool retval = false;
+
+    if (!obj) {
+        THROW(ERR, "Can't extract bool from NULL");
+    }
+    else if (Obj_Is_A(obj, STRING)) {
+        retval = (Str_To_I64((String*)obj) != 0);
+    }
+    else if (Obj_Is_A(obj, NUM)) {
+        retval = Num_To_Bool((Num*)obj);
+    }
+    else {
+        THROW(ERR, "Can't extract bool from object of type %o",
+              Obj_Get_Class_Name(obj));
+    }
+
+    return retval;
+}
+
