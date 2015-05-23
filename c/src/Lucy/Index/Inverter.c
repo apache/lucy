@@ -92,27 +92,23 @@ Inverter_Invert_Doc_IMP(Inverter *self, Doc *doc) {
                     break;
                 }
             case FType_INT32: {
-                    int32_t int_val = (int32_t)Obj_To_I64(obj);
                     Integer32* value = (Integer32*)inventry_ivars->value;
-                    Int32_Set_Value(value, int_val);
+                    Int32_Mimic(value, obj);
                     break;
                 }
             case FType_INT64: {
-                    int64_t int_val = Obj_To_I64(obj);
                     Integer64* value = (Integer64*)inventry_ivars->value;
-                    Int64_Set_Value(value, int_val);
+                    Int64_Mimic(value, obj);
                     break;
                 }
             case FType_FLOAT32: {
-                    float float_val = (float)Obj_To_F64(obj);
                     Float32* value = (Float32*)inventry_ivars->value;
-                    Float32_Set_Value(value, float_val);
+                    Float32_Mimic(value, obj);
                     break;
                 }
             case FType_FLOAT64: {
-                    double float_val = Obj_To_F64(obj);
                     Float64* value = (Float64*)inventry_ivars->value;
-                    Float64_Set_Value(value, float_val);
+                    Float64_Mimic(value, obj);
                     break;
                 }
             default:
