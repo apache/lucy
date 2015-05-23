@@ -237,16 +237,15 @@ S_add_vehicle(Indexer *indexer, String *name, int32_t speed, int32_t sloth,
     Doc_Store(doc, home_str, (Obj*)home);
     Doc_Store(doc, cat_str,  (Obj*)cat);
 
-    String *string;
-    string = Str_newf("%i32", speed);
-    Doc_Store(doc, speed_str, (Obj*)string);
-    DECREF(string);
-    string = Str_newf("%i32", sloth);
-    Doc_Store(doc, sloth_str, (Obj*)string);
-    DECREF(string);
-    string = Str_newf("%i32", weight);
-    Doc_Store(doc, weight_str, (Obj*)string);
-    DECREF(string);
+    Integer32 *speed_obj = Int32_new(speed);
+    Doc_Store(doc, speed_str, (Obj*)speed_obj);
+    DECREF(speed_obj);
+    Integer32 *sloth_obj = Int32_new(sloth);
+    Doc_Store(doc, sloth_str, (Obj*)sloth_obj);
+    DECREF(sloth_obj);
+    Integer32 *weight_obj = Int32_new(weight);
+    Doc_Store(doc, weight_str, (Obj*)weight_obj);
+    DECREF(weight_obj);
 
     Indexer_Add_Doc(indexer, doc, 1.0f);
 
@@ -254,13 +253,13 @@ S_add_vehicle(Indexer *indexer, String *name, int32_t speed, int32_t sloth,
 }
 
 static void
-S_add_doc(Indexer *indexer, Obj *name_obj, String *cat, String *field_name) {
+S_add_doc(Indexer *indexer, Obj *value, String *cat, String *field_name) {
     Doc *doc = Doc_new(NULL, 0);
-    String *name = Obj_To_String(name_obj);
+    String *name = Obj_To_String(value);
     Doc_Store(doc, name_str, (Obj*)name);
     Doc_Store(doc, cat_str,  (Obj*)cat);
     if (field_name) {
-        Doc_Store(doc, field_name, (Obj*)name);
+        Doc_Store(doc, field_name, value);
     }
     Indexer_Add_Doc(indexer, doc, 1.0f);
     DECREF(name);
