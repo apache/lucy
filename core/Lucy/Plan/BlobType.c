@@ -18,6 +18,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Plan/BlobType.h"
+#include "Lucy/Util/Json.h"
 
 BlobType*
 BlobType_new(bool stored) {
@@ -107,13 +108,13 @@ BlobType_Load_IMP(BlobType *self, Obj *dump) {
     BlobType_init(loaded, false);
     BlobTypeIVARS *const loaded_ivars = BlobType_IVARS(loaded);
     if (boost_dump) {
-        loaded_ivars->boost = (float)Obj_To_F64(boost_dump);
+        loaded_ivars->boost = (float)Json_obj_to_f64(boost_dump);
     }
     if (indexed_dump) {
-        loaded_ivars->indexed = Obj_To_Bool(indexed_dump);
+        loaded_ivars->indexed = Json_obj_to_bool(indexed_dump);
     }
     if (stored_dump){
-        loaded_ivars->stored = Obj_To_Bool(stored_dump);
+        loaded_ivars->stored = Json_obj_to_bool(stored_dump);
     }
 
     return loaded;

@@ -18,6 +18,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Plan/NumericType.h"
+#include "Lucy/Util/Json.h"
 
 NumericType*
 NumType_init(NumericType *self) {
@@ -108,15 +109,15 @@ NumType_Load_IMP(NumericType *self, Obj *dump) {
 
     // Extract boost.
     Obj *boost_dump = Hash_Fetch_Utf8(source, "boost", 5);
-    float boost = boost_dump ? (float)Obj_To_F64(boost_dump) : 1.0f;
+    float boost = boost_dump ? (float)Json_obj_to_f64(boost_dump) : 1.0f;
 
     // Find boolean properties.
     Obj *indexed_dump = Hash_Fetch_Utf8(source, "indexed", 7);
     Obj *stored_dump  = Hash_Fetch_Utf8(source, "stored", 6);
     Obj *sort_dump    = Hash_Fetch_Utf8(source, "sortable", 8);
-    bool indexed  = indexed_dump ? Obj_To_Bool(indexed_dump) : true;
-    bool stored   = stored_dump  ? Obj_To_Bool(stored_dump)  : true;
-    bool sortable = sort_dump    ? Obj_To_Bool(sort_dump)    : false;
+    bool indexed  = indexed_dump ? Json_obj_to_bool(indexed_dump) : true;
+    bool stored   = stored_dump  ? Json_obj_to_bool(stored_dump)  : true;
+    bool sortable = sort_dump    ? Json_obj_to_bool(sort_dump)    : false;
 
     return NumType_init2(loaded, boost, indexed, stored, sortable);
 }

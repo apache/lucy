@@ -128,7 +128,7 @@ test_offsets(TestBatchRunner *runner) {
         String *file   = HashIter_Get_Key(iter);
         Hash   *stats  = (Hash*)CERTIFY(HashIter_Get_Value(iter), HASH);
         Obj    *offset = CERTIFY(Hash_Fetch_Utf8(stats, "offset", 6), OBJ);
-        int64_t offs   = Obj_To_I64(offset);
+        int64_t offs   = Json_obj_to_i64(offset);
         if (offs % 8 != 0) {
             offsets_ok = false;
             FAIL(runner, "Offset %" PRId64 " for %s not a multiple of 8",

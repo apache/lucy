@@ -113,7 +113,7 @@ Seg_Read_File_IMP(Segment *self, Folder *folder) {
     Obj *count = Hash_Fetch_Utf8(my_metadata, "count", 5);
     if (!count) { count = Hash_Fetch_Utf8(my_metadata, "doc_count", 9); }
     if (!count) { THROW(ERR, "Missing 'count'"); }
-    else { ivars->count = Obj_To_I64(count); }
+    else { ivars->count = Json_obj_to_i64(count); }
 
     // Get list of field nums.
     Vector *source_by_num = (Vector*)Hash_Fetch_Utf8(my_metadata,

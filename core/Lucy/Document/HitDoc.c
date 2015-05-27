@@ -20,6 +20,7 @@
 #include "Lucy/Document/HitDoc.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Util/Json.h"
 
 HitDoc*
 HitDoc_new(void *fields, int32_t doc_id, float score) {
@@ -82,7 +83,7 @@ HitDoc_Load_IMP(HitDoc *self, Obj *dump) {
     HitDoc *loaded = super_load(self, dump);
     HitDocIVARS *const loaded_ivars = HitDoc_IVARS(loaded);
     Obj *score = CERTIFY(Hash_Fetch_Utf8(source, "score", 5), OBJ);
-    loaded_ivars->score = (float)Obj_To_F64(score);
+    loaded_ivars->score = (float)Json_obj_to_f64(score);
     return loaded;
 }
 

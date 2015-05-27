@@ -38,6 +38,7 @@
 #include "Lucy/Search/Query.h"
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Util/Json.h"
 
 DeletionsWriter*
 DelWriter_init(DeletionsWriter *self, Schema *schema, Snapshot *snapshot,
@@ -371,7 +372,7 @@ DefDelWriter_Merge_Segment_IMP(DefaultDeletionsWriter *self,
                          * merge away the most recent deletions file
                          * pointing at this target segment -- so force a
                          * new file to be written out. */
-                        int32_t count = (int32_t)Obj_To_I64(Hash_Fetch_Utf8(mini_meta, "count", 5));
+                        int32_t count = (int32_t)Json_obj_to_i64(Hash_Fetch_Utf8(mini_meta, "count", 5));
                         DeletionsReader *del_reader
                             = (DeletionsReader*)SegReader_Obtain(
                                   candidate, Class_Get_Name(DELETIONSREADER));

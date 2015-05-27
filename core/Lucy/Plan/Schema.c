@@ -336,7 +336,7 @@ Schema_Load_IMP(Schema *self, Obj *dump) {
                     = CERTIFY(Hash_Fetch_Utf8(type_dump, "analyzer", 8), OBJ);
                 Analyzer *analyzer
                     = (Analyzer*)Vec_Fetch(analyzers,
-                                          (uint32_t)Obj_To_I64(tick));
+                                          (uint32_t)Json_obj_to_i64(tick));
                 if (!analyzer) {
                     THROW(ERR, "Can't find analyzer for '%o'", field);
                 }

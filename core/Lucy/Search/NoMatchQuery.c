@@ -26,6 +26,7 @@
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/Freezer.h"
+#include "Lucy/Util/Json.h"
 
 NoMatchQuery*
 NoMatchQuery_new() {
@@ -96,7 +97,7 @@ NoMatchQuery_Load_IMP(NoMatchQuery *self, Obj *dump) {
     NoMatchQuery *loaded = super_load(self, dump);
     Obj *fails = CFISH_Hash_Fetch_Utf8(source, "fails_to_match", 14);
     NoMatchQuery_IVARS(loaded)->fails_to_match
-        = fails ? Obj_To_Bool(fails) : true;
+        = fails ? Json_obj_to_bool(fails) : true;
     return loaded;
 }
 

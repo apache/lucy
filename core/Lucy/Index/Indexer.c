@@ -184,7 +184,7 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
             THROW(ERR, "Background merge detected, but can't read merge data");
         }
         else {
-            int64_t cutoff = Obj_To_I64(cutoff_obj);
+            int64_t cutoff = Json_obj_to_i64(cutoff_obj);
             if (cutoff >= new_seg_num) {
                 new_seg_num = cutoff + 1;
             }
@@ -414,7 +414,7 @@ S_maybe_merge(Indexer *self, Vector *seg_readers) {
         if (merge_data) {
             Obj *cutoff_obj = Hash_Fetch_Utf8(merge_data, "cutoff", 6);
             if (cutoff_obj) {
-                cutoff = Obj_To_I64(cutoff_obj);
+                cutoff = Json_obj_to_i64(cutoff_obj);
             }
             else {
                 cutoff = INT64_MAX;

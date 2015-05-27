@@ -22,6 +22,7 @@
 #include "Lucy/Search/Searcher.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Util/Json.h"
 
 Query*
 Query_init(Query *self, float boost) {
@@ -71,7 +72,7 @@ Query_Load_IMP(Query *self, Obj *dump) {
     Class *klass  = Class_singleton(class_name, NULL);
     Query *loaded = (Query*)Class_Make_Obj(klass);
     Obj *boost = CERTIFY(Hash_Fetch_Utf8(source, "boost", 5), OBJ);
-    Query_IVARS(loaded)->boost = (float)Obj_To_F64(boost);
+    Query_IVARS(loaded)->boost = (float)Json_obj_to_f64(boost);
     return (Obj*)loaded;
 }
 

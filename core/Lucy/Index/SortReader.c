@@ -28,6 +28,7 @@
 #include "Lucy/Plan/Schema.h"
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/InStream.h"
+#include "Lucy/Util/Json.h"
 
 SortReader*
 SortReader_init(SortReader *self, Schema *schema, Folder *folder,
@@ -71,7 +72,7 @@ DefSortReader_init(DefaultSortReader *self, Schema *schema, Folder *folder,
         Obj *format = Hash_Fetch_Utf8(metadata, "format", 6);
         if (!format) { THROW(ERR, "Missing 'format' var"); }
         else {
-            ivars->format = (int32_t)Obj_To_I64(format);
+            ivars->format = (int32_t)Json_obj_to_i64(format);
             if (ivars->format < 2 || ivars->format > 3) {
                 THROW(ERR, "Unsupported sort cache format: %i32",
                       ivars->format);
@@ -160,7 +161,7 @@ S_lazy_init_sort_cache(DefaultSortReader *self, String *field) {
 
     // See if we have any values.
     Obj *count_obj = Hash_Fetch(ivars->counts, field);
-    int32_t count = count_obj ? (int32_t)Obj_To_I64(count_obj) : 0;
+    int32_t count = count_obj ? (int32_t)Json_obj_to_i64(count_obj) : 0;
     if (!count) { return NULL; }
 
     // Get a FieldType and sanity check that the field is sortable.
@@ -205,10 +206,10 @@ S_lazy_init_sort_cache(DefaultSortReader *self, String *field) {
     }
 
     Obj     *null_ord_obj = Hash_Fetch(ivars->null_ords, field);
-    int32_t  null_ord = null_ord_obj ? (int32_t)Obj_To_I64(null_ord_obj) : -1;
+    int32_t  null_ord = null_ord_obj ? (int32_t)Json_obj_to_i64(null_ord_obj) : -1;
     Obj     *ord_width_obj = Hash_Fetch(ivars->ord_widths, field);
     int32_t  ord_width = ord_width_obj
-                         ? (int32_t)Obj_To_I64(ord_width_obj)
+                         ? (int32_t)Json_obj_to_i64(ord_width_obj)
                          : S_calc_ord_width(count);
     int32_t  doc_max = (int32_t)Seg_Get_Count(segment);
 

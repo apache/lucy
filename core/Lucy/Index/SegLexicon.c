@@ -31,6 +31,7 @@
 #include "Lucy/Plan/Schema.h"
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/InStream.h"
+#include "Lucy/Util/Json.h"
 
 // Iterate until the state is greater than or equal to the target.
 static void
@@ -63,9 +64,9 @@ SegLex_init(SegLexicon *self, Schema *schema, Folder *folder,
     // Check format.
     if (!format) { THROW(ERR, "Missing 'format'"); }
     else {
-        if (Obj_To_I64(format) > LexWriter_current_file_format) {
+        if (Json_obj_to_i64(format) > LexWriter_current_file_format) {
             THROW(ERR, "Unsupported lexicon format: %i64",
-                  Obj_To_I64(format));
+                  Json_obj_to_i64(format));
         }
     }
 
@@ -73,7 +74,7 @@ SegLex_init(SegLexicon *self, Schema *schema, Folder *folder,
     if (!counts) { THROW(ERR, "Failed to extract 'counts'"); }
     else {
         Obj *count = CERTIFY(Hash_Fetch(counts, field), OBJ);
-        ivars->size = (int32_t)Obj_To_I64(count);
+        ivars->size = (int32_t)Json_obj_to_i64(count);
     }
 
     // Assign.

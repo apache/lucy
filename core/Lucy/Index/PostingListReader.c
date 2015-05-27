@@ -29,6 +29,7 @@
 #include "Lucy/Plan/FieldType.h"
 #include "Lucy/Plan/Schema.h"
 #include "Lucy/Store/Folder.h"
+#include "Lucy/Util/Json.h"
 
 PostingListReader*
 PListReader_init(PostingListReader *self, Schema *schema, Folder *folder,
@@ -80,9 +81,9 @@ DefPListReader_init(DefaultPostingListReader *self, Schema *schema,
         Obj *format = Hash_Fetch_Utf8(my_meta, "format", 6);
         if (!format) { THROW(ERR, "Missing 'format' var"); }
         else {
-            if (Obj_To_I64(format) != PListWriter_current_file_format) {
+            if (Json_obj_to_i64(format) != PListWriter_current_file_format) {
                 THROW(ERR, "Unsupported postings format: %i64",
-                      Obj_To_I64(format));
+                      Json_obj_to_i64(format));
             }
         }
     }

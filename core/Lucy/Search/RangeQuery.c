@@ -31,6 +31,7 @@
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/Freezer.h"
+#include "Lucy/Util/Json.h"
 
 // Determine the lowest ordinal that should match.
 static int32_t
@@ -203,10 +204,10 @@ RangeQuery_Load_IMP(RangeQuery *self, Obj *dump) {
     }
     Obj *include_lower
         = CERTIFY(Hash_Fetch_Utf8(source, "include_lower", 13), OBJ);
-    loaded_ivars->include_lower = Obj_To_Bool(include_lower);
+    loaded_ivars->include_lower = Json_obj_to_bool(include_lower);
     Obj *include_upper
         = CERTIFY(Hash_Fetch_Utf8(source, "include_upper", 13), OBJ);
-    loaded_ivars->include_upper = Obj_To_Bool(include_upper);
+    loaded_ivars->include_upper = Json_obj_to_bool(include_upper);
     return (Obj*)loaded;
 }
 
