@@ -183,7 +183,7 @@ void
 Inverter_Clear_IMP(Inverter *self) {
     InverterIVARS *const ivars = Inverter_IVARS(self);
     for (uint32_t i = 0, max = Vec_Get_Size(ivars->entries); i < max; i++) {
-        InvEntry_Clear(Vec_Fetch(ivars->entries, i));
+        InvEntry_Clear((InverterEntry*)Vec_Fetch(ivars->entries, i));
     }
     Vec_Clear(ivars->entries);
     ivars->tick = -1;
