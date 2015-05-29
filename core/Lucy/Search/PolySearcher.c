@@ -48,14 +48,14 @@ PolySearcher_init(PolySearcher *self, Schema *schema, Vector *searchers) {
         Searcher *searcher
             = (Searcher*)CERTIFY(Vec_Fetch(searchers, i), SEARCHER);
         Schema *candidate       = Searcher_Get_Schema(searcher);
-        Class  *orig_class      = Schema_Get_Class(schema);
-        Class  *candidate_class = Schema_Get_Class(candidate);
+        Class  *orig_class      = Schema_get_class(schema);
+        Class  *candidate_class = Schema_get_class(candidate);
 
         // Confirm that searchers all use the same schema.
         if (orig_class != candidate_class) {
             THROW(ERR, "Conflicting schemas: '%o', '%o'",
-                  Schema_Get_Class_Name(schema),
-                  Schema_Get_Class_Name(candidate));
+                  Schema_get_class_name(schema),
+                  Schema_get_class_name(candidate));
         }
 
         // Derive doc_max and relative start offsets.
@@ -135,7 +135,7 @@ PolySearcher_Top_Docs_IMP(PolySearcher *self, Query *query,
                             ? HitQ_new(schema, sort_spec, num_wanted)
                             : HitQ_new(NULL, NULL, num_wanted);
     uint32_t  total_hits  = 0;
-    Compiler *compiler    = Query_Is_A(query, COMPILER)
+    Compiler *compiler    = Query_is_a(query, COMPILER)
                             ? ((Compiler*)INCREF(query))
                             : Query_Make_Compiler(query, (Searcher*)self,
                                                   Query_Get_Boost(query),

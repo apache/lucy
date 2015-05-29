@@ -45,7 +45,7 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder) {
     Folder_init((Folder*)self, Folder_Get_Path(folder));
 
     // Parse metadata file.
-    if (!metadata || !Hash_Is_A(metadata, HASH)) {
+    if (!metadata || !Hash_is_a(metadata, HASH)) {
         error = Err_new(Str_newf("Can't read '%o' in '%o'", cfmeta_file,
                                  Folder_Get_Path(folder)));
     }

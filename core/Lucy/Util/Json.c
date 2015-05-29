@@ -143,9 +143,9 @@ Json_spew_json(Obj *dump, Folder *folder, String *path) {
 String*
 Json_to_json(Obj *dump) {
     // Validate object type, only allowing hashes and arrays per JSON spec.
-    if (!dump || !(Obj_Is_A(dump, HASH) || Obj_Is_A(dump, VECTOR))) {
+    if (!dump || !(Obj_is_a(dump, HASH) || Obj_is_a(dump, VECTOR))) {
         if (!tolerant) {
-            String *class_name = dump ? Obj_Get_Class_Name(dump) : NULL;
+            String *class_name = dump ? Obj_get_class_name(dump) : NULL;
             String *mess = MAKE_MESS("Illegal top-level object type: %o",
                                      class_name);
             Err_set_error(Err_new(mess));
@@ -278,16 +278,16 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
     else if (dump == (Obj*)CFISH_FALSE) {
         CB_Cat_Trusted_Utf8(buf, "false", 5);
     }
-    else if (Obj_Is_A(dump, STRING)) {
+    else if (Obj_is_a(dump, STRING)) {
         S_append_json_string((String*)dump, buf);
     }
-    else if (Obj_Is_A(dump, INTNUM)) {
+    else if (Obj_is_a(dump, INTNUM)) {
         CB_catf(buf, "%i64", IntNum_To_I64((IntNum*)dump));
     }
-    else if (Obj_Is_A(dump, FLOATNUM)) {
+    else if (Obj_is_a(dump, FLOATNUM)) {
         CB_catf(buf, "%f64", FloatNum_To_F64((FloatNum*)dump));
     }
-    else if (Obj_Is_A(dump, VECTOR)) {
+    else if (Obj_is_a(dump, VECTOR)) {
         Vector *array = (Vector*)dump;
         size_t size = Vec_Get_Size(array);
         if (size == 0) {
@@ -297,7 +297,7 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
         }
         else if (size == 1) {
             Obj *elem = Vec_Fetch(array, 0);
-            if (!(Obj_Is_A(elem, HASH) || Obj_Is_A(elem, VECTOR))) {
+            if (!(Obj_is_a(elem, HASH) || Obj_is_a(elem, VECTOR))) {
                 // Put array containing single scalar element on one line.
                 CB_Cat_Trusted_Utf8(buf, "[", 1);
                 if (!S_to_json(elem, buf, depth + 1)) {
@@ -323,7 +323,7 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
         S_cat_whitespace(buf, depth);
         CB_Cat_Trusted_Utf8(buf, "]", 1);
     }
-    else if (Obj_Is_A(dump, HASH)) {
+    else if (Obj_is_a(dump, HASH)) {
         Hash *hash = (Hash*)dump;
         size_t size = Hash_Get_Size(hash);
 
@@ -337,9 +337,9 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
         Vector *keys = Hash_Keys(hash);
         for (size_t i = 0; i < size; i++) {
             Obj *key = Vec_Fetch(keys, i);
-            if (!key || !Obj_Is_A(key, STRING)) {
+            if (!key || !Obj_is_a(key, STRING)) {
                 DECREF(keys);
-                String *key_class = key ? Obj_Get_Class_Name(key) : NULL;
+                String *key_class = key ? Obj_get_class_name(key) : NULL;
                 String *mess = MAKE_MESS("Illegal key type: %o", key_class);
                 Err_set_error(Err_new(mess));
                 return false;
@@ -708,15 +708,15 @@ Json_obj_to_i64(Obj *obj) {
     if (!obj) {
         THROW(ERR, "Can't extract integer from NULL");
     }
-    else if (Obj_Is_A(obj, STRING)) {
+    else if (Obj_is_a(obj, STRING)) {
         retval = Str_To_I64((String*)obj);
     }
-    else if (Obj_Is_A(obj, NUM)) {
+    else if (Obj_is_a(obj, NUM)) {
         retval = Num_To_I64((Num*)obj);
     }
     else {
         THROW(ERR, "Can't extract integer from object of type %o",
-              Obj_Get_Class_Name(obj));
+              Obj_get_class_name(obj));
     }
 
     return retval;
@@ -729,15 +729,15 @@ Json_obj_to_f64(Obj *obj) {
     if (!obj) {
         THROW(ERR, "Can't extract float from NULL");
     }
-    else if (Obj_Is_A(obj, STRING)) {
+    else if (Obj_is_a(obj, STRING)) {
         retval = Str_To_F64((String*)obj);
     }
-    else if (Obj_Is_A(obj, NUM)) {
+    else if (Obj_is_a(obj, NUM)) {
         retval = Num_To_F64((Num*)obj);
     }
     else {
         THROW(ERR, "Can't extract float from object of type %o",
-              Obj_Get_Class_Name(obj));
+              Obj_get_class_name(obj));
     }
 
     return retval;
@@ -750,15 +750,15 @@ Json_obj_to_bool(Obj *obj) {
     if (!obj) {
         THROW(ERR, "Can't extract bool from NULL");
     }
-    else if (Obj_Is_A(obj, STRING)) {
+    else if (Obj_is_a(obj, STRING)) {
         retval = (Str_To_I64((String*)obj) != 0);
     }
-    else if (Obj_Is_A(obj, NUM)) {
+    else if (Obj_is_a(obj, NUM)) {
         retval = Num_To_Bool((Num*)obj);
     }
     else {
         THROW(ERR, "Can't extract bool from object of type %o",
-              Obj_Get_Class_Name(obj));
+              Obj_get_class_name(obj));
     }
 
     return retval;

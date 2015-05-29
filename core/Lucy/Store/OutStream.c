@@ -57,20 +57,20 @@ OutStream_do_open(OutStream *self, Obj *file) {
     ivars->buf_pos     = 0;
 
     // Obtain a FileHandle.
-    if (Obj_Is_A(file, FILEHANDLE)) {
+    if (Obj_is_a(file, FILEHANDLE)) {
         ivars->file_handle = (FileHandle*)INCREF(file);
     }
-    else if (Obj_Is_A(file, RAMFILE)) {
+    else if (Obj_is_a(file, RAMFILE)) {
         ivars->file_handle
             = (FileHandle*)RAMFH_open(NULL, FH_WRITE_ONLY, (RAMFile*)file);
     }
-    else if (Obj_Is_A(file, STRING)) {
+    else if (Obj_is_a(file, STRING)) {
         ivars->file_handle = (FileHandle*)FSFH_open((String*)file,
                                                     FH_WRITE_ONLY | FH_CREATE | FH_EXCLUSIVE);
     }
     else {
         Err_set_error(Err_new(Str_newf("Invalid type for param 'file': '%o'",
-                                       Obj_Get_Class_Name(file))));
+                                       Obj_get_class_name(file))));
         DECREF(self);
         return NULL;
     }

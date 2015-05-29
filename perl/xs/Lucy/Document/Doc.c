@@ -165,7 +165,7 @@ LUCY_Doc_Dump_IMP(lucy_Doc *self) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     cfish_Hash *dump = cfish_Hash_new(0);
     CFISH_Hash_Store_Utf8(dump, "_class", 6,
-                          (cfish_Obj*)CFISH_Str_Clone(LUCY_Doc_Get_Class_Name(self)));
+                          (cfish_Obj*)CFISH_Str_Clone(lucy_Doc_get_class_name(self)));
     CFISH_Hash_Store_Utf8(dump, "doc_id", 7,
                           (cfish_Obj*)cfish_Str_newf("%i32", ivars->doc_id));
     CFISH_Hash_Store_Utf8(dump, "fields", 6,
@@ -202,7 +202,7 @@ LUCY_Doc_Load_IMP(lucy_Doc *self, cfish_Obj *dump) {
 bool
 LUCY_Doc_Equals_IMP(lucy_Doc *self, cfish_Obj *other) {
     if ((lucy_Doc*)other  == self)        { return true;  }
-    if (!CFISH_Obj_Is_A(other, LUCY_DOC)) { return false; }
+    if (!cfish_Obj_is_a(other, LUCY_DOC)) { return false; }
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     lucy_DocIVARS *const ovars = lucy_Doc_IVARS((lucy_Doc*)other);
 

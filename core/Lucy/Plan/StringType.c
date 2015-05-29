@@ -82,7 +82,7 @@ Hash*
 StringType_Dump_IMP(StringType *self) {
     Hash *dump = StringType_Dump_For_Schema(self);
     Hash_Store_Utf8(dump, "_class", 6,
-                    (Obj*)Str_Clone(StringType_Get_Class_Name(self)));
+                    (Obj*)Str_Clone(StringType_get_class_name(self)));
     DECREF(Hash_Delete_Utf8(dump, "type", 4));
     return dump;
 }
@@ -92,7 +92,7 @@ StringType_Load_IMP(StringType *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     String *class_name = (String*)Hash_Fetch_Utf8(source, "_class", 6);
     Class *klass
-        = (class_name != NULL && Obj_Is_A((Obj*)class_name, STRING))
+        = (class_name != NULL && Obj_is_a((Obj*)class_name, STRING))
           ? Class_singleton(class_name, NULL)
           : STRINGTYPE;
     StringType *loaded   = (StringType*)Class_Make_Obj(klass);

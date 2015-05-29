@@ -67,7 +67,7 @@ test_metadata_storage(TestBatchRunner *runner) {
     got = (String*)Seg_Fetch_Metadata_Utf8(segment, "foo", 3);
     TEST_TRUE(runner,
               got
-              && Str_Is_A(got, STRING)
+              && Str_is_a(got, STRING)
               && Str_Equals_Utf8(got, "bar", 3),
               "metadata round trip"
              );
@@ -146,7 +146,7 @@ test_Write_File_and_Read_File(TestBatchRunner *runner) {
     meta = (String*)Seg_Fetch_Metadata_Utf8(got, "foo", 3);
     TEST_TRUE(runner,
               meta
-              && Str_Is_A(meta, STRING)
+              && Str_is_a(meta, STRING)
               && Str_Equals_Utf8(meta, "bar", 3),
               "Round trip metadata through file");
 

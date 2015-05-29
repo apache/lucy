@@ -57,7 +57,7 @@ CaseFolder_Transform_Text_IMP(CaseFolder *self, String *text) {
 bool
 CaseFolder_Equals_IMP(CaseFolder *self, Obj *other) {
     if ((CaseFolder*)other == self)   { return true; }
-    if (!Obj_Is_A(other, CASEFOLDER)) { return false; }
+    if (!Obj_is_a(other, CASEFOLDER)) { return false; }
     return true;
 }
 

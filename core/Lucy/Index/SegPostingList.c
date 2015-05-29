@@ -260,7 +260,7 @@ SegPList_Seek_Lex_IMP(SegPostingList *self, Lexicon *lexicon) {
     SegLexicon *const seg_lexicon = (SegLexicon*)lexicon;
 
     // Optimized case.
-    if (Obj_Is_A((Obj*)lexicon, SEGLEXICON)
+    if (Obj_is_a((Obj*)lexicon, SEGLEXICON)
         && (SegLex_Get_Segment(seg_lexicon)
             == PListReader_Get_Segment(ivars->plist_reader)) // i.e. same segment
        ) {

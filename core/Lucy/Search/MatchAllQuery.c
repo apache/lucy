@@ -42,7 +42,7 @@ MatchAllQuery_init(MatchAllQuery *self) {
 
 bool
 MatchAllQuery_Equals_IMP(MatchAllQuery *self, Obj *other) {
-    if (!Obj_Is_A(other, MATCHALLQUERY)) { return false; }
+    if (!Obj_is_a(other, MATCHALLQUERY)) { return false; }
     MatchAllQueryIVARS *const ivars = MatchAllQuery_IVARS(self);
     MatchAllQueryIVARS *const ovars = MatchAllQuery_IVARS((MatchAllQuery*)other);
     if (ivars->boost != ovars->boost)    { return false; }

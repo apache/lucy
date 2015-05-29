@@ -81,7 +81,7 @@ test_stemming(TestBatchRunner *runner) {
             String *stem  = (String*)Vec_Fetch(got, 0);
             TEST_TRUE(runner,
                       stem
-                      && Str_Is_A(stem, STRING)
+                      && Str_is_a(stem, STRING)
                       && Str_Equals(stem, Vec_Fetch(stems, i)),
                       "Stem %s: %s", Str_Get_Ptr8(iso), Str_Get_Ptr8(word)
                      );

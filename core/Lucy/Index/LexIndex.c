@@ -154,15 +154,15 @@ LexIndex_Seek_IMP(LexIndex *self, Obj *target) {
         return;
     }
     else {
-        if (!Obj_Is_A(target, STRING)) {
+        if (!Obj_is_a(target, STRING)) {
             THROW(ERR, "Target is a %o, and not comparable to a %o",
-                  Obj_Get_Class_Name(target), Class_Get_Name(STRING));
+                  Obj_get_class_name(target), Class_Get_Name(STRING));
         }
         /* TODO:
         Obj *first_obj = Vec_Fetch(terms, 0);
-        if (!Obj_Is_A(target, Obj_Get_Class(first_obj))) {
+        if (!Obj_is_a(target, Obj_get_class(first_obj))) {
             THROW(ERR, "Target is a %o, and not comparable to a %o",
-                Obj_Get_Class_Name(target), Obj_Get_Class_Name(first_obj));
+                Obj_get_class_name(target), Obj_get_class_name(first_obj));
         }
         */
     }

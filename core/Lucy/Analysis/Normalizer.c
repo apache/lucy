@@ -165,7 +165,7 @@ Normalizer_Load_IMP(Normalizer *self, Obj *dump) {
 bool
 Normalizer_Equals_IMP(Normalizer *self, Obj *other) {
     if ((Normalizer*)other == self)       { return true; }
-    if (!Obj_Is_A(other, NORMALIZER))     { return false; }
+    if (!Obj_is_a(other, NORMALIZER))     { return false; }
     NormalizerIVARS *const ivars = Normalizer_IVARS(self);
     NormalizerIVARS *const ovars = Normalizer_IVARS((Normalizer*)other);
     if (ovars->options != ivars->options) { return false; }

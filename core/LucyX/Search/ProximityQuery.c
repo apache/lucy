@@ -131,7 +131,7 @@ ProximityQuery_Load_IMP(ProximityQuery *self, Obj *dump) {
 bool
 ProximityQuery_Equals_IMP(ProximityQuery *self, Obj *other) {
     if ((ProximityQuery*)other == self)   { return true; }
-    if (!Obj_Is_A(other, PROXIMITYQUERY)) { return false; }
+    if (!Obj_is_a(other, PROXIMITYQUERY)) { return false; }
     ProximityQueryIVARS *const ivars = ProximityQuery_IVARS(self);
     ProximityQueryIVARS *const ovars
         = ProximityQuery_IVARS((ProximityQuery*)other);
@@ -284,7 +284,7 @@ ProximityCompiler_Deserialize_IMP(ProximityCompiler *self,
 bool
 ProximityCompiler_Equals_IMP(ProximityCompiler *self, Obj *other) {
     if ((ProximityCompiler*)other == self)        { return true; }
-    if (!Obj_Is_A(other, PROXIMITYCOMPILER))      { return false; }
+    if (!Obj_is_a(other, PROXIMITYCOMPILER))      { return false; }
     ProximityCompiler_Equals_t super_equals
         = (ProximityCompiler_Equals_t)SUPER_METHOD_PTR(PROXIMITYCOMPILER,
                                                        LUCY_ProximityCompiler_Equals);
@@ -335,7 +335,7 @@ ProximityCompiler_Make_Matcher_IMP(ProximityCompiler *self, SegReader *reader,
     // Bail unless field is valid and posting type supports positions.
     Similarity *sim     = ProximityCompiler_Get_Similarity(self);
     Posting    *posting = Sim_Make_Posting(sim);
-    if (posting == NULL || !Obj_Is_A((Obj*)posting, SCOREPOSTING)) {
+    if (posting == NULL || !Obj_is_a((Obj*)posting, SCOREPOSTING)) {
         DECREF(posting);
         return NULL;
     }

@@ -63,7 +63,7 @@ FullTextType_Destroy_IMP(FullTextType *self) {
 bool
 FullTextType_Equals_IMP(FullTextType *self, Obj *other) {
     if ((FullTextType*)other == self)                     { return true; }
-    if (!Obj_Is_A(other, FULLTEXTTYPE))                   { return false; }
+    if (!Obj_is_a(other, FULLTEXTTYPE))                   { return false; }
     FullTextTypeIVARS *const ivars = FullTextType_IVARS(self);
     FullTextTypeIVARS *const ovars = FullTextType_IVARS((FullTextType*)other);
     FullTextType_Equals_t super_equals
@@ -109,7 +109,7 @@ FullTextType_Dump_IMP(FullTextType *self) {
     FullTextTypeIVARS *const ivars = FullTextType_IVARS(self);
     Hash *dump = FullTextType_Dump_For_Schema(self);
     Hash_Store_Utf8(dump, "_class", 6,
-                    (Obj*)Str_Clone(FullTextType_Get_Class_Name(self)));
+                    (Obj*)Str_Clone(FullTextType_get_class_name(self)));
     Hash_Store_Utf8(dump, "analyzer", 8,
                     (Obj*)Analyzer_Dump(ivars->analyzer));
     DECREF(Hash_Delete_Utf8(dump, "type", 4));
@@ -123,7 +123,7 @@ FullTextType_Load_IMP(FullTextType *self, Obj *dump) {
     Hash *source = (Hash*)CERTIFY(dump, HASH);
     String *class_name = (String*)Hash_Fetch_Utf8(source, "_class", 6);
     Class *klass
-        = (class_name != NULL && Obj_Is_A((Obj*)class_name, STRING))
+        = (class_name != NULL && Obj_is_a((Obj*)class_name, STRING))
           ? Class_singleton(class_name, NULL)
           : FULLTEXTTYPE;
     FullTextType *loaded = (FullTextType*)Class_Make_Obj(klass);
@@ -146,11 +146,11 @@ FullTextType_Load_IMP(FullTextType *self, Obj *dump) {
     Obj *analyzer_dump = Hash_Fetch_Utf8(source, "analyzer", 8);
     Analyzer *analyzer = NULL;
     if (analyzer_dump) {
-        if (Obj_Is_A(analyzer_dump, ANALYZER)) {
+        if (Obj_is_a(analyzer_dump, ANALYZER)) {
             // Schema munged the dump and installed a shared analyzer.
             analyzer = (Analyzer*)INCREF(analyzer_dump);
         }
-        else if (Obj_Is_A((Obj*)analyzer_dump, HASH)) {
+        else if (Obj_is_a((Obj*)analyzer_dump, HASH)) {
             analyzer = (Analyzer*)Freezer_load(analyzer_dump);
         }
     }

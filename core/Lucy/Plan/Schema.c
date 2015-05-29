@@ -89,7 +89,7 @@ S_add_unique(Vector *array, Obj *elem) {
         Obj *candidate = Vec_Fetch(array, i);
         if (!candidate) { continue; }
         if (elem == candidate) { return; }
-        if (Obj_Get_Class(elem) == Obj_Get_Class(candidate)) {
+        if (Obj_get_class(elem) == Obj_get_class(candidate)) {
             if (Obj_Equals(elem, candidate)) { return; }
         }
     }
@@ -99,7 +99,7 @@ S_add_unique(Vector *array, Obj *elem) {
 bool
 Schema_Equals_IMP(Schema *self, Obj *other) {
     if ((Schema*)other == self)                         { return true; }
-    if (!Obj_Is_A(other, SCHEMA))                       { return false; }
+    if (!Obj_is_a(other, SCHEMA))                       { return false; }
     SchemaIVARS *const ivars = Schema_IVARS(self);
     SchemaIVARS *const ovars = Schema_IVARS((Schema*)other);
     if (!Arch_Equals(ivars->arch, (Obj*)ovars->arch))   { return false; }
@@ -124,16 +124,16 @@ Schema_Spec_Field_IMP(Schema *self, String *field, FieldType *type) {
         else { THROW(ERR, "'%o' assigned conflicting FieldType", field); }
     }
 
-    if (FType_Is_A(type, FULLTEXTTYPE)) {
+    if (FType_is_a(type, FULLTEXTTYPE)) {
         S_add_text_field(self, field, type);
     }
-    else if (FType_Is_A(type, STRINGTYPE)) {
+    else if (FType_is_a(type, STRINGTYPE)) {
         S_add_string_field(self, field, type);
     }
-    else if (FType_Is_A(type, BLOBTYPE)) {
+    else if (FType_is_a(type, BLOBTYPE)) {
         S_add_blob_field(self, field, type);
     }
-    else if (FType_Is_A(type, NUMERICTYPE)) {
+    else if (FType_is_a(type, NUMERICTYPE)) {
         S_add_numeric_field(self, field, type);
     }
     else {
@@ -237,7 +237,7 @@ S_find_in_array(Vector *array, Obj *obj) {
             return i;
         }
         else if (obj != NULL && candidate != NULL) {
-            if (Obj_Get_Class(obj) == Obj_Get_Class(candidate)) {
+            if (Obj_get_class(obj) == Obj_get_class(candidate)) {
                 if (Obj_Equals(obj, candidate)) {
                     return i;
                 }
@@ -256,7 +256,7 @@ Schema_Dump_IMP(Schema *self) {
 
     // Record class name, store dumps of unique Analyzers.
     Hash_Store_Utf8(dump, "_class", 6,
-                    (Obj*)Str_Clone(Schema_Get_Class_Name(self)));
+                    (Obj*)Str_Clone(Schema_get_class_name(self)));
     Hash_Store_Utf8(dump, "analyzers", 9,
                     Freezer_dump((Obj*)ivars->uniq_analyzers));
 
@@ -266,7 +266,7 @@ Schema_Dump_IMP(Schema *self) {
     while (HashIter_Next(iter)) {
         String    *field      = HashIter_Get_Key(iter);
         FieldType *type       = (FieldType*)HashIter_Get_Value(iter);
-        Class     *type_class = FType_Get_Class(type);
+        Class     *type_class = FType_get_class(type);
 
         // Dump known types to simplified format.
         if (type_class == FULLTEXTTYPE) {
@@ -404,9 +404,9 @@ Schema_Load_IMP(Schema *self, Obj *dump) {
 
 void
 Schema_Eat_IMP(Schema *self, Schema *other) {
-    if (!Schema_Is_A(self, Schema_Get_Class(other))) {
+    if (!Schema_is_a(self, Schema_get_class(other))) {
         THROW(ERR, "%o not a descendent of %o",
-              Schema_Get_Class_Name(self), Schema_Get_Class_Name(other));
+              Schema_get_class_name(self), Schema_get_class_name(other));
     }
 
     SchemaIVARS *const ovars = Schema_IVARS(other);

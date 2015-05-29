@@ -79,7 +79,7 @@ RangeQuery_Destroy_IMP(RangeQuery *self) {
 bool
 RangeQuery_Equals_IMP(RangeQuery *self, Obj *other) {
     if ((RangeQuery*)other == self)                    { return true; }
-    if (!Obj_Is_A(other, RANGEQUERY))                  { return false; }
+    if (!Obj_is_a(other, RANGEQUERY))                  { return false; }
     RangeQueryIVARS *const ivars = RangeQuery_IVARS(self);
     RangeQueryIVARS *const ovars = RangeQuery_IVARS((RangeQuery*)other);
     if (ivars->boost != ovars->boost)                  { return false; }

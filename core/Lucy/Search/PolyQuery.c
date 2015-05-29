@@ -117,7 +117,7 @@ PolyQuery_Load_IMP(PolyQuery *self, Obj *dump) {
 bool
 PolyQuery_Equals_IMP(PolyQuery *self, Obj *other) {
     if ((PolyQuery*)other == self)                          { return true; }
-    if (!Obj_Is_A(other, POLYQUERY))                        { return false; }
+    if (!Obj_is_a(other, POLYQUERY))                        { return false; }
     PolyQueryIVARS *const ivars = PolyQuery_IVARS(self);
     PolyQueryIVARS *const ovars = PolyQuery_IVARS((PolyQuery*)other);
     if (ivars->boost != ovars->boost)                       { return false; }
@@ -203,7 +203,7 @@ PolyCompiler_Highlight_Spans_IMP(PolyCompiler *self, Searcher *searcher,
 void
 PolyCompiler_Serialize_IMP(PolyCompiler *self, OutStream *outstream) {
     PolyCompilerIVARS *const ivars = PolyCompiler_IVARS(self);
-    Freezer_serialize_string(PolyCompiler_Get_Class_Name(self), outstream);
+    Freezer_serialize_string(PolyCompiler_get_class_name(self), outstream);
     Freezer_serialize_varray(ivars->children, outstream);
     PolyCompiler_Serialize_t super_serialize
         = SUPER_METHOD_PTR(POLYCOMPILER, LUCY_PolyCompiler_Serialize);

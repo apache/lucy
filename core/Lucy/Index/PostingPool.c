@@ -485,7 +485,7 @@ PostPool_Refill_IMP(PostingPool *self) {
             if (Lex_Next(lexicon)) {
                 ivars->post_count = Lex_Doc_Freq(lexicon);
                 term_text = (String*)Lex_Get_Term(lexicon);
-                if (term_text && !Obj_Is_A((Obj*)term_text, STRING)) {
+                if (term_text && !Obj_is_a((Obj*)term_text, STRING)) {
                     THROW(ERR, "Only String terms are supported for now");
                 }
                 Posting *posting = PList_Get_Posting(plist);

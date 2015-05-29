@@ -74,7 +74,7 @@ IxReader_Close_IMP(IndexReader *self) {
         HashIterator *iter = HashIter_new(ivars->components);
         while (HashIter_Next(iter)) {
             DataReader *component = (DataReader*)HashIter_Get_Value(iter);
-            if (Obj_Is_A((Obj*)component, DATAREADER)) {
+            if (Obj_is_a((Obj*)component, DATAREADER)) {
                 DataReader_Close(component);
             }
         }

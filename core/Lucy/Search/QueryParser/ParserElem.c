@@ -52,7 +52,7 @@ ParserElem_Set_Value_IMP(ParserElem *self, Obj *value) {
 Obj*
 ParserElem_As_IMP(ParserElem *self, Class *klass) {
     ParserElemIVARS *const ivars = ParserElem_IVARS(self);
-    if (ivars->value && Obj_Is_A(ivars->value, klass)) {
+    if (ivars->value && Obj_is_a(ivars->value, klass)) {
         return ivars->value;
     }
     return NULL;

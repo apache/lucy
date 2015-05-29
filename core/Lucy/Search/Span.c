@@ -68,7 +68,7 @@ Span_Set_Weight_IMP(Span *self, float weight) {
 bool
 Span_Equals_IMP(Span *self, Obj *other) {
     if (self == (Span*)other)         { return true; }
-    if (!Obj_Is_A(other, SPAN))       { return false; }
+    if (!Obj_is_a(other, SPAN))       { return false; }
     SpanIVARS *const ivars = Span_IVARS(self);
     SpanIVARS *const ovars = Span_IVARS((Span*)other);
     if (ivars->offset != ovars->offset) { return false; }

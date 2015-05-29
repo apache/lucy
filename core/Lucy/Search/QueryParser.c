@@ -659,13 +659,13 @@ S_compose_subquery(QueryParser *self, Vector *elems, bool enclosed) {
 
 static bool
 S_has_valid_clauses(Query *query) {
-    if (Query_Is_A(query, NOTQUERY)) {
+    if (Query_is_a(query, NOTQUERY)) {
         return false;
     }
-    else if (Query_Is_A(query, MATCHALLQUERY)) {
+    else if (Query_is_a(query, MATCHALLQUERY)) {
         return false;
     }
-    else if (Query_Is_A(query, ORQUERY) || Query_Is_A(query, ANDQUERY)) {
+    else if (Query_is_a(query, ORQUERY) || Query_is_a(query, ANDQUERY)) {
         PolyQuery *polyquery = (PolyQuery*)query;
         Vector    *children  = PolyQuery_Get_Children(polyquery);
         for (uint32_t i = 0, max = Vec_Get_Size(children); i < max; i++) {
@@ -681,11 +681,11 @@ S_has_valid_clauses(Query *query) {
 
 static void
 S_do_prune(QueryParser *self, Query *query) {
-    if (Query_Is_A(query, NOTQUERY)) {
+    if (Query_is_a(query, NOTQUERY)) {
         // Don't allow double negatives.
         NOTQuery *not_query = (NOTQuery*)query;
         Query *neg_query = NOTQuery_Get_Negated_Query(not_query);
-        if (!Query_Is_A(neg_query, MATCHALLQUERY)
+        if (!Query_is_a(neg_query, MATCHALLQUERY)
             && !S_has_valid_clauses(neg_query)
            ) {
             MatchAllQuery *matchall = MatchAllQuery_new();
@@ -693,7 +693,7 @@ S_do_prune(QueryParser *self, Query *query) {
             DECREF(matchall);
         }
     }
-    else if (Query_Is_A(query, POLYQUERY)) {
+    else if (Query_is_a(query, POLYQUERY)) {
         PolyQuery *polyquery = (PolyQuery*)query;
         Vector    *children  = PolyQuery_Get_Children(polyquery);
 
@@ -703,8 +703,8 @@ S_do_prune(QueryParser *self, Query *query) {
             S_do_prune(self, child);
         }
 
-        if (PolyQuery_Is_A(polyquery, REQUIREDOPTIONALQUERY)
-            || PolyQuery_Is_A(polyquery, ORQUERY)
+        if (PolyQuery_is_a(polyquery, REQUIREDOPTIONALQUERY)
+            || PolyQuery_is_a(polyquery, ORQUERY)
            ) {
             // Don't allow 'foo OR (-bar)'.
             Vector *children = PolyQuery_Get_Children(polyquery);
@@ -715,7 +715,7 @@ S_do_prune(QueryParser *self, Query *query) {
                 }
             }
         }
-        else if (PolyQuery_Is_A(polyquery, ANDQUERY)) {
+        else if (PolyQuery_is_a(polyquery, ANDQUERY)) {
             // Don't allow '(-bar AND -baz)'.
             if (!S_has_valid_clauses((Query*)polyquery)) {
                 Vector *children = PolyQuery_Get_Children(polyquery);
@@ -728,12 +728,12 @@ S_do_prune(QueryParser *self, Query *query) {
 Query*
 QParser_Prune_IMP(QueryParser *self, Query *query) {
     if (!query
-        || Query_Is_A(query, NOTQUERY)
-        || Query_Is_A(query, MATCHALLQUERY)
+        || Query_is_a(query, NOTQUERY)
+        || Query_is_a(query, MATCHALLQUERY)
        ) {
         return (Query*)NoMatchQuery_new();
     }
-    else if (Query_Is_A(query, POLYQUERY)) {
+    else if (Query_is_a(query, POLYQUERY)) {
         S_do_prune(self, query);
     }
     return (Query*)INCREF(query);
@@ -743,10 +743,10 @@ Query*
 QParser_Expand_IMP(QueryParser *self, Query *query) {
     Query *retval = NULL;
 
-    if (Query_Is_A(query, LEAFQUERY)) {
+    if (Query_is_a(query, LEAFQUERY)) {
         retval = QParser_Expand_Leaf(self, query);
     }
-    else if (Query_Is_A(query, ORQUERY) || Query_Is_A(query, ANDQUERY)) {
+    else if (Query_is_a(query, ORQUERY) || Query_is_a(query, ANDQUERY)) {
         PolyQuery *polyquery = (PolyQuery*)query;
         Vector *children = PolyQuery_Get_Children(polyquery);
         Vector *new_kids = Vec_new(Vec_Get_Size(children));
@@ -755,7 +755,7 @@ QParser_Expand_IMP(QueryParser *self, Query *query) {
             Query *child = (Query*)Vec_Fetch(children, i);
             Query *new_child = QParser_Expand(self, child); // recurse
             if (new_child) {
-                if (Query_Is_A(new_child, NOMATCHQUERY)) {
+                if (Query_is_a(new_child, NOMATCHQUERY)) {
                     bool fails = NoMatchQuery_Get_Fails_To_Match(
                                        (NoMatchQuery*)new_child);
                     if (fails) {
@@ -784,7 +784,7 @@ QParser_Expand_IMP(QueryParser *self, Query *query) {
 
         DECREF(new_kids);
     }
-    else if (Query_Is_A(query, NOTQUERY)) {
+    else if (Query_is_a(query, NOTQUERY)) {
         NOTQuery *not_query     = (NOTQuery*)query;
         Query    *negated_query = NOTQuery_Get_Negated_Query(not_query);
         negated_query = QParser_Expand(self, negated_query);
@@ -797,7 +797,7 @@ QParser_Expand_IMP(QueryParser *self, Query *query) {
             retval = (Query*)MatchAllQuery_new();
         }
     }
-    else if (Query_Is_A(query, REQUIREDOPTIONALQUERY)) {
+    else if (Query_is_a(query, REQUIREDOPTIONALQUERY)) {
         RequiredOptionalQuery *req_opt_query = (RequiredOptionalQuery*)query;
         Query *req_query = ReqOptQuery_Get_Required_Query(req_opt_query);
         Query *opt_query = ReqOptQuery_Get_Optional_Query(req_opt_query);
@@ -867,7 +867,7 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
     bool       ambiguous  = false;
 
     // Determine whether we can actually process the input.
-    if (!Query_Is_A(query, LEAFQUERY)) { return NULL; }
+    if (!Query_is_a(query, LEAFQUERY)) { return NULL; }
     String *full_text = LeafQuery_Get_Text(leaf_query);
     if (!Str_Get_Size(full_text)) { return NULL; }
 

@@ -83,7 +83,7 @@ RAMFolder_Local_Open_FileHandle_IMP(RAMFolder *self, String *name,
     // Make sure the filepath isn't a directory, and that it either exists
     // or we have permission to create it.
     if (file) {
-        if (!RAMFile_Is_A(file, RAMFILE)) {
+        if (!RAMFile_is_a(file, RAMFILE)) {
             Err_set_error(Err_new(Str_newf("Not a file: '%o'", fullpath)));
             DECREF(fullpath);
             return NULL;
@@ -130,7 +130,7 @@ bool
 RAMFolder_Local_Is_Directory_IMP(RAMFolder *self, String *name) {
     RAMFolderIVARS *const ivars = RAMFolder_IVARS(self);
     Obj *entry = Hash_Fetch(ivars->entries, name);
-    if (entry && Obj_Is_A(entry, FOLDER)) { return true; }
+    if (entry && Obj_is_a(entry, FOLDER)) { return true; }
     return false;
 }
 
@@ -159,35 +159,35 @@ S_rename_or_hard_link(RAMFolder *self, String* from, String *to,
     }
 
     // Extract RAMFolders from compound reader wrappers, if necessary.
-    if (Folder_Is_A(from_folder, COMPOUNDFILEREADER)) {
+    if (Folder_is_a(from_folder, COMPOUNDFILEREADER)) {
         inner_from_folder = (RAMFolder*)CFReader_Get_Real_Folder(
                                 (CompoundFileReader*)from_folder);
     }
     else {
         inner_from_folder = (RAMFolder*)from_folder;
     }
-    if (Folder_Is_A(to_folder, COMPOUNDFILEREADER)) {
+    if (Folder_is_a(to_folder, COMPOUNDFILEREADER)) {
         inner_to_folder = (RAMFolder*)CFReader_Get_Real_Folder(
                               (CompoundFileReader*)to_folder);
     }
     else {
         inner_to_folder = (RAMFolder*)to_folder;
     }
-    if (!RAMFolder_Is_A(inner_from_folder, RAMFOLDER)) {
+    if (!RAMFolder_is_a(inner_from_folder, RAMFOLDER)) {
         Err_set_error(Err_new(Str_newf("Not a RAMFolder, but a '%o'",
-                                       Obj_Get_Class_Name((Obj*)inner_from_folder))));
+                                       Obj_get_class_name((Obj*)inner_from_folder))));
         return false;
     }
-    if (!RAMFolder_Is_A(inner_to_folder, RAMFOLDER)) {
+    if (!RAMFolder_is_a(inner_to_folder, RAMFOLDER)) {
         Err_set_error(Err_new(Str_newf("Not a RAMFolder, but a '%o'",
-                                       Obj_Get_Class_Name((Obj*)inner_to_folder))));
+                                       Obj_get_class_name((Obj*)inner_to_folder))));
         return false;
     }
 
     // Find the original element.
     elem = Hash_Fetch(RAMFolder_IVARS(inner_from_folder)->entries, from_name);
     if (!elem) {
-        if (Folder_Is_A(from_folder, COMPOUNDFILEREADER)
+        if (Folder_is_a(from_folder, COMPOUNDFILEREADER)
             && Folder_Local_Exists(from_folder, from_name)
            ) {
             Err_set_error(Err_new(Str_newf("Source file '%o' is virtual",
@@ -214,20 +214,20 @@ S_rename_or_hard_link(RAMFolder *self, String* from, String *to,
             }
 
             // Don't allow clobbering of different entry type.
-            if (Obj_Is_A(elem, RAMFILE)) {
-                if (!Obj_Is_A(existing, RAMFILE)) {
+            if (Obj_is_a(elem, RAMFILE)) {
+                if (!Obj_is_a(existing, RAMFILE)) {
                     conflict = true;
                 }
             }
-            else if (Obj_Is_A(elem, FOLDER)) {
-                if (!Obj_Is_A(existing, FOLDER)) {
+            else if (Obj_is_a(elem, FOLDER)) {
+                if (!Obj_is_a(existing, FOLDER)) {
                     conflict = true;
                 }
             }
             if (conflict) {
                 Err_set_error(Err_new(Str_newf("Can't clobber a %o with a %o",
-                                               Obj_Get_Class_Name(existing),
-                                               Obj_Get_Class_Name(elem))));
+                                               Obj_get_class_name(existing),
+                                               Obj_get_class_name(elem))));
                 return false;
             }
         }
@@ -238,16 +238,16 @@ S_rename_or_hard_link(RAMFolder *self, String* from, String *to,
                    to_name, INCREF(elem));
         DECREF(Hash_Delete(RAMFolder_IVARS(inner_from_folder)->entries,
                            from_name));
-        if (Obj_Is_A(elem, FOLDER)) {
+        if (Obj_is_a(elem, FOLDER)) {
             String *newpath = S_fullpath(inner_to_folder, to_name);
             Folder_Set_Path((Folder*)elem, newpath);
             DECREF(newpath);
         }
     }
     else if (op == OP_HARD_LINK) {
-        if (!Obj_Is_A(elem, RAMFILE)) {
+        if (!Obj_is_a(elem, RAMFILE)) {
             Err_set_error(Err_new(Str_newf("'%o' isn't a file, it's a %o",
-                                           from, Obj_Get_Class_Name(elem))));
+                                           from, Obj_get_class_name(elem))));
             return false;
         }
         else {
@@ -306,12 +306,12 @@ RAMFolder_Local_Delete_IMP(RAMFolder *self, String *name) {
     RAMFolderIVARS *const ivars = RAMFolder_IVARS(self);
     Obj *entry = Hash_Fetch(ivars->entries, name);
     if (entry) {
-        if (Obj_Is_A(entry, RAMFILE)) {
+        if (Obj_is_a(entry, RAMFILE)) {
             ;
         }
-        else if (Obj_Is_A(entry, FOLDER)) {
+        else if (Obj_is_a(entry, FOLDER)) {
             RAMFolder *inner_folder;
-            if (Obj_Is_A(entry, COMPOUNDFILEREADER)) {
+            if (Obj_is_a(entry, COMPOUNDFILEREADER)) {
                 inner_folder = (RAMFolder*)CERTIFY(
                                    CFReader_Get_Real_Folder((CompoundFileReader*)entry),
                                    RAMFOLDER);
@@ -339,7 +339,7 @@ Folder*
 RAMFolder_Local_Find_Folder_IMP(RAMFolder *self, String *path) {
     RAMFolderIVARS *const ivars = RAMFolder_IVARS(self);
     Folder *local_folder = (Folder*)Hash_Fetch(ivars->entries, path);
-    if (local_folder && Folder_Is_A(local_folder, FOLDER)) {
+    if (local_folder && Folder_is_a(local_folder, FOLDER)) {
         return local_folder;
     }
     return NULL;

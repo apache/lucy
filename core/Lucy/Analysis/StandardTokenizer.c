@@ -341,7 +341,7 @@ S_skip_extend_format(const char *text, size_t len, lucy_StringIter *iter) {
 bool
 StandardTokenizer_Equals_IMP(StandardTokenizer *self, Obj *other) {
     if ((StandardTokenizer*)other == self)   { return true; }
-    if (!Obj_Is_A(other, STANDARDTOKENIZER)) { return false; }
+    if (!Obj_is_a(other, STANDARDTOKENIZER)) { return false; }
     return true;
 }
 

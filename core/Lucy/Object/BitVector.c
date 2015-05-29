@@ -86,9 +86,9 @@ BitVec_Clone_IMP(BitVector *self) {
     BitVectorIVARS *const ovars = BitVec_IVARS(other);
 
     // Forbid inheritance.
-    if (BitVec_Get_Class(self) != BITVECTOR) {
+    if (BitVec_get_class(self) != BITVECTOR) {
         THROW(ERR, "Attempt by %o to inherit BitVec_Clone",
-              BitVec_Get_Class_Name(self));
+              BitVec_get_class_name(self));
     }
 
     memcpy(ovars->bits, ivars->bits, byte_size * sizeof(uint8_t));

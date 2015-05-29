@@ -66,20 +66,20 @@ InStream_do_open(InStream *self, Obj *file) {
     ivars->window       = FileWindow_new();
 
     // Obtain a FileHandle.
-    if (Obj_Is_A(file, FILEHANDLE)) {
+    if (Obj_is_a(file, FILEHANDLE)) {
         ivars->file_handle = (FileHandle*)INCREF(file);
     }
-    else if (Obj_Is_A(file, RAMFILE)) {
+    else if (Obj_is_a(file, RAMFILE)) {
         ivars->file_handle
             = (FileHandle*)RAMFH_open(NULL, FH_READ_ONLY, (RAMFile*)file);
     }
-    else if (Obj_Is_A(file, STRING)) {
+    else if (Obj_is_a(file, STRING)) {
         ivars->file_handle
             = (FileHandle*)FSFH_open((String*)file, FH_READ_ONLY);
     }
     else {
         Err_set_error(Err_new(Str_newf("Invalid type for param 'file': '%o'",
-                                       Obj_Get_Class_Name(file))));
+                                       Obj_get_class_name(file))));
         DECREF(self);
         return NULL;
     }
@@ -136,7 +136,7 @@ InStream_Reopen_IMP(InStream *self, String *filename, int64_t offset,
               offset, len, FH_Length(ivars->file_handle));
     }
 
-    Class *klass = InStream_Get_Class(self);
+    Class *klass = InStream_get_class(self);
     InStream *other = (InStream*)Class_Make_Obj(klass);
     InStreamIVARS *const ovars = InStream_IVARS(other);
     InStream_do_open(other, (Obj*)ivars->file_handle);
@@ -154,7 +154,7 @@ InStream_Reopen_IMP(InStream *self, String *filename, int64_t offset,
 InStream*
 InStream_Clone_IMP(InStream *self) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
-    Class *klass = InStream_Get_Class(self);
+    Class *klass = InStream_get_class(self);
     InStream *twin = (InStream*)Class_Make_Obj(klass);
     InStream_do_open(twin, (Obj*)ivars->file_handle);
     InStream_Seek(twin, SI_tell(self));

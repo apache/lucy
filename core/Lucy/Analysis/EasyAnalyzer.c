@@ -96,7 +96,7 @@ EasyAnalyzer_Load_IMP(EasyAnalyzer *self, Obj *dump) {
 bool
 EasyAnalyzer_Equals_IMP(EasyAnalyzer *self, Obj *other) {
     if ((EasyAnalyzer*)other == self)                       { return true; }
-    if (!Obj_Is_A(other, EASYANALYZER))                     { return false; }
+    if (!Obj_is_a(other, EASYANALYZER))                     { return false; }
     EasyAnalyzerIVARS *const ivars = EasyAnalyzer_IVARS(self);
     EasyAnalyzerIVARS *const ovars = EasyAnalyzer_IVARS((EasyAnalyzer*)other);
     if (!Str_Equals(ovars->language, (Obj*)ivars->language)) { return false; }

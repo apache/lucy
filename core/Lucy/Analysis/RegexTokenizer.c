@@ -74,7 +74,7 @@ RegexTokenizer_Load_IMP(RegexTokenizer *self, Obj *dump) {
 bool
 RegexTokenizer_Equals_IMP(RegexTokenizer *self, Obj *other) {
     if ((RegexTokenizer*)other == self)                   { return true; }
-    if (!Obj_Is_A(other, REGEXTOKENIZER))                 { return false; }
+    if (!Obj_is_a(other, REGEXTOKENIZER))                 { return false; }
     RegexTokenizerIVARS *ivars = RegexTokenizer_IVARS(self);
     RegexTokenizerIVARS *ovars = RegexTokenizer_IVARS((RegexTokenizer*)other);
     if (!Str_Equals(ivars->pattern, (Obj*)ovars->pattern)) { return false; }

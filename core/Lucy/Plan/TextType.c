@@ -114,12 +114,12 @@ TextTermStepper_Write_Delta_IMP(TextTermStepper *self, OutStream *outstream,
     const char *new_text  = NULL;
     size_t      new_size  = 0;
 
-    if (Obj_Is_A(value, STRING)) {
+    if (Obj_is_a(value, STRING)) {
         String *new_string = (String*)value;
         new_text = Str_Get_Ptr8(new_string);
         new_size = Str_Get_Size(new_string);
     }
-    else if (Obj_Is_A(value, CHARBUF)) {
+    else if (Obj_is_a(value, CHARBUF)) {
         CharBuf *new_charbuf = (CharBuf*)value;
         new_text = CB_Get_Ptr8(new_charbuf);
         new_size = CB_Get_Size(new_charbuf);

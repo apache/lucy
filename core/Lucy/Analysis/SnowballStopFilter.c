@@ -80,7 +80,7 @@ SnowStop_Transform_IMP(SnowballStopFilter *self, Inversion *inversion) {
 bool
 SnowStop_Equals_IMP(SnowballStopFilter *self, Obj *other) {
     if ((SnowballStopFilter*)other == self)   { return true; }
-    if (!Obj_Is_A(other, SNOWBALLSTOPFILTER)) { return false; }
+    if (!Obj_is_a(other, SNOWBALLSTOPFILTER)) { return false; }
     SnowballStopFilterIVARS *const ivars = SnowStop_IVARS(self);
     SnowballStopFilterIVARS *const ovars
         = SnowStop_IVARS((SnowballStopFilter*)other);

@@ -44,7 +44,7 @@ NoMatchQuery_init(NoMatchQuery *self) {
 
 bool
 NoMatchQuery_Equals_IMP(NoMatchQuery *self, Obj *other) {
-    if (!Obj_Is_A(other, NOMATCHQUERY))                     { return false; }
+    if (!Obj_is_a(other, NOMATCHQUERY))                     { return false; }
     NoMatchQueryIVARS *const ivars = NoMatchQuery_IVARS(self);
     NoMatchQueryIVARS *const ovars = NoMatchQuery_IVARS((NoMatchQuery*)other);
     if (ivars->boost != ovars->boost)                       { return false; }

@@ -52,7 +52,7 @@ IxSearcher_new(Obj *index) {
 IndexSearcher*
 IxSearcher_init(IndexSearcher *self, Obj *index) {
     IndexSearcherIVARS *const ivars = IxSearcher_IVARS(self);
-    if (Obj_Is_A(index, INDEXREADER)) {
+    if (Obj_is_a(index, INDEXREADER)) {
         ivars->reader = (IndexReader*)INCREF(index);
     }
     else {
@@ -133,7 +133,7 @@ IxSearcher_Collect_IMP(IndexSearcher *self, Query *query, Collector *collector) 
     Vector   *const seg_readers = ivars->seg_readers;
     I32Array *const seg_starts  = ivars->seg_starts;
     bool      need_score        = Coll_Need_Score(collector);
-    Compiler *compiler = Query_Is_A(query, COMPILER)
+    Compiler *compiler = Query_is_a(query, COMPILER)
                          ? (Compiler*)INCREF(query)
                          : Query_Make_Compiler(query, (Searcher*)self,
                                                Query_Get_Boost(query), false);

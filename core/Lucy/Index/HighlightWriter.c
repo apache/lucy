@@ -115,7 +115,7 @@ HLWriter_Add_Inverted_Doc_IMP(HighlightWriter *self, Inverter *inverter,
     Inverter_Iterate(inverter);
     while (Inverter_Next(inverter)) {
         FieldType *type = Inverter_Get_Type(inverter);
-        if (FType_Is_A(type, FULLTEXTTYPE)
+        if (FType_is_a(type, FULLTEXTTYPE)
             && FullTextType_Highlightable((FullTextType*)type)
            ) {
             num_highlightable++;
@@ -126,7 +126,7 @@ HLWriter_Add_Inverted_Doc_IMP(HighlightWriter *self, Inverter *inverter,
     Inverter_Iterate(inverter);
     while (Inverter_Next(inverter)) {
         FieldType *type = Inverter_Get_Type(inverter);
-        if (FType_Is_A(type, FULLTEXTTYPE)
+        if (FType_is_a(type, FULLTEXTTYPE)
             && FullTextType_Highlightable((FullTextType*)type)
            ) {
             String    *field     = Inverter_Get_Field_Name(inverter);

@@ -62,7 +62,7 @@ Highlighter_init(Highlighter *self, Searcher *searcher, Obj *query,
     ivars->slop           = excerpt_length / 3;
     ivars->pre_tag        = Str_new_from_trusted_utf8("<strong>", 8);
     ivars->post_tag       = Str_new_from_trusted_utf8("</strong>", 9);
-    if (Query_Is_A(ivars->query, COMPILER)) {
+    if (Query_is_a(ivars->query, COMPILER)) {
         ivars->compiler = (Compiler*)INCREF(ivars->query);
     }
     else {
@@ -155,7 +155,7 @@ Highlighter_Create_Excerpt_IMP(Highlighter *self, HitDoc *hit_doc) {
     String *field_val = (String*)HitDoc_Extract(hit_doc, ivars->field);
     String *retval;
 
-    if (!field_val || !Obj_Is_A((Obj*)field_val, STRING)) {
+    if (!field_val || !Obj_is_a((Obj*)field_val, STRING)) {
         retval = NULL;
     }
     else if (!Str_Get_Size(field_val)) {
@@ -565,7 +565,7 @@ Highlighter_Encode_IMP(Highlighter *self, String *text) {
 
 static String*
 S_do_encode(Highlighter *self, String *text, CharBuf **encode_buf) {
-    Class *klass = Highlighter_Get_Class(self);
+    Class *klass = Highlighter_get_class(self);
     Highlighter_Encode_t my_meth
         = (Highlighter_Encode_t)METHOD_PTR(klass, LUCY_Highlighter_Encode);
     Highlighter_Encode_t orig_meth

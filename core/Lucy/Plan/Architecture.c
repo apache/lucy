@@ -54,7 +54,7 @@ bool
 Arch_Equals_IMP(Architecture *self, Obj *other) {
     Architecture *twin = (Architecture*)other;
     if (twin == self)                   { return true; }
-    if (!Obj_Is_A(other, ARCHITECTURE)) { return false; }
+    if (!Obj_is_a(other, ARCHITECTURE)) { return false; }
     return true;
 }
 

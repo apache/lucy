@@ -244,14 +244,14 @@ S_init_folder(Obj *index, bool create) {
     Folder *folder = NULL;
 
     // Validate or acquire a Folder.
-    if (Obj_Is_A(index, FOLDER)) {
+    if (Obj_is_a(index, FOLDER)) {
         folder = (Folder*)INCREF(index);
     }
-    else if (Obj_Is_A(index, STRING)) {
+    else if (Obj_is_a(index, STRING)) {
         folder = (Folder*)FSFolder_new((String*)index);
     }
     else {
-        THROW(ERR, "Invalid type for 'index': %o", Obj_Get_Class_Name(index));
+        THROW(ERR, "Invalid type for 'index': %o", Obj_get_class_name(index));
     }
 
     // Validate or create the index directory.
@@ -285,7 +285,7 @@ Indexer_Delete_By_Term_IMP(Indexer *self, String *field, Obj *term) {
     }
 
     // Analyze term if appropriate, then zap.
-    if (FType_Is_A(type, FULLTEXTTYPE)) {
+    if (FType_is_a(type, FULLTEXTTYPE)) {
         CERTIFY(term, STRING);
         Analyzer *analyzer = Schema_Fetch_Analyzer(schema, field);
         Vector *terms = Analyzer_Split(analyzer, (String*)term);
@@ -319,14 +319,14 @@ Indexer_Add_Index_IMP(Indexer *self, Obj *index) {
     Folder *other_folder = NULL;
     IndexReader *reader  = NULL;
 
-    if (Obj_Is_A(index, FOLDER)) {
+    if (Obj_is_a(index, FOLDER)) {
         other_folder = (Folder*)INCREF(index);
     }
-    else if (Obj_Is_A(index, STRING)) {
+    else if (Obj_is_a(index, STRING)) {
         other_folder = (Folder*)FSFolder_new((String*)index);
     }
     else {
-        THROW(ERR, "Invalid type for 'index': %o", Obj_Get_Class_Name(index));
+        THROW(ERR, "Invalid type for 'index': %o", Obj_get_class_name(index));
     }
 
     reader = IxReader_open((Obj*)other_folder, NULL, NULL);

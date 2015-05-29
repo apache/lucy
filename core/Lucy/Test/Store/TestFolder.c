@@ -185,12 +185,12 @@ test_Enclosing_Folder_and_Find_Folder(TestBatchRunner *runner) {
         Folder *found = Folder_Find_Folder(folder, foo_bar);
         TEST_TRUE(runner,
                   encloser
-                  && Folder_Is_A(encloser, FOLDER)
+                  && Folder_is_a(encloser, FOLDER)
                   && Str_Ends_With(Folder_Get_Path(encloser), foo),
                   "Enclosing_Folder() - find one directory down");
         TEST_TRUE(runner,
                   found
-                  && Folder_Is_A(found, FOLDER)
+                  && Folder_is_a(found, FOLDER)
                   && Str_Ends_With(Folder_Get_Path(found), bar),
                   "Find_Folder() - 'foo/bar'");
     }
@@ -200,12 +200,12 @@ test_Enclosing_Folder_and_Find_Folder(TestBatchRunner *runner) {
         Folder *found = Folder_Find_Folder(folder, foo_bar_baz);
         TEST_TRUE(runner,
                   encloser
-                  && Folder_Is_A(encloser, FOLDER)
+                  && Folder_is_a(encloser, FOLDER)
                   && Str_Ends_With(Folder_Get_Path(encloser), bar),
                   "Find two directories down");
         TEST_TRUE(runner,
                   found
-                  && Folder_Is_A(found, FOLDER)
+                  && Folder_is_a(found, FOLDER)
                   && Str_Ends_With(Folder_Get_Path(found), baz),
                   "Find_Folder() - 'foo/bar/baz'");
     }
@@ -216,7 +216,7 @@ test_Enclosing_Folder_and_Find_Folder(TestBatchRunner *runner) {
         Folder *found = Folder_Find_Folder(folder, foo_bar_baz_boffo);
         TEST_TRUE(runner,
                   encloser
-                  && Folder_Is_A(encloser, FOLDER)
+                  && Folder_is_a(encloser, FOLDER)
                   && Str_Ends_With(Folder_Get_Path(encloser), baz),
                   "Recurse to find a directory containing a real file");
         TEST_TRUE(runner, found == NULL,
@@ -274,10 +274,10 @@ test_Open_Dir(TestBatchRunner *runner) {
     Folder_MkDir(folder, foo_bar);
 
     dh = Folder_Open_Dir(folder, foo);
-    TEST_TRUE(runner, dh && DH_Is_A(dh, DIRHANDLE), "Open_Dir");
+    TEST_TRUE(runner, dh && DH_is_a(dh, DIRHANDLE), "Open_Dir");
     DECREF(dh);
     dh = Folder_Open_Dir(folder, foo_bar);
-    TEST_TRUE(runner, dh && DH_Is_A(dh, DIRHANDLE), "Open_Dir nested dir");
+    TEST_TRUE(runner, dh && DH_is_a(dh, DIRHANDLE), "Open_Dir nested dir");
     DECREF(dh);
 
     Err_set_error(NULL);
@@ -305,12 +305,12 @@ test_Open_FileHandle(TestBatchRunner *runner) {
     Folder_MkDir(folder, foo);
 
     fh = Folder_Open_FileHandle(folder, boffo, FH_CREATE | FH_WRITE_ONLY);
-    TEST_TRUE(runner, fh && FH_Is_A(fh, FILEHANDLE), "Open_FileHandle");
+    TEST_TRUE(runner, fh && FH_is_a(fh, FILEHANDLE), "Open_FileHandle");
     DECREF(fh);
 
     fh = Folder_Open_FileHandle(folder, foo_boffo,
                                 FH_CREATE | FH_WRITE_ONLY);
-    TEST_TRUE(runner, fh && FH_Is_A(fh, FILEHANDLE),
+    TEST_TRUE(runner, fh && FH_is_a(fh, FILEHANDLE),
               "Open_FileHandle for nested file");
     DECREF(fh);
 
@@ -340,12 +340,12 @@ test_Open_Out(TestBatchRunner *runner) {
     Folder_MkDir(folder, foo);
 
     outstream = Folder_Open_Out(folder, boffo);
-    TEST_TRUE(runner, outstream && OutStream_Is_A(outstream, OUTSTREAM),
+    TEST_TRUE(runner, outstream && OutStream_is_a(outstream, OUTSTREAM),
               "Open_Out");
     DECREF(outstream);
 
     outstream = Folder_Open_Out(folder, foo_boffo);
-    TEST_TRUE(runner, outstream && OutStream_Is_A(outstream, OUTSTREAM),
+    TEST_TRUE(runner, outstream && OutStream_is_a(outstream, OUTSTREAM),
               "Open_Out for nested file");
     DECREF(outstream);
 
@@ -387,12 +387,12 @@ test_Open_In(TestBatchRunner *runner) {
     DECREF(fh);
 
     instream = Folder_Open_In(folder, boffo);
-    TEST_TRUE(runner, instream && InStream_Is_A(instream, INSTREAM),
+    TEST_TRUE(runner, instream && InStream_is_a(instream, INSTREAM),
               "Open_In");
     DECREF(instream);
 
     instream = Folder_Open_In(folder, foo_boffo);
-    TEST_TRUE(runner, instream && InStream_Is_A(instream, INSTREAM),
+    TEST_TRUE(runner, instream && InStream_is_a(instream, INSTREAM),
               "Open_In for nested file");
     DECREF(instream);
 

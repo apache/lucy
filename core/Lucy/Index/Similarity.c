@@ -90,7 +90,7 @@ Obj*
 Sim_Dump_IMP(Similarity *self) {
     Hash *dump = Hash_new(0);
     Hash_Store_Utf8(dump, "_class", 6,
-                    (Obj*)Str_Clone(Sim_Get_Class_Name(self)));
+                    (Obj*)Str_Clone(Sim_get_class_name(self)));
     return (Obj*)dump;
 }
 
@@ -108,14 +108,14 @@ Sim_Load_IMP(Similarity *self, Obj *dump) {
 void
 Sim_Serialize_IMP(Similarity *self, OutStream *target) {
     // Only the class name.
-    Freezer_serialize_string(Sim_Get_Class_Name(self), target);
+    Freezer_serialize_string(Sim_get_class_name(self), target);
 }
 
 Similarity*
 Sim_Deserialize_IMP(Similarity *self, InStream *instream) {
     String *class_name = Freezer_read_string(instream);
-    if (!Str_Equals(class_name, (Obj*)Sim_Get_Class_Name(self))) {
-        THROW(ERR, "Class name mismatch: '%o' '%o'", Sim_Get_Class_Name(self),
+    if (!Str_Equals(class_name, (Obj*)Sim_get_class_name(self))) {
+        THROW(ERR, "Class name mismatch: '%o' '%o'", Sim_get_class_name(self),
               class_name);
     }
     DECREF(class_name);
@@ -125,7 +125,7 @@ Sim_Deserialize_IMP(Similarity *self, InStream *instream) {
 
 bool
 Sim_Equals_IMP(Similarity *self, Obj *other) {
-    if (Sim_Get_Class(self) != Obj_Get_Class(other)) { return false; }
+    if (Sim_get_class(self) != Obj_get_class(other)) { return false; }
     return true;
 }
 

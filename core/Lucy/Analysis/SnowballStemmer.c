@@ -108,7 +108,7 @@ SnowStemmer_Load_IMP(SnowballStemmer *self, Obj *dump) {
 bool
 SnowStemmer_Equals_IMP(SnowballStemmer *self, Obj *other) {
     if ((SnowballStemmer*)other == self)                    { return true; }
-    if (!Obj_Is_A(other, SNOWBALLSTEMMER))                  { return false; }
+    if (!Obj_is_a(other, SNOWBALLSTEMMER))                  { return false; }
     SnowballStemmerIVARS *ivars = SnowStemmer_IVARS(self);
     SnowballStemmerIVARS *ovars = SnowStemmer_IVARS((SnowballStemmer*)other);
     if (!Str_Equals(ovars->language, (Obj*)ivars->language)) { return false; }

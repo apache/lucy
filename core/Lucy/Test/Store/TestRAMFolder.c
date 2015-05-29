@@ -158,7 +158,7 @@ test_Local_Find_Folder(TestBatchRunner *runner) {
     local = (RAMFolder*)RAMFolder_Local_Find_Folder(folder, foo);
     TEST_TRUE(runner,
               local
-              && RAMFolder_Is_A(local, RAMFOLDER)
+              && RAMFolder_is_a(local, RAMFOLDER)
               && Str_Equals_Utf8(RAMFolder_Get_Path(local), "foo", 3),
               "Find local directory");
 
@@ -202,7 +202,7 @@ static void
 test_Local_Open_Dir(TestBatchRunner *runner) {
     RAMFolder *folder = RAMFolder_new(NULL);
     DirHandle *dh = RAMFolder_Local_Open_Dir(folder);
-    TEST_TRUE(runner, dh && DH_Is_A(dh, RAMDIRHANDLE),
+    TEST_TRUE(runner, dh && DH_is_a(dh, RAMDIRHANDLE),
               "Local_Open_Dir returns a RAMDirHandle");
     DECREF(dh);
     DECREF(folder);
@@ -215,13 +215,13 @@ test_Local_Open_FileHandle(TestBatchRunner *runner) {
 
     fh = RAMFolder_Local_Open_FileHandle(folder, boffo,
                                          FH_CREATE | FH_WRITE_ONLY);
-    TEST_TRUE(runner, fh && FH_Is_A(fh, RAMFILEHANDLE),
+    TEST_TRUE(runner, fh && FH_is_a(fh, RAMFILEHANDLE),
               "opened FileHandle");
     DECREF(fh);
 
     fh = RAMFolder_Local_Open_FileHandle(folder, boffo,
                                          FH_CREATE | FH_WRITE_ONLY);
-    TEST_TRUE(runner, fh && FH_Is_A(fh, RAMFILEHANDLE),
+    TEST_TRUE(runner, fh && FH_is_a(fh, RAMFILEHANDLE),
               "opened FileHandle for append");
     DECREF(fh);
 
@@ -233,7 +233,7 @@ test_Local_Open_FileHandle(TestBatchRunner *runner) {
               "failure due to FH_EXLUSIVE flag sets global error");
 
     fh = RAMFolder_Local_Open_FileHandle(folder, boffo, FH_READ_ONLY);
-    TEST_TRUE(runner, fh && FH_Is_A(fh, RAMFILEHANDLE),
+    TEST_TRUE(runner, fh && FH_is_a(fh, RAMFILEHANDLE),
               "opened FileHandle for reading");
     DECREF(fh);
 

@@ -103,7 +103,7 @@ Doc_Load_IMP(Doc *self, Obj *dump) {
 bool
 Doc_Equals_IMP(Doc *self, Obj *other) {
     if ((Doc*)other == self)   { return true;  }
-    if (!Obj_Is_A(other, DOC)) { return false; }
+    if (!Obj_is_a(other, DOC)) { return false; }
     DocIVARS *const ivars = Doc_IVARS(self);
     DocIVARS *const ovars = Doc_IVARS((Doc*)other);
     return Hash_Equals((Hash*)ivars->fields, (Obj*)ovars->fields);

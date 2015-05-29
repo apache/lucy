@@ -114,7 +114,7 @@ PolyAnalyzer_Transform_Text_IMP(PolyAnalyzer *self, String *text) {
 bool
 PolyAnalyzer_Equals_IMP(PolyAnalyzer *self, Obj *other) {
     if ((PolyAnalyzer*)other == self)                         { return true; }
-    if (!Obj_Is_A(other, POLYANALYZER))                       { return false; }
+    if (!Obj_is_a(other, POLYANALYZER))                       { return false; }
     PolyAnalyzerIVARS *const ivars = PolyAnalyzer_IVARS(self);
     PolyAnalyzerIVARS *const ovars = PolyAnalyzer_IVARS((PolyAnalyzer*)other);
     if (!Vec_Equals(ovars->analyzers, (Obj*)ivars->analyzers)) { return false; }

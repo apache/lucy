@@ -180,14 +180,14 @@ S_init_folder(Obj *index) {
     Folder *folder = NULL;
 
     // Validate or acquire a Folder.
-    if (Obj_Is_A(index, FOLDER)) {
+    if (Obj_is_a(index, FOLDER)) {
         folder = (Folder*)INCREF(index);
     }
-    else if (Obj_Is_A(index, STRING)) {
+    else if (Obj_is_a(index, STRING)) {
         folder = (Folder*)FSFolder_new((String*)index);
     }
     else {
-        THROW(ERR, "Invalid type for 'index': %o", Obj_Get_Class_Name(index));
+        THROW(ERR, "Invalid type for 'index': %o", Obj_get_class_name(index));
     }
 
     // Validate index directory.

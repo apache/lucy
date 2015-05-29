@@ -237,11 +237,11 @@ InvEntry_init(InverterEntry *self, Schema *schema, String *field,
         }
 
         ivars->indexed = FType_Indexed(ivars->type);
-        if (ivars->indexed && FType_Is_A(ivars->type, NUMERICTYPE)) {
+        if (ivars->indexed && FType_is_a(ivars->type, NUMERICTYPE)) {
             THROW(ERR, "Field '%o' spec'd as indexed, but numerical types cannot "
                   "be indexed yet", field);
         }
-        if (FType_Is_A(ivars->type, FULLTEXTTYPE)) {
+        if (FType_is_a(ivars->type, FULLTEXTTYPE)) {
             ivars->highlightable
                 = FullTextType_Highlightable((FullTextType*)ivars->type);
         }

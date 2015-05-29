@@ -37,7 +37,7 @@
 
 void
 Freezer_freeze(Obj *obj, OutStream *outstream) {
-    Freezer_serialize_string(Obj_Get_Class_Name(obj), outstream);
+    Freezer_serialize_string(Obj_get_class_name(obj), outstream);
     Freezer_serialize(obj, outstream);
 }
 
@@ -52,94 +52,94 @@ Freezer_thaw(InStream *instream) {
 
 void
 Freezer_serialize(Obj *obj, OutStream *outstream) {
-    if (Obj_Is_A(obj, STRING)) {
+    if (Obj_is_a(obj, STRING)) {
         Freezer_serialize_string((String*)obj, outstream);
     }
-    else if (Obj_Is_A(obj, BLOB)) {
+    else if (Obj_is_a(obj, BLOB)) {
         Freezer_serialize_blob((Blob*)obj, outstream);
     }
-    else if (Obj_Is_A(obj, VECTOR)) {
+    else if (Obj_is_a(obj, VECTOR)) {
         Freezer_serialize_varray((Vector*)obj, outstream);
     }
-    else if (Obj_Is_A(obj, HASH)) {
+    else if (Obj_is_a(obj, HASH)) {
         Freezer_serialize_hash((Hash*)obj, outstream);
     }
-    else if (Obj_Is_A(obj, NUM)) {
-        if (Obj_Is_A(obj, INTNUM)) {
-            if (Obj_Is_A(obj, BOOLNUM)) {
+    else if (Obj_is_a(obj, NUM)) {
+        if (Obj_is_a(obj, INTNUM)) {
+            if (Obj_is_a(obj, BOOLNUM)) {
                 bool val = Bool_Get_Value((BoolNum*)obj);
                 OutStream_Write_U8(outstream, (uint8_t)val);
             }
-            else if (Obj_Is_A(obj, INTEGER32)) {
+            else if (Obj_is_a(obj, INTEGER32)) {
                 int32_t val = Int32_Get_Value((Integer32*)obj);
                 OutStream_Write_C32(outstream, (uint32_t)val);
             }
-            else if (Obj_Is_A(obj, INTEGER64)) {
+            else if (Obj_is_a(obj, INTEGER64)) {
                 int64_t val = Int64_Get_Value((Integer64*)obj);
                 OutStream_Write_C64(outstream, (uint64_t)val);
             }
         }
-        else if (Obj_Is_A(obj, FLOATNUM)) {
-            if (Obj_Is_A(obj, FLOAT32)) {
+        else if (Obj_is_a(obj, FLOATNUM)) {
+            if (Obj_is_a(obj, FLOAT32)) {
                 float val = Float32_Get_Value((Float32*)obj);
                 OutStream_Write_F32(outstream, val);
             }
-            else if (Obj_Is_A(obj, FLOAT64)) {
+            else if (Obj_is_a(obj, FLOAT64)) {
                 double val = Float64_Get_Value((Float64*)obj);
                 OutStream_Write_F64(outstream, val);
             }
         }
     }
-    else if (Obj_Is_A(obj, QUERY)) {
+    else if (Obj_is_a(obj, QUERY)) {
         Query_Serialize((Query*)obj, outstream);
     }
-    else if (Obj_Is_A(obj, DOC)) {
+    else if (Obj_is_a(obj, DOC)) {
         Doc_Serialize((Doc*)obj, outstream);
     }
-    else if (Obj_Is_A(obj, DOCVECTOR)) {
+    else if (Obj_is_a(obj, DOCVECTOR)) {
         DocVec_Serialize((DocVector*)obj, outstream);
     }
-    else if (Obj_Is_A(obj, TERMVECTOR)) {
+    else if (Obj_is_a(obj, TERMVECTOR)) {
         TV_Serialize((TermVector*)obj, outstream);
     }
-    else if (Obj_Is_A(obj, SIMILARITY)) {
+    else if (Obj_is_a(obj, SIMILARITY)) {
         Sim_Serialize((Similarity*)obj, outstream);
     }
-    else if (Obj_Is_A(obj, MATCHDOC)) {
+    else if (Obj_is_a(obj, MATCHDOC)) {
         MatchDoc_Serialize((MatchDoc*)obj, outstream);
     }
-    else if (Obj_Is_A(obj, TOPDOCS)) {
+    else if (Obj_is_a(obj, TOPDOCS)) {
         TopDocs_Serialize((TopDocs*)obj, outstream);
     }
-    else if (Obj_Is_A(obj, SORTSPEC)) {
+    else if (Obj_is_a(obj, SORTSPEC)) {
         SortSpec_Serialize((SortSpec*)obj, outstream);
     }
-    else if (Obj_Is_A(obj, SORTRULE)) {
+    else if (Obj_is_a(obj, SORTRULE)) {
         SortRule_Serialize((SortRule*)obj, outstream);
     }
     else {
         THROW(ERR, "Don't know how to serialize a %o",
-              Obj_Get_Class_Name(obj));
+              Obj_get_class_name(obj));
     }
 }
 
 Obj*
 Freezer_deserialize(Obj *obj, InStream *instream) {
-    if (Obj_Is_A(obj, STRING)) {
+    if (Obj_is_a(obj, STRING)) {
         obj = (Obj*)Freezer_deserialize_string((String*)obj, instream);
     }
-    else if (Obj_Is_A(obj, BLOB)) {
+    else if (Obj_is_a(obj, BLOB)) {
         obj = (Obj*)Freezer_deserialize_blob((Blob*)obj, instream);
     }
-    else if (Obj_Is_A(obj, VECTOR)) {
+    else if (Obj_is_a(obj, VECTOR)) {
         obj = (Obj*)Freezer_deserialize_varray((Vector*)obj, instream);
     }
-    else if (Obj_Is_A(obj, HASH)) {
+    else if (Obj_is_a(obj, HASH)) {
         obj = (Obj*)Freezer_deserialize_hash((Hash*)obj, instream);
     }
-    else if (Obj_Is_A(obj, NUM)) {
-        if (Obj_Is_A(obj, INTNUM)) {
-            if (Obj_Is_A(obj, BOOLNUM)) {
+    else if (Obj_is_a(obj, NUM)) {
+        if (Obj_is_a(obj, INTNUM)) {
+            if (Obj_is_a(obj, BOOLNUM)) {
                 bool value = !!InStream_Read_U8(instream);
                 Obj *result = value ? INCREF(CFISH_TRUE) : INCREF(CFISH_FALSE);
                 // FIXME: This DECREF is essentially a no-op causing a
@@ -147,56 +147,56 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
                 DECREF(obj);
                 obj = result;
             }
-            else if (Obj_Is_A(obj, INTEGER32)) {
+            else if (Obj_is_a(obj, INTEGER32)) {
                 int32_t value = (int32_t)InStream_Read_C32(instream);
                 obj = (Obj*)Int32_init((Integer32*)obj, value);
             }
-            else if (Obj_Is_A(obj, INTEGER64)) {
+            else if (Obj_is_a(obj, INTEGER64)) {
                 int64_t value = (int64_t)InStream_Read_C64(instream);
                 obj = (Obj*)Int64_init((Integer64*)obj, value);
             }
         }
-        else if (Obj_Is_A(obj, FLOATNUM)) {
-            if (Obj_Is_A(obj, FLOAT32)) {
+        else if (Obj_is_a(obj, FLOATNUM)) {
+            if (Obj_is_a(obj, FLOAT32)) {
                 float value = InStream_Read_F32(instream);
                 obj = (Obj*)Float32_init((Float32*)obj, value);
             }
-            else if (Obj_Is_A(obj, FLOAT64)) {
+            else if (Obj_is_a(obj, FLOAT64)) {
                 double value = InStream_Read_F64(instream);
                 obj = (Obj*)Float64_init((Float64*)obj, value);
             }
         }
     }
-    else if (Obj_Is_A(obj, QUERY)) {
+    else if (Obj_is_a(obj, QUERY)) {
         obj = (Obj*)Query_Deserialize((Query*)obj, instream);
     }
-    else if (Obj_Is_A(obj, DOC)) {
+    else if (Obj_is_a(obj, DOC)) {
         obj = (Obj*)Doc_Deserialize((Doc*)obj, instream);
     }
-    else if (Obj_Is_A(obj, DOCVECTOR)) {
+    else if (Obj_is_a(obj, DOCVECTOR)) {
         obj = (Obj*)DocVec_Deserialize((DocVector*)obj, instream);
     }
-    else if (Obj_Is_A(obj, TERMVECTOR)) {
+    else if (Obj_is_a(obj, TERMVECTOR)) {
         obj = (Obj*)TV_Deserialize((TermVector*)obj, instream);
     }
-    else if (Obj_Is_A(obj, SIMILARITY)) {
+    else if (Obj_is_a(obj, SIMILARITY)) {
         obj = (Obj*)Sim_Deserialize((Similarity*)obj, instream);
     }
-    else if (Obj_Is_A(obj, MATCHDOC)) {
+    else if (Obj_is_a(obj, MATCHDOC)) {
         obj = (Obj*)MatchDoc_Deserialize((MatchDoc*)obj, instream);
     }
-    else if (Obj_Is_A(obj, TOPDOCS)) {
+    else if (Obj_is_a(obj, TOPDOCS)) {
         obj = (Obj*)TopDocs_Deserialize((TopDocs*)obj, instream);
     }
-    else if (Obj_Is_A(obj, SORTSPEC)) {
+    else if (Obj_is_a(obj, SORTSPEC)) {
         obj = (Obj*)SortSpec_Deserialize((SortSpec*)obj, instream);
     }
-    else if (Obj_Is_A(obj, SORTRULE)) {
+    else if (Obj_is_a(obj, SORTRULE)) {
         obj = (Obj*)SortRule_Deserialize((SortRule*)obj, instream);
     }
     else {
         THROW(ERR, "Don't know how to deserialize a %o",
-              Obj_Get_Class_Name(obj));
+              Obj_get_class_name(obj));
     }
 
     return obj;
@@ -359,34 +359,34 @@ S_dump_hash(Hash *hash) {
 
 Obj*
 Freezer_dump(Obj *obj) {
-    if (Obj_Is_A(obj, STRING)) {
+    if (Obj_is_a(obj, STRING)) {
         return (Obj*)Obj_To_String(obj);
     }
-    else if (Obj_Is_A(obj, VECTOR)) {
+    else if (Obj_is_a(obj, VECTOR)) {
         return S_dump_array((Vector*)obj);
     }
-    else if (Obj_Is_A(obj, HASH)) {
+    else if (Obj_is_a(obj, HASH)) {
         return S_dump_hash((Hash*)obj);
     }
-    else if (Obj_Is_A(obj, ANALYZER)) {
+    else if (Obj_is_a(obj, ANALYZER)) {
         return Analyzer_Dump((Analyzer*)obj);
     }
-    else if (Obj_Is_A(obj, DOC)) {
+    else if (Obj_is_a(obj, DOC)) {
         return (Obj*)Doc_Dump((Doc*)obj);
     }
-    else if (Obj_Is_A(obj, SIMILARITY)) {
+    else if (Obj_is_a(obj, SIMILARITY)) {
         return Sim_Dump((Similarity*)obj);
     }
-    else if (Obj_Is_A(obj, FIELDTYPE)) {
+    else if (Obj_is_a(obj, FIELDTYPE)) {
         return FType_Dump((FieldType*)obj);
     }
-    else if (Obj_Is_A(obj, SCHEMA)) {
+    else if (Obj_is_a(obj, SCHEMA)) {
         return (Obj*)Schema_Dump((Schema*)obj);
     }
-    else if (Obj_Is_A(obj, QUERY)) {
+    else if (Obj_is_a(obj, QUERY)) {
         return Query_Dump((Query*)obj);
     }
-    else if (Obj_Is_A(obj, NUM)) {
+    else if (Obj_is_a(obj, NUM)) {
         return Obj_Clone(obj);
     }
     else {
@@ -398,22 +398,22 @@ static Obj*
 S_load_via_load_method(Class *klass, Obj *dump) {
     Obj *dummy = Class_Make_Obj(klass);
     Obj *loaded = NULL;
-    if (Obj_Is_A(dummy, ANALYZER)) {
+    if (Obj_is_a(dummy, ANALYZER)) {
         loaded = Analyzer_Load((Analyzer*)dummy, dump);
     }
-    else if (Obj_Is_A(dummy, DOC)) {
+    else if (Obj_is_a(dummy, DOC)) {
         loaded = (Obj*)Doc_Load((Doc*)dummy, dump);
     }
-    else if (Obj_Is_A(dummy, SIMILARITY)) {
+    else if (Obj_is_a(dummy, SIMILARITY)) {
         loaded = (Obj*)Sim_Load((Similarity*)dummy, dump);
     }
-    else if (Obj_Is_A(dummy, FIELDTYPE)) {
+    else if (Obj_is_a(dummy, FIELDTYPE)) {
         loaded = FType_Load((FieldType*)dummy, dump);
     }
-    else if (Obj_Is_A(dummy, SCHEMA)) {
+    else if (Obj_is_a(dummy, SCHEMA)) {
         loaded = (Obj*)Schema_Load((Schema*)dummy, dump);
     }
-    else if (Obj_Is_A(dummy, QUERY)) {
+    else if (Obj_is_a(dummy, QUERY)) {
         loaded = Query_Load((Query*)dummy, dump);
     }
     else {
@@ -431,7 +431,7 @@ S_load_from_hash(Hash *dump) {
 
     // Assume that the presence of the "_class" key paired with a valid class
     // name indicates the output of a dump() rather than an ordinary Hash.
-    if (class_name && Str_Is_A(class_name, STRING)) {
+    if (class_name && Str_is_a(class_name, STRING)) {
         Class *klass = Class_fetch_class(class_name);
 
         if (!klass) {
@@ -487,10 +487,10 @@ S_load_from_array(Vector *dump) {
 
 Obj*
 Freezer_load(Obj *obj) {
-    if (Obj_Is_A(obj, HASH)) {
+    if (Obj_is_a(obj, HASH)) {
         return S_load_from_hash((Hash*)obj);
     }
-    else if (Obj_Is_A(obj, VECTOR)) {
+    else if (Obj_is_a(obj, VECTOR)) {
         return S_load_from_array((Vector*)obj);
     }
     else {

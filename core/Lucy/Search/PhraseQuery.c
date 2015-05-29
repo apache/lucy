@@ -122,7 +122,7 @@ PhraseQuery_Load_IMP(PhraseQuery *self, Obj *dump) {
 bool
 PhraseQuery_Equals_IMP(PhraseQuery *self, Obj *other) {
     if ((PhraseQuery*)other == self)   { return true; }
-    if (!Obj_Is_A(other, PHRASEQUERY)) { return false; }
+    if (!Obj_is_a(other, PHRASEQUERY)) { return false; }
     PhraseQueryIVARS *const ivars = PhraseQuery_IVARS(self);
     PhraseQueryIVARS *const ovars = PhraseQuery_IVARS((PhraseQuery*)other);
     if (ivars->boost != ovars->boost)  { return false; }
@@ -258,7 +258,7 @@ PhraseCompiler_Deserialize_IMP(PhraseCompiler *self, InStream *instream) {
 
 bool
 PhraseCompiler_Equals_IMP(PhraseCompiler *self, Obj *other) {
-    if (!Obj_Is_A(other, PHRASECOMPILER))                     { return false; }
+    if (!Obj_is_a(other, PHRASECOMPILER))                     { return false; }
     PhraseCompiler_Equals_t super_equals
         = (PhraseCompiler_Equals_t)SUPER_METHOD_PTR(PHRASECOMPILER,
                                                     LUCY_PhraseCompiler_Equals);
@@ -307,7 +307,7 @@ PhraseCompiler_Make_Matcher_IMP(PhraseCompiler *self, SegReader *reader,
     // Bail unless field is valid and posting type supports positions.
     Similarity *sim     = PhraseCompiler_Get_Similarity(self);
     Posting    *posting = Sim_Make_Posting(sim);
-    if (posting == NULL || !Obj_Is_A((Obj*)posting, SCOREPOSTING)) {
+    if (posting == NULL || !Obj_is_a((Obj*)posting, SCOREPOSTING)) {
         DECREF(posting);
         return NULL;
     }

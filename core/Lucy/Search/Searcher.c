@@ -71,10 +71,10 @@ Searcher_Glean_Query_IMP(Searcher *self, Obj *query) {
     if (!query) {
         real_query = (Query*)NoMatchQuery_new();
     }
-    else if (Obj_Is_A(query, QUERY)) {
+    else if (Obj_is_a(query, QUERY)) {
         real_query = (Query*)INCREF(query);
     }
-    else if (Obj_Is_A(query, STRING)) {
+    else if (Obj_is_a(query, STRING)) {
         if (!ivars->qparser) {
             ivars->qparser = QParser_new(ivars->schema, NULL, NULL, NULL);
         }
@@ -82,7 +82,7 @@ Searcher_Glean_Query_IMP(Searcher *self, Obj *query) {
     }
     else {
         THROW(ERR, "Invalid type for 'query' param: %o",
-              Obj_Get_Class_Name(query));
+              Obj_get_class_name(query));
     }
 
     return real_query;

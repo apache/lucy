@@ -62,7 +62,7 @@ Obj*
 Analyzer_Dump_IMP(Analyzer *self) {
     Hash *dump = Hash_new(0);
     Hash_Store_Utf8(dump, "_class", 6,
-                    (Obj*)Str_Clone(Obj_Get_Class_Name((Obj*)self)));
+                    (Obj*)Str_Clone(Obj_get_class_name((Obj*)self)));
     return (Obj*)dump;
 }
 

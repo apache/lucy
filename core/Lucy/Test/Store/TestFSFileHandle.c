@@ -69,7 +69,7 @@ test_open(TestBatchRunner *runner) {
 
     Err_set_error(NULL);
     fh = FSFH_open(test_filename, FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
-    TEST_TRUE(runner, fh && FSFH_Is_A(fh, FSFILEHANDLE), "open() succeeds");
+    TEST_TRUE(runner, fh && FSFH_is_a(fh, FSFILEHANDLE), "open() succeeds");
     TEST_TRUE(runner, Err_get_error() == NULL, "open() no errors");
     FSFH_Write(fh, "foo", 3);
     if (!FSFH_Close(fh)) { RETHROW(INCREF(Err_get_error())); }
@@ -83,7 +83,7 @@ test_open(TestBatchRunner *runner) {
 
     Err_set_error(NULL);
     fh = FSFH_open(test_filename, FH_CREATE | FH_WRITE_ONLY);
-    TEST_TRUE(runner, fh && FSFH_Is_A(fh, FSFILEHANDLE),
+    TEST_TRUE(runner, fh && FSFH_is_a(fh, FSFILEHANDLE),
               "open() for append");
     TEST_TRUE(runner, Err_get_error() == NULL,
               "open() for append -- no errors");
@@ -93,7 +93,7 @@ test_open(TestBatchRunner *runner) {
 
     Err_set_error(NULL);
     fh = FSFH_open(test_filename, FH_READ_ONLY);
-    TEST_TRUE(runner, fh && FSFH_Is_A(fh, FSFILEHANDLE), "open() read only");
+    TEST_TRUE(runner, fh && FSFH_is_a(fh, FSFILEHANDLE), "open() read only");
     TEST_TRUE(runner, Err_get_error() == NULL,
               "open() read only -- no errors");
     DECREF(fh);

@@ -65,7 +65,7 @@ NOTQuery_To_String_IMP(NOTQuery *self) {
 bool
 NOTQuery_Equals_IMP(NOTQuery *self, Obj *other) {
     if ((NOTQuery*)other == self)   { return true; }
-    if (!Obj_Is_A(other, NOTQUERY)) { return false; }
+    if (!Obj_is_a(other, NOTQUERY)) { return false; }
     NOTQuery_Equals_t super_equals
         = (NOTQuery_Equals_t)SUPER_METHOD_PTR(NOTQUERY, LUCY_NOTQuery_Equals);
     return super_equals(self, other);
@@ -128,7 +128,7 @@ NOTCompiler_Make_Matcher_IMP(NOTCompiler *self, SegReader *reader,
         int32_t doc_max = SegReader_Doc_Max(reader);
         return (Matcher*)MatchAllMatcher_new(weight, doc_max);
     }
-    else if (Obj_Is_A((Obj*)negated_matcher, MATCHALLMATCHER)) {
+    else if (Obj_is_a((Obj*)negated_matcher, MATCHALLMATCHER)) {
         DECREF(negated_matcher);
         return NULL;
     }

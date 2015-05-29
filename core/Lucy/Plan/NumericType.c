@@ -70,7 +70,7 @@ Hash*
 NumType_Dump_IMP(NumericType *self) {
     Hash *dump = NumType_Dump_For_Schema(self);
     Hash_Store_Utf8(dump, "_class", 6,
-                    (Obj*)Str_Clone(NumType_Get_Class_Name(self)));
+                    (Obj*)Str_Clone(NumType_get_class_name(self)));
     DECREF(Hash_Delete_Utf8(dump, "type", 4));
     return dump;
 }
@@ -84,10 +84,10 @@ NumType_Load_IMP(NumericType *self, Obj *dump) {
     String *class_name = (String*)Hash_Fetch_Utf8(source, "_class", 6);
     String *type_spec  = (String*)Hash_Fetch_Utf8(source, "type", 4);
     Class *klass = NULL;
-    if (class_name != NULL && Obj_Is_A((Obj*)class_name, STRING)) {
+    if (class_name != NULL && Obj_is_a((Obj*)class_name, STRING)) {
         klass = Class_singleton(class_name, NULL);
     }
-    else if (type_spec != NULL && Obj_Is_A((Obj*)type_spec, STRING)) {
+    else if (type_spec != NULL && Obj_is_a((Obj*)type_spec, STRING)) {
         if (Str_Equals_Utf8(type_spec, "i32_t", 5)) {
             klass = INT32TYPE;
         }
@@ -158,7 +158,7 @@ bool
 Float64Type_Equals_IMP(Float64Type *self, Obj *other) {
     if (self == (Float64Type*)other) { return true; }
     if (!other) { return false; }
-    if (!Obj_Is_A(other, FLOAT64TYPE)) { return false; }
+    if (!Obj_is_a(other, FLOAT64TYPE)) { return false; }
     Float64Type_Equals_t super_equals
         = SUPER_METHOD_PTR(FLOAT64TYPE, LUCY_Float64Type_Equals);
     return super_equals(self, other);
@@ -200,7 +200,7 @@ bool
 Float32Type_Equals_IMP(Float32Type *self, Obj *other) {
     if (self == (Float32Type*)other) { return true; }
     if (!other) { return false; }
-    if (!Obj_Is_A(other, FLOAT32TYPE)) { return false; }
+    if (!Obj_is_a(other, FLOAT32TYPE)) { return false; }
     Float32Type_Equals_t super_equals
         = SUPER_METHOD_PTR(FLOAT32TYPE, LUCY_Float32Type_Equals);
     return super_equals(self, other);
@@ -242,7 +242,7 @@ bool
 Int32Type_Equals_IMP(Int32Type *self, Obj *other) {
     if (self == (Int32Type*)other) { return true; }
     if (!other) { return false; }
-    if (!Obj_Is_A(other, INT32TYPE)) { return false; }
+    if (!Obj_is_a(other, INT32TYPE)) { return false; }
     Int32Type_Equals_t super_equals
         = SUPER_METHOD_PTR(INT32TYPE, LUCY_Int32Type_Equals);
     return super_equals(self, other);
@@ -284,7 +284,7 @@ bool
 Int64Type_Equals_IMP(Int64Type *self, Obj *other) {
     if (self == (Int64Type*)other) { return true; }
     if (!other) { return false; }
-    if (!Obj_Is_A(other, INT64TYPE)) { return false; }
+    if (!Obj_is_a(other, INT64TYPE)) { return false; }
     Int64Type_Equals_t super_equals
         = SUPER_METHOD_PTR(INT64TYPE, LUCY_Int64Type_Equals);
     return super_equals(self, other);

@@ -90,7 +90,7 @@ HitDoc_Load_IMP(HitDoc *self, Obj *dump) {
 bool
 HitDoc_Equals_IMP(HitDoc *self, Obj *other) {
     if ((HitDoc*)other == self)           { return true;  }
-    if (!Obj_Is_A(other, HITDOC))         { return false; }
+    if (!Obj_is_a(other, HITDOC))         { return false; }
     HitDoc_Equals_t super_equals
         = (HitDoc_Equals_t)SUPER_METHOD_PTR(HITDOC, LUCY_HitDoc_Equals);
     if (!super_equals(self, other))       { return false; }

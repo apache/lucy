@@ -164,7 +164,7 @@ FSFolder_Local_Is_Directory_IMP(FSFolder *self, String *name) {
 
     // Check for a cached object, then fall back to a system call.
     Obj *elem = Hash_Fetch(ivars->entries, name);
-    if (elem && Obj_Is_A(elem, FOLDER)) {
+    if (elem && Obj_is_a(elem, FOLDER)) {
         return true;
     }
     else {
@@ -238,7 +238,7 @@ FSFolder_Local_Find_Folder_IMP(FSFolder *self, String *name) {
         return NULL;
     }
     else if (NULL != (subfolder = (Folder*)Hash_Fetch(ivars->entries, name))) {
-        if (Folder_Is_A(subfolder, FOLDER)) {
+        if (Folder_is_a(subfolder, FOLDER)) {
             return subfolder;
         }
         else {

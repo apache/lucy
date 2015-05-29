@@ -121,7 +121,7 @@ Compiler_To_String_IMP(Compiler *self) {
 bool
 Compiler_Equals_IMP(Compiler *self, Obj *other) {
     if ((Compiler*)other == self)                          { return true; }
-    if (!Obj_Is_A(other, COMPILER))                        { return false; }
+    if (!Obj_is_a(other, COMPILER))                        { return false; }
     CompilerIVARS *const ivars = Compiler_IVARS(self);
     CompilerIVARS *const ovars = Compiler_IVARS((Compiler*)other);
     if (ivars->boost != ovars->boost)                      { return false; }

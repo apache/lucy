@@ -35,7 +35,7 @@ NumSortCache_init(NumericSortCache *self, String *field,
                   int32_t null_ord, int32_t ord_width, InStream *ord_in,
                   InStream *dat_in) {
     // Validate.
-    if (!type || !FType_Sortable(type) || !FType_Is_A(type, NUMERICTYPE)) {
+    if (!type || !FType_Sortable(type) || !FType_is_a(type, NUMERICTYPE)) {
         DECREF(self);
         THROW(ERR, "'%o' isn't a sortable NumericType field", field);
     }

@@ -414,7 +414,7 @@ Folder_Consolidate_IMP(Folder *self, String *path) {
     if (!folder) {
         THROW(ERR, "Can't consolidate %o", path);
     }
-    else if (Folder_Is_A(folder, COMPOUNDFILEREADER)) {
+    else if (Folder_is_a(folder, COMPOUNDFILEREADER)) {
         THROW(ERR, "Can't consolidate %o twice", path);
     }
     else {

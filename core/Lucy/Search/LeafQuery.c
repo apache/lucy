@@ -60,7 +60,7 @@ LeafQuery_Get_Text_IMP(LeafQuery *self) {
 bool
 LeafQuery_Equals_IMP(LeafQuery *self, Obj *other) {
     if ((LeafQuery*)other == self)     { return true; }
-    if (!Obj_Is_A(other, LEAFQUERY))   { return false; }
+    if (!Obj_is_a(other, LEAFQUERY))   { return false; }
     LeafQueryIVARS *const ivars = LeafQuery_IVARS(self);
     LeafQueryIVARS *const ovars = LeafQuery_IVARS((LeafQuery*)other);
     if (ivars->boost != ovars->boost)    { return false; }

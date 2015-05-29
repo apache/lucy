@@ -112,7 +112,7 @@ TermQuery_Get_Term_IMP(TermQuery *self) {
 bool
 TermQuery_Equals_IMP(TermQuery *self, Obj *other) {
     if ((TermQuery*)other == self)                     { return true; }
-    if (!Obj_Is_A(other, TERMQUERY))                   { return false; }
+    if (!Obj_is_a(other, TERMQUERY))                   { return false; }
     TermQueryIVARS *const ivars = TermQuery_IVARS(self);
     TermQueryIVARS *const ovars = TermQuery_IVARS((TermQuery*)other);
     if (ivars->boost != ovars->boost)                  { return false; }
@@ -193,7 +193,7 @@ TermCompiler_Equals_IMP(TermCompiler *self, Obj *other) {
         = (TermCompiler_Equals_t)SUPER_METHOD_PTR(TERMCOMPILER,
                                                   LUCY_TermCompiler_Equals);
     if (!super_equals(self, other))                           { return false; }
-    if (!Obj_Is_A(other, TERMCOMPILER))                       { return false; }
+    if (!Obj_is_a(other, TERMCOMPILER))                       { return false; }
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
     TermCompilerIVARS *const ovars = TermCompiler_IVARS((TermCompiler*)other);
     if (ivars->idf != ovars->idf)                             { return false; }

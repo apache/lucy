@@ -100,7 +100,7 @@ FType_Compare_Values_IMP(FieldType *self, Obj *a, Obj *b) {
 bool
 FType_Equals_IMP(FieldType *self, Obj *other) {
     if ((FieldType*)other == self)                     { return true; }
-    if (FType_Get_Class(self) != Obj_Get_Class(other)) { return false; }
+    if (FType_get_class(self) != Obj_get_class(other)) { return false; }
     FieldTypeIVARS *const ivars = FType_IVARS(self);
     FieldTypeIVARS *const ovars = FType_IVARS((FieldType*)other);
     if (ivars->boost != ovars->boost)                  { return false; }

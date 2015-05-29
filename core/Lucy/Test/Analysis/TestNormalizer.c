@@ -94,7 +94,7 @@ test_normalization(TestBatchRunner *runner) {
             String *norm = (String*)Vec_Fetch(got, 0);
             TEST_TRUE(runner,
                       norm
-                      && Str_Is_A(norm, STRING)
+                      && Str_is_a(norm, STRING)
                       && Str_Equals(norm, Vec_Fetch(norms, j)),
                       "Normalize %s %d %d: %s", Str_Get_Ptr8(form),
                       case_fold, strip_accents, Str_Get_Ptr8(word)

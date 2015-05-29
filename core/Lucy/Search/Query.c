@@ -57,7 +57,7 @@ Query_Dump_IMP(Query *self) {
     QueryIVARS *ivars = Query_IVARS(self);
     Hash *dump = Hash_new(0);
     Hash_Store_Utf8(dump, "_class", 6,
-                    (Obj*)Str_Clone(Obj_Get_Class_Name((Obj*)self)));
+                    (Obj*)Str_Clone(Obj_get_class_name((Obj*)self)));
     Hash_Store_Utf8(dump, "boost", 5,
                     (Obj*)Str_newf("%f64", (double)ivars->boost));
     return (Obj*)dump;

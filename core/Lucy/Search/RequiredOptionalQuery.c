@@ -82,7 +82,7 @@ ReqOptQuery_To_String_IMP(RequiredOptionalQuery *self) {
 bool
 ReqOptQuery_Equals_IMP(RequiredOptionalQuery *self, Obj *other) {
     if ((RequiredOptionalQuery*)other == self)   { return true;  }
-    if (!Obj_Is_A(other, REQUIREDOPTIONALQUERY)) { return false; }
+    if (!Obj_is_a(other, REQUIREDOPTIONALQUERY)) { return false; }
     ReqOptQuery_Equals_t super_equals
         = (ReqOptQuery_Equals_t)SUPER_METHOD_PTR(REQUIREDOPTIONALQUERY,
                                                  LUCY_ReqOptQuery_Equals);
