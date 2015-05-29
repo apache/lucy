@@ -84,7 +84,7 @@ PPCODE:
         LUCY_OutStream_Close(target);
         serialized_bb
             = LUCY_RAMFile_Get_Contents(LUCY_RAMFH_Get_File(file_handle));
-        retval = XSBind_bb_to_sv(aTHX_ serialized_bb);
+        retval = (SV*)CFISH_BB_To_Host(serialized_bb);
         CFISH_DECREF(file_handle);
         CFISH_DECREF(target);
 

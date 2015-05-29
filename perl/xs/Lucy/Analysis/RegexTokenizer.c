@@ -75,7 +75,7 @@ S_compile_token_re(pTHX_ cfish_String *pattern) {
     SAVETMPS;
     EXTEND(SP, 1);
     PUSHMARK(SP);
-    XPUSHs(XSBind_str_to_sv(aTHX_ pattern));
+    XPUSHs((SV*)CFISH_Str_To_Host(pattern));
     PUTBACK;
     call_pv("Lucy::Analysis::RegexTokenizer::_compile_token_re", G_SCALAR);
     SPAGAIN;
