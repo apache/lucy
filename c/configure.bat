@@ -35,7 +35,7 @@ echo cl /nologo ..\common\charmonizer.c
 cl /nologo ..\common\charmonizer.c
 if errorlevel 1 exit /b 1
 echo Running charmonizer
-charmonizer.exe --cc=cl --enable-c --enable-makefile %*
+charmonizer.exe --cc=cl --host=c --enable-c --enable-makefile %*
 exit /b
 
 :found_gcc
