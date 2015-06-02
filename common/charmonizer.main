@@ -542,47 +542,48 @@ static void
 lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
     const char *dir_sep  = chaz_OS_dir_sep();
     const char *exe_ext  = chaz_OS_exe_ext();
+    const char *obj_ext  = chaz_CC_obj_ext();
 
-    chaz_CFlags   *test_cflags;
+    chaz_CFlags   *cflags;
+    chaz_CFlags   *link_flags;
     chaz_MakeRule *rule;
 
     char *test_lucy_exe;
-    char *test_lucy_c;
-    char *test_command;
+    char *test_lucy_obj;
 
     test_lucy_exe = chaz_Util_join("", "t", dir_sep, "test_lucy", exe_ext,
                                    NULL);
-    test_lucy_c = chaz_Util_join(dir_sep, "t", "test_lucy.c", NULL);
-    test_cflags = chaz_CC_new_cflags();
-    chaz_CFlags_enable_optimization(test_cflags);
-    chaz_CFlags_add_include_dir(test_cflags, self->autogen_inc_dir);
-    chaz_CFlags_add_library(test_cflags, self->shared_lib);
+    test_lucy_obj = chaz_Util_join("", "t", dir_sep, "test_lucy", obj_ext,
+                                   NULL);
+
+    chaz_MakeFile_add_rule(self->makefile, test_lucy_obj,
+                           self->autogen_target);
+
+    cflags = chaz_CC_new_cflags();
+    chaz_CFlags_enable_optimization(cflags);
+    chaz_CFlags_add_include_dir(cflags, self->autogen_inc_dir);
+    chaz_MakeFile_override_cflags(self->makefile, test_lucy_obj, cflags);
+    chaz_CFlags_destroy(cflags);
+
+    link_flags = chaz_CC_new_cflags();
+    chaz_CFlags_add_library(link_flags, self->shared_lib);
     if (self->cfish_lib_dir) {
-        chaz_CFlags_add_library_path(test_cflags, self->cfish_lib_dir);
+        chaz_CFlags_add_library_path(link_flags, self->cfish_lib_dir);
     }
-    chaz_CFlags_add_external_library(test_cflags, self->cfish_lib_name);
-    rule = chaz_MakeFile_add_compiled_exe(self->makefile, test_lucy_exe,
-                                          test_lucy_c, test_cflags);
+    chaz_CFlags_add_external_library(link_flags, self->cfish_lib_name);
+    rule = chaz_MakeFile_add_exe(self->makefile, test_lucy_exe, test_lucy_obj,
+                                 link_flags);
     chaz_MakeRule_add_prereq(rule, self->shared_lib_filename);
-    chaz_CFlags_destroy(test_cflags);
+    chaz_CFlags_destroy(link_flags);
 
     rule = chaz_MakeFile_add_rule(self->makefile, "test", test_lucy_exe);
-    if (strcmp(chaz_OS_shared_lib_ext(), ".so") == 0) {
-        if (self->cfish_lib_dir) {
-            test_command
-                = chaz_Util_join("", "LD_LIBRARY_PATH=.:", self->cfish_lib_dir,
-                                 ":$$LD_LIBRARY_PATH ", test_lucy_exe, NULL);
-        }
-        else {
-            test_command
-                = chaz_Util_join(" ", "LD_LIBRARY_PATH=.:$$LD_LIBRARY_PATH",
-                                 test_lucy_exe, NULL);
-        }
+    if (self->cfish_lib_dir) {
+        chaz_MakeRule_add_command_with_libpath(rule, test_lucy_exe, ".",
+                                               self->cfish_lib_dir, NULL);
     }
     else {
-        test_command = chaz_Util_strdup(test_lucy_exe);
+        chaz_MakeRule_add_command_with_libpath(rule, test_lucy_exe, ".", NULL);
     }
-    chaz_MakeRule_add_command(rule, test_command);
 
     if (chaz_CLI_defined(self->cli, "enable-coverage")) {
         rule = chaz_MakeFile_add_rule(self->makefile, "coverage", test_lucy_exe);
@@ -590,7 +591,14 @@ lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
                                   "lcov"
                                   " --zerocounters"
                                   " --directory $(BASE_DIR)");
-        chaz_MakeRule_add_command(rule, test_command);
+        if (self->cfish_lib_dir) {
+            chaz_MakeRule_add_command_with_libpath(rule, test_lucy_exe, ".",
+                                                   self->cfish_lib_dir, NULL);
+        }
+        else {
+            chaz_MakeRule_add_command_with_libpath(rule, test_lucy_exe, ".",
+                                                   NULL);
+        }
         chaz_MakeRule_add_command(rule,
                                   "lcov"
                                   " --capture"
@@ -610,8 +618,7 @@ lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
     }
 
     free(test_lucy_exe);
-    free(test_lucy_c);
-    free(test_command);
+    free(test_lucy_obj);
 }
 
 static void

@@ -778,6 +778,16 @@ chaz_MakeRule*
 chaz_MakeFile_add_lemon_grammar(chaz_MakeFile *makefile,
                                 const char *base_name);
 
+/** Override compiler flags for a single object file.
+ *
+ * @param makefile The makefile.
+ * @param obj The object file.
+ * @param cflags Compiler flags.
+ */
+void
+chaz_MakeFile_override_cflags(chaz_MakeFile *makefile, const char *obj,
+                              chaz_CFlags *cflags);
+
 /** Write the makefile to a file named 'Makefile' in the current directory.
  *
  * @param makefile The makefile.
@@ -817,6 +827,16 @@ chaz_MakeRule_add_prereq(chaz_MakeRule *rule, const char *prereq);
  */
 void
 chaz_MakeRule_add_command(chaz_MakeRule *rule, const char *command);
+
+/** Add a command to be executed with a special runtime library path.
+ *
+ * @param rule The rule.
+ * @param command The additional command.
+ * @param ... NULL-terminated list of library directories.
+ */
+void
+chaz_MakeRule_add_command_with_libpath(chaz_MakeRule *rule,
+                                       const char *command, ...);
 
 /** Add a command to remove one or more files.
  *
@@ -986,6 +1006,11 @@ chaz_Util_strdup(const char *string);
  */
 char*
 chaz_Util_join(const char *sep, ...);
+
+/* Join a NULL-terminated list of strings using a separator.
+ */
+char*
+chaz_Util_vjoin(const char *sep, va_list args);
 
 /* Get the length of a file (may overshoot on text files under DOS).
  */
@@ -2569,6 +2594,7 @@ chaz_CLI_parse(chaz_CLI *self, int argc, const char *argv[]) {
 /***************************************************************************/
 
 #line 17 "src/Charmonizer/Core/Compiler.c"
+#include <errno.h>
 #include <string.h>
 #include <stdlib.h>
 /* #include "Charmonizer/Core/Util.h" */
@@ -2613,6 +2639,7 @@ void
 chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     const char *code = "int main() { return 0; }\n";
     int compile_succeeded = 0;
+    int retval            = -1;
 
     if (chaz_Util_verbosity) { printf("Creating compiler object...\n"); }
 
@@ -2626,22 +2653,36 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     chaz_CC.try_exe_name
         = chaz_Util_join("", CHAZ_CC_TRY_BASENAME, chaz_OS_exe_ext(), NULL);
 
-    /* If we can't compile anything, game over. */
+    /* If we can't compile or execute anything, game over. */
     if (chaz_Util_verbosity) {
-        printf("Trying to compile a small test file...\n");
+        printf("Trying to compile and execute a small test file...\n");
+    }
+    if (!chaz_Util_remove_and_verify(chaz_CC.try_exe_name)) {
+        chaz_Util_die("Failed to delete file '%s'", chaz_CC.try_exe_name);
     }
     /* Try MSVC argument style. */
     strcpy(chaz_CC.obj_ext, ".obj");
     chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_MSVC;
-    compile_succeeded = chaz_CC_test_compile(code);
+    compile_succeeded = chaz_CC_compile_exe(CHAZ_CC_TRY_SOURCE_PATH,
+                                            CHAZ_CC_TRY_BASENAME, code);
     if (!compile_succeeded) {
         /* Try POSIX argument style. */
         strcpy(chaz_CC.obj_ext, ".o");
         chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_POSIX;
-        compile_succeeded = chaz_CC_test_compile(code);
+        compile_succeeded = chaz_CC_compile_exe(CHAZ_CC_TRY_SOURCE_PATH,
+                                                CHAZ_CC_TRY_BASENAME, code);
     }
     if (!compile_succeeded) {
         chaz_Util_die("Failed to compile a small test file");
+    }
+    retval = chaz_OS_run_local_redirected(chaz_CC.try_exe_name,
+                                          chaz_OS_dev_null());
+    chaz_Util_remove_and_verify(chaz_CC.try_exe_name);
+    if (retval < 0) {
+        chaz_Util_die("Failed to execute test file: %s", strerror(errno));
+    }
+    if (retval > 0) {
+        chaz_Util_die("Unexpected exit code %d from test file", retval);
     }
 
     chaz_CC_detect_known_compilers();
@@ -4841,6 +4882,47 @@ chaz_MakeFile_add_lemon_grammar(chaz_MakeFile *makefile,
 }
 
 void
+chaz_MakeFile_override_cflags(chaz_MakeFile *makefile, const char *obj,
+                              chaz_CFlags *cflags) {
+    const char *obj_ext       = chaz_CC_obj_ext();
+    const char *cflags_string = chaz_CFlags_get_string(cflags);
+    size_t obj_ext_len = strlen(obj_ext);
+    size_t obj_len     = strlen(obj);
+    size_t base_len;
+    char *src;
+    char *command;
+    chaz_MakeRule *rule;
+
+    if (obj_len <= obj_ext_len) {
+       chaz_Util_die("Invalid object file: %s", obj);
+    }
+
+    base_len = obj_len - obj_ext_len;
+
+    if (strcmp(obj + base_len, obj_ext) != 0) {
+       chaz_Util_die("Invalid object file: %s", obj);
+    }
+
+    src = malloc(base_len + sizeof(".c"));
+    memcpy(src, obj, base_len);
+    memcpy(src + base_len, ".c", sizeof(".c"));
+
+    rule = chaz_MakeFile_add_rule(makefile, obj, src);
+    if (chaz_CC_msvc_version_num()) {
+        command = chaz_Util_join(" ", "$(CC) /nologo", cflags_string, "/c",
+                                 src, "/Fo$@", NULL);
+    }
+    else {
+        command = chaz_Util_join(" ", "$(CC)", cflags_string, "-c", src,
+                                 "-o $@", NULL);
+    }
+    chaz_MakeRule_add_command(rule, command);
+
+    free(command);
+    free(src);
+}
+
+void
 chaz_MakeFile_write(chaz_MakeFile *makefile) {
     FILE   *out;
     size_t  i;
@@ -4981,6 +5063,42 @@ chaz_MakeRule_add_command(chaz_MakeRule *rule, const char *command) {
     }
 
     rule->commands = commands;
+}
+
+void
+chaz_MakeRule_add_command_with_libpath(chaz_MakeRule *rule,
+                                       const char *command, ...) {
+    va_list args;
+    char *path        = NULL;
+    char *lib_command = NULL;
+
+    if (strcmp(chaz_OS_shared_lib_ext(), ".so") == 0) {
+        va_start(args, command);
+        path = chaz_Util_vjoin(":", args);
+        va_end(args);
+
+        lib_command = chaz_Util_join("", "LD_LIBRARY_PATH=", path,
+                                     ":$$LD_LIBRARY_PATH ", command, NULL);
+
+        free(path);
+    }
+    else if (strcmp(chaz_OS_shared_lib_ext(), ".dll") == 0) {
+        va_start(args, command);
+        path = chaz_Util_vjoin(";", args);
+        va_end(args);
+
+        lib_command = chaz_Util_join("", "path ", path, ";%path% && ", command,
+                                     NULL);
+    }
+    else {
+        /* Assume that library paths are compiled into the executable on
+         * Darwin.
+         */
+        lib_command = chaz_Util_strdup(command);
+    }
+
+    chaz_MakeRule_add_command(rule, lib_command);
+    free(lib_command);
 }
 
 void
@@ -5414,6 +5532,13 @@ chaz_OS_rmdir(const char *filepath) {
 /* #include "Charmonizer/Core/Util.h" */
 /* #include "Charmonizer/Core/OperatingSystem.h" */
 
+/* va_copy is not part of C89. Assume that simple assignment works if it
+ * isn't defined.
+ */
+#ifndef va_copy
+  #define va_copy(dst, src) ((dst) = (src))
+#endif
+
 /* Global verbosity setting. */
 int chaz_Util_verbosity = 1;
 
@@ -5513,6 +5638,18 @@ chaz_Util_strdup(const char *string) {
 char*
 chaz_Util_join(const char *sep, ...) {
     va_list args;
+    char *result;
+
+    va_start(args, sep);
+    result = chaz_Util_vjoin(sep, args);
+    va_end(args);
+
+    return result;
+}
+
+char*
+chaz_Util_vjoin(const char *sep, va_list orig_args) {
+    va_list args;
     const char *string;
     char *result, *p;
     size_t sep_len = strlen(sep);
@@ -5520,7 +5657,7 @@ chaz_Util_join(const char *sep, ...) {
     int i;
 
     /* Determine result size. */
-    va_start(args, sep);
+    va_copy(args, orig_args);
     size = 1;
     string = va_arg(args, const char*);
     for (i = 0; string; ++i) {
@@ -5533,7 +5670,7 @@ chaz_Util_join(const char *sep, ...) {
     result = (char*)malloc(size);
 
     /* Create result string. */
-    va_start(args, sep);
+    va_copy(args, orig_args);
     p = result;
     string = va_arg(args, const char*);
     for (i = 0; string; ++i) {
@@ -6483,7 +6620,9 @@ chaz_Headers_probe_posix(void) {
         "grp.h",
         "pwd.h",
         "regex.h",
+        "sched.h",
         "sys/stat.h",
+        "sys/time.h",
         "sys/times.h",
         "sys/types.h",
         "sys/utsname.h",
@@ -7386,7 +7525,7 @@ chaz_Memory_probe_alloca(void) {
 
     /* Unixen. */
     sprintf(code_buf, alloca_code, "alloca.h", "alloca");
-    if (chaz_CC_test_compile(code_buf)) {
+    if (chaz_CC_test_link(code_buf)) {
         has_alloca = true;
         chaz_ConfWriter_add_def("HAS_ALLOCA_H", NULL);
         chaz_ConfWriter_add_def("alloca", "alloca");
@@ -7398,7 +7537,7 @@ chaz_Memory_probe_alloca(void) {
          * are subsequently repeated during the build.
          */
         sprintf(code_buf, alloca_code, "stdlib.h", "alloca");
-        if (chaz_CC_test_compile(code_buf)) {
+        if (chaz_CC_test_link(code_buf)) {
             has_alloca = true;
             chaz_ConfWriter_add_def("ALLOCA_IN_STDLIB_H", NULL);
             chaz_ConfWriter_add_def("alloca", "alloca");
@@ -7407,7 +7546,7 @@ chaz_Memory_probe_alloca(void) {
     if (!has_alloca) {
         sprintf(code_buf, alloca_code, "stdio.h", /* stdio.h is filler */
                 "__builtin_alloca");
-        if (chaz_CC_test_compile(code_buf)) {
+        if (chaz_CC_test_link(code_buf)) {
             has_builtin_alloca = true;
             chaz_ConfWriter_add_def("alloca", "__builtin_alloca");
         }
@@ -7416,7 +7555,7 @@ chaz_Memory_probe_alloca(void) {
     /* Windows. */
     if (!(has_alloca || has_builtin_alloca)) {
         sprintf(code_buf, alloca_code, "malloc.h", "alloca");
-        if (chaz_CC_test_compile(code_buf)) {
+        if (chaz_CC_test_link(code_buf)) {
             has_alloca = true;
             chaz_ConfWriter_add_def("HAS_MALLOC_H", NULL);
             chaz_ConfWriter_add_def("alloca", "alloca");
@@ -7424,9 +7563,9 @@ chaz_Memory_probe_alloca(void) {
     }
     if (!(has_alloca || has_builtin_alloca)) {
         sprintf(code_buf, alloca_code, "malloc.h", "_alloca");
-        if (chaz_CC_test_compile(code_buf)) {
+        if (chaz_CC_test_link(code_buf)) {
             chaz_ConfWriter_add_def("HAS_MALLOC_H", NULL);
-            chaz_ConfWriter_add_def("chy_alloca", "_alloca");
+            chaz_ConfWriter_add_def("alloca", "_alloca");
         }
     }
 }
@@ -8285,47 +8424,48 @@ static void
 lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
     const char *dir_sep  = chaz_OS_dir_sep();
     const char *exe_ext  = chaz_OS_exe_ext();
+    const char *obj_ext  = chaz_CC_obj_ext();
 
-    chaz_CFlags   *test_cflags;
+    chaz_CFlags   *cflags;
+    chaz_CFlags   *link_flags;
     chaz_MakeRule *rule;
 
     char *test_lucy_exe;
-    char *test_lucy_c;
-    char *test_command;
+    char *test_lucy_obj;
 
     test_lucy_exe = chaz_Util_join("", "t", dir_sep, "test_lucy", exe_ext,
                                    NULL);
-    test_lucy_c = chaz_Util_join(dir_sep, "t", "test_lucy.c", NULL);
-    test_cflags = chaz_CC_new_cflags();
-    chaz_CFlags_enable_optimization(test_cflags);
-    chaz_CFlags_add_include_dir(test_cflags, self->autogen_inc_dir);
-    chaz_CFlags_add_library(test_cflags, self->shared_lib);
+    test_lucy_obj = chaz_Util_join("", "t", dir_sep, "test_lucy", obj_ext,
+                                   NULL);
+
+    chaz_MakeFile_add_rule(self->makefile, test_lucy_obj,
+                           self->autogen_target);
+
+    cflags = chaz_CC_new_cflags();
+    chaz_CFlags_enable_optimization(cflags);
+    chaz_CFlags_add_include_dir(cflags, self->autogen_inc_dir);
+    chaz_MakeFile_override_cflags(self->makefile, test_lucy_obj, cflags);
+    chaz_CFlags_destroy(cflags);
+
+    link_flags = chaz_CC_new_cflags();
+    chaz_CFlags_add_library(link_flags, self->shared_lib);
     if (self->cfish_lib_dir) {
-        chaz_CFlags_add_library_path(test_cflags, self->cfish_lib_dir);
+        chaz_CFlags_add_library_path(link_flags, self->cfish_lib_dir);
     }
-    chaz_CFlags_add_external_library(test_cflags, self->cfish_lib_name);
-    rule = chaz_MakeFile_add_compiled_exe(self->makefile, test_lucy_exe,
-                                          test_lucy_c, test_cflags);
+    chaz_CFlags_add_external_library(link_flags, self->cfish_lib_name);
+    rule = chaz_MakeFile_add_exe(self->makefile, test_lucy_exe, test_lucy_obj,
+                                 link_flags);
     chaz_MakeRule_add_prereq(rule, self->shared_lib_filename);
-    chaz_CFlags_destroy(test_cflags);
+    chaz_CFlags_destroy(link_flags);
 
     rule = chaz_MakeFile_add_rule(self->makefile, "test", test_lucy_exe);
-    if (strcmp(chaz_OS_shared_lib_ext(), ".so") == 0) {
-        if (self->cfish_lib_dir) {
-            test_command
-                = chaz_Util_join("", "LD_LIBRARY_PATH=.:", self->cfish_lib_dir,
-                                 ":$$LD_LIBRARY_PATH ", test_lucy_exe, NULL);
-        }
-        else {
-            test_command
-                = chaz_Util_join(" ", "LD_LIBRARY_PATH=.:$$LD_LIBRARY_PATH",
-                                 test_lucy_exe, NULL);
-        }
+    if (self->cfish_lib_dir) {
+        chaz_MakeRule_add_command_with_libpath(rule, test_lucy_exe, ".",
+                                               self->cfish_lib_dir, NULL);
     }
     else {
-        test_command = chaz_Util_strdup(test_lucy_exe);
+        chaz_MakeRule_add_command_with_libpath(rule, test_lucy_exe, ".", NULL);
     }
-    chaz_MakeRule_add_command(rule, test_command);
 
     if (chaz_CLI_defined(self->cli, "enable-coverage")) {
         rule = chaz_MakeFile_add_rule(self->makefile, "coverage", test_lucy_exe);
@@ -8333,7 +8473,14 @@ lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
                                   "lcov"
                                   " --zerocounters"
                                   " --directory $(BASE_DIR)");
-        chaz_MakeRule_add_command(rule, test_command);
+        if (self->cfish_lib_dir) {
+            chaz_MakeRule_add_command_with_libpath(rule, test_lucy_exe, ".",
+                                                   self->cfish_lib_dir, NULL);
+        }
+        else {
+            chaz_MakeRule_add_command_with_libpath(rule, test_lucy_exe, ".",
+                                                   NULL);
+        }
         chaz_MakeRule_add_command(rule,
                                   "lcov"
                                   " --capture"
@@ -8353,8 +8500,7 @@ lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
     }
 
     free(test_lucy_exe);
-    free(test_lucy_c);
-    free(test_command);
+    free(test_lucy_obj);
 }
 
 static void
