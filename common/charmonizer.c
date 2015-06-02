@@ -784,7 +784,7 @@ chaz_MakeFile_add_lemon_grammar(chaz_MakeFile *makefile,
  * @param obj The object file.
  * @param cflags Compiler flags.
  */
-chaz_MakeRule*
+void
 chaz_MakeFile_override_cflags(chaz_MakeFile *makefile, const char *obj,
                               chaz_CFlags *cflags);
 
@@ -4881,7 +4881,7 @@ chaz_MakeFile_add_lemon_grammar(chaz_MakeFile *makefile,
     return rule;
 }
 
-chaz_MakeRule*
+void
 chaz_MakeFile_override_cflags(chaz_MakeFile *makefile, const char *obj,
                               chaz_CFlags *cflags) {
     const char *obj_ext       = chaz_CC_obj_ext();
@@ -4920,8 +4920,6 @@ chaz_MakeFile_override_cflags(chaz_MakeFile *makefile, const char *obj,
 
     free(command);
     free(src);
-
-    return rule;
 }
 
 void
@@ -5089,10 +5087,7 @@ chaz_MakeRule_add_command_with_libpath(chaz_MakeRule *rule,
         path = chaz_Util_vjoin(";", args);
         va_end(args);
 
-        /* It's important to not add a space before `&&`. Otherwise, the
-	 * space is added to the search path.
-	 */
-        lib_command = chaz_Util_join("", "path ", path, ";%path%&& ", command,
+        lib_command = chaz_Util_join("", "path ", path, ";%path% && ", command,
                                      NULL);
     }
     else {
@@ -8100,8 +8095,10 @@ S_add_compiler_flags(struct chaz_CLI *cli) {
         chaz_CFlags_append(extra_cflags, "-std=gnu99 -D_GNU_SOURCE");
     }
     else if (chaz_Probe_msvc_version_num()) {
-        /* Compile as C++ under MSVC. */
-        chaz_CFlags_append(extra_cflags, "/TP");
+        if (chaz_Probe_msvc_version_num() < 1800) {
+            /* Compile as C++ under MSVC11 and below. */
+            chaz_CFlags_append(extra_cflags, "/TP");
+        }
 
         chaz_CFlags_append(extra_cflags, "/W3");
         /* Thwart stupid warnings. */

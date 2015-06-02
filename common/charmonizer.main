@@ -213,8 +213,10 @@ S_add_compiler_flags(struct chaz_CLI *cli) {
         chaz_CFlags_append(extra_cflags, "-std=gnu99 -D_GNU_SOURCE");
     }
     else if (chaz_Probe_msvc_version_num()) {
-        /* Compile as C++ under MSVC. */
-        chaz_CFlags_append(extra_cflags, "/TP");
+        if (chaz_Probe_msvc_version_num() < 1800) {
+            /* Compile as C++ under MSVC11 and below. */
+            chaz_CFlags_append(extra_cflags, "/TP");
+        }
 
         chaz_CFlags_append(extra_cflags, "/W3");
         /* Thwart stupid warnings. */
