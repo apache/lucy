@@ -54,24 +54,14 @@
 
 #include <stdlib.h>
 #include <sys/types.h>
+/* Clownfish has better detection of stdbool.h and stdint.h. */
+#include "cfish_platform.h"
 #ifdef _MSC_VER
-typedef signed char int8_t;
-typedef unsigned char uint8_t;
-typedef short int16_t;
-typedef unsigned short uint16_t;
-typedef int int32_t;
 #ifdef _WIN64
 #define ssize_t __int64
 #else
 #define ssize_t int
 #endif
-#ifndef __cplusplus
-typedef unsigned char bool;
-enum {false, true};
-#endif
-#else
-#include <stdbool.h>
-#include <inttypes.h>
 #endif
 #include <limits.h>
 
