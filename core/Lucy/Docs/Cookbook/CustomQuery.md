@@ -135,7 +135,7 @@ by objects which subclass [](cfish:lucy.Searcher) -- such as
 A Searcher is associated with a particular collection of documents.   These
 documents may all reside in one index, as with IndexSearcher, or they may be
 spread out across multiple indexes on one or more machines, as with
-[](ClusterSearcher).
+LucyX::Remote::ClusterSearcher.
 
 Searcher objects have access to certain statistical information about the
 collections they represent; for instance, a Searcher can tell you how many
