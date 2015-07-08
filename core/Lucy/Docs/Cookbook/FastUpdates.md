@@ -1,29 +1,10 @@
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements.  See the NOTICE file distributed with
-# this work for additional information regarding copyright ownership.
-# The ASF licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-=head1 NAME
-
-Lucy::Docs::Cookbook::FastUpdates - Near real-time index updates.
-
-=head1 ABSTRACT
+# Near real-time index updates
 
 While index updates are fast on average, worst-case update performance may be
 significantly slower.  To make index updates consistently quick, we must
 manually intervene to control the process of index segment consolidation.
 
-=head1 The problem
+## The problem
 
 Ordinarily, modifying an index is cheap. New data is added to new segments,
 and the time to write a new segment scales more or less linearly with the
@@ -42,39 +23,43 @@ If the recycled segments are small, the time it takes to rewrite them may not
 be significant.  Every once in a while, though, a large amount of data must be
 rewritten.
 
-=head1 Procrastinating and playing catch-up
+## Procrastinating and playing catch-up
 
 The simplest way to force fast index updates is to avoid rewriting anything.
 
-Indexer relies upon L<IndexManager|Lucy::Index::IndexManager>'s
+Indexer relies upon [](cfish:lucy.IndexManager)'s
 recycle() method to tell it which segments should be consolidated.  If we
 subclass IndexManager and override recycle() so that it always returns an
 empty array, we get consistently quick performance:
 
-    package NoMergeManager;
-    use base qw( Lucy::Index::IndexManager );
-    sub recycle { [] }
-    
-    package main;
-    my $indexer = Lucy::Index::Indexer->new(
-        index => '/path/to/index',
-        manager => NoMergeManager->new,
-    );
-    ...
-    $indexer->commit;
+~~~ perl
+package NoMergeManager;
+use base qw( Lucy::Index::IndexManager );
+sub recycle { [] }
+
+package main;
+my $indexer = Lucy::Index::Indexer->new(
+    index => '/path/to/index',
+    manager => NoMergeManager->new,
+);
+...
+$indexer->commit;
+~~~
 
 However, we can't procrastinate forever.  Eventually, we'll have to run an
 ordinary, uncontrolled indexing session, potentially triggering a large
 rewrite of lots of small and/or degraded segments:
 
-    my $indexer = Lucy::Index::Indexer->new( 
-        index => '/path/to/index', 
-        # manager => NoMergeManager->new,
-    );
-    ...
-    $indexer->commit;
+~~~ perl
+my $indexer = Lucy::Index::Indexer->new( 
+    index => '/path/to/index', 
+    # manager => NoMergeManager->new,
+);
+...
+$indexer->commit;
+~~~
 
-=head1 Acceptable worst-case update time, slower degradation
+## Acceptable worst-case update time, slower degradation
 
 Never merging anything at all in the main indexing process is probably
 overkill.  Small segments are relatively cheap to merge; we just need to guard
@@ -84,20 +69,22 @@ Setting a ceiling on the number of documents in the segments to be recycled
 allows us to avoid a mass proliferation of tiny, single-document segments,
 while still offering decent worst-case update speed:
 
-    package LightMergeManager;
-    use base qw( Lucy::Index::IndexManager );
-    
-    sub recycle {
-        my $self = shift;
-        my $seg_readers = $self->SUPER::recycle(@_);
-        @$seg_readers = grep { $_->doc_max < 10 } @$seg_readers;
-        return $seg_readers;
-    }
+~~~ perl
+package LightMergeManager;
+use base qw( Lucy::Index::IndexManager );
+
+sub recycle {
+    my $self = shift;
+    my $seg_readers = $self->SUPER::recycle(@_);
+    @$seg_readers = grep { $_->doc_max < 10 } @$seg_readers;
+    return $seg_readers;
+}
+~~~
 
 However, we still have to consolidate every once in a while, and while that
 happens content updates will be locked out.
 
-=head1 Background merging
+## Background merging
 
 If it's not acceptable to lock out updates while the index consolidation
 process runs, the alternative is to move the consolidation process out of
@@ -107,37 +94,39 @@ It's never safe to have more than one Indexer attempting to modify the content
 of an index at the same time, but a BackgroundMerger and an Indexer can
 operate simultaneously:
 
-    # Indexing process.
-    use Scalar::Util qw( blessed );
-    my $retries = 0;
-    while (1) {
-        eval {
-            my $indexer = Lucy::Index::Indexer->new(
-                    index => '/path/to/index',
-                    manager => LightMergeManager->new,
-                );
-            $indexer->add_doc($doc);
-            $indexer->commit;
-        };
-        last unless $@;
-        if ( blessed($@) and $@->isa("Lucy::Store::LockErr") ) {
-            # Catch LockErr.
-            warn "Couldn't get lock ($retries retries)";
-            $retries++;
-        }
-        else {
-            die "Write failed: $@";
-        }
+~~~ perl
+# Indexing process.
+use Scalar::Util qw( blessed );
+my $retries = 0;
+while (1) {
+    eval {
+        my $indexer = Lucy::Index::Indexer->new(
+                index => '/path/to/index',
+                manager => LightMergeManager->new,
+            );
+        $indexer->add_doc($doc);
+        $indexer->commit;
+    };
+    last unless $@;
+    if ( blessed($@) and $@->isa("Lucy::Store::LockErr") ) {
+        # Catch LockErr.
+        warn "Couldn't get lock ($retries retries)";
+        $retries++;
     }
+    else {
+        die "Write failed: $@";
+    }
+}
 
-    # Background merge process.
-    my $manager = Lucy::Index::IndexManager->new;
-    $manager->set_write_lock_timeout(60_000);
-    my $bg_merger = Lucy::Index::BackgroundMerger->new(
-        index   => '/path/to/index',
-        manager => $manager,
-    );
-    $bg_merger->commit;
+# Background merge process.
+my $manager = Lucy::Index::IndexManager->new;
+$manager->set_write_lock_timeout(60_000);
+my $bg_merger = Lucy::Index::BackgroundMerger->new(
+    index   => '/path/to/index',
+    manager => $manager,
+);
+$bg_merger->commit;
+~~~
 
 The exception handling code becomes useful once you have more than one index
 modification process happening simultaneously.  By default, Indexer tries
@@ -148,6 +137,4 @@ once again near the end.  Under normal loads, the internal retry logic will
 resolve conflicts, but if it's not acceptable to miss an insert, you probably
 want to catch LockErr exceptions thrown by Indexer.  In contrast, a LockErr
 from BackgroundMerger probably just needs to be logged.
-
-=cut
 

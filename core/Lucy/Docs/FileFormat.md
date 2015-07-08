@@ -1,23 +1,4 @@
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements.  See the NOTICE file distributed with
-# this work for additional information regarding copyright ownership.
-# The ASF licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-=head1 NAME
-
-Lucy::Docs::FileFormat - Overview of index file format.
-
-=head1 OVERVIEW
+# Overview of index file format
 
 It is not necessary to understand the current implementation details of the
 index file format in order to use Apache Lucy effectively, but it may be
@@ -56,9 +37,9 @@ up of several component parts.
              |
              |--[...]--| 
 
-=head1 Write-once philosophy
+## Write-once philosophy
 
-All segment directory names consist of the string "seg_" followed by a number
+All segment directory names consist of the string "seg\_" followed by a number
 in base 36: seg_1, seg_5m, seg_p9s2 and so on, with higher numbers indicating
 more recent segments.  Once a segment is finished and committed, its name is
 never re-used and its files are never modified.
@@ -67,14 +48,14 @@ Old segments become obsolete and can be removed when their data has been
 consolidated into new segments during the process of segment merging and
 optimization.  A fully-optimized index has only one segment.
 
-=head1 Top-level entries
+## Top-level entries
 
 There are a handful of "top-level" files and directories which belong to the
 entire index rather than to a particular segment.
 
-=head2 snapshot_XXX.json
+### snapshot_XXX.json
 
-A "snapshot" file, e.g. C<snapshot_m7p.json>, is list of index files and
+A "snapshot" file, e.g. `snapshot_m7p.json`, is list of index files and
 directories.  Because index files, once written, are never modified, the list
 of entries in a snapshot defines a point-in-time view of the data in an index.
 
@@ -85,46 +66,46 @@ directory constitutes an index update.  While a new segment is being written
 new files may be added to the index directory, but until a new snapshot file
 gets written, a Searcher opening the index for reading won't know about them.
 
-=head2 schema_XXX.json
+### schema_XXX.json
 
 The schema file is a Schema object describing the index's format, serialized
 as JSON.  It, too, is versioned, and a given snapshot file will reference one
 and only one schema file.
 
-=head2 locks 
+### locks 
 
 By default, only one indexing process may safely modify the index at any given
-time.  Processes reserve an index by laying claim to the C<write.lock> file
-within the C<locks/> directory.  A smattering of other lock files may be used
+time.  Processes reserve an index by laying claim to the `write.lock` file
+within the `locks/` directory.  A smattering of other lock files may be used
 from time to time, as well.
 
-=head1 A segment's component parts
+## A segment's component parts
 
 By default, each segment has up to five logical components: lexicon, postings,
 document storage, highlight data, and deletions.  Binary data from these
 components gets stored in virtual files within the "cf.dat" compound file;
 metadata is stored in a shared "segmeta.json" file.
 
-=head2 segmeta.json
+### segmeta.json
 
 The segmeta.json file is a central repository for segment metadata.  In
 addition to information such as document counts and field numbers, it also
 warehouses arbitrary metadata on behalf of individual index components.
 
-=head2 Lexicon 
+### Lexicon 
 
 Each indexed field gets its own lexicon in each segment.  The exact files
 involved depend on the field's type, but generally speaking there will be two
-parts.  First, there's a primary C<lexicon-XXX.dat> file which houses a
+parts.  First, there's a primary `lexicon-XXX.dat` file which houses a
 complete term list associating terms with corpus frequency statistics,
 postings file locations, etc.  Second, one or more "lexicon index" files may
 be present which contain periodic samples from the primary lexicon file to
 facilitate fast lookups.
 
-=head2 Postings
+### Postings
 
 "Posting" is a technical term from the field of 
-L<information retrieval|Lucy::Docs::IRTheory>, defined as a single
+[information retrieval](cfish:IRTheory), defined as a single
 instance of a one term indexing one document.  If you are looking at the index
 in the back of a book, and you see that "freedom" is referenced on pages 8,
 86, and 240, that would be three postings, which taken together form a
@@ -142,54 +123,38 @@ in a book's index.  However, each posting record typically contains other
 information in addition to document id, e.g. the positions at which the term
 occurs within the field.
 
-=head2 Documents
+### Documents
 
 The document storage section is a simple database, organized into two files:
 
-=over
+* __documents.dat__ - Serialized documents.
 
-=item * 
+* __documents.ix__ - Document storage index, a solid array of 64-bit integers
+  where each integer location corresponds to a document id, and the value at
+  that location points at a file position in the documents.dat file.
 
-B<documents.dat> - Serialized documents.
-
-=item *
-
-B<documents.ix> - Document storage index, a solid array of 64-bit integers
-where each integer location corresponds to a document id, and the value at
-that location points at a file position in the documents.dat file.
-
-=back
-
-=head2 Highlight data 
+### Highlight data 
 
 The files which store data used for excerpting and highlighting are organized
 similarly to the files used to store documents.
 
-=over
+* __highlight.dat__ - Chunks of serialized highlight data, one per doc id.
 
-=item * 
+* __highlight.ix__ - Highlight data index -- as with the `documents.ix` file, a
+  solid array of 64-bit file pointers.
 
-B<highlight.dat> - Chunks of serialized highlight data, one per doc id.
-
-=item *
-
-B<highlight.ix> - Highlight data index -- as with the C<documents.ix> file, a
-solid array of 64-bit file pointers.
-
-=back
-
-=head2 Deletions
+### Deletions
 
 When a document is "deleted" from a segment, it is not actually purged right
 away; it is merely marked as "deleted" via a deletions file.  Deletions files
 contains bit vectors with one bit for each document in the segment; if bit
-#254 is set then document 254 is deleted, and if that document turns up in a
+\#254 is set then document 254 is deleted, and if that document turns up in a
 search it will be masked out.
 
 It is only when a segment's contents are rewritten to a new segment during the
 segment-merging process that deleted documents truly go away.
 
-=head1 Compound Files
+## Compound Files
 
 If you peer inside an index directory, you won't actually find any files named
 "documents.dat", "highlight.ix", etc. unless there is an indexing process
@@ -199,41 +164,28 @@ file per segment.
 To minimize the need for file descriptors at search-time, all per-segment
 binary data files are concatenated together in "cf.dat" at the close of each
 indexing session.  Information about where each file begins and ends is stored
-in C<cfmeta.json>.  When the segment is opened for reading, a single file
+in `cfmeta.json`.  When the segment is opened for reading, a single file
 descriptor per "cf.dat" file can be shared among several readers.
 
-=head1 A Typical Search
+## A Typical Search
 
 Here's a simplified narrative, dramatizing how a search for "freedom" against
 a given segment plays out:
 
-=over
+1. The searcher asks the relevant Lexicon Index, "Do you know anything about
+   'freedom'?"  Lexicon Index replies, "Can't say for sure, but if the main
+   Lexicon file does, 'freedom' is probably somewhere around byte 21008".  
 
-=item 1
+2. The main Lexicon tells the searcher "One moment, let me scan our records...
+   Yes, we have 2 documents which contain 'freedom'.  You'll find them in
+   seg_6/postings-4.dat starting at byte 66991."
 
-The searcher asks the relevant Lexicon Index, "Do you know anything about
-'freedom'?"  Lexicon Index replies, "Can't say for sure, but if the main
-Lexicon file does, 'freedom' is probably somewhere around byte 21008".  
+3. The Postings file says "Yep, we have 'freedom', all right!  Document id 40
+   has 1 'freedom', and document 44 has 8.  If you need to know more, like if any
+   'freedom' is part of the phrase 'freedom of speech', ask me about positions!
 
-=item 2
-
-The main Lexicon tells the searcher "One moment, let me scan our records...
-Yes, we have 2 documents which contain 'freedom'.  You'll find them in
-seg_6/postings-4.dat starting at byte 66991."
-
-=item 3
-
-The Postings file says "Yep, we have 'freedom', all right!  Document id 40
-has 1 'freedom', and document 44 has 8.  If you need to know more, like if any
-'freedom' is part of the phrase 'freedom of speech', ask me about positions!
-
-=item 4
-
-If the searcher is only looking for 'freedom' in isolation, that's where it
-stops.  It now knows enough to assign the documents scores against "freedom",
-with the 8-freedom document likely ranking higher than the single-freedom
-document.
-
-=back
-
+4. If the searcher is only looking for 'freedom' in isolation, that's where it
+   stops.  It now knows enough to assign the documents scores against "freedom",
+   with the 8-freedom document likely ranking higher than the single-freedom
+   document.
 
