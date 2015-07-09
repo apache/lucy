@@ -64,19 +64,13 @@ Freezer_serialize(Obj *obj, OutStream *outstream) {
     else if (Obj_is_a(obj, HASH)) {
         Freezer_serialize_hash((Hash*)obj, outstream);
     }
-    else if (Obj_is_a(obj, NUM)) {
-        if (Obj_is_a(obj, INTNUM)) {
-            if (Obj_is_a(obj, INTEGER64)) {
-                int64_t val = Int64_Get_Value((Integer64*)obj);
-                OutStream_Write_C64(outstream, (uint64_t)val);
-            }
-        }
-        else if (Obj_is_a(obj, FLOATNUM)) {
-            if (Obj_is_a(obj, FLOAT64)) {
-                double val = Float64_Get_Value((Float64*)obj);
-                OutStream_Write_F64(outstream, val);
-            }
-        }
+    else if (Obj_is_a(obj, INTEGER64)) {
+        int64_t val = Int64_Get_Value((Integer64*)obj);
+        OutStream_Write_C64(outstream, (uint64_t)val);
+    }
+    else if (Obj_is_a(obj, FLOAT64)) {
+        double val = Float64_Get_Value((Float64*)obj);
+        OutStream_Write_F64(outstream, val);
     }
     else if (Obj_is_a(obj, BOOLEAN)) {
         bool val = Bool_Get_Value((Boolean*)obj);
@@ -129,19 +123,13 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
     else if (Obj_is_a(obj, HASH)) {
         obj = (Obj*)Freezer_deserialize_hash((Hash*)obj, instream);
     }
-    else if (Obj_is_a(obj, NUM)) {
-        if (Obj_is_a(obj, INTNUM)) {
-            if (Obj_is_a(obj, INTEGER64)) {
-                int64_t value = (int64_t)InStream_Read_C64(instream);
-                obj = (Obj*)Int64_init((Integer64*)obj, value);
-            }
-        }
-        else if (Obj_is_a(obj, FLOATNUM)) {
-            if (Obj_is_a(obj, FLOAT64)) {
-                double value = InStream_Read_F64(instream);
-                obj = (Obj*)Float64_init((Float64*)obj, value);
-            }
-        }
+    else if (Obj_is_a(obj, INTEGER64)) {
+        int64_t value = (int64_t)InStream_Read_C64(instream);
+        obj = (Obj*)Int64_init((Integer64*)obj, value);
+    }
+    else if (Obj_is_a(obj, FLOAT64)) {
+        double value = InStream_Read_F64(instream);
+        obj = (Obj*)Float64_init((Float64*)obj, value);
     }
     else if (Obj_is_a(obj, BOOLEAN)) {
         bool value = !!InStream_Read_U8(instream);
@@ -370,7 +358,9 @@ Freezer_dump(Obj *obj) {
     else if (Obj_is_a(obj, QUERY)) {
         return Query_Dump((Query*)obj);
     }
-    else if (Obj_is_a(obj, NUM) || Obj_is_a(obj, BOOLEAN)) {
+    else if (Obj_is_a(obj, FLOAT64)
+             || Obj_is_a(obj, INTEGER64)
+             || Obj_is_a(obj, BOOLEAN)) {
         return Obj_Clone(obj);
     }
     else {

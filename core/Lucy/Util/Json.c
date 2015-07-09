@@ -281,11 +281,11 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
     else if (Obj_is_a(dump, STRING)) {
         S_append_json_string((String*)dump, buf);
     }
-    else if (Obj_is_a(dump, INTNUM)) {
-        CB_catf(buf, "%i64", IntNum_To_I64((IntNum*)dump));
+    else if (Obj_is_a(dump, INTEGER64)) {
+        CB_catf(buf, "%i64", Int64_Get_Value((Integer64*)dump));
     }
-    else if (Obj_is_a(dump, FLOATNUM)) {
-        CB_catf(buf, "%f64", FloatNum_To_F64((FloatNum*)dump));
+    else if (Obj_is_a(dump, FLOAT64)) {
+        CB_catf(buf, "%f64", Float64_Get_Value((Float64*)dump));
     }
     else if (Obj_is_a(dump, VECTOR)) {
         Vector *array = (Vector*)dump;
@@ -708,11 +708,14 @@ Json_obj_to_i64(Obj *obj) {
     if (!obj) {
         THROW(ERR, "Can't extract integer from NULL");
     }
+    else if (Obj_is_a(obj, INTEGER64)) {
+        retval = Int64_Get_Value((Integer64*)obj);
+    }
+    else if (Obj_is_a(obj, FLOAT64)) {
+        retval = Float64_To_I64((Float64*)obj);
+    }
     else if (Obj_is_a(obj, STRING)) {
         retval = Str_To_I64((String*)obj);
-    }
-    else if (Obj_is_a(obj, NUM)) {
-        retval = Num_To_I64((Num*)obj);
     }
     else {
         THROW(ERR, "Can't extract integer from object of type %o",
@@ -729,11 +732,14 @@ Json_obj_to_f64(Obj *obj) {
     if (!obj) {
         THROW(ERR, "Can't extract float from NULL");
     }
+    else if (Obj_is_a(obj, FLOAT64)) {
+        retval = Float64_Get_Value((Float64*)obj);
+    }
+    else if (Obj_is_a(obj, INTEGER64)) {
+        retval = Int64_To_F64((Integer64*)obj);
+    }
     else if (Obj_is_a(obj, STRING)) {
         retval = Str_To_F64((String*)obj);
-    }
-    else if (Obj_is_a(obj, NUM)) {
-        retval = Num_To_F64((Num*)obj);
     }
     else {
         THROW(ERR, "Can't extract float from object of type %o",
@@ -753,8 +759,11 @@ Json_obj_to_bool(Obj *obj) {
     else if (Obj_is_a(obj, BOOLEAN)) {
         retval = Bool_Get_Value((Boolean*)obj);
     }
-    else if (Obj_is_a(obj, NUM)) {
-        retval = Num_To_Bool((Num*)obj);
+    else if (Obj_is_a(obj, INTEGER64)) {
+        retval = Int64_To_Bool((Integer64*)obj);
+    }
+    else if (Obj_is_a(obj, FLOAT64)) {
+        retval = Float64_To_Bool((Float64*)obj);
     }
     else if (Obj_is_a(obj, STRING)) {
         retval = (Str_To_I64((String*)obj) != 0);
