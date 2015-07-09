@@ -66,21 +66,13 @@ Freezer_serialize(Obj *obj, OutStream *outstream) {
     }
     else if (Obj_is_a(obj, NUM)) {
         if (Obj_is_a(obj, INTNUM)) {
-            if (Obj_is_a(obj, INTEGER32)) {
-                int32_t val = Int32_Get_Value((Integer32*)obj);
-                OutStream_Write_C32(outstream, (uint32_t)val);
-            }
-            else if (Obj_is_a(obj, INTEGER64)) {
+            if (Obj_is_a(obj, INTEGER64)) {
                 int64_t val = Int64_Get_Value((Integer64*)obj);
                 OutStream_Write_C64(outstream, (uint64_t)val);
             }
         }
         else if (Obj_is_a(obj, FLOATNUM)) {
-            if (Obj_is_a(obj, FLOAT32)) {
-                float val = Float32_Get_Value((Float32*)obj);
-                OutStream_Write_F32(outstream, val);
-            }
-            else if (Obj_is_a(obj, FLOAT64)) {
+            if (Obj_is_a(obj, FLOAT64)) {
                 double val = Float64_Get_Value((Float64*)obj);
                 OutStream_Write_F64(outstream, val);
             }
@@ -139,21 +131,13 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
     }
     else if (Obj_is_a(obj, NUM)) {
         if (Obj_is_a(obj, INTNUM)) {
-            if (Obj_is_a(obj, INTEGER32)) {
-                int32_t value = (int32_t)InStream_Read_C32(instream);
-                obj = (Obj*)Int32_init((Integer32*)obj, value);
-            }
-            else if (Obj_is_a(obj, INTEGER64)) {
+            if (Obj_is_a(obj, INTEGER64)) {
                 int64_t value = (int64_t)InStream_Read_C64(instream);
                 obj = (Obj*)Int64_init((Integer64*)obj, value);
             }
         }
         else if (Obj_is_a(obj, FLOATNUM)) {
-            if (Obj_is_a(obj, FLOAT32)) {
-                float value = InStream_Read_F32(instream);
-                obj = (Obj*)Float32_init((Float32*)obj, value);
-            }
-            else if (Obj_is_a(obj, FLOAT64)) {
+            if (Obj_is_a(obj, FLOAT64)) {
                 double value = InStream_Read_F64(instream);
                 obj = (Obj*)Float64_init((Float64*)obj, value);
             }

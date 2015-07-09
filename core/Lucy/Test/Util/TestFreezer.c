@@ -93,7 +93,7 @@ test_hash(TestBatchRunner *runner) {
 
     for (uint32_t i = 0; i < 10; i++) {
         String *str = TestUtils_random_string(rand() % 1200);
-        Integer32 *num = Int32_new(i);
+        Integer64 *num = Int64_new(i);
         Hash_Store(wanted, str, (Obj*)num);
         DECREF(str);
     }
@@ -117,35 +117,23 @@ test_hash(TestBatchRunner *runner) {
 
 static void
 test_num(TestBatchRunner *runner) {
-    Float32   *f32 = Float32_new(1.33f);
     Float64   *f64 = Float64_new(1.33);
-    Integer32 *i32 = Int32_new(-1);
     Integer64 *i64 = Int64_new(-1);
-    Float32   *f32_thaw = (Float32*)S_freeze_thaw((Obj*)f32);
     Float64   *f64_thaw = (Float64*)S_freeze_thaw((Obj*)f64);
-    Integer32 *i32_thaw = (Integer32*)S_freeze_thaw((Obj*)i32);
     Integer64 *i64_thaw = (Integer64*)S_freeze_thaw((Obj*)i64);
     Boolean   *true_thaw = (Boolean*)S_freeze_thaw((Obj*)CFISH_TRUE);
 
-    TEST_TRUE(runner, Float32_Equals(f32, (Obj*)f32_thaw),
-              "Float32 freeze/thaw");
     TEST_TRUE(runner, Float64_Equals(f64, (Obj*)f64_thaw),
               "Float64 freeze/thaw");
-    TEST_TRUE(runner, Int32_Equals(i32, (Obj*)i32_thaw),
-              "Integer32 freeze/thaw");
     TEST_TRUE(runner, Int64_Equals(i64, (Obj*)i64_thaw),
               "Integer64 freeze/thaw");
     TEST_TRUE(runner, Bool_Equals(CFISH_TRUE, (Obj*)true_thaw),
               "Boolean freeze/thaw");
 
     DECREF(i64_thaw);
-    DECREF(i32_thaw);
     DECREF(f64_thaw);
-    DECREF(f32_thaw);
     DECREF(i64);
-    DECREF(i32);
     DECREF(f64);
-    DECREF(f32);
 }
 
 static void
@@ -173,7 +161,7 @@ test_varray(TestBatchRunner *runner) {
 
 void
 TestFreezer_Run_IMP(TestFreezer *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 11);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 9);
     test_blob(runner);
     test_string(runner);
     test_hash(runner);

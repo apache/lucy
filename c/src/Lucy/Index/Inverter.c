@@ -91,21 +91,13 @@ Inverter_Invert_Doc_IMP(Inverter *self, Doc *doc) {
                     inventry_ivars->value = INCREF(blob);
                     break;
                 }
-            case FType_INT32: {
-                    Integer32* value = (Integer32*)inventry_ivars->value;
-                    Int32_Mimic(value, obj);
-                    break;
-                }
+            case FType_INT32:
             case FType_INT64: {
                     Integer64* value = (Integer64*)inventry_ivars->value;
                     Int64_Mimic(value, obj);
                     break;
                 }
-            case FType_FLOAT32: {
-                    Float32* value = (Float32*)inventry_ivars->value;
-                    Float32_Mimic(value, obj);
-                    break;
-                }
+            case FType_FLOAT32:
             case FType_FLOAT64: {
                     Float64* value = (Float64*)inventry_ivars->value;
                     Float64_Mimic(value, obj);

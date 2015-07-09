@@ -221,14 +221,10 @@ InvEntry_init(InverterEntry *self, Schema *schema, String *field,
                 ivars->value = NULL;
                 break;
             case FType_INT32:
-                ivars->value = (Obj*)Int32_new(0);
-                break;
             case FType_INT64:
                 ivars->value = (Obj*)Int64_new(0);
                 break;
             case FType_FLOAT32:
-                ivars->value = (Obj*)Float32_new(0);
-                break;
             case FType_FLOAT64:
                 ivars->value = (Obj*)Float64_new(0);
                 break;

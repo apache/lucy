@@ -237,13 +237,13 @@ S_add_vehicle(Indexer *indexer, String *name, int32_t speed, int32_t sloth,
     Doc_Store(doc, home_str, (Obj*)home);
     Doc_Store(doc, cat_str,  (Obj*)cat);
 
-    Integer32 *speed_obj = Int32_new(speed);
+    Integer64 *speed_obj = Int64_new(speed);
     Doc_Store(doc, speed_str, (Obj*)speed_obj);
     DECREF(speed_obj);
-    Integer32 *sloth_obj = Int32_new(sloth);
+    Integer64 *sloth_obj = Int64_new(sloth);
     Doc_Store(doc, sloth_str, (Obj*)sloth_obj);
     DECREF(sloth_obj);
-    Integer32 *weight_obj = Int32_new(weight);
+    Integer64 *weight_obj = Int64_new(weight);
     Doc_Store(doc, weight_str, (Obj*)weight_obj);
     DECREF(weight_obj);
 
@@ -284,7 +284,7 @@ S_random_string() {
 static Obj*
 S_random_int32() {
     uint64_t num = TestUtils_random_u64();
-    return (Obj*)Int32_new(num & 0x7FFFFFFF);
+    return (Obj*)Int64_new(num & 0x7FFFFFFF);
 }
 
 static Obj*
@@ -297,7 +297,7 @@ static Obj*
 S_random_float32() {
     uint64_t num = TestUtils_random_u64();
     double d = CHY_U64_TO_DOUBLE(num) * (10.0 / UINT64_MAX);
-    return (Obj*)Float32_new((float)d);
+    return (Obj*)Float64_new((float)d);
 }
 
 static Obj*

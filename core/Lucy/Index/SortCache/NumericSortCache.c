@@ -151,7 +151,7 @@ F32SortCache_Value_IMP(Float32SortCache *self, int32_t ord) {
     }
     else {
         InStream_Seek(ivars->dat_in, ord * sizeof(float));
-        return (Obj*)Float32_new(InStream_Read_F32(ivars->dat_in));
+        return (Obj*)Float64_new(InStream_Read_F32(ivars->dat_in));
     }
 }
 
@@ -189,7 +189,7 @@ I32SortCache_Value_IMP(Int32SortCache *self, int32_t ord) {
     }
     else {
         InStream_Seek(ivars->dat_in, ord * sizeof(int32_t));
-        return (Obj*)Int32_new(InStream_Read_I32(ivars->dat_in));
+        return (Obj*)Int64_new(InStream_Read_I32(ivars->dat_in));
     }
 }
 
