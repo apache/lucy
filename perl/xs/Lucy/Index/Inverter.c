@@ -113,24 +113,24 @@ LUCY_Inverter_Invert_Doc_IMP(lucy_Inverter *self, lucy_Doc *doc) {
                     break;
                 }
             case lucy_FType_INT32: {
-                    cfish_Integer64* value = (cfish_Integer64*)entry_ivars->value;
-                    CFISH_Int64_Set_Value(value, SvIV(value_sv));
+                    cfish_Integer* value = (cfish_Integer*)entry_ivars->value;
+                    CFISH_Int_Set_Value(value, SvIV(value_sv));
                     break;
                 }
             case lucy_FType_INT64: {
-                    cfish_Integer64* value = (cfish_Integer64*)entry_ivars->value;
+                    cfish_Integer* value = (cfish_Integer*)entry_ivars->value;
                     // nwellnhof: Using SvNOK could avoid a int/float/int
                     // round-trip with 32-bit IVs.
                     int64_t val = sizeof(IV) == 8
                                   ? SvIV(value_sv)
                                   : (int64_t)SvNV(value_sv); // lossy
-                    CFISH_Int64_Set_Value(value, val);
+                    CFISH_Int_Set_Value(value, val);
                     break;
                 }
             case lucy_FType_FLOAT32:
             case lucy_FType_FLOAT64: {
-                    cfish_Float64* value = (cfish_Float64*)entry_ivars->value;
-                    CFISH_Float64_Set_Value(value, SvNV(value_sv));
+                    cfish_Float* value = (cfish_Float*)entry_ivars->value;
+                    CFISH_Float_Set_Value(value, SvNV(value_sv));
                     break;
                 }
             default:

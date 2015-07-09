@@ -114,7 +114,7 @@ DefDelWriter_init(DefaultDeletionsWriter *self, Schema *schema,
         Vec_Store(ivars->bit_vecs, i, (Obj*)bit_vec);
         Hash_Store(ivars->name_to_tick,
                    SegReader_Get_Seg_Name(seg_reader),
-                   (Obj*)Int64_new(i));
+                   (Obj*)Int_new(i));
     }
 
     return self;
@@ -214,9 +214,9 @@ DefDelWriter_Seg_Deletions_IMP(DefaultDeletionsWriter *self,
     Matcher *deletions    = NULL;
     Segment *segment      = SegReader_Get_Segment(seg_reader);
     String  *seg_name     = Seg_Get_Name(segment);
-    Integer64 *tick_obj   = (Integer64*)Hash_Fetch(ivars->name_to_tick,
+    Integer *tick_obj     = (Integer*)Hash_Fetch(ivars->name_to_tick,
                                                    seg_name);
-    int32_t tick          = tick_obj ? (int32_t)Int64_Get_Value(tick_obj) : 0;
+    int32_t tick          = tick_obj ? (int32_t)Int_Get_Value(tick_obj) : 0;
     SegReader *candidate  = tick_obj
                             ? (SegReader*)Vec_Fetch(ivars->seg_readers, tick)
                             : NULL;
@@ -241,10 +241,9 @@ int32_t
 DefDelWriter_Seg_Del_Count_IMP(DefaultDeletionsWriter *self,
                                String *seg_name) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
-    Integer64 *tick
-        = (Integer64*)Hash_Fetch(ivars->name_to_tick, seg_name);
+    Integer *tick = (Integer*)Hash_Fetch(ivars->name_to_tick, seg_name);
     BitVector *deldocs = tick
-                         ? (BitVector*)Vec_Fetch(ivars->bit_vecs, Int64_Get_Value(tick))
+                         ? (BitVector*)Vec_Fetch(ivars->bit_vecs, Int_Get_Value(tick))
                          : NULL;
     return deldocs ? BitVec_Count(deldocs) : 0;
 }

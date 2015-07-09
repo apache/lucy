@@ -130,22 +130,22 @@ DocWriter_Add_Inverted_Doc_IMP(DocWriter *self, Inverter *inverter,
                     break;
                 }
                 case FType_INT32: {
-                    int32_t val = (int32_t)Int64_Get_Value((Integer64*)value);
+                    int32_t val = (int32_t)Int_Get_Value((Integer*)value);
                     OutStream_Write_C32(dat_out, val);
                     break;
                 }
                 case FType_INT64: {
-                    int64_t val = Int64_Get_Value((Integer64*)value);
+                    int64_t val = Int_Get_Value((Integer*)value);
                     OutStream_Write_C64(dat_out, val);
                     break;
                 }
                 case FType_FLOAT32: {
-                    float val = (float)Float64_Get_Value((Float64*)value);
+                    float val = (float)Float_Get_Value((Float*)value);
                     OutStream_Write_F32(dat_out, val);
                     break;
                 }
                 case FType_FLOAT64: {
-                    double val = Float64_Get_Value((Float64*)value);
+                    double val = Float_Get_Value((Float*)value);
                     OutStream_Write_F64(dat_out, val);
                     break;
                 }

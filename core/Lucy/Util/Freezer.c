@@ -64,12 +64,12 @@ Freezer_serialize(Obj *obj, OutStream *outstream) {
     else if (Obj_is_a(obj, HASH)) {
         Freezer_serialize_hash((Hash*)obj, outstream);
     }
-    else if (Obj_is_a(obj, INTEGER64)) {
-        int64_t val = Int64_Get_Value((Integer64*)obj);
+    else if (Obj_is_a(obj, INTEGER)) {
+        int64_t val = Int_Get_Value((Integer*)obj);
         OutStream_Write_C64(outstream, (uint64_t)val);
     }
-    else if (Obj_is_a(obj, FLOAT64)) {
-        double val = Float64_Get_Value((Float64*)obj);
+    else if (Obj_is_a(obj, FLOAT)) {
+        double val = Float_Get_Value((Float*)obj);
         OutStream_Write_F64(outstream, val);
     }
     else if (Obj_is_a(obj, BOOLEAN)) {
@@ -123,13 +123,13 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
     else if (Obj_is_a(obj, HASH)) {
         obj = (Obj*)Freezer_deserialize_hash((Hash*)obj, instream);
     }
-    else if (Obj_is_a(obj, INTEGER64)) {
+    else if (Obj_is_a(obj, INTEGER)) {
         int64_t value = (int64_t)InStream_Read_C64(instream);
-        obj = (Obj*)Int64_init((Integer64*)obj, value);
+        obj = (Obj*)Int_init((Integer*)obj, value);
     }
-    else if (Obj_is_a(obj, FLOAT64)) {
+    else if (Obj_is_a(obj, FLOAT)) {
         double value = InStream_Read_F64(instream);
-        obj = (Obj*)Float64_init((Float64*)obj, value);
+        obj = (Obj*)Float_init((Float*)obj, value);
     }
     else if (Obj_is_a(obj, BOOLEAN)) {
         bool value = !!InStream_Read_U8(instream);
@@ -358,8 +358,8 @@ Freezer_dump(Obj *obj) {
     else if (Obj_is_a(obj, QUERY)) {
         return Query_Dump((Query*)obj);
     }
-    else if (Obj_is_a(obj, FLOAT64)
-             || Obj_is_a(obj, INTEGER64)
+    else if (Obj_is_a(obj, FLOAT)
+             || Obj_is_a(obj, INTEGER)
              || Obj_is_a(obj, BOOLEAN)) {
         return Obj_Clone(obj);
     }

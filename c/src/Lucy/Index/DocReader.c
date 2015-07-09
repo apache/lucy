@@ -86,18 +86,16 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
                     break;
                 }
             case FType_FLOAT32:
-                value = (Obj*)Float64_new(InStream_Read_F32(dat_in));
+                value = (Obj*)Float_new(InStream_Read_F32(dat_in));
                 break;
             case FType_FLOAT64:
-                value = (Obj*)Float64_new(InStream_Read_F64(dat_in));
+                value = (Obj*)Float_new(InStream_Read_F64(dat_in));
                 break;
             case FType_INT32:
-                value = (Obj*)Int64_new(
-                                (int32_t)InStream_Read_C32(dat_in));
+                value = (Obj*)Int_new((int32_t)InStream_Read_C32(dat_in));
                 break;
             case FType_INT64:
-                value = (Obj*)Int64_new(
-                                (int64_t)InStream_Read_C64(dat_in));
+                value = (Obj*)Int_new((int64_t)InStream_Read_C64(dat_in));
                 break;
             default:
                 value = NULL;

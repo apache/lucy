@@ -132,7 +132,7 @@ SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
         ivars->var_width = true;
     }
     else {
-        ivars->mem_per_entry += Class_Get_Obj_Alloc_Size(FLOAT64);
+        ivars->mem_per_entry += Class_Get_Obj_Alloc_Size(FLOAT);
         ivars->var_width = false;
     }
 
@@ -276,22 +276,22 @@ S_write_val(Obj *val, int8_t prim_id, OutStream *ix_out, OutStream *dat_out,
                     break;
                 }
             case FType_INT32: {
-                    int32_t i32 = (int32_t)Int64_Get_Value((Integer64*)val);
+                    int32_t i32 = (int32_t)Int_Get_Value((Integer*)val);
                     OutStream_Write_I32(dat_out, i32);
                     break;
                 }
             case FType_INT64: {
-                    int64_t i64 = Int64_Get_Value((Integer64*)val);
+                    int64_t i64 = Int_Get_Value((Integer*)val);
                     OutStream_Write_I64(dat_out, i64);
                     break;
                 }
             case FType_FLOAT32: {
-                    float f32 = (float)Float64_Get_Value((Float64*)val);
+                    float f32 = (float)Float_Get_Value((Float*)val);
                     OutStream_Write_F32(dat_out, f32);
                     break;
                 }
             case FType_FLOAT64: {
-                    double f64 = Float64_Get_Value((Float64*)val);
+                    double f64 = Float_Get_Value((Float*)val);
                     OutStream_Write_F64(dat_out, f64);
                     break;
                 }

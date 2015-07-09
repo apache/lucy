@@ -222,11 +222,11 @@ InvEntry_init(InverterEntry *self, Schema *schema, String *field,
                 break;
             case FType_INT32:
             case FType_INT64:
-                ivars->value = (Obj*)Int64_new(0);
+                ivars->value = (Obj*)Int_new(0);
                 break;
             case FType_FLOAT32:
             case FType_FLOAT64:
-                ivars->value = (Obj*)Float64_new(0);
+                ivars->value = (Obj*)Float_new(0);
                 break;
             default:
                 THROW(ERR, "Unrecognized primitive id: %i8", prim_id);
