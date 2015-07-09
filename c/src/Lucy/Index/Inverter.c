@@ -80,31 +80,30 @@ Inverter_Invert_Doc_IMP(Inverter *self, Doc *doc) {
         // Get the field value.
         switch (FType_Primitive_ID(type) & FType_PRIMITIVE_ID_MASK) {
             case FType_TEXT: {
-                    String *string = (String*)CERTIFY(obj, STRING);
-                    DECREF(inventry_ivars->value);
-                    inventry_ivars->value = INCREF(string);
+                    CERTIFY(obj, STRING);
                     break;
                 }
             case FType_BLOB: {
-                    Blob *blob = (Blob*)CERTIFY(obj, BLOB);
-                    DECREF(inventry_ivars->value);
-                    inventry_ivars->value = INCREF(blob);
+                    CERTIFY(obj, BLOB);
                     break;
                 }
             case FType_INT32:
             case FType_INT64: {
-                    Integer* value = (Integer*)inventry_ivars->value;
-                    Int_Mimic(value, obj);
+                    CERTIFY(obj, INTEGER);
                     break;
                 }
             case FType_FLOAT32:
             case FType_FLOAT64: {
-                    Float* value = (Float*)inventry_ivars->value;
-                    Float_Mimic(value, obj);
+                    CERTIFY(obj, FLOAT);
                     break;
                 }
             default:
                 THROW(ERR, "Unrecognized type: %o", type);
+        }
+
+        if (inventry_ivars->value != obj) {
+            DECREF(inventry_ivars->value);
+            inventry_ivars->value = INCREF(obj);
         }
 
         Inverter_Add_Field(self, inventry);
