@@ -125,7 +125,7 @@ test_num(TestBatchRunner *runner) {
     Float64   *f64_thaw = (Float64*)S_freeze_thaw((Obj*)f64);
     Integer32 *i32_thaw = (Integer32*)S_freeze_thaw((Obj*)i32);
     Integer64 *i64_thaw = (Integer64*)S_freeze_thaw((Obj*)i64);
-    BoolNum   *true_thaw = (BoolNum*)S_freeze_thaw((Obj*)CFISH_TRUE);
+    Boolean   *true_thaw = (Boolean*)S_freeze_thaw((Obj*)CFISH_TRUE);
 
     TEST_TRUE(runner, Float32_Equals(f32, (Obj*)f32_thaw),
               "Float32 freeze/thaw");
@@ -136,7 +136,7 @@ test_num(TestBatchRunner *runner) {
     TEST_TRUE(runner, Int64_Equals(i64, (Obj*)i64_thaw),
               "Integer64 freeze/thaw");
     TEST_TRUE(runner, Bool_Equals(CFISH_TRUE, (Obj*)true_thaw),
-              "BoolNum freeze/thaw");
+              "Boolean freeze/thaw");
 
     DECREF(i64_thaw);
     DECREF(i32_thaw);

@@ -66,11 +66,7 @@ Freezer_serialize(Obj *obj, OutStream *outstream) {
     }
     else if (Obj_is_a(obj, NUM)) {
         if (Obj_is_a(obj, INTNUM)) {
-            if (Obj_is_a(obj, BOOLNUM)) {
-                bool val = Bool_Get_Value((BoolNum*)obj);
-                OutStream_Write_U8(outstream, (uint8_t)val);
-            }
-            else if (Obj_is_a(obj, INTEGER32)) {
+            if (Obj_is_a(obj, INTEGER32)) {
                 int32_t val = Int32_Get_Value((Integer32*)obj);
                 OutStream_Write_C32(outstream, (uint32_t)val);
             }
@@ -89,6 +85,10 @@ Freezer_serialize(Obj *obj, OutStream *outstream) {
                 OutStream_Write_F64(outstream, val);
             }
         }
+    }
+    else if (Obj_is_a(obj, BOOLEAN)) {
+        bool val = Bool_Get_Value((Boolean*)obj);
+        OutStream_Write_U8(outstream, (uint8_t)val);
     }
     else if (Obj_is_a(obj, QUERY)) {
         Query_Serialize((Query*)obj, outstream);
@@ -139,15 +139,7 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
     }
     else if (Obj_is_a(obj, NUM)) {
         if (Obj_is_a(obj, INTNUM)) {
-            if (Obj_is_a(obj, BOOLNUM)) {
-                bool value = !!InStream_Read_U8(instream);
-                Obj *result = value ? INCREF(CFISH_TRUE) : INCREF(CFISH_FALSE);
-                // FIXME: This DECREF is essentially a no-op causing a
-                // memory leak.
-                DECREF(obj);
-                obj = result;
-            }
-            else if (Obj_is_a(obj, INTEGER32)) {
+            if (Obj_is_a(obj, INTEGER32)) {
                 int32_t value = (int32_t)InStream_Read_C32(instream);
                 obj = (Obj*)Int32_init((Integer32*)obj, value);
             }
@@ -166,6 +158,14 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
                 obj = (Obj*)Float64_init((Float64*)obj, value);
             }
         }
+    }
+    else if (Obj_is_a(obj, BOOLEAN)) {
+        bool value = !!InStream_Read_U8(instream);
+        Obj *result = value ? INCREF(CFISH_TRUE) : INCREF(CFISH_FALSE);
+        // FIXME: This DECREF is essentially a no-op causing a
+        // memory leak.
+        DECREF(obj);
+        obj = result;
     }
     else if (Obj_is_a(obj, QUERY)) {
         obj = (Obj*)Query_Deserialize((Query*)obj, instream);
@@ -386,7 +386,7 @@ Freezer_dump(Obj *obj) {
     else if (Obj_is_a(obj, QUERY)) {
         return Query_Dump((Query*)obj);
     }
-    else if (Obj_is_a(obj, NUM)) {
+    else if (Obj_is_a(obj, NUM) || Obj_is_a(obj, BOOLEAN)) {
         return Obj_Clone(obj);
     }
     else {

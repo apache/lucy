@@ -750,11 +750,14 @@ Json_obj_to_bool(Obj *obj) {
     if (!obj) {
         THROW(ERR, "Can't extract bool from NULL");
     }
-    else if (Obj_is_a(obj, STRING)) {
-        retval = (Str_To_I64((String*)obj) != 0);
+    else if (Obj_is_a(obj, BOOLEAN)) {
+        retval = Bool_Get_Value((Boolean*)obj);
     }
     else if (Obj_is_a(obj, NUM)) {
         retval = Num_To_Bool((Num*)obj);
+    }
+    else if (Obj_is_a(obj, STRING)) {
+        retval = (Str_To_I64((String*)obj) != 0);
     }
     else {
         THROW(ERR, "Can't extract bool from object of type %o",
