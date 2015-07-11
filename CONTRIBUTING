@@ -31,6 +31,11 @@ MAKE CHANGES:
 
   Edit the source code as you see fit, then build Lucy and run its test suite.
 
+  Lucy supports continuous integration services Travis and Appveyor
+  to run tests under multiple host languages, host language versions, and
+  platforms. If you fork the Github repository, you can make these services
+  automatically test the changes you made in your fork.
+
   Please bear the following in mind:
 
     * All code will eventually need to be portable to multiple operating
