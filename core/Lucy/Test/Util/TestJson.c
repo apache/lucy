@@ -160,14 +160,14 @@ test_escapes(TestBatchRunner *runner) {
 
 static void
 test_numbers(TestBatchRunner *runner) {
-    Integer64 *i64     = Int64_new(33);
-    String    *json    = Json_to_json((Obj*)i64);
-    String    *trimmed = Str_Trim(json);
+    Integer *i64     = Int_new(33);
+    String  *json    = Json_to_json((Obj*)i64);
+    String  *trimmed = Str_Trim(json);
     TEST_TRUE(runner, Str_Equals_Utf8(trimmed, "33", 2), "Integer");
     DECREF(json);
     DECREF(trimmed);
 
-    Float64 *f64 = Float64_new(33.33);
+    Float *f64 = Float_new(33.33);
     json = Json_to_json((Obj*)f64);
     if (json) {
         double value = Str_To_F64(json);
@@ -278,7 +278,7 @@ test_syntax_errors(TestBatchRunner *runner) {
 
 static void
 S_round_trip_integer(TestBatchRunner *runner, int64_t value) {
-    Integer64 *num = Int64_new(value);
+    Integer *num = Int_new(value);
     Vector *array = Vec_new(1);
     Vec_Store(array, 0, (Obj*)num);
     String *json = Json_to_json((Obj*)array);
@@ -300,13 +300,13 @@ test_integers(TestBatchRunner *runner) {
 
 static void
 S_round_trip_float(TestBatchRunner *runner, double value, double max_diff) {
-    Float64 *num = Float64_new(value);
+    Float *num = Float_new(value);
     Vector *array = Vec_new(1);
     Vec_Store(array, 0, (Obj*)num);
     String *json = Json_to_json((Obj*)array);
     Obj *dump = CERTIFY(Json_from_json(json), VECTOR);
-    Float64 *got = (Float64*)CERTIFY(Vec_Fetch((Vector*)dump, 0), FLOAT64);
-    double diff = Float64_Get_Value(num) - Float64_Get_Value(got);
+    Float *got = (Float*)CERTIFY(Vec_Fetch((Vector*)dump, 0), FLOAT);
+    double diff = Float_Get_Value(num) - Float_Get_Value(got);
     if (diff < 0) { diff = 0 - diff; }
     TEST_TRUE(runner, diff <= max_diff, "Round trip float %f", value);
     DECREF(dump);

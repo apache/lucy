@@ -64,31 +64,17 @@ Freezer_serialize(Obj *obj, OutStream *outstream) {
     else if (Obj_is_a(obj, HASH)) {
         Freezer_serialize_hash((Hash*)obj, outstream);
     }
-    else if (Obj_is_a(obj, NUM)) {
-        if (Obj_is_a(obj, INTNUM)) {
-            if (Obj_is_a(obj, BOOLNUM)) {
-                bool val = Bool_Get_Value((BoolNum*)obj);
-                OutStream_Write_U8(outstream, (uint8_t)val);
-            }
-            else if (Obj_is_a(obj, INTEGER32)) {
-                int32_t val = Int32_Get_Value((Integer32*)obj);
-                OutStream_Write_C32(outstream, (uint32_t)val);
-            }
-            else if (Obj_is_a(obj, INTEGER64)) {
-                int64_t val = Int64_Get_Value((Integer64*)obj);
-                OutStream_Write_C64(outstream, (uint64_t)val);
-            }
-        }
-        else if (Obj_is_a(obj, FLOATNUM)) {
-            if (Obj_is_a(obj, FLOAT32)) {
-                float val = Float32_Get_Value((Float32*)obj);
-                OutStream_Write_F32(outstream, val);
-            }
-            else if (Obj_is_a(obj, FLOAT64)) {
-                double val = Float64_Get_Value((Float64*)obj);
-                OutStream_Write_F64(outstream, val);
-            }
-        }
+    else if (Obj_is_a(obj, INTEGER)) {
+        int64_t val = Int_Get_Value((Integer*)obj);
+        OutStream_Write_C64(outstream, (uint64_t)val);
+    }
+    else if (Obj_is_a(obj, FLOAT)) {
+        double val = Float_Get_Value((Float*)obj);
+        OutStream_Write_F64(outstream, val);
+    }
+    else if (Obj_is_a(obj, BOOLEAN)) {
+        bool val = Bool_Get_Value((Boolean*)obj);
+        OutStream_Write_U8(outstream, (uint8_t)val);
     }
     else if (Obj_is_a(obj, QUERY)) {
         Query_Serialize((Query*)obj, outstream);
@@ -137,35 +123,21 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
     else if (Obj_is_a(obj, HASH)) {
         obj = (Obj*)Freezer_deserialize_hash((Hash*)obj, instream);
     }
-    else if (Obj_is_a(obj, NUM)) {
-        if (Obj_is_a(obj, INTNUM)) {
-            if (Obj_is_a(obj, BOOLNUM)) {
-                bool value = !!InStream_Read_U8(instream);
-                Obj *result = value ? INCREF(CFISH_TRUE) : INCREF(CFISH_FALSE);
-                // FIXME: This DECREF is essentially a no-op causing a
-                // memory leak.
-                DECREF(obj);
-                obj = result;
-            }
-            else if (Obj_is_a(obj, INTEGER32)) {
-                int32_t value = (int32_t)InStream_Read_C32(instream);
-                obj = (Obj*)Int32_init((Integer32*)obj, value);
-            }
-            else if (Obj_is_a(obj, INTEGER64)) {
-                int64_t value = (int64_t)InStream_Read_C64(instream);
-                obj = (Obj*)Int64_init((Integer64*)obj, value);
-            }
-        }
-        else if (Obj_is_a(obj, FLOATNUM)) {
-            if (Obj_is_a(obj, FLOAT32)) {
-                float value = InStream_Read_F32(instream);
-                obj = (Obj*)Float32_init((Float32*)obj, value);
-            }
-            else if (Obj_is_a(obj, FLOAT64)) {
-                double value = InStream_Read_F64(instream);
-                obj = (Obj*)Float64_init((Float64*)obj, value);
-            }
-        }
+    else if (Obj_is_a(obj, INTEGER)) {
+        int64_t value = (int64_t)InStream_Read_C64(instream);
+        obj = (Obj*)Int_init((Integer*)obj, value);
+    }
+    else if (Obj_is_a(obj, FLOAT)) {
+        double value = InStream_Read_F64(instream);
+        obj = (Obj*)Float_init((Float*)obj, value);
+    }
+    else if (Obj_is_a(obj, BOOLEAN)) {
+        bool value = !!InStream_Read_U8(instream);
+        Obj *result = value ? INCREF(CFISH_TRUE) : INCREF(CFISH_FALSE);
+        // FIXME: This DECREF is essentially a no-op causing a
+        // memory leak.
+        DECREF(obj);
+        obj = result;
     }
     else if (Obj_is_a(obj, QUERY)) {
         obj = (Obj*)Query_Deserialize((Query*)obj, instream);
@@ -386,7 +358,9 @@ Freezer_dump(Obj *obj) {
     else if (Obj_is_a(obj, QUERY)) {
         return Query_Dump((Query*)obj);
     }
-    else if (Obj_is_a(obj, NUM)) {
+    else if (Obj_is_a(obj, FLOAT)
+             || Obj_is_a(obj, INTEGER)
+             || Obj_is_a(obj, BOOLEAN)) {
         return Obj_Clone(obj);
     }
     else {

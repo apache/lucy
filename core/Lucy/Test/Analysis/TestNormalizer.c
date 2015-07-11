@@ -81,9 +81,9 @@ test_normalization(TestBatchRunner *runner) {
         Hash *test = (Hash*)Vec_Fetch(tests, i);
         String *form = (String*)Hash_Fetch_Utf8(
                             test, "normalization_form", 18);
-        bool case_fold = Bool_Get_Value((BoolNum*)Hash_Fetch_Utf8(
+        bool case_fold = Bool_Get_Value((Boolean*)Hash_Fetch_Utf8(
                                               test, "case_fold", 9));
-        bool strip_accents = Bool_Get_Value((BoolNum*)Hash_Fetch_Utf8(
+        bool strip_accents = Bool_Get_Value((Boolean*)Hash_Fetch_Utf8(
                                                   test, "strip_accents", 13));
         Normalizer *normalizer = Normalizer_new(form, case_fold, strip_accents);
         Vector *words = (Vector*)Hash_Fetch_Utf8(test, "words", 5);

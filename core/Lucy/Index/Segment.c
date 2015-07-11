@@ -160,13 +160,13 @@ Seg_Write_File_IMP(Segment *self, Folder *folder) {
 int32_t
 Seg_Add_Field_IMP(Segment *self, String *field) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
-    Integer32 *num = (Integer32*)Hash_Fetch(ivars->by_name, field);
+    Integer *num = (Integer*)Hash_Fetch(ivars->by_name, field);
     if (num) {
-        return Int32_Get_Value(num);
+        return (int32_t)Int_Get_Value(num);
     }
     else {
         int32_t field_num = Vec_Get_Size(ivars->by_num);
-        Hash_Store(ivars->by_name, field, (Obj*)Int32_new(field_num));
+        Hash_Store(ivars->by_name, field, (Obj*)Int_new(field_num));
         Vec_Push(ivars->by_num, (Obj*)Str_Clone(field));
         return field_num;
     }
@@ -257,8 +257,8 @@ Seg_Field_Num_IMP(Segment *self, String *field) {
     }
     else {
         SegmentIVARS *const ivars = Seg_IVARS(self);
-        Integer32 *num = (Integer32*)Hash_Fetch(ivars->by_name, field);
-        return num ? Int32_Get_Value(num) : 0;
+        Integer *num = (Integer*)Hash_Fetch(ivars->by_name, field);
+        return num ? (int32_t)Int_Get_Value(num) : 0;
     }
 }
 

@@ -92,52 +92,47 @@ LUCY_Inverter_Invert_Doc_IMP(lucy_Inverter *self, lucy_Doc *doc) {
         lucy_InverterEntryIVARS *const entry_ivars
             = lucy_InvEntry_IVARS(inv_entry);
         lucy_FieldType *type = entry_ivars->type;
+        cfish_Obj *obj = NULL;
 
         // Get the field value, forcing text fields to UTF-8.
         switch (LUCY_FType_Primitive_ID(type) & lucy_FType_PRIMITIVE_ID_MASK) {
             case lucy_FType_TEXT: {
                     STRLEN val_len;
                     char *val_ptr = SvPVutf8(value_sv, val_len);
-                    CFISH_DECREF(entry_ivars->value);
-                    entry_ivars->value
-                        = (cfish_Obj*)cfish_Str_new_wrap_trusted_utf8(
-                                val_ptr, val_len);
+                    obj = (cfish_Obj*)cfish_Str_new_wrap_trusted_utf8(val_ptr,
+                                                                      val_len);
                     break;
                 }
             case lucy_FType_BLOB: {
                     STRLEN val_len;
                     char *val_ptr = SvPV(value_sv, val_len);
-                    CFISH_DECREF(entry_ivars->value);
-                    entry_ivars->value
-                        = (cfish_Obj*)cfish_Blob_new_wrap(val_ptr, val_len);
+                    obj = (cfish_Obj*)cfish_Blob_new_wrap(val_ptr, val_len);
                     break;
                 }
             case lucy_FType_INT32: {
-                    cfish_Integer32* value = (cfish_Integer32*)entry_ivars->value;
-                    CFISH_Int32_Set_Value(value, SvIV(value_sv));
+                    obj = (cfish_Obj*)cfish_Int_new(SvIV(value_sv));
                     break;
                 }
             case lucy_FType_INT64: {
-                    cfish_Integer64* value = (cfish_Integer64*)entry_ivars->value;
+                    // nwellnhof: Using SvNOK could avoid a int/float/int
+                    // round-trip with 32-bit IVs.
                     int64_t val = sizeof(IV) == 8
                                   ? SvIV(value_sv)
                                   : (int64_t)SvNV(value_sv); // lossy
-                    CFISH_Int64_Set_Value(value, val);
+                    obj = (cfish_Obj*)cfish_Int_new(val);
                     break;
                 }
-            case lucy_FType_FLOAT32: {
-                    cfish_Float32* value = (cfish_Float32*)entry_ivars->value;
-                    CFISH_Float32_Set_Value(value, (float)SvNV(value_sv));
-                    break;
-                }
+            case lucy_FType_FLOAT32:
             case lucy_FType_FLOAT64: {
-                    cfish_Float64* value = (cfish_Float64*)entry_ivars->value;
-                    CFISH_Float64_Set_Value(value, SvNV(value_sv));
+                    obj = (cfish_Obj*)cfish_Float_new(SvNV(value_sv));
                     break;
                 }
             default:
                 THROW(CFISH_ERR, "Unrecognized type: %o", type);
         }
+
+        CFISH_DECREF(entry_ivars->value);
+        entry_ivars->value = obj;
 
         LUCY_Inverter_Add_Field(self, inv_entry);
     }

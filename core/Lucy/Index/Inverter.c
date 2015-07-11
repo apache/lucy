@@ -211,31 +211,7 @@ InvEntry_init(InverterEntry *self, Schema *schema, String *field,
         ivars->sim  = (Similarity*)INCREF(Schema_Fetch_Sim(schema, field));
         ivars->type = (FieldType*)INCREF(Schema_Fetch_Type(schema, field));
         if (!ivars->type) { THROW(ERR, "Unknown field: '%o'", field); }
-
-        uint8_t prim_id = FType_Primitive_ID(ivars->type);
-        switch (prim_id & FType_PRIMITIVE_ID_MASK) {
-            case FType_TEXT:
-                ivars->value = NULL;
-                break;
-            case FType_BLOB:
-                ivars->value = NULL;
-                break;
-            case FType_INT32:
-                ivars->value = (Obj*)Int32_new(0);
-                break;
-            case FType_INT64:
-                ivars->value = (Obj*)Int64_new(0);
-                break;
-            case FType_FLOAT32:
-                ivars->value = (Obj*)Float32_new(0);
-                break;
-            case FType_FLOAT64:
-                ivars->value = (Obj*)Float64_new(0);
-                break;
-            default:
-                THROW(ERR, "Unrecognized primitive id: %i8", prim_id);
-        }
-
+        ivars->value   = NULL;
         ivars->indexed = FType_Indexed(ivars->type);
         if (ivars->indexed && FType_is_a(ivars->type, NUMERICTYPE)) {
             THROW(ERR, "Field '%o' spec'd as indexed, but numerical types cannot "

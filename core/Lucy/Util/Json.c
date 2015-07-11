@@ -51,7 +51,7 @@ static Obj*
 S_do_parse_json(void *json_parser, const char *json, size_t len);
 
 // Parse a JSON number.  Advance the text buffer just past the number.
-static Float64*
+static Float*
 S_parse_number(const char **json_ptr, const char *limit);
 
 // Parse a JSON string.  Advance the text buffer from pointing at the opening
@@ -281,11 +281,11 @@ S_to_json(Obj *dump, CharBuf *buf, int32_t depth) {
     else if (Obj_is_a(dump, STRING)) {
         S_append_json_string((String*)dump, buf);
     }
-    else if (Obj_is_a(dump, INTNUM)) {
-        CB_catf(buf, "%i64", IntNum_To_I64((IntNum*)dump));
+    else if (Obj_is_a(dump, INTEGER)) {
+        CB_catf(buf, "%i64", Int_Get_Value((Integer*)dump));
     }
-    else if (Obj_is_a(dump, FLOATNUM)) {
-        CB_catf(buf, "%f64", FloatNum_To_F64((FloatNum*)dump));
+    else if (Obj_is_a(dump, FLOAT)) {
+        CB_catf(buf, "%f64", Float_Get_Value((Float*)dump));
     }
     else if (Obj_is_a(dump, VECTOR)) {
         Vector *array = (Vector*)dump;
@@ -492,7 +492,7 @@ S_do_parse_json(void *json_parser, const char *json, size_t len) {
     return state.result;
 }
 
-static Float64*
+static Float*
 S_parse_number(const char **json_ptr, const char *limit) {
     const char *top = *json_ptr;
     const char *end = top;
@@ -515,13 +515,13 @@ S_parse_number(const char **json_ptr, const char *limit) {
         }
     }
 
-    Float64 *result = NULL;
+    Float *result = NULL;
     if (terminated) {
         char *terminus;
         double number = strtod(top, &terminus);
         if (terminus != top) {
             *json_ptr = terminus;
-            result = Float64_new(number);
+            result = Float_new(number);
         }
     }
     if (!result) {
@@ -708,11 +708,14 @@ Json_obj_to_i64(Obj *obj) {
     if (!obj) {
         THROW(ERR, "Can't extract integer from NULL");
     }
+    else if (Obj_is_a(obj, INTEGER)) {
+        retval = Int_Get_Value((Integer*)obj);
+    }
+    else if (Obj_is_a(obj, FLOAT)) {
+        retval = Float_To_I64((Float*)obj);
+    }
     else if (Obj_is_a(obj, STRING)) {
         retval = Str_To_I64((String*)obj);
-    }
-    else if (Obj_is_a(obj, NUM)) {
-        retval = Num_To_I64((Num*)obj);
     }
     else {
         THROW(ERR, "Can't extract integer from object of type %o",
@@ -729,11 +732,14 @@ Json_obj_to_f64(Obj *obj) {
     if (!obj) {
         THROW(ERR, "Can't extract float from NULL");
     }
+    else if (Obj_is_a(obj, FLOAT)) {
+        retval = Float_Get_Value((Float*)obj);
+    }
+    else if (Obj_is_a(obj, INTEGER)) {
+        retval = Int_To_F64((Integer*)obj);
+    }
     else if (Obj_is_a(obj, STRING)) {
         retval = Str_To_F64((String*)obj);
-    }
-    else if (Obj_is_a(obj, NUM)) {
-        retval = Num_To_F64((Num*)obj);
     }
     else {
         THROW(ERR, "Can't extract float from object of type %o",
@@ -750,11 +756,17 @@ Json_obj_to_bool(Obj *obj) {
     if (!obj) {
         THROW(ERR, "Can't extract bool from NULL");
     }
+    else if (Obj_is_a(obj, BOOLEAN)) {
+        retval = Bool_Get_Value((Boolean*)obj);
+    }
+    else if (Obj_is_a(obj, INTEGER)) {
+        retval = Int_To_Bool((Integer*)obj);
+    }
+    else if (Obj_is_a(obj, FLOAT)) {
+        retval = Float_To_Bool((Float*)obj);
+    }
     else if (Obj_is_a(obj, STRING)) {
         retval = (Str_To_I64((String*)obj) != 0);
-    }
-    else if (Obj_is_a(obj, NUM)) {
-        retval = Num_To_Bool((Num*)obj);
     }
     else {
         THROW(ERR, "Can't extract bool from object of type %o",

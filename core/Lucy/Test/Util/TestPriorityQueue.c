@@ -37,23 +37,23 @@ NumPriQ_new(uint32_t max_size) {
 
 bool
 NumPriQ_Less_Than_IMP(NumPriorityQueue *self, Obj *a, Obj *b) {
-    Float64 *num_a = (Float64*)a;
-    Float64 *num_b = (Float64*)b;
+    Float *num_a = (Float*)a;
+    Float *num_b = (Float*)b;
     UNUSED_VAR(self);
-    return Float64_Get_Value(num_a) < Float64_Get_Value(num_b) ? true : false;
+    return Float_Get_Value(num_a) < Float_Get_Value(num_b) ? true : false;
 }
 
 static void
 S_insert_num(NumPriorityQueue *pq, int32_t value) {
-    NumPriQ_Insert(pq, (Obj*)Float64_new((double)value));
+    NumPriQ_Insert(pq, (Obj*)Float_new((double)value));
 }
 
 static int32_t
 S_pop_num(NumPriorityQueue *pq) {
-    Float64 *num = (Float64*)NumPriQ_Pop(pq);
+    Float *num = (Float*)NumPriQ_Pop(pq);
     int32_t retval;
     if (!num) { THROW(ERR, "Queue is empty"); }
-    retval = (int32_t)Float64_Get_Value(num);
+    retval = (int32_t)Float_Get_Value(num);
     DECREF(num);
     return retval;
 }
@@ -61,28 +61,28 @@ S_pop_num(NumPriorityQueue *pq) {
 static void
 test_Peek_and_Pop_All(TestBatchRunner *runner) {
     NumPriorityQueue *pq = NumPriQ_new(5);
-    Float64 *val;
+    Float *val;
 
     S_insert_num(pq, 3);
     S_insert_num(pq, 1);
     S_insert_num(pq, 2);
     S_insert_num(pq, 20);
     S_insert_num(pq, 10);
-    val = (Float64*)CERTIFY(NumPriQ_Peek(pq), FLOAT64);
-    TEST_INT_EQ(runner, (long)Float64_Get_Value(val), 1,
+    val = (Float*)CERTIFY(NumPriQ_Peek(pq), FLOAT);
+    TEST_INT_EQ(runner, (long)Float_Get_Value(val), 1,
                 "peek at the least item in the queue");
 
     Vector  *got = NumPriQ_Pop_All(pq);
-    val = (Float64*)CERTIFY(Vec_Fetch(got, 0), FLOAT64);
-    TEST_INT_EQ(runner, (long)Float64_Get_Value(val), 20, "pop_all");
-    val = (Float64*)CERTIFY(Vec_Fetch(got, 1), FLOAT64);
-    TEST_INT_EQ(runner, (long)Float64_Get_Value(val), 10, "pop_all");
-    val = (Float64*)CERTIFY(Vec_Fetch(got, 2), FLOAT64);
-    TEST_INT_EQ(runner, (long)Float64_Get_Value(val),  3, "pop_all");
-    val = (Float64*)CERTIFY(Vec_Fetch(got, 3), FLOAT64);
-    TEST_INT_EQ(runner, (long)Float64_Get_Value(val),  2, "pop_all");
-    val = (Float64*)CERTIFY(Vec_Fetch(got, 4), FLOAT64);
-    TEST_INT_EQ(runner, (long)Float64_Get_Value(val),  1, "pop_all");
+    val = (Float*)CERTIFY(Vec_Fetch(got, 0), FLOAT);
+    TEST_INT_EQ(runner, (long)Float_Get_Value(val), 20, "pop_all");
+    val = (Float*)CERTIFY(Vec_Fetch(got, 1), FLOAT);
+    TEST_INT_EQ(runner, (long)Float_Get_Value(val), 10, "pop_all");
+    val = (Float*)CERTIFY(Vec_Fetch(got, 2), FLOAT);
+    TEST_INT_EQ(runner, (long)Float_Get_Value(val),  3, "pop_all");
+    val = (Float*)CERTIFY(Vec_Fetch(got, 3), FLOAT);
+    TEST_INT_EQ(runner, (long)Float_Get_Value(val),  2, "pop_all");
+    val = (Float*)CERTIFY(Vec_Fetch(got, 4), FLOAT);
+    TEST_INT_EQ(runner, (long)Float_Get_Value(val),  1, "pop_all");
 
     DECREF(got);
     DECREF(pq);
