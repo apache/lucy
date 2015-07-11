@@ -26,7 +26,7 @@ test_c() {
     git clone -q https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git
     cd lucy-clownfish/runtime/c
     ./configure
-    make
+    make -j
     sudo ./install.sh --prefix /usr/local
     sudo ldconfig
 
