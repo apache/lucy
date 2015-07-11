@@ -7993,6 +7993,8 @@ int main(int argc, const char **argv) {
         = chaz_CLI_new(argv[0], "charmonizer: Probe C build environment");
     chaz_CLI_register(cli, "host", "specify host binding language",
                       CHAZ_CLI_ARG_REQUIRED);
+    chaz_CLI_register(cli, "disable-threads", "whether to disable threads",
+                      CHAZ_CLI_NO_ARG);
     chaz_CLI_register(cli, "clownfish-prefix",
                       "prefix of Clownfish installation",
                       CHAZ_CLI_ARG_OPTIONAL);
