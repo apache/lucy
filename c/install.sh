@@ -99,7 +99,14 @@ for src in `find ../core -name '*.cf[hp]'`; do
 done
 
 # Install man pages.
-cp -R autogen/man "$prefix"
+mkdir -p "$prefix/man"
+# Resolve symbolic links.
+man_dir=$(cd "$prefix/man" && pwd -P)
+if [ -n "$man_dir" ]; then
+    cp -R autogen/man "$man_dir"
+else
+    echo "Warning: Invalid directory $prefix/man"
+fi
 
 # Create pkg-config file.
 mkdir -p "$prefix/lib/pkgconfig"
