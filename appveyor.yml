@@ -13,3 +13,5 @@ build: off
 test_script:
   - 'devel\bin\appveyor-build.bat'
 
+clone_depth: 10
+

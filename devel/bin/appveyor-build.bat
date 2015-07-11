@@ -20,7 +20,7 @@ call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
 
 rem Install Clownfish.
 cd \projects
-git clone -q https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git
+git clone -q --depth 1 https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git
 cd lucy-clownfish\runtime\c
 call configure && nmake || exit /b
 call install --prefix C:\install
