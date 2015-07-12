@@ -21,7 +21,9 @@
 
 #include "Lucy/Util/Json.h"
 
+#include "Clownfish/Boolean.h"
 #include "Clownfish/CharBuf.h"
+#include "Clownfish/Num.h"
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"

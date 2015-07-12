@@ -18,6 +18,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Clownfish/Blob.h"
+#include "Clownfish/Num.h"
 #include "Lucy/Index/DocWriter.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Index/DocReader.h"

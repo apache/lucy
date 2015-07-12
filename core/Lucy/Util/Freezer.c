@@ -18,7 +18,9 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Clownfish/Blob.h"
+#include "Clownfish/Boolean.h"
 #include "Clownfish/HashIterator.h"
+#include "Clownfish/Num.h"
 #include "Lucy/Util/Freezer.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"

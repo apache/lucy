@@ -20,6 +20,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Analysis/Normalizer.h"
+#include "Clownfish/Boolean.h"
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
 #include "Lucy/Util/Json.h"

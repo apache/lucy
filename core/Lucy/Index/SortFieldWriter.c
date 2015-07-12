@@ -37,6 +37,7 @@
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/NumberUtils.h"
 #include "Clownfish/Blob.h"
+#include "Clownfish/Num.h"
 #include "Clownfish/Util/Memory.h"
 #include "Clownfish/Util/SortUtils.h"
 

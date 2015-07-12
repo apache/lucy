@@ -19,6 +19,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Index/FilePurger.h"
+#include "Clownfish/Boolean.h"
 #include "Lucy/Index/IndexManager.h"
 #include "Lucy/Index/Segment.h"
 #include "Lucy/Index/Snapshot.h"

@@ -20,6 +20,7 @@
 #include <ctype.h>
 
 #include "Lucy/Analysis/SnowballStopFilter.h"
+#include "Clownfish/Boolean.h"
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
 #include "Lucy/Util/Freezer.h"

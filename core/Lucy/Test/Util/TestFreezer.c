@@ -19,6 +19,8 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Clownfish/Blob.h"
+#include "Clownfish/Boolean.h"
+#include "Clownfish/Num.h"
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Clownfish/TestHarness/TestUtils.h"
 #include "Lucy/Test/Util/TestFreezer.h"

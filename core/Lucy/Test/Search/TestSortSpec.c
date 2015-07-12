@@ -31,6 +31,7 @@
 #include "Lucy/Search/SortSpec.h"
 
 #include "Clownfish/CharBuf.h"
+#include "Clownfish/Num.h"
 #include "Lucy/Analysis/StandardTokenizer.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Document/HitDoc.h"

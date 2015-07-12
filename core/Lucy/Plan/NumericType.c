@@ -18,6 +18,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Plan/NumericType.h"
+#include "Clownfish/Boolean.h"
 #include "Lucy/Util/Json.h"
 
 NumericType*

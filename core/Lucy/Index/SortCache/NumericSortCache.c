@@ -22,6 +22,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Index/SortCache/NumericSortCache.h"
+#include "Clownfish/Num.h"
 #include "Lucy/Index/Segment.h"
 #include "Lucy/Plan/FieldType.h"
 #include "Lucy/Plan/NumericType.h"

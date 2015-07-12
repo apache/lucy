@@ -18,6 +18,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Index/Snapshot.h"
+#include "Clownfish/Boolean.h"
 #include "Lucy/Index/Segment.h"
 #include "Lucy/Store/Folder.h"
 #include "Clownfish/Util/StringHelper.h"

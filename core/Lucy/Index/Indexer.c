@@ -18,6 +18,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Index/Indexer.h"
+#include "Clownfish/Boolean.h"
 #include "Lucy/Analysis/Analyzer.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Plan/FieldType.h"

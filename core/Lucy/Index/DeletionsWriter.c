@@ -21,6 +21,7 @@
 #include <math.h>
 
 #include "Clownfish/HashIterator.h"
+#include "Clownfish/Num.h"
 #include "Lucy/Index/DeletionsWriter.h"
 #include "Lucy/Index/DeletionsReader.h"
 #include "Lucy/Index/IndexReader.h"

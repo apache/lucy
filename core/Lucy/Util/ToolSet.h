@@ -37,13 +37,11 @@ extern "C" {
 #include <string.h>
 #include "Clownfish/Obj.h"
 #include "Lucy/Object/BitVector.h"
-#include "Clownfish/Boolean.h"
 #include "Clownfish/ByteBuf.h"
 #include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"
 #include "Lucy/Object/I32Array.h"
-#include "Clownfish/Num.h"
 #include "Clownfish/Vector.h"
 #include "Clownfish/Class.h"
 #include "Clownfish/Util/Memory.h"

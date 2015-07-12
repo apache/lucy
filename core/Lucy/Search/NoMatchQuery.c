@@ -18,6 +18,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Search/NoMatchQuery.h"
+#include "Clownfish/Boolean.h"
 #include "Lucy/Index/SegReader.h"
 #include "Lucy/Index/Similarity.h"
 #include "Lucy/Plan/Schema.h"

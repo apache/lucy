@@ -18,6 +18,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Plan/FullTextType.h"
+#include "Clownfish/Boolean.h"
 #include "Lucy/Analysis/Analyzer.h"
 #include "Lucy/Index/Posting/ScorePosting.h"
 #include "Lucy/Index/Similarity.h"

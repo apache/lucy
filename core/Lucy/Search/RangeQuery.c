@@ -19,6 +19,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Search/RangeQuery.h"
+#include "Clownfish/Boolean.h"
 #include "Lucy/Index/DocVector.h"
 #include "Lucy/Index/SegReader.h"
 #include "Lucy/Index/Similarity.h"
