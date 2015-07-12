@@ -5087,7 +5087,10 @@ chaz_MakeRule_add_command_with_libpath(chaz_MakeRule *rule,
         path = chaz_Util_vjoin(";", args);
         va_end(args);
 
-        lib_command = chaz_Util_join("", "path ", path, ";%path% && ", command,
+        /* It's important to not add a space before `&&`. Otherwise, the
+	 * space is added to the search path.
+	 */
+        lib_command = chaz_Util_join("", "path ", path, ";%path%&& ", command,
                                      NULL);
     }
     else {
