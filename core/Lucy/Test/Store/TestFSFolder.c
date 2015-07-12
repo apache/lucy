@@ -71,8 +71,12 @@ S_set_up() {
 static void
 S_tear_down() {
     struct stat stat_buf;
-    rmdir("_fstest");
-    /* FIXME: This can fail on Windows. */
+    int result = rmdir("_fstest");
+    if (result < 0) {
+        /* FIXME: This can fail on Windows with ENOTEMPTY. */
+        THROW(ERR, "Can't clean up directory _fstest: %s", strerror(errno));
+    }
+    /* FIXME: This can also fail on Windows even if rmdir was successful. */
     if (stat("_fstest", &stat_buf) != -1) {
         THROW(ERR, "Can't clean up directory _fstest");
     }

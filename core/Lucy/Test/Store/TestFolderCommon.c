@@ -279,6 +279,7 @@ test_Local_Delete(TestBatchRunner *runner, set_up_t set_up, tear_down_t tear_dow
     Folder_Delete(folder, foo_boffo);
     TEST_TRUE(runner, Folder_Local_Delete(folder, foo),
               "Local_Delete on empty dir succeeds");
+    // FIXME: This test sometimes fails on Windows.
     TEST_FALSE(runner, Folder_Exists(folder, foo),
                "Dir is really gone");
 
@@ -395,6 +396,7 @@ test_Rename(TestBatchRunner *runner, set_up_t set_up, tear_down_t tear_down) {
               "File still exists");
 
     result = Folder_Rename(folder, foo_bar, foo_bar);
+    // FIXME: This test sometimes fails on Windows with "Permission denied".
     TEST_TRUE(runner, result, "Renaming dir to itself succeeds");
     TEST_TRUE(runner, Folder_Exists(folder, foo_bar),
               "Dir still exists");
@@ -488,6 +490,7 @@ test_Hard_Link(TestBatchRunner *runner, set_up_t set_up, tear_down_t tear_down) 
     TEST_FALSE(runner, result, "Hard_Link dir fails");
     TEST_FALSE(runner, Folder_Exists(folder, banana),
                "Nothing at new path");
+    // FIXME: This test sometimes fails on Windows.
     TEST_TRUE(runner, Folder_Exists(folder, baz),
               "Folder still exists at old path");
     Folder_Delete(folder, baz);
