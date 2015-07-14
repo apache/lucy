@@ -34,6 +34,10 @@
   #include <sys/stat.h>
 #endif
 
+#ifdef CHY_HAS_ERRNO_H
+  #include "errno.h"
+#endif
+
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/Store/TestFSFolder.h"
