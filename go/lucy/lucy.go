@@ -19,12 +19,20 @@ package lucy
 /*
 #define C_LUCY_DOC
 #define C_LUCY_REGEXTOKENIZER
+#define C_LUCY_INVERTER
+#define C_LUCY_INVERTERENTRY
 
 #include "lucy_parcel.h"
 #include "Lucy/Analysis/RegexTokenizer.h"
 #include "Lucy/Document/Doc.h"
+#include "Lucy/Index/Inverter.h"
 
 #include "Clownfish/Hash.h"
+#include "Clownfish/HashIterator.h"
+#include "Clownfish/Vector.h"
+#include "Lucy/Plan/FieldType.h"
+#include "Lucy/Plan/Schema.h"
+#include "Lucy/Index/Segment.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/Freezer.h"
@@ -82,6 +90,10 @@ GOLUCY_Doc_Destroy(lucy_Doc *self);
 extern void
 (*GOLUCY_Doc_Destroy_BRIDGE)(lucy_Doc *self);
 
+extern void
+GOLUCY_Inverter_Invert_Doc(lucy_Inverter *self, lucy_Doc *doc);
+extern void
+(*GOLUCY_Inverter_Invert_Doc_BRIDGE)(lucy_Inverter *self, lucy_Doc *doc);
 
 
 // C symbols linked into a Go-built package archive are not visible to
@@ -103,12 +115,14 @@ GOLUCY_glue_exported_symbols() {
 	GOLUCY_Doc_Extract_BRIDGE = GOLUCY_Doc_Extract;
 	GOLUCY_Doc_Equals_BRIDGE = GOLUCY_Doc_Equals;
 	GOLUCY_Doc_Destroy_BRIDGE = GOLUCY_Doc_Destroy;
+	GOLUCY_Inverter_Invert_Doc_BRIDGE = GOLUCY_Inverter_Invert_Doc;
 }
 
 */
 import "C"
 import "unsafe"
-import _ "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
+import "fmt"
+import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
 func init() {
 	C.GOLUCY_glue_exported_symbols()
@@ -213,4 +227,89 @@ func GOLUCY_Doc_Destroy(d *C.lucy_Doc) {
 	ivars := C.lucy_Doc_IVARS(d)
 	C.cfish_decref(unsafe.Pointer(ivars.fields))
 	C.cfish_super_destroy(unsafe.Pointer(d), C.LUCY_DOC)
+}
+
+func fetchEntry(ivars *C.lucy_InverterIVARS, field *C.cfish_String) *C.lucy_InverterEntry {
+	schema := ivars.schema
+	fieldNum := C.LUCY_Seg_Field_Num(ivars.segment, field)
+	if fieldNum == 0 {
+		// This field seems not to be in the segment yet.  Try to find it in
+		// the Schema.
+		if C.LUCY_Schema_Fetch_Type(schema, field) != nil {
+			// The field is in the Schema.  Get a field num from the Segment.
+			fieldNum = C.LUCY_Seg_Add_Field(ivars.segment, field)
+		} else {
+			// We've truly failed to find the field.  The user must
+			// not have spec'd it.
+			fieldGo := clownfish.CFStringToGo(unsafe.Pointer(field))
+			err := clownfish.NewErr("Unknown field name: '" + fieldGo + "'")
+			panic(err)
+		}
+	}
+	entry := C.CFISH_Vec_Fetch(ivars.entry_pool, C.size_t(fieldNum))
+	if entry == nil {
+		newEntry := C.lucy_InvEntry_new(schema, field, fieldNum)
+		C.CFISH_Vec_Store(ivars.entry_pool, C.size_t(fieldNum),
+			(*C.cfish_Obj)(unsafe.Pointer(entry)))
+		return newEntry
+	}
+	return (*C.lucy_InverterEntry)(unsafe.Pointer(entry))
+}
+
+//export GOLUCY_Inverter_Invert_Doc
+func GOLUCY_Inverter_Invert_Doc(inverter *C.lucy_Inverter, doc *C.lucy_Doc) {
+	ivars := C.lucy_Inverter_IVARS(inverter)
+	fields := (*C.cfish_Hash)(C.LUCY_Doc_Get_Fields(doc))
+
+	// Prepare for the new doc.
+	C.LUCY_Inverter_Set_Doc(inverter, doc)
+
+	// Extract and invert the doc's fields.
+	iter := C.cfish_HashIter_new(fields)
+	for C.CFISH_HashIter_Next(iter) {
+		field := C.CFISH_HashIter_Get_Key(iter)
+		obj := C.CFISH_HashIter_Get_Value(iter)
+		if obj == nil {
+			mess := "Invalid nil value for field" + clownfish.CFStringToGo(unsafe.Pointer(field))
+			panic(clownfish.NewErr(mess))
+		}
+
+		inventry := fetchEntry(ivars, field)
+		inventryIvars := C.lucy_InvEntry_IVARS(inventry)
+		fieldType := inventryIvars._type
+
+		// Get the field value.
+		var expectedType *C.cfish_Class
+		switch C.LUCY_FType_Primitive_ID(fieldType) & C.lucy_FType_PRIMITIVE_ID_MASK {
+		case C.lucy_FType_TEXT:
+			expectedType = C.CFISH_STRING
+		case C.lucy_FType_BLOB:
+			expectedType = C.CFISH_BLOB
+		case C.lucy_FType_INT32:
+			expectedType = C.CFISH_INTEGER
+		case C.lucy_FType_INT64:
+			expectedType = C.CFISH_INTEGER
+		case C.lucy_FType_FLOAT32:
+			expectedType = C.CFISH_FLOAT
+		case C.lucy_FType_FLOAT64:
+			expectedType = C.CFISH_FLOAT
+		default:
+			panic(clownfish.NewErr("Internal Lucy error: bad type id for field " +
+				clownfish.CFStringToGo(unsafe.Pointer(field))))
+		}
+		if !C.cfish_Obj_is_a(obj, expectedType) {
+			className := C.cfish_Obj_get_class_name((*C.cfish_Obj)(unsafe.Pointer(fieldType)))
+			mess := fmt.Sprintf("Invalid type for field '%s': '%s'",
+				clownfish.CFStringToGo(unsafe.Pointer(field)),
+				clownfish.CFStringToGo(unsafe.Pointer(className)))
+			panic(clownfish.NewErr(mess))
+		}
+		if inventryIvars.value != obj {
+			C.cfish_decref(unsafe.Pointer(inventryIvars.value))
+			inventryIvars.value = C.cfish_inc_refcount(unsafe.Pointer(obj))
+		}
+
+		C.LUCY_Inverter_Add_Field(inverter, inventry)
+	}
+	C.cfish_dec_refcount(unsafe.Pointer(iter))
 }

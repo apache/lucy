@@ -249,83 +249,11 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
 
 /**************************** Inverter *****************************/
 
-static InverterEntry*
-S_fetch_entry(InverterIVARS *ivars, String *field) {
-    Schema *const schema = ivars->schema;
-    int32_t field_num = Seg_Field_Num(ivars->segment, field);
-    if (!field_num) {
-        // This field seems not to be in the segment yet.  Try to find it in
-        // the Schema.
-        if (Schema_Fetch_Type(schema, field)) {
-            // The field is in the Schema.  Get a field num from the Segment.
-            field_num = Seg_Add_Field(ivars->segment, field);
-        }
-        else {
-            // We've truly failed to find the field.  The user must
-            // not have spec'd it.
-            THROW(ERR, "Unknown field name: '%o'", field);
-        }
-    }
-
-    InverterEntry *entry
-        = (InverterEntry*)Vec_Fetch(ivars->entry_pool, field_num);
-    if (!entry) {
-        entry = InvEntry_new(schema, (String*)field, field_num);
-        Vec_Store(ivars->entry_pool, field_num, (Obj*)entry);
-    }
-    return entry;
-}
+Inverter_Invert_Doc_t GOLUCY_Inverter_Invert_Doc_BRIDGE;
 
 void
 Inverter_Invert_Doc_IMP(Inverter *self, Doc *doc) {
-    InverterIVARS *const ivars = Inverter_IVARS(self);
-    Hash *const fields = (Hash*)Doc_Get_Fields(doc);
-
-    // Prepare for the new doc.
-    Inverter_Set_Doc(self, doc);
-
-    // Extract and invert the doc's fields.
-    HashIterator *iter = HashIter_new(fields);
-    while (HashIter_Next(iter)) {
-        String *field = HashIter_Get_Key(iter);
-        Obj    *obj   = HashIter_Get_Value(iter);
-
-        InverterEntry *inventry = S_fetch_entry(ivars, field);
-        InverterEntryIVARS *inventry_ivars = InvEntry_IVARS(inventry);
-        FieldType *type = inventry_ivars->type;
-
-        // Get the field value.
-        switch (FType_Primitive_ID(type) & FType_PRIMITIVE_ID_MASK) {
-            case FType_TEXT: {
-                    CERTIFY(obj, STRING);
-                    break;
-                }
-            case FType_BLOB: {
-                    CERTIFY(obj, BLOB);
-                    break;
-                }
-            case FType_INT32:
-            case FType_INT64: {
-                    CERTIFY(obj, INTEGER);
-                    break;
-                }
-            case FType_FLOAT32:
-            case FType_FLOAT64: {
-                    CERTIFY(obj, FLOAT);
-                    break;
-                }
-            default:
-                THROW(ERR, "Unrecognized type: %o", type);
-        }
-
-        if (inventry_ivars->value != obj) {
-            DECREF(inventry_ivars->value);
-            inventry_ivars->value = INCREF(obj);
-        }
-
-        Inverter_Add_Field(self, inventry);
-    }
-    DECREF(iter);
+    GOLUCY_Inverter_Invert_Doc_BRIDGE(self, doc);
 }
 
 
