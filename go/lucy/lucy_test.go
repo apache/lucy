@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package lucy_test
+package lucy
 
-import "git-wip-us.apache.org/repos/asf/lucy.git/go/lucy"
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 import "testing"
 
 func TestStuff(t *testing.T) {
-	lucy.NewSchema()
+	NewSchema()
 }
 
 func TestOpenIndexer(t *testing.T) {
-	_, err := lucy.OpenIndexer(&lucy.OpenIndexerArgs{Index: "notalucyindex"})
+	_, err := OpenIndexer(&OpenIndexerArgs{Index: "notalucyindex"})
 	if _, ok := err.(clownfish.Err); !ok {
 		t.Error("Didn't catch exception opening indexer")
 	}
