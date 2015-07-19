@@ -86,61 +86,53 @@ RegexTokenizer_Tokenize_Utf8_IMP(RegexTokenizer *self, const char *string,
 /********************************** Doc ********************************/
 
 Doc*
+(*GOLUCY_Doc_init_BRIDGE)(Doc *self, void *fields, int32_t doc_id);
+
+Doc*
 Doc_init(Doc *self, void *fields, int32_t doc_id) {
-    DocIVARS *const ivars = Doc_IVARS(self);
-    Hash *hash;
-
-    if (fields) {
-        hash = (Hash *)INCREF(CERTIFY(fields, HASH));
-    }
-    else {
-        hash = Hash_new(0);
-    }
-    ivars->fields = hash;
-    ivars->doc_id = doc_id;
-
-    return self;
+    return GOLUCY_Doc_init_BRIDGE(self, fields, doc_id);
 }
+
+Doc_Set_Fields_t GOLUCY_Doc_Set_Fields_BRIDGE;
 
 void
 Doc_Set_Fields_IMP(Doc *self, void *fields) {
-    DocIVARS *const ivars = Doc_IVARS(self);
-    DECREF(ivars->fields);
-    ivars->fields = CERTIFY(fields, HASH);
+    GOLUCY_Doc_Set_Fields_BRIDGE(self, fields);
 }
+
+Doc_Get_Size_t GOLUCY_Doc_Get_Size_BRIDGE;
 
 uint32_t
 Doc_Get_Size_IMP(Doc *self) {
-    Hash *hash = (Hash*)Doc_IVARS(self)->fields;
-    return Hash_Get_Size(hash);
+    return GOLUCY_Doc_Get_Size_BRIDGE(self);
 }
+
+Doc_Store_t GOLUCY_Doc_Store_BRIDGE;
 
 void
 Doc_Store_IMP(Doc *self, String *field, Obj *value) {
-    Hash *hash = (Hash*)Doc_IVARS(self)->fields;
-    Hash_Store(hash, field, INCREF(value));
+    GOLUCY_Doc_Store_BRIDGE(self, field, value);
 }
+
+Doc_Serialize_t GOLUCY_Doc_Serialize_BRIDGE;
 
 void
 Doc_Serialize_IMP(Doc *self, OutStream *outstream) {
-    DocIVARS *const ivars = Doc_IVARS(self);
-    Hash *hash = (Hash*)ivars->fields;
-    Freezer_serialize_hash(hash, outstream);
-    OutStream_Write_C32(outstream, ivars->doc_id);
+    GOLUCY_Doc_Serialize_BRIDGE(self, outstream);
 }
+
+Doc_Deserialize_t GOLUCY_Doc_Deserialize_BRIDGE;
 
 Doc*
 Doc_Deserialize_IMP(Doc *self, InStream *instream) {
-    DocIVARS *const ivars = Doc_IVARS(self);
-    ivars->fields = Freezer_read_hash(instream);
-    ivars->doc_id = InStream_Read_C32(instream);
-    return self;
+    return GOLUCY_Doc_Deserialize_BRIDGE(self, instream);
 }
+
+Doc_Extract_t GOLUCY_Doc_Extract_BRIDGE;
 
 Obj*
 Doc_Extract_IMP(Doc *self, String *field) {
-    Hash *hash = (Hash*)Doc_IVARS(self)->fields;
-    return INCREF(Hash_Fetch(hash, field));
+    return GOLUCY_Doc_Extract_BRIDGE(self, field);
 }
 
 Hash*
@@ -158,22 +150,19 @@ Doc_Load_IMP(Doc *self, Obj *dump) {
     UNREACHABLE_RETURN(Doc*);
 }
 
+Doc_Equals_t GOLUCY_Doc_Equals_BRIDGE;
+
 bool
 Doc_Equals_IMP(Doc *self, Obj *other) {
-    if ((Doc*)other == self)   { return true;  }
-    if (!Obj_is_a(other, DOC)) { return false; }
-    DocIVARS *const ivars = Doc_IVARS(self);
-    DocIVARS *const ovars = Doc_IVARS((Doc*)other);
-    return Hash_Equals((Hash*)ivars->fields, (Obj*)ovars->fields);
+    return GOLUCY_Doc_Equals_BRIDGE(self, other);
 }
+
+Doc_Destroy_t GOLUCY_Doc_Destroy_BRIDGE;
 
 void
 Doc_Destroy_IMP(Doc *self) {
-    DocIVARS *const ivars = Doc_IVARS(self);
-    DECREF(ivars->fields);
-    SUPER_DESTROY(self, DOC);
+    GOLUCY_Doc_Destroy_BRIDGE(self);
 }
-
 
 /**************************** DocReader *****************************/
 
