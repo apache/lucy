@@ -166,85 +166,11 @@ Doc_Destroy_IMP(Doc *self) {
 
 /**************************** DocReader *****************************/
 
+DefDocReader_Fetch_Doc_t GOLUCY_DefDocReader_Fetch_Doc_BRIDGE;
+
 HitDoc*
 DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
-    DefaultDocReaderIVARS *const ivars = DefDocReader_IVARS(self);
-    Schema   *const schema = ivars->schema;
-    InStream *const dat_in = ivars->dat_in;
-    InStream *const ix_in  = ivars->ix_in;
-    Hash     *const fields = Hash_new(1);
-    int64_t   start;
-    uint32_t  num_fields;
-    uint32_t  field_name_cap = 31;
-    char     *field_name = (char*)MALLOCATE(field_name_cap + 1);
-
-    // Get data file pointer from index, read number of fields.
-    InStream_Seek(ix_in, (int64_t)doc_id * 8);
-    start = InStream_Read_U64(ix_in);
-    InStream_Seek(dat_in, start);
-    num_fields = InStream_Read_C32(dat_in);
-
-    // Decode stored data and build up the doc field by field.
-    while (num_fields--) {
-        uint32_t        field_name_len;
-        Obj       *value;
-        FieldType *type;
-
-        // Read field name.
-        field_name_len = InStream_Read_C32(dat_in);
-        if (field_name_len > field_name_cap) {
-            field_name_cap = field_name_len;
-            field_name     = (char*)REALLOCATE(field_name,
-                                                    field_name_cap + 1);
-        }
-        InStream_Read_Bytes(dat_in, field_name, field_name_len);
-
-        // Find the Field's FieldType.
-        String *field_name_str = SSTR_WRAP_UTF8(field_name, field_name_len);
-        type = Schema_Fetch_Type(schema, field_name_str);
-
-        // Read the field value.
-        switch (FType_Primitive_ID(type) & FType_PRIMITIVE_ID_MASK) {
-            case FType_TEXT: {
-                    uint32_t value_len = InStream_Read_C32(dat_in);
-                    char *buf = (char*)MALLOCATE(value_len + 1);
-                    InStream_Read_Bytes(dat_in, buf, value_len);
-                    buf[value_len] = '\0';
-                    value = (Obj*)Str_new_steal_utf8(buf, value_len);
-                    break;
-                }
-            case FType_BLOB: {
-                    uint32_t value_len = InStream_Read_C32(dat_in);
-                    char *buf = (char*)MALLOCATE(value_len);
-                    InStream_Read_Bytes(dat_in, buf, value_len);
-                    value = (Obj*)Blob_new_steal(buf, value_len);
-                    break;
-                }
-            case FType_FLOAT32:
-                value = (Obj*)Float_new(InStream_Read_F32(dat_in));
-                break;
-            case FType_FLOAT64:
-                value = (Obj*)Float_new(InStream_Read_F64(dat_in));
-                break;
-            case FType_INT32:
-                value = (Obj*)Int_new((int32_t)InStream_Read_C32(dat_in));
-                break;
-            case FType_INT64:
-                value = (Obj*)Int_new((int64_t)InStream_Read_C64(dat_in));
-                break;
-            default:
-                value = NULL;
-                THROW(ERR, "Unrecognized type: %o", type);
-        }
-
-        // Store the value.
-        Hash_Store_Utf8(fields, field_name, field_name_len, value);
-    }
-    FREEMEM(field_name);
-
-    HitDoc *retval = HitDoc_new(fields, doc_id, 0.0);
-    DECREF(fields);
-    return retval;
+    return GOLUCY_DefDocReader_Fetch_Doc_BRIDGE(self, doc_id);
 }
 
 /**************************** Inverter *****************************/

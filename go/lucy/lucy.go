@@ -17,19 +17,28 @@
 package lucy
 
 /*
+
+#include <stdlib.h>
+
 #define C_LUCY_DOC
 #define C_LUCY_REGEXTOKENIZER
+#define C_LUCY_DEFAULTDOCREADER
 #define C_LUCY_INVERTER
 #define C_LUCY_INVERTERENTRY
 
 #include "lucy_parcel.h"
 #include "Lucy/Analysis/RegexTokenizer.h"
 #include "Lucy/Document/Doc.h"
+#include "Lucy/Index/DocReader.h"
 #include "Lucy/Index/Inverter.h"
 
+#include "Clownfish/String.h"
+#include "Clownfish/Blob.h"
+#include "Clownfish/Num.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/HashIterator.h"
 #include "Clownfish/Vector.h"
+#include "Lucy/Document/HitDoc.h"
 #include "Lucy/Plan/FieldType.h"
 #include "Lucy/Plan/Schema.h"
 #include "Lucy/Index/Segment.h"
@@ -90,6 +99,11 @@ GOLUCY_Doc_Destroy(lucy_Doc *self);
 extern void
 (*GOLUCY_Doc_Destroy_BRIDGE)(lucy_Doc *self);
 
+extern lucy_HitDoc*
+GOLUCY_DefDocReader_Fetch_Doc(lucy_DefaultDocReader *self, int32_t doc_id);
+extern lucy_HitDoc*
+(*GOLUCY_DefDocReader_Fetch_Doc_BRIDGE)(lucy_DefaultDocReader *self, int32_t doc_id);
+
 extern void
 GOLUCY_Inverter_Invert_Doc(lucy_Inverter *self, lucy_Doc *doc);
 extern void
@@ -115,7 +129,14 @@ GOLUCY_glue_exported_symbols() {
 	GOLUCY_Doc_Extract_BRIDGE = GOLUCY_Doc_Extract;
 	GOLUCY_Doc_Equals_BRIDGE = GOLUCY_Doc_Equals;
 	GOLUCY_Doc_Destroy_BRIDGE = GOLUCY_Doc_Destroy;
+	GOLUCY_DefDocReader_Fetch_Doc_BRIDGE = GOLUCY_DefDocReader_Fetch_Doc;
 	GOLUCY_Inverter_Invert_Doc_BRIDGE = GOLUCY_Inverter_Invert_Doc;
+}
+
+
+static void
+null_terminate_string(char *string, size_t len) {
+	string[len] = '\0';
 }
 
 */
@@ -254,6 +275,79 @@ func fetchEntry(ivars *C.lucy_InverterIVARS, field *C.cfish_String) *C.lucy_Inve
 		return newEntry
 	}
 	return (*C.lucy_InverterEntry)(unsafe.Pointer(entry))
+}
+
+//export GOLUCY_DefDocReader_Fetch_Doc
+func GOLUCY_DefDocReader_Fetch_Doc(ddr *C.lucy_DefaultDocReader,
+	docID C.int32_t) *C.lucy_HitDoc {
+	ivars := C.lucy_DefDocReader_IVARS(ddr)
+	schema := ivars.schema
+	datInstream := ivars.dat_in
+	ixInstream := ivars.ix_in
+	fields := C.cfish_Hash_new(1)
+	fieldNameCap := C.size_t(31)
+	var fieldName *C.char = ((*C.char)(C.malloc(fieldNameCap + 1)))
+
+	// Get data file pointer from index, read number of fields.
+	C.LUCY_InStream_Seek(ixInstream, C.int64_t(docID*8))
+	start := C.LUCY_InStream_Read_U64(ixInstream)
+	C.LUCY_InStream_Seek(datInstream, C.int64_t(start))
+	numFields := uint32(C.LUCY_InStream_Read_C32(datInstream))
+
+	// Decode stored data and build up the doc field by field.
+	for i := uint32(0); i < numFields; i++ {
+		// Read field name.
+		fieldNameLen := C.size_t(C.LUCY_InStream_Read_C32(datInstream))
+		if fieldNameLen > fieldNameCap {
+			fieldNameCap = fieldNameLen
+			fieldName = ((*C.char)(C.realloc(unsafe.Pointer(fieldName), fieldNameCap+1)))
+		}
+		C.LUCY_InStream_Read_Bytes(datInstream, fieldName, fieldNameLen)
+
+		// Find the Field's FieldType.
+		// TODO: Creating and destroying a new string each time is
+		// inefficient.  The solution should be to add a privte
+		// Schema_Fetch_Type_Utf8 method which takes char* and size_t.
+		fieldNameStr := C.cfish_Str_new_from_utf8(fieldName, fieldNameLen)
+		fieldType := C.LUCY_Schema_Fetch_Type(schema, fieldNameStr)
+		C.cfish_dec_refcount(unsafe.Pointer(fieldNameStr))
+
+		// Read the field value.
+		var value *C.cfish_Obj
+		switch C.LUCY_FType_Primitive_ID(fieldType) & C.lucy_FType_PRIMITIVE_ID_MASK {
+		case C.lucy_FType_TEXT:
+			valueLen := C.size_t(C.LUCY_InStream_Read_C32(datInstream))
+			buf := ((*C.char)(C.malloc(valueLen + 1)))
+			C.LUCY_InStream_Read_Bytes(datInstream, buf, valueLen)
+			C.null_terminate_string(buf, valueLen)
+			value = ((*C.cfish_Obj)(C.cfish_Str_new_steal_utf8(buf, valueLen)))
+		case C.lucy_FType_BLOB:
+			valueLen := C.size_t(C.LUCY_InStream_Read_C32(datInstream))
+			buf := ((*C.char)(C.malloc(valueLen)))
+			C.LUCY_InStream_Read_Bytes(datInstream, buf, valueLen)
+			value = ((*C.cfish_Obj)(C.cfish_Blob_new_steal(buf, valueLen)))
+		case C.lucy_FType_FLOAT32:
+			value = ((*C.cfish_Obj)(C.cfish_Float_new(C.double(C.LUCY_InStream_Read_F32(datInstream)))))
+		case C.lucy_FType_FLOAT64:
+			value = ((*C.cfish_Obj)(C.cfish_Float_new(C.LUCY_InStream_Read_F64(datInstream))))
+		case C.lucy_FType_INT32:
+			value = ((*C.cfish_Obj)(C.cfish_Int_new(C.int64_t(C.LUCY_InStream_Read_C32(datInstream)))))
+		case C.lucy_FType_INT64:
+			value = ((*C.cfish_Obj)(C.cfish_Int_new(C.int64_t(C.LUCY_InStream_Read_C64(datInstream)))))
+		default:
+			value = nil
+			panic(clownfish.NewErr("Internal Lucy error: bad type id for field " +
+				C.GoStringN(fieldName, C.int(fieldNameLen))))
+		}
+
+		// Store the value.
+		C.CFISH_Hash_Store_Utf8(fields, fieldName, fieldNameLen, value)
+	}
+	C.free(unsafe.Pointer(fieldName))
+
+	retval := C.lucy_HitDoc_new(unsafe.Pointer(fields), docID, 0.0)
+	C.cfish_dec_refcount(unsafe.Pointer(fields))
+	return retval
 }
 
 //export GOLUCY_Inverter_Invert_Doc
