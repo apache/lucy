@@ -29,11 +29,6 @@ lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
 }
 
 void
-lucy_RegexTokenizer_set_token_re(lucy_RegexTokenizer *self, void *token_re) {
-    THROW(LUCY_ERR, "TODO");
-}
-
-void
 lucy_RegexTokenizer_destroy(lucy_RegexTokenizer *self) {
     THROW(LUCY_ERR, "TODO");
 }

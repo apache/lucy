@@ -87,13 +87,6 @@ RegexTokenizer_init(RegexTokenizer *self, String *pattern) {
 }
 
 void
-RegexTokenizer_Set_Token_RE_IMP(RegexTokenizer *self, void *token_re) {
-    UNUSED_VAR(self);
-    UNUSED_VAR(token_re);
-    THROW(ERR, "TODO");
-}
-
-void
 RegexTokenizer_Destroy_IMP(RegexTokenizer *self) {
     RegexTokenizerIVARS *const ivars = RegexTokenizer_IVARS(self);
     DECREF(ivars->pattern);

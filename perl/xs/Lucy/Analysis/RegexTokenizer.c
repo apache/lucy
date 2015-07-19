@@ -27,13 +27,6 @@
 static SV*
 S_compile_token_re(pTHX_ cfish_String *pattern);
 
-static void
-S_set_token_re_but_not_pattern(pTHX_ lucy_RegexTokenizer *self,
-                               void *token_re);
-
-static void
-S_set_pattern_from_token_re(pTHX_ lucy_RegexTokenizer *self, void *token_re);
-
 bool
 lucy_RegexTokenizer_is_available(void) {
     return true;
@@ -61,9 +54,26 @@ lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
 
     // Acquire a compiled regex engine for matching one token.
     dTHX;
-    SV *token_re_sv = S_compile_token_re(aTHX_ ivars->pattern);
-    S_set_token_re_but_not_pattern(aTHX_ self, SvRV(token_re_sv));
-    SvREFCNT_dec(token_re_sv);
+    SV *token_re = S_compile_token_re(aTHX_ ivars->pattern);
+#if (PERL_VERSION > 10)
+    REGEXP *rx = SvRX((SV*)token_re);
+#else
+    MAGIC *magic = NULL;
+    if (SvMAGICAL((SV*)token_re)) {
+        magic = mg_find((SV*)token_re, PERL_MAGIC_qr);
+    }
+    if (!magic) {
+        THROW(CFISH_ERR, "token_re is not a qr// entity");
+    }
+    REGEXP *rx = (REGEXP*)magic->mg_obj;
+#endif
+    if (rx == NULL) {
+        THROW(CFISH_ERR, "Failed to extract REGEXP from token_re '%s'",
+              SvPV_nolen((SV*)token_re));
+    }
+    ivars->token_re = rx;
+    (void)ReREFCNT_inc(((REGEXP*)ivars->token_re));
+    SvREFCNT_dec(token_re);
 
     return self;
 }
@@ -85,51 +95,6 @@ S_compile_token_re(pTHX_ cfish_String *pattern) {
     FREETMPS;
     LEAVE;
     return token_re_sv;
-}
-
-static void
-S_set_token_re_but_not_pattern(pTHX_ lucy_RegexTokenizer *self,
-                               void *token_re) {
-    lucy_RegexTokenizerIVARS *const ivars = lucy_RegexTokenizer_IVARS(self);
-#if (PERL_VERSION > 10)
-    REGEXP *rx = SvRX((SV*)token_re);
-#else
-    MAGIC *magic = NULL;
-    if (SvMAGICAL((SV*)token_re)) {
-        magic = mg_find((SV*)token_re, PERL_MAGIC_qr);
-    }
-    if (!magic) {
-        THROW(CFISH_ERR, "token_re is not a qr// entity");
-    }
-    REGEXP *rx = (REGEXP*)magic->mg_obj;
-#endif
-    if (rx == NULL) {
-        THROW(CFISH_ERR, "Failed to extract REGEXP from token_re '%s'",
-              SvPV_nolen((SV*)token_re));
-    }
-    if (ivars->token_re) { ReREFCNT_dec(((REGEXP*)ivars->token_re)); }
-    ivars->token_re = rx;
-    (void)ReREFCNT_inc(((REGEXP*)ivars->token_re));
-}
-
-static void
-S_set_pattern_from_token_re(pTHX_ lucy_RegexTokenizer *self, void *token_re) {
-    lucy_RegexTokenizerIVARS *const ivars = lucy_RegexTokenizer_IVARS(self);
-    SV *rv = newRV((SV*)token_re);
-    STRLEN len = 0;
-    char *ptr = SvPVutf8((SV*)rv, len);
-    CFISH_DECREF(ivars->pattern);
-    ivars->pattern = cfish_Str_new_from_trusted_utf8(ptr, len);
-    SvREFCNT_dec(rv);
-}
-
-void
-LUCY_RegexTokenizer_Set_Token_RE_IMP(lucy_RegexTokenizer *self,
-                                     void *token_re) {
-    dTHX;
-    S_set_token_re_but_not_pattern(aTHX_ self, token_re);
-    // Set pattern as a side effect.
-    S_set_pattern_from_token_re(aTHX_ self, token_re);
 }
 
 void
