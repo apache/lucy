@@ -34,6 +34,12 @@
 #include "Lucy/Search/Compiler.h"
 
 PolySearcher*
+PolySearcher_new(Schema *schema, Vector *searchers) {
+    PolySearcher *self = (PolySearcher*)Class_Make_Obj(POLYSEARCHER);
+    return PolySearcher_init(self, schema, searchers);
+}
+
+PolySearcher*
 PolySearcher_init(PolySearcher *self, Schema *schema, Vector *searchers) {
     const uint32_t num_searchers = Vec_Get_Size(searchers);
     int32_t *starts_array = (int32_t*)MALLOCATE(num_searchers * sizeof(int32_t));
