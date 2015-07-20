@@ -66,12 +66,9 @@ public abstract class Lucy::Search::PolyQuery inherits Lucy::Search::Query {
     Destroy(PolyQuery *self);
 }
 
-class Lucy::Search::PolyCompiler inherits Lucy::Search::Compiler {
+abstract class Lucy::Search::PolyCompiler inherits Lucy::Search::Compiler {
 
     Vector *children;
-
-    inert incremented PolyCompiler*
-    new(PolyQuery *parent, Searcher *searcher, float boost);
 
     /** Initialize the Compiler, creating a Compiler child for each child
      * Query.  Normalization is left to the subclass.
