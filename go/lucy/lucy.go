@@ -38,6 +38,11 @@ package lucy
 #include "Clownfish/Hash.h"
 #include "Clownfish/HashIterator.h"
 #include "Clownfish/Vector.h"
+#include "Clownfish/Err.h"
+#include "Clownfish/Util/StringHelper.h"
+#include "Lucy/Analysis/Analyzer.h"
+#include "Lucy/Analysis/Inversion.h"
+#include "Lucy/Analysis/Token.h"
 #include "Lucy/Document/HitDoc.h"
 #include "Lucy/Plan/FieldType.h"
 #include "Lucy/Plan/Schema.h"
@@ -133,6 +138,35 @@ GOLUCY_glue_exported_symbols() {
 	GOLUCY_Inverter_Invert_Doc_BRIDGE = GOLUCY_Inverter_Invert_Doc;
 }
 
+static uint32_t
+S_count_code_points(const char *string, size_t len) {
+    uint32_t num_code_points = 0;
+    size_t i = 0;
+
+    while (i < len) {
+        i += cfish_StrHelp_UTF8_COUNT[(uint8_t)(string[i])];
+        ++num_code_points;
+    }
+
+    if (i != len) {
+        CFISH_THROW(CFISH_ERR, "Match between code point boundaries in '%s'", string);
+    }
+
+    return num_code_points;
+}
+
+// Returns the number of code points through the end of the match.
+static int
+push_token(const char *str, int start, int end, int last_end,
+           int cp_count, lucy_Inversion *inversion) {
+	const char *match = str + start;
+	int match_len = end - start;
+	int cp_start = cp_count + S_count_code_points(str + last_end, start - last_end);
+	int cp_end   = cp_start + S_count_code_points(match, match_len);
+	lucy_Token *token = lucy_Token_new(match, match_len, cp_start, cp_end, 1.0f, 1);
+	LUCY_Inversion_Append(inversion, token);
+	return cp_end;
+}
 
 static void
 null_terminate_string(char *string, size_t len) {
@@ -143,25 +177,70 @@ null_terminate_string(char *string, size_t len) {
 import "C"
 import "unsafe"
 import "fmt"
+import "regexp"
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
+
+var registry *objRegistry
 
 func init() {
 	C.GOLUCY_glue_exported_symbols()
 	C.lucy_bootstrap_parcel()
+	registry = newObjRegistry(16)
 }
 
 //export GOLUCY_RegexTokenizer_init
 func GOLUCY_RegexTokenizer_init(rt *C.lucy_RegexTokenizer, pattern *C.cfish_String) *C.lucy_RegexTokenizer {
-	return nil
+	C.lucy_Analyzer_init(((*C.lucy_Analyzer)(unsafe.Pointer(rt))))
+
+	ivars := C.lucy_RegexTokenizer_IVARS(rt)
+	ivars.pattern = C.CFISH_Str_Clone(pattern)
+
+	var patternGo string
+	if pattern == nil {
+		patternGo = "\\w+(?:['\\x{2019}]\\w+)*"
+	} else {
+		patternGo = clownfish.CFStringToGo(unsafe.Pointer(pattern))
+	}
+	rx, err := regexp.Compile(patternGo)
+	if err != nil {
+		panic(err)
+	}
+	rxID := registry.store(rx)
+	ivars.token_re = unsafe.Pointer(rxID)
+
+	return rt
 }
 
 //export GOLUCY_RegexTokenizer_Destroy
 func GOLUCY_RegexTokenizer_Destroy(rt *C.lucy_RegexTokenizer) {
+	ivars := C.lucy_RegexTokenizer_IVARS(rt)
+	rxID := uintptr(ivars.token_re)
+	registry.delete(rxID)
+	C.cfish_super_destroy(unsafe.Pointer(rt), C.LUCY_REGEXTOKENIZER)
 }
 
 //export GOLUCY_RegexTokenizer_Tokenize_Utf8
 func GOLUCY_RegexTokenizer_Tokenize_Utf8(rt *C.lucy_RegexTokenizer, str *C.char,
 	stringLen C.size_t, inversion *C.lucy_Inversion) {
+
+	ivars := C.lucy_RegexTokenizer_IVARS(rt)
+	rxID := uintptr(ivars.token_re)
+	rx, ok := registry.fetch(rxID).(*regexp.Regexp)
+	if !ok {
+		mess := fmt.Sprintf("Failed to Fetch *RegExp with id %d and pattern %s",
+			rxID, clownfish.CFStringToGo(unsafe.Pointer(ivars.pattern)))
+		panic(clownfish.NewErr(mess))
+	}
+
+	buf := C.GoBytes(unsafe.Pointer(str), C.int(stringLen))
+	found := rx.FindAllIndex(buf, int(stringLen))
+	lastEnd := 0
+	cpCount := 0
+	for _, startEnd := range found {
+		cpCount = int(C.push_token(str, C.int(startEnd[0]), C.int(startEnd[1]),
+			C.int(lastEnd), C.int(cpCount), inversion))
+		lastEnd = startEnd[1]
+	}
 }
 
 func NewDoc(docID int32) Doc {
