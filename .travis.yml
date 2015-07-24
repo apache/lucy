@@ -14,14 +14,19 @@
 # limitations under the License.
 
 language: perl
-perl:
-  - "5.19"
-  - "5.18"
-  - "5.16"
-  - "5.14"
-  - "5.12"
-  - "5.10"
-  - "5.8"
-before_install:
-  - cd perl
+sudo: required
+# Override Travis' default Perl installation script.
+install: 'true'
+script: devel/bin/travis-test.sh
+env:
+  - LUCY_DEBUG=1 CLOWNFISH_HOST=c
+  - LUCY_DEBUG=1 CLOWNFISH_HOST=perl PERL_VERSION=5.20
+  - LUCY_DEBUG=1 CLOWNFISH_HOST=perl PERL_VERSION=5.18
+  - LUCY_DEBUG=1 CLOWNFISH_HOST=perl PERL_VERSION=5.16
+  - LUCY_DEBUG=1 CLOWNFISH_HOST=perl PERL_VERSION=5.14
+  - LUCY_DEBUG=1 CLOWNFISH_HOST=perl PERL_VERSION=5.12
+  - LUCY_DEBUG=1 CLOWNFISH_HOST=perl PERL_VERSION=5.10
+  - LUCY_DEBUG=1 CLOWNFISH_HOST=perl PERL_VERSION=5.8
+git:
+  depth: 10
 

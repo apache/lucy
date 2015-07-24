@@ -1,0 +1,17 @@
+environment:
+  global:
+    LUCY_DEBUG: 1
+  matrix:
+    - CLOWNFISH_HOST: c
+      MSVC_VERSION: 10
+    - CLOWNFISH_HOST: c
+      MSVC_VERSION: 12
+#    - CLOWNFISH_HOST: perl
+
+build: off
+
+test_script:
+  - 'devel\bin\appveyor-build.bat'
+
+clone_depth: 10
+
