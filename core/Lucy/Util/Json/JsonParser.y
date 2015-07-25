@@ -17,7 +17,10 @@
  */
 
 %token_type { cfish_Obj* }
-%token_destructor { CFISH_DECREF($$); }
+%token_destructor {
+    (void)state; /* Suppress unused variable warning. */
+    CFISH_DECREF($$);
+}
 %token_prefix LUCY_JSON_TOKENTYPE_
 
 %include {
