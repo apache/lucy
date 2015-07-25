@@ -161,6 +161,8 @@ S_write_makefile(struct chaz_CLI *cli) {
                                          "Json", "JsonParser", NULL);
     char *test_lucy_exe = chaz_Util_join("", "t", dir_sep, "test_lucy",
                                          exe_ext, NULL);
+    char *test_lucy_obj = chaz_Util_join("", "t", dir_sep, "test_lucy",
+                                         obj_ext, NULL);
 
     char *autogen_inc_dir
         = chaz_Util_join(dir_sep, "autogen", "include", NULL);
@@ -332,35 +334,29 @@ S_write_makefile(struct chaz_CLI *cli) {
     test_cflags = chaz_CC_new_cflags();
     chaz_CFlags_enable_optimization(test_cflags);
     chaz_CFlags_add_include_dir(test_cflags, autogen_inc_dir);
-    chaz_CFlags_add_library(test_cflags, lib);
+    rule = chaz_MakeFile_override_cflags(makefile, test_lucy_obj, test_cflags);
+    chaz_MakeRule_add_prereq(rule, autogen_target);
+    chaz_CFlags_destroy(test_cflags);
+
+    link_flags = chaz_CC_new_cflags();
+    chaz_CFlags_add_library(link_flags, lib);
     if (cfish_lib_dir) {
         chaz_CFlags_add_library_path(link_flags, cfish_lib_dir);
     }
-    chaz_CFlags_add_external_library(test_cflags, cfish_lib_name);
-    scratch = chaz_Util_join(dir_sep, "t", "test_lucy.c", NULL);
-    rule = chaz_MakeFile_add_compiled_exe(makefile, test_lucy_exe, scratch,
-                                          test_cflags);
-    free(scratch);
+    chaz_CFlags_add_external_library(link_flags, cfish_lib_name);
+    rule = chaz_MakeFile_add_exe(makefile, test_lucy_exe, test_lucy_obj,
+                                 link_flags);
     chaz_MakeRule_add_prereq(rule, lib_filename);
-    chaz_CFlags_destroy(test_cflags);
+    chaz_CFlags_destroy(link_flags);
 
     rule = chaz_MakeFile_add_rule(makefile, "test", test_lucy_exe);
-    if (strcmp(chaz_OS_shared_lib_ext(), ".so") == 0) {
-        if (cfish_lib_dir) {
-            test_command
-                = chaz_Util_join("", "LD_LIBRARY_PATH=.:", cfish_lib_dir,
-                                 ":$$LD_LIBRARY_PATH ", test_lucy_exe, NULL);
-        }
-        else {
-            test_command
-                = chaz_Util_join(" ", "LD_LIBRARY_PATH=.:$$LD_LIBRARY_PATH",
-                                 test_lucy_exe, NULL);
-        }
+    if (cfish_lib_dir) {
+        chaz_MakeRule_add_command_with_libpath(rule, test_lucy_exe, ".",
+	                                       cfish_lib_dir, NULL);
     }
     else {
-        test_command = chaz_Util_strdup(test_lucy_exe);
+        chaz_MakeRule_add_command_with_libpath(rule, test_lucy_exe, ".", NULL);
     }
-    chaz_MakeRule_add_command(rule, test_command);
 
     if (chaz_CLI_defined(cli, "enable-coverage")) {
         rule = chaz_MakeFile_add_rule(makefile, "coverage", test_lucy_exe);
@@ -400,6 +396,7 @@ S_write_makefile(struct chaz_CLI *cli) {
         chaz_MakeRule_add_rm_command(clean_rule, "$(LUCY_OBJS)");
     }
 
+    chaz_MakeRule_add_rm_command(clean_rule, test_lucy_obj);
     chaz_MakeRule_add_recursive_rm_command(clean_rule, "autogen");
 
     if (chaz_CLI_defined(cli, "enable-coverage")) {
@@ -422,6 +419,7 @@ S_write_makefile(struct chaz_CLI *cli) {
     free(utf8proc_dir);
     free(json_parser);
     free(test_lucy_exe);
+    free(test_lucy_obj);
     free(autogen_inc_dir);
     free(autogen_target);
     free(snowstem_inc_dir);
