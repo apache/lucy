@@ -784,7 +784,7 @@ chaz_MakeFile_add_lemon_grammar(chaz_MakeFile *makefile,
  * @param obj The object file.
  * @param cflags Compiler flags.
  */
-void
+chaz_MakeRule*
 chaz_MakeFile_override_cflags(chaz_MakeFile *makefile, const char *obj,
                               chaz_CFlags *cflags);
 
@@ -4881,7 +4881,7 @@ chaz_MakeFile_add_lemon_grammar(chaz_MakeFile *makefile,
     return rule;
 }
 
-void
+chaz_MakeRule*
 chaz_MakeFile_override_cflags(chaz_MakeFile *makefile, const char *obj,
                               chaz_CFlags *cflags) {
     const char *obj_ext       = chaz_CC_obj_ext();
@@ -4920,6 +4920,8 @@ chaz_MakeFile_override_cflags(chaz_MakeFile *makefile, const char *obj,
 
     free(command);
     free(src);
+
+    return rule;
 }
 
 void
@@ -8084,11 +8086,13 @@ S_add_compiler_flags(struct chaz_CLI *cli) {
                 "-DLUCY_VALGRIND -fno-inline-functions");
         }
         else if (getenv("LUCY_DEBUG")) {
-            chaz_CFlags_append(extra_cflags,
-                "-DLUCY_DEBUG -pedantic -Wall -Wextra -Wno-variadic-macros");
-            if (chaz_CLI_defined(cli, "enable-perl")) {
-                chaz_CFlags_append(extra_cflags, "-DPERL_GCC_PEDANTIC");
-            }
+            chaz_CFlags_append(extra_cflags, "-DLUCY_DEBUG");
+        }
+
+        chaz_CFlags_append(extra_cflags,
+            "-pedantic -Wall -Wextra -Wno-variadic-macros");
+        if (chaz_CLI_defined(cli, "enable-perl")) {
+            chaz_CFlags_append(extra_cflags, "-DPERL_GCC_PEDANTIC");
         }
 
         /* Only core source files require this -- not our headers and
@@ -8099,9 +8103,10 @@ S_add_compiler_flags(struct chaz_CLI *cli) {
         /* Compile as C++ under MSVC. */
         chaz_CFlags_append(extra_cflags, "/TP");
 
+        chaz_CFlags_append(extra_cflags, "/W3");
         /* Thwart stupid warnings. */
-        chaz_CFlags_append(extra_cflags, "/D_CRT_SECURE_NO_WARNINGS");
-        chaz_CFlags_append(extra_cflags, "/D_SCL_SECURE_NO_WARNINGS");
+        chaz_CFlags_append(extra_cflags,
+	    "/D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /wd4996");
 
         if (chaz_Probe_msvc_version_num() < 1300) {
             /* Redefine 'for' to fix broken 'for' scoping under MSVC6. */
