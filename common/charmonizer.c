@@ -36,47 +36,58 @@
 
 /***************************************************************************/
 
-#line 21 "src/Charmonizer/Core/SharedLibrary.h"
-/* Charmonizer/Core/SharedLibrary.h
+#line 21 "src/Charmonizer/Core/Library.h"
+/* Charmonizer/Core/Library.h
  */
 
-#ifndef H_CHAZ_SHARED_LIB
-#define H_CHAZ_SHARED_LIB
+#ifndef H_CHAZ_LIB
+#define H_CHAZ_LIB
 
-typedef struct chaz_SharedLib chaz_SharedLib;
+typedef struct chaz_Lib chaz_Lib;
 
-chaz_SharedLib*
-chaz_SharedLib_new(const char *name, const char *version,
-                   const char *major_version);
+typedef enum {
+    chaz_Lib_SHARED = 1,
+    chaz_Lib_STATIC = 2
+} chaz_LibType;
+
+chaz_Lib*
+chaz_Lib_new(const char *name, chaz_LibType type, const char *version,
+             const char *major_version);
 
 void
-chaz_SharedLib_destroy(chaz_SharedLib *flags);
+chaz_Lib_destroy(chaz_Lib *flags);
 
 const char*
-chaz_SharedLib_get_name(chaz_SharedLib *lib);
+chaz_Lib_get_name(chaz_Lib *lib);
 
 const char*
-chaz_SharedLib_get_version(chaz_SharedLib *lib);
+chaz_Lib_get_version(chaz_Lib *lib);
 
 const char*
-chaz_SharedLib_get_major_version(chaz_SharedLib *lib);
+chaz_Lib_get_major_version(chaz_Lib *lib);
+
+int
+chaz_Lib_is_shared(chaz_Lib *lib);
+
+int
+chaz_Lib_is_static(chaz_Lib *lib);
 
 char*
-chaz_SharedLib_filename(chaz_SharedLib *lib);
+chaz_Lib_filename(chaz_Lib *lib);
 
 char*
-chaz_SharedLib_major_version_filename(chaz_SharedLib *lib);
+chaz_Lib_major_version_filename(chaz_Lib *lib);
 
 char*
-chaz_SharedLib_no_version_filename(chaz_SharedLib *lib);
+chaz_Lib_no_version_filename(chaz_Lib *lib);
 
 char*
-chaz_SharedLib_implib_filename(chaz_SharedLib *lib);
+chaz_Lib_implib_filename(chaz_Lib *lib);
 
 char*
-chaz_SharedLib_export_filename(chaz_SharedLib *lib);
+chaz_Lib_export_filename(chaz_Lib *lib);
 
-#endif /* H_CHAZ_SHARED_LIB */
+#endif /* H_CHAZ_LIB */
 
 
 
@@ -89,7 +100,7 @@ chaz_SharedLib_export_filename(chaz_SharedLib *lib);
 #ifndef H_CHAZ_CFLAGS
 #define H_CHAZ_CFLAGS
 
-/* #include "Charmonizer/Core/SharedLibrary.h" */
+/* #include "Charmonizer/Core/Library.h" */
 
 #define CHAZ_CFLAGS_STYLE_POSIX  1
 #define CHAZ_CFLAGS_STYLE_GNU    2
@@ -145,8 +156,7 @@ void
 chaz_CFlags_link_shared_library(chaz_CFlags *flags);
 
 void
-chaz_CFlags_set_shared_library_version(chaz_CFlags *flags,
-                                       chaz_SharedLib *lib);
+chaz_CFlags_set_shared_library_version(chaz_CFlags *flags, chaz_Lib *lib);
 
 void
 chaz_CFlags_set_link_output(chaz_CFlags *flags, const char *filename);
@@ -155,7 +165,7 @@ void
 chaz_CFlags_add_library_path(chaz_CFlags *flags, const char *directory);
 
 void
-chaz_CFlags_add_library(chaz_CFlags *flags, chaz_SharedLib *lib);
+chaz_CFlags_add_library(chaz_CFlags *flags, chaz_Lib *lib);
 
 void
 chaz_CFlags_add_external_library(chaz_CFlags *flags, const char *library);
@@ -164,6 +174,97 @@ void
 chaz_CFlags_enable_code_coverage(chaz_CFlags *flags);
 
 #endif /* H_CHAZ_CFLAGS */
+
+
+
+/***************************************************************************/
+
+#line 21 "src/Charmonizer/Core/CLI.h"
+#ifndef H_CHAZ_CLI
+#define H_CHAZ_CLI 1
+
+#define CHAZ_CLI_NO_ARG       0
+#define CHAZ_CLI_ARG_REQUIRED (1 << 0)
+#define CHAZ_CLI_ARG_OPTIONAL (1 << 1)
+
+/* The CLI module provides argument parsing for a command line interface.
+ */
+
+typedef struct chaz_CLI chaz_CLI;
+
+/* Constructor.
+ *
+ * @param name The name of the application.
+ * @param description A description of the application.
+ */
+chaz_CLI*
+chaz_CLI_new(const char *name, const char *description);
+
+/* Destructor.
+ */
+void
+chaz_CLI_destroy(chaz_CLI *self);
+
+/* Return a string combining usage header with documentation of options.
+ */
+const char*
+chaz_CLI_help(chaz_CLI *self);
+
+/* Override the generated usage header.
+ */
+void
+chaz_CLI_set_usage(chaz_CLI *self, const char *usage);
+
+/* Register an option.  Updates the "help" string, invalidating previous
+ * values.  Returns true on success, or reports an error and returns false if
+ * the option was already registered.
+ */
+int
+chaz_CLI_register(chaz_CLI *self, const char *name, const char *help,
+                  int flags);
+
+/* Set an option.  The specified option must have been registered previously.
+ * The supplied `value` is optional and will be copied.
+ *
+ * Returns true on success.  Reports an error and returns false on failure.
+ */
+int
+chaz_CLI_set(chaz_CLI *self, const char *name, const char *value);
+
+/* Returns true if the option has been set, false otherwise.
+ */
+int
+chaz_CLI_defined(chaz_CLI *self, const char *name);
+
+/* Return the value of a given option converted to a long int.  Defaults to 0.
+ * Reports an error if the named option has not been registered.
+ */
+long
+chaz_CLI_longval(chaz_CLI *self, const char *name);
+
+/* Return the value of an option as a C string.  Defaults to NULL.  Reports an
+ * error if the named option has not been registered.
+ */
+const char*
+chaz_CLI_strval(chaz_CLI *self, const char *name);
+
+/* Unset an option, making subsequent calls to `get` return false and making
+ * it possible to call `set` again.
+ *
+ * Returns true if the option exists and was able to be unset.
+ */
+int
+chaz_CLI_unset(chaz_CLI *self, const char *name);
+
+/* Parse `argc` and `argv`, setting options as appropriate.  Returns true on
+ * success.  Reports an error and returns false if either an unexpected option
+ * was encountered or an option which requires an argument was supplied
+ * without one.
+ */
+int
+chaz_CLI_parse(chaz_CLI *self, int argc, const char *argv[]);
+
+#endif /* H_CHAZ_CLI */
 
 
 
@@ -199,6 +300,12 @@ chaz_CC_compile_obj(const char *source_path, const char *obj_path,
  */
 int
 chaz_CC_test_compile(const char *source);
+
+/* Attempt to compile and link the supplied source code and return true if
+ * the effort succeeds.
+ */
+int
+chaz_CC_test_link(const char *source);
 
 /* Attempt to compile the supplied source code.  If successful, capture the
  * output of the program and return a pointer to a newly allocated buffer.
@@ -262,6 +369,21 @@ chaz_CC_sun_c_version_num(void);
 
 const char*
 chaz_CC_link_command(void);
+
+/* Create a command for building a static library.
+ *
+ * @param target The target library filename.
+ * @param objects The list of object files to be archived in the library.
+ */
+char*
+chaz_CC_format_archiver_command(const char *target, const char *objects);
+
+/* Returns a "ranlib" command if valid.
+ *
+ * @param target The library filename.
+ */
+char*
+chaz_CC_format_ranlib_command(const char *target);
 
 #endif /* H_CHAZ_COMPILER */
 
@@ -477,6 +599,10 @@ chaz_HeadCheck_check_header(const char *header_name);
 int
 chaz_HeadCheck_check_many_headers(const char **header_names);
 
+/* Return true if the symbol is defined (possibly as a macro). */
+int
+chaz_HeadCheck_defines_symbol(const char *symbol, const char *includes);
+
 /* Return true if the member is present in the struct. */
 int
 chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
@@ -496,7 +622,7 @@ chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
 #define H_CHAZ_MAKE
 
 /* #include "Charmonizer/Core/CFlags.h" */
-/* #include "Charmonizer/Core/SharedLibrary.h" */
+/* #include "Charmonizer/Core/Library.h" */
 
 typedef struct chaz_MakeFile chaz_MakeFile;
 typedef struct chaz_MakeVar chaz_MakeVar;
@@ -506,9 +632,11 @@ typedef void (*chaz_Make_list_files_callback_t)(const char *dir, char *file,
                                                 void *context);
 
 /** Initialize the environment.
+ *
+ * @param make_command Name of the make command. Auto-detect if NULL.
  */
 void
-chaz_Make_init(void);
+chaz_Make_init(const char *make_command);
 
 /** Clean up the environment.
  */
@@ -619,8 +747,19 @@ chaz_MakeFile_add_compiled_exe(chaz_MakeFile *makefile, const char *exe,
  * @param link_flags Additional link flags.
  */
 chaz_MakeRule*
-chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
+chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_Lib *lib,
                              const char *sources, chaz_CFlags *link_flags);
+
+/** Add a rule to create a static library. The static library will also be added
+ * to the list of files to clean.
+ *
+ * @param makefile The makefile.
+ * @param lib The static library.
+ * @param objects The list of object files to be archived.
+ */
+chaz_MakeRule*
+chaz_MakeFile_add_static_lib(chaz_MakeFile *makefile, chaz_Lib *lib,
+                             const char *objects);
 
 /** Add a rule to build the lemon parser generator.
  *
@@ -638,6 +777,16 @@ chaz_MakeFile_add_lemon_exe(chaz_MakeFile *makefile, const char *dir);
 chaz_MakeRule*
 chaz_MakeFile_add_lemon_grammar(chaz_MakeFile *makefile,
                                 const char *base_name);
+
+/** Override compiler flags for a single object file.
+ *
+ * @param makefile The makefile.
+ * @param obj The object file.
+ * @param cflags Compiler flags.
+ */
+void
+chaz_MakeFile_override_cflags(chaz_MakeFile *makefile, const char *obj,
+                              chaz_CFlags *cflags);
 
 /** Write the makefile to a file named 'Makefile' in the current directory.
  *
@@ -678,6 +827,16 @@ chaz_MakeRule_add_prereq(chaz_MakeRule *rule, const char *prereq);
  */
 void
 chaz_MakeRule_add_command(chaz_MakeRule *rule, const char *command);
+
+/** Add a command to be executed with a special runtime library path.
+ *
+ * @param rule The rule.
+ * @param command The additional command.
+ * @param ... NULL-terminated list of library directories.
+ */
+void
+chaz_MakeRule_add_command_with_libpath(chaz_MakeRule *rule,
+                                       const char *command, ...);
 
 /** Add a command to remove one or more files.
  *
@@ -783,6 +942,11 @@ chaz_OS_exe_ext(void);
 const char*
 chaz_OS_shared_lib_ext(void);
 
+/* Return the extension for a static library on this system.
+ */
+const char*
+chaz_OS_static_lib_ext(void);
+
 /* Return the equivalent of /dev/null on this system.
  */
 const char*
@@ -843,6 +1007,11 @@ chaz_Util_strdup(const char *string);
 char*
 chaz_Util_join(const char *sep, ...);
 
+/* Join a NULL-terminated list of strings using a separator.
+ */
+char*
+chaz_Util_vjoin(const char *sep, va_list args);
+
 /* Get the length of a file (may overshoot on text files under DOS).
  */
 long
@@ -883,20 +1052,7 @@ chaz_Util_can_open_file(const char *file_path);
 #include <stddef.h>
 #include <stdio.h>
 
-#define CHAZ_PROBE_MAX_CC_LEN 100
-#define CHAZ_PROBE_MAX_CFLAGS_LEN 2000
-
-struct chaz_CLIArgs {
-    char cc[CHAZ_PROBE_MAX_CC_LEN + 1];
-    char cflags[CHAZ_PROBE_MAX_CFLAGS_LEN + 1];
-    int  charmony_h;
-    int  charmony_pm;
-    int  charmony_py;
-    int  charmony_rb;
-    int  verbosity;
-    int  write_makefile;
-    int  code_coverage;
-};
+struct chaz_CLI;
 
 /* Parse command line arguments, initializing and filling in the supplied
  * `args` struct.
@@ -913,7 +1069,7 @@ struct chaz_CLIArgs {
  */
 int
 chaz_Probe_parse_cli_args(int argc, const char *argv[],
-                          struct chaz_CLIArgs *args);
+                          struct chaz_CLI *cli);
 
 /* Exit after printing usage instructions to stderr.
  */
@@ -930,7 +1086,7 @@ chaz_Probe_die_usage(void);
  *      2 - debugging
  */
 void
-chaz_Probe_init(struct chaz_CLIArgs *args);
+chaz_Probe_init(struct chaz_CLI *cli);
 
 /* Clean up the Charmonizer environment -- deleting tempfiles, etc.  This
  * should be called only after everything else finishes.
@@ -1540,38 +1696,53 @@ void chaz_VariadicMacros_run(void);
 
 /***************************************************************************/
 
-#line 17 "src/Charmonizer/Core/SharedLibrary.c"
+#line 17 "src/Charmonizer/Core/Library.c"
 #include <string.h>
 #include <stdlib.h>
-/* #include "Charmonizer/Core/SharedLibrary.h" */
+/* #include "Charmonizer/Core/Library.h" */
 /* #include "Charmonizer/Core/Compiler.h" */
 /* #include "Charmonizer/Core/Util.h" */
 /* #include "Charmonizer/Core/OperatingSystem.h" */
 
-struct chaz_SharedLib {
+struct chaz_Lib {
     char *name;
     char *version;
     char *major_version;
+    int   is_static;
+    int   is_shared;
+    chaz_LibType lib_type;
 };
 
 static char*
-S_build_filename(chaz_SharedLib *lib, const char *version, const char *ext);
+S_build_filename(chaz_Lib *lib, const char *version, const char *ext);
 
 static const char*
 S_get_prefix(void);
 
-chaz_SharedLib*
-chaz_SharedLib_new(const char *name, const char *version,
-                   const char *major_version) {
-    chaz_SharedLib *lib = (chaz_SharedLib*)malloc(sizeof(chaz_SharedLib));
+chaz_Lib*
+chaz_Lib_new(const char *name, chaz_LibType lib_type, const char *version,
+             const char *major_version) {
+    chaz_Lib *lib = (chaz_Lib*)malloc(sizeof(chaz_Lib));
     lib->name          = chaz_Util_strdup(name);
     lib->version       = chaz_Util_strdup(version);
     lib->major_version = chaz_Util_strdup(major_version);
+    lib->lib_type      = lib_type;
+    if (lib_type == chaz_Lib_SHARED) {
+        lib->is_shared = 1;
+        lib->is_static = 0;
+    }
+    else if (lib_type == chaz_Lib_STATIC) {
+        lib->is_shared = 0;
+        lib->is_static = 1;
+    }
+    else {
+        chaz_Util_die("Invalid value for lib_type: %d", lib_type);
+    }
     return lib;
 }
 
 void
-chaz_SharedLib_destroy(chaz_SharedLib *lib) {
+chaz_Lib_destroy(chaz_Lib *lib) {
     free(lib->name);
     free(lib->version);
     free(lib->major_version);
@@ -1579,62 +1750,78 @@ chaz_SharedLib_destroy(chaz_SharedLib *lib) {
 }
 
 const char*
-chaz_SharedLib_get_name(chaz_SharedLib *lib) {
+chaz_Lib_get_name(chaz_Lib *lib) {
     return lib->name;
 }
 
 const char*
-chaz_SharedLib_get_version(chaz_SharedLib *lib) {
+chaz_Lib_get_version(chaz_Lib *lib) {
     return lib->version;
 }
 
 const char*
-chaz_SharedLib_get_major_version(chaz_SharedLib *lib) {
+chaz_Lib_get_major_version(chaz_Lib *lib) {
     return lib->major_version;
 }
 
-char*
-chaz_SharedLib_filename(chaz_SharedLib *lib) {
-    const char *shlib_ext = chaz_OS_shared_lib_ext();
+int
+chaz_Lib_is_shared (chaz_Lib *lib) {
+    return lib->is_shared;
+}
 
-    if (strcmp(shlib_ext, ".dll") == 0) {
-        return S_build_filename(lib, lib->major_version, shlib_ext);
+int
+chaz_Lib_is_static (chaz_Lib *lib) {
+    return lib->is_static;
+}
+
+char*
+chaz_Lib_filename(chaz_Lib *lib) {
+    const char *ext = lib->is_shared
+                      ? chaz_OS_shared_lib_ext()
+                      : chaz_OS_static_lib_ext();
+
+    if ((strcmp(ext, ".dll") == 0) || strcmp(ext, ".lib") == 0) {
+        return S_build_filename(lib, lib->major_version, ext);
     }
     else {
-        return S_build_filename(lib, lib->version, shlib_ext);
+        return S_build_filename(lib, lib->version, ext);
     }
 }
 
 char*
-chaz_SharedLib_major_version_filename(chaz_SharedLib *lib) {
-    const char *shlib_ext = chaz_OS_shared_lib_ext();
-
-    return S_build_filename(lib, lib->major_version, shlib_ext);
+chaz_Lib_major_version_filename(chaz_Lib *lib) {
+    const char *ext = lib->is_shared
+                      ? chaz_OS_shared_lib_ext()
+                      : chaz_OS_static_lib_ext();
+    return S_build_filename(lib, lib->major_version, ext);
 }
 
 char*
-chaz_SharedLib_no_version_filename(chaz_SharedLib *lib) {
-    const char *prefix    = S_get_prefix();
-    const char *shlib_ext = chaz_OS_shared_lib_ext();
-
-    return chaz_Util_join("", prefix, lib->name, shlib_ext, NULL);
+chaz_Lib_no_version_filename(chaz_Lib *lib) {
+    const char *prefix = S_get_prefix();
+    const char *ext = lib->is_shared
+                      ? chaz_OS_shared_lib_ext()
+                      : chaz_OS_static_lib_ext();
+    return chaz_Util_join("", prefix, lib->name, ext, NULL);
 }
 
 char*
-chaz_SharedLib_implib_filename(chaz_SharedLib *lib) {
+chaz_Lib_implib_filename(chaz_Lib *lib) {
     return S_build_filename(lib, lib->major_version, ".lib");
 }
 
 char*
-chaz_SharedLib_export_filename(chaz_SharedLib *lib) {
+chaz_Lib_export_filename(chaz_Lib *lib) {
     return S_build_filename(lib, lib->major_version, ".exp");
 }
 
 static char*
-S_build_filename(chaz_SharedLib *lib, const char *version, const char *ext) {
+S_build_filename(chaz_Lib *lib, const char *version, const char *ext) {
     const char *prefix    = S_get_prefix();
     const char *shlib_ext = chaz_OS_shared_lib_ext();
 
+    /* Use `shlib_ext` as a proxy for OS to determine behavior, but append
+     * the supplied `ext`. */
     if (strcmp(shlib_ext, ".dll") == 0) {
         return chaz_Util_join("", prefix, lib->name, "-", version, ext, NULL);
     }
@@ -1670,7 +1857,7 @@ S_get_prefix() {
 /* #include "Charmonizer/Core/Compiler.h" */
 /* #include "Charmonizer/Core/Util.h" */
 /* #include "Charmonizer/Core/OperatingSystem.h" */
-/* #include "Charmonizer/Core/SharedLibrary.h" */
+/* #include "Charmonizer/Core/Library.h" */
 
 struct chaz_CFlags {
     int   style;
@@ -1922,20 +2109,19 @@ chaz_CFlags_link_shared_library(chaz_CFlags *flags) {
 }
 
 void
-chaz_CFlags_set_shared_library_version(chaz_CFlags *flags,
-                                       chaz_SharedLib *lib) {
+chaz_CFlags_set_shared_library_version(chaz_CFlags *flags, chaz_Lib *lib) {
     if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
         const char *shlib_ext = chaz_OS_shared_lib_ext();
 
         if (strcmp(shlib_ext, ".dylib") == 0) {
-            const char *version = chaz_SharedLib_get_version(lib);
+            const char *version = chaz_Lib_get_version(lib);
             char *string
                 = chaz_Util_join(" ", "-current_version", version, NULL);
             chaz_CFlags_append(flags, string);
             free(string);
         }
         else if (strcmp(shlib_ext, ".so") == 0) {
-            char *soname = chaz_SharedLib_major_version_filename(lib);
+            char *soname = chaz_Lib_major_version_filename(lib);
             char *string = chaz_Util_join("", "-Wl,-soname,", soname, NULL);
             chaz_CFlags_append(flags, string);
             free(string);
@@ -1943,7 +2129,7 @@ chaz_CFlags_set_shared_library_version(chaz_CFlags *flags,
         }
     }
     else if (flags->style == CHAZ_CFLAGS_STYLE_SUN_C) {
-        char *soname = chaz_SharedLib_major_version_filename(lib);
+        char *soname = chaz_Lib_major_version_filename(lib);
         char *string = chaz_Util_join(" ", "-h", soname, NULL);
         chaz_CFlags_append(flags, string);
         free(string);
@@ -1988,13 +2174,13 @@ chaz_CFlags_add_library_path(chaz_CFlags *flags, const char *directory) {
 }
 
 void
-chaz_CFlags_add_library(chaz_CFlags *flags, chaz_SharedLib *lib) {
+chaz_CFlags_add_library(chaz_CFlags *flags, chaz_Lib *lib) {
     char *filename;
     if (flags->style == CHAZ_CFLAGS_STYLE_MSVC) {
-        filename = chaz_SharedLib_implib_filename(lib);
+        filename = chaz_Lib_implib_filename(lib);
     }
     else {
-        filename = chaz_SharedLib_filename(lib);
+        filename = chaz_Lib_filename(lib);
     }
     chaz_CFlags_append(flags, filename);
     free(filename);
@@ -2028,7 +2214,387 @@ chaz_CFlags_enable_code_coverage(chaz_CFlags *flags) {
 
 /***************************************************************************/
 
+#line 17 "src/Charmonizer/Core/CLI.c"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <string.h>
+#include <ctype.h>
+/* #include "Charmonizer/Core/CLI.h" */
+/* #include "Charmonizer/Core/Util.h" */
+
+typedef struct chaz_CLIOption {
+    char *name;
+    char *help;
+    char *value;
+    int   defined;
+    int   flags;
+} chaz_CLIOption;
+
+struct chaz_CLI {
+    char *name;
+    char *desc;
+    char *usage;
+    char *help;
+    chaz_CLIOption *opts;
+    int   num_opts;
+};
+
+static void
+S_chaz_CLI_error(chaz_CLI *self, const char *pattern, ...) {
+    va_list ap;
+    if (chaz_Util_verbosity > 0) {
+        va_start(ap, pattern);
+        vfprintf(stderr, pattern, ap);
+        va_end(ap);
+        fprintf(stderr, "\n");
+    }
+}
+
+static void
+S_chaz_CLI_rebuild_help(chaz_CLI *self) {
+    int i;
+    size_t amount = 200; /* Length of section headers. */
+
+    /* Allocate space. */
+    if (self->usage) {
+        amount += strlen(self->usage);
+    }
+    else {
+        amount += strlen(self->name);
+    }
+    if (self->desc) {
+        amount += strlen(self->desc);
+    }
+    for (i = 0; i < self->num_opts; i++) {
+        chaz_CLIOption *opt = &self->opts[i];
+        amount += 24 + 2 * strlen(opt->name);
+        if (opt->flags) {
+            amount += strlen(opt->name);
+        }
+        if (opt->help) {
+            amount += strlen(opt->help);
+        }
+    }
+    free(self->help);
+    self->help = (char*)malloc(amount);
+    self->help[0] = '\0';
+
+    /* Accumulate "help" string. */
+    if (self->usage) {
+        strcat(self->help, self->usage);
+    }
+    else {
+        strcat(self->help, "Usage: ");
+        strcat(self->help, self->name);
+        if (self->num_opts) {
+            strcat(self->help, " [OPTIONS]");
+        }
+    }
+    if (self->desc) {
+        strcat(self->help, "\n\n");
+        strcat(self->help, self->desc);
+    }
+    strcat(self->help, "\n");
+    if (self->num_opts) {
+        strcat(self->help, "\nArguments:\n");
+        for (i = 0; i < self->num_opts; i++) {
+            chaz_CLIOption *opt = &self->opts[i];
+            size_t line_start = strlen(self->help);
+            size_t current_len;
+
+            strcat(self->help, "  --");
+            strcat(self->help, opt->name);
+            current_len = strlen(self->help);
+            if (opt->flags) {
+                int j;
+                if (opt->flags & CHAZ_CLI_ARG_OPTIONAL) {
+                    self->help[current_len++] = '[';
+                }
+                self->help[current_len++] = '=';
+                for (j = 0; opt->name[j]; j++) {
+                    self->help[current_len++] = toupper(opt->name[j]);
+                }
+                if (opt->flags & CHAZ_CLI_ARG_OPTIONAL) {
+                    self->help[current_len++] = ']';
+                }
+                self->help[current_len] = '\0';
+            }
+            if (opt->help) {
+                self->help[current_len++] = ' ';
+                while (current_len - line_start < 25) {
+                    self->help[current_len++] = ' ';
+                }
+                self->help[current_len] = '\0';
+                strcpy(self->help + current_len, opt->help);
+            }
+            strcat(self->help, "\n");
+        }
+    }
+    strcat(self->help, "\n");
+}
+
+static chaz_CLIOption*
+S_find_opt(chaz_CLI *self, const char *name) {
+    int i;
+    for (i = 0; i < self->num_opts; i++) {
+        chaz_CLIOption *opt = &self->opts[i];
+        if (strcmp(opt->name, name) == 0) {
+            return opt;
+        }
+    }
+    return NULL;
+}
+
+chaz_CLI*
+chaz_CLI_new(const char *name, const char *description) {
+    chaz_CLI *self  = calloc(1, sizeof(chaz_CLI));
+    self->name      = chaz_Util_strdup(name ? name : "PROGRAM");
+    self->desc      = description ? chaz_Util_strdup(description) : NULL;
+    self->help      = NULL;
+    self->opts      = NULL;
+    self->num_opts  = 0;
+    S_chaz_CLI_rebuild_help(self);
+    return self;
+}
+
+void
+chaz_CLI_destroy(chaz_CLI *self) {
+    int i;
+    for (i = 0; i < self->num_opts; i++) {
+        chaz_CLIOption *opt = &self->opts[i];
+        free(opt->name);
+        free(opt->help);
+        free(opt->value);
+    }
+    free(self->name);
+    free(self->desc);
+    free(self->opts);
+    free(self->usage);
+    free(self->help);
+    free(self);
+}
+
+void
+chaz_CLI_set_usage(chaz_CLI *self, const char *usage) {
+    free(self->usage);
+    self->usage = chaz_Util_strdup(usage);
+}
+
+const char*
+chaz_CLI_help(chaz_CLI *self) {
+    return self->help;
+}
+
+int
+chaz_CLI_register(chaz_CLI *self, const char *name, const char *help,
+                  int flags) {
+    int rank;
+    int i;
+    int arg_required = !!(flags & CHAZ_CLI_ARG_REQUIRED);
+    int arg_optional = !!(flags & CHAZ_CLI_ARG_OPTIONAL);
+
+    /* Validate flags */
+    if (arg_required && arg_optional) {
+        S_chaz_CLI_error(self, "Conflicting flags: value both optional "
+                         "and required");
+        return 0;
+    }
+
+    /* Insert new option.  Keep options sorted by name. */
+    for (rank = self->num_opts; rank > 0; rank--) {
+        int comparison = strcmp(name, self->opts[rank - 1].name);
+        if (comparison == 0) {
+            S_chaz_CLI_error(self, "Option '%s' already registered", name);
+            return 0;
+        }
+        else if (comparison > 0) {
+            break;
+        }
+    }
+    self->num_opts += 1;
+    self->opts = realloc(self->opts, self->num_opts * sizeof(chaz_CLIOption));
+    for (i = self->num_opts - 1; i > rank; i--) {
+        self->opts[i] = self->opts[i - 1];
+    }
+    self->opts[rank].name    = chaz_Util_strdup(name);
+    self->opts[rank].help    = help ? chaz_Util_strdup(help) : NULL;
+    self->opts[rank].flags   = flags;
+    self->opts[rank].defined = 0;
+    self->opts[rank].value   = NULL;
+
+    /* Update `help` with new option. */
+    S_chaz_CLI_rebuild_help(self);
+
+    return 1;
+}
+
+int
+chaz_CLI_set(chaz_CLI *self, const char *name, const char *value) {
+    chaz_CLIOption *opt = S_find_opt(self, name);
+    if (opt == NULL) {
+        S_chaz_CLI_error(self, "Attempt to set unknown option: '%s'", name);
+        return 0;
+    }
+    if (opt->defined) {
+        S_chaz_CLI_error(self, "'%s' specified multiple times", name);
+        return 0;
+    }
+    opt->defined = 1;
+    if (opt->flags == CHAZ_CLI_NO_ARG) {
+        if (value != NULL) {
+            S_chaz_CLI_error(self, "'%s' expects no value", name);
+            return 0;
+        }
+    }
+    else {
+        if (value == NULL) {
+            S_chaz_CLI_error(self, "'%s' expects a value", name);
+            return 0;
+        }
+        opt->value = chaz_Util_strdup(value);
+    }
+    return 1;
+}
+
+int
+chaz_CLI_unset(chaz_CLI *self, const char *name) {
+    chaz_CLIOption *opt = S_find_opt(self, name);
+    if (opt == NULL) {
+        S_chaz_CLI_error(self, "Attempt to unset unknown option: '%s'", name);
+        return 0;
+    }
+    free(opt->value);
+    opt->value = NULL;
+    opt->defined = 0;
+    return 1;
+}
+
+int
+chaz_CLI_defined(chaz_CLI *self, const char *name) {
+    chaz_CLIOption *opt = S_find_opt(self, name);
+    if (opt == NULL) {
+        S_chaz_CLI_error(self, "Inquiry for unknown option: '%s'", name);
+        return 0;
+    }
+    return opt->defined;
+}
+
+long
+chaz_CLI_longval(chaz_CLI *self, const char *name) {
+    chaz_CLIOption *opt = S_find_opt(self, name);
+    if (opt == NULL) {
+        S_chaz_CLI_error(self, "Longval request for unknown option: '%s'",
+                         name);
+        return 0;
+    }
+    if (!opt->defined || !opt->value) {
+        return 0;
+    }
+    return strtol(opt->value, NULL, 10);
+}
+
+const char*
+chaz_CLI_strval(chaz_CLI *self, const char *name) {
+    chaz_CLIOption *opt = S_find_opt(self, name);
+    if (opt == NULL) {
+        S_chaz_CLI_error(self, "Strval request for unknown option: '%s'",
+                         name);
+        return 0;
+    }
+    return opt->value;
+}
+
+int
+chaz_CLI_parse(chaz_CLI *self, int argc, const char *argv[]) {
+    int i;
+    char *name = NULL;
+    size_t name_cap = 0;
+
+    /* Parse most args. */
+    for (i = 1; i < argc; i++) {
+        const char *arg = argv[i];
+        size_t name_len = 0;
+        const char *value = NULL;
+
+        /* Stop processing if we see `-` or `--`. */
+        if (strcmp(arg, "--") == 0 || strcmp(arg, "-") == 0) {
+            break;
+        }
+
+        if (strncmp(arg, "--", 2) != 0) {
+            S_chaz_CLI_error(self, "Unexpected argument: '%s'", arg);
+            free(name);
+            return 0;
+        }
+
+        /* Extract the name of the argument, look for a potential value. */
+        while (1) {
+            char c = arg[name_len + 2];
+            if (isalnum(c) || c == '-' || c == '_') {
+                name_len++;
+            }
+            else if (c == '\0') {
+                break;
+            }
+            else if (c == '=') {
+                /* The rest of the arg is the value. */
+                value = arg + 2 + name_len + 1;
+                break;
+            }
+            else {
+                free(name);
+                S_chaz_CLI_error(self, "Malformed argument: '%s'", arg);
+                return 0;
+            }
+        }
+        if (name_len + 1 > name_cap) {
+            name_cap = name_len + 1;
+            name = (char*)realloc(name, name_cap);
+        }
+        memcpy(name, arg + 2, name_len);
+        name[name_len] = '\0';
+
+        if (value == NULL && i + 1 < argc) {
+            /* Support both '--opt=val' and '--opt val' styles. */
+            chaz_CLIOption *opt = S_find_opt(self, name);
+            if (opt == NULL) {
+                S_chaz_CLI_error(self, "Attempt to set unknown option: '%s'",
+                                 name);
+                free(name);
+                return 0;
+            }
+            if (opt->flags != CHAZ_CLI_NO_ARG) {
+                i++;
+                value = argv[i];
+            }
+        }
+
+        /* Attempt to set the option. */
+        if (!chaz_CLI_set(self, name, value)) {
+            free(name);
+            return 0;
+        }
+    }
+
+    free(name);
+
+    for (i = 0; i < self->num_opts; i++) {
+        chaz_CLIOption *opt = &self->opts[i];
+        if (!opt->defined && (opt->flags & CHAZ_CLI_ARG_REQUIRED)) {
+            S_chaz_CLI_error(self, "Option '%s' is required", opt->name);
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+
+/***************************************************************************/
+
 #line 17 "src/Charmonizer/Core/Compiler.c"
+#include <errno.h>
 #include <string.h>
 #include <stdlib.h>
 /* #include "Charmonizer/Core/Util.h" */
@@ -2073,6 +2639,7 @@ void
 chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     const char *code = "int main() { return 0; }\n";
     int compile_succeeded = 0;
+    int retval            = -1;
 
     if (chaz_Util_verbosity) { printf("Creating compiler object...\n"); }
 
@@ -2086,22 +2653,36 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     chaz_CC.try_exe_name
         = chaz_Util_join("", CHAZ_CC_TRY_BASENAME, chaz_OS_exe_ext(), NULL);
 
-    /* If we can't compile anything, game over. */
+    /* If we can't compile or execute anything, game over. */
     if (chaz_Util_verbosity) {
-        printf("Trying to compile a small test file...\n");
+        printf("Trying to compile and execute a small test file...\n");
+    }
+    if (!chaz_Util_remove_and_verify(chaz_CC.try_exe_name)) {
+        chaz_Util_die("Failed to delete file '%s'", chaz_CC.try_exe_name);
     }
     /* Try MSVC argument style. */
     strcpy(chaz_CC.obj_ext, ".obj");
     chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_MSVC;
-    compile_succeeded = chaz_CC_test_compile(code);
+    compile_succeeded = chaz_CC_compile_exe(CHAZ_CC_TRY_SOURCE_PATH,
+                                            CHAZ_CC_TRY_BASENAME, code);
     if (!compile_succeeded) {
         /* Try POSIX argument style. */
         strcpy(chaz_CC.obj_ext, ".o");
         chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_POSIX;
-        compile_succeeded = chaz_CC_test_compile(code);
+        compile_succeeded = chaz_CC_compile_exe(CHAZ_CC_TRY_SOURCE_PATH,
+                                                CHAZ_CC_TRY_BASENAME, code);
     }
     if (!compile_succeeded) {
         chaz_Util_die("Failed to compile a small test file");
+    }
+    retval = chaz_OS_run_local_redirected(chaz_CC.try_exe_name,
+                                          chaz_OS_dev_null());
+    chaz_Util_remove_and_verify(chaz_CC.try_exe_name);
+    if (retval < 0) {
+        chaz_Util_die("Failed to execute test file: %s", strerror(errno));
+    }
+    if (retval > 0) {
+        chaz_Util_die("Unexpected exit code %d from test file", retval);
     }
 
     chaz_CC_detect_known_compilers();
@@ -2295,6 +2876,18 @@ chaz_CC_test_compile(const char *source) {
     return compile_succeeded;
 }
 
+int
+chaz_CC_test_link(const char *source) {
+    int link_succeeded;
+    if (!chaz_Util_remove_and_verify(chaz_CC.try_exe_name)) {
+        chaz_Util_die("Failed to delete file '%s'", chaz_CC.try_exe_name);
+    }
+    link_succeeded = chaz_CC_compile_exe(CHAZ_CC_TRY_SOURCE_PATH,
+                                         CHAZ_CC_TRY_BASENAME, source);
+    chaz_Util_remove_and_verify(chaz_CC.try_exe_name);
+    return link_succeeded;
+}
+
 char*
 chaz_CC_capture_output(const char *source, size_t *output_len) {
     char *captured_output = NULL;
@@ -2391,6 +2984,28 @@ chaz_CC_link_command() {
     }
 }
 
+char*
+chaz_CC_format_archiver_command(const char *target, const char *objects) {
+    if (chaz_CC.intval__MSC_VER) {
+        /* TODO: Write `objects` to a temporary file in order to avoid
+         * exceeding line length limits. */
+        char *out = chaz_Util_join("", "/OUT:", target, NULL);
+        char *command = chaz_Util_join(" ", "lib", "/NOLOGO", out, NULL);
+        free(out);
+        return command;
+    }
+    else {
+        return chaz_Util_join(" ", "ar", "rcs", target, objects, NULL);
+    }
+}
+
+char*
+chaz_CC_format_ranlib_command(const char *target) {
+    if (chaz_CC.intval__MSC_VER) {
+        return NULL;
+    }
+    return chaz_Util_join(" ", "ranlib", target, NULL);
+}
 
 
 /***************************************************************************/
@@ -3658,6 +4273,34 @@ chaz_HeadCheck_check_many_headers(const char **header_names) {
 }
 
 int
+chaz_HeadCheck_defines_symbol(const char *symbol, const char *includes) {
+    /*
+     * Casting function pointers to object pointers like 'char*' is a C
+     * extension, so for a bullet-proof check, a separate test for functions
+     * might be necessary.
+     */
+    static const char defines_code[] =
+        CHAZ_QUOTE(  %s                                            )
+        CHAZ_QUOTE(  int main() {                                  )
+        CHAZ_QUOTE(  #ifdef %s                                     )
+        CHAZ_QUOTE(      return 0;                                 )
+        CHAZ_QUOTE(  #else                                         )
+        CHAZ_QUOTE(      return *(char*)&%s;                       )
+        CHAZ_QUOTE(  #endif                                        )
+        CHAZ_QUOTE(  }                                             );
+    long needed = sizeof(defines_code)
+                  + 2 * strlen(symbol)
+                  + strlen(includes)
+                  + 10;
+    char *buf = (char*)malloc(needed);
+    int retval;
+    sprintf(buf, defines_code, includes, symbol, symbol);
+    retval = chaz_CC_test_compile(buf);
+    free(buf);
+    return retval;
+}
+
+int
 chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
                                const char *includes) {
     static const char contains_code[] =
@@ -3814,15 +4457,17 @@ static void
 S_write_rule(chaz_MakeRule *rule, FILE *out);
 
 void
-chaz_Make_init(void) {
-    const char *make;
+chaz_Make_init(const char *make_command) {
+    if (make_command) {
+        chaz_Make.make_command = chaz_Util_strdup(make_command);
+    }
+    else {
+        chaz_Make_detect("make", "gmake", "nmake", "dmake", "mingw32-make",
+                         "mingw64-make", NULL);
+    }
 
-    chaz_Make_detect("make", "gmake", "nmake", "dmake", "mingw32-make",
-                     "mingw64-make", NULL);
-    make = chaz_Make.make_command;
-
-    if (make) {
-        if (strcmp(make, "nmake") == 0) {
+    if (chaz_Make.make_command) {
+        if (strcmp(chaz_Make.make_command, "nmake") == 0) {
             chaz_Make.shell_type = CHAZ_OS_CMD_EXE;
         }
         else {
@@ -4056,7 +4701,7 @@ chaz_MakeFile_add_compiled_exe(chaz_MakeFile *makefile, const char *exe,
 }
 
 chaz_MakeRule*
-chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
+chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_Lib *lib,
                              const char *sources, chaz_CFlags *link_flags) {
     chaz_CFlags   *local_flags  = chaz_CC_new_cflags();
     const char    *link         = chaz_CC_link_command();
@@ -4067,7 +4712,7 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
     char          *filename;
     char          *command;
 
-    filename = chaz_SharedLib_filename(lib);
+    filename = chaz_Lib_filename(lib);
     rule = chaz_MakeFile_add_rule(makefile, filename, sources);
 
     if (link_flags) {
@@ -4081,7 +4726,7 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
     if (strcmp(shlib_ext, ".dylib") == 0) {
         /* Set temporary install name with full path on Darwin. */
         const char *dir_sep = chaz_OS_dir_sep();
-        char *major_v_name = chaz_SharedLib_major_version_filename(lib);
+        char *major_v_name = chaz_Lib_major_version_filename(lib);
         char *install_name = chaz_Util_join("", "-install_name $(CURDIR)",
                                             dir_sep, major_v_name, NULL);
         chaz_CFlags_append(local_flags, install_name);
@@ -4101,8 +4746,8 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
 
     /* Add symlinks. */
     if (strcmp(shlib_ext, ".dll") != 0) {
-        char *major_v_name = chaz_SharedLib_major_version_filename(lib);
-        char *no_v_name    = chaz_SharedLib_no_version_filename(lib);
+        char *major_v_name = chaz_Lib_major_version_filename(lib);
+        char *no_v_name    = chaz_Lib_no_version_filename(lib);
 
         command = chaz_Util_join(" ", "ln -sf", filename, major_v_name, NULL);
         chaz_MakeRule_add_command(rule, command);
@@ -4128,8 +4773,8 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
 
     if (chaz_CC_msvc_version_num()) {
         /* Remove import library and export file under MSVC. */
-        char *lib_filename = chaz_SharedLib_implib_filename(lib);
-        char *exp_filename = chaz_SharedLib_export_filename(lib);
+        char *lib_filename = chaz_Lib_implib_filename(lib);
+        char *exp_filename = chaz_Lib_export_filename(lib);
         chaz_MakeRule_add_rm_command(makefile->clean, lib_filename);
         chaz_MakeRule_add_rm_command(makefile->clean, exp_filename);
         free(lib_filename);
@@ -4137,6 +4782,57 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_SharedLib *lib,
     }
 
     chaz_CFlags_destroy(local_flags);
+    free(filename);
+    return rule;
+}
+
+chaz_MakeRule*
+chaz_MakeFile_add_static_lib(chaz_MakeFile *makefile, chaz_Lib *lib,
+                             const char *objects) {
+    const char    *shlib_ext    = chaz_OS_shared_lib_ext();
+    chaz_MakeRule *rule;
+    char          *filename;
+    char          *command;
+
+    filename = chaz_Lib_filename(lib);
+    rule = chaz_MakeFile_add_rule(makefile, filename, objects);
+    command = chaz_CC_format_archiver_command(filename, objects);
+    chaz_MakeRule_add_command(rule, command);
+    free(command);
+    command = chaz_CC_format_ranlib_command(filename);
+    if (command) {
+        chaz_MakeRule_add_command(rule, command);
+        free(command);
+    }
+    chaz_MakeRule_add_rm_command(makefile->clean, filename);
+
+    /* Add symlinks. */
+    if (strcmp(shlib_ext, ".dll") != 0) {
+        char *major_v_name = chaz_Lib_major_version_filename(lib);
+        char *no_v_name    = chaz_Lib_no_version_filename(lib);
+
+        command = chaz_Util_join(" ", "ln -sf", filename, major_v_name, NULL);
+        chaz_MakeRule_add_command(rule, command);
+        free(command);
+
+        if (strcmp(shlib_ext, ".dylib") == 0) {
+            command = chaz_Util_join(" ", "ln -sf", filename, no_v_name,
+                                     NULL);
+        }
+        else {
+            command = chaz_Util_join(" ", "ln -sf", major_v_name, no_v_name,
+                                     NULL);
+        }
+        chaz_MakeRule_add_command(rule, command);
+        free(command);
+
+        chaz_MakeRule_add_rm_command(makefile->clean, major_v_name);
+        chaz_MakeRule_add_rm_command(makefile->clean, no_v_name);
+
+        free(major_v_name);
+        free(no_v_name);
+    }
+
     free(filename);
     return rule;
 }
@@ -4183,6 +4879,47 @@ chaz_MakeFile_add_lemon_grammar(chaz_MakeFile *makefile,
     free(y_file);
     free(command);
     return rule;
+}
+
+void
+chaz_MakeFile_override_cflags(chaz_MakeFile *makefile, const char *obj,
+                              chaz_CFlags *cflags) {
+    const char *obj_ext       = chaz_CC_obj_ext();
+    const char *cflags_string = chaz_CFlags_get_string(cflags);
+    size_t obj_ext_len = strlen(obj_ext);
+    size_t obj_len     = strlen(obj);
+    size_t base_len;
+    char *src;
+    char *command;
+    chaz_MakeRule *rule;
+
+    if (obj_len <= obj_ext_len) {
+       chaz_Util_die("Invalid object file: %s", obj);
+    }
+
+    base_len = obj_len - obj_ext_len;
+
+    if (strcmp(obj + base_len, obj_ext) != 0) {
+       chaz_Util_die("Invalid object file: %s", obj);
+    }
+
+    src = malloc(base_len + sizeof(".c"));
+    memcpy(src, obj, base_len);
+    memcpy(src + base_len, ".c", sizeof(".c"));
+
+    rule = chaz_MakeFile_add_rule(makefile, obj, src);
+    if (chaz_CC_msvc_version_num()) {
+        command = chaz_Util_join(" ", "$(CC) /nologo", cflags_string, "/c",
+                                 src, "/Fo$@", NULL);
+    }
+    else {
+        command = chaz_Util_join(" ", "$(CC)", cflags_string, "-c", src,
+                                 "-o $@", NULL);
+    }
+    chaz_MakeRule_add_command(rule, command);
+
+    free(command);
+    free(src);
 }
 
 void
@@ -4326,6 +5063,45 @@ chaz_MakeRule_add_command(chaz_MakeRule *rule, const char *command) {
     }
 
     rule->commands = commands;
+}
+
+void
+chaz_MakeRule_add_command_with_libpath(chaz_MakeRule *rule,
+                                       const char *command, ...) {
+    va_list args;
+    char *path        = NULL;
+    char *lib_command = NULL;
+
+    if (strcmp(chaz_OS_shared_lib_ext(), ".so") == 0) {
+        va_start(args, command);
+        path = chaz_Util_vjoin(":", args);
+        va_end(args);
+
+        lib_command = chaz_Util_join("", "LD_LIBRARY_PATH=", path,
+                                     ":$$LD_LIBRARY_PATH ", command, NULL);
+
+        free(path);
+    }
+    else if (strcmp(chaz_OS_shared_lib_ext(), ".dll") == 0) {
+        va_start(args, command);
+        path = chaz_Util_vjoin(";", args);
+        va_end(args);
+
+        /* It's important to not add a space before `&&`. Otherwise, the
+	 * space is added to the search path.
+	 */
+        lib_command = chaz_Util_join("", "path ", path, ";%path%&& ", command,
+                                     NULL);
+    }
+    else {
+        /* Assume that library paths are compiled into the executable on
+         * Darwin.
+         */
+        lib_command = chaz_Util_strdup(command);
+    }
+
+    chaz_MakeRule_add_command(rule, lib_command);
+    free(lib_command);
 }
 
 void
@@ -4511,10 +5287,11 @@ static struct {
     char dev_null[20];
     char dir_sep[2];
     char exe_ext[5];
+    char static_lib_ext[5];
     char shared_lib_ext[7];
     char local_command_start[3];
     int  shell_type;
-} chaz_OS = { "", "", "", "", "", "", 0 };
+} chaz_OS = { "", "", "", "", "", "", "", 0 };
 
 void
 chaz_OS_init(void) {
@@ -4548,6 +5325,7 @@ chaz_OS_init(void) {
         strcpy(chaz_OS.dev_null, "/dev/null");
         strcpy(chaz_OS.dir_sep, "/");
         strcpy(chaz_OS.exe_ext, "");
+        strcpy(chaz_OS.static_lib_ext, ".a");
         if (memcmp(chaz_OS.name, "darwin", 6) == 0) {
             strcpy(chaz_OS.shared_lib_ext, ".dylib");
         }
@@ -4565,6 +5343,7 @@ chaz_OS_init(void) {
         strcpy(chaz_OS.dir_sep, "\\");
         strcpy(chaz_OS.exe_ext, ".exe");
         strcpy(chaz_OS.shared_lib_ext, ".dll");
+        strcpy(chaz_OS.static_lib_ext, ".lib");
         strcpy(chaz_OS.local_command_start, ".\\");
         chaz_OS.shell_type = CHAZ_OS_CMD_EXE;
     }
@@ -4597,6 +5376,11 @@ chaz_OS_exe_ext(void) {
 const char*
 chaz_OS_shared_lib_ext(void) {
     return chaz_OS.shared_lib_ext;
+}
+
+const char*
+chaz_OS_static_lib_ext(void) {
+    return chaz_OS.static_lib_ext;
 }
 
 const char*
@@ -4751,6 +5535,13 @@ chaz_OS_rmdir(const char *filepath) {
 /* #include "Charmonizer/Core/Util.h" */
 /* #include "Charmonizer/Core/OperatingSystem.h" */
 
+/* va_copy is not part of C89. Assume that simple assignment works if it
+ * isn't defined.
+ */
+#ifndef va_copy
+  #define va_copy(dst, src) ((dst) = (src))
+#endif
+
 /* Global verbosity setting. */
 int chaz_Util_verbosity = 1;
 
@@ -4850,6 +5641,18 @@ chaz_Util_strdup(const char *string) {
 char*
 chaz_Util_join(const char *sep, ...) {
     va_list args;
+    char *result;
+
+    va_start(args, sep);
+    result = chaz_Util_vjoin(sep, args);
+    va_end(args);
+
+    return result;
+}
+
+char*
+chaz_Util_vjoin(const char *sep, va_list orig_args) {
+    va_list args;
     const char *string;
     char *result, *p;
     size_t sep_len = strlen(sep);
@@ -4857,7 +5660,7 @@ chaz_Util_join(const char *sep, ...) {
     int i;
 
     /* Determine result size. */
-    va_start(args, sep);
+    va_copy(args, orig_args);
     size = 1;
     string = va_arg(args, const char*);
     for (i = 0; string; ++i) {
@@ -4870,7 +5673,7 @@ chaz_Util_join(const char *sep, ...) {
     result = (char*)malloc(size);
 
     /* Create result string. */
-    va_start(args, sep);
+    va_copy(args, orig_args);
     p = result;
     string = va_arg(args, const char*);
     for (i = 0; string; ++i) {
@@ -4958,99 +5761,82 @@ chaz_Util_can_open_file(const char *file_path) {
 /* #include "Charmonizer/Core/ConfWriterPython.h" */
 /* #include "Charmonizer/Core/ConfWriterRuby.h" */
 /* #include "Charmonizer/Core/Util.h" */
+/* #include "Charmonizer/Core/CLI.h" */
 /* #include "Charmonizer/Core/Compiler.h" */
 /* #include "Charmonizer/Core/Make.h" */
 /* #include "Charmonizer/Core/OperatingSystem.h" */
 
 int
-chaz_Probe_parse_cli_args(int argc, const char *argv[],
-                          struct chaz_CLIArgs *args) {
+chaz_Probe_parse_cli_args(int argc, const char *argv[], chaz_CLI *cli) {
     int i;
-    int output_enabled = 0;
 
-    /* Zero out args struct. */
-    memset(args, 0, sizeof(struct chaz_CLIArgs));
+    /* Register Charmonizer-specific options. */
+    chaz_CLI_register(cli, "enable-c", "generate charmony.h", CHAZ_CLI_NO_ARG);
+    chaz_CLI_register(cli, "enable-perl", "generate Charmony.pm", CHAZ_CLI_NO_ARG);
+    chaz_CLI_register(cli, "enable-python", "generate charmony.py", CHAZ_CLI_NO_ARG);
+    chaz_CLI_register(cli, "enable-ruby", "generate charmony.rb", CHAZ_CLI_NO_ARG);
+    chaz_CLI_register(cli, "enable-makefile", NULL, CHAZ_CLI_NO_ARG);
+    chaz_CLI_register(cli, "enable-coverage", NULL, CHAZ_CLI_NO_ARG);
+    chaz_CLI_register(cli, "cc", "compiler command", CHAZ_CLI_ARG_REQUIRED);
+    chaz_CLI_register(cli, "cflags", NULL, CHAZ_CLI_ARG_OPTIONAL);
+    chaz_CLI_register(cli, "make", "make command", 0);
 
-    /* Parse most args. */
-    for (i = 1; i < argc; i++) {
-        const char *arg = argv[i];
-        if (strcmp(arg, "--") == 0) {
-            /* From here on out, everything will be a compiler flag. */
-            i++;
-            break;
-        }
-        if (strcmp(arg, "--enable-c") == 0) {
-            args->charmony_h = 1;
-            output_enabled = 1;
-        }
-        else if (strcmp(arg, "--enable-perl") == 0) {
-            args->charmony_pm = 1;
-            output_enabled = 1;
-        }
-        else if (strcmp(arg, "--enable-python") == 0) {
-            args->charmony_py = 1;
-            output_enabled = 1;
-        }
-        else if (strcmp(arg, "--enable-ruby") == 0) {
-            args->charmony_rb = 1;
-            output_enabled = 1;
-        }
-        else if (strcmp(arg, "--enable-makefile") == 0) {
-            args->write_makefile = 1;
-        }
-        else if (strcmp(arg, "--enable-coverage") == 0) {
-            args->code_coverage = 1;
-        }
-        else if (memcmp(arg, "--cc=", 5) == 0) {
-            size_t len = strlen(arg);
-            size_t l   = 5;
-            size_t r   = len;
-            size_t trimmed_len;
-
-            if (len > CHAZ_PROBE_MAX_CC_LEN - 5) {
-                fprintf(stderr, "Exceeded max length for compiler command");
-                exit(1);
-            }
-
-            /*
-             * Some Perl setups have a 'cc' config value with leading
-             * whitespace.
-             */
-            while (isspace(arg[l])) {
-                ++l;
-            }
-            while (r > l && isspace(arg[r-1])) {
-                --r;
-            }
-
-            trimmed_len = r - l;
-            memcpy(args->cc, arg + l, trimmed_len);
-            args->cc[trimmed_len] = '\0';
-        }
-    } /* preserve value of i */
-
-    /* Accumulate compiler flags. */
-    for (; i < argc; i++) {
-        const char *arg = argv[i];
-        size_t new_len = strlen(arg) + strlen(args->cflags) + 2;
-        if (new_len >= CHAZ_PROBE_MAX_CFLAGS_LEN) {
-            fprintf(stderr, "Exceeded max length for compiler flags");
-            exit(1);
-        }
-        strcat(args->cflags, " ");
-        strcat(args->cflags, arg);
+    /* Parse options, exiting on failure. */
+    if (!chaz_CLI_parse(cli, argc, argv)) {
+        fprintf(stderr, "%s", chaz_CLI_help(cli));
+        exit(1);
     }
 
-    /* Process CHARM_VERBOSITY environment variable. */
+    /* Accumulate compiler flags. */
     {
-        const char *verbosity_env = getenv("CHARM_VERBOSITY");
-        if (verbosity_env && strlen(verbosity_env)) {
-            args->verbosity = strtol(verbosity_env, NULL, 10);
+        char *cflags = chaz_Util_strdup("");
+        size_t cflags_len = 0;
+        for (i = 0; i < argc; i++) {
+            if (strcmp(argv[i], "--") == 0) {
+                i++;
+                break;
+            }
         }
+        for (; i < argc; i++) {
+            const char *arg = argv[i];
+            cflags_len += strlen(arg) + 2;
+            cflags = (char*)realloc(cflags, cflags_len);
+            strcat(cflags, " ");
+            strcat(cflags, arg);
+        }
+        chaz_CLI_set(cli, "cflags", cflags);
+        free(cflags);
+    }
+
+    /* Some Perl setups have a 'cc' config value with leading whitespace. */
+    if (chaz_CLI_defined(cli, "cc")) {
+        const char *arg = chaz_CLI_strval(cli, "cc");
+        char  *cc;
+        size_t len = strlen(arg);
+        size_t l   = 0;
+        size_t r   = len;
+        size_t trimmed_len;
+
+        while (isspace(arg[l])) {
+            ++l;
+        }
+        while (r > l && isspace(arg[r-1])) {
+            --r;
+        }
+
+        trimmed_len = r - l;
+        cc = (char*)malloc(trimmed_len + 1);
+        memcpy(cc, arg + l, trimmed_len);
+        cc[trimmed_len] = '\0';
+        chaz_CLI_unset(cli, "cc");
+        chaz_CLI_set(cli, "cc", cc);
+        free(cc);
     }
 
     /* Validate. */
-    if (!strlen(args->cc) || !output_enabled) {
+    if (!chaz_CLI_defined(cli, "cc")
+        || !strlen(chaz_CLI_strval(cli, "cc"))
+       ) {
         return false;
     }
 
@@ -5066,7 +5852,7 @@ chaz_Probe_die_usage(void) {
 }
 
 void
-chaz_Probe_init(struct chaz_CLIArgs *args) {
+chaz_Probe_init(struct chaz_CLI *cli) {
     int output_enabled = 0;
 
     {
@@ -5079,25 +5865,25 @@ chaz_Probe_init(struct chaz_CLIArgs *args) {
 
     /* Dispatch other initializers. */
     chaz_OS_init();
-    chaz_CC_init(args->cc, args->cflags);
+    chaz_CC_init(chaz_CLI_strval(cli, "cc"), chaz_CLI_strval(cli, "cflags"));
     chaz_ConfWriter_init();
     chaz_HeadCheck_init();
-    chaz_Make_init();
+    chaz_Make_init(chaz_CLI_strval(cli, "make"));
 
     /* Enable output. */
-    if (args->charmony_h) {
+    if (chaz_CLI_defined(cli, "enable-c")) {
         chaz_ConfWriterC_enable();
         output_enabled = true;
     }
-    if (args->charmony_pm) {
+    if (chaz_CLI_defined(cli, "enable-perl")) {
         chaz_ConfWriterPerl_enable();
         output_enabled = true;
     }
-    if (args->charmony_py) {
+    if (chaz_CLI_defined(cli, "enable-python")) {
         chaz_ConfWriterPython_enable();
         output_enabled = true;
     }
-    if (args->charmony_rb) {
+    if (chaz_CLI_defined(cli, "enable-ruby")) {
         chaz_ConfWriterRuby_enable();
         output_enabled = true;
     }
@@ -5361,7 +6147,6 @@ chaz_DirManip_try_rmdir(void) {
 void
 chaz_DirManip_run(void) {
     const char *dir_sep = chaz_OS_dir_sep();
-    int remove_zaps_dirs = false;
     int has_dirent_h = chaz_HeadCheck_check_header("dirent.h");
     int has_direct_h = chaz_HeadCheck_check_header("direct.h");
     int has_dirent_d_namlen = false;
@@ -5433,7 +6218,6 @@ chaz_DirManip_run(void) {
     /* See whether remove works on directories. */
     chaz_OS_mkdir("_charm_test_remove_me");
     if (0 == remove("_charm_test_remove_me")) {
-        remove_zaps_dirs = true;
         chaz_ConfWriter_add_def("REMOVE_ZAPS_DIRS", NULL);
     }
     chaz_OS_rmdir("_charm_test_remove_me");
@@ -5839,7 +6623,9 @@ chaz_Headers_probe_posix(void) {
         "grp.h",
         "pwd.h",
         "regex.h",
+        "sched.h",
         "sys/stat.h",
+        "sys/time.h",
         "sys/times.h",
         "sys/types.h",
         "sys/utsname.h",
@@ -5975,7 +6761,6 @@ chaz_Integers_run(void) {
     int has___int64       = false;
     int has_inttypes      = chaz_HeadCheck_check_header("inttypes.h");
     int has_stdint        = chaz_HeadCheck_check_header("stdint.h");
-    int can_convert_u64_to_double = true;
     char i32_t_type[10];
     char i32_t_postfix[10];
     char u32_t_postfix[10];
@@ -6723,13 +7508,8 @@ chaz_Memory_probe_alloca(void) {
         CHAZ_QUOTE(      void *foo = %s(1);         )
         CHAZ_QUOTE(      return 0;                  )
         CHAZ_QUOTE(  }                              );
-    int has_sys_mman_h = false;
-    int has_alloca_h   = false;
-    int has_malloc_h   = false;
-    int need_stdlib_h  = false;
     int has_alloca     = false;
     int has_builtin_alloca    = false;
-    int has_underscore_alloca = false;
     char code_buf[sizeof(alloca_code) + 100];
 
     {
@@ -6742,16 +7522,14 @@ chaz_Memory_probe_alloca(void) {
             NULL
         };
         if (chaz_HeadCheck_check_many_headers((const char**)mman_headers)) {
-            has_sys_mman_h = true;
             chaz_ConfWriter_add_def("HAS_SYS_MMAN_H", NULL);
         }
     }
 
     /* Unixen. */
     sprintf(code_buf, alloca_code, "alloca.h", "alloca");
-    if (chaz_CC_test_compile(code_buf)) {
-        has_alloca_h = true;
-        has_alloca   = true;
+    if (chaz_CC_test_link(code_buf)) {
+        has_alloca = true;
         chaz_ConfWriter_add_def("HAS_ALLOCA_H", NULL);
         chaz_ConfWriter_add_def("alloca", "alloca");
     }
@@ -6762,9 +7540,8 @@ chaz_Memory_probe_alloca(void) {
          * are subsequently repeated during the build.
          */
         sprintf(code_buf, alloca_code, "stdlib.h", "alloca");
-        if (chaz_CC_test_compile(code_buf)) {
-            has_alloca    = true;
-            need_stdlib_h = true;
+        if (chaz_CC_test_link(code_buf)) {
+            has_alloca = true;
             chaz_ConfWriter_add_def("ALLOCA_IN_STDLIB_H", NULL);
             chaz_ConfWriter_add_def("alloca", "alloca");
         }
@@ -6772,7 +7549,7 @@ chaz_Memory_probe_alloca(void) {
     if (!has_alloca) {
         sprintf(code_buf, alloca_code, "stdio.h", /* stdio.h is filler */
                 "__builtin_alloca");
-        if (chaz_CC_test_compile(code_buf)) {
+        if (chaz_CC_test_link(code_buf)) {
             has_builtin_alloca = true;
             chaz_ConfWriter_add_def("alloca", "__builtin_alloca");
         }
@@ -6781,20 +7558,17 @@ chaz_Memory_probe_alloca(void) {
     /* Windows. */
     if (!(has_alloca || has_builtin_alloca)) {
         sprintf(code_buf, alloca_code, "malloc.h", "alloca");
-        if (chaz_CC_test_compile(code_buf)) {
-            has_malloc_h = true;
-            has_alloca   = true;
+        if (chaz_CC_test_link(code_buf)) {
+            has_alloca = true;
             chaz_ConfWriter_add_def("HAS_MALLOC_H", NULL);
             chaz_ConfWriter_add_def("alloca", "alloca");
         }
     }
     if (!(has_alloca || has_builtin_alloca)) {
         sprintf(code_buf, alloca_code, "malloc.h", "_alloca");
-        if (chaz_CC_test_compile(code_buf)) {
-            has_malloc_h = true;
-            has_underscore_alloca = true;
+        if (chaz_CC_test_link(code_buf)) {
             chaz_ConfWriter_add_def("HAS_MALLOC_H", NULL);
-            chaz_ConfWriter_add_def("chy_alloca", "_alloca");
+            chaz_ConfWriter_add_def("alloca", "_alloca");
         }
     }
 }
@@ -7078,9 +7852,7 @@ void
 chaz_VariadicMacros_run(void) {
     char *output;
     size_t output_len;
-    int has_varmacros      = false;
-    int has_iso_varmacros  = false;
-    int has_gnuc_varmacros = false;
+    int has_varmacros = false;
 
     chaz_ConfWriter_start_module("VariadicMacros");
 
@@ -7088,7 +7860,6 @@ chaz_VariadicMacros_run(void) {
     output = chaz_CC_capture_output(chaz_VariadicMacros_iso_code, &output_len);
     if (output != NULL) {
         has_varmacros = true;
-        has_iso_varmacros = true;
         chaz_ConfWriter_add_def("HAS_VARIADIC_MACROS", NULL);
         chaz_ConfWriter_add_def("HAS_ISO_VARIADIC_MACROS", NULL);
         free(output);
@@ -7097,7 +7868,6 @@ chaz_VariadicMacros_run(void) {
     /* Test for GNU-style variadic macros. */
     output = chaz_CC_capture_output(chaz_VariadicMacros_gnuc_code, &output_len);
     if (output != NULL) {
-        has_gnuc_varmacros = true;
         if (has_varmacros == false) {
             has_varmacros = true;
             chaz_ConfWriter_add_def("HAS_VARIADIC_MACROS", NULL);
@@ -7164,7 +7934,7 @@ static const char lucy_version[]        = "0.4.2";
 static const char lucy_major_version[]  = "0.4";
 
 static void
-S_add_compiler_flags(struct chaz_CLIArgs *args) {
+S_add_compiler_flags(struct chaz_CLI *cli) {
     chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
 
     if (chaz_Probe_gcc_version_num()) {
@@ -7175,7 +7945,7 @@ S_add_compiler_flags(struct chaz_CLIArgs *args) {
         else if (getenv("LUCY_DEBUG")) {
             chaz_CFlags_append(extra_cflags,
                 "-DLUCY_DEBUG -pedantic -Wall -Wextra -Wno-variadic-macros");
-            if (args->charmony_pm) {
+            if (chaz_CLI_defined(cli, "enable-perl")) {
                 chaz_CFlags_append(extra_cflags, "-DPERL_GCC_PEDANTIC");
             }
         }
@@ -7251,8 +8021,7 @@ S_cfh_file_callback(const char *dir, char *file, void *context) {
 }
 
 static void
-S_write_makefile(struct chaz_CLIArgs *chaz_args,
-                 struct lucy_CLIArgs *lucy_args) {
+S_write_makefile(struct chaz_CLI *cli) {
     SourceFileContext sfc;
 
     const char *base_dir     = "..";
@@ -7260,7 +8029,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     const char *exe_ext      = chaz_OS_exe_ext();
     const char *obj_ext      = chaz_CC_obj_ext();
     const char *math_lib     = chaz_Floats_math_library();
-    const char *cfish_prefix = lucy_args->clownfish_prefix;
+    const char *cfish_prefix = chaz_CLI_strval(cli, "clownfish-prefix");
 
     char *core_dir      = chaz_Util_join(dir_sep, base_dir, "core", NULL);
     char *lemon_dir     = chaz_Util_join(dir_sep, base_dir, "lemon", NULL);
@@ -7295,7 +8064,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     chaz_CFlags *link_flags;
     chaz_CFlags *test_cflags;
 
-    chaz_SharedLib *lib;
+    chaz_Lib *lib;
 
     const char *cfish_lib_name = NULL;
     char       *cfish_lib_dir  = NULL;
@@ -7321,7 +8090,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     chaz_CFlags_enable_debugging(makefile_cflags);
     chaz_CFlags_disable_strict_aliasing(makefile_cflags);
     chaz_CFlags_compile_shared_library(makefile_cflags);
-    if (chaz_args->code_coverage) {
+    if (chaz_CLI_defined(cli, "enable-coverage")) {
         chaz_CFlags_enable_code_coverage(makefile_cflags);
     }
 
@@ -7372,8 +8141,9 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
 
     /* Rules */
 
-    lib = chaz_SharedLib_new("lucy", lucy_version, lucy_major_version);
-    lib_filename = chaz_SharedLib_filename(lib);
+    lib = chaz_Lib_new("lucy", chaz_Lib_SHARED, lucy_version,
+                       lucy_major_version);
+    lib_filename = chaz_Lib_filename(lib);
     chaz_MakeFile_add_rule(makefile, "all", lib_filename);
 
     chaz_MakeFile_add_lemon_exe(makefile, lemon_dir);
@@ -7437,7 +8207,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     if (chaz_HeadCheck_check_header("pcre.h")) {
         chaz_CFlags_add_external_library(link_flags, "pcre");
     }
-    if (chaz_args->code_coverage) {
+    if (chaz_CLI_defined(cli, "enable-coverage")) {
         chaz_CFlags_enable_code_coverage(link_flags);
     }
     rule = chaz_MakeFile_add_shared_lib(makefile, lib, "$(LUCY_OBJS)",
@@ -7477,7 +8247,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     }
     chaz_MakeRule_add_command(rule, test_command);
 
-    if (chaz_args->code_coverage) {
+    if (chaz_CLI_defined(cli, "enable-coverage")) {
         rule = chaz_MakeFile_add_rule(makefile, "coverage", test_lucy_exe);
         chaz_MakeRule_add_command(rule,
                                   "lcov"
@@ -7517,7 +8287,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
 
     chaz_MakeRule_add_recursive_rm_command(clean_rule, "autogen");
 
-    if (chaz_args->code_coverage) {
+    if (chaz_CLI_defined(cli, "enable-coverage")) {
         chaz_MakeRule_add_rm_command(clean_rule, "lucy.info");
         chaz_MakeRule_add_recursive_rm_command(clean_rule, "coverage");
     }
@@ -7527,7 +8297,7 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
     chaz_MakeFile_write(makefile);
 
     chaz_MakeFile_destroy(makefile);
-    chaz_SharedLib_destroy(lib);
+    chaz_Lib_destroy(lib);
     free(core_dir);
     free(lemon_dir);
     free(modules_dir);
@@ -7547,30 +8317,19 @@ S_write_makefile(struct chaz_CLIArgs *chaz_args,
 
 int main(int argc, const char **argv) {
     /* Initialize. */
-    struct chaz_CLIArgs chaz_args;
-    struct lucy_CLIArgs lucy_args = { NULL };
-    {
-        int result = chaz_Probe_parse_cli_args(argc, argv, &chaz_args);
-        if (!result) {
-            chaz_Probe_die_usage();
-        }
-        chaz_Probe_init(&chaz_args);
-        S_add_compiler_flags(&chaz_args);
+    chaz_CLI *cli
+        = chaz_CLI_new(argv[0], "charmonizer: Probe C build environment");
+    chaz_CLI_register(cli, "disable-threads", "whether to disable threads",
+                      CHAZ_CLI_NO_ARG);
+    chaz_CLI_register(cli, "clownfish-prefix",
+                      "prefix of Clownfish installation",
+                      CHAZ_CLI_ARG_OPTIONAL);
+    chaz_CLI_set_usage(cli, "Usage: charmonizer [OPTIONS] [-- [CFLAGS]]");
+    if (!chaz_Probe_parse_cli_args(argc, argv, cli)) {
+        chaz_Probe_die_usage();
     }
-    {
-        int i;
-        for (i = 0; i < argc; i++) {
-            const char *arg = argv[i];
-            if (strncmp(arg, "--disable-threads", 17) == 0) {
-                chaz_CFlags *extra_cflags = chaz_CC_get_extra_cflags();
-                chaz_CFlags_append(extra_cflags, "-DCFISH_NOTHREADS");
-                break;
-            }
-            else if (memcmp(arg, "--clownfish-prefix=", 19) == 0) {
-                lucy_args.clownfish_prefix = arg + 19;
-            }
-        }
-    }
+    chaz_Probe_init(cli);
+    S_add_compiler_flags(cli);
 
     /* Employ integer features but don't define stdint types in charmony.h. */
     chaz_ConfWriter_append_conf(
@@ -7618,11 +8377,12 @@ int main(int argc, const char **argv) {
         "#endif\n\n"
     );
 
-    if (chaz_args.write_makefile) {
-        S_write_makefile(&chaz_args, &lucy_args);
+    if (chaz_CLI_defined(cli, "enable-makefile")) {
+        S_write_makefile(cli);
     }
 
     /* Clean up. */
+    chaz_CLI_destroy(cli);
     chaz_Probe_clean_up();
 
     return 0;
