@@ -28,11 +28,37 @@ rewritten.
 The simplest way to force fast index updates is to avoid rewriting anything.
 
 Indexer relies upon [](cfish:lucy.IndexManager)'s
-recycle() method to tell it which segments should be consolidated.  If we
-subclass IndexManager and override recycle() so that it always returns an
-empty array, we get consistently quick performance:
+[](cfish:lucy.IndexManager.Recycle) method to tell it which segments should
+be consolidated.  If we subclass IndexManager and override the method so that
+it always returns an empty array, we get consistently quick performance:
 
-~~~ perl
+``` c
+Vector*
+NoMergeManager_Recycle_IMP(IndexManager *self, PolyReader *reader,
+                           DeletionsWriter *del_writer, int64_t cutoff,
+                           bool optimize) {
+    return Vec_new(0);
+}
+
+void
+do_index(Obj *index) {
+    CFCClass *klass = Class_singleton("NoMergeManager", INDEXMANAGER);
+    Class_Override(klass, (cfish_method_t)NoMergeManager_Recycle_IMP,
+                   LUCY_IndexManager_Recycle_OFFSET);
+
+    IndexManager *manager = (IndexManager*)Class_Make_Obj(klass);
+    IxManager_init(manager, NULL, NULL);
+
+    Indexer *indexer = Indexer_new(NULL, index, manager, 0);
+    ...
+    Indexer_Commit(indexer);
+
+    DECREF(indexer);
+    DECREF(manager);
+}
+```
+
+``` perl
 package NoMergeManager;
 use base qw( Lucy::Index::IndexManager );
 sub recycle { [] }
@@ -44,20 +70,30 @@ my $indexer = Lucy::Index::Indexer->new(
 );
 ...
 $indexer->commit;
-~~~
+```
 
 However, we can't procrastinate forever.  Eventually, we'll have to run an
 ordinary, uncontrolled indexing session, potentially triggering a large
 rewrite of lots of small and/or degraded segments:
 
-~~~ perl
+``` c
+void
+do_index(Obj *index) {
+    Indexer *indexer = Indexer_new(NULL, index, NULL /* manager */, 0);
+    ...
+    Indexer_Commit(indexer);
+    DECREF(indexer);
+}
+```
+
+``` perl
 my $indexer = Lucy::Index::Indexer->new( 
     index => '/path/to/index', 
     # manager => NoMergeManager->new,
 );
 ...
 $indexer->commit;
-~~~
+```
 
 ## Acceptable worst-case update time, slower degradation
 
@@ -69,7 +105,31 @@ Setting a ceiling on the number of documents in the segments to be recycled
 allows us to avoid a mass proliferation of tiny, single-document segments,
 while still offering decent worst-case update speed:
 
-~~~ perl
+``` c
+Vector*
+LightMergeManager_Recycle_IMP(IndexManager *self, PolyReader *reader,
+                              DeletionsWriter *del_writer, int64_t cutoff,
+                              bool optimize) {
+    IndexManager_Recycle_t super_recycle
+        = SUPER_METHOD_PTR(IndexManager, LUCY_IndexManager_Recycle);
+    Vector *seg_readers = super_recycle(self, reader, del_writer, cutoff,
+                                        optimize);
+    Vector *small_segments = Vec_new(0);
+
+    for (size_t i = 0, max = Vec_Get_Size(seg_readers); i < max; i++) {
+        SegReader *seg_reader = (SegReader*)Vec_Fetch(seg_readers, i);
+
+        if (SegReader_Doc_Max(seg_reader) < 10) {
+            Vec_Push(small_segments, INCREF(seg_reader));
+        }
+    }
+
+    DECREF(seg_readers);
+    return small_segments;
+}
+```
+
+``` perl
 package LightMergeManager;
 use base qw( Lucy::Index::IndexManager );
 
@@ -79,7 +139,7 @@ sub recycle {
     @$seg_readers = grep { $_->doc_max < 10 } @$seg_readers;
     return $seg_readers;
 }
-~~~
+```
 
 However, we still have to consolidate every once in a while, and while that
 happens content updates will be locked out.
@@ -88,13 +148,67 @@ happens content updates will be locked out.
 
 If it's not acceptable to lock out updates while the index consolidation
 process runs, the alternative is to move the consolidation process out of
-band, using Lucy::Index::BackgroundMerger.  
+band, using [](cfish:lucy.BackgroundMerger).
 
 It's never safe to have more than one Indexer attempting to modify the content
 of an index at the same time, but a BackgroundMerger and an Indexer can
 operate simultaneously:
 
-~~~ perl
+``` c
+typedef struct {
+    Obj *index;
+    Doc *doc;
+} Context;
+
+static void
+S_index_doc(void *arg) {
+    Context *ctx = (Context*)arg;
+
+    CFCClass *klass = Class_singleton("LightMergeManager", INDEXMANAGER);
+    Class_Override(klass, (cfish_method_t)LightMergeManager_Recycle_IMP,
+                   LUCY_IndexManager_Recycle_OFFSET);
+
+    IndexManager *manager = (IndexManager*)Class_Make_Obj(klass);
+    IxManager_init(manager, NULL, NULL);
+
+    Indexer *indexer = Indexer_new(NULL, ctx->index, manager, 0);
+    Indexer_Add_Doc(indexer, ctx->doc, 1.0);
+    Indexer_Commit(indexer);
+
+    DECREF(indexer);
+    DECREF(manager);
+}
+
+void indexing_process(Obj *index, Doc *doc) {
+    Context ctx;
+    ctx.index = index;
+    ctx.doc = doc;
+
+    for (int i = 0; i < max_retries; i++) {
+        Err *err = Err_trap(S_index_doc, &ctx);
+        if (!err) { break; }
+        if (!Err_is_a(err, LOCKERR)) {
+            RETHROW(err);
+        }
+        WARN("Couldn't get lock (%d retries)", i);
+        DECREF(err);
+    }
+}
+
+void
+background_merge_process(Obj *index) {
+    IndexManager *manager = IxManager_new(NULL, NULL);
+    IxManager_Set_Write_Lock_Timeout(manager, 60000);
+
+    BackgroundMerger bg_merger = BGMerger_new(index, manager);
+    BGMerger_Commit(bg_merger);
+
+    DECREF(bg_merger);
+    DECREF(manager);
+}
+```
+
+``` perl
 # Indexing process.
 use Scalar::Util qw( blessed );
 my $retries = 0;
@@ -126,15 +240,16 @@ my $bg_merger = Lucy::Index::BackgroundMerger->new(
     manager => $manager,
 );
 $bg_merger->commit;
-~~~
+```
 
 The exception handling code becomes useful once you have more than one index
 modification process happening simultaneously.  By default, Indexer tries
 several times to acquire a write lock over the span of one second, then holds
-it until commit() completes.  BackgroundMerger handles most of its work
+it until [](cfish:lucy.Indexer.Commit) completes.  BackgroundMerger handles
+most of its work
 without the write lock, but it does need it briefly once at the beginning and
 once again near the end.  Under normal loads, the internal retry logic will
 resolve conflicts, but if it's not acceptable to miss an insert, you probably
-want to catch LockErr exceptions thrown by Indexer.  In contrast, a LockErr
-from BackgroundMerger probably just needs to be logged.
+want to catch [](cfish:lucy.LockErr) exceptions thrown by Indexer.  In
+contrast, a LockErr from BackgroundMerger probably just needs to be logged.
 
