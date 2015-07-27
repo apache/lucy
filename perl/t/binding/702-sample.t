@@ -29,6 +29,7 @@ BEGIN {
 }
 use File::Spec::Functions qw( catfile catdir );
 use File::Path qw( rmtree );
+use Lucy::Test::TestUtils qw( uscon_dir );
 
 my $search_cgi_orig_path = catfile(qw( sample search.cgi ));
 my $indexer_pl_orig_path = catfile(qw( sample indexer.pl ));
@@ -47,7 +48,7 @@ for my $filename (qw( search.cgi indexer.pl )) {
     close $fh or die "Close failed: $!";
     $content =~ s/(path_to_index\s+=\s+).*?;/$1'_sample_index';/
         or die "no match";
-    my $uscon_source = catdir(qw( sample us_constitution ));
+    my $uscon_source = uscon_dir();
     $content =~ s/(uscon_source\s+=\s+).*?;/$1'$uscon_source';/;
     $content =~ s/(^use warnings;\n)/$1no warnings 'deprecated';\n/m;
     $content =~ s/^use/$use_dirs;\nuse/m;

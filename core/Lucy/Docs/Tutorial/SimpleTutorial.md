@@ -16,7 +16,23 @@ builds a searchable "inverted index" from a collection of documents.
 After we specify some configuration variables and load all necessary
 modules...
 
-~~~ perl
+``` c
+#include <dirent.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define CFISH_USE_SHORT_NAMES
+#define LUCY_USE_SHORT_NAMES
+#include "Clownfish/String.h"
+#include "Lucy/Simple.h"
+#include "Lucy/Document/Doc.h"
+
+const char path_to_index[] = "lucy_index";
+const char uscon_source[]  = "../../common/sample/us_constitution";
+```
+
+``` perl
 #!/usr/local/bin/perl
 use strict;
 use warnings;
@@ -27,21 +43,93 @@ my $uscon_source  = '/usr/local/apache2/htdocs/us_constitution';
 
 use Lucy::Simple;
 use File::Spec::Functions qw( catfile );
-~~~
+```
 
-... we'll start by creating a Lucy::Simple object, telling it where we'd
-like the index to be located and the language of the source material.
+... we'll start by creating a [Lucy::Simple](lucy.Simple) object, telling it
+where we'd like the index to be located and the language of the source
+material.
 
-~~~ perl
+``` c
+int
+main() {
+    // Initialize the library.
+    lucy_bootstrap_parcel();
+
+    String *folder   = Str_newf("%s", path_to_index);
+    String *language = Str_newf("en");
+    Simple *lucy     = Simple_new((Obj*)folder, language);
+```
+
+``` perl
 my $lucy = Lucy::Simple->new(
     path     => $path_to_index,
     language => 'en',
 );
-~~~
+```
 
 Next, we'll add a subroutine which parses our sample documents.
 
-~~~ perl
+``` c
+Doc*
+S_parse_file(const char *filename) {
+    size_t bytes = strlen(uscon_source) + 1 + strlen(filename) + 1;
+    char *path = (char*)malloc(bytes);
+    path[0] = '\0';
+    strcat(path, uscon_source);
+    strcat(path, "/");
+    strcat(path, filename);
+
+    FILE *stream = fopen(path, "r");
+    if (stream == NULL) {
+        perror(path);
+        exit(1);
+    }
+
+    char *title    = NULL;
+    char *bodytext = NULL;
+    if (fscanf(stream, "%m[^\r\n] %m[\x01-\x7F]", &title, &bodytext) != 2) {
+        fprintf(stderr, "Can't extract title/bodytext from '%s'", path);
+        exit(1);
+    }
+
+    Doc *doc = Doc_new(NULL, 0);
+
+    {
+        // Store 'title' field
+        String *field = Str_newf("title");
+        String *value = Str_new_from_utf8(title, strlen(title));
+        Doc_Store(doc, field, (Obj*)value);
+        DECREF(field);
+        DECREF(value);
+    }
+
+    {
+        // Store 'content' field
+        String *field = Str_newf("content");
+        String *value = Str_new_from_utf8(bodytext, strlen(bodytext));
+        Doc_Store(doc, field, (Obj*)value);
+        DECREF(field);
+        DECREF(value);
+    }
+
+    {
+        // Store 'url' field
+        String *field = Str_newf("url");
+        String *value = Str_new_from_utf8(filename, strlen(filename));
+        Doc_Store(doc, field, (Obj*)value);
+        DECREF(field);
+        DECREF(value);
+    }
+
+    fclose(stream);
+    free(bodytext);
+    free(title);
+    free(path);
+    return doc;
+}
+```
+
+``` perl
 # Parse a file from our US Constitution collection and return a hashref with
 # the fields title, body, and url.
 sub parse_file {
@@ -59,26 +147,55 @@ sub parse_file {
         url      => "/us_constitution/$filename",
     };
 }
-~~~
+```
 
 Add some elementary directory reading code...
 
-~~~ perl
+``` c
+    DIR *dir = opendir(uscon_source);
+    if (dir == NULL) {
+        perror(uscon_source);
+        return 1;
+    }
+```
+
+``` perl
 # Collect names of source files.
 opendir( my $dh, $uscon_source )
     or die "Couldn't opendir '$uscon_source': $!";
 my @filenames = grep { $_ =~ /\.txt/ } readdir $dh;
-~~~
+```
 
 ... and now we're ready for the meat of indexer.pl -- which occupies exactly
 one line of code.
 
-~~~ perl
+``` c
+    for (struct dirent *entry = readdir(dir);
+         entry;
+         entry = readdir(dir)) {
+
+        if (S_ends_with(entry->d_name, ".txt")) {
+            Doc *doc = S_parse_file(entry->d_name);
+            Simple_Add_Doc(lucy, doc); // ta-da!
+            DECREF(doc);
+        }
+    }
+
+    closedir(dir);
+
+    DECREF(lucy);
+    DECREF(language);
+    DECREF(folder);
+    return 0;
+}
+```
+
+``` perl
 foreach my $filename (@filenames) {
     my $doc = parse_file($filename);
     $lucy->add_doc($doc);  # ta-da!
 }
-~~~
+```
 
 ## Search: search.cgi
 
@@ -87,7 +204,40 @@ Lucy-specific.
 
 The beginning is dedicated to CGI processing and configuration.
 
-~~~ perl
+``` c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define CFISH_USE_SHORT_NAMES
+#define LUCY_USE_SHORT_NAMES
+#include "Clownfish/String.h"
+#include "Lucy/Document/HitDoc.h"
+#include "Lucy/Simple.h"
+
+const char path_to_index[] = "lucy_index";
+
+static void
+S_usage_and_exit(const char *arg0) {
+    printf("Usage: %s <querystring>\n", arg0);
+    exit(1);
+}
+
+int
+main(int argc, char *argv[]) {
+    // Initialize the library.
+    lucy_bootstrap_parcel();
+
+    if (argc != 2) {
+        S_usage_and_exit(argv[0]);
+    }
+
+    const char *query_c = argv[1];
+
+    printf("Searching for: %s\n\n", query_c);
+```
+
+``` perl
 #!/usr/local/bin/perl -T
 use strict;
 use warnings;
@@ -105,12 +255,21 @@ my $cgi       = CGI->new;
 my $q         = decode( "UTF-8", $cgi->param('q') || '' );
 my $offset    = decode( "UTF-8", $cgi->param('offset') || 0 );
 my $page_size = 10;
-~~~
+```
 
 Once that's out of the way, we create our Lucy::Simple object and feed
 it a query string.
 
-~~~ perl
+``` c
+    String *folder   = Str_newf("%s", path_to_index);
+    String *language = Str_newf("en");
+    Simple *lucy     = Simple_new((Obj*)folder, language);
+
+    String *query_str = Str_newf("%s", query_c);
+    Simple_Search(lucy, query_str, 0, 10);
+```
+
+``` perl
 my $lucy = Lucy::Simple->new(
     path     => $path_to_index,
     language => 'en',
@@ -120,18 +279,52 @@ my $hit_count = $lucy->search(
     offset     => $offset,
     num_wanted => $page_size,
 );
-~~~
+```
 
-The value returned by search() is the total number of documents in the
-collection which matched the query.  We'll show this hit count to the user,
-and also use it in conjunction with the parameters `offset` and `num_wanted`
-to break up results into "pages" of manageable size.
+The value returned by [](lucy.Simple.Search) is the total number of documents
+in the collection which matched the query.  We'll show this hit count to the
+user, and also use it in conjunction with the parameters `offset` and
+`num_wanted` to break up results into "pages" of manageable size.
 
-Calling search() on our Simple object turns it into an iterator. Invoking
-next() now returns hits one at a time as [](cfish:lucy.HitDoc)
+Calling [](lucy.Simple.Search) on our Simple object turns it into an iterator.
+Invoking [](lucy.Simple.Next) now returns hits one at a time as [](lucy.HitDoc)
 objects, starting with the most relevant.
 
-~~~ perl
+``` c
+    String *title_str = Str_newf("title");
+    String *url_str   = Str_newf("url");
+    HitDoc *hit;
+    int i = 1;
+
+    // Loop over search results.
+    while (NULL != (hit = Simple_Next(lucy))) {
+        String *title = (String*)HitDoc_Extract(hit, title_str);
+        char *title_c = Str_To_Utf8(title);
+
+        String *url = (String*)HitDoc_Extract(hit, url_str);
+        char *url_c = Str_To_Utf8(url);
+
+        printf("Result %d: %s (%s)\n", i, title_c, url_c);
+
+        free(url_c);
+        free(title_c);
+        DECREF(url);
+        DECREF(title);
+        DECREF(hit);
+        i++;
+    }
+
+    DECREF(url_str);
+    DECREF(title_str);
+    DECREF(query_str);
+    DECREF(lucy);
+    DECREF(language);
+    DECREF(folder);
+    return 0;
+}
+```
+
+``` perl
 # Create result list.
 my $report = '';
 while ( my $hit = $lucy->next ) {
@@ -145,11 +338,11 @@ while ( my $hit = $lucy->next ) {
         </p>
         |;
 }
-~~~
+```
 
 The rest of the script is just text wrangling. 
 
-~~~ perl5
+``` perl
 #---------------------------------------------------------------#
 # No tutorial material below this point - just html generation. #
 #---------------------------------------------------------------#
@@ -282,7 +475,7 @@ sub blast_out_content {
 </html>
 |;
 }
-~~~
+```
 
 ## OK... now what?
 

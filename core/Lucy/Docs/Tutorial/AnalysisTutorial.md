@@ -1,13 +1,19 @@
 # How to choose and use Analyzers.
 
-Try swapping out the EasyAnalyzer in our Schema for a StandardTokenizer:
+Try swapping out the EasyAnalyzer in our Schema for a
+[](lucy.StandardTokenizer):
 
-~~~ perl
+``` c
+    StandardTokenizer *tokenizer = StandardTokenizer_new();
+    FullTextType *type = FullTextType_new((Analyzer*)tokenizer);
+```
+
+``` perl
 my $tokenizer = Lucy::Analysis::StandardTokenizer->new;
 my $type = Lucy::Plan::FullTextType->new(
     analyzer => $tokenizer,
 );
-~~~
+```
 
 Search for `senate`, `Senate`, and `Senator` before and after making the
 change and re-indexing.
@@ -18,45 +24,68 @@ under StandardTokenizer, searches are case-sensitive, and the result sets for
 
 ## EasyAnalyzer
 
-What's happening is that EasyAnalyzer is performing more aggressive processing
-than StandardTokenizer.  In addition to tokenizing, it's also converting all
-text to lower case so that searches are case-insensitive, and using a
-"stemming" algorithm to reduce related words to a common stem (`senat`, in
-this case).
+What's happening is that [](lucy.EasyAnalyzer) is performing more aggressive
+processing than StandardTokenizer.  In addition to tokenizing, it's also
+converting all text to lower case so that searches are case-insensitive, and
+using a "stemming" algorithm to reduce related words to a common stem (`senat`,
+in this case).
 
 EasyAnalyzer is actually multiple Analyzers wrapped up in a single package.
 In this case, it's three-in-one, since specifying a EasyAnalyzer with
-`language => 'en'` is equivalent to this snippet:
+`language => 'en'` is equivalent to this snippet creating a
+[](lucy.PolyAnalyzer):
 
-~~~ perl
+``` c
+    Vector *analyzers = Vec_new(3);
+    Vec_Push(analyzers, (Analyzer*)StandardTokenizer_new());
+    Vec_Push(analyzers, (Analyzer*)Normalizer_new(NULL, true, false));
+    Vec_Push(analyzers, (Analyzer*)SnowStemmer_new(language));
+
+    PolyAnalyzer *analyzer = PolyAnalyzer_new(NULL, analyzers);
+    DECREC(analyzers);
+```
+
+``` perl
 my $tokenizer    = Lucy::Analysis::StandardTokenizer->new;
 my $normalizer   = Lucy::Analysis::Normalizer->new;
 my $stemmer      = Lucy::Analysis::SnowballStemmer->new( language => 'en' );
 my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
     analyzers => [ $tokenizer, $normalizer, $stemmer ],
 );
-~~~
+```
 
 You can add or subtract Analyzers from there if you like.  Try adding a fourth
 Analyzer, a SnowballStopFilter for suppressing "stopwords" like "the", "if",
 and "maybe".
 
-~~~ perl
+``` c
+    Vec_Push(analyzers, (Analyzer*)StandardTokenizer_new());
+    Vec_Push(analyzers, (Analyzer*)Normalizer_new(NULL, true, false));
+    Vec_Push(analyzers, (Analyzer*)SnowStemmer_new(language));
+    Vec_Push(analyzers, (Analyzer*)SnowStop_new(language, NULL));
+```
+
+``` perl
 my $stopfilter = Lucy::Analysis::SnowballStopFilter->new( 
     language => 'en',
 );
 my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
     analyzers => [ $tokenizer, $normalizer, $stopfilter, $stemmer ],
 );
-~~~
+```
 
 Also, try removing the SnowballStemmer.
 
-~~~ perl
+``` c
+    Vec_Push(analyzers, (Analyzer*)StandardTokenizer_new());
+    Vec_Push(analyzers, (Analyzer*)Normalizer_new(NULL, true, false));
+```
+
+``` perl
 my $polyanalyzer = Lucy::Analysis::PolyAnalyzer->new(
     analyzers => [ $tokenizer, $normalizer ],
 );
-~~~
+```
 
 The original choice of a stock English EasyAnalyzer probably still yields the
 best results for this document collection, but you get the idea: sometimes you
@@ -72,10 +101,18 @@ you may not want to conflate results for "Humphrey" and "Humphries").
 
 To specify that there should be no analysis performed at all, use StringType:
 
-~~~ perl
+``` c
+    String     *name = Str_newf("category");
+    StringType *type = StringType_new();
+    Schema_Spec_Field(schema, name, (FieldType*)type);
+    DECREF(type);
+    DECREF(name);
+```
+
+``` perl
 my $type = Lucy::Plan::StringType->new;
 $schema->spec_field( name => 'category', type => $type );
-~~~
+```
 
 ## Highlighting up next
 

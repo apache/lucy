@@ -26,6 +26,7 @@ our @EXPORT_OK = qw(
     working_dir
     create_working_dir
     remove_working_dir
+    uscon_dir
     create_index
     create_uscon_index
     test_index_loc
@@ -40,7 +41,7 @@ our @EXPORT_OK = qw(
 
 use Lucy;
 use Lucy::Test;
-use File::Spec::Functions qw( catdir catfile curdir );
+use File::Spec::Functions qw( catdir catfile curdir updir );
 use Encode qw( _utf8_off );
 use File::Path qw( rmtree );
 use Carp;
@@ -100,10 +101,23 @@ sub create_index {
     return $folder;
 }
 
+sub uscon_dir {
+    my @dirs = (
+        catdir('sample', 'us_constitution'),
+        catdir(updir(), 'common', 'sample', 'us_constitution'),
+    );
+
+    for my $dir (@dirs) {
+        return $dir if -d $dir;
+    }
+
+    die("uscon source dir not found");
+}
+
 # Slurp us constitition docs and build hashrefs.
 sub get_uscon_docs {
 
-    my $uscon_dir = catdir( 'sample', 'us_constitution' );
+    my $uscon_dir = uscon_dir();
     opendir( my $uscon_dh, $uscon_dir )
         or die "couldn't opendir '$uscon_dir': $!";
     my @filenames = grep {/\.txt$/} sort readdir $uscon_dh;

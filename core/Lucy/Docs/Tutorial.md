@@ -33,11 +33,19 @@ of the United States constitution -- can be found in the `sample` directory
 at the root of the Lucy distribution, along with finished indexing and search
 apps.
 
-~~~ perl
+``` c
+sample/indexer_simple.c  # simple indexing executable
+sample/search_simple.c   # simple search executable
+sample/indexer.c         # indexing executable
+sample/search.c          # search executable
+sample/us_constitution   # corpus
+```
+
+``` perl
 sample/indexer.pl        # indexing app
 sample/search.cgi        # search app
 sample/us_constitution   # corpus
-~~~
+```
 
 ## Conventions
 
