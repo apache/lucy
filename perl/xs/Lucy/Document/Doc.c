@@ -150,7 +150,7 @@ LUCY_Doc_Extract_IMP(lucy_Doc *self, cfish_String *field) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     cfish_Obj *retval = NULL;
     SV **sv_ptr = hv_fetch((HV*)ivars->fields, CFISH_Str_Get_Ptr8(field),
-                           CFISH_Str_Get_Size(field), 0);
+                           -CFISH_Str_Get_Size(field), 0);
 
     if (sv_ptr) {
         retval = XSBind_perl_to_cfish(aTHX_ *sv_ptr);
@@ -218,8 +218,20 @@ LUCY_Doc_Equals_IMP(lucy_Doc *self, cfish_Obj *other) {
     while (num_fields--) {
         HE *my_entry = hv_iternext(my_fields);
         SV *my_val_sv = HeVAL(my_entry);
-        STRLEN key_len = HeKLEN(my_entry);
-        char *key = HeKEY(my_entry);
+        STRLEN key_len;
+        char *key;
+
+        if (HeKLEN(my_entry) == HEf_SVKEY) {
+            SV *key_sv = HeKEY_sv(my_entry);
+            key = SvPV(key_sv, key_len);
+            if (SvUTF8(key_sv)) { key_len = -key_len; }
+        }
+        else {
+            key_len = HeKLEN(my_entry);
+            key = key_len ? HeKEY(my_entry) : Nullch;
+            if (HeKUTF8(my_entry)) { key_len = -key_len; }
+        }
+
         SV **const other_val = hv_fetch(other_fields, key, key_len, 0);
         if (!other_val) { return false; }
         if (!sv_eq(my_val_sv, *other_val)) { return false; }
