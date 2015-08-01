@@ -1,0 +1,99 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+/** Basic search engine.
+ *
+ * Lucy::Simple is a stripped-down interface for the Apache Lucy search
+ * engine library.
+ */
+public class Lucy::Simple {
+
+    Obj           *index;
+    String        *language;
+    Schema        *schema;
+    FieldType     *type;
+    Indexer       *indexer;
+    IndexSearcher *searcher;
+    Hits          *hits;
+
+    /** Create a Lucy::Simple object, which can be used for both indexing and
+     * searching.  Both parameters `path` and `language` are required.
+     *
+     * @param path Where the index directory should be located.  If no index
+     * is found at the specified location, one will be created.
+     * @param language The language of the documents in your collection,
+     * indicated  by a two-letter ISO code.  12 languages are supported:
+     *
+     *     |-----------------------|
+     *     | Language   | ISO code |
+     *     |-----------------------|
+     *     | Danish     | da       |
+     *     | Dutch      | nl       |
+     *     | English    | en       |
+     *     | Finnish    | fi       |
+     *     | French     | fr       |
+     *     | German     | de       |
+     *     | Italian    | it       |
+     *     | Norwegian  | no       |
+     *     | Portuguese | pt       |
+     *     | Spanish    | es       |
+     *     | Swedish    | sv       |
+     *     | Russian    | ru       |
+     *     |-----------------------|
+     */
+    public inert Simple*
+    new(Obj *path, String *language);
+
+    public inert Simple*
+    init(Simple *self, Obj *path, String *language);
+
+    /** Add a document to the index.
+     */
+    public void
+    Add_Doc(Simple *self, Doc *doc);
+
+    /** Search the index.  Returns the total number of documents which match
+     * the query.  (This number is unlikely to match `num_wanted`.)
+     *
+     * @param query A search query string.
+     * @param offset The number of most-relevant hits to discard, typically
+     * used when "paging" through hits N at a time.  Setting offset to 20 and
+     * num_wanted to 10 retrieves hits 21-30, assuming that 30 hits can be
+     * found.
+     * @param num_wanted The number of hits you would like to see after
+     * `offset` is taken into account.
+     */
+    public uint32_t
+    Search(Simple *self, String *query, uint32_t offset = 0,
+           uint32_t num_wanted = 10);
+
+    /** Return the next hit, or [](cfish:@null) when the iterator is exhausted.
+     */
+    public incremented nullable HitDoc*
+    Next(Simple *self);
+
+    Indexer*
+    Get_Indexer(Simple *self);
+
+    void
+    Finish_Indexing(Simple *self);
+
+    public void
+    Destroy(Simple *self);
+}
+

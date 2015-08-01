@@ -26,6 +26,7 @@ sub bind_all {
     $hierarchy->inherit_metadata;
 
     $class->bind_lucy;
+    $class->bind_simple;
     $class->bind_test;
 }
 
@@ -144,6 +145,112 @@ END_XS_CODE
         class_name => "Lucy",
     );
     $binding->append_xs($xs_code);
+
+    Clownfish::CFC::Binding::Perl::Class->register($binding);
+}
+
+sub bind_simple {
+    my @exposed = qw(
+        Search
+        Next
+    );
+    my @hand_rolled = qw( Add_Doc );
+
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
+    my $synopsis = <<'END_SYNOPSIS';
+First, build an index of your documents.
+
+    my $index = Lucy::Simple->new(
+        path     => '/path/to/index/'
+        language => 'en',
+    );
+
+    while ( my ( $title, $content ) = each %source_docs ) {
+        $index->add_doc({
+            title    => $title,
+            content  => $content,
+        });
+    }
+
+Later, search the index.
+
+    my $total_hits = $index->search(
+        query      => $query_string,
+        offset     => 0,
+        num_wanted => 10,
+    );
+
+    print "Total hits: $total_hits\n";
+    while ( my $hit = $index->next ) {
+        print "$hit->{title}\n",
+    }
+END_SYNOPSIS
+    my $add_doc_pod = <<'END_ADD_DOC_POD';
+=head2 add_doc
+
+    $lucy->add_doc({
+        location => $url,
+        title    => $title,
+        content  => $content,
+    });
+
+Add a document to the index. The document must be supplied as a hashref,
+with field names as keys and content as values.
+
+END_ADD_DOC_POD
+    $pod_spec->set_synopsis($synopsis);
+
+    # Override is necessary because there's no standard way to explain
+    # hash/hashref across multiple host languages.
+    $pod_spec->add_method(
+        method => 'Add_Doc',
+        alias  => 'add_doc',
+        pod    => $add_doc_pod,
+    );
+    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
+
+    my $xs_code = <<'END_XS_CODE';
+MODULE = Lucy  PACKAGE = Lucy::Simple
+
+void
+add_doc(self, doc_sv)
+    lucy_Simple *self;
+    SV *doc_sv;
+PPCODE:
+{
+    lucy_Doc *doc = NULL;
+
+    // Either get a Doc or use the stock doc.
+    if (sv_isobject(doc_sv)
+        && sv_derived_from(doc_sv, "Lucy::Document::Doc")
+       ) {
+        IV tmp = SvIV(SvRV(doc_sv));
+        doc = INT2PTR(lucy_Doc*, tmp);
+    }
+    else if (XSBind_sv_defined(aTHX_ doc_sv) && SvROK(doc_sv)) {
+        HV *maybe_fields = (HV*)SvRV(doc_sv);
+        if (SvTYPE((SV*)maybe_fields) == SVt_PVHV) {
+            lucy_Indexer *indexer = LUCY_Simple_Get_Indexer(self);
+            doc = LUCY_Indexer_Get_Stock_Doc(indexer);
+            LUCY_Doc_Set_Fields(doc, maybe_fields);
+        }
+    }
+    if (!doc) {
+        THROW(CFISH_ERR, "Need either a hashref or a %o",
+              CFISH_Class_Get_Name(LUCY_DOC));
+    }
+
+    LUCY_Simple_Add_Doc(self, doc);
+}
+END_XS_CODE
+
+    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
+        parcel     => "Lucy",
+        class_name => "Lucy::Simple",
+    );
+    $binding->exclude_method($_) for @hand_rolled;
+    $binding->append_xs($xs_code);
+    $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
