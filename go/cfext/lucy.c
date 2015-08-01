@@ -135,6 +135,13 @@ Doc_Extract_IMP(Doc *self, String *field) {
     return GOLUCY_Doc_Extract_BRIDGE(self, field);
 }
 
+Doc_Field_Names_t GOLUCY_Doc_Field_Names_BRIDGE;
+
+Vector*
+Doc_Field_Names_IMP(Doc *self) {
+    return GOLUCY_Doc_Field_Names_BRIDGE(self);
+}
+
 Hash*
 Doc_Dump_IMP(Doc *self) {
     UNUSED_VAR(self);

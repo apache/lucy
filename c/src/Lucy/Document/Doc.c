@@ -23,6 +23,7 @@
 #include "Clownfish/Err.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/Class.h"
+#include "Clownfish/Vector.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/Freezer.h"
@@ -83,6 +84,12 @@ Obj*
 Doc_Extract_IMP(Doc *self, String *field) {
     Hash *hash = (Hash*)Doc_IVARS(self)->fields;
     return INCREF(Hash_Fetch(hash, field));
+}
+
+Vector*
+Doc_Field_Names_IMP(Doc *self) {
+    Hash *hash = (Hash*)Doc_IVARS(self)->fields;
+    return Hash_Keys(hash);
 }
 
 Hash*

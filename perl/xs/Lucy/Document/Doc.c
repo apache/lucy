@@ -159,6 +159,26 @@ LUCY_Doc_Extract_IMP(lucy_Doc *self, cfish_String *field) {
     return retval;
 }
 
+cfish_Vector*
+LUCY_Doc_Field_Names_IMP(lucy_Doc *self) {
+    dTHX;
+    lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
+
+    HV           *fields     = (HV*)ivars->fields;
+    I32           num_fields = hv_iterinit(fields);
+    cfish_Vector *retval     = cfish_Vec_new(num_fields);
+
+    while (num_fields--) {
+        HE *entry = hv_iternext(fields);
+        STRLEN key_size;
+        const char *key = XSBind_hash_key_to_utf8(aTHX_ entry, &key_size);
+        cfish_String *key_str = cfish_Str_new_from_trusted_utf8(key, key_size);
+        CFISH_Vec_Push(retval, (cfish_Obj*)key_str);
+    }
+
+    return retval;
+}
+
 cfish_Hash*
 LUCY_Doc_Dump_IMP(lucy_Doc *self) {
     dTHX;

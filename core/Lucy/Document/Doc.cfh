@@ -76,6 +76,11 @@ public class Lucy::Document::Doc inherits Clownfish::Obj {
     nullable incremented Obj*
     Extract(Doc *self, String *field);
 
+    /** Return a list of names of all fields present.
+     */
+    incremented Vector*
+    Field_Names(Doc *self);
+
     /* Unimplemented methods.
      */
     public bool

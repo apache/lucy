@@ -95,6 +95,10 @@ extern cfish_Obj*
 GOLUCY_Doc_Extract(lucy_Doc *self, cfish_String *field);
 extern cfish_Obj*
 (*GOLUCY_Doc_Extract_BRIDGE)(lucy_Doc *self, cfish_String *field);
+extern cfish_Vector*
+GOLUCY_Doc_Field_Names(lucy_Doc *self);
+extern cfish_Vector*
+(*GOLUCY_Doc_Field_Names_BRIDGE)(lucy_Doc *self);
 extern bool
 GOLUCY_Doc_Equals(lucy_Doc *self, cfish_Obj *other);
 extern bool
@@ -132,6 +136,7 @@ GOLUCY_glue_exported_symbols() {
 	GOLUCY_Doc_Serialize_BRIDGE = GOLUCY_Doc_Serialize;
 	GOLUCY_Doc_Deserialize_BRIDGE = GOLUCY_Doc_Deserialize;
 	GOLUCY_Doc_Extract_BRIDGE = GOLUCY_Doc_Extract;
+	GOLUCY_Doc_Field_Names_BRIDGE = GOLUCY_Doc_Field_Names;
 	GOLUCY_Doc_Equals_BRIDGE = GOLUCY_Doc_Equals;
 	GOLUCY_Doc_Destroy_BRIDGE = GOLUCY_Doc_Destroy;
 	GOLUCY_DefDocReader_Fetch_Doc_BRIDGE = GOLUCY_DefDocReader_Fetch_Doc;
@@ -304,6 +309,13 @@ func GOLUCY_Doc_Extract(d *C.lucy_Doc, field *C.cfish_String) *C.cfish_Obj {
 	hash := (*C.cfish_Hash)(ivars.fields)
 	val := C.CFISH_Hash_Fetch(hash, field)
 	return C.cfish_inc_refcount(unsafe.Pointer(val))
+}
+
+//export GOLUCY_Doc_Field_Names
+func GOLUCY_Doc_Field_Names(d *C.lucy_Doc) *C.cfish_Vector {
+	ivars := C.lucy_Doc_IVARS(d)
+	hash := (*C.cfish_Hash)(ivars.fields)
+	return C.CFISH_Hash_Keys(hash)
 }
 
 //export GOLUCY_Doc_Equals
