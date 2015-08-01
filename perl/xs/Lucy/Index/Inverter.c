@@ -32,25 +32,10 @@ static lucy_InverterEntry*
 S_fetch_entry(pTHX_ lucy_Inverter *self, HE *hash_entry) {
     lucy_InverterIVARS *const ivars = lucy_Inverter_IVARS(self);
     lucy_Schema *const schema = ivars->schema;
-    char *key;
-    STRLEN key_len;
-    STRLEN he_key_len = HeKLEN(hash_entry);
+    STRLEN key_size;
+    const char *key = XSBind_hash_key_to_utf8(aTHX_ hash_entry, &key_size);
 
-    // Force field name to UTF-8 if necessary.
-    if (he_key_len == (STRLEN)HEf_SVKEY) {
-        SV *key_sv = HeKEY_sv(hash_entry);
-        key = SvPVutf8(key_sv, key_len);
-    }
-    else {
-        key = HeKEY(hash_entry);
-        key_len = he_key_len;
-        if (!cfish_StrHelp_utf8_valid(key, key_len)) {
-            SV *key_sv = HeSVKEY_force(hash_entry);
-            key = SvPVutf8(key_sv, key_len);
-        }
-    }
-
-    cfish_String *field = CFISH_SSTR_WRAP_UTF8(key, key_len);
+    cfish_String *field = CFISH_SSTR_WRAP_UTF8(key, key_size);
     int32_t field_num = LUCY_Seg_Field_Num(ivars->segment, field);
     if (!field_num) {
         // This field seems not to be in the segment yet.  Try to find it in
