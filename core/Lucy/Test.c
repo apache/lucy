@@ -77,6 +77,7 @@
 #include "Lucy/Test/Store/TestRAMFileHandle.h"
 #include "Lucy/Test/Store/TestRAMFolder.h"
 #include "Lucy/Test/TestSchema.h"
+#include "Lucy/Test/TestSimple.h"
 #include "Lucy/Test/Util/TestFreezer.h"
 #include "Lucy/Test/Util/TestIndexFileNames.h"
 #include "Lucy/Test/Util/TestJson.h"
@@ -136,6 +137,7 @@ Test_create_test_suite() {
     TestSuite_Add_Batch(suite, (TestBatch*)TestFType_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestSeg_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestHighlighter_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestSimple_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestSpan_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestHeatMap_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestTermQuery_new());
