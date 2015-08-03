@@ -252,7 +252,7 @@ lucy_MakeFile_new(chaz_CLI *cli) {
         self->host_src_dir = "xs";
     }
 	else if (chaz_CLI_defined(cli, "enable-go")) {
-        self->host_src_dir = "../c/src";
+        self->host_src_dir = "cfext";
 	}
     else {
         self->host_src_dir = "src";

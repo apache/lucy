@@ -84,12 +84,6 @@ public class Lucy::Analysis::RegexTokenizer
     Tokenize_Utf8(RegexTokenizer *self, const char *text, size_t len,
                   Inversion *inversion);
 
-    /** Set the compiled regular expression for matching a token.  Also sets
-     * `pattern` as a side effect.
-     */
-    void
-    Set_Token_RE(RegexTokenizer *self, void *token_re);
-
     public incremented Obj*
     Dump(RegexTokenizer *self);
 
