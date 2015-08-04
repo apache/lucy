@@ -113,12 +113,13 @@ test_c32(TestBatchRunner *runner) {
                                      mins[set_num], limits[set_num]);
         target = encoded;
         for (size_t i = 0; i < count; i++) {
+            ints[i] = (uint32_t)ints[i];
             NumUtil_encode_c32((uint32_t)ints[i], &target);
         }
         decode = encoded;
         skip   = encoded;
         for (size_t i = 0; i < count; i++) {
-            TEST_INT_EQ(runner, NumUtil_decode_c32(&decode), (long)ints[i],
+            TEST_INT_EQ(runner, NumUtil_decode_c32(&decode), ints[i],
                         "c32 %lu", (long)ints[i]);
             NumUtil_skip_cint(&skip);
             if (decode > limit) { THROW(ERR, "overrun"); }
@@ -136,7 +137,7 @@ test_c32(TestBatchRunner *runner) {
         decode = encoded;
         skip   = encoded;
         for (size_t i = 0; i < count; i++) {
-            TEST_INT_EQ(runner, NumUtil_decode_c32(&decode), (long)ints[i],
+            TEST_INT_EQ(runner, NumUtil_decode_c32(&decode), ints[i],
                         "padded c32 %lu", (long)ints[i]);
             NumUtil_skip_cint(&skip);
             if (decode > limit) { THROW(ERR, "overrun"); }
@@ -239,13 +240,14 @@ test_bigend_u32(TestBatchRunner *runner) {
     char     *target    = encoded;
 
     for (size_t i = 0; i < count; i++) {
+        ints[i] = (uint32_t)ints[i];
         NumUtil_encode_bigend_u32((uint32_t)ints[i], &target);
         target += sizeof(uint32_t);
     }
     target = encoded;
     for (size_t i = 0; i < count; i++) {
         uint32_t got = NumUtil_decode_bigend_u32(target);
-        TEST_INT_EQ(runner, got, (long)ints[i], "bigend u32");
+        TEST_INT_EQ(runner, got, ints[i], "bigend u32");
         target += sizeof(uint32_t);
     }
 
