@@ -46,7 +46,7 @@ to_clownfish(sv)
     SV *sv;
 CODE:
 {
-    cfish_Obj *obj = XSBind_perl_to_cfish(aTHX_ sv);
+    cfish_Obj *obj = XSBind_perl_to_cfish_nullable(aTHX_ sv, CFISH_OBJ);
     RETVAL = CFISH_OBJ_TO_SV_NOINC(obj);
 }
 OUTPUT: RETVAL

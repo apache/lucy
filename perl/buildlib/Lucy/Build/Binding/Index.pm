@@ -304,10 +304,7 @@ set_race_condition_debug1(val_sv)
 PPCODE:
     CFISH_DECREF(lucy_PolyReader_race_condition_debug1);
     lucy_PolyReader_race_condition_debug1 = (cfish_String*)
-        XSBind_maybe_sv_to_cfish_obj(aTHX_ val_sv, CFISH_STRING, NULL);
-    if (lucy_PolyReader_race_condition_debug1) {
-        (void)CFISH_INCREF(lucy_PolyReader_race_condition_debug1);
-    }
+        XSBind_perl_to_cfish_nullable(aTHX_ val_sv, CFISH_STRING);
 
 int32_t
 debug1_num_passes()

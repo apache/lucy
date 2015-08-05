@@ -467,18 +467,15 @@ CODE:
     }
     else if (strcmp(type_str, "FIELD") == 0) {
         type = LUCY_QPARSER_TOKEN_FIELD; 
-        value = CFISH_CERTIFY(XSBind_perl_to_cfish(aTHX_ value_sv),
-                              CFISH_STRING);
+        value = XSBind_perl_to_cfish(aTHX_ value_sv, CFISH_STRING);
     }
     else if (strcmp(type_str, "STRING") == 0) {
         type = LUCY_QPARSER_TOKEN_STRING; 
-        value = CFISH_CERTIFY(XSBind_perl_to_cfish(aTHX_ value_sv),
-                              CFISH_STRING);
+        value = XSBind_perl_to_cfish(aTHX_ value_sv, CFISH_STRING);
     }
     else if (strcmp(type_str, "QUERY") == 0) {
         type = LUCY_QPARSER_TOKEN_QUERY; 
-        value = CFISH_CERTIFY(XSBind_perl_to_cfish(aTHX_ value_sv),
-                              LUCY_QUERY);
+        value = XSBind_perl_to_cfish(aTHX_ value_sv, LUCY_QUERY);
     }
     else {
         CFISH_THROW(CFISH_ERR, "Bad type: '%s'", type_str);

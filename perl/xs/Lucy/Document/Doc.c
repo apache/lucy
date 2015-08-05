@@ -153,7 +153,7 @@ LUCY_Doc_Extract_IMP(lucy_Doc *self, cfish_String *field) {
                            -CFISH_Str_Get_Size(field), 0);
 
     if (sv_ptr) {
-        retval = XSBind_perl_to_cfish(aTHX_ *sv_ptr);
+        retval = XSBind_perl_to_cfish_nullable(aTHX_ *sv_ptr, CFISH_OBJ);
     }
 
     return retval;
@@ -188,8 +188,10 @@ LUCY_Doc_Dump_IMP(lucy_Doc *self) {
                           (cfish_Obj*)CFISH_Str_Clone(lucy_Doc_get_class_name(self)));
     CFISH_Hash_Store_Utf8(dump, "doc_id", 7,
                           (cfish_Obj*)cfish_Str_newf("%i32", ivars->doc_id));
+    SV *fields_sv = newRV_inc((SV*)ivars->fields);
     CFISH_Hash_Store_Utf8(dump, "fields", 6,
-                          XSBind_perl_to_cfish(aTHX_ (SV*)ivars->fields));
+                          XSBind_perl_to_cfish(aTHX_ fields_sv, CFISH_HASH));
+    SvREFCNT_dec(fields_sv);
     return dump;
 }
 
