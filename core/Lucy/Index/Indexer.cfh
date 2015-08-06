@@ -29,7 +29,7 @@ parcel Lucy;
  * identify itself by supplying an
  * [](cfish:IndexManager) with a unique
  * `host` id to Indexer's constructor or index corruption will
- * occur.  See [FileLocking](Lucy::Docs::FileLocking) for a detailed
+ * occur.  See [](FileLocking) for a detailed
  * discussion.
  *
  * Note: at present, [](cfish:.Delete_By_Term) and [](cfish:.Delete_By_Query) only affect
@@ -115,7 +115,7 @@ public class Lucy::Index::Indexer inherits Clownfish::Obj {
 
     /** Mark the document identified by the supplied document ID as deleted.
      *
-     * @param doc_id A [document id](Lucy::Docs::DocIDs).
+     * @param doc_id A [document id](DocIDs).
      */
     public void
     Delete_By_Doc_ID(Indexer *self, int32_t doc_id);
