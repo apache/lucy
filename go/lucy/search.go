@@ -40,14 +40,8 @@ type HitsIMP struct {
 }
 
 func OpenIndexSearcher(index interface{}) (obj IndexSearcher, err error) {
-	var indexC *C.cfish_Obj
-	switch index.(type) {
-	case string:
-		ixLoc := clownfish.NewString(index.(string))
-		indexC = (*C.cfish_Obj)(unsafe.Pointer(ixLoc.TOPTR()))
-	default:
-		panic("TODO: support Folder")
-	}
+	indexC := (*C.cfish_Obj)(clownfish.GoToClownfish(index, unsafe.Pointer(C.CFISH_OBJ), false))
+	defer C.cfish_decref(unsafe.Pointer(indexC))
 	err = clownfish.TrapErr(func() {
 		cfObj := C.lucy_IxSearcher_new(indexC)
 		obj = WRAPIndexSearcher(unsafe.Pointer(cfObj))
