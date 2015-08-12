@@ -18,11 +18,13 @@ package lucy
 
 /*
 #include "Lucy/Object/BitVector.h"
+#include "Lucy/Object/I32Array.h"
 */
 import "C"
 import "fmt"
+import "unsafe"
 
-import _ "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
+import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
 func (bv *BitVectorIMP) ToArray() []bool {
 	cap := bv.GetCapacity()
@@ -36,3 +38,14 @@ func (bv *BitVectorIMP) ToArray() []bool {
 	return bools
 }
 
+func NewI32Array(nums []int32) I32Array {
+	size := len(nums)
+	if int(C.uint32_t(size)) != size {
+		panic(clownfish.NewErr("input too large"))
+	}
+	obj := C.lucy_I32Arr_new_blank(C.uint32_t(size))
+	for i := 0; i < size; i++ {
+		C.LUCY_I32Arr_Set(obj, C.uint32_t(i), C.int32_t(nums[i]))
+	}
+	return WRAPI32Array(unsafe.Pointer(obj))
+}
