@@ -167,6 +167,10 @@ func specClasses(parcel *cfc.Parcel) {
 	orQueryBinding := cfc.NewGoClass(parcel, "Lucy::Search::ORQuery")
 	orQueryBinding.SetSuppressCtor(true)
 	orQueryBinding.Register()
+
+	bitVecBinding := cfc.NewGoClass(parcel, "Lucy::Object::BitVector")
+	bitVecBinding.SpecMethod("To_Array", "ToArray() []bool")
+	bitVecBinding.Register()
 }
 
 func build() {
