@@ -30,6 +30,12 @@ MockMatcher*
 MockMatcher_init(MockMatcher *self, I32Array *doc_ids, Blob *scores) {
     Matcher_init((Matcher*)self);
     MockMatcherIVARS *const ivars = MockMatcher_IVARS(self);
+    size_t num_doc_ids = I32Arr_Get_Size(doc_ids);
+    size_t num_scores = scores ? Blob_Get_Size(scores) / sizeof(float) : 0;
+    if (scores != NULL && num_scores != num_doc_ids) {
+        THROW(ERR, "Num doc IDs != num scores (%u64, %u64)",
+              (uint64_t)num_doc_ids, (uint64_t)num_scores);
+    }
     ivars->tick    = -1;
     ivars->size    = I32Arr_Get_Size(doc_ids);
     ivars->doc_ids = (I32Array*)INCREF(doc_ids);
