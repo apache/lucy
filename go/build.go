@@ -171,6 +171,10 @@ func specClasses(parcel *cfc.Parcel) {
 	bitVecBinding := cfc.NewGoClass(parcel, "Lucy::Object::BitVector")
 	bitVecBinding.SpecMethod("To_Array", "ToArray() []bool")
 	bitVecBinding.Register()
+
+	mockMatcherBinding := cfc.NewGoClass(parcel, "LucyX::Search::MockMatcher")
+	mockMatcherBinding.SetSuppressCtor(true)
+	mockMatcherBinding.Register()
 }
 
 func build() {

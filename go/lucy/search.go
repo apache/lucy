@@ -25,8 +25,16 @@ package lucy
 #include "Lucy/Search/ANDQuery.h"
 #include "Lucy/Search/ORQuery.h"
 #include "Lucy/Document/HitDoc.h"
+#include "LucyX/Search/MockMatcher.h"
+#include "Clownfish/Blob.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/HashIterator.h"
+
+static inline void
+float32_set(float *floats, size_t i, float value) {
+	floats[i] = value;
+}
+
 */
 import "C"
 import "fmt"
@@ -182,4 +190,21 @@ func NewORQuery(children []Query) ORQuery {
 	childrenC := (*C.cfish_Vector)(unsafe.Pointer(vec.TOPTR()))
 	cfObj := C.lucy_ORQuery_new(childrenC)
 	return WRAPORQuery(unsafe.Pointer(cfObj))
+}
+
+func newMockMatcher(docIDs []int32, scores []float32) MockMatcher {
+	docIDsconv := NewI32Array(docIDs)
+	docIDsCF := (*C.lucy_I32Array)(unsafe.Pointer(docIDsconv.TOPTR()))
+	var blob *C.cfish_Blob = nil
+	if scores != nil {
+		size := len(scores) * 4
+		floats := (*C.float)(C.malloc(C.size_t(size)))
+		for i := 0; i < len(scores); i++ {
+			C.float32_set(floats, C.size_t(i), C.float(scores[i]))
+		}
+		blob = C.cfish_Blob_new_steal((*C.char)(unsafe.Pointer(floats)), C.size_t(size))
+		defer C.cfish_decref(unsafe.Pointer(blob))
+	}
+	matcher := C.lucy_MockMatcher_new(docIDsCF, blob)
+	return WRAPMockMatcher(unsafe.Pointer(matcher))
 }

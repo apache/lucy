@@ -249,3 +249,22 @@ func TestLeafQueryBasics(t *testing.T) {
 	checkQueryEquals(t, query)
 	checkQueryToStringHasFoo(t, query)
 }
+
+func TestMockMatcherBasics(t *testing.T) {
+	matcher := newMockMatcher([]int32{42, 43, 100}, []float32{1.5, 1.5, 1.5})
+	if got := matcher.Next(); got != 42 {
+		t.Error("Next: %d", got)
+	}
+	if got := matcher.GetDocID(); got != 42 {
+		t.Error("GetDocID: %d", got)
+	}
+	if score := matcher.Score(); score != 1.5 {
+		t.Error("Score: %f", score)
+	}
+	if got := matcher.Advance(50); got != 100 {
+		t.Error("Advance: %d", got)
+	}
+	if got := matcher.Next(); got != 0 {
+		t.Error("Next (iteration finished): %d", got)
+	}
+}
