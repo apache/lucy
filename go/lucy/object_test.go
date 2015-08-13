@@ -119,4 +119,13 @@ func TestBitVecBool(t *testing.T) {
 	}
 }
 
-
+func TestI32ArrBasics(t *testing.T) {
+	arr := NewI32Array([]int32{42, 43})
+	if size := arr.GetSize(); size != 2 {
+		t.Errorf("Unexpected size: %d", size)
+	}
+	arr.Set(1, 101)
+	if got := arr.Get(1); got != 101 {
+		t.Errorf("Unexpected value: %d", got)
+	}
+}
