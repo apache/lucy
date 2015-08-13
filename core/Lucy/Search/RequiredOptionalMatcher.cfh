@@ -27,11 +27,11 @@ class Lucy::Search::RequiredOptionalMatcher nickname ReqOptMatcher
     bool          opt_matcher_first_time;
 
     inert incremented RequiredOptionalMatcher*
-    new(Similarity *similarity, Matcher *required_matcher,
+    new(Similarity *similarity = NULL, Matcher *required_matcher,
         Matcher *optional_matcher = NULL);
 
     inert RequiredOptionalMatcher*
-    init(RequiredOptionalMatcher *self, Similarity *similarity,
+    init(RequiredOptionalMatcher *self, Similarity *similarity = NULL,
          Matcher *required_matcher, Matcher *optional_matcher = NULL);
 
     public void
