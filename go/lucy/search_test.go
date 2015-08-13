@@ -268,3 +268,23 @@ func TestMockMatcherBasics(t *testing.T) {
 		t.Error("Next (iteration finished): %d", got)
 	}
 }
+
+func TestBitVecMatcherBasics(t *testing.T) {
+	bv := NewBitVector(0)
+	bv.Set(42)
+	bv.Set(43)
+	bv.Set(100)
+	matcher := NewBitVecMatcher(bv)
+	if got := matcher.Next(); got != 42 {
+		t.Error("Next: %d", got)
+	}
+	if got := matcher.GetDocID(); got != 42 {
+		t.Error("GetDocID: %d", got)
+	}
+	if got := matcher.Advance(50); got != 100 {
+		t.Error("Advance: %d", got)
+	}
+	if got := matcher.Next(); got != 0 {
+		t.Error("Next (iteration finished): %d", got)
+	}
+}
