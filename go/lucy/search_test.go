@@ -250,16 +250,17 @@ func TestLeafQueryBasics(t *testing.T) {
 	checkQueryToStringHasFoo(t, query)
 }
 
-func TestMockMatcherBasics(t *testing.T) {
-	matcher := newMockMatcher([]int32{42, 43, 100}, []float32{1.5, 1.5, 1.5})
+func checkMatcher(t *testing.T, matcher Matcher, supportsScore bool) {
 	if got := matcher.Next(); got != 42 {
 		t.Error("Next: %d", got)
 	}
 	if got := matcher.GetDocID(); got != 42 {
 		t.Error("GetDocID: %d", got)
 	}
-	if score := matcher.Score(); score != 1.5 {
-		t.Error("Score: %f", score)
+	if supportsScore {
+		if score := matcher.Score(); score != 2 {
+			t.Error("Score: %f", score)
+		}
 	}
 	if got := matcher.Advance(50); got != 100 {
 		t.Error("Advance: %d", got)
@@ -269,22 +270,52 @@ func TestMockMatcherBasics(t *testing.T) {
 	}
 }
 
+func TestMockMatcherBasics(t *testing.T) {
+	matcher := newMockMatcher([]int32{42, 43, 100}, []float32{2,2,2})
+	checkMatcher(t, matcher, true)
+}
+
 func TestBitVecMatcherBasics(t *testing.T) {
 	bv := NewBitVector(0)
 	bv.Set(42)
 	bv.Set(43)
 	bv.Set(100)
 	matcher := NewBitVecMatcher(bv)
-	if got := matcher.Next(); got != 42 {
-		t.Error("Next: %d", got)
-	}
-	if got := matcher.GetDocID(); got != 42 {
-		t.Error("GetDocID: %d", got)
-	}
-	if got := matcher.Advance(50); got != 100 {
-		t.Error("Advance: %d", got)
-	}
-	if got := matcher.Next(); got != 0 {
-		t.Error("Next (iteration finished): %d", got)
-	}
+	checkMatcher(t, matcher, false)
+}
+
+func TestANDMatcherBasics(t *testing.T) {
+	a := newMockMatcher([]int32{42, 43, 99, 100}, []float32{1,1,1,1})
+	b := newMockMatcher([]int32{1, 42, 43, 100}, []float32{1,1,1,1})
+	matcher := NewANDMatcher([]Matcher{a, b}, nil)
+	checkMatcher(t, matcher, true)
+}
+
+func TestORMatcherBasics(t *testing.T) {
+	a := newMockMatcher([]int32{42, 43}, nil)
+	b := newMockMatcher([]int32{42, 100}, nil)
+	matcher := NewORMatcher([]Matcher{a, b})
+	checkMatcher(t, matcher, false)
+}
+
+func TestORScorerBasics(t *testing.T) {
+	a := newMockMatcher([]int32{42, 43}, []float32{1,1})
+	b := newMockMatcher([]int32{42, 100}, []float32{1,1})
+	matcher := NewORScorer([]Matcher{a, b}, nil)
+	checkMatcher(t, matcher, true)
+}
+
+func TestReqOptMatcherBasics(t *testing.T) {
+	req := newMockMatcher([]int32{42, 43, 100}, []float32{1,1,1})
+	opt := newMockMatcher([]int32{1, 42, 99, 100}, []float32{1,1,1,1})
+	matcher := NewRequiredOptionalMatcher(nil, req, opt)
+	checkMatcher(t, matcher, true)
+}
+
+func TestNOTMatcherBasics(t *testing.T) {
+	a := newMockMatcher([]int32{1, 42, 43, 99, 100}, nil)
+	b := newMockMatcher([]int32{1, 99}, nil)
+	notB := NewNOTMatcher(b, 999)
+	matcher := NewANDMatcher([]Matcher{a, notB}, nil)
+	checkMatcher(t, matcher, false)
 }
