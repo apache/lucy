@@ -144,8 +144,7 @@ func specClasses(parcel *cfc.Parcel) {
 	indexerBinding.Register()
 
 	schemaBinding := cfc.NewGoClass(parcel, "Lucy::Plan::Schema")
-	schemaBinding.SpecMethod("Spec_Field",
-		"SpecField(field string, fieldType FieldType)")
+	schemaBinding.SpecMethod("All_Fields", "AllFields() []string")
 	schemaBinding.Register()
 
 	searcherBinding := cfc.NewGoClass(parcel, "Lucy::Search::Searcher")
