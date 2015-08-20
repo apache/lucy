@@ -632,10 +632,6 @@ END_CONSTRUCTOR_CODE_SAMPLE
         parcel     => "Lucy",
         class_name => "Lucy::Search::Query",
     );
-    $binding->bind_method(
-        alias  => '_load',
-        method => 'Load',
-    );
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);

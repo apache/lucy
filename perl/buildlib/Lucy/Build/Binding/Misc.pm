@@ -41,32 +41,6 @@ CODE:
 OUTPUT:
     RETVAL
 
-SV*
-to_clownfish(sv)
-    SV *sv;
-CODE:
-{
-    cfish_Obj *obj = XSBind_perl_to_cfish_nullable(aTHX_ sv, CFISH_OBJ);
-    RETVAL = CFISH_OBJ_TO_SV_NOINC(obj);
-}
-OUTPUT: RETVAL
-
-SV*
-to_perl(sv)
-    SV *sv;
-CODE:
-{
-    if (sv_isobject(sv) && sv_derived_from(sv, "Clownfish::Obj")) {
-        IV tmp = SvIV(SvRV(sv));
-        cfish_Obj* obj = INT2PTR(cfish_Obj*, tmp);
-        RETVAL = XSBind_cfish_to_perl(aTHX_ obj);
-    }
-    else {
-        RETVAL = newSVsv(sv);
-    }
-}
-OUTPUT: RETVAL
-
 void
 STORABLE_freeze(self, ...)
     cfish_Obj *self;

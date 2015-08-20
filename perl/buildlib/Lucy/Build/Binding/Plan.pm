@@ -151,10 +151,6 @@ END_SYNOPSIS
         class_name => "Lucy::Plan::FieldType",
     );
     $binding->bind_constructor( alias => 'new', initializer => 'init2' );
-    $binding->bind_method(
-        alias  => '_load',
-        method => 'Load',
-    );
     $binding->set_pod_spec($pod_spec);
     $binding->add_class_alias("KinoSearch::Plan::FieldType");
     $binding->add_class_alias("KinoSearch::FieldType");
@@ -281,10 +277,6 @@ END_CONSTRUCTOR
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Plan::Schema",
-    );
-    $binding->bind_method(
-        alias  => '_load',
-        method => 'Load',
     );
     $binding->set_pod_spec($pod_spec);
     $binding->add_class_alias("KinoSearch::Plan::Schema");
