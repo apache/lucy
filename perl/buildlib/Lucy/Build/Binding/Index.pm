@@ -46,8 +46,6 @@ sub bind_all {
 }
 
 sub bind_backgroundmerger {
-    my @exposed = qw( Commit Prepare_Commit Optimize );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $bg_merger = Lucy::Index::BackgroundMerger->new(
@@ -63,7 +61,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -75,16 +72,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_datareader {
-    my @exposed = qw(
-        Get_Schema
-        Get_Folder
-        Get_Snapshot
-        Get_Segments
-        Get_Segment
-        Get_Seg_Tick
-        Aggregator
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     # Abstract base class.
@@ -100,7 +87,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -112,21 +98,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_datawriter {
-    my @exposed = qw(
-        Add_Inverted_Doc
-        Add_Segment
-        Delete_Segment
-        Merge_Segment
-        Finish
-        Format
-        Metadata
-        Get_Snapshot
-        Get_Segment
-        Get_PolyReader
-        Get_Schema
-        Get_Folder
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<END_SYNOPSIS;
     # Abstract base class.
@@ -140,7 +111,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -152,13 +122,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_deletionswriter {
-    my @exposed = qw(
-        Delete_By_Term
-        Delete_By_Query
-        Updated
-        Seg_Del_Count
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $polyreader  = $del_writer->get_polyreader;
@@ -169,7 +132,6 @@ sub bind_deletionswriter {
     }
 END_SYNOPSIS
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -181,15 +143,12 @@ END_SYNOPSIS
 }
 
 sub bind_docreader {
-    my @exposed = qw( Fetch_Doc Aggregator );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $doc_reader = $seg_reader->obtain("Lucy::Index::DocReader");
     my $doc        = $doc_reader->fetch_doc($doc_id);
 END_SYNOPSIS
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -201,18 +160,6 @@ END_SYNOPSIS
 }
 
 sub bind_indexmanager {
-    my @exposed = qw(
-        Make_Write_Lock
-        Recycle
-        Set_Folder
-        Get_Folder
-        Get_Host
-        Set_Write_Lock_Timeout
-        Get_Write_Lock_Timeout
-        Set_Write_Lock_Interval
-        Get_Write_Lock_Interval
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     use Sys::Hostname qw( hostname );
@@ -241,7 +188,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -253,16 +199,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_indexreader {
-    my @exposed = qw(
-        Doc_Max
-        Doc_Count
-        Del_Count
-        Seg_Readers
-        Offsets
-        Fetch
-        Obtain
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $reader = Lucy::Index::IndexReader->open(
@@ -293,7 +229,6 @@ END_CONSTRUCTOR
         initializer => 'do_open',
         sample      => $constructor,
     );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy    PACKAGE = Lucy::Index::IndexReader
@@ -330,16 +265,6 @@ END_XS_CODE
 }
 
 sub bind_indexer {
-    my @exposed = qw(
-        Add_Index
-        Optimize
-        Commit
-        Prepare_Commit
-        Delete_By_Term
-        Delete_By_Query
-        Delete_By_Doc_ID
-        Get_Schema
-    );
     my @hand_rolled = qw( Add_Doc );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
@@ -435,7 +360,6 @@ END_ADD_DOC_POD
         alias  => 'add_doc',
         pod    => $add_doc_pod,
     );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy  PACKAGE = Lucy::Index::Indexer
@@ -516,13 +440,6 @@ END_XS_CODE
 }
 
 sub bind_lexicon {
-    my @exposed = qw(
-        Seek
-        Next
-        Get_Term
-        Reset
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $lex_reader = $seg_reader->obtain('Lucy::Index::LexiconReader');
@@ -532,7 +449,6 @@ sub bind_lexicon {
     }
 END_SYNOPSIS
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -544,15 +460,12 @@ END_SYNOPSIS
 }
 
 sub bind_lexiconreader {
-    my @exposed = qw( Lexicon Doc_Freq );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $lex_reader = $seg_reader->obtain("Lucy::Index::LexiconReader");
     my $lexicon    = $lex_reader->lexicon( field => 'title' );
 END_SYNOPSIS
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -637,14 +550,6 @@ END_XS_CODE
 }
 
 sub bind_postinglist {
-    my @exposed = qw(
-        Next
-        Advance
-        Get_Doc_ID
-        Get_Doc_Freq
-        Seek
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $posting_list_reader 
@@ -658,7 +563,6 @@ sub bind_postinglist {
     }
 END_SYNOPSIS
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -670,8 +574,6 @@ END_SYNOPSIS
 }
 
 sub bind_postinglistreader {
-    my @exposed = qw( Posting_List );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $posting_list_reader 
@@ -682,7 +584,6 @@ sub bind_postinglistreader {
     );
 END_SYNOPSIS
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -714,11 +615,6 @@ END_XS
 }
 
 sub bind_segreader {
-    my @exposed = qw(
-        Get_Seg_Name
-        Get_Seg_Num
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $polyreader = Lucy::Index::IndexReader->open(
@@ -737,7 +633,6 @@ sub bind_segreader {
     }
 END_SYNOPSIS
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -749,15 +644,7 @@ END_SYNOPSIS
 }
 
 sub bind_segwriter {
-    my @exposed = qw(
-        Add_Doc
-        Add_Writer
-        Register
-        Fetch
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -769,18 +656,6 @@ sub bind_segwriter {
 }
 
 sub bind_segment {
-    my @exposed = qw(
-        Add_Field
-        Store_Metadata
-        Fetch_Metadata
-        Field_Num
-        Field_Name
-        Get_Name
-        Get_Number
-        Set_Count
-        Get_Count
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     # Index-time.
@@ -814,7 +689,6 @@ sub bind_segment {
     }
 END_SYNOPSIS
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -826,9 +700,6 @@ END_SYNOPSIS
 }
 
 sub bind_similarity {
-    my @exposed = qw(
-        Length_Norm
-    );
     my @hand_rolled = qw( Get_Norm_Decoder );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
@@ -845,7 +716,6 @@ END_SYNOPSIS
     my $constructor = qq|    my \$sim = Lucy::Index::Similarity->new;\n|;
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy    PACKAGE = Lucy::Index::Similarity
@@ -871,17 +741,6 @@ END_XS_CODE
 }
 
 sub bind_snapshot {
-    my @exposed = qw(
-        List
-        Num_Entries
-        Add_Entry
-        Delete_Entry
-        Read_File
-        Write_File
-        Set_Path
-        Get_Path
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $snapshot = Lucy::Index::Snapshot->new;
@@ -894,7 +753,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",

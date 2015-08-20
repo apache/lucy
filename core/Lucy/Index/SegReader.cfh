@@ -62,7 +62,7 @@ public class Lucy::Index::SegReader inherits Lucy::Index::IndexReader {
      * interface implemented by `component`.
      * @param component A DataReader.
      */
-    public void
+    void
     Register(SegReader *self, String *api,
              decremented DataReader *component);
 

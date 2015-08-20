@@ -62,7 +62,7 @@ class Lucy::Index::PolyDocReader inherits Lucy::Index::DocReader {
     public incremented HitDoc*
     Fetch_Doc(PolyDocReader *self, int32_t doc_id);
 
-    public void
+    void
     Close(PolyDocReader *self);
 
     public void
@@ -92,7 +92,7 @@ class Lucy::Index::DefaultDocReader nickname DefDocReader
     void
     Read_Record(DefaultDocReader *self, ByteBuf *buffer, int32_t doc_id);
 
-    public void
+    void
     Close(DefaultDocReader *self);
 
     public void

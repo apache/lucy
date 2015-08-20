@@ -71,7 +71,7 @@ class Lucy::Index::DefaultPostingListReader nickname DefPListReader
     LexiconReader*
     Get_Lex_Reader(DefaultPostingListReader *self);
 
-    public void
+    void
     Close(DefaultPostingListReader *self);
 
     public void

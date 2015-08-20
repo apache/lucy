@@ -82,7 +82,7 @@ public class Lucy::Index::PolyReader inherits Lucy::Index::IndexReader {
     Vector*
     Get_Seg_Readers(PolyReader *self);
 
-    public void
+    void
     Close(PolyReader *self);
 
     public void

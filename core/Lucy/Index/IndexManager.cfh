@@ -105,45 +105,45 @@ public class Lucy::Index::IndexManager nickname IxManager
     /** Create the Lock which grants permission to delete obsolete snapshot
      * files or any file listed within an existing snapshot file.
      */
-    public incremented Lock*
+    incremented Lock*
     Make_Deletion_Lock(IndexManager *self);
 
-    public incremented Lock*
+    incremented Lock*
     Make_Merge_Lock(IndexManager *self);
 
     /** Write supplied data to "merge.json".  Throw an exception if the write
      * fails.
      */
-    public void
+    void
     Write_Merge_Data(IndexManager *self, int64_t cutoff);
 
     /** Look for the "merge.json" file dropped by BackgroundMerger.  If it's
      * not there, return NULL.  If it's there but can't be decoded, return an
      * empty Hash.  If successfully decoded, return contents.
      */
-    public incremented Hash*
+    incremented Hash*
     Read_Merge_Data(IndexManager *self);
 
-    public bool
+    bool
     Remove_Merge_Data(IndexManager *self);
 
     /** Create a shared lock on a snapshot file, which serves as a proxy for
      * all the files it lists and indicates that they must not be deleted.
      */
-    public incremented Lock*
+    incremented Lock*
     Make_Snapshot_Read_Lock(IndexManager *self, String *filename);
 
     /** Return the highest number for a segment directory which contains a
      * segmeta file in the snapshot.
      */
-    public int64_t
+    int64_t
     Highest_Seg_Num(IndexManager *self, Snapshot *snapshot);
 
     /** Return the name of a new snapshot file, which shall contain a base-36
      * "generation" embedded inside it greater than the generation of any
      * snapshot file currently in the index folder.
      */
-    public incremented String*
+    incremented String*
     Make_Snapshot_Filename(IndexManager *self);
 
     /** Setter for write lock timeout.  Default: 1000 milliseconds.
@@ -168,42 +168,42 @@ public class Lucy::Index::IndexManager nickname IxManager
 
     /** Setter for merge lock timeout.  Default: 0 milliseconds (no retries).
      */
-    public void
+    void
     Set_Merge_Lock_Timeout(IndexManager *self, uint32_t timeout);
 
     /** Getter for merge lock timeout.
      */
-    public uint32_t
+    uint32_t
     Get_Merge_Lock_Timeout(IndexManager *self);
 
     /** Setter for merge lock retry interval.  Default: 1000 milliseconds.
      */
-    public void
+    void
     Set_Merge_Lock_Interval(IndexManager *self, uint32_t timeout);
 
     /** Getter for merge lock retry interval.
      */
-    public uint32_t
+    uint32_t
     Get_Merge_Lock_Interval(IndexManager *self);
 
     /** Setter for deletion lock timeout.  Default: 1000 milliseconds.
      */
-    public void
+    void
     Set_Deletion_Lock_Timeout(IndexManager *self, uint32_t timeout);
 
     /** Getter for deletion lock timeout.
      */
-    public uint32_t
+    uint32_t
     Get_Deletion_Lock_Timeout(IndexManager *self);
 
     /** Setter for deletion lock retry interval.  Default: 100 milliseconds.
      */
-    public void
+    void
     Set_Deletion_Lock_Interval(IndexManager *self, uint32_t timeout);
 
     /** Getter for deletion lock retry interval.
      */
-    public uint32_t
+    uint32_t
     Get_Deletion_Lock_Interval(IndexManager *self);
 }
 

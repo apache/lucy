@@ -45,7 +45,7 @@ class Lucy::Index::RawLexicon nickname RawLex
     public nullable Obj*
     Get_Term(RawLexicon *self);
 
-    public int32_t
+    int32_t
     Doc_Freq(RawLexicon *self);
 }
 

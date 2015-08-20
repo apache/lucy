@@ -57,7 +57,7 @@ class Lucy::Index::DefaultSortReader nickname DefSortReader
     nullable SortCache*
     Fetch_Sort_Cache(DefaultSortReader *self, String *field);
 
-    public void
+    void
     Close(DefaultSortReader *self);
 
     public void
