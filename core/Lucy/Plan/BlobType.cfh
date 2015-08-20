@@ -48,10 +48,10 @@ public class Lucy::Plan::BlobType inherits Lucy::Plan::FieldType {
     incremented Hash*
     Dump_For_Schema(BlobType *self);
 
-    public incremented Hash*
+    incremented Hash*
     Dump(BlobType *self);
 
-    public incremented BlobType*
+    incremented BlobType*
     Load(BlobType *self, Obj *dump);
 
     public bool

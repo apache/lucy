@@ -29,10 +29,10 @@ class Lucy::Test::Plan::TestArchitecture nickname TestArch
     inert TestArchitecture*
     init(TestArchitecture *self);
 
-    public int32_t
+    int32_t
     Index_Interval(TestArchitecture *self);
 
-    public int32_t
+    int32_t
     Skip_Interval(TestArchitecture *self);
 }
 

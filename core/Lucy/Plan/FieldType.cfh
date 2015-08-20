@@ -135,7 +135,7 @@ public abstract class Lucy::Plan::FieldType nickname FType
      * @return a negative number if a is "less than" b, 0 if they are "equal",
      * and a positive number if a is "greater than" b.
      */
-    public int32_t
+    int32_t
     Compare_Values(FieldType *self, Obj *a, Obj *b);
 
     /** NULL-safe comparison wrapper which sorts NULLs towards the back.
@@ -159,10 +159,10 @@ public abstract class Lucy::Plan::FieldType nickname FType
     abstract incremented Hash*
     Dump_For_Schema(FieldType *self);
 
-    public abstract incremented Obj*
+    abstract incremented Obj*
     Dump(FieldType *self);
 
-    public abstract incremented Obj*
+    abstract incremented Obj*
     Load(FieldType *self, Obj *dump);
 
     /** Compares all common properties.

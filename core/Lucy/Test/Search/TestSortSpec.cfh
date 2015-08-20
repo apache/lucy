@@ -37,7 +37,7 @@ class Lucy::Test::Search::TestReverseType inherits Lucy::Plan::Int32Type {
     init2(TestReverseType *self, float boost = 1.0, bool indexed = true,
           bool stored = true, bool sortable = false);
 
-    public int32_t
+    int32_t
     Compare_Values(TestReverseType *self, Obj *a, Obj *b);
 }
 
