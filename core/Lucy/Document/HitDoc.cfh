@@ -53,10 +53,10 @@ public class Lucy::Document::HitDoc inherits Lucy::Document::Doc {
     public bool
     Equals(HitDoc *self, Obj *other);
 
-    public incremented Hash*
+    incremented Hash*
     Dump(HitDoc *self);
 
-    public incremented HitDoc*
+    incremented HitDoc*
     Load(HitDoc *self, Obj *dump);
 
     void
