@@ -32,6 +32,8 @@ public abstract class Lucy::Analysis::Analyzer inherits Clownfish::Obj {
     /** Take a single [](cfish:Inversion) as input
      * and returns an Inversion, either the same one (presumably transformed
      * in some way), or a new one.
+     *
+     * @param inversion An inversion.
      */
     public abstract incremented Inversion*
     Transform(Analyzer *self, Inversion *inversion);
@@ -40,18 +42,41 @@ public abstract class Lucy::Analysis::Analyzer inherits Clownfish::Obj {
      * The default implementation simply creates an initial Inversion with a
      * single Token, then calls [](cfish:.Transform), but occasionally subclasses will
      * provide an optimized implementation which minimizes string copies.
+     *
+     * @param text A string.
      */
     public incremented Inversion*
     Transform_Text(Analyzer *self, String *text);
 
     /** Analyze text and return an array of token texts.
+     *
+     * @param text A string.
      */
     public incremented Vector*
     Split(Analyzer *self, String *text);
 
+    /** Dump the analyzer as hash.
+     *
+     * Subclasses should call [](.Dump) on the superclass. The returned
+     * object is a hash which should be populated with parameters of
+     * the analyzer.
+     *
+     * @return A hash containing a description of the analyzer.
+     */
     public incremented Obj*
     Dump(Analyzer *self);
 
+    /** Reconstruct an analyzer from a dump.
+     *
+     * Subclasses should first call [](.Load) on the superclass. The
+     * returned object is an analyzer which should be reconstructed by
+     * setting the dumped parameters from the hash contained in `dump`.
+     *
+     * Note that the invocant analyzer is unused.
+     *
+     * @param dump A hash.
+     * @return An analyzer.
+     */
     public incremented Obj*
     Load(Analyzer *self, Obj *dump);
 }

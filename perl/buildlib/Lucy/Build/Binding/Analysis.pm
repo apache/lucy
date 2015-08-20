@@ -35,13 +35,8 @@ sub bind_all {
 }
 
 sub bind_analyzer {
-    my @exposed = qw(
-        Split
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     $pod_spec->set_synopsis("    # Abstract base class.\n");
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -178,8 +173,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_polyanalyzer {
-    my @exposed = qw( Get_Analyzers );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $schema = Lucy::Plan::Schema->new;
@@ -201,7 +194,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
