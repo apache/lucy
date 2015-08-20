@@ -47,10 +47,10 @@ public class Lucy::Search::NoMatchQuery inherits Lucy::Search::Query {
     public incremented NoMatchQuery*
     Load(NoMatchQuery *self, Obj *dump);
 
-    public void
+    void
     Serialize(NoMatchQuery *self, OutStream *outstream);
 
-    public incremented NoMatchQuery*
+    incremented NoMatchQuery*
     Deserialize(decremented NoMatchQuery *self, InStream *instream);
 
     public bool

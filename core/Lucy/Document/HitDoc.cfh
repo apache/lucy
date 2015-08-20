@@ -59,10 +59,10 @@ public class Lucy::Document::HitDoc inherits Lucy::Document::Doc {
     public incremented HitDoc*
     Load(HitDoc *self, Obj *dump);
 
-    public void
+    void
     Serialize(HitDoc *self, OutStream *outstream);
 
-    public incremented HitDoc*
+    incremented HitDoc*
     Deserialize(decremented HitDoc *self, InStream *instream);
 }
 

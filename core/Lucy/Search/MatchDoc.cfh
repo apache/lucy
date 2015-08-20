@@ -31,10 +31,10 @@ class Lucy::Search::MatchDoc inherits Clownfish::Obj {
     inert MatchDoc*
     init(MatchDoc *self, int32_t doc_id, float score, Vector *values = NULL);
 
-    public void
+    void
     Serialize(MatchDoc *self, OutStream *outstream);
 
-    public incremented MatchDoc*
+    incremented MatchDoc*
     Deserialize(decremented MatchDoc *self, InStream *instream);
 
     int32_t

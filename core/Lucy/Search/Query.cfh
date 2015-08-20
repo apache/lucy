@@ -71,10 +71,10 @@ public class Lucy::Search::Query inherits Clownfish::Obj {
     public float
     Get_Boost(Query *self);
 
-    public void
+    void
     Serialize(Query *self, OutStream *outstream);
 
-    public incremented Query*
+    incremented Query*
     Deserialize(decremented Query *self, InStream *instream);
 
     public incremented Obj*

@@ -132,10 +132,10 @@ public class Lucy::Index::Similarity nickname Sim inherits Clownfish::Obj {
     public bool
     Equals(Similarity *self, Obj *other);
 
-    public void
+    void
     Serialize(Similarity *self, OutStream *outstream);
 
-    public incremented Similarity*
+    incremented Similarity*
     Deserialize(decremented Similarity *self, InStream *instream);
 }
 

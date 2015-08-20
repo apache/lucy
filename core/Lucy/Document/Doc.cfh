@@ -86,10 +86,10 @@ public class Lucy::Document::Doc inherits Clownfish::Obj {
     public bool
     Equals(Doc *self, Obj *other);
 
-    public void
+    void
     Serialize(Doc *self, OutStream *outstream);
 
-    public incremented Doc*
+    incremented Doc*
     Deserialize(decremented Doc *self, InStream *instream);
 
     public incremented Hash*
