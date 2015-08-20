@@ -26,23 +26,6 @@ sub bind_all {
 }
 
 sub bind_bitvector {
-    my @exposed = qw(
-        Get
-        Set
-        Clear
-        Clear_All
-        And
-        Or
-        And_Not
-        Xor
-        Flip
-        Flip_Block
-        Next_Hit
-        To_Array
-        Grow
-        Count
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $bit_vec = Lucy::Object::BitVector->new( capacity => 8 );
@@ -59,7 +42,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",

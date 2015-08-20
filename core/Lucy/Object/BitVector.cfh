@@ -94,7 +94,7 @@ public class Lucy::Object::BitVector nickname BitVec
      *
      * @param other Another BitVector.
      */
-    public void
+    void
     Mimic(BitVector *self, Obj *other);
 
     /** Modify the BitVector so that only bits which remain set are those
