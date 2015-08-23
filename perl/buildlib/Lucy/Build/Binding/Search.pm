@@ -51,8 +51,6 @@ sub bind_all {
 }
 
 sub bind_andquery {
-    my @exposed = qw( Add_Child );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $foo_and_bar_query = Lucy::Search::ANDQuery->new(
@@ -68,7 +66,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -80,8 +77,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_collector {
-    my @exposed = qw( Collect );
-
     my $pod_spec    = Clownfish::CFC::Binding::Perl::Pod->new;
     my $constructor = <<'END_CONSTRUCTOR';
     package MyCollector;
@@ -96,7 +91,6 @@ sub bind_collector {
 END_CONSTRUCTOR
     $pod_spec->set_synopsis("    # Abstract base class.\n");
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -108,8 +102,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_bitcollector {
-    my @exposed = qw( Collect );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $bit_vec = Lucy::Object::BitVector->new(
@@ -130,7 +122,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -142,17 +133,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_compiler {
-    my @exposed = qw(
-        Make_Matcher
-        Get_Weight
-        Sum_Of_Squared_Weights
-        Apply_Norm_Factor
-        Normalize
-        Get_Parent
-        Get_Similarity
-        Highlight_Spans
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     # (Compiler is an abstract base class.)
@@ -174,7 +154,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR_CODE_SAMPLE
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -187,8 +166,6 @@ END_CONSTRUCTOR_CODE_SAMPLE
 }
 
 sub bind_hits {
-    my @exposed = qw( Next Total_Hits );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $hits = $searcher->hits(
@@ -201,7 +178,6 @@ sub bind_hits {
     }
 END_SYNOPSIS
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -213,16 +189,6 @@ END_SYNOPSIS
 }
 
 sub bind_indexsearcher {
-    my @exposed = qw(
-        Hits
-        Collect
-        Doc_Max
-        Doc_Freq
-        Fetch_Doc
-        Get_Schema
-        Get_Reader
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $searcher = Lucy::Search::IndexSearcher->new( 
@@ -241,7 +207,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -253,8 +218,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_leafquery {
-    my @exposed = qw( Get_Field Get_Text );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     package MyQueryParser;
@@ -281,7 +244,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -309,13 +271,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_matcher {
-    my @exposed = qw(
-        Next
-        Advance
-        Get_Doc_ID
-        Score
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     # abstract base class
@@ -325,7 +280,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR_CODE_SAMPLE
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -337,11 +291,6 @@ END_CONSTRUCTOR_CODE_SAMPLE
 }
 
 sub bind_notquery {
-    my @exposed = qw(
-        Get_Negated_Query
-        Set_Negated_Query
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $not_bar_query = Lucy::Search::NOTQuery->new( 
@@ -360,7 +309,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -388,8 +336,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_orquery {
-    my @exposed = qw( Add_Child );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $foo_or_bar_query = Lucy::Search::ORQuery->new(
@@ -405,7 +351,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -499,8 +444,6 @@ END_XS_CODE
 }
 
 sub bind_phrasequery {
-    my @exposed = qw( Get_Field Get_Terms );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $phrase_query = Lucy::Search::PhraseQuery->new( 
@@ -511,7 +454,6 @@ sub bind_phrasequery {
 END_SYNOPSIS
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new' );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -559,14 +501,6 @@ END_SYNOPSIS
 }
 
 sub bind_polysearcher {
-    my @exposed = qw(
-        Hits
-        Doc_Max
-        Doc_Freq
-        Fetch_Doc
-        Get_Schema
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $schema = MySchema->new;
@@ -587,7 +521,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -599,8 +532,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_query {
-    my @exposed = qw( Make_Compiler Set_Boost Get_Boost );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     # Query is an abstract base class.
@@ -626,7 +557,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR_CODE_SAMPLE
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -638,21 +568,6 @@ END_CONSTRUCTOR_CODE_SAMPLE
 }
 
 sub bind_queryparser {
-    my @exposed = qw(
-        Parse
-        Tree
-        Expand
-        Expand_Leaf
-        Prune
-        Set_Heed_Colons
-        Make_Term_Query
-        Make_Phrase_Query
-        Make_AND_Query
-        Make_OR_Query
-        Make_NOT_Query
-        Make_Req_Opt_Query
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $query_parser = Lucy::Search::QueryParser->new(
@@ -672,7 +587,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -724,13 +638,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_requiredoptionalquery {
-    my @exposed = qw(
-        Get_Required_Query
-        Set_Required_Query
-        Get_Optional_Query
-        Set_Optional_Query
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $foo_and_maybe_bar = Lucy::Search::RequiredOptionalQuery->new(
@@ -748,7 +655,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -760,16 +666,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_searcher {
-    my @exposed = qw(
-        Hits
-        Collect
-        Glean_Query
-        Doc_Max
-        Doc_Freq
-        Fetch_Doc
-        Get_Schema
-    );
-
     my $pod_spec    = Clownfish::CFC::Binding::Perl::Pod->new;
     my $constructor = <<'END_CONSTRUCTOR';
     package MySearcher;
@@ -782,7 +678,6 @@ sub bind_searcher {
 END_CONSTRUCTOR
     $pod_spec->set_synopsis("    # Abstract base class.\n");
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -794,8 +689,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_sortrule {
-    my @exposed = qw( Get_Field Get_Reverse );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $sort_spec = Lucy::Search::SortSpec->new(
@@ -816,7 +709,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Search::SortRule
@@ -881,15 +773,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_span {
-    my @exposed = qw(
-        Set_Offset
-        Get_Offset
-        Set_Length
-        Get_Length
-        Set_Weight
-        Get_Weight
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $combined_length = $upper_span->get_length
@@ -909,7 +792,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -921,8 +803,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_termquery {
-    my @exposed = qw( Get_Field Get_Term );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $term_query = Lucy::Search::TermQuery->new(
@@ -939,7 +819,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",

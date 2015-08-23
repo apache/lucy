@@ -71,10 +71,10 @@ class Lucy::Search::Collector::SortCollector nickname SortColl
     uint32_t
     Get_Total_Hits(SortCollector *self);
 
-    public void
+    void
     Set_Reader(SortCollector *self, SegReader *reader);
 
-    public bool
+    bool
     Need_Score(SortCollector *self);
 
     public void

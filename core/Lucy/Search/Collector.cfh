@@ -24,7 +24,7 @@ parcel Lucy;
  *
  * Collectors operate on individual segments, but must operate within the
  * context of a larger collection.  Each time the collector moves to a new
- * segment, [](cfish:.Set_Reader), [](cfish:.Set_Base) and [](cfish:.Set_Matcher) will be called, and the
+ * segment, Set_Reader(), Set_Base() and Set_Matcher() will be called, and the
  * collector must take the updated information into account.
  */
 
@@ -53,24 +53,24 @@ public abstract class Lucy::Search::Collector nickname Coll
 
     /** Setter for "reader".
      */
-    public void
+    void
     Set_Reader(Collector *self, SegReader *reader);
 
     /** Set the "base" document id, an offset which must be added to the
      * `doc_id` supplied via [](cfish:.Collect) to get the doc id for the
      * larger index.
      */
-    public void
+    void
     Set_Base(Collector *self, int32_t base);
 
     /** Indicate whether the Collector will call [](cfish:Matcher.Score) on its Matcher.
      */
-    public abstract bool
+    abstract bool
     Need_Score(Collector *self);
 
     /** Setter for "matcher".
      */
-    public void
+    void
     Set_Matcher(Collector *self, Matcher *matcher);
 }
 
@@ -101,7 +101,7 @@ public class Lucy::Search::Collector::BitCollector nickname BitColl
 
     /** Returns false, since BitCollector requires only doc ids.
      */
-    public bool
+    bool
     Need_Score(BitCollector *self);
 }
 
@@ -127,16 +127,16 @@ class Lucy::Search::Collector::OffsetCollector nickname OffsetColl
     public void
     Collect(OffsetCollector *self, int32_t doc_id);
 
-    public bool
+    bool
     Need_Score(OffsetCollector *self);
 
-    public void
+    void
     Set_Reader(OffsetCollector *self, SegReader *reader);
 
-    public void
+    void
     Set_Base(OffsetCollector *self, int32_t base);
 
-    public void
+    void
     Set_Matcher(OffsetCollector *self, Matcher *matcher);
 }
 
