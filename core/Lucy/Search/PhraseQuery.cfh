@@ -100,7 +100,7 @@ class Lucy::Search::PhraseCompiler
     public void
     Apply_Norm_Factor(PhraseCompiler *self, float factor);
 
-    public incremented Vector*
+    incremented Vector*
     Highlight_Spans(PhraseCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, String *field);
 

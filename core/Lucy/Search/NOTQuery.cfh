@@ -76,7 +76,7 @@ class Lucy::Search::NOTCompiler
     public float
     Sum_Of_Squared_Weights(NOTCompiler *self);
 
-    public incremented Vector*
+    incremented Vector*
     Highlight_Spans(NOTCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, String *field);
 }
