@@ -55,7 +55,7 @@ class Lucy::Store::CompoundFileReader nickname CFReader
     void
     Set_Path(CompoundFileReader *self, String *path);
 
-    public void
+    void
     Close(CompoundFileReader *self);
 
     public void
