@@ -28,7 +28,7 @@ parcel Lucy;
  * The sub-components of a SegWriter are determined by
  * [](cfish:Architecture).  DataWriter components
  * which are added to the stack of writers via [](cfish:.Add_Writer) have
- * [](cfish:.Add_Inverted_Doc) invoked for each document supplied to SegWriter's
+ * Add_Inverted_Doc() invoked for each document supplied to SegWriter's
  * [](cfish:.Add_Doc).
  */
 public class Lucy::Index::SegWriter inherits Lucy::Index::DataWriter {
@@ -89,7 +89,7 @@ public class Lucy::Index::SegWriter inherits Lucy::Index::DataWriter {
     Prep_Seg_Dir(SegWriter *self);
 
     /** Add a document to the segment.  Inverts `doc`, increments
-     * the Segment's internal document id, then calls [](cfish:.Add_Inverted_Doc),
+     * the Segment's internal document id, then calls Add_Inverted_Doc(),
      * feeding all sub-writers.
      */
     public void
@@ -103,7 +103,7 @@ public class Lucy::Index::SegWriter inherits Lucy::Index::DataWriter {
     DeletionsWriter*
     Get_Del_Writer(SegWriter *self);
 
-    public void
+    void
     Add_Inverted_Doc(SegWriter *self, Inverter *inverter, int32_t doc_id);
 
     public void

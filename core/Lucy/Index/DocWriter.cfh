@@ -35,7 +35,7 @@ class Lucy::Index::DocWriter inherits Lucy::Index::DataWriter {
     init(DocWriter *self, Schema *schema, Snapshot *snapshot,
          Segment *segment, PolyReader *polyreader);
 
-    public void
+    void
     Add_Inverted_Doc(DocWriter *self, Inverter *inverter, int32_t doc_id);
 
     public void

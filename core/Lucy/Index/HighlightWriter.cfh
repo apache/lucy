@@ -38,7 +38,7 @@ class Lucy::Index::HighlightWriter nickname HLWriter
     incremented Blob*
     TV_Buf(HighlightWriter *self, Inversion *inversion);
 
-    public void
+    void
     Add_Inverted_Doc(HighlightWriter *self, Inverter *inverter, int32_t doc_id);
 
     public void
