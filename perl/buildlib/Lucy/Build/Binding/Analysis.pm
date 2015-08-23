@@ -104,6 +104,22 @@ END_CONSTRUCTOR
 }
 
 sub bind_inversion {
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
+    my $synopsis = <<'END_SYNOPSIS';
+    my $result = Lucy::Analysis::Inversion->new;
+
+    while (my $token = $inversion->next) {
+        $result->append($token);
+    }
+END_SYNOPSIS
+    my $constructor = <<'END_CONSTRUCTOR';
+    my $inversion = Lucy::Analysis::Inversion->new(
+        $seed,  # optional
+    );
+END_CONSTRUCTOR
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+
     my $xs = <<'END_XS';
 MODULE = Lucy   PACKAGE = Lucy::Analysis::Inversion
 
@@ -139,6 +155,7 @@ END_XS
         parcel     => "Lucy",
         class_name => "Lucy::Analysis::Inversion",
     );
+    $binding->set_pod_spec($pod_spec);
     $binding->append_xs($xs);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);

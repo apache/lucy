@@ -33,27 +33,28 @@ public class Lucy::Analysis::Inversion inherits Clownfish::Obj {
     uint32_t   cluster_counts_size;   /* num unique texts */
 
     /**
-     * @param seed An initial Token to start things off, which may be NULL.
+     * @param seed An initial Token to start things off, which may be
+     * [](@null).
      */
-    inert incremented Inversion*
+    public inert incremented Inversion*
     new(Token *seed = NULL);
 
     /** Tack a token onto the end of the Inversion.
      *
      * @param token A Token.
      */
-    void
+    public void
     Append(Inversion *self, decremented Token *token);
 
     /** Return the next token in the Inversion until out of tokens.
      */
-    nullable Token*
+    public nullable Token*
     Next(Inversion *self);
 
     /** Reset the Inversion's iterator, so that the next call to next()
      * returns the first Token in the inversion.
      */
-    void
+    public void
     Reset(Inversion *self);
 
     /** Assign positions to constituent Tokens, tallying up the position
