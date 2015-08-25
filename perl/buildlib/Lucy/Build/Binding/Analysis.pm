@@ -349,6 +349,68 @@ sub bind_token {
         Get_Text
     ); 
 
+    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
+    my $synopsis = <<'END_SYNOPSIS';
+        my $token = Lucy::Analysis::Token->new(
+            text         => 'blind',
+            start_offset => 8,
+            end_offset   => 13,
+        );
+
+        $token->set_text('mice');
+END_SYNOPSIS
+    my $constructor_pod = <<'END_CONSTRUCTOR_POD';
+=head2 new( I<[labeled params]> )
+
+    my $token = Lucy::Analysis::Token->new(
+        text         => $text,          # required
+        start_offset => $start_offset,  # required
+        end_offset   => $end_offset,    # required
+        boost        => 1.0,            # optional
+        pos_inc      => 1,              # optional
+    );
+
+=over
+
+=item *
+
+B<text> - A string.
+
+=item *
+
+B<start_offset> - Start offset into the original document in Unicode
+code points.
+
+=item *
+
+B<start_offset> - End offset into the original document in Unicode
+code points.
+
+=item *
+
+B<boost> - Per-token weight.
+
+=item *
+
+B<pos_inc> - Position increment for phrase matching.
+
+=back
+END_CONSTRUCTOR_POD
+    my $get_text_pod = <<'END_GET_TEXT_POD';
+=head2 get_text()
+
+Get the token's text.
+END_GET_TEXT_POD
+    my $set_text_pod = <<'END_SET_TEXT_POD';
+=head2 set_text(text)
+
+Set the token's text.
+END_SET_TEXT_POD
+    $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_constructor( alias => 'new', pod => $constructor_pod );
+    $pod_spec->add_method( alias => 'Get_Text', pod => $get_text_pod);
+    $pod_spec->add_method( alias => 'Set_Text', pod => $set_text_pod);
+
     my $xs = <<'END_XS';
 MODULE = Lucy    PACKAGE = Lucy::Analysis::Token
 
@@ -411,6 +473,7 @@ END_XS
         parcel     => "Lucy",
         class_name => "Lucy::Analysis::Token",
     );
+    $binding->set_pod_spec($pod_spec);
     $binding->append_xs($xs);
     $binding->exclude_method($_) for @hand_rolled;
     $binding->exclude_constructor;
