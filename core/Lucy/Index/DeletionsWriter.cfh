@@ -58,7 +58,7 @@ public abstract class Lucy::Index::DeletionsWriter nickname DelWriter
 
     /** Delete the document identified in the PolyReader by the supplied id.
      */
-    public abstract void
+    abstract void
     Delete_By_Doc_ID(DeletionsWriter *self, int32_t doc_id);
 
     /** Returns true if there are updates that need to be written.
@@ -76,7 +76,7 @@ public abstract class Lucy::Index::DeletionsWriter nickname DelWriter
      * With an offset of 1000, the array in the previous example would be
      * { 1001, 0, 1002, 1003 }.
      */
-    public incremented I32Array*
+    incremented I32Array*
     Generate_Doc_Map(DeletionsWriter *self, Matcher *deletions,
                      int32_t doc_max, int32_t offset);
 
@@ -84,7 +84,7 @@ public abstract class Lucy::Index::DeletionsWriter nickname DelWriter
      * a component within the PolyReader that was supplied at
      * construction-time.
      */
-    public abstract incremented nullable Matcher*
+    abstract incremented nullable Matcher*
     Seg_Deletions(DeletionsWriter *self, SegReader *seg_reader);
 
     /** Return the number of deletions for a given segment.
@@ -130,13 +130,13 @@ class Lucy::Index::DefaultDeletionsWriter nickname DefDelWriter
     public void
     Delete_By_Query(DefaultDeletionsWriter *self, Query *query);
 
-    public void
+    void
     Delete_By_Doc_ID(DefaultDeletionsWriter *self, int32_t doc_id);
 
     public bool
     Updated(DefaultDeletionsWriter *self);
 
-    public incremented nullable Matcher*
+    incremented nullable Matcher*
     Seg_Deletions(DefaultDeletionsWriter *self, SegReader *seg_reader);
 
     public int32_t

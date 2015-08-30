@@ -47,10 +47,10 @@ class Lucy::Index::DocVector nickname DocVec
     Blob*
     Field_Buf(DocVector *self, String *field);
 
-    public void
+    void
     Serialize(DocVector *self, OutStream *outstream);
 
-    public incremented DocVector*
+    incremented DocVector*
     Deserialize(decremented DocVector *self, InStream *instream);
 
     public void

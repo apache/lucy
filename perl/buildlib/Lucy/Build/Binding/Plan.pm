@@ -34,8 +34,6 @@ sub bind_all {
 }
 
 sub bind_architecture {
-    my @exposed = qw( Register_Doc_Writer Register_Doc_Reader );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     package MyArchitecture;
@@ -86,7 +84,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -126,14 +123,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_fieldtype {
-    my @exposed = qw(
-        Get_Boost
-        Indexed
-        Stored
-        Sortable
-        Binary
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my @sortable;
@@ -144,7 +133,6 @@ sub bind_fieldtype {
     }
 END_SYNOPSIS
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -177,12 +165,6 @@ sub bind_float64type {
 }
 
 sub bind_fulltexttype {
-    my @exposed = qw(
-        Set_Highlightable
-        Highlightable
-        Get_Analyzer
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $easyanalyzer = Lucy::Analysis::EasyAnalyzer->new(
@@ -207,7 +189,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -240,17 +221,6 @@ sub bind_int64type {
 }
 
 sub bind_schema {
-    my @exposed = qw(
-        Spec_Field
-        Num_Fields
-        All_Fields
-        Fetch_Type
-        Fetch_Sim
-        Architecture
-        Get_Architecture
-        Get_Similarity
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     use Lucy::Plan::Schema;
@@ -272,7 +242,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",

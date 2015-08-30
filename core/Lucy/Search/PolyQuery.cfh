@@ -47,10 +47,10 @@ public abstract class Lucy::Search::PolyQuery inherits Lucy::Search::Query {
     Vector*
     Get_Children(PolyQuery *self);
 
-    public void
+    void
     Serialize(PolyQuery *self, OutStream *outstream);
 
-    public incremented PolyQuery*
+    incremented PolyQuery*
     Deserialize(decremented PolyQuery *self, InStream *instream);
 
     public incremented Obj*
@@ -83,17 +83,17 @@ abstract class Lucy::Search::PolyCompiler inherits Lucy::Search::Compiler {
     public void
     Apply_Norm_Factor(PolyCompiler *self, float factor);
 
-    public incremented Vector*
+    incremented Vector*
     Highlight_Spans(PolyCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, String *field);
 
     public void
     Destroy(PolyCompiler *self);
 
-    public void
+    void
     Serialize(PolyCompiler *self, OutStream *outstream);
 
-    public incremented PolyCompiler*
+    incremented PolyCompiler*
     Deserialize(decremented PolyCompiler *self, InStream *instream);
 }
 

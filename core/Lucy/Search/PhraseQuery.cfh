@@ -57,10 +57,10 @@ public class Lucy::Search::PhraseQuery inherits Lucy::Search::Query {
     public incremented String*
     To_String(PhraseQuery *self);
 
-    public void
+    void
     Serialize(PhraseQuery *self, OutStream *outstream);
 
-    public incremented PhraseQuery*
+    incremented PhraseQuery*
     Deserialize(decremented PhraseQuery *self, InStream *instream);
 
     public incremented Obj*
@@ -100,17 +100,17 @@ class Lucy::Search::PhraseCompiler
     public void
     Apply_Norm_Factor(PhraseCompiler *self, float factor);
 
-    public incremented Vector*
+    incremented Vector*
     Highlight_Spans(PhraseCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, String *field);
 
     public bool
     Equals(PhraseCompiler *self, Obj *other);
 
-    public void
+    void
     Serialize(PhraseCompiler *self, OutStream *outstream);
 
-    public incremented PhraseCompiler*
+    incremented PhraseCompiler*
     Deserialize(decremented PhraseCompiler *self, InStream *instream);
 }
 

@@ -56,10 +56,10 @@ public class Lucy::Search::LeafQuery inherits Lucy::Search::Query {
     public incremented String*
     To_String(LeafQuery *self);
 
-    public void
+    void
     Serialize(LeafQuery *self, OutStream *outstream);
 
-    public incremented LeafQuery*
+    incremented LeafQuery*
     Deserialize(decremented LeafQuery *self, InStream *instream);
 
     public incremented Obj*

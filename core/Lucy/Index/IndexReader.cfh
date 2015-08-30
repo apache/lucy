@@ -113,7 +113,7 @@ public class Lucy::Index::IndexReader nickname IxReader
     public nullable DataReader*
     Fetch(IndexReader *self, String *api);
 
-    public void
+    void
     Close(IndexReader *self);
 
     Hash*

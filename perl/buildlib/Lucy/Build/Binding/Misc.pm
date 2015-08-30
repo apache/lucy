@@ -124,10 +124,6 @@ END_XS_CODE
 }
 
 sub bind_simple {
-    my @exposed = qw(
-        Search
-        Next
-    );
     my @hand_rolled = qw( Add_Doc );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
@@ -181,7 +177,6 @@ END_ADD_DOC_POD
         alias  => 'add_doc',
         pod    => $add_doc_pod,
     );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy  PACKAGE = Lucy::Simple

@@ -91,7 +91,7 @@ public class Lucy::Index::DataReader inherits Clownfish::Obj {
      * performed upon either the reader or any component subreaders other than
      * object destruction.
      */
-    public abstract void
+    abstract void
     Close(DataReader *self);
 
     public void

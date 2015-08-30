@@ -16,7 +16,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 use Storable qw( nfreeze thaw );
 use Lucy::Test;
 
@@ -29,6 +29,9 @@ is_deeply( $doc->get_fields, { foo => 'oink' }, "set_fields" );
 
 $doc->{foo} = "blah";
 is_deeply( $doc->get_fields, { foo => 'blah' }, "overloading" );
+
+$doc->store(title => "A title");
+is_deeply( $doc->extract('title'), "A title", "store/extract" );
 
 my %hash = ( foo => 'foo' );
 $doc = Lucy::Document::Doc->new(

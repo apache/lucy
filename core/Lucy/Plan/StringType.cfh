@@ -39,16 +39,16 @@ public class Lucy::Plan::StringType inherits Lucy::Plan::TextType {
     public inert incremented StringType*
     new();
 
-    public incremented Similarity*
+    incremented Similarity*
     Make_Similarity(StringType *self);
 
     incremented Hash*
     Dump_For_Schema(StringType *self);
 
-    public incremented Hash*
+    incremented Hash*
     Dump(StringType *self);
 
-    public incremented StringType*
+    incremented StringType*
     Load(StringType *self, Obj *dump);
 
     public bool

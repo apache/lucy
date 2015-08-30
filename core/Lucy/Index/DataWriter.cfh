@@ -53,7 +53,7 @@ public class Lucy::Index::DataWriter inherits Clownfish::Obj {
      * @param doc_id Internal number assigned to this document within the
      * segment.
      */
-    public abstract void
+    abstract void
     Add_Inverted_Doc(DataWriter *self, Inverter *inverter, int32_t doc_id);
 
     /** Add content from an existing segment into the one currently being

@@ -97,10 +97,10 @@ public class Lucy::Plan::Schema inherits Clownfish::Obj {
     public Similarity*
     Get_Similarity(Schema *self);
 
-    public incremented Hash*
+    incremented Hash*
     Dump(Schema *self);
 
-    public incremented Schema*
+    incremented Schema*
     Load(Schema *self, Obj *dump);
 
     /** Absorb the field definitions of another Schema, verify compatibility.

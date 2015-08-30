@@ -59,14 +59,14 @@ public class Lucy::Search::RangeQuery inherits Lucy::Search::Query {
     public incremented String*
     To_String(RangeQuery *self);
 
-    public incremented RangeCompiler*
+    public incremented Compiler*
     Make_Compiler(RangeQuery *self, Searcher *searcher, float boost,
                   bool subordinate = false);
 
-    public void
+    void
     Serialize(RangeQuery *self, OutStream *outstream);
 
-    public incremented RangeQuery*
+    incremented RangeQuery*
     Deserialize(decremented RangeQuery *self, InStream *instream);
 
     public incremented Obj*

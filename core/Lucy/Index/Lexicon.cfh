@@ -64,7 +64,7 @@ public class Lucy::Index::Lexicon nickname Lex inherits Clownfish::Obj {
     /** Return the number of documents that the current term appears in at
      * least once.  Deleted documents may be included in the count.
      */
-    public abstract int32_t
+    abstract int32_t
     Doc_Freq(Lexicon *self);
 
     /** Return the current term, or [](cfish:@null) if the iterator is not in a
@@ -73,7 +73,7 @@ public class Lucy::Index::Lexicon nickname Lex inherits Clownfish::Obj {
     public abstract nullable Obj*
     Get_Term(Lexicon *self);
 
-    public String*
+    String*
     Get_Field(Lexicon *self);
 }
 

@@ -70,16 +70,16 @@ public class Lucy::Plan::FullTextType inherits Lucy::Plan::TextType {
     public Analyzer*
     Get_Analyzer(FullTextType *self);
 
-    public incremented Similarity*
+    incremented Similarity*
     Make_Similarity(FullTextType *self);
 
     incremented Hash*
     Dump_For_Schema(FullTextType *self);
 
-    public incremented Hash*
+    incremented Hash*
     Dump(FullTextType *self);
 
-    public incremented FullTextType*
+    incremented FullTextType*
     Load(FullTextType *self, Obj *dump);
 
     public bool

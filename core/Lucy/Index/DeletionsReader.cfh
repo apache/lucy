@@ -59,7 +59,7 @@ class Lucy::Index::PolyDeletionsReader nickname PolyDelReader
     incremented Matcher*
     Iterator(PolyDeletionsReader *self);
 
-    public void
+    void
     Close(PolyDeletionsReader *self);
 
     public void
@@ -89,7 +89,7 @@ class Lucy::Index::DefaultDeletionsReader nickname DefDelReader
     nullable BitVector*
     Read_Deletions(DefaultDeletionsReader *self);
 
-    public void
+    void
     Close(DefaultDeletionsReader *self);
 
     public void

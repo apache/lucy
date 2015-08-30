@@ -63,10 +63,10 @@ public class LucyX::Search::ProximityQuery inherits Lucy::Search::Query {
     public incremented String*
     To_String(ProximityQuery *self);
 
-    public void
+    void
     Serialize(ProximityQuery *self, OutStream *outstream);
 
-    public incremented ProximityQuery*
+    incremented ProximityQuery*
     Deserialize(decremented ProximityQuery *self, InStream *instream);
 
     public incremented Obj*
@@ -107,17 +107,17 @@ class LucyX::Search::ProximityCompiler
     public void
     Apply_Norm_Factor(ProximityCompiler *self, float factor);
 
-    public incremented Vector*
+    incremented Vector*
     Highlight_Spans(ProximityCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, String *field);
 
     public bool
     Equals(ProximityCompiler *self, Obj *other);
 
-    public void
+    void
     Serialize(ProximityCompiler *self, OutStream *outstream);
 
-    public incremented ProximityCompiler*
+    incremented ProximityCompiler*
     Deserialize(decremented ProximityCompiler *self, InStream *instream);
 }
 

@@ -41,11 +41,11 @@ public class Lucy::Search::SortSpec inherits Clownfish::Obj {
     public inert SortSpec*
     init(SortSpec *self, Vector *rules);
 
-    public incremented SortSpec*
-    Deserialize(decremented SortSpec *self, InStream *instream);
-
-    public void
+    void
     Serialize(SortSpec *self, OutStream *outstream);
+
+    incremented SortSpec*
+    Deserialize(decremented SortSpec *self, InStream *instream);
 
     Vector*
     Get_Rules(SortSpec *self);

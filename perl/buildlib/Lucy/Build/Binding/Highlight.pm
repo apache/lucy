@@ -45,21 +45,6 @@ END_CONSTRUCTOR
 }
 
 sub bind_highlighter {
-    my @exposed = qw(
-        Create_Excerpt
-        Highlight
-        Encode
-        Set_Pre_Tag
-        Get_Pre_Tag
-        Set_Post_Tag
-        Get_Post_Tag
-        Get_Searcher
-        Get_Query
-        Get_Compiler
-        Get_Excerpt_Length
-        Get_Field
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $highlighter = Lucy::Highlight::Highlighter->new(
@@ -83,7 +68,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",

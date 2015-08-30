@@ -214,14 +214,6 @@ END_XS_CODE
 }
 
 sub bind_lock {
-    my @exposed = qw(
-        Obtain
-        Request
-        Release
-        Is_Locked
-        Clear_Stale
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     my $lock = $lock_factory->make_lock(
@@ -243,7 +235,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -283,11 +274,6 @@ END_SYNOPSIS
 }
 
 sub bind_lockfactory {
-    my @exposed = qw(
-        Make_Lock
-        Make_Shared_Lock
-    );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     use Sys::Hostname qw( hostname );
@@ -313,7 +299,6 @@ END_SYNOPSIS
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",

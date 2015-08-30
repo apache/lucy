@@ -33,13 +33,13 @@ public class Lucy::Store::RAMFolder inherits Lucy::Store::Folder {
     public inert RAMFolder*
     init(RAMFolder *self, String *path = NULL);
 
-    public void
+    void
     Initialize(RAMFolder *self);
 
-    public bool
+    bool
     Check(RAMFolder *self);
 
-    public void
+    void
     Close(RAMFolder *self);
 
     incremented nullable FileHandle*
@@ -63,10 +63,10 @@ public class Lucy::Store::RAMFolder inherits Lucy::Store::Folder {
     bool
     Local_Delete(RAMFolder *self, String *name);
 
-    public bool
+    bool
     Rename(RAMFolder *self, String* from, String *to);
 
-    public bool
+    bool
     Hard_Link(RAMFolder *self, String *from, String *to);
 }
 

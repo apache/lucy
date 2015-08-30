@@ -165,7 +165,7 @@ public class Lucy::Index::Indexer inherits Clownfish::Obj {
 
     /** Accessor for seg_writer member var.
      */
-    public SegWriter*
+    SegWriter*
     Get_Seg_Writer(Indexer *self);
 
     Doc*

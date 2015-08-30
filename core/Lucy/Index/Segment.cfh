@@ -136,7 +136,7 @@ public class Lucy::Index::Segment nickname Seg inherits Clownfish::Obj {
 
     /** Write the segdata file.
      */
-    public void
+    void
     Write_File(Segment *self, Folder *folder);
 
     /** Read the segmeta file for this segment.
@@ -144,7 +144,7 @@ public class Lucy::Index::Segment nickname Seg inherits Clownfish::Obj {
      * @return true if the file is read and decoded successfully, false
      * otherwise.
      */
-    public bool
+    bool
     Read_File(Segment *self, Folder *folder);
 
     /** Compare by segment number.

@@ -62,11 +62,11 @@ public class Lucy::Search::SortRule inherits Clownfish::Obj {
     public bool
     Get_Reverse(SortRule *self);
 
-    public incremented SortRule*
-    Deserialize(decremented SortRule *self, InStream *instream);
-
-    public void
+    void
     Serialize(SortRule *self, OutStream *outstream);
+
+    incremented SortRule*
+    Deserialize(decremented SortRule *self, InStream *instream);
 
     public void
     Destroy(SortRule *self);

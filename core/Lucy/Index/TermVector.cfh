@@ -49,7 +49,10 @@ class Lucy::Index::TermVector nickname TV
     I32Array*
     Get_End_Offsets(TermVector *self);
 
-    public incremented TermVector*
+    void
+    Serialize(TermVector *self, OutStream *outstream);
+
+    incremented TermVector*
     Deserialize(decremented TermVector *self, InStream *instream);
 
     public bool
@@ -57,9 +60,6 @@ class Lucy::Index::TermVector nickname TV
 
     public void
     Destroy(TermVector *self);
-
-    public void
-    Serialize(TermVector *self, OutStream *outstream);
 }
 
 

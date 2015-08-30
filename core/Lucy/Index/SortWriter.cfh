@@ -53,7 +53,7 @@ class Lucy::Index::SortWriter inherits Lucy::Index::DataWriter {
     inert void
     set_default_mem_thresh(size_t mem_thresh);
 
-    public void
+    void
     Add_Inverted_Doc(SortWriter *self, Inverter *inverter, int32_t doc_id);
 
     public void

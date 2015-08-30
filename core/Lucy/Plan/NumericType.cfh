@@ -39,10 +39,10 @@ class Lucy::Plan::NumericType nickname NumType inherits Lucy::Plan::FieldType {
     incremented Hash*
     Dump_For_Schema(NumericType *self);
 
-    public incremented Hash*
+    incremented Hash*
     Dump(NumericType *self);
 
-    public incremented NumericType*
+    incremented NumericType*
     Load(NumericType *self, Obj *dump);
 }
 

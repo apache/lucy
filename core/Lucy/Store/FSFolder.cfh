@@ -38,16 +38,16 @@ public class Lucy::Store::FSFolder inherits Lucy::Store::Folder {
 
     /** Attempt to create the directory specified by `path`.
      */
-    public void
+    void
     Initialize(FSFolder *self);
 
     /** Verify that `path` is a directory.  TODO: check
      * permissions.
      */
-    public bool
+    bool
     Check(FSFolder *self);
 
-    public void
+    void
     Close(FSFolder *self);
 
     incremented nullable FileHandle*
@@ -72,10 +72,10 @@ public class Lucy::Store::FSFolder inherits Lucy::Store::Folder {
     bool
     Local_Delete(FSFolder *self, String *name);
 
-    public bool
+    bool
     Rename(FSFolder *self, String* from, String *to);
 
-    public bool
+    bool
     Hard_Link(FSFolder *self, String *from, String *to);
 }
 

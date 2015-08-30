@@ -26,8 +26,7 @@ sub bind_all {
 }
 
 sub bind_doc {
-    my @exposed     = qw( Set_Doc_ID Get_Doc_ID Get_Fields );
-    my @hand_rolled = qw( Set_Fields Get_Fields );
+    my @hand_rolled = qw( Store Set_Fields Get_Fields );
 
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -46,9 +45,30 @@ END_SYNOPSIS
         fields => { foo => 'foo foo', bar => 'bar bar' },
     );
 END_CONSTRUCTOR
+    my $store_pod = <<'END_POD';
+=head2 store(field, value)
+
+Store a field value in the Doc.
+
+=over
+
+=item *
+
+B<field> - The field name.
+
+=item *
+
+B<value> - The value.
+
+=back
+END_POD
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor );
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
+    $pod_spec->add_method(
+        method => 'Store',
+        alias  => 'store',
+        pod    => $store_pod,
+    );
 
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy     PACKAGE = Lucy::Document::Doc
@@ -88,6 +108,19 @@ CODE:
 }
 OUTPUT: RETVAL
 
+void
+store(self, field, value_sv)
+    lucy_Doc *self;
+    cfish_String *field;
+    SV *value_sv;
+PPCODE:
+{
+    cfish_Obj *value
+        = (cfish_Obj*)XSBind_perl_to_cfish(aTHX_ value_sv, CFISH_OBJ);
+    LUCY_Doc_Store(self, field, value);
+    CFISH_DECREF(value);
+}
+
 SV*
 get_fields(self, ...)
     lucy_Doc *self;
@@ -117,8 +150,6 @@ END_XS_CODE
 }
 
 sub bind_hitdoc {
-    my @exposed = qw( Set_Score Get_Score );
-
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
     while ( my $hit_doc = $hits->next ) {
@@ -128,7 +159,6 @@ sub bind_hitdoc {
     }
 END_SYNOPSIS
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_method( method => $_, alias => lc($_) ) for @exposed;
 
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Document::HitDoc

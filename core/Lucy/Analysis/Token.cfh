@@ -38,8 +38,7 @@ parcel Lucy;
  * `boost` is a per-token weight.  Use this when you want to assign
  * more or less importance to a particular token, as you might for emboldened
  * text within an HTML document, for example.  (Note: The field this token
- * belongs to must be spec'd to use a posting of type
- * [](cfish:RichPosting).)
+ * belongs to must be spec'd to use a posting of type RichPosting.)
  *
  * `pos_inc` is the POSition INCrement, measured in Tokens.  This
  * attribute, which defaults to 1, is a an advanced tool for manipulating
@@ -49,7 +48,7 @@ parcel Lucy;
  * will end up assigned to positions 0, 1, and 1001 -- and will no longer
  * produce a phrase match for the query `"three blind mice"`.
  */
-class Lucy::Analysis::Token inherits Clownfish::Obj {
+public class Lucy::Analysis::Token inherits Clownfish::Obj {
 
     char     *text;
     size_t    len;
@@ -59,11 +58,21 @@ class Lucy::Analysis::Token inherits Clownfish::Obj {
     int32_t   pos_inc;
     int32_t   pos;
 
-    inert incremented Token*
+    public inert incremented Token*
     new(const char *text, size_t len, uint32_t start_offset,
         uint32_t end_offset, float boost = 1.0, int32_t pos_inc = 1);
 
-    inert Token*
+    /**
+     * @param text A UTF-8 string.
+     * @param len Size of the string in bytes.
+     * @param start_offset Start offset into the original document in Unicode
+     * code points.
+     * @param start_offset End offset into the original document in Unicode
+     * code points.
+     * @param boost Per-token weight.
+     * @param pos_inc Position increment for phrase matching.
+     */
+    public inert Token*
     init(Token *self, const char *text, size_t len,
          uint32_t start_offset, uint32_t end_offset,
          float boost = 1.0, int32_t pos_inc = 1);
@@ -73,16 +82,16 @@ class Lucy::Analysis::Token inherits Clownfish::Obj {
     inert int
     compare(const void *va, const void *vb);
 
-    uint32_t
+    public uint32_t
     Get_Start_Offset(Token *self);
 
-    uint32_t
+    public uint32_t
     Get_End_Offset(Token *self);
 
-    float
+    public float
     Get_Boost(Token *self);
 
-    int32_t
+    public int32_t
     Get_Pos_Inc(Token *self);
 
     /** Accessor for pos.  Only valid after position increments for an array
@@ -91,13 +100,13 @@ class Lucy::Analysis::Token inherits Clownfish::Obj {
     int32_t
     Get_Pos(Token *self);
 
-    char*
+    public char*
     Get_Text(Token *self);
 
-    size_t
+    public size_t
     Get_Len(Token *self);
 
-    void
+    public void
     Set_Text(Token *self, char *text, size_t len);
 
     public void

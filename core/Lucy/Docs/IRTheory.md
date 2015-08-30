@@ -19,10 +19,10 @@ formal introduction:
 Since Lucy is a practical implementation of IR theory, it loads these
 abstract, distilled definitions down with useful traits.  For instance, a
 "posting" in its most rarefied form is simply a term-document pairing; in
-Lucy, the class [](cfish:lucy.MatchPosting) fills this
+Lucy, the class MatchPosting fills this
 role.  However, by associating additional information with a posting like the
 number of times the term occurs in the document, we can turn it into a
-[](cfish:lucy.ScorePosting), making it possible
+ScorePosting, making it possible
 to rank documents by relevance rather than just list documents which happen to
 match in no particular order.
 

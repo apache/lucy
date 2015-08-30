@@ -52,10 +52,10 @@ class Lucy::Search::TopDocs inherits Clownfish::Obj {
     void
     Set_Total_Hits(TopDocs *self, uint32_t total_hits);
 
-    public void
+    void
     Serialize(TopDocs *self, OutStream *outstream);
 
-    public incremented TopDocs*
+    incremented TopDocs*
     Deserialize(decremented TopDocs *self, InStream *instream);
 
     public void

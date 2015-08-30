@@ -55,10 +55,10 @@ public class Lucy::Search::TermQuery inherits Lucy::Search::Query {
     public incremented String*
     To_String(TermQuery *self);
 
-    public void
+    void
     Serialize(TermQuery *self, OutStream *outstream);
 
-    public incremented TermQuery*
+    incremented TermQuery*
     Deserialize(decremented TermQuery *self, InStream *instream);
 
     public incremented Obj*
@@ -99,17 +99,17 @@ class Lucy::Search::TermCompiler inherits Lucy::Search::Compiler {
     public void
     Apply_Norm_Factor(TermCompiler *self, float factor);
 
-    public incremented Vector*
+    incremented Vector*
     Highlight_Spans(TermCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, String *field);
 
     public bool
     Equals(TermCompiler *self, Obj *other);
 
-    public void
+    void
     Serialize(TermCompiler *self, OutStream *outstream);
 
-    public incremented TermCompiler*
+    incremented TermCompiler*
     Deserialize(decremented TermCompiler *self, InStream *instream);
 }
 

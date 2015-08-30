@@ -68,7 +68,7 @@ class Lucy::Index::SegLexicon nickname SegLex
     public nullable Obj*
     Get_Term(SegLexicon *self);
 
-    public int32_t
+    int32_t
     Doc_Freq(SegLexicon *self);
 
     public bool

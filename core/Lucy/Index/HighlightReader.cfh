@@ -52,7 +52,7 @@ class Lucy::Index::PolyHighlightReader nickname PolyHLReader
     public incremented DocVector*
     Fetch_Doc_Vec(PolyHighlightReader *self, int32_t doc_id);
 
-    public void
+    void
     Close(PolyHighlightReader *self);
 
     public void
@@ -86,7 +86,7 @@ class Lucy::Index::DefaultHighlightReader nickname DefHLReader
     Read_Record(DefaultHighlightReader *self, int32_t doc_id,
                 ByteBuf *buffer);
 
-    public void
+    void
     Close(DefaultHighlightReader *self);
 
     public void

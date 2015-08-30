@@ -47,7 +47,7 @@ public class Lucy::Index::Similarity nickname Sim inherits Clownfish::Obj {
 
     /** Factory method for creating a Posting.
      */
-    public incremented Posting*
+    incremented Posting*
     Make_Posting(Similarity *self);
 
     /** Factory method for creating a PostingWriter.
@@ -63,7 +63,7 @@ public class Lucy::Index::Similarity nickname Sim inherits Clownfish::Obj {
      * freqs, since the more times a doc matches, the more relevant it is
      * likely to be.
      */
-    public float
+    float
     TF(Similarity *self, float freq);
 
     /** Calculate the Inverse Document Frequecy for a term in a given
@@ -72,12 +72,12 @@ public class Lucy::Index::Similarity nickname Sim inherits Clownfish::Obj {
      * @param doc_freq The number of documents that the term appears in.
      * @param total_docs The number of documents in the collection.
      */
-    public float
+    float
     IDF(Similarity *self, int64_t doc_freq, int64_t total_docs);
 
     /** Calculate a score factor based on the number of terms which match.
      */
-    public float
+    float
     Coord(Similarity *self, uint32_t overlap, uint32_t max_overlap);
 
     /** Dampen the scores of long documents.
@@ -101,7 +101,7 @@ public class Lucy::Index::Similarity nickname Sim inherits Clownfish::Obj {
 
     /** Normalize a Query's weight so that it is comparable to other Queries.
      */
-    public float
+    float
     Query_Norm(Similarity *self, float sum_of_squared_weights);
 
     /** encode_norm and decode_norm encode and decode between 32-bit IEEE
@@ -123,19 +123,19 @@ public class Lucy::Index::Similarity nickname Sim inherits Clownfish::Obj {
     public void
     Destroy(Similarity *self);
 
-    public incremented Obj*
+    incremented Obj*
     Dump(Similarity *self);
 
-    public incremented Similarity*
+    incremented Similarity*
     Load(Similarity *self, Obj *dump);
 
     public bool
     Equals(Similarity *self, Obj *other);
 
-    public void
+    void
     Serialize(Similarity *self, OutStream *outstream);
 
-    public incremented Similarity*
+    incremented Similarity*
     Deserialize(decremented Similarity *self, InStream *instream);
 }
 
