@@ -159,6 +159,14 @@ func specClasses(parcel *cfc.Parcel) {
 	hitsBinding.SpecMethod("", "Error() error")
 	hitsBinding.SetSuppressStruct(true)
 	hitsBinding.Register()
+
+	andQueryBinding := cfc.NewGoClass(parcel, "Lucy::Search::ANDQuery")
+	andQueryBinding.SetSuppressCtor(true)
+	andQueryBinding.Register()
+
+	orQueryBinding := cfc.NewGoClass(parcel, "Lucy::Search::ORQuery")
+	orQueryBinding.SetSuppressCtor(true)
+	orQueryBinding.Register()
 }
 
 func build() {

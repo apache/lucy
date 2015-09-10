@@ -22,6 +22,8 @@ package lucy
 #include "Lucy/Search/IndexSearcher.h"
 #include "Lucy/Search/Query.h"
 #include "Lucy/Search/Searcher.h"
+#include "Lucy/Search/ANDQuery.h"
+#include "Lucy/Search/ORQuery.h"
 #include "Lucy/Document/HitDoc.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/HashIterator.h"
@@ -160,4 +162,24 @@ func (obj *HitsIMP) Next(hit interface{}) bool {
 
 func (obj *HitsIMP) Error() error {
 	return obj.err
+}
+
+func NewANDQuery(children []Query) ANDQuery {
+	vec := clownfish.NewVector(len(children))
+	for _, child := range children {
+		vec.Push(child)
+	}
+	childrenC := (*C.cfish_Vector)(unsafe.Pointer(vec.TOPTR()))
+	cfObj := C.lucy_ANDQuery_new(childrenC)
+	return WRAPANDQuery(unsafe.Pointer(cfObj))
+}
+
+func NewORQuery(children []Query) ORQuery {
+	vec := clownfish.NewVector(len(children))
+	for _, child := range children {
+		vec.Push(child)
+	}
+	childrenC := (*C.cfish_Vector)(unsafe.Pointer(vec.TOPTR()))
+	cfObj := C.lucy_ORQuery_new(childrenC)
+	return WRAPORQuery(unsafe.Pointer(cfObj))
 }
