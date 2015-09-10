@@ -24,6 +24,8 @@ package lucy
 #include "Lucy/Search/Searcher.h"
 #include "Lucy/Search/ANDQuery.h"
 #include "Lucy/Search/ORQuery.h"
+#include "Lucy/Search/ANDMatcher.h"
+#include "Lucy/Search/ORMatcher.h"
 #include "Lucy/Document/HitDoc.h"
 #include "LucyX/Search/MockMatcher.h"
 #include "Clownfish/Blob.h"
@@ -190,6 +192,38 @@ func NewORQuery(children []Query) ORQuery {
 	childrenC := (*C.cfish_Vector)(unsafe.Pointer(vec.TOPTR()))
 	cfObj := C.lucy_ORQuery_new(childrenC)
 	return WRAPORQuery(unsafe.Pointer(cfObj))
+}
+
+func NewANDMatcher(children []Matcher, sim Similarity) ANDMatcher {
+	simC := (*C.lucy_Similarity)(clownfish.UnwrapNullable(sim))
+	vec := clownfish.NewVector(len(children))
+	for _, child := range children {
+		vec.Push(child)
+	}
+	childrenC := (*C.cfish_Vector)(unsafe.Pointer(vec.TOPTR()))
+	cfObj := C.lucy_ANDMatcher_new(childrenC, simC)
+	return WRAPANDMatcher(unsafe.Pointer(cfObj))
+}
+
+func NewORMatcher(children []Matcher) ORMatcher {
+	vec := clownfish.NewVector(len(children))
+	for _, child := range children {
+		vec.Push(child)
+	}
+	childrenC := (*C.cfish_Vector)(unsafe.Pointer(vec.TOPTR()))
+	cfObj := C.lucy_ORMatcher_new(childrenC)
+	return WRAPORMatcher(unsafe.Pointer(cfObj))
+}
+
+func NewORScorer(children []Matcher, sim Similarity) ORScorer {
+	simC := (*C.lucy_Similarity)(clownfish.UnwrapNullable(sim))
+	vec := clownfish.NewVector(len(children))
+	for _, child := range children {
+		vec.Push(child)
+	}
+	childrenC := (*C.cfish_Vector)(unsafe.Pointer(vec.TOPTR()))
+	cfObj := C.lucy_ORScorer_new(childrenC, simC)
+	return WRAPORScorer(unsafe.Pointer(cfObj))
 }
 
 func newMockMatcher(docIDs []int32, scores []float32) MockMatcher {

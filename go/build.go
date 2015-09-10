@@ -168,6 +168,18 @@ func specClasses(parcel *cfc.Parcel) {
 	orQueryBinding.SetSuppressCtor(true)
 	orQueryBinding.Register()
 
+	andMatcherBinding := cfc.NewGoClass(parcel, "Lucy::Search::ANDMatcher")
+	andMatcherBinding.SetSuppressCtor(true)
+	andMatcherBinding.Register()
+
+	orMatcherBinding := cfc.NewGoClass(parcel, "Lucy::Search::ORMatcher")
+	orMatcherBinding.SetSuppressCtor(true)
+	orMatcherBinding.Register()
+
+	orScorerBinding := cfc.NewGoClass(parcel, "Lucy::Search::ORScorer")
+	orScorerBinding.SetSuppressCtor(true)
+	orScorerBinding.Register()
+
 	bitVecBinding := cfc.NewGoClass(parcel, "Lucy::Object::BitVector")
 	bitVecBinding.SpecMethod("To_Array", "ToArray() []bool")
 	bitVecBinding.Register()
