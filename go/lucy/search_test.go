@@ -319,3 +319,11 @@ func TestNOTMatcherBasics(t *testing.T) {
 	matcher := NewANDMatcher([]Matcher{a, notB}, nil)
 	checkMatcher(t, matcher, false)
 }
+
+func TestSeriesMatcherBasics(t *testing.T) {
+	a := newMockMatcher([]int32{42}, nil)
+	b := newMockMatcher([]int32{1, 4}, nil)
+	c := newMockMatcher([]int32{20}, nil)
+	matcher := NewSeriesMatcher([]Matcher{a, b, c}, []int32{0, 42, 80})
+	checkMatcher(t, matcher, false)
+}

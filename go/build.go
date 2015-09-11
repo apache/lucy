@@ -180,6 +180,10 @@ func specClasses(parcel *cfc.Parcel) {
 	orScorerBinding.SetSuppressCtor(true)
 	orScorerBinding.Register()
 
+	seriesMatcherBinding := cfc.NewGoClass(parcel, "Lucy::Search::SeriesMatcher")
+	seriesMatcherBinding.SetSuppressCtor(true)
+	seriesMatcherBinding.Register()
+
 	bitVecBinding := cfc.NewGoClass(parcel, "Lucy::Object::BitVector")
 	bitVecBinding.SpecMethod("To_Array", "ToArray() []bool")
 	bitVecBinding.Register()

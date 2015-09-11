@@ -26,6 +26,7 @@ package lucy
 #include "Lucy/Search/ORQuery.h"
 #include "Lucy/Search/ANDMatcher.h"
 #include "Lucy/Search/ORMatcher.h"
+#include "Lucy/Search/SeriesMatcher.h"
 #include "Lucy/Document/HitDoc.h"
 #include "LucyX/Search/MockMatcher.h"
 #include "Clownfish/Blob.h"
@@ -224,6 +225,17 @@ func NewORScorer(children []Matcher, sim Similarity) ORScorer {
 	childrenC := (*C.cfish_Vector)(unsafe.Pointer(vec.TOPTR()))
 	cfObj := C.lucy_ORScorer_new(childrenC, simC)
 	return WRAPORScorer(unsafe.Pointer(cfObj))
+}
+
+func NewSeriesMatcher(matchers []Matcher, offsets []int32) SeriesMatcher {
+	vec := clownfish.NewVector(len(matchers))
+	for _, child := range matchers {
+		vec.Push(child)
+	}
+	i32arr := NewI32Array(offsets)
+	cfObj := C.lucy_SeriesMatcher_new(((*C.cfish_Vector)(clownfish.Unwrap(vec, "matchers"))),
+		((*C.lucy_I32Array)(clownfish.Unwrap(i32arr, "offsets"))))
+	return WRAPSeriesMatcher(unsafe.Pointer(cfObj))
 }
 
 func newMockMatcher(docIDs []int32, scores []float32) MockMatcher {
