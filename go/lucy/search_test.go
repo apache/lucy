@@ -354,3 +354,45 @@ func TestTopDocsBasics(t *testing.T) {
 		t.Errorf("Failed round-trip serializetion of TopDocs")
 	}
 }
+
+type simpleTestDoc struct {
+	Content string
+}
+
+func TestSortSpecBasics(t *testing.T) {
+	folder := NewRAMFolder("")
+	schema := NewSchema()
+	fieldType := NewFullTextType(NewStandardTokenizer())
+	fieldType.SetSortable(true)
+	schema.SpecField("content", fieldType)
+	args := &OpenIndexerArgs{Index: folder, Schema: schema, Create: true}
+	indexer, err := OpenIndexer(args)
+	if err != nil {
+		panic(err)
+	}
+	for _, fieldVal := range []string{"a b", "a a"} {
+		indexer.AddDoc(&simpleTestDoc{fieldVal})
+	}
+	indexer.Commit()
+
+	rules := []SortRule{
+		NewFieldSortRule("content", false),
+	}
+	sortSpec := NewSortSpec(rules)
+	searcher, _ := OpenIndexSearcher(folder)
+	hits, _ := searcher.Hits("a", 0, 1, sortSpec)
+	var doc simpleTestDoc
+	hits.Next(&doc)
+	if doc.Content != "a a" {
+		t.Error("Sort by field value")
+	}
+
+	outstream := folder.OpenOut("foo")
+	sortSpec.Serialize(outstream)
+	outstream.Close()
+	inStream := folder.OpenIn("foo")
+	dupe := clownfish.GetClass(sortSpec).MakeObj().(SortSpec).Deserialize(inStream)
+	if len(dupe.GetRules()) != len(rules) {
+		t.Errorf("Failed round-trip serializetion of SortSpec")
+	}
+}

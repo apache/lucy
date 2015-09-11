@@ -27,6 +27,8 @@ package lucy
 #include "Lucy/Search/ANDMatcher.h"
 #include "Lucy/Search/ORMatcher.h"
 #include "Lucy/Search/SeriesMatcher.h"
+#include "Lucy/Search/SortRule.h"
+#include "Lucy/Search/SortSpec.h"
 #include "Lucy/Search/TopDocs.h"
 #include "Lucy/Document/HitDoc.h"
 #include "LucyX/Search/MockMatcher.h"
@@ -175,6 +177,43 @@ func (obj *HitsIMP) Next(hit interface{}) bool {
 
 func (obj *HitsIMP) Error() error {
 	return obj.err
+}
+
+func NewFieldSortRule(field string, reverse bool) SortRule {
+	fieldC := clownfish.GoToClownfish(field, unsafe.Pointer(C.CFISH_STRING), false)
+	cfObj := C.lucy_SortRule_new(C.lucy_SortRule_FIELD, (*C.cfish_String)(fieldC), C.bool(reverse))
+	return WRAPSortRule(unsafe.Pointer(cfObj))
+}
+
+func NewDocIDSortRule(reverse bool) SortRule {
+	cfObj := C.lucy_SortRule_new(C.lucy_SortRule_DOC_ID, nil, C.bool(reverse))
+	return WRAPSortRule(unsafe.Pointer(cfObj))
+}
+
+func NewScoreSortRule(reverse bool) SortRule {
+	cfObj := C.lucy_SortRule_new(C.lucy_SortRule_SCORE, nil, C.bool(reverse))
+	return WRAPSortRule(unsafe.Pointer(cfObj))
+}
+
+func NewSortSpec(rules []SortRule) SortSpec {
+	vec := clownfish.NewVector(len(rules))
+	for _, rule := range rules {
+		vec.Push(rule)
+	}
+	cfObj := C.lucy_SortSpec_new((*C.cfish_Vector)(clownfish.Unwrap(vec, "rules")))
+	return WRAPSortSpec(unsafe.Pointer(cfObj))
+}
+
+func (spec *SortSpecIMP) GetRules() []SortRule {
+	self := (*C.lucy_SortSpec)(clownfish.Unwrap(spec, "spec"))
+	vec := C.LUCY_SortSpec_Get_Rules(self)
+	length := int(C.CFISH_Vec_Get_Size(vec))
+	slice := make([]SortRule, length)
+	for i := 0; i < length; i++ {
+		elem := C.cfish_incref(unsafe.Pointer(C.CFISH_Vec_Fetch(vec, C.size_t(i))))
+		slice[i] = WRAPSortRule(unsafe.Pointer(elem))
+	}
+	return slice
 }
 
 func NewTopDocs(matchDocs []MatchDoc, totalHits uint32) TopDocs {

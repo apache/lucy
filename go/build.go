@@ -197,6 +197,11 @@ func specClasses(parcel *cfc.Parcel) {
 	topDocsBinding.SpecMethod("Set_Match_Docs", "SetMatchDocs([]MatchDoc)")
 	topDocsBinding.SpecMethod("Get_Match_Docs", "GetMatchDocs() []MatchDoc")
 	topDocsBinding.Register()
+
+	sortSpecBinding := cfc.NewGoClass(parcel, "Lucy::Search::SortSpec")
+	sortSpecBinding.SetSuppressCtor(true)
+	sortSpecBinding.SpecMethod("Get_Rules", "GetRules() []SortRule")
+	sortSpecBinding.Register()
 }
 
 func build() {
