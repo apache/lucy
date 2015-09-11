@@ -396,3 +396,31 @@ func TestSortSpecBasics(t *testing.T) {
 		t.Errorf("Failed round-trip serializetion of SortSpec")
 	}
 }
+
+func TestHitQueueBasics(t *testing.T) {
+	hitQ := NewHitQueue(nil, nil, 1)
+	fortyTwo := NewMatchDoc(42, 1.0, nil)
+	fortyThree := NewMatchDoc(43, 1.0, nil)
+	if !hitQ.LessThan(fortyThree, fortyTwo) {
+		t.Error("LessThan")
+	}
+	if !hitQ.Insert(fortyTwo) {
+		t.Error("Insert")
+	}
+	if hitQ.GetSize() != 1 {
+		t.Error("GetSize")
+	}
+	if bumped := hitQ.Jostle(fortyThree); bumped.(MatchDoc).GetDocID() != 43 {
+		t.Error("Jostle")
+	}
+	if peeked := hitQ.Peek(); peeked.(MatchDoc).GetDocID() != 42 {
+		t.Error("Peek")
+	}
+	if popped := hitQ.Pop(); popped.(MatchDoc).GetDocID() != 42 {
+		t.Error("Pop")
+	}
+	hitQ.Insert(fortyTwo)
+	if got := hitQ.PopAll(); got[0].(MatchDoc).GetDocID() != 42 {
+		t.Error("PopAll")
+	}
+}
