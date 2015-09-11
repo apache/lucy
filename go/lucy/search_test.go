@@ -327,3 +327,30 @@ func TestSeriesMatcherBasics(t *testing.T) {
 	matcher := NewSeriesMatcher([]Matcher{a, b, c}, []int32{0, 42, 80})
 	checkMatcher(t, matcher, false)
 }
+
+func TestTopDocsBasics(t *testing.T) {
+	matchDocs := []MatchDoc{
+		NewMatchDoc(42, 2.0, nil),
+		NewMatchDoc(100, 3.0, nil),
+	}
+	td := NewTopDocs(matchDocs, 50)
+	td.SetTotalHits(20)
+	if totalHits := td.GetTotalHits(); totalHits != 20 {
+		t.Errorf("Expected 20 total hits, got %d", totalHits)
+	}
+	td.SetMatchDocs(matchDocs)
+	fetched := td.GetMatchDocs()
+	if docID := fetched[0].GetDocID(); docID != 42 {
+		t.Errorf("Set/Get MatchDocs expected 42, got %d", docID)
+	}
+
+	folder := NewRAMFolder("")
+	outstream := folder.OpenOut("foo")
+	td.Serialize(outstream)
+	outstream.Close()
+	inStream := folder.OpenIn("foo")
+	dupe := clownfish.GetClass(td).MakeObj().(TopDocs).Deserialize(inStream)
+	if dupe.GetTotalHits() != td.GetTotalHits() {
+		t.Errorf("Failed round-trip serializetion of TopDocs")
+	}
+}

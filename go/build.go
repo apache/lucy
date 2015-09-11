@@ -191,6 +191,12 @@ func specClasses(parcel *cfc.Parcel) {
 	mockMatcherBinding := cfc.NewGoClass(parcel, "LucyX::Search::MockMatcher")
 	mockMatcherBinding.SetSuppressCtor(true)
 	mockMatcherBinding.Register()
+
+	topDocsBinding := cfc.NewGoClass(parcel, "Lucy::Search::TopDocs")
+	topDocsBinding.SetSuppressCtor(true)
+	topDocsBinding.SpecMethod("Set_Match_Docs", "SetMatchDocs([]MatchDoc)")
+	topDocsBinding.SpecMethod("Get_Match_Docs", "GetMatchDocs() []MatchDoc")
+	topDocsBinding.Register()
 }
 
 func build() {

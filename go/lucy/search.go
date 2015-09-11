@@ -27,11 +27,13 @@ package lucy
 #include "Lucy/Search/ANDMatcher.h"
 #include "Lucy/Search/ORMatcher.h"
 #include "Lucy/Search/SeriesMatcher.h"
+#include "Lucy/Search/TopDocs.h"
 #include "Lucy/Document/HitDoc.h"
 #include "LucyX/Search/MockMatcher.h"
 #include "Clownfish/Blob.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/HashIterator.h"
+#include "Clownfish/Vector.h"
 
 static inline void
 float32_set(float *floats, size_t i, float value) {
@@ -173,6 +175,37 @@ func (obj *HitsIMP) Next(hit interface{}) bool {
 
 func (obj *HitsIMP) Error() error {
 	return obj.err
+}
+
+func NewTopDocs(matchDocs []MatchDoc, totalHits uint32) TopDocs {
+	vec := clownfish.NewVector(len(matchDocs))
+	for _, matchDoc := range matchDocs {
+		vec.Push(matchDoc)
+	}
+	cfObj := C.lucy_TopDocs_new(((*C.cfish_Vector)(clownfish.Unwrap(vec, "matchDocs"))),
+		C.uint32_t(totalHits))
+	return WRAPTopDocs(unsafe.Pointer(cfObj))
+}
+
+func (td *TopDocsIMP) SetMatchDocs(matchDocs []MatchDoc) {
+	self := (*C.lucy_TopDocs)(clownfish.Unwrap(td, "td"))
+	vec := clownfish.NewVector(len(matchDocs))
+	for _, matchDoc := range matchDocs {
+		vec.Push(matchDoc)
+	}
+	C.LUCY_TopDocs_Set_Match_Docs(self, (*C.cfish_Vector)(clownfish.Unwrap(vec, "matchDocs")))
+}
+
+func (td *TopDocsIMP) GetMatchDocs() []MatchDoc {
+	self := (*C.lucy_TopDocs)(clownfish.Unwrap(td, "td"))
+	vec := C.LUCY_TopDocs_Get_Match_Docs(self)
+	length := int(C.CFISH_Vec_Get_Size(vec))
+	slice := make([]MatchDoc, length)
+	for i := 0; i < length; i++ {
+		elem := C.cfish_incref(unsafe.Pointer(C.CFISH_Vec_Fetch(vec, C.size_t(i))))
+		slice[i] = WRAPMatchDoc(unsafe.Pointer(elem))
+	}
+	return slice
 }
 
 func NewANDQuery(children []Query) ANDQuery {
