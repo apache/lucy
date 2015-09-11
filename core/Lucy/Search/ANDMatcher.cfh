@@ -26,10 +26,10 @@ class Lucy::Search::ANDMatcher inherits Lucy::Search::PolyMatcher {
     bool          first_time;
 
     inert incremented ANDMatcher*
-    new(Vector *children, Similarity *sim);
+    new(Vector *children, Similarity *sim = NULL);
 
     inert ANDMatcher*
-    init(ANDMatcher *self, Vector *children, Similarity *similarity);
+    init(ANDMatcher *self, Vector *children, Similarity *similarity = NULL);
 
     public void
     Destroy(ANDMatcher *self);

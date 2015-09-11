@@ -159,6 +159,34 @@ func specClasses(parcel *cfc.Parcel) {
 	hitsBinding.SpecMethod("", "Error() error")
 	hitsBinding.SetSuppressStruct(true)
 	hitsBinding.Register()
+
+	andQueryBinding := cfc.NewGoClass(parcel, "Lucy::Search::ANDQuery")
+	andQueryBinding.SetSuppressCtor(true)
+	andQueryBinding.Register()
+
+	orQueryBinding := cfc.NewGoClass(parcel, "Lucy::Search::ORQuery")
+	orQueryBinding.SetSuppressCtor(true)
+	orQueryBinding.Register()
+
+	andMatcherBinding := cfc.NewGoClass(parcel, "Lucy::Search::ANDMatcher")
+	andMatcherBinding.SetSuppressCtor(true)
+	andMatcherBinding.Register()
+
+	orMatcherBinding := cfc.NewGoClass(parcel, "Lucy::Search::ORMatcher")
+	orMatcherBinding.SetSuppressCtor(true)
+	orMatcherBinding.Register()
+
+	orScorerBinding := cfc.NewGoClass(parcel, "Lucy::Search::ORScorer")
+	orScorerBinding.SetSuppressCtor(true)
+	orScorerBinding.Register()
+
+	bitVecBinding := cfc.NewGoClass(parcel, "Lucy::Object::BitVector")
+	bitVecBinding.SpecMethod("To_Array", "ToArray() []bool")
+	bitVecBinding.Register()
+
+	mockMatcherBinding := cfc.NewGoClass(parcel, "LucyX::Search::MockMatcher")
+	mockMatcherBinding.SetSuppressCtor(true)
+	mockMatcherBinding.Register()
 }
 
 func build() {

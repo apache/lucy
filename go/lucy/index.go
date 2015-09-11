@@ -47,20 +47,10 @@ type OpenIndexerArgs struct {
 }
 
 func OpenIndexer(args *OpenIndexerArgs) (obj Indexer, err error) {
-	var schemaC *C.lucy_Schema = nil
-	if args.Schema != nil {
-		schemaC = (*C.lucy_Schema)(unsafe.Pointer(args.Schema.TOPTR()))
-	}
-	switch args.Index.(type) {
-	case string:
-	default:
-		panic("TODO: support Folder")
-	}
-	ixLoc := clownfish.NewString(args.Index.(string))
-	var managerC *C.lucy_IndexManager = nil
-	if args.Manager != nil {
-		managerC = (*C.lucy_IndexManager)(unsafe.Pointer(args.Manager.TOPTR()))
-	}
+	schema := (*C.lucy_Schema)(clownfish.UnwrapNullable(args.Schema))
+	manager := (*C.lucy_IndexManager)(clownfish.UnwrapNullable(args.Manager))
+	index := (*C.cfish_Obj)(clownfish.GoToClownfish(args.Index, unsafe.Pointer(C.CFISH_OBJ), false))
+	defer C.cfish_decref(unsafe.Pointer(index))
 	var flags int32
 	if args.Create {
 		flags = flags | int32(C.lucy_Indexer_CREATE)
@@ -69,9 +59,7 @@ func OpenIndexer(args *OpenIndexerArgs) (obj Indexer, err error) {
 		flags = flags | int32(C.lucy_Indexer_TRUNCATE)
 	}
 	err = clownfish.TrapErr(func() {
-		cfObj := C.lucy_Indexer_new(schemaC,
-			(*C.cfish_Obj)(unsafe.Pointer(ixLoc.TOPTR())),
-			managerC, C.int32_t(flags))
+		cfObj := C.lucy_Indexer_new(schema, index, manager, C.int32_t(flags))
 		obj = WRAPIndexer(unsafe.Pointer(cfObj))
 	})
 	return obj, err

@@ -191,6 +191,7 @@ func init() {
 	C.GOLUCY_glue_exported_symbols()
 	C.lucy_bootstrap_parcel()
 	registry = newObjRegistry(16)
+	initWRAP()
 }
 
 //export GOLUCY_RegexTokenizer_init

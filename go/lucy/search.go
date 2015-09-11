@@ -22,9 +22,21 @@ package lucy
 #include "Lucy/Search/IndexSearcher.h"
 #include "Lucy/Search/Query.h"
 #include "Lucy/Search/Searcher.h"
+#include "Lucy/Search/ANDQuery.h"
+#include "Lucy/Search/ORQuery.h"
+#include "Lucy/Search/ANDMatcher.h"
+#include "Lucy/Search/ORMatcher.h"
 #include "Lucy/Document/HitDoc.h"
+#include "LucyX/Search/MockMatcher.h"
+#include "Clownfish/Blob.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/HashIterator.h"
+
+static inline void
+float32_set(float *floats, size_t i, float value) {
+	floats[i] = value;
+}
+
 */
 import "C"
 import "fmt"
@@ -40,14 +52,8 @@ type HitsIMP struct {
 }
 
 func OpenIndexSearcher(index interface{}) (obj IndexSearcher, err error) {
-	var indexC *C.cfish_Obj
-	switch index.(type) {
-	case string:
-		ixLoc := clownfish.NewString(index.(string))
-		indexC = (*C.cfish_Obj)(unsafe.Pointer(ixLoc.TOPTR()))
-	default:
-		panic("TODO: support Folder")
-	}
+	indexC := (*C.cfish_Obj)(clownfish.GoToClownfish(index, unsafe.Pointer(C.CFISH_OBJ), false))
+	defer C.cfish_decref(unsafe.Pointer(indexC))
 	err = clownfish.TrapErr(func() {
 		cfObj := C.lucy_IxSearcher_new(indexC)
 		obj = WRAPIndexSearcher(unsafe.Pointer(cfObj))
@@ -166,4 +172,73 @@ func (obj *HitsIMP) Next(hit interface{}) bool {
 
 func (obj *HitsIMP) Error() error {
 	return obj.err
+}
+
+func NewANDQuery(children []Query) ANDQuery {
+	vec := clownfish.NewVector(len(children))
+	for _, child := range children {
+		vec.Push(child)
+	}
+	childrenC := (*C.cfish_Vector)(unsafe.Pointer(vec.TOPTR()))
+	cfObj := C.lucy_ANDQuery_new(childrenC)
+	return WRAPANDQuery(unsafe.Pointer(cfObj))
+}
+
+func NewORQuery(children []Query) ORQuery {
+	vec := clownfish.NewVector(len(children))
+	for _, child := range children {
+		vec.Push(child)
+	}
+	childrenC := (*C.cfish_Vector)(unsafe.Pointer(vec.TOPTR()))
+	cfObj := C.lucy_ORQuery_new(childrenC)
+	return WRAPORQuery(unsafe.Pointer(cfObj))
+}
+
+func NewANDMatcher(children []Matcher, sim Similarity) ANDMatcher {
+	simC := (*C.lucy_Similarity)(clownfish.UnwrapNullable(sim))
+	vec := clownfish.NewVector(len(children))
+	for _, child := range children {
+		vec.Push(child)
+	}
+	childrenC := (*C.cfish_Vector)(unsafe.Pointer(vec.TOPTR()))
+	cfObj := C.lucy_ANDMatcher_new(childrenC, simC)
+	return WRAPANDMatcher(unsafe.Pointer(cfObj))
+}
+
+func NewORMatcher(children []Matcher) ORMatcher {
+	vec := clownfish.NewVector(len(children))
+	for _, child := range children {
+		vec.Push(child)
+	}
+	childrenC := (*C.cfish_Vector)(unsafe.Pointer(vec.TOPTR()))
+	cfObj := C.lucy_ORMatcher_new(childrenC)
+	return WRAPORMatcher(unsafe.Pointer(cfObj))
+}
+
+func NewORScorer(children []Matcher, sim Similarity) ORScorer {
+	simC := (*C.lucy_Similarity)(clownfish.UnwrapNullable(sim))
+	vec := clownfish.NewVector(len(children))
+	for _, child := range children {
+		vec.Push(child)
+	}
+	childrenC := (*C.cfish_Vector)(unsafe.Pointer(vec.TOPTR()))
+	cfObj := C.lucy_ORScorer_new(childrenC, simC)
+	return WRAPORScorer(unsafe.Pointer(cfObj))
+}
+
+func newMockMatcher(docIDs []int32, scores []float32) MockMatcher {
+	docIDsconv := NewI32Array(docIDs)
+	docIDsCF := (*C.lucy_I32Array)(unsafe.Pointer(docIDsconv.TOPTR()))
+	var blob *C.cfish_Blob = nil
+	if scores != nil {
+		size := len(scores) * 4
+		floats := (*C.float)(C.malloc(C.size_t(size)))
+		for i := 0; i < len(scores); i++ {
+			C.float32_set(floats, C.size_t(i), C.float(scores[i]))
+		}
+		blob = C.cfish_Blob_new_steal((*C.char)(unsafe.Pointer(floats)), C.size_t(size))
+		defer C.cfish_decref(unsafe.Pointer(blob))
+	}
+	matcher := C.lucy_MockMatcher_new(docIDsCF, blob)
+	return WRAPMockMatcher(unsafe.Pointer(matcher))
 }

@@ -79,10 +79,10 @@ class Lucy::Search::ORScorer inherits Lucy::Search::ORMatcher {
     int32_t           doc_id;
 
     inert incremented ORScorer*
-    new(Vector *children, Similarity *similarity);
+    new(Vector *children, Similarity *similarity = NULL);
 
     inert ORScorer*
-    init(ORScorer *self, Vector *children, Similarity *similarity);
+    init(ORScorer *self, Vector *children, Similarity *similarity = NULL);
 
     public void
     Destroy(ORScorer *self);

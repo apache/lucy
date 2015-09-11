@@ -20,8 +20,47 @@ import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 import "testing"
 import "reflect"
 
-func TestStuff(t *testing.T) {
-	NewSchema()
+type testDoc struct {
+	Content string
+}
+
+// Build a RAM index, using the supplied array of strings as source material.
+// The index will have a single field: "content".
+func createTestIndex(values ...string) Folder {
+	folder := NewRAMFolder("")
+	schema := createTestSchema()
+	indexerArgs := &OpenIndexerArgs{
+		Schema:   schema,
+		Index:    folder,
+		Create:   true,
+	}
+	indexer, err := OpenIndexer(indexerArgs)
+	if err != nil {
+		panic(err)
+	}
+	defer indexer.Close()
+
+	for _, val := range values {
+		err := indexer.AddDoc(&testDoc{val})
+		if err != nil {
+			panic(err)
+		}
+	}
+	err = indexer.Commit()
+	if err != nil {
+		panic(err)
+	}
+
+	return folder
+}
+
+func createTestSchema() Schema {
+	schema := NewSchema()
+	analyzer := NewStandardTokenizer()
+	fieldType := NewFullTextType(analyzer)
+	fieldType.SetHighlightable(true)
+	schema.SpecField("content", fieldType)
+	return schema
 }
 
 func TestOpenIndexer(t *testing.T) {
