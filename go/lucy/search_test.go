@@ -424,3 +424,29 @@ func TestHitQueueBasics(t *testing.T) {
 		t.Error("PopAll")
 	}
 }
+
+func TestSpanBasics(t *testing.T) {
+	a := NewSpan(42, 1, 0.0)
+	b := NewSpan(42, 2, 0.0)
+	if !a.Equals(a) {
+		t.Error("Equals self")
+	}
+	if a.Equals(b) {
+		t.Error("Equals should return false for non-equal spans")
+	}
+	if got := a.CompareTo(b); got >= 0 {
+		t.Errorf("CompareTo returned %d", got)
+	}
+	a.SetOffset(21)
+	if got := a.GetOffset(); got != 21 {
+		t.Errorf("Set/Get offset: %d", got)
+	}
+	a.SetLength(10)
+	if got := a.GetLength(); got != 10 {
+		t.Errorf("Set/Get length: %d", got)
+	}
+	a.SetWeight(1.5)
+	if got := a.GetWeight(); got != 1.5 {
+		t.Errorf("Set/Get weight: %f", got)
+	}
+}
