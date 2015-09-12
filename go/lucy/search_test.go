@@ -359,6 +359,31 @@ func TestNoMatchMatcherBasics(t *testing.T) {
 	}
 }
 
+func TestRangeMatcherBasics(t *testing.T) {
+	index := createTestIndex("d", "c", "b", "a", "a", "a", "a")
+	searcher, _ := OpenIndexSearcher(index)
+	segReaders := searcher.GetReader().SegReaders()
+	segReader := segReaders[0].(SegReader)
+	sortReader := segReader.Obtain("Lucy::Index::SortReader").(SortReader)
+	sortCache := sortReader.FetchSortCache("content")
+	matcher := NewRangeMatcher(0, 0, sortCache, segReader.DocMax())
+	if docID := matcher.Next(); docID != 4 {
+		t.Errorf("Next: %d", docID)
+	}
+	if docID := matcher.GetDocID(); docID != 4 {
+		t.Errorf("GetDocID: %d", docID)
+	}
+	if score := matcher.Score(); score != 0.0 {
+		t.Errorf("Score: %f", score)
+	}
+	if docID := matcher.Advance(7); docID != 7 {
+		t.Errorf("Advance: %d", docID)
+	}
+	if docID := matcher.Next(); docID != 0 {
+		t.Errorf("Matcher should be exhausted: %d", docID)
+	}
+}
+
 func TestTopDocsBasics(t *testing.T) {
 	matchDocs := []MatchDoc{
 		NewMatchDoc(42, 2.0, nil),

@@ -59,6 +59,7 @@ func createTestSchema() Schema {
 	analyzer := NewStandardTokenizer()
 	fieldType := NewFullTextType(analyzer)
 	fieldType.SetHighlightable(true)
+	fieldType.SetSortable(true)
 	schema.SpecField("content", fieldType)
 	return schema
 }
