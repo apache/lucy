@@ -328,6 +328,37 @@ func TestSeriesMatcherBasics(t *testing.T) {
 	checkMatcher(t, matcher, false)
 }
 
+func TestMatchAllMatcherBasics(t *testing.T) {
+	matcher := NewMatchAllMatcher(1.5, 42)
+	matcher.Next()
+	if docID := matcher.Next(); docID != 2 {
+		t.Errorf("Unexpected return value for Next: %d", docID)
+	}
+	if docID := matcher.GetDocID(); docID != 2 {
+		t.Errorf("Unexpected return value for GetDocID: %d", docID)
+	}
+	if docID := matcher.Advance(42); docID != 42 {
+		t.Errorf("Advance returned %d", docID)
+	}
+	if score := matcher.Score(); score != 1.5 {
+		t.Errorf("Unexpected score: %f", score)
+	}
+	if matcher.Next() != 0 {
+		t.Error("Matcher should be exhausted")
+	}
+}
+
+func TestNoMatchMatcherBasics(t *testing.T) {
+	matcher := NewNoMatchMatcher()
+	if matcher.Next() != 0 {
+		t.Error("Next should return false")
+	}
+	matcher = NewNoMatchMatcher()
+	if matcher.Advance(3) != 0 {
+		t.Error("Advance should return false")
+	}
+}
+
 func TestTopDocsBasics(t *testing.T) {
 	matchDocs := []MatchDoc{
 		NewMatchDoc(42, 2.0, nil),
