@@ -359,6 +359,29 @@ type simpleTestDoc struct {
 	Content string
 }
 
+func TestHitsBasics(t *testing.T) {
+	index := createTestIndex("a", "b")
+	searcher, _ := OpenIndexSearcher(index)
+	topDocs := searcher.TopDocs(NewTermQuery("content", "a"), 10, nil)
+	hits := NewHits(searcher, topDocs, 0)
+	if got := hits.TotalHits(); got != topDocs.GetTotalHits() {
+		t.Errorf("TotalHits is off: %d", got)
+	}
+	var doc simpleTestDoc
+	if !hits.Next(&doc) {
+		t.Error("Hits.Next")
+	}
+	if doc.Content != "a" {
+		t.Errorf("Bad doc content after Next: %s", doc.Content)
+	}
+	if hits.Next(&doc) {
+		t.Error("Hits iterator should be exhausted");
+	}
+	if err := hits.Error(); err != nil {
+		t.Error("Hits.Error() not nil: %v", err)
+	}
+}
+
 func TestSortSpecBasics(t *testing.T) {
 	folder := NewRAMFolder("")
 	schema := NewSchema()
