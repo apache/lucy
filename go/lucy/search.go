@@ -18,6 +18,7 @@ package lucy
 
 /*
 #include "Lucy/Search/Collector.h"
+#include "Lucy/Search/Collector/SortCollector.h"
 #include "Lucy/Search/Hits.h"
 #include "Lucy/Search/IndexSearcher.h"
 #include "Lucy/Search/Query.h"
@@ -325,4 +326,17 @@ func newMockMatcher(docIDs []int32, scores []float32) MockMatcher {
 	}
 	matcher := C.lucy_MockMatcher_new(docIDsCF, blob)
 	return WRAPMockMatcher(unsafe.Pointer(matcher))
+}
+
+func (sc *SortCollectorIMP) PopMatchDocs() []MatchDoc {
+	self := (*C.lucy_SortCollector)(clownfish.Unwrap(sc, "sc"))
+	matchDocsC := C.LUCY_SortColl_Pop_Match_Docs(self)
+	defer C.cfish_decref(unsafe.Pointer(matchDocsC))
+	length := int(C.CFISH_Vec_Get_Size(matchDocsC))
+	slice := make([]MatchDoc, length)
+	for i := 0; i < length; i++ {
+		elem := C.cfish_incref(unsafe.Pointer(C.CFISH_Vec_Fetch(matchDocsC, C.size_t(i))))
+		slice[i] = WRAPMatchDoc(unsafe.Pointer(elem))
+	}
+	return slice
 }

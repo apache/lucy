@@ -202,6 +202,10 @@ func specClasses(parcel *cfc.Parcel) {
 	sortSpecBinding.SetSuppressCtor(true)
 	sortSpecBinding.SpecMethod("Get_Rules", "GetRules() []SortRule")
 	sortSpecBinding.Register()
+
+	sortCollBinding := cfc.NewGoClass(parcel, "Lucy::Search::Collector::SortCollector")
+	sortCollBinding.SpecMethod("Pop_Match_Docs", "PopMatchDocs() []MatchDoc")
+	sortCollBinding.Register()
 }
 
 func build() {

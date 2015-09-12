@@ -529,3 +529,41 @@ func TestSpanBasics(t *testing.T) {
 		t.Errorf("Set/Get weight: %f", got)
 	}
 }
+
+func TestBitCollectorBasics(t *testing.T) {
+	index := createTestIndex("a", "b", "c", "a")
+	searcher, _ := OpenIndexSearcher(index)
+	bitVec := NewBitVector(5)
+	collector := NewBitCollector(bitVec)
+	searcher.Collect(NewTermQuery("content", "a"), collector)
+	expected := []bool{false, true, false, false, true, false, false, false}
+	if got := bitVec.ToArray(); !reflect.DeepEqual(got,expected) {
+		t.Errorf("Unexpected result set: %v", got)
+	}
+}
+
+func TestOffsetCollectorBasics(t *testing.T) {
+	index := createTestIndex("a", "b", "c")
+	searcher, _ := OpenIndexSearcher(index)
+	bitVec := NewBitVector(64)
+	bitColl := NewBitCollector(bitVec)
+	offsetColl := NewOffsetCollector(bitColl, 40)
+	searcher.Collect(NewTermQuery("content", "b"), offsetColl)
+	if got := bitVec.NextHit(0); got != 42 {
+		t.Errorf("Unexpected docID: %d", got)
+	}
+}
+
+func TestSortCollectorBasics(t *testing.T) {
+	index := createTestIndex("a", "b", "c", "a")
+	searcher, _ := OpenIndexSearcher(index)
+	collector := NewSortCollector(nil, nil, 1)
+	searcher.Collect(NewTermQuery("content", "a"), collector)
+	if totalHits := collector.GetTotalHits(); totalHits != 2 {
+		t.Errorf("Unexpected TotalHits: %d", totalHits)
+	}
+	matchDocs := collector.PopMatchDocs()
+	if docID := matchDocs[0].GetDocID(); docID != 1 {
+		t.Errorf("Weird MatchDoc: %d", docID)
+	}
+}
