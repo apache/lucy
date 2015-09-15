@@ -567,3 +567,58 @@ func TestSortCollectorBasics(t *testing.T) {
 		t.Errorf("Weird MatchDoc: %d", docID)
 	}
 }
+
+func TestIndexSearcherMisc(t *testing.T) {
+	index := createTestIndex("a", "b", "c", "a a")
+	searcher, _ := OpenIndexSearcher(index)
+	if got := searcher.DocFreq("content", "a"); got != 2 {
+		t.Errorf("DocFreq expected 2, got %d", got)
+	}
+	if got := searcher.DocMax(); got != 4 {
+		t.Errorf("DocMax expected 4, got %d", got)
+	}
+	if _, ok := searcher.GetReader().(PolyReader); !ok {
+		t.Error("GetReader")
+	}
+	if _, ok := searcher.FetchDocVec(4).(DocVector); !ok {
+		t.Error("DocVector")
+	}
+}
+
+func TestIndexSearcherOpenClose(t *testing.T) {
+	if _, err := OpenIndexSearcher(NewRAMFolder("")); err == nil {
+		t.Error("Open non-existent index")
+	}
+	if _, err := OpenIndexSearcher(42); err == nil {
+		t.Error("Garbage 'index' argument")
+	}
+	index := createTestIndex("a", "b", "c")
+	searcher, _ := OpenIndexSearcher(index)
+	searcher.Close()
+}
+
+func TestIndexSearcherHits(t *testing.T) {
+	index := createTestIndex("a", "b", "c", "a a")
+	searcher, _ := OpenIndexSearcher(index)
+	if got, _ := searcher.Hits("a", 0, 1, nil); got.TotalHits() != 2 {
+		t.Errorf("Hits() with query string: %d", got.TotalHits())
+	}
+	termQuery := NewTermQuery("content", "a")
+	if got, _ := searcher.Hits(termQuery, 0, 1, nil); got.TotalHits() != 2 {
+		t.Errorf("Hits() with TermQuery object: %d", got.TotalHits())
+	}
+
+	if _, err := searcher.Hits(42, 0, 1, nil); err == nil {
+		t.Error("Garbage 'query' argument")
+	}
+}
+
+func TestIndexSearcherTopDocs(t *testing.T) {
+	index := createTestIndex("a", "b")
+	searcher, _ := OpenIndexSearcher(index)
+	topDocs := searcher.TopDocs(NewTermQuery("content", "b"), 10, nil)
+	matchDocs := topDocs.GetMatchDocs()
+	if docID := matchDocs[0].GetDocID(); docID != 2 {
+		t.Errorf("TopDocs expected 2, got %d", docID)
+	}
+}
