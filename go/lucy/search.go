@@ -83,25 +83,17 @@ func doClose(obj Searcher) error {
 	})
 }
 
-func doHits(obj Searcher, query interface{}, offset uint32, numWanted uint32,
+func doHits(s Searcher, query interface{}, offset uint32, numWanted uint32,
 	sortSpec SortSpec) (hits Hits, err error) {
-	self := ((*C.lucy_Searcher)(unsafe.Pointer(obj.TOPTR())))
-	var sortSpecC *C.lucy_SortSpec
-	if sortSpec != nil {
-		sortSpecC = (*C.lucy_SortSpec)(unsafe.Pointer(sortSpec.TOPTR()))
-	}
-	switch query.(type) {
-	case string:
-		queryStringC := clownfish.NewString(query.(string))
-		err = clownfish.TrapErr(func() {
-			hitsC := C.LUCY_Searcher_Hits(self,
-				(*C.cfish_Obj)(unsafe.Pointer(queryStringC.TOPTR())),
-				C.uint32_t(offset), C.uint32_t(numWanted), sortSpecC)
-			hits = WRAPHits(unsafe.Pointer(hitsC))
-		})
-	default:
-		panic("TODO: support Query objects")
-	}
+	self := (*C.lucy_Searcher)(clownfish.Unwrap(s, "s"))
+	sortSpecC := (*C.lucy_SortSpec)(clownfish.UnwrapNullable(sortSpec))
+	queryC := (*C.cfish_Obj)(clownfish.GoToClownfish(query, unsafe.Pointer(C.CFISH_OBJ), false))
+	defer C.cfish_decref(unsafe.Pointer(queryC))
+	err = clownfish.TrapErr(func() {
+		hitsC := C.LUCY_Searcher_Hits(self, queryC,
+			C.uint32_t(offset), C.uint32_t(numWanted), sortSpecC)
+		hits = WRAPHits(unsafe.Pointer(hitsC))
+	})
 	return hits, err
 }
 
