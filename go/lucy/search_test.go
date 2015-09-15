@@ -622,3 +622,34 @@ func TestIndexSearcherTopDocs(t *testing.T) {
 		t.Errorf("TopDocs expected 2, got %d", docID)
 	}
 }
+
+func TestMatchDocBasics(t *testing.T) {
+	matchDoc := NewMatchDoc(0, 1.0, nil)
+	matchDoc.SetDocID(42)
+	if got := matchDoc.GetDocID(); got != 42 {
+		t.Errorf("Set/GetDocID: %d", got)
+	}
+	matchDoc.SetScore(1.5)
+	if got := matchDoc.GetScore(); got != 1.5 {
+		t.Errorf("Set/GetScore: %f", got)
+	}
+	values := []interface{}{"foo", int64(42)}
+	matchDoc.SetValues(values)
+	if got := matchDoc.GetValues(); !reflect.DeepEqual(got, values) {
+		t.Error("Get/SetValues")
+	}
+}
+
+func TestMatchDocSerialization(t *testing.T) {
+	values := []interface{}{"foo", int64(42)}
+	matchDoc := NewMatchDoc(100, 1.5, values)
+	folder := NewRAMFolder("")
+	outstream := folder.OpenOut("foo")
+	matchDoc.Serialize(outstream)
+	outstream.Close()
+	inStream := folder.OpenIn("foo")
+	dupe := clownfish.GetClass(matchDoc).MakeObj().(MatchDoc).Deserialize(inStream)
+	if got := dupe.GetValues(); !reflect.DeepEqual(got, values) {
+		t.Errorf("Failed round-trip serializetion of MatchDoc")
+	}
+}
