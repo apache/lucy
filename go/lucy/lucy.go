@@ -252,10 +252,11 @@ func GOLUCY_RegexTokenizer_Tokenize_Utf8(rt *C.lucy_RegexTokenizer, str *C.char,
 //export GOLUCY_Doc_init
 func GOLUCY_Doc_init(d *C.lucy_Doc, fields unsafe.Pointer, docID C.int32_t) *C.lucy_Doc {
 	ivars := C.lucy_Doc_IVARS(d)
-	if fields != nil {
-		ivars.fields = unsafe.Pointer(C.cfish_inc_refcount(fields))
+	if fields == nil {
+		fieldsID := registry.store(clownfish.NewHash(0))
+		ivars.fields = unsafe.Pointer(fieldsID)
 	} else {
-		ivars.fields = unsafe.Pointer(C.cfish_Hash_new(0))
+		ivars.fields = fields
 	}
 	ivars.doc_id = docID
 	return d
@@ -263,30 +264,25 @@ func GOLUCY_Doc_init(d *C.lucy_Doc, fields unsafe.Pointer, docID C.int32_t) *C.l
 
 //export GOLUCY_Doc_Set_Fields
 func GOLUCY_Doc_Set_Fields(d *C.lucy_Doc, fields unsafe.Pointer) {
-	ivars := C.lucy_Doc_IVARS(d)
-	temp := ivars.fields
-	ivars.fields = unsafe.Pointer(C.cfish_inc_refcount(fields))
-	C.cfish_decref(temp)
+	panic(clownfish.NewErr("Set_Fields unsupported in Go bindings"))
 }
 
 //export GOLUCY_Doc_Get_Size
 func GOLUCY_Doc_Get_Size(d *C.lucy_Doc) C.uint32_t {
-	ivars := C.lucy_Doc_IVARS(d)
-	hash := ((*C.cfish_Hash)(ivars.fields))
+	hash := fetchDocFields(d)
 	return C.uint32_t(C.CFISH_Hash_Get_Size(hash))
 }
 
 //export GOLUCY_Doc_Store
 func GOLUCY_Doc_Store(d *C.lucy_Doc, field *C.cfish_String, value *C.cfish_Obj) {
-	ivars := C.lucy_Doc_IVARS(d)
-	hash := (*C.cfish_Hash)(ivars.fields)
+	hash := fetchDocFields(d)
 	C.CFISH_Hash_Store(hash, field, C.cfish_inc_refcount(unsafe.Pointer(value)))
 }
 
 //export GOLUCY_Doc_Serialize
 func GOLUCY_Doc_Serialize(d *C.lucy_Doc, outstream *C.lucy_OutStream) {
 	ivars := C.lucy_Doc_IVARS(d)
-	hash := (*C.cfish_Hash)(ivars.fields)
+	hash := fetchDocFields(d)
 	C.lucy_Freezer_serialize_hash(hash, outstream)
 	C.LUCY_OutStream_Write_C32(outstream, C.uint32_t(ivars.doc_id))
 }
@@ -294,23 +290,23 @@ func GOLUCY_Doc_Serialize(d *C.lucy_Doc, outstream *C.lucy_OutStream) {
 //export GOLUCY_Doc_Deserialize
 func GOLUCY_Doc_Deserialize(d *C.lucy_Doc, instream *C.lucy_InStream) *C.lucy_Doc {
 	ivars := C.lucy_Doc_IVARS(d)
-	ivars.fields = unsafe.Pointer(C.lucy_Freezer_read_hash(instream))
+	hash := unsafe.Pointer(C.lucy_Freezer_read_hash(instream))
+	fieldsID := registry.store(clownfish.WRAPAny(hash))
+	ivars.fields = unsafe.Pointer(fieldsID)
 	ivars.doc_id = C.int32_t(C.LUCY_InStream_Read_C32(instream))
 	return d
 }
 
 //export GOLUCY_Doc_Extract
 func GOLUCY_Doc_Extract(d *C.lucy_Doc, field *C.cfish_String) *C.cfish_Obj {
-	ivars := C.lucy_Doc_IVARS(d)
-	hash := (*C.cfish_Hash)(ivars.fields)
+	hash := fetchDocFields(d)
 	val := C.CFISH_Hash_Fetch(hash, field)
 	return C.cfish_inc_refcount(unsafe.Pointer(val))
 }
 
 //export GOLUCY_Doc_Field_Names
 func GOLUCY_Doc_Field_Names(d *C.lucy_Doc) *C.cfish_Vector {
-	ivars := C.lucy_Doc_IVARS(d)
-	hash := (*C.cfish_Hash)(ivars.fields)
+	hash := fetchDocFields(d)
 	return C.CFISH_Hash_Keys(hash)
 }
 
@@ -323,17 +319,16 @@ func GOLUCY_Doc_Equals(d *C.lucy_Doc, other *C.cfish_Obj) C.bool {
 	if !C.cfish_Obj_is_a(other, C.LUCY_DOC) {
 		return false
 	}
-	ivars := C.lucy_Doc_IVARS(d)
-	ovars := C.lucy_Doc_IVARS(twin)
-	hash := (*C.cfish_Hash)(ivars.fields)
-	otherHash := (*C.cfish_Obj)(ovars.fields)
+	hash := fetchDocFields(d)
+	otherHash := (*C.cfish_Obj)(unsafe.Pointer(fetchDocFields(twin)))
 	return C.CFISH_Hash_Equals(hash, otherHash)
 }
 
 //export GOLUCY_Doc_Destroy
 func GOLUCY_Doc_Destroy(d *C.lucy_Doc) {
 	ivars := C.lucy_Doc_IVARS(d)
-	C.cfish_decref(unsafe.Pointer(ivars.fields))
+	fieldsID := uintptr(ivars.fields)
+	registry.delete(fieldsID)
 	C.cfish_super_destroy(unsafe.Pointer(d), C.LUCY_DOC)
 }
 
@@ -432,15 +427,15 @@ func GOLUCY_DefDocReader_Fetch_Doc(ddr *C.lucy_DefaultDocReader,
 	}
 	C.free(unsafe.Pointer(fieldName))
 
-	retval := C.lucy_HitDoc_new(unsafe.Pointer(fields), docID, 0.0)
-	C.cfish_dec_refcount(unsafe.Pointer(fields))
+	fieldsID := registry.store(clownfish.WRAPAny(unsafe.Pointer(fields)))
+	retval := C.lucy_HitDoc_new(unsafe.Pointer(fieldsID), docID, 0.0)
 	return retval
 }
 
 //export GOLUCY_Inverter_Invert_Doc
 func GOLUCY_Inverter_Invert_Doc(inverter *C.lucy_Inverter, doc *C.lucy_Doc) {
 	ivars := C.lucy_Inverter_IVARS(inverter)
-	fields := (*C.cfish_Hash)(C.LUCY_Doc_Get_Fields(doc))
+	fields := fetchDocFields(doc)
 
 	// Prepare for the new doc.
 	C.LUCY_Inverter_Set_Doc(inverter, doc)

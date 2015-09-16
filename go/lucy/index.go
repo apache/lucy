@@ -73,7 +73,7 @@ func (obj *IndexerIMP) Close() error {
 func (obj *IndexerIMP) AddDoc(doc interface{}) error {
 	self := ((*C.lucy_Indexer)(unsafe.Pointer(obj.TOPTR())))
 	stockDoc := C.LUCY_Indexer_Get_Stock_Doc(self)
-	docFields := (*C.cfish_Hash)(C.LUCY_Doc_Get_Fields(stockDoc))
+	docFields := fetchDocFields(stockDoc)
 	C.CFISH_Hash_Clear(docFields)
 
 	// TODO: Support map as doc in addition to struct as doc.

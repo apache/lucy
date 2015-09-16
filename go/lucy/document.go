@@ -17,11 +17,17 @@
 package lucy
 
 /*
+#define C_LUCY_DOC
+
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Document/HitDoc.h"
 */
 import "C"
 import "unsafe"
+import "fmt"
+
+import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
+
 
 func NewDoc(docID int32) Doc {
 	retvalCF := C.lucy_Doc_new(nil, C.int32_t(docID))
@@ -31,4 +37,14 @@ func NewDoc(docID int32) Doc {
 func NewHitDoc(docID int32, score float32) HitDoc {
 	retvalCF := C.lucy_HitDoc_new(nil, C.int32_t(docID), C.float(score))
 	return WRAPHitDoc(unsafe.Pointer(retvalCF))
+}
+
+func fetchDocFields(d *C.lucy_Doc) *C.cfish_Hash {
+	ivars := C.lucy_Doc_IVARS(d)
+	fieldsID := uintptr(ivars.fields)
+	fieldsGo, ok := registry.fetch(fieldsID).(clownfish.Hash)
+	if !ok {
+		panic(clownfish.NewErr(fmt.Sprintf("Failed to fetch doc %d from registry ", fieldsID)))
+	}
+	return (*C.cfish_Hash)(clownfish.Unwrap(fieldsGo, "fieldsGo"))
 }

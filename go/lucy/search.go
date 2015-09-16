@@ -149,7 +149,7 @@ func (obj *HitsIMP) Next(hit interface{}) bool {
 	}
 	defer C.cfish_dec_refcount(unsafe.Pointer(docC))
 
-	fields := (*C.cfish_Hash)(unsafe.Pointer(C.LUCY_HitDoc_Get_Fields(docC)))
+	fields := fetchDocFields((*C.lucy_Doc)(unsafe.Pointer(docC)))
 	iterator := C.cfish_HashIter_new(fields)
 	defer C.cfish_dec_refcount(unsafe.Pointer(iterator))
 	for C.CFISH_HashIter_Next(iterator) {
