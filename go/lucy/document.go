@@ -39,12 +39,12 @@ func NewHitDoc(docID int32, score float32) HitDoc {
 	return WRAPHitDoc(unsafe.Pointer(retvalCF))
 }
 
-func fetchDocFields(d *C.lucy_Doc) *C.cfish_Hash {
+func fetchDocFields(d *C.lucy_Doc) map[string]interface{} {
 	ivars := C.lucy_Doc_IVARS(d)
 	fieldsID := uintptr(ivars.fields)
-	fieldsGo, ok := registry.fetch(fieldsID).(clownfish.Hash)
+	fieldsGo, ok := registry.fetch(fieldsID).(map[string]interface{})
 	if !ok {
 		panic(clownfish.NewErr(fmt.Sprintf("Failed to fetch doc %d from registry ", fieldsID)))
 	}
-	return (*C.cfish_Hash)(clownfish.Unwrap(fieldsGo, "fieldsGo"))
+	return fieldsGo
 }

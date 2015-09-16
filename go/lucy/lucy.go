@@ -183,6 +183,7 @@ import "C"
 import "unsafe"
 import "fmt"
 import "regexp"
+import "reflect"
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
 var registry *objRegistry
@@ -253,7 +254,8 @@ func GOLUCY_RegexTokenizer_Tokenize_Utf8(rt *C.lucy_RegexTokenizer, str *C.char,
 func GOLUCY_Doc_init(d *C.lucy_Doc, fields unsafe.Pointer, docID C.int32_t) *C.lucy_Doc {
 	ivars := C.lucy_Doc_IVARS(d)
 	if fields == nil {
-		fieldsID := registry.store(clownfish.NewHash(0))
+		fieldsGo := make(map[string]interface{})
+		fieldsID := registry.store(fieldsGo)
 		ivars.fields = unsafe.Pointer(fieldsID)
 	} else {
 		ivars.fields = fields
@@ -269,21 +271,25 @@ func GOLUCY_Doc_Set_Fields(d *C.lucy_Doc, fields unsafe.Pointer) {
 
 //export GOLUCY_Doc_Get_Size
 func GOLUCY_Doc_Get_Size(d *C.lucy_Doc) C.uint32_t {
-	hash := fetchDocFields(d)
-	return C.uint32_t(C.CFISH_Hash_Get_Size(hash))
+	fields := fetchDocFields(d)
+	return C.uint32_t(len(fields))
 }
 
 //export GOLUCY_Doc_Store
 func GOLUCY_Doc_Store(d *C.lucy_Doc, field *C.cfish_String, value *C.cfish_Obj) {
-	hash := fetchDocFields(d)
-	C.CFISH_Hash_Store(hash, field, C.cfish_inc_refcount(unsafe.Pointer(value)))
+	fields := fetchDocFields(d)
+	fieldGo := clownfish.CFStringToGo(unsafe.Pointer(field))
+	valGo := clownfish.ToGo(unsafe.Pointer(value))
+	fields[fieldGo] = valGo
 }
 
 //export GOLUCY_Doc_Serialize
 func GOLUCY_Doc_Serialize(d *C.lucy_Doc, outstream *C.lucy_OutStream) {
 	ivars := C.lucy_Doc_IVARS(d)
-	hash := fetchDocFields(d)
-	C.lucy_Freezer_serialize_hash(hash, outstream)
+	fields := fetchDocFields(d)
+	hash := clownfish.GoToClownfish(fields, unsafe.Pointer(C.CFISH_HASH), false)
+	defer C.cfish_decref(hash)
+	C.lucy_Freezer_serialize_hash((*C.cfish_Hash)(hash), outstream)
 	C.LUCY_OutStream_Write_C32(outstream, C.uint32_t(ivars.doc_id))
 }
 
@@ -291,7 +297,9 @@ func GOLUCY_Doc_Serialize(d *C.lucy_Doc, outstream *C.lucy_OutStream) {
 func GOLUCY_Doc_Deserialize(d *C.lucy_Doc, instream *C.lucy_InStream) *C.lucy_Doc {
 	ivars := C.lucy_Doc_IVARS(d)
 	hash := unsafe.Pointer(C.lucy_Freezer_read_hash(instream))
-	fieldsID := registry.store(clownfish.WRAPAny(hash))
+	defer C.cfish_decref(hash)
+	fields := clownfish.ToGo(hash)
+	fieldsID := registry.store(fields)
 	ivars.fields = unsafe.Pointer(fieldsID)
 	ivars.doc_id = C.int32_t(C.LUCY_InStream_Read_C32(instream))
 	return d
@@ -299,15 +307,20 @@ func GOLUCY_Doc_Deserialize(d *C.lucy_Doc, instream *C.lucy_InStream) *C.lucy_Do
 
 //export GOLUCY_Doc_Extract
 func GOLUCY_Doc_Extract(d *C.lucy_Doc, field *C.cfish_String) *C.cfish_Obj {
-	hash := fetchDocFields(d)
-	val := C.CFISH_Hash_Fetch(hash, field)
-	return C.cfish_inc_refcount(unsafe.Pointer(val))
+	fields := fetchDocFields(d)
+	fieldGo := clownfish.CFStringToGo(unsafe.Pointer(field))
+	return (*C.cfish_Obj)(clownfish.GoToClownfish(fields[fieldGo],
+		unsafe.Pointer(C.CFISH_OBJ), true))
 }
 
 //export GOLUCY_Doc_Field_Names
 func GOLUCY_Doc_Field_Names(d *C.lucy_Doc) *C.cfish_Vector {
-	hash := fetchDocFields(d)
-	return C.CFISH_Hash_Keys(hash)
+	fields := fetchDocFields(d)
+	vec := clownfish.NewVector(len(fields))
+	for key, _ := range fields {
+		vec.Push(key)
+	}
+	return (*C.cfish_Vector)(C.cfish_incref(clownfish.Unwrap(vec, "vec")))
 }
 
 //export GOLUCY_Doc_Equals
@@ -319,9 +332,10 @@ func GOLUCY_Doc_Equals(d *C.lucy_Doc, other *C.cfish_Obj) C.bool {
 	if !C.cfish_Obj_is_a(other, C.LUCY_DOC) {
 		return false
 	}
-	hash := fetchDocFields(d)
-	otherHash := (*C.cfish_Obj)(unsafe.Pointer(fetchDocFields(twin)))
-	return C.CFISH_Hash_Equals(hash, otherHash)
+	fields := fetchDocFields(d)
+	otherFields := fetchDocFields(twin)
+	result := reflect.DeepEqual(fields, otherFields)
+	return C.bool(result)
 }
 
 //export GOLUCY_Doc_Destroy
@@ -332,7 +346,10 @@ func GOLUCY_Doc_Destroy(d *C.lucy_Doc) {
 	C.cfish_super_destroy(unsafe.Pointer(d), C.LUCY_DOC)
 }
 
-func fetchEntry(ivars *C.lucy_InverterIVARS, field *C.cfish_String) *C.lucy_InverterEntry {
+func fetchEntry(ivars *C.lucy_InverterIVARS, fieldGo string) *C.lucy_InverterEntry {
+	field := (*C.cfish_String)(clownfish.GoToClownfish(fieldGo,
+		unsafe.Pointer(C.CFISH_STRING), false))
+	defer C.cfish_decref(unsafe.Pointer(field))
 	schema := ivars.schema
 	fieldNum := C.LUCY_Seg_Field_Num(ivars.segment, field)
 	if fieldNum == 0 {
@@ -366,7 +383,7 @@ func GOLUCY_DefDocReader_Fetch_Doc(ddr *C.lucy_DefaultDocReader,
 	schema := ivars.schema
 	datInstream := ivars.dat_in
 	ixInstream := ivars.ix_in
-	fields := C.cfish_Hash_new(1)
+	fields := make(map[string]interface{})
 	fieldNameCap := C.size_t(31)
 	var fieldName *C.char = ((*C.char)(C.malloc(fieldNameCap + 1)))
 
@@ -391,43 +408,40 @@ func GOLUCY_DefDocReader_Fetch_Doc(ddr *C.lucy_DefaultDocReader,
 		// inefficient.  The solution should be to add a privte
 		// Schema_Fetch_Type_Utf8 method which takes char* and size_t.
 		fieldNameStr := C.cfish_Str_new_from_utf8(fieldName, fieldNameLen)
+		fieldNameGo := C.GoStringN(fieldName, C.int(fieldNameLen))
 		fieldType := C.LUCY_Schema_Fetch_Type(schema, fieldNameStr)
 		C.cfish_dec_refcount(unsafe.Pointer(fieldNameStr))
 
 		// Read the field value.
-		var value *C.cfish_Obj
 		switch C.LUCY_FType_Primitive_ID(fieldType) & C.lucy_FType_PRIMITIVE_ID_MASK {
 		case C.lucy_FType_TEXT:
 			valueLen := C.size_t(C.LUCY_InStream_Read_C32(datInstream))
 			buf := ((*C.char)(C.malloc(valueLen + 1)))
 			C.LUCY_InStream_Read_Bytes(datInstream, buf, valueLen)
-			C.null_terminate_string(buf, valueLen)
-			value = ((*C.cfish_Obj)(C.cfish_Str_new_steal_utf8(buf, valueLen)))
+			val := C.GoStringN(buf, C.int(valueLen))
+			fields[fieldNameGo] = val
 		case C.lucy_FType_BLOB:
 			valueLen := C.size_t(C.LUCY_InStream_Read_C32(datInstream))
 			buf := ((*C.char)(C.malloc(valueLen)))
 			C.LUCY_InStream_Read_Bytes(datInstream, buf, valueLen)
-			value = ((*C.cfish_Obj)(C.cfish_Blob_new_steal(buf, valueLen)))
+			val := C.GoBytes(unsafe.Pointer(buf), C.int(valueLen))
+			fields[fieldNameGo] = val
 		case C.lucy_FType_FLOAT32:
-			value = ((*C.cfish_Obj)(C.cfish_Float_new(C.double(C.LUCY_InStream_Read_F32(datInstream)))))
+			fields[fieldNameGo] = float32(C.LUCY_InStream_Read_F32(datInstream))
 		case C.lucy_FType_FLOAT64:
-			value = ((*C.cfish_Obj)(C.cfish_Float_new(C.LUCY_InStream_Read_F64(datInstream))))
+			fields[fieldNameGo] = float64(C.LUCY_InStream_Read_F64(datInstream))
 		case C.lucy_FType_INT32:
-			value = ((*C.cfish_Obj)(C.cfish_Int_new(C.int64_t(C.LUCY_InStream_Read_C32(datInstream)))))
+			fields[fieldNameGo] = int32(C.LUCY_InStream_Read_C32(datInstream))
 		case C.lucy_FType_INT64:
-			value = ((*C.cfish_Obj)(C.cfish_Int_new(C.int64_t(C.LUCY_InStream_Read_C64(datInstream)))))
+			fields[fieldNameGo] = int32(C.LUCY_InStream_Read_C64(datInstream))
 		default:
-			value = nil
 			panic(clownfish.NewErr("Internal Lucy error: bad type id for field " +
-				C.GoStringN(fieldName, C.int(fieldNameLen))))
+				fieldNameGo))
 		}
-
-		// Store the value.
-		C.CFISH_Hash_Store_Utf8(fields, fieldName, fieldNameLen, value)
 	}
 	C.free(unsafe.Pointer(fieldName))
 
-	fieldsID := registry.store(clownfish.WRAPAny(unsafe.Pointer(fields)))
+	fieldsID := registry.store(fields)
 	retval := C.lucy_HitDoc_new(unsafe.Pointer(fieldsID), docID, 0.0)
 	return retval
 }
@@ -441,15 +455,7 @@ func GOLUCY_Inverter_Invert_Doc(inverter *C.lucy_Inverter, doc *C.lucy_Doc) {
 	C.LUCY_Inverter_Set_Doc(inverter, doc)
 
 	// Extract and invert the doc's fields.
-	iter := C.cfish_HashIter_new(fields)
-	for C.CFISH_HashIter_Next(iter) {
-		field := C.CFISH_HashIter_Get_Key(iter)
-		obj := C.CFISH_HashIter_Get_Value(iter)
-		if obj == nil {
-			mess := "Invalid nil value for field" + clownfish.CFStringToGo(unsafe.Pointer(field))
-			panic(clownfish.NewErr(mess))
-		}
-
+	for field, val := range(fields) {
 		inventry := fetchEntry(ivars, field)
 		inventryIvars := C.lucy_InvEntry_IVARS(inventry)
 		fieldType := inventryIvars._type
@@ -470,22 +476,13 @@ func GOLUCY_Inverter_Invert_Doc(inverter *C.lucy_Inverter, doc *C.lucy_Doc) {
 		case C.lucy_FType_FLOAT64:
 			expectedType = C.CFISH_FLOAT
 		default:
-			panic(clownfish.NewErr("Internal Lucy error: bad type id for field " +
-				clownfish.CFStringToGo(unsafe.Pointer(field))))
+			panic(clownfish.NewErr("Internal Lucy error: bad type id for field " + field))
 		}
-		if !C.cfish_Obj_is_a(obj, expectedType) {
-			className := C.cfish_Obj_get_class_name((*C.cfish_Obj)(unsafe.Pointer(fieldType)))
-			mess := fmt.Sprintf("Invalid type for field '%s': '%s'",
-				clownfish.CFStringToGo(unsafe.Pointer(field)),
-				clownfish.CFStringToGo(unsafe.Pointer(className)))
-			panic(clownfish.NewErr(mess))
-		}
-		if inventryIvars.value != obj {
-			C.cfish_decref(unsafe.Pointer(inventryIvars.value))
-			inventryIvars.value = C.cfish_inc_refcount(unsafe.Pointer(obj))
-		}
+		temp := inventryIvars.value
+		valCF := clownfish.GoToClownfish(val, unsafe.Pointer(expectedType), false)
+		inventryIvars.value = C.cfish_inc_refcount(valCF)
+		C.cfish_decref(unsafe.Pointer(temp))
 
 		C.LUCY_Inverter_Add_Field(inverter, inventry)
 	}
-	C.cfish_dec_refcount(unsafe.Pointer(iter))
 }

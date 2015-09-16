@@ -150,19 +150,14 @@ func (obj *HitsIMP) Next(hit interface{}) bool {
 	defer C.cfish_dec_refcount(unsafe.Pointer(docC))
 
 	fields := fetchDocFields((*C.lucy_Doc)(unsafe.Pointer(docC)))
-	iterator := C.cfish_HashIter_new(fields)
-	defer C.cfish_dec_refcount(unsafe.Pointer(iterator))
-	for C.CFISH_HashIter_Next(iterator) {
-		keyC := C.CFISH_HashIter_Get_Key(iterator)
-		valC := C.CFISH_HashIter_Get_Value(iterator)
-		key := clownfish.CFStringToGo(unsafe.Pointer(keyC))
-		val := clownfish.CFStringToGo(unsafe.Pointer(valC))
+	for key, val := range fields {
+		stringVal := val.(string) // TODO type switch
 		match := func(name string) bool {
 			return strings.EqualFold(key, name)
 		}
 		structField := hitValue.FieldByNameFunc(match)
 		if structField != (reflect.Value{}) {
-			structField.SetString(val)
+			structField.SetString(stringVal)
 		}
 	}
 	return true

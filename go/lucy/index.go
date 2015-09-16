@@ -35,7 +35,7 @@ import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
 type IndexerIMP struct {
 	clownfish.ObjIMP
-	fieldNames map[string]clownfish.String
+	fieldNames map[string]string
 }
 
 type OpenIndexerArgs struct {
@@ -74,7 +74,9 @@ func (obj *IndexerIMP) AddDoc(doc interface{}) error {
 	self := ((*C.lucy_Indexer)(unsafe.Pointer(obj.TOPTR())))
 	stockDoc := C.LUCY_Indexer_Get_Stock_Doc(self)
 	docFields := fetchDocFields(stockDoc)
-	C.CFISH_Hash_Clear(docFields)
+	for field := range docFields {
+		delete(docFields, field)
+	}
 
 	// TODO: Support map as doc in addition to struct as doc.
 
@@ -96,11 +98,8 @@ func (obj *IndexerIMP) AddDoc(doc interface{}) error {
 	for i := 0; i < docValue.NumField(); i++ {
 		field := docType.Field(i).Name
 		value := docValue.Field(i).String()
-		fieldC := obj.findFieldC(field)
-		valueC := clownfish.NewString(value)
-		C.CFISH_Hash_Store(docFields,
-			(*C.cfish_String)(unsafe.Pointer(fieldC)),
-			C.cfish_inc_refcount(unsafe.Pointer(valueC.TOPTR())))
+		realField := obj.findRealField(field)
+		docFields[realField] = value
 	}
 
 	// TODO create an additional method AddDocWithBoost which allows the
@@ -113,10 +112,10 @@ func (obj *IndexerIMP) AddDoc(doc interface{}) error {
 	return err
 }
 
-func (obj *IndexerIMP) findFieldC(name string) *C.cfish_String {
+func (obj *IndexerIMP) findRealField(name string) string {
 	self := ((*C.lucy_Indexer)(unsafe.Pointer(obj.TOPTR())))
 	if obj.fieldNames == nil {
-		obj.fieldNames = make(map[string]clownfish.String)
+		obj.fieldNames = make(map[string]string)
 	}
 	f, ok := obj.fieldNames[name]
 	if !ok {
@@ -127,13 +126,12 @@ func (obj *IndexerIMP) findFieldC(name string) *C.cfish_String {
 			cfString := unsafe.Pointer(C.CFISH_Vec_Fetch(fieldList, C.size_t(i)))
 			field := clownfish.CFStringToGo(cfString)
 			if strings.EqualFold(name, field) {
-				C.cfish_inc_refcount(cfString)
-				f = clownfish.WRAPString(cfString)
-				obj.fieldNames[name] = f
+				f = field
+				obj.fieldNames[name] = field
 			}
 		}
 	}
-	return (*C.cfish_String)(unsafe.Pointer(f.TOPTR()))
+	return f
 }
 
 func (obj *IndexerIMP) Commit() error {
