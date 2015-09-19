@@ -229,6 +229,10 @@ END_CONSTRUCTOR
         initializer => 'do_open',
         sample      => $constructor,
     );
+    $pod_spec->add_method(
+        method => 'Offsets',
+        alias  => 'offsets',
+    );
 
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy    PACKAGE = Lucy::Index::IndexReader

@@ -69,6 +69,10 @@ END_POD
         alias  => 'store',
         pod    => $store_pod,
     );
+    $pod_spec->add_method(
+        method => 'Get_Fields',
+        alias  => 'get_fields',
+    );
 
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy     PACKAGE = Lucy::Document::Doc
