@@ -70,55 +70,95 @@ func (obj *IndexerIMP) Close() error {
 	return nil // TODO catch errors
 }
 
-func (obj *IndexerIMP) AddDoc(doc interface{}) error {
-	self := ((*C.lucy_Indexer)(unsafe.Pointer(obj.TOPTR())))
-	stockDoc := C.LUCY_Indexer_Get_Stock_Doc(self)
-	docFields := fetchDocFields(stockDoc)
+func (obj *IndexerIMP) addDocObj(doc Doc, boost float32) error {
+	self := (*C.lucy_Indexer)(clownfish.Unwrap(obj, "obj"))
+	d := (*C.lucy_Doc)(clownfish.Unwrap(doc, "doc"))
+	return clownfish.TrapErr(func() {
+		C.LUCY_Indexer_Add_Doc(self, d, C.float(boost))
+	})
+}
+
+func (obj *IndexerIMP) addMapAsDoc(doc map[string]interface{}, boost float32) error {
+	self := (*C.lucy_Indexer)(clownfish.Unwrap(obj, "obj"))
+	d := C.LUCY_Indexer_Get_Stock_Doc(self)
+	docFields := fetchDocFields(d)
+	for field := range docFields {
+		delete(docFields, field)
+	}
+	for key, value := range doc {
+		field, err := obj.findRealField(key)
+		if err != nil {
+			return err
+		}
+		docFields[field] = value
+	}
+	return clownfish.TrapErr(func() {
+		C.LUCY_Indexer_Add_Doc(self, d, C.float(boost))
+	})
+}
+
+func (obj *IndexerIMP) addStructAsDoc(doc interface{}, boost float32) error {
+	self := (*C.lucy_Indexer)(clownfish.Unwrap(obj, "obj"))
+	d := C.LUCY_Indexer_Get_Stock_Doc(self)
+	docFields := fetchDocFields(d)
 	for field := range docFields {
 		delete(docFields, field)
 	}
 
-	// TODO: Support map as doc in addition to struct as doc.
-
 	// Get reflection value and type for the supplied struct.
 	var docValue reflect.Value
+	var success bool
 	if reflect.ValueOf(doc).Kind() == reflect.Ptr {
 		temp := reflect.ValueOf(doc).Elem()
 		if temp.Kind() == reflect.Struct {
 			docValue = temp
+			success = true
 		}
 	}
-	if docValue == (reflect.Value{}) {
-		mess := fmt.Sprintf("Doc not struct pointer: %v",
-			reflect.TypeOf(doc))
+	if !success {
+		mess := fmt.Sprintf("Unexpected type for doc: %t", doc)
 		return clownfish.NewErr(mess)
 	}
-	docType := docValue.Type()
 
+	// Copy field values into stockDoc.
+	docType := docValue.Type()
 	for i := 0; i < docValue.NumField(); i++ {
 		field := docType.Field(i).Name
 		value := docValue.Field(i).String()
-		realField := obj.findRealField(field)
+		realField, err := obj.findRealField(field)
+		if err != nil {
+			return err
+		}
 		docFields[realField] = value
 	}
 
-	// TODO create an additional method AddDocWithBoost which allows the
-	// client to supply `boost`.
-	boost := 1.0
-	err := clownfish.TrapErr(func() {
-		C.LUCY_Indexer_Add_Doc(self, stockDoc, C.float(boost))
+	return clownfish.TrapErr(func() {
+		C.LUCY_Indexer_Add_Doc(self, d, C.float(boost))
 	})
-
-	return err
 }
 
-func (obj *IndexerIMP) findRealField(name string) string {
+func (obj *IndexerIMP) AddDoc(doc interface{}) error {
+	// TODO create an additional method AddDocWithBoost which allows the
+	// client to supply `boost`.
+	boost := float32(1.0)
+
+	if suppliedDoc, ok := doc.(Doc); ok {
+		return obj.addDocObj(suppliedDoc, boost)
+	} else if m, ok := doc.(map[string]interface{}); ok {
+		return obj.addMapAsDoc(m, boost)
+	} else {
+		return obj.addStructAsDoc(doc, boost)
+	}
+}
+
+func (obj *IndexerIMP) findRealField(name string) (string, error) {
 	self := ((*C.lucy_Indexer)(unsafe.Pointer(obj.TOPTR())))
 	if obj.fieldNames == nil {
 		obj.fieldNames = make(map[string]string)
 	}
-	f, ok := obj.fieldNames[name]
-	if !ok {
+	if field, ok := obj.fieldNames[name]; ok {
+		return field, nil
+	} else {
 		schema := C.LUCY_Indexer_Get_Schema(self)
 		fieldList := C.LUCY_Schema_All_Fields(schema)
 		defer C.cfish_dec_refcount(unsafe.Pointer(fieldList))
@@ -126,12 +166,12 @@ func (obj *IndexerIMP) findRealField(name string) string {
 			cfString := unsafe.Pointer(C.CFISH_Vec_Fetch(fieldList, C.size_t(i)))
 			field := clownfish.CFStringToGo(cfString)
 			if strings.EqualFold(name, field) {
-				f = field
 				obj.fieldNames[name] = field
+				return field, nil
 			}
 		}
 	}
-	return f
+	return "", clownfish.NewErr(fmt.Sprintf("Unknown field: '%v'", name))
 }
 
 func (obj *IndexerIMP) Commit() error {
