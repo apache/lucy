@@ -182,6 +182,7 @@ null_terminate_string(char *string, size_t len) {
 import "C"
 import "unsafe"
 import "fmt"
+import "strings"
 import "regexp"
 import "reflect"
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
@@ -376,16 +377,72 @@ func fetchEntry(ivars *C.lucy_InverterIVARS, fieldGo string) *C.lucy_InverterEnt
 	return (*C.lucy_InverterEntry)(unsafe.Pointer(entry))
 }
 
-//export GOLUCY_DefDocReader_Fetch_Doc
-func GOLUCY_DefDocReader_Fetch_Doc(ddr *C.lucy_DefaultDocReader,
-	docID C.int32_t) *C.lucy_HitDoc {
-	ivars := C.lucy_DefDocReader_IVARS(ddr)
+func setMapField(store interface{}, field string, val interface{}) error {
+	m := store.(map[string]interface{})
+	m[field] = val
+	return nil
+}
+
+func setStructField(store interface{}, field string, val interface{}) error {
+	structStore := store.(reflect.Value)
+	stringVal := val.(string) // TODO type switch
+	match := func(name string) bool {
+		return strings.EqualFold(field, name)
+	}
+	structField := structStore.FieldByNameFunc(match)
+	if structField != (reflect.Value{}) { // TODO require match?
+		structField.SetString(stringVal)
+	}
+	return nil
+}
+
+func doReadDocData(ddrC *C.lucy_DefaultDocReader, docID int32, doc interface{}) error {
+
+	// Adapt for different types of "doc".
+	var setField func(interface{}, string, interface{}) error
+	var fields interface{}
+	switch v := doc.(type) {
+	case Doc:
+		docC := (*C.lucy_Doc)(clownfish.Unwrap(v, "doc"))
+		fieldsMap := fetchDocFields(docC)
+		for field, _ := range fieldsMap {
+			delete(fieldsMap, field)
+		}
+		fields = fieldsMap
+		setField = setMapField
+	case map[string]interface{}:
+		for field, _ := range v {
+			delete(v, field)
+		}
+		fields = v
+		setField = setMapField
+	default:
+		// Get reflection value and type for the supplied struct.
+		var hitValue reflect.Value
+		if reflect.ValueOf(doc).Kind() == reflect.Ptr {
+			temp := reflect.ValueOf(doc).Elem()
+			if temp.Kind() == reflect.Struct {
+				if temp.CanSet() {
+					hitValue = temp
+				}
+			}
+		}
+		if hitValue == (reflect.Value{}) {
+			mess := fmt.Sprintf("Arg not writeable struct pointer: %v",
+				reflect.TypeOf(doc))
+			return clownfish.NewErr(mess)
+		}
+		fields = hitValue
+		setField = setStructField
+	}
+
+	ivars := C.lucy_DefDocReader_IVARS(ddrC)
 	schema := ivars.schema
 	datInstream := ivars.dat_in
 	ixInstream := ivars.ix_in
-	fields := make(map[string]interface{})
 	fieldNameCap := C.size_t(31)
 	var fieldName *C.char = ((*C.char)(C.malloc(fieldNameCap + 1)))
+	defer C.free(unsafe.Pointer(fieldName))
 
 	// Get data file pointer from index, read number of fields.
 	C.LUCY_InStream_Seek(ixInstream, C.int64_t(docID*8))
@@ -419,28 +476,55 @@ func GOLUCY_DefDocReader_Fetch_Doc(ddr *C.lucy_DefaultDocReader,
 			buf := ((*C.char)(C.malloc(valueLen + 1)))
 			C.LUCY_InStream_Read_Bytes(datInstream, buf, valueLen)
 			val := C.GoStringN(buf, C.int(valueLen))
-			fields[fieldNameGo] = val
+			err := setField(fields, fieldNameGo, val)
+			if err != nil {
+				return err
+			}
 		case C.lucy_FType_BLOB:
 			valueLen := C.size_t(C.LUCY_InStream_Read_C32(datInstream))
 			buf := ((*C.char)(C.malloc(valueLen)))
 			C.LUCY_InStream_Read_Bytes(datInstream, buf, valueLen)
 			val := C.GoBytes(unsafe.Pointer(buf), C.int(valueLen))
-			fields[fieldNameGo] = val
+			err := setField(fields, fieldNameGo, val)
+			if err != nil {
+				return err
+			}
 		case C.lucy_FType_FLOAT32:
-			fields[fieldNameGo] = float32(C.LUCY_InStream_Read_F32(datInstream))
+			err := setField(fields, fieldNameGo, float32(C.LUCY_InStream_Read_F32(datInstream)))
+			if err != nil {
+				return err
+			}
 		case C.lucy_FType_FLOAT64:
-			fields[fieldNameGo] = float64(C.LUCY_InStream_Read_F64(datInstream))
+			err := setField(fields, fieldNameGo, float64(C.LUCY_InStream_Read_F64(datInstream)))
+			if err != nil {
+				return err
+			}
 		case C.lucy_FType_INT32:
-			fields[fieldNameGo] = int32(C.LUCY_InStream_Read_C32(datInstream))
+			err := setField(fields, fieldNameGo, int32(C.LUCY_InStream_Read_C32(datInstream)))
+			if err != nil {
+				return err
+			}
 		case C.lucy_FType_INT64:
-			fields[fieldNameGo] = int32(C.LUCY_InStream_Read_C64(datInstream))
+			err := setField(fields, fieldNameGo, int64(C.LUCY_InStream_Read_C64(datInstream)))
+			if err != nil {
+				return err
+			}
 		default:
-			panic(clownfish.NewErr("Internal Lucy error: bad type id for field " +
-				fieldNameGo))
+			return clownfish.NewErr(
+				"Internal Lucy error: bad type id for field " + fieldNameGo)
 		}
 	}
-	C.free(unsafe.Pointer(fieldName))
+	return nil
+}
 
+//export GOLUCY_DefDocReader_Fetch_Doc
+func GOLUCY_DefDocReader_Fetch_Doc(ddr *C.lucy_DefaultDocReader,
+	docID C.int32_t) *C.lucy_HitDoc {
+	fields := make(map[string]interface{})
+	err := doReadDocData(ddr, int32(docID), fields)
+	if err != nil {
+		panic(err)
+	}
 	fieldsID := registry.store(fields)
 	retval := C.lucy_HitDoc_new(unsafe.Pointer(fieldsID), docID, 0.0)
 	return retval
