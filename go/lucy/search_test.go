@@ -438,6 +438,30 @@ func TestHitsBasics(t *testing.T) {
 	}
 }
 
+func TestHitsNext(t *testing.T) {
+	index := createTestIndex("a x", "a y", "a z", "b")
+	searcher, _ := OpenIndexSearcher(index)
+	hits, _ := searcher.Hits("a", 0, 10, nil)
+	docDoc := NewHitDoc(0, -1.0)
+	docStruct := &simpleTestDoc{}
+	docMap := make(map[string]interface{})
+	if !hits.Next(docDoc) || !hits.Next(docStruct) || !hits.Next(docMap) {
+		t.Errorf("Hits.Next returned false: %v", hits.Error())
+	}
+	if hits.Next(&simpleTestDoc{}) {
+		t.Error("Hits iterator should be exhausted");
+	}
+	if docDoc.Extract("content").(string) != "a x" {
+		t.Error("Next with Doc object yielded bad data")
+	}
+	if docStruct.Content != "a y" {
+		t.Error("Next with struct yielded bad data")
+	}
+	if docMap["content"].(string) != "a z" {
+		t.Error("Next with map yielded bad data")
+	}
+}
+
 func TestSortSpecBasics(t *testing.T) {
 	folder := NewRAMFolder("")
 	schema := NewSchema()

@@ -17,6 +17,9 @@
 package lucy
 
 /*
+
+#define C_LUCY_HITS
+
 #include "Lucy/Search/Collector.h"
 #include "Lucy/Search/Collector/SortCollector.h"
 #include "Lucy/Search/Hits.h"
@@ -26,6 +29,7 @@ package lucy
 #include "Lucy/Search/ANDQuery.h"
 #include "Lucy/Search/ORQuery.h"
 #include "Lucy/Search/ANDMatcher.h"
+#include "Lucy/Search/MatchDoc.h"
 #include "Lucy/Search/ORMatcher.h"
 #include "Lucy/Search/SeriesMatcher.h"
 #include "Lucy/Search/SortRule.h"
@@ -46,9 +50,6 @@ float32_set(float *floats, size_t i, float value) {
 
 */
 import "C"
-import "fmt"
-import "reflect"
-import "strings"
 import "unsafe"
 
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
@@ -135,52 +136,36 @@ func (obj *PolySearcherIMP) Hits(query interface{}, offset uint32, numWanted uin
 	return doHits(obj, query, offset, numWanted, sortSpec)
 }
 
-func (obj *HitsIMP) Next(hit interface{}) bool {
-	self := ((*C.lucy_Hits)(unsafe.Pointer(obj.TOPTR())))
-	// TODO: accept a HitDoc object and populate score.
+type setScorer interface {
+	SetScore(float32)
+}
 
-	// Get reflection value and type for the supplied struct.
-	var hitValue reflect.Value
-	if reflect.ValueOf(hit).Kind() == reflect.Ptr {
-		temp := reflect.ValueOf(hit).Elem()
-		if temp.Kind() == reflect.Struct {
-			if temp.CanSet() {
-				hitValue = temp
-			}
-		}
-	}
-	if hitValue == (reflect.Value{}) {
-		mess := fmt.Sprintf("Arg not writeable struct pointer: %v",
-			reflect.TypeOf(hit))
-		obj.err = clownfish.NewErr(mess)
-		return false
-	}
+func (h *HitsIMP) Next(hit interface{}) bool {
+	self := (*C.lucy_Hits)(clownfish.Unwrap(h, "h"))
+	ivars := C.lucy_Hits_IVARS(self)
+	matchDoc := (*C.lucy_MatchDoc)(unsafe.Pointer(
+		C.CFISH_Vec_Fetch(ivars.match_docs, C.size_t(ivars.offset))))
+	ivars.offset += 1
 
-	var docC *C.lucy_HitDoc
-	errCallingNext := clownfish.TrapErr(func() {
-		docC = C.LUCY_Hits_Next(self)
-	})
-	if errCallingNext != nil {
-		obj.err = errCallingNext
+	if matchDoc == nil {
+		// Bail if there aren't any more *captured* hits.  (There may be
+		// more total hits.)
 		return false
-	}
-	if docC == nil {
-		return false
-	}
-	defer C.cfish_dec_refcount(unsafe.Pointer(docC))
-
-	fields := fetchDocFields((*C.lucy_Doc)(unsafe.Pointer(docC)))
-	for key, val := range fields {
-		stringVal := val.(string) // TODO type switch
-		match := func(name string) bool {
-			return strings.EqualFold(key, name)
+	} else {
+		// Lazily fetch HitDoc, set score.
+		searcher := clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(
+			unsafe.Pointer(ivars.searcher)))).(Searcher)
+		docID := int32(C.LUCY_MatchDoc_Get_Doc_ID(matchDoc))
+		err := searcher.ReadDoc(docID, hit)
+		if err != nil {
+			h.err = err
+			return false
 		}
-		structField := hitValue.FieldByNameFunc(match)
-		if structField != (reflect.Value{}) {
-			structField.SetString(stringVal)
+		if ss, ok := hit.(setScorer); ok {
+			ss.SetScore(float32(C.LUCY_MatchDoc_Get_Score(matchDoc)))
 		}
+		return true
 	}
-	return true
 }
 
 func (obj *HitsIMP) Error() error {
