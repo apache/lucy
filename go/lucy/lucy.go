@@ -25,6 +25,7 @@ package lucy
 #define C_LUCY_DEFAULTDOCREADER
 #define C_LUCY_INVERTER
 #define C_LUCY_INVERTERENTRY
+#define C_LUCY_POLYDOCREADER
 
 #include "lucy_parcel.h"
 #include "Lucy/Analysis/RegexTokenizer.h"
@@ -46,9 +47,12 @@ package lucy
 #include "Lucy/Document/HitDoc.h"
 #include "Lucy/Plan/FieldType.h"
 #include "Lucy/Plan/Schema.h"
+#include "Lucy/Index/DocReader.h"
+#include "Lucy/Index/PolyReader.h"
 #include "Lucy/Index/Segment.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Object/I32Array.h"
 #include "Lucy/Util/Freezer.h"
 
 extern lucy_RegexTokenizer*
@@ -375,6 +379,42 @@ func fetchEntry(ivars *C.lucy_InverterIVARS, fieldGo string) *C.lucy_InverterEnt
 		return newEntry
 	}
 	return (*C.lucy_InverterEntry)(unsafe.Pointer(entry))
+}
+
+func fetchDocFromDocReader(dr DocReader, docID int32, doc interface{}) error {
+	switch v := dr.(type) {
+	case *DefaultDocReaderIMP:
+		return v.readDoc(docID, doc)
+	case *PolyDocReaderIMP:
+		return v.readDoc(docID, doc)
+	default:
+		panic(clownfish.NewErr(fmt.Sprintf("Unexpected type: %T", v)))
+	}
+}
+
+func (pdr *PolyDocReaderIMP) readDoc(docID int32, doc interface{}) error {
+	self := (*C.lucy_PolyDocReader)(clownfish.Unwrap(pdr, "pdr"))
+	ivars := C.lucy_PolyDocReader_IVARS(self)
+	segTick := C.lucy_PolyReader_sub_tick(ivars.offsets, C.int32_t(docID))
+	offset := C.LUCY_I32Arr_Get(ivars.offsets, segTick)
+	defDocReader := (*C.lucy_DefaultDocReader)(C.CFISH_Vec_Fetch(ivars.readers, C.size_t(segTick)))
+	if (defDocReader == nil) {
+		return clownfish.NewErr(fmt.Sprintf("Invalid docID: %d", docID))
+	}
+	if !C.cfish_Obj_is_a((*C.cfish_Obj)(unsafe.Pointer(defDocReader)), C.LUCY_DEFAULTDOCREADER) {
+		panic(clownfish.NewErr("Unexpected type")) // sanity check
+	}
+	adjustedDocID := docID - int32(offset)
+	err := doReadDocData(defDocReader, adjustedDocID, doc)
+	if docDoc, ok := doc.(Doc); ok {
+		docDoc.SetDocID(docID)
+	}
+	return err
+}
+
+func (ddr *DefaultDocReaderIMP) readDoc(docID int32, doc interface{}) error {
+	self := (*C.lucy_DefaultDocReader)(clownfish.Unwrap(ddr, "ddr"))
+	return doReadDocData(self, docID, doc)
 }
 
 func setMapField(store interface{}, field string, val interface{}) error {
