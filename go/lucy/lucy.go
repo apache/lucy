@@ -249,11 +249,6 @@ func GOLUCY_RegexTokenizer_Tokenize_Utf8(rt *C.lucy_RegexTokenizer, str *C.char,
 	}
 }
 
-func NewDoc(docID int32) Doc {
-	retvalCF := C.lucy_Doc_new(nil, C.int32_t(docID))
-	return WRAPDoc(unsafe.Pointer(retvalCF))
-}
-
 //export GOLUCY_Doc_init
 func GOLUCY_Doc_init(d *C.lucy_Doc, fields unsafe.Pointer, docID C.int32_t) *C.lucy_Doc {
 	ivars := C.lucy_Doc_IVARS(d)
