@@ -98,7 +98,7 @@ PPCODE:
     lucy_RAMFileHandle *file_handle
         = lucy_RAMFH_open(NULL, LUCY_FH_READ_ONLY, ram_file);
     lucy_InStream *instream = lucy_InStream_open((cfish_Obj*)file_handle);
-    cfish_Obj *self = CFISH_Class_Foster_Obj(klass, blank_obj);
+    cfish_Obj *self = XSBind_foster_obj(aTHX_ blank_obj, klass);
     cfish_Obj *deserialized = lucy_Freezer_deserialize(self, instream);
 
     CFISH_UNUSED_VAR(cloning);
