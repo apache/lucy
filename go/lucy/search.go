@@ -32,6 +32,7 @@ package lucy
 #include "Lucy/Search/SortSpec.h"
 #include "Lucy/Search/TopDocs.h"
 #include "Lucy/Document/HitDoc.h"
+#include "Lucy/Index/IndexReader.h"
 #include "LucyX/Search/MockMatcher.h"
 #include "Clownfish/Blob.h"
 #include "Clownfish/Hash.h"
@@ -74,6 +75,25 @@ func (obj *IndexSearcherIMP) Close() error {
 func (obj *IndexSearcherIMP) Hits(query interface{}, offset uint32, numWanted uint32,
 	sortSpec SortSpec) (hits Hits, err error) {
 	return doHits(obj, query, offset, numWanted, sortSpec)
+}
+
+// Read data into the supplied doc.
+func (s *SearcherIMP) ReadDoc(docID int32, doc interface{}) error {
+	self := (*C.lucy_Searcher)(clownfish.Unwrap(s, "s"))
+	class := C.cfish_Obj_get_class((*C.cfish_Obj)(unsafe.Pointer(self)))
+	if class == C.LUCY_INDEXSEARCHER {
+		ixReader := C.LUCY_IxSearcher_Get_Reader((*C.lucy_IndexSearcher)(unsafe.Pointer(self)))
+		cfStr := (*C.cfish_String)(clownfish.GoToClownfish("Lucy::Index::DocReader", unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(cfStr))
+		docReader := C.LUCY_IxReader_Fetch(ixReader, cfStr)
+		if docReader == nil {
+			return clownfish.NewErr("No DocReader available")
+		}
+		docReaderGo := clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(docReader)))).(DocReader)
+		return fetchDocFromDocReader(docReaderGo, docID, doc)
+	} else {
+		return clownfish.NewErr("Support for ReadDoc not implemented")
+	}
 }
 
 func doClose(obj Searcher) error {

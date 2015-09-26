@@ -623,6 +623,36 @@ func TestIndexSearcherTopDocs(t *testing.T) {
 	}
 }
 
+func TestIndexSearcherReadDoc(t *testing.T) {
+	index := createTestIndex("a", "b")
+	searcher, _ := OpenIndexSearcher(index)
+	docDoc := NewHitDoc(0, -1.0)
+	docStruct := &simpleTestDoc{}
+	docMap := make(map[string]interface{})
+	var err error
+	err = searcher.ReadDoc(2, docDoc)
+	if err != nil {
+		t.Errorf("ReadDoc failed with HitDoc: %v", err)
+	}
+	err = searcher.ReadDoc(2, docStruct)
+	if err != nil {
+		t.Errorf("ReadDoc failed with struct: %v", err)
+	}
+	err = searcher.ReadDoc(2, docMap)
+	if err != nil {
+		t.Errorf("ReadDoc failed with map: %v", err)
+	}
+	if docDoc.Extract("content").(string) != "b" {
+		t.Error("Next with Doc object yielded bad data")
+	}
+	if docStruct.Content != "b" {
+		t.Error("Next with struct yielded bad data")
+	}
+	if docMap["content"].(string) != "b" {
+		t.Error("Next with map yielded bad data")
+	}
+}
+
 func TestMatchDocBasics(t *testing.T) {
 	matchDoc := NewMatchDoc(0, 1.0, nil)
 	matchDoc.SetDocID(42)
