@@ -85,6 +85,9 @@ public class Lucy::Search::Collector::BitCollector nickname BitColl
 
     BitVector    *bit_vec;
 
+    public inert incremented BitCollector*
+    new(BitVector *bit_vector);
+
     /**
      * @param bit_vector A Lucy::Object::BitVector.
      */

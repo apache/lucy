@@ -18,6 +18,7 @@ package lucy
 
 /*
 #include "Lucy/Search/Collector.h"
+#include "Lucy/Search/Collector/SortCollector.h"
 #include "Lucy/Search/Hits.h"
 #include "Lucy/Search/IndexSearcher.h"
 #include "Lucy/Search/Query.h"
@@ -26,11 +27,16 @@ package lucy
 #include "Lucy/Search/ORQuery.h"
 #include "Lucy/Search/ANDMatcher.h"
 #include "Lucy/Search/ORMatcher.h"
+#include "Lucy/Search/SeriesMatcher.h"
+#include "Lucy/Search/SortRule.h"
+#include "Lucy/Search/SortSpec.h"
+#include "Lucy/Search/TopDocs.h"
 #include "Lucy/Document/HitDoc.h"
 #include "LucyX/Search/MockMatcher.h"
 #include "Clownfish/Blob.h"
 #include "Clownfish/Hash.h"
 #include "Clownfish/HashIterator.h"
+#include "Clownfish/Vector.h"
 
 static inline void
 float32_set(float *floats, size_t i, float value) {
@@ -77,25 +83,17 @@ func doClose(obj Searcher) error {
 	})
 }
 
-func doHits(obj Searcher, query interface{}, offset uint32, numWanted uint32,
+func doHits(s Searcher, query interface{}, offset uint32, numWanted uint32,
 	sortSpec SortSpec) (hits Hits, err error) {
-	self := ((*C.lucy_Searcher)(unsafe.Pointer(obj.TOPTR())))
-	var sortSpecC *C.lucy_SortSpec
-	if sortSpec != nil {
-		sortSpecC = (*C.lucy_SortSpec)(unsafe.Pointer(sortSpec.TOPTR()))
-	}
-	switch query.(type) {
-	case string:
-		queryStringC := clownfish.NewString(query.(string))
-		err = clownfish.TrapErr(func() {
-			hitsC := C.LUCY_Searcher_Hits(self,
-				(*C.cfish_Obj)(unsafe.Pointer(queryStringC.TOPTR())),
-				C.uint32_t(offset), C.uint32_t(numWanted), sortSpecC)
-			hits = WRAPHits(unsafe.Pointer(hitsC))
-		})
-	default:
-		panic("TODO: support Query objects")
-	}
+	self := (*C.lucy_Searcher)(clownfish.Unwrap(s, "s"))
+	sortSpecC := (*C.lucy_SortSpec)(clownfish.UnwrapNullable(sortSpec))
+	queryC := (*C.cfish_Obj)(clownfish.GoToClownfish(query, unsafe.Pointer(C.CFISH_OBJ), false))
+	defer C.cfish_decref(unsafe.Pointer(queryC))
+	err = clownfish.TrapErr(func() {
+		hitsC := C.LUCY_Searcher_Hits(self, queryC,
+			C.uint32_t(offset), C.uint32_t(numWanted), sortSpecC)
+		hits = WRAPHits(unsafe.Pointer(hitsC))
+	})
 	return hits, err
 }
 
@@ -174,6 +172,74 @@ func (obj *HitsIMP) Error() error {
 	return obj.err
 }
 
+func NewFieldSortRule(field string, reverse bool) SortRule {
+	fieldC := clownfish.GoToClownfish(field, unsafe.Pointer(C.CFISH_STRING), false)
+	cfObj := C.lucy_SortRule_new(C.lucy_SortRule_FIELD, (*C.cfish_String)(fieldC), C.bool(reverse))
+	return WRAPSortRule(unsafe.Pointer(cfObj))
+}
+
+func NewDocIDSortRule(reverse bool) SortRule {
+	cfObj := C.lucy_SortRule_new(C.lucy_SortRule_DOC_ID, nil, C.bool(reverse))
+	return WRAPSortRule(unsafe.Pointer(cfObj))
+}
+
+func NewScoreSortRule(reverse bool) SortRule {
+	cfObj := C.lucy_SortRule_new(C.lucy_SortRule_SCORE, nil, C.bool(reverse))
+	return WRAPSortRule(unsafe.Pointer(cfObj))
+}
+
+func NewSortSpec(rules []SortRule) SortSpec {
+	vec := clownfish.NewVector(len(rules))
+	for _, rule := range rules {
+		vec.Push(rule)
+	}
+	cfObj := C.lucy_SortSpec_new((*C.cfish_Vector)(clownfish.Unwrap(vec, "rules")))
+	return WRAPSortSpec(unsafe.Pointer(cfObj))
+}
+
+func (spec *SortSpecIMP) GetRules() []SortRule {
+	self := (*C.lucy_SortSpec)(clownfish.Unwrap(spec, "spec"))
+	vec := C.LUCY_SortSpec_Get_Rules(self)
+	length := int(C.CFISH_Vec_Get_Size(vec))
+	slice := make([]SortRule, length)
+	for i := 0; i < length; i++ {
+		elem := C.cfish_incref(unsafe.Pointer(C.CFISH_Vec_Fetch(vec, C.size_t(i))))
+		slice[i] = WRAPSortRule(unsafe.Pointer(elem))
+	}
+	return slice
+}
+
+func NewTopDocs(matchDocs []MatchDoc, totalHits uint32) TopDocs {
+	vec := clownfish.NewVector(len(matchDocs))
+	for _, matchDoc := range matchDocs {
+		vec.Push(matchDoc)
+	}
+	cfObj := C.lucy_TopDocs_new(((*C.cfish_Vector)(clownfish.Unwrap(vec, "matchDocs"))),
+		C.uint32_t(totalHits))
+	return WRAPTopDocs(unsafe.Pointer(cfObj))
+}
+
+func (td *TopDocsIMP) SetMatchDocs(matchDocs []MatchDoc) {
+	self := (*C.lucy_TopDocs)(clownfish.Unwrap(td, "td"))
+	vec := clownfish.NewVector(len(matchDocs))
+	for _, matchDoc := range matchDocs {
+		vec.Push(matchDoc)
+	}
+	C.LUCY_TopDocs_Set_Match_Docs(self, (*C.cfish_Vector)(clownfish.Unwrap(vec, "matchDocs")))
+}
+
+func (td *TopDocsIMP) GetMatchDocs() []MatchDoc {
+	self := (*C.lucy_TopDocs)(clownfish.Unwrap(td, "td"))
+	vec := C.LUCY_TopDocs_Get_Match_Docs(self)
+	length := int(C.CFISH_Vec_Get_Size(vec))
+	slice := make([]MatchDoc, length)
+	for i := 0; i < length; i++ {
+		elem := C.cfish_incref(unsafe.Pointer(C.CFISH_Vec_Fetch(vec, C.size_t(i))))
+		slice[i] = WRAPMatchDoc(unsafe.Pointer(elem))
+	}
+	return slice
+}
+
 func NewANDQuery(children []Query) ANDQuery {
 	vec := clownfish.NewVector(len(children))
 	for _, child := range children {
@@ -226,6 +292,17 @@ func NewORScorer(children []Matcher, sim Similarity) ORScorer {
 	return WRAPORScorer(unsafe.Pointer(cfObj))
 }
 
+func NewSeriesMatcher(matchers []Matcher, offsets []int32) SeriesMatcher {
+	vec := clownfish.NewVector(len(matchers))
+	for _, child := range matchers {
+		vec.Push(child)
+	}
+	i32arr := NewI32Array(offsets)
+	cfObj := C.lucy_SeriesMatcher_new(((*C.cfish_Vector)(clownfish.Unwrap(vec, "matchers"))),
+		((*C.lucy_I32Array)(clownfish.Unwrap(i32arr, "offsets"))))
+	return WRAPSeriesMatcher(unsafe.Pointer(cfObj))
+}
+
 func newMockMatcher(docIDs []int32, scores []float32) MockMatcher {
 	docIDsconv := NewI32Array(docIDs)
 	docIDsCF := (*C.lucy_I32Array)(unsafe.Pointer(docIDsconv.TOPTR()))
@@ -241,4 +318,17 @@ func newMockMatcher(docIDs []int32, scores []float32) MockMatcher {
 	}
 	matcher := C.lucy_MockMatcher_new(docIDsCF, blob)
 	return WRAPMockMatcher(unsafe.Pointer(matcher))
+}
+
+func (sc *SortCollectorIMP) PopMatchDocs() []MatchDoc {
+	self := (*C.lucy_SortCollector)(clownfish.Unwrap(sc, "sc"))
+	matchDocsC := C.LUCY_SortColl_Pop_Match_Docs(self)
+	defer C.cfish_decref(unsafe.Pointer(matchDocsC))
+	length := int(C.CFISH_Vec_Get_Size(matchDocsC))
+	slice := make([]MatchDoc, length)
+	for i := 0; i < length; i++ {
+		elem := C.cfish_incref(unsafe.Pointer(C.CFISH_Vec_Fetch(matchDocsC, C.size_t(i))))
+		slice[i] = WRAPMatchDoc(unsafe.Pointer(elem))
+	}
+	return slice
 }

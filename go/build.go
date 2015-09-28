@@ -180,6 +180,10 @@ func specClasses(parcel *cfc.Parcel) {
 	orScorerBinding.SetSuppressCtor(true)
 	orScorerBinding.Register()
 
+	seriesMatcherBinding := cfc.NewGoClass(parcel, "Lucy::Search::SeriesMatcher")
+	seriesMatcherBinding.SetSuppressCtor(true)
+	seriesMatcherBinding.Register()
+
 	bitVecBinding := cfc.NewGoClass(parcel, "Lucy::Object::BitVector")
 	bitVecBinding.SpecMethod("To_Array", "ToArray() []bool")
 	bitVecBinding.Register()
@@ -187,6 +191,21 @@ func specClasses(parcel *cfc.Parcel) {
 	mockMatcherBinding := cfc.NewGoClass(parcel, "LucyX::Search::MockMatcher")
 	mockMatcherBinding.SetSuppressCtor(true)
 	mockMatcherBinding.Register()
+
+	topDocsBinding := cfc.NewGoClass(parcel, "Lucy::Search::TopDocs")
+	topDocsBinding.SetSuppressCtor(true)
+	topDocsBinding.SpecMethod("Set_Match_Docs", "SetMatchDocs([]MatchDoc)")
+	topDocsBinding.SpecMethod("Get_Match_Docs", "GetMatchDocs() []MatchDoc")
+	topDocsBinding.Register()
+
+	sortSpecBinding := cfc.NewGoClass(parcel, "Lucy::Search::SortSpec")
+	sortSpecBinding.SetSuppressCtor(true)
+	sortSpecBinding.SpecMethod("Get_Rules", "GetRules() []SortRule")
+	sortSpecBinding.Register()
+
+	sortCollBinding := cfc.NewGoClass(parcel, "Lucy::Search::Collector::SortCollector")
+	sortCollBinding.SpecMethod("Pop_Match_Docs", "PopMatchDocs() []MatchDoc")
+	sortCollBinding.Register()
 }
 
 func build() {

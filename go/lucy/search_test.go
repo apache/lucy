@@ -319,3 +319,337 @@ func TestNOTMatcherBasics(t *testing.T) {
 	matcher := NewANDMatcher([]Matcher{a, notB}, nil)
 	checkMatcher(t, matcher, false)
 }
+
+func TestSeriesMatcherBasics(t *testing.T) {
+	a := newMockMatcher([]int32{42}, nil)
+	b := newMockMatcher([]int32{1, 4}, nil)
+	c := newMockMatcher([]int32{20}, nil)
+	matcher := NewSeriesMatcher([]Matcher{a, b, c}, []int32{0, 42, 80})
+	checkMatcher(t, matcher, false)
+}
+
+func TestMatchAllMatcherBasics(t *testing.T) {
+	matcher := NewMatchAllMatcher(1.5, 42)
+	matcher.Next()
+	if docID := matcher.Next(); docID != 2 {
+		t.Errorf("Unexpected return value for Next: %d", docID)
+	}
+	if docID := matcher.GetDocID(); docID != 2 {
+		t.Errorf("Unexpected return value for GetDocID: %d", docID)
+	}
+	if docID := matcher.Advance(42); docID != 42 {
+		t.Errorf("Advance returned %d", docID)
+	}
+	if score := matcher.Score(); score != 1.5 {
+		t.Errorf("Unexpected score: %f", score)
+	}
+	if matcher.Next() != 0 {
+		t.Error("Matcher should be exhausted")
+	}
+}
+
+func TestNoMatchMatcherBasics(t *testing.T) {
+	matcher := NewNoMatchMatcher()
+	if matcher.Next() != 0 {
+		t.Error("Next should return false")
+	}
+	matcher = NewNoMatchMatcher()
+	if matcher.Advance(3) != 0 {
+		t.Error("Advance should return false")
+	}
+}
+
+func TestRangeMatcherBasics(t *testing.T) {
+	index := createTestIndex("d", "c", "b", "a", "a", "a", "a")
+	searcher, _ := OpenIndexSearcher(index)
+	segReaders := searcher.GetReader().SegReaders()
+	segReader := segReaders[0].(SegReader)
+	sortReader := segReader.Obtain("Lucy::Index::SortReader").(SortReader)
+	sortCache := sortReader.FetchSortCache("content")
+	matcher := NewRangeMatcher(0, 0, sortCache, segReader.DocMax())
+	if docID := matcher.Next(); docID != 4 {
+		t.Errorf("Next: %d", docID)
+	}
+	if docID := matcher.GetDocID(); docID != 4 {
+		t.Errorf("GetDocID: %d", docID)
+	}
+	if score := matcher.Score(); score != 0.0 {
+		t.Errorf("Score: %f", score)
+	}
+	if docID := matcher.Advance(7); docID != 7 {
+		t.Errorf("Advance: %d", docID)
+	}
+	if docID := matcher.Next(); docID != 0 {
+		t.Errorf("Matcher should be exhausted: %d", docID)
+	}
+}
+
+func TestTopDocsBasics(t *testing.T) {
+	matchDocs := []MatchDoc{
+		NewMatchDoc(42, 2.0, nil),
+		NewMatchDoc(100, 3.0, nil),
+	}
+	td := NewTopDocs(matchDocs, 50)
+	td.SetTotalHits(20)
+	if totalHits := td.GetTotalHits(); totalHits != 20 {
+		t.Errorf("Expected 20 total hits, got %d", totalHits)
+	}
+	td.SetMatchDocs(matchDocs)
+	fetched := td.GetMatchDocs()
+	if docID := fetched[0].GetDocID(); docID != 42 {
+		t.Errorf("Set/Get MatchDocs expected 42, got %d", docID)
+	}
+
+	folder := NewRAMFolder("")
+	outstream := folder.OpenOut("foo")
+	td.Serialize(outstream)
+	outstream.Close()
+	inStream := folder.OpenIn("foo")
+	dupe := clownfish.GetClass(td).MakeObj().(TopDocs).Deserialize(inStream)
+	if dupe.GetTotalHits() != td.GetTotalHits() {
+		t.Errorf("Failed round-trip serializetion of TopDocs")
+	}
+}
+
+type simpleTestDoc struct {
+	Content string
+}
+
+func TestHitsBasics(t *testing.T) {
+	index := createTestIndex("a", "b")
+	searcher, _ := OpenIndexSearcher(index)
+	topDocs := searcher.TopDocs(NewTermQuery("content", "a"), 10, nil)
+	hits := NewHits(searcher, topDocs, 0)
+	if got := hits.TotalHits(); got != topDocs.GetTotalHits() {
+		t.Errorf("TotalHits is off: %d", got)
+	}
+	var doc simpleTestDoc
+	if !hits.Next(&doc) {
+		t.Error("Hits.Next")
+	}
+	if doc.Content != "a" {
+		t.Errorf("Bad doc content after Next: %s", doc.Content)
+	}
+	if hits.Next(&doc) {
+		t.Error("Hits iterator should be exhausted");
+	}
+	if err := hits.Error(); err != nil {
+		t.Error("Hits.Error() not nil: %v", err)
+	}
+}
+
+func TestSortSpecBasics(t *testing.T) {
+	folder := NewRAMFolder("")
+	schema := NewSchema()
+	fieldType := NewFullTextType(NewStandardTokenizer())
+	fieldType.SetSortable(true)
+	schema.SpecField("content", fieldType)
+	args := &OpenIndexerArgs{Index: folder, Schema: schema, Create: true}
+	indexer, err := OpenIndexer(args)
+	if err != nil {
+		panic(err)
+	}
+	for _, fieldVal := range []string{"a b", "a a"} {
+		indexer.AddDoc(&simpleTestDoc{fieldVal})
+	}
+	indexer.Commit()
+
+	rules := []SortRule{
+		NewFieldSortRule("content", false),
+	}
+	sortSpec := NewSortSpec(rules)
+	searcher, _ := OpenIndexSearcher(folder)
+	hits, _ := searcher.Hits("a", 0, 1, sortSpec)
+	var doc simpleTestDoc
+	hits.Next(&doc)
+	if doc.Content != "a a" {
+		t.Error("Sort by field value")
+	}
+
+	outstream := folder.OpenOut("foo")
+	sortSpec.Serialize(outstream)
+	outstream.Close()
+	inStream := folder.OpenIn("foo")
+	dupe := clownfish.GetClass(sortSpec).MakeObj().(SortSpec).Deserialize(inStream)
+	if len(dupe.GetRules()) != len(rules) {
+		t.Errorf("Failed round-trip serializetion of SortSpec")
+	}
+}
+
+func TestHitQueueBasics(t *testing.T) {
+	hitQ := NewHitQueue(nil, nil, 1)
+	fortyTwo := NewMatchDoc(42, 1.0, nil)
+	fortyThree := NewMatchDoc(43, 1.0, nil)
+	if !hitQ.LessThan(fortyThree, fortyTwo) {
+		t.Error("LessThan")
+	}
+	if !hitQ.Insert(fortyTwo) {
+		t.Error("Insert")
+	}
+	if hitQ.GetSize() != 1 {
+		t.Error("GetSize")
+	}
+	if bumped := hitQ.Jostle(fortyThree); bumped.(MatchDoc).GetDocID() != 43 {
+		t.Error("Jostle")
+	}
+	if peeked := hitQ.Peek(); peeked.(MatchDoc).GetDocID() != 42 {
+		t.Error("Peek")
+	}
+	if popped := hitQ.Pop(); popped.(MatchDoc).GetDocID() != 42 {
+		t.Error("Pop")
+	}
+	hitQ.Insert(fortyTwo)
+	if got := hitQ.PopAll(); got[0].(MatchDoc).GetDocID() != 42 {
+		t.Error("PopAll")
+	}
+}
+
+func TestSpanBasics(t *testing.T) {
+	a := NewSpan(42, 1, 0.0)
+	b := NewSpan(42, 2, 0.0)
+	if !a.Equals(a) {
+		t.Error("Equals self")
+	}
+	if a.Equals(b) {
+		t.Error("Equals should return false for non-equal spans")
+	}
+	if got := a.CompareTo(b); got >= 0 {
+		t.Errorf("CompareTo returned %d", got)
+	}
+	a.SetOffset(21)
+	if got := a.GetOffset(); got != 21 {
+		t.Errorf("Set/Get offset: %d", got)
+	}
+	a.SetLength(10)
+	if got := a.GetLength(); got != 10 {
+		t.Errorf("Set/Get length: %d", got)
+	}
+	a.SetWeight(1.5)
+	if got := a.GetWeight(); got != 1.5 {
+		t.Errorf("Set/Get weight: %f", got)
+	}
+}
+
+func TestBitCollectorBasics(t *testing.T) {
+	index := createTestIndex("a", "b", "c", "a")
+	searcher, _ := OpenIndexSearcher(index)
+	bitVec := NewBitVector(5)
+	collector := NewBitCollector(bitVec)
+	searcher.Collect(NewTermQuery("content", "a"), collector)
+	expected := []bool{false, true, false, false, true, false, false, false}
+	if got := bitVec.ToArray(); !reflect.DeepEqual(got,expected) {
+		t.Errorf("Unexpected result set: %v", got)
+	}
+}
+
+func TestOffsetCollectorBasics(t *testing.T) {
+	index := createTestIndex("a", "b", "c")
+	searcher, _ := OpenIndexSearcher(index)
+	bitVec := NewBitVector(64)
+	bitColl := NewBitCollector(bitVec)
+	offsetColl := NewOffsetCollector(bitColl, 40)
+	searcher.Collect(NewTermQuery("content", "b"), offsetColl)
+	if got := bitVec.NextHit(0); got != 42 {
+		t.Errorf("Unexpected docID: %d", got)
+	}
+}
+
+func TestSortCollectorBasics(t *testing.T) {
+	index := createTestIndex("a", "b", "c", "a")
+	searcher, _ := OpenIndexSearcher(index)
+	collector := NewSortCollector(nil, nil, 1)
+	searcher.Collect(NewTermQuery("content", "a"), collector)
+	if totalHits := collector.GetTotalHits(); totalHits != 2 {
+		t.Errorf("Unexpected TotalHits: %d", totalHits)
+	}
+	matchDocs := collector.PopMatchDocs()
+	if docID := matchDocs[0].GetDocID(); docID != 1 {
+		t.Errorf("Weird MatchDoc: %d", docID)
+	}
+}
+
+func TestIndexSearcherMisc(t *testing.T) {
+	index := createTestIndex("a", "b", "c", "a a")
+	searcher, _ := OpenIndexSearcher(index)
+	if got := searcher.DocFreq("content", "a"); got != 2 {
+		t.Errorf("DocFreq expected 2, got %d", got)
+	}
+	if got := searcher.DocMax(); got != 4 {
+		t.Errorf("DocMax expected 4, got %d", got)
+	}
+	if _, ok := searcher.GetReader().(PolyReader); !ok {
+		t.Error("GetReader")
+	}
+	if _, ok := searcher.FetchDocVec(4).(DocVector); !ok {
+		t.Error("DocVector")
+	}
+}
+
+func TestIndexSearcherOpenClose(t *testing.T) {
+	if _, err := OpenIndexSearcher(NewRAMFolder("")); err == nil {
+		t.Error("Open non-existent index")
+	}
+	if _, err := OpenIndexSearcher(42); err == nil {
+		t.Error("Garbage 'index' argument")
+	}
+	index := createTestIndex("a", "b", "c")
+	searcher, _ := OpenIndexSearcher(index)
+	searcher.Close()
+}
+
+func TestIndexSearcherHits(t *testing.T) {
+	index := createTestIndex("a", "b", "c", "a a")
+	searcher, _ := OpenIndexSearcher(index)
+	if got, _ := searcher.Hits("a", 0, 1, nil); got.TotalHits() != 2 {
+		t.Errorf("Hits() with query string: %d", got.TotalHits())
+	}
+	termQuery := NewTermQuery("content", "a")
+	if got, _ := searcher.Hits(termQuery, 0, 1, nil); got.TotalHits() != 2 {
+		t.Errorf("Hits() with TermQuery object: %d", got.TotalHits())
+	}
+
+	if _, err := searcher.Hits(42, 0, 1, nil); err == nil {
+		t.Error("Garbage 'query' argument")
+	}
+}
+
+func TestIndexSearcherTopDocs(t *testing.T) {
+	index := createTestIndex("a", "b")
+	searcher, _ := OpenIndexSearcher(index)
+	topDocs := searcher.TopDocs(NewTermQuery("content", "b"), 10, nil)
+	matchDocs := topDocs.GetMatchDocs()
+	if docID := matchDocs[0].GetDocID(); docID != 2 {
+		t.Errorf("TopDocs expected 2, got %d", docID)
+	}
+}
+
+func TestMatchDocBasics(t *testing.T) {
+	matchDoc := NewMatchDoc(0, 1.0, nil)
+	matchDoc.SetDocID(42)
+	if got := matchDoc.GetDocID(); got != 42 {
+		t.Errorf("Set/GetDocID: %d", got)
+	}
+	matchDoc.SetScore(1.5)
+	if got := matchDoc.GetScore(); got != 1.5 {
+		t.Errorf("Set/GetScore: %f", got)
+	}
+	values := []interface{}{"foo", int64(42)}
+	matchDoc.SetValues(values)
+	if got := matchDoc.GetValues(); !reflect.DeepEqual(got, values) {
+		t.Error("Get/SetValues")
+	}
+}
+
+func TestMatchDocSerialization(t *testing.T) {
+	values := []interface{}{"foo", int64(42)}
+	matchDoc := NewMatchDoc(100, 1.5, values)
+	folder := NewRAMFolder("")
+	outstream := folder.OpenOut("foo")
+	matchDoc.Serialize(outstream)
+	outstream.Close()
+	inStream := folder.OpenIn("foo")
+	dupe := clownfish.GetClass(matchDoc).MakeObj().(MatchDoc).Deserialize(inStream)
+	if got := dupe.GetValues(); !reflect.DeepEqual(got, values) {
+		t.Errorf("Failed round-trip serializetion of MatchDoc")
+	}
+}
