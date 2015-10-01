@@ -152,6 +152,7 @@ func specClasses(parcel *cfc.Parcel) {
 	searcherBinding.SpecMethod("Hits",
 		"Hits(query interface{}, offset uint32, numWanted uint32, sortSpec SortSpec) (Hits, error)")
 	searcherBinding.SpecMethod("Close", "Close() error")
+	searcherBinding.SpecMethod("", "ReadDoc(int32, interface{}) error")
 	searcherBinding.Register()
 
 	hitsBinding := cfc.NewGoClass(parcel, "Lucy::Search::Hits")
