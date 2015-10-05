@@ -95,22 +95,27 @@ test_tokenizer(TestBatchRunner *runner) {
     DECREF(got);
 
     FSFolder *modules_folder = TestUtils_modules_folder();
-    String *path = Str_newf("unicode/ucd/WordBreakTest.json");
-    Vector *tests = (Vector*)Json_slurp_json((Folder*)modules_folder, path);
-    if (!tests) { RETHROW(Err_get_error()); }
-
-    for (uint32_t i = 0, max = Vec_Get_Size(tests); i < max; i++) {
-        Hash *test = (Hash*)Vec_Fetch(tests, i);
-        String *text = (String*)Hash_Fetch_Utf8(test, "text", 4);
-        Vector *wanted = (Vector*)Hash_Fetch_Utf8(test, "words", 5);
-        Vector *got = StandardTokenizer_Split(tokenizer, text);
-        TEST_TRUE(runner, Vec_Equals(wanted, (Obj*)got), "UCD test #%d", i + 1);
-        DECREF(got);
+    if (modules_folder == NULL) {
+        SKIP(runner, 1372, "Can't locate test data");
     }
+    else {
+        String *path = Str_newf("unicode/ucd/WordBreakTest.json");
+        Vector *tests = (Vector*)Json_slurp_json((Folder*)modules_folder, path);
+        if (!tests) { RETHROW(Err_get_error()); }
 
-    DECREF(tests);
-    DECREF(modules_folder);
-    DECREF(path);
+        for (uint32_t i = 0, max = Vec_Get_Size(tests); i < max; i++) {
+            Hash *test = (Hash*)Vec_Fetch(tests, i);
+            String *text = (String*)Hash_Fetch_Utf8(test, "text", 4);
+            Vector *wanted = (Vector*)Hash_Fetch_Utf8(test, "words", 5);
+            Vector *got = StandardTokenizer_Split(tokenizer, text);
+            TEST_TRUE(runner, Vec_Equals(wanted, (Obj*)got), "UCD test #%d", i + 1);
+            DECREF(got);
+        }
+
+        DECREF(tests);
+        DECREF(modules_folder);
+        DECREF(path);
+    }
 
     DECREF(tokenizer);
 }

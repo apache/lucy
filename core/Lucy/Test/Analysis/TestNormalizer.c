@@ -74,6 +74,11 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 static void
 test_normalization(TestBatchRunner *runner) {
     FSFolder *modules_folder = TestUtils_modules_folder();
+    if (modules_folder == NULL) {
+        SKIP(runner, 13, "Can't locate test data");
+        return;
+    }
+
     String *path = Str_newf("unicode/utf8proc/tests.json");
     Vector *tests = (Vector*)Json_slurp_json((Folder*)modules_folder, path);
     if (!tests) { RETHROW(Err_get_error()); }

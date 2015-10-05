@@ -66,8 +66,10 @@ inert class Lucy::Test::TestUtils  {
                   Vector *expected, const char *message);
 
     /** Return the "modules" folder.
+     *
+     * If the folder cannot be found, return NULL.
      */
-    inert FSFolder*
+    inert incremented nullable FSFolder*
     modules_folder();
 }
 

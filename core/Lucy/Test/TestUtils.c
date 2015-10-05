@@ -180,7 +180,6 @@ TestUtils_modules_folder() {
         DECREF(modules_folder);
     }
 
-    THROW(ERR, "Can't open modules folder");
-    UNREACHABLE_RETURN(FSFolder*);
+    return NULL;
 }
 

@@ -64,6 +64,11 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 static void
 test_stemming(TestBatchRunner *runner) {
     FSFolder *modules_folder = TestUtils_modules_folder();
+    if (modules_folder == NULL) {
+        SKIP(runner, 150, "Can't locate test data");
+        return;
+    }
+
     String *path = Str_newf("analysis/snowstem/source/test/tests.json");
     Hash *tests = (Hash*)Json_slurp_json((Folder*)modules_folder, path);
     if (!tests) { RETHROW(Err_get_error()); }

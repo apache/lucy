@@ -28,6 +28,7 @@ package lucy
 #define C_LUCY_POLYDOCREADER
 
 #include "lucy_parcel.h"
+#include "testlucy_parcel.h"
 #include "Lucy/Analysis/RegexTokenizer.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Index/DocReader.h"
@@ -196,6 +197,7 @@ var registry *objRegistry
 func init() {
 	C.GOLUCY_glue_exported_symbols()
 	C.lucy_bootstrap_parcel()
+	C.testlucy_bootstrap_parcel()
 	registry = newObjRegistry(16)
 	initWRAP()
 }
