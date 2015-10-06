@@ -136,6 +136,11 @@ func runCFC() {
 }
 
 func specClasses(parcel *cfc.Parcel) {
+	tokenBinding := cfc.NewGoClass(parcel, "Lucy::Analysis::Token")
+	tokenBinding.SpecMethod("", "SetText(string)")
+	tokenBinding.SpecMethod("", "GetText() string")
+	tokenBinding.Register()
+
 	indexerBinding := cfc.NewGoClass(parcel, "Lucy::Index::Indexer")
 	indexerBinding.SpecMethod("", "Close() error")
 	indexerBinding.SpecMethod("Add_Doc", "AddDoc(doc interface{}) error")

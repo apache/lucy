@@ -38,6 +38,31 @@ func TestTokenBasics(t *testing.T) {
 	token.GetLen()
 }
 
+func TestInversionBasics(t *testing.T) {
+	inv := NewInversion(nil)
+	inv.Append(NewToken("foo"))
+	inv.Append(NewToken("bar"))
+	inv.Append(NewToken("baz"))
+	if size := inv.GetSize(); size != 3 {
+		t.Errorf("Unexpected size: %d", size)
+	}
+
+	if got := inv.Next().GetText(); got != "foo" {
+		t.Errorf("Next yielded %s", got)
+	}
+
+	inv.Reset()
+	if got := inv.Next().GetText(); got != "foo" {
+		t.Errorf("Next after Reset yielded %s", got)
+	}
+
+	inv.Reset()
+	inv.Invert()
+	if got := inv.Next().GetText(); got != "bar" {
+		t.Errorf("Next after Invert yielded %s", got)
+	}
+}
+
 func TestRegexTokenizerSplit(t *testing.T) {
 	tokenizer := NewRegexTokenizer("\\S+")
 	var expected []interface{} = []interface{}{"foo", "bar", "baz"}
