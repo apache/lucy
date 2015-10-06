@@ -19,6 +19,25 @@ package lucy
 import "testing"
 import "reflect"
 
+func TestTokenBasics(t *testing.T) {
+	token := NewToken("foo")
+	if got := token.GetText(); got != "foo" {
+		t.Errorf("GetText: %v", got)
+	}
+	token.SetText("bar")
+	if got := token.GetText(); got != "bar" {
+		t.Errorf("SetText/GetText: %v", got)
+	}
+
+	// Verify that these were bound.
+	token.GetStartOffset()
+	token.GetEndOffset()
+	token.GetBoost()
+	token.GetPosInc()
+	token.GetPos()
+	token.GetLen()
+}
+
 func TestRegexTokenizerSplit(t *testing.T) {
 	tokenizer := NewRegexTokenizer("\\S+")
 	var expected []interface{} = []interface{}{"foo", "bar", "baz"}
