@@ -115,3 +115,88 @@ func TestSchemaEat(t *testing.T) {
 		t.Error("Failed to Eat other Schema")
 	}
 }
+
+func runFieldTypeTests(t *testing.T, ft FieldType) {
+	// Accessors, etc.
+	ft.SetBoost(2.0)
+	if got := ft.GetBoost(); got != 2.0 {
+		t.Errorf("SetBoost/GetBoost: %d", got)
+	}
+	ft.SetIndexed(false)
+	if ft.Indexed() {
+		t.Errorf("SetIndexed/Indexed")
+	}
+	ft.SetStored(false)
+	if ft.Stored() {
+		t.Errorf("SetStored/Stored")
+	}
+	ft.SetSortable(false)
+	if ft.Sortable() {
+		t.Errorf("SetSortable/Sortable")
+	}
+	ft.Binary()
+	ft.PrimitiveID()
+
+	// CompareValues, MakeTermStepper
+	if comparison := ft.CompareValues("foo", "bar"); comparison <= 0 {
+		t.Errorf("Unexpected CompareValues result: %d", comparison)
+	}
+	switch ft.(type) {
+	case BlobType:
+	default:
+		if stepper, ok := ft.MakeTermStepper().(TermStepper); !ok {
+			t.Errorf("MakeTermStepper failed: %v", stepper)
+		}
+	}
+
+	// Equals, Dump/Load
+	if !ft.Equals(ft) {
+		t.Error("Equals self")
+	}
+	if ft.Equals("foo") {
+		t.Error("Equals Go string")
+	}
+	if ft.Equals(NewStringType()) {
+		t.Error("Equals different field type")
+	}
+	ft.DumpForSchema()
+	dupe := ft.Load(ft.Dump()).(FieldType)
+	if !ft.Equals(dupe) {
+		t.Errorf("Round-trip through Dump/Load produced %v", dupe)
+	}
+	dupe.SetIndexed(true)
+	if ft.Equals(dupe) {
+		t.Error("Equals with altered dupe")
+	}
+}
+
+func TestFieldTypeBasics(t *testing.T) {
+	runFieldTypeTests(t, NewFullTextType(NewStandardTokenizer()))
+	runFieldTypeTests(t, NewStringType())
+	runFieldTypeTests(t, NewBlobType(true))
+	runFieldTypeTests(t, NewInt32Type())
+	runFieldTypeTests(t, NewInt64Type())
+	runFieldTypeTests(t, NewFloat32Type())
+	runFieldTypeTests(t, NewFloat64Type())
+}
+
+func TestFullTextTypeMisc(t *testing.T) {
+	ft := NewFullTextType(NewStandardTokenizer())
+	ft.SetHighlightable(true)
+	if !ft.Highlightable() {
+		t.Error("SetHighlightable/Highlightable")
+	}
+	if sim, ok := ft.MakeSimilarity().(Similarity); !ok {
+		t.Errorf("MakeSimilarity: %v", sim)
+	}
+	if _, ok := ft.GetAnalyzer().(StandardTokenizer); !ok {
+		t.Error("GetAnalyzer")
+	}
+}
+
+func TestStringTypeMisc(t *testing.T) {
+	ft := NewStringType();
+	if sim, ok := ft.MakeSimilarity().(Similarity); !ok {
+		t.Errorf("MakeSimilarity: %v", sim)
+	}
+}
