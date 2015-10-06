@@ -200,3 +200,22 @@ func TestStringTypeMisc(t *testing.T) {
 		t.Errorf("MakeSimilarity: %v", sim)
 	}
 }
+
+func TestArchitectureBasics(t *testing.T) {
+	arch := NewArchitecture()
+
+	if got := arch.IndexInterval(); got < 0 {
+		t.Errorf("IndexInterval: %d", got)
+	}
+	if got := arch.SkipInterval(); got < 0 {
+		t.Errorf("IndexInterval: %d", got)
+	}
+
+	if sim, ok := arch.MakeSimilarity().(Similarity); !ok {
+		t.Errorf("MakeSimilarity: %v", sim)
+	}
+
+	if !arch.Equals(arch) {
+		t.Error("Equals")
+	}
+}
