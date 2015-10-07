@@ -19,7 +19,9 @@ package lucy
 /*
 #include <stdlib.h>
 
+#include "Lucy/Analysis/Analyzer.h"
 #include "Lucy/Analysis/Token.h"
+#include "Clownfish/Vector.h"
 */
 import "C"
 import "unsafe"
@@ -47,4 +49,18 @@ func (t *TokenIMP) GetText() string {
 	chars := C.LUCY_Token_Get_Text(self)
 	size := C.LUCY_Token_Get_Len(self)
 	return C.GoStringN(chars, C.int(size))
+}
+
+func (a *AnalyzerIMP) Split(text string) []string {
+	self := (*C.lucy_Analyzer)(clownfish.Unwrap(a, "a"))
+	input := (*C.cfish_String)(clownfish.GoToClownfish(text, unsafe.Pointer(C.CFISH_STRING), false))
+	defer C.cfish_decref(unsafe.Pointer(input))
+	retvalCF := C.LUCY_Analyzer_Split(self, input)
+	size := C.CFISH_Vec_Get_Size(retvalCF)
+	retvalGO := make([]string, int(size))
+	for i := 0; i < int(size); i++ {
+		elem := C.CFISH_Vec_Fetch(retvalCF, C.size_t(i))
+		retvalGO[i] = clownfish.CFStringToGo(unsafe.Pointer(elem))
+	}
+	return retvalGO
 }

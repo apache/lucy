@@ -65,7 +65,7 @@ func TestInversionBasics(t *testing.T) {
 
 func TestRegexTokenizerSplit(t *testing.T) {
 	tokenizer := NewRegexTokenizer("\\S+")
-	var expected []interface{} = []interface{}{"foo", "bar", "baz"}
+	expected := []string{"foo", "bar", "baz"}
 	got := tokenizer.Split("foo bar baz")
 	if !reflect.DeepEqual(got, expected) {
 		t.Errorf("Expected %v, got %v", expected, got)
