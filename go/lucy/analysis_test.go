@@ -63,6 +63,50 @@ func TestInversionBasics(t *testing.T) {
 	}
 }
 
+func runAnalyzerTests(t *testing.T, a Analyzer) {
+	input := "foo bar baz"
+	fromSplit := a.Split(input)
+	fromTransform := make([]string, 0)
+	fromTransformText := make([]string, 0)
+	invFromTransform := a.Transform(NewInversion(NewToken(input)))
+	invFromTransformText := a.TransformText(input)
+	for i := 0; true; i++ {
+		token := invFromTransform.Next()
+		if token == nil {
+			break;
+		}
+		fromTransform = append(fromTransform, token.GetText())
+	}
+	for i := 0; true; i++ {
+		token := invFromTransformText.Next()
+		if token == nil {
+			break;
+		}
+		fromTransformText = append(fromTransformText, token.GetText())
+	}
+	if !reflect.DeepEqual(fromSplit, fromTransform) {
+		t.Errorf("Split and Transform not the same: %v, %v", fromSplit, fromTransform)
+	}
+	if !reflect.DeepEqual(fromSplit, fromTransformText) {
+		t.Errorf("Split and TransformText not the same: %v, %v", fromSplit, fromTransformText)
+	}
+
+	dupe := a.Load(a.Dump())
+	if !a.Equals(dupe) {
+		t.Errorf("Round-trip through Dump/Load failed: %v", dupe)
+	}
+}
+
+func TestCoreAnalyzers(t *testing.T) {
+	runAnalyzerTests(t, NewCaseFolder())
+	runAnalyzerTests(t, NewEasyAnalyzer("en"))
+	runAnalyzerTests(t, NewNormalizer("NFKC", true, false))
+	runAnalyzerTests(t, NewRegexTokenizer("\\S+"))
+	runAnalyzerTests(t, NewSnowballStemmer("en"))
+	runAnalyzerTests(t, NewSnowballStopFilter("en", nil))
+	runAnalyzerTests(t, NewStandardTokenizer())
+}
+
 func TestRegexTokenizerSplit(t *testing.T) {
 	tokenizer := NewRegexTokenizer("\\S+")
 	expected := []string{"foo", "bar", "baz"}
