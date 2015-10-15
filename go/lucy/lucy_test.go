@@ -18,7 +18,6 @@ package lucy
 
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 import "testing"
-import "reflect"
 
 type testDoc struct {
 	Content string
@@ -68,14 +67,5 @@ func TestOpenIndexer(t *testing.T) {
 	_, err := OpenIndexer(&OpenIndexerArgs{Index: "notalucyindex"})
 	if _, ok := err.(clownfish.Err); !ok {
 		t.Error("Didn't catch exception opening indexer")
-	}
-}
-
-func TestRegex(t *testing.T) {
-	tokenizer := NewRegexTokenizer("\\S+")
-	var expected []interface{} = []interface{}{"foo", "bar", "baz"}
-	got := tokenizer.Split("foo bar baz")
-	if !reflect.DeepEqual(got, expected) {
-		t.Errorf("Expected %v, got %v", expected, got)
 	}
 }
