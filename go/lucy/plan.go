@@ -19,17 +19,23 @@ package lucy
 /*
 #include "Lucy/Plan/Schema.h"
 #include "Lucy/Plan/FullTextType.h"
+#include "Clownfish/Vector.h"
 */
 import "C"
 import "unsafe"
 
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
-func (obj *SchemaIMP) SpecField(field string, fieldType FieldType) {
-	self := ((*C.lucy_Schema)(unsafe.Pointer(obj.TOPTR())))
-	fieldCF := clownfish.NewString(field)
-	C.LUCY_Schema_Spec_Field(self,
-		(*C.cfish_String)(unsafe.Pointer(fieldCF.TOPTR())),
-		(*C.lucy_FieldType)(unsafe.Pointer(fieldType.TOPTR())))
+func (s *SchemaIMP) AllFields() []string {
+	self := (*C.lucy_Schema)(unsafe.Pointer(s.TOPTR()))
+	fieldsCF := C.LUCY_Schema_All_Fields(self)
+	defer C.cfish_decref(unsafe.Pointer(fieldsCF))
+	numFields := C.CFISH_Vec_Get_Size(fieldsCF)
+	fields := make([]string, int(numFields))
+	for i := C.size_t(0); i < numFields; i++ {
+		fields[i] =
+		clownfish.CFStringToGo(unsafe.Pointer(C.CFISH_Vec_Fetch(fieldsCF, i)))
+	}
+	return fields
 }
 
