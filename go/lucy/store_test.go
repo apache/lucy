@@ -297,12 +297,17 @@ func TestIOStreamMisc(t *testing.T) {
 func runFolderTests(t *testing.T, folder Folder) {
 	var err error
 
-	folder.Initialize()
+	err = folder.Initialize()
+	if err != nil {
+		t.Errorf("Initialize: %v", err)
+	}
 	if !folder.Check() {
 		t.Errorf("Check")
 	}
 
-	folder.MkDir("stuff")
+	if problem := folder.MkDir("stuff"); problem != nil {
+		t.Errorf("MkDir: %v", problem)
+	}
 	outStream, err := folder.OpenOut("stuff/hello")
 	if outStream == nil || err != nil {
 		t.Errorf("OpenOut: %v", err)
@@ -314,19 +319,22 @@ func runFolderTests(t *testing.T, folder Folder) {
 		t.Errorf("OpenIn: %s", err)
 	}
 	inStream.Close()
-	fh := folder.OpenFileHandle("stuff/hello", 0x1) // 0x1 == FH_READ_ONLY
-	if fh == nil {
-		t.Errorf("OpenFileHandle")
+	fh, err := folder.OpenFileHandle("stuff/hello", 0x1) // 0x1 == FH_READ_ONLY
+	if fh == nil || err != nil {
+		t.Errorf("OpenFileHandle: %v", err)
 	}
 	fh.Close()
-	dh := folder.OpenDir("stuff")
-	if dh == nil {
-		t.Errorf("OpenDir")
+	dh, err := folder.OpenDir("stuff")
+	if dh == nil || err != nil {
+		t.Errorf("OpenDir: %v", err)
 	}
 	dh.Close()
 
-	if got := folder.SlurpFile("stuff/hello"); !reflect.DeepEqual(got, []byte("hi")) {
-		t.Errorf("SlurpFile: %s", got)
+	if got, err := folder.SlurpFile("stuff/hello"); !reflect.DeepEqual(got, []byte("hi")) || err != nil {
+		t.Errorf("SlurpFile: %v, %v", got, err)
+	}
+	if got, err := folder.SlurpFile("nope/nyet/nada"); got != nil || err == nil {
+		t.Errorf("SlurpFile [non-existent file]: %v, %v", got, err)
 	}
 
 	if !folder.Exists("stuff") {
@@ -349,13 +357,13 @@ func runFolderTests(t *testing.T, folder Folder) {
 		t.Errorf("IsDirectory [non-existent entry]")
 	}
 
-	listExpected := []interface{}{"stuff"}
-	if got := folder.List(""); !reflect.DeepEqual(got, listExpected) {
-		t.Errorf("Unexpected result for List: %v", got)
+	listExpected := []string{"stuff"}
+	if got, err := folder.List(""); !reflect.DeepEqual(got, listExpected) || err != nil {
+		t.Errorf("Unexpected result for List: %v, %v", got, err)
 	}
-	listRExpected := []interface{}{"stuff", "stuff/hello"}
-	if got := folder.ListR(""); !reflect.DeepEqual(got, listRExpected) {
-		t.Errorf("Unexpected result for ListR: %v", got)
+	listRExpected := []string{"stuff", "stuff/hello"}
+	if got, err := folder.ListR(""); !reflect.DeepEqual(got, listRExpected) || err != nil {
+		t.Errorf("Unexpected result for ListR: %v, %v", got, err)
 	}
 	if stuff := folder.FindFolder("stuff"); stuff == nil {
 		t.Errorf("FindFolder")
@@ -370,26 +378,26 @@ func runFolderTests(t *testing.T, folder Folder) {
 		t.Errorf("EnclosingFolder [non-existent]")
 	}
 
-	if success := folder.HardLink("stuff/hello", "aloha"); !success {
-		t.Errorf("HardLink")
+	if err := folder.HardLink("stuff/hello", "aloha"); err != nil {
+		t.Errorf("HardLink: %v", err)
 	}
-	if success := folder.Rename("stuff/hello", "stuff/hola"); !success {
-		t.Errorf("Rename")
+	if err := folder.Rename("stuff/hello", "stuff/hola"); err != nil {
+		t.Errorf("Rename: %v", err)
 	}
 	if success := folder.Delete("stuff/hola"); !success {
 		t.Errorf("Delete")
 	}
 
-	if fh := folder.LocalOpenFileHandle("aloha", 0x1); fh == nil {
-		t.Errorf("LocalOpenFileHandle")
+	if fh, err := folder.LocalOpenFileHandle("aloha", 0x1); fh == nil || err != nil {
+		t.Errorf("LocalOpenFileHandle: %v", err)
 	}
-	if in := folder.LocalOpenIn("aloha"); in == nil {
-		t.Errorf("LocalOpenIn")
+	if in, err := folder.LocalOpenIn("aloha"); in == nil || err != nil {
+		t.Errorf("LocalOpenIn: %v", err)
 	} else {
 		in.Close()
 	}
-	if !folder.LocalMkDir("things") {
-		t.Errorf("LocalMkdir")
+	if err = folder.LocalMkDir("things"); err != nil {
+		t.Errorf("LocalMkdir: %v", err)
 	}
 	if !folder.LocalExists("things") {
 		t.Errorf("LocalExists")
@@ -400,8 +408,8 @@ func runFolderTests(t *testing.T, folder Folder) {
 	if things := folder.LocalFindFolder("things"); things == nil {
 		t.Errorf("LocalFindFolder")
 	}
-	if dh := folder.LocalOpenDir(); dh == nil {
-		t.Errorf("LocalOpenDir")
+	if dh, err := folder.LocalOpenDir(); dh == nil || err != nil {
+		t.Errorf("LocalOpenDir: %v", err)
 	} else {
 		dh.Close()
 	}

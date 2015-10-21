@@ -331,6 +331,13 @@ func (out *OutStreamIMP) Absorb(in InStream) error {
 	})
 }
 
+func (f *FolderIMP) Initialize() error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Folder)(clownfish.Unwrap(f, "f"))
+		C.LUCY_Folder_Initialize(self)
+	})
+}
+
 func (f *FolderIMP) OpenOut(path string) (retval OutStream, err error) {
 	err = clownfish.TrapErr(func() {
 		self := (*C.lucy_Folder)(clownfish.Unwrap(f, "f"))
@@ -359,4 +366,182 @@ func (f *FolderIMP) OpenIn(path string) (retval InStream, err error) {
 		retval = WRAPInStream(unsafe.Pointer(retvalC))
 	})
 	return retval, err
+}
+
+func (f *FolderIMP) OpenFileHandle(path string, flags uint32) (retval FileHandle, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Folder)(clownfish.Unwrap(f, "f"))
+		pathC := (*C.cfish_String)(clownfish.GoToClownfish(path, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(pathC))
+		retvalC := C.LUCY_Folder_Open_FileHandle(self, pathC, C.uint32_t(flags))
+		if retvalC == nil {
+			cfErr := C.cfish_Err_get_error();
+			panic(clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error))
+		}
+		retval = WRAPFileHandle(unsafe.Pointer(retvalC))
+	})
+	return retval, err
+}
+
+func (f *FolderIMP) OpenDir(path string) (retval DirHandle, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Folder)(clownfish.Unwrap(f, "f"))
+		pathC := (*C.cfish_String)(clownfish.GoToClownfish(path, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(pathC))
+		retvalC := C.LUCY_Folder_Open_Dir(self, pathC)
+		if retvalC == nil {
+			cfErr := C.cfish_Err_get_error();
+			panic(clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error))
+		}
+		retval = WRAPDirHandle(unsafe.Pointer(retvalC))
+	})
+	return retval, err
+}
+
+func (f *FolderIMP) MkDir(path string) error {
+	self := (*C.lucy_Folder)(clownfish.Unwrap(f, "f"))
+	pathC := (*C.cfish_String)(clownfish.GoToClownfish(path, unsafe.Pointer(C.CFISH_STRING), false))
+	defer C.cfish_decref(unsafe.Pointer(pathC))
+	success := C.LUCY_Folder_MkDir(self, pathC)
+	if !success {
+		cfErr := C.cfish_Err_get_error();
+		return clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error)
+	}
+	return nil
+}
+
+func (f *FolderIMP) List(path string) (retval []string, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Folder)(clownfish.Unwrap(f, "f"))
+		pathC := (*C.cfish_String)(clownfish.GoToClownfish(path, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(pathC))
+		retvalC := C.LUCY_Folder_List(self, pathC)
+		if retvalC == nil {
+			cfErr := C.cfish_Err_get_error();
+			panic(clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error))
+		}
+		defer C.cfish_decref(unsafe.Pointer(retvalC))
+		retval = vecToStringSlice(retvalC)
+	})
+	return retval, err
+}
+
+func (f *FolderIMP) ListR(path string) (retval []string, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Folder)(clownfish.Unwrap(f, "f"))
+		pathC := (*C.cfish_String)(clownfish.GoToClownfish(path, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(pathC))
+		retvalC := C.LUCY_Folder_List_R(self, pathC)
+		if retvalC == nil {
+			cfErr := C.cfish_Err_get_error();
+			panic(clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error))
+		}
+		defer C.cfish_decref(unsafe.Pointer(retvalC))
+		retval = vecToStringSlice(retvalC)
+	})
+	return retval, err
+}
+
+func (f *FolderIMP) Rename(from, to string) error {
+	self := (*C.lucy_Folder)(clownfish.Unwrap(f, "f"))
+	fromC := (*C.cfish_String)(clownfish.GoToClownfish(from, unsafe.Pointer(C.CFISH_STRING), false))
+	toC := (*C.cfish_String)(clownfish.GoToClownfish(to, unsafe.Pointer(C.CFISH_STRING), false))
+	defer C.cfish_decref(unsafe.Pointer(fromC))
+	defer C.cfish_decref(unsafe.Pointer(toC))
+	success := C.LUCY_Folder_Rename(self, fromC, toC)
+	if !success {
+		cfErr := C.cfish_Err_get_error();
+		return clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error)
+	}
+	return nil
+}
+
+func (f *FolderIMP) HardLink(from, to string) error {
+	self := (*C.lucy_Folder)(clownfish.Unwrap(f, "f"))
+	fromC := (*C.cfish_String)(clownfish.GoToClownfish(from, unsafe.Pointer(C.CFISH_STRING), false))
+	toC := (*C.cfish_String)(clownfish.GoToClownfish(to, unsafe.Pointer(C.CFISH_STRING), false))
+	defer C.cfish_decref(unsafe.Pointer(fromC))
+	defer C.cfish_decref(unsafe.Pointer(toC))
+	success := C.LUCY_Folder_Hard_Link(self, fromC, toC)
+	if !success {
+		cfErr := C.cfish_Err_get_error();
+		return clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error)
+	}
+	return nil
+}
+
+func (f *FolderIMP) SlurpFile(path string) (retval []byte, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Folder)(clownfish.Unwrap(f, "f"))
+		pathC := (*C.cfish_String)(clownfish.GoToClownfish(path, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(pathC))
+		retvalC := C.LUCY_Folder_Slurp_File(self, pathC)
+		defer C.cfish_decref(unsafe.Pointer(retvalC))
+		retval = clownfish.ToGo(unsafe.Pointer(retvalC)).([]byte)
+	})
+	return retval, err
+}
+
+func (f *FolderIMP) Consolidate(path string) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Folder)(clownfish.Unwrap(f, "f"))
+		pathC := (*C.cfish_String)(clownfish.GoToClownfish(path, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(pathC))
+		C.LUCY_Folder_Consolidate(self, pathC)
+	})
+}
+
+func (f *FolderIMP) LocalOpenIn(name string) (retval InStream, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Folder)(clownfish.Unwrap(f, "f"))
+		nameC := (*C.cfish_String)(clownfish.GoToClownfish(name, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(nameC))
+		retvalC := C.LUCY_Folder_Local_Open_In(self, nameC)
+		if retvalC == nil {
+			cfErr := C.cfish_Err_get_error();
+			panic(clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error))
+		}
+		retval = WRAPInStream(unsafe.Pointer(retvalC))
+	})
+	return retval, err
+}
+
+func (f *FolderIMP) LocalOpenFileHandle(name string, flags uint32) (retval FileHandle, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Folder)(clownfish.Unwrap(f, "f"))
+		nameC := (*C.cfish_String)(clownfish.GoToClownfish(name, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(nameC))
+		retvalC := C.LUCY_Folder_Local_Open_FileHandle(self, nameC, C.uint32_t(flags))
+		if retvalC == nil {
+			cfErr := C.cfish_Err_get_error();
+			panic(clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error))
+		}
+		retval = WRAPFileHandle(unsafe.Pointer(retvalC))
+	})
+	return retval, err
+}
+
+func (f *FolderIMP) LocalOpenDir() (retval DirHandle, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Folder)(clownfish.Unwrap(f, "f"))
+		retvalC := C.LUCY_Folder_Local_Open_Dir(self)
+		if retvalC == nil {
+			cfErr := C.cfish_Err_get_error();
+			panic(clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error))
+		}
+		retval = WRAPDirHandle(unsafe.Pointer(retvalC))
+	})
+	return retval, err
+}
+
+func (f *FolderIMP) LocalMkDir(name string) error {
+	self := (*C.lucy_Folder)(clownfish.Unwrap(f, "f"))
+	nameC := (*C.cfish_String)(clownfish.GoToClownfish(name, unsafe.Pointer(C.CFISH_STRING), false))
+	defer C.cfish_decref(unsafe.Pointer(nameC))
+	success := C.LUCY_Folder_Local_MkDir(self, nameC)
+	if !success {
+		cfErr := C.cfish_Err_get_error();
+		return clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error)
+	}
+	return nil
 }

@@ -254,8 +254,22 @@ func specClasses(parcel *cfc.Parcel) {
 	outStreamBinding.Register()
 
 	folderBinding := cfc.NewGoClass(parcel, "Lucy::Store::Folder")
+	folderBinding.SpecMethod("Initialize", "Initialize() error")
 	folderBinding.SpecMethod("Open_Out", "OpenOut(string) (OutStream, error)")
 	folderBinding.SpecMethod("Open_In", "OpenIn(string) (InStream, error)")
+	folderBinding.SpecMethod("Open_FileHandle", "OpenFileHandle(string, uint32) (FileHandle, error)")
+	folderBinding.SpecMethod("Open_Dir", "OpenDir(string) (DirHandle, error)")
+	folderBinding.SpecMethod("MkDir", "MkDir(string) error")
+	folderBinding.SpecMethod("List", "List(string) ([]string, error)")
+	folderBinding.SpecMethod("List_R", "ListR(string) ([]string, error)")
+	folderBinding.SpecMethod("Rename", "Rename(string, string) error")
+	folderBinding.SpecMethod("Hard_Link", "HardLink(string, string) error")
+	folderBinding.SpecMethod("Slurp_File", "SlurpFile(string) ([]byte, error)")
+	folderBinding.SpecMethod("Consolidate", "Consolidate(string) error")
+	folderBinding.SpecMethod("Local_Open_In", "LocalOpenIn(string) (InStream, error)")
+	folderBinding.SpecMethod("Local_Open_FileHandle", "LocalOpenFileHandle(string, uint32) (FileHandle, error)")
+	folderBinding.SpecMethod("Local_Open_Dir", "LocalOpenDir() (DirHandle, error)")
+	folderBinding.SpecMethod("Local_MkDir", "LocalMkDir(string) error")
 	folderBinding.Register()
 }
 
