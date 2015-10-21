@@ -23,7 +23,7 @@ import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
 func checkQuerySerialize(t *testing.T, query Query) {
 	folder := NewRAMFolder("")
-	outStream := folder.OpenOut("foo")
+	outStream, _ := folder.OpenOut("foo")
 	query.Serialize(outStream)
 	outStream.Close()
 	inStream := folder.OpenIn("foo")
@@ -401,7 +401,7 @@ func TestTopDocsBasics(t *testing.T) {
 	}
 
 	folder := NewRAMFolder("")
-	outstream := folder.OpenOut("foo")
+	outstream, _ := folder.OpenOut("foo")
 	td.Serialize(outstream)
 	outstream.Close()
 	inStream := folder.OpenIn("foo")
@@ -490,7 +490,7 @@ func TestSortSpecBasics(t *testing.T) {
 		t.Error("Sort by field value")
 	}
 
-	outstream := folder.OpenOut("foo")
+	outstream, _ := folder.OpenOut("foo")
 	sortSpec.Serialize(outstream)
 	outstream.Close()
 	inStream := folder.OpenIn("foo")
@@ -698,7 +698,7 @@ func TestMatchDocSerialization(t *testing.T) {
 	values := []interface{}{"foo", int64(42)}
 	matchDoc := NewMatchDoc(100, 1.5, values)
 	folder := NewRAMFolder("")
-	outstream := folder.OpenOut("foo")
+	outstream, _ := folder.OpenOut("foo")
 	matchDoc.Serialize(outstream)
 	outstream.Close()
 	inStream := folder.OpenIn("foo")

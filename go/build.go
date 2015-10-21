@@ -252,6 +252,10 @@ func specClasses(parcel *cfc.Parcel) {
 	outStreamBinding.SpecMethod("Write_F64", "WriteF64(float64) error")
 	outStreamBinding.SpecMethod("Absorb", "Absorb(InStream) error")
 	outStreamBinding.Register()
+
+	folderBinding := cfc.NewGoClass(parcel, "Lucy::Store::Folder")
+	folderBinding.SpecMethod("Open_Out", "OpenOut(string) (OutStream, error)")
+	folderBinding.Register()
 }
 
 func build() {

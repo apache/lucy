@@ -280,7 +280,7 @@ func TestIOStreamReadWrite(t *testing.T) {
 
 func TestIOStreamMisc(t *testing.T) {
 	folder := NewRAMFolder("mydir")
-	outStream := folder.OpenOut("file.dat")
+	outStream, _ := folder.OpenOut("file.dat")
 	if got := outStream.GetPath(); got != "mydir/file.dat" {
 		t.Errorf("GetPath: %s", got)
 	}
@@ -301,9 +301,9 @@ func runFolderTests(t *testing.T, folder Folder) {
 	}
 
 	folder.MkDir("stuff")
-	outStream := folder.OpenOut("stuff/hello")
-	if outStream == nil {
-		t.Errorf("OpenOut")
+	outStream, err := folder.OpenOut("stuff/hello")
+	if outStream == nil || err != nil {
+		t.Errorf("OpenOut: %v", err)
 	}
 	outStream.WriteBytes([]byte("hi"), 2)
 	outStream.Close()
