@@ -26,7 +26,7 @@ func checkQuerySerialize(t *testing.T, query Query) {
 	outStream, _ := folder.OpenOut("foo")
 	query.Serialize(outStream)
 	outStream.Close()
-	inStream := folder.OpenIn("foo")
+	inStream, _ := folder.OpenIn("foo")
 	dupe := clownfish.GetClass(query).MakeObj().(Query).Deserialize(inStream)
 	if !query.Equals(dupe) {
 		t.Errorf("Unsuccessful serialization round trip -- expected '%v', got '%v'",
@@ -404,7 +404,7 @@ func TestTopDocsBasics(t *testing.T) {
 	outstream, _ := folder.OpenOut("foo")
 	td.Serialize(outstream)
 	outstream.Close()
-	inStream := folder.OpenIn("foo")
+	inStream, _ := folder.OpenIn("foo")
 	dupe := clownfish.GetClass(td).MakeObj().(TopDocs).Deserialize(inStream)
 	if dupe.GetTotalHits() != td.GetTotalHits() {
 		t.Errorf("Failed round-trip serializetion of TopDocs")
@@ -493,7 +493,7 @@ func TestSortSpecBasics(t *testing.T) {
 	outstream, _ := folder.OpenOut("foo")
 	sortSpec.Serialize(outstream)
 	outstream.Close()
-	inStream := folder.OpenIn("foo")
+	inStream, _ := folder.OpenIn("foo")
 	dupe := clownfish.GetClass(sortSpec).MakeObj().(SortSpec).Deserialize(inStream)
 	if len(dupe.GetRules()) != len(rules) {
 		t.Errorf("Failed round-trip serializetion of SortSpec")
@@ -701,7 +701,7 @@ func TestMatchDocSerialization(t *testing.T) {
 	outstream, _ := folder.OpenOut("foo")
 	matchDoc.Serialize(outstream)
 	outstream.Close()
-	inStream := folder.OpenIn("foo")
+	inStream, _ := folder.OpenIn("foo")
 	dupe := clownfish.GetClass(matchDoc).MakeObj().(MatchDoc).Deserialize(inStream)
 	if got := dupe.GetValues(); !reflect.DeepEqual(got, values) {
 		t.Errorf("Failed round-trip serializetion of MatchDoc")

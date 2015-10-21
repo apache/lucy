@@ -255,6 +255,7 @@ func specClasses(parcel *cfc.Parcel) {
 
 	folderBinding := cfc.NewGoClass(parcel, "Lucy::Store::Folder")
 	folderBinding.SpecMethod("Open_Out", "OpenOut(string) (OutStream, error)")
+	folderBinding.SpecMethod("Open_In", "OpenIn(string) (InStream, error)")
 	folderBinding.Register()
 }
 

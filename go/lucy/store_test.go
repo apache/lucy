@@ -288,13 +288,15 @@ func TestIOStreamMisc(t *testing.T) {
 	outStream.Flush()
 	outStream.Close()
 
-	inStream := folder.OpenIn("file.dat")
+	inStream, _ := folder.OpenIn("file.dat")
 	if got := inStream.GetFilename(); got != "mydir/file.dat" {
 		t.Errorf("GetFilename: %s", got)
 	}
 }
 
 func runFolderTests(t *testing.T, folder Folder) {
+	var err error
+
 	folder.Initialize()
 	if !folder.Check() {
 		t.Errorf("Check")
@@ -307,9 +309,9 @@ func runFolderTests(t *testing.T, folder Folder) {
 	}
 	outStream.WriteBytes([]byte("hi"), 2)
 	outStream.Close()
-	inStream := folder.OpenIn("stuff/hello")
-	if inStream == nil {
-		t.Errorf("OpenIn")
+	inStream, err := folder.OpenIn("stuff/hello")
+	if inStream == nil || err != nil {
+		t.Errorf("OpenIn: %s", err)
 	}
 	inStream.Close()
 	fh := folder.OpenFileHandle("stuff/hello", 0x1) // 0x1 == FH_READ_ONLY

@@ -345,3 +345,18 @@ func (f *FolderIMP) OpenOut(path string) (retval OutStream, err error) {
 	})
 	return retval, err
 }
+
+func (f *FolderIMP) OpenIn(path string) (retval InStream, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Folder)(clownfish.Unwrap(f, "f"))
+		pathC := (*C.cfish_String)(clownfish.GoToClownfish(path, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(pathC))
+		retvalC := C.LUCY_Folder_Open_In(self, pathC)
+		if retvalC == nil {
+			cfErr := C.cfish_Err_get_error();
+			panic(clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error))
+		}
+		retval = WRAPInStream(unsafe.Pointer(retvalC))
+	})
+	return retval, err
+}
