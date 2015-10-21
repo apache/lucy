@@ -293,3 +293,143 @@ func TestIOStreamMisc(t *testing.T) {
 		t.Errorf("GetFilename: %s", got)
 	}
 }
+
+func runFolderTests(t *testing.T, folder Folder) {
+	folder.Initialize()
+	if !folder.Check() {
+		t.Errorf("Check")
+	}
+
+	folder.MkDir("stuff")
+	outStream := folder.OpenOut("stuff/hello")
+	if outStream == nil {
+		t.Errorf("OpenOut")
+	}
+	outStream.WriteBytes([]byte("hi"), 2)
+	outStream.Close()
+	inStream := folder.OpenIn("stuff/hello")
+	if inStream == nil {
+		t.Errorf("OpenIn")
+	}
+	inStream.Close()
+	fh := folder.OpenFileHandle("stuff/hello", 0x1) // 0x1 == FH_READ_ONLY
+	if fh == nil {
+		t.Errorf("OpenFileHandle")
+	}
+	fh.Close()
+	dh := folder.OpenDir("stuff")
+	if dh == nil {
+		t.Errorf("OpenDir")
+	}
+	dh.Close()
+
+	if got := folder.SlurpFile("stuff/hello"); !reflect.DeepEqual(got, []byte("hi")) {
+		t.Errorf("SlurpFile: %s", got)
+	}
+
+	if !folder.Exists("stuff") {
+		t.Errorf("Exists [directory]")
+	}
+	if !folder.Exists("stuff/hello") {
+		t.Errorf("Exists [file]")
+	}
+	if folder.Exists("stuff/nope") {
+		t.Errorf("Exists [non-existent entry]")
+	}
+
+	if !folder.IsDirectory("stuff") {
+		t.Errorf("IsDirectory [directory]")
+	}
+	if folder.IsDirectory("stuff/hello") {
+		t.Errorf("IsDirectory [file]")
+	}
+	if folder.IsDirectory("nope") {
+		t.Errorf("IsDirectory [non-existent entry]")
+	}
+
+	listExpected := []interface{}{"stuff"}
+	if got := folder.List(""); !reflect.DeepEqual(got, listExpected) {
+		t.Errorf("Unexpected result for List: %v", got)
+	}
+	listRExpected := []interface{}{"stuff", "stuff/hello"}
+	if got := folder.ListR(""); !reflect.DeepEqual(got, listRExpected) {
+		t.Errorf("Unexpected result for ListR: %v", got)
+	}
+	if stuff := folder.FindFolder("stuff"); stuff == nil {
+		t.Errorf("FindFolder")
+	}
+	if nope := folder.FindFolder("nope"); nope != nil {
+		t.Errorf("FindFolder [non-existent]")
+	}
+	if stuff := folder.EnclosingFolder("stuff/hello"); stuff == nil {
+		t.Errorf("EnclosingFolder")
+	}
+	if nope := folder.EnclosingFolder("nada/nope/nyet"); nope != nil {
+		t.Errorf("EnclosingFolder [non-existent]")
+	}
+
+	if success := folder.HardLink("stuff/hello", "aloha"); !success {
+		t.Errorf("HardLink")
+	}
+	if success := folder.Rename("stuff/hello", "stuff/hola"); !success {
+		t.Errorf("Rename")
+	}
+	if success := folder.Delete("stuff/hola"); !success {
+		t.Errorf("Delete")
+	}
+
+	if fh := folder.LocalOpenFileHandle("aloha", 0x1); fh == nil {
+		t.Errorf("LocalOpenFileHandle")
+	}
+	if in := folder.LocalOpenIn("aloha"); in == nil {
+		t.Errorf("LocalOpenIn")
+	} else {
+		in.Close()
+	}
+	if !folder.LocalMkDir("things") {
+		t.Errorf("LocalMkdir")
+	}
+	if !folder.LocalExists("things") {
+		t.Errorf("LocalExists")
+	}
+	if !folder.LocalIsDirectory("things") {
+		t.Errorf("LocalIsDirectory")
+	}
+	if things := folder.LocalFindFolder("things"); things == nil {
+		t.Errorf("LocalFindFolder")
+	}
+	if dh := folder.LocalOpenDir(); dh == nil {
+		t.Errorf("LocalOpenDir")
+	} else {
+		dh.Close()
+	}
+	if !folder.LocalDelete("things") {
+		t.Errorf("LocalDelete")
+	}
+
+	folder.Consolidate("stuff")
+
+	if success := folder.DeleteTree("stuff"); !success {
+		t.Errorf("DeleteTree")
+	}
+
+	folder.Close()
+}
+
+func TestRAMFolderBasics(t *testing.T) {
+	folder := NewRAMFolder("orig")
+	if folder.GetPath() != "orig" {
+		t.Error("GetPath")
+	}
+	folder.SetPath("basedir")
+	if folder.GetPath() != "basedir" {
+		t.Error("SetPath/GetPath")
+	}
+	runFolderTests(t, folder)
+}
+
+func TestFSFolderBasics(t *testing.T) {
+	folder := NewFSFolder("_fsfolder_go_test")
+	defer os.RemoveAll("_fsfolder_go_test")
+	runFolderTests(t, folder)
+}
