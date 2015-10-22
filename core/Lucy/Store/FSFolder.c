@@ -39,6 +39,7 @@
   #include <direct.h>
 #endif
 
+#include "Clownfish/CharBuf.h"
 #include "Lucy/Store/FSFolder.h"
 #include "Lucy/Store/CompoundFileReader.h"
 #include "Lucy/Store/CompoundFileWriter.h"
@@ -276,7 +277,19 @@ S_fullpath(FSFolder *self, String *path) {
     String *fullpath = Str_newf("%o%s%o", ivars->path, CHY_DIR_SEP, path);
     String *retval;
     if (CHY_DIR_SEP[0] != '/') {
-        retval = Str_Swap_Chars(fullpath, '/', CHY_DIR_SEP[0]);
+        // Replace '/' with CHY_DIR_SEP.
+        StringIterator *iter = Str_Top(fullpath);
+        CharBuf *buf = CB_new(Str_Get_Size(fullpath));
+        int32_t cp;
+
+        while (STRITER_DONE != (cp = StrIter_Next(iter))) {
+            if (cp == '/') { cp = CHY_DIR_SEP[0]; }
+            CB_Cat_Char(buf, cp);
+        }
+
+        retval = CB_Yield_String(buf);
+        DECREF(buf);
+        DECREF(iter);
         DECREF(fullpath);
     }
     else {
