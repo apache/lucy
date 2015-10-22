@@ -56,11 +56,6 @@ func (a *AnalyzerIMP) Split(text string) []string {
 	input := (*C.cfish_String)(clownfish.GoToClownfish(text, unsafe.Pointer(C.CFISH_STRING), false))
 	defer C.cfish_decref(unsafe.Pointer(input))
 	retvalCF := C.LUCY_Analyzer_Split(self, input)
-	size := C.CFISH_Vec_Get_Size(retvalCF)
-	retvalGO := make([]string, int(size))
-	for i := 0; i < int(size); i++ {
-		elem := C.CFISH_Vec_Fetch(retvalCF, C.size_t(i))
-		retvalGO[i] = clownfish.CFStringToGo(unsafe.Pointer(elem))
-	}
-	return retvalGO
+	defer C.cfish_decref(unsafe.Pointer(retvalCF))
+	return vecToStringSlice(retvalCF)
 }
