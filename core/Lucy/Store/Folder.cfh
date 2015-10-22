@@ -101,7 +101,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @param path A relative filepath optionally specifying a subdirectory.
      * @return an unsorted array of filenames.
      */
-    incremented Vector*
+    incremented nullable Vector*
     List(Folder *self, String *path = NULL);
 
     /** Recursively list all files and directories in the Folder.
@@ -109,7 +109,7 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
      * @param path A relative filepath optionally specifying a subdirectory.
      * @return an unsorted array of relative filepaths.
      */
-    incremented Vector*
+    incremented nullable Vector*
     List_R(Folder *self, String *path = NULL);
 
     /** Indicate whether an entity exists at `path`.
