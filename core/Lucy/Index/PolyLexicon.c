@@ -208,7 +208,7 @@ SegLexQ_Less_Than_IMP(SegLexQueue *self, Obj *a, Obj *b) {
     Obj *const term_a = SegLex_Get_Term(lex_a);
     Obj *const term_b = SegLex_Get_Term(lex_b);
     UNUSED_VAR(self);
-    return Str_less_than(&term_a, &term_b);
+    return Obj_Compare_To(term_a, term_b) < 0;
 }
 
 
