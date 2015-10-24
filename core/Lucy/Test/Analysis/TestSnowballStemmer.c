@@ -34,8 +34,8 @@ TestSnowStemmer_new() {
 
 static void
 test_Dump_Load_and_Equals(TestBatchRunner *runner) {
-    String *EN = (String*)SSTR_WRAP_C("en");
-    String *ES = (String*)SSTR_WRAP_C("es");
+    String *EN = SSTR_WRAP_C("en");
+    String *ES = SSTR_WRAP_C("es");
     SnowballStemmer *stemmer = SnowStemmer_new(EN);
     SnowballStemmer *other   = SnowStemmer_new(ES);
     Obj *dump       = (Obj*)SnowStemmer_Dump(stemmer);

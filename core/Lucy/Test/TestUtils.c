@@ -76,14 +76,14 @@ TestUtils_make_poly_query(uint32_t boolop, ...) {
 
 TermQuery*
 TestUtils_make_term_query(const char *field, const char *term) {
-    String *field_str = (String*)SSTR_WRAP_C(field);
-    String *term_str  = (String*)SSTR_WRAP_C(term);
+    String *field_str = SSTR_WRAP_C(field);
+    String *term_str  = SSTR_WRAP_C(term);
     return TermQuery_new((String*)field_str, (Obj*)term_str);
 }
 
 PhraseQuery*
 TestUtils_make_phrase_query(const char *field, ...) {
-    String *field_str = (String*)SSTR_WRAP_C(field);
+    String *field_str = SSTR_WRAP_C(field);
     va_list args;
     Vector *terms = Vec_new(0);
     PhraseQuery *query;
@@ -102,10 +102,8 @@ TestUtils_make_phrase_query(const char *field, ...) {
 
 LeafQuery*
 TestUtils_make_leaf_query(const char *field, const char *term) {
-    String *term_str  = (String*)SSTR_WRAP_C(term);
-    String *field_str = field
-                       ? (String*)SSTR_WRAP_C(field)
-                       : NULL;
+    String *term_str  = SSTR_WRAP_C(term);
+    String *field_str = field ? SSTR_WRAP_C(field) : NULL;
     return LeafQuery_new(field_str, term_str);
 }
 
@@ -120,9 +118,9 @@ RangeQuery*
 TestUtils_make_range_query(const char *field, const char *lower_term,
                            const char *upper_term, bool include_lower,
                            bool include_upper) {
-    String *f     = (String*)SSTR_WRAP_C(field);
-    String *lterm = (String*)SSTR_WRAP_C(lower_term);
-    String *uterm = (String*)SSTR_WRAP_C(upper_term);
+    String *f     = SSTR_WRAP_C(field);
+    String *lterm = SSTR_WRAP_C(lower_term);
+    String *uterm = SSTR_WRAP_C(upper_term);
     return RangeQuery_new(f, (Obj*)lterm, (Obj*)uterm, include_lower,
                           include_upper);
 }

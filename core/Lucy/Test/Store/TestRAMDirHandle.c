@@ -33,9 +33,9 @@ TestRAMDH_new() {
 static void
 test_all(TestBatchRunner *runner) {
     RAMFolder *folder        = RAMFolder_new(NULL);
-    String    *foo           = (String*)SSTR_WRAP_C("foo");
-    String    *boffo         = (String*)SSTR_WRAP_C("boffo");
-    String    *foo_boffo     = (String*)SSTR_WRAP_C("foo/boffo");
+    String    *foo           = SSTR_WRAP_C("foo");
+    String    *boffo         = SSTR_WRAP_C("boffo");
+    String    *foo_boffo     = SSTR_WRAP_C("foo/boffo");
     bool       saw_foo       = false;
     bool       saw_boffo     = false;
     bool       foo_was_dir   = false;

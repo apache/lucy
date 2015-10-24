@@ -202,7 +202,7 @@ test_spew_and_slurp(TestBatchRunner *runner) {
     Obj *dump = S_make_dump();
     Folder *folder = (Folder*)RAMFolder_new(NULL);
 
-    String *foo = (String*)SSTR_WRAP_C("foo");
+    String *foo = SSTR_WRAP_C("foo");
     bool result = Json_spew_json(dump, folder, foo);
     TEST_TRUE(runner, result, "spew_json returns true on success");
     TEST_TRUE(runner, Folder_Exists(folder, foo),
@@ -220,14 +220,14 @@ test_spew_and_slurp(TestBatchRunner *runner) {
               "Failed spew_json sets global error");
 
     Err_set_error(NULL);
-    String *bar = (String*)SSTR_WRAP_C("bar");
+    String *bar = SSTR_WRAP_C("bar");
     got = Json_slurp_json(folder, bar);
     TEST_TRUE(runner, got == NULL,
               "slurp_json returns NULL when file doesn't exist");
     TEST_TRUE(runner, Err_get_error() != NULL,
               "Failed slurp_json sets global error");
 
-    String *boffo = (String*)SSTR_WRAP_C("boffo");
+    String *boffo = SSTR_WRAP_C("boffo");
 
     FileHandle *fh
         = Folder_Open_FileHandle(folder, boffo, FH_CREATE | FH_WRITE_ONLY);

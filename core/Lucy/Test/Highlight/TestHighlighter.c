@@ -59,12 +59,12 @@ TestHighlighter_new() {
 
 static void
 test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
-    String *content = (String*)SSTR_WRAP_C("content");
+    String *content = SSTR_WRAP_C("content");
     Highlighter *highlighter = Highlighter_new(searcher, query, content, 6);
     int32_t top;
     String *raw_excerpt;
 
-    String *field_val = (String *)SSTR_WRAP_C("Ook.  Urk.  Ick.  ");
+    String *field_val = SSTR_WRAP_C("Ook.  Urk.  Ick.  ");
     Vector *spans = Vec_new(1);
     Vec_Push(spans, (Obj*)Span_new(0, 18, 1.0f));
     HeatMap *heat_map = HeatMap_new(spans, 133);
@@ -95,7 +95,7 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
     DECREF(raw_excerpt);
     DECREF(heat_map);
 
-    field_val = (String *)SSTR_WRAP_C("Ook urk ick i.");
+    field_val = SSTR_WRAP_C("Ook urk ick i.");
     spans     = Vec_new(1);
     Vec_Push(spans, (Obj*)Span_new(12, 1, 1.0f));
     heat_map = HeatMap_new(spans, 133);
@@ -111,7 +111,7 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
     DECREF(heat_map);
     DECREF(raw_excerpt);
 
-    field_val = (String *)SSTR_WRAP_C("Urk.  Iz no good.");
+    field_val = SSTR_WRAP_C("Urk.  Iz no good.");
     spans     = Vec_new(1);
     Vec_Push(spans, (Obj*)Span_new(6, 2, 1.0f));
     heat_map = HeatMap_new(spans, 133);
@@ -129,7 +129,7 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
 
     // Words longer than excerpt len
 
-    field_val = (String *)SSTR_WRAP_C("abc/def/ghi/jkl/mno");
+    field_val = SSTR_WRAP_C("abc/def/ghi/jkl/mno");
 
     spans = Vec_new(1);
     Vec_Push(spans, (Obj*)Span_new(0, 3, 1.0f));
@@ -160,13 +160,13 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
 
 static void
 test_Highlight_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
-    String *content = (String*)SSTR_WRAP_C("content");
+    String *content = SSTR_WRAP_C("content");
     Highlighter *highlighter = Highlighter_new(searcher, query, content, 3);
     String *highlighted;
 
     Vector *spans = Vec_new(1);
     Vec_Push(spans, (Obj*)Span_new(2, 1, 0.0f));
-    String *raw_excerpt = (String *)SSTR_WRAP_C("a b c");
+    String *raw_excerpt = SSTR_WRAP_C("a b c");
     highlighted = Highlighter_Highlight_Excerpt(highlighter, spans,
                                                 raw_excerpt, 0);
     TEST_TRUE(runner,
@@ -178,7 +178,7 @@ test_Highlight_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) 
     spans = Vec_new(2);
     Vec_Push(spans, (Obj*)Span_new(0, 1, 1.0f));
     Vec_Push(spans, (Obj*)Span_new(10, 10, 1.0f));
-    raw_excerpt = (String *)SSTR_WRAP_C(PHI);
+    raw_excerpt = SSTR_WRAP_C(PHI);
     highlighted = Highlighter_Highlight_Excerpt(highlighter, spans,
                                                 raw_excerpt, 0);
     TEST_TRUE(runner,
@@ -189,7 +189,7 @@ test_Highlight_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) 
 
     spans = Vec_new(1);
     Vec_Push(spans, (Obj*)Span_new(3, 1, 1.0f));
-    raw_excerpt = (String *)SSTR_WRAP_C(PHI " " PHI " " PHI);
+    raw_excerpt = SSTR_WRAP_C(PHI " " PHI " " PHI);
     highlighted = Highlighter_Highlight_Excerpt(highlighter, spans,
                                                 raw_excerpt, 1);
     TEST_TRUE(runner,
@@ -204,7 +204,7 @@ test_Highlight_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) 
     Vec_Push(spans, (Obj*)Span_new(2,  4, 1.0f));
     Vec_Push(spans, (Obj*)Span_new(8,  9, 1.0f));
     Vec_Push(spans, (Obj*)Span_new(8,  4, 1.0f));
-    raw_excerpt = (String *)SSTR_WRAP_C(PHI " Oook. Urk. Ick. " PHI);
+    raw_excerpt = SSTR_WRAP_C(PHI " Oook. Urk. Ick. " PHI);
     highlighted = Highlighter_Highlight_Excerpt(highlighter, spans,
                                                 raw_excerpt, 0);
     TEST_TRUE(runner,
@@ -221,7 +221,7 @@ test_Highlight_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) 
 static void
 test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
                     Hits *hits) {
-    String *content = (String*)SSTR_WRAP_C("content");
+    String *content = SSTR_WRAP_C("content");
     Highlighter *highlighter = Highlighter_new(searcher, query, content, 200);
 
     HitDoc *hit = Hits_Next(hits);
@@ -233,9 +233,9 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
               "highlighter tagged phrase and single term");
     DECREF(excerpt);
 
-    String *pre_tag = (String*)SSTR_WRAP_C("\x1B[1m");
+    String *pre_tag = SSTR_WRAP_C("\x1B[1m");
     Highlighter_Set_Pre_Tag(highlighter, pre_tag);
-    String *post_tag = (String*)SSTR_WRAP_C("\x1B[0m");
+    String *post_tag = SSTR_WRAP_C("\x1B[0m");
     Highlighter_Set_Post_Tag(highlighter, post_tag);
     excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_TRUE(runner,
@@ -307,7 +307,7 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
               "specify field highlights correct field...");
     DECREF(excerpt);
     DECREF(highlighter);
-    String *alt = (String*)SSTR_WRAP_C("alt");
+    String *alt = SSTR_WRAP_C("alt");
     highlighter = Highlighter_new(searcher, query, alt, 200);
     excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_FALSE(runner,
@@ -329,9 +329,9 @@ test_highlighting(TestBatchRunner *runner) {
     FullTextType *dunked_type = FullTextType_new((Analyzer*)tokenizer);
     FullTextType_Set_Highlightable(dunked_type, true);
     FullTextType_Set_Boost(dunked_type, 0.1f);
-    String *content = (String*)SSTR_WRAP_C("content");
+    String *content = SSTR_WRAP_C("content");
     Schema_Spec_Field(schema, content, (FieldType*)plain_type);
-    String *alt = (String*)SSTR_WRAP_C("alt");
+    String *alt = SSTR_WRAP_C("alt");
     Schema_Spec_Field(schema, alt, (FieldType*)dunked_type);
     DECREF(plain_type);
     DECREF(dunked_type);
@@ -341,22 +341,21 @@ test_highlighting(TestBatchRunner *runner) {
     Indexer *indexer = Indexer_new(schema, (Obj*)folder, NULL, 0);
 
     Doc *doc = Doc_new(NULL, 0);
-    String *string = (String *)SSTR_WRAP_C(TEST_STRING);
+    String *string = SSTR_WRAP_C(TEST_STRING);
     Doc_Store(doc, content, (Obj*)string);
     Indexer_Add_Doc(indexer, doc, 1.0f);
     DECREF(doc);
 
     doc = Doc_new(NULL, 0);
-    string = (String *)SSTR_WRAP_C("\"I see,\" said the blind man.");
+    string = SSTR_WRAP_C("\"I see,\" said the blind man.");
     Doc_Store(doc, content, (Obj*)string);
     Indexer_Add_Doc(indexer, doc, 1.0f);
     DECREF(doc);
 
     doc = Doc_new(NULL, 0);
-    string = (String *)SSTR_WRAP_C("x but not why or 2ee");
+    string = SSTR_WRAP_C("x but not why or 2ee");
     Doc_Store(doc, content, (Obj*)string);
-    string = (String *)SSTR_WRAP_C(TEST_STRING
-                                   " and extra stuff so it scores lower");
+    string = SSTR_WRAP_C(TEST_STRING " and extra stuff so it scores lower");
     Doc_Store(doc, alt, (Obj*)string);
     Indexer_Add_Doc(indexer, doc, 1.0f);
     DECREF(doc);
@@ -384,7 +383,7 @@ test_hl_selection(TestBatchRunner *runner) {
     StandardTokenizer *tokenizer = StandardTokenizer_new();
     FullTextType *plain_type = FullTextType_new((Analyzer*)tokenizer);
     FullTextType_Set_Highlightable(plain_type, true);
-    String *content = (String*)SSTR_WRAP_C("content");
+    String *content = SSTR_WRAP_C("content");
     Schema_Spec_Field(schema, content, (FieldType*)plain_type);
     DECREF(plain_type);
     DECREF(tokenizer);
@@ -407,7 +406,7 @@ test_hl_selection(TestBatchRunner *runner) {
         "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla. "
         "bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla. ";
     Doc *doc = Doc_new(NULL, 0);
-    String *string = (String *)SSTR_WRAP_C(test_string);
+    String *string = SSTR_WRAP_C(test_string);
     Doc_Store(doc, content, (Obj*)string);
     Indexer_Add_Doc(indexer, doc, 1.0f);
     DECREF(doc);
@@ -421,8 +420,8 @@ test_hl_selection(TestBatchRunner *runner) {
     Hits *hits = Searcher_Hits(searcher, query, 0, 10, NULL);
     HitDoc *hit = Hits_Next(hits);
     String *excerpt = Highlighter_Create_Excerpt(highlighter, hit);
-    String *mmm = (String*)SSTR_WRAP_C("MMM");
-    String *nnn = (String*)SSTR_WRAP_C("NNN");
+    String *mmm = SSTR_WRAP_C("MMM");
+    String *nnn = SSTR_WRAP_C("NNN");
     TEST_TRUE(runner, Str_Contains(excerpt, mmm) || Str_Contains(excerpt, nnn),
               "Sentence boundary algo doesn't chop terms");
 

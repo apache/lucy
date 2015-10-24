@@ -43,10 +43,10 @@ TestFSDH_new() {
 
 static void
 test_all(TestBatchRunner *runner) {
-    String   *foo           = (String*)SSTR_WRAP_C("foo");
-    String   *boffo         = (String*)SSTR_WRAP_C("boffo");
-    String   *foo_boffo     = (String*)SSTR_WRAP_C("foo/boffo");
-    String   *test_dir      = (String*)SSTR_WRAP_C("_fsdir_test");
+    String   *foo           = SSTR_WRAP_C("foo");
+    String   *boffo         = SSTR_WRAP_C("boffo");
+    String   *foo_boffo     = SSTR_WRAP_C("foo/boffo");
+    String   *test_dir      = SSTR_WRAP_C("_fsdir_test");
     FSFolder *folder        = FSFolder_new(test_dir);
     bool      saw_foo       = false;
     bool      saw_boffo     = false;

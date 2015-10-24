@@ -864,7 +864,7 @@ S_create_index() {
     Indexer    *indexer = Indexer_new(schema, (Obj*)folder, NULL, 0);
     uint32_t i, max;
 
-    String *field = (String*)SSTR_WRAP_C("content");
+    String *field = SSTR_WRAP_C("content");
     for (i = 0, max = Vec_Get_Size(doc_set); i < max; i++) {
         Doc *doc = Doc_new(NULL, 0);
         Doc_Store(doc, field, Vec_Fetch(doc_set, i));
