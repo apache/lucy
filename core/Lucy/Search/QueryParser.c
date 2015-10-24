@@ -874,8 +874,8 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
     // If quoted, always generate PhraseQuery.
     StringIterator *top  = Str_Top(full_text);
     StringIterator *tail = Str_Tail(full_text);
-    StrIter_Skip_Next_Whitespace(top);
-    StrIter_Skip_Prev_Whitespace(tail);
+    StrIter_Skip_Whitespace(top);
+    StrIter_Skip_Whitespace_Back(tail);
     if (StrIter_Starts_With_Utf8(top, "\"", 1)) {
         is_phrase = true;
         StrIter_Advance(top, 1);

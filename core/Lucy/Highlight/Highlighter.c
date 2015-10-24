@@ -228,7 +228,7 @@ S_find_starting_boundary(StringIterator *top, uint32_t max_skip,
 
         if (code_point == STRITER_DONE || code_point == '.') {
             // Skip remaining whitespace.
-            *num_skipped_ptr = StrIter_Skip_Next_Whitespace(top);
+            *num_skipped_ptr = StrIter_Skip_Whitespace(top);
             DECREF(iter);
             return true;
         }
@@ -271,7 +271,7 @@ S_find_starting_boundary(StringIterator *top, uint32_t max_skip,
     }
 
     // Skip remaining whitespace.
-    num_skipped += StrIter_Skip_Next_Whitespace(top);
+    num_skipped += StrIter_Skip_Whitespace(top);
     *num_skipped_ptr = num_skipped;
 
     DECREF(word);
@@ -298,7 +298,7 @@ S_find_ending_boundary(StringIterator *tail, uint32_t max_skip,
 
         if (code_point == STRITER_DONE) {
             // Skip remaining whitespace.
-            *num_skipped_ptr = StrIter_Skip_Prev_Whitespace(tail);
+            *num_skipped_ptr = StrIter_Skip_Whitespace_Back(tail);
             DECREF(iter);
             return true;
         }

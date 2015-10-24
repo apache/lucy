@@ -82,7 +82,7 @@ QueryLexer_Tokenize_IMP(QueryLexer *self, String *query_string) {
     while (StrIter_Has_Next(iter)) {
         ParserElem *elem = NULL;
 
-        if (StrIter_Skip_Next_Whitespace(iter)) {
+        if (StrIter_Skip_Whitespace(iter)) {
             // Fast-forward past whitespace.
             continue;
         }
@@ -104,7 +104,7 @@ QueryLexer_Tokenize_IMP(QueryLexer *self, String *query_string) {
                 break;
             case '+':
                 if (StrIter_Has_Next(iter)
-                    && !StrIter_Skip_Next_Whitespace(iter)
+                    && !StrIter_Skip_Whitespace(iter)
                    ) {
                     elem = ParserElem_new(TOKEN_PLUS, NULL);
                 }
@@ -114,7 +114,7 @@ QueryLexer_Tokenize_IMP(QueryLexer *self, String *query_string) {
                 break;
             case '-':
                 if (StrIter_Has_Next(iter)
-                    && !StrIter_Skip_Next_Whitespace(iter)
+                    && !StrIter_Skip_Whitespace(iter)
                    ) {
                     elem = ParserElem_new(TOKEN_MINUS, NULL);
                 }
