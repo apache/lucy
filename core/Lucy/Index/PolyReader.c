@@ -384,7 +384,7 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
 
         // Testing only.
         if (PolyReader_race_condition_debug1) {
-            String *temp = SSTR_WRAP_UTF8("temp", 4);
+            String *temp = SSTR_WRAP_C("temp");
             if (Folder_Exists(folder, temp)) {
                 bool success = Folder_Rename(folder, temp,
                                              PolyReader_race_condition_debug1);

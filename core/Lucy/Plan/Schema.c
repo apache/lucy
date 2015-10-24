@@ -422,7 +422,7 @@ Schema_Eat_IMP(Schema *self, Schema *other) {
 void
 Schema_Write_IMP(Schema *self, Folder *folder, String *filename) {
     Hash *dump = Schema_Dump(self);
-    String *schema_temp = SSTR_WRAP_UTF8("schema.temp", 11);
+    String *schema_temp = SSTR_WRAP_C("schema.temp");
     bool success;
     Folder_Delete(folder, schema_temp); // Just in case.
     Json_spew_json((Obj*)dump, folder, schema_temp);

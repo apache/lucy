@@ -31,8 +31,8 @@ TestSnapshot_new() {
 static void
 test_Add_and_Delete(TestBatchRunner *runner) {
     Snapshot *snapshot = Snapshot_new();
-    String *foo = (String*)SSTR_WRAP_UTF8("foo", 3);
-    String *bar = (String*)SSTR_WRAP_UTF8("bar", 3);
+    String *foo = (String*)SSTR_WRAP_C("foo");
+    String *bar = (String*)SSTR_WRAP_C("bar");
 
     Snapshot_Add_Entry(snapshot, foo);
     Snapshot_Add_Entry(snapshot, foo); // redundant
@@ -55,8 +55,8 @@ static void
 test_path_handling(TestBatchRunner *runner) {
     Snapshot *snapshot = Snapshot_new();
     Folder   *folder   = (Folder*)RAMFolder_new(NULL);
-    String   *snap     = (String*)SSTR_WRAP_UTF8("snap", 4);
-    String   *crackle  = (String*)SSTR_WRAP_UTF8("crackle", 7);
+    String   *snap     = (String*)SSTR_WRAP_C("snap");
+    String   *crackle  = (String*)SSTR_WRAP_C("crackle");
 
     Snapshot_Write_File(snapshot, folder, snap);
     TEST_TRUE(runner, Str_Equals(snap, (Obj*)Snapshot_Get_Path(snapshot)),
@@ -79,8 +79,8 @@ static void
 test_Read_File_and_Write_File(TestBatchRunner *runner) {
     Snapshot *snapshot = Snapshot_new();
     Folder   *folder   = (Folder*)RAMFolder_new(NULL);
-    String   *snap     = (String*)SSTR_WRAP_UTF8("snap", 4);
-    String   *foo      = (String*)SSTR_WRAP_UTF8("foo", 3);
+    String   *snap     = (String*)SSTR_WRAP_C("snap");
+    String   *foo      = (String*)SSTR_WRAP_C("foo");
 
     Snapshot_Add_Entry(snapshot, foo);
     Snapshot_Write_File(snapshot, folder, snap);

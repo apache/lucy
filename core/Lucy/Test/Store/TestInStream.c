@@ -95,8 +95,8 @@ test_refill(TestBatchRunner *runner) {
 
 static void
 test_Clone_and_Reopen(TestBatchRunner *runner) {
-    String        *foo       = SSTR_WRAP_UTF8("foo", 3);
-    String        *bar       = SSTR_WRAP_UTF8("bar", 3);
+    String        *foo       = SSTR_WRAP_C("foo");
+    String        *bar       = SSTR_WRAP_C("bar");
     RAMFile       *file      = RAMFile_new(NULL, false);
     OutStream     *outstream = OutStream_open((Obj*)file);
     RAMFileHandle *fh;

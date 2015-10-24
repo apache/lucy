@@ -108,7 +108,7 @@ S_create_schema() {
 static void
 S_store_field(Doc *doc, String *field, const char *value) {
     if (value) {
-        String *string = SSTR_WRAP_UTF8(value, strlen(value));
+        String *string = SSTR_WRAP_C(value);
         Doc_Store(doc, field, (Obj*)string);
     }
 }
@@ -231,7 +231,7 @@ test_sort_writer(TestBatchRunner *runner) {
     {
         // Consolidate everything, to test merging.
         Indexer *indexer = Indexer_new(schema, (Obj*)folder, NULL, 0);
-        String *bike_str = SSTR_WRAP_UTF8("bike", 4);
+        String *bike_str = SSTR_WRAP_C("bike");
         Indexer_Delete_By_Term(indexer, name_str, (Obj*)bike_str);
         // no "wheels" field -- test NULL/undef
         S_add_doc(indexer, "elephant", "0020", "6000", "land", NULL, NULL);

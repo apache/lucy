@@ -37,9 +37,9 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     }
 
     RegexTokenizer *word_char_tokenizer
-        = RegexTokenizer_new(SSTR_WRAP_UTF8("\\w+", 3));
+        = RegexTokenizer_new(SSTR_WRAP_C("\\w+"));
     RegexTokenizer *whitespace_tokenizer
-        = RegexTokenizer_new(SSTR_WRAP_UTF8("\\S+", 3));
+        = RegexTokenizer_new(SSTR_WRAP_C("\\S+"));
     Obj *word_char_dump  = RegexTokenizer_Dump(word_char_tokenizer);
     Obj *whitespace_dump = RegexTokenizer_Dump(whitespace_tokenizer);
     RegexTokenizer *word_char_clone

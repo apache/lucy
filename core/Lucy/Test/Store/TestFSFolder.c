@@ -63,7 +63,7 @@ TestFSFolder_new() {
 static Folder*
 S_set_up() {
     rmdir("_fstest");
-    String   *test_dir = (String*)SSTR_WRAP_UTF8("_fstest", 7);
+    String   *test_dir = (String*)SSTR_WRAP_C("_fstest");
     FSFolder *folder = FSFolder_new(test_dir);
     FSFolder_Initialize(folder);
     if (!FSFolder_Check(folder)) {
@@ -89,7 +89,7 @@ S_tear_down() {
 static void
 test_Initialize_and_Check(TestBatchRunner *runner) {
     rmdir("_fstest");
-    String   *test_dir = (String*)SSTR_WRAP_UTF8("_fstest", 7);
+    String   *test_dir = (String*)SSTR_WRAP_C("_fstest");
     FSFolder *folder   = FSFolder_new(test_dir);
     TEST_FALSE(runner, FSFolder_Check(folder),
                "Check() returns false when folder dir doesn't exist");
@@ -105,9 +105,9 @@ static void
 test_protect_symlinks(TestBatchRunner *runner) {
 #ifdef ENABLE_SYMLINK_TESTS
     FSFolder *folder    = (FSFolder*)S_set_up();
-    String   *foo       = (String*)SSTR_WRAP_UTF8("foo", 3);
-    String   *bar       = (String*)SSTR_WRAP_UTF8("bar", 3);
-    String   *foo_boffo = (String*)SSTR_WRAP_UTF8("foo/boffo", 9);
+    String   *foo       = (String*)SSTR_WRAP_C("foo");
+    String   *bar       = (String*)SSTR_WRAP_C("bar");
+    String   *foo_boffo = (String*)SSTR_WRAP_C("foo/boffo");
 
     FSFolder_MkDir(folder, foo);
     FSFolder_MkDir(folder, bar);
@@ -158,14 +158,14 @@ void
 test_disallow_updir(TestBatchRunner *runner) {
     FSFolder *outer_folder = (FSFolder*)S_set_up();
 
-    String *foo = (String*)SSTR_WRAP_UTF8("foo", 3);
-    String *bar = (String*)SSTR_WRAP_UTF8("bar", 3);
+    String *foo = (String*)SSTR_WRAP_C("foo");
+    String *bar = (String*)SSTR_WRAP_C("bar");
     FSFolder_MkDir(outer_folder, foo);
     FSFolder_MkDir(outer_folder, bar);
 
-    String *inner_path = (String*)SSTR_WRAP_UTF8("_fstest/foo", 11);
+    String *inner_path = (String*)SSTR_WRAP_C("_fstest/foo");
     FSFolder *foo_folder = FSFolder_new(inner_path);
-    String *up_bar = (String*)SSTR_WRAP_UTF8("../bar", 6);
+    String *up_bar = (String*)SSTR_WRAP_C("../bar");
     TEST_FALSE(runner, FSFolder_Exists(foo_folder, up_bar),
                "up-dirs are inaccessible.");
 

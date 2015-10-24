@@ -41,8 +41,8 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
         return;
     }
 
-    String       *EN          = (String*)SSTR_WRAP_UTF8("en", 2);
-    String       *ES          = (String*)SSTR_WRAP_UTF8("es", 2);
+    String       *EN          = (String*)SSTR_WRAP_C("en");
+    String       *ES          = (String*)SSTR_WRAP_C("es");
     PolyAnalyzer *analyzer    = PolyAnalyzer_new(EN, NULL);
     PolyAnalyzer *other       = PolyAnalyzer_new(ES, NULL);
     Obj          *dump        = (Obj*)PolyAnalyzer_Dump(analyzer);
@@ -68,7 +68,7 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 
 static void
 test_analysis(TestBatchRunner *runner) {
-    String             *EN          = (String*)SSTR_WRAP_UTF8("en", 2);
+    String             *EN          = (String*)SSTR_WRAP_C("en");
     String             *source_text = Str_newf("Eats, shoots and leaves.");
     Normalizer         *normalizer  = Normalizer_new(NULL, true, false);
     StandardTokenizer  *tokenizer   = StandardTokenizer_new();

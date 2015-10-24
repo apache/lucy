@@ -158,7 +158,7 @@ LFLock_Request_IMP(LockFileLock *self) {
     }
 
     // Create the "locks" subdirectory if necessary.
-    String *lock_dir_name = (String*)SSTR_WRAP_UTF8("locks", 5);
+    String *lock_dir_name = (String*)SSTR_WRAP_C("locks");
     if (!Folder_Exists(ivars->folder, lock_dir_name)) {
         if (!Folder_MkDir(ivars->folder, lock_dir_name)) {
             Err *mkdir_err = (Err*)CERTIFY(Err_get_error(), ERR);

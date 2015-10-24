@@ -234,7 +234,7 @@ S_obtain_lock_factory(IndexManager *self) {
 Lock*
 IxManager_Make_Write_Lock_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
-    String *write_lock_name = SSTR_WRAP_UTF8("write", 5);
+    String *write_lock_name = SSTR_WRAP_C("write");
     LockFactory *lock_factory = S_obtain_lock_factory(self);
     return LockFact_Make_Lock(lock_factory, write_lock_name,
                               ivars->write_lock_timeout,
@@ -244,7 +244,7 @@ IxManager_Make_Write_Lock_IMP(IndexManager *self) {
 Lock*
 IxManager_Make_Deletion_Lock_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
-    String *lock_name = SSTR_WRAP_UTF8("deletion", 8);
+    String *lock_name = SSTR_WRAP_C("deletion");
     LockFactory *lock_factory = S_obtain_lock_factory(self);
     return LockFact_Make_Lock(lock_factory, lock_name,
                               ivars->deletion_lock_timeout,
@@ -254,7 +254,7 @@ IxManager_Make_Deletion_Lock_IMP(IndexManager *self) {
 Lock*
 IxManager_Make_Merge_Lock_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
-    String *merge_lock_name = SSTR_WRAP_UTF8("merge", 5);
+    String *merge_lock_name = SSTR_WRAP_C("merge");
     LockFactory *lock_factory = S_obtain_lock_factory(self);
     return LockFact_Make_Lock(lock_factory, merge_lock_name,
                               ivars->merge_lock_timeout,
@@ -264,7 +264,7 @@ IxManager_Make_Merge_Lock_IMP(IndexManager *self) {
 void
 IxManager_Write_Merge_Data_IMP(IndexManager *self, int64_t cutoff) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
-    String *merge_json = SSTR_WRAP_UTF8("merge.json", 10);
+    String *merge_json = SSTR_WRAP_C("merge.json");
     Hash *data = Hash_new(1);
     bool success;
     Hash_Store_Utf8(data, "cutoff", 6, (Obj*)Str_newf("%i64", cutoff));
@@ -278,7 +278,7 @@ IxManager_Write_Merge_Data_IMP(IndexManager *self, int64_t cutoff) {
 Hash*
 IxManager_Read_Merge_Data_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
-    String *merge_json = SSTR_WRAP_UTF8("merge.json", 10);
+    String *merge_json = SSTR_WRAP_C("merge.json");
     if (Folder_Exists(ivars->folder, merge_json)) {
         Hash *stuff = (Hash*)Json_slurp_json(ivars->folder, merge_json);
         if (stuff) {
@@ -297,7 +297,7 @@ IxManager_Read_Merge_Data_IMP(IndexManager *self) {
 bool
 IxManager_Remove_Merge_Data_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
-    String *merge_json = SSTR_WRAP_UTF8("merge.json", 10);
+    String *merge_json = SSTR_WRAP_C("merge.json");
     return Folder_Delete(ivars->folder, merge_json) != 0;
 }
 

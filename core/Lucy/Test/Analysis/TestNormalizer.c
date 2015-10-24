@@ -39,8 +39,8 @@ static void
 test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     Normalizer *normalizer[4];
 
-    String *NFC  = (String*)SSTR_WRAP_UTF8("NFC",  3);
-    String *NFKC = (String*)SSTR_WRAP_UTF8("NFKC", 4);
+    String *NFC  = (String*)SSTR_WRAP_C("NFC");
+    String *NFKC = (String*)SSTR_WRAP_C("NFKC");
 
     normalizer[0] = Normalizer_new(NFKC, true,  false);
     normalizer[1] = Normalizer_new(NFC,  true,  false);

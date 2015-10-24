@@ -34,38 +34,38 @@ TestSimple_new() {
 static void
 test_simple(TestBatchRunner *runner) {
     RAMFolder *folder   = RAMFolder_new(NULL);
-    String    *language = SSTR_WRAP_UTF8("en", 2);
+    String    *language = SSTR_WRAP_C("en");
     Simple    *lucy     = Simple_new((Obj*)folder, language);
 
-    String *food_field = SSTR_WRAP_UTF8("food", 4);
+    String *food_field = SSTR_WRAP_C("food");
 
     {
         Doc *doc = Doc_new(NULL, 0);
-        String *value = SSTR_WRAP_UTF8("creamed corn", 12);
+        String *value = SSTR_WRAP_C("creamed corn");
         Doc_Store(doc, food_field, (Obj*)value);
         Simple_Add_Doc(lucy, doc);
         DECREF(doc);
 
-        String *query = SSTR_WRAP_UTF8("creamed", 7);
+        String *query = SSTR_WRAP_C("creamed");
         uint32_t num_results = Simple_Search(lucy, query, 0, 10);
         TEST_INT_EQ(runner, num_results, 1, "Search works right after add");
     }
 
     {
         Doc *doc = Doc_new(NULL, 0);
-        String *value = SSTR_WRAP_UTF8("creamed spinach", 15);
+        String *value = SSTR_WRAP_C("creamed spinach");
         Doc_Store(doc, food_field, (Obj*)value);
         Simple_Add_Doc(lucy, doc);
         DECREF(doc);
 
-        String *query = SSTR_WRAP_UTF8("creamed", 7);
+        String *query = SSTR_WRAP_C("creamed");
         uint32_t num_results = Simple_Search(lucy, query, 0, 10);
         TEST_INT_EQ(runner, num_results, 2, "Search returns total hits");
     }
 
     {
         Doc *doc = Doc_new(NULL, 0);
-        String *value = SSTR_WRAP_UTF8("creamed broccoli", 16);
+        String *value = SSTR_WRAP_C("creamed broccoli");
         Doc_Store(doc, food_field, (Obj*)value);
         Simple_Add_Doc(lucy, doc);
         DECREF(doc);
@@ -73,7 +73,7 @@ test_simple(TestBatchRunner *runner) {
         DECREF(lucy);
         lucy = Simple_new((Obj*)folder, language);
 
-        String *query = SSTR_WRAP_UTF8("cream", 5);
+        String *query = SSTR_WRAP_C("cream");
         uint32_t num_results = Simple_Search(lucy, query, 0, 10);
         TEST_INT_EQ(runner, num_results, 3, "commit upon destroy");
 
@@ -88,13 +88,13 @@ test_simple(TestBatchRunner *runner) {
 
     {
         Doc *doc = Doc_new(NULL, 0);
-        String *band_field = SSTR_WRAP_UTF8("band", 4);
-        String *value = SSTR_WRAP_UTF8("Cream", 5);
+        String *band_field = SSTR_WRAP_C("band");
+        String *value = SSTR_WRAP_C("Cream");
         Doc_Store(doc, band_field, (Obj*)value);
         Simple_Add_Doc(lucy, doc);
         DECREF(doc);
 
-        String *query = SSTR_WRAP_UTF8("cream", 5);
+        String *query = SSTR_WRAP_C("cream");
         uint32_t num_results = Simple_Search(lucy, query, 0, 10);
         TEST_INT_EQ(runner, num_results, 4,
                     "Search uses correct EasyAnalyzer");

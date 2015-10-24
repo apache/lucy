@@ -157,7 +157,7 @@ S_zap_dead_merge(FilePurger *self, Hash *candidates) {
         if (cutoff) {
             String *cutoff_seg = Seg_num_to_name(Json_obj_to_i64(cutoff));
             if (Folder_Exists(ivars->folder, cutoff_seg)) {
-                String *merge_json = SSTR_WRAP_UTF8("merge.json", 10);
+                String *merge_json = SSTR_WRAP_C("merge.json");
                 DirHandle *dh = Folder_Open_Dir(ivars->folder, cutoff_seg);
 
                 if (!dh) {

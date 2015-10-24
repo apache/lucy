@@ -37,7 +37,7 @@ DummyFieldType_new() {
 
 static FieldType*
 S_alt_field_type() {
-    String *name = SSTR_WRAP_UTF8("DummyFieldType2", 15);
+    String *name = SSTR_WRAP_C("DummyFieldType2");
     Class *klass = Class_singleton(name, DUMMYFIELDTYPE);
     FieldType *self = (FieldType*)Class_Make_Obj(klass);
     return FType_init(self);
@@ -84,8 +84,8 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
 static void
 test_Compare_Values(TestBatchRunner *runner) {
     FieldType *type = (FieldType*)DummyFieldType_new();
-    Obj       *a    = (Obj*)SSTR_WRAP_UTF8("a", 1);
-    Obj       *b    = (Obj*)SSTR_WRAP_UTF8("b", 1);
+    Obj       *a    = (Obj*)SSTR_WRAP_C("a");
+    Obj       *b    = (Obj*)SSTR_WRAP_C("b");
 
     TEST_TRUE(runner, FType_Compare_Values(type, a, b) < 0,
               "a less than b");
