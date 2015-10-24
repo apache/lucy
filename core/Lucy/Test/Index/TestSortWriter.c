@@ -245,8 +245,8 @@ test_sort_writer(TestBatchRunner *runner) {
         int num_old_seg_files = 0;
         for (uint32_t i = 0, size = Vec_Get_Size(filenames); i < size; ++i) {
             String *filename = (String*)Vec_Fetch(filenames, i);
-            if (Str_Find_Utf8(filename, "seg_1", 5) >= 0
-                || Str_Find_Utf8(filename, "seg_2", 5) >= 0
+            if (Str_Contains_Utf8(filename, "seg_1", 5)
+                || Str_Contains_Utf8(filename, "seg_2", 5)
                ) {
                 ++num_old_seg_files;
             }

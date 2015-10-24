@@ -227,9 +227,9 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     HitDoc *hit = Hits_Next(hits);
     String *excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_TRUE(runner,
-              Str_Find_Utf8(excerpt,
-                           "<strong>&#934;</strong> a b c d <strong>x y z</strong>",
-                           54) >= 0,
+              Str_Contains_Utf8(excerpt,
+                                "<strong>&#934;</strong> a b c d <strong>x y z</strong>",
+                                54),
               "highlighter tagged phrase and single term");
     DECREF(excerpt);
 
@@ -239,9 +239,9 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     Highlighter_Set_Post_Tag(highlighter, post_tag);
     excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_TRUE(runner,
-              Str_Find_Utf8(excerpt,
-                          "\x1B[1m&#934;\x1B[0m a b c d \x1B[1mx y z\x1B[0m",
-                          36) >= 0,
+              Str_Contains_Utf8(excerpt,
+                                "\x1B[1m&#934;\x1B[0m a b c d \x1B[1mx y z\x1B[0m",
+                                36),
               "set_pre_tag and set_post_tag");
     DECREF(excerpt);
     DECREF(hit);
@@ -249,7 +249,7 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     hit = Hits_Next(hits);
     excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_TRUE(runner,
-              Str_Find_Utf8(excerpt, "x", 1) >= 0,
+              Str_Contains_Utf8(excerpt, "x", 1),
               "excerpt field with partial hit doesn't cause highlighter freakout");
     DECREF(excerpt);
     DECREF(hit);
@@ -261,9 +261,9 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     hit = Hits_Next(hits);
     excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_TRUE(runner,
-              Str_Find_Utf8(excerpt,
-                          "<strong>b</strong> c d <strong>x y z</strong>",
-                          45) >= 0,
+              Str_Contains_Utf8(excerpt,
+                                "<strong>b</strong> c d <strong>x y z</strong>",
+                                45),
               "query with same word in both phrase and term doesn't cause freakout");
     DECREF(excerpt);
     DECREF(hit);
@@ -276,7 +276,7 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     hit = Hits_Next(hits);
     excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_TRUE(runner,
-              Str_Find_Utf8(excerpt, "&quot;", 6) >= 0,
+              Str_Contains_Utf8(excerpt, "&quot;", 6),
               "HTML entity encoded properly");
     DECREF(excerpt);
     DECREF(hit);
@@ -288,9 +288,9 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     highlighter = Highlighter_new(searcher, query, content, 200);
     hit = Hits_Next(hits);
     excerpt = Highlighter_Create_Excerpt(highlighter, hit);
-    TEST_TRUE(runner,
-              Str_Find_Utf8(excerpt, "&#934;", 6) == -1,
-              "no ellipsis for short excerpt");
+    TEST_FALSE(runner,
+               Str_Contains_Utf8(excerpt, "&#934;", 6),
+               "no ellipsis for short excerpt");
     DECREF(excerpt);
     DECREF(hit);
     DECREF(highlighter);
@@ -303,16 +303,16 @@ test_Create_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query,
     highlighter = Highlighter_new(searcher, query, content, 200);
     excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     TEST_TRUE(runner,
-              Str_Find_Utf8(excerpt, "strong", 5) >= 0,
+              Str_Contains_Utf8(excerpt, "strong", 5),
               "specify field highlights correct field...");
     DECREF(excerpt);
     DECREF(highlighter);
     String *alt = (String*)SSTR_WRAP_UTF8("alt", 3);
     highlighter = Highlighter_new(searcher, query, alt, 200);
     excerpt = Highlighter_Create_Excerpt(highlighter, hit);
-    TEST_TRUE(runner,
-              Str_Find_Utf8(excerpt, "strong", 5) == -1,
-              "... but not another field");
+    TEST_FALSE(runner,
+               Str_Contains_Utf8(excerpt, "strong", 5),
+               "... but not another field");
     DECREF(excerpt);
     DECREF(highlighter);
     DECREF(hit);
@@ -424,7 +424,7 @@ test_hl_selection(TestBatchRunner *runner) {
     String *excerpt = Highlighter_Create_Excerpt(highlighter, hit);
     String *mmm = (String*)SSTR_WRAP_UTF8("MMM", 3);
     String *nnn = (String*)SSTR_WRAP_UTF8("NNN", 3);
-    TEST_TRUE(runner, Str_Find(excerpt, mmm) >= 0 || Str_Find(excerpt, nnn) >= 0,
+    TEST_TRUE(runner, Str_Contains(excerpt, mmm) || Str_Contains(excerpt, nnn),
               "Sentence boundary algo doesn't chop terms");
 
     DECREF(excerpt);

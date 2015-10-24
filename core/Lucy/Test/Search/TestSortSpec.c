@@ -467,7 +467,7 @@ test_sort_spec(TestBatchRunner *runner) {
     error = Err_trap(S_attempt_sorted_search, &sort_ctx);
     TEST_TRUE(runner, error != NULL
               && Err_is_a(error, ERR)
-              && Str_Find_Utf8(Err_Get_Mess(error), "sortable", 8) != -1,
+              && Str_Contains_Utf8(Err_Get_Mess(error), "sortable", 8),
               "sorting on a non-sortable field throws an error");
     DECREF(error);
 
@@ -475,7 +475,7 @@ test_sort_spec(TestBatchRunner *runner) {
     error = Err_trap(S_attempt_sorted_search, &sort_ctx);
     TEST_TRUE(runner, error != NULL
               && Err_is_a(error, ERR)
-              && Str_Find_Utf8(Err_Get_Mess(error), "sortable", 8) != -1,
+              && Str_Contains_Utf8(Err_Get_Mess(error), "sortable", 8),
               "sorting on an unknown field throws an error");
     DECREF(error);
 #endif

@@ -39,8 +39,8 @@ lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
     lucy_RegexTokenizerIVARS *const ivars = lucy_RegexTokenizer_IVARS(self);
     #define DEFAULT_PATTERN "\\w+(?:['\\x{2019}]\\w+)*"
     if (pattern) {
-        if (CFISH_Str_Find_Utf8(pattern, "\\p", 2) != -1
-            || CFISH_Str_Find_Utf8(pattern, "\\P", 2) != -1
+        if (CFISH_Str_Contains_Utf8(pattern, "\\p", 2)
+            || CFISH_Str_Contains_Utf8(pattern, "\\P", 2)
            ) {
             CFISH_DECREF(self);
             THROW(CFISH_ERR, "\\p and \\P constructs forbidden");

@@ -349,7 +349,7 @@ S_create_dir(String *path) {
 
 static bool
 S_is_local_entry(String *path) {
-    return Str_Find_Utf8(path, "/", 1) == -1;
+    return !Str_Contains_Utf8(path, "/", 1);
 }
 
 /***************************************************************************/
