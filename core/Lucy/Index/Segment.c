@@ -70,7 +70,7 @@ Seg_valid_seg_name(String *name) {
         StringIterator *iter = Str_Top(name);
         StrIter_Advance(iter, 4);
         int32_t code_point;
-        while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
+        while (STR_OOB != (code_point = StrIter_Next(iter))) {
             if (!isalnum(code_point)) {
                 DECREF(iter);
                 return false;

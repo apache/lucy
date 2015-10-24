@@ -282,7 +282,7 @@ S_fullpath(FSFolder *self, String *path) {
         CharBuf *buf = CB_new(Str_Get_Size(fullpath));
         int32_t cp;
 
-        while (STRITER_DONE != (cp = StrIter_Next(iter))) {
+        while (STR_OOB != (cp = StrIter_Next(iter))) {
             if (cp == '/') { cp = CHY_DIR_SEP[0]; }
             CB_Cat_Char(buf, cp);
         }

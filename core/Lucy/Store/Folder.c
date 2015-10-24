@@ -439,7 +439,7 @@ S_enclosing_folder(Folder *self, StringIterator *path) {
     // Find first component of the file path.
     String *path_component = NULL;
     StringIterator *iter = StrIter_Clone(path);
-    while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
+    while (STR_OOB != (code_point = StrIter_Next(iter))) {
         if (code_point == '/' && StrIter_Has_Next(iter)) {
             StrIter_Recede(iter, 1);
             path_component = StrIter_substring(path, iter);

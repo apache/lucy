@@ -41,7 +41,7 @@ Lock_init(Lock *self, Folder *folder, String *name,
     }
     StringIterator *iter = Str_Top(name);
     int32_t code_point;
-    while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
+    while (STR_OOB != (code_point = StrIter_Next(iter))) {
         if (isalnum(code_point)
             || code_point == '.'
             || code_point == '-'

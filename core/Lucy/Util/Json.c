@@ -186,7 +186,7 @@ S_append_json_string(String *dump, CharBuf *buf) {
     // Process string data.
     StringIterator *iter = Str_Top(dump);
     int32_t code_point;
-    while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
+    while (STR_OOB != (code_point = StrIter_Next(iter))) {
         if (code_point > 127) {
             // There is no need to escape any high characters, including those
             // above the BMP, as we assume that the destination channel can

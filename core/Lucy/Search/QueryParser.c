@@ -833,7 +833,7 @@ S_unescape(QueryParser *self, String *orig, CharBuf *buf) {
     CB_Set_Size(buf, 0);
     CB_Grow(buf, Str_Get_Size(orig) + 4);
 
-    while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
+    while (STR_OOB != (code_point = StrIter_Next(iter))) {
         if (code_point == '\\') {
             int32_t next_code_point = StrIter_Next(iter);
             if (next_code_point == ':'
@@ -844,7 +844,7 @@ S_unescape(QueryParser *self, String *orig, CharBuf *buf) {
             }
             else {
                 CB_Cat_Char(buf, code_point);
-                if (next_code_point != STRITER_DONE) {
+                if (next_code_point != STR_OOB) {
                     CB_Cat_Char(buf, next_code_point);
                 }
             }

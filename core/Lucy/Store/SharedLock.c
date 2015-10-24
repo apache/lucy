@@ -144,8 +144,8 @@ ShLock_Is_Locked_IMP(SharedLock *self) {
             int32_t code_point = StrIter_Next(iter);
             if (code_point == '-') {
                 code_point = StrIter_Next(iter);
-                if (code_point != STRITER_DONE && isdigit(code_point)) {
-                    while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
+                if (code_point != STR_OOB && isdigit(code_point)) {
+                    while (STR_OOB != (code_point = StrIter_Next(iter))) {
                         if (!isdigit(code_point)) { break; }
                     }
                     if (code_point == '.'

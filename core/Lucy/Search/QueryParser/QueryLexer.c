@@ -169,7 +169,7 @@ S_consume_keyword(StringIterator *iter, const char *keyword,
     StringIterator *temp = StrIter_Clone(iter);
     StrIter_Advance(temp, keyword_len);
     int32_t lookahead = StrIter_Next(temp);
-    if (lookahead == STRITER_DONE) {
+    if (lookahead == STR_OOB) {
         DECREF(temp);
         return NULL;
     }
@@ -195,7 +195,7 @@ S_consume_field(StringIterator *iter) {
 
     // Field names constructs must start with a letter or underscore.
     int32_t code_point = StrIter_Next(temp);
-    if (code_point == STRITER_DONE) {
+    if (code_point == STR_OOB) {
         DECREF(temp);
         return NULL;
     }
@@ -206,7 +206,7 @@ S_consume_field(StringIterator *iter) {
 
     // Only alphanumerics and underscores are allowed in field names.
     while (':' != (code_point = StrIter_Next(temp))) {
-        if (code_point == STRITER_DONE) {
+        if (code_point == STR_OOB) {
             DECREF(temp);
             return NULL;
         }
@@ -218,7 +218,7 @@ S_consume_field(StringIterator *iter) {
 
     // Field name constructs must be followed by something sensible.
     int32_t lookahead = StrIter_Next(temp);
-    if (lookahead == STRITER_DONE) {
+    if (lookahead == STR_OOB) {
         DECREF(temp);
         return NULL;
     }
@@ -250,11 +250,11 @@ S_consume_text(StringIterator *iter) {
         int32_t code_point = StrIter_Next(temp);
         if (code_point == '\\') {
             code_point = StrIter_Next(temp);
-            if (code_point == STRITER_DONE) {
+            if (code_point == STR_OOB) {
                 break;
             }
         }
-        else if (code_point == STRITER_DONE) {
+        else if (code_point == STR_OOB) {
             break;
         }
         else if (StrHelp_is_whitespace(code_point)
@@ -283,7 +283,7 @@ S_consume_quoted_string(StringIterator *iter) {
 
     while (1) {
         int32_t code_point = StrIter_Next(temp);
-        if (code_point == STRITER_DONE || code_point == '"') {
+        if (code_point == STR_OOB || code_point == '"') {
             break;
         }
         else if (code_point == '\\') {

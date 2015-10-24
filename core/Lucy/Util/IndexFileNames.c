@@ -57,7 +57,7 @@ IxFileNames_extract_gen(String *name) {
     // encounter a NULL.
     while (1) {
         int32_t code_point = StrIter_Next(iter);
-        if (code_point == STRITER_DONE) { return 0; }
+        if (code_point == STR_OOB) { return 0; }
         else if (code_point == '_') { break; }
     }
 
@@ -83,7 +83,7 @@ IxFileNames_local_part(String *path) {
     StrIter_Advance(tail, 1);
 
     // Substring should start after last slash.
-    while (code_point != STRITER_DONE) {
+    while (code_point != STR_OOB) {
         if (code_point == '/') {
             StrIter_Advance(top, 1);
             break;

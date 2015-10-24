@@ -226,7 +226,7 @@ S_find_starting_boundary(StringIterator *top, uint32_t max_skip,
     while (true) {
         int32_t code_point = StrIter_Prev(iter);
 
-        if (code_point == STRITER_DONE || code_point == '.') {
+        if (code_point == STR_OOB || code_point == '.') {
             // Skip remaining whitespace.
             *num_skipped_ptr = StrIter_Skip_Whitespace(top);
             DECREF(iter);
@@ -251,7 +251,7 @@ S_find_starting_boundary(StringIterator *top, uint32_t max_skip,
     for (uint32_t i = 0; i < max_skip; ++i) {
         int32_t code_point = StrIter_Next(iter);
 
-        if (code_point == STRITER_DONE || code_point == '.') {
+        if (code_point == STR_OOB || code_point == '.') {
             found_edge = true;
             StrIter_Assign(top, iter);
             num_skipped = i + 1;
@@ -296,7 +296,7 @@ S_find_ending_boundary(StringIterator *tail, uint32_t max_skip,
     do {
         code_point = StrIter_Next(iter);
 
-        if (code_point == STRITER_DONE) {
+        if (code_point == STR_OOB) {
             // Skip remaining whitespace.
             *num_skipped_ptr = StrIter_Skip_Whitespace_Back(tail);
             DECREF(iter);
@@ -311,7 +311,7 @@ S_find_ending_boundary(StringIterator *tail, uint32_t max_skip,
     StrIter_Assign(iter, tail);
 
     for (uint32_t i = 0;
-         STRITER_DONE != (code_point = StrIter_Prev(iter));
+         STR_OOB != (code_point = StrIter_Prev(iter));
          ++i)
     {
         if (code_point == '.') {
@@ -345,7 +345,7 @@ S_find_ending_boundary(StringIterator *tail, uint32_t max_skip,
         StrIter_Assign(tail, word);
 
         // Strip whitespace and punctuation that collides with an ellipsis.
-        while (STRITER_DONE != (code_point = StrIter_Prev(tail))) {
+        while (STR_OOB != (code_point = StrIter_Prev(tail))) {
             if (!StrHelp_is_whitespace(code_point)
                 && code_point != '.'
                 && code_point != ','
@@ -588,7 +588,7 @@ S_encode_entities(String *text, CharBuf *buf) {
 
     // Scan first so that we only allocate once.
     int32_t code_point;
-    while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
+    while (STR_OOB != (code_point = StrIter_Next(iter))) {
         if (code_point > 127
             || (!isgraph(code_point) && !isspace(code_point))
             || code_point == '<'
@@ -607,7 +607,7 @@ S_encode_entities(String *text, CharBuf *buf) {
     CB_Set_Size(buf, 0);
     DECREF(iter);
     iter = Str_Top(text);
-    while (STRITER_DONE != (code_point = StrIter_Next(iter))) {
+    while (STR_OOB != (code_point = StrIter_Next(iter))) {
         if (code_point > 127
             || (!isgraph(code_point) && !isspace(code_point))
            ) {
