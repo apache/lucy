@@ -443,3 +443,97 @@ func TestFSFolderBasics(t *testing.T) {
 	defer os.RemoveAll("_fsfolder_go_test")
 	runFolderTests(t, folder)
 }
+
+func TestFileWindowBasics(t *testing.T) {
+	window := NewFileWindow()
+	window.SetOffset(30)
+	if got := window.GetOffset(); got != 30 {
+		t.Errorf("SetOffset/GetOffset: %d", got)
+	}
+	if got := window.GetLen(); got != 0 {
+		t.Errorf("GetLen: %d", got)
+	}
+}
+
+func runFileHandleCommonTests(t *testing.T, makeFH func(uint32) FileHandle) {
+	var err error
+	fh := makeFH(0x2 | 0x4) // FH_WRITE_ONLY | FH_CREATE
+	if fh == nil {
+		t.Errorf("Failed to open FileHandle for write: %v", err)
+		return
+	}
+	fh.SetPath("fake")
+	if got := fh.GetPath(); got != "fake" {
+		t.Errorf("SetPath/GetPath: %v", got)
+	}
+	err = fh.Grow(20)
+	if err != nil {
+		t.Errorf("Grow: %v", err)
+	}
+	fh.Write([]byte("hello"), 5)
+	err = fh.Close()
+	if err != nil {
+		t.Errorf("Close: %v", err)
+	}
+
+	fh = makeFH(0x1) // FH_READ_ONLY
+	if fh == nil {
+		t.Errorf("Failed to open FileHandle for read: %v", err)
+	}
+	fh.SetPath("fake")
+	if got := fh.GetPath(); got != "fake" {
+		t.Errorf("SetPath/GetPath: %v", got)
+	}
+	if got := fh.Length(); got != 5 {
+		t.Errorf("Unexpected Length: %d", got)
+	}
+	buf := make([]byte, 3)
+	fh.Read(buf, 1, 3)
+	if !reflect.DeepEqual(buf, []byte("ell")) {
+		t.Errorf("FH read/write: %v", buf)
+	}
+
+	window := NewFileWindow()
+	err = fh.Window(window, 1, 2)
+	if err != nil {
+		t.Errorf("Window: %v", err)
+	}
+	err = fh.Window(window, 1, 2)
+	if err != nil {
+		t.Errorf("ReleaseWindow: %v", err)
+	}
+
+	err = fh.Close()
+	if err != nil {
+		t.Errorf("Close: %v", err)
+	}
+}
+
+func TestRAMFileHandleAll(t *testing.T) {
+	ramFile := NewRAMFile(nil, false)
+	makeFH := func(flags uint32) FileHandle {
+		fh, err := OpenRAMFileHandle("content", flags, ramFile)
+		if fh == nil || err != nil {
+			t.Errorf("OpenRAMFileHandle: %v", err)
+		}
+		return fh
+	}
+	runFileHandleCommonTests(t, makeFH)
+	fh := makeFH(0x1).(RAMFileHandle) // FH_READ_ONLY
+	if _, ok := fh.GetFile().(RAMFile); !ok {
+		t.Errorf("GetFile")
+	}
+}
+
+func TestFSFileHandleAll(t *testing.T) {
+	path := "_fsfilehandle_test"
+	defer os.Remove(path)
+	makeFH := func(flags uint32) FileHandle {
+		fh, err := OpenFSFileHandle(path, flags)
+		if fh == nil || err != nil {
+			t.Errorf("OpenFSFileHandle: %v", err)
+		}
+		return fh
+	}
+	runFileHandleCommonTests(t, makeFH)
+}

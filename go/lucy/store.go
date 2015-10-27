@@ -23,6 +23,9 @@ package lucy
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Store/FileHandle.h"
+#include "Lucy/Store/FSFileHandle.h"
+#include "Lucy/Store/RAMFileHandle.h"
 
 #include "Clownfish/Err.h"
 */
@@ -544,4 +547,95 @@ func (f *FolderIMP) LocalMkDir(name string) error {
 		return clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error)
 	}
 	return nil
+}
+
+func (fh *FileHandleIMP) Write(data []byte, size int) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_FileHandle)(clownfish.Unwrap(fh, "fh"))
+		if size > len(data) {
+			panic(clownfish.NewErr(fmt.Sprintf("Buf only %d long, can't write %d bytes",
+				len(data), size)))
+		}
+		octets := C.CString(string(data))
+		defer C.free(unsafe.Pointer(octets))
+		C.LUCY_FH_Write(self, unsafe.Pointer(octets), C.size_t(size))
+	})
+}
+
+func (fh *FileHandleIMP) Read(b []byte, offset int64, length int) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_FileHandle)(clownfish.Unwrap(fh, "fh"))
+		buf := (*C.char)(C.malloc(C.size_t(length)))
+		defer C.free(unsafe.Pointer(buf))
+		C.LUCY_FH_Read(self, buf, C.int64_t(offset), C.size_t(length))
+		dupe := []byte(C.GoStringN(buf, C.int(length)))
+		for i := 0; i < length; i++ {
+			b[i] = dupe[i]
+		}
+	})
+}
+
+func (fh *FileHandleIMP) Grow(length int64) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_FileHandle)(clownfish.Unwrap(fh, "fh"))
+		C.LUCY_FH_Grow(self, C.int64_t(length))
+	})
+}
+
+func (fh *FileHandleIMP) Window(window FileWindow, offset, length int64) error {
+	self := (*C.lucy_FileHandle)(clownfish.Unwrap(fh, "fh"))
+	windowC := (*C.lucy_FileWindow)(clownfish.Unwrap(window, "window"))
+	success := C.LUCY_FH_Window(self, windowC, C.int64_t(offset), C.int64_t(length))
+	if !success {
+		cfErr := C.cfish_Err_get_error();
+		return clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error)
+	}
+	return nil
+}
+
+func (fh *FileHandleIMP) ReleaseWindow(window FileWindow) error {
+	self := (*C.lucy_FileHandle)(clownfish.Unwrap(fh, "fh"))
+	windowC := (*C.lucy_FileWindow)(clownfish.Unwrap(window, "window"))
+	success := C.LUCY_FH_Release_Window(self, windowC)
+	if !success {
+		cfErr := C.cfish_Err_get_error();
+		return clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error)
+	}
+	return nil
+}
+
+func (fh *FileHandleIMP) Close() error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_FileHandle)(clownfish.Unwrap(fh, "fh"))
+		C.LUCY_FH_Close(self)
+	})
+}
+
+func OpenFSFileHandle(path string, flags uint32) (fh FSFileHandle, err error) {
+	err = clownfish.TrapErr(func() {
+		pathC := (*C.cfish_String)(clownfish.GoToClownfish(path, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(pathC))
+		cfObj := C.lucy_FSFH_open(pathC, C.uint32_t(flags))
+		if cfObj == nil {
+			cfErr := C.cfish_Err_get_error();
+			panic(clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error))
+		}
+		fh = WRAPFSFileHandle(unsafe.Pointer(cfObj))
+	})
+	return fh, err
+}
+
+func OpenRAMFileHandle(path string, flags uint32, ramFile RAMFile) (fh RAMFileHandle, err error) {
+	err = clownfish.TrapErr(func() {
+		pathC := (*C.cfish_String)(clownfish.GoToClownfish(path, unsafe.Pointer(C.CFISH_STRING), false))
+		ramFileC := (*C.lucy_RAMFile)(clownfish.GoToClownfish(ramFile, unsafe.Pointer(C.LUCY_RAMFILE), true))
+		defer C.cfish_decref(unsafe.Pointer(pathC))
+		cfObj := C.lucy_RAMFH_open(pathC, C.uint32_t(flags), ramFileC)
+		if cfObj == nil {
+			cfErr := C.cfish_Err_get_error();
+			panic(clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error))
+		}
+		fh = WRAPRAMFileHandle(unsafe.Pointer(cfObj))
+	})
+	return fh, err
 }

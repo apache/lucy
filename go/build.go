@@ -271,6 +271,15 @@ func specClasses(parcel *cfc.Parcel) {
 	folderBinding.SpecMethod("Local_Open_Dir", "LocalOpenDir() (DirHandle, error)")
 	folderBinding.SpecMethod("Local_MkDir", "LocalMkDir(string) error")
 	folderBinding.Register()
+
+	fhBinding := cfc.NewGoClass(parcel, "Lucy::Store::FileHandle")
+	fhBinding.SpecMethod("", "Write([]byte, int) error")
+	fhBinding.SpecMethod("", "Read([]byte, int64, int) error")
+	fhBinding.SpecMethod("Window", "Window(FileWindow, int64, int64) error")
+	fhBinding.SpecMethod("Release_Window", "ReleaseWindow(FileWindow) error")
+	fhBinding.SpecMethod("Grow", "Grow(int64) error")
+	fhBinding.SpecMethod("Close", "Close() error")
+	fhBinding.Register()
 }
 
 func build() {
