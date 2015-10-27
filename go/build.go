@@ -280,6 +280,10 @@ func specClasses(parcel *cfc.Parcel) {
 	fhBinding.SpecMethod("Grow", "Grow(int64) error")
 	fhBinding.SpecMethod("Close", "Close() error")
 	fhBinding.Register()
+
+	dhBinding := cfc.NewGoClass(parcel, "Lucy::Store::DirHandle")
+	dhBinding.SpecMethod("Close", "Close() error")
+	dhBinding.Register()
 }
 
 func build() {

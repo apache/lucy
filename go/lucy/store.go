@@ -23,6 +23,8 @@ package lucy
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Store/DirHandle.h"
+#include "Lucy/Store/FSDirHandle.h"
 #include "Lucy/Store/FileHandle.h"
 #include "Lucy/Store/FSFileHandle.h"
 #include "Lucy/Store/RAMFileHandle.h"
@@ -638,4 +640,25 @@ func OpenRAMFileHandle(path string, flags uint32, ramFile RAMFile) (fh RAMFileHa
 		fh = WRAPRAMFileHandle(unsafe.Pointer(cfObj))
 	})
 	return fh, err
+}
+
+func (dh *DirHandleIMP) Close() error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DirHandle)(clownfish.Unwrap(dh, "dh"))
+		C.LUCY_DH_Close(self)
+	})
+}
+
+func OpenFSDirHandle(path string) (dh FSDirHandle, err error) {
+	err = clownfish.TrapErr(func() {
+		pathC := (*C.cfish_String)(clownfish.GoToClownfish(path, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(pathC))
+		cfObj := C.lucy_FSDH_open(pathC)
+		if cfObj == nil {
+			cfErr := C.cfish_Err_get_error();
+			panic(clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error))
+		}
+		dh = WRAPFSDirHandle(unsafe.Pointer(cfObj))
+	})
+	return dh, err
 }

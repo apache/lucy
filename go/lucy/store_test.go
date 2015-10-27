@@ -537,3 +537,90 @@ func TestFSFileHandleAll(t *testing.T) {
 	}
 	runFileHandleCommonTests(t, makeFH)
 }
+
+func runDirHandleCommonTests(t *testing.T, folder Folder, makeDH func() DirHandle) {
+	var err error
+	err = folder.Initialize()
+	if err != nil {
+		t.Errorf("Initialize: %v", err)
+		return
+	}
+	err = folder.MkDir("stuff")
+	if err != nil {
+		t.Errorf("MkDir: %v", err)
+		return
+	}
+	out, err := folder.OpenOut("hello")
+	if err != nil {
+		t.Errorf("OpenOut: %v", err)
+		return
+	}
+	out.Close()
+	if err != nil {
+		t.Errorf("Close OutStream: %v", err)
+		return
+	}
+
+	dh := makeDH()
+	if dh == nil {
+		t.Errorf("Failed to open DirHandle: %v", err)
+		return
+	}
+	if got := dh.GetDir(); got != folder.GetPath() {
+		t.Errorf("GetDir didn't match: '%v' '%v'", got, folder.GetPath())
+	}
+	count := 0
+	for dh.Next() {
+		count += 1
+		entry := dh.GetEntry()
+		switch entry {
+		case "hello":
+			if dh.EntryIsDir() {
+				t.Errorf("Entry should not be directory")
+			}
+			if dh.EntryIsSymlink() {
+				t.Errorf("File should not be symlink")
+			}
+		case "stuff":
+			if !dh.EntryIsDir() {
+				t.Errorf("Entry should be directory")
+			}
+			if dh.EntryIsSymlink() {
+				t.Errorf("Dir should not be symlink")
+			}
+		default:
+			t.Errorf("Unexpected entry: '%s'", entry)
+		}
+	}
+	if count != 2 {
+		t.Errorf("Didn't get to all entries, found only %d", count)
+	}
+
+	err = dh.Close()
+	if err != nil {
+		t.Errorf("Close: %v", err)
+	}
+}
+
+func TestRAMDirHandleAll(t *testing.T) {
+	folder := NewRAMFolder("myramdir")
+	makeDH := func() DirHandle {
+		return NewRAMDirHandle(folder)
+	}
+	runDirHandleCommonTests(t, folder, makeDH)
+}
+
+func TestFSDirHandleAll(t *testing.T) {
+	path := "_fsdirhandle_go_tests"
+	defer os.RemoveAll(path)
+	folder := NewFSFolder(path)
+	makeDH := func() DirHandle {
+		dh, err := OpenFSDirHandle(folder.GetPath())
+		if err != nil {
+			t.Errorf("Failed to open DirHandle: %v", err)
+			return nil
+		}
+		return dh
+	}
+	runDirHandleCommonTests(t, folder, makeDH)
+}
