@@ -685,3 +685,16 @@ func TestSharedLockAll(t *testing.T) {
 	}
 	runLockCommonTests(t, makeLock)
 }
+
+func TestLockFactoryAll(t *testing.T) {
+	folder := NewRAMFolder("")
+	factory := NewLockFactory(folder, "dev.example.com")
+	lock := factory.MakeLock("write", 10, 42)
+	if _, ok := lock.(Lock); !ok {
+		t.Errorf("MakeLock")
+	}
+	shlock := factory.MakeSharedLock("read", 10, 42)
+	if _, ok := shlock.(SharedLock); !ok {
+		t.Errorf("MakeSharedLock")
+	}
+}
