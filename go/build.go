@@ -291,6 +291,10 @@ func specClasses(parcel *cfc.Parcel) {
 	lockBinding.SpecMethod("Release", "Release() error")
 	lockBinding.SpecMethod("Clear_Stale", "ClearStale() error")
 	lockBinding.Register()
+
+	cfWriterBinding := cfc.NewGoClass(parcel, "Lucy::Store::CompoundFileWriter")
+	cfWriterBinding.SpecMethod("Consolidate", "Consolidate() error")
+	cfWriterBinding.Register()
 }
 
 func build() {

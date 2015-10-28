@@ -698,3 +698,31 @@ func TestLockFactoryAll(t *testing.T) {
 		t.Errorf("MakeSharedLock")
 	}
 }
+
+func TestCompoundFiles(t *testing.T) {
+	var err error
+	folder := NewRAMFolder("seg_6b")
+	out, _ := folder.OpenOut("foo")
+	out.WriteI32(42)
+	out.Close()
+
+	writer := NewCompoundFileWriter(folder)
+	err = writer.Consolidate()
+	if err != nil {
+		t.Errorf("Consolidate: %v", err)
+	}
+	err = writer.Consolidate()
+	if err == nil {
+		t.Errorf("Consolidating twice should fail")
+	}
+
+	reader, err := OpenCompoundFileReader(folder)
+	if err != nil {
+		t.Errorf("OpenCompoundFileReader: %v", err)
+	}
+	in, err := reader.OpenIn("foo")
+	if _, ok := in.(InStream); !ok || err != nil {
+		t.Errorf("Failed to open file within compound file: %v", err)
+	}
+	in.Close()
+}

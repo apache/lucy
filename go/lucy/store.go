@@ -28,6 +28,8 @@ package lucy
 #include "Lucy/Store/FileHandle.h"
 #include "Lucy/Store/FSFileHandle.h"
 #include "Lucy/Store/RAMFileHandle.h"
+#include "Lucy/Store/CompoundFileReader.h"
+#include "Lucy/Store/CompoundFileWriter.h"
 
 #include "Clownfish/Err.h"
 */
@@ -695,5 +697,25 @@ func (lock *LockIMP) ClearStale() error {
 	return clownfish.TrapErr(func() {
 		self := (*C.lucy_Lock)(clownfish.Unwrap(lock, "lock"))
 		C.LUCY_Lock_Clear_Stale(self)
+	})
+}
+
+func OpenCompoundFileReader(folder Folder) (reader CompoundFileReader, err error) {
+	err = clownfish.TrapErr(func() {
+		folderC := (*C.lucy_Folder)(clownfish.Unwrap(folder, "Folder"))
+		cfObj := C.lucy_CFReader_open(folderC)
+		if cfObj == nil {
+			cfErr := C.cfish_Err_get_error();
+			panic(clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error))
+		}
+		reader = WRAPCompoundFileReader(unsafe.Pointer(cfObj))
+	})
+	return reader, err
+}
+
+func (writer *CompoundFileWriterIMP) Consolidate() error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_CompoundFileWriter)(clownfish.Unwrap(writer, "writer"))
+		C.LUCY_CFWriter_Consolidate(self)
 	})
 }
