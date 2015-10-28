@@ -662,3 +662,38 @@ func OpenFSDirHandle(path string) (dh FSDirHandle, err error) {
 	})
 	return dh, err
 }
+
+func (lock *LockIMP) Request() error {
+	self := (*C.lucy_Lock)(clownfish.Unwrap(lock, "lock"))
+	success := C.LUCY_Lock_Request(self)
+	if !success {
+		cfErr := C.cfish_Err_get_error();
+		return clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error)
+	}
+	return nil
+}
+
+func (lock *LockIMP) Obtain() error {
+	self := (*C.lucy_Lock)(clownfish.Unwrap(lock, "lock"))
+	success := C.LUCY_Lock_Obtain(self)
+	if !success {
+		cfErr := C.cfish_Err_get_error();
+		return clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error)
+	}
+	return nil
+}
+
+func (lock *LockIMP) Release() error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Lock)(clownfish.Unwrap(lock, "lock"))
+		C.LUCY_Lock_Release(self)
+	})
+}
+
+
+func (lock *LockIMP) ClearStale() error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Lock)(clownfish.Unwrap(lock, "lock"))
+		C.LUCY_Lock_Clear_Stale(self)
+	})
+}

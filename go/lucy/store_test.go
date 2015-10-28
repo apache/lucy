@@ -624,3 +624,64 @@ func TestFSDirHandleAll(t *testing.T) {
 	}
 	runDirHandleCommonTests(t, folder, makeDH)
 }
+
+func runLockCommonTests(t *testing.T, makeLock func(string, string) Lock) {
+	var err error
+	lock := makeLock("foo", "dev.example.com")
+	other := makeLock("foo", "dev.example.com")
+
+	if got := lock.GetName(); got != "foo" {
+		t.Errorf("GetName: %v", got)
+	}
+	if got := lock.GetHost(); got != "dev.example.com" {
+		t.Errorf("GetHost: %v", got)
+	}
+
+	err = lock.Request()
+	if err != nil {
+		t.Errorf("Request: %v", err)
+	}
+	if !lock.IsLocked() {
+		t.Errorf("Lock should be locked, but IsLocked returned false")
+	}
+	if got := lock.GetLockPath(); len(got) == 0 {
+		// Lock path only valid when locked for shared locks.
+		t.Errorf("GetLockPath should work")
+	}
+	err = other.Request()
+	if other.Shared() && err != nil {
+		t.Errorf("SharedLock Request should succeed: %v", err)
+	} else if !other.Shared() && err == nil {
+		t.Errorf("Request should fail for locked resource")
+	}
+	err = lock.Release()
+	if err != nil {
+		t.Errorf("Request: %v", err)
+	}
+	other.Release()
+	err = lock.Obtain()
+	if err != nil {
+		t.Errorf("Obtain: %v", err)
+	}
+
+	err = lock.ClearStale()
+	if err != nil {
+		t.Errorf("Nothing for ClearStale to do, but should still suceed: %v", err)
+	}
+}
+
+func TestLockFileLockAll(t *testing.T) {
+	folder := NewRAMFolder("myindex")
+	makeLock := func(name, host string) Lock {
+		return NewLockFileLock(folder, name, host, 0, 1)
+	}
+	runLockCommonTests(t, makeLock)
+}
+
+func TestSharedLockAll(t *testing.T) {
+	folder := NewRAMFolder("myindex")
+	makeLock := func(name, host string) Lock {
+		return NewSharedLock(folder, name, host, 0, 1)
+	}
+	runLockCommonTests(t, makeLock)
+}
