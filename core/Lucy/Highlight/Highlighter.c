@@ -434,7 +434,7 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, String *field_val,
         raw_excerpt = Str_new_from_trusted_utf8("", 0);
     }
     else {
-        String  *substring = StrIter_substring(top, tail);
+        String  *substring = StrIter_crop(top, tail);
         CharBuf *buf       = CB_new(Str_Get_Size(substring) + 8);
 
         // If not starting on a sentence boundary, prepend an ellipsis.
@@ -499,7 +499,7 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, Vector *spans,
                     int32_t highlighted_len = hl_end - hl_start;
                     StrIter_Assign(temp, iter);
                     StrIter_Advance(iter, highlighted_len);
-                    String *to_cat = StrIter_substring(temp, iter);
+                    String *to_cat = StrIter_crop(temp, iter);
                     String *encoded = S_do_encode(self, to_cat, &encode_buf);
                     String *hl_frag = Highlighter_Highlight(self, encoded);
                     CB_Cat(buf, hl_frag);
@@ -511,7 +511,7 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, Vector *spans,
                 int32_t non_highlighted_len = relative_start - hl_end;
                 StrIter_Assign(temp, iter);
                 StrIter_Advance(iter, non_highlighted_len);
-                String *to_cat = StrIter_substring(temp, iter);
+                String *to_cat = StrIter_crop(temp, iter);
                 String *encoded = S_do_encode(self, to_cat, &encode_buf);
                 CB_Cat(buf, (String*)encoded);
                 DECREF(encoded);
@@ -528,7 +528,7 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, Vector *spans,
         int32_t highlighted_len = hl_end - hl_start;
         StrIter_Assign(temp, iter);
         StrIter_Advance(iter, highlighted_len);
-        String *to_cat = StrIter_substring(temp, iter);
+        String *to_cat = StrIter_crop(temp, iter);
         String *encoded = S_do_encode(self, to_cat, &encode_buf);
         String *hl_frag = Highlighter_Highlight(self, encoded);
         CB_Cat(buf, hl_frag);
@@ -539,7 +539,7 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, Vector *spans,
 
     // Last text, beyond last highlight span.
     if (StrIter_Has_Next(iter)) {
-        String *to_cat = StrIter_substring(iter, NULL);
+        String *to_cat = StrIter_crop(iter, NULL);
         String *encoded = S_do_encode(self, to_cat, &encode_buf);
         CB_Cat(buf, encoded);
         DECREF(encoded);

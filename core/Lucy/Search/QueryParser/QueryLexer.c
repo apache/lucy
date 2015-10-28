@@ -235,7 +235,7 @@ S_consume_field(StringIterator *iter) {
 
     // Consume string data.
     StrIter_Recede(temp, 2); // Back up over lookahead and colon.
-    String *field = StrIter_substring(iter, temp);
+    String *field = StrIter_crop(iter, temp);
     StrIter_Advance(temp, 1); // Skip colon.
     StrIter_Assign(iter, temp);
     DECREF(temp);
@@ -267,7 +267,7 @@ S_consume_text(StringIterator *iter) {
         }
     }
 
-    String *text = StrIter_substring(iter, temp);
+    String *text = StrIter_crop(iter, temp);
     StrIter_Assign(iter, temp);
     DECREF(temp);
     return ParserElem_new(TOKEN_STRING, (Obj*)text);
@@ -291,7 +291,7 @@ S_consume_quoted_string(StringIterator *iter) {
         }
     }
 
-    String *text = StrIter_substring(iter, temp);
+    String *text = StrIter_crop(iter, temp);
     StrIter_Assign(iter, temp);
     DECREF(temp);
     return ParserElem_new(TOKEN_STRING, (Obj*)text);

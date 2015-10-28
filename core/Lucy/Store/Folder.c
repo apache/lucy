@@ -442,7 +442,7 @@ S_enclosing_folder(Folder *self, StringIterator *path) {
     while (STR_OOB != (code_point = StrIter_Next(iter))) {
         if (code_point == '/' && StrIter_Has_Next(iter)) {
             StrIter_Recede(iter, 1);
-            path_component = StrIter_substring(path, iter);
+            path_component = StrIter_crop(path, iter);
             StrIter_Advance(iter, 1);
             StrIter_Assign(path, iter);
             break;
@@ -485,7 +485,7 @@ Folder_Find_Folder_IMP(Folder *self, String *path) {
         StringIterator *iter = Str_Top(path);
         Folder *enclosing_folder = S_enclosing_folder(self, iter);
         if (enclosing_folder) {
-            String *folder_name = StrIter_substring(iter, NULL);
+            String *folder_name = StrIter_crop(iter, NULL);
             folder = Folder_Local_Find_Folder(enclosing_folder, folder_name);
             DECREF(folder_name);
         }

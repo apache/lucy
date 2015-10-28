@@ -61,7 +61,7 @@ IxFileNames_extract_gen(String *name) {
         else if (code_point == '_') { break; }
     }
 
-    String *num_string = StrIter_substring(iter, NULL);
+    String *num_string = StrIter_crop(iter, NULL);
     uint64_t retval = (uint64_t)Str_BaseX_To_I64(num_string, 36);
 
     DECREF(num_string);
@@ -91,7 +91,7 @@ IxFileNames_local_part(String *path) {
         code_point = StrIter_Prev(top);
     }
 
-    String *retval = StrIter_substring(top, tail);
+    String *retval = StrIter_crop(top, tail);
 
     DECREF(tail);
     DECREF(top);

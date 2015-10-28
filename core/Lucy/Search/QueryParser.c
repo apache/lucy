@@ -885,7 +885,7 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
             StrIter_Recede(tail, 1);
         }
     }
-    String *source_text = StrIter_substring(top, tail);
+    String *source_text = StrIter_crop(top, tail);
 
     // Either use LeafQuery's field or default to Parser's list.
     Vector *fields;
