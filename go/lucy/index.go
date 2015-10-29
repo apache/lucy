@@ -19,6 +19,7 @@ package lucy
 /*
 #include "Lucy/Index/Indexer.h"
 #include "Lucy/Index/IndexManager.h"
+#include "Lucy/Index/BackgroundMerger.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Plan/Schema.h"
 #include "Clownfish/Hash.h"
@@ -220,5 +221,30 @@ func (obj *IndexerIMP) Commit() error {
 	self := ((*C.lucy_Indexer)(unsafe.Pointer(obj.TOPTR())))
 	return clownfish.TrapErr(func() {
 		C.LUCY_Indexer_Commit(self)
+	})
+}
+
+func OpenBackgroundMerger(index interface{}, manager IndexManager) (bgm BackgroundMerger, err error) {
+	err = clownfish.TrapErr(func() {
+		indexC := (*C.cfish_Obj)(clownfish.GoToClownfish(index, unsafe.Pointer(C.CFISH_OBJ), false))
+		defer C.cfish_decref(unsafe.Pointer(indexC))
+		managerC := (*C.lucy_IndexManager)(clownfish.UnwrapNullable(manager))
+		cfObj := C.lucy_BGMerger_new(indexC, managerC)
+		bgm = WRAPBackgroundMerger(unsafe.Pointer(cfObj))
+	})
+	return bgm, err
+}
+
+func (bgm *BackgroundMergerIMP) PrepareCommit() error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_BackgroundMerger)(clownfish.Unwrap(bgm, "bgm"))
+		C.LUCY_BGMerger_Prepare_Commit(self)
+	})
+}
+
+func (bgm *BackgroundMergerIMP) Commit() error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_BackgroundMerger)(clownfish.Unwrap(bgm, "bgm"))
+		C.LUCY_BGMerger_Commit(self)
 	})
 }

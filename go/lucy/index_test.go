@@ -126,3 +126,18 @@ func TestIndexerMisc(t *testing.T) {
 		t.Errorf("Commit: %v", err)
 	}
 }
+
+func TestBackgroundMergerMisc(t *testing.T) {
+	var err error
+	index := createTestIndex("foo", "bar", "baz")
+	merger, _ := OpenBackgroundMerger(index, nil)
+	merger.Optimize()
+	err = merger.PrepareCommit()
+	if err != nil {
+		t.Errorf("PrepareCommit: %v", err)
+	}
+	err = merger.Commit()
+	if err != nil {
+		t.Errorf("Commit: %v", err)
+	}
+}

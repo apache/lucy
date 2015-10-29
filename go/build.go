@@ -157,6 +157,11 @@ func specClasses(parcel *cfc.Parcel) {
 	indexerBinding.SetSuppressStruct(true)
 	indexerBinding.Register()
 
+	bgMergerBinding := cfc.NewGoClass(parcel, "Lucy::Index::BackgroundMerger")
+	bgMergerBinding.SpecMethod("Prepare_Commit", "PrepareCommit() error")
+	bgMergerBinding.SpecMethod("Commit", "Commit() error")
+	bgMergerBinding.Register()
+
 	schemaBinding := cfc.NewGoClass(parcel, "Lucy::Plan::Schema")
 	schemaBinding.SpecMethod("All_Fields", "AllFields() []string")
 	schemaBinding.Register()
