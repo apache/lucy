@@ -174,6 +174,48 @@ func (obj *IndexerIMP) findRealField(name string) (string, error) {
 	return "", clownfish.NewErr(fmt.Sprintf("Unknown field: '%v'", name))
 }
 
+func (obj *IndexerIMP) AddIndex(index interface{}) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Indexer)(clownfish.Unwrap(obj, "obj"))
+		indexC := (*C.cfish_Obj)(clownfish.GoToClownfish(index, unsafe.Pointer(C.CFISH_OBJ), false))
+		defer C.cfish_decref(unsafe.Pointer(indexC))
+		C.LUCY_Indexer_Add_Index(self, indexC)
+	})
+}
+
+func (obj *IndexerIMP) DeleteByTerm(field string, term interface{}) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Indexer)(clownfish.Unwrap(obj, "obj"))
+		fieldC := (*C.cfish_String)(clownfish.GoToClownfish(field, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(fieldC))
+		termC := (*C.cfish_Obj)(clownfish.GoToClownfish(term, unsafe.Pointer(C.CFISH_OBJ), false))
+		defer C.cfish_decref(unsafe.Pointer(termC))
+		C.LUCY_Indexer_Delete_By_Term(self, fieldC, termC)
+	})
+}
+
+func (obj *IndexerIMP) DeleteByQuery(query Query) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Indexer)(clownfish.Unwrap(obj, "obj"))
+		queryC := (*C.lucy_Query)(clownfish.Unwrap(query, "query"))
+		C.LUCY_Indexer_Delete_By_Query(self, queryC)
+	})
+}
+
+func (obj *IndexerIMP) DeleteByDocID(docID int32) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Indexer)(clownfish.Unwrap(obj, "obj"))
+		C.LUCY_Indexer_Delete_By_Doc_ID(self, C.int32_t(docID))
+	})
+}
+
+func (obj *IndexerIMP) PrepareCommit() error {
+	self := ((*C.lucy_Indexer)(unsafe.Pointer(obj.TOPTR())))
+	return clownfish.TrapErr(func() {
+		C.LUCY_Indexer_Prepare_Commit(self)
+	})
+}
+
 func (obj *IndexerIMP) Commit() error {
 	self := ((*C.lucy_Indexer)(unsafe.Pointer(obj.TOPTR())))
 	return clownfish.TrapErr(func() {
