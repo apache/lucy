@@ -247,3 +247,39 @@ func TestIndexManagerRecycle(t *testing.T) {
 		t.Errorf("Recycle: (%d SegReaders) %v", len(segReaders), err)
 	}
 }
+
+func TestTermInfoMisc(t *testing.T) {
+	tinfo := NewTermInfo(1000)
+	if got := tinfo.GetDocFreq(); got != 1000 {
+		t.Errorf("GetDocFreq: %d", got)
+	}
+	tinfo.SetDocFreq(1001)
+	if got := tinfo.GetDocFreq(); got != 1001 {
+		t.Errorf("Set/GetDocFreq: %d", got)
+	}
+	tinfo.SetLexFilePos(1002)
+	if got := tinfo.GetLexFilePos(); got != 1002 {
+		t.Errorf("Set/GetLexFilePos: %d", got)
+	}
+	tinfo.SetPostFilePos(1003)
+	if got := tinfo.GetPostFilePos(); got != 1003 {
+		t.Errorf("Set/GetPostFilePos: %d", got)
+	}
+	tinfo.SetSkipFilePos(1002)
+	if got := tinfo.GetSkipFilePos(); got != 1002 {
+		t.Errorf("Set/GetSkipFilePos: %d", got)
+	}
+	other := NewTermInfo(42)
+	other.Mimic(tinfo)
+	if got := other.GetDocFreq(); got != tinfo.GetDocFreq() {
+		t.Errorf("Mimic: (%d != %d)", got, tinfo.GetDocFreq())
+	}
+	other = tinfo.Clone().(TermInfo)
+	if got := other.GetDocFreq(); got != tinfo.GetDocFreq() {
+		t.Errorf("Clone: (%d != %d)", got, tinfo.GetDocFreq())
+	}
+	tinfo.Reset()
+	if got := tinfo.GetDocFreq(); got != 0 {
+		t.Errorf("Reset: expected 0, got %d", got)
+	}
+}
