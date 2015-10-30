@@ -18,6 +18,8 @@ package lucy
 
 import "testing"
 import "os"
+import "reflect"
+import "strings"
 
 func TestIndexerAddDoc(t *testing.T) {
 	schema := createTestSchema()
@@ -139,5 +141,109 @@ func TestBackgroundMergerMisc(t *testing.T) {
 	err = merger.Commit()
 	if err != nil {
 		t.Errorf("Commit: %v", err)
+	}
+}
+
+func TestIndexManagerAccessors(t *testing.T) {
+	host := "dev.example.com"
+	manager := NewIndexManager(host, nil)
+	if got := manager.GetHost(); got != host {
+		t.Errorf("GetHost: %v", got)
+	}
+	folder := NewRAMFolder("")
+	manager.SetFolder(folder)
+	if got := manager.GetFolder(); !reflect.DeepEqual(folder, got) {
+		t.Errorf("SetFolder/GetFolder")
+	}
+	manager.SetWriteLockTimeout(72)
+	if got := manager.GetWriteLockTimeout(); got != 72 {
+		t.Errorf("Set/GetWriteLockTimeout: %d", got)
+	}
+	manager.SetWriteLockInterval(42)
+	if got := manager.GetWriteLockInterval(); got != 42 {
+		t.Errorf("Set/GetWriteLockInterval: %d", got)
+	}
+	manager.SetMergeLockTimeout(73)
+	if got := manager.GetMergeLockTimeout(); got != 73 {
+		t.Errorf("Set/GetMergeLockTimeout: %d", got)
+	}
+	manager.SetMergeLockInterval(43)
+	if got := manager.GetMergeLockInterval(); got != 43 {
+		t.Errorf("Set/GetMergeLockInterval: %d", got)
+	}
+	manager.SetDeletionLockTimeout(71)
+	if got := manager.GetDeletionLockTimeout(); got != 71 {
+		t.Errorf("Set/GetDeletionLockTimeout: %d", got)
+	}
+	manager.SetDeletionLockInterval(41)
+	if got := manager.GetDeletionLockInterval(); got != 41 {
+		t.Errorf("Set/GetDeletionLockInterval: %d", got)
+	}
+}
+
+func TestIndexManagerLocks(t *testing.T) {
+	manager := NewIndexManager("", nil)
+	manager.SetFolder(NewRAMFolder(""))
+	if _, ok := manager.MakeWriteLock().(Lock); !ok {
+		t.Errorf("MakeWriteLock")
+	}
+	if _, ok := manager.MakeMergeLock().(Lock); !ok {
+		t.Errorf("MakeMergeLock")
+	}
+	if _, ok := manager.MakeDeletionLock().(Lock); !ok {
+		t.Errorf("MakeDeletionLock")
+	}
+	snapFile := "snapshot_4a.json"
+	if _, ok := manager.MakeSnapshotReadLock(snapFile).(SharedLock); !ok {
+		t.Errorf("MakeDeletionLock")
+	}
+}
+
+func TestIndexManagerMergeData(t *testing.T) {
+	var err error
+	manager := NewIndexManager("", nil)
+	manager.SetFolder(NewRAMFolder(""))
+	err = manager.WriteMergeData(42)
+	if err != nil {
+		t.Errorf("WriteMergeData: %v", err)
+	}
+	mergeData, err := manager.ReadMergeData()
+	if err != nil {
+		t.Errorf("ReadMergeData: %v", err)
+	}
+	if got, ok := mergeData["cutoff"].(string); !ok || got != "42" {
+		t.Errorf("ReadMergeData: %v", got)
+	}
+	err = manager.RemoveMergeData()
+	if err != nil {
+		t.Errorf("RemoveMergeData: %v", err)
+	}
+}
+
+func TestIndexManagerMisc(t *testing.T) {
+	manager := NewIndexManager("", nil)
+	manager.SetFolder(NewRAMFolder(""))
+	if got, err := manager.MakeSnapshotFilename(); !strings.Contains(got, "snapshot") || err != nil {
+		t.Errorf("MakeSnapshotFilename: %s, %v", got, err)
+	}
+	snapshot := NewSnapshot()
+	snapshot.AddEntry("seg_4")
+	snapshot.AddEntry("seg_5")
+	if got := manager.HighestSegNum(snapshot); got != 5 {
+		t.Errorf("HighestSegNum: %d", got)
+	}
+}
+
+func TestIndexManagerRecycle(t *testing.T) {
+	index := createTestIndex("foo", "bar", "baz")
+	manager := NewIndexManager("", nil)
+	manager.SetFolder(index)
+	indexer, _ := OpenIndexer(&OpenIndexerArgs{Index: index})
+	searcher, _ := OpenIndexSearcher(index)
+	reader := searcher.GetReader().(PolyReader)
+	delWriter := indexer.GetSegWriter().GetDelWriter()
+	segReaders, err := manager.Recycle(reader, delWriter, 0, true)
+	if err != nil || len(segReaders) != 1 {
+		t.Errorf("Recycle: (%d SegReaders) %v", len(segReaders), err)
 	}
 }

@@ -248,3 +248,62 @@ func (bgm *BackgroundMergerIMP) Commit() error {
 		C.LUCY_BGMerger_Commit(self)
 	})
 }
+
+func (im *IndexManagerIMP) WriteMergeData(cutoff int64) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_IndexManager)(clownfish.Unwrap(im, "im"))
+		C.LUCY_IxManager_Write_Merge_Data(self, C.int64_t(cutoff))
+	})
+}
+
+func (im *IndexManagerIMP) ReadMergeData() (retval map[string]interface{}, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_IndexManager)(clownfish.Unwrap(im, "im"))
+		retvalC := C.LUCY_IxManager_Read_Merge_Data(self)
+		if retvalC != nil {
+			defer C.cfish_decref(unsafe.Pointer(retvalC))
+			retval = clownfish.ToGo(unsafe.Pointer(retvalC)).(map[string]interface{})
+		}
+	})
+	return retval, err
+}
+
+func (im *IndexManagerIMP) RemoveMergeData() error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_IndexManager)(clownfish.Unwrap(im, "im"))
+		C.LUCY_IxManager_Remove_Merge_Data(self)
+	})
+}
+
+func (im *IndexManagerIMP) MakeSnapshotFilename() (retval string, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_IndexManager)(clownfish.Unwrap(im, "im"))
+		retvalC := C.LUCY_IxManager_Make_Snapshot_Filename(self)
+		if retvalC != nil {
+			defer C.cfish_decref(unsafe.Pointer(retvalC))
+			retval = clownfish.ToGo(unsafe.Pointer(retvalC)).(string)
+		}
+	})
+	return retval, err
+}
+
+func (im *IndexManagerIMP) Recycle(reader PolyReader, delWriter DeletionsWriter,
+	cutoff int64, optimize bool) (retval []SegReader, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_IndexManager)(clownfish.Unwrap(im, "im"))
+		readerC := (*C.lucy_PolyReader)(clownfish.Unwrap(reader, "reader"))
+		delWriterC := (*C.lucy_DeletionsWriter)(clownfish.Unwrap(delWriter, "delWriter"))
+		vec := C.LUCY_IxManager_Recycle(self, readerC, delWriterC,
+			C.int64_t(cutoff), C.bool(optimize))
+		if vec != nil {
+			defer C.cfish_decref(unsafe.Pointer(vec))
+			size := int(C.CFISH_Vec_Get_Size(vec))
+			retval = make([]SegReader, size)
+			for i := 0; i < size; i++ {
+				elem := C.CFISH_Vec_Fetch(vec, C.size_t(i))
+				retval[i] = WRAPSegReader(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(elem))))
+			}
+		}
+	})
+	return retval, err
+}
