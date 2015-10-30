@@ -283,3 +283,14 @@ func TestTermInfoMisc(t *testing.T) {
 		t.Errorf("Reset: expected 0, got %d", got)
 	}
 }
+
+func TestBitVecDelDocsMisc(t *testing.T) {
+	folder := NewRAMFolder("")
+	out, _ := folder.OpenOut("bits")
+	out.WriteU32(0xDEADBEEF)
+	out.Close()
+	bv := NewBitVecDelDocs(folder, "bits")
+	if !bv.Get(31) {
+		t.Errorf("Get returned false")
+	}
+}
