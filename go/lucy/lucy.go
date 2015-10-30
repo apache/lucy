@@ -612,3 +612,17 @@ func GOLUCY_Inverter_Invert_Doc(inverter *C.lucy_Inverter, doc *C.lucy_Doc) {
 		C.LUCY_Inverter_Add_Field(inverter, inventry)
 	}
 }
+
+// Turn a Vector of Clownfish Strings into a slice of Go string.  NULL
+// elements in the Vector are not allowed.
+func vecToStringSlice(v *C.cfish_Vector) []string {
+	if v == nil {
+		return nil
+	}
+	length := int(C.CFISH_Vec_Get_Size(v))
+	slice := make([]string, length)
+	for i := 0; i < length; i++ {
+		slice[i] = clownfish.CFStringToGo(unsafe.Pointer(C.CFISH_Vec_Fetch(v, C.size_t(i))))
+	}
+	return slice
+}

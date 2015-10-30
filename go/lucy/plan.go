@@ -24,18 +24,10 @@ package lucy
 import "C"
 import "unsafe"
 
-import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
-
 func (s *SchemaIMP) AllFields() []string {
 	self := (*C.lucy_Schema)(unsafe.Pointer(s.TOPTR()))
 	fieldsCF := C.LUCY_Schema_All_Fields(self)
 	defer C.cfish_decref(unsafe.Pointer(fieldsCF))
-	numFields := C.CFISH_Vec_Get_Size(fieldsCF)
-	fields := make([]string, int(numFields))
-	for i := C.size_t(0); i < numFields; i++ {
-		fields[i] =
-		clownfish.CFStringToGo(unsafe.Pointer(C.CFISH_Vec_Fetch(fieldsCF, i)))
-	}
-	return fields
+	return vecToStringSlice(fieldsCF)
 }
 
