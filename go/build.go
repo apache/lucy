@@ -170,6 +170,13 @@ func specClasses(parcel *cfc.Parcel) {
 	managerBinding.SpecMethod("Recycle", "Recycle(PolyReader, DeletionsWriter, int64, bool) ([]SegReader, error)")
 	managerBinding.Register()
 
+	tvBinding := cfc.NewGoClass(parcel, "Lucy::Index::TermVector")
+	tvBinding.SpecMethod("Get_Positions", "GetPositions() []int32")
+	tvBinding.SpecMethod("Get_Start_Offsets", "GetStartOffsets() []int32")
+	tvBinding.SpecMethod("Get_End_Offsets", "GetEndOffsets() []int32")
+	tvBinding.SetSuppressCtor(true)
+	tvBinding.Register()
+
 	schemaBinding := cfc.NewGoClass(parcel, "Lucy::Plan::Schema")
 	schemaBinding.SpecMethod("All_Fields", "AllFields() []string")
 	schemaBinding.Register()

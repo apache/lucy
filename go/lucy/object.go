@@ -49,3 +49,12 @@ func NewI32Array(nums []int32) I32Array {
 	}
 	return WRAPI32Array(unsafe.Pointer(obj))
 }
+
+func i32ArrayToSlice(a *C.lucy_I32Array) []int32 {
+	size := int(C.LUCY_I32Arr_Get_Size(a))
+	nums := make([]int32, size)
+	for i := 0; i < size; i++ {
+		nums[i] = int32(C.LUCY_I32Arr_Get(a, C.uint32_t(i)))
+	}
+	return nums
+}

@@ -21,6 +21,8 @@ import "os"
 import "reflect"
 import "strings"
 
+import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
+
 func TestIndexerAddDoc(t *testing.T) {
 	schema := createTestSchema()
 	index := NewRAMFolder("")
@@ -292,5 +294,32 @@ func TestBitVecDelDocsMisc(t *testing.T) {
 	bv := NewBitVecDelDocs(folder, "bits")
 	if !bv.Get(31) {
 		t.Errorf("Get returned false")
+	}
+}
+
+func TestTermVectorMisc(t *testing.T) {
+
+	positions := []int32{0, 3}
+	startOffsets := []int32{0, 20}
+	endOffsets := []int32{2, 22}
+	tv := NewTermVector("content", "red yellow green red blue", positions, startOffsets, endOffsets)
+	if got := tv.GetPositions(); !reflect.DeepEqual(got, positions) {
+		t.Errorf("GetPositions: %v", got)
+	}
+	if got := tv.GetStartOffsets(); !reflect.DeepEqual(got, startOffsets) {
+		t.Errorf("GetStartOffsets: %v", got)
+	}
+	if got := tv.GetEndOffsets(); !reflect.DeepEqual(got, endOffsets) {
+		t.Errorf("GetEndOffsets: %v", got)
+	}
+
+	folder := NewRAMFolder("")
+	out, _ := folder.OpenOut("dump")
+	tv.Serialize(out)
+	out.Close()
+	in, _ := folder.OpenIn("dump")
+	dupe := clownfish.GetClass(tv).MakeObj().(TermVector).Deserialize(in)
+	if !tv.Equals(dupe) {
+		t.Errorf("Unsuccessful serialization round trip")
 	}
 }

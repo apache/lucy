@@ -20,6 +20,7 @@ package lucy
 #include "Lucy/Index/Indexer.h"
 #include "Lucy/Index/IndexManager.h"
 #include "Lucy/Index/BackgroundMerger.h"
+#include "Lucy/Index/TermVector.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Plan/Schema.h"
 #include "Clownfish/Hash.h"
@@ -306,4 +307,34 @@ func (im *IndexManagerIMP) Recycle(reader PolyReader, delWriter DeletionsWriter,
 		}
 	})
 	return retval, err
+}
+
+func NewTermVector(field, text string, positions, startOffsets, endOffsets []int32) TermVector {
+	fieldC := (*C.cfish_String)(clownfish.GoToClownfish(field, unsafe.Pointer(C.CFISH_STRING), false))
+	textC := (*C.cfish_String)(clownfish.GoToClownfish(text, unsafe.Pointer(C.CFISH_STRING), false))
+	defer C.cfish_decref(unsafe.Pointer(fieldC))
+	defer C.cfish_decref(unsafe.Pointer(textC))
+	posits := NewI32Array(positions)
+	starts := NewI32Array(startOffsets)
+	ends := NewI32Array(endOffsets)
+	positsC := (*C.lucy_I32Array)(clownfish.Unwrap(posits, "posits"))
+	startsC := (*C.lucy_I32Array)(clownfish.Unwrap(starts, "starts"))
+	endsC := (*C.lucy_I32Array)(clownfish.Unwrap(ends, "ends"))
+	retvalC := C.lucy_TV_new(fieldC, textC, positsC, startsC, endsC)
+	return WRAPTermVector(unsafe.Pointer(retvalC))
+}
+
+func (tv *TermVectorIMP) GetPositions() []int32 {
+	self := (*C.lucy_TermVector)(clownfish.Unwrap(tv, "tv"))
+	return i32ArrayToSlice(C.LUCY_TV_Get_Positions(self))
+}
+
+func (tv *TermVectorIMP) GetStartOffsets() []int32 {
+	self := (*C.lucy_TermVector)(clownfish.Unwrap(tv, "tv"))
+	return i32ArrayToSlice(C.LUCY_TV_Get_Start_Offsets(self))
+}
+
+func (tv *TermVectorIMP) GetEndOffsets() []int32 {
+	self := (*C.lucy_TermVector)(clownfish.Unwrap(tv, "tv"))
+	return i32ArrayToSlice(C.LUCY_TV_Get_End_Offsets(self))
 }
