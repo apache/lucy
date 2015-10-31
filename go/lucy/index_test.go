@@ -323,3 +323,33 @@ func TestTermVectorMisc(t *testing.T) {
 		t.Errorf("Unsuccessful serialization round trip")
 	}
 }
+
+func TestSnapshotMisc(t *testing.T) {
+	var err error
+	snapshot := NewSnapshot()
+	snapshot.AddEntry("foo")
+	snapshot.AddEntry("bar")
+	snapshot.DeleteEntry("bar")
+	if got := snapshot.NumEntries(); got != 1 {
+		t.Errorf("Add/DeleteEntry, NumEntries: %d", got)
+	}
+	if got := snapshot.List(); !reflect.DeepEqual(got, []string{"foo"}) {
+		t.Errorf("List: %v", got)
+	}
+	folder := NewRAMFolder("")
+	err = snapshot.WriteFile(folder, "")
+	if err != nil {
+		t.Errorf("WriteFile: %v", err)
+	}
+	other := NewSnapshot()
+	_, err = other.ReadFile(folder, "")
+	if err != nil {
+		t.Errorf("ReadFile: %v", err)
+	}
+
+	path := "snapshot_4.json"
+	snapshot.SetPath(path)
+	if got := snapshot.GetPath(); got != path {
+		t.Errorf("SetPath/GetPath: %v", path)
+	}
+}

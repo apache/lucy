@@ -21,6 +21,7 @@ package lucy
 #include "Lucy/Index/IndexManager.h"
 #include "Lucy/Index/BackgroundMerger.h"
 #include "Lucy/Index/TermVector.h"
+#include "Lucy/Index/Snapshot.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Plan/Schema.h"
 #include "Clownfish/Hash.h"
@@ -337,4 +338,32 @@ func (tv *TermVectorIMP) GetStartOffsets() []int32 {
 func (tv *TermVectorIMP) GetEndOffsets() []int32 {
 	self := (*C.lucy_TermVector)(clownfish.Unwrap(tv, "tv"))
 	return i32ArrayToSlice(C.LUCY_TV_Get_End_Offsets(self))
+}
+
+func (s *SnapshotIMP) List() []string {
+	self := (*C.lucy_Snapshot)(clownfish.Unwrap(s, "s"))
+	retvalC := C.LUCY_Snapshot_List(self)
+	defer C.cfish_decref(unsafe.Pointer(retvalC))
+	return vecToStringSlice(retvalC)
+}
+
+func (s *SnapshotIMP) ReadFile(folder Folder, path string) (Snapshot, error) {
+	err := clownfish.TrapErr(func() {
+		self := (*C.lucy_Snapshot)(clownfish.Unwrap(s, "s"))
+		folderC := (*C.lucy_Folder)(clownfish.Unwrap(folder, "folder"))
+		pathC := (*C.cfish_String)(clownfish.GoToClownfish(path, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(pathC))
+		C.LUCY_Snapshot_Read_File(self, folderC, pathC)
+	})
+	return s, err
+}
+
+func (s *SnapshotIMP) WriteFile(folder Folder, path string) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Snapshot)(clownfish.Unwrap(s, "s"))
+		folderC := (*C.lucy_Folder)(clownfish.Unwrap(folder, "folder"))
+		pathC := (*C.cfish_String)(clownfish.GoToClownfish(path, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(pathC))
+		C.LUCY_Snapshot_Write_File(self, folderC, pathC)
+	})
 }

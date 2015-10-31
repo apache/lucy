@@ -177,6 +177,12 @@ func specClasses(parcel *cfc.Parcel) {
 	tvBinding.SetSuppressCtor(true)
 	tvBinding.Register()
 
+	snapshotBinding := cfc.NewGoClass(parcel, "Lucy::Index::Snapshot")
+	snapshotBinding.SpecMethod("List", "List() []string")
+	snapshotBinding.SpecMethod("Read_File", "ReadFile(Folder, string) (Snapshot, error)")
+	snapshotBinding.SpecMethod("Write_File", "WriteFile(Folder, string) error")
+	snapshotBinding.Register()
+
 	schemaBinding := cfc.NewGoClass(parcel, "Lucy::Plan::Schema")
 	schemaBinding.SpecMethod("All_Fields", "AllFields() []string")
 	schemaBinding.Register()
