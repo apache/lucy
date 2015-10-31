@@ -109,7 +109,9 @@ Snapshot_Read_File_IMP(Snapshot *self, Folder *folder, String *path) {
 
     // Eliminate all prior data. Pick a snapshot file.
     S_zero_out(self);
-    ivars->path = path ? Str_Clone(path) : IxFileNames_latest_snapshot(folder);
+    ivars->path = (path != NULL && Str_Get_Size(path) > 0)
+                  ? Str_Clone(path)
+                  : IxFileNames_latest_snapshot(folder);
 
     if (ivars->path) {
         Hash *snap_data
@@ -178,7 +180,7 @@ Snapshot_Write_File_IMP(Snapshot *self, Folder *folder, String *path) {
 
     // Update path.
     DECREF(ivars->path);
-    if (path) {
+    if (path != NULL && Str_Get_Size(path) != 0) {
         ivars->path = Str_Clone(path);
     }
     else {
