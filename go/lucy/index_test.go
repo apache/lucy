@@ -429,6 +429,48 @@ func TestSortCacheMisc(t *testing.T) {
 	}
 }
 
+func TestSimilarityMisc(t *testing.T) {
+	sim := NewSimilarity()
+	if _, ok := sim.MakePosting().(Posting); !ok {
+		t.Errorf("MakePosting")
+	}
+	if got := sim.TF(4.0); got != 2.0 {
+		t.Errorf("TF: %f", got)
+	}
+	if got := sim.IDF(40, 1000); got <= 0 {
+		t.Errorf("IDF: %f", got)
+	}
+	if got := sim.Coord(3, 4); got <= 0 {
+		t.Errorf("Coord: %f", got)
+	}
+	if got := sim.LengthNorm(4); got != 0.5 {
+		t.Errorf("LengthNorm: %f", got)
+	}
+	if got := sim.QueryNorm(4); got != 0.5 {
+		t.Errorf("QueryNorm: %f", got)
+	}
+	if got := sim.EncodeNorm(sim.DecodeNorm(42)); got != 42 {
+		t.Errorf("Encode/DecodeNorm: %d", got)
+	}
+}
+
+func TestSimilarityRoundTrip(t *testing.T) {
+	sim := NewSimilarity()
+	dupe := sim.Load(sim.Dump())
+	if !sim.Equals(dupe) {
+		t.Errorf("Dump/Load round-trip")
+	}
+	folder := NewRAMFolder("")
+	out, _ := folder.OpenOut("dump")
+	sim.Serialize(out)
+	out.Close()
+	in, _ := folder.OpenIn("dump")
+	dupe = clownfish.GetClass(sim).MakeObj().(Similarity).Deserialize(in)
+	if !sim.Equals(dupe) {
+		t.Errorf("Serialize/Deserialize round-trip")
+	}
+}
+
 func TestSegmentMisc(t *testing.T) {
 	var err error
 
