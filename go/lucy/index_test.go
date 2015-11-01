@@ -384,3 +384,47 @@ func TestSnapshotMisc(t *testing.T) {
 		t.Errorf("SetPath/GetPath: %v", path)
 	}
 }
+
+func TestSortCacheMisc(t *testing.T) {
+	schema := NewSchema()
+	spec := NewFullTextType(NewStandardTokenizer())
+	spec.SetSortable(true)
+	schema.SpecField("content", spec)
+	folder := NewRAMFolder("")
+	indexer, _ := OpenIndexer(&OpenIndexerArgs{Index: folder, Schema: schema, Create: true})
+	indexer.AddDoc(&testDoc{Content: "foo"})
+	indexer.AddDoc(&testDoc{Content: "bar"})
+	indexer.AddDoc(&testDoc{Content: "baz"})
+	indexer.AddDoc(make(map[string]interface{}))
+	indexer.Commit()
+
+	searcher, _ := OpenIndexSearcher(folder)
+	segReaders := searcher.GetReader().SegReaders()
+	sortReader := segReaders[0].(SegReader).Obtain("Lucy::Index::SortReader").(SortReader)
+	sortCache := sortReader.FetchSortCache("content")
+
+	if card := sortCache.GetCardinality(); card != 4 {
+		t.Errorf("GetCardinality: %d", card)
+	}
+	if width := sortCache.GetOrdWidth(); width != 2 {
+		t.Errorf("GetOrdWidth: %d", width)
+	}
+
+	if lowest, ok := sortCache.Value(0).(string); !ok || lowest != "bar" {
+		t.Errorf("Ord")
+	}
+	if ord := sortCache.Ordinal(1); ord != 2 { // "foo" is ordinal 2
+		t.Errorf("Ordinal: %d", ord)
+	}
+	if nullOrd := sortCache.GetNullOrd(); nullOrd != 3 {
+		t.Errorf("GetNullOrd: %d", nullOrd)
+	}
+
+	if ord := sortCache.Find("foo"); ord != 2 {
+		t.Errorf("Find: %d", ord)
+	}
+
+	if sortCache.GetNativeOrds() {
+		t.Errorf("recent index shouldn't have native ords")
+	}
+}
