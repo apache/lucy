@@ -183,6 +183,11 @@ func specClasses(parcel *cfc.Parcel) {
 	snapshotBinding.SpecMethod("Write_File", "WriteFile(Folder, string) error")
 	snapshotBinding.Register()
 
+	segBinding := cfc.NewGoClass(parcel, "Lucy::Index::Segment")
+	segBinding.SpecMethod("Read_File", "ReadFile(Folder) error")
+	segBinding.SpecMethod("Write_File", "WriteFile(Folder) error")
+	segBinding.Register()
+
 	schemaBinding := cfc.NewGoClass(parcel, "Lucy::Plan::Schema")
 	schemaBinding.SpecMethod("All_Fields", "AllFields() []string")
 	schemaBinding.Register()

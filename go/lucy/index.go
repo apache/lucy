@@ -21,6 +21,7 @@ package lucy
 #include "Lucy/Index/IndexManager.h"
 #include "Lucy/Index/BackgroundMerger.h"
 #include "Lucy/Index/TermVector.h"
+#include "Lucy/Index/Segment.h"
 #include "Lucy/Index/Snapshot.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Plan/Schema.h"
@@ -365,5 +366,21 @@ func (s *SnapshotIMP) WriteFile(folder Folder, path string) error {
 		pathC := (*C.cfish_String)(clownfish.GoToClownfish(path, unsafe.Pointer(C.CFISH_STRING), false))
 		defer C.cfish_decref(unsafe.Pointer(pathC))
 		C.LUCY_Snapshot_Write_File(self, folderC, pathC)
+	})
+}
+
+func (s *SegmentIMP) WriteFile(folder Folder) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Segment)(clownfish.Unwrap(s, "s"))
+		folderC := (*C.lucy_Folder)(clownfish.Unwrap(folder, "folder"))
+		C.LUCY_Seg_Write_File(self, folderC)
+	})
+}
+
+func (s *SegmentIMP) ReadFile(folder Folder) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Segment)(clownfish.Unwrap(s, "s"))
+		folderC := (*C.lucy_Folder)(clownfish.Unwrap(folder, "folder"))
+		C.LUCY_Seg_Read_File(self, folderC)
 	})
 }

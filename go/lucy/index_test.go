@@ -428,3 +428,60 @@ func TestSortCacheMisc(t *testing.T) {
 		t.Errorf("recent index shouldn't have native ords")
 	}
 }
+
+func TestSegmentMisc(t *testing.T) {
+	var err error
+
+	seg := NewSegment(4)
+	if name := seg.GetName(); name != "seg_4" {
+		t.Errorf("GetName: %s", name)
+	}
+	if num := seg.GetNumber(); num != 4 {
+		t.Errorf("GetNumber: %d", num)
+	}
+
+	if num := seg.AddField("field1"); num != 1 {
+		t.Errorf("AddField: %d", num)
+	}
+	if field := seg.FieldName(1); field != "field1" {
+		t.Errorf("FieldName: %v", field)
+	}
+	if num := seg.FieldNum("field1"); num != 1 {
+		t.Errorf("FieldNum: %d", num)
+	}
+
+	metadata := map[string]interface{}{
+		"foo": "1",
+		"bar": "2",
+	}
+	seg.StoreMetadata("mycomponent", metadata)
+	if got := seg.FetchMetadata("mycomponent"); !reflect.DeepEqual(got, metadata) {
+		t.Errorf("Store/FetchMetadata: %v", got)
+	}
+	if got := seg.GetMetadata(); got["mycomponent"] == nil {
+		t.Errorf("%v", got)
+	}
+
+	seg.SetCount(42)
+	seg.IncrementCount(5)
+	if got := seg.GetCount(); got != 47 {
+		t.Errorf("SetCount/GetCount: %d", got)
+	}
+
+	folder := NewRAMFolder("")
+	folder.MkDir("seg_4")
+	err = seg.WriteFile(folder)
+	if err != nil {
+		t.Errorf("WriteFile: %v", err)
+	}
+	dupe := NewSegment(4)
+	dupe.ReadFile(folder)
+	if err != nil {
+		t.Errorf("WriteFile: %v", err)
+	}
+
+	other := NewSegment(5)
+	if got := seg.CompareTo(other); got >= 0 {
+		t.Errorf("CompareTo (seg 4 vs seg 5): %d", got)
+	}
+}
