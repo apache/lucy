@@ -527,3 +527,20 @@ func TestSegmentMisc(t *testing.T) {
 		t.Errorf("CompareTo (seg 4 vs seg 5): %d", got)
 	}
 }
+
+func TestFilePurgerMisc(t *testing.T) {
+	folder := NewRAMFolder("")
+	oldSnapshot := NewSnapshot()
+	oldSnapshot.AddEntry("foo")
+	out, _ := folder.OpenOut("foo")
+	out.Close()
+	oldSnapshot.WriteFile(folder, "")
+
+	snapshot := NewSnapshot()
+	snapshot.WriteFile(folder, "")
+	purger := NewFilePurger(folder, snapshot, nil)
+	purger.Purge()
+	if folder.Exists("foo") {
+		t.Errorf("Failed to purge file")
+	}
+}
