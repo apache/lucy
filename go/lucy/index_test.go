@@ -324,6 +324,37 @@ func TestTermVectorMisc(t *testing.T) {
 	}
 }
 
+func TestDocVectorMisc(t *testing.T) {
+	schema := NewSchema()
+	spec := NewFullTextType(NewStandardTokenizer())
+	spec.SetHighlightable(true)
+	schema.SpecField("content", spec)
+	folder := NewRAMFolder("")
+	indexer, _ := OpenIndexer(&OpenIndexerArgs{Index: folder, Schema: schema, Create: true})
+	indexer.AddDoc(&testDoc{Content: "foo bar baz"})
+	indexer.Commit()
+	searcher, _ := OpenIndexSearcher(folder)
+	dv := searcher.FetchDocVec(1)
+	fieldBuf := dv.FieldBuf("content");
+	if fieldBuf == nil {
+		t.Errorf("FieldBuf returned nil")
+	}
+	dv.AddFieldBuf("content", fieldBuf)
+	if got := dv.TermVector("content", "bar"); got == nil {
+		t.Errorf("TermVector returned nil")
+	}
+
+	out, _ := folder.OpenOut("dump")
+	dv.Serialize(out)
+	out.Close()
+	in, _ := folder.OpenIn("dump")
+	dupe := clownfish.GetClass(dv).MakeObj().(DocVector).Deserialize(in)
+	in.Close()
+	if _, ok := dupe.(DocVector); !ok {
+		t.Errorf("Serialize/Deserialize")
+	}
+}
+
 func TestSnapshotMisc(t *testing.T) {
 	var err error
 	snapshot := NewSnapshot()
