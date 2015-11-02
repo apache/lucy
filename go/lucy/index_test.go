@@ -544,3 +544,98 @@ func TestFilePurgerMisc(t *testing.T) {
 		t.Errorf("Failed to purge file")
 	}
 }
+
+func TestInvEntryMisc(t *testing.T) {
+	entry := NewInverterEntry(nil, "content", 1)
+	other := NewInverterEntry(nil, "title", 2)
+	if got := entry.CompareTo(other); got >= 0 {
+		t.Errorf("CompareTo compares field numbers: %d", got)
+	}
+}
+
+func TestInverterMisc(t *testing.T) {
+
+	schema := NewSchema()
+	spec := NewFullTextType(NewStandardTokenizer())
+	schema.SpecField("title", spec)
+	schema.SpecField("content", spec)
+	seg := NewSegment(4)
+	seg.AddField("title")
+	seg.AddField("content")
+
+	inverter := NewInverter(schema, seg)
+	inverter.SetBoost(2.0)
+	if got := inverter.GetBoost(); got != 2.0 {
+		t.Errorf("Set/GetBoost: %f", got)
+	}
+	if got := inverter.GetDoc(); got != nil {
+		t.Errorf("GetDoc should return nil when not yet set")
+	}
+	inverter.Clear()
+
+	doc := NewDoc(42)
+	doc.Store("title", "Foo")
+	doc.Store("content", "foo foo foo foo foo")
+	inverter.SetDoc(doc)
+	if docID := inverter.GetDoc().GetDocID(); docID != 42 {
+		t.Errorf("Set/GetDoc: %d", docID)
+	}
+	inverter.Clear()
+	// Can't test AddField.
+	// inverter.AddField(entry)
+	inverter.InvertDoc(doc)
+
+
+	numFields := inverter.Iterate()
+	if numFields != 2 {
+		t.Errorf("Iterate: %d", numFields)
+	}
+	fieldNum := inverter.Next()
+	if fieldNum != 1 {
+		t.Errorf("Next: %d", fieldNum)
+	}
+	if got := inverter.GetFieldName(); got != "title" {
+		t.Errorf("GetFieldName during first iter: %s", got)
+	}
+	if got := inverter.GetValue(); got != "Foo" {
+		t.Errorf("GetValue during first iter: %v", got)
+	}
+	if got, ok := inverter.GetType().(FullTextType); !ok {
+		t.Errorf("GetType: %T", got)
+	}
+	if got, ok := inverter.GetAnalyzer().(StandardTokenizer); !ok {
+		t.Errorf("GetType: %T", got)
+	}
+	if got, ok := inverter.GetSimilarity().(Similarity); !ok {
+		t.Errorf("GetSimilarity: %T", got)
+	}
+	if got, ok := inverter.GetInversion().(Inversion); !ok {
+		t.Errorf("GetInversion: %T", got)
+	}
+
+	if nextFieldNum := inverter.Next(); nextFieldNum != 2 {
+		t.Errorf("Next second iter: %d", nextFieldNum)
+	}
+
+	if done := inverter.Next(); done != 0 {
+		t.Errorf("Next should return 0 when exhausted: %d", done)
+	}
+	if got := inverter.GetFieldName(); got != "" {
+		t.Errorf("GetFieldName after iterator exhausted: %s", got)
+	}
+	if got := inverter.GetValue(); got != nil {
+		t.Errorf("GetValue after iterator exhausted: %v", got)
+	}
+	if got := inverter.GetType(); got != nil {
+		t.Errorf("GetType after iterator exhausted: %v", got)
+	}
+	if got := inverter.GetAnalyzer(); got != nil {
+		t.Errorf("GetAnalyzer after iterator exhausted: %v", got)
+	}
+	if got := inverter.GetSimilarity(); got != nil {
+		t.Errorf("GetSimilarity after iterator exhausted: %v", got)
+	}
+	if got := inverter.GetInversion(); got != nil {
+		t.Errorf("GetInversion after iterator exhausted: %v", got)
+	}
+}
