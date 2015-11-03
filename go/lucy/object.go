@@ -27,7 +27,7 @@ import "unsafe"
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
 func (bv *BitVectorIMP) ToArray() []bool {
-	cap := bv.GetCapacity()
+	cap := bv.getCapacity()
 	if cap != uint32(int(cap)) {
 		panic(fmt.Sprintf("Capacity of range: %d", cap))
 	}

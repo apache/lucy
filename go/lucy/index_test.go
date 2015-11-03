@@ -113,11 +113,11 @@ func TestIndexerMisc(t *testing.T) {
 	if _, ok := indexer.GetSchema().(Schema); !ok {
 		t.Errorf("GetSchema")
 	}
-	if _, ok := indexer.GetStockDoc().(Doc); !ok {
-		t.Errorf("GetStockDoc")
+	if _, ok := indexer.getStockDoc().(Doc); !ok {
+		t.Errorf("getStockDoc")
 	}
-	if _, ok := indexer.GetSegWriter().(SegWriter); !ok {
-		t.Errorf("GetSegWriter")
+	if _, ok := indexer.getSegWriter().(SegWriter); !ok {
+		t.Errorf("getSegWriter")
 	}
 	indexer.AddDoc(&testDoc{Content: "gazi"})
 	indexer.Optimize()
@@ -159,27 +159,27 @@ func TestIndexManagerAccessors(t *testing.T) {
 	}
 	manager.SetWriteLockTimeout(72)
 	if got := manager.GetWriteLockTimeout(); got != 72 {
-		t.Errorf("Set/GetWriteLockTimeout: %d", got)
+		t.Errorf("set/GetWriteLockTimeout: %d", got)
 	}
 	manager.SetWriteLockInterval(42)
 	if got := manager.GetWriteLockInterval(); got != 42 {
-		t.Errorf("Set/GetWriteLockInterval: %d", got)
+		t.Errorf("set/GetWriteLockInterval: %d", got)
 	}
-	manager.SetMergeLockTimeout(73)
-	if got := manager.GetMergeLockTimeout(); got != 73 {
-		t.Errorf("Set/GetMergeLockTimeout: %d", got)
+	manager.setMergeLockTimeout(73)
+	if got := manager.getMergeLockTimeout(); got != 73 {
+		t.Errorf("set/getMergeLockTimeout: %d", got)
 	}
-	manager.SetMergeLockInterval(43)
-	if got := manager.GetMergeLockInterval(); got != 43 {
-		t.Errorf("Set/GetMergeLockInterval: %d", got)
+	manager.setMergeLockInterval(43)
+	if got := manager.getMergeLockInterval(); got != 43 {
+		t.Errorf("set/getMergeLockInterval: %d", got)
 	}
-	manager.SetDeletionLockTimeout(71)
-	if got := manager.GetDeletionLockTimeout(); got != 71 {
-		t.Errorf("Set/GetDeletionLockTimeout: %d", got)
+	manager.setDeletionLockTimeout(71)
+	if got := manager.getDeletionLockTimeout(); got != 71 {
+		t.Errorf("set/getDeletionLockTimeout: %d", got)
 	}
-	manager.SetDeletionLockInterval(41)
-	if got := manager.GetDeletionLockInterval(); got != 41 {
-		t.Errorf("Set/GetDeletionLockInterval: %d", got)
+	manager.setDeletionLockInterval(41)
+	if got := manager.getDeletionLockInterval(); got != 41 {
+		t.Errorf("set/getDeletionLockInterval: %d", got)
 	}
 }
 
@@ -189,15 +189,15 @@ func TestIndexManagerLocks(t *testing.T) {
 	if _, ok := manager.MakeWriteLock().(Lock); !ok {
 		t.Errorf("MakeWriteLock")
 	}
-	if _, ok := manager.MakeMergeLock().(Lock); !ok {
-		t.Errorf("MakeMergeLock")
+	if _, ok := manager.makeMergeLock().(Lock); !ok {
+		t.Errorf("makeMergeLock")
 	}
-	if _, ok := manager.MakeDeletionLock().(Lock); !ok {
-		t.Errorf("MakeDeletionLock")
+	if _, ok := manager.makeDeletionLock().(Lock); !ok {
+		t.Errorf("makeDeletionLock")
 	}
 	snapFile := "snapshot_4a.json"
-	if _, ok := manager.MakeSnapshotReadLock(snapFile).(SharedLock); !ok {
-		t.Errorf("MakeDeletionLock")
+	if _, ok := manager.makeSnapshotReadLock(snapFile).(SharedLock); !ok {
+		t.Errorf("makeDeletionLock")
 	}
 }
 
@@ -231,8 +231,8 @@ func TestIndexManagerMisc(t *testing.T) {
 	snapshot := NewSnapshot()
 	snapshot.AddEntry("seg_4")
 	snapshot.AddEntry("seg_5")
-	if got := manager.HighestSegNum(snapshot); got != 5 {
-		t.Errorf("HighestSegNum: %d", got)
+	if got := manager.highestSegNum(snapshot); got != 5 {
+		t.Errorf("highestSegNum: %d", got)
 	}
 }
 
@@ -243,7 +243,7 @@ func TestIndexManagerRecycle(t *testing.T) {
 	indexer, _ := OpenIndexer(&OpenIndexerArgs{Index: index})
 	searcher, _ := OpenIndexSearcher(index)
 	reader := searcher.GetReader().(PolyReader)
-	delWriter := indexer.GetSegWriter().GetDelWriter()
+	delWriter := indexer.getSegWriter().getDelWriter()
 	segReaders, err := manager.Recycle(reader, delWriter, 0, true)
 	if err != nil || len(segReaders) != 1 {
 		t.Errorf("Recycle: (%d SegReaders) %v", len(segReaders), err)
@@ -280,7 +280,7 @@ func TestTermInfoMisc(t *testing.T) {
 	if got := other.GetDocFreq(); got != tinfo.GetDocFreq() {
 		t.Errorf("Clone: (%d != %d)", got, tinfo.GetDocFreq())
 	}
-	tinfo.Reset()
+	tinfo.reset()
 	if got := tinfo.GetDocFreq(); got != 0 {
 		t.Errorf("Reset: expected 0, got %d", got)
 	}
@@ -315,10 +315,10 @@ func TestTermVectorMisc(t *testing.T) {
 
 	folder := NewRAMFolder("")
 	out, _ := folder.OpenOut("dump")
-	tv.Serialize(out)
+	tv.serialize(out)
 	out.Close()
 	in, _ := folder.OpenIn("dump")
-	dupe := clownfish.GetClass(tv).MakeObj().(TermVector).Deserialize(in)
+	dupe := clownfish.GetClass(tv).MakeObj().(TermVector).deserialize(in)
 	if !tv.Equals(dupe) {
 		t.Errorf("Unsuccessful serialization round trip")
 	}
@@ -334,24 +334,24 @@ func TestDocVectorMisc(t *testing.T) {
 	indexer.AddDoc(&testDoc{Content: "foo bar baz"})
 	indexer.Commit()
 	searcher, _ := OpenIndexSearcher(folder)
-	dv := searcher.FetchDocVec(1)
-	fieldBuf := dv.FieldBuf("content");
+	dv := searcher.fetchDocVec(1)
+	fieldBuf := dv.fieldBuf("content");
 	if fieldBuf == nil {
-		t.Errorf("FieldBuf returned nil")
+		t.Errorf("fieldBuf returned nil")
 	}
-	dv.AddFieldBuf("content", fieldBuf)
-	if got := dv.TermVector("content", "bar"); got == nil {
-		t.Errorf("TermVector returned nil")
+	dv.addFieldBuf("content", fieldBuf)
+	if got := dv.termVector("content", "bar"); got == nil {
+		t.Errorf("termVector returned nil")
 	}
 
 	out, _ := folder.OpenOut("dump")
-	dv.Serialize(out)
+	dv.serialize(out)
 	out.Close()
 	in, _ := folder.OpenIn("dump")
-	dupe := clownfish.GetClass(dv).MakeObj().(DocVector).Deserialize(in)
+	dupe := clownfish.GetClass(dv).MakeObj().(DocVector).deserialize(in)
 	in.Close()
 	if _, ok := dupe.(DocVector); !ok {
-		t.Errorf("Serialize/Deserialize")
+		t.Errorf("serialize/deserialize")
 	}
 }
 
@@ -401,7 +401,7 @@ func TestSortCacheMisc(t *testing.T) {
 	searcher, _ := OpenIndexSearcher(folder)
 	segReaders := searcher.GetReader().SegReaders()
 	sortReader := segReaders[0].(SegReader).Obtain("Lucy::Index::SortReader").(SortReader)
-	sortCache := sortReader.FetchSortCache("content")
+	sortCache := sortReader.fetchSortCache("content")
 
 	if card := sortCache.GetCardinality(); card != 4 {
 		t.Errorf("GetCardinality: %d", card)
@@ -424,50 +424,50 @@ func TestSortCacheMisc(t *testing.T) {
 		t.Errorf("Find: %d", ord)
 	}
 
-	if sortCache.GetNativeOrds() {
+	if sortCache.getNativeOrds() {
 		t.Errorf("recent index shouldn't have native ords")
 	}
 }
 
 func TestSimilarityMisc(t *testing.T) {
 	sim := NewSimilarity()
-	if _, ok := sim.MakePosting().(Posting); !ok {
-		t.Errorf("MakePosting")
+	if _, ok := sim.makePosting().(Posting); !ok {
+		t.Errorf("makePosting")
 	}
-	if got := sim.TF(4.0); got != 2.0 {
-		t.Errorf("TF: %f", got)
+	if got := sim.tF(4.0); got != 2.0 {
+		t.Errorf("tF: %f", got)
 	}
-	if got := sim.IDF(40, 1000); got <= 0 {
-		t.Errorf("IDF: %f", got)
+	if got := sim.iDF(40, 1000); got <= 0 {
+		t.Errorf("iDF: %f", got)
 	}
-	if got := sim.Coord(3, 4); got <= 0 {
-		t.Errorf("Coord: %f", got)
+	if got := sim.coord(3, 4); got <= 0 {
+		t.Errorf("coord: %f", got)
 	}
 	if got := sim.LengthNorm(4); got != 0.5 {
 		t.Errorf("LengthNorm: %f", got)
 	}
-	if got := sim.QueryNorm(4); got != 0.5 {
-		t.Errorf("QueryNorm: %f", got)
+	if got := sim.queryNorm(4); got != 0.5 {
+		t.Errorf("queryNorm: %f", got)
 	}
-	if got := sim.EncodeNorm(sim.DecodeNorm(42)); got != 42 {
-		t.Errorf("Encode/DecodeNorm: %d", got)
+	if got := sim.encodeNorm(sim.decodeNorm(42)); got != 42 {
+		t.Errorf("encode/decodeNorm: %d", got)
 	}
 }
 
 func TestSimilarityRoundTrip(t *testing.T) {
 	sim := NewSimilarity()
-	dupe := sim.Load(sim.Dump())
+	dupe := sim.load(sim.dump())
 	if !sim.Equals(dupe) {
 		t.Errorf("Dump/Load round-trip")
 	}
 	folder := NewRAMFolder("")
 	out, _ := folder.OpenOut("dump")
-	sim.Serialize(out)
+	sim.serialize(out)
 	out.Close()
 	in, _ := folder.OpenIn("dump")
-	dupe = clownfish.GetClass(sim).MakeObj().(Similarity).Deserialize(in)
+	dupe = clownfish.GetClass(sim).MakeObj().(Similarity).deserialize(in)
 	if !sim.Equals(dupe) {
-		t.Errorf("Serialize/Deserialize round-trip")
+		t.Errorf("serialize/deserialize round-trip")
 	}
 }
 
@@ -500,12 +500,12 @@ func TestSegmentMisc(t *testing.T) {
 	if got := seg.FetchMetadata("mycomponent"); !reflect.DeepEqual(got, metadata) {
 		t.Errorf("Store/FetchMetadata: %v", got)
 	}
-	if got := seg.GetMetadata(); got["mycomponent"] == nil {
+	if got := seg.getMetadata(); got["mycomponent"] == nil {
 		t.Errorf("%v", got)
 	}
 
 	seg.SetCount(42)
-	seg.IncrementCount(5)
+	seg.incrementCount(5)
 	if got := seg.GetCount(); got != 47 {
 		t.Errorf("SetCount/GetCount: %d", got)
 	}
@@ -539,8 +539,8 @@ func TestFilePurgerMisc(t *testing.T) {
 	snapshot := NewSnapshot()
 	snapshot.WriteFile(folder, "")
 	purger := NewFilePurger(folder, snapshot, nil)
-	purger.Purge()
-	if folder.Exists("foo") {
+	purger.purge()
+	if folder.exists("foo") {
 		t.Errorf("Failed to purge file")
 	}
 }
