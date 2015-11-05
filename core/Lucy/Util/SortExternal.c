@@ -265,42 +265,42 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
 
     if (ivars->buf_max != 0) { THROW(ERR, "Can't refill unless empty"); }
 
-    // Move all the elements in range into the main buffer as slices.
+    // Find non-empty slices.
     uint32_t num_slices = 0;
+    uint32_t total_size = 0;
     for (uint32_t i = 0; i < num_runs; i++) {
         SortExternal *const run = (SortExternal*)Vec_Fetch(ivars->runs, i);
         SortExternalIVARS *const run_ivars = SortEx_IVARS(run);
         uint32_t slice_size = S_find_slice_size(run, run_ivars, endpost);
 
         if (slice_size) {
-            // Move slice content from run buffer to main buffer.
-            if (ivars->buf_max + slice_size > ivars->buf_cap) {
-                size_t cap = Memory_oversize(ivars->buf_max + slice_size,
-                                             sizeof(Obj*));
-                SortEx_Grow_Buffer(self, cap);
-            }
-            memcpy(ivars->buffer + ivars->buf_max,
-                   run_ivars->buffer + run_ivars->buf_tick,
-                   slice_size * sizeof(Obj*));
+            // Track slice start and size.
+            slice_starts[num_slices] = run_ivars->buffer + run_ivars->buf_tick;
+            slice_sizes[num_slices]  = slice_size;
             run_ivars->buf_tick += slice_size;
-            ivars->buf_max += slice_size;
 
-            // Track number of slices and slice sizes.
-            slice_sizes[num_slices++] = slice_size;
+            num_slices++;
+            total_size += slice_size;
         }
     }
 
-    // Transform slice starts from ticks to pointers.
-    uint32_t total = 0;
-    for (uint32_t i = 0; i < num_slices; i++) {
-        slice_starts[i] = ivars->buffer + total;
-        total += slice_sizes[i];
+    if (num_slices == 0) { return; }
+
+    if (ivars->buf_cap < total_size) {
+        size_t cap = Memory_oversize(total_size, sizeof(Obj*));
+        SortEx_Grow_Buffer(self, cap);
+    }
+    ivars->buf_max = total_size;
+
+    if (num_slices == 1) {
+        // Copy single slice content from run buffer to main buffer.
+        memcpy(ivars->buffer, slice_starts[0], total_size * sizeof(Obj*));
+        return;
     }
 
-    // The main buffer now consists of several slices.  Sort the main buffer,
-    // but exploit the fact that each slice is already sorted.
-    if (ivars->scratch_cap < ivars->buf_cap) {
-        ivars->scratch_cap = ivars->buf_cap;
+    // There are more than two slices to merge.
+    if (ivars->scratch_cap < total_size) {
+        ivars->scratch_cap = total_size;
         ivars->scratch = (Obj**)REALLOCATE(
                             ivars->scratch, ivars->scratch_cap * sizeof(Obj*));
     }
