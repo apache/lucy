@@ -55,7 +55,6 @@ SortEx_init(SortExternal *self) {
     ivars->runs         = Vec_new(0);
     ivars->slice_sizes  = NULL;
     ivars->slice_starts = NULL;
-    ivars->num_slices   = 0;
     ivars->flipped      = false;
 
     ABSTRACT_CLASS_CHECK(self, SORTEXTERNAL);
@@ -267,6 +266,7 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
     if (ivars->buf_max != 0) { THROW(ERR, "Can't refill unless empty"); }
 
     // Move all the elements in range into the main buffer as slices.
+    uint32_t num_slices = 0;
     for (uint32_t i = 0; i < num_runs; i++) {
         SortExternal *const run = (SortExternal*)Vec_Fetch(ivars->runs, i);
         SortExternalIVARS *const run_ivars = SortEx_IVARS(run);
@@ -286,13 +286,13 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
             ivars->buf_max += slice_size;
 
             // Track number of slices and slice sizes.
-            slice_sizes[ivars->num_slices++] = slice_size;
+            slice_sizes[num_slices++] = slice_size;
         }
     }
 
     // Transform slice starts from ticks to pointers.
     uint32_t total = 0;
-    for (uint32_t i = 0; i < ivars->num_slices; i++) {
+    for (uint32_t i = 0; i < num_slices; i++) {
         slice_starts[i] = ivars->buffer + total;
         total += slice_sizes[i];
     }
@@ -307,12 +307,12 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
 
     // Exploit previous sorting, rather than sort buffer naively.
     // Leave the first slice intact if the number of slices is odd. */
-    while (ivars->num_slices > 1) {
+    while (num_slices > 1) {
         uint32_t i = 0;
         uint32_t j = 0;
 
-        while (i < ivars->num_slices) {
-            if (ivars->num_slices - i >= 2) {
+        while (i < num_slices) {
+            if (num_slices - i >= 2) {
                 // Merge two consecutive slices.
                 const uint32_t merged_size = slice_sizes[i] + slice_sizes[i + 1];
                 Sort_merge(slice_starts[i], slice_sizes[i],
@@ -324,7 +324,7 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
                 i += 2;
                 j += 1;
             }
-            else if (ivars->num_slices - i >= 1) {
+            else if (num_slices - i >= 1) {
                 // Move single slice pointer.
                 slice_sizes[j]  = slice_sizes[i];
                 slice_starts[j] = slice_starts[i];
@@ -332,10 +332,8 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
                 j += 1;
             }
         }
-        ivars->num_slices = j;
+        num_slices = j;
     }
-
-    ivars->num_slices = 0;
 }
 
 void
