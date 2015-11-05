@@ -30,6 +30,12 @@ static void
 S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
                 Obj **endpost);
 
+static void
+S_merge(SortExternal *self,
+        Obj **left_ptr,  size_t left_size,
+        Obj **right_ptr, size_t right_size,
+        Obj **dest, SortEx_Compare_t compare);
+
 // Return the address for the item in one of the runs' buffers which is the
 // highest in sort order, but which we can guarantee is lower in sort order
 // than any item which has yet to enter a run buffer.
@@ -260,8 +266,7 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
     Obj      ***slice_starts = ivars->slice_starts;
     uint32_t   *slice_sizes  = ivars->slice_sizes;
     Class      *klass        = SortEx_get_class(self);
-    CFISH_Sort_Compare_t compare
-        = (CFISH_Sort_Compare_t)METHOD_PTR(klass, LUCY_SortEx_Compare);
+    SortEx_Compare_t compare = METHOD_PTR(klass, LUCY_SortEx_Compare);
 
     if (ivars->buf_max != 0) { THROW(ERR, "Can't refill unless empty"); }
 
@@ -315,9 +320,10 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
             if (num_slices - i >= 2) {
                 // Merge two consecutive slices.
                 const uint32_t merged_size = slice_sizes[i] + slice_sizes[i + 1];
-                Sort_merge(slice_starts[i], slice_sizes[i],
-                           slice_starts[i + 1], slice_sizes[i + 1], dest,
-                           sizeof(Obj*), compare, self);
+                S_merge(self,
+                        slice_starts[i], slice_sizes[i],
+                        slice_starts[i + 1], slice_sizes[i + 1],
+                        dest, compare);
                 slice_sizes[j]  = merged_size;
                 slice_starts[j] = dest;
                 dest += merged_size;
@@ -342,6 +348,36 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
         ivars->buf_cap     = ivars->scratch_cap;
         ivars->scratch     = tmp_buf;
         ivars->scratch_cap = tmp_cap;
+    }
+}
+
+// Assumes left_size > 0 and right_size > 0.
+static void
+S_merge(SortExternal *self,
+        Obj **left_ptr,  size_t left_size,
+        Obj **right_ptr, size_t right_size,
+        Obj **dest, SortEx_Compare_t compare) {
+
+    Obj **left_limit  = left_ptr  + left_size;
+    Obj **right_limit = right_ptr + right_size;
+
+    while (1) {
+        if (compare(self, left_ptr, right_ptr) <= 0) {
+            *dest++ = *left_ptr++;
+            if (left_ptr >= left_limit) {
+                right_size = right_limit - right_ptr;
+                memcpy(dest, right_ptr, right_size * sizeof(Obj*));
+                break;
+            }
+        }
+        else {
+            *dest++ = *right_ptr++;
+            if (right_ptr >= right_limit) {
+                left_size = left_limit - left_ptr;
+                memcpy(dest, left_ptr, left_size * sizeof(Obj*));
+                break;
+            }
+        }
     }
 }
 
