@@ -305,34 +305,43 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
                             ivars->scratch, ivars->scratch_cap * sizeof(Obj*));
     }
 
-    // Exploit previous sorting, rather than sort buffer naively.
-    // Leave the first slice intact if the number of slices is odd. */
+    // Divide-and-conquer k-way merge.
     while (num_slices > 1) {
         uint32_t i = 0;
         uint32_t j = 0;
+        Obj **dest = ivars->scratch;
 
         while (i < num_slices) {
             if (num_slices - i >= 2) {
                 // Merge two consecutive slices.
                 const uint32_t merged_size = slice_sizes[i] + slice_sizes[i + 1];
                 Sort_merge(slice_starts[i], slice_sizes[i],
-                           slice_starts[i + 1], slice_sizes[i + 1], ivars->scratch,
+                           slice_starts[i + 1], slice_sizes[i + 1], dest,
                            sizeof(Obj*), compare, self);
                 slice_sizes[j]  = merged_size;
-                slice_starts[j] = slice_starts[i];
-                memcpy(slice_starts[j], ivars->scratch, merged_size * sizeof(Obj*));
+                slice_starts[j] = dest;
+                dest += merged_size;
                 i += 2;
                 j += 1;
             }
             else if (num_slices - i >= 1) {
-                // Move single slice pointer.
+                // Move last slice.
+                memcpy(dest, slice_starts[i], slice_sizes[i] * sizeof(Obj*));
                 slice_sizes[j]  = slice_sizes[i];
-                slice_starts[j] = slice_starts[i];
+                slice_starts[j] = dest;
                 i += 1;
                 j += 1;
             }
         }
         num_slices = j;
+
+        // Swap scratch and buffer.
+        Obj      **tmp_buf = ivars->buffer;
+        uint32_t   tmp_cap = ivars->buf_cap;
+        ivars->buffer      = ivars->scratch;
+        ivars->buf_cap     = ivars->scratch_cap;
+        ivars->scratch     = tmp_buf;
+        ivars->scratch_cap = tmp_cap;
     }
 }
 
