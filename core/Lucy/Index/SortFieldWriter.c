@@ -327,10 +327,10 @@ S_write_val(Obj *val, int8_t prim_id, OutStream *ix_out, OutStream *dat_out,
 }
 
 int
-SortFieldWriter_Compare_IMP(SortFieldWriter *self, void *va, void *vb) {
+SortFieldWriter_Compare_IMP(SortFieldWriter *self, Obj **ptr_a, Obj **ptr_b) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
-    SFWriterElemIVARS *a = SFWriterElem_IVARS(*(SFWriterElem**)va);
-    SFWriterElemIVARS *b = SFWriterElem_IVARS(*(SFWriterElem**)vb);
+    SFWriterElemIVARS *a = SFWriterElem_IVARS(*(SFWriterElem**)ptr_a);
+    SFWriterElemIVARS *b = SFWriterElem_IVARS(*(SFWriterElem**)ptr_b);
     int32_t comparison
         = FType_null_back_compare_values(ivars->type, a->value, b->value);
     if (comparison == 0) { comparison = a->doc_id - b->doc_id; }

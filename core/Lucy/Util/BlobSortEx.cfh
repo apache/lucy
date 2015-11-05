@@ -49,7 +49,7 @@ class Lucy::Util::BlobSortEx
     Flip(BlobSortEx *self);
 
     int
-    Compare(BlobSortEx *self, void *va, void *vb);
+    Compare(BlobSortEx *self, Obj **ptr_a, Obj **ptr_b);
 
     incremented Vector*
     Peek_Cache(BlobSortEx *self);

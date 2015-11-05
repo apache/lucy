@@ -165,9 +165,9 @@ BlobSortEx_Flip_IMP(BlobSortEx *self) {
 }
 
 int
-BlobSortEx_Compare_IMP(BlobSortEx *self, void *va, void *vb) {
+BlobSortEx_Compare_IMP(BlobSortEx *self, Obj **ptr_a, Obj **ptr_b) {
     UNUSED_VAR(self);
-    return Blob_compare((Blob**)va, (Blob**)vb);
+    return Blob_compare((Blob**)ptr_a, (Blob**)ptr_b);
 }
 
 Vector*

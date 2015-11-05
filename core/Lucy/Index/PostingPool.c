@@ -144,9 +144,9 @@ PostPool_Destroy_IMP(PostingPool *self) {
 }
 
 int
-PostPool_Compare_IMP(PostingPool *self, void *va, void *vb) {
-    RawPostingIVARS *const a     = RawPost_IVARS(*(RawPosting**)va);
-    RawPostingIVARS *const b     = RawPost_IVARS(*(RawPosting**)vb);
+PostPool_Compare_IMP(PostingPool *self, Obj **ptr_a, Obj **ptr_b) {
+    RawPostingIVARS *const a     = RawPost_IVARS(*(RawPosting**)ptr_a);
+    RawPostingIVARS *const b     = RawPost_IVARS(*(RawPosting**)ptr_b);
     const size_t      a_len = a->content_len;
     const size_t      b_len = b->content_len;
     const size_t      len   = a_len < b_len ? a_len : b_len;
