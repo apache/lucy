@@ -19,6 +19,10 @@ package lucy
 /*
 #include "Lucy/Index/Indexer.h"
 #include "Lucy/Index/IndexManager.h"
+#include "Lucy/Index/BackgroundMerger.h"
+#include "Lucy/Index/TermVector.h"
+#include "Lucy/Index/Segment.h"
+#include "Lucy/Index/Snapshot.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Plan/Schema.h"
 #include "Clownfish/Hash.h"
@@ -174,9 +178,209 @@ func (obj *IndexerIMP) findRealField(name string) (string, error) {
 	return "", clownfish.NewErr(fmt.Sprintf("Unknown field: '%v'", name))
 }
 
+func (obj *IndexerIMP) AddIndex(index interface{}) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Indexer)(clownfish.Unwrap(obj, "obj"))
+		indexC := (*C.cfish_Obj)(clownfish.GoToClownfish(index, unsafe.Pointer(C.CFISH_OBJ), false))
+		defer C.cfish_decref(unsafe.Pointer(indexC))
+		C.LUCY_Indexer_Add_Index(self, indexC)
+	})
+}
+
+func (obj *IndexerIMP) DeleteByTerm(field string, term interface{}) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Indexer)(clownfish.Unwrap(obj, "obj"))
+		fieldC := (*C.cfish_String)(clownfish.GoToClownfish(field, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(fieldC))
+		termC := (*C.cfish_Obj)(clownfish.GoToClownfish(term, unsafe.Pointer(C.CFISH_OBJ), false))
+		defer C.cfish_decref(unsafe.Pointer(termC))
+		C.LUCY_Indexer_Delete_By_Term(self, fieldC, termC)
+	})
+}
+
+func (obj *IndexerIMP) DeleteByQuery(query Query) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Indexer)(clownfish.Unwrap(obj, "obj"))
+		queryC := (*C.lucy_Query)(clownfish.Unwrap(query, "query"))
+		C.LUCY_Indexer_Delete_By_Query(self, queryC)
+	})
+}
+
+func (obj *IndexerIMP) DeleteByDocID(docID int32) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Indexer)(clownfish.Unwrap(obj, "obj"))
+		C.LUCY_Indexer_Delete_By_Doc_ID(self, C.int32_t(docID))
+	})
+}
+
+func (obj *IndexerIMP) PrepareCommit() error {
+	self := ((*C.lucy_Indexer)(unsafe.Pointer(obj.TOPTR())))
+	return clownfish.TrapErr(func() {
+		C.LUCY_Indexer_Prepare_Commit(self)
+	})
+}
+
 func (obj *IndexerIMP) Commit() error {
 	self := ((*C.lucy_Indexer)(unsafe.Pointer(obj.TOPTR())))
 	return clownfish.TrapErr(func() {
 		C.LUCY_Indexer_Commit(self)
+	})
+}
+
+func OpenBackgroundMerger(index interface{}, manager IndexManager) (bgm BackgroundMerger, err error) {
+	err = clownfish.TrapErr(func() {
+		indexC := (*C.cfish_Obj)(clownfish.GoToClownfish(index, unsafe.Pointer(C.CFISH_OBJ), false))
+		defer C.cfish_decref(unsafe.Pointer(indexC))
+		managerC := (*C.lucy_IndexManager)(clownfish.UnwrapNullable(manager))
+		cfObj := C.lucy_BGMerger_new(indexC, managerC)
+		bgm = WRAPBackgroundMerger(unsafe.Pointer(cfObj))
+	})
+	return bgm, err
+}
+
+func (bgm *BackgroundMergerIMP) PrepareCommit() error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_BackgroundMerger)(clownfish.Unwrap(bgm, "bgm"))
+		C.LUCY_BGMerger_Prepare_Commit(self)
+	})
+}
+
+func (bgm *BackgroundMergerIMP) Commit() error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_BackgroundMerger)(clownfish.Unwrap(bgm, "bgm"))
+		C.LUCY_BGMerger_Commit(self)
+	})
+}
+
+func (im *IndexManagerIMP) WriteMergeData(cutoff int64) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_IndexManager)(clownfish.Unwrap(im, "im"))
+		C.LUCY_IxManager_Write_Merge_Data(self, C.int64_t(cutoff))
+	})
+}
+
+func (im *IndexManagerIMP) ReadMergeData() (retval map[string]interface{}, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_IndexManager)(clownfish.Unwrap(im, "im"))
+		retvalC := C.LUCY_IxManager_Read_Merge_Data(self)
+		if retvalC != nil {
+			defer C.cfish_decref(unsafe.Pointer(retvalC))
+			retval = clownfish.ToGo(unsafe.Pointer(retvalC)).(map[string]interface{})
+		}
+	})
+	return retval, err
+}
+
+func (im *IndexManagerIMP) RemoveMergeData() error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_IndexManager)(clownfish.Unwrap(im, "im"))
+		C.LUCY_IxManager_Remove_Merge_Data(self)
+	})
+}
+
+func (im *IndexManagerIMP) MakeSnapshotFilename() (retval string, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_IndexManager)(clownfish.Unwrap(im, "im"))
+		retvalC := C.LUCY_IxManager_Make_Snapshot_Filename(self)
+		if retvalC != nil {
+			defer C.cfish_decref(unsafe.Pointer(retvalC))
+			retval = clownfish.ToGo(unsafe.Pointer(retvalC)).(string)
+		}
+	})
+	return retval, err
+}
+
+func (im *IndexManagerIMP) Recycle(reader PolyReader, delWriter DeletionsWriter,
+	cutoff int64, optimize bool) (retval []SegReader, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_IndexManager)(clownfish.Unwrap(im, "im"))
+		readerC := (*C.lucy_PolyReader)(clownfish.Unwrap(reader, "reader"))
+		delWriterC := (*C.lucy_DeletionsWriter)(clownfish.Unwrap(delWriter, "delWriter"))
+		vec := C.LUCY_IxManager_Recycle(self, readerC, delWriterC,
+			C.int64_t(cutoff), C.bool(optimize))
+		if vec != nil {
+			defer C.cfish_decref(unsafe.Pointer(vec))
+			size := int(C.CFISH_Vec_Get_Size(vec))
+			retval = make([]SegReader, size)
+			for i := 0; i < size; i++ {
+				elem := C.CFISH_Vec_Fetch(vec, C.size_t(i))
+				retval[i] = WRAPSegReader(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(elem))))
+			}
+		}
+	})
+	return retval, err
+}
+
+func NewTermVector(field, text string, positions, startOffsets, endOffsets []int32) TermVector {
+	fieldC := (*C.cfish_String)(clownfish.GoToClownfish(field, unsafe.Pointer(C.CFISH_STRING), false))
+	textC := (*C.cfish_String)(clownfish.GoToClownfish(text, unsafe.Pointer(C.CFISH_STRING), false))
+	defer C.cfish_decref(unsafe.Pointer(fieldC))
+	defer C.cfish_decref(unsafe.Pointer(textC))
+	posits := NewI32Array(positions)
+	starts := NewI32Array(startOffsets)
+	ends := NewI32Array(endOffsets)
+	positsC := (*C.lucy_I32Array)(clownfish.Unwrap(posits, "posits"))
+	startsC := (*C.lucy_I32Array)(clownfish.Unwrap(starts, "starts"))
+	endsC := (*C.lucy_I32Array)(clownfish.Unwrap(ends, "ends"))
+	retvalC := C.lucy_TV_new(fieldC, textC, positsC, startsC, endsC)
+	return WRAPTermVector(unsafe.Pointer(retvalC))
+}
+
+func (tv *TermVectorIMP) GetPositions() []int32 {
+	self := (*C.lucy_TermVector)(clownfish.Unwrap(tv, "tv"))
+	return i32ArrayToSlice(C.LUCY_TV_Get_Positions(self))
+}
+
+func (tv *TermVectorIMP) GetStartOffsets() []int32 {
+	self := (*C.lucy_TermVector)(clownfish.Unwrap(tv, "tv"))
+	return i32ArrayToSlice(C.LUCY_TV_Get_Start_Offsets(self))
+}
+
+func (tv *TermVectorIMP) GetEndOffsets() []int32 {
+	self := (*C.lucy_TermVector)(clownfish.Unwrap(tv, "tv"))
+	return i32ArrayToSlice(C.LUCY_TV_Get_End_Offsets(self))
+}
+
+func (s *SnapshotIMP) List() []string {
+	self := (*C.lucy_Snapshot)(clownfish.Unwrap(s, "s"))
+	retvalC := C.LUCY_Snapshot_List(self)
+	defer C.cfish_decref(unsafe.Pointer(retvalC))
+	return vecToStringSlice(retvalC)
+}
+
+func (s *SnapshotIMP) ReadFile(folder Folder, path string) (Snapshot, error) {
+	err := clownfish.TrapErr(func() {
+		self := (*C.lucy_Snapshot)(clownfish.Unwrap(s, "s"))
+		folderC := (*C.lucy_Folder)(clownfish.Unwrap(folder, "folder"))
+		pathC := (*C.cfish_String)(clownfish.GoToClownfish(path, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(pathC))
+		C.LUCY_Snapshot_Read_File(self, folderC, pathC)
+	})
+	return s, err
+}
+
+func (s *SnapshotIMP) WriteFile(folder Folder, path string) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Snapshot)(clownfish.Unwrap(s, "s"))
+		folderC := (*C.lucy_Folder)(clownfish.Unwrap(folder, "folder"))
+		pathC := (*C.cfish_String)(clownfish.GoToClownfish(path, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(pathC))
+		C.LUCY_Snapshot_Write_File(self, folderC, pathC)
+	})
+}
+
+func (s *SegmentIMP) WriteFile(folder Folder) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Segment)(clownfish.Unwrap(s, "s"))
+		folderC := (*C.lucy_Folder)(clownfish.Unwrap(folder, "folder"))
+		C.LUCY_Seg_Write_File(self, folderC)
+	})
+}
+
+func (s *SegmentIMP) ReadFile(folder Folder) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Segment)(clownfish.Unwrap(s, "s"))
+		folderC := (*C.lucy_Folder)(clownfish.Unwrap(folder, "folder"))
+		C.LUCY_Seg_Read_File(self, folderC)
 	})
 }
