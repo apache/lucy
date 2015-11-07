@@ -41,12 +41,12 @@ func TestSchemaFetchType(t *testing.T) {
 
 func TestSchemaFetchAnalyzer(t *testing.T) {
 	schema := createTestSchema()
-	analyzer := schema.FetchAnalyzer("content")
+	analyzer := schema.fetchAnalyzer("content")
 	if _, ok := analyzer.(StandardTokenizer); !ok {
-		t.Errorf("Unexpected result for FetchAnalyzer: %T", analyzer)
+		t.Errorf("Unexpected result for fetchAnalyzer: %T", analyzer)
 	}
-	if got := schema.FetchAnalyzer(""); got != nil {
-		t.Errorf("Expected nil from FetchAnalyzer, got %T %v", got, got)
+	if got := schema.fetchAnalyzer(""); got != nil {
+		t.Errorf("Expected nil from fetchAnalyzer, got %T %v", got, got)
 	}
 }
 
@@ -96,23 +96,23 @@ func TestSchemaAccessors(t *testing.T) {
 
 func TestSchemaDumpLoad(t *testing.T) {
 	schema := createTestSchema()
-	dupe := schema.Load(schema.Dump())
+	dupe := schema.load(schema.dump())
 	if _, ok := dupe.(Schema); !ok {
-		t.Errorf("Failed Dump/Load round trip produced a %T", dupe)
+		t.Errorf("Failed dump/load round trip produced a %T", dupe)
 	}
 }
 
 func TestSchemaWrite(t *testing.T) {
 	schema := createTestSchema()
 	folder := NewRAMFolder("")
-	schema.Write(folder, "serialized_schema.json")
+	schema.write(folder, "serialized_schema.json")
 }
 
 func TestSchemaEat(t *testing.T) {
 	cannibal := NewSchema()
-	cannibal.Eat(createTestSchema())
+	cannibal.eat(createTestSchema())
 	if _, ok := cannibal.FetchType("content").(FieldType); !ok {
-		t.Error("Failed to Eat other Schema")
+		t.Error("Failed to eat other Schema")
 	}
 }
 
@@ -135,21 +135,21 @@ func runFieldTypeTests(t *testing.T, ft FieldType) {
 		t.Errorf("SetSortable/Sortable")
 	}
 	ft.Binary()
-	ft.PrimitiveID()
+	ft.primitiveID()
 
-	// CompareValues, MakeTermStepper
-	if comparison := ft.CompareValues("foo", "bar"); comparison <= 0 {
-		t.Errorf("Unexpected CompareValues result: %d", comparison)
+	// compareValues, makeTermStepper
+	if comparison := ft.compareValues("foo", "bar"); comparison <= 0 {
+		t.Errorf("Unexpected compareValues result: %d", comparison)
 	}
 	switch ft.(type) {
 	case BlobType:
 	default:
-		if stepper, ok := ft.MakeTermStepper().(TermStepper); !ok {
-			t.Errorf("MakeTermStepper failed: %v", stepper)
+		if stepper, ok := ft.makeTermStepper().(TermStepper); !ok {
+			t.Errorf("makeTermStepper failed: %v", stepper)
 		}
 	}
 
-	// Equals, Dump/Load
+	// Equals, dump/load
 	if !ft.Equals(ft) {
 		t.Error("Equals self")
 	}
@@ -159,10 +159,10 @@ func runFieldTypeTests(t *testing.T, ft FieldType) {
 	if ft.Equals(NewStringType()) {
 		t.Error("Equals different field type")
 	}
-	ft.DumpForSchema()
-	dupe := ft.Load(ft.Dump()).(FieldType)
+	ft.dumpForSchema()
+	dupe := ft.load(ft.dump()).(FieldType)
 	if !ft.Equals(dupe) {
-		t.Errorf("Round-trip through Dump/Load produced %v", dupe)
+		t.Errorf("Round-trip through dump/load produced %v", dupe)
 	}
 	dupe.SetIndexed(true)
 	if ft.Equals(dupe) {
@@ -186,8 +186,8 @@ func TestFullTextTypeMisc(t *testing.T) {
 	if !ft.Highlightable() {
 		t.Error("SetHighlightable/Highlightable")
 	}
-	if sim, ok := ft.MakeSimilarity().(Similarity); !ok {
-		t.Errorf("MakeSimilarity: %v", sim)
+	if sim, ok := ft.makeSimilarity().(Similarity); !ok {
+		t.Errorf("makeSimilarity: %v", sim)
 	}
 	if _, ok := ft.GetAnalyzer().(StandardTokenizer); !ok {
 		t.Error("GetAnalyzer")
@@ -196,23 +196,23 @@ func TestFullTextTypeMisc(t *testing.T) {
 
 func TestStringTypeMisc(t *testing.T) {
 	ft := NewStringType();
-	if sim, ok := ft.MakeSimilarity().(Similarity); !ok {
-		t.Errorf("MakeSimilarity: %v", sim)
+	if sim, ok := ft.makeSimilarity().(Similarity); !ok {
+		t.Errorf("makeSimilarity: %v", sim)
 	}
 }
 
 func TestArchitectureBasics(t *testing.T) {
 	arch := NewArchitecture()
 
-	if got := arch.IndexInterval(); got < 0 {
-		t.Errorf("IndexInterval: %d", got)
+	if got := arch.indexInterval(); got < 0 {
+		t.Errorf("indexInterval: %d", got)
 	}
-	if got := arch.SkipInterval(); got < 0 {
-		t.Errorf("IndexInterval: %d", got)
+	if got := arch.skipInterval(); got < 0 {
+		t.Errorf("skipInterval: %d", got)
 	}
 
-	if sim, ok := arch.MakeSimilarity().(Similarity); !ok {
-		t.Errorf("MakeSimilarity: %v", sim)
+	if sim, ok := arch.makeSimilarity().(Similarity); !ok {
+		t.Errorf("makeSimilarity: %v", sim)
 	}
 
 	if !arch.Equals(arch) {

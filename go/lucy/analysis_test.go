@@ -34,7 +34,7 @@ func TestTokenBasics(t *testing.T) {
 	token.GetEndOffset()
 	token.GetBoost()
 	token.GetPosInc()
-	token.GetPos()
+	token.getPos()
 	token.GetLen()
 }
 
@@ -43,7 +43,7 @@ func TestInversionBasics(t *testing.T) {
 	inv.Append(NewToken("foo"))
 	inv.Append(NewToken("bar"))
 	inv.Append(NewToken("baz"))
-	if size := inv.GetSize(); size != 3 {
+	if size := inv.getSize(); size != 3 {
 		t.Errorf("Unexpected size: %d", size)
 	}
 
@@ -57,7 +57,7 @@ func TestInversionBasics(t *testing.T) {
 	}
 
 	inv.Reset()
-	inv.Invert()
+	inv.invert()
 	if got := inv.Next().GetText(); got != "bar" {
 		t.Errorf("Next after Invert yielded %s", got)
 	}

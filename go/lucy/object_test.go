@@ -46,10 +46,10 @@ func TestBitVecSingle(t *testing.T) {
 
 func TestBitVecMisc(t *testing.T) {
 	bitVec := NewBitVector(0)
-	oldCap := bitVec.GetCapacity()
+	oldCap := bitVec.getCapacity()
 	bitVec.Grow(64)
-	if newCap := bitVec.GetCapacity(); newCap <= oldCap {
-		t.Error("Grow/GetCapacity had unexpected result: %v %v", oldCap, newCap)
+	if newCap := bitVec.getCapacity(); newCap <= oldCap {
+		t.Error("Grow/getCapacity had unexpected result: %v %v", oldCap, newCap)
 	}
 	bitVec.Set(0)
 	bitVec.Set(63)
@@ -113,7 +113,7 @@ func TestBitVecBool(t *testing.T) {
 	}
 
 	dupe = seven.Clone().(BitVector)
-	dupe.Mimic(twelve)
+	dupe.mimic(twelve)
 	if count := dupe.Count(); count != twelve.Count() {
 		t.Errorf("Mimic: %d", count)
 	}

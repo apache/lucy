@@ -24,10 +24,10 @@ import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 func checkQuerySerialize(t *testing.T, query Query) {
 	folder := NewRAMFolder("")
 	outStream, _ := folder.OpenOut("foo")
-	query.Serialize(outStream)
+	query.serialize(outStream)
 	outStream.Close()
 	inStream, _ := folder.OpenIn("foo")
-	dupe := clownfish.GetClass(query).MakeObj().(Query).Deserialize(inStream)
+	dupe := clownfish.GetClass(query).MakeObj().(Query).deserialize(inStream)
 	if !query.Equals(dupe) {
 		t.Errorf("Unsuccessful serialization round trip -- expected '%v', got '%v'",
 				 query.ToString(), dupe.ToString())
@@ -365,7 +365,7 @@ func TestRangeMatcherBasics(t *testing.T) {
 	segReaders := searcher.GetReader().SegReaders()
 	segReader := segReaders[0].(SegReader)
 	sortReader := segReader.Obtain("Lucy::Index::SortReader").(SortReader)
-	sortCache := sortReader.FetchSortCache("content")
+	sortCache := sortReader.fetchSortCache("content")
 	matcher := NewRangeMatcher(0, 0, sortCache, segReader.DocMax())
 	if docID := matcher.Next(); docID != 4 {
 		t.Errorf("Next: %d", docID)
@@ -390,23 +390,23 @@ func TestTopDocsBasics(t *testing.T) {
 		NewMatchDoc(100, 3.0, nil),
 	}
 	td := NewTopDocs(matchDocs, 50)
-	td.SetTotalHits(20)
-	if totalHits := td.GetTotalHits(); totalHits != 20 {
+	td.setTotalHits(20)
+	if totalHits := td.getTotalHits(); totalHits != 20 {
 		t.Errorf("Expected 20 total hits, got %d", totalHits)
 	}
 	td.SetMatchDocs(matchDocs)
 	fetched := td.GetMatchDocs()
-	if docID := fetched[0].GetDocID(); docID != 42 {
+	if docID := fetched[0].getDocID(); docID != 42 {
 		t.Errorf("Set/Get MatchDocs expected 42, got %d", docID)
 	}
 
 	folder := NewRAMFolder("")
 	outstream, _ := folder.OpenOut("foo")
-	td.Serialize(outstream)
+	td.serialize(outstream)
 	outstream.Close()
 	inStream, _ := folder.OpenIn("foo")
-	dupe := clownfish.GetClass(td).MakeObj().(TopDocs).Deserialize(inStream)
-	if dupe.GetTotalHits() != td.GetTotalHits() {
+	dupe := clownfish.GetClass(td).MakeObj().(TopDocs).deserialize(inStream)
+	if dupe.getTotalHits() != td.getTotalHits() {
 		t.Errorf("Failed round-trip serializetion of TopDocs")
 	}
 }
@@ -418,9 +418,9 @@ type simpleTestDoc struct {
 func TestHitsBasics(t *testing.T) {
 	index := createTestIndex("a", "b")
 	searcher, _ := OpenIndexSearcher(index)
-	topDocs := searcher.TopDocs(NewTermQuery("content", "a"), 10, nil)
+	topDocs := searcher.topDocs(NewTermQuery("content", "a"), 10, nil)
 	hits := NewHits(searcher, topDocs, 0)
-	if got := hits.TotalHits(); got != topDocs.GetTotalHits() {
+	if got := hits.TotalHits(); got != topDocs.getTotalHits() {
 		t.Errorf("TotalHits is off: %d", got)
 	}
 	var doc simpleTestDoc
@@ -491,10 +491,10 @@ func TestSortSpecBasics(t *testing.T) {
 	}
 
 	outstream, _ := folder.OpenOut("foo")
-	sortSpec.Serialize(outstream)
+	sortSpec.serialize(outstream)
 	outstream.Close()
 	inStream, _ := folder.OpenIn("foo")
-	dupe := clownfish.GetClass(sortSpec).MakeObj().(SortSpec).Deserialize(inStream)
+	dupe := clownfish.GetClass(sortSpec).MakeObj().(SortSpec).deserialize(inStream)
 	if len(dupe.GetRules()) != len(rules) {
 		t.Errorf("Failed round-trip serializetion of SortSpec")
 	}
@@ -504,27 +504,27 @@ func TestHitQueueBasics(t *testing.T) {
 	hitQ := NewHitQueue(nil, nil, 1)
 	fortyTwo := NewMatchDoc(42, 1.0, nil)
 	fortyThree := NewMatchDoc(43, 1.0, nil)
-	if !hitQ.LessThan(fortyThree, fortyTwo) {
-		t.Error("LessThan")
+	if !hitQ.lessThan(fortyThree, fortyTwo) {
+		t.Error("lessThan")
 	}
-	if !hitQ.Insert(fortyTwo) {
-		t.Error("Insert")
+	if !hitQ.insert(fortyTwo) {
+		t.Error("insert")
 	}
-	if hitQ.GetSize() != 1 {
-		t.Error("GetSize")
+	if hitQ.getSize() != 1 {
+		t.Error("getSize")
 	}
-	if bumped := hitQ.Jostle(fortyThree); bumped.(MatchDoc).GetDocID() != 43 {
-		t.Error("Jostle")
+	if bumped := hitQ.jostle(fortyThree); bumped.(MatchDoc).getDocID() != 43 {
+		t.Error("jostle")
 	}
-	if peeked := hitQ.Peek(); peeked.(MatchDoc).GetDocID() != 42 {
-		t.Error("Peek")
+	if peeked := hitQ.peek(); peeked.(MatchDoc).getDocID() != 42 {
+		t.Error("peek")
 	}
-	if popped := hitQ.Pop(); popped.(MatchDoc).GetDocID() != 42 {
-		t.Error("Pop")
+	if popped := hitQ.pop(); popped.(MatchDoc).getDocID() != 42 {
+		t.Error("pop")
 	}
-	hitQ.Insert(fortyTwo)
-	if got := hitQ.PopAll(); got[0].(MatchDoc).GetDocID() != 42 {
-		t.Error("PopAll")
+	hitQ.insert(fortyTwo)
+	if got := hitQ.popAll(); got[0].(MatchDoc).getDocID() != 42 {
+		t.Error("popAll")
 	}
 }
 
@@ -583,11 +583,11 @@ func TestSortCollectorBasics(t *testing.T) {
 	searcher, _ := OpenIndexSearcher(index)
 	collector := NewSortCollector(nil, nil, 1)
 	searcher.Collect(NewTermQuery("content", "a"), collector)
-	if totalHits := collector.GetTotalHits(); totalHits != 2 {
+	if totalHits := collector.getTotalHits(); totalHits != 2 {
 		t.Errorf("Unexpected TotalHits: %d", totalHits)
 	}
 	matchDocs := collector.PopMatchDocs()
-	if docID := matchDocs[0].GetDocID(); docID != 1 {
+	if docID := matchDocs[0].getDocID(); docID != 1 {
 		t.Errorf("Weird MatchDoc: %d", docID)
 	}
 }
@@ -604,7 +604,7 @@ func TestIndexSearcherMisc(t *testing.T) {
 	if _, ok := searcher.GetReader().(PolyReader); !ok {
 		t.Error("GetReader")
 	}
-	if _, ok := searcher.FetchDocVec(4).(DocVector); !ok {
+	if _, ok := searcher.fetchDocVec(4).(DocVector); !ok {
 		t.Error("DocVector")
 	}
 }
@@ -640,9 +640,9 @@ func TestIndexSearcherHits(t *testing.T) {
 func TestIndexSearcherTopDocs(t *testing.T) {
 	index := createTestIndex("a", "b")
 	searcher, _ := OpenIndexSearcher(index)
-	topDocs := searcher.TopDocs(NewTermQuery("content", "b"), 10, nil)
+	topDocs := searcher.topDocs(NewTermQuery("content", "b"), 10, nil)
 	matchDocs := topDocs.GetMatchDocs()
-	if docID := matchDocs[0].GetDocID(); docID != 2 {
+	if docID := matchDocs[0].getDocID(); docID != 2 {
 		t.Errorf("TopDocs expected 2, got %d", docID)
 	}
 }
@@ -679,18 +679,18 @@ func TestIndexSearcherReadDoc(t *testing.T) {
 
 func TestMatchDocBasics(t *testing.T) {
 	matchDoc := NewMatchDoc(0, 1.0, nil)
-	matchDoc.SetDocID(42)
-	if got := matchDoc.GetDocID(); got != 42 {
-		t.Errorf("Set/GetDocID: %d", got)
+	matchDoc.setDocID(42)
+	if got := matchDoc.getDocID(); got != 42 {
+		t.Errorf("set/getDocID: %d", got)
 	}
-	matchDoc.SetScore(1.5)
-	if got := matchDoc.GetScore(); got != 1.5 {
-		t.Errorf("Set/GetScore: %f", got)
+	matchDoc.setScore(1.5)
+	if got := matchDoc.getScore(); got != 1.5 {
+		t.Errorf("set/getScore: %f", got)
 	}
 	values := []interface{}{"foo", int64(42)}
-	matchDoc.SetValues(values)
-	if got := matchDoc.GetValues(); !reflect.DeepEqual(got, values) {
-		t.Error("Get/SetValues")
+	matchDoc.setValues(values)
+	if got := matchDoc.getValues(); !reflect.DeepEqual(got, values) {
+		t.Error("get/setValues")
 	}
 }
 
@@ -699,11 +699,11 @@ func TestMatchDocSerialization(t *testing.T) {
 	matchDoc := NewMatchDoc(100, 1.5, values)
 	folder := NewRAMFolder("")
 	outstream, _ := folder.OpenOut("foo")
-	matchDoc.Serialize(outstream)
+	matchDoc.serialize(outstream)
 	outstream.Close()
 	inStream, _ := folder.OpenIn("foo")
-	dupe := clownfish.GetClass(matchDoc).MakeObj().(MatchDoc).Deserialize(inStream)
-	if got := dupe.GetValues(); !reflect.DeepEqual(got, values) {
+	dupe := clownfish.GetClass(matchDoc).MakeObj().(MatchDoc).deserialize(inStream)
+	if got := dupe.getValues(); !reflect.DeepEqual(got, values) {
 		t.Errorf("Failed round-trip serializetion of MatchDoc")
 	}
 }
