@@ -45,7 +45,6 @@ abstract class Lucy::Util::SortExternal nickname SortEx
     Obj          **scratch;
     uint32_t       scratch_cap;
     Vector        *runs;
-    uint32_t       num_slices;
     Obj         ***slice_starts;
     uint32_t      *slice_sizes;
     uint32_t       mem_thresh;
@@ -57,7 +56,7 @@ abstract class Lucy::Util::SortExternal nickname SortEx
     /** Compare two sortable elements.
      */
     abstract int
-    Compare(SortExternal *self, void *va, void *vb);
+    Compare(SortExternal *self, Obj **ptr_a, Obj **ptr_b);
 
     /** Flush all elements currently in the buffer.
      *

@@ -30,6 +30,12 @@ static void
 S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
                 Obj **endpost);
 
+static void
+S_merge(SortExternal *self,
+        Obj **left_ptr,  size_t left_size,
+        Obj **right_ptr, size_t right_size,
+        Obj **dest, SortEx_Compare_t compare);
+
 // Return the address for the item in one of the runs' buffers which is the
 // highest in sort order, but which we can guarantee is lower in sort order
 // than any item which has yet to enter a run buffer.
@@ -55,7 +61,6 @@ SortEx_init(SortExternal *self) {
     ivars->runs         = Vec_new(0);
     ivars->slice_sizes  = NULL;
     ivars->slice_starts = NULL;
-    ivars->num_slices   = 0;
     ivars->flipped      = false;
 
     ABSTRACT_CLASS_CHECK(self, SORTEXTERNAL);
@@ -261,81 +266,119 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
     Obj      ***slice_starts = ivars->slice_starts;
     uint32_t   *slice_sizes  = ivars->slice_sizes;
     Class      *klass        = SortEx_get_class(self);
-    CFISH_Sort_Compare_t compare
-        = (CFISH_Sort_Compare_t)METHOD_PTR(klass, LUCY_SortEx_Compare);
+    SortEx_Compare_t compare = METHOD_PTR(klass, LUCY_SortEx_Compare);
 
     if (ivars->buf_max != 0) { THROW(ERR, "Can't refill unless empty"); }
 
-    // Move all the elements in range into the main buffer as slices.
+    // Find non-empty slices.
+    uint32_t num_slices = 0;
+    uint32_t total_size = 0;
     for (uint32_t i = 0; i < num_runs; i++) {
         SortExternal *const run = (SortExternal*)Vec_Fetch(ivars->runs, i);
         SortExternalIVARS *const run_ivars = SortEx_IVARS(run);
         uint32_t slice_size = S_find_slice_size(run, run_ivars, endpost);
 
         if (slice_size) {
-            // Move slice content from run buffer to main buffer.
-            if (ivars->buf_max + slice_size > ivars->buf_cap) {
-                size_t cap = Memory_oversize(ivars->buf_max + slice_size,
-                                             sizeof(Obj*));
-                SortEx_Grow_Buffer(self, cap);
-            }
-            memcpy(ivars->buffer + ivars->buf_max,
-                   run_ivars->buffer + run_ivars->buf_tick,
-                   slice_size * sizeof(Obj*));
+            // Track slice start and size.
+            slice_starts[num_slices] = run_ivars->buffer + run_ivars->buf_tick;
+            slice_sizes[num_slices]  = slice_size;
             run_ivars->buf_tick += slice_size;
-            ivars->buf_max += slice_size;
 
-            // Track number of slices and slice sizes.
-            slice_sizes[ivars->num_slices++] = slice_size;
+            num_slices++;
+            total_size += slice_size;
         }
     }
 
-    // Transform slice starts from ticks to pointers.
-    uint32_t total = 0;
-    for (uint32_t i = 0; i < ivars->num_slices; i++) {
-        slice_starts[i] = ivars->buffer + total;
-        total += slice_sizes[i];
+    if (num_slices == 0) { return; }
+
+    if (ivars->buf_cap < total_size) {
+        size_t cap = Memory_oversize(total_size, sizeof(Obj*));
+        SortEx_Grow_Buffer(self, cap);
+    }
+    ivars->buf_max = total_size;
+
+    if (num_slices == 1) {
+        // Copy single slice content from run buffer to main buffer.
+        memcpy(ivars->buffer, slice_starts[0], total_size * sizeof(Obj*));
+        return;
     }
 
-    // The main buffer now consists of several slices.  Sort the main buffer,
-    // but exploit the fact that each slice is already sorted.
-    if (ivars->scratch_cap < ivars->buf_cap) {
-        ivars->scratch_cap = ivars->buf_cap;
+    // There are more than two slices to merge.
+    if (ivars->scratch_cap < total_size) {
+        ivars->scratch_cap = total_size;
         ivars->scratch = (Obj**)REALLOCATE(
                             ivars->scratch, ivars->scratch_cap * sizeof(Obj*));
     }
 
-    // Exploit previous sorting, rather than sort buffer naively.
-    // Leave the first slice intact if the number of slices is odd. */
-    while (ivars->num_slices > 1) {
+    // Divide-and-conquer k-way merge.
+    while (num_slices > 1) {
         uint32_t i = 0;
         uint32_t j = 0;
+        Obj **dest = ivars->scratch;
 
-        while (i < ivars->num_slices) {
-            if (ivars->num_slices - i >= 2) {
+        while (i < num_slices) {
+            if (num_slices - i >= 2) {
                 // Merge two consecutive slices.
                 const uint32_t merged_size = slice_sizes[i] + slice_sizes[i + 1];
-                Sort_merge(slice_starts[i], slice_sizes[i],
-                           slice_starts[i + 1], slice_sizes[i + 1], ivars->scratch,
-                           sizeof(Obj*), compare, self);
+                S_merge(self,
+                        slice_starts[i], slice_sizes[i],
+                        slice_starts[i + 1], slice_sizes[i + 1],
+                        dest, compare);
                 slice_sizes[j]  = merged_size;
-                slice_starts[j] = slice_starts[i];
-                memcpy(slice_starts[j], ivars->scratch, merged_size * sizeof(Obj*));
+                slice_starts[j] = dest;
+                dest += merged_size;
                 i += 2;
                 j += 1;
             }
-            else if (ivars->num_slices - i >= 1) {
-                // Move single slice pointer.
+            else if (num_slices - i >= 1) {
+                // Move last slice.
+                memcpy(dest, slice_starts[i], slice_sizes[i] * sizeof(Obj*));
                 slice_sizes[j]  = slice_sizes[i];
-                slice_starts[j] = slice_starts[i];
+                slice_starts[j] = dest;
                 i += 1;
                 j += 1;
             }
         }
-        ivars->num_slices = j;
-    }
+        num_slices = j;
 
-    ivars->num_slices = 0;
+        // Swap scratch and buffer.
+        Obj      **tmp_buf = ivars->buffer;
+        uint32_t   tmp_cap = ivars->buf_cap;
+        ivars->buffer      = ivars->scratch;
+        ivars->buf_cap     = ivars->scratch_cap;
+        ivars->scratch     = tmp_buf;
+        ivars->scratch_cap = tmp_cap;
+    }
+}
+
+// Assumes left_size > 0 and right_size > 0.
+static void
+S_merge(SortExternal *self,
+        Obj **left_ptr,  size_t left_size,
+        Obj **right_ptr, size_t right_size,
+        Obj **dest, SortEx_Compare_t compare) {
+
+    Obj **left_limit  = left_ptr  + left_size;
+    Obj **right_limit = right_ptr + right_size;
+
+    while (1) {
+        if (compare(self, left_ptr, right_ptr) <= 0) {
+            *dest++ = *left_ptr++;
+            if (left_ptr >= left_limit) {
+                right_size = right_limit - right_ptr;
+                memcpy(dest, right_ptr, right_size * sizeof(Obj*));
+                break;
+            }
+        }
+        else {
+            *dest++ = *right_ptr++;
+            if (right_ptr >= right_limit) {
+                left_size = left_limit - left_ptr;
+                memcpy(dest, left_ptr, left_size * sizeof(Obj*));
+                break;
+            }
+        }
+    }
 }
 
 void

@@ -85,7 +85,7 @@ class Lucy::Index::PostingPool nickname PostPool
     /** Compares two non-NULL RawPosting objects.
      */
     int
-    Compare(PostingPool *self, void *va, void *vb);
+    Compare(PostingPool *self, Obj **ptr_a, Obj **ptr_b);
 
     void
     Finish(PostingPool *self);

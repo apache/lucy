@@ -83,7 +83,7 @@ class Lucy::Index::SortFieldWriter
     Finish(SortFieldWriter *self);
 
     int
-    Compare(SortFieldWriter *self, void *va, void *vb);
+    Compare(SortFieldWriter *self, Obj **ptr_a, Obj **ptr_b);
 
     int32_t
     Get_Null_Ord(SortFieldWriter *self);
