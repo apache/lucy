@@ -105,6 +105,10 @@ func TestCoreAnalyzers(t *testing.T) {
 	runAnalyzerTests(t, NewSnowballStemmer("en"))
 	runAnalyzerTests(t, NewSnowballStopFilter("en", nil))
 	runAnalyzerTests(t, NewStandardTokenizer())
+
+	children := []Analyzer{NewStandardTokenizer(), NewNormalizer("NFKC", true, false)}
+	polyAnalyzer := NewPolyAnalyzer(children)
+	runAnalyzerTests(t, polyAnalyzer)
 }
 
 func TestRegexTokenizerSplit(t *testing.T) {

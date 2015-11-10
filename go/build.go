@@ -145,6 +145,11 @@ func specClasses(parcel *cfc.Parcel) {
 	analyzerBinding.SpecMethod("Split", "Split(string) []string")
 	analyzerBinding.Register()
 
+	polyAnalyzerBinding := cfc.NewGoClass(parcel, "Lucy::Analysis::PolyAnalyzer")
+	polyAnalyzerBinding.SpecMethod("Get_Analyzers", "GetAnalyzers() []Analyzer")
+	polyAnalyzerBinding.SetSuppressCtor(true)
+	polyAnalyzerBinding.Register()
+
 	indexerBinding := cfc.NewGoClass(parcel, "Lucy::Index::Indexer")
 	indexerBinding.SpecMethod("", "Close() error")
 	indexerBinding.SpecMethod("Add_Doc", "AddDoc(doc interface{}) error")
