@@ -49,7 +49,8 @@ ANDQuery_To_String_IMP(ANDQuery *self) {
     uint32_t num_kids = Vec_Get_Size(ivars->children);
     if (!num_kids) { return Str_new_from_trusted_utf8("()", 2); }
     else {
-        CharBuf *buf = CB_new_from_trusted_utf8("(", 1);
+        CharBuf *buf = CB_new(0);
+        CB_Cat_Trusted_Utf8(buf, "(", 1);
         for (uint32_t i = 0; i < num_kids; i++) {
             String *kid_string = Obj_To_String(Vec_Fetch(ivars->children, i));
             CB_Cat(buf, kid_string);

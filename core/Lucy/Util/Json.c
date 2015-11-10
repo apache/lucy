@@ -89,7 +89,7 @@ S_cat_whitespace(CharBuf *buf, int32_t depth);
 // Set the global error object, appending escaped JSON in the vicinity of the
 // error.
 static void
-S_set_error(CharBuf *buf, const char *json, const char *limit, int line,
+S_set_error(const char *mess, const char *json, const char *limit, int line,
             const char *func);
 #define SET_ERROR(_mess, _json, _end) \
     S_set_error(_mess, _json, _end, __LINE__, CFISH_ERR_FUNC_MACRO)
@@ -480,7 +480,7 @@ S_do_parse_json(void *json_parser, const char *json, size_t len) {
         }
         LucyParseJson(json_parser, token_type, value, &state);
         if (state.errors) {
-            SET_ERROR(CB_newf("JSON syntax error"), save, end);
+            SET_ERROR("JSON syntax error", save, end);
             return NULL;
         }
     }
@@ -488,7 +488,7 @@ S_do_parse_json(void *json_parser, const char *json, size_t len) {
     // Finish up.
     LucyParseJson(json_parser, 0, NULL, &state);
     if (state.errors) {
-        SET_ERROR(CB_newf("JSON syntax error"), json, end);
+        SET_ERROR("JSON syntax error", json, end);
         return NULL;
     }
     return state.result;
@@ -527,7 +527,7 @@ S_parse_number(const char **json_ptr, const char *limit) {
         }
     }
     if (!result) {
-        SET_ERROR(CB_newf("JSON syntax error"), top, limit);
+        SET_ERROR("JSON syntax error", top, limit);
     }
     return result;
 }
@@ -554,7 +554,7 @@ S_parse_string(const char **json_ptr, const char *limit) {
         }
     }
     if (!end) {
-        SET_ERROR(CB_newf("Unterminated string"), *json_ptr, limit);
+        SET_ERROR("Unterminated string", *json_ptr, limit);
         return NULL;
     }
 
@@ -628,12 +628,12 @@ S_unescape_text(const char *top, const char *end) {
                         char *temp_ptr = temp;
                         if (num_end != temp_ptr + 4 || code_point < 0) {
                             FREEMEM(target_buf);
-                            SET_ERROR(CB_newf("Invalid \\u escape"), text - 5, end);
+                            SET_ERROR("Invalid \\u escape", text - 5, end);
                             return NULL;
                         }
                         if (code_point >= 0xD800 && code_point <= 0xDFFF) {
                             FREEMEM(target_buf);
-                            SET_ERROR(CB_newf("Surrogate pairs not supported"),
+                            SET_ERROR("Surrogate pairs not supported",
                                       text - 5, end);
                             return NULL;
                         }
@@ -643,7 +643,7 @@ S_unescape_text(const char *top, const char *end) {
                     break;
                 default:
                     FREEMEM(target_buf);
-                    SET_ERROR(CB_newf("Illegal escape"), text - 1, end);
+                    SET_ERROR("Illegal escape", text - 1, end);
                     return NULL;
             }
         }
@@ -674,8 +674,11 @@ SI_check_keyword(const char *json, const char* end, const char *keyword,
 }
 
 static void
-S_set_error(CharBuf *buf, const char *json, const char *limit, int line,
+S_set_error(const char *mess, const char *json, const char *limit, int line,
             const char *func) {
+    CharBuf *buf = CB_new(0);
+    CB_Cat_Utf8(buf, mess, strlen(mess));
+
     if (func) {
         CB_catf(buf, " at %s %s line %i32 near ", func, __FILE__,
                  (int32_t)line);
@@ -696,11 +699,11 @@ S_set_error(CharBuf *buf, const char *json, const char *limit, int line,
     String *snippet = SSTR_WRAP_UTF8(json, (size_t)len);
     S_append_json_string(snippet, buf);
 
-    String *mess = CB_Yield_String(buf);
+    String *full_mess = CB_Yield_String(buf);
     DECREF(buf);
 
     // Set global error object.
-    Err_set_error(Err_new(mess));
+    Err_set_error(Err_new(full_mess));
 }
 
 int64_t
