@@ -21,7 +21,7 @@
 #include "Lucy/Plan/TextType.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/ByteBuf.h"
 #include "Clownfish/Util/StringHelper.h"
 
 TermStepper*
@@ -49,14 +49,14 @@ TextTermStepper*
 TextTermStepper_init(TextTermStepper *self) {
     TermStepper_init((TermStepper*)self);
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
-    ivars->charbuf = CB_new(0);
+    ivars->bytebuf = BB_new(0);
     return self;
 }
 
 void
 TextTermStepper_Destroy_IMP(TextTermStepper *self) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
-    DECREF(ivars->charbuf);
+    DECREF(ivars->bytebuf);
     SUPER_DESTROY(self, TEXTTERMSTEPPER);
 }
 
@@ -78,7 +78,7 @@ Obj*
 TextTermStepper_Get_Value_IMP(TextTermStepper *self) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
     if (ivars->value == NULL) {
-        ivars->value = (Obj*)CB_To_String(ivars->charbuf);
+        ivars->value = (Obj*)BB_Trusted_Utf8_To_String(ivars->bytebuf);
     }
     return ivars->value;
 }
@@ -88,7 +88,7 @@ TextTermStepper_Reset_IMP(TextTermStepper *self) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
     DECREF(ivars->value);
     ivars->value = NULL;
-    CB_Set_Size(ivars->charbuf, 0);
+    BB_Set_Size(ivars->bytebuf, 0);
 }
 
 void
@@ -107,9 +107,9 @@ void
 TextTermStepper_Write_Delta_IMP(TextTermStepper *self, OutStream *outstream,
                                 Obj *value) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
-    CharBuf    *charbuf  = (CharBuf*)CERTIFY(value, CHARBUF);
-    const char *new_text = CB_Get_Ptr8(charbuf);
-    size_t      new_size = CB_Get_Size(charbuf);
+    ByteBuf    *bytebuf  = (ByteBuf*)CERTIFY(value, BYTEBUF);
+    const char *new_text = BB_Get_Buf(bytebuf);
+    size_t      new_size = BB_Get_Size(bytebuf);
 
     const char *last_text;
     size_t      last_size;
@@ -119,8 +119,8 @@ TextTermStepper_Write_Delta_IMP(TextTermStepper *self, OutStream *outstream,
         last_size = Str_Get_Size(last_string);
     }
     else {
-        last_text = CB_Get_Ptr8(ivars->charbuf);
-        last_size = CB_Get_Size(ivars->charbuf);
+        last_text = BB_Get_Buf(ivars->bytebuf);
+        last_size = BB_Get_Size(ivars->bytebuf);
     }
 
     // Count how many bytes the strings share at the top.
@@ -134,7 +134,7 @@ TextTermStepper_Write_Delta_IMP(TextTermStepper *self, OutStream *outstream,
     OutStream_Write_String(outstream, diff_start_str, diff_len);
 
     // Update value.
-    CB_Mimic_Utf8(ivars->charbuf, new_text, new_size);
+    BB_Mimic_Bytes(ivars->bytebuf, new_text, new_size);
 
     // Invalidate string value.
     DECREF(ivars->value);
@@ -148,11 +148,11 @@ TextTermStepper_Read_Key_Frame_IMP(TextTermStepper *self,
     const uint32_t text_len = InStream_Read_C32(instream);
 
     // Allocate space.
-    char *ptr = CB_Grow(ivars->charbuf, text_len);
+    char *ptr = BB_Grow(ivars->bytebuf, text_len);
 
     // Set the value text.
     InStream_Read_Bytes(instream, ptr, text_len);
-    CB_Set_Size(ivars->charbuf, text_len);
+    BB_Set_Size(ivars->bytebuf, text_len);
     if (!StrHelp_utf8_valid(ptr, text_len)) {
         THROW(ERR, "Invalid UTF-8 sequence in '%o' at byte %i64",
               InStream_Get_Filename(instream),
@@ -176,13 +176,13 @@ TextTermStepper_Read_Delta_IMP(TextTermStepper *self, InStream *instream) {
 
     // Allocate space.
     if (ivars->value) {
-        CB_Mimic(ivars->charbuf, ivars->value);
+        BB_Mimic(ivars->bytebuf, ivars->value);
     }
-    char *ptr = CB_Grow(ivars->charbuf, total_text_len);
+    char *ptr = BB_Grow(ivars->bytebuf, total_text_len);
 
     // Set the value text.
     InStream_Read_Bytes(instream, ptr + text_overlap, finish_chars_len);
-    CB_Set_Size(ivars->charbuf, total_text_len);
+    BB_Set_Size(ivars->bytebuf, total_text_len);
     if (!StrHelp_utf8_valid(ptr, total_text_len)) {
         THROW(ERR, "Invalid UTF-8 sequence in '%o' at byte %i64",
               InStream_Get_Filename(instream),
