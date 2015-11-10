@@ -603,8 +603,8 @@ S_encode_entities(String *text, CharBuf *buf) {
         }
     }
 
+    CB_Clear(buf);
     CB_Grow(buf, space);
-    CB_Set_Size(buf, 0);
     DECREF(iter);
     iter = Str_Top(text);
     while (STR_OOB != (code_point = StrIter_Next(iter))) {

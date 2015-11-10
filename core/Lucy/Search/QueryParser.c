@@ -830,7 +830,7 @@ S_unescape(QueryParser *self, String *orig, CharBuf *buf) {
     int32_t code_point;
     UNUSED_VAR(self);
 
-    CB_Set_Size(buf, 0);
+    CB_Clear(buf);
     CB_Grow(buf, Str_Get_Size(orig) + 4);
 
     while (STR_OOB != (code_point = StrIter_Next(iter))) {
