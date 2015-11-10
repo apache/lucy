@@ -170,6 +170,11 @@ Simple_Get_Indexer_IMP(Simple *self) {
     return ivars->indexer;
 }
 
+Hits*
+Simple_Get_Hits_IMP(Simple *self) {
+    return Simple_IVARS(self)->hits;
+}
+
 void
 Simple_Finish_Indexing_IMP(Simple *self) {
     SimpleIVARS *const ivars = Simple_IVARS(self);

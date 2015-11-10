@@ -90,6 +90,9 @@ public class Lucy::Simple {
     Indexer*
     Get_Indexer(Simple *self);
 
+    nullable Hits*
+    Get_Hits(Simple *self);
+
     void
     Finish_Indexing(Simple *self);
 
