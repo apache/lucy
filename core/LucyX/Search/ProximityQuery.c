@@ -151,7 +151,8 @@ String*
 ProximityQuery_To_String_IMP(ProximityQuery *self) {
     ProximityQueryIVARS *const ivars = ProximityQuery_IVARS(self);
     uint32_t num_terms = Vec_Get_Size(ivars->terms);
-    CharBuf *buf = CB_new_from_str(ivars->field);
+    CharBuf *buf = CB_new(0);
+    CB_Cat(buf, ivars->field);
     CB_Cat_Trusted_Utf8(buf, ":\"", 2);
     for (uint32_t i = 0; i < num_terms; i++) {
         Obj *term = Vec_Fetch(ivars->terms, i);
