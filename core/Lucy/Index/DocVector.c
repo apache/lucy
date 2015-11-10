@@ -123,7 +123,7 @@ S_extract_tv_cache(Blob *field_buf) {
     Hash       *tv_cache  = Hash_new(0);
     const char *tv_string = Blob_Get_Buf(field_buf);
     int32_t     num_terms = NumUtil_decode_c32(&tv_string);
-    CharBuf    *text_buf  = CB_new(0);
+    ByteBuf    *text_buf  = BB_new(0);
 
     // Read the number of highlightable terms in the field.
     for (int32_t i = 0; i < num_terms; i++) {
@@ -131,8 +131,8 @@ S_extract_tv_cache(Blob *field_buf) {
         size_t   len     = NumUtil_decode_c32(&tv_string);
 
         // Decompress the term text.
-        CB_Set_Size(text_buf, overlap);
-        CB_Cat_Trusted_Utf8(text_buf, tv_string, len);
+        BB_Set_Size(text_buf, overlap);
+        BB_Cat_Bytes(text_buf, tv_string, len);
         tv_string += len;
 
         // Get positions & offsets string.
@@ -147,7 +147,7 @@ S_extract_tv_cache(Blob *field_buf) {
         len = tv_string - bookmark_ptr;
 
         // Store the $text => $posdata pair in the output hash.
-        String *text = CB_To_String(text_buf);
+        String *text = BB_Trusted_Utf8_To_String(text_buf);
         Hash_Store(tv_cache, text, (Obj*)Blob_new(bookmark_ptr, len));
         DECREF(text);
     }
