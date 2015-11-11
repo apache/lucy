@@ -88,6 +88,24 @@ func (s *SearcherIMP) ReadDoc(docID int32, doc interface{}) error {
 	}
 }
 
+func (s *SearcherIMP) FetchDoc(docID int32) (doc HitDoc, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Searcher)(clownfish.Unwrap(s, "s"))
+		docC := C.LUCY_Searcher_Fetch_Doc(self, C.int32_t(docID))
+		doc = WRAPHitDoc(unsafe.Pointer(docC))
+	})
+	return doc, err
+}
+
+func (s *SearcherIMP) fetchDocVec(docID int32) (dv DocVector, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Searcher)(clownfish.Unwrap(s, "s"))
+		dvC := C.LUCY_Searcher_Fetch_Doc_Vec(self, C.int32_t(docID))
+		dv = WRAPDocVector(unsafe.Pointer(dvC))
+	})
+	return dv, err
+}
+
 func (s *SearcherIMP) Close() error {
 	return clownfish.TrapErr(func() {
 		self := (*C.lucy_Searcher)(clownfish.Unwrap(s, "s"))
@@ -107,6 +125,19 @@ func (s *SearcherIMP) Hits(query interface{}, offset uint32, numWanted uint32,
 		hits = WRAPHits(unsafe.Pointer(hitsC))
 	})
 	return hits, err
+}
+
+func (s *SearcherIMP) topDocs(query Query, numWanted uint32,
+	sortSpec SortSpec) (topDocs TopDocs, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Searcher)(clownfish.Unwrap(s, "s"))
+		sortSpecC := (*C.lucy_SortSpec)(clownfish.UnwrapNullable(sortSpec))
+		queryC := (*C.lucy_Query)(clownfish.Unwrap(query, "query"))
+		topDocsC := C.LUCY_Searcher_Top_Docs(self, queryC,
+			C.uint32_t(numWanted), sortSpecC)
+		topDocs = WRAPTopDocs(unsafe.Pointer(topDocsC))
+	})
+	return topDocs, err
 }
 
 type setScorer interface {

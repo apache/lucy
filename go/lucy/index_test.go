@@ -334,7 +334,7 @@ func TestDocVectorMisc(t *testing.T) {
 	indexer.AddDoc(&testDoc{Content: "foo bar baz"})
 	indexer.Commit()
 	searcher, _ := OpenIndexSearcher(folder)
-	dv := searcher.fetchDocVec(1)
+	dv, _ := searcher.fetchDocVec(1)
 	fieldBuf := dv.fieldBuf("content");
 	if fieldBuf == nil {
 		t.Errorf("fieldBuf returned nil")

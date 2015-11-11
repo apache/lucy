@@ -418,7 +418,7 @@ type simpleTestDoc struct {
 func TestHitsBasics(t *testing.T) {
 	index := createTestIndex("a", "b")
 	searcher, _ := OpenIndexSearcher(index)
-	topDocs := searcher.topDocs(NewTermQuery("content", "a"), 10, nil)
+	topDocs, _ := searcher.topDocs(NewTermQuery("content", "a"), 10, nil)
 	hits := NewHits(searcher, topDocs, 0)
 	if got := hits.TotalHits(); got != topDocs.getTotalHits() {
 		t.Errorf("TotalHits is off: %d", got)
@@ -604,8 +604,13 @@ func TestIndexSearcherMisc(t *testing.T) {
 	if _, ok := searcher.GetReader().(PolyReader); !ok {
 		t.Error("GetReader")
 	}
-	if _, ok := searcher.fetchDocVec(4).(DocVector); !ok {
-		t.Error("DocVector")
+	doc, err := searcher.FetchDoc(4)
+	if _, ok := doc.(Doc); !ok || err != nil {
+		t.Error("FetchDoc: %v", err)
+	}
+	docVec, err := searcher.fetchDocVec(4)
+	if _, ok := docVec.(DocVector); !ok || err != nil {
+		t.Error("FetchDocVec: %v", err)
 	}
 }
 
@@ -640,7 +645,10 @@ func TestIndexSearcherHits(t *testing.T) {
 func TestIndexSearcherTopDocs(t *testing.T) {
 	index := createTestIndex("a", "b")
 	searcher, _ := OpenIndexSearcher(index)
-	topDocs := searcher.topDocs(NewTermQuery("content", "b"), 10, nil)
+	topDocs, err := searcher.topDocs(NewTermQuery("content", "b"), 10, nil)
+	if err != nil {
+		t.Errorf("topDocs: %v", err)
+	}
 	matchDocs := topDocs.GetMatchDocs()
 	if docID := matchDocs[0].getDocID(); docID != 2 {
 		t.Errorf("TopDocs expected 2, got %d", docID)

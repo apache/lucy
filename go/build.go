@@ -209,7 +209,10 @@ func specClasses(parcel *cfc.Parcel) {
 	searcherBinding := cfc.NewGoClass(parcel, "Lucy::Search::Searcher")
 	searcherBinding.SpecMethod("Hits",
 		"Hits(query interface{}, offset uint32, numWanted uint32, sortSpec SortSpec) (Hits, error)")
+	searcherBinding.SpecMethod("Top_Docs", "topDocs(Query, uint32, SortSpec) (TopDocs, error)")
 	searcherBinding.SpecMethod("Close", "Close() error")
+	searcherBinding.SpecMethod("Fetch_Doc", "FetchDoc(int32) (HitDoc, error)")
+	searcherBinding.SpecMethod("Fetch_Doc_Vec", "fetchDocVec(int32) (DocVector, error)")
 	searcherBinding.SpecMethod("", "ReadDoc(int32, interface{}) error")
 	searcherBinding.Register()
 
