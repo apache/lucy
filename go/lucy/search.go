@@ -69,15 +69,6 @@ func OpenIndexSearcher(index interface{}) (obj IndexSearcher, err error) {
 	return obj, err
 }
 
-func (obj *IndexSearcherIMP) Close() error {
-	return doClose(obj)
-}
-
-func (obj *IndexSearcherIMP) Hits(query interface{}, offset uint32, numWanted uint32,
-	sortSpec SortSpec) (hits Hits, err error) {
-	return doHits(obj, query, offset, numWanted, sortSpec)
-}
-
 // Read data into the supplied doc.
 func (s *SearcherIMP) ReadDoc(docID int32, doc interface{}) error {
 	self := (*C.lucy_Searcher)(clownfish.Unwrap(s, "s"))
@@ -97,14 +88,14 @@ func (s *SearcherIMP) ReadDoc(docID int32, doc interface{}) error {
 	}
 }
 
-func doClose(obj Searcher) error {
-	self := ((*C.lucy_Searcher)(unsafe.Pointer(obj.TOPTR())))
+func (s *SearcherIMP) Close() error {
 	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Searcher)(clownfish.Unwrap(s, "s"))
 		C.LUCY_Searcher_Close(self)
 	})
 }
 
-func doHits(s Searcher, query interface{}, offset uint32, numWanted uint32,
+func (s *SearcherIMP) Hits(query interface{}, offset uint32, numWanted uint32,
 	sortSpec SortSpec) (hits Hits, err error) {
 	self := (*C.lucy_Searcher)(clownfish.Unwrap(s, "s"))
 	sortSpecC := (*C.lucy_SortSpec)(clownfish.UnwrapNullable(sortSpec))
@@ -116,24 +107,6 @@ func doHits(s Searcher, query interface{}, offset uint32, numWanted uint32,
 		hits = WRAPHits(unsafe.Pointer(hitsC))
 	})
 	return hits, err
-}
-
-func (obj *SearcherIMP) Close() error {
-	return doClose(obj)
-}
-
-func (obj *SearcherIMP) Hits(query interface{}, offset uint32, numWanted uint32,
-	sortSpec SortSpec) (hits Hits, err error) {
-	return doHits(obj, query, offset, numWanted, sortSpec)
-}
-
-func (obj *PolySearcherIMP) Close() error {
-	return doClose(obj)
-}
-
-func (obj *PolySearcherIMP) Hits(query interface{}, offset uint32, numWanted uint32,
-	sortSpec SortSpec) (hits Hits, err error) {
-	return doHits(obj, query, offset, numWanted, sortSpec)
 }
 
 type setScorer interface {
