@@ -159,9 +159,6 @@ TextTermStepper_Read_Key_Frame_IMP(TextTermStepper *self,
               InStream_Tell(instream) - text_len);
     }
 
-    // Null-terminate.
-    ptr[text_len] = '\0';
-
     // Invalidate string value.
     DECREF(ivars->value);
     ivars->value = NULL;
@@ -188,9 +185,6 @@ TextTermStepper_Read_Delta_IMP(TextTermStepper *self, InStream *instream) {
               InStream_Get_Filename(instream),
               InStream_Tell(instream) - finish_chars_len);
     }
-
-    // Null-terminate.
-    ptr[total_text_len] = '\0';
 
     // Invalidate string value.
     DECREF(ivars->value);
