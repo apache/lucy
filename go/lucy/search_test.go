@@ -95,6 +95,11 @@ func TestTermCompilerMisc(t *testing.T) {
 	checkQuerySerialize(t, compiler) 
 	checkQueryEquals(t, compiler)
 	checkQueryToStringHasFoo(t, compiler)
+	segReaders := searcher.GetReader().SegReaders()
+	matcher, err := compiler.MakeMatcher(segReaders[0].(SegReader), false)
+	if matcher == nil || err != nil {
+		t.Errorf("MakeMatcher: %v", err)
+	}
 }
 
 func TestTermCompilerWeighting(t *testing.T) {

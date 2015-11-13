@@ -25,6 +25,7 @@ package lucy
 #include "Lucy/Search/Hits.h"
 #include "Lucy/Search/IndexSearcher.h"
 #include "Lucy/Search/Query.h"
+#include "Lucy/Search/Compiler.h"
 #include "Lucy/Search/Searcher.h"
 #include "Lucy/Search/ANDQuery.h"
 #include "Lucy/Search/ORQuery.h"
@@ -242,6 +243,21 @@ func (td *TopDocsIMP) GetMatchDocs() []MatchDoc {
 		slice[i] = WRAPMatchDoc(unsafe.Pointer(elem))
 	}
 	return slice
+}
+
+func (c *CompilerIMP) MakeMatcher(reader SegReader, needScore bool) (retval Matcher, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Compiler)(clownfish.Unwrap(c, "c"))
+		readerCF := (*C.lucy_SegReader)(clownfish.Unwrap(reader, "reader"))
+		retvalCF := C.LUCY_Compiler_Make_Matcher(self, readerCF, C.bool(needScore))
+		if retvalCF != nil {
+			retval = clownfish.WRAPAny(unsafe.Pointer(retvalCF)).(Matcher)
+		}
+	})
+	if err != nil || retval == nil {
+		return nil, err
+	}
+	return retval, err
 }
 
 func NewANDQuery(children []Query) ANDQuery {
