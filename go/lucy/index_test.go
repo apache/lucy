@@ -386,6 +386,8 @@ func TestSnapshotMisc(t *testing.T) {
 }
 
 func TestSortCacheMisc(t *testing.T) {
+	var err error
+
 	schema := NewSchema()
 	spec := NewFullTextType(NewStandardTokenizer())
 	spec.SetSortable(true)
@@ -410,18 +412,19 @@ func TestSortCacheMisc(t *testing.T) {
 		t.Errorf("GetOrdWidth: %d", width)
 	}
 
-	if lowest, ok := sortCache.Value(0).(string); !ok || lowest != "bar" {
-		t.Errorf("Ord")
+	lowest, err := sortCache.Value(0)
+	if _, ok := lowest.(string); err != nil || !ok || lowest != "bar" {
+		t.Errorf("Value: %v", err)
 	}
-	if ord := sortCache.Ordinal(1); ord != 2 { // "foo" is ordinal 2
-		t.Errorf("Ordinal: %d", ord)
+	if ord, err := sortCache.Ordinal(1); err != nil || ord != 2 { // "foo" is ordinal 2
+		t.Errorf("Ordinal: %d, %v", ord, err)
 	}
 	if nullOrd := sortCache.GetNullOrd(); nullOrd != 3 {
 		t.Errorf("GetNullOrd: %d", nullOrd)
 	}
 
-	if ord := sortCache.Find("foo"); ord != 2 {
-		t.Errorf("Find: %d", ord)
+	if ord, err := sortCache.Find("foo"); err != nil || ord != 2 {
+		t.Errorf("Find: %d, %v", ord, err)
 	}
 
 	if sortCache.getNativeOrds() {

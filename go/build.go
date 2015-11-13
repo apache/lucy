@@ -202,6 +202,12 @@ func specClasses(parcel *cfc.Parcel) {
 	segBinding.SpecMethod("Write_File", "WriteFile(Folder) error")
 	segBinding.Register()
 
+	sortCacheBinding := cfc.NewGoClass(parcel, "Lucy::Index::SortCache")
+	sortCacheBinding.SpecMethod("Value", "Value(int32) (interface{}, error)")
+	sortCacheBinding.SpecMethod("Ordinal", "Ordinal(int32) (int32, error)")
+	sortCacheBinding.SpecMethod("Find", "Find(interface{}) (int32, error)")
+	sortCacheBinding.Register()
+
 	schemaBinding := cfc.NewGoClass(parcel, "Lucy::Plan::Schema")
 	schemaBinding.SpecMethod("All_Fields", "AllFields() []string")
 	schemaBinding.Register()
