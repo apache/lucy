@@ -27,7 +27,7 @@ class Lucy::Plan::TextType inherits Lucy::Plan::FieldType {
 class Lucy::Index::TermStepper::TextTermStepper
     inherits Lucy::Index::TermStepper {
 
-    String *string;
+    ByteBuf *bytebuf;
 
     inert incremented TextTermStepper*
     new();

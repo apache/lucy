@@ -22,7 +22,7 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Index/PostingPool.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/ByteBuf.h"
 #include "Lucy/Analysis/Inversion.h"
 #include "Lucy/Plan/Architecture.h"
 #include "Lucy/Plan/FieldType.h"
@@ -353,10 +353,10 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
     RawPosting *posting
         = (RawPosting*)CERTIFY(PostPool_Fetch(self), RAWPOSTING);
     RawPostingIVARS *post_ivars = RawPost_IVARS(posting);
-    CharBuf *last_term_text
-        = CB_new_from_trusted_utf8(post_ivars->blob, post_ivars->content_len);
-    const char *last_text_buf  = CB_Get_Ptr8(last_term_text);
-    uint32_t    last_text_size = CB_Get_Size(last_term_text);
+    ByteBuf *last_term_text
+        = BB_new_bytes(post_ivars->blob, post_ivars->content_len);
+    const char *last_text_buf  = BB_Get_Buf(last_term_text);
+    uint32_t    last_text_size = BB_Get_Size(last_term_text);
     SkipStepper_Set_ID_And_Filepos(skip_stepper, 0, 0);
 
     // Initialize sentinel to be used on the last iter, using an empty string
@@ -402,10 +402,10 @@ S_write_terms_and_postings(PostingPool *self, PostingWriter *post_writer,
             last_skip_filepos     = tinfo_ivars->post_filepos;
 
             // Remember the term_text so we can write string diffs.
-            CB_Mimic_Utf8(last_term_text, post_ivars->blob,
-                          post_ivars->content_len);
-            last_text_buf  = CB_Get_Ptr8(last_term_text);
-            last_text_size = CB_Get_Size(last_term_text);
+            BB_Mimic_Bytes(last_term_text, post_ivars->blob,
+                           post_ivars->content_len);
+            last_text_buf  = BB_Get_Buf(last_term_text);
+            last_text_size = BB_Get_Size(last_term_text);
         }
 
         // Bail on last iter before writing invalid posting data.

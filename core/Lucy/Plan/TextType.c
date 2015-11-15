@@ -21,7 +21,7 @@
 #include "Lucy/Plan/TextType.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
-#include "Clownfish/CharBuf.h"
+#include "Clownfish/ByteBuf.h"
 #include "Clownfish/Util/StringHelper.h"
 
 TermStepper*
@@ -49,83 +49,78 @@ TextTermStepper*
 TextTermStepper_init(TextTermStepper *self) {
     TermStepper_init((TermStepper*)self);
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
-    ivars->value  = (Obj*)CB_new(0);
-    ivars->string = NULL;
+    ivars->bytebuf = BB_new(0);
     return self;
 }
 
 void
 TextTermStepper_Destroy_IMP(TextTermStepper *self) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
-    DECREF(ivars->string);
+    DECREF(ivars->bytebuf);
     SUPER_DESTROY(self, TEXTTERMSTEPPER);
+}
+
+static void
+S_set_value(TextTermStepper *self, Obj *value) {
+    TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
+    if (ivars->value != value) {
+        DECREF(ivars->value);
+        ivars->value = INCREF(value);
+    }
 }
 
 void
 TextTermStepper_Set_Value_IMP(TextTermStepper *self, Obj *value) {
-    TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
-    CERTIFY(value, STRING);
-    CB_Mimic((CharBuf*)ivars->value, value);
-    // Invalidate string.
-    DECREF(ivars->string);
-    ivars->string = NULL;
+    S_set_value(self, CERTIFY(value, STRING));
 }
 
 Obj*
 TextTermStepper_Get_Value_IMP(TextTermStepper *self) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
-    if (ivars->string == NULL) {
-        ivars->string = CB_To_String((CharBuf*)ivars->value);
+    if (ivars->value == NULL) {
+        ivars->value = (Obj*)BB_Trusted_Utf8_To_String(ivars->bytebuf);
     }
-    return (Obj*)ivars->string;
+    return ivars->value;
 }
 
 void
 TextTermStepper_Reset_IMP(TextTermStepper *self) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
-    CB_Set_Size((CharBuf*)ivars->value, 0);
-    // Invalidate string.
-    DECREF(ivars->string);
-    ivars->string = NULL;
+    DECREF(ivars->value);
+    ivars->value = NULL;
+    BB_Set_Size(ivars->bytebuf, 0);
 }
 
 void
 TextTermStepper_Write_Key_Frame_IMP(TextTermStepper *self,
                                     OutStream *outstream, Obj *value) {
-    TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
-    CharBuf *charbuf = (CharBuf*)ivars->value;
-    CB_Mimic(charbuf, value);
-    const char *buf  = CB_Get_Ptr8(charbuf);
-    size_t      size = CB_Get_Size(charbuf);
+    String     *string = (String*)CERTIFY(value, STRING);
+    const char *buf    = Str_Get_Ptr8(string);
+    size_t      size   = Str_Get_Size(string);
     OutStream_Write_C32(outstream, size);
     OutStream_Write_Bytes(outstream, buf, size);
-    // Invalidate string.
-    DECREF(ivars->string);
-    ivars->string = NULL;
+
+    S_set_value(self, value);
 }
 
 void
 TextTermStepper_Write_Delta_IMP(TextTermStepper *self, OutStream *outstream,
                                 Obj *value) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
-    CharBuf    *charbuf   = (CharBuf*)ivars->value;
-    const char *last_text = CB_Get_Ptr8(charbuf);
-    size_t      last_size = CB_Get_Size(charbuf);
-    const char *new_text  = NULL;
-    size_t      new_size  = 0;
+    ByteBuf    *bytebuf  = (ByteBuf*)CERTIFY(value, BYTEBUF);
+    const char *new_text = BB_Get_Buf(bytebuf);
+    size_t      new_size = BB_Get_Size(bytebuf);
 
-    if (Obj_is_a(value, STRING)) {
-        String *new_string = (String*)value;
-        new_text = Str_Get_Ptr8(new_string);
-        new_size = Str_Get_Size(new_string);
-    }
-    else if (Obj_is_a(value, CHARBUF)) {
-        CharBuf *new_charbuf = (CharBuf*)value;
-        new_text = CB_Get_Ptr8(new_charbuf);
-        new_size = CB_Get_Size(new_charbuf);
+    const char *last_text;
+    size_t      last_size;
+    if (ivars->value) {
+        String *last_string = (String*)ivars->value;
+        last_text = Str_Get_Ptr8(last_string);
+        last_size = Str_Get_Size(last_string);
     }
     else {
-        THROW(ERR, "'value' must be a String or CharBuf");
+        last_text = BB_Get_Buf(ivars->bytebuf);
+        last_size = BB_Get_Size(ivars->bytebuf);
     }
 
     // Count how many bytes the strings share at the top.
@@ -139,11 +134,11 @@ TextTermStepper_Write_Delta_IMP(TextTermStepper *self, OutStream *outstream,
     OutStream_Write_String(outstream, diff_start_str, diff_len);
 
     // Update value.
-    CB_Mimic_Utf8(charbuf, new_text, new_size);
+    BB_Mimic_Bytes(ivars->bytebuf, new_text, new_size);
 
-    // Invalidate string.
-    DECREF(ivars->string);
-    ivars->string = NULL;
+    // Invalidate string value.
+    DECREF(ivars->value);
+    ivars->value = NULL;
 }
 
 void
@@ -153,24 +148,20 @@ TextTermStepper_Read_Key_Frame_IMP(TextTermStepper *self,
     const uint32_t text_len = InStream_Read_C32(instream);
 
     // Allocate space.
-    CharBuf *charbuf = (CharBuf*)ivars->value;
-    char    *ptr     = CB_Grow(charbuf, text_len);
+    char *ptr = BB_Grow(ivars->bytebuf, text_len);
 
     // Set the value text.
     InStream_Read_Bytes(instream, ptr, text_len);
-    CB_Set_Size(charbuf, text_len);
+    BB_Set_Size(ivars->bytebuf, text_len);
     if (!StrHelp_utf8_valid(ptr, text_len)) {
         THROW(ERR, "Invalid UTF-8 sequence in '%o' at byte %i64",
               InStream_Get_Filename(instream),
               InStream_Tell(instream) - text_len);
     }
 
-    // Null-terminate.
-    ptr[text_len] = '\0';
-
-    // Invalidate string.
-    DECREF(ivars->string);
-    ivars->string = NULL;
+    // Invalidate string value.
+    DECREF(ivars->value);
+    ivars->value = NULL;
 }
 
 void
@@ -181,24 +172,23 @@ TextTermStepper_Read_Delta_IMP(TextTermStepper *self, InStream *instream) {
     const uint32_t total_text_len   = text_overlap + finish_chars_len;
 
     // Allocate space.
-    CharBuf *charbuf = (CharBuf*)ivars->value;
-    char    *ptr     = CB_Grow(charbuf, total_text_len);
+    if (ivars->value) {
+        BB_Mimic(ivars->bytebuf, ivars->value);
+    }
+    char *ptr = BB_Grow(ivars->bytebuf, total_text_len);
 
     // Set the value text.
     InStream_Read_Bytes(instream, ptr + text_overlap, finish_chars_len);
-    CB_Set_Size(charbuf, total_text_len);
+    BB_Set_Size(ivars->bytebuf, total_text_len);
     if (!StrHelp_utf8_valid(ptr, total_text_len)) {
         THROW(ERR, "Invalid UTF-8 sequence in '%o' at byte %i64",
               InStream_Get_Filename(instream),
               InStream_Tell(instream) - finish_chars_len);
     }
 
-    // Null-terminate.
-    ptr[total_text_len] = '\0';
-
-    // Invalidate string.
-    DECREF(ivars->string);
-    ivars->string = NULL;
+    // Invalidate string value.
+    DECREF(ivars->value);
+    ivars->value = NULL;
 }
 
 
