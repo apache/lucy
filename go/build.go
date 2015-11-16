@@ -350,6 +350,9 @@ func specClasses(parcel *cfc.Parcel) {
 
 	dhBinding := cfc.NewGoClass(parcel, "Lucy::Store::DirHandle")
 	dhBinding.SpecMethod("Close", "Close() error")
+	dhBinding.SpecMethod("Next", "next() bool")
+	dhBinding.SpecMethod("", "Error() error")
+	dhBinding.SetSuppressStruct(true)
 	dhBinding.Register()
 
 	lockBinding := cfc.NewGoClass(parcel, "Lucy::Store::Lock")
