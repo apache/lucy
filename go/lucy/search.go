@@ -245,6 +245,19 @@ func (td *TopDocsIMP) GetMatchDocs() []MatchDoc {
 	return slice
 }
 
+func (q *QueryIMP) MakeCompiler(searcher Searcher, boost float32,
+	subordinate bool) (retval Compiler, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Query)(clownfish.Unwrap(q, "q"))
+		searcherCF := (*C.lucy_Searcher)(clownfish.Unwrap(searcher, "searcher"))
+		retvalCF := C.LUCY_Query_Make_Compiler(self, searcherCF, C.float(boost), C.bool(subordinate))
+		if retvalCF != nil {
+			retval = clownfish.WRAPAny(unsafe.Pointer(retvalCF)).(Compiler)
+		}
+	})
+	return retval, err
+}
+
 func (c *CompilerIMP) MakeMatcher(reader SegReader, needScore bool) (retval Matcher, err error) {
 	err = clownfish.TrapErr(func() {
 		self := (*C.lucy_Compiler)(clownfish.Unwrap(c, "c"))

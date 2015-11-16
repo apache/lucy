@@ -228,6 +228,10 @@ func specClasses(parcel *cfc.Parcel) {
 	hitsBinding.SetSuppressStruct(true)
 	hitsBinding.Register()
 
+	queryBinding := cfc.NewGoClass(parcel, "Lucy::Search::Query")
+	queryBinding.SpecMethod("Make_Compiler", "MakeCompiler(Searcher, float32, bool) (Compiler, error)")
+	queryBinding.Register()
+
 	compilerBinding := cfc.NewGoClass(parcel, "Lucy::Search::Compiler")
 	compilerBinding.SpecMethod("Make_Matcher", "MakeMatcher(SegReader, bool) (Matcher, error)")
 	compilerBinding.Register()

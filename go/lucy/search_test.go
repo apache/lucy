@@ -55,9 +55,9 @@ func checkQueryEquals(t *testing.T, query Query) {
 func checkQueryMakeCompiler(t *testing.T, query Query) {
 	index := createTestIndex("foo", "bar", "baz")
 	searcher, _ := OpenIndexSearcher(index)
-	compiler := query.MakeCompiler(searcher, 1.0, false)
-	if got, ok := compiler.(Compiler); !ok {
-		t.Error("MakeCompiler failed: got '%v'", got)
+	compiler, err := query.MakeCompiler(searcher, 1.0, false)
+	if _, ok := compiler.(Compiler); !ok || err != nil {
+		t.Error("MakeCompiler for %v failed: %v", query, err)
 	}
 }
 
