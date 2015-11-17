@@ -49,6 +49,19 @@ func TestDocMisc(t *testing.T) {
 	checkdocDumpLoad(t, doc)
 }
 
+func TestHitDocMisc(t *testing.T) {
+	hitDoc := NewHitDoc(42, 1.5)
+	if got := hitDoc.GetScore(); got != 1.5 {
+		t.Errorf("GetScore: %f", got)
+	}
+	hitDoc.SetScore(2.0)
+	if got := hitDoc.GetScore(); got != 2.0 {
+		t.Errorf("Set/GetScore: %f", got)
+	}
+	checkDocSerialize(t, hitDoc)
+	checkdocDumpLoad(t, hitDoc)
+}
+
 func checkDocSerialize(t *testing.T, doc Doc) {
 	folder := NewRAMFolder("")
 	outStream, _ := folder.OpenOut("foo")
