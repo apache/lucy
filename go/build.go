@@ -365,6 +365,14 @@ func specClasses(parcel *cfc.Parcel) {
 	cfWriterBinding := cfc.NewGoClass(parcel, "Lucy::Store::CompoundFileWriter")
 	cfWriterBinding.SpecMethod("Consolidate", "Consolidate() error")
 	cfWriterBinding.Register()
+
+	stepperBinding := cfc.NewGoClass(parcel, "Lucy::Util::Stepper")
+	stepperBinding.SpecMethod("Write_Key_Frame", "WriteKeyFrame(OutStream, interface{}) error")
+	stepperBinding.SpecMethod("Write_Delta", "WriteDelta(OutStream, interface{}) error")
+	stepperBinding.SpecMethod("Read_Key_Frame", "ReadKeyFrame(InStream) error")
+	stepperBinding.SpecMethod("Read_Delta", "ReadDelta(InStream) error")
+	stepperBinding.SpecMethod("Read_Record", "readRecord(InStream) error")
+	stepperBinding.Register()
 }
 
 func build() {
