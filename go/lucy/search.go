@@ -60,6 +60,11 @@ type HitsIMP struct {
 	err error
 }
 
+type MatcherIMP struct {
+	clownfish.ObjIMP
+	err error
+}
+
 func OpenIndexSearcher(index interface{}) (obj IndexSearcher, err error) {
 	indexC := (*C.cfish_Obj)(clownfish.GoToClownfish(index, unsafe.Pointer(C.CFISH_OBJ), false))
 	defer C.cfish_decref(unsafe.Pointer(indexC))
@@ -291,6 +296,22 @@ func NewORQuery(children []Query) ORQuery {
 	childrenC := (*C.cfish_Vector)(unsafe.Pointer(vec.TOPTR()))
 	cfObj := C.lucy_ORQuery_new(childrenC)
 	return WRAPORQuery(unsafe.Pointer(cfObj))
+}
+
+func (m *MatcherIMP) Next() int32 {
+	var retval int32
+	m.err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Matcher)(clownfish.Unwrap(m, "m"))
+		retval = int32(C.LUCY_Matcher_Next(self))
+	})
+	if m.err != nil {
+		return 0
+	}
+	return retval
+}
+
+func (m *MatcherIMP) Error() error {
+	return m.err
 }
 
 func NewANDMatcher(children []Matcher, sim Similarity) ANDMatcher {

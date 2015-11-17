@@ -273,6 +273,9 @@ func checkMatcher(t *testing.T, matcher Matcher, supportsScore bool) {
 	if got := matcher.Next(); got != 0 {
 		t.Error("Next (iteration finished): %d", got)
 	}
+	if got := matcher.Error(); got != nil {
+		t.Error("Error after iteration finished: %v", got)
+	}
 }
 
 func TestMockMatcherBasics(t *testing.T) {

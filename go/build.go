@@ -250,6 +250,12 @@ func specClasses(parcel *cfc.Parcel) {
 	orQueryBinding.SetSuppressCtor(true)
 	orQueryBinding.Register()
 
+	matcherBinding := cfc.NewGoClass(parcel, "Lucy::Search::Matcher")
+	matcherBinding.SpecMethod("Next", "Next() int32")
+	matcherBinding.SpecMethod("", "Error() error")
+	matcherBinding.SetSuppressStruct(true)
+	matcherBinding.Register()
+
 	andMatcherBinding := cfc.NewGoClass(parcel, "Lucy::Search::ANDMatcher")
 	andMatcherBinding.SetSuppressCtor(true)
 	andMatcherBinding.Register()
