@@ -23,6 +23,7 @@ package lucy
 #include "Lucy/Index/TermVector.h"
 #include "Lucy/Index/Segment.h"
 #include "Lucy/Index/Snapshot.h"
+#include "Lucy/Index/SortCache.h"
 #include "Lucy/Document/Doc.h"
 #include "Lucy/Plan/Schema.h"
 #include "Clownfish/Hash.h"
@@ -383,4 +384,34 @@ func (s *SegmentIMP) ReadFile(folder Folder) error {
 		folderC := (*C.lucy_Folder)(clownfish.Unwrap(folder, "folder"))
 		C.LUCY_Seg_Read_File(self, folderC)
 	})
+}
+
+func (s *SortCacheIMP) Value(ord int32) (retval interface{}, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_SortCache)(clownfish.Unwrap(s, "s"))
+		retvalCF := C.LUCY_SortCache_Value(self, C.int32_t(ord))
+		defer C.cfish_decref(unsafe.Pointer(retvalCF))
+		retval = clownfish.ToGo(unsafe.Pointer(retvalCF))
+	})
+	return retval, err
+}
+
+func (s *SortCacheIMP) Ordinal(docId int32) (retval int32, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_SortCache)(clownfish.Unwrap(s, "s"))
+		retvalCF := C.LUCY_SortCache_Ordinal(self, C.int32_t(docId))
+		retval = int32(retvalCF)
+	})
+	return retval, err
+}
+
+func (s *SortCacheIMP) Find(term interface{}) (retval int32, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_SortCache)(clownfish.Unwrap(s, "s"))
+		termCF := (*C.cfish_Obj)(clownfish.GoToClownfish(term, unsafe.Pointer(C.CFISH_OBJ), true))
+		defer C.cfish_decref(unsafe.Pointer(termCF))
+		retvalCF := C.LUCY_SortCache_Find(self, termCF)
+		retval = int32(retvalCF)
+	})
+	return retval, err
 }

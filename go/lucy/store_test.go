@@ -598,6 +598,9 @@ func runDirHandleCommonTests(t *testing.T, folder Folder, makeDH func() DirHandl
 			t.Errorf("Unexpected entry: '%s'", entry)
 		}
 	}
+	if got := dh.Error(); got != nil {
+		t.Errorf("Error() should return nil after iteration: %v", got)
+	}
 	if count != 2 {
 		t.Errorf("Didn't get to all entries, found only %d", count)
 	}

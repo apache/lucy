@@ -136,6 +136,15 @@ func runCFC() {
 }
 
 func specClasses(parcel *cfc.Parcel) {
+	simpleBinding := cfc.NewGoClass(parcel, "Lucy::Simple")
+	simpleBinding.SpecMethod("Add_Doc", "AddDoc(doc interface{}) error")
+	simpleBinding.SpecMethod("Search", "Search(string, int, int) (int, error)")
+	simpleBinding.SpecMethod("Next", "Next(hit interface{}) bool")
+	simpleBinding.SpecMethod("", "Error() error")
+	simpleBinding.SetSuppressCtor(true)
+	simpleBinding.SetSuppressStruct(true)
+	simpleBinding.Register()
+
 	tokenBinding := cfc.NewGoClass(parcel, "Lucy::Analysis::Token")
 	tokenBinding.SpecMethod("", "SetText(string)")
 	tokenBinding.SpecMethod("", "GetText() string")
@@ -144,6 +153,17 @@ func specClasses(parcel *cfc.Parcel) {
 	analyzerBinding := cfc.NewGoClass(parcel, "Lucy::Analysis::Analyzer")
 	analyzerBinding.SpecMethod("Split", "Split(string) []string")
 	analyzerBinding.Register()
+
+	polyAnalyzerBinding := cfc.NewGoClass(parcel, "Lucy::Analysis::PolyAnalyzer")
+	polyAnalyzerBinding.SpecMethod("Get_Analyzers", "GetAnalyzers() []Analyzer")
+	polyAnalyzerBinding.SetSuppressCtor(true)
+	polyAnalyzerBinding.Register()
+
+	docBinding := cfc.NewGoClass(parcel, "Lucy::Document::Doc")
+	docBinding.SpecMethod("", "GetFields() map[string]interface{}")
+	docBinding.SpecMethod("", "SetFields(map[string]interface{})")
+	docBinding.SpecMethod("Field_Names", "FieldNames() []string")
+	docBinding.Register()
 
 	indexerBinding := cfc.NewGoClass(parcel, "Lucy::Index::Indexer")
 	indexerBinding.SpecMethod("", "Close() error")
@@ -188,6 +208,12 @@ func specClasses(parcel *cfc.Parcel) {
 	segBinding.SpecMethod("Write_File", "WriteFile(Folder) error")
 	segBinding.Register()
 
+	sortCacheBinding := cfc.NewGoClass(parcel, "Lucy::Index::SortCache")
+	sortCacheBinding.SpecMethod("Value", "Value(int32) (interface{}, error)")
+	sortCacheBinding.SpecMethod("Ordinal", "Ordinal(int32) (int32, error)")
+	sortCacheBinding.SpecMethod("Find", "Find(interface{}) (int32, error)")
+	sortCacheBinding.Register()
+
 	schemaBinding := cfc.NewGoClass(parcel, "Lucy::Plan::Schema")
 	schemaBinding.SpecMethod("All_Fields", "AllFields() []string")
 	schemaBinding.Register()
@@ -195,7 +221,10 @@ func specClasses(parcel *cfc.Parcel) {
 	searcherBinding := cfc.NewGoClass(parcel, "Lucy::Search::Searcher")
 	searcherBinding.SpecMethod("Hits",
 		"Hits(query interface{}, offset uint32, numWanted uint32, sortSpec SortSpec) (Hits, error)")
+	searcherBinding.SpecMethod("Top_Docs", "topDocs(Query, uint32, SortSpec) (TopDocs, error)")
 	searcherBinding.SpecMethod("Close", "Close() error")
+	searcherBinding.SpecMethod("Fetch_Doc", "FetchDoc(int32) (HitDoc, error)")
+	searcherBinding.SpecMethod("Fetch_Doc_Vec", "fetchDocVec(int32) (DocVector, error)")
 	searcherBinding.SpecMethod("", "ReadDoc(int32, interface{}) error")
 	searcherBinding.Register()
 
@@ -205,6 +234,14 @@ func specClasses(parcel *cfc.Parcel) {
 	hitsBinding.SetSuppressStruct(true)
 	hitsBinding.Register()
 
+	queryBinding := cfc.NewGoClass(parcel, "Lucy::Search::Query")
+	queryBinding.SpecMethod("Make_Compiler", "MakeCompiler(Searcher, float32, bool) (Compiler, error)")
+	queryBinding.Register()
+
+	compilerBinding := cfc.NewGoClass(parcel, "Lucy::Search::Compiler")
+	compilerBinding.SpecMethod("Make_Matcher", "MakeMatcher(SegReader, bool) (Matcher, error)")
+	compilerBinding.Register()
+
 	andQueryBinding := cfc.NewGoClass(parcel, "Lucy::Search::ANDQuery")
 	andQueryBinding.SetSuppressCtor(true)
 	andQueryBinding.Register()
@@ -212,6 +249,12 @@ func specClasses(parcel *cfc.Parcel) {
 	orQueryBinding := cfc.NewGoClass(parcel, "Lucy::Search::ORQuery")
 	orQueryBinding.SetSuppressCtor(true)
 	orQueryBinding.Register()
+
+	matcherBinding := cfc.NewGoClass(parcel, "Lucy::Search::Matcher")
+	matcherBinding.SpecMethod("Next", "Next() int32")
+	matcherBinding.SpecMethod("", "Error() error")
+	matcherBinding.SetSuppressStruct(true)
+	matcherBinding.Register()
 
 	andMatcherBinding := cfc.NewGoClass(parcel, "Lucy::Search::ANDMatcher")
 	andMatcherBinding.SetSuppressCtor(true)
@@ -319,6 +362,9 @@ func specClasses(parcel *cfc.Parcel) {
 
 	dhBinding := cfc.NewGoClass(parcel, "Lucy::Store::DirHandle")
 	dhBinding.SpecMethod("Close", "Close() error")
+	dhBinding.SpecMethod("Next", "next() bool")
+	dhBinding.SpecMethod("", "Error() error")
+	dhBinding.SetSuppressStruct(true)
 	dhBinding.Register()
 
 	lockBinding := cfc.NewGoClass(parcel, "Lucy::Store::Lock")
@@ -331,6 +377,14 @@ func specClasses(parcel *cfc.Parcel) {
 	cfWriterBinding := cfc.NewGoClass(parcel, "Lucy::Store::CompoundFileWriter")
 	cfWriterBinding.SpecMethod("Consolidate", "Consolidate() error")
 	cfWriterBinding.Register()
+
+	stepperBinding := cfc.NewGoClass(parcel, "Lucy::Util::Stepper")
+	stepperBinding.SpecMethod("Write_Key_Frame", "WriteKeyFrame(OutStream, interface{}) error")
+	stepperBinding.SpecMethod("Write_Delta", "WriteDelta(OutStream, interface{}) error")
+	stepperBinding.SpecMethod("Read_Key_Frame", "ReadKeyFrame(InStream) error")
+	stepperBinding.SpecMethod("Read_Delta", "ReadDelta(InStream) error")
+	stepperBinding.SpecMethod("Read_Record", "readRecord(InStream) error")
+	stepperBinding.Register()
 }
 
 func build() {

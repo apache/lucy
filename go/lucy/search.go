@@ -25,6 +25,7 @@ package lucy
 #include "Lucy/Search/Hits.h"
 #include "Lucy/Search/IndexSearcher.h"
 #include "Lucy/Search/Query.h"
+#include "Lucy/Search/Compiler.h"
 #include "Lucy/Search/Searcher.h"
 #include "Lucy/Search/ANDQuery.h"
 #include "Lucy/Search/ORQuery.h"
@@ -59,6 +60,11 @@ type HitsIMP struct {
 	err error
 }
 
+type MatcherIMP struct {
+	clownfish.ObjIMP
+	err error
+}
+
 func OpenIndexSearcher(index interface{}) (obj IndexSearcher, err error) {
 	indexC := (*C.cfish_Obj)(clownfish.GoToClownfish(index, unsafe.Pointer(C.CFISH_OBJ), false))
 	defer C.cfish_decref(unsafe.Pointer(indexC))
@@ -67,15 +73,6 @@ func OpenIndexSearcher(index interface{}) (obj IndexSearcher, err error) {
 		obj = WRAPIndexSearcher(unsafe.Pointer(cfObj))
 	})
 	return obj, err
-}
-
-func (obj *IndexSearcherIMP) Close() error {
-	return doClose(obj)
-}
-
-func (obj *IndexSearcherIMP) Hits(query interface{}, offset uint32, numWanted uint32,
-	sortSpec SortSpec) (hits Hits, err error) {
-	return doHits(obj, query, offset, numWanted, sortSpec)
 }
 
 // Read data into the supplied doc.
@@ -97,14 +94,32 @@ func (s *SearcherIMP) ReadDoc(docID int32, doc interface{}) error {
 	}
 }
 
-func doClose(obj Searcher) error {
-	self := ((*C.lucy_Searcher)(unsafe.Pointer(obj.TOPTR())))
+func (s *SearcherIMP) FetchDoc(docID int32) (doc HitDoc, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Searcher)(clownfish.Unwrap(s, "s"))
+		docC := C.LUCY_Searcher_Fetch_Doc(self, C.int32_t(docID))
+		doc = WRAPHitDoc(unsafe.Pointer(docC))
+	})
+	return doc, err
+}
+
+func (s *SearcherIMP) fetchDocVec(docID int32) (dv DocVector, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Searcher)(clownfish.Unwrap(s, "s"))
+		dvC := C.LUCY_Searcher_Fetch_Doc_Vec(self, C.int32_t(docID))
+		dv = WRAPDocVector(unsafe.Pointer(dvC))
+	})
+	return dv, err
+}
+
+func (s *SearcherIMP) Close() error {
 	return clownfish.TrapErr(func() {
+		self := (*C.lucy_Searcher)(clownfish.Unwrap(s, "s"))
 		C.LUCY_Searcher_Close(self)
 	})
 }
 
-func doHits(s Searcher, query interface{}, offset uint32, numWanted uint32,
+func (s *SearcherIMP) Hits(query interface{}, offset uint32, numWanted uint32,
 	sortSpec SortSpec) (hits Hits, err error) {
 	self := (*C.lucy_Searcher)(clownfish.Unwrap(s, "s"))
 	sortSpecC := (*C.lucy_SortSpec)(clownfish.UnwrapNullable(sortSpec))
@@ -118,22 +133,17 @@ func doHits(s Searcher, query interface{}, offset uint32, numWanted uint32,
 	return hits, err
 }
 
-func (obj *SearcherIMP) Close() error {
-	return doClose(obj)
-}
-
-func (obj *SearcherIMP) Hits(query interface{}, offset uint32, numWanted uint32,
-	sortSpec SortSpec) (hits Hits, err error) {
-	return doHits(obj, query, offset, numWanted, sortSpec)
-}
-
-func (obj *PolySearcherIMP) Close() error {
-	return doClose(obj)
-}
-
-func (obj *PolySearcherIMP) Hits(query interface{}, offset uint32, numWanted uint32,
-	sortSpec SortSpec) (hits Hits, err error) {
-	return doHits(obj, query, offset, numWanted, sortSpec)
+func (s *SearcherIMP) topDocs(query Query, numWanted uint32,
+	sortSpec SortSpec) (topDocs TopDocs, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Searcher)(clownfish.Unwrap(s, "s"))
+		sortSpecC := (*C.lucy_SortSpec)(clownfish.UnwrapNullable(sortSpec))
+		queryC := (*C.lucy_Query)(clownfish.Unwrap(query, "query"))
+		topDocsC := C.LUCY_Searcher_Top_Docs(self, queryC,
+			C.uint32_t(numWanted), sortSpecC)
+		topDocs = WRAPTopDocs(unsafe.Pointer(topDocsC))
+	})
+	return topDocs, err
 }
 
 type setScorer interface {
@@ -240,6 +250,34 @@ func (td *TopDocsIMP) GetMatchDocs() []MatchDoc {
 	return slice
 }
 
+func (q *QueryIMP) MakeCompiler(searcher Searcher, boost float32,
+	subordinate bool) (retval Compiler, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Query)(clownfish.Unwrap(q, "q"))
+		searcherCF := (*C.lucy_Searcher)(clownfish.Unwrap(searcher, "searcher"))
+		retvalCF := C.LUCY_Query_Make_Compiler(self, searcherCF, C.float(boost), C.bool(subordinate))
+		if retvalCF != nil {
+			retval = clownfish.WRAPAny(unsafe.Pointer(retvalCF)).(Compiler)
+		}
+	})
+	return retval, err
+}
+
+func (c *CompilerIMP) MakeMatcher(reader SegReader, needScore bool) (retval Matcher, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Compiler)(clownfish.Unwrap(c, "c"))
+		readerCF := (*C.lucy_SegReader)(clownfish.Unwrap(reader, "reader"))
+		retvalCF := C.LUCY_Compiler_Make_Matcher(self, readerCF, C.bool(needScore))
+		if retvalCF != nil {
+			retval = clownfish.WRAPAny(unsafe.Pointer(retvalCF)).(Matcher)
+		}
+	})
+	if err != nil || retval == nil {
+		return nil, err
+	}
+	return retval, err
+}
+
 func NewANDQuery(children []Query) ANDQuery {
 	vec := clownfish.NewVector(len(children))
 	for _, child := range children {
@@ -258,6 +296,22 @@ func NewORQuery(children []Query) ORQuery {
 	childrenC := (*C.cfish_Vector)(unsafe.Pointer(vec.TOPTR()))
 	cfObj := C.lucy_ORQuery_new(childrenC)
 	return WRAPORQuery(unsafe.Pointer(cfObj))
+}
+
+func (m *MatcherIMP) Next() int32 {
+	var retval int32
+	m.err = clownfish.TrapErr(func() {
+		self := (*C.lucy_Matcher)(clownfish.Unwrap(m, "m"))
+		retval = int32(C.LUCY_Matcher_Next(self))
+	})
+	if m.err != nil {
+		return 0
+	}
+	return retval
+}
+
+func (m *MatcherIMP) Error() error {
+	return m.err
 }
 
 func NewANDMatcher(children []Matcher, sim Similarity) ANDMatcher {

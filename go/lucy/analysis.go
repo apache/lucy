@@ -20,6 +20,7 @@ package lucy
 #include <stdlib.h>
 
 #include "Lucy/Analysis/Analyzer.h"
+#include "Lucy/Analysis/PolyAnalyzer.h"
 #include "Lucy/Analysis/Token.h"
 #include "Clownfish/Vector.h"
 */
@@ -58,4 +59,25 @@ func (a *AnalyzerIMP) Split(text string) []string {
 	retvalCF := C.LUCY_Analyzer_Split(self, input)
 	defer C.cfish_decref(unsafe.Pointer(retvalCF))
 	return vecToStringSlice(retvalCF)
+}
+
+func NewPolyAnalyzer(children []Analyzer) PolyAnalyzer {
+	vec := clownfish.NewVector(len(children))
+	for i := 0; i < len(children); i++ {
+		vec.Push(children[i])
+	}
+	retvalCF := C.lucy_PolyAnalyzer_new(nil, (*C.cfish_Vector)(clownfish.Unwrap(vec, "vec")))
+	return WRAPPolyAnalyzer(unsafe.Pointer(retvalCF))
+}
+
+func (p *PolyAnalyzerIMP) GetAnalyzers() []Analyzer {
+	self := (*C.lucy_PolyAnalyzer)(clownfish.Unwrap(p, "p"))
+	retvalCF := C.LUCY_PolyAnalyzer_Get_Analyzers(self)
+	size := C.CFISH_Vec_Get_Size(retvalCF)
+	retval := make([]Analyzer, int(size))
+	for i := 0; i < int(size); i++ {
+		child := unsafe.Pointer(C.CFISH_Vec_Fetch(retvalCF, C.size_t(i)))
+		retval[i] = clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(child))).(Analyzer)
+	}
+	return retval
 }

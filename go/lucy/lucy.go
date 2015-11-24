@@ -273,7 +273,7 @@ func GOLUCY_Doc_init(d *C.lucy_Doc, fields unsafe.Pointer, docID C.int32_t) *C.l
 
 //export GOLUCY_Doc_Set_Fields
 func GOLUCY_Doc_Set_Fields(d *C.lucy_Doc, fields unsafe.Pointer) {
-	panic(clownfish.NewErr("Set_Fields unsupported in Go bindings"))
+	panic(clownfish.NewErr("Set_Fields unsupported from C-space in Go"))
 }
 
 //export GOLUCY_Doc_Get_Size

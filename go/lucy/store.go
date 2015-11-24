@@ -39,6 +39,11 @@ import "fmt"
 
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
+type DirHandleIMP struct {
+	clownfish.ObjIMP
+	err error
+}
+
 func (e *LockErrIMP) Error() string {
 	self := ((*C.lucy_LockErr)(unsafe.Pointer(e.TOPTR())))
 	return clownfish.CFStringToGo(unsafe.Pointer(C.LUCY_LockErr_Get_Mess(self)))
@@ -642,6 +647,22 @@ func OpenRAMFileHandle(path string, flags uint32, ramFile RAMFile) (fh RAMFileHa
 		fh = WRAPRAMFileHandle(unsafe.Pointer(cfObj))
 	})
 	return fh, err
+}
+
+func (dh *DirHandleIMP) Error() error {
+	return dh.err
+}
+
+func (dh *DirHandleIMP) next() bool {
+	var retval bool
+	dh.err = clownfish.TrapErr(func() {
+		self := (*C.lucy_DirHandle)(clownfish.Unwrap(dh, "dh"))
+		retval = bool(C.LUCY_DH_Next(self))
+	})
+	if dh.err != nil {
+		return false
+	}
+	return retval
 }
 
 func (dh *DirHandleIMP) Close() error {
