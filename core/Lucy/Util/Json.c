@@ -765,10 +765,10 @@ Json_obj_to_bool(Obj *obj) {
         retval = Bool_Get_Value((Boolean*)obj);
     }
     else if (Obj_is_a(obj, INTEGER)) {
-        retval = Int_To_Bool((Integer*)obj);
+        retval = Int_Get_Value((Integer*)obj) != 0;
     }
     else if (Obj_is_a(obj, FLOAT)) {
-        retval = Float_To_Bool((Float*)obj);
+        retval = Float_Get_Value((Float*)obj) != 0.0;
     }
     else if (Obj_is_a(obj, STRING)) {
         retval = (Str_To_I64((String*)obj) != 0);
