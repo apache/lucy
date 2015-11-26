@@ -127,22 +127,20 @@ SV*
 new(...)
 CODE:
 {
+    static const XSBind_ParamSpec param_specs[1] = {
+        XSBIND_PARAM("text", false)
+    };
+    int32_t     locations[1];
+    SV         *text_sv       = NULL;
     lucy_Token *starter_token = NULL;
-    // parse params, only if there's more than one arg
-    if (items > 1) {
-        SV *text_sv = NULL;
-        bool args_ok
-            = XSBind_allot_params(aTHX_ &(ST(0)), 1, items,
-                                  ALLOT_SV(&text_sv, "text", 4, false),
-                                  NULL);
-        if (!args_ok) {
-            CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
-        }
-        if (XSBind_sv_defined(aTHX_ text_sv)) {
-            STRLEN len;
-            char *text = SvPVutf8(text_sv, len);
-            starter_token = lucy_Token_new(text, len, 0, len, 1.0, 1);
-        }
+
+    XSBind_locate_args(aTHX_ &ST(0), 1, items, param_specs, locations, 1);
+
+    text_sv = locations[0] < items ? ST(locations[0]) : NULL;
+    if (XSBind_sv_defined(aTHX_ text_sv)) {
+        STRLEN len;
+        char *text = SvPVutf8(text_sv, len);
+        starter_token = lucy_Token_new(text, len, 0, len, 1.0, 1);
     }
 
     RETVAL = CFISH_OBJ_TO_SV_NOINC(lucy_Inversion_new(starter_token));
@@ -419,7 +417,14 @@ new(either_sv, ...)
     SV *either_sv;
 CODE:
 {
-    SV         *text_sv   = NULL;
+    static const XSBind_ParamSpec param_specs[5] = {
+        XSBIND_PARAM("text", true),
+        XSBIND_PARAM("start_offset", true),
+        XSBIND_PARAM("end_offset", true),
+        XSBIND_PARAM("pos_inc", false),
+        XSBIND_PARAM("boost", false)
+    };
+    int32_t     locations[5];
     uint32_t    start_off = 0;
     uint32_t    end_off   = 0;
     int32_t     pos_inc   = 1;
@@ -427,21 +432,15 @@ CODE:
     STRLEN      len       = 0;
     char       *text      = NULL;
     lucy_Token *self      = NULL;
-    bool        args_ok;
 
-    args_ok
-        = XSBind_allot_params(aTHX_ &(ST(0)), 1, items,
-                              ALLOT_SV(&text_sv, "text", 4, true),
-                              ALLOT_U32(&start_off, "start_offset", 12, true),
-                              ALLOT_U32(&end_off, "end_offset", 10, true),
-                              ALLOT_I32(&pos_inc, "pos_inc", 7, false),
-                              ALLOT_F32(&boost, "boost", 5, false),
-                              NULL);
-    if (!args_ok) {
-        CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
-    }
+    XSBind_locate_args(aTHX_ &ST(0), 1, items, param_specs, locations, 5);
 
-    text = SvPVutf8(text_sv, len);
+    text      = SvPVutf8(ST(locations[0]), len);
+    start_off = (uint32_t)SvUV(ST(locations[1]));
+    end_off   = (uint32_t)SvUV(ST(locations[2]));
+    pos_inc   = locations[3] < items ? (int32_t)SvIV(ST(locations[3])) : 1;
+    boost     = locations[4] < items ? (float)SvNV(ST(locations[4])) : 1.0f;
+
     self = (lucy_Token*)XSBind_new_blank_obj(aTHX_ either_sv);
     lucy_Token_init(self, text, len, start_off, end_off, boost,
                     pos_inc);

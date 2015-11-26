@@ -82,20 +82,20 @@ new(either_sv, ...)
     SV *either_sv;
 CODE:
 {
+    static const XSBind_ParamSpec param_specs[2] = {
+        XSBIND_PARAM("fields", false),
+        XSBIND_PARAM("doc_id", false)
+    };
+    int32_t   locations[2];
     SV*       fields_sv = NULL;
     HV       *fields    = NULL;
     int32_t   doc_id    = 0;
     lucy_Doc *self      = NULL;
-    bool      args_ok;
 
-    args_ok
-        = XSBind_allot_params(aTHX_ &(ST(0)), 1, items,
-                              ALLOT_SV(&fields_sv, "fields", 6, false),
-                              ALLOT_I32(&doc_id, "doc_id", 6, false),
-                              NULL);
-    if (!args_ok) {
-        CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
-    }
+    XSBind_locate_args(aTHX_ &ST(0), 1, items, param_specs, locations, 2);
+
+    fields_sv = locations[0] < items ? ST(locations[0]) : NULL;
+    doc_id    = locations[1] < items ? (int32_t)SvIV(ST(locations[1])) : 0;
 
     if (fields_sv && XSBind_sv_defined(aTHX_ fields_sv)) {
         if (SvROK(fields_sv)) {
@@ -172,22 +172,23 @@ new(either_sv, ...)
     SV *either_sv;
 CODE:
 {
+    static const XSBind_ParamSpec param_specs[3] = {
+        XSBIND_PARAM("fields", false),
+        XSBIND_PARAM("doc_id", false),
+        XSBIND_PARAM("score", false)
+    };
+    int32_t      locations[3];
     SV          *fields_sv = NULL;
     HV          *fields    = NULL;
     int32_t      doc_id    = 0;
     float        score     = 0.0f;
     lucy_HitDoc *self      = NULL;
-    bool         args_ok;
 
-    args_ok
-        = XSBind_allot_params(aTHX_ &(ST(0)), 1, items,
-                              ALLOT_SV(&fields_sv, "fields", 6, false),
-                              ALLOT_I32(&doc_id, "doc_id", 6, false),
-                              ALLOT_F32(&score, "score", 5, false),
-                              NULL);
-    if (!args_ok) {
-        CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
-    }
+    XSBind_locate_args(aTHX_ &ST(0), 1, items, param_specs, locations, 3);
+
+    fields_sv = locations[0] < items ? ST(locations[0]) : NULL;
+    doc_id    = locations[1] < items ? (int32_t)SvIV(ST(locations[1])) : 0;
+    score     = locations[2] < items ? (float)SvNV(ST(locations[2])) : 0.0f;
 
     if (fields_sv && XSBind_sv_defined(aTHX_ fields_sv)) {
         if (SvROK(fields_sv)) {

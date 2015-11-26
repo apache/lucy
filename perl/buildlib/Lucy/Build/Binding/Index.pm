@@ -394,18 +394,17 @@ PPCODE:
     if (items == 2) {
         doc_sv = ST(1);
     }
-    else if (items > 2) {
-        bool args_ok
-            = XSBind_allot_params(aTHX_ &(ST(0)), 1, items,
-                                  ALLOT_SV(&doc_sv, "doc", 3, true),
-                                  ALLOT_F32(&boost, "boost", 5, false),
-                                  NULL);
-        if (!args_ok) {
-            CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
-        }
-    }
-    else if (items == 1) {
-        CFISH_THROW(CFISH_ERR, "Missing required argument 'doc'");
+    else {
+        static const XSBind_ParamSpec param_specs[2] = {
+            XSBIND_PARAM("doc", true),
+            XSBIND_PARAM("boost", false)
+        };
+        int32_t locations[2];
+
+        XSBind_locate_args(aTHX_ &ST(0), 1, items, param_specs, locations, 2);
+
+        doc_sv = ST(locations[0]);
+        if (locations[1] < items) { boost = (float)SvNV(ST(locations[1])); }
     }
 
     // Either get a Doc or use the stock doc.
@@ -778,14 +777,16 @@ value(self, ...)
     lucy_SortCache *self;
 CODE:
 {
+    static const XSBind_ParamSpec param_specs[1] = {
+        XSBIND_PARAM("ord", false)
+    };
+    int32_t locations[1];
     int32_t ord = 0;
-    bool args_ok
-        = XSBind_allot_params(aTHX_ &(ST(0)), 1, items,
-                              ALLOT_I32(&ord, "ord", 3, false),
-                              NULL);
-    if (!args_ok) {
-        CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
-    }
+
+    XSBind_locate_args(aTHX_ &ST(0), 1, items, param_specs, locations, 1);
+
+    ord = locations[0] < items ? (int32_t)SvIV(ST(locations[0])) : 0;
+
     {
         cfish_Obj *value = LUCY_SortCache_Value(self, ord);
         RETVAL = XSBind_cfish_to_perl(aTHX_ value);

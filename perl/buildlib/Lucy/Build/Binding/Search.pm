@@ -370,23 +370,23 @@ new(either_sv, ...)
     SV *either_sv;
 CODE:
 {
+    static const XSBind_ParamSpec param_specs[2] = {
+        XSBIND_PARAM("type", true),
+        XSBIND_PARAM("value", false)
+    };
+    int32_t          locations[2];
     SV              *type_sv  = NULL;
     SV              *value_sv = NULL;
     const char      *type_str = NULL;
     cfish_Obj       *value    = NULL;
     uint32_t         type     = 0;
     lucy_ParserElem *self     = NULL;
-    bool args_ok;
 
-    args_ok
-        = XSBind_allot_params(aTHX_ &(ST(0)), 1, items,
-                              ALLOT_SV(&type_sv, "type", 4, true),
-                              ALLOT_SV(&value_sv, "value", 5, false),
-                              NULL);
+    XSBind_locate_args(aTHX_ &ST(0), 1, items, param_specs, locations, 2);
 
-    if (!args_ok) {
-        CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
-    }
+    type_sv  = ST(locations[0]);
+    value_sv = locations[1] < items ? ST(locations[1]) : NULL;
+
     type_str = SvPVutf8_nolen(type_sv);
 
     if (strcmp(type_str, "OPEN_PAREN") == 0) {

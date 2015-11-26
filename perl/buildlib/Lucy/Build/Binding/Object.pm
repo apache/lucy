@@ -63,19 +63,17 @@ new(either_sv, ...)
     SV *either_sv;
 CODE:
 {
+    static const XSBind_ParamSpec param_specs[1] = {
+        XSBIND_PARAM("ints", true)
+    };
+    int32_t        locations[1];
     SV            *ints_sv = NULL;
     AV            *ints_av = NULL;
     lucy_I32Array *self    = NULL;
-    bool           args_ok;
 
-    args_ok
-        = XSBind_allot_params(aTHX_ &(ST(0)), 1, items,
-                              ALLOT_SV(&ints_sv, "ints", 4, true),
-                              NULL);
-    if (!args_ok) {
-        CFISH_RETHROW(CFISH_INCREF(cfish_Err_get_error()));
-    }
+    XSBind_locate_args(aTHX_ &ST(0), 1, items, param_specs, locations, 1);
 
+    ints_sv = ST(locations[0]);
     if (SvROK(ints_sv)) {
         ints_av = (AV*)SvRV(ints_sv);
     }
