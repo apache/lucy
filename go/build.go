@@ -165,6 +165,14 @@ func specClasses(parcel *cfc.Parcel) {
 	docBinding.SpecMethod("Field_Names", "FieldNames() []string")
 	docBinding.Register()
 
+	heatMapBinding := cfc.NewGoClass(parcel, "Lucy::Highlight::HeatMap")
+	heatMapBinding.SetSuppressCtor(true)
+	heatMapBinding.SpecMethod("Flatten_Spans", "flattenSpans([]Span) []Span")
+	heatMapBinding.SpecMethod("Generate_Proximity_Boosts",
+		"generateProximityBoosts([]Span) []Span")
+	heatMapBinding.SpecMethod("Get_Spans", "getSpans() []Span")
+	heatMapBinding.Register()
+
 	indexerBinding := cfc.NewGoClass(parcel, "Lucy::Index::Indexer")
 	indexerBinding.SpecMethod("", "Close() error")
 	indexerBinding.SpecMethod("Add_Doc", "AddDoc(doc interface{}) error")
