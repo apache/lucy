@@ -17,6 +17,7 @@
 package lucy
 
 import "testing"
+import "strings"
 
 func TestHeatMapBasics(t *testing.T) {
 	spans := make([]Span, 2)
@@ -40,5 +41,54 @@ func TestHeatMapBasics(t *testing.T) {
 	flattened := heatMap.flattenSpans(spans)
 	if length := len(flattened); length <= 0 {
 		t.Errorf("flattenSpans: %d", length)
+	}
+}
+
+func TestHighlighterBasics(t *testing.T) {
+	folder := createTestIndex("foo bar baz")
+	searcher := NewIndexSearcher(folder)
+	hl := NewHighlighter(searcher, "bar", "content", 200)
+	found :=  "<strong>bar</strong>"
+	if got := hl.Highlight("bar"); got != found {
+		t.Errorf("Highlight: '%s'", got)
+	}
+	doc, _ := searcher.FetchDoc(1)
+	if got := hl.CreateExcerpt(doc); !strings.Contains(got, found) {
+		t.Errorf("CreateExcerpt: '%s'", got)
+	}
+	phi := "\u03a6";
+	encodedPhi := "&#934;";
+	if got := hl.Encode(phi); got != encodedPhi {
+		t.Errorf("Encode: '%v'", got)
+	}
+}
+
+func TestHighlighterAccessors(t *testing.T) {
+	folder := createTestIndex("foo bar baz")
+	searcher := NewIndexSearcher(folder)
+	hl := NewHighlighter(searcher, "bar", "content", 200)
+	if field := hl.GetField(); field != "content" {
+		t.Errorf("GetField: %v", field)
+	}
+	if _, ok := hl.GetSearcher().(Searcher); !ok {
+		t.Errorf("GetSearcher")
+	}
+	barQuery := NewTermQuery("content", "bar")
+	if got := hl.GetQuery(); !barQuery.Equals(got) {
+		t.Errorf("GetQuery: %T %v", got, got)
+	}
+	if _, ok := hl.GetCompiler().(Compiler); !ok {
+		t.Errorf("GetCompiler")
+	}
+	if got := hl.GetExcerptLength(); got != 200 {
+		t.Errorf("GetExcerptLength: %d", got)
+	}
+	hl.SetPreTag("<blink>")
+	if got := hl.GetPreTag(); got != "<blink>" {
+		t.Errorf("Set/GetPreTag: %s", got)
+	}
+	hl.SetPostTag("</blink>")
+	if got := hl.GetPostTag(); got != "</blink>" {
+		t.Errorf("Set/GetPostTag: %s", got)
 	}
 }
