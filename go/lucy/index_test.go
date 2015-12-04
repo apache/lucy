@@ -699,3 +699,16 @@ func TestPostingListBasics(t *testing.T) {
 		t.Error("Next (done): %d", got)
 	}
 }
+
+func TestPostingBasics(t *testing.T) {
+	sim := NewSimilarity()
+	posting := NewMatchPosting(sim)
+	posting.SetDocID(42)
+	if got := posting.GetDocID(); got != 42 {
+		t.Errorf("Set/GetDocID: %d", got)
+	}
+	posting.Reset()
+	if got := posting.getFreq(); got != 0 {
+		t.Errorf("getFreq: %d", got)
+	}
+}
