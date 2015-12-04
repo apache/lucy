@@ -675,3 +675,27 @@ func TestLexiconBasics(t *testing.T) {
 		t.Errorf("Next after Reset")
 	}
 }
+
+func TestPostingListBasics(t *testing.T) {
+	folder := createTestIndex("c", "b b b", "a", "b",)
+	searcher, _ := OpenIndexSearcher(folder)
+	segReaders := searcher.GetReader().SegReaders()
+	pListReader := segReaders[0].(SegReader).Obtain("Lucy::Index::PostingListReader").(PostingListReader)
+	pList := pListReader.PostingList("content", nil)
+	pList.Seek("b")
+	if docFreq := pList.GetDocFreq(); docFreq != 2 {
+		t.Errorf("GetDocFreq: %d", docFreq)
+	}
+	if got := pList.Next(); got != 2 {
+		t.Errorf("Next: %d", got)
+	}
+	if docID := pList.GetDocID(); docID != 2 {
+		t.Errorf("GetDocID: %d", docID)
+	}
+	if got := pList.Next(); got != 4 {
+		t.Errorf("Next (second iter): %d", got)
+	}
+	if got := pList.Next(); got != 0 {
+		t.Error("Next (done): %d", got)
+	}
+}
