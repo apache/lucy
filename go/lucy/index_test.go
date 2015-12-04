@@ -642,3 +642,36 @@ func TestInverterMisc(t *testing.T) {
 		t.Errorf("GetInversion after iterator exhausted: %v", got)
 	}
 }
+
+// Use SegLexicon to air out the Lexicon interface.
+func TestLexiconBasics(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	searcher, _ := OpenIndexSearcher(folder)
+	segReaders := searcher.GetReader().SegReaders()
+	lexReader := segReaders[0].(SegReader).Obtain("Lucy::Index::LexiconReader").(LexiconReader)
+	segLex := lexReader.Lexicon("content", nil).(Lexicon)
+	if field := segLex.getField(); field != "content" {
+		t.Errorf("getField: %s", field)
+	}
+	segLex.Next()
+	if got := segLex.GetTerm(); got != "a" {
+		t.Errorf("GetTerm: %v", got)
+	}
+	if docFreq := segLex.docFreq(); docFreq != 1 {
+		t.Errorf("docFreq: %d", docFreq)
+	}
+	if !segLex.Next() || !segLex.Next() {
+		t.Errorf("Iterate")
+	}
+	if segLex.Next() {
+		t.Errorf("Iteration should be finished")
+	}
+	segLex.Seek("b")
+	if got := segLex.GetTerm(); got != "b" {
+		t.Errorf("Seek: %v", got)
+	}
+	segLex.Reset()
+	if !segLex.Next() {
+		t.Errorf("Next after Reset")
+	}
+}
