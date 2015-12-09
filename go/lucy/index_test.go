@@ -750,3 +750,26 @@ func TestIndexReaderMisc(t *testing.T) {
 	reader := searcher.GetReader()
 	runDataReaderCommon(t, reader, false)
 }
+
+func TestDefaultDocReaderMisc(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	searcher, _ := OpenIndexSearcher(folder)
+	segReaders := searcher.GetReader().SegReaders()
+	reader := segReaders[0].(SegReader).Obtain("Lucy::Index::DocReader").(DefaultDocReader)
+	doc := make(map[string]interface{})
+	if err := reader.ReadDoc(2, doc); err != nil {
+		t.Errorf("ReadDoc: %v", err)
+	}
+	runDataReaderCommon(t, reader, true)
+}
+
+func TestPolyDocReaderMisc(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	searcher, _ := OpenIndexSearcher(folder)
+	reader := searcher.GetReader().Obtain("Lucy::Index::DocReader").(PolyDocReader)
+	doc := make(map[string]interface{})
+	if err := reader.ReadDoc(2, doc); err != nil {
+		t.Errorf("ReadDoc: %v", err)
+	}
+	runDataReaderCommon(t, reader, true)
+}

@@ -88,7 +88,7 @@ func (s *SearcherIMP) ReadDoc(docID int32, doc interface{}) error {
 			return clownfish.NewErr("No DocReader available")
 		}
 		docReaderGo := clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(docReader)))).(DocReader)
-		return fetchDocFromDocReader(docReaderGo, docID, doc)
+		return docReaderGo.ReadDoc(docID, doc)
 	} else {
 		return clownfish.NewErr("Support for ReadDoc not implemented")
 	}

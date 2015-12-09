@@ -19,6 +19,7 @@ package lucy
 /*
 #include "Lucy/Index/Indexer.h"
 #include "Lucy/Index/DataReader.h"
+#include "Lucy/Index/DocReader.h"
 #include "Lucy/Index/IndexManager.h"
 #include "Lucy/Index/BackgroundMerger.h"
 #include "Lucy/Index/TermVector.h"
@@ -458,4 +459,26 @@ func (d *DataReaderIMP) Close() error {
 		self := (*C.lucy_DataReader)(clownfish.Unwrap(d, "d"))
 		C.LUCY_DataReader_Close(self)
 	})
+}
+
+func (d *DocReaderIMP) ReadDoc(docID int32, doc interface{}) error {
+	self := (*C.lucy_DocReader)(clownfish.Unwrap(d, "d"))
+	class := clownfish.GetClass(d)
+	classC := ((*C.cfish_Class)(clownfish.Unwrap(class, "class")))
+	if classC == C.LUCY_DEFAULTDOCREADER {
+		return doReadDocData((*C.lucy_DefaultDocReader)(self), docID, doc)
+	} else if classC == C.LUCY_POLYDOCREADER {
+		return readDocPolyDR((*C.lucy_PolyDocReader)(self), docID, doc)
+	} else {
+		panic(clownfish.NewErr(fmt.Sprintf("Unexpected type: %s", class.GetName)))
+	}
+}
+
+func (d *DocReaderIMP) FetchDoc(docID int32) (doc HitDoc, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_DocReader)(clownfish.Unwrap(d, "d"))
+		docC := C.LUCY_DocReader_Fetch_Doc(self, C.int32_t(docID))
+		doc = WRAPHitDoc(unsafe.Pointer(docC))
+	})
+	return doc, err
 }
