@@ -185,6 +185,12 @@ func specClasses(parcel *cfc.Parcel) {
 	indexerBinding.SetSuppressStruct(true)
 	indexerBinding.Register()
 
+	dataReaderBinding := cfc.NewGoClass(parcel, "Lucy::Index::DataReader")
+	dataReaderBinding.SpecMethod("Aggregator", "Aggregator([]DataReader, []int32) (DataReader, error)")
+	dataReaderBinding.SpecMethod("Get_Segments", "GetSegments() []Segment")
+	dataReaderBinding.SpecMethod("Close", "Close() error")
+	dataReaderBinding.Register()
+
 	bgMergerBinding := cfc.NewGoClass(parcel, "Lucy::Index::BackgroundMerger")
 	bgMergerBinding.SpecMethod("Prepare_Commit", "PrepareCommit() error")
 	bgMergerBinding.SpecMethod("Commit", "Commit() error")

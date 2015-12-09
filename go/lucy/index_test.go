@@ -712,3 +712,41 @@ func TestPostingBasics(t *testing.T) {
 		t.Errorf("getFreq: %d", got)
 	}
 }
+
+// This function runs Close(), so the reader becomes unusable afterwards.
+func runDataReaderCommon(t *testing.T, reader DataReader, runAggregator bool) {
+	if runAggregator {
+		got, err := reader.Aggregator([]DataReader{}, []int32{})
+		if got == nil || err != nil {
+			t.Errorf("Aggregator: %#v, %v", got, err)
+		}
+	}
+	if got := reader.GetSchema(); false {
+		t.Errorf("GetSchema: %v", got)
+	}
+	if got := reader.GetFolder(); false {
+		t.Errorf("GetFolder: %v", got)
+	}
+	if got := reader.GetSnapshot(); false {
+		t.Errorf("GetSnapshot: %v", got)
+	}
+	if got := reader.GetSegments(); false {
+		t.Errorf("GetSegments: %#v", got)
+	}
+	if got := reader.GetSegment(); false {
+		t.Errorf("GetSegment: %#v", got)
+	}
+	if got := reader.GetSegTick(); false {
+		t.Errorf("GetSegTick: %d", got)
+	}
+	if err := reader.Close(); err != nil {
+		t.Errorf("Close: %v", err)
+	}
+}
+
+func TestIndexReaderMisc(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	searcher, _ := OpenIndexSearcher(folder)
+	reader := searcher.GetReader()
+	runDataReaderCommon(t, reader, false)
+}

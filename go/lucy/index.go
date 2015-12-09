@@ -18,6 +18,7 @@ package lucy
 
 /*
 #include "Lucy/Index/Indexer.h"
+#include "Lucy/Index/DataReader.h"
 #include "Lucy/Index/IndexManager.h"
 #include "Lucy/Index/BackgroundMerger.h"
 #include "Lucy/Index/TermVector.h"
@@ -414,4 +415,47 @@ func (s *SortCacheIMP) Find(term interface{}) (retval int32, err error) {
 		retval = int32(retvalCF)
 	})
 	return retval, err
+}
+
+func (d *DataReaderIMP) Aggregator(readers []DataReader, offsets []int32) (retval DataReader, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_DataReader)(clownfish.Unwrap(d, "d"))
+		size := len(readers)
+		readersC := C.cfish_Vec_new(C.size_t(size))
+		defer C.cfish_decref(unsafe.Pointer(readersC))
+		for i := 0; i < size; i++ {
+			elemC := clownfish.Unwrap(readers[i], "readers[i]")
+			C.CFISH_Vec_Push(readersC, C.cfish_incref(elemC))
+		}
+		offs := NewI32Array(offsets)
+		offsetsC := (*C.lucy_I32Array)(clownfish.Unwrap(offs, "offs"))
+		retvalCF := C.LUCY_DataReader_Aggregator(self, readersC, offsetsC)
+		defer C.cfish_decref(unsafe.Pointer(retvalCF))
+		if retvalCF != nil {
+			retval = clownfish.ToGo(unsafe.Pointer(retvalCF)).(DataReader)
+		}
+	})
+	return retval, err
+}
+
+func (d *DataReaderIMP) GetSegments() []Segment {
+	self := (*C.lucy_DataReader)(clownfish.Unwrap(d, "d"))
+	retvalCF := C.LUCY_DataReader_Get_Segments(self);
+	if retvalCF == nil {
+		return nil
+	}
+	size := C.CFISH_Vec_Get_Size(retvalCF)
+	retval := make([]Segment, int(size))
+	for i := 0; i < int(size); i++ {
+		elem := unsafe.Pointer(C.CFISH_Vec_Fetch(retvalCF, C.size_t(i)))
+		retval[i] = clownfish.ToGo(unsafe.Pointer(C.cfish_incref(elem))).(Segment)
+	}
+	return retval
+}
+
+func (d *DataReaderIMP) Close() error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DataReader)(clownfish.Unwrap(d, "d"))
+		C.LUCY_DataReader_Close(self)
+	})
 }
