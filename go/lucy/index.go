@@ -18,6 +18,7 @@ package lucy
 
 /*
 #include "Lucy/Index/Indexer.h"
+#include "Lucy/Index/IndexReader.h"
 #include "Lucy/Index/DataReader.h"
 #include "Lucy/Index/DocReader.h"
 #include "Lucy/Index/IndexManager.h"
@@ -481,4 +482,50 @@ func (d *DocReaderIMP) FetchDoc(docID int32) (doc HitDoc, err error) {
 		doc = WRAPHitDoc(unsafe.Pointer(docC))
 	})
 	return doc, err
+}
+
+func OpenIndexReader(index interface{}, snapshot Snapshot, manager IndexManager) (retval IndexReader, err error) {
+	err = clownfish.TrapErr(func() {
+		indexC := (*C.cfish_Obj)(clownfish.GoToClownfish(index, unsafe.Pointer(C.CFISH_OBJ), false))
+		defer C.cfish_decref(unsafe.Pointer(indexC))
+		snapshotC := (*C.lucy_Snapshot)(clownfish.UnwrapNullable(snapshot))
+		managerC := (*C.lucy_IndexManager)(clownfish.UnwrapNullable(manager))
+		cfObj := C.lucy_IxReader_open(indexC, snapshotC, managerC)
+		retval = clownfish.WRAPAny(unsafe.Pointer(cfObj)).(IndexReader)
+	})
+	return retval, err
+}
+
+func (r *IndexReaderIMP) SegReaders() []SegReader {
+	self := (*C.lucy_IndexReader)(clownfish.Unwrap(r, "r"))
+	retvalCF := C.LUCY_IxReader_Seg_Readers(self);
+	defer C.cfish_decref(unsafe.Pointer(retvalCF))
+	if retvalCF == nil {
+		return nil
+	}
+	size := C.CFISH_Vec_Get_Size(retvalCF)
+	retval := make([]SegReader, int(size))
+	for i := 0; i < int(size); i++ {
+		elem := unsafe.Pointer(C.CFISH_Vec_Fetch(retvalCF, C.size_t(i)))
+		retval[i] = clownfish.ToGo(unsafe.Pointer(C.cfish_incref(elem))).(SegReader)
+	}
+	return retval
+}
+
+func (r *IndexReaderIMP) Offsets() []int32 {
+	self := (*C.lucy_IndexReader)(clownfish.Unwrap(r, "r"))
+	retvalCF := C.LUCY_IxReader_Offsets(self)
+	defer C.cfish_decref(unsafe.Pointer(retvalCF))
+	return i32ArrayToSlice(retvalCF)
+}
+
+func (r *IndexReaderIMP) Obtain(api string) (retval DataReader, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_IndexReader)(clownfish.Unwrap(r, "r"))
+		apiC := (*C.cfish_String)(clownfish.GoToClownfish(api, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(apiC))
+		retvalCF := C.LUCY_IxReader_Obtain(self, apiC)
+		retval = clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(retvalCF)))).(DataReader)
+	})
+	return retval, err
 }

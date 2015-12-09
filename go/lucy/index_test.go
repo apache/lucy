@@ -400,9 +400,9 @@ func TestSortCacheMisc(t *testing.T) {
 	indexer.AddDoc(make(map[string]interface{}))
 	indexer.Commit()
 
-	searcher, _ := OpenIndexSearcher(folder)
-	segReaders := searcher.GetReader().SegReaders()
-	sortReader := segReaders[0].(SegReader).Obtain("Lucy::Index::SortReader").(SortReader)
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	segReaders := ixReader.SegReaders()
+	sortReader := segReaders[0].Fetch("Lucy::Index::SortReader").(SortReader)
 	sortCache := sortReader.fetchSortCache("content")
 
 	if card := sortCache.GetCardinality(); card != 4 {
@@ -646,9 +646,9 @@ func TestInverterMisc(t *testing.T) {
 // Use SegLexicon to air out the Lexicon interface.
 func TestLexiconBasics(t *testing.T) {
 	folder := createTestIndex("a", "b", "c")
-	searcher, _ := OpenIndexSearcher(folder)
-	segReaders := searcher.GetReader().SegReaders()
-	lexReader := segReaders[0].(SegReader).Obtain("Lucy::Index::LexiconReader").(LexiconReader)
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	segReaders := ixReader.SegReaders()
+	lexReader := segReaders[0].Fetch("Lucy::Index::LexiconReader").(LexiconReader)
 	segLex := lexReader.Lexicon("content", nil).(Lexicon)
 	if field := segLex.getField(); field != "content" {
 		t.Errorf("getField: %s", field)
@@ -678,9 +678,9 @@ func TestLexiconBasics(t *testing.T) {
 
 func TestPostingListBasics(t *testing.T) {
 	folder := createTestIndex("c", "b b b", "a", "b",)
-	searcher, _ := OpenIndexSearcher(folder)
-	segReaders := searcher.GetReader().SegReaders()
-	pListReader := segReaders[0].(SegReader).Obtain("Lucy::Index::PostingListReader").(PostingListReader)
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	segReaders := ixReader.SegReaders()
+	pListReader := segReaders[0].Fetch("Lucy::Index::PostingListReader").(PostingListReader)
 	pList := pListReader.PostingList("content", nil)
 	pList.Seek("b")
 	if docFreq := pList.GetDocFreq(); docFreq != 2 {
@@ -746,16 +746,62 @@ func runDataReaderCommon(t *testing.T, reader DataReader, runAggregator bool) {
 
 func TestIndexReaderMisc(t *testing.T) {
 	folder := createTestIndex("a", "b", "c")
-	searcher, _ := OpenIndexSearcher(folder)
-	reader := searcher.GetReader()
+	reader, _ := OpenIndexReader(folder, nil, nil)
+	if segReaders := reader.SegReaders(); len(segReaders) != 1 {
+		t.Errorf("SegReaders: %#v", segReaders)
+	}
+	if offsets := reader.Offsets(); offsets[0] != 0 {
+		t.Errorf("Offsets: %#v", offsets)
+	}
+	if got, err := reader.Obtain("Lucy::Index::DocReader"); got == nil || err != nil {
+		t.Errorf("Obtain should succeed for DocReader: %#v, %v", got, err)
+	}
+	if got, err := reader.Obtain("Nope"); got != nil || err == nil {
+		t.Errorf("Obtain should fail for non-existent API name: %v", err)
+	}
+	if got := reader.Fetch("Lucy::Index::DocReader"); got == nil  {
+		t.Errorf("Fetch should succeed for DocReader")
+	}
+	if got := reader.Fetch("Nope"); got != nil {
+		t.Errorf("Fetch should return nil for non-existent API name: %v", got)
+	}
+	if got := reader.DocMax(); got != 3 {
+		t.Errorf("DocMax: %d", got);
+	}
+	if got := reader.DocCount(); got != 3 {
+		t.Errorf("DocCount: %d", got);
+	}
+	if got := reader.DelCount(); got != 0 {
+		t.Errorf("DelCount: %d", got);
+	}
 	runDataReaderCommon(t, reader, false)
+}
+
+func TestIndexReaderOpen(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	if got, err := OpenIndexReader(folder, nil, nil); got == nil || err != nil {
+		t.Errorf("nil Snapshot and IndexManager: %v", err)
+	}
+	snapshot := NewSnapshot()
+	snapshot.ReadFile(folder, "")
+	if got, err := OpenIndexReader(folder, snapshot, nil); got == nil || err != nil {
+		t.Errorf("With Snapshot: %v", err)
+	}
+	manager := NewIndexManager("", nil)
+	manager.SetFolder(folder)
+	if got, err := OpenIndexReader(folder, nil, manager); got == nil || err != nil {
+		t.Errorf("With IndexManager: %v", err)
+	}
+	if got, err := OpenIndexReader("no-index-here", nil, nil); got != nil || err == nil {
+		t.Errorf("Non-existent index path")
+	}
 }
 
 func TestDefaultDocReaderMisc(t *testing.T) {
 	folder := createTestIndex("a", "b", "c")
-	searcher, _ := OpenIndexSearcher(folder)
-	segReaders := searcher.GetReader().SegReaders()
-	reader := segReaders[0].(SegReader).Obtain("Lucy::Index::DocReader").(DefaultDocReader)
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	segReaders := ixReader.SegReaders()
+	reader := segReaders[0].Fetch("Lucy::Index::DocReader").(DefaultDocReader)
 	doc := make(map[string]interface{})
 	if err := reader.ReadDoc(2, doc); err != nil {
 		t.Errorf("ReadDoc: %v", err)
@@ -765,8 +811,8 @@ func TestDefaultDocReaderMisc(t *testing.T) {
 
 func TestPolyDocReaderMisc(t *testing.T) {
 	folder := createTestIndex("a", "b", "c")
-	searcher, _ := OpenIndexSearcher(folder)
-	reader := searcher.GetReader().Obtain("Lucy::Index::DocReader").(PolyDocReader)
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	reader := ixReader.Fetch("Lucy::Index::DocReader").(PolyDocReader)
 	doc := make(map[string]interface{})
 	if err := reader.ReadDoc(2, doc); err != nil {
 		t.Errorf("ReadDoc: %v", err)

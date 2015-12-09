@@ -191,6 +191,11 @@ func specClasses(parcel *cfc.Parcel) {
 	dataReaderBinding.SpecMethod("Close", "Close() error")
 	dataReaderBinding.Register()
 
+	ixReaderBinding := cfc.NewGoClass(parcel, "Lucy::Index::IndexReader")
+	ixReaderBinding.SpecMethod("Seg_Readers", "SegReaders() []SegReader")
+	ixReaderBinding.SpecMethod("Offsets", "Offsets() []int32")
+	ixReaderBinding.SpecMethod("Obtain", "Obtain(string) (DataReader, error)")
+	ixReaderBinding.Register()
 
 	docReaderBinding := cfc.NewGoClass(parcel, "Lucy::Index::DocReader")
 	docReaderBinding.SpecMethod("", "ReadDoc(int32, interface{}) error")
