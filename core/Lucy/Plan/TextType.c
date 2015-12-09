@@ -38,6 +38,10 @@ TextType_Primitive_ID_IMP(TextType *self) {
 
 /***************************************************************************/
 
+// The internal, current value of TextTermStepper is stored either as a
+// String in `ivars->value` or, if `ivars->value == NULL`, as ByteBuf in
+// `ivars->bytebuf`.
+
 TextTermStepper*
 TextTermStepper_new() {
     TextTermStepper *self
@@ -134,7 +138,9 @@ TextTermStepper_Write_Delta_IMP(TextTermStepper *self, OutStream *outstream,
     OutStream_Write_String(outstream, diff_start_str, diff_len);
 
     // Update value.
-    BB_Mimic_Bytes(ivars->bytebuf, new_text, new_size);
+    char *buf = BB_Grow(ivars->bytebuf, new_size);
+    memcpy(buf, new_text, new_size);
+    BB_Set_Size(ivars->bytebuf, new_size);
 
     // Invalidate string value.
     DECREF(ivars->value);
@@ -172,10 +178,16 @@ TextTermStepper_Read_Delta_IMP(TextTermStepper *self, InStream *instream) {
     const uint32_t total_text_len   = text_overlap + finish_chars_len;
 
     // Allocate space.
-    if (ivars->value) {
-        BB_Mimic(ivars->bytebuf, ivars->value);
-    }
     char *ptr = BB_Grow(ivars->bytebuf, total_text_len);
+
+    if (ivars->value) {
+        // Copy overlapping part from string value.
+        memcpy(ptr, Str_Get_Ptr8((String*)ivars->value), text_overlap);
+
+        // Invalidate string value.
+        DECREF(ivars->value);
+        ivars->value = NULL;
+    }
 
     // Set the value text.
     InStream_Read_Bytes(instream, ptr + text_overlap, finish_chars_len);
@@ -185,10 +197,6 @@ TextTermStepper_Read_Delta_IMP(TextTermStepper *self, InStream *instream) {
               InStream_Get_Filename(instream),
               InStream_Tell(instream) - finish_chars_len);
     }
-
-    // Invalidate string value.
-    DECREF(ivars->value);
-    ivars->value = NULL;
 }
 
 
