@@ -218,6 +218,12 @@ func specClasses(parcel *cfc.Parcel) {
 	sortReaderBinding.SpecMethod("Fetch_Sort_Cache", "fetchSortCache(string) (SortCache, error)")
 	sortReaderBinding.Register()
 
+	lexReaderBinding := cfc.NewGoClass(parcel, "Lucy::Index::LexiconReader")
+	lexReaderBinding.SpecMethod("Lexicon", "Lexicon(string, interface{}) (Lexicon, error)")
+	lexReaderBinding.SpecMethod("Doc_Freq", "DocFreq(string, interface{}) (uint32, error)")
+	lexReaderBinding.SpecMethod("Fetch_Term_Info", "fetchTermInfo(string, interface{}) (TermInfo, error)")
+	lexReaderBinding.Register()
+
 	bgMergerBinding := cfc.NewGoClass(parcel, "Lucy::Index::BackgroundMerger")
 	bgMergerBinding.SpecMethod("Prepare_Commit", "PrepareCommit() error")
 	bgMergerBinding.SpecMethod("Commit", "Commit() error")

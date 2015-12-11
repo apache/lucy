@@ -21,6 +21,7 @@ package lucy
 #include "Lucy/Index/IndexReader.h"
 #include "Lucy/Index/DataReader.h"
 #include "Lucy/Index/DocReader.h"
+#include "Lucy/Index/LexiconReader.h"
 #include "Lucy/Index/HighlightReader.h"
 #include "Lucy/Index/SortReader.h"
 #include "Lucy/Index/IndexManager.h"
@@ -484,6 +485,48 @@ func (d *DocReaderIMP) FetchDoc(docID int32) (doc HitDoc, err error) {
 		doc = WRAPHitDoc(unsafe.Pointer(docC))
 	})
 	return doc, err
+}
+
+func (lr *LexiconReaderIMP) Lexicon(field string, term interface{}) (retval Lexicon, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_LexiconReader)(clownfish.Unwrap(lr, "lr"))
+		fieldC := (*C.cfish_String)(clownfish.GoToClownfish(field, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(fieldC))
+		termC := (*C.cfish_Obj)(clownfish.GoToClownfish(term, unsafe.Pointer(C.CFISH_OBJ), true))
+		defer C.cfish_decref(unsafe.Pointer(termC))
+		retvalCF := C.LUCY_LexReader_Lexicon(self, fieldC, termC)
+		if retvalCF != nil {
+			retval = clownfish.ToGo(unsafe.Pointer(retvalCF)).(Lexicon)
+		}
+	})
+	return retval, err
+}
+
+func (lr *LexiconReaderIMP) DocFreq(field string, term interface{}) (retval uint32, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_LexiconReader)(clownfish.Unwrap(lr, "lr"))
+		fieldC := (*C.cfish_String)(clownfish.GoToClownfish(field, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(fieldC))
+		termC := (*C.cfish_Obj)(clownfish.GoToClownfish(term, unsafe.Pointer(C.CFISH_OBJ), true))
+		defer C.cfish_decref(unsafe.Pointer(termC))
+		retval = uint32(C.LUCY_LexReader_Doc_Freq(self, fieldC, termC))
+	})
+	return retval, err
+}
+
+func (lr *LexiconReaderIMP) fetchTermInfo(field string, term interface{}) (retval TermInfo, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_LexiconReader)(clownfish.Unwrap(lr, "lr"))
+		fieldC := (*C.cfish_String)(clownfish.GoToClownfish(field, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(fieldC))
+		termC := (*C.cfish_Obj)(clownfish.GoToClownfish(term, unsafe.Pointer(C.CFISH_OBJ), true))
+		defer C.cfish_decref(unsafe.Pointer(termC))
+		retvalCF := C.LUCY_LexReader_Fetch_Term_Info(self, fieldC, termC)
+		if retvalCF != nil {
+			retval = clownfish.ToGo(unsafe.Pointer(retvalCF)).(TermInfo)
+		}
+	})
+	return retval, err
 }
 
 func (h *HighlightReaderIMP) FetchDocVec(docID int32) (retval DocVector, err error) {

@@ -649,7 +649,7 @@ func TestLexiconBasics(t *testing.T) {
 	ixReader, _ := OpenIndexReader(folder, nil, nil)
 	segReaders := ixReader.SegReaders()
 	lexReader := segReaders[0].Fetch("Lucy::Index::LexiconReader").(LexiconReader)
-	segLex := lexReader.Lexicon("content", nil).(Lexicon)
+	segLex, _ := lexReader.Lexicon("content", nil)
 	if field := segLex.getField(); field != "content" {
 		t.Errorf("getField: %s", field)
 	}
@@ -818,6 +818,35 @@ func TestPolyDocReaderMisc(t *testing.T) {
 		t.Errorf("ReadDoc: %v", err)
 	}
 	runDataReaderCommon(t, reader, true)
+}
+
+func TestLexReaderMisc(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	segReaders := ixReader.SegReaders()
+	lexReader := segReaders[0].Fetch("Lucy::Index::LexiconReader").(LexiconReader)
+	if got, err := lexReader.Lexicon("content", nil); got == nil || err != nil {
+		t.Errorf("Lexicon should succeed: %v", err)
+	}
+	if got, err := lexReader.Lexicon("content", "foo"); got == nil || err != nil {
+		t.Errorf("Lexicon with term should succeed: %v", err)
+	}
+	if got, err := lexReader.Lexicon("nope", nil); got != nil || err != nil {
+		t.Errorf("Lexicon for non-field should return nil: %v", err)
+	}
+	if got, err := lexReader.DocFreq("content", "b"); got != 1 || err != nil {
+		t.Errorf("DocFreq: %d, %v", got, err)
+	}
+	if got, err := lexReader.DocFreq("content", "nope"); got != 0 || err != nil {
+		t.Errorf("DocFreq should be 0: %d, %v", got, err)
+	}
+	if got, err := lexReader.fetchTermInfo("content", "a"); got == nil || err != nil {
+		t.Errorf("fetchTermInfo should succeed: %v", err)
+	}
+	if got, err := lexReader.fetchTermInfo("content", "nope"); got != nil || err != nil {
+		t.Errorf("fetchTermInfo with non-existent term should return nil: %v", err)
+	}
+	runDataReaderCommon(t, lexReader, false)
 }
 
 func TestHighlightReaderMisc(t *testing.T) {
