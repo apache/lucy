@@ -224,6 +224,10 @@ func specClasses(parcel *cfc.Parcel) {
 	lexReaderBinding.SpecMethod("Fetch_Term_Info", "fetchTermInfo(string, interface{}) (TermInfo, error)")
 	lexReaderBinding.Register()
 
+	pListReaderBinding := cfc.NewGoClass(parcel, "Lucy::Index::PostingListReader")
+	pListReaderBinding.SpecMethod("Posting_List", "PostingList(string, interface{}) (PostingList, error)")
+	pListReaderBinding.Register()
+
 	bgMergerBinding := cfc.NewGoClass(parcel, "Lucy::Index::BackgroundMerger")
 	bgMergerBinding.SpecMethod("Prepare_Commit", "PrepareCommit() error")
 	bgMergerBinding.SpecMethod("Commit", "Commit() error")

@@ -22,6 +22,7 @@ package lucy
 #include "Lucy/Index/DataReader.h"
 #include "Lucy/Index/DocReader.h"
 #include "Lucy/Index/LexiconReader.h"
+#include "Lucy/Index/PostingListReader.h"
 #include "Lucy/Index/HighlightReader.h"
 #include "Lucy/Index/SortReader.h"
 #include "Lucy/Index/IndexManager.h"
@@ -524,6 +525,21 @@ func (lr *LexiconReaderIMP) fetchTermInfo(field string, term interface{}) (retva
 		retvalCF := C.LUCY_LexReader_Fetch_Term_Info(self, fieldC, termC)
 		if retvalCF != nil {
 			retval = clownfish.ToGo(unsafe.Pointer(retvalCF)).(TermInfo)
+		}
+	})
+	return retval, err
+}
+
+func (p *PostingListReaderIMP) PostingList(field string, term interface{}) (retval PostingList, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_PostingListReader)(clownfish.Unwrap(p, "p"))
+		fieldC := (*C.cfish_String)(clownfish.GoToClownfish(field, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(fieldC))
+		termC := (*C.cfish_Obj)(clownfish.GoToClownfish(term, unsafe.Pointer(C.CFISH_OBJ), true))
+		defer C.cfish_decref(unsafe.Pointer(termC))
+		retvalCF := C.LUCY_PListReader_Posting_List(self, fieldC, termC)
+		if retvalCF != nil {
+			retval = clownfish.ToGo(unsafe.Pointer(retvalCF)).(PostingList)
 		}
 	})
 	return retval, err

@@ -681,7 +681,7 @@ func TestPostingListBasics(t *testing.T) {
 	ixReader, _ := OpenIndexReader(folder, nil, nil)
 	segReaders := ixReader.SegReaders()
 	pListReader := segReaders[0].Fetch("Lucy::Index::PostingListReader").(PostingListReader)
-	pList := pListReader.PostingList("content", nil)
+	pList, _ := pListReader.PostingList("content", nil)
 	pList.Seek("b")
 	if docFreq := pList.GetDocFreq(); docFreq != 2 {
 		t.Errorf("GetDocFreq: %d", docFreq)
@@ -847,6 +847,23 @@ func TestLexReaderMisc(t *testing.T) {
 		t.Errorf("fetchTermInfo with non-existent term should return nil: %v", err)
 	}
 	runDataReaderCommon(t, lexReader, false)
+}
+
+func TestPostingListReaderMisc(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	segReaders := ixReader.SegReaders()
+	pListReader := segReaders[0].Fetch("Lucy::Index::PostingListReader").(PostingListReader)
+	if got, err := pListReader.PostingList("content", nil); got == nil || err != nil {
+		t.Errorf("PostingList should succeed: %v", err)
+	}
+	if got, err := pListReader.PostingList("content", "foo"); got == nil || err != nil {
+		t.Errorf("PostingList with term should succeed: %v", err)
+	}
+	if got, err := pListReader.PostingList("nope", nil); got != nil || err != nil {
+		t.Errorf("PostingList for non-field should return nil: %v", err)
+	}
+	runDataReaderCommon(t, pListReader, false)
 }
 
 func TestHighlightReaderMisc(t *testing.T) {
