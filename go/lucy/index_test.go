@@ -819,3 +819,17 @@ func TestPolyDocReaderMisc(t *testing.T) {
 	}
 	runDataReaderCommon(t, reader, true)
 }
+
+func TestHighlightReaderMisc(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	segReaders := ixReader.SegReaders()
+	reader := segReaders[0].Fetch("Lucy::Index::HighlightReader").(HighlightReader)
+	if got, err := reader.FetchDocVec(2); got == nil || err != nil {
+		t.Errorf("FetchDocVec: %v", err)
+	}
+	if got, err := reader.FetchDocVec(4); got != nil || err == nil {
+		t.Errorf("FetchDocVec catch error: %#v", got)
+	}
+	runDataReaderCommon(t, reader, true)
+}

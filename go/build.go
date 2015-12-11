@@ -210,6 +210,10 @@ func specClasses(parcel *cfc.Parcel) {
 	docReaderBinding.SpecMethod("Fetch_Doc", "FetchDoc(int32) (HitDoc, error)")
 	docReaderBinding.Register()
 
+	hlReaderBinding := cfc.NewGoClass(parcel, "Lucy::Index::HighlightReader")
+	hlReaderBinding.SpecMethod("Fetch_Doc_Vec", "FetchDocVec(int32) (DocVector, error)")
+	hlReaderBinding.Register()
+
 	bgMergerBinding := cfc.NewGoClass(parcel, "Lucy::Index::BackgroundMerger")
 	bgMergerBinding.SpecMethod("Prepare_Commit", "PrepareCommit() error")
 	bgMergerBinding.SpecMethod("Commit", "Commit() error")

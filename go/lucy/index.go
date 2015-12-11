@@ -21,6 +21,7 @@ package lucy
 #include "Lucy/Index/IndexReader.h"
 #include "Lucy/Index/DataReader.h"
 #include "Lucy/Index/DocReader.h"
+#include "Lucy/Index/HighlightReader.h"
 #include "Lucy/Index/IndexManager.h"
 #include "Lucy/Index/BackgroundMerger.h"
 #include "Lucy/Index/TermVector.h"
@@ -482,6 +483,15 @@ func (d *DocReaderIMP) FetchDoc(docID int32) (doc HitDoc, err error) {
 		doc = WRAPHitDoc(unsafe.Pointer(docC))
 	})
 	return doc, err
+}
+
+func (h *HighlightReaderIMP) FetchDocVec(docID int32) (retval DocVector, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_HighlightReader)(clownfish.Unwrap(h, "h"))
+		retvalCF := C.LUCY_HLReader_Fetch_Doc_Vec(self, C.int32_t(docID))
+		retval = WRAPDocVector(unsafe.Pointer(retvalCF))
+	})
+	return retval, err
 }
 
 func OpenIndexReader(index interface{}, snapshot Snapshot, manager IndexManager) (retval IndexReader, err error) {
