@@ -833,3 +833,17 @@ func TestHighlightReaderMisc(t *testing.T) {
 	}
 	runDataReaderCommon(t, reader, true)
 }
+
+func TestDeletionsReaderMisc(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	segReaders := ixReader.SegReaders()
+	delReader := segReaders[0].Fetch("Lucy::Index::DeletionsReader").(DeletionsReader)
+	if count := delReader.delCount(); count != 0 {
+		t.Errorf("delCount: %d", count);
+	}
+	if matcher := delReader.iterator(); matcher == nil {
+		t.Errorf("iterator: %#v", matcher)
+	}
+	runDataReaderCommon(t, delReader, true)
+}
