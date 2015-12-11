@@ -403,7 +403,7 @@ func TestSortCacheMisc(t *testing.T) {
 	ixReader, _ := OpenIndexReader(folder, nil, nil)
 	segReaders := ixReader.SegReaders()
 	sortReader := segReaders[0].Fetch("Lucy::Index::SortReader").(SortReader)
-	sortCache := sortReader.fetchSortCache("content")
+	sortCache, _ := sortReader.fetchSortCache("content")
 
 	if card := sortCache.GetCardinality(); card != 4 {
 		t.Errorf("GetCardinality: %d", card)
@@ -846,4 +846,18 @@ func TestDeletionsReaderMisc(t *testing.T) {
 		t.Errorf("iterator: %#v", matcher)
 	}
 	runDataReaderCommon(t, delReader, true)
+}
+
+func TestSortReaderMisc(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	segReaders := ixReader.SegReaders()
+	sortReader := segReaders[0].Fetch("Lucy::Index::SortReader").(SortReader)
+	if got, err := sortReader.fetchSortCache("content"); got == nil || err != nil {
+		t.Errorf("fetchSortCache should succeed: %v", err)
+	}
+	if got, err := sortReader.fetchSortCache("nope"); got != nil || err != nil {
+		t.Errorf("fetchSortCache for non-field should return nil: %v", err)
+	}
+	runDataReaderCommon(t, sortReader, false)
 }

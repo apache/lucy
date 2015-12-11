@@ -22,6 +22,7 @@ package lucy
 #include "Lucy/Index/DataReader.h"
 #include "Lucy/Index/DocReader.h"
 #include "Lucy/Index/HighlightReader.h"
+#include "Lucy/Index/SortReader.h"
 #include "Lucy/Index/IndexManager.h"
 #include "Lucy/Index/BackgroundMerger.h"
 #include "Lucy/Index/TermVector.h"
@@ -490,6 +491,19 @@ func (h *HighlightReaderIMP) FetchDocVec(docID int32) (retval DocVector, err err
 		self := (*C.lucy_HighlightReader)(clownfish.Unwrap(h, "h"))
 		retvalCF := C.LUCY_HLReader_Fetch_Doc_Vec(self, C.int32_t(docID))
 		retval = WRAPDocVector(unsafe.Pointer(retvalCF))
+	})
+	return retval, err
+}
+
+func (s *SortReaderIMP) fetchSortCache(field string) (retval SortCache, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_SortReader)(clownfish.Unwrap(s, "s"))
+		fieldC := (*C.cfish_String)(clownfish.GoToClownfish(field, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(fieldC))
+		retvalCF := C.LUCY_SortReader_Fetch_Sort_Cache(self, fieldC)
+		if retvalCF != nil {
+			retval = clownfish.ToGo(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(retvalCF)))).(SortCache)
+		}
 	})
 	return retval, err
 }

@@ -372,7 +372,7 @@ func TestRangeMatcherBasics(t *testing.T) {
 	ixReader, _ := OpenIndexReader(index, nil, nil)
 	segReaders := ixReader.SegReaders()
 	sortReader := segReaders[0].Fetch("Lucy::Index::SortReader").(SortReader)
-	sortCache := sortReader.fetchSortCache("content")
+	sortCache, _ := sortReader.fetchSortCache("content")
 	matcher := NewRangeMatcher(0, 0, sortCache, segReaders[0].DocMax())
 	if docID := matcher.Next(); docID != 4 {
 		t.Errorf("Next: %d", docID)
