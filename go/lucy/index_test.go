@@ -907,3 +907,60 @@ func TestSortReaderMisc(t *testing.T) {
 	}
 	runDataReaderCommon(t, sortReader, false)
 }
+
+func runDataWriterCommon(t *testing.T, api string) {
+	abcIndex := createTestIndex("a", "b", "c")
+	indexer, _ := OpenIndexer(&OpenIndexerArgs{Index: abcIndex})
+	dataWriter := indexer.getSegWriter().Fetch(api).(DataWriter)
+
+	if got := dataWriter.GetSnapshot(); false {
+		t.Errorf("GetSnapshot: %v", got)
+	}
+	if got := dataWriter.GetSegment(); false {
+		t.Errorf("GetSegment: %#v", got)
+	}
+	if got := dataWriter.GetPolyReader(); false {
+		t.Errorf("GetPolyReader: %#v", got)
+	}
+	if got := dataWriter.GetSchema(); false {
+		t.Errorf("GetSchema: %v", got)
+	}
+	if got := dataWriter.GetFolder(); false {
+		t.Errorf("GetFolder: %v", got)
+	}
+
+	doc := NewDoc(1)
+	doc.Store("content", "three blind mice")
+	inverter := NewInverter(dataWriter.GetSchema(), dataWriter.GetSegment())
+	inverter.SetDoc(doc)
+	inverter.InvertDoc(doc)
+	if err := dataWriter.addInvertedDoc(inverter, 1); err != nil {
+		t.Errorf("addInvertedDoc: %v", err)
+	}
+
+	segReaders := indexer.getSegWriter().GetPolyReader().SegReaders()
+	abcSegReader := segReaders[0]
+	if err := dataWriter.MergeSegment(abcSegReader, []int32{0, 2, 0, 3}); err != nil {
+		t.Errorf("MergeSegment: %v", err)
+	}
+
+	// TODO
+	//if err := dataWriter.DeleteSegment(fooSegReader); err != nil {
+	//	t.Errorf("DeleteSegment: %v", err)
+	//}
+
+	xyzIndex := createTestIndex("x", "y", "z")
+	xyzReader, _ := OpenIndexReader(xyzIndex, nil, nil)
+	xyzSegReaders := xyzReader.SegReaders()
+	if err := dataWriter.AddSegment(xyzSegReaders[0], []int32{0, 4, 5, 6}); err != nil {
+		t.Errorf("AddSegment: %v", err)
+	}
+
+	if err := dataWriter.Finish(); err != nil {
+		t.Errorf("Finish: %v", err)
+	}
+}
+
+func TestSortWriterMisc(t *testing.T) {
+	runDataWriterCommon(t, "Lucy::Index::SortWriter")
+}

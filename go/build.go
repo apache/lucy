@@ -228,6 +228,14 @@ func specClasses(parcel *cfc.Parcel) {
 	pListReaderBinding.SpecMethod("Posting_List", "PostingList(string, interface{}) (PostingList, error)")
 	pListReaderBinding.Register()
 
+	dwBinding := cfc.NewGoClass(parcel, "Lucy::Index::DataWriter")
+	dwBinding.SpecMethod("Add_Inverted_Doc", "addInvertedDoc(Inverter, int32) error")
+	dwBinding.SpecMethod("Add_Segment", "AddSegment(SegReader, []int32) error")
+	dwBinding.SpecMethod("Delete_Segment", "DeleteSegment(SegReader) error")
+	dwBinding.SpecMethod("Merge_Segment", "MergeSegment(SegReader, []int32) error")
+	dwBinding.SpecMethod("Finish", "Finish() error")
+	dwBinding.Register()
+
 	bgMergerBinding := cfc.NewGoClass(parcel, "Lucy::Index::BackgroundMerger")
 	bgMergerBinding.SpecMethod("Prepare_Commit", "PrepareCommit() error")
 	bgMergerBinding.SpecMethod("Commit", "Commit() error")

@@ -20,6 +20,7 @@ package lucy
 #include "Lucy/Index/Indexer.h"
 #include "Lucy/Index/IndexReader.h"
 #include "Lucy/Index/DataReader.h"
+#include "Lucy/Index/DataWriter.h"
 #include "Lucy/Index/DocReader.h"
 #include "Lucy/Index/LexiconReader.h"
 #include "Lucy/Index/PostingListReader.h"
@@ -232,6 +233,49 @@ func (obj *IndexerIMP) Commit() error {
 	self := ((*C.lucy_Indexer)(unsafe.Pointer(obj.TOPTR())))
 	return clownfish.TrapErr(func() {
 		C.LUCY_Indexer_Commit(self)
+	})
+}
+
+func (d *DataWriterIMP) addInvertedDoc(inverter Inverter, docId int32) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DataWriter)(clownfish.Unwrap(d, "d"))
+		inverterCF := (*C.lucy_Inverter)(clownfish.Unwrap(inverter, "inverter"))
+		C.LUCY_DataWriter_Add_Inverted_Doc(self, inverterCF, C.int32_t(docId))
+	})
+}
+
+func (d *DataWriterIMP) AddSegment(reader SegReader, docMap []int32) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DataWriter)(clownfish.Unwrap(d, "d"))
+		readerCF := (*C.lucy_SegReader)(clownfish.Unwrap(reader, "reader"))
+		docMapConv := NewI32Array(docMap)
+		docMapCF := (*C.lucy_I32Array)(clownfish.UnwrapNullable(docMapConv))
+		C.LUCY_DataWriter_Add_Segment(self, readerCF, docMapCF)
+	})
+}
+
+func (d *DataWriterIMP) DeleteSegment(reader SegReader) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DataWriter)(clownfish.Unwrap(d, "d"))
+		readerCF := (*C.lucy_SegReader)(clownfish.Unwrap(reader, "reader"))
+		C.LUCY_DataWriter_Delete_Segment(self, readerCF)
+	})
+}
+
+func (d *DataWriterIMP) MergeSegment(reader SegReader, docMap []int32) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DataWriter)(clownfish.Unwrap(d, "d"))
+		readerCF := (*C.lucy_SegReader)(clownfish.Unwrap(reader, "reader"))
+		docMapConv := NewI32Array(docMap)
+		docMapCF := (*C.lucy_I32Array)(clownfish.UnwrapNullable(docMapConv))
+		C.LUCY_DataWriter_Merge_Segment(self, readerCF, docMapCF)
+	})
+}
+
+func (d *DataWriterIMP) Finish() error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DataWriter)(clownfish.Unwrap(d, "d"))
+		C.LUCY_DataWriter_Finish(self)
 	})
 }
 
