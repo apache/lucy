@@ -964,3 +964,33 @@ func runDataWriterCommon(t *testing.T, api string) {
 func TestSortWriterMisc(t *testing.T) {
 	runDataWriterCommon(t, "Lucy::Index::SortWriter")
 }
+
+func TestDeletionsWriterMisc(t *testing.T) {
+	index := createTestIndex("a", "b", "c")
+	indexer, _ := OpenIndexer(&OpenIndexerArgs{Index: index})
+	delWriter := indexer.getSegWriter().Fetch("Lucy::Index::DeletionsWriter").(DeletionsWriter)
+	if delWriter.Updated() {
+		t.Errorf("Not yet updated")
+	}
+
+	if err := delWriter.DeleteByTerm("content", "a"); err != nil {
+		t.Errorf("DeleteByTerm: %v", err)
+	}
+	if err := delWriter.DeleteByQuery(NewTermQuery("content", "b")); err != nil {
+		t.Errorf("DeleteByQuery: %v", err)
+	}
+	if err := delWriter.deleteByDocID(3); err != nil {
+		t.Errorf("deleteByDocID: %v", err)
+	}
+	if !delWriter.Updated() {
+		t.Errorf("Now we're updated")
+	}
+
+	if got := delWriter.SegDelCount("seg_1"); got != 3 {
+		t.Errorf("SegDelCount: %d", got)
+	}
+	segReaders := delWriter.GetPolyReader().SegReaders()
+	if dels, err := delWriter.segDeletions(segReaders[0]); dels == nil || err != nil {
+		t.Errorf("segDeletions: %v", err)
+	}
+}

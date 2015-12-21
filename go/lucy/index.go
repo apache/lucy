@@ -21,6 +21,7 @@ package lucy
 #include "Lucy/Index/IndexReader.h"
 #include "Lucy/Index/DataReader.h"
 #include "Lucy/Index/DataWriter.h"
+#include "Lucy/Index/DeletionsWriter.h"
 #include "Lucy/Index/DocReader.h"
 #include "Lucy/Index/LexiconReader.h"
 #include "Lucy/Index/PostingListReader.h"
@@ -277,6 +278,55 @@ func (d *DataWriterIMP) Finish() error {
 		self := (*C.lucy_DataWriter)(clownfish.Unwrap(d, "d"))
 		C.LUCY_DataWriter_Finish(self)
 	})
+}
+
+func (d *DeletionsWriterIMP) DeleteByTerm(field string, term interface{}) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DeletionsWriter)(clownfish.Unwrap(d, "d"))
+		fieldCF := (*C.cfish_String)(clownfish.GoToClownfish(field, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(fieldCF))
+		termCF := (*C.cfish_Obj)(clownfish.GoToClownfish(term, unsafe.Pointer(C.CFISH_OBJ), false))
+		defer C.cfish_decref(unsafe.Pointer(termCF))
+		C.LUCY_DelWriter_Delete_By_Term(self, fieldCF, termCF)
+	})
+}
+
+func (d *DeletionsWriterIMP) DeleteByQuery(query Query) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DeletionsWriter)(clownfish.Unwrap(d, "d"))
+		queryCF := (*C.lucy_Query)(clownfish.Unwrap(query, "query"))
+		C.LUCY_DelWriter_Delete_By_Query(self, queryCF)
+	})
+}
+
+func (d *DeletionsWriterIMP) deleteByDocID(docId int32) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DeletionsWriter)(clownfish.Unwrap(d, "d"))
+		C.LUCY_DelWriter_Delete_By_Doc_ID(self, C.int32_t(docId))
+	})
+}
+
+func (d *DeletionsWriterIMP) generateDocMap(deletions Matcher, docMax int32, offset int32) (retval []int32, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_DeletionsWriter)(clownfish.Unwrap(d, "d"))
+		deletionsCF := (*C.lucy_Matcher)(clownfish.Unwrap(deletions, "deletions"))
+		retvalCF := C.LUCY_DelWriter_Generate_Doc_Map(self, deletionsCF, C.int32_t(docMax), C.int32_t(offset))
+		defer C.cfish_decref(unsafe.Pointer(retvalCF))
+		retval = i32ArrayToSlice(retvalCF)
+	})
+	return retval, err
+}
+
+func (d *DeletionsWriterIMP) segDeletions(segReader SegReader) (retval Matcher, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_DeletionsWriter)(clownfish.Unwrap(d, "d"))
+		segReaderCF := (*C.lucy_SegReader)(clownfish.Unwrap(segReader, "segReader"))
+		retvalCF := C.LUCY_DelWriter_Seg_Deletions(self, segReaderCF)
+		if retvalCF != nil {
+			retval = clownfish.WRAPAny(unsafe.Pointer(retvalCF)).(Matcher)
+		}
+	})
+	return retval, err
 }
 
 func OpenBackgroundMerger(index interface{}, manager IndexManager) (bgm BackgroundMerger, err error) {

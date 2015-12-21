@@ -236,6 +236,14 @@ func specClasses(parcel *cfc.Parcel) {
 	dwBinding.SpecMethod("Finish", "Finish() error")
 	dwBinding.Register()
 
+	delWriterBinding := cfc.NewGoClass(parcel, "Lucy::Index::DeletionsWriter")
+	delWriterBinding.SpecMethod("Delete_By_Term", "DeleteByTerm(string, interface{}) error")
+	delWriterBinding.SpecMethod("Delete_By_Query", "DeleteByQuery(Query) error")
+	delWriterBinding.SpecMethod("Delete_By_Doc_ID", "deleteByDocID(int32) error")
+	delWriterBinding.SpecMethod("Generate_Doc_Map", "generateDocMap(Matcher, int32, int32) ([]int32, error)")
+	delWriterBinding.SpecMethod("Seg_Deletions", "segDeletions(SegReader) (Matcher, error)")
+	delWriterBinding.Register()
+
 	bgMergerBinding := cfc.NewGoClass(parcel, "Lucy::Index::BackgroundMerger")
 	bgMergerBinding.SpecMethod("Prepare_Commit", "PrepareCommit() error")
 	bgMergerBinding.SpecMethod("Commit", "Commit() error")
