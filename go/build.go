@@ -236,6 +236,11 @@ func specClasses(parcel *cfc.Parcel) {
 	dwBinding.SpecMethod("Finish", "Finish() error")
 	dwBinding.Register()
 
+	segWriterBinding := cfc.NewGoClass(parcel, "Lucy::Index::SegWriter")
+	segWriterBinding.SpecMethod("Prep_Seg_Dir", "PrepSegDir() error")
+	segWriterBinding.SpecMethod("Add_Doc", "AddDoc(Doc, float32) error")
+	segWriterBinding.Register()
+
 	delWriterBinding := cfc.NewGoClass(parcel, "Lucy::Index::DeletionsWriter")
 	delWriterBinding.SpecMethod("Delete_By_Term", "DeleteByTerm(string, interface{}) error")
 	delWriterBinding.SpecMethod("Delete_By_Query", "DeleteByQuery(Query) error")

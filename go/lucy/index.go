@@ -21,6 +21,7 @@ package lucy
 #include "Lucy/Index/IndexReader.h"
 #include "Lucy/Index/DataReader.h"
 #include "Lucy/Index/DataWriter.h"
+#include "Lucy/Index/SegWriter.h"
 #include "Lucy/Index/DeletionsWriter.h"
 #include "Lucy/Index/DocReader.h"
 #include "Lucy/Index/LexiconReader.h"
@@ -277,6 +278,21 @@ func (d *DataWriterIMP) Finish() error {
 	return clownfish.TrapErr(func() {
 		self := (*C.lucy_DataWriter)(clownfish.Unwrap(d, "d"))
 		C.LUCY_DataWriter_Finish(self)
+	})
+}
+
+func (s *SegWriterIMP) PrepSegDir() error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_SegWriter)(clownfish.Unwrap(s, "s"))
+		C.LUCY_SegWriter_Prep_Seg_Dir(self)
+	})
+}
+
+func (s *SegWriterIMP) AddDoc(doc Doc, boost float32) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_SegWriter)(clownfish.Unwrap(s, "s"))
+		docCF := (*C.lucy_Doc)(clownfish.Unwrap(doc, "doc"))
+		C.LUCY_SegWriter_Add_Doc(self, docCF, C.float(boost))
 	})
 }
 

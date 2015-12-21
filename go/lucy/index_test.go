@@ -994,3 +994,20 @@ func TestDeletionsWriterMisc(t *testing.T) {
 		t.Errorf("segDeletions: %v", err)
 	}
 }
+
+func TestSegWriterMisc(t *testing.T) {
+	index := createTestIndex("a", "b", "c")
+	ixReader, _ := OpenIndexReader(index, nil, nil)
+	polyReader := ixReader.(PolyReader)
+	schema := polyReader.GetSchema()
+	segment := NewSegment(2)
+	snapshot := polyReader.GetSnapshot()
+	segWriter := NewSegWriter(schema, snapshot, segment, polyReader)
+	if err := segWriter.PrepSegDir(); err != nil {
+		t.Errorf("PrepSegDir: %v", err)
+	}
+	doc := NewDoc(1)
+	if err := segWriter.AddDoc(doc, 1.0); err != nil {
+		t.Errorf("AddDoc: %v", err)
+	}
+}
