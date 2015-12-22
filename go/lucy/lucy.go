@@ -626,3 +626,19 @@ func vecToStringSlice(v *C.cfish_Vector) []string {
 	}
 	return slice
 }
+
+// Turn a slice of Go strings into a Vector of Clownfish Strings.
+func stringSliceToVec(strings []string) *C.cfish_Vector {
+	if strings == nil {
+		return nil
+	}
+	size := len(strings)
+	vec := C.cfish_Vec_new(C.size_t(size))
+	for i := 0; i < size; i++ {
+		str := C.CString(strings[i])
+		length := C.size_t(len(strings[i]))
+		cfStr := C.cfish_Str_new_steal_utf8(str, length)
+		C.CFISH_Vec_Push(vec, (*C.cfish_Obj)(unsafe.Pointer(cfStr)))
+	}
+	return vec
+}
