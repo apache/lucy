@@ -723,3 +723,82 @@ func TestMatchDocSerialization(t *testing.T) {
 		t.Errorf("Failed round-trip serializetion of MatchDoc")
 	}
 }
+
+func TestQueryParserConstructors(t *testing.T) {
+	schema := createTestSchema()
+	qParser := NewQueryParser(schema, nil)
+	if _, ok := qParser.Parse("foo bar").(ORQuery); !ok {
+		t.Errorf("qParser boolop")
+	}
+	orParser := NewORParser(schema, nil)
+	if _, ok := orParser.Parse("foo bar").(ORQuery); !ok {
+		t.Errorf("orParser boolop")
+	}
+	andParser := NewANDParser(schema, nil)
+	if _, ok := andParser.Parse("foo bar").(ANDQuery); !ok {
+		t.Errorf("andParser boolop")
+	}
+}
+
+func TestQueryParserFactories(t *testing.T) {
+	qParser := NewQueryParser(createTestSchema(), nil)
+	if _, ok := qParser.MakeTermQuery("content", "foo").(TermQuery); !ok {
+		t.Errorf("MakeTermQuery")
+	}
+	if _, ok := qParser.MakePhraseQuery("content", []interface{}{}).(PhraseQuery); !ok {
+		t.Errorf("MakePhraseQuery")
+	}
+	if _, ok := qParser.MakeORQuery([]Query{}).(ORQuery); !ok {
+		t.Errorf("MakeORQuery")
+	}
+	if _, ok := qParser.MakeANDQuery([]Query{}).(ANDQuery); !ok {
+		t.Errorf("MakeANDQuery")
+	}
+	if _, ok := qParser.MakeNOTQuery(NewTermQuery("content", "foo")).(NOTQuery); !ok {
+		t.Errorf("MakeNOTQuery")
+	}
+	req := NewTermQuery("content", "foo")
+	opt := NewTermQuery("content", "bar")
+	if _, ok := qParser.MakeReqOptQuery(req, opt).(RequiredOptionalQuery); !ok {
+		t.Errorf("MakeReqOptQuery")
+	}
+}
+
+func TestQueryParserParsing(t *testing.T) {
+	qParser := NewQueryParser(createTestSchema(), nil)
+	if _, ok := qParser.Parse("foo").(Query); !ok {
+		t.Errorf("Parse")
+	}
+	if _, ok := qParser.Tree("foo").(Query); !ok {
+		t.Errorf("Tree")
+	}
+	if _, ok := qParser.Expand(NewTermQuery("content", "foo")).(Query); !ok {
+		t.Errorf("Expand")
+	}
+	if _, ok := qParser.ExpandLeaf(NewLeafQuery("content", "foo")).(Query); !ok {
+		t.Errorf("ExpandLeaf")
+	}
+	if _, ok := qParser.Prune(NewTermQuery("content", "foo")).(Query); !ok {
+		t.Errorf("Prune")
+	}
+}
+
+func TestQueryParserAccessors(t *testing.T) {
+	qParser := NewQueryParser(createTestSchema(), nil)
+	if got := qParser.getAnalyzer(); got != nil {
+		t.Errorf("getAnalyzer")
+	}
+	if got := qParser.getSchema(); got == nil {
+		t.Errorf("getSchema")
+	}
+	if got := qParser.getFields(); !reflect.DeepEqual(got, []string{"content"}) {
+		t.Errorf("getFields")
+	}
+	if got := qParser.getDefaultBoolOp(); got != "OR" {
+		t.Errorf("getDefaultBoolOp")
+	}
+	qParser.SetHeedColons(true)
+	if !qParser.heedColons() {
+		t.Errorf("SetHeedColons/heedColons")
+	}
+}

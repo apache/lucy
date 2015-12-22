@@ -27,6 +27,7 @@ package lucy
 #include "Lucy/Search/Query.h"
 #include "Lucy/Search/Compiler.h"
 #include "Lucy/Search/Searcher.h"
+#include "Lucy/Search/QueryParser.h"
 #include "Lucy/Search/ANDQuery.h"
 #include "Lucy/Search/ORQuery.h"
 #include "Lucy/Search/ANDMatcher.h"
@@ -144,6 +145,46 @@ func (s *SearcherIMP) topDocs(query Query, numWanted uint32,
 		topDocs = WRAPTopDocs(unsafe.Pointer(topDocsC))
 	})
 	return topDocs, err
+}
+
+func NewQueryParser(schema Schema, fields []string) QueryParser {
+	return NewORParser(schema, fields)
+}
+
+func NewORParser(schema Schema, fields []string) QueryParser {
+	return doNewQueryParser(schema, "OR", fields)
+}
+
+func NewANDParser(schema Schema, fields []string) QueryParser {
+	return doNewQueryParser(schema, "AND", fields)
+}
+
+func doNewQueryParser(schema Schema, defaultBoolop string, fields []string) QueryParser {
+	schemaCF := (*C.lucy_Schema)(clownfish.Unwrap(schema, "schema"))
+	defaultBoolopCF := (*C.cfish_String)(clownfish.GoToClownfish(defaultBoolop, unsafe.Pointer(C.CFISH_STRING), true))
+	defer C.cfish_decref(unsafe.Pointer(defaultBoolopCF))
+	fieldsCF := stringSliceToVec(fields)
+	defer C.cfish_decref(unsafe.Pointer(fieldsCF))
+	retvalCF := C.lucy_QParser_new(schemaCF, nil, defaultBoolopCF, fieldsCF)
+	return clownfish.WRAPAny(unsafe.Pointer(retvalCF)).(QueryParser)
+}
+
+func (qp *QueryParserIMP) MakePhraseQuery(field string, terms []interface{}) PhraseQuery {
+	return NewPhraseQuery(field, terms)
+}
+
+func (qp *QueryParserIMP) MakeANDQuery(children []Query) ANDQuery {
+	return NewANDQuery(children)
+}
+
+func (qp *QueryParserIMP) MakeORQuery(children []Query) ORQuery {
+	return NewORQuery(children)
+}
+
+func (q *QueryParserIMP) getFields() []string {
+	self := (*C.lucy_QueryParser)(clownfish.Unwrap(q, "q"))
+	retvalCF := C.LUCY_QParser_Get_Fields(self)
+	return vecToStringSlice(retvalCF)
 }
 
 type setScorer interface {

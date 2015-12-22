@@ -236,6 +236,14 @@ func specClasses(parcel *cfc.Parcel) {
 	searcherBinding.SpecMethod("", "ReadDoc(int32, interface{}) error")
 	searcherBinding.Register()
 
+	qParserBinding := cfc.NewGoClass(parcel, "Lucy::Search::QueryParser")
+	qParserBinding.SetSuppressCtor(true)
+	qParserBinding.SpecMethod("Make_Phrase_Query", "MakePhraseQuery(string, []interface{}) PhraseQuery")
+	qParserBinding.SpecMethod("Make_AND_Query", "MakeANDQuery([]Query) ANDQuery")
+	qParserBinding.SpecMethod("Make_OR_Query", "MakeORQuery([]Query) ORQuery")
+	qParserBinding.SpecMethod("Get_Fields", "getFields() []string")
+	qParserBinding.Register()
+
 	hitsBinding := cfc.NewGoClass(parcel, "Lucy::Search::Hits")
 	hitsBinding.SpecMethod("Next", "Next(hit interface{}) bool")
 	hitsBinding.SpecMethod("", "Error() error")
