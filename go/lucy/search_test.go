@@ -369,12 +369,11 @@ func TestNoMatchMatcherBasics(t *testing.T) {
 
 func TestRangeMatcherBasics(t *testing.T) {
 	index := createTestIndex("d", "c", "b", "a", "a", "a", "a")
-	searcher, _ := OpenIndexSearcher(index)
-	segReaders := searcher.GetReader().SegReaders()
-	segReader := segReaders[0].(SegReader)
-	sortReader := segReader.Obtain("Lucy::Index::SortReader").(SortReader)
-	sortCache := sortReader.fetchSortCache("content")
-	matcher := NewRangeMatcher(0, 0, sortCache, segReader.DocMax())
+	ixReader, _ := OpenIndexReader(index, nil, nil)
+	segReaders := ixReader.SegReaders()
+	sortReader := segReaders[0].Fetch("Lucy::Index::SortReader").(SortReader)
+	sortCache, _ := sortReader.fetchSortCache("content")
+	matcher := NewRangeMatcher(0, 0, sortCache, segReaders[0].DocMax())
 	if docID := matcher.Next(); docID != 4 {
 		t.Errorf("Next: %d", docID)
 	}

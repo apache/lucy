@@ -185,6 +185,70 @@ func specClasses(parcel *cfc.Parcel) {
 	indexerBinding.SetSuppressStruct(true)
 	indexerBinding.Register()
 
+	dataReaderBinding := cfc.NewGoClass(parcel, "Lucy::Index::DataReader")
+	dataReaderBinding.SpecMethod("Aggregator", "Aggregator([]DataReader, []int32) (DataReader, error)")
+	dataReaderBinding.SpecMethod("Get_Segments", "GetSegments() []Segment")
+	dataReaderBinding.SpecMethod("Close", "Close() error")
+	dataReaderBinding.Register()
+
+	ixReaderBinding := cfc.NewGoClass(parcel, "Lucy::Index::IndexReader")
+	ixReaderBinding.SpecMethod("Seg_Readers", "SegReaders() []SegReader")
+	ixReaderBinding.SpecMethod("Offsets", "Offsets() []int32")
+	ixReaderBinding.SpecMethod("Obtain", "Obtain(string) (DataReader, error)")
+	ixReaderBinding.Register()
+
+	polyReaderBinding := cfc.NewGoClass(parcel, "Lucy::Index::PolyReader")
+	polyReaderBinding.SetSuppressCtor(true)
+	polyReaderBinding.Register()
+
+	segReaderBinding := cfc.NewGoClass(parcel, "Lucy::Index::SegReader")
+	segReaderBinding.SetSuppressCtor(true)
+	segReaderBinding.Register()
+
+	docReaderBinding := cfc.NewGoClass(parcel, "Lucy::Index::DocReader")
+	docReaderBinding.SpecMethod("", "ReadDoc(int32, interface{}) error")
+	docReaderBinding.SpecMethod("Fetch_Doc", "FetchDoc(int32) (HitDoc, error)")
+	docReaderBinding.Register()
+
+	hlReaderBinding := cfc.NewGoClass(parcel, "Lucy::Index::HighlightReader")
+	hlReaderBinding.SpecMethod("Fetch_Doc_Vec", "FetchDocVec(int32) (DocVector, error)")
+	hlReaderBinding.Register()
+
+	sortReaderBinding := cfc.NewGoClass(parcel, "Lucy::Index::SortReader")
+	sortReaderBinding.SpecMethod("Fetch_Sort_Cache", "fetchSortCache(string) (SortCache, error)")
+	sortReaderBinding.Register()
+
+	lexReaderBinding := cfc.NewGoClass(parcel, "Lucy::Index::LexiconReader")
+	lexReaderBinding.SpecMethod("Lexicon", "Lexicon(string, interface{}) (Lexicon, error)")
+	lexReaderBinding.SpecMethod("Doc_Freq", "DocFreq(string, interface{}) (uint32, error)")
+	lexReaderBinding.SpecMethod("Fetch_Term_Info", "fetchTermInfo(string, interface{}) (TermInfo, error)")
+	lexReaderBinding.Register()
+
+	pListReaderBinding := cfc.NewGoClass(parcel, "Lucy::Index::PostingListReader")
+	pListReaderBinding.SpecMethod("Posting_List", "PostingList(string, interface{}) (PostingList, error)")
+	pListReaderBinding.Register()
+
+	dwBinding := cfc.NewGoClass(parcel, "Lucy::Index::DataWriter")
+	dwBinding.SpecMethod("Add_Inverted_Doc", "addInvertedDoc(Inverter, int32) error")
+	dwBinding.SpecMethod("Add_Segment", "AddSegment(SegReader, []int32) error")
+	dwBinding.SpecMethod("Delete_Segment", "DeleteSegment(SegReader) error")
+	dwBinding.SpecMethod("Merge_Segment", "MergeSegment(SegReader, []int32) error")
+	dwBinding.SpecMethod("Finish", "Finish() error")
+	dwBinding.Register()
+
+	segWriterBinding := cfc.NewGoClass(parcel, "Lucy::Index::SegWriter")
+	segWriterBinding.SpecMethod("Prep_Seg_Dir", "PrepSegDir() error")
+	segWriterBinding.SpecMethod("Add_Doc", "AddDoc(Doc, float32) error")
+	segWriterBinding.Register()
+
+	delWriterBinding := cfc.NewGoClass(parcel, "Lucy::Index::DeletionsWriter")
+	delWriterBinding.SpecMethod("Delete_By_Term", "DeleteByTerm(string, interface{}) error")
+	delWriterBinding.SpecMethod("Delete_By_Query", "DeleteByQuery(Query) error")
+	delWriterBinding.SpecMethod("Delete_By_Doc_ID", "deleteByDocID(int32) error")
+	delWriterBinding.SpecMethod("Generate_Doc_Map", "generateDocMap(Matcher, int32, int32) ([]int32, error)")
+	delWriterBinding.SpecMethod("Seg_Deletions", "segDeletions(SegReader) (Matcher, error)")
+	delWriterBinding.Register()
+
 	bgMergerBinding := cfc.NewGoClass(parcel, "Lucy::Index::BackgroundMerger")
 	bgMergerBinding.SpecMethod("Prepare_Commit", "PrepareCommit() error")
 	bgMergerBinding.SpecMethod("Commit", "Commit() error")

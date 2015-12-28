@@ -383,20 +383,8 @@ func fetchEntry(ivars *C.lucy_InverterIVARS, fieldGo string) *C.lucy_InverterEnt
 	return (*C.lucy_InverterEntry)(unsafe.Pointer(entry))
 }
 
-func fetchDocFromDocReader(dr DocReader, docID int32, doc interface{}) error {
-	switch v := dr.(type) {
-	case *DefaultDocReaderIMP:
-		return v.readDoc(docID, doc)
-	case *PolyDocReaderIMP:
-		return v.readDoc(docID, doc)
-	default:
-		panic(clownfish.NewErr(fmt.Sprintf("Unexpected type: %T", v)))
-	}
-}
-
-func (pdr *PolyDocReaderIMP) readDoc(docID int32, doc interface{}) error {
-	self := (*C.lucy_PolyDocReader)(clownfish.Unwrap(pdr, "pdr"))
-	ivars := C.lucy_PolyDocReader_IVARS(self)
+func readDocPolyDR(pdr *C.lucy_PolyDocReader, docID int32, doc interface{}) error {
+	ivars := C.lucy_PolyDocReader_IVARS(pdr)
 	segTick := C.lucy_PolyReader_sub_tick(ivars.offsets, C.int32_t(docID))
 	offset := C.LUCY_I32Arr_Get(ivars.offsets, segTick)
 	defDocReader := (*C.lucy_DefaultDocReader)(C.CFISH_Vec_Fetch(ivars.readers, C.size_t(segTick)))
@@ -412,11 +400,6 @@ func (pdr *PolyDocReaderIMP) readDoc(docID int32, doc interface{}) error {
 		docDoc.SetDocID(docID)
 	}
 	return err
-}
-
-func (ddr *DefaultDocReaderIMP) readDoc(docID int32, doc interface{}) error {
-	self := (*C.lucy_DefaultDocReader)(clownfish.Unwrap(ddr, "ddr"))
-	return doReadDocData(self, docID, doc)
 }
 
 func setMapField(store interface{}, field string, val interface{}) error {

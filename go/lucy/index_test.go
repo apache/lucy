@@ -400,10 +400,10 @@ func TestSortCacheMisc(t *testing.T) {
 	indexer.AddDoc(make(map[string]interface{}))
 	indexer.Commit()
 
-	searcher, _ := OpenIndexSearcher(folder)
-	segReaders := searcher.GetReader().SegReaders()
-	sortReader := segReaders[0].(SegReader).Obtain("Lucy::Index::SortReader").(SortReader)
-	sortCache := sortReader.fetchSortCache("content")
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	segReaders := ixReader.SegReaders()
+	sortReader := segReaders[0].Fetch("Lucy::Index::SortReader").(SortReader)
+	sortCache, _ := sortReader.fetchSortCache("content")
 
 	if card := sortCache.GetCardinality(); card != 4 {
 		t.Errorf("GetCardinality: %d", card)
@@ -640,5 +640,374 @@ func TestInverterMisc(t *testing.T) {
 	}
 	if got := inverter.GetInversion(); got != nil {
 		t.Errorf("GetInversion after iterator exhausted: %v", got)
+	}
+}
+
+// Use SegLexicon to air out the Lexicon interface.
+func TestLexiconBasics(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	segReaders := ixReader.SegReaders()
+	lexReader := segReaders[0].Fetch("Lucy::Index::LexiconReader").(LexiconReader)
+	segLex, _ := lexReader.Lexicon("content", nil)
+	if field := segLex.getField(); field != "content" {
+		t.Errorf("getField: %s", field)
+	}
+	segLex.Next()
+	if got := segLex.GetTerm(); got != "a" {
+		t.Errorf("GetTerm: %v", got)
+	}
+	if docFreq := segLex.docFreq(); docFreq != 1 {
+		t.Errorf("docFreq: %d", docFreq)
+	}
+	if !segLex.Next() || !segLex.Next() {
+		t.Errorf("Iterate")
+	}
+	if segLex.Next() {
+		t.Errorf("Iteration should be finished")
+	}
+	segLex.Seek("b")
+	if got := segLex.GetTerm(); got != "b" {
+		t.Errorf("Seek: %v", got)
+	}
+	segLex.Reset()
+	if !segLex.Next() {
+		t.Errorf("Next after Reset")
+	}
+}
+
+func TestPostingListBasics(t *testing.T) {
+	folder := createTestIndex("c", "b b b", "a", "b",)
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	segReaders := ixReader.SegReaders()
+	pListReader := segReaders[0].Fetch("Lucy::Index::PostingListReader").(PostingListReader)
+	pList, _ := pListReader.PostingList("content", nil)
+	pList.Seek("b")
+	if docFreq := pList.GetDocFreq(); docFreq != 2 {
+		t.Errorf("GetDocFreq: %d", docFreq)
+	}
+	if got := pList.Next(); got != 2 {
+		t.Errorf("Next: %d", got)
+	}
+	if docID := pList.GetDocID(); docID != 2 {
+		t.Errorf("GetDocID: %d", docID)
+	}
+	if got := pList.Next(); got != 4 {
+		t.Errorf("Next (second iter): %d", got)
+	}
+	if got := pList.Next(); got != 0 {
+		t.Error("Next (done): %d", got)
+	}
+}
+
+func TestPostingBasics(t *testing.T) {
+	sim := NewSimilarity()
+	posting := NewMatchPosting(sim)
+	posting.SetDocID(42)
+	if got := posting.GetDocID(); got != 42 {
+		t.Errorf("Set/GetDocID: %d", got)
+	}
+	posting.Reset()
+	if got := posting.getFreq(); got != 0 {
+		t.Errorf("getFreq: %d", got)
+	}
+}
+
+// This function runs Close(), so the reader becomes unusable afterwards.
+func runDataReaderCommon(t *testing.T, reader DataReader, runAggregator bool) {
+	if runAggregator {
+		got, err := reader.Aggregator([]DataReader{}, []int32{})
+		if got == nil || err != nil {
+			t.Errorf("Aggregator: %#v, %v", got, err)
+		}
+	}
+	if got := reader.GetSchema(); false {
+		t.Errorf("GetSchema: %v", got)
+	}
+	if got := reader.GetFolder(); false {
+		t.Errorf("GetFolder: %v", got)
+	}
+	if got := reader.GetSnapshot(); false {
+		t.Errorf("GetSnapshot: %v", got)
+	}
+	if got := reader.GetSegments(); false {
+		t.Errorf("GetSegments: %#v", got)
+	}
+	if got := reader.GetSegment(); false {
+		t.Errorf("GetSegment: %#v", got)
+	}
+	if got := reader.GetSegTick(); false {
+		t.Errorf("GetSegTick: %d", got)
+	}
+	if err := reader.Close(); err != nil {
+		t.Errorf("Close: %v", err)
+	}
+}
+
+func TestIndexReaderMisc(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	reader, _ := OpenIndexReader(folder, nil, nil)
+	if segReaders := reader.SegReaders(); len(segReaders) != 1 {
+		t.Errorf("SegReaders: %#v", segReaders)
+	}
+	if offsets := reader.Offsets(); offsets[0] != 0 {
+		t.Errorf("Offsets: %#v", offsets)
+	}
+	if got, err := reader.Obtain("Lucy::Index::DocReader"); got == nil || err != nil {
+		t.Errorf("Obtain should succeed for DocReader: %#v, %v", got, err)
+	}
+	if got, err := reader.Obtain("Nope"); got != nil || err == nil {
+		t.Errorf("Obtain should fail for non-existent API name: %v", err)
+	}
+	if got := reader.Fetch("Lucy::Index::DocReader"); got == nil  {
+		t.Errorf("Fetch should succeed for DocReader")
+	}
+	if got := reader.Fetch("Nope"); got != nil {
+		t.Errorf("Fetch should return nil for non-existent API name: %v", got)
+	}
+	if got := reader.DocMax(); got != 3 {
+		t.Errorf("DocMax: %d", got);
+	}
+	if got := reader.DocCount(); got != 3 {
+		t.Errorf("DocCount: %d", got);
+	}
+	if got := reader.DelCount(); got != 0 {
+		t.Errorf("DelCount: %d", got);
+	}
+	runDataReaderCommon(t, reader, false)
+}
+
+func TestIndexReaderOpen(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	if got, err := OpenIndexReader(folder, nil, nil); got == nil || err != nil {
+		t.Errorf("nil Snapshot and IndexManager: %v", err)
+	}
+	snapshot := NewSnapshot()
+	snapshot.ReadFile(folder, "")
+	if got, err := OpenIndexReader(folder, snapshot, nil); got == nil || err != nil {
+		t.Errorf("With Snapshot: %v", err)
+	}
+	manager := NewIndexManager("", nil)
+	manager.SetFolder(folder)
+	if got, err := OpenIndexReader(folder, nil, manager); got == nil || err != nil {
+		t.Errorf("With IndexManager: %v", err)
+	}
+	if got, err := OpenIndexReader("no-index-here", nil, nil); got != nil || err == nil {
+		t.Errorf("Non-existent index path")
+	}
+}
+
+func TestDefaultDocReaderMisc(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	segReaders := ixReader.SegReaders()
+	reader := segReaders[0].Fetch("Lucy::Index::DocReader").(DefaultDocReader)
+	doc := make(map[string]interface{})
+	if err := reader.ReadDoc(2, doc); err != nil {
+		t.Errorf("ReadDoc: %v", err)
+	}
+	runDataReaderCommon(t, reader, true)
+}
+
+func TestPolyDocReaderMisc(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	reader := ixReader.Fetch("Lucy::Index::DocReader").(PolyDocReader)
+	doc := make(map[string]interface{})
+	if err := reader.ReadDoc(2, doc); err != nil {
+		t.Errorf("ReadDoc: %v", err)
+	}
+	runDataReaderCommon(t, reader, true)
+}
+
+func TestLexReaderMisc(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	segReaders := ixReader.SegReaders()
+	lexReader := segReaders[0].Fetch("Lucy::Index::LexiconReader").(LexiconReader)
+	if got, err := lexReader.Lexicon("content", nil); got == nil || err != nil {
+		t.Errorf("Lexicon should succeed: %v", err)
+	}
+	if got, err := lexReader.Lexicon("content", "foo"); got == nil || err != nil {
+		t.Errorf("Lexicon with term should succeed: %v", err)
+	}
+	if got, err := lexReader.Lexicon("nope", nil); got != nil || err != nil {
+		t.Errorf("Lexicon for non-field should return nil: %v", err)
+	}
+	if got, err := lexReader.DocFreq("content", "b"); got != 1 || err != nil {
+		t.Errorf("DocFreq: %d, %v", got, err)
+	}
+	if got, err := lexReader.DocFreq("content", "nope"); got != 0 || err != nil {
+		t.Errorf("DocFreq should be 0: %d, %v", got, err)
+	}
+	if got, err := lexReader.fetchTermInfo("content", "a"); got == nil || err != nil {
+		t.Errorf("fetchTermInfo should succeed: %v", err)
+	}
+	if got, err := lexReader.fetchTermInfo("content", "nope"); got != nil || err != nil {
+		t.Errorf("fetchTermInfo with non-existent term should return nil: %v", err)
+	}
+	runDataReaderCommon(t, lexReader, false)
+}
+
+func TestPostingListReaderMisc(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	segReaders := ixReader.SegReaders()
+	pListReader := segReaders[0].Fetch("Lucy::Index::PostingListReader").(PostingListReader)
+	if got, err := pListReader.PostingList("content", nil); got == nil || err != nil {
+		t.Errorf("PostingList should succeed: %v", err)
+	}
+	if got, err := pListReader.PostingList("content", "foo"); got == nil || err != nil {
+		t.Errorf("PostingList with term should succeed: %v", err)
+	}
+	if got, err := pListReader.PostingList("nope", nil); got != nil || err != nil {
+		t.Errorf("PostingList for non-field should return nil: %v", err)
+	}
+	runDataReaderCommon(t, pListReader, false)
+}
+
+func TestHighlightReaderMisc(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	segReaders := ixReader.SegReaders()
+	reader := segReaders[0].Fetch("Lucy::Index::HighlightReader").(HighlightReader)
+	if got, err := reader.FetchDocVec(2); got == nil || err != nil {
+		t.Errorf("FetchDocVec: %v", err)
+	}
+	if got, err := reader.FetchDocVec(4); got != nil || err == nil {
+		t.Errorf("FetchDocVec catch error: %#v", got)
+	}
+	runDataReaderCommon(t, reader, true)
+}
+
+func TestDeletionsReaderMisc(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	segReaders := ixReader.SegReaders()
+	delReader := segReaders[0].Fetch("Lucy::Index::DeletionsReader").(DeletionsReader)
+	if count := delReader.delCount(); count != 0 {
+		t.Errorf("delCount: %d", count);
+	}
+	if matcher := delReader.iterator(); matcher == nil {
+		t.Errorf("iterator: %#v", matcher)
+	}
+	runDataReaderCommon(t, delReader, true)
+}
+
+func TestSortReaderMisc(t *testing.T) {
+	folder := createTestIndex("a", "b", "c")
+	ixReader, _ := OpenIndexReader(folder, nil, nil)
+	segReaders := ixReader.SegReaders()
+	sortReader := segReaders[0].Fetch("Lucy::Index::SortReader").(SortReader)
+	if got, err := sortReader.fetchSortCache("content"); got == nil || err != nil {
+		t.Errorf("fetchSortCache should succeed: %v", err)
+	}
+	if got, err := sortReader.fetchSortCache("nope"); got != nil || err != nil {
+		t.Errorf("fetchSortCache for non-field should return nil: %v", err)
+	}
+	runDataReaderCommon(t, sortReader, false)
+}
+
+func runDataWriterCommon(t *testing.T, api string) {
+	abcIndex := createTestIndex("a", "b", "c")
+	indexer, _ := OpenIndexer(&OpenIndexerArgs{Index: abcIndex})
+	dataWriter := indexer.getSegWriter().Fetch(api).(DataWriter)
+
+	if got := dataWriter.GetSnapshot(); false {
+		t.Errorf("GetSnapshot: %v", got)
+	}
+	if got := dataWriter.GetSegment(); false {
+		t.Errorf("GetSegment: %#v", got)
+	}
+	if got := dataWriter.GetPolyReader(); false {
+		t.Errorf("GetPolyReader: %#v", got)
+	}
+	if got := dataWriter.GetSchema(); false {
+		t.Errorf("GetSchema: %v", got)
+	}
+	if got := dataWriter.GetFolder(); false {
+		t.Errorf("GetFolder: %v", got)
+	}
+
+	doc := NewDoc(1)
+	doc.Store("content", "three blind mice")
+	inverter := NewInverter(dataWriter.GetSchema(), dataWriter.GetSegment())
+	inverter.SetDoc(doc)
+	inverter.InvertDoc(doc)
+	if err := dataWriter.addInvertedDoc(inverter, 1); err != nil {
+		t.Errorf("addInvertedDoc: %v", err)
+	}
+
+	segReaders := indexer.getSegWriter().GetPolyReader().SegReaders()
+	abcSegReader := segReaders[0]
+	if err := dataWriter.MergeSegment(abcSegReader, []int32{0, 2, 0, 3}); err != nil {
+		t.Errorf("MergeSegment: %v", err)
+	}
+
+	// TODO
+	//if err := dataWriter.DeleteSegment(fooSegReader); err != nil {
+	//	t.Errorf("DeleteSegment: %v", err)
+	//}
+
+	xyzIndex := createTestIndex("x", "y", "z")
+	xyzReader, _ := OpenIndexReader(xyzIndex, nil, nil)
+	xyzSegReaders := xyzReader.SegReaders()
+	if err := dataWriter.AddSegment(xyzSegReaders[0], []int32{0, 4, 5, 6}); err != nil {
+		t.Errorf("AddSegment: %v", err)
+	}
+
+	if err := dataWriter.Finish(); err != nil {
+		t.Errorf("Finish: %v", err)
+	}
+}
+
+func TestSortWriterMisc(t *testing.T) {
+	runDataWriterCommon(t, "Lucy::Index::SortWriter")
+}
+
+func TestDeletionsWriterMisc(t *testing.T) {
+	index := createTestIndex("a", "b", "c")
+	indexer, _ := OpenIndexer(&OpenIndexerArgs{Index: index})
+	delWriter := indexer.getSegWriter().Fetch("Lucy::Index::DeletionsWriter").(DeletionsWriter)
+	if delWriter.Updated() {
+		t.Errorf("Not yet updated")
+	}
+
+	if err := delWriter.DeleteByTerm("content", "a"); err != nil {
+		t.Errorf("DeleteByTerm: %v", err)
+	}
+	if err := delWriter.DeleteByQuery(NewTermQuery("content", "b")); err != nil {
+		t.Errorf("DeleteByQuery: %v", err)
+	}
+	if err := delWriter.deleteByDocID(3); err != nil {
+		t.Errorf("deleteByDocID: %v", err)
+	}
+	if !delWriter.Updated() {
+		t.Errorf("Now we're updated")
+	}
+
+	if got := delWriter.SegDelCount("seg_1"); got != 3 {
+		t.Errorf("SegDelCount: %d", got)
+	}
+	segReaders := delWriter.GetPolyReader().SegReaders()
+	if dels, err := delWriter.segDeletions(segReaders[0]); dels == nil || err != nil {
+		t.Errorf("segDeletions: %v", err)
+	}
+}
+
+func TestSegWriterMisc(t *testing.T) {
+	index := createTestIndex("a", "b", "c")
+	ixReader, _ := OpenIndexReader(index, nil, nil)
+	polyReader := ixReader.(PolyReader)
+	schema := polyReader.GetSchema()
+	segment := NewSegment(2)
+	snapshot := polyReader.GetSnapshot()
+	segWriter := NewSegWriter(schema, snapshot, segment, polyReader)
+	if err := segWriter.PrepSegDir(); err != nil {
+		t.Errorf("PrepSegDir: %v", err)
+	}
+	doc := NewDoc(1)
+	if err := segWriter.AddDoc(doc, 1.0); err != nil {
+		t.Errorf("AddDoc: %v", err)
 	}
 }

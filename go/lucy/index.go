@@ -18,6 +18,16 @@ package lucy
 
 /*
 #include "Lucy/Index/Indexer.h"
+#include "Lucy/Index/IndexReader.h"
+#include "Lucy/Index/DataReader.h"
+#include "Lucy/Index/DataWriter.h"
+#include "Lucy/Index/SegWriter.h"
+#include "Lucy/Index/DeletionsWriter.h"
+#include "Lucy/Index/DocReader.h"
+#include "Lucy/Index/LexiconReader.h"
+#include "Lucy/Index/PostingListReader.h"
+#include "Lucy/Index/HighlightReader.h"
+#include "Lucy/Index/SortReader.h"
 #include "Lucy/Index/IndexManager.h"
 #include "Lucy/Index/BackgroundMerger.h"
 #include "Lucy/Index/TermVector.h"
@@ -228,6 +238,113 @@ func (obj *IndexerIMP) Commit() error {
 	})
 }
 
+func (d *DataWriterIMP) addInvertedDoc(inverter Inverter, docId int32) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DataWriter)(clownfish.Unwrap(d, "d"))
+		inverterCF := (*C.lucy_Inverter)(clownfish.Unwrap(inverter, "inverter"))
+		C.LUCY_DataWriter_Add_Inverted_Doc(self, inverterCF, C.int32_t(docId))
+	})
+}
+
+func (d *DataWriterIMP) AddSegment(reader SegReader, docMap []int32) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DataWriter)(clownfish.Unwrap(d, "d"))
+		readerCF := (*C.lucy_SegReader)(clownfish.Unwrap(reader, "reader"))
+		docMapConv := NewI32Array(docMap)
+		docMapCF := (*C.lucy_I32Array)(clownfish.UnwrapNullable(docMapConv))
+		C.LUCY_DataWriter_Add_Segment(self, readerCF, docMapCF)
+	})
+}
+
+func (d *DataWriterIMP) DeleteSegment(reader SegReader) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DataWriter)(clownfish.Unwrap(d, "d"))
+		readerCF := (*C.lucy_SegReader)(clownfish.Unwrap(reader, "reader"))
+		C.LUCY_DataWriter_Delete_Segment(self, readerCF)
+	})
+}
+
+func (d *DataWriterIMP) MergeSegment(reader SegReader, docMap []int32) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DataWriter)(clownfish.Unwrap(d, "d"))
+		readerCF := (*C.lucy_SegReader)(clownfish.Unwrap(reader, "reader"))
+		docMapConv := NewI32Array(docMap)
+		docMapCF := (*C.lucy_I32Array)(clownfish.UnwrapNullable(docMapConv))
+		C.LUCY_DataWriter_Merge_Segment(self, readerCF, docMapCF)
+	})
+}
+
+func (d *DataWriterIMP) Finish() error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DataWriter)(clownfish.Unwrap(d, "d"))
+		C.LUCY_DataWriter_Finish(self)
+	})
+}
+
+func (s *SegWriterIMP) PrepSegDir() error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_SegWriter)(clownfish.Unwrap(s, "s"))
+		C.LUCY_SegWriter_Prep_Seg_Dir(self)
+	})
+}
+
+func (s *SegWriterIMP) AddDoc(doc Doc, boost float32) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_SegWriter)(clownfish.Unwrap(s, "s"))
+		docCF := (*C.lucy_Doc)(clownfish.Unwrap(doc, "doc"))
+		C.LUCY_SegWriter_Add_Doc(self, docCF, C.float(boost))
+	})
+}
+
+func (d *DeletionsWriterIMP) DeleteByTerm(field string, term interface{}) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DeletionsWriter)(clownfish.Unwrap(d, "d"))
+		fieldCF := (*C.cfish_String)(clownfish.GoToClownfish(field, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(fieldCF))
+		termCF := (*C.cfish_Obj)(clownfish.GoToClownfish(term, unsafe.Pointer(C.CFISH_OBJ), false))
+		defer C.cfish_decref(unsafe.Pointer(termCF))
+		C.LUCY_DelWriter_Delete_By_Term(self, fieldCF, termCF)
+	})
+}
+
+func (d *DeletionsWriterIMP) DeleteByQuery(query Query) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DeletionsWriter)(clownfish.Unwrap(d, "d"))
+		queryCF := (*C.lucy_Query)(clownfish.Unwrap(query, "query"))
+		C.LUCY_DelWriter_Delete_By_Query(self, queryCF)
+	})
+}
+
+func (d *DeletionsWriterIMP) deleteByDocID(docId int32) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DeletionsWriter)(clownfish.Unwrap(d, "d"))
+		C.LUCY_DelWriter_Delete_By_Doc_ID(self, C.int32_t(docId))
+	})
+}
+
+func (d *DeletionsWriterIMP) generateDocMap(deletions Matcher, docMax int32, offset int32) (retval []int32, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_DeletionsWriter)(clownfish.Unwrap(d, "d"))
+		deletionsCF := (*C.lucy_Matcher)(clownfish.Unwrap(deletions, "deletions"))
+		retvalCF := C.LUCY_DelWriter_Generate_Doc_Map(self, deletionsCF, C.int32_t(docMax), C.int32_t(offset))
+		defer C.cfish_decref(unsafe.Pointer(retvalCF))
+		retval = i32ArrayToSlice(retvalCF)
+	})
+	return retval, err
+}
+
+func (d *DeletionsWriterIMP) segDeletions(segReader SegReader) (retval Matcher, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_DeletionsWriter)(clownfish.Unwrap(d, "d"))
+		segReaderCF := (*C.lucy_SegReader)(clownfish.Unwrap(segReader, "segReader"))
+		retvalCF := C.LUCY_DelWriter_Seg_Deletions(self, segReaderCF)
+		if retvalCF != nil {
+			retval = clownfish.WRAPAny(unsafe.Pointer(retvalCF)).(Matcher)
+		}
+	})
+	return retval, err
+}
+
 func OpenBackgroundMerger(index interface{}, manager IndexManager) (bgm BackgroundMerger, err error) {
 	err = clownfish.TrapErr(func() {
 		indexC := (*C.cfish_Obj)(clownfish.GoToClownfish(index, unsafe.Pointer(C.CFISH_OBJ), false))
@@ -412,6 +529,196 @@ func (s *SortCacheIMP) Find(term interface{}) (retval int32, err error) {
 		defer C.cfish_decref(unsafe.Pointer(termCF))
 		retvalCF := C.LUCY_SortCache_Find(self, termCF)
 		retval = int32(retvalCF)
+	})
+	return retval, err
+}
+
+func (d *DataReaderIMP) Aggregator(readers []DataReader, offsets []int32) (retval DataReader, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_DataReader)(clownfish.Unwrap(d, "d"))
+		size := len(readers)
+		readersC := C.cfish_Vec_new(C.size_t(size))
+		defer C.cfish_decref(unsafe.Pointer(readersC))
+		for i := 0; i < size; i++ {
+			elemC := clownfish.Unwrap(readers[i], "readers[i]")
+			C.CFISH_Vec_Push(readersC, C.cfish_incref(elemC))
+		}
+		offs := NewI32Array(offsets)
+		offsetsC := (*C.lucy_I32Array)(clownfish.Unwrap(offs, "offs"))
+		retvalCF := C.LUCY_DataReader_Aggregator(self, readersC, offsetsC)
+		defer C.cfish_decref(unsafe.Pointer(retvalCF))
+		if retvalCF != nil {
+			retval = clownfish.ToGo(unsafe.Pointer(retvalCF)).(DataReader)
+		}
+	})
+	return retval, err
+}
+
+func (d *DataReaderIMP) GetSegments() []Segment {
+	self := (*C.lucy_DataReader)(clownfish.Unwrap(d, "d"))
+	retvalCF := C.LUCY_DataReader_Get_Segments(self);
+	if retvalCF == nil {
+		return nil
+	}
+	size := C.CFISH_Vec_Get_Size(retvalCF)
+	retval := make([]Segment, int(size))
+	for i := 0; i < int(size); i++ {
+		elem := unsafe.Pointer(C.CFISH_Vec_Fetch(retvalCF, C.size_t(i)))
+		retval[i] = clownfish.ToGo(unsafe.Pointer(C.cfish_incref(elem))).(Segment)
+	}
+	return retval
+}
+
+func (d *DataReaderIMP) Close() error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_DataReader)(clownfish.Unwrap(d, "d"))
+		C.LUCY_DataReader_Close(self)
+	})
+}
+
+func (d *DocReaderIMP) ReadDoc(docID int32, doc interface{}) error {
+	self := (*C.lucy_DocReader)(clownfish.Unwrap(d, "d"))
+	class := clownfish.GetClass(d)
+	classC := ((*C.cfish_Class)(clownfish.Unwrap(class, "class")))
+	if classC == C.LUCY_DEFAULTDOCREADER {
+		return doReadDocData((*C.lucy_DefaultDocReader)(self), docID, doc)
+	} else if classC == C.LUCY_POLYDOCREADER {
+		return readDocPolyDR((*C.lucy_PolyDocReader)(self), docID, doc)
+	} else {
+		panic(clownfish.NewErr(fmt.Sprintf("Unexpected type: %s", class.GetName)))
+	}
+}
+
+func (d *DocReaderIMP) FetchDoc(docID int32) (doc HitDoc, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_DocReader)(clownfish.Unwrap(d, "d"))
+		docC := C.LUCY_DocReader_Fetch_Doc(self, C.int32_t(docID))
+		doc = WRAPHitDoc(unsafe.Pointer(docC))
+	})
+	return doc, err
+}
+
+func (lr *LexiconReaderIMP) Lexicon(field string, term interface{}) (retval Lexicon, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_LexiconReader)(clownfish.Unwrap(lr, "lr"))
+		fieldC := (*C.cfish_String)(clownfish.GoToClownfish(field, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(fieldC))
+		termC := (*C.cfish_Obj)(clownfish.GoToClownfish(term, unsafe.Pointer(C.CFISH_OBJ), true))
+		defer C.cfish_decref(unsafe.Pointer(termC))
+		retvalCF := C.LUCY_LexReader_Lexicon(self, fieldC, termC)
+		if retvalCF != nil {
+			retval = clownfish.ToGo(unsafe.Pointer(retvalCF)).(Lexicon)
+		}
+	})
+	return retval, err
+}
+
+func (lr *LexiconReaderIMP) DocFreq(field string, term interface{}) (retval uint32, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_LexiconReader)(clownfish.Unwrap(lr, "lr"))
+		fieldC := (*C.cfish_String)(clownfish.GoToClownfish(field, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(fieldC))
+		termC := (*C.cfish_Obj)(clownfish.GoToClownfish(term, unsafe.Pointer(C.CFISH_OBJ), true))
+		defer C.cfish_decref(unsafe.Pointer(termC))
+		retval = uint32(C.LUCY_LexReader_Doc_Freq(self, fieldC, termC))
+	})
+	return retval, err
+}
+
+func (lr *LexiconReaderIMP) fetchTermInfo(field string, term interface{}) (retval TermInfo, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_LexiconReader)(clownfish.Unwrap(lr, "lr"))
+		fieldC := (*C.cfish_String)(clownfish.GoToClownfish(field, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(fieldC))
+		termC := (*C.cfish_Obj)(clownfish.GoToClownfish(term, unsafe.Pointer(C.CFISH_OBJ), true))
+		defer C.cfish_decref(unsafe.Pointer(termC))
+		retvalCF := C.LUCY_LexReader_Fetch_Term_Info(self, fieldC, termC)
+		if retvalCF != nil {
+			retval = clownfish.ToGo(unsafe.Pointer(retvalCF)).(TermInfo)
+		}
+	})
+	return retval, err
+}
+
+func (p *PostingListReaderIMP) PostingList(field string, term interface{}) (retval PostingList, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_PostingListReader)(clownfish.Unwrap(p, "p"))
+		fieldC := (*C.cfish_String)(clownfish.GoToClownfish(field, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(fieldC))
+		termC := (*C.cfish_Obj)(clownfish.GoToClownfish(term, unsafe.Pointer(C.CFISH_OBJ), true))
+		defer C.cfish_decref(unsafe.Pointer(termC))
+		retvalCF := C.LUCY_PListReader_Posting_List(self, fieldC, termC)
+		if retvalCF != nil {
+			retval = clownfish.ToGo(unsafe.Pointer(retvalCF)).(PostingList)
+		}
+	})
+	return retval, err
+}
+
+func (h *HighlightReaderIMP) FetchDocVec(docID int32) (retval DocVector, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_HighlightReader)(clownfish.Unwrap(h, "h"))
+		retvalCF := C.LUCY_HLReader_Fetch_Doc_Vec(self, C.int32_t(docID))
+		retval = WRAPDocVector(unsafe.Pointer(retvalCF))
+	})
+	return retval, err
+}
+
+func (s *SortReaderIMP) fetchSortCache(field string) (retval SortCache, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_SortReader)(clownfish.Unwrap(s, "s"))
+		fieldC := (*C.cfish_String)(clownfish.GoToClownfish(field, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(fieldC))
+		retvalCF := C.LUCY_SortReader_Fetch_Sort_Cache(self, fieldC)
+		if retvalCF != nil {
+			retval = clownfish.ToGo(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(retvalCF)))).(SortCache)
+		}
+	})
+	return retval, err
+}
+
+func OpenIndexReader(index interface{}, snapshot Snapshot, manager IndexManager) (retval IndexReader, err error) {
+	err = clownfish.TrapErr(func() {
+		indexC := (*C.cfish_Obj)(clownfish.GoToClownfish(index, unsafe.Pointer(C.CFISH_OBJ), false))
+		defer C.cfish_decref(unsafe.Pointer(indexC))
+		snapshotC := (*C.lucy_Snapshot)(clownfish.UnwrapNullable(snapshot))
+		managerC := (*C.lucy_IndexManager)(clownfish.UnwrapNullable(manager))
+		cfObj := C.lucy_IxReader_open(indexC, snapshotC, managerC)
+		retval = clownfish.WRAPAny(unsafe.Pointer(cfObj)).(IndexReader)
+	})
+	return retval, err
+}
+
+func (r *IndexReaderIMP) SegReaders() []SegReader {
+	self := (*C.lucy_IndexReader)(clownfish.Unwrap(r, "r"))
+	retvalCF := C.LUCY_IxReader_Seg_Readers(self);
+	defer C.cfish_decref(unsafe.Pointer(retvalCF))
+	if retvalCF == nil {
+		return nil
+	}
+	size := C.CFISH_Vec_Get_Size(retvalCF)
+	retval := make([]SegReader, int(size))
+	for i := 0; i < int(size); i++ {
+		elem := unsafe.Pointer(C.CFISH_Vec_Fetch(retvalCF, C.size_t(i)))
+		retval[i] = clownfish.ToGo(unsafe.Pointer(C.cfish_incref(elem))).(SegReader)
+	}
+	return retval
+}
+
+func (r *IndexReaderIMP) Offsets() []int32 {
+	self := (*C.lucy_IndexReader)(clownfish.Unwrap(r, "r"))
+	retvalCF := C.LUCY_IxReader_Offsets(self)
+	defer C.cfish_decref(unsafe.Pointer(retvalCF))
+	return i32ArrayToSlice(retvalCF)
+}
+
+func (r *IndexReaderIMP) Obtain(api string) (retval DataReader, err error) {
+	err = clownfish.TrapErr(func() {
+		self := (*C.lucy_IndexReader)(clownfish.Unwrap(r, "r"))
+		apiC := (*C.cfish_String)(clownfish.GoToClownfish(api, unsafe.Pointer(C.CFISH_STRING), false))
+		defer C.cfish_decref(unsafe.Pointer(apiC))
+		retvalCF := C.LUCY_IxReader_Obtain(self, apiC)
+		retval = clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(retvalCF)))).(DataReader)
 	})
 	return retval, err
 }
