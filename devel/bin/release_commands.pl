@@ -74,7 +74,19 @@ if ( $rc < 2 ) {
 if ( $micro == 0 && $rc < 2 ) {
     say qq|# Since this is the first release in a series (i.e. X.Y.0),|;
     say qq|# create a branch.|;
-    say qq|git checkout -b $major.$minor|;
+    say qq|git checkout -b $major.$minor\n|;
+
+    say qq|# Update the CI test scripts|;
+    say qq|# - devel/bin/appveyor-build.bat|;
+    say qq|# - devel/bin/travis-test.sh|;
+    say qq|# to use the Clownfish branch containing the required major|;
+    say qq|# version. Replace the commands|;
+    say qq|#     git clone -q --depth 1 <cfish_repo>|;
+    say qq|# with|;
+    say qq|#     git clone -q -b <cfish_branch> --depth 1 <cfish_repo>|;
+    say qq|[...]|;
+    say qq|git commit -m "Updating CI test scripts |
+        . qq|for release $x_y_z_version."\n|;
 }
 
 say qq|# Create a tag for the release candidate.|;
