@@ -1,6 +1,13 @@
 Revision history for Lucy
 
-0.4.1  2014-11-18
+0.4.3  2016-01-09
+
+  Improvements:
+
+    * Check for incompatible Clownfish major version.
+    * Improve build and installation scripts for C library.
+
+0.4.2  2014-11-18
 
   Bugfixes:
 
