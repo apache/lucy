@@ -15,7 +15,7 @@
 
 Gem::Specification.new do |spec|
   spec.name        = 'apache_lucy'
-  spec.version     = '0.4.2'
+  spec.version     = '0.4.3'
   spec.summary     = "Full text search engine library."
   spec.author      = "Apache Lucy project"
   spec.email       = 'dev@lucy.apache.org'

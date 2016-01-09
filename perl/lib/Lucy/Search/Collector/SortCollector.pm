@@ -15,7 +15,7 @@
 
 package Lucy::Search::Collector::SortCollector;
 use Lucy;
-our $VERSION = '0.004002';
+our $VERSION = '0.004003';
 $VERSION = eval $VERSION;
 
 1;

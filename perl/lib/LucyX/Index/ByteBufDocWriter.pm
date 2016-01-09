@@ -18,7 +18,7 @@ use warnings;
 
 package LucyX::Index::ByteBufDocWriter;
 use base qw( Lucy::Index::DataWriter );
-our $VERSION = '0.004002';
+our $VERSION = '0.004003';
 $VERSION = eval $VERSION;
 use Carp;
 use Scalar::Util qw( blessed );

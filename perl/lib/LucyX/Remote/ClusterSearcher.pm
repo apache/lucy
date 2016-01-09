@@ -18,7 +18,7 @@ use warnings;
 
 package LucyX::Remote::ClusterSearcher;
 BEGIN { our @ISA = qw( Lucy::Search::Searcher ) }
-our $VERSION = '0.004002';
+our $VERSION = '0.004003';
 $VERSION = eval $VERSION;
 use Carp;
 use Storable qw( nfreeze thaw );

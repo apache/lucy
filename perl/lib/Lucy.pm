@@ -20,7 +20,7 @@ package Lucy;
 
 use 5.008003;
 
-our $VERSION = '0.004002';
+our $VERSION = '0.004003';
 $VERSION = eval $VERSION;
 
 use Clownfish;
@@ -53,12 +53,12 @@ BEGIN {
     require DynaLoader;
     our @ISA = qw( DynaLoader );
     # This loads a large number of disparate subs.
-    bootstrap Lucy '0.4.2';
+    bootstrap Lucy '0.4.3';
 }
 
 {
     package Lucy::Util::IndexFileNames;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     BEGIN {
         push our @ISA, 'Exporter';
@@ -77,14 +77,14 @@ BEGIN {
 
 {
     package Lucy::Analysis::Analyzer;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     use Lucy qw( load );
 }
 
 {
     package Lucy::Analysis::RegexTokenizer;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
 
     sub _compile_token_re {qr/$_[0]/}
@@ -99,7 +99,7 @@ BEGIN {
 
 {
     package Lucy::Document::Doc;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     use Storable ();  # Needed by serialize/deserialize.
     use Lucy qw( STORABLE_freeze STORABLE_thaw load );
@@ -111,14 +111,14 @@ BEGIN {
 
 {
     package Lucy::Index::DocVector;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     use Lucy qw( STORABLE_freeze STORABLE_thaw );
 }
 
 {
     package Lucy::Index::Indexer;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
 
     sub new {
@@ -132,7 +132,7 @@ BEGIN {
 
 {
     package Lucy::Index::IndexReader;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     use Carp;
 
@@ -157,7 +157,7 @@ BEGIN {
 
 {
     package Lucy::Index::Segment;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     use Clownfish qw( to_clownfish );
     sub store_metadata {
@@ -169,21 +169,21 @@ BEGIN {
 
 {
     package Lucy::Index::Similarity;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     use Lucy qw( STORABLE_freeze STORABLE_thaw load );
 }
 
 {
     package Lucy::Index::TermVector;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     use Lucy qw( STORABLE_freeze STORABLE_thaw );
 }
 
 {
     package Lucy::Search::Compiler;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     use Carp;
     use Scalar::Util qw( blessed );
@@ -202,35 +202,35 @@ BEGIN {
 
 {
     package Lucy::Plan::FieldType;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     use Lucy qw( load );
 }
 
 {
     package Lucy::Plan::Schema;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     use Lucy qw( load );
 }
 
 {
     package Lucy::Search::MatchDoc;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     use Lucy qw( STORABLE_freeze STORABLE_thaw );
 }
 
 {
     package Lucy::Search::Query;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     use Lucy qw( STORABLE_freeze STORABLE_thaw load );
 }
 
 {
     package Lucy::Search::SortRule;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     use Carp;
     use Lucy qw( STORABLE_freeze STORABLE_thaw );
@@ -251,28 +251,28 @@ BEGIN {
 
 {
     package Lucy::Search::SortSpec;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     use Lucy qw( STORABLE_freeze STORABLE_thaw );
 }
 
 {
     package Lucy::Search::TopDocs;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     use Lucy qw( STORABLE_freeze STORABLE_thaw );
 }
 
 {
     package Lucy::Object::BitVector;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     sub to_arrayref { shift->to_array->to_arrayref }
 }
 
 {
     package Lucy::Store::FileHandle;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     BEGIN {
         push our @ISA, 'Exporter';
@@ -299,7 +299,7 @@ BEGIN {
 
 {
     package Lucy::Store::FSFileHandle;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
 
     sub open {
@@ -312,7 +312,7 @@ BEGIN {
 
 {
     package Lucy::Store::RAMFileHandle;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
 
     sub open {
@@ -325,7 +325,7 @@ BEGIN {
 
 {
     package Lucy::Util::Debug;
-    our $VERSION = '0.004002';
+    our $VERSION = '0.004003';
     $VERSION = eval $VERSION;
     BEGIN {
         push our @ISA, 'Exporter';

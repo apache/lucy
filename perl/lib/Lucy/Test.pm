@@ -15,7 +15,7 @@
 
 package Lucy::Test;
 use Lucy;
-our $VERSION = '0.004002';
+our $VERSION = '0.004003';
 $VERSION = eval $VERSION;
 
 # Set the default memory threshold for PostingListWriter to a low number so

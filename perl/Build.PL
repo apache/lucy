@@ -39,7 +39,7 @@ my $builder = Lucy::Build->new(
     license     => 'apache',
     dist_author =>
         'The Apache Lucy Project <dev at lucy dot apache dot org>',
-    dist_version       => '0.4.2',
+    dist_version       => '0.4.3',
     requires           => {
         'perl'      => '5.8.3',
         'Clownfish' => undef,
