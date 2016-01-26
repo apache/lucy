@@ -28,18 +28,29 @@ my $usage = "$0 version\n";
 my $version = shift(@ARGV) or die $usage;
 
 # standardize version strings
-my ( $x, $y, $z );
+my ( $x, $y, $z, $dev );
 if ( $version =~ m/^(\d+)\.(\d+)\.(\d+)$/ ) {
     ( $x, $y, $z ) = ( $1, $2, $3 );
+}
+elsif ( $version =~ m/^(\d+)\.(\d+)\.(\d+)_(\d+)$/ ) {
+    ( $x, $y, $z, $dev ) = ( $1, $2, $3, $4 );
 }
 elsif ( $version =~ m/^(\d+)\.(\d\d\d)(\d\d\d)$/ ) {
     ( $x, $y, $z ) = ( int($1), int($2), int($3) );
 }
+elsif ( $version =~ m/^(\d+)\.(\d\d\d)(\d\d\d)_(\d\d\d)$/ ) {
+    ( $x, $y, $z, $dev ) = ( int($1), int($2), int($3), int($4) );
+}
 else {
     die "Unknown version syntax. Try X.Y.Z or X.YYYZZZ\n";
 }
-my $x_y_z_version    = sprintf( "%d.%d.%d",    $x, $y, $z );
-my $x_yyyzzz_version = sprintf( "%d.%03d%03d", $x, $y, $z );
+my $x_y_z_version    = sprintf( "%d.%d.%d", $x, $y, $z );
+my $x_y_z_d_version  = $dev
+                       ? sprintf( "%d.%d.%d_%d", $x, $y, $z, $dev )
+                       : sprintf( "%d.%d.%d", $x, $y, $z );
+my $x_yyyzzz_version = $dev
+                       ? sprintf( "%d.%03d%03d_%03d", $x, $y, $z, $dev )
+                       : sprintf( "%d.%03d%03d", $x, $y, $z );
 
 print "Using version: $x_y_z_version ( $x_yyyzzz_version )\n";
 
@@ -61,19 +72,19 @@ for my $path ('common/charmonizer.c', 'common/charmonizer.main') {
 $buf = read_file('perl/lib/Lucy.pm');
 $buf =~ s/(our \$VERSION\ +=\ +)'.+?'/$1'$x_yyyzzz_version'/g
     or die "no match";
-$buf =~ s/(bootstrap\s+Lucy\s+)'[\d\.]+'/$1'$x_y_z_version'/
+$buf =~ s/(bootstrap\s+Lucy\s+)'[\d\._]+'/$1'$x_y_z_d_version'/
     or die "no match";
 write_file( 'perl/lib/Lucy.pm', $buf );
 
 # Update Lucy.pod.
 $buf = read_file('perl/lib/Lucy.pod');
-$buf =~ s/(^=head1\s+VERSION\s+)([\d.]+)/$1$x_y_z_version/m
+$buf =~ s/(^=head1\s+VERSION\s+)([\d._]+)/$1$x_y_z_d_version/m
     or die "no match";
 write_file( 'perl/lib/Lucy.pod', $buf );
 
 # Update Build.PL
 $buf = read_file('perl/Build.PL');
-$buf =~ s/(dist_version\ +=>\ +)'.+?'/$1'$x_y_z_version'/
+$buf =~ s/(dist_version\ +=>\ +)'.+?'/$1'$x_y_z_d_version'/
     or die "no match";
 write_file( 'perl/Build.PL', $buf );
 
@@ -164,7 +175,9 @@ depending on the file format and type.
 I<version> may be specified in either format:
 
  X.Y.Z
+ X.Y.Z_D (CPAN developer release)
  X.YYYZZZ
+ X.YYYZZZ_DDD (CPAN developer release)
 
 and update_version will convert the specified string into the 
 correct format for each relevant file.
