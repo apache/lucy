@@ -15,7 +15,7 @@
 
 package LucyX::Search::ProximityQuery;
 use Lucy;
-our $VERSION = '0.004003';
+our $VERSION = '0.004004';
 $VERSION = eval $VERSION;
 
 1;

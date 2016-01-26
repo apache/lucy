@@ -18,7 +18,7 @@ use warnings;
 
 package Lucy::Simple;
 use Lucy;
-our $VERSION = '0.004003';
+our $VERSION = '0.004004';
 $VERSION = eval $VERSION;
 use Carp;
 use Scalar::Util qw( weaken reftype refaddr );
