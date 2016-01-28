@@ -42,11 +42,11 @@ my $builder = Lucy::Build->new(
     dist_version       => '0.4.4',
     requires           => {
         'perl'      => '5.8.3',
-        'Clownfish' => undef,
+        'Clownfish' => 0.004004,
     },
     configure_requires => {
         'Module::Build'               => 0.280801,
-        'Clownfish::CFC::Perl::Build' => undef,
+        'Clownfish::CFC::Perl::Build' => 0.004004,
     },
     build_requires     => {
         'Module::Build'      => 0.280801,
