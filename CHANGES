@@ -1,5 +1,13 @@
 Revision history for Lucy
 
+0.4.4  2016-01-31
+
+  Bugfixes:
+
+    * [LUCY-287] - Mismatch between required Clownfish versions
+    * [LUCY-288] - Add Clownfish to configure_requires
+    * Fix Windows build for some CPAN Testers setups (see CLOWNFISH-3).
+
 0.4.3  2016-01-09
 
   Improvements:
