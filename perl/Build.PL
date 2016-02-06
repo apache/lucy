@@ -46,6 +46,7 @@ my $builder = Lucy::Build->new(
     },
     configure_requires => {
         'Module::Build'               => 0.280801,
+        'Clownfish'                   => 0.004000,
         'Clownfish::CFC::Perl::Build' => 0.004000,
     },
     build_requires     => {
@@ -53,6 +54,8 @@ my $builder = Lucy::Build->new(
         'ExtUtils::CBuilder' => 0.21,
         'ExtUtils::ParseXS'  => 2.18,
         'Devel::PPPort'      => 3.14,
+        'Clownfish'          => 0.004000,
+        'Clownfish::CFC'     => 0.004000,
     },
     meta_merge => { keywords => [qw( search lucy lucene )], },
     meta_add   => {

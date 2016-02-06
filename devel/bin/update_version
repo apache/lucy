@@ -89,6 +89,8 @@ $buf =~ s/(dist_version\ +=>\ +)'.+?'/$1'$x_y_z_d_version'/
 if ( $z == 0 && $dev == 0 ) {
     $buf =~ s/(Clownfish::CFC::Perl::Build'\s*=>\s*)(.*?),/$1$x_yyyzzz_version,/g
         or die "no match";
+    $buf =~ s/(Clownfish::CFC'\s*=>\s*)(.*?),/$1$x_yyyzzz_version,/g
+        or die "no match";
     $buf =~ s/(Clownfish'\s*=>\s*)(.*?),/$1$x_yyyzzz_version,/g
         or die "no match";
 }
