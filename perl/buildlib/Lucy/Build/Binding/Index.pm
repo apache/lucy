@@ -287,7 +287,7 @@ sub bind_indexer {
     $indexer->commit;
 END_SYNOPSIS
     my $constructor = <<'END_NEW';
-=head2 new( I<[labeled params]> )
+=head2 new
 
     my $indexer = Lucy::Index::Indexer->new(
         schema   => $schema,             # required at index creation
@@ -326,7 +326,7 @@ B<manager> - An IndexManager.
 =back
 END_NEW
     my $add_doc_pod = <<'END_ADD_DOC_POD';
-=head2 add_doc(...)
+=head2 add_doc
 
     $indexer->add_doc($doc);
     $indexer->add_doc( { field_name => $field_value } );

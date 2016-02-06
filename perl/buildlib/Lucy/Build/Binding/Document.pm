@@ -46,7 +46,9 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
     my $store_pod = <<'END_POD';
-=head2 store(field, value)
+=head2 store
+
+    $doc->store($field, $value);
 
 Store a field value in the Doc.
 

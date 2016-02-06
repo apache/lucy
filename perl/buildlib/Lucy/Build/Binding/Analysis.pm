@@ -358,7 +358,7 @@ sub bind_token {
         $token->set_text('mice');
 END_SYNOPSIS
     my $constructor_pod = <<'END_CONSTRUCTOR_POD';
-=head2 new( I<[labeled params]> )
+=head2 new
 
     my $token = Lucy::Analysis::Token->new(
         text         => $text,          # required
@@ -395,12 +395,16 @@ B<pos_inc> - Position increment for phrase matching.
 =back
 END_CONSTRUCTOR_POD
     my $get_text_pod = <<'END_GET_TEXT_POD';
-=head2 get_text()
+=head2 get_text
+
+    my $text = $token->get_text;
 
 Get the token's text.
 END_GET_TEXT_POD
     my $set_text_pod = <<'END_SET_TEXT_POD';
-=head2 set_text(text)
+=head2 set_text
+
+    $token->set_text($text);
 
 Set the token's text.
 END_SET_TEXT_POD
