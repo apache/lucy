@@ -23,7 +23,7 @@ use 5.008003;
 our $VERSION = '0.004000';
 $VERSION = eval $VERSION;
 
-use Clownfish;
+use Clownfish 0.004000;
 use Exporter 'import';
 BEGIN {
     our @EXPORT_OK = qw(
