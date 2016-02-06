@@ -30,13 +30,13 @@ my $version = shift(@ARGV) or die $usage;
 # standardize version strings
 my ( $x, $y, $z, $dev );
 if ( $version =~ m/^(\d+)\.(\d+)\.(\d+)$/ ) {
-    ( $x, $y, $z ) = ( $1, $2, $3 );
+    ( $x, $y, $z, $dev ) = ( $1, $2, $3, 0 );
 }
 elsif ( $version =~ m/^(\d+)\.(\d+)\.(\d+)_(\d+)$/ ) {
     ( $x, $y, $z, $dev ) = ( $1, $2, $3, $4 );
 }
 elsif ( $version =~ m/^(\d+)\.(\d\d\d)(\d\d\d)$/ ) {
-    ( $x, $y, $z ) = ( int($1), int($2), int($3) );
+    ( $x, $y, $z, $dev ) = ( int($1), int($2), int($3), 0 );
 }
 elsif ( $version =~ m/^(\d+)\.(\d\d\d)(\d\d\d)_(\d\d\d)$/ ) {
     ( $x, $y, $z, $dev ) = ( int($1), int($2), int($3), int($4) );
@@ -86,6 +86,12 @@ write_file( 'perl/lib/Lucy.pod', $buf );
 $buf = read_file('perl/Build.PL');
 $buf =~ s/(dist_version\ +=>\ +)'.+?'/$1'$x_y_z_d_version'/
     or die "no match";
+if ( $z == 0 && $dev == 0 ) {
+    $buf =~ s/(Clownfish::CFC::Perl::Build'\s*=>\s*)(.*?),/$1$x_yyyzzz_version,/g
+        or die "no match";
+    $buf =~ s/(Clownfish'\s*=>\s*)(.*?),/$1$x_yyyzzz_version,/g
+        or die "no match";
+}
 write_file( 'perl/Build.PL', $buf );
 
 # Update ruby/apache_lucy.gemspec
@@ -104,16 +110,20 @@ write_file( 'ruby/lib/apache_lucy.rb', $buf );
 $buf = read_file('core/Lucy.cfp');
 $buf =~ s/("version":\s+)"v\d+\.\d+\.\d+"/$1"v$x_y_z_version"/
     or die "no match";
-$buf =~ s/("Clownfish":\s+)"v\d+\.\d+\.\d+"/$1"v$x_y_z_version"/
-    or die "no match";
+if ( $z == 0 && $dev == 0 ) {
+    $buf =~ s/("Clownfish":\s+)"v\d+\.\d+\.\d+"/$1"v$x_y_z_version"/
+        or die "no match";
+}
 write_file( 'core/Lucy.cfp', $buf );
 
 # Update TestLucy.cfp
 $buf = read_file('core/TestLucy.cfp');
 $buf =~ s/("version":\s+)"v\d+\.\d+\.\d+"/$1"v$x_y_z_version"/
     or die "no match";
-$buf =~ s/("Clownfish":\s+)"v\d+\.\d+\.\d+"/$1"v$x_y_z_version"/
-    or die "no match";
+if ( $z == 0 && $dev == 0 ) {
+    $buf =~ s/("Clownfish":\s+)"v\d+\.\d+\.\d+"/$1"v$x_y_z_version"/
+        or die "no match";
+}
 $buf =~ s/("Lucy":\s+)"v\d+\.\d+\.\d+"/$1"v$x_y_z_version"/
     or die "no match";
 write_file( 'core/TestLucy.cfp', $buf );
