@@ -36,7 +36,7 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
     int32_t      timeout;
     int32_t      interval;
 
-    /** Abstract constructor.
+    /** Abstract initializer.
      *
      * @param folder A Folder.
      * @param name String identifying the resource to be locked, which must

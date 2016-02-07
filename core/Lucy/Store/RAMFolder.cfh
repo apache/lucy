@@ -24,10 +24,15 @@ parcel Lucy;
 
 public class Lucy::Store::RAMFolder inherits Lucy::Store::Folder {
 
-    inert incremented RAMFolder*
+    /** Create a new RAMFolder.
+     *
+     * @param path Relative path, used for subfolders.
+     */
+    public inert incremented RAMFolder*
     new(String *path = NULL);
 
-    /**
+    /** Initialize a RAMFolder.
+     *
      * @param path Relative path, used for subfolders.
      */
     public inert RAMFolder*

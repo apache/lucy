@@ -32,10 +32,15 @@ public class Lucy::Search::SortSpec inherits Clownfish::Obj {
 
     Vector        *rules;
 
+    /** Create a new SortSpec.
+     *
+     * @param rules An array of SortRules.
+     */
     public inert SortSpec*
     new(Vector *rules);
 
-    /**
+    /** Initialize a SortSpec.
+     *
      * @param rules An array of SortRules.
      */
     public inert SortSpec*

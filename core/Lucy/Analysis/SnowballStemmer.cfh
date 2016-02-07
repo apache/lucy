@@ -31,10 +31,16 @@ public class Lucy::Analysis::SnowballStemmer nickname SnowStemmer
     void *snowstemmer;
     String *language;
 
-    inert incremented SnowballStemmer*
+    /** Create a new SnowballStemmer.
+     *
+     * @param language A two-letter ISO code identifying a language supported
+     * by Snowball.
+     */
+    public inert incremented SnowballStemmer*
     new(String *language);
 
-    /**
+    /** Initialize a SnowballStemmer.
+     *
      * @param language A two-letter ISO code identifying a language supported
      * by Snowball.
      */

@@ -30,7 +30,8 @@ public abstract class Lucy::Search::PolyQuery inherits Lucy::Search::Query {
 
     Vector    *children;
 
-    /**
+    /** Abstract initializer.
+     *
      * @param children An array of child Queries.
      */
     public inert PolyQuery*

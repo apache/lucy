@@ -32,7 +32,8 @@ public class Lucy::Analysis::Inversion inherits Clownfish::Obj {
     uint32_t  *cluster_counts;        /* counts per unique text */
     uint32_t   cluster_counts_size;   /* num unique texts */
 
-    /**
+    /** Create a new Inversion.
+     *
      * @param seed An initial Token to start things off, which may be
      * [](@null).
      */

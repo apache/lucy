@@ -35,7 +35,7 @@ public abstract class Lucy::Search::Collector nickname Coll
     Matcher   *matcher;
     int32_t    base;
 
-    /** Abstract constructor.  Takes no arguments.
+    /** Abstract initializer.
      */
     public inert Collector*
     init(Collector *self);
@@ -85,10 +85,15 @@ public class Lucy::Search::Collector::BitCollector nickname BitColl
 
     BitVector    *bit_vec;
 
+    /** Create a new BitCollector.
+     *
+     * @param bit_vector A Lucy::Object::BitVector.
+     */
     public inert incremented BitCollector*
     new(BitVector *bit_vector);
 
-    /**
+    /** Initialize a BitCollector.
+     *
      * @param bit_vector A Lucy::Object::BitVector.
      */
     public inert BitCollector*

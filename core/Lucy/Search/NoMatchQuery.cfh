@@ -27,10 +27,12 @@ public class Lucy::Search::NoMatchQuery inherits Lucy::Search::Query {
 
     bool fails_to_match;
 
-    inert incremented NoMatchQuery*
+    /** Constructor. Takes no arguments.
+     */
+    public inert incremented NoMatchQuery*
     new();
 
-    /** Constructor. Takes no arguments.
+    /** Initialize a NoMatchQuery.
      */
     public inert NoMatchQuery*
     init(NoMatchQuery *self);

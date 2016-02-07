@@ -23,14 +23,19 @@ parcel Lucy;
  */
 public class Lucy::Plan::BlobType inherits Lucy::Plan::FieldType {
 
-    /**
+    /** Create a new BlobType.
+     *
+     * @param stored boolean indicating whether the field should be stored.
+     */
+    public inert incremented BlobType*
+    new(bool stored);
+
+    /** Initialize a BlobType.
+     *
      * @param stored boolean indicating whether the field should be stored.
      */
     public inert BlobType*
     init(BlobType *self, bool stored);
-
-    public inert incremented BlobType*
-    new(bool stored);
 
     /** Returns true.
      */

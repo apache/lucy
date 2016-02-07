@@ -28,7 +28,7 @@ public class Lucy::Search::Searcher inherits Clownfish::Obj {
     Schema      *schema;
     QueryParser *qparser;
 
-    /** Abstract constructor.
+    /** Abstract initializer.
      *
      * @param schema A Schema.
      */

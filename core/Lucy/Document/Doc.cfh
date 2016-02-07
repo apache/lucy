@@ -27,10 +27,17 @@ public class Lucy::Document::Doc inherits Clownfish::Obj {
     void        *fields;
     int32_t      doc_id;
 
-    inert incremented Doc*
+    /** Create a new Document.
+     *
+     * @param fields Field-value pairs.
+     * @param doc_id Internal Lucy document id.  Default of 0 (an
+     * invalid doc id).
+     */
+    public inert incremented Doc*
     new(void *fields = NULL, int32_t doc_id = 0);
 
-    /**
+    /** Initialize a Document.
+     *
      * @param fields Field-value pairs.
      * @param doc_id Internal Lucy document id.  Default of 0 (an
      * invalid doc id).

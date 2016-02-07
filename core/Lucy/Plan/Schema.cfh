@@ -34,10 +34,12 @@ public class Lucy::Plan::Schema inherits Clownfish::Obj {
     Hash              *analyzers;
     Vector            *uniq_analyzers;
 
+    /** Constructor.  Takes no arguments.
+     */
     public inert incremented Schema*
     new();
 
-    /** Constructor.  Takes no arguments.
+    /** Initialize a Schema.
      */
     public inert Schema*
     init(Schema *self);

@@ -24,14 +24,18 @@ parcel Lucy;
 
 public class Lucy::Store::FSFolder inherits Lucy::Store::Folder {
 
-    inert incremented FSFolder*
-    new(String *path);
-
-    /**
+    /** Create a new Folder.
+     *
      * @param path Location of the index. If the specified directory does
      * not exist already, it will NOT be created, in order to prevent
      * misconfigured read applications from spawning bogus files -- so it may
      * be necessary to create the directory yourself.
+     */
+    public inert incremented FSFolder*
+    new(String *path);
+
+    /** Initialize a Folder.  See [](.new) for a description of the
+     * parameters.
      */
     public inert FSFolder*
     init(FSFolder *self, String *path);

@@ -32,13 +32,17 @@ public class Lucy::Search::Span inherits Clownfish::Obj {
     int32_t length;
     float   weight;
 
-    inert incremented Span*
-    new(int32_t offset, int32_t length, float weight = 0.0);
-
-    /**
+    /** Create a new Span.
+     *
      * @param offset Integer offset, unit is context-dependent.
      * @param length Integer length, unit is context-dependent.
      * @param weight A floating point weight.
+     */
+    public inert incremented Span*
+    new(int32_t offset, int32_t length, float weight = 0.0);
+
+    /** Initialize a Span.  See [](.new) for a description of the
+     * parameters.
      */
     public inert Span*
     init(Span *self, int32_t offset, int32_t length,

@@ -29,13 +29,15 @@ parcel Lucy;
 
 public class Lucy::Search::NOTQuery inherits Lucy::Search::PolyQuery {
 
-    /**
-     * @param negated_query The Query to be inverted.
+    /** Create a new NOTQuery.
+     *
+     * @param negated_query The Query whose result set should be inverted.
      */
-    inert incremented NOTQuery*
+    public inert incremented NOTQuery*
     new(Query *negated_query);
 
-    /**
+    /** Initialize a NOTQuery.
+     *
      * @param negated_query The Query whose result set should be inverted.
      */
     public inert NOTQuery*

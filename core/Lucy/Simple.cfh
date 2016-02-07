@@ -59,6 +59,8 @@ public class Lucy::Simple {
     public inert Simple*
     new(Obj *path, String *language);
 
+    /** Initialize a Lucy::Simple object.
+     */
     public inert Simple*
     init(Simple *self, Obj *path, String *language);
 

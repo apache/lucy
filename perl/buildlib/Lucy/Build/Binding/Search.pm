@@ -79,6 +79,8 @@ END_CONSTRUCTOR
 sub bind_collector {
     my $pod_spec    = Clownfish::CFC::Binding::Perl::Pod->new;
     my $constructor = <<'END_CONSTRUCTOR';
+=head2 new
+
     package MyCollector;
     use base qw( Lucy::Search::Collector );
     our %foo;
@@ -88,9 +90,11 @@ sub bind_collector {
         $foo{$$self} = $args{foo};
         return $self;
     }
+
+Abstract constructor.  Takes no arguments.
 END_CONSTRUCTOR
     $pod_spec->set_synopsis("    # Abstract base class.\n");
-    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+    $pod_spec->add_constructor( alias => 'new', pod => $constructor, );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -144,16 +148,42 @@ sub bind_compiler {
         return MyMatcher->new( @_, compiler => $self );
     }
 END_SYNOPSIS
-    my $constructor = <<'END_CONSTRUCTOR_CODE_SAMPLE';
+    my $constructor = <<'END_CONSTRUCTOR_POD';
+=head2 new
+
     my $compiler = MyCompiler->SUPER::new(
         parent     => $my_query,
         searcher   => $searcher,
         similarity => $sim,        # default: undef
         boost      => undef,       # default: see below
     );
-END_CONSTRUCTOR_CODE_SAMPLE
+
+Abstract constructor.
+
+=over
+
+=item *
+
+B<parent> - The parent Query.
+
+=item *
+
+B<searcher> - A Lucy::Search::Searcher, such as an
+IndexSearcher.
+
+=item *
+
+B<similarity> - A Similarity.
+
+=item *
+
+B<boost> - An arbitrary scoring multiplier.  Defaults to the boost of
+the parent Query.
+
+=back
+END_CONSTRUCTOR_POD
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+    $pod_spec->add_constructor( alias => 'new', pod => $constructor, );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -275,11 +305,15 @@ sub bind_matcher {
     my $synopsis = <<'END_SYNOPSIS';
     # abstract base class
 END_SYNOPSIS
-    my $constructor = <<'END_CONSTRUCTOR_CODE_SAMPLE';
+    my $constructor = <<'END_CONSTRUCTOR_POD';
+=head2 new
+
     my $matcher = MyMatcher->SUPER::new;
-END_CONSTRUCTOR_CODE_SAMPLE
+
+Abstract constructor.
+END_CONSTRUCTOR_POD
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+    $pod_spec->add_constructor( alias => 'new', pod => $constructor, );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -550,13 +584,28 @@ sub bind_query {
     use base ( Lucy::Search::Compiler );
     ...
 END_SYNOPSIS
-    my $constructor = <<'END_CONSTRUCTOR_CODE_SAMPLE';
+    my $constructor = <<'END_CONSTRUCTOR_POD';
+=head2 new
+
     my $query = MyQuery->SUPER::new(
         boost => 2.5,
     );
-END_CONSTRUCTOR_CODE_SAMPLE
+
+Abstract constructor.
+
+=over
+
+=item *
+
+B<boost> - A scoring multiplier, affecting the Query's relative
+contribution to each document's score.  Typically defaults to 1.0, but
+subclasses which do not contribute to document scores such as NOTQuery
+and MatchAllQuery default to 0.0 instead.
+
+=back
+END_CONSTRUCTOR_POD
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+    $pod_spec->add_constructor( alias => 'new', pod => $constructor, );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -668,6 +717,8 @@ END_CONSTRUCTOR
 sub bind_searcher {
     my $pod_spec    = Clownfish::CFC::Binding::Perl::Pod->new;
     my $constructor = <<'END_CONSTRUCTOR';
+=head2 new
+
     package MySearcher;
     use base qw( Lucy::Search::Searcher );
     sub new {
@@ -675,9 +726,19 @@ sub bind_searcher {
         ...
         return $self;
     }
+
+Abstract constructor.
+
+=over
+
+=item *
+
+B<schema> - A Schema.
+
+=back
 END_CONSTRUCTOR
     $pod_spec->set_synopsis("    # Abstract base class.\n");
-    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+    $pod_spec->add_constructor( alias => 'new', pod => $constructor, );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",

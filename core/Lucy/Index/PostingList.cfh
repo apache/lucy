@@ -27,6 +27,8 @@ parcel Lucy;
 public class Lucy::Index::PostingList nickname PList
     inherits Lucy::Search::Matcher {
 
+    /** Abstract initializer.
+     */
     public inert PostingList*
     init(PostingList *self);
 

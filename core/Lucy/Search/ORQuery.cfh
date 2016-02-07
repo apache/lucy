@@ -26,10 +26,15 @@ parcel Lucy;
 
 public class Lucy::Search::ORQuery inherits Lucy::Search::PolyQuery {
 
-    inert incremented ORQuery*
+    /** Create a new ORQuery.
+     *
+     * @param children An array of child Queries.
+     */
+    public inert incremented ORQuery*
     new(Vector *children = NULL);
 
-    /**
+    /** Initialize an ORQuery.
+     *
      * @param children An array of child Queries.
      */
     public inert ORQuery*

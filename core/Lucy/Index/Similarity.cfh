@@ -37,10 +37,12 @@ public class Lucy::Index::Similarity nickname Sim inherits Clownfish::Obj {
 
     float  *norm_decoder;
 
-    inert incremented Similarity*
+    /** Constructor. Takes no arguments.
+     */
+    public inert incremented Similarity*
     new();
 
-    /** Constructor. Takes no arguments.
+    /** Initialize a Similarity.
      */
     public inert Similarity*
     init(Similarity *self);

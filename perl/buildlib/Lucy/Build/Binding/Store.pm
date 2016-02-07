@@ -225,6 +225,8 @@ sub bind_lock {
     $lock->release;
 END_SYNOPSIS
     my $constructor = <<'END_CONSTRUCTOR';
+=head2 new
+
     my $lock = Lucy::Store::Lock->new(
         name     => 'commit',     # required
         folder   => $folder,      # required
@@ -232,9 +234,37 @@ END_SYNOPSIS
         timeout  => 5000,         # default: 0
         interval => 1000,         # default: 100
     );
+
+Abstract constructor.
+
+=over
+
+=item *
+
+B<folder> - A Folder.
+
+=item *
+
+B<name> - String identifying the resource to be locked, which must
+consist solely of characters matching [-_.A-Za-z0-9].
+
+=item *
+
+B<host> - A unique per-machine identifier.
+
+=item *
+
+B<timeout> - Time in milliseconds to keep retrying before abandoning
+the attempt to L<obtain()|/obtain> a lock.
+
+=item *
+
+B<interval> - Time in milliseconds between retries.
+
+=back
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+    $pod_spec->add_constructor( alias => 'new', pod => $constructor, );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",

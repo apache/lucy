@@ -30,10 +30,16 @@ public class Lucy::Store::LockFactory nickname LockFact
     Folder  *folder;
     String *host;
 
-    inert incremented LockFactory*
+    /** Create a new LockFactory.
+     *
+     * @param folder A [](cfish:Folder).
+     * @param host An identifier which should be unique per-machine.
+     */
+    public inert incremented LockFactory*
     new(Folder *folder, String *host);
 
-    /**
+    /** Initialize a LockFactory.
+     *
      * @param folder A [](cfish:Folder).
      * @param host An identifier which should be unique per-machine.
      */

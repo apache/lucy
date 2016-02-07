@@ -48,10 +48,15 @@ public class Lucy::Analysis::EasyAnalyzer inherits Lucy::Analysis::Analyzer {
     Normalizer *normalizer;
     SnowballStemmer *stemmer;
 
-    inert incremented EasyAnalyzer*
+    /** Create a new EasyAnalyzer.
+     *
+     * @param language An ISO code from the list of supported languages.
+     */
+    public inert incremented EasyAnalyzer*
     new(String *language = NULL);
 
-    /**
+    /** Initialize an EasyAnalyzer.
+     *
      * @param language An ISO code from the list of supported languages.
      */
     public inert EasyAnalyzer*

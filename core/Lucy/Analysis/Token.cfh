@@ -58,11 +58,23 @@ public class Lucy::Analysis::Token inherits Clownfish::Obj {
     int32_t   pos_inc;
     int32_t   pos;
 
+    /** Create a new Token.
+     *
+     * @param text A UTF-8 string.
+     * @param len Size of the string in bytes.
+     * @param start_offset Start offset into the original document in Unicode
+     * code points.
+     * @param start_offset End offset into the original document in Unicode
+     * code points.
+     * @param boost Per-token weight.
+     * @param pos_inc Position increment for phrase matching.
+     */
     public inert incremented Token*
     new(const char *text, size_t len, uint32_t start_offset,
         uint32_t end_offset, float boost = 1.0, int32_t pos_inc = 1);
 
-    /**
+    /** Initialize a Token.
+     *
      * @param text A UTF-8 string.
      * @param len Size of the string in bytes.
      * @param start_offset Start offset into the original document in Unicode

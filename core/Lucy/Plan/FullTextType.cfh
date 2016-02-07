@@ -33,6 +33,16 @@ public class Lucy::Plan::FullTextType inherits Lucy::Plan::TextType {
     bool        highlightable;
     Analyzer   *analyzer;
 
+    /** Create a new FullTextType.
+     */
+    public inert incremented FullTextType*
+    new(Analyzer *analyzer);
+
+    /** Initialize a FullTextType.
+     */
+    public inert FullTextType*
+    init(FullTextType *self, Analyzer *analyzer);
+
     /**
      * @param analyzer An Analyzer.
      * @param boost floating point per-field boost.
@@ -43,15 +53,9 @@ public class Lucy::Plan::FullTextType inherits Lucy::Plan::TextType {
      * highlightable.
      */
     public inert FullTextType*
-    init(FullTextType *self, Analyzer *analyzer);
-
-    inert FullTextType*
     init2(FullTextType *self, Analyzer *analyzer, float boost = 1.0,
           bool indexed = true, bool stored = true,
           bool sortable = false, bool highlightable = false);
-
-    public inert incremented FullTextType*
-    new(Analyzer *analyzer);
 
     /** Indicate whether to store data required by
      * [](cfish:Highlighter) for excerpt selection and search

@@ -25,10 +25,12 @@ parcel Lucy;
  */
 public class Lucy::Search::MatchAllQuery inherits Lucy::Search::Query {
 
-    inert incremented MatchAllQuery*
+    /** Constructor.  Takes no arguments.
+     */
+    public inert incremented MatchAllQuery*
     new();
 
-    /** Constructor.  Takes no arguments.
+    /** Initialize a MatchAllQuery.
      */
     public inert MatchAllQuery*
     init(MatchAllQuery *self);

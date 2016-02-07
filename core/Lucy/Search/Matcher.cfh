@@ -25,7 +25,7 @@ parcel Lucy;
 
 public abstract class Lucy::Search::Matcher inherits Clownfish::Obj {
 
-    /** Abstract constructor.
+    /** Abstract initializer.
      */
     public inert Matcher*
     init(Matcher* self);
