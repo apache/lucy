@@ -69,7 +69,7 @@ public class Lucy::Analysis::RegexTokenizer
     public inert incremented RegexTokenizer*
     new(String *pattern = NULL);
 
-    /** Initilaize a RegexTokenizer.
+    /** Initialize a RegexTokenizer.
      *
      * @param pattern A string specifying a Perl-syntax regular expression
      * which should match one token.  The default value is
