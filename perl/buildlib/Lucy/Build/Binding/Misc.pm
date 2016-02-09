@@ -154,6 +154,12 @@ Later, search the index.
         print "$hit->{title}\n",
     }
 END_SYNOPSIS
+    my $constructor = <<'END_CONSTRUCTOR';
+    my $lucy = Lucy::Simple->new(
+        path     => '/path/to/index/',
+        language => 'en',
+    );
+END_CONSTRUCTOR
     my $add_doc_pod = <<'END_ADD_DOC_POD';
 =head2 add_doc
 
@@ -169,6 +175,7 @@ with field names as keys and content as values.
 END_ADD_DOC_POD
     $pod_spec->set_synopsis($synopsis);
 
+    $pod_spec->add_constructor( sample => $constructor );
     # Override is necessary because there's no standard way to explain
     # hash/hashref across multiple host languages.
     $pod_spec->add_method(
