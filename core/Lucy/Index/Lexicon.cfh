@@ -37,7 +37,7 @@ public class Lucy::Index::Lexicon nickname Lex inherits Clownfish::Obj {
 
     /** Abstract initializer.
      */
-    public inert Lexicon*
+    inert Lexicon*
     init(Lexicon *self, String *field);
 
     public void

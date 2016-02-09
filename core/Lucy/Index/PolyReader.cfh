@@ -58,13 +58,13 @@ public class Lucy::Index::PolyReader inherits Lucy::Index::IndexReader {
 
     /** Create a new PolyReader.
      */
-    public inert incremented PolyReader*
+    inert incremented PolyReader*
     new(Schema *schema = NULL, Folder *folder, Snapshot *snapshot = NULL,
         IndexManager *manager = NULL, Vector *sub_readers = NULL);
 
     /** Initialize a PolyReader.
      */
-    public inert PolyReader*
+    inert PolyReader*
     init(PolyReader *self, Schema *schema = NULL, Folder *folder,
          Snapshot *snapshot = NULL, IndexManager *manager = NULL,
          Vector *sub_readers = NULL);

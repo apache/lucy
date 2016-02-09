@@ -44,7 +44,7 @@ public class Lucy::Index::IndexReader nickname IxReader
 
     /** Abstract initializer.
      */
-    public inert nullable IndexReader*
+    inert nullable IndexReader*
     init(IndexReader *self, Schema *schema = NULL, Folder *folder,
          Snapshot *snapshot = NULL, Vector *segments = NULL,
          int32_t seg_tick = -1, IndexManager *manager = NULL);

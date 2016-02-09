@@ -34,7 +34,7 @@ public abstract class Lucy::Search::PolyQuery inherits Lucy::Search::Query {
      *
      * @param children An array of child Queries.
      */
-    public inert PolyQuery*
+    inert PolyQuery*
     init(PolyQuery *self, Vector *children = NULL);
 
     /** Add a child Query node.
