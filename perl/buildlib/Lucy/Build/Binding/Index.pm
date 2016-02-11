@@ -545,6 +545,10 @@ sub bind_polyreader {
     }
 END_SYNOPSIS
     $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_method(
+        method => 'Offsets',
+        alias  => 'offsets',
+    );
 
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Index::PolyReader
