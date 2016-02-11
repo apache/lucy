@@ -22,8 +22,16 @@ use 5.008003;
 
 our $VERSION = '0.004000';
 $VERSION = eval $VERSION;
+our $MAJOR_VERSION = 0.004000;
 
 use Clownfish 0.004000;
+BEGIN {
+    die <<"EOF" if $Clownfish::MAJOR_VERSION > 0.004000;
+This version of Lucy doesn't support Clownfish $Clownfish::MAJOR_VERSION or
+higher. You should downgrade Clownfish or, if possible, upgrade Lucy.
+EOF
+}
+
 use Exporter 'import';
 BEGIN {
     our @EXPORT_OK = qw(

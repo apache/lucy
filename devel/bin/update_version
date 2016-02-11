@@ -75,7 +75,11 @@ $buf =~ s/(our \$VERSION\ +=\ +)'.+?'/$1'$x_yyyzzz_version'/g
 $buf =~ s/(bootstrap\s+Lucy\s+)'[\d\._]+'/$1'$x_y_z_d_version'/
     or die "no match";
 if ( $z == 0 && $dev == 0 ) {
+    $buf =~ s/(our \$MAJOR_VERSION\ +=\ +)[\d._]+/$1$x_yyyzzz_version/g
+        or die "no match";
     $buf =~ s/(use Clownfish +)[\d\._]+/$1$x_yyyzzz_version/g
+        or die "no match";
+    $buf =~ s/(if \$Clownfish::MAJOR_VERSION\ +>\ +)[\d._]+/$1$x_yyyzzz_version/g
         or die "no match";
 }
 write_file( 'perl/lib/Lucy.pm', $buf );
