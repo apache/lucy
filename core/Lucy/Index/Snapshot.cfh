@@ -33,11 +33,12 @@ public class Lucy::Index::Snapshot inherits Clownfish::Obj {
 
     inert int32_t current_file_format;
 
+    /** Constructor.  Takes no arguments.
+     */
     public inert incremented Snapshot*
     new();
 
-    /**
-     * Constructor.  Takes no arguments.
+    /** Initialize a Snapshot.
      */
     public inert Snapshot*
     init(Snapshot *self);

@@ -188,7 +188,11 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+    $pod_spec->add_constructor(
+        alias    => 'new',
+        pod_func => 'init2',
+        sample   => $constructor,
+    );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -270,7 +274,11 @@ END_SYNOPSIS
     );
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+    $pod_spec->add_constructor(
+        alias    => 'new',
+        pod_func => 'init2',
+        sample   => $constructor,
+    );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",

@@ -29,10 +29,12 @@ public class Lucy::Analysis::CaseFolder inherits Lucy::Analysis::Analyzer {
 
     Normalizer *normalizer;
 
-    inert incremented CaseFolder*
+    /** Constructor.  Takes no arguments.
+     */
+    public inert incremented CaseFolder*
     new();
 
-    /** Constructor.  Takes no arguments.
+    /** Initialize a CaseFolder.
      */
     public inert CaseFolder*
     init(CaseFolder *self);

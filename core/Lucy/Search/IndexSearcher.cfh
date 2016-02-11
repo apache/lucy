@@ -35,10 +35,15 @@ public class Lucy::Search::IndexSearcher nickname IxSearcher
     Vector            *seg_readers;
     I32Array          *seg_starts;
 
-    inert incremented IndexSearcher*
+    /** Create a new IndexSearcher.
+     *
+     * @param index Either a string filepath, a Folder, or an IndexReader.
+     */
+    public inert incremented IndexSearcher*
     new(Obj *index);
 
-    /**
+    /** Initialize an IndexSearcher.
+     *
      * @param index Either a string filepath, a Folder, or an IndexReader.
      */
     public inert IndexSearcher*

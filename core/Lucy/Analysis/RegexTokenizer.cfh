@@ -59,10 +59,18 @@ public class Lucy::Analysis::RegexTokenizer
     inert bool
     is_available();
 
-    inert incremented RegexTokenizer*
+    /** Create a new RegexTokenizer.
+     *
+     * @param pattern A string specifying a Perl-syntax regular expression
+     * which should match one token.  The default value is
+     * `\w+(?:[\x{2019}']\w+)*`, which matches "it's" as well as
+     * "it" and "O'Henry's" as well as "Henry".
+     */
+    public inert incremented RegexTokenizer*
     new(String *pattern = NULL);
 
-    /**
+    /** Initialize a RegexTokenizer.
+     *
      * @param pattern A string specifying a Perl-syntax regular expression
      * which should match one token.  The default value is
      * `\w+(?:[\x{2019}']\w+)*`, which matches "it's" as well as

@@ -28,10 +28,16 @@ public class LucyX::Search::ProximityQuery inherits Lucy::Search::Query {
     Vector        *terms;
     uint32_t       within;
 
-    inert incremented ProximityQuery*
+    /** Create a new ProximityQuery.
+     *
+     * @param field The field that the phrase must occur in.
+     * @param terms The ordered array of terms that must match.
+     */
+    public inert incremented ProximityQuery*
     new(String *field, Vector *terms, uint32_t within);
 
-    /**
+    /** Initialize a ProximityQuery.
+     *
      * @param field The field that the phrase must occur in.
      * @param terms The ordered array of terms that must match.
      */

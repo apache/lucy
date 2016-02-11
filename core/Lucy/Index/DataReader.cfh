@@ -32,7 +32,8 @@ public class Lucy::Index::DataReader inherits Clownfish::Obj {
     Segment     *segment;
     int32_t      seg_tick;
 
-    /**
+    /** Abstract initializer.
+     *
      * @param schema A Schema.
      * @param folder A Folder.
      * @param snapshot A Snapshot.

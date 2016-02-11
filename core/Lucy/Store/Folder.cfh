@@ -31,7 +31,9 @@ public abstract class Lucy::Store::Folder inherits Clownfish::Obj {
     String *path;
     Hash   *entries;
 
-    public inert nullable Folder*
+    /** Abstract initializer.
+     */
+    inert nullable Folder*
     init(Folder *self, String *path);
 
     public void

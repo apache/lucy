@@ -62,7 +62,7 @@ public class Lucy::Search::Compiler inherits Lucy::Search::Query {
     Query        *parent;
     Similarity   *sim;
 
-    /** Abstract constructor.
+    /** Abstract initializer.
      *
      * @param parent The parent Query.
      * @param searcher A Lucy::Search::Searcher, such as an

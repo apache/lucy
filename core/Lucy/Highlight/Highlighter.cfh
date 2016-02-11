@@ -34,11 +34,23 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
     String     *post_tag;
     Compiler   *compiler;
 
-    inert incremented Highlighter*
+    /** Create a new Highlighter.
+     *
+     * @param searcher An object which inherits from
+     * [](cfish:Searcher), such as an
+     * [](cfish:IndexSearcher).
+     * @param query Query object or a query string.
+     * @param field The name of the field from which to draw the excerpt.  The
+     * field must marked as be `highlightable` (see
+     * [](cfish:FieldType)).
+     * @param excerpt_length Maximum length of the excerpt, in characters.
+     */
+    public inert incremented Highlighter*
     new(Searcher *searcher, Obj *query, String *field,
         uint32_t excerpt_length = 200);
 
-    /**
+    /** Initialize a Highlighter.
+     *
      * @param searcher An object which inherits from
      * [](cfish:Searcher), such as an
      * [](cfish:IndexSearcher).

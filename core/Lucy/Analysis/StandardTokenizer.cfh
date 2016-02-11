@@ -29,10 +29,12 @@ parcel Lucy;
 public class Lucy::Analysis::StandardTokenizer
     inherits Lucy::Analysis::Analyzer {
 
-    inert incremented StandardTokenizer*
+    /** Constructor.  Takes no arguments.
+     */
+    public inert incremented StandardTokenizer*
     new();
 
-    /** Constructor.  Takes no arguments.
+    /** Initialize a StandardTokenizer.
      */
     public inert StandardTokenizer*
     init(StandardTokenizer *self);

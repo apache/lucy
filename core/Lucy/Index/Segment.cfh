@@ -40,10 +40,14 @@ public class Lucy::Index::Segment nickname Seg inherits Clownfish::Obj {
     Vector      *by_num;    /* field names by num */
     Hash        *metadata;
 
+    /** Create a new Segment.
+     */
     inert incremented Segment*
     new(int64_t number);
 
-    public inert Segment*
+    /** Initialize a segment.
+     */
+    inert Segment*
     init(Segment *self, int64_t number);
 
     /** Return a segment name with a base-36-encoded segment number.

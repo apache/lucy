@@ -77,6 +77,8 @@ sub bind_datareader {
     # Abstract base class.
 END_SYNOPSIS
     my $constructor = <<'END_CONSTRUCTOR';
+=head2 new
+
     my $reader = MyDataReader->new(
         schema   => $seg_reader->get_schema,      # default undef
         folder   => $seg_reader->get_folder,      # default undef
@@ -84,9 +86,38 @@ END_SYNOPSIS
         segments => $seg_reader->get_segments,    # default undef
         seg_tick => $seg_reader->get_seg_tick,    # default -1
     );
+
+Abstract constructor.
+
+=over
+
+=item *
+
+B<schema> - A Schema.
+
+=item *
+
+B<folder> - A Folder.
+
+=item *
+
+B<snapshot> - A Snapshot.
+
+=item *
+
+B<segments> - An array of Segments.
+
+=item *
+
+B<seg_tick> - The array index of the Segment object within the
+C<segments> array that this particular DataReader is assigned
+to, if any.  A value of -1 indicates that no Segment should be
+assigned.
+
+=back
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+    $pod_spec->add_constructor( alias => 'new', pod => $constructor, );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -103,14 +134,37 @@ sub bind_datawriter {
     # Abstract base class.
 END_SYNOPSIS
     my $constructor = <<'END_CONSTRUCTOR';
+=head2 new
+
     my $writer = MyDataWriter->new(
         snapshot   => $snapshot,      # required
         segment    => $segment,       # required
         polyreader => $polyreader,    # required
     );
+
+Abstract constructor.
+
+=over
+
+=item *
+
+B<snapshot> - The Snapshot that will be committed at the end of the
+indexing session.
+
+=item *
+
+B<segment> - The Segment in progress.
+
+=item *
+
+B<polyreader> - A PolyReader representing all existing data in the
+index.  (If the index is brand new, the PolyReader will have no
+sub-readers).
+
+=back
 END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
+    $pod_spec->add_constructor( alias => 'new', pod => $constructor, );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
@@ -226,7 +280,6 @@ END_CONSTRUCTOR
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor(
         alias       => 'open',
-        initializer => 'do_open',
         sample      => $constructor,
     );
     $pod_spec->add_method(
@@ -492,6 +545,10 @@ sub bind_polyreader {
     }
 END_SYNOPSIS
     $pod_spec->set_synopsis($synopsis);
+    $pod_spec->add_method(
+        method => 'Offsets',
+        alias  => 'offsets',
+    );
 
     my $xs_code = <<'END_XS_CODE';
 MODULE = Lucy   PACKAGE = Lucy::Index::PolyReader

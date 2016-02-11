@@ -35,7 +35,8 @@ public class Lucy::Index::DataWriter inherits Clownfish::Obj {
     Schema      *schema;
     Folder      *folder;
 
-    /**
+    /** Abstract initializer.
+     *
      * @param snapshot The Snapshot that will be committed at the end of the
      * indexing session.
      * @param segment The Segment in progress.

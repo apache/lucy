@@ -26,6 +26,8 @@ parcel Lucy;
  */
 public abstract class Lucy::Analysis::Analyzer inherits Clownfish::Obj {
 
+    /** Abstract initializer.
+     */
     public inert Analyzer*
     init(Analyzer *self);
 

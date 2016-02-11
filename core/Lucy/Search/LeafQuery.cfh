@@ -30,10 +30,16 @@ public class Lucy::Search::LeafQuery inherits Lucy::Search::Query {
     String *field;
     String *text;
 
-    inert incremented LeafQuery*
+    /** Create a new LeafQuery.
+     *
+     * @param field Optional field name.
+     * @param text Raw query text.
+     */
+    public inert incremented LeafQuery*
     new(String *field = NULL, String *text);
 
-    /**
+    /** Initialize a LeafQuery.
+     *
      * @param field Optional field name.
      * @param text Raw query text.
      */

@@ -33,10 +33,19 @@ public class Lucy::Index::PolyReader inherits Lucy::Index::IndexReader {
     int32_t   del_count;
     I32Array *offsets;
 
+    /** Create and open a PolyReader.
+     *
+     * @param index Either a string filepath or a [](cfish:Folder).
+     * @param snapshot A Snapshot.  If not supplied, the most recent snapshot
+     * file will be used.
+     * @param manager An [](cfish:IndexManager).
+     * Read-locking is off by default; supplying this argument turns it on.
+     */
     public inert incremented nullable PolyReader*
     open(Obj *index, Snapshot *snapshot = NULL, IndexManager *manager = NULL);
 
-    /**
+    /** Initialize and open a PolyReader.
+     *
      * @param index Either a string filepath or a [](cfish:Folder).
      * @param snapshot A Snapshot.  If not supplied, the most recent snapshot
      * file will be used.
@@ -47,11 +56,15 @@ public class Lucy::Index::PolyReader inherits Lucy::Index::IndexReader {
     do_open(PolyReader *self, Obj *index, Snapshot *snapshot = NULL,
             IndexManager *manager = NULL);
 
-    public inert incremented PolyReader*
+    /** Create a new PolyReader.
+     */
+    inert incremented PolyReader*
     new(Schema *schema = NULL, Folder *folder, Snapshot *snapshot = NULL,
         IndexManager *manager = NULL, Vector *sub_readers = NULL);
 
-    public inert PolyReader*
+    /** Initialize a PolyReader.
+     */
+    inert PolyReader*
     init(PolyReader *self, Schema *schema = NULL, Folder *folder,
          Snapshot *snapshot = NULL, IndexManager *manager = NULL,
          Vector *sub_readers = NULL);

@@ -18,6 +18,8 @@ parcel Lucy;
 
 class Lucy::Plan::NumericType nickname NumType inherits Lucy::Plan::FieldType {
 
+    /** Abstract initializer.
+     */
     public inert NumericType*
     init(NumericType *self);
 
@@ -50,9 +52,13 @@ abstract class Lucy::Plan::FloatType inherits Lucy::Plan::NumericType { }
 
 class Lucy::Plan::Float64Type inherits Lucy::Plan::FloatType {
 
+    /** Create a new Float64Type.
+     */
     public inert Float64Type*
     new();
 
+    /** Initialize a Float64Type.
+     */
     public inert Float64Type*
     init(Float64Type *self);
 
@@ -72,9 +78,13 @@ class Lucy::Plan::Float64Type inherits Lucy::Plan::FloatType {
 
 class Lucy::Plan::Float32Type inherits Lucy::Plan::FloatType {
 
+    /** Create a new Float32Type.
+     */
     public inert Float32Type*
     new();
 
+    /** Initialize a Float32Type.
+     */
     public inert Float32Type*
     init(Float32Type *self);
 
@@ -96,9 +106,13 @@ abstract class Lucy::Plan::IntType inherits Lucy::Plan::NumericType { }
 
 class Lucy::Plan::Int32Type inherits Lucy::Plan::IntType {
 
+    /** Create a new Int32Type.
+     */
     public inert Int32Type*
     new();
 
+    /** Initialize an Int32Type.
+     */
     public inert Int32Type*
     init(Int32Type *self);
 
@@ -118,9 +132,13 @@ class Lucy::Plan::Int32Type inherits Lucy::Plan::IntType {
 
 class Lucy::Plan::Int64Type inherits Lucy::Plan::IntType {
 
+    /** Create a new Int64Type.
+     */
     public inert Int64Type*
     new();
 
+    /** Initialize an Int64Type.
+     */
     public inert Int64Type*
     init(Int64Type *self);
 

@@ -28,10 +28,16 @@ public class Lucy::Search::TermQuery inherits Lucy::Search::Query {
     String *field;
     Obj    *term;
 
-    inert incremented TermQuery*
+    /** Create a new TermQuery.
+     *
+     * @param field Field name.
+     * @param term Term text.
+     */
+    public inert incremented TermQuery*
     new(String *field, Obj *term);
 
-    /**
+    /** Initialize a TermQuery.
+     *
      * @param field Field name.
      * @param term Term text.
      */

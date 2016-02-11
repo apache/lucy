@@ -31,6 +31,8 @@ class Lucy::Index::Posting nickname Post inherits Lucy::Util::Stepper {
 
     int32_t doc_id;
 
+    /** Abstract initializer.
+     */
     public inert Posting*
     init(Posting *self);
 

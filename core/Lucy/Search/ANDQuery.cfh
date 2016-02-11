@@ -24,10 +24,15 @@ parcel Lucy;
  */
 public class Lucy::Search::ANDQuery inherits Lucy::Search::PolyQuery {
 
-    inert incremented ANDQuery*
+    /** Create a new ANDQuery.
+     *
+     * @param children An array of child Queries.
+     */
+    public inert incremented ANDQuery*
     new(Vector *children = NULL);
 
-    /**
+    /** Initialize an ANDQuery.
+     *
      * @param children An array of child Queries.
      */
     public inert ANDQuery*

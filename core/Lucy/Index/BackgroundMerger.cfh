@@ -47,10 +47,16 @@ public class Lucy::Index::BackgroundMerger nickname BGMerger
     bool               needs_commit;
     bool               prepared;
 
+    /** Open a new BackgroundMerger.
+     *
+     * @param index Either a string filepath or a Folder.
+     * @param manager An IndexManager.  If not supplied, an IndexManager with
+     * a 10-second write lock timeout will be created.
+     */
     public inert incremented BackgroundMerger*
     new(Obj *index, IndexManager *manager = NULL);
 
-    /** Open a new BackgroundMerger.
+    /** Initialize a BackgroundMerger.
      *
      * @param index Either a string filepath or a Folder.
      * @param manager An IndexManager.  If not supplied, an IndexManager with

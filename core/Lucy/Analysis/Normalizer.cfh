@@ -31,11 +31,19 @@ public class Lucy::Analysis::Normalizer inherits Lucy::Analysis::Analyzer {
 
     int options;
 
-    inert incremented Normalizer*
+    /** Create a new Normalizer.
+     *
+     * @param normalization_form Unicode normalization form, can be one of
+     * 'NFC', 'NFKC', 'NFD', 'NFKD'. Defaults to 'NFKC'.
+     * @param case_fold Perform case folding, default is true.
+     * @param strip_accents Strip accents, default is false.
+     */
+    public inert incremented Normalizer*
     new(String *normalization_form = NULL, bool case_fold = true,
         bool strip_accents = false);
 
-    /**
+    /** Initialize a Normalizer.
+     *
      * @param normalization_form Unicode normalization form, can be one of
      * 'NFC', 'NFKC', 'NFD', 'NFKD'. Defaults to 'NFKC'.
      * @param case_fold Perform case folding, default is true.

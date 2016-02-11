@@ -22,6 +22,16 @@ parcel Lucy;
  */
 public class Lucy::Plan::StringType inherits Lucy::Plan::TextType {
 
+    /** Create a new StringType.
+     */
+    public inert incremented StringType*
+    new();
+
+    /** Initialize a StringType.
+     */
+    public inert StringType*
+    init(StringType *self);
+
     /**
      * @param boost floating point per-field boost.
      * @param indexed boolean indicating whether the field should be indexed.
@@ -30,14 +40,8 @@ public class Lucy::Plan::StringType inherits Lucy::Plan::TextType {
      * sortable.
      */
     public inert StringType*
-    init(StringType *self);
-
-    inert StringType*
     init2(StringType *self, float boost = 1.0, bool indexed = true,
           bool stored = true, bool sortable = false);
-
-    public inert incremented StringType*
-    new();
 
     incremented Similarity*
     Make_Similarity(StringType *self);

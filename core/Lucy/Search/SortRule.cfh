@@ -33,15 +33,19 @@ public class Lucy::Search::SortRule inherits Clownfish::Obj {
     inert int32_t SCORE;
     inert int32_t DOC_ID;
 
-    public inert incremented SortRule*
-    new(int32_t type = 0, String *field = NULL,
-        bool reverse = false);
-
-    /**
+    /** Create a new SortRule.
+     *
      * @param type Indicate whether to sort by score, field, etc.  (The
      * default is to sort by a field.)
      * @param field The name of a `sortable` field.
      * @param reverse If true, reverse the order of the sort for this rule.
+     */
+    public inert incremented SortRule*
+    new(int32_t type = 0, String *field = NULL,
+        bool reverse = false);
+
+    /** Initialize a SortRule.  See [](.new) for a description of the
+     * parameters.
      */
     public inert incremented SortRule*
     init(SortRule *self, int32_t type = 0, String *field = NULL,

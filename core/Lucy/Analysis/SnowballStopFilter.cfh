@@ -73,10 +73,16 @@ public class Lucy::Analysis::SnowballStopFilter nickname SnowStop
     inert const uint8_t** snow_ru;
     inert const uint8_t** snow_sv;
 
-    inert incremented SnowballStopFilter*
+    /** Create a new SnowballStopFilter.
+     *
+     * @param stoplist A hash with stopwords as the keys.
+     * @param language The ISO code for a supported language.
+     */
+    public inert incremented SnowballStopFilter*
     new(String *language = NULL, Hash *stoplist = NULL);
 
-    /**
+    /** Initialize a SnowballStopFilter.
+     *
      * @param stoplist A hash with stopwords as the keys.
      * @param language The ISO code for a supported language.
      */

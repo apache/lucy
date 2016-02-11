@@ -27,10 +27,16 @@ public class Lucy::Search::PhraseQuery inherits Lucy::Search::Query {
     String        *field;
     Vector        *terms;
 
-    inert incremented PhraseQuery*
+    /** Create a new PhraseQuery.
+     *
+     * @param field The field that the phrase must occur in.
+     * @param terms The ordered array of terms that must match.
+     */
+    public inert incremented PhraseQuery*
     new(String *field, Vector *terms);
 
-    /**
+    /** Initialize a PhraseQuery.
+     *
      * @param field The field that the phrase must occur in.
      * @param terms The ordered array of terms that must match.
      */

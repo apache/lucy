@@ -21,6 +21,8 @@ abstract class Lucy::Index::TermStepper
 
     Obj *value;
 
+    /** Abstract initializer.
+     */
     public inert TermStepper*
     init(TermStepper *self);
 

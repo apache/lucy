@@ -39,10 +39,16 @@ public class Lucy::Index::IndexManager nickname IxManager
     uint32_t     deletion_lock_timeout;
     uint32_t     deletion_lock_interval;
 
+    /** Create a new IndexManager.
+     *
+     * @param host An identifier which should be unique per-machine.
+     * @param lock_factory A LockFactory.
+     */
     public inert incremented IndexManager*
     new(String *host = NULL, LockFactory *lock_factory = NULL);
 
-    /**
+    /** Initialize an IndexManager.
+     *
      * @param host An identifier which should be unique per-machine.
      * @param lock_factory A LockFactory.
      */

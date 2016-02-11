@@ -26,10 +26,16 @@ parcel Lucy;
 public class Lucy::Search::RequiredOptionalQuery nickname ReqOptQuery
     inherits Lucy::Search::PolyQuery {
 
-    inert incremented RequiredOptionalQuery*
+    /** Create a new RequiredOptionalQuery.
+     *
+     * @param required_query Query must must match.
+     * @param optional_query Query which should match.
+     */
+    public inert incremented RequiredOptionalQuery*
     new(Query *required_query, Query *optional_query);
 
-    /**
+    /** Initialize a RequiredOptionalQuery.
+     *
      * @param required_query Query must must match.
      * @param optional_query Query which should match.
      */

@@ -36,7 +36,23 @@ sub bind_all {
 
 sub bind_analyzer {
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
+    my $constructor = <<'END_CONSTRUCTOR';
+=head2 new
+
+    package MyAnalyzer;
+    use base qw( Lucy::Analysis::Analyzer );
+    our %foo;
+    sub new {
+        my $self = shift->SUPER::new;
+        my %args = @_;
+        $foo{$$self} = $args{foo};
+        return $self;
+    }
+
+Abstract constructor.  Takes no arguments.
+END_CONSTRUCTOR
     $pod_spec->set_synopsis("    # Abstract base class.\n");
+    $pod_spec->add_constructor( pod => $constructor );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",

@@ -27,10 +27,16 @@ public class Lucy::Object::BitVector nickname BitVec
     uint32_t  cap;
     uint8_t  *bits;
 
-    inert incremented BitVector*
+    /** Create a new BitVector.
+     *
+     * @param capacity The number of bits that the initial array should be
+     * able to hold.
+     */
+    public inert incremented BitVector*
     new(uint32_t capacity = 0);
 
-    /**
+    /** Initialize a BitVector.
+     *
      * @param capacity The number of bits that the initial array should be
      * able to hold.
      */

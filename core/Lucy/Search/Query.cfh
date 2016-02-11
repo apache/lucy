@@ -38,7 +38,7 @@ public class Lucy::Search::Query inherits Clownfish::Obj {
 
     float boost;
 
-    /** Abstract constructor.
+    /** Abstract initializer.
      *
      * @param boost A scoring multiplier, affecting the Query's relative
      * contribution to each document's score.  Typically defaults to 1.0, but

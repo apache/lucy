@@ -29,6 +29,8 @@ class Lucy::Index::SortCache inherits Clownfish::Obj {
     int32_t     null_ord;
     bool        native_ords;
 
+    /** Abstract initializer.
+     */
     public inert SortCache*
     init(SortCache *self, String *field, FieldType *type, const void *ords,
          int32_t cardinality, int32_t doc_max, int32_t null_ord = -1,

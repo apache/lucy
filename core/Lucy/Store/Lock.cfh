@@ -36,7 +36,7 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
     int32_t      timeout;
     int32_t      interval;
 
-    /** Abstract constructor.
+    /** Abstract initializer.
      *
      * @param folder A Folder.
      * @param name String identifying the resource to be locked, which must
@@ -164,10 +164,10 @@ class Lucy::Store::LockFileLock nickname LFLock
  */
 public class Lucy::Store::LockErr inherits Clownfish::Err {
 
-    public inert incremented LockErr*
+    inert incremented LockErr*
     new(String *message);
 
-    public inert LockErr*
+    inert LockErr*
     init(LockErr *self, String *message);
 }
 

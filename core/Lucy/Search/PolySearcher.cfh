@@ -29,10 +29,16 @@ public class Lucy::Search::PolySearcher
     I32Array  *starts;
     int32_t    doc_max;
 
-    inert incremented PolySearcher*
+    /** Create a new PolySearcher.
+     *
+     * @param schema A Schema.
+     * @param searchers An array of Searchers.
+     */
+    public inert incremented PolySearcher*
     new(Schema *schema, Vector *searchers);
 
-    /**
+    /** Initialize a PolySearcher.
+     *
      * @param schema A Schema.
      * @param searchers An array of Searchers.
      */

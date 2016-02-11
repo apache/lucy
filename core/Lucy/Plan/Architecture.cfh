@@ -27,10 +27,12 @@ parcel Lucy;
  */
 public class Lucy::Plan::Architecture nickname Arch inherits Clownfish::Obj {
 
+    /** Constructor.  Takes no arguments.
+     */
     public inert incremented Architecture*
     new();
 
-    /** Constructor.  Takes no arguments.
+    /** Initialize an Architecture.
      */
     public inert Architecture*
     init(Architecture *self);

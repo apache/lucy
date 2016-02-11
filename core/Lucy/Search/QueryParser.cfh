@@ -51,11 +51,27 @@ public class Lucy::Search::QueryParser nickname QParser
     bool        heed_colons;
     int32_t     default_occur;
 
-    inert incremented QueryParser*
+    /** Constructor.
+     *
+     * @param schema A [](cfish:Schema).
+     * @param analyzer An [](cfish:Analyzer).
+     * Ordinarily, the analyzers specified by each field's definition will be
+     * used, but if `analyzer` is supplied, it will override and be used for
+     * all fields.  This can lead to mismatches between what is in the index
+     * and what is being searched for, so use caution.
+     * @param fields The names of the fields which will be searched against.
+     * Defaults to those fields which are defined as indexed in the supplied
+     * Schema.
+     * @param default_boolop Two possible values: 'AND' and 'OR'.  The default
+     * is 'OR', which means: return documents which match any of the query
+     * terms.  If you want only documents which match all of the query terms,
+     * set this to 'AND'.
+     */
+    public inert incremented QueryParser*
     new(Schema *schema, Analyzer *analyzer = NULL,
         String *default_boolop = NULL, Vector *fields = NULL);
 
-    /** Constructor.
+    /** Initialize a QueryParser.
      *
      * @param schema A [](cfish:Schema).
      * @param analyzer An [](cfish:Analyzer).
