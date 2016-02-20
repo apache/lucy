@@ -282,16 +282,17 @@ sub ACTION_dist {
     # bunch of stuff.  After the tarball is packaged up, we delete the copied
     # directories.
     my %to_copy = (
-        '../core'         => 'core',
-        '../modules'      => 'modules',
-        '../devel'        => 'devel',
-        '../lemon'        => 'lemon',
-        '../CHANGES'      => 'CHANGES',
-        '../CONTRIBUTING' => 'CONTRIBUTING',
-        '../LICENSE'      => 'LICENSE',
-        '../NOTICE'       => 'NOTICE',
-        '../README'       => 'README',
-        $CHARMONIZER_C    => 'charmonizer.c',
+        '../core'                          => 'core',
+        '../modules'                       => 'modules',
+        '../devel'                         => 'devel',
+        '../lemon'                         => 'lemon',
+        '../common/sample/us_constitution' => 'sample/us_constitution',
+        '../CHANGES'                       => 'CHANGES',
+        '../CONTRIBUTING'                  => 'CONTRIBUTING',
+        '../LICENSE'                       => 'LICENSE',
+        '../NOTICE'                        => 'NOTICE',
+        '../README'                        => 'README',
+        $CHARMONIZER_C                     => 'charmonizer.c',
     );
     print "Copying files...\n";
     while (my ($from, $to) = each %to_copy) {
