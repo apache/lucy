@@ -16,12 +16,13 @@
 # limitations under the License.
 
 use strict;
+use warnings;
 
 package NameExtractor;
 
 use base qw(Pod::Simple);
 
-# Extremely dirty extraction of NAME sections.
+# Extraction of NAME sections. Possibly fragile.
 
 sub _handle_element_start {
     my ($parser, $element_name, $attr_hash_r) = @_;
@@ -63,16 +64,18 @@ use File::Slurp;
 use Getopt::Std;
 use Pod::Simple::HTML;
 
-sub pod2html {
+my $out_root = 'mdtext';
+
+sub pod2mdtext {
     my ($base_dir, $filename) = @_;
 
     my @path_comps = split('/', $filename);
     pop(@path_comps);
 
-    my $out_dir = join('/', 'html', @path_comps);
+    my $out_dir = join('/', $out_root, @path_comps);
     make_path($out_dir);
 
-    my $out_filename = "html/$filename";
+    my $out_filename = "$out_root/$filename";
     $out_filename =~ s"(\.[^/.]*)?$".mdtext";
 
     open(my $out_file, '>', $out_filename)
@@ -85,6 +88,10 @@ sub pod2html {
     $p->html_header_before_title('Title: ');
     $p->html_header_after_title(" - Apache Lucy Documentation\n\n<div>\n");
     $p->html_footer("\n</div>\n");
+    $p->html_h_level(2);
+    # Needed to make strip_verbatim_indent work, no idea why.
+    $p->unaccept_codes('VerbatimFormatted');
+    $p->strip_verbatim_indent('    ');
 
     $p->output_fh($out_file);
     $p->parse_file("$base_dir/$filename");
@@ -126,7 +133,7 @@ for my $dir (qw(lib)) {
 
         $filename =~ s"^$dir/"";
 
-        my $pod_info = pod2html($dir, $filename);
+        my $pod_info = pod2mdtext($dir, $filename);
 
         if (!defined($pod_info->{name})) {
             print STDERR (
@@ -142,14 +149,14 @@ for my $dir (qw(lib)) {
     find({ wanted => $wanted, no_chdir => 1 }, $dir);
 }
 
-my $index_filename = "html/index.mdtext";
+my $index_filename = "$out_root/index.mdtext";
 open(my $index_file, '>', $index_filename)
     or die("$index_filename: $!");
 
 print $index_file (<<EOF);
 Title: Perl API documentation for Apache Lucy $version
 
-#### Perl API documentation for Apache Lucy $version
+## Perl API documentation for Apache Lucy $version
 
 EOF
 
@@ -163,9 +170,28 @@ for my $pod_info (sort { $a->{name} cmp $b->{name} } @pod_infos) {
     }
 
     my ($class, $desc) = ($1, $2);
+    utf8::encode($desc);
 
     print $index_file (" - [$class]($html_filename) - $desc\n");
 }
 
 close($index_filename);
+
+__END__
+
+=head1 NAME
+
+pod2mdtext.pl - Convert POD to mdtext for the Apache CMS
+
+=head1 SYNOPSIS
+
+    pod2mdtext.pl -v <version>
+
+=head1 DESCRIPTION
+
+This script creates mdtext files from POD. It must be run in the C<perl>
+directory and scans all .pod files found in C<lib>. The resulting mdtext
+files are stored in a directory named C<mdtext>.
+
+=cut
 
