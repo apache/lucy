@@ -102,7 +102,7 @@ public class Lucy::Index::DataWriter inherits Clownfish::Obj {
     Finish(DataWriter *self);
 
     /** Arbitrary metadata to be serialized and stored by the Segment.  The
-     * default implementation supplies a Hash with a single key-value pair for
+     * default implementation supplies a hash with a single key-value pair for
      * "format".
      */
     public incremented Hash*

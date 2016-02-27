@@ -70,7 +70,7 @@ public class Lucy::Index::Segment nickname Seg inherits Clownfish::Obj {
     public int32_t
     Add_Field(Segment *self, String *field);
 
-    /** Store arbitrary information in the segment's metadata Hash, to be
+    /** Store arbitrary information in the segment's metadata hash, to be
      * serialized later.  Throws an error if `key` is used twice.
      *
      * @param key String identifying an index component.
