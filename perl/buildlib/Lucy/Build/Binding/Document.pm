@@ -64,6 +64,13 @@ B<value> - The value.
 
 =back
 END_POD
+    my $get_fields_pod = <<'END_POD';
+=head2 get_fields
+
+    my $hashref = $doc->get_fields();
+
+Return the Doc's backing fields hash.
+END_POD
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', sample => $constructor );
     $pod_spec->add_method(
@@ -74,6 +81,7 @@ END_POD
     $pod_spec->add_method(
         method => 'Get_Fields',
         alias  => 'get_fields',
+        pod    => $get_fields_pod,
     );
 
     my $xs_code = <<'END_XS_CODE';
