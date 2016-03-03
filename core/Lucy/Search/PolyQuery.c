@@ -57,8 +57,9 @@ PolyQuery_Add_Child_IMP(PolyQuery *self, Query *query) {
 void
 PolyQuery_Set_Children_IMP(PolyQuery *self, Vector *children) {
     PolyQueryIVARS *const ivars = PolyQuery_IVARS(self);
-    DECREF(ivars->children);
+    Vector *temp = ivars->children;
     ivars->children = (Vector*)INCREF(children);
+    DECREF(temp);
 }
 
 Vector*

@@ -103,15 +103,17 @@ Highlighter_Highlight_IMP(Highlighter *self, String *text) {
 void
 Highlighter_Set_Pre_Tag_IMP(Highlighter *self, String *pre_tag) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
-    DECREF(ivars->pre_tag);
+    String *temp = ivars->pre_tag;
     ivars->pre_tag = Str_Clone(pre_tag);
+    DECREF(temp);
 }
 
 void
 Highlighter_Set_Post_Tag_IMP(Highlighter *self, String *post_tag) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
-    DECREF(ivars->post_tag);
+    String *temp = ivars->post_tag;
     ivars->post_tag = Str_Clone(post_tag);
+    DECREF(temp);
 }
 
 String*

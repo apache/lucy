@@ -141,8 +141,9 @@ InStream_Reopen_IMP(InStream *self, String *filename, int64_t offset,
     InStreamIVARS *const ovars = InStream_IVARS(other);
     InStream_do_open(other, (Obj*)ivars->file_handle);
     if (filename != NULL) {
-        DECREF(ovars->filename);
+        String *temp = ovars->filename;
         ovars->filename = Str_Clone(filename);
+        DECREF(temp);
     }
     ovars->offset = offset;
     ovars->len    = len;

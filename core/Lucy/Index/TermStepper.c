@@ -53,8 +53,9 @@ TermStepper_Get_Value_IMP(TermStepper *self) {
 void
 TermStepper_Set_Value_IMP(TermStepper *self, Obj *value) {
     TermStepperIVARS *const ivars = TermStepper_IVARS(self);
-    DECREF(ivars->value);
+    Obj *temp = ivars->value;
     ivars->value = value ? INCREF(value) : NULL;
+    DECREF(temp);
 }
 
 

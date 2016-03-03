@@ -134,8 +134,9 @@ PolyLex_Next_IMP(PolyLexicon *self) {
             || Obj_Compare_To(ivars->term, candidate) != 0
            ) {
             // Succeed if the next item in the queue has a different term.
-            DECREF(ivars->term);
+            Obj *temp = ivars->term;
             ivars->term = Obj_Clone(candidate);
+            DECREF(temp);
             return true;
         }
         else {

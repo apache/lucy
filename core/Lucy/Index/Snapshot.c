@@ -94,8 +94,9 @@ Snapshot_Num_Entries_IMP(Snapshot *self) {
 void
 Snapshot_Set_Path_IMP(Snapshot *self, String *path) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
-    DECREF(ivars->path);
+    String *temp = ivars->path;
     ivars->path = path ? Str_Clone(path) : NULL;
+    DECREF(temp);
 }
 
 String*

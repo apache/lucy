@@ -325,8 +325,9 @@ IxManager_Make_Snapshot_Read_Lock_IMP(IndexManager *self,
 void
 IxManager_Set_Folder_IMP(IndexManager *self, Folder *folder) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
-    DECREF(ivars->folder);
+    Folder *temp = ivars->folder;
     ivars->folder = (Folder*)INCREF(folder);
+    DECREF(temp);
 }
 
 Folder*

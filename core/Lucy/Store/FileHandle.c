@@ -55,8 +55,9 @@ FH_Grow_IMP(FileHandle *self, int64_t length) {
 void
 FH_Set_Path_IMP(FileHandle *self, String *path) {
     FileHandleIVARS *const ivars = FH_IVARS(self);
-    DECREF(ivars->path);
+    String *temp = ivars->path;
     ivars->path = Str_Clone(path);
+    DECREF(temp);
 }
 
 String*
