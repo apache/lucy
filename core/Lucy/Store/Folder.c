@@ -403,8 +403,9 @@ Folder_Get_Path_IMP(Folder *self) {
 void
 Folder_Set_Path_IMP(Folder *self, String *path) {
     FolderIVARS *const ivars = Folder_IVARS(self);
-    DECREF(ivars->path);
+    String *temp = ivars->path;
     ivars->path = Str_Clone(path);
+    DECREF(temp);
 }
 
 void

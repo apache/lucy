@@ -75,8 +75,9 @@ TopDocs_Get_Total_Hits_IMP(TopDocs *self) {
 void
 TopDocs_Set_Match_Docs_IMP(TopDocs *self, Vector *match_docs) {
     TopDocsIVARS *const ivars = TopDocs_IVARS(self);
-    DECREF(ivars->match_docs);
+    Vector *temp = ivars->match_docs;
     ivars->match_docs = (Vector*)INCREF(match_docs);
+    DECREF(temp);
 }
 void
 TopDocs_Set_Total_Hits_IMP(TopDocs *self, uint32_t total_hits) {

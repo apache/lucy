@@ -222,8 +222,9 @@ SegWriter_Add_Data_Writer_IMP(SegWriter *self, DataWriter *writer) {
 void
 SegWriter_Set_Del_Writer_IMP(SegWriter *self, DeletionsWriter *del_writer) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
-    DECREF(ivars->del_writer);
+    DeletionsWriter *temp = ivars->del_writer;
     ivars->del_writer = (DeletionsWriter*)INCREF(del_writer);
+    DECREF(temp);
 }
 
 DeletionsWriter*

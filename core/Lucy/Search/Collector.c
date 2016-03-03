@@ -44,15 +44,17 @@ Coll_Destroy_IMP(Collector *self) {
 void
 Coll_Set_Reader_IMP(Collector *self, SegReader *reader) {
     CollectorIVARS *const ivars = Coll_IVARS(self);
-    DECREF(ivars->reader);
+    SegReader *temp = ivars->reader;
     ivars->reader = (SegReader*)INCREF(reader);
+    DECREF(temp);
 }
 
 void
 Coll_Set_Matcher_IMP(Collector *self, Matcher *matcher) {
     CollectorIVARS *const ivars = Coll_IVARS(self);
-    DECREF(ivars->matcher);
+    Matcher *temp = ivars->matcher;
     ivars->matcher = (Matcher*)INCREF(matcher);
+    DECREF(temp);
 }
 
 void

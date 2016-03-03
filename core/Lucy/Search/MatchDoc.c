@@ -92,8 +92,9 @@ MatchDoc_Set_Score_IMP(MatchDoc *self, float score) {
 void
 MatchDoc_Set_Values_IMP(MatchDoc *self, Vector *values) {
     MatchDocIVARS *const ivars = MatchDoc_IVARS(self);
-    DECREF(ivars->values);
+    Vector *temp = ivars->values;
     ivars->values = (Vector*)INCREF(values);
+    DECREF(temp);
 }
 
 
