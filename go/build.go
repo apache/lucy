@@ -537,6 +537,7 @@ func writeConfigGO() {
 			"// #cgo LDFLAGS: -L%s\n"+
 			"// #cgo LDFLAGS: -llucy\n"+
 			"// #cgo LDFLAGS: -lclownfish\n"+
+			"// #cgo LDFLAGS: -lm\n"+
 			"import \"C\"\n",
 		buildDir, buildDir, buildDir, buildDir, installedLibDir, cfLibDir)
 	ioutil.WriteFile(configGO, []byte(content), 0666)
