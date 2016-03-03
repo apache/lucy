@@ -408,7 +408,7 @@ func newMockMatcher(docIDs []int32, scores []float32) MockMatcher {
 		for i := 0; i < len(scores); i++ {
 			C.float32_set(floats, C.size_t(i), C.float(scores[i]))
 		}
-		blob = C.cfish_Blob_new_steal((*C.char)(unsafe.Pointer(floats)), C.size_t(size))
+		blob = C.cfish_Blob_new_steal(unsafe.Pointer(floats), C.size_t(size))
 		defer C.cfish_decref(unsafe.Pointer(blob))
 	}
 	matcher := C.lucy_MockMatcher_new(docIDsCF, blob)
