@@ -550,6 +550,10 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
     // doc id 0.
     SFWriterElem *elem = (SFWriterElem*)SortFieldWriter_Fetch(self);
     SFWriterElemIVARS *elem_ivars = SFWriterElem_IVARS(elem);
+    if (elem_ivars->doc_id > doc_max) {
+        THROW(ERR, "doc_id %i32 greater than doc_max %i32",
+              elem_ivars->doc_id, doc_max);
+    }
     ords[elem_ivars->doc_id] = ord;
     ords[0] = 0;
 
@@ -570,6 +574,10 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
             }
             DECREF(last_val);
             last_val = INCREF(elem_ivars->value);
+        }
+        if (elem_ivars->doc_id > doc_max) {
+            THROW(ERR, "doc_id %i32 greater than doc_max %i32",
+                  elem_ivars->doc_id, doc_max);
         }
         ords[elem_ivars->doc_id] = ord;
         DECREF(elem);
