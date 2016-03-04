@@ -15,45 +15,107 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if test ! -f devel/bin/test_all.sh
-then
-    echo Error: can only run from root dir of repository
+set -e
+
+usage() {
+    cat <<EOF
+
+Run this script from a directory containing the Lucy Git repository in
+subdir "lucy" and the Clownfish repo in subdir "clownfish". You can fetch
+the repos with:
+
+git clone https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git \\
+    clownfish
+git clone https://git-wip-us.apache.org/repos/asf/lucy.git
+EOF
+}
+
+root="$(pwd)"
+cfish_dir="$root/clownfish"
+lucy_dir="$root/lucy"
+tmp_dir="$lucy_dir/test_tmp"
+
+if [ ! -f "$cfish_dir/runtime/core/Clownfish.cfp" ]; then
+    echo "Clownfish not found in $cfish_dir"
+    usage
     exit 1
 fi
 
-# C
-cd clownfish/compiler/c
-./configure && make -j && make -j test
-C_CFC_RESULT=$?
-cd ../../runtime/c
-./configure && make -j && make -j test
-C_CFISH_RUNTIME_RESULT=$?
-cd ../../../c
-./configure && make -j && make -j test
-C_LUCY_RESULT=$?
-make distclean
-
-# Perl
-cd ../clownfish/compiler/perl
-perl Build.PL && ./Build test
-PERL_CFC_RESULT=$?
-cd ../../runtime/perl
-perl Build.PL && ./Build test
-PERL_CFISH_RUNTIME_RESULT=$?
-cd ../../../perl
-perl Build.PL && ./Build test
-PERL_LUCY_RESULT=$?
-./Build realclean
-
-# Exit with a failing value if any test failed.
-if     [ $C_CFC_RESULT -ne 0 ] \
-    || [ $C_CFISH_RUNTIME_RESULT -ne 0 ] \
-    || [ $C_LUCY_RESULT -ne 0 ] \
-    || [ $PERL_CFC_RESULT -ne 0 ] \
-    || [ $PERL_CFISH_RUNTIME_RESULT -ne 0 ] \
-    || [ $PERL_LUCY_RESULT -ne 0 ]
-then
+if [ ! -f "$lucy_dir/core/Lucy.cfp" ]; then
+    echo "Lucy not found in $lucy_dir"
+    usage
     exit 1
 fi
-exit 0
+
+set -x
+
+rm -rf "$tmp_dir"
+
+if [ -z "$1" -o "$1" = go ]; then
+    export GOPATH="$tmp_dir/go:$GOPATH"
+    mkdir -p "$tmp_dir/go/src/git-wip-us.apache.org/repos/asf"
+    ln -s "$cfish_dir" \
+        "$tmp_dir/go/src/git-wip-us.apache.org/repos/asf/lucy-clownfish.git"
+    ln -s "$lucy_dir" \
+        "$tmp_dir/go/src/git-wip-us.apache.org/repos/asf/lucy.git"
+
+    cd "$cfish_dir/compiler/go"
+    go run build.go test
+    go run build.go install
+    go run build.go clean
+
+    cd ../../runtime/go
+    go run build.go test
+    go run build.go install
+    go run build.go clean
+
+    cd "$lucy_dir/go"
+    go run build.go test
+    go run build.go clean
+
+    cd "$root"
+fi
+
+if [ -z "$1" -o "$1" = perl ]; then
+    export PERL5LIB="$tmp_dir/perl/lib/perl5:$PERL5LIB"
+
+    cd "$cfish_dir/compiler/perl"
+    perl Build.PL
+    ./Build test
+    ./Build install --install-base "$tmp_dir/perl"
+
+    cd ../../runtime/perl
+    perl Build.PL
+    ./Build test
+    ./Build install --install-base "$tmp_dir/perl"
+    ./Build realclean
+
+    cd "$lucy_dir/perl"
+    perl Build.PL
+    ./Build test
+    ./Build realclean
+
+    cd "$root"
+fi
+
+if [ -z "$1" -o "$1" = c ]; then
+    cd "$cfish_dir/compiler/c"
+    ./configure
+    make -j test
+
+    cd ../../runtime/c
+    ./configure
+    make -j test
+    ./install.sh --prefix "$tmp_dir/c"
+    make distclean
+
+    cd "$lucy_dir/c"
+    ./configure --clownfish-prefix "$tmp_dir/c"
+    make -j test
+    make distclean
+
+    cd "$root"
+fi
+
+rm -rf "$tmp_dir"
 
