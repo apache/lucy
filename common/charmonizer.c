@@ -8449,9 +8449,12 @@ lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
     chaz_CFlags   *cflags;
     chaz_CFlags   *link_flags;
     chaz_MakeRule *rule;
+    chaz_MakeRule *clean_rule;
 
     char *test_lucy_exe;
     char *test_lucy_obj;
+
+    clean_rule = chaz_MakeFile_clean_rule(self->makefile);
 
     test_lucy_exe = chaz_Util_join("", "t", dir_sep, "test_lucy", exe_ext,
                                    NULL);
@@ -8487,6 +8490,8 @@ lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
         chaz_MakeRule_add_command_with_libpath(rule, test_lucy_exe, ".", NULL);
     }
 
+    chaz_MakeRule_add_rm_command(clean_rule, test_lucy_obj);
+
     if (chaz_CLI_defined(self->cli, "enable-coverage")) {
         rule = chaz_MakeFile_add_rule(self->makefile, "coverage", test_lucy_exe);
         chaz_MakeRule_add_command(rule,
@@ -8514,9 +8519,8 @@ lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
                                   " --output-directory coverage"
                                   " lucy.info");
 
-        rule = chaz_MakeFile_clean_rule(self->makefile);
-        chaz_MakeRule_add_rm_command(rule, "lucy.info");
-        chaz_MakeRule_add_recursive_rm_command(rule, "coverage");
+        chaz_MakeRule_add_rm_command(clean_rule, "lucy.info");
+        chaz_MakeRule_add_recursive_rm_command(clean_rule, "coverage");
     }
 
     free(test_lucy_exe);
