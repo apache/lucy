@@ -39,23 +39,23 @@ my $builder = Lucy::Build->new(
     license     => 'apache',
     dist_author =>
         'The Apache Lucy Project <dev at lucy dot apache dot org>',
-    dist_version       => '0.4.0',
+    dist_version       => '0.5.0',
     requires           => {
         'perl'      => '5.8.3',
-        'Clownfish' => 0.004000,
+        'Clownfish' => 0.005000,
     },
     configure_requires => {
         'Module::Build'               => 0.280801,
-        'Clownfish'                   => 0.004000,
-        'Clownfish::CFC::Perl::Build' => 0.004000,
+        'Clownfish'                   => 0.005000,
+        'Clownfish::CFC::Perl::Build' => 0.005000,
     },
     build_requires     => {
         'Module::Build'      => 0.280801,
         'ExtUtils::CBuilder' => 0.21,
         'ExtUtils::ParseXS'  => 2.18,
         'Devel::PPPort'      => 3.14,
-        'Clownfish'          => 0.004000,
-        'Clownfish::CFC'     => 0.004000,
+        'Clownfish'          => 0.005000,
+        'Clownfish::CFC'     => 0.005000,
     },
     meta_merge => { keywords => [qw( search lucy lucene )], },
     meta_add   => {

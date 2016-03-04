@@ -17,8 +17,8 @@
 
 set -e
 
-version=0.4.0
-major_version=0.4
+version=0.5.0
+major_version=0.5
 
 usage()
 {

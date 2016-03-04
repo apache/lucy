@@ -15,7 +15,7 @@
 
 package Lucy::Index::DocVector;
 use Lucy;
-our $VERSION = '0.004000';
+our $VERSION = '0.005000';
 $VERSION = eval $VERSION;
 
 1;
