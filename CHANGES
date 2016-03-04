@@ -1,5 +1,65 @@
 Revision history for Lucy
 
+0.5.0  2016-03-04
+
+  New features:
+
+    * [LUCY-275] - Proof-of-concept Go bindings
+
+  Bugfixes:
+
+    * [LUCY-273] - Require specific version of Clownfish
+    * [LUCY-287] - Mismatch between required Clownfish versions
+    * [LUCY-288] - Add Clownfish to configure_requires
+
+  Improvements:
+
+    * [LUCY-274] - Refcounting needs to use functions rather than methods
+    * [LUCY-277] - Autogenerate Go Bindings
+    * [LUCY-279] - Prepare for removal of Obj methods
+    * [LUCY-281] - Port host-specific Lucy code to Go/CGO
+    * [LUCY-282] - Refine and test Go bindings
+    * [LUCY-284] - Support multiple Go types as document
+    * [LUCY-285] - Run core tests under Go bindings
+    * [LUCY-289] - Check for incompatible Clownfish major version
+
+  Tasks:
+
+    * [LUCY-290] - Review generated C API documentation
+
+
+0.4.4  2016-01-31
+
+  Bugfixes:
+
+    * [LUCY-287] - Mismatch between required Clownfish versions
+    * [LUCY-288] - Add Clownfish to configure_requires
+    * Fix Windows build for some CPAN Testers setups (see CLOWNFISH-3).
+
+
+0.4.3  2016-01-09
+
+  Improvements:
+
+    * Check for incompatible Clownfish major version.
+    * Improve build and installation scripts for C library.
+
+
+0.4.2  2014-11-18
+
+  Bugfixes:
+
+    * [LUCY-272] - Wrong encoding of extremely small similarity values
+
+
+0.4.1  2014-09-25
+
+  Bugfixes:
+
+    * [LUCY-269] - Field names with underscores break query parser
+    * [LUCY-270] - RegexTokenizer broken in C bindings
+
+
 0.4.0  2014-08-21
 
   Bugfixes:
