@@ -23,7 +23,7 @@ set -x
 
 test_c() {
     # Install Clownfish.
-    git clone -q --depth 1 https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git
+    git clone -q -b 0.5 --depth 1 https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git
     cd lucy-clownfish/runtime/c
     ./configure
     make -j
@@ -39,7 +39,7 @@ test_perl() {
     perlbrew switch $PERL_VERSION
 
     # Install Clownfish.
-    git clone -q --depth 1 https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git
+    git clone -q -b 0.5 --depth 1 https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git
     cd lucy-clownfish/runtime/perl
     perl Build.PL
     ./Build
