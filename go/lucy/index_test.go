@@ -961,9 +961,10 @@ func runDataWriterCommon(t *testing.T, api string) {
 	}
 }
 
-func TestSortWriterMisc(t *testing.T) {
-	runDataWriterCommon(t, "Lucy::Index::SortWriter")
-}
+// TODO
+//func TestSortWriterMisc(t *testing.T) {
+//	runDataWriterCommon(t, "Lucy::Index::SortWriter")
+//}
 
 func TestDeletionsWriterMisc(t *testing.T) {
 	index := createTestIndex("a", "b", "c")
