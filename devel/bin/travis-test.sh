@@ -21,31 +21,33 @@ set -e
 # Print all commands before executing.
 set -x
 
+install_dir="$TRAVIS_BUILD_DIR/install"
+
+# Fetch Clownfish.
+git clone -q -b 0.5 --depth 1 https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git
+
 test_c() {
     # Install Clownfish.
-    git clone -q -b 0.5 --depth 1 https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git
     cd lucy-clownfish/runtime/c
     ./configure
     make -j
-    sudo ./install.sh --prefix /usr/local
-    sudo ldconfig
+    ./install.sh --prefix "$install_dir"
 
     cd ../../../c
-    ./configure
+    ./configure --clownfish-prefix "$install_dir"
     make -j test
 }
 
 test_perl() {
     perlbrew switch $PERL_VERSION
+    export PERL5LIB="$install_dir/lib/perl5"
 
     # Install Clownfish.
-    git clone -q -b 0.5 --depth 1 https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git
     cd lucy-clownfish/runtime/perl
     perl Build.PL
-    ./Build
-    sudo ./Build install
+    ./Build install --install-base "$install_dir"
     cd ../../compiler/perl
-    sudo ./Build install
+    ./Build install --install-base "$install_dir"
 
     cd ../../../perl
     perl Build.PL
@@ -53,8 +55,21 @@ test_perl() {
 }
 
 test_go() {
-    # TODO
-    exit 1
+    export GOPATH="$install_dir"
+    mkdir -p "$install_dir/src/git-wip-us.apache.org/repos/asf"
+    ln -s "$TRAVIS_BUILD_DIR/lucy-clownfish" \
+        "$install_dir/src/git-wip-us.apache.org/repos/asf/lucy-clownfish.git"
+    ln -s "$TRAVIS_BUILD_DIR" \
+        "$install_dir/src/git-wip-us.apache.org/repos/asf/lucy.git"
+
+    # Install Clownfish.
+    cd lucy-clownfish/compiler/go
+    go run build.go install
+    cd ../../runtime/go
+    go run build.go install
+
+    cd ../../../go
+    go run build.go test
 }
 
 case $CLOWNFISH_HOST in
