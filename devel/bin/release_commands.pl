@@ -21,20 +21,16 @@ use warnings;
 use Getopt::Long qw( GetOptions );
 
 my $usage = join( ' ',
-    $0, qq|--version=X.Y.Z-rcN|, qq|--apache-id=APACHE_ID|,
-    qq|--name="FULL NAME"| )
+    $0, qq|--version=X.Y.Z-rcN|, qq|--name="FULL NAME"| )
     . "\n";
 
-my ( $full_rc_version, $apache_id, $name );
+my ( $full_rc_version, $name );
 GetOptions(
-    'version=s'   => \$full_rc_version,
-    'apache-id=s' => \$apache_id,
-    'name=s'      => \$name,
+    'version=s' => \$full_rc_version,
+    'name=s'    => \$name,
 );
 $full_rc_version or die $usage;
-$apache_id       or die $usage;
 $name            or die $usage;
-$apache_id =~ /^\w+$/ or die $usage;
 $full_rc_version =~ m/^(\d+)\.(\d+)\.(\d+)-rc(\d+)$/ or die $usage;
 my ( $major, $minor, $micro, $rc ) = ( $1, $2, $3, $4 );
 my $x_y_z_version = sprintf( "%d.%d.%d", $major, $minor, $micro );
@@ -170,9 +166,7 @@ say "";
 
 say qq|# Copy release artifacts to the production dist directory and|;
 say qq|# remove the RC dir.  The "svnmucc" app, which ships with Subversion|;
-say qq|# 1.7, is required.  If you don't have it, you can ssh to|;
-say qq|# people.apache.org and run the commands from there.|;
-say qq|ssh $apache_id\@people.apache.org|;
+say qq|# 1.7, is required.|;
 say qq|svnmucc -m "Publish Apache Lucy $x_y_z_version" |
     . qq|-U https://dist.apache.org/repos/dist/ |
     . qq|mv dev/lucy/apache-lucy-$full_rc_version/apache-lucy-$x_y_z_version.tar.gz |
