@@ -155,8 +155,8 @@ say qq|# After the vote has passed...|;
 say qq|###############################################################\n|;
 
 say qq|# Tag the release and delete the RC tags.|;
-say qq|git tag apache-lucy-$x_y_z_version apache-lucy-$full_rc_version|;
-say qq|git push origin apache-lucy-$x_y_z_version|;
+say qq|git tag rel/apache-lucy-$x_y_z_version apache-lucy-$full_rc_version|;
+say qq|git push origin rel/apache-lucy-$x_y_z_version|;
 for ( 1 .. $rc ) {
     my $rc_tag = qq|apache-lucy-$major.$minor.$micro-rc$_|;
     say qq|git tag -d $rc_tag|;
