@@ -151,7 +151,7 @@ SortWriter_Add_Inverted_Doc_IMP(SortWriter *self, Inverter *inverter,
     // If our SortFieldWriters have collectively passed the memory threshold,
     // flush all of them, then reset the counter which tracks memory
     // consumption.
-    if (Counter_Get_Value(ivars->counter) > ivars->mem_thresh) {
+    if ((size_t)Counter_Get_Value(ivars->counter) > ivars->mem_thresh) {
         for (uint32_t i = 0; i < Vec_Get_Size(ivars->field_writers); i++) {
             SortFieldWriter *const field_writer
                 = (SortFieldWriter*)Vec_Fetch(ivars->field_writers, i);
