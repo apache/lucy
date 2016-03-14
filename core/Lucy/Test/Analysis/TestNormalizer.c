@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include <stdlib.h>
+
 #define C_TESTLUCY_TESTNORMALIZER
 #define C_LUCY_NORMALIZER
 #define TESTLUCY_USE_SHORT_NAMES
@@ -98,13 +100,17 @@ test_normalization(TestBatchRunner *runner) {
             String *word = (String*)Vec_Fetch(words, j);
             Vector *got  = Normalizer_Split(normalizer, word);
             String *norm = (String*)Vec_Fetch(got, 0);
+            char   *fstr = Str_To_Utf8(form);
+            char   *wstr = Str_To_Utf8(word);
             TEST_TRUE(runner,
                       norm
                       && Str_is_a(norm, STRING)
                       && Str_Equals(norm, Vec_Fetch(norms, j)),
-                      "Normalize %s %d %d: %s", Str_Get_Ptr8(form),
-                      case_fold, strip_accents, Str_Get_Ptr8(word)
+                      "Normalize %s %d %d: %s", fstr,
+                      case_fold, strip_accents, wstr
                      );
+            free(fstr);
+            free(wstr);
             DECREF(got);
         }
         DECREF(normalizer);
@@ -139,7 +145,9 @@ test_utf8proc_normalization(TestBatchRunner *runner) {
             if (!json) {
                 json = Str_newf("[failed to encode]");
             }
-            FAIL(runner, "Failed to normalize: %s", Str_Get_Ptr8(json));
+            char *str = Str_To_Utf8(json);
+            FAIL(runner, "Failed to normalize: %s", str);
+            free(str);
             DECREF(json);
             DECREF(source);
             return;

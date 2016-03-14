@@ -19,6 +19,7 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 #include <string.h>
+#include <stdlib.h>
 
 #include "Clownfish/Boolean.h"
 #include "Clownfish/TestHarness/TestBatchRunner.h"
@@ -401,13 +402,15 @@ test_query_parser_syntax(TestBatchRunner *runner) {
         Query *expanded = QParser_Expand_Leaf(qparser, ivars->tree);
         Query *parsed   = QParser_Parse(qparser, ivars->query_string);
         Hits  *hits     = IxSearcher_Hits(searcher, (Obj*)parsed, 0, 10, NULL);
+        char  *qstr     = Str_To_Utf8(ivars->query_string);
 
         TEST_TRUE(runner, Query_Equals(tree, (Obj*)ivars->tree),
-                  "tree()    %s", Str_Get_Ptr8(ivars->query_string));
+                  "tree()    %s", qstr);
         TEST_TRUE(runner, Query_Equals(expanded, (Obj*)ivars->expanded),
-                  "expand_leaf()    %s", Str_Get_Ptr8(ivars->query_string));
+                  "expand_leaf()    %s", qstr);
         TEST_INT_EQ(runner, Hits_Total_Hits(hits), ivars->num_hits,
-                    "hits:    %s", Str_Get_Ptr8(ivars->query_string));
+                    "hits:    %s", qstr);
+        free(qstr);
         DECREF(hits);
         DECREF(parsed);
         DECREF(expanded);
@@ -422,11 +425,13 @@ test_query_parser_syntax(TestBatchRunner *runner) {
         Query *tree   = QParser_Tree(qparser, ivars->query_string);
         Query *parsed = QParser_Parse(qparser, ivars->query_string);
         Hits  *hits   = IxSearcher_Hits(searcher, (Obj*)parsed, 0, 10, NULL);
+        char  *qstr   = Str_To_Utf8(ivars->query_string);
 
         TEST_TRUE(runner, Query_Equals(tree, (Obj*)ivars->tree),
-                  "tree()    %s", Str_Get_Ptr8(ivars->query_string));
+                  "tree()    %s", qstr);
         TEST_INT_EQ(runner, Hits_Total_Hits(hits), ivars->num_hits,
-                    "hits:    %s", Str_Get_Ptr8(ivars->query_string));
+                    "hits:    %s", qstr);
+        free(qstr);
         DECREF(hits);
         DECREF(parsed);
         DECREF(tree);

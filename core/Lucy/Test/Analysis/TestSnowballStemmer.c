@@ -76,22 +76,26 @@ test_stemming(TestBatchRunner *runner) {
     HashIterator *iter = HashIter_new(tests);
     while (HashIter_Next(iter)) {
         String *iso       = HashIter_Get_Key(iter);
+        char   *iso_str   = Str_To_Utf8(iso);
         Hash   *lang_data = (Hash*)HashIter_Get_Value(iter);
         Vector *words = (Vector*)Hash_Fetch_Utf8(lang_data, "words", 5);
         Vector *stems = (Vector*)Hash_Fetch_Utf8(lang_data, "stems", 5);
         SnowballStemmer *stemmer = SnowStemmer_new(iso);
         for (uint32_t i = 0, max = Vec_Get_Size(words); i < max; i++) {
             String *word  = (String*)Vec_Fetch(words, i);
+            char   *wstr  = Str_To_Utf8(word);
             Vector *got   = SnowStemmer_Split(stemmer, word);
             String *stem  = (String*)Vec_Fetch(got, 0);
             TEST_TRUE(runner,
                       stem
                       && Str_is_a(stem, STRING)
                       && Str_Equals(stem, Vec_Fetch(stems, i)),
-                      "Stem %s: %s", Str_Get_Ptr8(iso), Str_Get_Ptr8(word)
+                      "Stem %s: %s", iso_str, wstr
                      );
+            free(wstr);
             DECREF(got);
         }
+        free(iso_str);
         DECREF(stemmer);
     }
     DECREF(iter);

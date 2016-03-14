@@ -62,35 +62,45 @@ test_tokenizer(TestBatchRunner *runner) {
                               "/");
     Vector *got = StandardTokenizer_Split(tokenizer, word);
     String *token = (String*)Vec_Fetch(got, 0);
+    char   *token_str = Str_To_Utf8(token);
     TEST_TRUE(runner,
               token
               && Str_is_a(token, STRING)
               && Str_Equals_Utf8(token, "tha\xcc\x82t's", 8),
-              "Token: %s", Str_Get_Ptr8(token));
+              "Token: %s", token_str);
+    free(token_str);
     token = (String*)Vec_Fetch(got, 1);
+    token_str = Str_To_Utf8(token);
     TEST_TRUE(runner,
               token
               && Str_is_a(token, STRING)
               && Str_Equals_Utf8(token, "1,02\xC2\xADZ4.38", 11),
-              "Token: %s", Str_Get_Ptr8(token));
+              "Token: %s", token_str);
+    free(token_str);
     token = (String*)Vec_Fetch(got, 2);
+    token_str = Str_To_Utf8(token);
     TEST_TRUE(runner,
               token
               && Str_is_a(token, STRING)
               && Str_Equals_Utf8(token, "\xE0\xB8\x81\xC2\xAD\xC2\xAD", 7),
-              "Token: %s", Str_Get_Ptr8(token));
+              "Token: %s", token_str);
+    free(token_str);
     token = (String*)Vec_Fetch(got, 3);
+    token_str = Str_To_Utf8(token);
     TEST_TRUE(runner,
               token
               && Str_is_a(token, STRING)
               && Str_Equals_Utf8(token, "\xF0\xA0\x80\x80", 4),
-              "Token: %s", Str_Get_Ptr8(token));
+              "Token: %s", token_str);
+    free(token_str);
     token = (String*)Vec_Fetch(got, 4);
+    token_str = Str_To_Utf8(token);
     TEST_TRUE(runner,
               token
               && Str_is_a(token, STRING)
               && Str_Equals_Utf8(token, "a", 1),
-              "Token: %s", Str_Get_Ptr8(token));
+              "Token: %s", token_str);
+    free(token_str);
     DECREF(got);
 
     FSFolder *modules_folder = TestUtils_modules_folder();
