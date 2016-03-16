@@ -37,12 +37,14 @@ void
 DEBUG_PRINT(message)
     char *message;
 PPCODE:
+    CFISH_UNUSED_VAR(message);
     LUCY_DEBUG_PRINT("%s", message);
 
 void
 DEBUG(message)
     char *message;
 PPCODE:
+    CFISH_UNUSED_VAR(message);
     LUCY_DEBUG("%s", message);
 
 bool
@@ -77,6 +79,7 @@ void
 ASSERT(maybe)
     int maybe;
 PPCODE:
+    CFISH_UNUSED_VAR(maybe);
     LUCY_ASSERT(maybe, "XS ASSERT binding test");
 
 IV
