@@ -17,8 +17,6 @@
 #define C_LUCY_BITVECTOR
 #include "Lucy/Util/ToolSet.h"
 
-#include <math.h>
-
 #include "Lucy/Object/BitVector.h"
 #include "Lucy/Util/NumberUtils.h"
 
@@ -58,7 +56,7 @@ BitVec_new(uint32_t capacity) {
 BitVector*
 BitVec_init(BitVector *self, uint32_t capacity) {
     BitVectorIVARS *const ivars = BitVec_IVARS(self);
-    const uint32_t byte_size = (uint32_t)ceil(capacity / 8.0);
+    const uint32_t byte_size = (capacity + 7) / 8;
 
     // Derive.
     ivars->bits = capacity
@@ -82,7 +80,7 @@ BitVector*
 BitVec_Clone_IMP(BitVector *self) {
     BitVectorIVARS *const ivars = BitVec_IVARS(self);
     BitVector *other = BitVec_new(ivars->cap);
-    uint32_t   byte_size = (uint32_t)ceil(ivars->cap / 8.0);
+    uint32_t   byte_size = (ivars->cap + 7) / 8;
     BitVectorIVARS *const ovars = BitVec_IVARS(other);
 
     // Forbid inheritance.
@@ -111,8 +109,8 @@ BitVec_Mimic_IMP(BitVector *self, Obj *other) {
     CERTIFY(other, BITVECTOR);
     BitVectorIVARS *const ivars = BitVec_IVARS(self);
     BitVectorIVARS *const ovars = BitVec_IVARS((BitVector*)other);
-    const uint32_t my_byte_size = (uint32_t)ceil(ivars->cap / 8.0);
-    const uint32_t other_byte_size = (uint32_t)ceil(ovars->cap / 8.0);
+    const uint32_t my_byte_size = (ivars->cap + 7) / 8;
+    const uint32_t other_byte_size = (ovars->cap + 7) / 8;
     if (my_byte_size > other_byte_size) {
         uint32_t space = my_byte_size - other_byte_size;
         memset(ivars->bits + other_byte_size, 0, space);
@@ -127,8 +125,8 @@ void
 BitVec_Grow_IMP(BitVector *self, uint32_t capacity) {
     BitVectorIVARS *const ivars = BitVec_IVARS(self);
     if (capacity > ivars->cap) {
-        const size_t old_byte_cap  = (size_t)ceil(ivars->cap / 8.0);
-        const size_t new_byte_cap  = (size_t)ceil((capacity + 1) / 8.0);
+        const size_t old_byte_cap  = (ivars->cap + 7) / 8;
+        const size_t new_byte_cap  = (capacity   + 7) / 8;
         const size_t num_new_bytes = new_byte_cap - old_byte_cap;
 
         ivars->bits = (uint8_t*)REALLOCATE(ivars->bits, new_byte_cap);
@@ -159,7 +157,7 @@ BitVec_Clear_IMP(BitVector *self, uint32_t tick) {
 void
 BitVec_Clear_All_IMP(BitVector *self) {
     BitVectorIVARS *const ivars = BitVec_IVARS(self);
-    const size_t byte_size = (size_t)ceil(ivars->cap / 8.0);
+    const size_t byte_size = (ivars->cap + 7) / 8;
     memset(ivars->bits, 0, byte_size);
 }
 
@@ -184,7 +182,7 @@ S_first_bit_in_nonzero_byte(uint8_t num) {
 int32_t
 BitVec_Next_Hit_IMP(BitVector *self, uint32_t tick) {
     BitVectorIVARS *const ivars = BitVec_IVARS(self);
-    size_t byte_size = (size_t)ceil(ivars->cap / 8.0);
+    size_t byte_size = (ivars->cap + 7) / 8;
     uint8_t *const limit = ivars->bits + byte_size;
     uint8_t *ptr = ivars->bits + (tick >> 3);
 
@@ -224,7 +222,7 @@ BitVec_And_IMP(BitVector *self, const BitVector *other) {
     const uint32_t min_cap = ivars->cap < ovars->cap
                              ? ivars->cap
                              : ovars->cap;
-    const size_t byte_size = (size_t)ceil(min_cap / 8.0);
+    const size_t byte_size = (min_cap + 7) / 8;
     uint8_t *const limit = bits_a + byte_size;
 
     // Intersection.
@@ -235,7 +233,7 @@ BitVec_And_IMP(BitVector *self, const BitVector *other) {
 
     // Set all remaining to zero.
     if (ivars->cap > min_cap) {
-        const size_t self_byte_size = (size_t)ceil(ivars->cap / 8.0);
+        const size_t self_byte_size = (ivars->cap + 7) / 8;
         memset(bits_a, 0, self_byte_size - byte_size);
     }
 }
@@ -273,7 +271,7 @@ S_do_or_or_xor(BitVector *self, const BitVector *other, int operation) {
     if (max_cap > ivars->cap) { BitVec_Grow(self, max_cap); }
     bits_a        = ivars->bits;
     bits_b        = ovars->bits;
-    byte_size     = ceil(min_cap / 8.0);
+    byte_size     = (min_cap + 7) / 8;
     limit         = ivars->bits + (size_t)byte_size;
 
     // Perform union of common bits.
@@ -295,7 +293,7 @@ S_do_or_or_xor(BitVector *self, const BitVector *other, int operation) {
 
     // Copy remaining bits if other is bigger than self.
     if (ovars->cap > min_cap) {
-        const double other_byte_size = ceil(ovars->cap / 8.0);
+        const double other_byte_size = (ovars->cap + 7) / 8;
         const size_t bytes_to_copy = (size_t)(other_byte_size - byte_size);
         memcpy(bits_a, bits_b, bytes_to_copy);
     }
@@ -310,7 +308,7 @@ BitVec_And_Not_IMP(BitVector *self, const BitVector *other) {
     const uint32_t min_cap = ivars->cap < ovars->cap
                              ? ivars->cap
                              : ovars->cap;
-    const size_t byte_size = (size_t)ceil(min_cap / 8.0);
+    const size_t byte_size = (min_cap + 7) / 8;
     uint8_t *const limit = bits_a + byte_size;
 
     // Clear bits set in other.
@@ -377,7 +375,7 @@ uint32_t
 BitVec_Count_IMP(BitVector *self) {
     BitVectorIVARS *const ivars = BitVec_IVARS(self);
     uint32_t count = 0;
-    const size_t byte_size = (size_t)ceil(ivars->cap / 8.0);
+    const size_t byte_size = (ivars->cap + 7) / 8;
     uint8_t *ptr = ivars->bits;
     uint8_t *const limit = ptr + byte_size;
 
@@ -395,7 +393,7 @@ BitVec_To_Array_IMP(BitVector *self) {
     uint32_t        num_left  = count;
     const uint32_t  capacity  = ivars->cap;
     uint32_t *const array     = (uint32_t*)CALLOCATE(count, sizeof(uint32_t));
-    const size_t    byte_size = (size_t)ceil(ivars->cap / 8.0);
+    const size_t    byte_size = (ivars->cap + 7) / 8;
     uint8_t *const  bits      = ivars->bits;
     uint8_t *const  limit     = bits + byte_size;
     uint32_t        num       = 0;

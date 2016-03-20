@@ -17,7 +17,6 @@
 #define C_LUCY_SORTFIELDWRITER
 #define C_LUCY_SFWRITERELEM
 #include "Lucy/Util/ToolSet.h"
-#include <math.h>
 
 #include "Lucy/Index/SortFieldWriter.h"
 #include "Lucy/Index/Inverter.h"
@@ -603,16 +602,36 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
     int32_t ord_width   = ivars->ord_width;
 
     // Write ords.
-    const double BITS_PER_BYTE = 8.0;
-    double bytes_per_doc = ord_width / BITS_PER_BYTE;
-    double byte_count = ceil((doc_max + 1) * bytes_per_doc);
-    char *compressed_ords
-        = (char*)CALLOCATE((size_t)byte_count, sizeof(char));
+    size_t byte_count;
+    switch (ord_width) {
+        case 1:
+            byte_count = (((size_t)doc_max + 1) + 7) / 8;
+            break;
+        case 2:
+            byte_count = (((size_t)doc_max + 1) + 3) / 4;
+            break;
+        case 4:
+            byte_count = (((size_t)doc_max + 1) + 1) / 2;
+            break;
+        case 8:
+            byte_count = (size_t)doc_max + 1;
+            break;
+        case 16:
+            byte_count = ((size_t)doc_max + 1) * 2;
+            break;
+        case 32:
+            byte_count = ((size_t)doc_max + 1) * 4;
+            break;
+        default:
+            THROW(ERR, "Invalid width: %i32", ord_width);
+
+    }
+    char *compressed_ords = (char*)CALLOCATE(byte_count, sizeof(char));
     for (int32_t i = 0; i <= doc_max; i++) {
         int32_t real_ord = ords[i] == -1 ? null_ord : ords[i];
         S_write_ord(compressed_ords, ord_width, i, real_ord);
     }
-    OutStream_Write_Bytes(ord_out, compressed_ords, (size_t)byte_count);
+    OutStream_Write_Bytes(ord_out, compressed_ords, byte_count);
     FREEMEM(compressed_ords);
 
     FREEMEM(ords);

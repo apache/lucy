@@ -18,8 +18,6 @@
 #define C_LUCY_DEFAULTDELETIONSWRITER
 #include "Lucy/Util/ToolSet.h"
 
-#include <math.h>
-
 #include "Clownfish/HashIterator.h"
 #include "Clownfish/Num.h"
 #include "Lucy/Index/DeletionsWriter.h"
@@ -151,8 +149,7 @@ DefDelWriter_Finish_IMP(DefaultDeletionsWriter *self) {
         if (ivars->updated[i]) {
             BitVector *deldocs   = (BitVector*)Vec_Fetch(ivars->bit_vecs, i);
             int32_t    doc_max   = SegReader_Doc_Max(seg_reader);
-            double     used      = (doc_max + 1) / 8.0;
-            uint32_t   byte_size = (uint32_t)ceil(used);
+            uint32_t   byte_size = (((uint32_t)doc_max + 1) + 7) / 8;
             uint32_t   new_max   = byte_size * 8 - 1;
             String    *filename  = S_del_filename(self, seg_reader);
             OutStream *outstream = Folder_Open_Out(folder, filename);
