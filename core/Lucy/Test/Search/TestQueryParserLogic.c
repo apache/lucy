@@ -19,6 +19,7 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 #include <string.h>
+#include <stdlib.h>
 
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
@@ -904,11 +905,13 @@ TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
         Query *tree     = QParser_Tree(or_parser, test_case->query_string);
         Query *parsed   = QParser_Parse(or_parser, test_case->query_string);
         Hits  *hits     = IxSearcher_Hits(searcher, (Obj*)parsed, 0, 10, NULL);
+        char  *qstr     = Str_To_Utf8(test_case->query_string);
 
         TEST_TRUE(runner, Query_Equals(tree, (Obj*)test_case->tree),
-                  "tree() OR   %s", Str_Get_Ptr8(test_case->query_string));
+                  "tree() OR   %s", qstr);
         TEST_INT_EQ(runner, Hits_Total_Hits(hits), test_case->num_hits,
-                    "hits: OR   %s", Str_Get_Ptr8(test_case->query_string));
+                    "hits: OR   %s", qstr);
+        free(qstr);
         DECREF(hits);
         DECREF(parsed);
         DECREF(tree);
@@ -923,11 +926,13 @@ TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
         Query *tree     = QParser_Tree(and_parser, test_case->query_string);
         Query *parsed   = QParser_Parse(and_parser, test_case->query_string);
         Hits  *hits     = IxSearcher_Hits(searcher, (Obj*)parsed, 0, 10, NULL);
+        char  *qstr     = Str_To_Utf8(test_case->query_string);
 
         TEST_TRUE(runner, Query_Equals(tree, (Obj*)test_case->tree),
-                  "tree() AND   %s", Str_Get_Ptr8(test_case->query_string));
+                  "tree() AND   %s", qstr);
         TEST_INT_EQ(runner, Hits_Total_Hits(hits), test_case->num_hits,
-                    "hits: AND   %s", Str_Get_Ptr8(test_case->query_string));
+                    "hits: AND   %s", qstr);
+        free(qstr);
         DECREF(hits);
         DECREF(parsed);
         DECREF(tree);
@@ -942,6 +947,7 @@ TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
         String *qstring = test_case->tree
                           ? Query_To_String(test_case->tree)
                           : Str_new_from_trusted_utf8("(NULL)", 6);
+        char  *qstr = Str_To_Utf8(qstring);
         Query *tree = test_case->tree;
         Query *wanted = test_case->expanded;
         Query *pruned   = QParser_Prune(or_parser, tree);
@@ -949,12 +955,13 @@ TestQPLogic_Run_IMP(TestQueryParserLogic *self, TestBatchRunner *runner) {
         Hits  *hits;
 
         TEST_TRUE(runner, Query_Equals(pruned, (Obj*)wanted),
-                  "prune()   %s", Str_Get_Ptr8(qstring));
+                  "prune()   %s", qstr);
         expanded = QParser_Expand(or_parser, pruned);
         hits = IxSearcher_Hits(searcher, (Obj*)expanded, 0, 10, NULL);
         TEST_INT_EQ(runner, Hits_Total_Hits(hits), test_case->num_hits,
-                    "hits:    %s", Str_Get_Ptr8(qstring));
+                    "hits:    %s", qstr);
 
+        free(qstr);
         DECREF(hits);
         DECREF(expanded);
         DECREF(pruned);

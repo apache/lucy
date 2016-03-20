@@ -71,9 +71,11 @@ test_Raw_Excerpt(TestBatchRunner *runner, Searcher *searcher, Obj *query) {
     DECREF(spans);
     raw_excerpt = Highlighter_Raw_Excerpt(highlighter, field_val, &top,
                                           heat_map);
+    char *raw_str = Str_To_Utf8(raw_excerpt);
     TEST_TRUE(runner,
               Str_Equals_Utf8(raw_excerpt, "Ook.", 4),
-              "Raw_Excerpt at top %s", Str_Get_Ptr8(raw_excerpt));
+              "Raw_Excerpt at top %s", raw_str);
+    free(raw_str);
     TEST_TRUE(runner,
               top == 0,
               "top is 0");

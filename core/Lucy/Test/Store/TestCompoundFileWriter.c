@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include <stdlib.h>
+
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
@@ -131,8 +133,10 @@ test_offsets(TestBatchRunner *runner) {
         int64_t offs   = Json_obj_to_i64(offset);
         if (offs % 8 != 0) {
             offsets_ok = false;
+            char *str = Str_To_Utf8(file);
             FAIL(runner, "Offset %" PRId64 " for %s not a multiple of 8",
-                 offset, Str_Get_Ptr8(file));
+                 offset, str);
+            free(str);
             break;
         }
     }

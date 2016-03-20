@@ -123,19 +123,20 @@ S_add_doc(Indexer *indexer, String *field_name) {
 static void
 S_check(TestBatchRunner *runner, RAMFolder *folder, String *field,
         String *query_text, uint32_t expected_num_hits) {
+    char *field_str  = Str_To_Utf8(field);
     TermQuery *query = TermQuery_new(field, (Obj*)query_text);
     IndexSearcher *searcher = IxSearcher_new((Obj*)folder);
     Hits *hits = IxSearcher_Hits(searcher, (Obj*)query, 0, 10, NULL);
 
     TEST_TRUE(runner, Hits_Total_Hits(hits) == expected_num_hits,
-              "%s correct num hits", Str_Get_Ptr8(field));
+              "%s correct num hits", field_str);
 
     // Don't check the contents of the hit if there aren't any.
     if (expected_num_hits) {
         HitDoc *hit = Hits_Next(hits);
         String *value = (String*)HitDoc_Extract(hit, field);
         TEST_TRUE(runner, Str_Equals(united_states_str, (Obj*)value),
-                  "%s correct doc returned", Str_Get_Ptr8(field));
+                  "%s correct doc returned", field_str);
         DECREF(value);
         DECREF(hit);
     }
@@ -143,6 +144,7 @@ S_check(TestBatchRunner *runner, RAMFolder *folder, String *field,
     DECREF(hits);
     DECREF(searcher);
     DECREF(query);
+    free(field_str);
 }
 
 static void

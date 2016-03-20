@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include <stdlib.h>
+
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
@@ -138,18 +140,22 @@ S_test_sort_cache(TestBatchRunner *runner, RAMFolder *folder,
                   String *field) {
     Segment *segment   = SegReader_Get_Segment(seg_reader);
     int32_t  field_num = Seg_Field_Num(segment, field);
+    char    *field_str = Str_To_Utf8(field);
     String  *filename  = Str_newf("seg_%s/sort-%i32.ord", gen, field_num);
     if (is_used) {
         TEST_TRUE(runner, RAMFolder_Exists(folder, filename),
-                  "sort files written for %s", Str_Get_Ptr8(field));
+                  "sort files written for %s", field_str);
     }
     else {
         TEST_TRUE(runner, !RAMFolder_Exists(folder, filename),
-                  "no sort files written for %s", Str_Get_Ptr8(field));
+                  "no sort files written for %s", field_str);
     }
     DECREF(filename);
 
-    if (!is_used) { return; }
+    if (!is_used) {
+        free(field_str);
+        return;
+    }
 
     SortReader *sort_reader
         = (SortReader*)SegReader_Obtain(seg_reader,
@@ -174,12 +180,14 @@ S_test_sort_cache(TestBatchRunner *runner, RAMFolder *folder,
             is_equal = Obj_Equals(cache_value, doc_value);
         }
         TEST_TRUE(runner, is_equal, "correct cached value field %s doc %d",
-                  Str_Get_Ptr8(field), doc_id);
+                  field_str, doc_id);
 
         DECREF(doc_value);
         DECREF(doc);
         DECREF(cache_value);
     }
+
+    free(field_str);
 }
 
 static void

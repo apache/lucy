@@ -15,6 +15,7 @@
  */
 
 #include <stdio.h> // for remove()
+#include <stdlib.h>
 
 #define C_LUCY_FSFILEHANDLE
 #define C_LUCY_FILEWINDOW
@@ -33,6 +34,13 @@
 #include "Lucy/Store/FSFileHandle.h"
 #include "Lucy/Store/FileWindow.h"
 
+static void
+S_remove(String *path) {
+    char *str = Str_To_Utf8(path);
+    remove(str);
+    free(str);
+}
+
 TestFSFileHandle*
 TestFSFH_new() {
     return (TestFSFileHandle*)Class_Make_Obj(TESTFSFILEHANDLE);
@@ -44,7 +52,7 @@ test_open(TestBatchRunner *runner) {
     FSFileHandle *fh;
     String *test_filename = SSTR_WRAP_C("_fstest");
 
-    remove(Str_Get_Ptr8(test_filename));
+    S_remove(test_filename);
 
     Err_set_error(NULL);
     fh = FSFH_open(test_filename, FH_READ_ONLY);
@@ -98,7 +106,7 @@ test_open(TestBatchRunner *runner) {
               "open() read only -- no errors");
     DECREF(fh);
 
-    remove(Str_Get_Ptr8(test_filename));
+    S_remove(test_filename);
 }
 
 static void
@@ -110,7 +118,7 @@ test_Read_Write(TestBatchRunner *runner) {
     char *buf = buffer;
     String *test_filename = SSTR_WRAP_C("_fstest");
 
-    remove(Str_Get_Ptr8(test_filename));
+    S_remove(test_filename);
     fh = FSFH_open(test_filename,
                    FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
 
@@ -157,7 +165,7 @@ test_Read_Write(TestBatchRunner *runner) {
               "Writing to a read-only handle sets error");
 
     DECREF(fh);
-    remove(Str_Get_Ptr8(test_filename));
+    S_remove(test_filename);
 }
 
 static void
@@ -165,7 +173,7 @@ test_Close(TestBatchRunner *runner) {
     String *test_filename = SSTR_WRAP_C("_fstest");
     FSFileHandle *fh;
 
-    remove(Str_Get_Ptr8(test_filename));
+    S_remove(test_filename);
     fh = FSFH_open(test_filename,
                    FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
     TEST_TRUE(runner, FSFH_Close(fh), "Close returns true for write-only");
@@ -173,7 +181,7 @@ test_Close(TestBatchRunner *runner) {
 
     // Simulate an OS error when closing the file descriptor.  This
     // approximates what would happen if, say, we run out of disk space.
-    remove(Str_Get_Ptr8(test_filename));
+    S_remove(test_filename);
     fh = FSFH_open(test_filename,
                    FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
 #ifdef _MSC_VER
@@ -194,7 +202,7 @@ test_Close(TestBatchRunner *runner) {
     TEST_TRUE(runner, FSFH_Close(fh), "Close returns true for read-only");
 
     DECREF(fh);
-    remove(Str_Get_Ptr8(test_filename));
+    S_remove(test_filename);
 }
 
 static void
@@ -205,7 +213,7 @@ test_Window(TestBatchRunner *runner) {
     FileWindowIVARS *const window_ivars = FileWindow_IVARS(window);
     uint32_t i;
 
-    remove(Str_Get_Ptr8(test_filename));
+    S_remove(test_filename);
     fh = FSFH_open(test_filename,
                    FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
     for (i = 0; i < 1024; i++) {
@@ -244,7 +252,7 @@ test_Window(TestBatchRunner *runner) {
 
     DECREF(window);
     DECREF(fh);
-    remove(Str_Get_Ptr8(test_filename));
+    S_remove(test_filename);
 }
 
 void
