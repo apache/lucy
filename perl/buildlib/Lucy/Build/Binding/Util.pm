@@ -157,7 +157,7 @@ latest_snapshot(folder)
 CODE:
 {
     cfish_String *latest = lucy_IxFileNames_latest_snapshot(folder);
-    RETVAL = (SV*)CFISH_Str_To_Host(latest);
+    RETVAL = (SV*)CFISH_Str_To_Host(latest, NULL);
     CFISH_DECREF(latest);
 }
 OUTPUT: RETVAL
