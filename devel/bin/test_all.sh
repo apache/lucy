@@ -52,7 +52,11 @@ set -x
 rm -rf "$tmp_dir"
 
 if [ -z "$1" -o "$1" = go ]; then
-    export GOPATH="$tmp_dir/go:$GOPATH"
+    if [ -z "$GOPATH" ]; then
+        export GOPATH="$tmp_dir/go"
+    else
+        export GOPATH="$tmp_dir/go:$GOPATH"
+    fi
     mkdir -p "$tmp_dir/go/src/git-wip-us.apache.org/repos/asf"
     ln -s "$cfish_dir" \
         "$tmp_dir/go/src/git-wip-us.apache.org/repos/asf/lucy-clownfish.git"
@@ -62,15 +66,18 @@ if [ -z "$1" -o "$1" = go ]; then
     cd "$cfish_dir/compiler/go"
     go run build.go test
     go run build.go install
-    go run build.go clean
 
     cd ../../runtime/go
     go run build.go test
     go run build.go install
-    go run build.go clean
 
     cd "$lucy_dir/go"
     go run build.go test
+
+    go run build.go clean
+    cd "$cfish_dir/runtime/go"
+    go run build.go clean
+    cd "$cfish_dir/compiler/go"
     go run build.go clean
 
     cd "$root"
