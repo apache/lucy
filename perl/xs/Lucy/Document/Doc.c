@@ -228,7 +228,7 @@ LUCY_Doc_Equals_IMP(lucy_Doc *self, cfish_Obj *other) {
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
     lucy_DocIVARS *const ovars = lucy_Doc_IVARS((lucy_Doc*)other);
 
-    if (!ivars->doc_id == ovars->doc_id)   { return false; }
+    if (!!ivars->doc_id ^ !!ovars->doc_id) { return false; }
     if (!!ivars->fields ^ !!ovars->fields) { return false; }
 
     // Verify fields.  Don't allow any deep data structures.
