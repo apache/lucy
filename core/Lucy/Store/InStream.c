@@ -203,7 +203,7 @@ S_fill(InStream *self, int64_t amount) {
 
     // Throw an error if the requested amount would take us beyond EOF.
     if (amount > remaining) {
-        THROW(ERR,  "Read past EOF of %o (pos: %u64 len: %u64 request: %u64)",
+        THROW(ERR,  "Read past EOF of %o (pos: %i64 len: %i64 request: %i64)",
               ivars->filename, virtual_file_pos, ivars->len, amount);
     }
 

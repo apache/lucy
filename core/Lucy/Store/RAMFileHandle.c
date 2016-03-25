@@ -124,7 +124,7 @@ RAMFH_Read_IMP(RAMFileHandle *self, char *dest, int64_t offset, size_t len) {
         return false;
     }
     else if (end > ivars->len) {
-        Err_set_error(Err_new(Str_newf("Attempt to read %u64 bytes starting at %i64 goes past EOF %u64",
+        Err_set_error(Err_new(Str_newf("Attempt to read %u64 bytes starting at %i64 goes past EOF %i64",
                                        (uint64_t)len, offset, ivars->len)));
         return false;
     }
