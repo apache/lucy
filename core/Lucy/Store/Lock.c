@@ -124,7 +124,8 @@ LFLock_init(LockFileLock *self, Folder *folder, String *name,
     int pid = PID_getpid();
     Lock_init((Lock*)self, folder, name, host, timeout, interval);
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
-    ivars->link_path = Str_newf("%o.%o.%i64", ivars->lock_path, host, pid);
+    ivars->link_path = Str_newf("%o.%o.%i64", ivars->lock_path, host,
+                                (int64_t)pid);
     return self;
 }
 
