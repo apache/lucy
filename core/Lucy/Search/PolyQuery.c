@@ -164,7 +164,7 @@ PolyCompiler_Sum_Of_Squared_Weights_IMP(PolyCompiler *self) {
     float sum      = 0;
     float my_boost = PolyCompiler_Get_Boost(self);
 
-    for (uint32_t i = 0, max = Vec_Get_Size(ivars->children); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(ivars->children); i < max; i++) {
         Compiler *child = (Compiler*)Vec_Fetch(ivars->children, i);
         sum += Compiler_Sum_Of_Squared_Weights(child);
     }
@@ -178,7 +178,7 @@ PolyCompiler_Sum_Of_Squared_Weights_IMP(PolyCompiler *self) {
 void
 PolyCompiler_Apply_Norm_Factor_IMP(PolyCompiler *self, float factor) {
     PolyCompilerIVARS *const ivars = PolyCompiler_IVARS(self);
-    for (uint32_t i = 0, max = Vec_Get_Size(ivars->children); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(ivars->children); i < max; i++) {
         Compiler *child = (Compiler*)Vec_Fetch(ivars->children, i);
         Compiler_Apply_Norm_Factor(child, factor);
     }
@@ -189,7 +189,7 @@ PolyCompiler_Highlight_Spans_IMP(PolyCompiler *self, Searcher *searcher,
                                  DocVector *doc_vec, String *field) {
     PolyCompilerIVARS *const ivars = PolyCompiler_IVARS(self);
     Vector *spans = Vec_new(0);
-    for (uint32_t i = 0, max = Vec_Get_Size(ivars->children); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(ivars->children); i < max; i++) {
         Compiler *child = (Compiler*)Vec_Fetch(ivars->children, i);
         Vector *child_spans = Compiler_Highlight_Spans(child, searcher,
                                                        doc_vec, field);

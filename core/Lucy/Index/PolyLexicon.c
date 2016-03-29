@@ -81,7 +81,7 @@ S_refresh_lex_q(SegLexQueue *lex_q, Vector *seg_lexicons, Obj *target) {
     }
 
     // Refill the queue.
-    for (uint32_t i = 0, max = Vec_Get_Size(seg_lexicons); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(seg_lexicons); i < max; i++) {
         SegLexicon *const seg_lexicon
             = (SegLexicon*)Vec_Fetch(seg_lexicons, i);
         SegLex_Seek(seg_lexicon, target);

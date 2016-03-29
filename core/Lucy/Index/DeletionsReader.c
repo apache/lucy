@@ -61,7 +61,7 @@ PolyDelReader_init(PolyDeletionsReader *self, Vector *readers,
     DelReader_init((DeletionsReader*)self, NULL, NULL, NULL, NULL, -1);
     PolyDeletionsReaderIVARS *const ivars = PolyDelReader_IVARS(self);
     ivars->del_count = 0;
-    for (uint32_t i = 0, max = Vec_Get_Size(readers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(readers); i < max; i++) {
         DeletionsReader *reader = (DeletionsReader*)CERTIFY(
                                       Vec_Fetch(readers, i), DELETIONSREADER);
         ivars->del_count += DelReader_Del_Count(reader);
@@ -75,7 +75,7 @@ void
 PolyDelReader_Close_IMP(PolyDeletionsReader *self) {
     PolyDeletionsReaderIVARS *const ivars = PolyDelReader_IVARS(self);
     if (ivars->readers) {
-        for (uint32_t i = 0, max = Vec_Get_Size(ivars->readers); i < max; i++) {
+        for (size_t i = 0, max = Vec_Get_Size(ivars->readers); i < max; i++) {
             DeletionsReader *reader
                 = (DeletionsReader*)Vec_Fetch(ivars->readers, i);
             if (reader) { DelReader_Close(reader); }

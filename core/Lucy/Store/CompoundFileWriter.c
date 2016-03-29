@@ -110,7 +110,7 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
                     (Obj*)Str_newf("%i32", CFWriter_current_file_format));
 
     Vec_Sort(files);
-    for (uint32_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
         String *infilename = (String*)Vec_Fetch(files, i);
 
         if (!Str_Ends_With_Utf8(infilename, ".json", 5)) {
@@ -167,7 +167,7 @@ S_do_consolidate(CompoundFileWriter *self, CompoundFileWriterIVARS *ivars) {
     DECREF(iter);
     */
     DECREF(sub_files);
-    for (uint32_t i = 0, max = Vec_Get_Size(merged); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(merged); i < max; i++) {
         String *merged_file = (String*)Vec_Fetch(merged, i);
         if (!Folder_Delete(folder, merged_file)) {
             String *mess = MAKE_MESS("Can't delete '%o'", merged_file);

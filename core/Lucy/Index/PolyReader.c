@@ -93,7 +93,7 @@ PolyReader_open(Obj *index, Snapshot *snapshot, IndexManager *manager) {
 
 static Obj*
 S_first_non_null(Vector *array) {
-    for (uint32_t i = 0, max = Vec_Get_Size(array); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(array); i < max; i++) {
         Obj *thing = Vec_Fetch(array, i);
         if (thing) { return thing; }
     }
@@ -191,7 +191,7 @@ PolyReader_Close_IMP(PolyReader *self) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
     PolyReader_Close_t super_close
         = SUPER_METHOD_PTR(POLYREADER, LUCY_PolyReader_Close);
-    for (uint32_t i = 0, max = Vec_Get_Size(ivars->sub_readers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(ivars->sub_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)Vec_Fetch(ivars->sub_readers, i);
         SegReader_Close(seg_reader);
     }
@@ -234,7 +234,7 @@ S_try_open_elements(void *context) {
     String     *schema_file       = NULL;
 
     // Find schema file, count segments.
-    for (uint32_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
         String *entry = (String*)Vec_Fetch(files, i);
 
         if (Seg_valid_seg_name(entry)) {
@@ -272,7 +272,7 @@ S_try_open_elements(void *context) {
     }
 
     Vector *segments = Vec_new(num_segs);
-    for (uint32_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
         String *entry = (String*)Vec_Fetch(files, i);
 
         // Create a Segment for each segmeta.

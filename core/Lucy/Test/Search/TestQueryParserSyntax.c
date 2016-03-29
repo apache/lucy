@@ -93,7 +93,7 @@ build_index() {
 
     // Index documents.
     Vector *doc_set = TestUtils_doc_set();
-    for (uint32_t i = 0; i < Vec_Get_Size(doc_set); ++i) {
+    for (size_t i = 0; i < Vec_Get_Size(doc_set); ++i) {
         String *content_string = (String*)Vec_Fetch(doc_set, i);
         Doc *doc = Doc_new(NULL, 0);
         Doc_Store(doc, plain_str, (Obj*)content_string);

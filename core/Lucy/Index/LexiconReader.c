@@ -56,7 +56,7 @@ PolyLexiconReader*
 PolyLexReader_init(PolyLexiconReader *self, Vector *readers,
                    I32Array *offsets) {
     Schema *schema = NULL;
-    for (uint32_t i = 0, max = Vec_Get_Size(readers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(readers); i < max; i++) {
         LexiconReader *reader
             = (LexiconReader*)CERTIFY(Vec_Fetch(readers, i), LEXICONREADER);
         if (!schema) { schema = LexReader_Get_Schema(reader); }
@@ -72,7 +72,7 @@ void
 PolyLexReader_Close_IMP(PolyLexiconReader *self) {
     PolyLexiconReaderIVARS *const ivars = PolyLexReader_IVARS(self);
     if (ivars->readers) {
-        for (uint32_t i = 0, max = Vec_Get_Size(ivars->readers); i < max; i++) {
+        for (size_t i = 0, max = Vec_Get_Size(ivars->readers); i < max; i++) {
             LexiconReader *reader
                 = (LexiconReader*)Vec_Fetch(ivars->readers, i);
             if (reader) { LexReader_Close(reader); }
@@ -116,7 +116,7 @@ PolyLexReader_Doc_Freq_IMP(PolyLexiconReader *self, String *field,
                            Obj *term) {
     PolyLexiconReaderIVARS *const ivars = PolyLexReader_IVARS(self);
     uint32_t doc_freq = 0;
-    for (uint32_t i = 0, max = Vec_Get_Size(ivars->readers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(ivars->readers); i < max; i++) {
         LexiconReader *reader = (LexiconReader*)Vec_Fetch(ivars->readers, i);
         if (reader) {
             doc_freq += LexReader_Doc_Freq(reader, field, term);

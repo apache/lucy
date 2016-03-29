@@ -68,7 +68,7 @@ static PhraseQuery*
 S_do_init(PhraseQuery *self, String *field, Vector *terms, float boost) {
     Query_init((Query*)self, boost);
     PhraseQueryIVARS *const ivars = PhraseQuery_IVARS(self);
-    for (uint32_t i = 0, max = Vec_Get_Size(terms); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(terms); i < max; i++) {
         CERTIFY(Vec_Fetch(terms, i), OBJ);
     }
     ivars->field = field;
@@ -218,7 +218,7 @@ PhraseCompiler_init(PhraseCompiler *self, PhraseQuery *parent,
 
     // Store IDF for the phrase.
     ivars->idf = 0;
-    for (uint32_t i = 0, max = Vec_Get_Size(terms); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(terms); i < max; i++) {
         Obj     *term     = Vec_Fetch(terms, i);
         int32_t  doc_max  = Searcher_Doc_Max(searcher);
         int32_t  doc_freq = Searcher_Doc_Freq(searcher, parent_ivars->field, term);

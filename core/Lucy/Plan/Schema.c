@@ -85,7 +85,7 @@ Schema_Destroy_IMP(Schema *self) {
 static void
 S_add_unique(Vector *array, Obj *elem) {
     if (!elem) { return; }
-    for (uint32_t i = 0, max = Vec_Get_Size(array); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(array); i < max; i++) {
         Obj *candidate = Vec_Fetch(array, i);
         if (!candidate) { continue; }
         if (elem == candidate) { return; }

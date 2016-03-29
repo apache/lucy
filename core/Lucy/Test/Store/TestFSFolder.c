@@ -127,7 +127,7 @@ test_protect_symlinks(TestBatchRunner *runner) {
     else {
         Vector *list = FSFolder_List_R(folder, NULL);
         bool saw_bazooka_boffo = false;
-        for (uint32_t i = 0, max = Vec_Get_Size(list); i < max; i++) {
+        for (size_t i = 0, max = Vec_Get_Size(list); i < max; i++) {
             String *entry = (String*)Vec_Fetch(list, i);
             if (Str_Ends_With_Utf8(entry, "bazooka/boffo", 13)) {
                 saw_bazooka_boffo = true;

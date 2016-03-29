@@ -85,7 +85,7 @@ test_normalization(TestBatchRunner *runner) {
     Vector *tests = (Vector*)Json_slurp_json((Folder*)modules_folder, path);
     if (!tests) { RETHROW(Err_get_error()); }
 
-    for (uint32_t i = 0, max = Vec_Get_Size(tests); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(tests); i < max; i++) {
         Hash *test = (Hash*)Vec_Fetch(tests, i);
         String *form = (String*)Hash_Fetch_Utf8(
                             test, "normalization_form", 18);
@@ -96,7 +96,7 @@ test_normalization(TestBatchRunner *runner) {
         Normalizer *normalizer = Normalizer_new(form, case_fold, strip_accents);
         Vector *words = (Vector*)Hash_Fetch_Utf8(test, "words", 5);
         Vector *norms = (Vector*)Hash_Fetch_Utf8(test, "norms", 5);
-        for (uint32_t j = 0, max = Vec_Get_Size(words); j < max; j++) {
+        for (size_t j = 0, max = Vec_Get_Size(words); j < max; j++) {
             String *word = (String*)Vec_Fetch(words, j);
             Vector *got  = Normalizer_Split(normalizer, word);
             String *norm = (String*)Vec_Fetch(got, 0);

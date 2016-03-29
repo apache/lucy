@@ -197,7 +197,7 @@ SortEx_Shrink_IMP(SortExternal *self) {
     FREEMEM(ivars->scratch);
     ivars->scratch = NULL;
 
-    for (uint32_t i = 0, max = Vec_Get_Size(ivars->runs); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(ivars->runs); i < max; i++) {
         SortExternal *run = (SortExternal*)Vec_Fetch(ivars->runs, i);
         SortEx_Shrink(run);
     }
@@ -231,7 +231,7 @@ static Obj**
 S_find_endpost(SortExternal *self, SortExternalIVARS *ivars) {
     Obj **endpost = NULL;
 
-    for (uint32_t i = 0, max = Vec_Get_Size(ivars->runs); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(ivars->runs); i < max; i++) {
         // Get a run and retrieve the last item in its buffer.
         SortExternal *const run = (SortExternal*)Vec_Fetch(ivars->runs, i);
         SortExternalIVARS *const run_ivars = SortEx_IVARS(run);

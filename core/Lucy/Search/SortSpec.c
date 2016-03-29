@@ -37,7 +37,7 @@ SortSpec*
 SortSpec_init(SortSpec *self, Vector *rules) {
     SortSpecIVARS *const ivars = SortSpec_IVARS(self);
     ivars->rules = Vec_Clone(rules);
-    for (int32_t i = 0, max = Vec_Get_Size(rules); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(rules); i < max; i++) {
         SortRule *rule = (SortRule*)Vec_Fetch(rules, i);
         CERTIFY(rule, SORTRULE);
     }

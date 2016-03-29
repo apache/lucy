@@ -152,7 +152,7 @@ SortWriter_Add_Inverted_Doc_IMP(SortWriter *self, Inverter *inverter,
     // flush all of them, then reset the counter which tracks memory
     // consumption.
     if ((size_t)Counter_Get_Value(ivars->counter) > ivars->mem_thresh) {
-        for (uint32_t i = 0; i < Vec_Get_Size(ivars->field_writers); i++) {
+        for (size_t i = 0; i < Vec_Get_Size(ivars->field_writers); i++) {
             SortFieldWriter *const field_writer
                 = (SortFieldWriter*)Vec_Fetch(ivars->field_writers, i);
             if (field_writer) { SortFieldWriter_Flush(field_writer); }
@@ -169,7 +169,7 @@ SortWriter_Add_Segment_IMP(SortWriter *self, SegReader *reader,
     Vector *fields = Schema_All_Fields(ivars->schema);
 
     // Proceed field-at-a-time, rather than doc-at-a-time.
-    for (uint32_t i = 0, max = Vec_Get_Size(fields); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(fields); i < max; i++) {
         String *field = (String*)Vec_Fetch(fields, i);
         SortReader *sort_reader = (SortReader*)SegReader_Fetch(
                                       reader, Class_Get_Name(SORTREADER));
@@ -199,7 +199,7 @@ SortWriter_Finish_IMP(SortWriter *self) {
     // If we've either flushed or added segments, flush everything so that any
     // one field can use the entire margin up to mem_thresh.
     if (ivars->flush_at_finish) {
-        for (uint32_t i = 1, max = Vec_Get_Size(field_writers); i < max; i++) {
+        for (size_t i = 1, max = Vec_Get_Size(field_writers); i < max; i++) {
             SortFieldWriter *field_writer
                 = (SortFieldWriter*)Vec_Fetch(field_writers, i);
             if (field_writer) {

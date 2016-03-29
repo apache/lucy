@@ -182,7 +182,7 @@ Inverter_Add_Field_IMP(Inverter *self, InverterEntry *entry) {
 void
 Inverter_Clear_IMP(Inverter *self) {
     InverterIVARS *const ivars = Inverter_IVARS(self);
-    for (uint32_t i = 0, max = Vec_Get_Size(ivars->entries); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(ivars->entries); i < max; i++) {
         InvEntry_Clear((InverterEntry*)Vec_Fetch(ivars->entries, i));
     }
     Vec_Clear(ivars->entries);

@@ -115,7 +115,7 @@ void
 SegWriter_Add_Inverted_Doc_IMP(SegWriter *self, Inverter *inverter,
                                int32_t doc_id) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
-    for (uint32_t i = 0, max = Vec_Get_Size(ivars->writers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(ivars->writers); i < max; i++) {
         DataWriter *writer = (DataWriter*)Vec_Fetch(ivars->writers, i);
         DataWriter_Add_Inverted_Doc(writer, inverter, doc_id);
     }
@@ -140,7 +140,7 @@ SegWriter_Add_Segment_IMP(SegWriter *self, SegReader *reader,
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
 
     // Bulk add the slab of documents to the various writers.
-    for (uint32_t i = 0, max = Vec_Get_Size(ivars->writers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(ivars->writers); i < max; i++) {
         DataWriter *writer = (DataWriter*)Vec_Fetch(ivars->writers, i);
         DataWriter_Add_Segment(writer, reader, doc_map);
     }
@@ -161,7 +161,7 @@ SegWriter_Merge_Segment_IMP(SegWriter *self, SegReader *reader,
     String   *seg_name = Seg_Get_Name(SegReader_Get_Segment(reader));
 
     // Have all the sub-writers merge the segment.
-    for (uint32_t i = 0, max = Vec_Get_Size(ivars->writers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(ivars->writers); i < max; i++) {
         DataWriter *writer = (DataWriter*)Vec_Fetch(ivars->writers, i);
         DataWriter_Merge_Segment(writer, reader, doc_map);
     }
@@ -181,7 +181,7 @@ SegWriter_Delete_Segment_IMP(SegWriter *self, SegReader *reader) {
     String   *seg_name = Seg_Get_Name(SegReader_Get_Segment(reader));
 
     // Have all the sub-writers delete the segment.
-    for (uint32_t i = 0, max = Vec_Get_Size(ivars->writers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(ivars->writers); i < max; i++) {
         DataWriter *writer = (DataWriter*)Vec_Fetch(ivars->writers, i);
         DataWriter_Delete_Segment(writer, reader);
     }
@@ -197,7 +197,7 @@ SegWriter_Finish_IMP(SegWriter *self) {
     String *seg_name = Seg_Get_Name(ivars->segment);
 
     // Finish off children.
-    for (uint32_t i = 0, max = Vec_Get_Size(ivars->writers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(ivars->writers); i < max; i++) {
         DataWriter *writer = (DataWriter*)Vec_Fetch(ivars->writers, i);
         DataWriter_Finish(writer);
     }

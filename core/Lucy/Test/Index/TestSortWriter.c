@@ -251,7 +251,7 @@ test_sort_writer(TestBatchRunner *runner) {
     {
         Vector *filenames = RAMFolder_List_R(folder, NULL);
         int num_old_seg_files = 0;
-        for (uint32_t i = 0, size = Vec_Get_Size(filenames); i < size; ++i) {
+        for (size_t i = 0, size = Vec_Get_Size(filenames); i < size; ++i) {
             String *filename = (String*)Vec_Fetch(filenames, i);
             if (Str_Contains_Utf8(filename, "seg_1", 5)
                 || Str_Contains_Utf8(filename, "seg_2", 5)

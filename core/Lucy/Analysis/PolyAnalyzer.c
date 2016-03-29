@@ -38,7 +38,7 @@ PolyAnalyzer_init(PolyAnalyzer *self, String *language,
     PolyAnalyzerIVARS *const ivars = PolyAnalyzer_IVARS(self);
 
     if (analyzers) {
-        for (uint32_t i = 0, max = Vec_Get_Size(analyzers); i < max; i++) {
+        for (size_t i = 0, max = Vec_Get_Size(analyzers); i < max; i++) {
             CERTIFY(Vec_Fetch(analyzers, i), ANALYZER);
         }
         ivars->analyzers = (Vector*)INCREF(analyzers);
@@ -74,7 +74,7 @@ PolyAnalyzer_Transform_IMP(PolyAnalyzer *self, Inversion *inversion) {
     (void)INCREF(inversion);
 
     // Iterate through each of the analyzers in order.
-    for (uint32_t i = 0, max = Vec_Get_Size(analyzers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(analyzers); i < max; i++) {
         Analyzer *analyzer = (Analyzer*)Vec_Fetch(analyzers, i);
         Inversion *new_inversion = Analyzer_Transform(analyzer, inversion);
         DECREF(inversion);

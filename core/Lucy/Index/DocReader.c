@@ -54,7 +54,7 @@ PolyDocReader*
 PolyDocReader_init(PolyDocReader *self, Vector *readers, I32Array *offsets) {
     DocReader_init((DocReader*)self, NULL, NULL, NULL, NULL, -1);
     PolyDocReaderIVARS *const ivars = PolyDocReader_IVARS(self);
-    for (uint32_t i = 0, max = Vec_Get_Size(readers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(readers); i < max; i++) {
         CERTIFY(Vec_Fetch(readers, i), DOCREADER);
     }
     ivars->readers = (Vector*)INCREF(readers);
@@ -66,7 +66,7 @@ void
 PolyDocReader_Close_IMP(PolyDocReader *self) {
     PolyDocReaderIVARS *const ivars = PolyDocReader_IVARS(self);
     if (ivars->readers) {
-        for (uint32_t i = 0, max = Vec_Get_Size(ivars->readers); i < max; i++) {
+        for (size_t i = 0, max = Vec_Get_Size(ivars->readers); i < max; i++) {
             DocReader *reader = (DocReader*)Vec_Fetch(ivars->readers, i);
             if (reader) { DocReader_Close(reader); }
         }

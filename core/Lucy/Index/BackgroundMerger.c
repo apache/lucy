@@ -127,7 +127,7 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager) {
         = IxManager_Highest_Seg_Num(ivars->manager, ivars->snapshot) + 1;
     Vector *fields = Schema_All_Fields(ivars->schema);
     ivars->segment = Seg_new(new_seg_num);
-    for (uint32_t i = 0, max = Vec_Get_Size(fields); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(fields); i < max; i++) {
         Seg_Add_Field(ivars->segment, (String*)Vec_Fetch(fields, i));
     }
     DECREF(fields);
@@ -261,13 +261,13 @@ S_merge_updated_deletions(BackgroundMerger *self) {
         = PolyReader_Get_Seg_Readers(ivars->polyreader);
     Hash *new_segs = Hash_new(Vec_Get_Size(new_seg_readers));
 
-    for (uint32_t i = 0, max = Vec_Get_Size(new_seg_readers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(new_seg_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)Vec_Fetch(new_seg_readers, i);
         String    *seg_name   = SegReader_Get_Seg_Name(seg_reader);
         Hash_Store(new_segs, seg_name, INCREF(seg_reader));
     }
 
-    for (uint32_t i = 0, max = Vec_Get_Size(old_seg_readers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(old_seg_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)Vec_Fetch(old_seg_readers, i);
         String    *seg_name   = SegReader_Get_Seg_Name(seg_reader);
 
@@ -443,7 +443,7 @@ BGMerger_Prepare_Commit_IMP(BackgroundMerger *self) {
             // run this AFTER S_merge_updated_deletions, because otherwise
             // we couldn't tell whether the deletion counts changed.)
             Vector *files = Snapshot_List(latest_snapshot);
-            for (uint32_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
+            for (size_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
                 String *file = (String*)Vec_Fetch(files, i);
                 if (Str_Starts_With_Utf8(file, "seg_", 4)) {
                     int64_t gen = (int64_t)IxFileNames_extract_gen(file);

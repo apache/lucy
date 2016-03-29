@@ -167,7 +167,7 @@ PListWriter_Add_Inverted_Doc_IMP(PostingListWriter *self, Inverter *inverter,
     // flush all of them, then release all the RawPostings with a single
     // action.
     if (MemPool_Get_Consumed(ivars->mem_pool) > ivars->mem_thresh) {
-        for (uint32_t i = 0, max = Vec_Get_Size(ivars->pools); i < max; i++) {
+        for (size_t i = 0, max = Vec_Get_Size(ivars->pools); i < max; i++) {
             PostingPool *const pool = (PostingPool*)Vec_Fetch(ivars->pools, i);
             if (pool) { PostPool_Flush(pool); }
         }
@@ -185,7 +185,7 @@ PListWriter_Add_Segment_IMP(PostingListWriter *self, SegReader *reader,
     Vector  *all_fields    = Schema_All_Fields(schema);
     S_lazy_init(self);
 
-    for (uint32_t i = 0, max = Vec_Get_Size(all_fields); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(all_fields); i < max; i++) {
         String    *field = (String*)Vec_Fetch(all_fields, i);
         FieldType *type  = Schema_Fetch_Type(schema, field);
         int32_t old_field_num = Seg_Field_Num(other_segment, field);
@@ -223,13 +223,13 @@ PListWriter_Finish_IMP(PostingListWriter *self) {
     OutStream_Close(ivars->post_temp_out);
 
     // Try to free up some memory.
-    for (uint32_t i = 0, max = Vec_Get_Size(ivars->pools); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(ivars->pools); i < max; i++) {
         PostingPool *pool = (PostingPool*)Vec_Fetch(ivars->pools, i);
         if (pool) { PostPool_Shrink(pool); }
     }
 
     // Write postings for each field.
-    for (uint32_t i = 0, max = Vec_Get_Size(ivars->pools); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(ivars->pools); i < max; i++) {
         PostingPool *pool = (PostingPool*)Vec_Delete(ivars->pools, i);
         if (pool) {
             // Write out content for each PostingPool.  Let each PostingPool
