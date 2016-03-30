@@ -95,7 +95,6 @@ void
 PolyLex_Reset_IMP(PolyLexicon *self) {
     PolyLexiconIVARS *const ivars = PolyLex_IVARS(self);
     Vector *seg_lexicons = ivars->seg_lexicons;
-    uint32_t num_segs = Vec_Get_Size(seg_lexicons);
     SegLexQueue *lex_q = ivars->lex_q;
 
     // Empty out the queue.
@@ -106,7 +105,7 @@ PolyLex_Reset_IMP(PolyLexicon *self) {
     }
 
     // Fill the queue with valid SegLexicons.
-    for (uint32_t i = 0; i < num_segs; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(seg_lexicons); i < max; i++) {
         SegLexicon *const seg_lexicon
             = (SegLexicon*)Vec_Fetch(seg_lexicons, i);
         SegLex_Reset(seg_lexicon);

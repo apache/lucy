@@ -230,9 +230,9 @@ S_discover_unused(FilePurger *self, Vector **purgables_ptr,
             if (lock && Lock_Is_Locked(lock)) {
                 // The snapshot file is locked, which means someone's using
                 // that version of the index -- protect all of its entries.
-                uint32_t new_size = Vec_Get_Size(spared)
-                                    + Vec_Get_Size(referenced)
-                                    + 1;
+                size_t new_size = Vec_Get_Size(spared)
+                                  + Vec_Get_Size(referenced)
+                                  + 1;
                 Vec_Grow(spared, new_size);
                 Vec_Push(spared, (Obj*)Str_Clone(entry));
                 Vec_Push_All(spared, referenced);

@@ -85,7 +85,7 @@ DefDelWriter_init(DefaultDeletionsWriter *self, Schema *schema,
     DataWriter_init((DataWriter*)self, schema, snapshot, segment, polyreader);
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     ivars->seg_readers          = PolyReader_Seg_Readers(polyreader);
-    uint32_t num_seg_readers    = Vec_Get_Size(ivars->seg_readers);
+    size_t num_seg_readers      = Vec_Get_Size(ivars->seg_readers);
     ivars->seg_starts           = PolyReader_Offsets(polyreader);
     ivars->bit_vecs             = Vec_new(num_seg_readers);
     ivars->updated              = (bool*)CALLOCATE(num_seg_readers, sizeof(bool));
@@ -93,7 +93,7 @@ DefDelWriter_init(DefaultDeletionsWriter *self, Schema *schema,
     ivars->name_to_tick         = Hash_new(num_seg_readers);
 
     // Materialize a BitVector of deletions for each segment.
-    for (uint32_t i = 0; i < num_seg_readers; i++) {
+    for (size_t i = 0; i < num_seg_readers; i++) {
         SegReader *seg_reader = (SegReader*)Vec_Fetch(ivars->seg_readers, i);
         BitVector *bit_vec    = BitVec_new(SegReader_Doc_Max(seg_reader));
         DeletionsReader *del_reader

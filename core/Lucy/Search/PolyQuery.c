@@ -30,11 +30,11 @@
 
 PolyQuery*
 PolyQuery_init(PolyQuery *self, Vector *children) {
-    const uint32_t num_kids = children ? Vec_Get_Size(children) : 0;
+    const size_t num_kids = children ? Vec_Get_Size(children) : 0;
     Query_init((Query*)self, 1.0f);
     PolyQueryIVARS *const ivars = PolyQuery_IVARS(self);
     ivars->children = Vec_new(num_kids);
-    for (uint32_t i = 0; i < num_kids; i++) {
+    for (size_t i = 0; i < num_kids; i++) {
         PolyQuery_Add_Child(self, (Query*)Vec_Fetch(children, i));
     }
     return self;
@@ -134,13 +134,13 @@ PolyCompiler_init(PolyCompiler *self, PolyQuery *parent,
                   Searcher *searcher, float boost) {
     PolyCompilerIVARS *const ivars = PolyCompiler_IVARS(self);
     PolyQueryIVARS *const parent_ivars = PolyQuery_IVARS(parent);
-    const uint32_t num_kids = Vec_Get_Size(parent_ivars->children);
+    const size_t num_kids = Vec_Get_Size(parent_ivars->children);
 
     Compiler_init((Compiler*)self, (Query*)parent, searcher, NULL, boost);
     ivars->children = Vec_new(num_kids);
 
     // Iterate over the children, creating a Compiler for each one.
-    for (uint32_t i = 0; i < num_kids; i++) {
+    for (size_t i = 0; i < num_kids; i++) {
         Query *child_query = (Query*)Vec_Fetch(parent_ivars->children, i);
         float sub_boost = boost * Query_Get_Boost(child_query);
         Compiler *child_compiler

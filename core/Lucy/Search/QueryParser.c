@@ -127,9 +127,9 @@ QParser_init(QueryParser *self, Schema *schema, Analyzer *analyzer,
     }
     else {
         Vector *all_fields = Schema_All_Fields(schema);
-        uint32_t num_fields = Vec_Get_Size(all_fields);
+        size_t num_fields = Vec_Get_Size(all_fields);
         ivars->fields = Vec_new(num_fields);
-        for (uint32_t i = 0; i < num_fields; i++) {
+        for (size_t i = 0; i < num_fields; i++) {
             String *field = (String*)Vec_Fetch(all_fields, i);
             FieldType *type = Schema_Fetch_Type(schema, field);
             if (type && FType_Indexed(type)) {
@@ -569,7 +569,7 @@ S_compose_subquery(QueryParser *self, Vector *elems, bool enclosed) {
         retval = (Query*)INCREF(query);
     }
     else {
-        uint32_t  num_elems = Vec_Get_Size(elems);
+        size_t    num_elems = Vec_Get_Size(elems);
         Vector   *required  = Vec_new(num_elems);
         Vector   *optional  = Vec_new(num_elems);
         Vector   *negated   = Vec_new(num_elems);
@@ -577,7 +577,7 @@ S_compose_subquery(QueryParser *self, Vector *elems, bool enclosed) {
         Query    *opt_query = NULL;
 
         // Demux elems into bins.
-        for (uint32_t i = 0; i < num_elems; i++) {
+        for (size_t i = 0; i < num_elems; i++) {
             ParserElem *elem = (ParserElem*)Vec_Fetch(elems, i);
             if (ParserElem_Required(elem)) {
                 Vec_Push(required, INCREF(ParserElem_As(elem, QUERY)));
@@ -589,9 +589,9 @@ S_compose_subquery(QueryParser *self, Vector *elems, bool enclosed) {
                 Vec_Push(negated, INCREF(ParserElem_As(elem, QUERY)));
             }
         }
-        uint32_t num_required = Vec_Get_Size(required);
-        uint32_t num_negated  = Vec_Get_Size(negated);
-        uint32_t num_optional = Vec_Get_Size(optional);
+        size_t num_required = Vec_Get_Size(required);
+        size_t num_negated  = Vec_Get_Size(negated);
+        size_t num_optional = Vec_Get_Size(optional);
 
         // Bind all mandatory matchers together in one Query.
         if (num_required || num_negated) {
@@ -914,11 +914,11 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
             // Extract token texts.
             String *split_source = S_unescape(self, source_text, unescape_buf);
             Vector *maybe_texts = Analyzer_Split(analyzer, split_source);
-            uint32_t num_maybe_texts = Vec_Get_Size(maybe_texts);
+            size_t num_maybe_texts = Vec_Get_Size(maybe_texts);
             Vector *token_texts = Vec_new(num_maybe_texts);
 
             // Filter out zero-length token texts.
-            for (uint32_t j = 0; j < num_maybe_texts; j++) {
+            for (size_t j = 0; j < num_maybe_texts; j++) {
                 String *token_text = (String*)Vec_Fetch(maybe_texts, j);
                 if (Str_Get_Size(token_text)) {
                     Vec_Push(token_texts, INCREF(token_text));

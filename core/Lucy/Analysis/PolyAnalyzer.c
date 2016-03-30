@@ -87,7 +87,7 @@ PolyAnalyzer_Transform_IMP(PolyAnalyzer *self, Inversion *inversion) {
 Inversion*
 PolyAnalyzer_Transform_Text_IMP(PolyAnalyzer *self, String *text) {
     Vector *const   analyzers     = PolyAnalyzer_IVARS(self)->analyzers;
-    const uint32_t  num_analyzers = Vec_Get_Size(analyzers);
+    const size_t    num_analyzers = Vec_Get_Size(analyzers);
     Inversion      *retval;
 
     if (num_analyzers == 0) {
@@ -100,7 +100,7 @@ PolyAnalyzer_Transform_Text_IMP(PolyAnalyzer *self, String *text) {
     else {
         Analyzer *first_analyzer = (Analyzer*)Vec_Fetch(analyzers, 0);
         retval = Analyzer_Transform_Text(first_analyzer, text);
-        for (uint32_t i = 1; i < num_analyzers; i++) {
+        for (size_t i = 1; i < num_analyzers; i++) {
             Analyzer *analyzer = (Analyzer*)Vec_Fetch(analyzers, i);
             Inversion *new_inversion = Analyzer_Transform(analyzer, retval);
             DECREF(retval);

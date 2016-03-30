@@ -150,11 +150,11 @@ ProximityQuery_Equals_IMP(ProximityQuery *self, Obj *other) {
 String*
 ProximityQuery_To_String_IMP(ProximityQuery *self) {
     ProximityQueryIVARS *const ivars = ProximityQuery_IVARS(self);
-    uint32_t num_terms = Vec_Get_Size(ivars->terms);
+    size_t num_terms = Vec_Get_Size(ivars->terms);
     CharBuf *buf = CB_new(0);
     CB_Cat(buf, ivars->field);
     CB_Cat_Trusted_Utf8(buf, ":\"", 2);
-    for (uint32_t i = 0; i < num_terms; i++) {
+    for (size_t i = 0; i < num_terms; i++) {
         Obj *term = Vec_Fetch(ivars->terms, i);
         String *term_string = Obj_To_String(term);
         CB_Cat(buf, term_string);
@@ -328,7 +328,7 @@ ProximityCompiler_Make_Matcher_IMP(ProximityCompiler *self, SegReader *reader,
     ProximityQueryIVARS *const parent_ivars
         = ProximityQuery_IVARS((ProximityQuery*)ivars->parent);
     Vector *const      terms     = parent_ivars->terms;
-    uint32_t           num_terms = Vec_Get_Size(terms);
+    size_t             num_terms = Vec_Get_Size(terms);
 
     // Bail if there are no terms.
     if (!num_terms) { return NULL; }
@@ -350,7 +350,7 @@ ProximityCompiler_Make_Matcher_IMP(ProximityCompiler *self, SegReader *reader,
 
     // Look up each term.
     Vector  *plists = Vec_new(num_terms);
-    for (uint32_t i = 0; i < num_terms; i++) {
+    for (size_t i = 0; i < num_terms; i++) {
         Obj *term = Vec_Fetch(terms, i);
         PostingList *plist
             = PListReader_Posting_List(plist_reader, parent_ivars->field, term);

@@ -102,9 +102,9 @@ PolyDelReader_Iterator_IMP(PolyDeletionsReader *self) {
     PolyDeletionsReaderIVARS *const ivars = PolyDelReader_IVARS(self);
     SeriesMatcher *deletions = NULL;
     if (ivars->del_count) {
-        uint32_t num_readers = Vec_Get_Size(ivars->readers);
+        size_t num_readers = Vec_Get_Size(ivars->readers);
         Vector *matchers = Vec_new(num_readers);
-        for (uint32_t i = 0; i < num_readers; i++) {
+        for (size_t i = 0; i < num_readers; i++) {
             DeletionsReader *reader
                 = (DeletionsReader*)Vec_Fetch(ivars->readers, i);
             Matcher *matcher = DelReader_Iterator(reader);

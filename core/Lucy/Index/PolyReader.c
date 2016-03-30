@@ -164,9 +164,9 @@ PolyReader_init(PolyReader *self, Schema *schema, Folder *folder,
     ivars->del_count  = 0;
 
     if (sub_readers) {
-        uint32_t num_segs = Vec_Get_Size(sub_readers);
+        size_t num_segs = Vec_Get_Size(sub_readers);
         Vector *segments = Vec_new(num_segs);
-        for (uint32_t i = 0; i < num_segs; i++) {
+        for (size_t i = 0; i < num_segs; i++) {
             SegReader *seg_reader
                 = (SegReader*)CERTIFY(Vec_Fetch(sub_readers, i), SEGREADER);
             Vec_Push(segments, INCREF(SegReader_Get_Segment(seg_reader)));

@@ -400,7 +400,7 @@ static bool
 S_maybe_merge(Indexer *self, Vector *seg_readers) {
     IndexerIVARS *const ivars = Indexer_IVARS(self);
     bool      merge_happened  = false;
-    uint32_t  num_seg_readers = Vec_Get_Size(seg_readers);
+    size_t    num_seg_readers = Vec_Get_Size(seg_readers);
     Lock     *merge_lock      = IxManager_Make_Merge_Lock(ivars->manager);
     bool      got_merge_lock  = Lock_Obtain(merge_lock);
     int64_t   cutoff;
@@ -484,7 +484,7 @@ void
 Indexer_Prepare_Commit_IMP(Indexer *self) {
     IndexerIVARS *const ivars = Indexer_IVARS(self);
     Vector   *seg_readers     = PolyReader_Get_Seg_Readers(ivars->polyreader);
-    uint32_t  num_seg_readers = Vec_Get_Size(seg_readers);
+    size_t    num_seg_readers = Vec_Get_Size(seg_readers);
     bool      merge_happened  = false;
 
     if (!ivars->write_lock || ivars->prepared) {
