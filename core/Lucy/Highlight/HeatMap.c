@@ -74,7 +74,7 @@ S_flattened_but_empty_spans(Vector *spans) {
         bounds[i]             = Span_Get_Offset(span);
         bounds[i + num_spans] = Span_Get_Offset(span) + Span_Get_Length(span);
     }
-    qsort(bounds, num_spans * 2, sizeof(uint32_t), S_compare_i32);
+    qsort(bounds, num_spans * 2, sizeof(int32_t), S_compare_i32);
     size_t   num_bounds = 0;
     int32_t  last       = INT32_MAX;
     for (size_t i = 0; i < num_spans * 2; i++) {
