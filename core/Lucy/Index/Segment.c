@@ -166,7 +166,7 @@ Seg_Add_Field_IMP(Segment *self, String *field) {
         return (int32_t)Int_Get_Value(num);
     }
     else {
-        int32_t field_num = Vec_Get_Size(ivars->by_num);
+        int32_t field_num = (int32_t)Vec_Get_Size(ivars->by_num);
         Hash_Store(ivars->by_name, field, (Obj*)Int_new(field_num));
         Vec_Push(ivars->by_num, (Obj*)Str_Clone(field));
         return field_num;

@@ -147,7 +147,7 @@ BlobSortEx_Flip_IMP(BlobSortEx *self) {
     BlobSortEx_Flush(self);
 
     // Recalculate the approximate mem allowed for each run.
-    uint32_t num_runs = Vec_Get_Size(ivars->runs);
+    uint32_t num_runs = (uint32_t)Vec_Get_Size(ivars->runs);
     if (num_runs) {
         run_mem_thresh = (ivars->mem_thresh / 2) / num_runs;
         if (run_mem_thresh < 65536) {
@@ -195,7 +195,7 @@ BlobSortEx_Peek_Last_IMP(BlobSortEx *self) {
 uint32_t
 BlobSortEx_Get_Num_Runs_IMP(BlobSortEx *self) {
     BlobSortExIVARS *const ivars = BlobSortEx_IVARS(self);
-    return Vec_Get_Size(ivars->runs);
+    return (uint32_t)Vec_Get_Size(ivars->runs);
 }
 
 

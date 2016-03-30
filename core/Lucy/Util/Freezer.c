@@ -229,7 +229,7 @@ Freezer_read_blob(InStream *instream) {
 void
 Freezer_serialize_varray(Vector *array, OutStream *outstream) {
     uint32_t last_valid_tick = 0;
-    size_t size = Vec_Get_Size(array);
+    uint32_t size = (uint32_t)Vec_Get_Size(array);
     OutStream_Write_C32(outstream, size);
     for (uint32_t i = 0; i < size; i++) {
         Obj *elem = Vec_Fetch(array, i);

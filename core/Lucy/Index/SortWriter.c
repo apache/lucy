@@ -213,11 +213,11 @@ SortWriter_Finish_IMP(SortWriter *self) {
     OutStream_Close(ivars->temp_ix_out);
     OutStream_Close(ivars->temp_dat_out);
 
-    for (uint32_t i = 1, max = Vec_Get_Size(field_writers); i < max; i++) {
+    for (size_t i = 1, max = Vec_Get_Size(field_writers); i < max; i++) {
         SortFieldWriter *field_writer
             = (SortFieldWriter*)Vec_Delete(field_writers, i);
         if (field_writer) {
-            String *field = Seg_Field_Name(ivars->segment, i);
+            String *field = Seg_Field_Name(ivars->segment, (int32_t)i);
             SortFieldWriter_Flip(field_writer);
             int32_t count = SortFieldWriter_Finish(field_writer);
             Hash_Store(ivars->counts, field, (Obj*)Str_newf("%i32", count));

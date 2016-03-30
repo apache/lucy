@@ -166,8 +166,8 @@ DefDelReader_Read_Deletions_IMP(DefaultDeletionsReader *self) {
     // Start with deletions files in the most recently added segments and work
     // backwards.  The first one we find which addresses our segment is the
     // one we need.
-    for (int32_t i = Vec_Get_Size(segments) - 1; i >= 0; i--) {
-        Segment *other_seg = (Segment*)Vec_Fetch(segments, i);
+    for (int32_t i = (int32_t)Vec_Get_Size(segments) - 1; i >= 0; i--) {
+        Segment *other_seg = (Segment*)Vec_Fetch(segments, (size_t)i);
         Hash *metadata
             = (Hash*)Seg_Fetch_Metadata_Utf8(other_seg, "deletions", 9);
         if (metadata) {

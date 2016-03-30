@@ -103,7 +103,7 @@ S_first_non_null(Vector *array) {
 static void
 S_init_sub_readers(PolyReader *self, Vector *sub_readers) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
-    uint32_t  num_sub_readers = Vec_Get_Size(sub_readers);
+    size_t   num_sub_readers = Vec_Get_Size(sub_readers);
     int32_t *starts = (int32_t*)MALLOCATE(num_sub_readers * sizeof(int32_t));
     Hash  *data_readers = Hash_new(0);
 
@@ -113,7 +113,7 @@ S_init_sub_readers(PolyReader *self, Vector *sub_readers) {
 
     // Accumulate doc_max, subreader start offsets, and DataReaders.
     ivars->doc_max = 0;
-    for (uint32_t i = 0; i < num_sub_readers; i++) {
+    for (size_t i = 0; i < num_sub_readers; i++) {
         SegReader *seg_reader = (SegReader*)Vec_Fetch(sub_readers, i);
         Hash *components = SegReader_Get_Components(seg_reader);
         starts[i] = ivars->doc_max;
@@ -131,7 +131,7 @@ S_init_sub_readers(PolyReader *self, Vector *sub_readers) {
         }
         DECREF(iter);
     }
-    ivars->offsets = I32Arr_new_steal(starts, num_sub_readers);
+    ivars->offsets = I32Arr_new_steal(starts, (uint32_t)num_sub_readers);
 
     HashIterator *iter = HashIter_new(data_readers);
     while (HashIter_Next(iter)) {

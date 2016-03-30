@@ -139,7 +139,7 @@ IxSearcher_Collect_IMP(IndexSearcher *self, Query *query, Collector *collector) 
                                                Query_Get_Boost(query), false);
 
     // Accumulate hits into the Collector.
-    for (uint32_t i = 0, max = Vec_Get_Size(seg_readers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(seg_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)Vec_Fetch(seg_readers, i);
         DeletionsReader *del_reader = (DeletionsReader*)SegReader_Fetch(
                                           seg_reader,
@@ -147,7 +147,7 @@ IxSearcher_Collect_IMP(IndexSearcher *self, Query *query, Collector *collector) 
         Matcher *matcher
             = Compiler_Make_Matcher(compiler, seg_reader, need_score);
         if (matcher) {
-            int32_t  seg_start = I32Arr_Get(seg_starts, i);
+            int32_t  seg_start = I32Arr_Get(seg_starts, (uint32_t)i);
             Matcher *deletions = DelReader_Iterator(del_reader);
             Coll_Set_Reader(collector, seg_reader);
             Coll_Set_Base(collector, seg_start);

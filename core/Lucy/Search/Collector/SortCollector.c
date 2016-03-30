@@ -89,7 +89,7 @@ SortColl_init(SortCollector *self, Schema *schema, SortSpec *sort_spec,
     Vector *rules = sort_spec
                     ? (Vector*)INCREF(SortSpec_Get_Rules(sort_spec))
                     : S_default_sort_rules();
-    uint32_t num_rules = Vec_Get_Size(rules);
+    uint32_t num_rules = (uint32_t)Vec_Get_Size(rules);
 
     // Validate.
     if (sort_spec && !schema) {

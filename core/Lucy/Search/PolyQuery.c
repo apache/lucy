@@ -70,7 +70,7 @@ PolyQuery_Get_Children_IMP(PolyQuery *self) {
 void
 PolyQuery_Serialize_IMP(PolyQuery *self, OutStream *outstream) {
     PolyQueryIVARS *const ivars = PolyQuery_IVARS(self);
-    const uint32_t num_kids = Vec_Get_Size(ivars->children);
+    const uint32_t num_kids = (uint32_t)Vec_Get_Size(ivars->children);
     OutStream_Write_F32(outstream, ivars->boost);
     OutStream_Write_U32(outstream, num_kids);
     for (uint32_t i = 0; i < num_kids; i++) {

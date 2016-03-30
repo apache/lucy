@@ -350,7 +350,7 @@ PhraseCompiler_Highlight_Spans_IMP(PhraseCompiler *self, Searcher *searcher,
         = PhraseQuery_IVARS((PhraseQuery*)ivars->parent);
     Vector *const      terms     = parent_ivars->terms;
     Vector *const      spans     = Vec_new(0);
-    const uint32_t     num_terms = Vec_Get_Size(terms);
+    const uint32_t     num_terms = (uint32_t)Vec_Get_Size(terms);
     UNUSED_VAR(searcher);
 
     // Bail if no terms or field doesn't match.
@@ -395,7 +395,7 @@ PhraseCompiler_Highlight_Spans_IMP(PhraseCompiler *self, Searcher *searcher,
     }
 
     // Proceed only if all terms are present.
-    uint32_t num_tvs = Vec_Get_Size(term_vectors);
+    uint32_t num_tvs = (uint32_t)Vec_Get_Size(term_vectors);
     if (num_tvs == num_terms) {
         TermVector *first_tv = (TermVector*)Vec_Fetch(term_vectors, 0);
         TermVector *last_tv

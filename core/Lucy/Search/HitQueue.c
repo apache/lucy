@@ -48,7 +48,7 @@ HitQ_init(HitQueue *self, Schema *schema, SortSpec *sort_spec,
     HitQueueIVARS *const ivars = HitQ_IVARS(self);
     if (sort_spec) {
         Vector   *rules      = SortSpec_Get_Rules(sort_spec);
-        uint32_t  num_rules  = Vec_Get_Size(rules);
+        uint32_t  num_rules  = (uint32_t)Vec_Get_Size(rules);
         uint32_t  action_num = 0;
 
         if (!schema) {

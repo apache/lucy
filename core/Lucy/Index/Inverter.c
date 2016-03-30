@@ -80,7 +80,7 @@ Inverter_Iterate_IMP(Inverter *self) {
         Vec_Sort(ivars->entries);
         ivars->sorted = true;
     }
-    return Vec_Get_Size(ivars->entries);
+    return (uint32_t)Vec_Get_Size(ivars->entries);
 }
 
 int32_t
