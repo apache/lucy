@@ -58,9 +58,13 @@ lucy_RegexTokenizer_init(lucy_RegexTokenizer *self,
 #if (PERL_VERSION > 10)
     REGEXP *rx = SvRX((SV*)token_re);
 #else
+    if (!SvROK(token_re)) {
+        THROW(CFISH_ERR, "token_re is not a qr// entity");
+    }
+    SV *inner = SvRV(token_re);
     MAGIC *magic = NULL;
-    if (SvMAGICAL((SV*)token_re)) {
-        magic = mg_find((SV*)token_re, PERL_MAGIC_qr);
+    if (SvMAGICAL((SV*)inner)) {
+        magic = mg_find((SV*)inner, PERL_MAGIC_qr);
     }
     if (!magic) {
         THROW(CFISH_ERR, "token_re is not a qr// entity");
