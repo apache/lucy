@@ -61,7 +61,7 @@ PolyDelReader_init(PolyDeletionsReader *self, Vector *readers,
     DelReader_init((DeletionsReader*)self, NULL, NULL, NULL, NULL, -1);
     PolyDeletionsReaderIVARS *const ivars = PolyDelReader_IVARS(self);
     ivars->del_count = 0;
-    for (uint32_t i = 0, max = Vec_Get_Size(readers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(readers); i < max; i++) {
         DeletionsReader *reader = (DeletionsReader*)CERTIFY(
                                       Vec_Fetch(readers, i), DELETIONSREADER);
         ivars->del_count += DelReader_Del_Count(reader);
@@ -75,7 +75,7 @@ void
 PolyDelReader_Close_IMP(PolyDeletionsReader *self) {
     PolyDeletionsReaderIVARS *const ivars = PolyDelReader_IVARS(self);
     if (ivars->readers) {
-        for (uint32_t i = 0, max = Vec_Get_Size(ivars->readers); i < max; i++) {
+        for (size_t i = 0, max = Vec_Get_Size(ivars->readers); i < max; i++) {
             DeletionsReader *reader
                 = (DeletionsReader*)Vec_Fetch(ivars->readers, i);
             if (reader) { DelReader_Close(reader); }
@@ -102,9 +102,9 @@ PolyDelReader_Iterator_IMP(PolyDeletionsReader *self) {
     PolyDeletionsReaderIVARS *const ivars = PolyDelReader_IVARS(self);
     SeriesMatcher *deletions = NULL;
     if (ivars->del_count) {
-        uint32_t num_readers = Vec_Get_Size(ivars->readers);
+        size_t num_readers = Vec_Get_Size(ivars->readers);
         Vector *matchers = Vec_new(num_readers);
-        for (uint32_t i = 0; i < num_readers; i++) {
+        for (size_t i = 0; i < num_readers; i++) {
             DeletionsReader *reader
                 = (DeletionsReader*)Vec_Fetch(ivars->readers, i);
             Matcher *matcher = DelReader_Iterator(reader);
@@ -166,8 +166,8 @@ DefDelReader_Read_Deletions_IMP(DefaultDeletionsReader *self) {
     // Start with deletions files in the most recently added segments and work
     // backwards.  The first one we find which addresses our segment is the
     // one we need.
-    for (int32_t i = Vec_Get_Size(segments) - 1; i >= 0; i--) {
-        Segment *other_seg = (Segment*)Vec_Fetch(segments, i);
+    for (int32_t i = (int32_t)Vec_Get_Size(segments) - 1; i >= 0; i--) {
+        Segment *other_seg = (Segment*)Vec_Fetch(segments, (size_t)i);
         Hash *metadata
             = (Hash*)Seg_Fetch_Metadata_Utf8(other_seg, "deletions", 9);
         if (metadata) {

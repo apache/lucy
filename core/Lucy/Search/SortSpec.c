@@ -37,7 +37,7 @@ SortSpec*
 SortSpec_init(SortSpec *self, Vector *rules) {
     SortSpecIVARS *const ivars = SortSpec_IVARS(self);
     ivars->rules = Vec_Clone(rules);
-    for (int32_t i = 0, max = Vec_Get_Size(rules); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(rules); i < max; i++) {
         SortRule *rule = (SortRule*)Vec_Fetch(rules, i);
         CERTIFY(rule, SORTRULE);
     }
@@ -75,7 +75,7 @@ SortSpec_Get_Rules_IMP(SortSpec *self) {
 void
 SortSpec_Serialize_IMP(SortSpec *self, OutStream *target) {
     SortSpecIVARS *const ivars = SortSpec_IVARS(self);
-    uint32_t num_rules = Vec_Get_Size(ivars->rules);
+    uint32_t num_rules = (uint32_t)Vec_Get_Size(ivars->rules);
     OutStream_Write_C32(target, num_rules);
     for (uint32_t i = 0; i < num_rules; i++) {
         SortRule *rule = (SortRule*)Vec_Fetch(ivars->rules, i);

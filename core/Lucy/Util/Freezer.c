@@ -229,7 +229,7 @@ Freezer_read_blob(InStream *instream) {
 void
 Freezer_serialize_varray(Vector *array, OutStream *outstream) {
     uint32_t last_valid_tick = 0;
-    size_t size = Vec_Get_Size(array);
+    uint32_t size = (uint32_t)Vec_Get_Size(array);
     OutStream_Write_C32(outstream, size);
     for (uint32_t i = 0; i < size; i++) {
         Obj *elem = Vec_Fetch(array, i);
@@ -307,7 +307,7 @@ Freezer_read_hash(InStream *instream) {
 static Obj*
 S_dump_array(Vector *array) {
     Vector *dump = Vec_new(Vec_Get_Size(array));
-    for (uint32_t i = 0, max = Vec_Get_Size(array); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(array); i < max; i++) {
         Obj *elem = Vec_Fetch(array, i);
         if (elem) {
             Vec_Store(dump, i, Freezer_dump(elem));
@@ -451,7 +451,7 @@ Obj*
 S_load_from_array(Vector *dump) {
     Vector *loaded = Vec_new(Vec_Get_Size(dump));
 
-    for (uint32_t i = 0, max = Vec_Get_Size(dump); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(dump); i < max; i++) {
         Obj *elem_dump = Vec_Fetch(dump, i);
         if (elem_dump) {
             Vec_Store(loaded, i, Freezer_load(elem_dump));

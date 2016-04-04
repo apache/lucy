@@ -36,17 +36,17 @@ PolyLex_new(String *field, Vector *sub_readers) {
 
 PolyLexicon*
 PolyLex_init(PolyLexicon *self, String *field, Vector *sub_readers) {
-    uint32_t  num_sub_readers = Vec_Get_Size(sub_readers);
+    size_t    num_sub_readers = Vec_Get_Size(sub_readers);
     Vector   *seg_lexicons    = Vec_new(num_sub_readers);
 
     // Init.
     Lex_init((Lexicon*)self, field);
     PolyLexiconIVARS *const ivars = PolyLex_IVARS(self);
     ivars->term            = NULL;
-    ivars->lex_q           = SegLexQ_new(num_sub_readers);
+    ivars->lex_q           = SegLexQ_new((uint32_t)num_sub_readers);
 
     // Derive.
-    for (uint32_t i = 0; i < num_sub_readers; i++) {
+    for (size_t i = 0; i < num_sub_readers; i++) {
         LexiconReader *lex_reader = (LexiconReader*)Vec_Fetch(sub_readers, i);
         if (lex_reader && CERTIFY(lex_reader, LEXICONREADER)) {
             Lexicon *seg_lexicon = LexReader_Lexicon(lex_reader, field, NULL);
@@ -81,7 +81,7 @@ S_refresh_lex_q(SegLexQueue *lex_q, Vector *seg_lexicons, Obj *target) {
     }
 
     // Refill the queue.
-    for (uint32_t i = 0, max = Vec_Get_Size(seg_lexicons); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(seg_lexicons); i < max; i++) {
         SegLexicon *const seg_lexicon
             = (SegLexicon*)Vec_Fetch(seg_lexicons, i);
         SegLex_Seek(seg_lexicon, target);
@@ -95,7 +95,6 @@ void
 PolyLex_Reset_IMP(PolyLexicon *self) {
     PolyLexiconIVARS *const ivars = PolyLex_IVARS(self);
     Vector *seg_lexicons = ivars->seg_lexicons;
-    uint32_t num_segs = Vec_Get_Size(seg_lexicons);
     SegLexQueue *lex_q = ivars->lex_q;
 
     // Empty out the queue.
@@ -106,7 +105,7 @@ PolyLex_Reset_IMP(PolyLexicon *self) {
     }
 
     // Fill the queue with valid SegLexicons.
-    for (uint32_t i = 0; i < num_segs; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(seg_lexicons); i < max; i++) {
         SegLexicon *const seg_lexicon
             = (SegLexicon*)Vec_Fetch(seg_lexicons, i);
         SegLex_Reset(seg_lexicon);
@@ -193,7 +192,7 @@ PolyLex_Get_Term_IMP(PolyLexicon *self) {
 uint32_t
 PolyLex_Get_Num_Seg_Lexicons_IMP(PolyLexicon *self) {
     PolyLexiconIVARS *const ivars = PolyLex_IVARS(self);
-    return Vec_Get_Size(ivars->seg_lexicons);
+    return (uint32_t)Vec_Get_Size(ivars->seg_lexicons);
 }
 
 SegLexQueue*

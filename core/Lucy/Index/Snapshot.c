@@ -141,7 +141,7 @@ Snapshot_Read_File_IMP(Snapshot *self, Folder *folder, String *path) {
             list = cleaned;
         }
         Hash_Clear(ivars->entries);
-        for (uint32_t i = 0, max = Vec_Get_Size(list); i < max; i++) {
+        for (size_t i = 0, max = Vec_Get_Size(list); i < max; i++) {
             String *entry
                 = (String*)CERTIFY(Vec_Fetch(list, i), STRING);
             Hash_Store(ivars->entries, entry, (Obj*)CFISH_TRUE);
@@ -160,7 +160,7 @@ S_clean_segment_contents(Vector *orig) {
     // within segment directories being listed.  Filter these files because
     // they cause a problem with FilePurger.
     Vector *cleaned = Vec_new(Vec_Get_Size(orig));
-    for (uint32_t i = 0, max = Vec_Get_Size(orig); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(orig); i < max; i++) {
         String *name = (String*)Vec_Fetch(orig, i);
         if (!Seg_valid_seg_name(name)) {
             if (Str_Starts_With_Utf8(name, "seg_", 4)) {

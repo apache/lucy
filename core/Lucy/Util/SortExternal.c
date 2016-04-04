@@ -163,7 +163,7 @@ void
 SortEx_Add_Run_IMP(SortExternal *self, SortExternal *run) {
     SortExternalIVARS *const ivars = SortEx_IVARS(self);
     Vec_Push(ivars->runs, (Obj*)run);
-    uint32_t num_runs = Vec_Get_Size(ivars->runs);
+    size_t num_runs = Vec_Get_Size(ivars->runs);
     ivars->slice_sizes
         = (uint32_t*)REALLOCATE(ivars->slice_sizes,
                                 num_runs * sizeof(uint32_t));
@@ -197,7 +197,7 @@ SortEx_Shrink_IMP(SortExternal *self) {
     FREEMEM(ivars->scratch);
     ivars->scratch = NULL;
 
-    for (uint32_t i = 0, max = Vec_Get_Size(ivars->runs); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(ivars->runs); i < max; i++) {
         SortExternal *run = (SortExternal*)Vec_Fetch(ivars->runs, i);
         SortEx_Shrink(run);
     }
@@ -231,7 +231,7 @@ static Obj**
 S_find_endpost(SortExternal *self, SortExternalIVARS *ivars) {
     Obj **endpost = NULL;
 
-    for (uint32_t i = 0, max = Vec_Get_Size(ivars->runs); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(ivars->runs); i < max; i++) {
         // Get a run and retrieve the last item in its buffer.
         SortExternal *const run = (SortExternal*)Vec_Fetch(ivars->runs, i);
         SortExternalIVARS *const run_ivars = SortEx_IVARS(run);
@@ -262,7 +262,7 @@ S_find_endpost(SortExternal *self, SortExternalIVARS *ivars) {
 static void
 S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
                 Obj **endpost) {
-    uint32_t    num_runs     = Vec_Get_Size(ivars->runs);
+    size_t      num_runs     = Vec_Get_Size(ivars->runs);
     Obj      ***slice_starts = ivars->slice_starts;
     uint32_t   *slice_sizes  = ivars->slice_sizes;
     Class      *klass        = SortEx_get_class(self);
@@ -273,7 +273,7 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
     // Find non-empty slices.
     uint32_t num_slices = 0;
     uint32_t total_size = 0;
-    for (uint32_t i = 0; i < num_runs; i++) {
+    for (size_t i = 0; i < num_runs; i++) {
         SortExternal *const run = (SortExternal*)Vec_Fetch(ivars->runs, i);
         SortExternalIVARS *const run_ivars = SortEx_IVARS(run);
         uint32_t slice_size = S_find_slice_size(run, run_ivars, endpost);

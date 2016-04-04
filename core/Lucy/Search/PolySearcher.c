@@ -41,7 +41,7 @@ PolySearcher_new(Schema *schema, Vector *searchers) {
 
 PolySearcher*
 PolySearcher_init(PolySearcher *self, Schema *schema, Vector *searchers) {
-    const uint32_t num_searchers = Vec_Get_Size(searchers);
+    const uint32_t num_searchers = (uint32_t)Vec_Get_Size(searchers);
     int32_t *starts_array = (int32_t*)MALLOCATE(num_searchers * sizeof(int32_t));
     int32_t  doc_max      = 0;
 
@@ -182,8 +182,8 @@ PolySearcher_Collect_IMP(PolySearcher *self, Query *query,
     Vector *const searchers = ivars->searchers;
     I32Array *starts = ivars->starts;
 
-    for (uint32_t i = 0, max = Vec_Get_Size(searchers); i < max; i++) {
-        int32_t start = I32Arr_Get(starts, i);
+    for (size_t i = 0, max = Vec_Get_Size(searchers); i < max; i++) {
+        int32_t start = I32Arr_Get(starts, (uint32_t)i);
         Searcher *searcher = (Searcher*)Vec_Fetch(searchers, i);
         OffsetCollector *offset_coll = OffsetColl_new(collector, start);
         Searcher_Collect(searcher, query, (Collector*)offset_coll);

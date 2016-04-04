@@ -96,7 +96,7 @@ FilePurger_Purge_IMP(FilePurger *self) {
         // again later.  Proceed in reverse lexical order so that directories
         // get deleted after they've been emptied.
         Vec_Sort(purgables);
-        for (uint32_t i = Vec_Get_Size(purgables); i--;) {
+        for (size_t i = Vec_Get_Size(purgables); i--;) {
             String *entry = (String*)Vec_Fetch(purgables, i);
             if (Hash_Fetch(ivars->disallowed, entry)) { continue; }
             if (!Folder_Delete(folder, entry)) {
@@ -106,14 +106,14 @@ FilePurger_Purge_IMP(FilePurger *self) {
             }
         }
 
-        for (uint32_t i = 0, max = Vec_Get_Size(snapshots); i < max; i++) {
+        for (size_t i = 0, max = Vec_Get_Size(snapshots); i < max; i++) {
             Snapshot *snapshot = (Snapshot*)Vec_Fetch(snapshots, i);
             bool snapshot_has_failures = false;
             if (Hash_Get_Size(failures)) {
                 // Only delete snapshot files if all of their entries were
                 // successfully deleted.
                 Vector *entries = Snapshot_List(snapshot);
-                for (uint32_t j = Vec_Get_Size(entries); j--;) {
+                for (size_t j = Vec_Get_Size(entries); j--;) {
                     String *entry = (String*)Vec_Fetch(entries, j);
                     if (Hash_Fetch(failures, entry)) {
                         snapshot_has_failures = true;
@@ -230,9 +230,9 @@ S_discover_unused(FilePurger *self, Vector **purgables_ptr,
             if (lock && Lock_Is_Locked(lock)) {
                 // The snapshot file is locked, which means someone's using
                 // that version of the index -- protect all of its entries.
-                uint32_t new_size = Vec_Get_Size(spared)
-                                    + Vec_Get_Size(referenced)
-                                    + 1;
+                size_t new_size = Vec_Get_Size(spared)
+                                  + Vec_Get_Size(referenced)
+                                  + 1;
                 Vec_Grow(spared, new_size);
                 Vec_Push(spared, (Obj*)Str_Clone(entry));
                 Vec_Push_All(spared, referenced);
@@ -240,7 +240,7 @@ S_discover_unused(FilePurger *self, Vector **purgables_ptr,
             else {
                 // No one's using this snapshot, so all of its entries are
                 // candidates for deletion.
-                for (uint32_t i = 0, max = Vec_Get_Size(referenced); i < max; i++) {
+                for (size_t i = 0, max = Vec_Get_Size(referenced); i < max; i++) {
                     String *file = (String*)Vec_Fetch(referenced, i);
                     Hash_Store(candidates, file, (Obj*)CFISH_TRUE);
                 }
@@ -260,7 +260,7 @@ S_discover_unused(FilePurger *self, Vector **purgables_ptr,
     S_zap_dead_merge(self, candidates);
 
     // Eliminate any current files from the list of files to be purged.
-    for (uint32_t i = 0, max = Vec_Get_Size(spared); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(spared); i < max; i++) {
         String *filename = (String*)Vec_Fetch(spared, i);
         DECREF(Hash_Delete(candidates, filename));
     }
@@ -276,12 +276,12 @@ S_discover_unused(FilePurger *self, Vector **purgables_ptr,
 static Vector*
 S_find_all_referenced(Folder *folder, Vector *entries) {
     Hash *uniqued = Hash_new(Vec_Get_Size(entries));
-    for (uint32_t i = 0, max = Vec_Get_Size(entries); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(entries); i < max; i++) {
         String *entry = (String*)Vec_Fetch(entries, i);
         Hash_Store(uniqued, entry, (Obj*)CFISH_TRUE);
         if (Folder_Is_Directory(folder, entry)) {
             Vector *contents = Folder_List_R(folder, entry);
-            for (uint32_t j = Vec_Get_Size(contents); j--;) {
+            for (size_t j = Vec_Get_Size(contents); j--;) {
                 String *sub_entry = (String*)Vec_Fetch(contents, j);
                 Hash_Store(uniqued, sub_entry, (Obj*)CFISH_TRUE);
             }

@@ -119,7 +119,7 @@ Seg_Read_File_IMP(Segment *self, Folder *folder) {
     // Get list of field nums.
     Vector *source_by_num = (Vector*)Hash_Fetch_Utf8(my_metadata,
                                                      "field_names", 11);
-    uint32_t num_fields = source_by_num ? Vec_Get_Size(source_by_num) : 0;
+    size_t num_fields = source_by_num ? Vec_Get_Size(source_by_num) : 0;
     if (source_by_num == NULL) {
         THROW(ERR, "Failed to extract 'field_names' from metadata");
     }
@@ -131,7 +131,7 @@ Seg_Read_File_IMP(Segment *self, Folder *folder) {
     ivars->by_name = Hash_new(num_fields);
 
     // Copy the list of fields from the source.
-    for (uint32_t i = 0; i < num_fields; i++) {
+    for (size_t i = 0; i < num_fields; i++) {
         String *name = (String*)Vec_Fetch(source_by_num, i);
         Seg_Add_Field(self, name);
     }
@@ -166,7 +166,7 @@ Seg_Add_Field_IMP(Segment *self, String *field) {
         return (int32_t)Int_Get_Value(num);
     }
     else {
-        int32_t field_num = Vec_Get_Size(ivars->by_num);
+        int32_t field_num = (int32_t)Vec_Get_Size(ivars->by_num);
         Hash_Store(ivars->by_name, field, (Obj*)Int_new(field_num));
         Vec_Push(ivars->by_num, (Obj*)Str_Clone(field));
         return field_num;

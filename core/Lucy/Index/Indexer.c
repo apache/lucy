@@ -196,7 +196,7 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
 
     // Add all known fields to Segment.
     Vector *fields = Schema_All_Fields(schema);
-    for (uint32_t i = 0, max = Vec_Get_Size(fields); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(fields); i < max; i++) {
         Seg_Add_Field(ivars->segment, (String*)Vec_Fetch(fields, i));
     }
     DECREF(fields);
@@ -344,14 +344,14 @@ Indexer_Add_Index_IMP(Indexer *self, Obj *index) {
         Schema_Eat(schema, other_schema);
 
         // Add fields to Segment.
-        for (uint32_t i = 0, max = Vec_Get_Size(other_fields); i < max; i++) {
+        for (size_t i = 0, max = Vec_Get_Size(other_fields); i < max; i++) {
             String *other_field = (String*)Vec_Fetch(other_fields, i);
             Seg_Add_Field(ivars->segment, other_field);
         }
         DECREF(other_fields);
 
         // Add all segments.
-        for (uint32_t i = 0, max = Vec_Get_Size(seg_readers); i < max; i++) {
+        for (size_t i = 0, max = Vec_Get_Size(seg_readers); i < max; i++) {
             SegReader *seg_reader = (SegReader*)Vec_Fetch(seg_readers, i);
             DeletionsReader *del_reader
                 = (DeletionsReader*)SegReader_Fetch(
@@ -383,7 +383,7 @@ static String*
 S_find_schema_file(Snapshot *snapshot) {
     Vector *files = Snapshot_List(snapshot);
     String *retval = NULL;
-    for (uint32_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
         String *file = (String*)Vec_Fetch(files, i);
         if (Str_Starts_With_Utf8(file, "schema_", 7)
             && Str_Ends_With_Utf8(file, ".json", 5)
@@ -400,7 +400,7 @@ static bool
 S_maybe_merge(Indexer *self, Vector *seg_readers) {
     IndexerIVARS *const ivars = Indexer_IVARS(self);
     bool      merge_happened  = false;
-    uint32_t  num_seg_readers = Vec_Get_Size(seg_readers);
+    size_t    num_seg_readers = Vec_Get_Size(seg_readers);
     Lock     *merge_lock      = IxManager_Make_Merge_Lock(ivars->manager);
     bool      got_merge_lock  = Lock_Obtain(merge_lock);
     int64_t   cutoff;
@@ -434,7 +434,7 @@ S_maybe_merge(Indexer *self, Vector *seg_readers) {
                                          ivars->del_writer, cutoff, ivars->optimize);
 
     Hash *seen = Hash_new(Vec_Get_Size(to_merge));
-    for (uint32_t i = 0, max = Vec_Get_Size(to_merge); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(to_merge); i < max; i++) {
         SegReader *seg_reader
             = (SegReader*)CERTIFY(Vec_Fetch(to_merge, i), SEGREADER);
         String *seg_name = SegReader_Get_Seg_Name(seg_reader);
@@ -449,7 +449,7 @@ S_maybe_merge(Indexer *self, Vector *seg_readers) {
     DECREF(seen);
 
     // Consolidate segments if either sparse or optimizing forced.
-    for (uint32_t i = 0, max = Vec_Get_Size(to_merge); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(to_merge); i < max; i++) {
         SegReader *seg_reader = (SegReader*)Vec_Fetch(to_merge, i);
         int64_t seg_num = SegReader_Get_Seg_Num(seg_reader);
         Matcher *deletions
@@ -484,7 +484,7 @@ void
 Indexer_Prepare_Commit_IMP(Indexer *self) {
     IndexerIVARS *const ivars = Indexer_IVARS(self);
     Vector   *seg_readers     = PolyReader_Get_Seg_Readers(ivars->polyreader);
-    uint32_t  num_seg_readers = Vec_Get_Size(seg_readers);
+    size_t    num_seg_readers = Vec_Get_Size(seg_readers);
     bool      merge_happened  = false;
 
     if (!ivars->write_lock || ivars->prepared) {

@@ -61,13 +61,13 @@ ORQuery_Equals_IMP(ORQuery *self, Obj *other) {
 String*
 ORQuery_To_String_IMP(ORQuery *self) {
     ORQueryIVARS *const ivars = ORQuery_IVARS(self);
-    uint32_t num_kids = Vec_Get_Size(ivars->children);
+    size_t num_kids = Vec_Get_Size(ivars->children);
     if (!num_kids) { return Str_new_from_trusted_utf8("()", 2); }
     else {
         CharBuf *buf = CB_new(0);
         CB_Cat_Trusted_Utf8(buf, "(", 1);
-        uint32_t last_kid = num_kids - 1;
-        for (uint32_t i = 0; i < num_kids; i++) {
+        size_t last_kid = num_kids - 1;
+        for (size_t i = 0; i < num_kids; i++) {
             String *kid_string = Obj_To_String(Vec_Fetch(ivars->children, i));
             CB_Cat(buf, kid_string);
             DECREF(kid_string);
@@ -104,7 +104,7 @@ Matcher*
 ORCompiler_Make_Matcher_IMP(ORCompiler *self, SegReader *reader,
                             bool need_score) {
     ORCompilerIVARS *const ivars = ORCompiler_IVARS(self);
-    uint32_t num_kids = Vec_Get_Size(ivars->children);
+    size_t num_kids = Vec_Get_Size(ivars->children);
 
     if (num_kids == 1) {
         // No need for an ORMatcher wrapper.
@@ -116,7 +116,7 @@ ORCompiler_Make_Matcher_IMP(ORCompiler *self, SegReader *reader,
         uint32_t num_submatchers = 0;
 
         // Accumulate sub-matchers.
-        for (uint32_t i = 0; i < num_kids; i++) {
+        for (size_t i = 0; i < num_kids; i++) {
             Compiler *child = (Compiler*)Vec_Fetch(ivars->children, i);
             Matcher *submatcher
                 = Compiler_Make_Matcher(child, reader, need_score);

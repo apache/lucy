@@ -127,7 +127,7 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager) {
         = IxManager_Highest_Seg_Num(ivars->manager, ivars->snapshot) + 1;
     Vector *fields = Schema_All_Fields(ivars->schema);
     ivars->segment = Seg_new(new_seg_num);
-    for (uint32_t i = 0, max = Vec_Get_Size(fields); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(fields); i < max; i++) {
         Seg_Add_Field(ivars->segment, (String*)Vec_Fetch(fields, i));
     }
     DECREF(fields);
@@ -203,12 +203,12 @@ BGMerger_Optimize_IMP(BackgroundMerger *self) {
     BGMerger_IVARS(self)->optimize = true;
 }
 
-static uint32_t
+static size_t
 S_maybe_merge(BackgroundMerger *self) {
     BackgroundMergerIVARS *const ivars = BGMerger_IVARS(self);
     Vector *to_merge = IxManager_Recycle(ivars->manager, ivars->polyreader,
                                          ivars->del_writer, 0, ivars->optimize);
-    int32_t num_to_merge = Vec_Get_Size(to_merge);
+    size_t num_to_merge = Vec_Get_Size(to_merge);
 
     // There's no point in merging one segment if it has no deletions, because
     // we'd just be rewriting it. */
@@ -228,7 +228,7 @@ S_maybe_merge(BackgroundMerger *self) {
     SegWriter_Prep_Seg_Dir(ivars->seg_writer);
 
     // Consolidate segments.
-    for (uint32_t i = 0, max = num_to_merge; i < max; i++) {
+    for (size_t i = 0, max = num_to_merge; i < max; i++) {
         SegReader *seg_reader = (SegReader*)Vec_Fetch(to_merge, i);
         String    *seg_name   = SegReader_Get_Seg_Name(seg_reader);
         int64_t    doc_count  = Seg_Get_Count(ivars->segment);
@@ -261,13 +261,13 @@ S_merge_updated_deletions(BackgroundMerger *self) {
         = PolyReader_Get_Seg_Readers(ivars->polyreader);
     Hash *new_segs = Hash_new(Vec_Get_Size(new_seg_readers));
 
-    for (uint32_t i = 0, max = Vec_Get_Size(new_seg_readers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(new_seg_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)Vec_Fetch(new_seg_readers, i);
         String    *seg_name   = SegReader_Get_Seg_Name(seg_reader);
         Hash_Store(new_segs, seg_name, INCREF(seg_reader));
     }
 
-    for (uint32_t i = 0, max = Vec_Get_Size(old_seg_readers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(old_seg_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)Vec_Fetch(old_seg_readers, i);
         String    *seg_name   = SegReader_Get_Seg_Name(seg_reader);
 
@@ -319,12 +319,12 @@ S_merge_updated_deletions(BackgroundMerger *self) {
 
         SegWriter_Prep_Seg_Dir(seg_writer);
 
-        for (uint32_t i = 0, max = Vec_Get_Size(merge_seg_readers); i < max; i++) {
+        for (size_t i = 0, max = Vec_Get_Size(merge_seg_readers); i < max; i++) {
             SegReader *seg_reader
                 = (SegReader*)Vec_Fetch(merge_seg_readers, i);
             if (SegReader_Get_Seg_Num(seg_reader) == merge_seg_num) {
                 I32Array *offsets = PolyReader_Offsets(merge_polyreader);
-                seg_tick = i;
+                seg_tick = (uint32_t)i;
                 offset = I32Arr_Get(offsets, seg_tick);
                 DECREF(offsets);
             }
@@ -372,8 +372,8 @@ void
 BGMerger_Prepare_Commit_IMP(BackgroundMerger *self) {
     BackgroundMergerIVARS *const ivars = BGMerger_IVARS(self);
     Vector   *seg_readers     = PolyReader_Get_Seg_Readers(ivars->polyreader);
-    uint32_t  num_seg_readers = Vec_Get_Size(seg_readers);
-    uint32_t  segs_merged     = 0;
+    size_t    num_seg_readers = Vec_Get_Size(seg_readers);
+    size_t    segs_merged     = 0;
 
     if (ivars->prepared) {
         THROW(ERR, "Can't call Prepare_Commit() more than once");
@@ -443,7 +443,7 @@ BGMerger_Prepare_Commit_IMP(BackgroundMerger *self) {
             // run this AFTER S_merge_updated_deletions, because otherwise
             // we couldn't tell whether the deletion counts changed.)
             Vector *files = Snapshot_List(latest_snapshot);
-            for (uint32_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
+            for (size_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
                 String *file = (String*)Vec_Fetch(files, i);
                 if (Str_Starts_With_Utf8(file, "seg_", 4)) {
                     int64_t gen = (int64_t)IxFileNames_extract_gen(file);

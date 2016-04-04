@@ -85,7 +85,7 @@ Schema_Destroy_IMP(Schema *self) {
 static void
 S_add_unique(Vector *array, Obj *elem) {
     if (!elem) { return; }
-    for (uint32_t i = 0, max = Vec_Get_Size(array); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(array); i < max; i++) {
         Obj *candidate = Vec_Fetch(array, i);
         if (!candidate) { continue; }
         if (elem == candidate) { return; }
@@ -229,9 +229,9 @@ Schema_All_Fields_IMP(Schema *self) {
     return Hash_Keys(Schema_IVARS(self)->types);
 }
 
-uint32_t
+size_t
 S_find_in_array(Vector *array, Obj *obj) {
-    for (uint32_t i = 0, max = Vec_Get_Size(array); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(array); i < max; i++) {
         Obj *candidate = Vec_Fetch(array, i);
         if (obj == NULL && candidate == NULL) {
             return i;
@@ -245,7 +245,7 @@ S_find_in_array(Vector *array, Obj *obj) {
         }
     }
     THROW(ERR, "Couldn't find match for %o", obj);
-    UNREACHABLE_RETURN(uint32_t);
+    UNREACHABLE_RETURN(size_t);
 }
 
 Hash*
@@ -273,12 +273,12 @@ Schema_Dump_IMP(Schema *self) {
             FullTextType *fttype = (FullTextType*)type;
             Hash *type_dump = FullTextType_Dump_For_Schema(fttype);
             Analyzer *analyzer = FullTextType_Get_Analyzer(fttype);
-            uint32_t tick
+            size_t tick
                 = S_find_in_array(ivars->uniq_analyzers, (Obj*)analyzer);
 
             // Store the tick which references a unique analyzer.
             Hash_Store_Utf8(type_dump, "analyzer", 8,
-                            (Obj*)Str_newf("%u32", tick));
+                            (Obj*)Str_newf("%u64", (uint64_t)tick));
 
             Hash_Store(type_dumps, field, (Obj*)type_dump);
         }

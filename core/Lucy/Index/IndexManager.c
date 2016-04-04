@@ -72,7 +72,7 @@ IxManager_Highest_Seg_Num_IMP(IndexManager *self, Snapshot *snapshot) {
     Vector *files = Snapshot_List(snapshot);
     uint64_t highest_seg_num = 0;
     UNUSED_VAR(self);
-    for (uint32_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
         String *file = (String*)Vec_Fetch(files, i);
         if (Seg_valid_seg_name(file)) {
             uint64_t seg_num = IxFileNames_extract_gen(file);

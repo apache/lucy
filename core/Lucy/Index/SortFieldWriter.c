@@ -483,7 +483,7 @@ void
 SortFieldWriter_Flip_IMP(SortFieldWriter *self) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
     uint32_t num_items = SortFieldWriter_Buffer_Count(self);
-    uint32_t num_runs = Vec_Get_Size(ivars->runs);
+    size_t   num_runs = Vec_Get_Size(ivars->runs);
 
     if (ivars->flipped) { THROW(ERR, "Can't call Flip() twice"); }
     ivars->flipped = true;
@@ -491,7 +491,7 @@ SortFieldWriter_Flip_IMP(SortFieldWriter *self) {
     // Sanity check.
     if (num_runs && num_items) {
         THROW(ERR, "Sanity check failed: num_runs: %u32 num_items: %u32",
-              num_runs, num_items);
+              (uint32_t)num_runs, num_items);
     }
 
     if (num_items) {
@@ -518,7 +518,7 @@ SortFieldWriter_Flip_IMP(SortFieldWriter *self) {
         // Assign streams and a slice of mem_thresh.
         size_t sub_thresh = ivars->mem_thresh / num_runs;
         if (sub_thresh < 65536) { sub_thresh = 65536; }
-        for (uint32_t i = 0; i < num_runs; i++) {
+        for (size_t i = 0; i < num_runs; i++) {
             SortFieldWriter *run = (SortFieldWriter*)Vec_Fetch(ivars->runs, i);
             S_flip_run(run, sub_thresh, ivars->ord_in, ivars->ix_in,
                        ivars->dat_in);

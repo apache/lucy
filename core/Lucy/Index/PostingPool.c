@@ -174,7 +174,7 @@ PostPool_Get_Mem_Pool_IMP(PostingPool *self) {
 void
 PostPool_Flip_IMP(PostingPool *self) {
     PostingPoolIVARS *const ivars = PostPool_IVARS(self);
-    uint32_t num_runs   = Vec_Get_Size(ivars->runs);
+    size_t   num_runs   = Vec_Get_Size(ivars->runs);
     uint32_t sub_thresh = num_runs > 0
                           ? ivars->mem_thresh / num_runs
                           : ivars->mem_thresh;
@@ -217,7 +217,7 @@ PostPool_Flip_IMP(PostingPool *self) {
     }
 
     // Assign.
-    for (uint32_t i = 0; i < num_runs; i++) {
+    for (size_t i = 0; i < num_runs; i++) {
         PostingPool *run = (PostingPool*)Vec_Fetch(ivars->runs, i);
         if (run != NULL) {
             PostPool_Set_Mem_Thresh(run, sub_thresh);

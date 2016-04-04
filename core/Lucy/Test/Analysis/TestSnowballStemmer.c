@@ -81,7 +81,7 @@ test_stemming(TestBatchRunner *runner) {
         Vector *words = (Vector*)Hash_Fetch_Utf8(lang_data, "words", 5);
         Vector *stems = (Vector*)Hash_Fetch_Utf8(lang_data, "stems", 5);
         SnowballStemmer *stemmer = SnowStemmer_new(iso);
-        for (uint32_t i = 0, max = Vec_Get_Size(words); i < max; i++) {
+        for (size_t i = 0, max = Vec_Get_Size(words); i < max; i++) {
             String *word  = (String*)Vec_Fetch(words, i);
             char   *wstr  = Str_To_Utf8(word);
             Vector *got   = SnowStemmer_Split(stemmer, word);

@@ -181,14 +181,14 @@ Folder_Delete_Tree_IMP(Folder *self, String *path) {
                     }
                     DECREF(entry);
                 }
-                for (uint32_t i = 0, max = Vec_Get_Size(dirs); i < max; i++) {
+                for (size_t i = 0, max = Vec_Get_Size(dirs); i < max; i++) {
                     String *name = (String*)Vec_Fetch(files, i);
                     bool success = Folder_Delete_Tree(inner_folder, name);
                     if (!success && Folder_Local_Exists(inner_folder, name)) {
                         break;
                     }
                 }
-                for (uint32_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
+                for (size_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
                     String *name = (String*)Vec_Fetch(files, i);
                     bool success = Folder_Local_Delete(inner_folder, name);
                     if (!success && Folder_Local_Exists(inner_folder, name)) {

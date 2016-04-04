@@ -61,7 +61,7 @@ PolyHLReader_init(PolyHighlightReader *self, Vector *readers,
                   I32Array *offsets) {
     HLReader_init((HighlightReader*)self, NULL, NULL, NULL, NULL, -1);
     PolyHighlightReaderIVARS *const ivars = PolyHLReader_IVARS(self);
-    for (uint32_t i = 0, max = Vec_Get_Size(readers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(readers); i < max; i++) {
         CERTIFY(Vec_Fetch(readers, i), HIGHLIGHTREADER);
     }
     ivars->readers = (Vector*)INCREF(readers);
@@ -73,7 +73,7 @@ void
 PolyHLReader_Close_IMP(PolyHighlightReader *self) {
     PolyHighlightReaderIVARS *const ivars = PolyHLReader_IVARS(self);
     if (ivars->readers) {
-        for (uint32_t i = 0, max = Vec_Get_Size(ivars->readers); i < max; i++) {
+        for (size_t i = 0, max = Vec_Get_Size(ivars->readers); i < max; i++) {
             HighlightReader *sub_reader
                 = (HighlightReader*)Vec_Fetch(ivars->readers, i);
             if (sub_reader) { HLReader_Close(sub_reader); }

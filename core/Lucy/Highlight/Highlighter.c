@@ -200,7 +200,7 @@ S_hottest(HeatMap *heat_map) {
     float max_score = 0.0f;
     int32_t retval = 0;
     Vector *spans = HeatMap_Get_Spans(heat_map);
-    for (uint32_t i = Vec_Get_Size(spans); i--;) {
+    for (size_t i = Vec_Get_Size(spans); i--;) {
         Span *span = (Span*)Vec_Fetch(spans, i);
         if (Span_Get_Weight(span) >= max_score) {
             retval = Span_Get_Offset(span);
@@ -477,7 +477,7 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, Vector *spans,
     CharBuf        *encode_buf      = NULL;
     int32_t         raw_excerpt_end = top + Str_Length(raw_excerpt);
 
-    for (uint32_t i = 0, max = Vec_Get_Size(spans); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(spans); i < max; i++) {
         Span *span = (Span*)Vec_Fetch(spans, i);
         int32_t offset = Span_Get_Offset(span);
         if (offset < top) {
