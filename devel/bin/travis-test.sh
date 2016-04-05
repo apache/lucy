@@ -39,7 +39,9 @@ test_c() {
 }
 
 test_perl() {
+    source ~/perl5/perlbrew/etc/bashrc
     perlbrew switch $PERL_VERSION
+    perlbrew list
     export PERL5LIB="$install_dir/lib/perl5"
 
     # Install Clownfish.
