@@ -18,35 +18,35 @@ parcel Lucy;
 
 public class Lucy::Object::I32Array nickname I32Arr inherits Clownfish::Obj {
     int32_t  *ints;
-    uint32_t  size;
+    size_t  size;
 
     public inert incremented I32Array*
-    new(int32_t *ints, uint32_t size);
+    new(int32_t *ints, size_t size);
 
     inert incremented I32Array*
-    new_steal(int32_t *ints, uint32_t size);
+    new_steal(int32_t *ints, size_t size);
 
     public inert incremented I32Array*
-    new_blank(uint32_t size);
+    new_blank(size_t size);
 
     public inert I32Array*
-    init(I32Array *self, int32_t *ints, uint32_t size);
+    init(I32Array *self, int32_t *ints, size_t size);
 
     /** Set the value at `tick`, or throw an error if
      * `tick` is out of bounds.
      */
     public void
-    Set(I32Array *self, uint32_t tick, int32_t value);
+    Set(I32Array *self, size_t tick, int32_t value);
 
     /** Return the value at `tick`, or throw an error if
      * `tick` is out of bounds.
      */
     public int32_t
-    Get(I32Array *self, uint32_t tick);
+    Get(I32Array *self, size_t tick);
 
     /** Accessor for 'size' member.
      */
-    public uint32_t
+    public size_t
     Get_Size(I32Array *self);
 
     public void

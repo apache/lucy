@@ -131,7 +131,7 @@ S_init_sub_readers(PolyReader *self, Vector *sub_readers) {
         }
         DECREF(iter);
     }
-    ivars->offsets = I32Arr_new_steal(starts, (uint32_t)num_sub_readers);
+    ivars->offsets = I32Arr_new_steal(starts, num_sub_readers);
 
     HashIterator *iter = HashIter_new(data_readers);
     while (HashIter_Next(iter)) {
@@ -550,16 +550,19 @@ PolyReader_Get_Seg_Readers_IMP(PolyReader *self) {
 
 uint32_t
 PolyReader_sub_tick(I32Array *offsets, int32_t doc_id) {
-    int32_t size = I32Arr_Get_Size(offsets);
+    size_t size = I32Arr_Get_Size(offsets);
     if (size == 0) {
         return 0;
     }
+    else if (size > INT32_MAX) {
+        THROW(ERR, "Unexpectedly large offsets array: %u64", (uint64_t)size);
+    }
 
     int32_t lo = -1;
-    int32_t hi = size;
+    int32_t hi = (int32_t)size;
     while (hi - lo > 1) {
         int32_t mid = lo + ((hi - lo) / 2);
-        int32_t offset = I32Arr_Get(offsets, mid);
+        int32_t offset = I32Arr_Get(offsets, (size_t)mid);
         if (doc_id <= offset) {
             hi = mid;
         }
@@ -567,12 +570,12 @@ PolyReader_sub_tick(I32Array *offsets, int32_t doc_id) {
             lo = mid;
         }
     }
-    if (hi == size) {
+    if (hi == (int32_t)size) {
         hi--;
     }
 
     while (hi > 0) {
-        int32_t offset = I32Arr_Get(offsets, hi);
+        int32_t offset = I32Arr_Get(offsets, (size_t)hi);
         if (doc_id <= offset) {
             hi--;
         }

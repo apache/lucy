@@ -24,7 +24,7 @@ class Lucy::Index::TermVector nickname TV
 
     String *field;
     String *text;
-    uint32_t num_pos;
+    size_t num_pos;
     I32Array  *positions;
     I32Array  *start_offsets;
     I32Array  *end_offsets;

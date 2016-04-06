@@ -20,7 +20,7 @@
 #include "Lucy/Object/I32Array.h"
 
 I32Array*
-I32Arr_new(int32_t *ints, uint32_t size) {
+I32Arr_new(int32_t *ints, size_t size) {
     I32Array *self = (I32Array*)Class_Make_Obj(I32ARRAY);
     int32_t *ints_copy = (int32_t*)MALLOCATE(size * sizeof(int32_t));
     memcpy(ints_copy, ints, size * sizeof(int32_t));
@@ -28,20 +28,20 @@ I32Arr_new(int32_t *ints, uint32_t size) {
 }
 
 I32Array*
-I32Arr_new_blank(uint32_t size) {
+I32Arr_new_blank(size_t size) {
     I32Array *self = (I32Array*)Class_Make_Obj(I32ARRAY);
     int32_t *ints = (int32_t*)CALLOCATE(size, sizeof(int32_t));
     return I32Arr_init(self, ints, size);
 }
 
 I32Array*
-I32Arr_new_steal(int32_t *ints, uint32_t size) {
+I32Arr_new_steal(int32_t *ints, size_t size) {
     I32Array *self = (I32Array*)Class_Make_Obj(I32ARRAY);
     return I32Arr_init(self, ints, size);
 }
 
 I32Array*
-I32Arr_init(I32Array *self, int32_t *ints, uint32_t size) {
+I32Arr_init(I32Array *self, int32_t *ints, size_t size) {
     I32ArrayIVARS *const ivars = I32Arr_IVARS(self);
     ivars->ints = ints;
     ivars->size = size;
@@ -56,24 +56,26 @@ I32Arr_Destroy_IMP(I32Array *self) {
 }
 
 void
-I32Arr_Set_IMP(I32Array *self, uint32_t tick, int32_t value) {
+I32Arr_Set_IMP(I32Array *self, size_t tick, int32_t value) {
     I32ArrayIVARS *const ivars = I32Arr_IVARS(self);
     if (tick >= ivars->size) {
-        THROW(ERR, "Out of bounds: %u32 >= %u32", tick, ivars->size);
+        THROW(ERR, "Out of bounds: %u64 >= %u64", (uint64_t)tick,
+              (uint64_t)ivars->size);
     }
     ivars->ints[tick] = value;
 }
 
 int32_t
-I32Arr_Get_IMP(I32Array *self, uint32_t tick) {
+I32Arr_Get_IMP(I32Array *self, size_t tick) {
     I32ArrayIVARS *const ivars = I32Arr_IVARS(self);
     if (tick >= ivars->size) {
-        THROW(ERR, "Out of bounds: %u32 >= %u32", tick, ivars->size);
+        THROW(ERR, "Out of bounds: %u64 >= %u64", (uint64_t)tick,
+              (uint64_t)ivars->size);
     }
     return ivars->ints[tick];
 }
 
-uint32_t
+size_t
 I32Arr_Get_Size_IMP(I32Array *self) {
     return I32Arr_IVARS(self)->size;
 }

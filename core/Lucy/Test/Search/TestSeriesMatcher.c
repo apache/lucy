@@ -31,14 +31,13 @@ TestSeriesMatcher_new() {
 
 static SeriesMatcher*
 S_make_series_matcher(I32Array *doc_ids, I32Array *offsets, int32_t doc_max) {
-    int32_t  num_doc_ids  = I32Arr_Get_Size(doc_ids);
-    int32_t  num_matchers = I32Arr_Get_Size(offsets);
+    size_t   num_doc_ids  = I32Arr_Get_Size(doc_ids);
+    size_t   num_matchers = I32Arr_Get_Size(offsets);
     Vector  *matchers     = Vec_new(num_matchers);
-    int32_t  tick         = 0;
-    int32_t  i;
+    size_t   tick         = 0;
 
     // Divvy up doc_ids by segment into BitVectors.
-    for (i = 0; i < num_matchers; i++) {
+    for (size_t i = 0; i < num_matchers; i++) {
         int32_t offset = I32Arr_Get(offsets, i);
         int32_t max    = i == num_matchers - 1
                          ? doc_max + 1
@@ -71,7 +70,7 @@ S_generate_match_list(int32_t first, int32_t max, int32_t doc_inc) {
     }
     if (i != count) { THROW(ERR, "Screwed up somehow: %i32 %i32", i, count); }
 
-    return I32Arr_new_steal(doc_ids, count);
+    return I32Arr_new_steal(doc_ids, (size_t)count);
 }
 
 static void
@@ -83,16 +82,16 @@ S_do_test_matrix(TestBatchRunner *runner, int32_t doc_max, int32_t first_doc_id,
         = S_generate_match_list(0, doc_max, offset_inc);
     SeriesMatcher *series_matcher
         = S_make_series_matcher(doc_ids, offsets, doc_max);
-    uint32_t num_in_agreement = 0;
+    size_t num_in_agreement = 0;
     int32_t got;
 
     while (0 != (got = SeriesMatcher_Next(series_matcher))) {
         if (got != I32Arr_Get(doc_ids, num_in_agreement)) { break; }
         num_in_agreement++;
     }
-    TEST_INT_EQ(runner, num_in_agreement, I32Arr_Get_Size(doc_ids),
-                "doc_max=%d first_doc_id=%d doc_inc=%d offset_inc=%d",
-                doc_max, first_doc_id, doc_inc, offset_inc);
+    TEST_UINT_EQ(runner, num_in_agreement, I32Arr_Get_Size(doc_ids),
+                 "doc_max=%d first_doc_id=%d doc_inc=%d offset_inc=%d",
+                 doc_max, first_doc_id, doc_inc, offset_inc);
 
     DECREF(doc_ids);
     DECREF(offsets);

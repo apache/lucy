@@ -127,8 +127,8 @@ SegWriter_Add_Inverted_Doc_IMP(SegWriter *self, Inverter *inverter,
 static void
 S_adjust_doc_id(SegWriter *self, SegReader *reader, I32Array *doc_map) {
     SegWriterIVARS *const ivars = SegWriter_IVARS(self);
-    uint32_t doc_count = SegReader_Doc_Max(reader);
-    for (uint32_t i = 1, max = I32Arr_Get_Size(doc_map); i < max; i++) {
+    size_t doc_count = SegReader_Doc_Max(reader);
+    for (size_t i = 1, max = I32Arr_Get_Size(doc_map); i < max; i++) {
         if (I32Arr_Get(doc_map, i) == 0) { doc_count--; }
     }
     Seg_Increment_Count(ivars->segment, doc_count);

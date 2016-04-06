@@ -53,6 +53,9 @@ DelWriter_Generate_Doc_Map_IMP(DeletionsWriter *self, Matcher *deletions,
     int32_t *doc_map = (int32_t*)CALLOCATE(doc_max + 1, sizeof(int32_t));
     int32_t  next_deletion = deletions ? Matcher_Next(deletions) : INT32_MAX;
     UNUSED_VAR(self);
+    if (doc_max < 0) {
+        THROW(ERR, "Negative doc_max is invalid: %i32", doc_max);
+    }
 
     // 0 for a deleted doc, a new number otherwise
     for (int32_t i = 1, new_doc_id = 1; i <= doc_max; i++) {
@@ -64,7 +67,7 @@ DelWriter_Generate_Doc_Map_IMP(DeletionsWriter *self, Matcher *deletions,
         }
     }
 
-    return I32Arr_new_steal(doc_map, doc_max + 1);
+    return I32Arr_new_steal(doc_map, (size_t)doc_max + 1);
 }
 
 int32_t DefDelWriter_current_file_format = 1;
@@ -308,7 +311,7 @@ DefDelWriter_Delete_By_Doc_ID_IMP(DefaultDeletionsWriter *self, int32_t doc_id) 
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
     uint32_t   sub_tick   = PolyReader_sub_tick(ivars->seg_starts, doc_id);
     BitVector *bit_vec    = (BitVector*)Vec_Fetch(ivars->bit_vecs, sub_tick);
-    uint32_t   offset     = I32Arr_Get(ivars->seg_starts, sub_tick);
+    int32_t    offset     = I32Arr_Get(ivars->seg_starts, sub_tick);
     int32_t    seg_doc_id = doc_id - offset;
 
     if (!BitVec_Get(bit_vec, seg_doc_id)) {

@@ -233,7 +233,7 @@ HLWriter_Add_Segment_IMP(HighlightWriter *self, SegReader *reader,
 
         for (orig = 1; orig <= doc_max; orig++) {
             // Skip deleted docs.
-            if (doc_map && !I32Arr_Get(doc_map, orig)) {
+            if (doc_map && !I32Arr_Get(doc_map, (size_t)orig)) {
                 continue;
             }
 

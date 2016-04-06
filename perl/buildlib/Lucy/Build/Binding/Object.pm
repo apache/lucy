@@ -78,18 +78,22 @@ CODE:
         ints_av = (AV*)SvRV(ints_sv);
     }
     if (ints_av && SvTYPE(ints_av) == SVt_PVAV) {
-        int32_t size  = av_len(ints_av) + 1;
-        int32_t *ints = (int32_t*)CFISH_MALLOCATE(size * sizeof(int32_t));
-        int32_t i;
+        int64_t size = av_len(ints_av) + 1;
+        int32_t *ints;
+        int64_t i;
+        if (size < 0 || size > INT32_MAX) {
+            THROW(CFISH_ERR, "Size out of range: %i64", size);
+        }
+        ints = (int32_t*)CFISH_MALLOCATE(size * sizeof(int32_t));
 
         for (i = 0; i < size; i++) {
-            SV **const sv_ptr = av_fetch(ints_av, i, 0);
+            SV **const sv_ptr = av_fetch(ints_av, (I32)i, 0);
             ints[i] = (sv_ptr && XSBind_sv_defined(aTHX_ *sv_ptr))
                       ? SvIV(*sv_ptr)
                       : 0;
         }
         self = (lucy_I32Array*)XSBind_new_blank_obj(aTHX_ either_sv);
-        lucy_I32Arr_init(self, ints, size);
+        lucy_I32Arr_init(self, ints, (size_t)size);
     }
     else {
         THROW(CFISH_ERR, "Required param 'ints' isn't an arrayref");
@@ -105,8 +109,8 @@ to_arrayref(self)
 CODE:
 {
     AV *out_av = newAV();
-    uint32_t i;
-    uint32_t size = LUCY_I32Arr_Get_Size(self);
+    size_t i;
+    size_t size = LUCY_I32Arr_Get_Size(self);
 
     av_extend(out_av, size);
     for (i = 0; i < size; i++) {
