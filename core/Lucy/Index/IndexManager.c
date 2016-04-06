@@ -192,14 +192,14 @@ uint32_t
 IxManager_Choose_Sparse_IMP(IndexManager *self, I32Array *doc_counts) {
     UNUSED_VAR(self);
     uint32_t threshold  = 0;
-    uint32_t total_docs = 0;
-    const uint32_t num_candidates = I32Arr_Get_Size(doc_counts);
+    int32_t total_docs = 0;
+    const uint32_t num_candidates = (uint32_t)I32Arr_Get_Size(doc_counts);
 
     // Find sparsely populated segments.
     for (uint32_t i = 0; i < num_candidates; i++) {
         uint32_t num_segs_when_done = num_candidates - threshold + 1;
         total_docs += I32Arr_Get(doc_counts, i);
-        if (total_docs < S_fibonacci(num_segs_when_done + 5)) {
+        if (total_docs < (int32_t)S_fibonacci(num_segs_when_done + 5)) {
             threshold = i + 1;
         }
     }
