@@ -40,12 +40,12 @@ func (bv *BitVectorIMP) ToArray() []bool {
 
 func NewI32Array(nums []int32) I32Array {
 	size := len(nums)
-	if int(C.uint32_t(size)) != size {
+	if int(C.size_t(size)) != size {
 		panic(clownfish.NewErr("input too large"))
 	}
-	obj := C.lucy_I32Arr_new_blank(C.uint32_t(size))
+	obj := C.lucy_I32Arr_new_blank(C.size_t(size))
 	for i := 0; i < size; i++ {
-		C.LUCY_I32Arr_Set(obj, C.uint32_t(i), C.int32_t(nums[i]))
+		C.LUCY_I32Arr_Set(obj, C.size_t(i), C.int32_t(nums[i]))
 	}
 	return WRAPI32Array(unsafe.Pointer(obj))
 }
@@ -54,7 +54,7 @@ func i32ArrayToSlice(a *C.lucy_I32Array) []int32 {
 	size := int(C.LUCY_I32Arr_Get_Size(a))
 	nums := make([]int32, size)
 	for i := 0; i < size; i++ {
-		nums[i] = int32(C.LUCY_I32Arr_Get(a, C.uint32_t(i)))
+		nums[i] = int32(C.LUCY_I32Arr_Get(a, C.size_t(i)))
 	}
 	return nums
 }
