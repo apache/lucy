@@ -418,7 +418,7 @@ test_To_Array(TestBatchRunner *runner) {
     // Create the array and compare it to the source.
     array = BitVec_To_Array(bit_vec);
     for (i = 0; i < num_unique; i++) {
-        if (I32Arr_Get(array, i) != (int32_t)source_ints[i]) { break; }
+        if (I32Arr_Get(array, (size_t)i) != (int32_t)source_ints[i]) { break; }
     }
     TEST_INT_EQ(runner, i, num_unique, "To_Array (%ld == %ld)", i,
                 num_unique);

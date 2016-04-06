@@ -131,7 +131,7 @@ S_init_sub_readers(PolyReader *self, Vector *sub_readers) {
         }
         DECREF(iter);
     }
-    ivars->offsets = I32Arr_new_steal(starts, (uint32_t)num_sub_readers);
+    ivars->offsets = I32Arr_new_steal(starts, num_sub_readers);
 
     HashIterator *iter = HashIter_new(data_readers);
     while (HashIter_Next(iter)) {

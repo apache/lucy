@@ -147,7 +147,7 @@ IxSearcher_Collect_IMP(IndexSearcher *self, Query *query, Collector *collector) 
         Matcher *matcher
             = Compiler_Make_Matcher(compiler, seg_reader, need_score);
         if (matcher) {
-            int32_t  seg_start = I32Arr_Get(seg_starts, (uint32_t)i);
+            int32_t  seg_start = I32Arr_Get(seg_starts, i);
             Matcher *deletions = DelReader_Iterator(del_reader);
             Coll_Set_Reader(collector, seg_reader);
             Coll_Set_Base(collector, seg_start);

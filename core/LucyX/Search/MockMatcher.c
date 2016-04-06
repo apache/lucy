@@ -58,7 +58,7 @@ MockMatcher_Next_IMP(MockMatcher* self) {
         ivars->tick--;
         return 0;
     }
-    return I32Arr_Get(ivars->doc_ids, ivars->tick);
+    return I32Arr_Get(ivars->doc_ids, (size_t)ivars->tick);
 }
 
 float
@@ -74,7 +74,7 @@ MockMatcher_Score_IMP(MockMatcher* self) {
 int32_t
 MockMatcher_Get_Doc_ID_IMP(MockMatcher* self) {
     MockMatcherIVARS *const ivars = MockMatcher_IVARS(self);
-    return I32Arr_Get(ivars->doc_ids, ivars->tick);
+    return I32Arr_Get(ivars->doc_ids, (size_t)ivars->tick);
 }
 
 

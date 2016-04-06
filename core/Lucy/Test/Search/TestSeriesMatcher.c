@@ -71,7 +71,7 @@ S_generate_match_list(int32_t first, int32_t max, int32_t doc_inc) {
     }
     if (i != count) { THROW(ERR, "Screwed up somehow: %i32 %i32", i, count); }
 
-    return I32Arr_new_steal(doc_ids, count);
+    return I32Arr_new_steal(doc_ids, (size_t)count);
 }
 
 static void

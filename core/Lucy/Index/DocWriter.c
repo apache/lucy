@@ -180,7 +180,7 @@ DocWriter_Add_Segment_IMP(DocWriter *self, SegReader *reader,
                   DEFAULTDOCREADER);
 
         for (int32_t i = 1, max = SegReader_Doc_Max(reader); i <= max; i++) {
-            if (I32Arr_Get(doc_map, i)) {
+            if (I32Arr_Get(doc_map, (size_t)i)) {
                 int64_t  start = OutStream_Tell(dat_out);
 
                 // Copy record over.

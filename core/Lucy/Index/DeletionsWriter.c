@@ -64,7 +64,7 @@ DelWriter_Generate_Doc_Map_IMP(DeletionsWriter *self, Matcher *deletions,
         }
     }
 
-    return I32Arr_new_steal(doc_map, doc_max + 1);
+    return I32Arr_new_steal(doc_map, (size_t)doc_max + 1);
 }
 
 int32_t DefDelWriter_current_file_format = 1;
