@@ -207,6 +207,15 @@ sub ACTION_parsers {
     }
 }
 
+sub ACTION_clownfish {
+    my $self = shift;
+
+    $self->SUPER::ACTION_clownfish;
+
+    # Make sure to remove empty directory.
+    $self->add_to_cleanup( catdir( $LIB_DIR, 'Lucy', 'Docs' ) );
+}
+
 sub ACTION_compile_custom_xs {
     my $self = shift;
 
