@@ -42,12 +42,12 @@ S_make_series_matcher(I32Array *doc_ids, I32Array *offsets, int32_t doc_max) {
         int32_t max    = i == num_matchers - 1
                          ? doc_max + 1
                          : I32Arr_Get(offsets, i + 1);
-        BitVector *bit_vec = BitVec_new(max - offset);
+        BitVector *bit_vec = BitVec_new((size_t)(max - offset));
         while (tick < num_doc_ids) {
             int32_t doc_id = I32Arr_Get(doc_ids, tick);
             if (doc_id > max) { break; }
             else               { tick++; }
-            BitVec_Set(bit_vec, doc_id - offset);
+            BitVec_Set(bit_vec, (size_t)(doc_id - offset));
         }
         Vec_Push(matchers, (Obj*)BitVecMatcher_new(bit_vec));
         DECREF(bit_vec);
