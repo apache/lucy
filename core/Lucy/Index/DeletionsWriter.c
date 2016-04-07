@@ -152,8 +152,8 @@ DefDelWriter_Finish_IMP(DefaultDeletionsWriter *self) {
         if (ivars->updated[i]) {
             BitVector *deldocs   = (BitVector*)Vec_Fetch(ivars->bit_vecs, i);
             int32_t    doc_max   = SegReader_Doc_Max(seg_reader);
-            uint32_t   byte_size = (((uint32_t)doc_max + 1) + 7) / 8;
-            uint32_t   new_max   = byte_size * 8 - 1;
+            size_t     byte_size = (((size_t)doc_max + 1) + 7) / 8;
+            size_t     new_max   = byte_size * 8 - 1;
             String    *filename  = S_del_filename(self, seg_reader);
             OutStream *outstream = Folder_Open_Out(folder, filename);
             if (!outstream) { RETHROW(INCREF(Err_get_error())); }
@@ -246,7 +246,7 @@ DefDelWriter_Seg_Del_Count_IMP(DefaultDeletionsWriter *self,
     BitVector *deldocs = tick
                          ? (BitVector*)Vec_Fetch(ivars->bit_vecs, Int_Get_Value(tick))
                          : NULL;
-    return deldocs ? BitVec_Count(deldocs) : 0;
+    return deldocs ? (int32_t)BitVec_Count(deldocs) : 0;
 }
 
 void
