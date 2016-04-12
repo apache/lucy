@@ -404,8 +404,8 @@ ProximityCompiler_Highlight_Spans_IMP(ProximityCompiler *self,
         if (i == 0) {
             // Set initial positions from first term.
             I32Array *positions = TV_Get_Positions(term_vector);
-            for (uint32_t j = I32Arr_Get_Size(positions); j > 0; j--) {
-                BitVec_Set(posit_vec, I32Arr_Get(positions, j - 1));
+            for (size_t j = I32Arr_Get_Size(positions); j > 0; j--) {
+                BitVec_Set(posit_vec, (uint32_t)I32Arr_Get(positions, j - 1));
             }
         }
         else {
@@ -413,8 +413,8 @@ ProximityCompiler_Highlight_Spans_IMP(ProximityCompiler *self,
             I32Array *positions = TV_Get_Positions(term_vector);
 
             BitVec_Clear_All(other_posit_vec);
-            for (uint32_t j = I32Arr_Get_Size(positions); j > 0; j--) {
-                int32_t pos = I32Arr_Get(positions, j - 1) - i;
+            for (size_t j = I32Arr_Get_Size(positions); j > 0; j--) {
+                int32_t pos = I32Arr_Get(positions, j - 1) - (int32_t)i;
                 if (pos >= 0) {
                     BitVec_Set(other_posit_vec, pos);
                 }
@@ -435,24 +435,24 @@ ProximityCompiler_Highlight_Spans_IMP(ProximityCompiler *self,
         I32Array *tv_end_offsets     = TV_Get_End_Offsets(last_tv);
         uint32_t  terms_max          = num_terms - 1;
         I32Array *valid_posits       = BitVec_To_Array(posit_vec);
-        uint32_t  num_valid_posits   = I32Arr_Get_Size(valid_posits);
-        uint32_t  j = 0;
+        size_t    num_valid_posits   = I32Arr_Get_Size(valid_posits);
+        size_t    j = 0;
         float     weight = ProximityCompiler_Get_Weight(self);
-        uint32_t  i = 0;
+        size_t    i = 0;
 
         // Add only those starts/ends that belong to a valid position.
-        for (uint32_t posit_tick = 0; posit_tick < num_valid_posits; posit_tick++) {
+        for (size_t posit_tick = 0; posit_tick < num_valid_posits; posit_tick++) {
             int32_t valid_start_posit = I32Arr_Get(valid_posits, posit_tick);
             int32_t valid_end_posit   = valid_start_posit + terms_max;
             int32_t start_offset = 0, end_offset = 0;
 
-            for (uint32_t max = I32Arr_Get_Size(tv_start_positions); i < max; i++) {
+            for (size_t max = I32Arr_Get_Size(tv_start_positions); i < max; i++) {
                 if (I32Arr_Get(tv_start_positions, i) == valid_start_posit) {
                     start_offset = I32Arr_Get(tv_start_offsets, i);
                     break;
                 }
             }
-            for (uint32_t max = I32Arr_Get_Size(tv_end_positions); j < max; j++) {
+            for (size_t max = I32Arr_Get_Size(tv_end_positions); j < max; j++) {
                 if (I32Arr_Get(tv_end_positions, j) == valid_end_posit) {
                     end_offset = I32Arr_Get(tv_end_offsets, j);
                     break;

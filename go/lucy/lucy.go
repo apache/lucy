@@ -386,7 +386,7 @@ func fetchEntry(ivars *C.lucy_InverterIVARS, fieldGo string) *C.lucy_InverterEnt
 func readDocPolyDR(pdr *C.lucy_PolyDocReader, docID int32, doc interface{}) error {
 	ivars := C.lucy_PolyDocReader_IVARS(pdr)
 	segTick := C.lucy_PolyReader_sub_tick(ivars.offsets, C.int32_t(docID))
-	offset := C.LUCY_I32Arr_Get(ivars.offsets, segTick)
+	offset := C.LUCY_I32Arr_Get(ivars.offsets, C.size_t(segTick))
 	defDocReader := (*C.lucy_DefaultDocReader)(C.CFISH_Vec_Fetch(ivars.readers, C.size_t(segTick)))
 	if (defDocReader == nil) {
 		return clownfish.NewErr(fmt.Sprintf("Invalid docID: %d", docID))

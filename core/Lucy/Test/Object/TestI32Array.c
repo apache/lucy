@@ -49,16 +49,16 @@ test_all(TestBatchRunner *runner) {
             break;
         }
     }
-    TEST_INT_EQ(runner, num_matched, num_ints,
-                "Matched all source ints with Get()");
+    TEST_UINT_EQ(runner, num_matched, num_ints,
+                 "Matched all source ints with Get()");
 
     for (num_matched = 0; num_matched < num_ints; num_matched++) {
         if (source_ints[num_matched] != I32Arr_Get(stolen, num_matched)) {
             break;
         }
     }
-    TEST_INT_EQ(runner, num_matched, num_ints,
-                "Matched all source ints in stolen I32Array with Get()");
+    TEST_UINT_EQ(runner, num_matched, num_ints,
+                 "Matched all source ints in stolen I32Array with Get()");
 
     DECREF(i32_array);
     DECREF(stolen);

@@ -513,7 +513,7 @@ PostPool_Refill_IMP(PostingPool *self) {
         // Skip deletions.
         if (doc_map != NULL) {
             const int32_t remapped
-                = I32Arr_Get(doc_map, rawpost_ivars->doc_id - doc_base);
+                = I32Arr_Get(doc_map, (size_t)(rawpost_ivars->doc_id - doc_base));
             if (!remapped) {
                 continue;
             }

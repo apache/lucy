@@ -303,7 +303,7 @@ TermCompiler_Highlight_Spans_IMP(TermCompiler *self, Searcher *searcher,
 
     starts = TV_Get_Start_Offsets(term_vector);
     ends   = TV_Get_End_Offsets(term_vector);
-    for (uint32_t i = 0, max = I32Arr_Get_Size(starts); i < max; i++) {
+    for (size_t i = 0, max = I32Arr_Get_Size(starts); i < max; i++) {
         int32_t start  = I32Arr_Get(starts, i);
         int32_t length = I32Arr_Get(ends, i) - start;
         Vec_Push(spans,

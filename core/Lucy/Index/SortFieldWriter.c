@@ -457,7 +457,7 @@ SortFieldWriter_Refill_IMP(SortFieldWriter *self) {
         int32_t ord = SortCache_Ordinal(sort_cache, raw_doc_id);
         if (ord != null_ord) {
             int32_t remapped = doc_map
-                               ? I32Arr_Get(doc_map, raw_doc_id)
+                               ? I32Arr_Get(doc_map, (size_t)raw_doc_id)
                                : raw_doc_id;
             if (remapped) {
                 Obj *val = SortCache_Value(sort_cache, ord);

@@ -324,7 +324,7 @@ S_merge_updated_deletions(BackgroundMerger *self) {
                 = (SegReader*)Vec_Fetch(merge_seg_readers, i);
             if (SegReader_Get_Seg_Num(seg_reader) == merge_seg_num) {
                 I32Array *offsets = PolyReader_Offsets(merge_polyreader);
-                seg_tick = (uint32_t)i;
+                seg_tick = i;
                 offset = I32Arr_Get(offsets, seg_tick);
                 DECREF(offsets);
             }
@@ -345,7 +345,7 @@ S_merge_updated_deletions(BackgroundMerger *self) {
                 // Find the slot where the deleted doc resides in the
                 // rewritten segment. If the doc was already deleted when we
                 // were merging, do nothing.
-                int32_t remapped = I32Arr_Get(doc_map, del);
+                int32_t remapped = I32Arr_Get(doc_map, (size_t)del);
                 if (remapped) {
                     // It's a new deletion, so carry it forward and zap it in
                     // the rewritten segment.

@@ -183,7 +183,7 @@ PolySearcher_Collect_IMP(PolySearcher *self, Query *query,
     I32Array *starts = ivars->starts;
 
     for (size_t i = 0, max = Vec_Get_Size(searchers); i < max; i++) {
-        int32_t start = I32Arr_Get(starts, (uint32_t)i);
+        int32_t start = I32Arr_Get(starts, i);
         Searcher *searcher = (Searcher*)Vec_Fetch(searchers, i);
         OffsetCollector *offset_coll = OffsetColl_new(collector, start);
         Searcher_Collect(searcher, query, (Collector*)offset_coll);

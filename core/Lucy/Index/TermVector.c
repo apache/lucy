@@ -46,8 +46,10 @@ TV_init(TermVector *self, String *field, String *text,
     if (I32Arr_Get_Size(start_offsets) != ivars->num_pos
         || I32Arr_Get_Size(end_offsets) != ivars->num_pos
        ) {
-        THROW(ERR, "Unbalanced arrays: %u32 %u32 %u32", ivars->num_pos,
-              I32Arr_Get_Size(start_offsets), I32Arr_Get_Size(end_offsets));
+        THROW(ERR, "Unbalanced arrays: %u64 %u64 %u64",
+              (uint64_t)ivars->num_pos,
+              (uint64_t)I32Arr_Get_Size(start_offsets),
+              (uint64_t)I32Arr_Get_Size(end_offsets));
     }
 
     return self;
@@ -88,9 +90,9 @@ TV_Serialize_IMP(TermVector *self, OutStream *target) {
 
     Freezer_serialize_string(ivars->field, target);
     Freezer_serialize_string(ivars->text, target);
-    OutStream_Write_C32(target, ivars->num_pos);
+    OutStream_Write_C64(target, ivars->num_pos);
 
-    for (uint32_t i = 0; i < ivars->num_pos; i++) {
+    for (size_t i = 0; i < ivars->num_pos; i++) {
         OutStream_Write_C32(target, posits[i]);
         OutStream_Write_C32(target, starts[i]);
         OutStream_Write_C32(target, ends[i]);
@@ -101,13 +103,13 @@ TermVector*
 TV_Deserialize_IMP(TermVector *self, InStream *instream) {
     String *field = Freezer_read_string(instream);
     String *text  = Freezer_read_string(instream);
-    uint32_t num_pos = InStream_Read_C32(instream);
+    size_t  num_pos = InStream_Read_C64(instream);
 
     // Read positional data.
     int32_t *posits = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
     int32_t *starts = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
     int32_t *ends   = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
-    for (uint32_t i = 0; i < num_pos; i++) {
+    for (size_t i = 0; i < num_pos; i++) {
         posits[i] = InStream_Read_C32(instream);
         starts[i] = InStream_Read_C32(instream);
         ends[i]   = InStream_Read_C32(instream);
@@ -142,7 +144,7 @@ TV_Equals_IMP(TermVector *self, Obj *other) {
     int32_t *const other_posits = I32Arr_IVARS(ovars->positions)->ints;
     int32_t *const other_starts = I32Arr_IVARS(ovars->start_offsets)->ints;
     int32_t *const other_ends   = I32Arr_IVARS(ovars->start_offsets)->ints;
-    for (uint32_t i = 0; i < ivars->num_pos; i++) {
+    for (size_t i = 0; i < ivars->num_pos; i++) {
         if (posits[i] != other_posits[i]) { return false; }
         if (starts[i] != other_starts[i]) { return false; }
         if (ends[i]   != other_ends[i])   { return false; }
