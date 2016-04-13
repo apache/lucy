@@ -48,10 +48,8 @@ static const uint32_t BYTE_COUNTS[256] = {
 
 static CFISH_INLINE size_t
 SI_octet_size(size_t bit_size) {
-    if (bit_size > SIZE_MAX - 8) {
-        return SIZE_MAX / 8;
-    }
-    return (bit_size + 7) / 8;
+    if (bit_size == 0) { return 0; }
+    return (bit_size - 1) / 8 + 1;
 }
 
 BitVector*
@@ -192,6 +190,11 @@ BitVec_Next_Hit_IMP(BitVector *self, size_t tick) {
     size_t byte_size = SI_octet_size(ivars->cap);
     uint8_t *const limit = ivars->bits + byte_size;
     uint8_t *ptr = ivars->bits + (tick >> 3);
+
+    if (ivars->cap > INT32_MAX / 8) {
+        THROW(ERR, "Capacity too large for Next_Hit: %u64",
+              (uint64_t)ivars->cap);
+    }
 
     if (ptr >= limit) {
         return -1;
