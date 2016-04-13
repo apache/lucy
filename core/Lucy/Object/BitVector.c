@@ -48,10 +48,8 @@ static const uint32_t BYTE_COUNTS[256] = {
 
 static CFISH_INLINE size_t
 SI_octet_size(size_t bit_size) {
-    if (bit_size > SIZE_MAX - 8) {
-        return SIZE_MAX / 8;
-    }
-    return (bit_size + 7) / 8;
+    if (bit_size == 0) { return 0; }
+    return (bit_size - 1) / 8 + 1;
 }
 
 BitVector*
