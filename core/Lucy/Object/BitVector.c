@@ -193,6 +193,11 @@ BitVec_Next_Hit_IMP(BitVector *self, size_t tick) {
     uint8_t *const limit = ivars->bits + byte_size;
     uint8_t *ptr = ivars->bits + (tick >> 3);
 
+    if (ivars->cap > INT32_MAX / 8) {
+        THROW(ERR, "Capacity too large for Next_Hit: %u64",
+              (uint64_t)ivars->cap);
+    }
+
     if (ptr >= limit) {
         return -1;
     }
