@@ -55,7 +55,7 @@ FilterMatcher_Next_IMP(FilterMatcher* self) {
             ivars->doc_id--;
             return 0;
         }
-    } while (!BitVec_Get(ivars->bits, ivars->doc_id));
+    } while (!BitVec_Get(ivars->bits, (size_t)ivars->doc_id));
     return ivars->doc_id;
 }
 

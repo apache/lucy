@@ -24,7 +24,7 @@ parcel Lucy;
 public class Lucy::Object::BitVector nickname BitVec
     inherits Clownfish::Obj {
 
-    uint32_t  cap;
+    size_t  cap;
     uint8_t  *bits;
 
     /** Create a new BitVector.
@@ -33,7 +33,7 @@ public class Lucy::Object::BitVector nickname BitVec
      * able to hold.
      */
     public inert incremented BitVector*
-    new(uint32_t capacity = 0);
+    new(size_t capacity = 0);
 
     /** Initialize a BitVector.
      *
@@ -41,7 +41,7 @@ public class Lucy::Object::BitVector nickname BitVec
      * able to hold.
      */
     public inert BitVector*
-    init(BitVector *self, uint32_t capacity = 0);
+    init(BitVector *self, size_t capacity = 0);
 
     /** Return true if the bit at `tick` has been set, false if it
      * hasn't (regardless of whether it lies within the bounds of the
@@ -50,14 +50,14 @@ public class Lucy::Object::BitVector nickname BitVec
      * @param tick The requested bit.
      */
     public bool
-    Get(BitVector *self, uint32_t tick);
+    Get(BitVector *self, size_t tick);
 
     /** Set the bit at `tick` to 1.
      *
      * @param tick The bit to be set.
      */
     public void
-    Set(BitVector *self, uint32_t tick);
+    Set(BitVector *self, size_t tick);
 
     /** Accessor for the BitVector's underlying bit array.
      */
@@ -66,21 +66,21 @@ public class Lucy::Object::BitVector nickname BitVec
 
     /** Accessor for capacity.
      */
-    uint32_t
+    size_t
     Get_Capacity(BitVector *self);
 
     /** Returns the next set bit equal to or greater than `tick`,
      * or -1 if no such bit exists.
      */
     public int32_t
-    Next_Hit(BitVector *self, uint32_t tick);
+    Next_Hit(BitVector *self, size_t tick);
 
     /** Clear the indicated bit. (i.e. set it to 0).
      *
      * @param tick The bit to be cleared.
      */
     public void
-    Clear(BitVector *self, uint32_t tick);
+    Clear(BitVector *self, size_t tick);
 
     /** Clear all bits.
      */
@@ -93,7 +93,7 @@ public class Lucy::Object::BitVector nickname BitVec
      * @param capacity Least number of bits the BitVector should accomodate.
      */
     public void
-    Grow(BitVector *self, uint32_t capacity);
+    Grow(BitVector *self, size_t capacity);
 
     /** Modify the contents of this BitVector so that it has the same bits set
      * as `other`.
@@ -139,7 +139,7 @@ public class Lucy::Object::BitVector nickname BitVec
      * @param tick The bit to invert.
      */
     public void
-    Flip(BitVector *self, uint32_t tick);
+    Flip(BitVector *self, size_t tick);
 
     /** Invert each bit within a contiguous block.
      *
@@ -147,11 +147,11 @@ public class Lucy::Object::BitVector nickname BitVec
      * @param length The number of bits to flip.
      */
     public void
-    Flip_Block(BitVector *self, uint32_t offset, uint32_t length);
+    Flip_Block(BitVector *self, size_t offset, size_t length);
 
     /** Return a count of the number of set bits.
      */
-    public uint32_t
+    public size_t
     Count(BitVector *self);
 
     /** Return an array where each element represents a set bit.

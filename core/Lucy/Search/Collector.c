@@ -88,7 +88,7 @@ BitColl_Collect_IMP(BitCollector *self, int32_t doc_id) {
     BitCollectorIVARS *const ivars = BitColl_IVARS(self);
 
     // Add the doc_id to the BitVector.
-    BitVec_Set(ivars->bit_vec, (ivars->base + doc_id));
+    BitVec_Set(ivars->bit_vec, (size_t)(ivars->base + doc_id));
 }
 
 bool

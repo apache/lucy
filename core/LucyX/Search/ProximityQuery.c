@@ -405,7 +405,7 @@ ProximityCompiler_Highlight_Spans_IMP(ProximityCompiler *self,
             // Set initial positions from first term.
             I32Array *positions = TV_Get_Positions(term_vector);
             for (size_t j = I32Arr_Get_Size(positions); j > 0; j--) {
-                BitVec_Set(posit_vec, (uint32_t)I32Arr_Get(positions, j - 1));
+                BitVec_Set(posit_vec, (size_t)I32Arr_Get(positions, j - 1));
             }
         }
         else {
@@ -416,7 +416,7 @@ ProximityCompiler_Highlight_Spans_IMP(ProximityCompiler *self,
             for (size_t j = I32Arr_Get_Size(positions); j > 0; j--) {
                 int32_t pos = I32Arr_Get(positions, j - 1) - (int32_t)i;
                 if (pos >= 0) {
-                    BitVec_Set(other_posit_vec, pos);
+                    BitVec_Set(other_posit_vec, (size_t)pos);
                 }
             }
             BitVec_And(posit_vec, other_posit_vec);

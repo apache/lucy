@@ -44,14 +44,15 @@ BitVecMatcher_Destroy_IMP(BitVecMatcher *self) {
 int32_t
 BitVecMatcher_Next_IMP(BitVecMatcher *self) {
     BitVecMatcherIVARS *const ivars = BitVecMatcher_IVARS(self);
-    ivars->doc_id = BitVec_Next_Hit(ivars->bit_vec, ivars->doc_id + 1);
+    ivars->doc_id
+        = BitVec_Next_Hit(ivars->bit_vec, (size_t)(ivars->doc_id + 1));
     return ivars->doc_id == -1 ? 0 : ivars->doc_id;
 }
 
 int32_t
 BitVecMatcher_Advance_IMP(BitVecMatcher *self, int32_t target) {
     BitVecMatcherIVARS *const ivars = BitVecMatcher_IVARS(self);
-    ivars->doc_id = BitVec_Next_Hit(ivars->bit_vec, target);
+    ivars->doc_id = BitVec_Next_Hit(ivars->bit_vec, (size_t)target);
     return ivars->doc_id == -1 ? 0 : ivars->doc_id;
 }
 

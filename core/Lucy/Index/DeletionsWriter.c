@@ -98,7 +98,7 @@ DefDelWriter_init(DefaultDeletionsWriter *self, Schema *schema,
     // Materialize a BitVector of deletions for each segment.
     for (size_t i = 0; i < num_seg_readers; i++) {
         SegReader *seg_reader = (SegReader*)Vec_Fetch(ivars->seg_readers, i);
-        BitVector *bit_vec    = BitVec_new(SegReader_Doc_Max(seg_reader));
+        BitVector *bit_vec    = BitVec_new((size_t)SegReader_Doc_Max(seg_reader));
         DeletionsReader *del_reader
             = (DeletionsReader*)SegReader_Fetch(
                   seg_reader, Class_Get_Name(DELETIONSREADER));
@@ -109,7 +109,7 @@ DefDelWriter_init(DefaultDeletionsWriter *self, Schema *schema,
         if (seg_dels) {
             int32_t del;
             while (0 != (del = Matcher_Next(seg_dels))) {
-                BitVec_Set(bit_vec, del);
+                BitVec_Set(bit_vec, (size_t)del);
             }
             DECREF(seg_dels);
         }
@@ -152,8 +152,8 @@ DefDelWriter_Finish_IMP(DefaultDeletionsWriter *self) {
         if (ivars->updated[i]) {
             BitVector *deldocs   = (BitVector*)Vec_Fetch(ivars->bit_vecs, i);
             int32_t    doc_max   = SegReader_Doc_Max(seg_reader);
-            uint32_t   byte_size = (((uint32_t)doc_max + 1) + 7) / 8;
-            uint32_t   new_max   = byte_size * 8 - 1;
+            size_t     byte_size = (((size_t)doc_max + 1) + 7) / 8;
+            size_t     new_max   = byte_size * 8 - 1;
             String    *filename  = S_del_filename(self, seg_reader);
             OutStream *outstream = Folder_Open_Out(folder, filename);
             if (!outstream) { RETHROW(INCREF(Err_get_error())); }
@@ -246,7 +246,7 @@ DefDelWriter_Seg_Del_Count_IMP(DefaultDeletionsWriter *self,
     BitVector *deldocs = tick
                          ? (BitVector*)Vec_Fetch(ivars->bit_vecs, Int_Get_Value(tick))
                          : NULL;
-    return deldocs ? BitVec_Count(deldocs) : 0;
+    return deldocs ? (int32_t)BitVec_Count(deldocs) : 0;
 }
 
 void
@@ -268,8 +268,8 @@ DefDelWriter_Delete_By_Term_IMP(DefaultDeletionsWriter *self,
         // Iterate through postings, marking each doc as deleted.
         if (plist) {
             while (0 != (doc_id = PList_Next(plist))) {
-                num_zapped += !BitVec_Get(bit_vec, doc_id);
-                BitVec_Set(bit_vec, doc_id);
+                num_zapped += !BitVec_Get(bit_vec, (size_t)doc_id);
+                BitVec_Set(bit_vec, (size_t)doc_id);
             }
             if (num_zapped) { ivars->updated[i] = true; }
             DECREF(plist);
@@ -294,8 +294,8 @@ DefDelWriter_Delete_By_Query_IMP(DefaultDeletionsWriter *self, Query *query) {
 
             // Iterate through matches, marking each doc as deleted.
             while (0 != (doc_id = Matcher_Next(matcher))) {
-                num_zapped += !BitVec_Get(bit_vec, doc_id);
-                BitVec_Set(bit_vec, doc_id);
+                num_zapped += !BitVec_Get(bit_vec, (size_t)doc_id);
+                BitVec_Set(bit_vec, (size_t)doc_id);
             }
             if (num_zapped) { ivars->updated[i] = true; }
 
@@ -314,9 +314,9 @@ DefDelWriter_Delete_By_Doc_ID_IMP(DefaultDeletionsWriter *self, int32_t doc_id) 
     int32_t    offset     = I32Arr_Get(ivars->seg_starts, sub_tick);
     int32_t    seg_doc_id = doc_id - offset;
 
-    if (!BitVec_Get(bit_vec, seg_doc_id)) {
+    if (!BitVec_Get(bit_vec, (size_t)seg_doc_id)) {
         ivars->updated[sub_tick] = true;
-        BitVec_Set(bit_vec, seg_doc_id);
+        BitVec_Set(bit_vec, (size_t)seg_doc_id);
     }
 }
 

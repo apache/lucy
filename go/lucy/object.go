@@ -28,11 +28,11 @@ import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
 func (bv *BitVectorIMP) ToArray() []bool {
 	cap := bv.getCapacity()
-	if cap != uint32(int(cap)) {
+	if cap != uintptr(int(cap)) {
 		panic(fmt.Sprintf("Capacity of range: %d", cap))
 	}
 	bools := make([]bool, int(cap))
-	for i := uint32(0); i < cap; i++ {
+	for i := uintptr(0); i < cap; i++ {
 		bools[i] = bv.Get(i)
 	}
 	return bools
