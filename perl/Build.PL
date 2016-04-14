@@ -55,7 +55,7 @@ my $builder = Lucy::Build->new(
         'ExtUtils::ParseXS'  => 2.18,
         'Devel::PPPort'      => 3.14,
         'Clownfish'          => 0.005000,
-        'Clownfish::CFC'     => 0.005000,
+        'Clownfish::CFC'     => 0.005001,
     },
     meta_merge => { keywords => [qw( search lucy lucene )], },
     meta_add   => {
