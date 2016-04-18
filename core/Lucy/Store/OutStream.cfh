@@ -118,10 +118,20 @@ class Lucy::Store::OutStream inherits Clownfish::Obj {
     final void
     Write_C32(OutStream *self, uint32_t value);
 
+    /** Write an unsigned 32-bit integer using a compressed format.
+     */
+    final void
+    Write_CU32(OutStream *self, uint32_t value);
+
     /** Write a 64-bit integer using a compressed format.
      */
     final void
     Write_C64(OutStream *self, uint64_t value);
+
+    /** Write an unsigned 64-bit integer using a compressed format.
+     */
+    final void
+    Write_CU64(OutStream *self, uint64_t value);
 
     /** Write an IEEE 764 32-bit floating point number in big-endian byte
      * order.

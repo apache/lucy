@@ -176,15 +176,26 @@ class Lucy::Store::InStream inherits Clownfish::Obj {
     uint32_t
     Read_C32(InStream *self);
 
+    /** Read in a compressed 32-bit unsigned integer.
+     */
+    uint32_t
+    Read_CU32(InStream *self);
+
     /** Read a 64-bit integer, using the same encoding as a C32 but occupying
      * as many as 10 bytes.
      */
     final uint64_t
     Read_C64(InStream *self);
 
-    /** Read the bytes for a C32/C64 into `buf`.  Return the number
-     * of bytes read.  The caller must ensure that sufficient space exists in
-     * `buf` (worst case is 10 bytes).
+    /** Read a 64-bit unsigned integer, using the same encoding as a CU32 but
+     * occupying as many as 10 bytes.
+     */
+    final uint64_t
+    Read_CU64(InStream *self);
+
+    /** Read the bytes for a compressed 64-bit integer into `buf`.  Return the
+     * number of bytes read.  The caller must ensure that sufficient space
+     * exists in `buf` (worst case is 10 bytes).
      */
     final int
     Read_Raw_C64(InStream *self, char *buf);

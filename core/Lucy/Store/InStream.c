@@ -49,6 +49,12 @@ S_fill(InStream *self, int64_t amount);
 static int64_t
 S_refill(InStream *self);
 
+static CFISH_INLINE uint32_t
+SI_read_cu32(InStream *self);
+
+static CFISH_INLINE uint64_t
+SI_read_cu64(InStream *self);
+
 InStream*
 InStream_open(Obj *file) {
     InStream *self = (InStream*)Class_Make_Obj(INSTREAM);
@@ -468,6 +474,16 @@ InStream_Read_F64_IMP(InStream *self) {
 
 uint32_t
 InStream_Read_C32_IMP(InStream *self) {
+    return SI_read_cu32(self);
+}
+
+uint32_t
+InStream_Read_CU32_IMP(InStream *self) {
+    return SI_read_cu32(self);
+}
+
+static CFISH_INLINE uint32_t
+SI_read_cu32(InStream *self) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     uint32_t retval = 0;
     while (1) {
@@ -482,6 +498,16 @@ InStream_Read_C32_IMP(InStream *self) {
 
 uint64_t
 InStream_Read_C64_IMP(InStream *self) {
+    return SI_read_cu64(self);
+}
+
+uint64_t
+InStream_Read_CU64_IMP(InStream *self) {
+    return SI_read_cu64(self);
+}
+
+static CFISH_INLINE uint64_t
+SI_read_cu64(InStream *self) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     uint64_t retval = 0;
     while (1) {
