@@ -242,6 +242,45 @@ test_u64(TestBatchRunner *runner) {
 }
 
 static void
+test_ci32(TestBatchRunner *runner) {
+    int64_t *ints = TestUtils_random_i64s(NULL, 1000, INT32_MIN, INT32_MAX);
+    RAMFile *file = RAMFile_new(NULL, false);
+    OutStream *outstream = OutStream_open((Obj*)file);
+    InStream *instream;
+    size_t i;
+
+    // Test boundaries.
+    ints[0] = 0;
+    ints[1] = 1;
+    ints[2] = -1;
+    ints[3] = INT32_MAX;
+    ints[4] = INT32_MIN;
+
+    for (i = 0; i < 1000; i++) {
+        OutStream_Write_CI32(outstream, (int32_t)ints[i]);
+    }
+    OutStream_Close(outstream);
+
+    instream = InStream_open((Obj*)file);
+    for (i = 0; i < 1000; i++) {
+        int32_t got = InStream_Read_CI32(instream);
+        if ((int64_t)got != ints[i]) {
+            FAIL(runner, "ci32 round trip failed: %" PRId32 ", %" PRId64,
+                 got, ints[i]);
+            break;
+        }
+    }
+    if (i == 1000) {
+        PASS(runner, "ci32 round trip");
+    }
+
+    DECREF(instream);
+    DECREF(outstream);
+    DECREF(file);
+    FREEMEM(ints);
+}
+
+static void
 test_cu32(TestBatchRunner *runner) {
     uint64_t   *ints = TestUtils_random_u64s(NULL, 1000, 0, UINT32_MAX);
     RAMFile    *file      = RAMFile_new(NULL, false);
@@ -271,6 +310,45 @@ test_cu32(TestBatchRunner *runner) {
     }
     if (i == 1000) {
         PASS(runner, "cu32 round trip");
+    }
+
+    DECREF(instream);
+    DECREF(outstream);
+    DECREF(file);
+    FREEMEM(ints);
+}
+
+static void
+test_ci64(TestBatchRunner *runner) {
+    int64_t *ints = TestUtils_random_i64s(NULL, 1000, INT64_MIN, INT64_MAX);
+    RAMFile *file = RAMFile_new(NULL, false);
+    OutStream *outstream = OutStream_open((Obj*)file);
+    InStream *instream;
+    uint32_t i;
+
+    // Test boundaries.
+    ints[0] = 0;
+    ints[1] = 1;
+    ints[2] = -1;
+    ints[3] = INT64_MAX;
+    ints[4] = INT64_MIN;
+
+    for (i = 0; i < 1000; i++) {
+        OutStream_Write_CI64(outstream, ints[i]);
+    }
+    OutStream_Close(outstream);
+
+    instream = InStream_open((Obj*)file);
+    for (i = 0; i < 1000; i++) {
+        int64_t got = InStream_Read_CI64(instream);
+        if (got != ints[i]) {
+            FAIL(runner, "ci64 round trip failed: %" PRId64 ", %" PRId64,
+                 got, ints[i]);
+            break;
+        }
+    }
+    if (i == 1000) {
+        PASS(runner, "ci64 round trip");
     }
 
     DECREF(instream);
@@ -421,7 +499,7 @@ test_f64(TestBatchRunner *runner) {
 
 void
 TestIOPrimitives_Run_IMP(TestIOPrimitives *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 11);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 13);
     srand((unsigned int)time((time_t*)NULL));
     test_i8(runner);
     test_u8(runner);
@@ -429,7 +507,9 @@ TestIOPrimitives_Run_IMP(TestIOPrimitives *self, TestBatchRunner *runner) {
     test_u32(runner);
     test_i64(runner);
     test_u64(runner);
+    test_ci32(runner);
     test_cu32(runner);
+    test_ci64(runner);
     test_cu64(runner);
     test_f32(runner);
     test_f64(runner);

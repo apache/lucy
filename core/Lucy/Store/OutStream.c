@@ -295,6 +295,11 @@ OutStream_Write_C32_IMP(OutStream *self, uint32_t value) {
 }
 
 void
+OutStream_Write_CI32_IMP(OutStream *self, int32_t value) {
+    SI_write_cu32(self, OutStream_IVARS(self), (uint32_t)value);
+}
+
+void
 OutStream_Write_CU32_IMP(OutStream *self, uint32_t value) {
     SI_write_cu32(self, OutStream_IVARS(self), value);
 }
@@ -320,6 +325,11 @@ SI_write_cu32(OutStream *self, OutStreamIVARS *ivars, uint32_t value) {
 void
 OutStream_Write_C64_IMP(OutStream *self, uint64_t value) {
     SI_write_cu64(self, OutStream_IVARS(self), value);
+}
+
+void
+OutStream_Write_CI64_IMP(OutStream *self, int64_t value) {
+    SI_write_cu64(self, OutStream_IVARS(self), (uint64_t)value);
 }
 
 void

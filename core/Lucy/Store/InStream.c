@@ -477,6 +477,11 @@ InStream_Read_C32_IMP(InStream *self) {
     return SI_read_cu32(self);
 }
 
+int32_t
+InStream_Read_CI32_IMP(InStream *self) {
+    return (int32_t)SI_read_cu32(self);
+}
+
 uint32_t
 InStream_Read_CU32_IMP(InStream *self) {
     return SI_read_cu32(self);
@@ -499,6 +504,11 @@ SI_read_cu32(InStream *self) {
 uint64_t
 InStream_Read_C64_IMP(InStream *self) {
     return SI_read_cu64(self);
+}
+
+int64_t
+InStream_Read_CI64_IMP(InStream *self) {
+    return (int64_t)SI_read_cu64(self);
 }
 
 uint64_t
