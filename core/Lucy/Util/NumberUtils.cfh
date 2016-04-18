@@ -87,6 +87,13 @@ inert class Lucy::Util::NumberUtils nickname NumUtil {
     inert inline void
     encode_c32(uint32_t value, char **dest);
 
+    /** Encode a compressed 32-bit unsigned integer at the space pointed to by
+     * `dest`. As a side effect, `dest` will be advanced to immediately after
+     * the end of the compressed data.
+     */
+    inert inline void
+    encode_cu32(uint32_t value, char **dest);
+
     /** Encode a C32 at the space pointed to by `dest`, but add
      * "leading zeroes" so that the space consumed will always be 5 bytes.  As
      * a side effect, `dest` will be advanced to immediately after
@@ -95,12 +102,27 @@ inert class Lucy::Util::NumberUtils nickname NumUtil {
     inert inline void
     encode_padded_c32(uint32_t value, char **dest);
 
+    /** Encode a compressed 32-bit unsigned integer at the space pointed to by
+     * `dest`, but add "leading zeroes" so that the space consumed will always
+     * be 5 bytes.  As a side effect, `dest` will be advanced to immediately
+     * after the end of the compressed data.
+     */
+    inert inline void
+    encode_padded_cu32(uint32_t value, char **dest);
+
     /** Encode a C64 at the space pointed to by `dest`. As a side
      * effect, `dest` will be advanced to immediately after the end
      * of the C64.
      */
     inert inline void
     encode_c64(uint64_t value, char **dest);
+
+    /** Encode a compressed 64-bit unsigned integer at the space pointed to by
+     * `dest`. As a side effect, `dest` will be advanced to immediately after
+     * the end of the compressed data.
+     */
+    inert inline void
+    encode_cu64(uint64_t value, char **dest);
 
     /** Read a C32 from the buffer pointed to by `source`.  As a
      * side effect, advance the pointer, consuming the bytes occupied by the
@@ -109,12 +131,26 @@ inert class Lucy::Util::NumberUtils nickname NumUtil {
     inert inline uint32_t
     decode_c32(const char **source);
 
+    /** Read a compressed 32-bit unsigned integer from the buffer pointed to
+     * by `source`.  As a side effect, advance the pointer, consuming the
+     * bytes occupied by the compressed number.
+     */
+    inert inline uint32_t
+    decode_cu32(const char **source);
+
     /** Read a C64 from the buffer pointed to by `source`.  As a
      * side effect, advance the pointer, consuming the bytes occupied by the
      * C64.
      */
     inert inline uint64_t
     decode_c64(const char **source);
+
+    /** Read a compressed 64-bit unsigned integer from the buffer pointed to
+     * by `source`.  As a side effect, advance the pointer, consuming the
+     * bytes occupied by the compressed number.
+     */
+    inert inline uint64_t
+    decode_cu64(const char **source);
 
     /** Advance `source` past one encoded C32 or C64.
      */
@@ -296,10 +332,17 @@ lucy_NumUtil_decode_bigend_f64(const void *source) {
 
 #define LUCY_NUMUTIL_C32_MAX_BYTES ((sizeof(uint32_t) * 8 / 7) + 1) /*  5 */
 #define LUCY_NUMUTIL_C64_MAX_BYTES ((sizeof(uint64_t) * 8 / 7) + 1) /* 10 */
+#define LUCY_NUMUTIL_CU32_MAX_BYTES ((sizeof(uint32_t) * 8 / 7) + 1) /*  5 */
+#define LUCY_NUMUTIL_CU64_MAX_BYTES ((sizeof(uint64_t) * 8 / 7) + 1) /* 10 */
 
 static CFISH_INLINE void
 lucy_NumUtil_encode_c32(uint32_t value, char **out_buf) {
-    uint8_t   buf[LUCY_NUMUTIL_C32_MAX_BYTES];
+    lucy_NumUtil_encode_cu32(value, out_buf);
+}
+
+static CFISH_INLINE void
+lucy_NumUtil_encode_cu32(uint32_t value, char **out_buf) {
+    uint8_t   buf[LUCY_NUMUTIL_CU32_MAX_BYTES];
     uint8_t  *const limit = buf + sizeof(buf);
     uint8_t  *ptr         = limit - 1;
     int       num_bytes;
@@ -318,7 +361,12 @@ lucy_NumUtil_encode_c32(uint32_t value, char **out_buf) {
 
 static CFISH_INLINE void
 lucy_NumUtil_encode_c64(uint64_t value, char **out_buf) {
-    uint8_t   buf[LUCY_NUMUTIL_C64_MAX_BYTES];
+    lucy_NumUtil_encode_cu64(value, out_buf);
+}
+
+static CFISH_INLINE void
+lucy_NumUtil_encode_cu64(uint64_t value, char **out_buf) {
+    uint8_t   buf[LUCY_NUMUTIL_CU64_MAX_BYTES];
     uint8_t  *const limit = buf + sizeof(buf);
     uint8_t  *ptr         = limit - 1;
     int       num_bytes;
@@ -337,7 +385,12 @@ lucy_NumUtil_encode_c64(uint64_t value, char **out_buf) {
 
 static CFISH_INLINE void
 lucy_NumUtil_encode_padded_c32(uint32_t value, char **out_buf) {
-    uint8_t buf[LUCY_NUMUTIL_C32_MAX_BYTES]
+    lucy_NumUtil_encode_padded_cu32(value, out_buf);
+}
+
+static CFISH_INLINE void
+lucy_NumUtil_encode_padded_cu32(uint32_t value, char **out_buf) {
+    uint8_t buf[LUCY_NUMUTIL_CU32_MAX_BYTES]
         = { 0x80, 0x80, 0x80, 0x80, 0x80 };
     uint8_t *const limit = buf + sizeof(buf);
     uint8_t *ptr         = limit - 1;
@@ -349,7 +402,7 @@ lucy_NumUtil_encode_padded_c32(uint32_t value, char **out_buf) {
         *--ptr = ((value & 0x7f) | 0x80);
         value >>= 7;
     }
-    memcpy(*out_buf, buf, LUCY_NUMUTIL_C32_MAX_BYTES);
+    memcpy(*out_buf, buf, LUCY_NUMUTIL_CU32_MAX_BYTES);
     *out_buf += sizeof(buf);
 }
 
@@ -371,8 +424,26 @@ lucy_NumUtil_decode_c32(const char **source_ptr) {
     return decoded;
 }
 
+static CFISH_INLINE uint32_t
+lucy_NumUtil_decode_cu32(const char **source_ptr) {
+    const char *source = *source_ptr;
+    uint32_t decoded;
+    LUCY_NUMUTIL_DECODE_CINT(decoded, source);
+    *source_ptr = source;
+    return decoded;
+}
+
 static CFISH_INLINE uint64_t
 lucy_NumUtil_decode_c64(const char **source_ptr) {
+    const char *source = *source_ptr;
+    uint64_t decoded;
+    LUCY_NUMUTIL_DECODE_CINT(decoded, source);
+    *source_ptr = source;
+    return decoded;
+}
+
+static CFISH_INLINE uint64_t
+lucy_NumUtil_decode_cu64(const char **source_ptr) {
     const char *source = *source_ptr;
     uint64_t decoded;
     LUCY_NUMUTIL_DECODE_CINT(decoded, source);
@@ -459,6 +530,8 @@ lucy_NumUtil_u4set(void *array, uint32_t tick, uint8_t value) {
 #ifdef LUCY_USE_SHORT_NAMES
   #define C32_MAX_BYTES                LUCY_NUMUTIL_C32_MAX_BYTES
   #define C64_MAX_BYTES                LUCY_NUMUTIL_C64_MAX_BYTES
+  #define CU32_MAX_BYTES               LUCY_NUMUTIL_CU32_MAX_BYTES
+  #define CU64_MAX_BYTES               LUCY_NUMUTIL_CU64_MAX_BYTES
 #endif
 
 __END_C__

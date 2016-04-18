@@ -94,14 +94,14 @@ test_u4(TestBatchRunner *runner) {
 }
 
 static void
-test_c32(TestBatchRunner *runner) {
+test_cu32(TestBatchRunner *runner) {
     uint64_t  mins[]   = { 0,   0x4000 - 100, (uint32_t)INT32_MAX - 100, UINT32_MAX - 10 };
     uint64_t  limits[] = { 500, 0x4000 + 100, (uint32_t)INT32_MAX + 100, UINT32_MAX      };
     uint32_t  set_num;
     uint32_t  num_sets  = sizeof(mins) / sizeof(uint64_t);
     size_t    count     = 64;
     uint64_t *ints      = NULL;
-    size_t    amount    = count * C32_MAX_BYTES;
+    size_t    amount    = count * CU32_MAX_BYTES;
     char     *encoded   = (char*)CALLOCATE(amount, sizeof(char));
     char     *target    = encoded;
     char     *limit     = target + amount;
@@ -114,13 +114,13 @@ test_c32(TestBatchRunner *runner) {
         target = encoded;
         for (size_t i = 0; i < count; i++) {
             ints[i] = (uint32_t)ints[i];
-            NumUtil_encode_c32((uint32_t)ints[i], &target);
+            NumUtil_encode_cu32((uint32_t)ints[i], &target);
         }
         decode = encoded;
         skip   = encoded;
         for (size_t i = 0; i < count; i++) {
-            TEST_INT_EQ(runner, NumUtil_decode_c32(&decode), ints[i],
-                        "c32 %lu", (long)ints[i]);
+            TEST_INT_EQ(runner, NumUtil_decode_cu32(&decode), ints[i],
+                        "cu32 %lu", (long)ints[i]);
             NumUtil_skip_cint(&skip);
             if (decode > limit) { THROW(ERR, "overrun"); }
         }
@@ -129,16 +129,16 @@ test_c32(TestBatchRunner *runner) {
 
         target = encoded;
         for (size_t i = 0; i < count; i++) {
-            NumUtil_encode_padded_c32((uint32_t)ints[i], &target);
+            NumUtil_encode_padded_cu32((uint32_t)ints[i], &target);
         }
         TEST_TRUE(runner, target == limit,
-                  "padded c32 uses 5 bytes (%lu == %lu)", (unsigned long)target,
+                  "padded cu32 uses 5 bytes (%lu == %lu)", (unsigned long)target,
                   (unsigned long)limit);
         decode = encoded;
         skip   = encoded;
         for (size_t i = 0; i < count; i++) {
-            TEST_INT_EQ(runner, NumUtil_decode_c32(&decode), ints[i],
-                        "padded c32 %lu", (long)ints[i]);
+            TEST_INT_EQ(runner, NumUtil_decode_cu32(&decode), ints[i],
+                        "padded cu32 %lu", (long)ints[i]);
             NumUtil_skip_cint(&skip);
             if (decode > limit) { THROW(ERR, "overrun"); }
         }
@@ -147,23 +147,23 @@ test_c32(TestBatchRunner *runner) {
     }
 
     target = encoded;
-    NumUtil_encode_c32(UINT32_MAX, &target);
+    NumUtil_encode_cu32(UINT32_MAX, &target);
     decode = encoded;
-    TEST_INT_EQ(runner, NumUtil_decode_c32(&decode), UINT32_MAX, "c32 UINT32_MAX");
+    TEST_INT_EQ(runner, NumUtil_decode_cu32(&decode), UINT32_MAX, "cu32 UINT32_MAX");
 
     FREEMEM(encoded);
     FREEMEM(ints);
 }
 
 static void
-test_c64(TestBatchRunner *runner) {
+test_cu64(TestBatchRunner *runner) {
     uint64_t  mins[]    = { 0,   0x4000 - 100, (uint64_t)UINT32_MAX - 100,  UINT64_MAX - 10 };
     uint64_t  limits[]  = { 500, 0x4000 + 100, (uint64_t)UINT32_MAX + 1000, UINT64_MAX      };
     uint32_t  set_num;
     uint32_t  num_sets  = sizeof(mins) / sizeof(uint64_t);
     size_t    count     = 64;
     uint64_t *ints      = NULL;
-    size_t    amount    = count * C64_MAX_BYTES;
+    size_t    amount    = count * CU64_MAX_BYTES;
     char     *encoded   = (char*)CALLOCATE(amount, sizeof(char));
     char     *target    = encoded;
     char     *limit     = target + amount;
@@ -175,14 +175,14 @@ test_c64(TestBatchRunner *runner) {
                                      mins[set_num], limits[set_num]);
         target = encoded;
         for (size_t i = 0; i < count; i++) {
-            NumUtil_encode_c64(ints[i], &target);
+            NumUtil_encode_cu64(ints[i], &target);
         }
         decode = encoded;
         skip   = encoded;
         for (size_t i = 0; i < count; i++) {
-            uint64_t got = NumUtil_decode_c64(&decode);
+            uint64_t got = NumUtil_decode_cu64(&decode);
             TEST_TRUE(runner, got == ints[i],
-                      "c64 %" PRIu64 " == %" PRIu64, got, ints[i]);
+                      "cu64 %" PRIu64 " == %" PRIu64, got, ints[i]);
             if (decode > limit) { THROW(ERR, "overrun"); }
             NumUtil_skip_cint(&skip);
         }
@@ -191,11 +191,11 @@ test_c64(TestBatchRunner *runner) {
     }
 
     target = encoded;
-    NumUtil_encode_c64(UINT64_MAX, &target);
+    NumUtil_encode_cu64(UINT64_MAX, &target);
 
     decode = encoded;
-    uint64_t got = NumUtil_decode_c64(&decode);
-    TEST_TRUE(runner, got == UINT64_MAX, "c64 UINT64_MAX");
+    uint64_t got = NumUtil_decode_cu64(&decode);
+    TEST_TRUE(runner, got == UINT64_MAX, "cu64 UINT64_MAX");
 
     FREEMEM(encoded);
     FREEMEM(ints);
@@ -364,8 +364,8 @@ TestNumUtil_Run_IMP(TestNumberUtils *self, TestBatchRunner *runner) {
     test_u1(runner);
     test_u2(runner);
     test_u4(runner);
-    test_c32(runner);
-    test_c64(runner);
+    test_cu32(runner);
+    test_cu64(runner);
     test_bigend_u16(runner);
     test_bigend_u32(runner);
     test_bigend_u64(runner);

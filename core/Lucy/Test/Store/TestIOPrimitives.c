@@ -321,7 +321,7 @@ test_cu64(TestBatchRunner *runner) {
         char  buffer[10];
         const char *buf = buffer;
         size_t size = InStream_Read_Raw_C64(raw_instream, buffer);
-        uint64_t got = NumUtil_decode_c64(&buf);
+        uint64_t got = NumUtil_decode_cu64(&buf);
         UNUSED_VAR(size);
         if (got != ints[i]) {
             FAIL(runner, "Read_Raw_C64 failed: %" PRIu64 ", %" PRIu64,
