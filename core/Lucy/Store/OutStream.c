@@ -306,7 +306,7 @@ OutStream_Write_CU32_IMP(OutStream *self, uint32_t value) {
 
 static CFISH_INLINE void
 SI_write_cu32(OutStream *self, OutStreamIVARS *ivars, uint32_t value) {
-    uint8_t buf[C32_MAX_BYTES];
+    uint8_t buf[CU32_MAX_BYTES];
     uint8_t *ptr = buf + sizeof(buf) - 1;
 
     // Write last byte first, which has no continue bit.
@@ -339,7 +339,7 @@ OutStream_Write_CU64_IMP(OutStream *self, uint64_t value) {
 
 static CFISH_INLINE void
 SI_write_cu64(OutStream *self, OutStreamIVARS *ivars, uint64_t value) {
-    uint8_t buf[C64_MAX_BYTES];
+    uint8_t buf[CU64_MAX_BYTES];
     uint8_t *ptr = buf + sizeof(buf) - 1;
 
     // Write last byte first, which has no continue bit.

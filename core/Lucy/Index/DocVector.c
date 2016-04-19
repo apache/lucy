@@ -122,13 +122,13 @@ static Hash*
 S_extract_tv_cache(Blob *field_buf) {
     Hash       *tv_cache  = Hash_new(0);
     const char *tv_string = Blob_Get_Buf(field_buf);
-    int32_t     num_terms = NumUtil_decode_c32(&tv_string);
+    int32_t     num_terms = NumUtil_decode_ci32(&tv_string);
     ByteBuf    *text_buf  = BB_new(0);
 
     // Read the number of highlightable terms in the field.
     for (int32_t i = 0; i < num_terms; i++) {
-        size_t   overlap = NumUtil_decode_c32(&tv_string);
-        size_t   len     = NumUtil_decode_c32(&tv_string);
+        size_t   overlap = NumUtil_decode_cu32(&tv_string);
+        size_t   len     = NumUtil_decode_cu32(&tv_string);
 
         // Decompress the term text.
         BB_Set_Size(text_buf, overlap);
@@ -137,7 +137,7 @@ S_extract_tv_cache(Blob *field_buf) {
 
         // Get positions & offsets string.
         const char *bookmark_ptr  = tv_string;
-        int32_t     num_positions = NumUtil_decode_c32(&tv_string);
+        int32_t     num_positions = NumUtil_decode_ci32(&tv_string);
         while (num_positions--) {
             // Leave nums compressed to save a little mem.
             NumUtil_skip_cint(&tv_string);
@@ -167,17 +167,17 @@ S_extract_tv_from_tv_buf(String *field, String *term_text, Blob *tv_buf) {
     uint32_t    num_pos     = 0;
 
     if (posdata != posdata_end) {
-        num_pos   = NumUtil_decode_c32(&posdata);
+        num_pos   = NumUtil_decode_cu32(&posdata);
         positions = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
         starts    = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
         ends      = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
     }
 
-    // Expand C32s.
+    // Expand CI32s.
     for (uint32_t i = 0; i < num_pos; i++) {
-        positions[i] = NumUtil_decode_c32(&posdata);
-        starts[i]    = NumUtil_decode_c32(&posdata);
-        ends[i]      = NumUtil_decode_c32(&posdata);
+        positions[i] = NumUtil_decode_ci32(&posdata);
+        starts[i]    = NumUtil_decode_ci32(&posdata);
+        ends[i]      = NumUtil_decode_ci32(&posdata);
     }
 
     if (posdata != posdata_end) {

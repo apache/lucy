@@ -149,8 +149,8 @@ HLWriter_TV_Buf_IMP(HighlightWriter *self, Inversion *inversion) {
     uint32_t    freq;
     UNUSED_VAR(self);
 
-    // Leave space for a c32 indicating the number of postings.
-    BB_Set_Size(tv_buf, C32_MAX_BYTES);
+    // Leave space for a cu32 indicating the number of postings.
+    BB_Set_Size(tv_buf, CU32_MAX_BYTES);
 
     Inversion_Reset(inversion);
     while ((tokens = Inversion_Next_Cluster(inversion, &freq)) != NULL) {
@@ -164,11 +164,11 @@ HLWriter_TV_Buf_IMP(HighlightWriter *self, Inversion *inversion) {
         char *orig;
         size_t old_size = BB_Get_Size(tv_buf);
         size_t new_size = old_size
-                          + C32_MAX_BYTES      // overlap
-                          + C32_MAX_BYTES      // length of string diff
+                          + CI32_MAX_BYTES      // overlap
+                          + CI32_MAX_BYTES      // length of string diff
                           + (token_len - overlap)        // diff char data
-                          + C32_MAX_BYTES                // num prox
-                          + (C32_MAX_BYTES * freq * 3);  // pos data
+                          + CU32_MAX_BYTES                // num prox
+                          + (CU32_MAX_BYTES * freq * 3);  // pos data
 
         // Allocate for worst-case scenario.
         ptr  = BB_Grow(tv_buf, new_size);
@@ -179,8 +179,8 @@ HLWriter_TV_Buf_IMP(HighlightWriter *self, Inversion *inversion) {
         num_postings += 1;
 
         // Append the string diff to the tv_buf.
-        NumUtil_encode_c32(overlap, &ptr);
-        NumUtil_encode_c32((token_len - overlap), &ptr);
+        NumUtil_encode_ci32(overlap, &ptr);
+        NumUtil_encode_ci32((token_len - overlap), &ptr);
         memcpy(ptr, (token_text + overlap), (token_len - overlap));
         ptr += token_len - overlap;
 
@@ -189,13 +189,13 @@ HLWriter_TV_Buf_IMP(HighlightWriter *self, Inversion *inversion) {
         last_len  = token_len;
 
         // Append the number of positions for this term.
-        NumUtil_encode_c32(freq, &ptr);
+        NumUtil_encode_cu32(freq, &ptr);
 
         do {
             // Add position, start_offset, and end_offset to tv_buf.
-            NumUtil_encode_c32(Token_Get_Pos(token), &ptr);
-            NumUtil_encode_c32(Token_Get_Start_Offset(token), &ptr);
-            NumUtil_encode_c32(Token_Get_End_Offset(token), &ptr);
+            NumUtil_encode_ci32(Token_Get_Pos(token), &ptr);
+            NumUtil_encode_cu32(Token_Get_Start_Offset(token), &ptr);
+            NumUtil_encode_cu32(Token_Get_End_Offset(token), &ptr);
         } while (--freq && (token = *++tokens));
 
         // Set new byte length.
@@ -204,7 +204,7 @@ HLWriter_TV_Buf_IMP(HighlightWriter *self, Inversion *inversion) {
 
     // Go back and start the term vector string with the posting count.
     char *dest = BB_Get_Buf(tv_buf);
-    NumUtil_encode_padded_c32(num_postings, &dest);
+    NumUtil_encode_padded_cu32(num_postings, &dest);
 
     Blob *blob = BB_Yield_Blob(tv_buf);
     DECREF(tv_buf);

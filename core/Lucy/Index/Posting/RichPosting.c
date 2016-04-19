@@ -33,12 +33,12 @@
 #include "Lucy/Util/MemoryPool.h"
 #include "Lucy/Util/NumberUtils.h"
 
-#define FREQ_MAX_LEN     C32_MAX_BYTES
+#define FREQ_MAX_LEN     CU32_MAX_BYTES
 #define MAX_RAW_POSTING_LEN(_raw_posting_size, _text_len, _freq) \
     (              _raw_posting_size \
                    + _text_len                /* term text content */ \
-                   + FREQ_MAX_LEN             /* freq c32 */ \
-                   + (C32_MAX_BYTES * _freq)  /* positions deltas */ \
+                   + FREQ_MAX_LEN             /* freq cu32 */ \
+                   + (CU32_MAX_BYTES * _freq)  /* positions deltas */ \
                    + _freq                    /* per-pos boost byte */ \
     )
 
@@ -137,7 +137,7 @@ RichPost_Add_Inversion_To_Pool_IMP(RichPosting *self, PostingPool *post_pool,
             const uint32_t prox_delta = t_ivars->pos - last_prox;
             const float boost = field_boost * t_ivars->boost;
 
-            NumUtil_encode_c32(prox_delta, &dest);
+            NumUtil_encode_cu32(prox_delta, &dest);
             last_prox = t_ivars->pos;
 
             *((uint8_t*)dest) = Sim_Encode_Norm(sim, boost);
