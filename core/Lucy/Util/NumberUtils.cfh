@@ -87,6 +87,13 @@ inert class Lucy::Util::NumberUtils nickname NumUtil {
     inert inline void
     encode_c32(uint32_t value, char **dest);
 
+    /** Encode a compressed 32-bit signed integer at the space pointed to by
+     * `dest`. As a side effect, `dest` will be advanced to immediately after
+     * the end of the compressed data.
+     */
+    inert inline void
+    encode_ci32(int32_t value, char **dest);
+
     /** Encode a compressed 32-bit unsigned integer at the space pointed to by
      * `dest`. As a side effect, `dest` will be advanced to immediately after
      * the end of the compressed data.
@@ -117,6 +124,13 @@ inert class Lucy::Util::NumberUtils nickname NumUtil {
     inert inline void
     encode_c64(uint64_t value, char **dest);
 
+    /** Encode a compressed 64-bit signed integer at the space pointed to by
+     * `dest`. As a side effect, `dest` will be advanced to immediately after
+     * the end of the compressed data.
+     */
+    inert inline void
+    encode_ci64(int64_t value, char **dest);
+
     /** Encode a compressed 64-bit unsigned integer at the space pointed to by
      * `dest`. As a side effect, `dest` will be advanced to immediately after
      * the end of the compressed data.
@@ -131,6 +145,13 @@ inert class Lucy::Util::NumberUtils nickname NumUtil {
     inert inline uint32_t
     decode_c32(const char **source);
 
+    /** Read a compressed 32-bit signed integer from the buffer pointed to
+     * by `source`.  As a side effect, advance the pointer, consuming the
+     * bytes occupied by the compressed number.
+     */
+    inert inline int32_t
+    decode_ci32(const char **source);
+
     /** Read a compressed 32-bit unsigned integer from the buffer pointed to
      * by `source`.  As a side effect, advance the pointer, consuming the
      * bytes occupied by the compressed number.
@@ -144,6 +165,13 @@ inert class Lucy::Util::NumberUtils nickname NumUtil {
      */
     inert inline uint64_t
     decode_c64(const char **source);
+
+    /** Read a compressed 64-bit signed integer from the buffer pointed to
+     * by `source`.  As a side effect, advance the pointer, consuming the
+     * bytes occupied by the compressed number.
+     */
+    inert inline int64_t
+    decode_ci64(const char **source);
 
     /** Read a compressed 64-bit unsigned integer from the buffer pointed to
      * by `source`.  As a side effect, advance the pointer, consuming the
@@ -332,12 +360,19 @@ lucy_NumUtil_decode_bigend_f64(const void *source) {
 
 #define LUCY_NUMUTIL_C32_MAX_BYTES ((sizeof(uint32_t) * 8 / 7) + 1) /*  5 */
 #define LUCY_NUMUTIL_C64_MAX_BYTES ((sizeof(uint64_t) * 8 / 7) + 1) /* 10 */
+#define LUCY_NUMUTIL_CI32_MAX_BYTES ((sizeof(int32_t) * 8 / 7) + 1)  /*  5 */
 #define LUCY_NUMUTIL_CU32_MAX_BYTES ((sizeof(uint32_t) * 8 / 7) + 1) /*  5 */
+#define LUCY_NUMUTIL_CI64_MAX_BYTES ((sizeof(int64_t) * 8 / 7) + 1)  /* 10 */
 #define LUCY_NUMUTIL_CU64_MAX_BYTES ((sizeof(uint64_t) * 8 / 7) + 1) /* 10 */
 
 static CFISH_INLINE void
 lucy_NumUtil_encode_c32(uint32_t value, char **out_buf) {
     lucy_NumUtil_encode_cu32(value, out_buf);
+}
+
+static CFISH_INLINE void
+lucy_NumUtil_encode_ci32(int32_t value, char **out_buf) {
+    lucy_NumUtil_encode_cu32((uint32_t)value, out_buf);
 }
 
 static CFISH_INLINE void
@@ -362,6 +397,11 @@ lucy_NumUtil_encode_cu32(uint32_t value, char **out_buf) {
 static CFISH_INLINE void
 lucy_NumUtil_encode_c64(uint64_t value, char **out_buf) {
     lucy_NumUtil_encode_cu64(value, out_buf);
+}
+
+static CFISH_INLINE void
+lucy_NumUtil_encode_ci64(int64_t value, char **out_buf) {
+    lucy_NumUtil_encode_cu64((uint64_t)value, out_buf);
 }
 
 static CFISH_INLINE void
@@ -424,6 +464,11 @@ lucy_NumUtil_decode_c32(const char **source_ptr) {
     return decoded;
 }
 
+static CFISH_INLINE int32_t
+lucy_NumUtil_decode_ci32(const char **source_ptr) {
+    return (int32_t)lucy_NumUtil_decode_cu32(source_ptr);
+}
+
 static CFISH_INLINE uint32_t
 lucy_NumUtil_decode_cu32(const char **source_ptr) {
     const char *source = *source_ptr;
@@ -440,6 +485,11 @@ lucy_NumUtil_decode_c64(const char **source_ptr) {
     LUCY_NUMUTIL_DECODE_CINT(decoded, source);
     *source_ptr = source;
     return decoded;
+}
+
+static CFISH_INLINE int64_t
+lucy_NumUtil_decode_ci64(const char **source_ptr) {
+    return (int64_t)lucy_NumUtil_decode_cu64(source_ptr);
 }
 
 static CFISH_INLINE uint64_t
@@ -530,6 +580,8 @@ lucy_NumUtil_u4set(void *array, uint32_t tick, uint8_t value) {
 #ifdef LUCY_USE_SHORT_NAMES
   #define C32_MAX_BYTES                LUCY_NUMUTIL_C32_MAX_BYTES
   #define C64_MAX_BYTES                LUCY_NUMUTIL_C64_MAX_BYTES
+  #define CI32_MAX_BYTES               LUCY_NUMUTIL_CI32_MAX_BYTES
+  #define CI64_MAX_BYTES               LUCY_NUMUTIL_CI64_MAX_BYTES
   #define CU32_MAX_BYTES               LUCY_NUMUTIL_CU32_MAX_BYTES
   #define CU64_MAX_BYTES               LUCY_NUMUTIL_CU64_MAX_BYTES
 #endif
