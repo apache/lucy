@@ -297,7 +297,7 @@ func GOLUCY_Doc_Serialize(d *C.lucy_Doc, outstream *C.lucy_OutStream) {
 	hash := clownfish.GoToClownfish(fields, unsafe.Pointer(C.CFISH_HASH), false)
 	defer C.cfish_decref(hash)
 	C.lucy_Freezer_serialize_hash((*C.cfish_Hash)(hash), outstream)
-	C.LUCY_OutStream_Write_C32(outstream, C.uint32_t(ivars.doc_id))
+	C.LUCY_OutStream_Write_CI32(outstream, ivars.doc_id)
 }
 
 //export GOLUCY_Doc_Deserialize
@@ -308,7 +308,7 @@ func GOLUCY_Doc_Deserialize(d *C.lucy_Doc, instream *C.lucy_InStream) *C.lucy_Do
 	fields := clownfish.ToGo(hash)
 	fieldsID := registry.store(fields)
 	ivars.fields = unsafe.Pointer(fieldsID)
-	ivars.doc_id = C.int32_t(C.LUCY_InStream_Read_C32(instream))
+	ivars.doc_id = C.LUCY_InStream_Read_CI32(instream)
 	return d
 }
 
@@ -473,12 +473,12 @@ func doReadDocData(ddrC *C.lucy_DefaultDocReader, docID int32, doc interface{}) 
 	C.LUCY_InStream_Seek(ixInstream, C.int64_t(docID*8))
 	start := C.LUCY_InStream_Read_U64(ixInstream)
 	C.LUCY_InStream_Seek(datInstream, C.int64_t(start))
-	numFields := uint32(C.LUCY_InStream_Read_C32(datInstream))
+	numFields := uint32(C.LUCY_InStream_Read_CU32(datInstream))
 
 	// Decode stored data and build up the doc field by field.
 	for i := uint32(0); i < numFields; i++ {
 		// Read field name.
-		fieldNameLen := C.size_t(C.LUCY_InStream_Read_C32(datInstream))
+		fieldNameLen := C.size_t(C.LUCY_InStream_Read_CU32(datInstream))
 		if fieldNameLen > fieldNameCap {
 			fieldNameCap = fieldNameLen
 			fieldName = ((*C.char)(C.realloc(unsafe.Pointer(fieldName), fieldNameCap+1)))
@@ -497,7 +497,7 @@ func doReadDocData(ddrC *C.lucy_DefaultDocReader, docID int32, doc interface{}) 
 		// Read the field value.
 		switch C.LUCY_FType_Primitive_ID(fieldType) & C.lucy_FType_PRIMITIVE_ID_MASK {
 		case C.lucy_FType_TEXT:
-			valueLen := C.size_t(C.LUCY_InStream_Read_C32(datInstream))
+			valueLen := C.size_t(C.LUCY_InStream_Read_CU32(datInstream))
 			buf := ((*C.char)(C.malloc(valueLen + 1)))
 			C.LUCY_InStream_Read_Bytes(datInstream, buf, valueLen)
 			val := C.GoStringN(buf, C.int(valueLen))
@@ -506,7 +506,7 @@ func doReadDocData(ddrC *C.lucy_DefaultDocReader, docID int32, doc interface{}) 
 				return err
 			}
 		case C.lucy_FType_BLOB:
-			valueLen := C.size_t(C.LUCY_InStream_Read_C32(datInstream))
+			valueLen := C.size_t(C.LUCY_InStream_Read_CU32(datInstream))
 			buf := ((*C.char)(C.malloc(valueLen)))
 			C.LUCY_InStream_Read_Bytes(datInstream, buf, valueLen)
 			val := C.GoBytes(unsafe.Pointer(buf), C.int(valueLen))
@@ -525,12 +525,12 @@ func doReadDocData(ddrC *C.lucy_DefaultDocReader, docID int32, doc interface{}) 
 				return err
 			}
 		case C.lucy_FType_INT32:
-			err := setField(fields, fieldNameGo, int32(C.LUCY_InStream_Read_C32(datInstream)))
+			err := setField(fields, fieldNameGo, int32(C.LUCY_InStream_Read_CI32(datInstream)))
 			if err != nil {
 				return err
 			}
 		case C.lucy_FType_INT64:
-			err := setField(fields, fieldNameGo, int64(C.LUCY_InStream_Read_C64(datInstream)))
+			err := setField(fields, fieldNameGo, int64(C.LUCY_InStream_Read_CI64(datInstream)))
 			if err != nil {
 				return err
 			}

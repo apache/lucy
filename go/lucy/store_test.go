@@ -215,11 +215,17 @@ func TestIOStreamReadWrite(t *testing.T) {
 	if err = outStream.WriteU64(42); err != nil {
 		t.Errorf("WriteU64: %s", err)
 	}
-	if err = outStream.WriteC32(42); err != nil {
-		t.Errorf("WriteC32: %s", err)
+	if err = outStream.WriteCI32(42); err != nil {
+		t.Errorf("WriteCI32: %s", err)
 	}
-	if err = outStream.WriteC64(42); err != nil {
-		t.Errorf("WriteC64: %s", err)
+	if err = outStream.WriteCU32(42); err != nil {
+		t.Errorf("WriteCU32: %s", err)
+	}
+	if err = outStream.WriteCI64(42); err != nil {
+		t.Errorf("WriteCI64: %s", err)
+	}
+	if err = outStream.WriteCU64(42); err != nil {
+		t.Errorf("WriteCU64: %s", err)
 	}
 	if err = outStream.WriteF32(1.5); err != nil {
 		t.Errorf("WriteF32: %s", err)
@@ -265,11 +271,17 @@ func TestIOStreamReadWrite(t *testing.T) {
 	if got, err := inStream.ReadU64(); got != 42 || err != nil {
 		t.Errorf("ReadU64: %d, %s", got, err)
 	}
-	if got, err := inStream.ReadC32(); got != 42 || err != nil {
-		t.Errorf("ReadC32: %d, %s", got, err)
+	if got, err := inStream.ReadCI32(); got != 42 || err != nil {
+		t.Errorf("ReadCI32: %d, %s", got, err)
 	}
-	if got, err := inStream.ReadC64(); got != 42 || err != nil {
-		t.Errorf("ReadC64: %d, %s", got, err)
+	if got, err := inStream.ReadCU32(); got != 42 || err != nil {
+		t.Errorf("ReadCU32: %d, %s", got, err)
+	}
+	if got, err := inStream.ReadCI64(); got != 42 || err != nil {
+		t.Errorf("ReadCI64: %d, %s", got, err)
+	}
+	if got, err := inStream.ReadCU64(); got != 42 || err != nil {
+		t.Errorf("ReadCU64: %d, %s", got, err)
 	}
 	if got, err := inStream.ReadF32(); got != 1.5 || err != nil {
 		t.Errorf("ReadF32: %d, %s", got, err)

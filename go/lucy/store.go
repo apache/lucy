@@ -95,7 +95,7 @@ func (in *InStreamIMP) ReadString() (string, error) {
 	var retval string
 	err := clownfish.TrapErr(func() {
 		self := (*C.lucy_InStream)(clownfish.Unwrap(in, "in"))
-		size := C.size_t(C.LUCY_InStream_Read_C32(self))
+		size := C.size_t(C.LUCY_InStream_Read_CU32(self))
 		buf := (*C.char)(C.malloc(size))
 		defer C.free(unsafe.Pointer(buf))
 		C.LUCY_InStream_Read_Bytes(self, buf, size)
@@ -180,11 +180,47 @@ func (in *InStreamIMP) ReadC32() (uint32, error) {
 	return retval, err
 }
 
+func (in *InStreamIMP) ReadCI32() (int32, error) {
+	var retval int32
+	err := clownfish.TrapErr(func() {
+		self := (*C.lucy_InStream)(clownfish.Unwrap(in, "in"))
+		retval = int32(C.LUCY_InStream_Read_CI32(self))
+	})
+	return retval, err
+}
+
+func (in *InStreamIMP) ReadCU32() (uint32, error) {
+	var retval uint32
+	err := clownfish.TrapErr(func() {
+		self := (*C.lucy_InStream)(clownfish.Unwrap(in, "in"))
+		retval = uint32(C.LUCY_InStream_Read_CU32(self))
+	})
+	return retval, err
+}
+
 func (in *InStreamIMP) ReadC64() (uint64, error) {
 	var retval uint64
 	err := clownfish.TrapErr(func() {
 		self := (*C.lucy_InStream)(clownfish.Unwrap(in, "in"))
 		retval = uint64(C.LUCY_InStream_Read_C64(self))
+	})
+	return retval, err
+}
+
+func (in *InStreamIMP) ReadCI64() (int64, error) {
+	var retval int64
+	err := clownfish.TrapErr(func() {
+		self := (*C.lucy_InStream)(clownfish.Unwrap(in, "in"))
+		retval = int64(C.LUCY_InStream_Read_CI64(self))
+	})
+	return retval, err
+}
+
+func (in *InStreamIMP) ReadCU64() (uint64, error) {
+	var retval uint64
+	err := clownfish.TrapErr(func() {
+		self := (*C.lucy_InStream)(clownfish.Unwrap(in, "in"))
+		retval = uint64(C.LUCY_InStream_Read_CU64(self))
 	})
 	return retval, err
 }
@@ -314,10 +350,38 @@ func (out *OutStreamIMP) WriteC32(value uint32) error {
 	})
 }
 
+func (out *OutStreamIMP) WriteCI32(value int32) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_OutStream)(clownfish.Unwrap(out, "out"))
+		C.LUCY_OutStream_Write_CI32(self, C.int32_t(value))
+	})
+}
+
+func (out *OutStreamIMP) WriteCU32(value uint32) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_OutStream)(clownfish.Unwrap(out, "out"))
+		C.LUCY_OutStream_Write_CU32(self, C.uint32_t(value))
+	})
+}
+
 func (out *OutStreamIMP) WriteC64(value uint64) error {
 	return clownfish.TrapErr(func() {
 		self := (*C.lucy_OutStream)(clownfish.Unwrap(out, "out"))
 		C.LUCY_OutStream_Write_C64(self, C.uint64_t(value))
+	})
+}
+
+func (out *OutStreamIMP) WriteCI64(value int64) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_OutStream)(clownfish.Unwrap(out, "out"))
+		C.LUCY_OutStream_Write_CI64(self, C.int64_t(value))
+	})
+}
+
+func (out *OutStreamIMP) WriteCU64(value uint64) error {
+	return clownfish.TrapErr(func() {
+		self := (*C.lucy_OutStream)(clownfish.Unwrap(out, "out"))
+		C.LUCY_OutStream_Write_CU64(self, C.uint64_t(value))
 	})
 }
 
