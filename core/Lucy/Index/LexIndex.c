@@ -129,11 +129,11 @@ S_read_entry(LexIndex *self) {
     int64_t offset = (int64_t)NumUtil_decode_bigend_u64(ivars->offsets + ivars->tick);
     InStream_Seek(ix_in, offset);
     TermStepper_Read_Key_Frame(ivars->term_stepper, ix_in);
-    int32_t doc_freq = InStream_Read_C32(ix_in);
+    int32_t doc_freq = InStream_Read_CI32(ix_in);
     TInfo_Set_Doc_Freq(tinfo, doc_freq);
     TInfo_Set_Post_FilePos(tinfo, InStream_Read_C64(ix_in));
     int64_t skip_filepos = doc_freq >= ivars->skip_interval
-                           ? InStream_Read_C64(ix_in)
+                           ? InStream_Read_CI64(ix_in)
                            : 0;
     TInfo_Set_Skip_FilePos(tinfo, skip_filepos);
     TInfo_Set_Lex_FilePos(tinfo, InStream_Read_C64(ix_in));

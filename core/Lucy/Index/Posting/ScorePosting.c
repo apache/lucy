@@ -177,12 +177,12 @@ ScorePost_Read_Raw_IMP(ScorePosting *self, InStream *instream,
                        MemoryPool *mem_pool) {
     const char *const text_buf  = Str_Get_Ptr8(term_text);
     const size_t      text_size = Str_Get_Size(term_text);
-    const uint32_t    doc_code  = InStream_Read_C32(instream);
+    const uint32_t    doc_code  = InStream_Read_CU32(instream);
     const uint32_t    delta_doc = doc_code >> 1;
     const int32_t     doc_id    = last_doc_id + delta_doc;
     const uint32_t    freq      = (doc_code & 1)
                                   ? 1
-                                  : InStream_Read_C32(instream);
+                                  : InStream_Read_CU32(instream);
     const size_t base_size = Class_Get_Obj_Alloc_Size(RAWPOSTING);
     size_t raw_post_bytes  = MAX_RAW_POSTING_LEN(base_size, text_size, freq);
     void *const allocation = MemPool_Grab(mem_pool, raw_post_bytes);

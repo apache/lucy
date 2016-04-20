@@ -126,7 +126,7 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
         obj = (Obj*)Freezer_deserialize_hash((Hash*)obj, instream);
     }
     else if (Obj_is_a(obj, INTEGER)) {
-        int64_t value = (int64_t)InStream_Read_C64(instream);
+        int64_t value = InStream_Read_CI64(instream);
         obj = (Obj*)Int_init((Integer*)obj, value);
     }
     else if (Obj_is_a(obj, FLOAT)) {
@@ -245,11 +245,11 @@ Freezer_serialize_varray(Vector *array, OutStream *outstream) {
 
 Vector*
 Freezer_deserialize_varray(Vector *array, InStream *instream) {
-    uint32_t size = InStream_Read_C32(instream);
+    uint32_t size = InStream_Read_CU32(instream);
     Vec_init(array, size);
-    for (uint32_t tick = InStream_Read_C32(instream);
+    for (uint32_t tick = InStream_Read_CU32(instream);
          tick < size;
-         tick += InStream_Read_C32(instream)
+         tick += InStream_Read_CU32(instream)
         ) {
         Obj *obj = THAW(instream);
         Vec_Store(array, tick, obj);
@@ -281,12 +281,12 @@ Freezer_serialize_hash(Hash *hash, OutStream *outstream) {
 
 Hash*
 Freezer_deserialize_hash(Hash *hash, InStream *instream) {
-    uint32_t size = InStream_Read_C32(instream);
+    uint32_t size = InStream_Read_CU32(instream);
 
     Hash_init(hash, size);
 
     while (size--) {
-        uint32_t len = InStream_Read_C32(instream);
+        uint32_t len = InStream_Read_CU32(instream);
         char *key_buf = (char*)MALLOCATE(len + 1);
         InStream_Read_Bytes(instream, key_buf, len);
         key_buf[len] = '\0';

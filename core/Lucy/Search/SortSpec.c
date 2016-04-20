@@ -53,7 +53,7 @@ SortSpec_Destroy_IMP(SortSpec *self) {
 
 SortSpec*
 SortSpec_Deserialize_IMP(SortSpec *self, InStream *instream) {
-    uint32_t num_rules = InStream_Read_C32(instream);
+    uint32_t num_rules = InStream_Read_CU32(instream);
     Vector *rules = Vec_new(num_rules);
 
     // Add rules.

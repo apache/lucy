@@ -95,7 +95,7 @@ ProximityQuery_Deserialize_IMP(ProximityQuery *self, InStream *instream) {
     float boost = InStream_Read_F32(instream);
     String *field = Freezer_read_string(instream);
     Vector *terms = Freezer_read_varray(instream);
-    uint32_t within = InStream_Read_C32(instream);
+    uint32_t within = InStream_Read_CU32(instream);
     return S_do_init(self, field, terms, boost, within);
 }
 

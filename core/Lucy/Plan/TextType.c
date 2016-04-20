@@ -151,7 +151,7 @@ void
 TextTermStepper_Read_Key_Frame_IMP(TextTermStepper *self,
                                    InStream *instream) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
-    const uint32_t text_len = InStream_Read_C32(instream);
+    const uint32_t text_len = InStream_Read_CU32(instream);
 
     // Allocate space.
     char *ptr = BB_Grow(ivars->bytebuf, text_len);
@@ -173,8 +173,8 @@ TextTermStepper_Read_Key_Frame_IMP(TextTermStepper *self,
 void
 TextTermStepper_Read_Delta_IMP(TextTermStepper *self, InStream *instream) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
-    const uint32_t text_overlap     = InStream_Read_C32(instream);
-    const uint32_t finish_chars_len = InStream_Read_C32(instream);
+    const uint32_t text_overlap     = InStream_Read_CU32(instream);
+    const uint32_t finish_chars_len = InStream_Read_CU32(instream);
     const uint32_t total_text_len   = text_overlap + finish_chars_len;
 
     // Allocate space.

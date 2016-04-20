@@ -71,7 +71,7 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
         // Read the field value.
         switch (FType_Primitive_ID(type) & FType_PRIMITIVE_ID_MASK) {
             case FType_TEXT: {
-                    uint32_t value_len = InStream_Read_C32(dat_in);
+                    uint32_t value_len = InStream_Read_CU32(dat_in);
                     char *buf = (char*)MALLOCATE(value_len + 1);
                     InStream_Read_Bytes(dat_in, buf, value_len);
                     buf[value_len] = '\0'; 
@@ -79,7 +79,7 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
                     break;
                 }
             case FType_BLOB: {
-                    uint32_t value_len = InStream_Read_C32(dat_in);
+                    uint32_t value_len = InStream_Read_CU32(dat_in);
                     char *buf = (char*)MALLOCATE(value_len);
                     InStream_Read_Bytes(dat_in, buf, value_len);
                     value = (Obj*)Blob_new_steal(buf, value_len);
@@ -92,10 +92,10 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
                 value = (Obj*)Float_new(InStream_Read_F64(dat_in));
                 break;
             case FType_INT32:
-                value = (Obj*)Int_new((int32_t)InStream_Read_C32(dat_in));
+                value = (Obj*)Int_new(InStream_Read_CI32(dat_in));
                 break;
             case FType_INT64:
-                value = (Obj*)Int_new((int64_t)InStream_Read_C64(dat_in));
+                value = (Obj*)Int_new(InStream_Read_CI64(dat_in));
                 break;
             default:
                 value = NULL;
