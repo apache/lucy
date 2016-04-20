@@ -38,7 +38,7 @@ sub get_number { $number{ ${ +shift } } }
 
 sub read_record {
     my ( $self, $instream ) = @_;
-    $number{$$self} += $instream->read_c32;
+    $number{$$self} += $instream->read_ci32;
 }
 
 package main;
@@ -47,7 +47,7 @@ use Lucy::Test;
 
 my $folder = Lucy::Store::RAMFolder->new;
 my $outstream = $folder->open_out("foo") or die Clownfish->error;
-$outstream->write_c32(10) for 1 .. 5;
+$outstream->write_ci32(10) for 1 .. 5;
 $outstream->close;
 my $instream = $folder->open_in("foo") or die Clownfish->error;
 my $stepper = MyStepper->new;

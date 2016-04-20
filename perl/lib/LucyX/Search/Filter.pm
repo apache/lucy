@@ -63,14 +63,14 @@ sub serialize {
     my ( $self, $outstream ) = @_;
     $self->SUPER::serialize($outstream);
     my $frozen = nfreeze( $query{$$self} );
-    $outstream->write_c32( bytes::length($frozen) );
+    $outstream->write_cu32( bytes::length($frozen) );
     $outstream->print($frozen);
 }
 
 sub deserialize {
     my ( $self, $instream ) = @_;
     $self->SUPER::deserialize($instream);
-    my $len = $instream->read_c32;
+    my $len = $instream->read_cu32;
     my $frozen;
     $instream->read( $frozen, $len );
     $query{$$self} = thaw($frozen);

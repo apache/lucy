@@ -47,7 +47,7 @@ sub check_round_trip_bytes {
     my $file = Lucy::Store::RAMFile->new;
     my $outstream = Lucy::Store::OutStream->open( file => $file );
     for (@$expected) {
-        $outstream->write_c32( bytes::length($_) );
+        $outstream->write_ci32( bytes::length($_) );
         $outstream->print($_);
     }
     $outstream->close;
@@ -56,7 +56,7 @@ sub check_round_trip_bytes {
     my @got;
     for (@$expected) {
         my $buf;
-        my $len = $instream->read_c32;
+        my $len = $instream->read_ci32;
         $instream->read( $buf, $len );
         push @got, $buf;
     }
@@ -95,24 +95,24 @@ $_ += int( rand( 2**16 ) ) for @nums;
 check_round_trip( 'u64', \@nums );
 
 @nums = ( 0 .. 127 );
-check_round_trip( 'c32', \@nums );
+check_round_trip( 'ci32', \@nums );
 
 @nums     = ( 128 .. 500 );
 $packed   = pack( 'w*', @nums );
-$ram_file = check_round_trip( 'c32', \@nums );
-is( $ram_file->get_contents, $packed, "C32 is equivalent to Perl's pack w" );
+$ram_file = check_round_trip( 'cu32', \@nums );
+is( $ram_file->get_contents, $packed, "CU32 is equivalent to Perl's pack w" );
 
 @nums = ( 0 .. 127 );
-check_round_trip( 'c64', \@nums );
+check_round_trip( 'ci64', \@nums );
 
 @nums     = ( 128 .. 500 );
 $packed   = pack( 'w*', @nums );
-$ram_file = check_round_trip( 'c64', \@nums );
-is( $ram_file->get_contents, $packed, "C64 is equivalent to Perl's pack w" );
+$ram_file = check_round_trip( 'cu64', \@nums );
+is( $ram_file->get_contents, $packed, "CU64 is equivalent to Perl's pack w" );
 
 @nums = map { $_ * 2**31 } 0 .. 2000;
 $_ += int( rand( 2**16 ) ) for @nums;
-check_round_trip( 'c64', \@nums );
+check_round_trip( 'cu64', \@nums );
 
 # rand (always?) has 64-bit precision, but we need 32-bit - so truncate via
 # pack/unpack.
@@ -152,6 +152,6 @@ my $unibytes = $latin;
 utf8ify($unibytes);
 utf8_flag_off($unibytes);
 my $slurped = $ram_file->get_contents;
-substr( $slurped, 0, 1, "" );    # ditch c32 at head of string;
+substr( $slurped, 0, 1, "" );    # ditch cu32 at head of string;
 is( $slurped, $unibytes, "write_string upgrades to utf8" );
 

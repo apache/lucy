@@ -24,7 +24,7 @@ my ( @items, $packed, $template, $buf, $file, $out, $in, $correct );
 $file = Lucy::Store::RAMFile->new;
 $out = Lucy::Store::OutStream->open( file => $file )
     or die Clownfish->error;
-$out->write_c64(10000);
+$out->write_cu64(10000);
 $out->close;
 $in = Lucy::Store::InStream->open( file => $file )
     or die Clownfish->error;

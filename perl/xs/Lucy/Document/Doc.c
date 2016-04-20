@@ -92,11 +92,11 @@ void
 LUCY_Doc_Serialize_IMP(lucy_Doc *self, lucy_OutStream *outstream) {
     dTHX;
     lucy_DocIVARS *const ivars = lucy_Doc_IVARS(self);
-    LUCY_OutStream_Write_C32(outstream, ivars->doc_id);
+    LUCY_OutStream_Write_CU32(outstream, ivars->doc_id);
     SV *frozen = S_nfreeze_fields(aTHX_ self);
     STRLEN len;
     char *buf = SvPV(frozen, len);
-    LUCY_OutStream_Write_C64(outstream, len);
+    LUCY_OutStream_Write_CU64(outstream, len);
     LUCY_OutStream_Write_Bytes(outstream, buf, len);
     SvREFCNT_dec(frozen);
 }
@@ -104,7 +104,7 @@ LUCY_Doc_Serialize_IMP(lucy_Doc *self, lucy_OutStream *outstream) {
 static HV*
 S_thaw_fields(pTHX_ lucy_InStream *instream) {
     // Read frozen data into an SV buffer.
-    size_t len = (size_t)LUCY_InStream_Read_C64(instream);
+    size_t len = (size_t)LUCY_InStream_Read_CU64(instream);
     SV *buf_sv = newSV(len + 1);
     SvPOK_on(buf_sv);
     SvCUR_set(buf_sv, len);
@@ -137,7 +137,7 @@ S_thaw_fields(pTHX_ lucy_InStream *instream) {
 lucy_Doc*
 LUCY_Doc_Deserialize_IMP(lucy_Doc *self, lucy_InStream *instream) {
     dTHX;
-    int32_t doc_id = (int32_t)LUCY_InStream_Read_C32(instream);
+    int32_t doc_id = (int32_t)LUCY_InStream_Read_CU32(instream);
     HV *fields = S_thaw_fields(aTHX_ instream);
     lucy_Doc_init(self, fields, doc_id);
     SvREFCNT_dec(fields);
