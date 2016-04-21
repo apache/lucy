@@ -121,7 +121,7 @@ HLWriter_Add_Inverted_Doc_IMP(HighlightWriter *self, Inverter *inverter,
             num_highlightable++;
         }
     }
-    OutStream_Write_C32(dat_out, num_highlightable);
+    OutStream_Write_CU32(dat_out, num_highlightable);
 
     Inverter_Iterate(inverter);
     while (Inverter_Next(inverter)) {

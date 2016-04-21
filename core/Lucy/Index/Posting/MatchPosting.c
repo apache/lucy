@@ -272,7 +272,7 @@ MatchTInfoStepper_Write_Key_Frame_IMP(MatchTermInfoStepper *self,
     TermInfoIVARS *const tinfo_ivars = TInfo_IVARS((TermInfo*)value);
 
     // Write doc_freq.
-    OutStream_Write_C32(outstream, doc_freq);
+    OutStream_Write_CI32(outstream, doc_freq);
 
     // Write postings file pointer.
     OutStream_Write_CI64(outstream, tinfo_ivars->post_filepos);
@@ -316,7 +316,7 @@ MatchTInfoStepper_Read_Key_Frame_IMP(MatchTermInfoStepper *self,
     TermInfoIVARS *const tinfo_ivars = TInfo_IVARS((TermInfo*)ivars->value);
 
     // Read doc freq.
-    tinfo_ivars->doc_freq = InStream_Read_C32(instream);
+    tinfo_ivars->doc_freq = InStream_Read_CI32(instream);
 
     // Read postings file pointer.
     tinfo_ivars->post_filepos = InStream_Read_CI64(instream);
@@ -336,7 +336,7 @@ MatchTInfoStepper_Read_Delta_IMP(MatchTermInfoStepper *self, InStream *instream)
     TermInfoIVARS *const tinfo_ivars = TInfo_IVARS((TermInfo*)ivars->value);
 
     // Read doc freq.
-    tinfo_ivars->doc_freq = InStream_Read_C32(instream);
+    tinfo_ivars->doc_freq = InStream_Read_CI32(instream);
 
     // Adjust postings file pointer.
     tinfo_ivars->post_filepos += InStream_Read_CI64(instream);

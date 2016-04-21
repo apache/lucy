@@ -47,7 +47,7 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
     InStream_Seek(ix_in, (int64_t)doc_id * 8);
     start = InStream_Read_U64(ix_in);
     InStream_Seek(dat_in, start);
-    num_fields = InStream_Read_C32(dat_in);
+    num_fields = InStream_Read_CU32(dat_in);
 
     // Decode stored data and build up the doc field by field.
     while (num_fields--) {

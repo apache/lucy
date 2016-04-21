@@ -51,14 +51,14 @@ void
 TopDocs_Serialize_IMP(TopDocs *self, OutStream *outstream) {
     TopDocsIVARS *const ivars = TopDocs_IVARS(self);
     Freezer_serialize_varray(ivars->match_docs, outstream);
-    OutStream_Write_C32(outstream, ivars->total_hits);
+    OutStream_Write_CU32(outstream, ivars->total_hits);
 }
 
 TopDocs*
 TopDocs_Deserialize_IMP(TopDocs *self, InStream *instream) {
     TopDocsIVARS *const ivars = TopDocs_IVARS(self);
     ivars->match_docs = Freezer_read_varray(instream);
-    ivars->total_hits = InStream_Read_C32(instream);
+    ivars->total_hits = InStream_Read_CU32(instream);
     return self;
 }
 

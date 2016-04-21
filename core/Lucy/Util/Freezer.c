@@ -68,7 +68,7 @@ Freezer_serialize(Obj *obj, OutStream *outstream) {
     }
     else if (Obj_is_a(obj, INTEGER)) {
         int64_t val = Int_Get_Value((Integer*)obj);
-        OutStream_Write_C64(outstream, (uint64_t)val);
+        OutStream_Write_CI64(outstream, val);
     }
     else if (Obj_is_a(obj, FLOAT)) {
         double val = Float_Get_Value((Float*)obj);
@@ -241,13 +241,13 @@ Freezer_serialize_varray(Vector *array, OutStream *outstream) {
     for (uint32_t i = 0; i < size; i++) {
         Obj *elem = Vec_Fetch(array, i);
         if (elem) {
-            OutStream_Write_C32(outstream, i - last_valid_tick);
+            OutStream_Write_CU32(outstream, i - last_valid_tick);
             FREEZE(elem, outstream);
             last_valid_tick = i;
         }
     }
     // Terminate.
-    OutStream_Write_C32(outstream, size - last_valid_tick);
+    OutStream_Write_CU32(outstream, size - last_valid_tick);
 }
 
 Vector*

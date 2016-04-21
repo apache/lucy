@@ -135,7 +135,7 @@ TextTermStepper_Write_Delta_IMP(TextTermStepper *self, OutStream *outstream,
     const size_t diff_len            = new_size - overlap;
 
     // Write number of common bytes and common bytes.
-    OutStream_Write_C32(outstream, overlap);
+    OutStream_Write_CI32(outstream, overlap);
     OutStream_Write_String(outstream, diff_start_str, diff_len);
 
     // Update value.
