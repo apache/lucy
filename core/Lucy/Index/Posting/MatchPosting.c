@@ -275,11 +275,11 @@ MatchTInfoStepper_Write_Key_Frame_IMP(MatchTermInfoStepper *self,
     OutStream_Write_C32(outstream, doc_freq);
 
     // Write postings file pointer.
-    OutStream_Write_C64(outstream, tinfo_ivars->post_filepos);
+    OutStream_Write_CI64(outstream, tinfo_ivars->post_filepos);
 
     // Write skip file pointer (maybe).
     if (doc_freq >= ivars->skip_interval) {
-        OutStream_Write_C64(outstream, tinfo_ivars->skip_filepos);
+        OutStream_Write_CI64(outstream, tinfo_ivars->skip_filepos);
     }
 
     TInfo_Mimic((TermInfo*)ivars->value, (Obj*)tinfo);
@@ -299,11 +299,11 @@ MatchTInfoStepper_Write_Delta_IMP(MatchTermInfoStepper *self,
     OutStream_Write_C32(outstream, doc_freq);
 
     // Write postings file pointer delta.
-    OutStream_Write_C64(outstream, post_delta);
+    OutStream_Write_CI64(outstream, post_delta);
 
     // Write skip file pointer (maybe).
     if (doc_freq >= ivars->skip_interval) {
-        OutStream_Write_C64(outstream, TInfo_IVARS(tinfo)->skip_filepos);
+        OutStream_Write_CI64(outstream, TInfo_IVARS(tinfo)->skip_filepos);
     }
 
     TInfo_Mimic((TermInfo*)ivars->value, (Obj*)tinfo);
@@ -319,11 +319,11 @@ MatchTInfoStepper_Read_Key_Frame_IMP(MatchTermInfoStepper *self,
     tinfo_ivars->doc_freq = InStream_Read_C32(instream);
 
     // Read postings file pointer.
-    tinfo_ivars->post_filepos = InStream_Read_C64(instream);
+    tinfo_ivars->post_filepos = InStream_Read_CI64(instream);
 
     // Maybe read skip pointer.
     if (tinfo_ivars->doc_freq >= ivars->skip_interval) {
-        tinfo_ivars->skip_filepos = InStream_Read_C64(instream);
+        tinfo_ivars->skip_filepos = InStream_Read_CI64(instream);
     }
     else {
         tinfo_ivars->skip_filepos = 0;
@@ -339,11 +339,11 @@ MatchTInfoStepper_Read_Delta_IMP(MatchTermInfoStepper *self, InStream *instream)
     tinfo_ivars->doc_freq = InStream_Read_C32(instream);
 
     // Adjust postings file pointer.
-    tinfo_ivars->post_filepos += InStream_Read_C64(instream);
+    tinfo_ivars->post_filepos += InStream_Read_CI64(instream);
 
     // Maybe read skip pointer.
     if (tinfo_ivars->doc_freq >= ivars->skip_interval) {
-        tinfo_ivars->skip_filepos = InStream_Read_C64(instream);
+        tinfo_ivars->skip_filepos = InStream_Read_CI64(instream);
     }
     else {
         tinfo_ivars->skip_filepos = 0;

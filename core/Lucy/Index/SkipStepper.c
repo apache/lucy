@@ -48,7 +48,7 @@ void
 SkipStepper_Read_Record_IMP(SkipStepper *self, InStream *instream) {
     SkipStepperIVARS *const ivars = SkipStepper_IVARS(self);
     ivars->doc_id   += InStream_Read_C32(instream);
-    ivars->filepos  += InStream_Read_C64(instream);
+    ivars->filepos  += InStream_Read_CI64(instream);
 }
 
 String*
@@ -69,7 +69,7 @@ SkipStepper_Write_Record_IMP(SkipStepper *self, OutStream *outstream,
     OutStream_Write_C32(outstream, delta_doc_id);
 
     // Write delta file pointer.
-    OutStream_Write_C64(outstream, delta_filepos);
+    OutStream_Write_CI64(outstream, delta_filepos);
 }
 
 
