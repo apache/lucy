@@ -138,7 +138,7 @@ RawPostWriter_Write_Posting_IMP(RawPostingWriter *self, RawPosting *posting) {
     else {
         const uint32_t doc_code = delta_doc << 1;
         OutStream_Write_CU32(outstream, doc_code);
-        OutStream_Write_C32(outstream, posting_ivars->freq);
+        OutStream_Write_CU32(outstream, posting_ivars->freq);
     }
     OutStream_Write_Bytes(outstream, aux_content, posting_ivars->aux_len);
     ivars->last_doc_id = doc_id;

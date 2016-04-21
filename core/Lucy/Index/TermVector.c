@@ -93,9 +93,9 @@ TV_Serialize_IMP(TermVector *self, OutStream *target) {
     OutStream_Write_CU64(target, ivars->num_pos);
 
     for (size_t i = 0; i < ivars->num_pos; i++) {
-        OutStream_Write_C32(target, posits[i]);
-        OutStream_Write_C32(target, starts[i]);
-        OutStream_Write_C32(target, ends[i]);
+        OutStream_Write_CI32(target, posits[i]);
+        OutStream_Write_CI32(target, starts[i]);
+        OutStream_Write_CI32(target, ends[i]);
     }
 }
 
@@ -110,9 +110,9 @@ TV_Deserialize_IMP(TermVector *self, InStream *instream) {
     int32_t *starts = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
     int32_t *ends   = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
     for (size_t i = 0; i < num_pos; i++) {
-        posits[i] = InStream_Read_C32(instream);
-        starts[i] = InStream_Read_C32(instream);
-        ends[i]   = InStream_Read_C32(instream);
+        posits[i] = InStream_Read_CI32(instream);
+        starts[i] = InStream_Read_CI32(instream);
+        ends[i]   = InStream_Read_CI32(instream);
     }
     I32Array *positions     = I32Arr_new_steal(posits, num_pos);
     I32Array *start_offsets = I32Arr_new_steal(starts, num_pos);

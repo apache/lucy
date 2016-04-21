@@ -81,7 +81,7 @@ RichPost_Read_Record_IMP(RichPosting *self, InStream *instream) {
     }
     // Otherwise, freq was stored as a C32.
     else {
-        ivars->freq = InStream_Read_C32(instream);
+        ivars->freq = InStream_Read_CU32(instream);
     }
 
     // Read positions, aggregate per-position boost byte into weight.
@@ -96,7 +96,7 @@ RichPost_Read_Record_IMP(RichPosting *self, InStream *instream) {
     float    *prox_boosts  = ivars->prox_boosts;
 
     while (num_prox--) {
-        position += InStream_Read_C32(instream);
+        position += InStream_Read_CU32(instream);
         *positions++ = position;
         *prox_boosts = norm_decoder[InStream_Read_U8(instream)];
         aggregate_weight += *prox_boosts;

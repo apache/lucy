@@ -90,7 +90,7 @@ MatchPost_Read_Record_IMP(MatchPosting *self, InStream *instream) {
         ivars->freq = 1;
     }
     else {
-        ivars->freq = InStream_Read_C32(instream);
+        ivars->freq = InStream_Read_CU32(instream);
     }
 }
 
@@ -217,7 +217,7 @@ MatchPostWriter_Write_Posting_IMP(MatchPostingWriter *self, RawPosting *posting)
     else {
         const uint32_t doc_code = delta_doc << 1;
         OutStream_Write_CU32(outstream, doc_code);
-        OutStream_Write_C32(outstream, posting_ivars->freq);
+        OutStream_Write_CU32(outstream, posting_ivars->freq);
     }
     OutStream_Write_Bytes(outstream, aux_content, posting_ivars->aux_len);
     ivars->last_doc_id = doc_id;
@@ -296,7 +296,7 @@ MatchTInfoStepper_Write_Delta_IMP(MatchTermInfoStepper *self,
                            - TInfo_IVARS(last_tinfo)->post_filepos;
 
     // Write doc_freq.
-    OutStream_Write_C32(outstream, doc_freq);
+    OutStream_Write_CU32(outstream, doc_freq);
 
     // Write postings file pointer delta.
     OutStream_Write_CI64(outstream, post_delta);
