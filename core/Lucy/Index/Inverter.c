@@ -17,6 +17,7 @@
 #define C_LUCY_INVERTER
 #define C_LUCY_INVERTERENTRY
 #include "Lucy/Util/ToolSet.h"
+#include "Clownfish/Blob.h"
 
 #include "Lucy/Index/Inverter.h"
 #include "Lucy/Analysis/Analyzer.h"
@@ -154,6 +155,23 @@ void
 Inverter_Add_Field_IMP(Inverter *self, InverterEntry *entry) {
     InverterIVARS *const ivars = Inverter_IVARS(self);
     InverterEntryIVARS *const entry_ivars = InvEntry_IVARS(entry);
+
+    if (entry_ivars->type) {
+        if (Obj_is_a((Obj*)entry_ivars->type, TEXTTYPE)) {
+            String *value = (String*)entry_ivars->value;
+            if (value != NULL && Str_Get_Size(value) > INT32_MAX) {
+                THROW(ERR, "Can't index strings over 2GB: %u64",
+                      (uint64_t)Str_Get_Size(value));
+            }
+        }
+        else if (Obj_is_a((Obj*)entry_ivars->type, BLOBTYPE)) {
+            Blob *value = (Blob*)entry_ivars->value;
+            if (value != NULL && Blob_Get_Size(value) > INT32_MAX) {
+                THROW(ERR, "Can't index strings over 2GB: %u64",
+                      (uint64_t)Blob_Get_Size(value));
+            }
+        }
+    }
 
     // Get an Inversion, going through analyzer if appropriate.
     if (entry_ivars->analyzer) {
