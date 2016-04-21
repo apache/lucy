@@ -47,7 +47,7 @@ MatchDoc_Destroy_IMP(MatchDoc *self) {
 void
 MatchDoc_Serialize_IMP(MatchDoc *self, OutStream *outstream) {
     MatchDocIVARS *const ivars = MatchDoc_IVARS(self);
-    OutStream_Write_C32(outstream, ivars->doc_id);
+    OutStream_Write_CI32(outstream, ivars->doc_id);
     OutStream_Write_F32(outstream, ivars->score);
     OutStream_Write_U8(outstream, ivars->values ? 1 : 0);
     if (ivars->values) { Freezer_serialize_varray(ivars->values, outstream); }
@@ -56,7 +56,7 @@ MatchDoc_Serialize_IMP(MatchDoc *self, OutStream *outstream) {
 MatchDoc*
 MatchDoc_Deserialize_IMP(MatchDoc *self, InStream *instream) {
     MatchDocIVARS *const ivars = MatchDoc_IVARS(self);
-    ivars->doc_id = InStream_Read_C32(instream);
+    ivars->doc_id = InStream_Read_CI32(instream);
     ivars->score  = InStream_Read_F32(instream);
     if (InStream_Read_U8(instream)) {
         ivars->values = Freezer_read_varray(instream);

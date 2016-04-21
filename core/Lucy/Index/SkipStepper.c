@@ -47,7 +47,7 @@ SkipStepper_Set_ID_And_Filepos_IMP(SkipStepper *self, int32_t doc_id,
 void
 SkipStepper_Read_Record_IMP(SkipStepper *self, InStream *instream) {
     SkipStepperIVARS *const ivars = SkipStepper_IVARS(self);
-    ivars->doc_id   += InStream_Read_C32(instream);
+    ivars->doc_id   += InStream_Read_CI32(instream);
     ivars->filepos  += InStream_Read_CI64(instream);
 }
 
@@ -66,7 +66,7 @@ SkipStepper_Write_Record_IMP(SkipStepper *self, OutStream *outstream,
     const int64_t delta_filepos = ivars->filepos - last_filepos;
 
     // Write delta doc id.
-    OutStream_Write_C32(outstream, delta_doc_id);
+    OutStream_Write_CI32(outstream, delta_doc_id);
 
     // Write delta file pointer.
     OutStream_Write_CI64(outstream, delta_filepos);
