@@ -265,8 +265,8 @@ test_ci32(TestBatchRunner *runner) {
     for (i = 0; i < 1000; i++) {
         int32_t got = InStream_Read_CI32(instream);
         if ((int64_t)got != ints[i]) {
-            FAIL(runner, "ci32 round trip failed: %" PRId32 ", %" PRId64,
-                 got, ints[i]);
+            FAIL(runner, "ci32 round trip failed: %" PRId64 ", %" PRId64,
+                 (int64_t)got, ints[i]);
             break;
         }
     }
