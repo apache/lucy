@@ -53,7 +53,7 @@ SortSpec_Destroy_IMP(SortSpec *self) {
 
 SortSpec*
 SortSpec_Deserialize_IMP(SortSpec *self, InStream *instream) {
-    uint32_t num_rules = InStream_Read_C32(instream);
+    uint32_t num_rules = InStream_Read_CU32(instream);
     Vector *rules = Vec_new(num_rules);
 
     // Add rules.
@@ -75,8 +75,9 @@ SortSpec_Get_Rules_IMP(SortSpec *self) {
 void
 SortSpec_Serialize_IMP(SortSpec *self, OutStream *target) {
     SortSpecIVARS *const ivars = SortSpec_IVARS(self);
+    // Skip size check.
     uint32_t num_rules = (uint32_t)Vec_Get_Size(ivars->rules);
-    OutStream_Write_C32(target, num_rules);
+    OutStream_Write_CU32(target, num_rules);
     for (uint32_t i = 0; i < num_rules; i++) {
         SortRule *rule = (SortRule*)Vec_Fetch(ivars->rules, i);
         SortRule_Serialize(rule, target);

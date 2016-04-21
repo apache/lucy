@@ -101,7 +101,8 @@ TextTermStepper_Write_Key_Frame_IMP(TextTermStepper *self,
     String     *string = (String*)CERTIFY(value, STRING);
     const char *buf    = Str_Get_Ptr8(string);
     size_t      size   = Str_Get_Size(string);
-    OutStream_Write_C32(outstream, size);
+    // Skip size check because we're deep in the internals.
+    OutStream_Write_CU32(outstream, (uint32_t)size);
     OutStream_Write_Bytes(outstream, buf, size);
 
     S_set_value(self, value);
@@ -134,7 +135,7 @@ TextTermStepper_Write_Delta_IMP(TextTermStepper *self, OutStream *outstream,
     const size_t diff_len            = new_size - overlap;
 
     // Write number of common bytes and common bytes.
-    OutStream_Write_C32(outstream, overlap);
+    OutStream_Write_CI32(outstream, overlap);
     OutStream_Write_String(outstream, diff_start_str, diff_len);
 
     // Update value.
@@ -151,7 +152,7 @@ void
 TextTermStepper_Read_Key_Frame_IMP(TextTermStepper *self,
                                    InStream *instream) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
-    const uint32_t text_len = InStream_Read_C32(instream);
+    const uint32_t text_len = InStream_Read_CU32(instream);
 
     // Allocate space.
     char *ptr = BB_Grow(ivars->bytebuf, text_len);
@@ -173,8 +174,8 @@ TextTermStepper_Read_Key_Frame_IMP(TextTermStepper *self,
 void
 TextTermStepper_Read_Delta_IMP(TextTermStepper *self, InStream *instream) {
     TextTermStepperIVARS *const ivars = TextTermStepper_IVARS(self);
-    const uint32_t text_overlap     = InStream_Read_C32(instream);
-    const uint32_t finish_chars_len = InStream_Read_C32(instream);
+    const uint32_t text_overlap     = InStream_Read_CU32(instream);
+    const uint32_t finish_chars_len = InStream_Read_CU32(instream);
     const uint32_t total_text_len   = text_overlap + finish_chars_len;
 
     // Allocate space.

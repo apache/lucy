@@ -90,12 +90,12 @@ TV_Serialize_IMP(TermVector *self, OutStream *target) {
 
     Freezer_serialize_string(ivars->field, target);
     Freezer_serialize_string(ivars->text, target);
-    OutStream_Write_C64(target, ivars->num_pos);
+    OutStream_Write_CU64(target, ivars->num_pos);
 
     for (size_t i = 0; i < ivars->num_pos; i++) {
-        OutStream_Write_C32(target, posits[i]);
-        OutStream_Write_C32(target, starts[i]);
-        OutStream_Write_C32(target, ends[i]);
+        OutStream_Write_CI32(target, posits[i]);
+        OutStream_Write_CI32(target, starts[i]);
+        OutStream_Write_CI32(target, ends[i]);
     }
 }
 
@@ -103,16 +103,16 @@ TermVector*
 TV_Deserialize_IMP(TermVector *self, InStream *instream) {
     String *field = Freezer_read_string(instream);
     String *text  = Freezer_read_string(instream);
-    size_t  num_pos = InStream_Read_C64(instream);
+    size_t  num_pos = InStream_Read_CU64(instream);
 
     // Read positional data.
     int32_t *posits = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
     int32_t *starts = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
     int32_t *ends   = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));
     for (size_t i = 0; i < num_pos; i++) {
-        posits[i] = InStream_Read_C32(instream);
-        starts[i] = InStream_Read_C32(instream);
-        ends[i]   = InStream_Read_C32(instream);
+        posits[i] = InStream_Read_CI32(instream);
+        starts[i] = InStream_Read_CI32(instream);
+        ends[i]   = InStream_Read_CI32(instream);
     }
     I32Array *positions     = I32Arr_new_steal(posits, num_pos);
     I32Array *start_offsets = I32Arr_new_steal(starts, num_pos);

@@ -35,13 +35,13 @@
 #include "Lucy/Util/NumberUtils.h"
 
 #define FIELD_BOOST_LEN  1
-#define FREQ_MAX_LEN     C32_MAX_BYTES
+#define FREQ_MAX_LEN     CU32_MAX_BYTES
 #define MAX_RAW_POSTING_LEN(_raw_post_size, _text_len, _freq) \
     (              _raw_post_size \
                    + _text_len                /* term text content */ \
                    + FIELD_BOOST_LEN          /* field boost byte */ \
-                   + FREQ_MAX_LEN             /* freq c32 */ \
-                   + (C32_MAX_BYTES * _freq)  /* positions deltas */ \
+                   + FREQ_MAX_LEN             /* freq cu32 */ \
+                   + (CU32_MAX_BYTES * _freq)  /* positions deltas */ \
     )
 
 ScorePosting*
@@ -110,7 +110,7 @@ ScorePost_Add_Inversion_To_Pool_IMP(ScorePosting *self,
         for (uint32_t i = 0; i < freq; i++) {
             TokenIVARS *const t_ivars = Token_IVARS(tokens[i]);
             const uint32_t prox_delta = t_ivars->pos - last_prox;
-            NumUtil_encode_c32(prox_delta, &dest);
+            NumUtil_encode_cu32(prox_delta, &dest);
             last_prox = t_ivars->pos;
         }
 
@@ -134,9 +134,9 @@ void
 ScorePost_Read_Record_IMP(ScorePosting *self, InStream *instream) {
     ScorePostingIVARS *const ivars = ScorePost_IVARS(self);
     uint32_t  position = 0;
-    const size_t max_start_bytes = (C32_MAX_BYTES * 2) + 1;
+    const size_t max_start_bytes = (CU32_MAX_BYTES * 2) + 1;
     const char *buf = InStream_Buf(instream, max_start_bytes);
-    const uint32_t doc_code = NumUtil_decode_c32(&buf);
+    const uint32_t doc_code = NumUtil_decode_cu32(&buf);
     const uint32_t doc_delta = doc_code >> 1;
 
     // Apply delta doc and retrieve freq.
@@ -145,7 +145,7 @@ ScorePost_Read_Record_IMP(ScorePosting *self, InStream *instream) {
         ivars->freq = 1;
     }
     else {
-        ivars->freq = NumUtil_decode_c32(&buf);
+        ivars->freq = NumUtil_decode_cu32(&buf);
     }
 
     // Decode boost/norm byte.
@@ -162,9 +162,9 @@ ScorePost_Read_Record_IMP(ScorePosting *self, InStream *instream) {
     uint32_t *positions = ivars->prox;
 
     InStream_Advance_Buf(instream, buf);
-    buf = InStream_Buf(instream, num_prox * C32_MAX_BYTES);
+    buf = InStream_Buf(instream, num_prox * CU32_MAX_BYTES);
     while (num_prox--) {
-        position += NumUtil_decode_c32(&buf);
+        position += NumUtil_decode_cu32(&buf);
         *positions++ = position;
     }
 
@@ -177,12 +177,12 @@ ScorePost_Read_Raw_IMP(ScorePosting *self, InStream *instream,
                        MemoryPool *mem_pool) {
     const char *const text_buf  = Str_Get_Ptr8(term_text);
     const size_t      text_size = Str_Get_Size(term_text);
-    const uint32_t    doc_code  = InStream_Read_C32(instream);
+    const uint32_t    doc_code  = InStream_Read_CU32(instream);
     const uint32_t    delta_doc = doc_code >> 1;
     const int32_t     doc_id    = last_doc_id + delta_doc;
     const uint32_t    freq      = (doc_code & 1)
                                   ? 1
-                                  : InStream_Read_C32(instream);
+                                  : InStream_Read_CU32(instream);
     const size_t base_size = Class_Get_Obj_Alloc_Size(RAWPOSTING);
     size_t raw_post_bytes  = MAX_RAW_POSTING_LEN(base_size, text_size, freq);
     void *const allocation = MemPool_Grab(mem_pool, raw_post_bytes);

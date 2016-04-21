@@ -100,7 +100,7 @@ S_add_last_term_to_ix(LexiconWriter *self) {
                                 ivars->ix_out, TermStepper_Get_Value(ivars->term_stepper));
     TermStepper_Write_Key_Frame(ivars->tinfo_stepper,
                                 ivars->ix_out, TermStepper_Get_Value(ivars->tinfo_stepper));
-    OutStream_Write_C64(ivars->ix_out, OutStream_Tell(ivars->dat_out));
+    OutStream_Write_CI64(ivars->ix_out, OutStream_Tell(ivars->dat_out));
     ivars->ix_count++;
 }
 

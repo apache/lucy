@@ -40,23 +40,23 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
     Hash     *const fields = Hash_new(1);
     int64_t   start;
     uint32_t  num_fields;
-    uint32_t  field_name_cap = 31;
+    size_t    field_name_cap = 31;
     char     *field_name = (char*)MALLOCATE(field_name_cap + 1);
 
     // Get data file pointer from index, read number of fields.
     InStream_Seek(ix_in, (int64_t)doc_id * 8);
     start = InStream_Read_U64(ix_in);
     InStream_Seek(dat_in, start);
-    num_fields = InStream_Read_C32(dat_in);
+    num_fields = InStream_Read_CU32(dat_in);
 
     // Decode stored data and build up the doc field by field.
     while (num_fields--) {
-        uint32_t        field_name_len;
+        size_t     field_name_len;
         Obj       *value;
         FieldType *type;
 
         // Read field name.
-        field_name_len = InStream_Read_C32(dat_in);
+        field_name_len = InStream_Read_CU32(dat_in);
         if (field_name_len > field_name_cap) {
             field_name_cap = field_name_len;
             field_name     = (char*)REALLOCATE(field_name,
@@ -71,7 +71,7 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
         // Read the field value.
         switch (FType_Primitive_ID(type) & FType_PRIMITIVE_ID_MASK) {
             case FType_TEXT: {
-                    uint32_t value_len = InStream_Read_C32(dat_in);
+                    uint32_t value_len = InStream_Read_CU32(dat_in);
                     char *buf = (char*)MALLOCATE(value_len + 1);
                     InStream_Read_Bytes(dat_in, buf, value_len);
                     buf[value_len] = '\0'; 
@@ -79,7 +79,7 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
                     break;
                 }
             case FType_BLOB: {
-                    uint32_t value_len = InStream_Read_C32(dat_in);
+                    uint32_t value_len = InStream_Read_CU32(dat_in);
                     char *buf = (char*)MALLOCATE(value_len);
                     InStream_Read_Bytes(dat_in, buf, value_len);
                     value = (Obj*)Blob_new_steal(buf, value_len);
@@ -92,10 +92,10 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
                 value = (Obj*)Float_new(InStream_Read_F64(dat_in));
                 break;
             case FType_INT32:
-                value = (Obj*)Int_new((int32_t)InStream_Read_C32(dat_in));
+                value = (Obj*)Int_new(InStream_Read_CI32(dat_in));
                 break;
             case FType_INT64:
-                value = (Obj*)Int_new((int64_t)InStream_Read_C64(dat_in));
+                value = (Obj*)Int_new(InStream_Read_CI64(dat_in));
                 break;
             default:
                 value = NULL;

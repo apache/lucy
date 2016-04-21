@@ -200,7 +200,7 @@ DefHLReader_Fetch_Doc_Vec_IMP(DefaultHighlightReader *self, int32_t doc_id) {
     int64_t file_pos = InStream_Read_I64(ix_in);
     InStream_Seek(dat_in, file_pos);
 
-    uint32_t num_fields = InStream_Read_C32(dat_in);
+    uint32_t num_fields = InStream_Read_CU32(dat_in);
     while (num_fields--) {
         String *field = Freezer_read_string(dat_in);
         Blob *field_buf = Freezer_read_blob(dat_in);

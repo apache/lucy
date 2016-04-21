@@ -175,7 +175,7 @@ read_string(self)
 CODE:
 {
     char *ptr;
-    size_t len = LUCY_InStream_Read_C32(self);
+    size_t len = LUCY_InStream_Read_CU32(self);
     RETVAL = newSV(len + 1);
     SvCUR_set(RETVAL, len);
     SvPOK_on(RETVAL);
@@ -364,7 +364,10 @@ PPCODE:
 {
     STRLEN len = 0;
     char *ptr = SvPVutf8(aSV, len);
-    LUCY_OutStream_Write_C32(self, len);
+    if (len > INT32_MAX) {
+        CFISH_THROW(CFISH_ERR, "String too long: %u64", (uint64_t)len);
+    }
+    LUCY_OutStream_Write_CU32(self, len);
     LUCY_OutStream_Write_Bytes(self, ptr, len);
 }
 END_XS_CODE

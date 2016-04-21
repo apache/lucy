@@ -87,7 +87,7 @@ ProximityQuery_Serialize_IMP(ProximityQuery *self, OutStream *outstream) {
     OutStream_Write_F32(outstream, ivars->boost);
     Freezer_serialize_string(ivars->field, outstream);
     Freezer_serialize_varray(ivars->terms, outstream);
-    OutStream_Write_C32(outstream, ivars->within);
+    OutStream_Write_CU32(outstream, ivars->within);
 }
 
 ProximityQuery*
@@ -95,7 +95,7 @@ ProximityQuery_Deserialize_IMP(ProximityQuery *self, InStream *instream) {
     float boost = InStream_Read_F32(instream);
     String *field = Freezer_read_string(instream);
     Vector *terms = Freezer_read_varray(instream);
-    uint32_t within = InStream_Read_C32(instream);
+    uint32_t within = InStream_Read_CU32(instream);
     return S_do_init(self, field, terms, boost, within);
 }
 
@@ -264,7 +264,7 @@ ProximityCompiler_Serialize_IMP(ProximityCompiler *self,
     OutStream_Write_F32(outstream, ivars->raw_weight);
     OutStream_Write_F32(outstream, ivars->query_norm_factor);
     OutStream_Write_F32(outstream, ivars->normalized_weight);
-    OutStream_Write_C32(outstream, ivars->within);
+    OutStream_Write_CU32(outstream, ivars->within);
 }
 
 ProximityCompiler*
@@ -278,7 +278,7 @@ ProximityCompiler_Deserialize_IMP(ProximityCompiler *self,
     ivars->raw_weight        = InStream_Read_F32(instream);
     ivars->query_norm_factor = InStream_Read_F32(instream);
     ivars->normalized_weight = InStream_Read_F32(instream);
-    ivars->within            = InStream_Read_C32(instream);
+    ivars->within            = InStream_Read_CU32(instream);
     return self;
 }
 

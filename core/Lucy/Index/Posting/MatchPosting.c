@@ -81,7 +81,7 @@ MatchPost_Reset_IMP(MatchPosting *self) {
 void
 MatchPost_Read_Record_IMP(MatchPosting *self, InStream *instream) {
     MatchPostingIVARS *const ivars = MatchPost_IVARS(self);
-    const uint32_t doc_code = InStream_Read_C32(instream);
+    const uint32_t doc_code = InStream_Read_CU32(instream);
     const uint32_t doc_delta = doc_code >> 1;
 
     // Apply delta doc and retrieve freq.
@@ -90,7 +90,7 @@ MatchPost_Read_Record_IMP(MatchPosting *self, InStream *instream) {
         ivars->freq = 1;
     }
     else {
-        ivars->freq = InStream_Read_C32(instream);
+        ivars->freq = InStream_Read_CU32(instream);
     }
 }
 
@@ -100,12 +100,12 @@ MatchPost_Read_Raw_IMP(MatchPosting *self, InStream *instream,
                        MemoryPool *mem_pool) {
     const char *const text_buf  = Str_Get_Ptr8(term_text);
     const size_t      text_size = Str_Get_Size(term_text);
-    const uint32_t    doc_code  = InStream_Read_C32(instream);
+    const uint32_t    doc_code  = InStream_Read_CU32(instream);
     const uint32_t    delta_doc = doc_code >> 1;
     const int32_t     doc_id    = last_doc_id + delta_doc;
     const uint32_t    freq      = (doc_code & 1)
                                   ? 1
-                                  : InStream_Read_C32(instream);
+                                  : InStream_Read_CU32(instream);
     const size_t base_size = Class_Get_Obj_Alloc_Size(RAWPOSTING);
     size_t raw_post_bytes  = MAX_RAW_POSTING_LEN(base_size, text_size);
     void *const allocation = MemPool_Grab(mem_pool, raw_post_bytes);
@@ -212,12 +212,12 @@ MatchPostWriter_Write_Posting_IMP(MatchPostingWriter *self, RawPosting *posting)
                                    + posting_ivars->content_len;
     if (posting_ivars->freq == 1) {
         const uint32_t doc_code = (delta_doc << 1) | 1;
-        OutStream_Write_C32(outstream, doc_code);
+        OutStream_Write_CU32(outstream, doc_code);
     }
     else {
         const uint32_t doc_code = delta_doc << 1;
-        OutStream_Write_C32(outstream, doc_code);
-        OutStream_Write_C32(outstream, posting_ivars->freq);
+        OutStream_Write_CU32(outstream, doc_code);
+        OutStream_Write_CU32(outstream, posting_ivars->freq);
     }
     OutStream_Write_Bytes(outstream, aux_content, posting_ivars->aux_len);
     ivars->last_doc_id = doc_id;
@@ -272,14 +272,14 @@ MatchTInfoStepper_Write_Key_Frame_IMP(MatchTermInfoStepper *self,
     TermInfoIVARS *const tinfo_ivars = TInfo_IVARS((TermInfo*)value);
 
     // Write doc_freq.
-    OutStream_Write_C32(outstream, doc_freq);
+    OutStream_Write_CI32(outstream, doc_freq);
 
     // Write postings file pointer.
-    OutStream_Write_C64(outstream, tinfo_ivars->post_filepos);
+    OutStream_Write_CI64(outstream, tinfo_ivars->post_filepos);
 
     // Write skip file pointer (maybe).
     if (doc_freq >= ivars->skip_interval) {
-        OutStream_Write_C64(outstream, tinfo_ivars->skip_filepos);
+        OutStream_Write_CI64(outstream, tinfo_ivars->skip_filepos);
     }
 
     TInfo_Mimic((TermInfo*)ivars->value, (Obj*)tinfo);
@@ -296,14 +296,14 @@ MatchTInfoStepper_Write_Delta_IMP(MatchTermInfoStepper *self,
                            - TInfo_IVARS(last_tinfo)->post_filepos;
 
     // Write doc_freq.
-    OutStream_Write_C32(outstream, doc_freq);
+    OutStream_Write_CI32(outstream, doc_freq);
 
     // Write postings file pointer delta.
-    OutStream_Write_C64(outstream, post_delta);
+    OutStream_Write_CI64(outstream, post_delta);
 
     // Write skip file pointer (maybe).
     if (doc_freq >= ivars->skip_interval) {
-        OutStream_Write_C64(outstream, TInfo_IVARS(tinfo)->skip_filepos);
+        OutStream_Write_CI64(outstream, TInfo_IVARS(tinfo)->skip_filepos);
     }
 
     TInfo_Mimic((TermInfo*)ivars->value, (Obj*)tinfo);
@@ -316,14 +316,14 @@ MatchTInfoStepper_Read_Key_Frame_IMP(MatchTermInfoStepper *self,
     TermInfoIVARS *const tinfo_ivars = TInfo_IVARS((TermInfo*)ivars->value);
 
     // Read doc freq.
-    tinfo_ivars->doc_freq = InStream_Read_C32(instream);
+    tinfo_ivars->doc_freq = InStream_Read_CI32(instream);
 
     // Read postings file pointer.
-    tinfo_ivars->post_filepos = InStream_Read_C64(instream);
+    tinfo_ivars->post_filepos = InStream_Read_CI64(instream);
 
     // Maybe read skip pointer.
     if (tinfo_ivars->doc_freq >= ivars->skip_interval) {
-        tinfo_ivars->skip_filepos = InStream_Read_C64(instream);
+        tinfo_ivars->skip_filepos = InStream_Read_CI64(instream);
     }
     else {
         tinfo_ivars->skip_filepos = 0;
@@ -336,14 +336,14 @@ MatchTInfoStepper_Read_Delta_IMP(MatchTermInfoStepper *self, InStream *instream)
     TermInfoIVARS *const tinfo_ivars = TInfo_IVARS((TermInfo*)ivars->value);
 
     // Read doc freq.
-    tinfo_ivars->doc_freq = InStream_Read_C32(instream);
+    tinfo_ivars->doc_freq = InStream_Read_CI32(instream);
 
     // Adjust postings file pointer.
-    tinfo_ivars->post_filepos += InStream_Read_C64(instream);
+    tinfo_ivars->post_filepos += InStream_Read_CI64(instream);
 
     // Maybe read skip pointer.
     if (tinfo_ivars->doc_freq >= ivars->skip_interval) {
-        tinfo_ivars->skip_filepos = InStream_Read_C64(instream);
+        tinfo_ivars->skip_filepos = InStream_Read_CI64(instream);
     }
     else {
         tinfo_ivars->skip_filepos = 0;

@@ -68,7 +68,7 @@ Freezer_serialize(Obj *obj, OutStream *outstream) {
     }
     else if (Obj_is_a(obj, INTEGER)) {
         int64_t val = Int_Get_Value((Integer*)obj);
-        OutStream_Write_C64(outstream, (uint64_t)val);
+        OutStream_Write_CI64(outstream, val);
     }
     else if (Obj_is_a(obj, FLOAT)) {
         double val = Float_Get_Value((Float*)obj);
@@ -126,7 +126,7 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
         obj = (Obj*)Freezer_deserialize_hash((Hash*)obj, instream);
     }
     else if (Obj_is_a(obj, INTEGER)) {
-        int64_t value = (int64_t)InStream_Read_C64(instream);
+        int64_t value = InStream_Read_CI64(instream);
         obj = (Obj*)Int_init((Integer*)obj, value);
     }
     else if (Obj_is_a(obj, FLOAT)) {
@@ -180,13 +180,16 @@ void
 Freezer_serialize_string(String *string, OutStream *outstream) {
     size_t      size = Str_Get_Size(string);
     const char *buf  = Str_Get_Ptr8(string);
-    OutStream_Write_C64(outstream, size);
+    if (size > INT32_MAX) {
+        THROW(ERR, "Can't serialize string above 2GB: %u64", (uint64_t)size);
+    }
+    OutStream_Write_CU64(outstream, size);
     OutStream_Write_Bytes(outstream, buf, size);
 }
 
 String*
 Freezer_deserialize_string(String *string, InStream *instream) {
-    size_t size = InStream_Read_C32(instream);
+    size_t size = InStream_Read_CU32(instream);
     if (size == SIZE_MAX) {
         THROW(ERR, "Can't deserialize SIZE_MAX bytes");
     }
@@ -208,13 +211,16 @@ Freezer_read_string(InStream *instream) {
 void
 Freezer_serialize_blob(Blob *blob, OutStream *outstream) {
     size_t size = Blob_Get_Size(blob);
-    OutStream_Write_C32(outstream, size);
+    if (size > INT32_MAX) {
+        THROW(ERR, "Can't serialize blob above 2GB: %u64", (uint64_t)size);
+    }
+    OutStream_Write_CU64(outstream, size);
     OutStream_Write_Bytes(outstream, Blob_Get_Buf(blob), size);
 }
 
 Blob*
 Freezer_deserialize_blob(Blob *blob, InStream *instream) {
-    size_t size = InStream_Read_C32(instream);
+    size_t size = InStream_Read_CU32(instream);
     char   *buf = (char*)MALLOCATE(size);
     InStream_Read_Bytes(instream, buf, size);
     return Blob_init_steal(blob, buf, size);
@@ -229,27 +235,28 @@ Freezer_read_blob(InStream *instream) {
 void
 Freezer_serialize_varray(Vector *array, OutStream *outstream) {
     uint32_t last_valid_tick = 0;
+    // Skip size check.
     uint32_t size = (uint32_t)Vec_Get_Size(array);
-    OutStream_Write_C32(outstream, size);
+    OutStream_Write_CU32(outstream, size);
     for (uint32_t i = 0; i < size; i++) {
         Obj *elem = Vec_Fetch(array, i);
         if (elem) {
-            OutStream_Write_C32(outstream, i - last_valid_tick);
+            OutStream_Write_CU32(outstream, i - last_valid_tick);
             FREEZE(elem, outstream);
             last_valid_tick = i;
         }
     }
     // Terminate.
-    OutStream_Write_C32(outstream, size - last_valid_tick);
+    OutStream_Write_CU32(outstream, size - last_valid_tick);
 }
 
 Vector*
 Freezer_deserialize_varray(Vector *array, InStream *instream) {
-    uint32_t size = InStream_Read_C32(instream);
+    uint32_t size = InStream_Read_CU32(instream);
     Vec_init(array, size);
-    for (uint32_t tick = InStream_Read_C32(instream);
+    for (uint32_t tick = InStream_Read_CU32(instream);
          tick < size;
-         tick += InStream_Read_C32(instream)
+         tick += InStream_Read_CU32(instream)
         ) {
         Obj *obj = THAW(instream);
         Vec_Store(array, tick, obj);
@@ -266,8 +273,9 @@ Freezer_read_varray(InStream *instream) {
 
 void
 Freezer_serialize_hash(Hash *hash, OutStream *outstream) {
-    uint32_t hash_size = Hash_Get_Size(hash);
-    OutStream_Write_C32(outstream, hash_size);
+    // Skip size check.
+    uint32_t hash_size = (uint32_t)Hash_Get_Size(hash);
+    OutStream_Write_CU32(outstream, hash_size);
 
     HashIterator *iter = HashIter_new(hash);
     while (HashIter_Next(iter)) {
@@ -281,12 +289,12 @@ Freezer_serialize_hash(Hash *hash, OutStream *outstream) {
 
 Hash*
 Freezer_deserialize_hash(Hash *hash, InStream *instream) {
-    uint32_t size = InStream_Read_C32(instream);
+    uint32_t size = InStream_Read_CU32(instream);
 
     Hash_init(hash, size);
 
     while (size--) {
-        uint32_t len = InStream_Read_C32(instream);
+        uint32_t len = InStream_Read_CU32(instream);
         char *key_buf = (char*)MALLOCATE(len + 1);
         InStream_Read_Bytes(instream, key_buf, len);
         key_buf[len] = '\0';
