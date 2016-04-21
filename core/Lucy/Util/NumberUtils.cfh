@@ -441,7 +441,7 @@ static CFISH_INLINE bool
 lucy_NumUtil_u1get(const void *array, uint32_t tick) {
     uint8_t *const u8bits      = (uint8_t*)array;
     const uint32_t byte_offset = tick >> 3;
-    const uint8_t  mask        = 1 << (tick & 0x7);
+    const unsigned mask        = 1 << (tick & 0x7);
     return !((u8bits[byte_offset] & mask) == 0);
 }
 
@@ -449,7 +449,7 @@ static CFISH_INLINE void
 lucy_NumUtil_u1set(void *array, uint32_t tick) {
     uint8_t *const u8bits      = (uint8_t*)array;
     const uint32_t byte_offset = tick >> 3;
-    const uint8_t  mask        = 1 << (tick & 0x7);
+    const unsigned mask        = 1 << (tick & 0x7);
     u8bits[byte_offset] |= mask;
 }
 
@@ -457,7 +457,7 @@ static CFISH_INLINE void
 lucy_NumUtil_u1clear(void *array, uint32_t tick) {
     uint8_t *const u8bits      = (uint8_t*)array;
     const uint32_t byte_offset = tick >> 3;
-    const uint8_t  mask        = 1 << (tick & 0x7);
+    const unsigned mask        = 1 << (tick & 0x7);
     u8bits[byte_offset] &= ~mask;
 }
 
@@ -465,7 +465,7 @@ static CFISH_INLINE void
 lucy_NumUtil_u1flip(void *array, uint32_t tick) {
     uint8_t *const u8bits      = (uint8_t*)array;
     const uint32_t byte_offset = tick >> 3;
-    const uint8_t  mask        = 1 << (tick & 0x7);
+    const unsigned mask        = 1 << (tick & 0x7);
     u8bits[byte_offset] ^= mask;
 }
 
@@ -480,8 +480,8 @@ lucy_NumUtil_u2get(const void *array, uint32_t tick) {
 static CFISH_INLINE void
 lucy_NumUtil_u2set(void *array, uint32_t tick, uint8_t value) {
     uint8_t *ints     = (uint8_t*)array;
-    int      shift    = 2 * (tick & 0x3);
-    uint8_t  mask     = 0x3 << shift;
+    unsigned shift    = 2 * (tick & 0x3);
+    unsigned mask     = (unsigned)0x3 << shift;
     uint8_t  new_val  = value & 0x3;
     uint8_t  new_bits = new_val << shift;
     ints[(tick >> 2)]  = (ints[(tick >> 2)] & ~mask) | new_bits;
@@ -499,8 +499,8 @@ lucy_NumUtil_u4get(const void *array, uint32_t tick) {
 static CFISH_INLINE void
 lucy_NumUtil_u4set(void *array, uint32_t tick, uint8_t value) {
     uint8_t  *ints     = (uint8_t*)array;
-    int       shift    = 4 * (tick & 0x1);
-    uint8_t   mask     = 0xF << shift;
+    unsigned  shift    = 4 * (tick & 0x1);
+    unsigned  mask     = (unsigned)0xF << shift;
     uint8_t   new_val  = value & 0xF;
     uint8_t   new_bits = new_val << shift;
     ints[(tick >> 1)]  = (ints[(tick >> 1)] & ~mask) | new_bits;
