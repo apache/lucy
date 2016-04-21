@@ -337,7 +337,7 @@ lucy_NumUtil_encode_cu32(uint32_t value, char **out_buf) {
     uint8_t   buf[LUCY_NUMUTIL_CU32_MAX_BYTES];
     uint8_t  *const limit = buf + sizeof(buf);
     uint8_t  *ptr         = limit - 1;
-    int       num_bytes;
+    ptrdiff_t num_bytes;
     /* Write last byte first, which has no continue bit. */
     *ptr = value & 0x7f;
     value >>= 7;
@@ -347,7 +347,7 @@ lucy_NumUtil_encode_cu32(uint32_t value, char **out_buf) {
         value >>= 7;
     }
     num_bytes = limit - ptr;
-    memcpy(*out_buf, ptr, num_bytes);
+    memcpy(*out_buf, ptr, (size_t)num_bytes);
     *out_buf += num_bytes;
 }
 
@@ -361,7 +361,7 @@ lucy_NumUtil_encode_cu64(uint64_t value, char **out_buf) {
     uint8_t   buf[LUCY_NUMUTIL_CU64_MAX_BYTES];
     uint8_t  *const limit = buf + sizeof(buf);
     uint8_t  *ptr         = limit - 1;
-    int       num_bytes;
+    ptrdiff_t num_bytes;
     /* Write last byte first, which has no continue bit. */
     *ptr = value & 0x7f;
     value >>= 7;
@@ -371,7 +371,7 @@ lucy_NumUtil_encode_cu64(uint64_t value, char **out_buf) {
         value >>= 7;
     }
     num_bytes = limit - ptr;
-    memcpy(*out_buf, ptr, num_bytes);
+    memcpy(*out_buf, ptr, (size_t)num_bytes);
     *out_buf += num_bytes;
 }
 
