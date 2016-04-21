@@ -171,11 +171,6 @@ class Lucy::Store::InStream inherits Clownfish::Obj {
     final double
     Read_F64(InStream *self);
 
-    /** Read in a compressed 32-bit unsigned integer.
-     */
-    uint32_t
-    Read_C32(InStream *self);
-
     /** Read in a compressed 32-bit signed integer.
      */
     int32_t
@@ -185,12 +180,6 @@ class Lucy::Store::InStream inherits Clownfish::Obj {
      */
     uint32_t
     Read_CU32(InStream *self);
-
-    /** Read a 64-bit integer, using the same encoding as a C32 but occupying
-     * as many as 10 bytes.
-     */
-    final uint64_t
-    Read_C64(InStream *self);
 
     /** Read a 64-bit signed integer, using the same encoding as a CI32 but
      * occupying as many as 10 bytes.

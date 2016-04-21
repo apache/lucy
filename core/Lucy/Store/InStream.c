@@ -472,11 +472,6 @@ InStream_Read_F64_IMP(InStream *self) {
     return duo.d;
 }
 
-uint32_t
-InStream_Read_C32_IMP(InStream *self) {
-    return SI_read_cu32(self);
-}
-
 int32_t
 InStream_Read_CI32_IMP(InStream *self) {
     return (int32_t)SI_read_cu32(self);
@@ -499,11 +494,6 @@ SI_read_cu32(InStream *self) {
         }
     }
     return retval;
-}
-
-uint64_t
-InStream_Read_C64_IMP(InStream *self) {
-    return SI_read_cu64(self);
 }
 
 int64_t
