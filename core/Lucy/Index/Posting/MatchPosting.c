@@ -296,7 +296,7 @@ MatchTInfoStepper_Write_Delta_IMP(MatchTermInfoStepper *self,
                            - TInfo_IVARS(last_tinfo)->post_filepos;
 
     // Write doc_freq.
-    OutStream_Write_CU32(outstream, doc_freq);
+    OutStream_Write_CI32(outstream, doc_freq);
 
     // Write postings file pointer delta.
     OutStream_Write_CI64(outstream, post_delta);
