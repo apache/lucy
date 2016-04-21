@@ -90,7 +90,7 @@ TV_Serialize_IMP(TermVector *self, OutStream *target) {
 
     Freezer_serialize_string(ivars->field, target);
     Freezer_serialize_string(ivars->text, target);
-    OutStream_Write_C64(target, ivars->num_pos);
+    OutStream_Write_CU64(target, ivars->num_pos);
 
     for (size_t i = 0; i < ivars->num_pos; i++) {
         OutStream_Write_C32(target, posits[i]);
@@ -103,7 +103,7 @@ TermVector*
 TV_Deserialize_IMP(TermVector *self, InStream *instream) {
     String *field = Freezer_read_string(instream);
     String *text  = Freezer_read_string(instream);
-    size_t  num_pos = InStream_Read_C64(instream);
+    size_t  num_pos = InStream_Read_CU64(instream);
 
     // Read positional data.
     int32_t *posits = (int32_t*)MALLOCATE(num_pos * sizeof(int32_t));

@@ -180,13 +180,16 @@ void
 Freezer_serialize_string(String *string, OutStream *outstream) {
     size_t      size = Str_Get_Size(string);
     const char *buf  = Str_Get_Ptr8(string);
-    OutStream_Write_C64(outstream, size);
+    if (size > INT32_MAX) {
+        THROW(ERR, "Can't serialize string above 2GB: %u64", (uint64_t)size);
+    }
+    OutStream_Write_CU64(outstream, size);
     OutStream_Write_Bytes(outstream, buf, size);
 }
 
 String*
 Freezer_deserialize_string(String *string, InStream *instream) {
-    size_t size = InStream_Read_C32(instream);
+    size_t size = InStream_Read_CU32(instream);
     if (size == SIZE_MAX) {
         THROW(ERR, "Can't deserialize SIZE_MAX bytes");
     }
@@ -208,13 +211,16 @@ Freezer_read_string(InStream *instream) {
 void
 Freezer_serialize_blob(Blob *blob, OutStream *outstream) {
     size_t size = Blob_Get_Size(blob);
-    OutStream_Write_C32(outstream, size);
+    if (size > INT32_MAX) {
+        THROW(ERR, "Can't serialize blob above 2GB: %u64", (uint64_t)size);
+    }
+    OutStream_Write_CU64(outstream, size);
     OutStream_Write_Bytes(outstream, Blob_Get_Buf(blob), size);
 }
 
 Blob*
 Freezer_deserialize_blob(Blob *blob, InStream *instream) {
-    size_t size = InStream_Read_C32(instream);
+    size_t size = InStream_Read_CU32(instream);
     char   *buf = (char*)MALLOCATE(size);
     InStream_Read_Bytes(instream, buf, size);
     return Blob_init_steal(blob, buf, size);
@@ -229,8 +235,9 @@ Freezer_read_blob(InStream *instream) {
 void
 Freezer_serialize_varray(Vector *array, OutStream *outstream) {
     uint32_t last_valid_tick = 0;
+    // Skip size check.
     uint32_t size = (uint32_t)Vec_Get_Size(array);
-    OutStream_Write_C32(outstream, size);
+    OutStream_Write_CU32(outstream, size);
     for (uint32_t i = 0; i < size; i++) {
         Obj *elem = Vec_Fetch(array, i);
         if (elem) {
@@ -266,8 +273,9 @@ Freezer_read_varray(InStream *instream) {
 
 void
 Freezer_serialize_hash(Hash *hash, OutStream *outstream) {
-    uint32_t hash_size = Hash_Get_Size(hash);
-    OutStream_Write_C32(outstream, hash_size);
+    // Skip size check.
+    uint32_t hash_size = (uint32_t)Hash_Get_Size(hash);
+    OutStream_Write_CU32(outstream, hash_size);
 
     HashIterator *iter = HashIter_new(hash);
     while (HashIter_Next(iter)) {

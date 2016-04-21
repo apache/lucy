@@ -119,14 +119,22 @@ DocWriter_Add_Inverted_Doc_IMP(DocWriter *self, Inverter *inverter,
                 case FType_TEXT: {
                     const char *buf  = Str_Get_Ptr8((String*)value);
                     size_t      size = Str_Get_Size((String*)value);
-                    OutStream_Write_C32(dat_out, size);
+                    if (size > INT32_MAX) {
+                        THROW(ERR, "Field %o over 2GB: %u64", field,
+                              (uint64_t)size);
+                    }
+                    OutStream_Write_CU32(dat_out, (uint32_t)size);
                     OutStream_Write_Bytes(dat_out, buf, size);
                     break;
                 }
                 case FType_BLOB: {
                     const char *buf  = Blob_Get_Buf((Blob*)value);
                     size_t      size = Blob_Get_Size((Blob*)value);
-                    OutStream_Write_C32(dat_out, size);
+                    if (size > INT32_MAX) {
+                        THROW(ERR, "Field %o over 2GB: %u64", field,
+                              (uint64_t)size);
+                    }
+                    OutStream_Write_CU32(dat_out, (uint32_t)size);
                     OutStream_Write_Bytes(dat_out, buf, size);
                     break;
                 }

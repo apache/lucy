@@ -40,7 +40,7 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
     Hash     *const fields = Hash_new(1);
     int64_t   start;
     uint32_t  num_fields;
-    uint32_t  field_name_cap = 31;
+    size_t    field_name_cap = 31;
     char     *field_name = (char*)MALLOCATE(field_name_cap + 1);
 
     // Get data file pointer from index, read number of fields.
@@ -51,12 +51,12 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
 
     // Decode stored data and build up the doc field by field.
     while (num_fields--) {
-        uint32_t        field_name_len;
+        size_t     field_name_len;
         Obj       *value;
         FieldType *type;
 
         // Read field name.
-        field_name_len = InStream_Read_C32(dat_in);
+        field_name_len = InStream_Read_CU32(dat_in);
         if (field_name_len > field_name_cap) {
             field_name_cap = field_name_len;
             field_name     = (char*)REALLOCATE(field_name,

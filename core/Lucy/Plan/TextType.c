@@ -101,7 +101,8 @@ TextTermStepper_Write_Key_Frame_IMP(TextTermStepper *self,
     String     *string = (String*)CERTIFY(value, STRING);
     const char *buf    = Str_Get_Ptr8(string);
     size_t      size   = Str_Get_Size(string);
-    OutStream_Write_C32(outstream, size);
+    // Skip size check because we're deep in the internals.
+    OutStream_Write_CU32(outstream, (uint32_t)size);
     OutStream_Write_Bytes(outstream, buf, size);
 
     S_set_value(self, value);
