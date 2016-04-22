@@ -223,14 +223,14 @@ static void
 S_write_ord(void *ords, int32_t width, int32_t doc_id, int32_t ord) {
     switch (width) {
         case 1:
-            if (ord) { NumUtil_u1set(ords, doc_id); }
-            else     { NumUtil_u1clear(ords, doc_id); }
+            if (ord) { NumUtil_u1set(ords, (uint32_t)doc_id); }
+            else     { NumUtil_u1clear(ords, (uint32_t)doc_id); }
             break;
         case 2:
-            NumUtil_u2set(ords, doc_id, ord);
+            NumUtil_u2set(ords, (uint32_t)doc_id, (uint8_t)ord);
             break;
         case 4:
-            NumUtil_u4set(ords, doc_id, ord);
+            NumUtil_u4set(ords, (uint32_t)doc_id, (uint8_t)ord);
             break;
         case 8: {
                 uint8_t *ints = (uint8_t*)ords;
