@@ -483,7 +483,7 @@ lucy_NumUtil_u2set(void *array, uint32_t tick, uint8_t value) {
     unsigned shift    = 2 * (tick & 0x3);
     unsigned mask     = (unsigned)0x3 << shift;
     uint8_t  new_val  = value & 0x3;
-    uint8_t  new_bits = new_val << shift;
+    uint8_t  new_bits = (uint8_t)(new_val << shift);
     ints[(tick >> 2)]  = (ints[(tick >> 2)] & ~mask) | new_bits;
 }
 
@@ -502,7 +502,7 @@ lucy_NumUtil_u4set(void *array, uint32_t tick, uint8_t value) {
     unsigned  shift    = 4 * (tick & 0x1);
     unsigned  mask     = (unsigned)0xF << shift;
     uint8_t   new_val  = value & 0xF;
-    uint8_t   new_bits = new_val << shift;
+    uint8_t   new_bits = (uint8_t)(new_val << shift);
     ints[(tick >> 1)]  = (ints[(tick >> 1)] & ~mask) | new_bits;
 }
 
