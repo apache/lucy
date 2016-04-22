@@ -249,8 +249,7 @@ lucy_NumUtil_encode_bigend_u64(uint64_t value, void *dest_ptr) {
 static CFISH_INLINE uint16_t
 lucy_NumUtil_decode_bigend_u16(const void *source) {
     const uint8_t *const buf = (const uint8_t*)source;
-    return  ((uint16_t)buf[0] << 8) |
-            ((uint16_t)buf[1]);
+    return  (uint16_t)((buf[0] << 8) | buf[1]);
 }
 
 static CFISH_INLINE uint32_t
