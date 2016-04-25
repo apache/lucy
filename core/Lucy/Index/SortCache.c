@@ -71,9 +71,9 @@ SortCache_Ordinal_IMP(SortCache *self, int32_t doc_id) {
         THROW(ERR, "Out of range: %i32 > %i32", doc_id, ivars->doc_max);
     }
     switch (ivars->ord_width) {
-        case 1: return NumUtil_u1get(ivars->ords, doc_id);
-        case 2: return NumUtil_u2get(ivars->ords, doc_id);
-        case 4: return NumUtil_u4get(ivars->ords, doc_id);
+        case 1: return NumUtil_u1get(ivars->ords, (uint32_t)doc_id);
+        case 2: return NumUtil_u2get(ivars->ords, (uint32_t)doc_id);
+        case 4: return NumUtil_u4get(ivars->ords, (uint32_t)doc_id);
         case 8: {
                 uint8_t *ints = (uint8_t*)ivars->ords;
                 return ints[doc_id];

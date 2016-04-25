@@ -153,49 +153,49 @@ inert class Lucy::Util::NumberUtils nickname NumUtil {
      * bit at `tick` is set, false otherwise.
      */
     inert inline bool
-    u1get(const void *array, uint32_t tick);
+    u1get(const void *array, size_t tick);
 
     /** Interpret `array` as an array of bits; set the bit at
      * `tick`.
      */
     inert inline void
-    u1set(void *array, uint32_t tick);
+    u1set(void *array, size_t tick);
 
     /** Interpret `array` as an array of bits; clear the bit at
      * `tick`.
      */
     inert inline void
-    u1clear(void *array, uint32_t tick);
+    u1clear(void *array, size_t tick);
 
     /** Interpret `array` as an array of bits; flip the bit at
      * `tick`.
      */
     inert inline void
-    u1flip(void *array, uint32_t tick);
+    u1flip(void *array, size_t tick);
 
     /** Interpret `array` as an array of two-bit integers; return
      * the value at `tick`.
      */
     inert inline uint8_t
-    u2get(const void *array, uint32_t tick);
+    u2get(const void *array, size_t tick);
 
     /** Interpret `array` as an array of two-bit integers; set the
      * element at `tick` to `value`.
      */
     inert inline void
-    u2set(void *array, uint32_t tick, uint8_t value);
+    u2set(void *array, size_t tick, uint8_t value);
 
     /** Interpret `array` as an array of four-bit integers; return
      * the value at `tick`.
      */
     inert inline uint8_t
-    u4get(const void *array, uint32_t tick);
+    u4get(const void *array, size_t tick);
 
     /** Interpret `array` as an array of four-bit integers; set the
      * element at `tick` to `value`.
      */
     inert inline void
-    u4set(void *array, uint32_t tick, uint8_t value);
+    u4set(void *array, size_t tick, uint8_t value);
 }
 
 __C__
@@ -249,8 +249,7 @@ lucy_NumUtil_encode_bigend_u64(uint64_t value, void *dest_ptr) {
 static CFISH_INLINE uint16_t
 lucy_NumUtil_decode_bigend_u16(const void *source) {
     const uint8_t *const buf = (const uint8_t*)source;
-    return  ((uint16_t)buf[0] << 8) |
-            ((uint16_t)buf[1]);
+    return  (uint16_t)((buf[0] << 8) | buf[1]);
 }
 
 static CFISH_INLINE uint32_t
@@ -337,7 +336,7 @@ lucy_NumUtil_encode_cu32(uint32_t value, char **out_buf) {
     uint8_t   buf[LUCY_NUMUTIL_CU32_MAX_BYTES];
     uint8_t  *const limit = buf + sizeof(buf);
     uint8_t  *ptr         = limit - 1;
-    int       num_bytes;
+    ptrdiff_t num_bytes;
     /* Write last byte first, which has no continue bit. */
     *ptr = value & 0x7f;
     value >>= 7;
@@ -347,7 +346,7 @@ lucy_NumUtil_encode_cu32(uint32_t value, char **out_buf) {
         value >>= 7;
     }
     num_bytes = limit - ptr;
-    memcpy(*out_buf, ptr, num_bytes);
+    memcpy(*out_buf, ptr, (size_t)num_bytes);
     *out_buf += num_bytes;
 }
 
@@ -361,7 +360,7 @@ lucy_NumUtil_encode_cu64(uint64_t value, char **out_buf) {
     uint8_t   buf[LUCY_NUMUTIL_CU64_MAX_BYTES];
     uint8_t  *const limit = buf + sizeof(buf);
     uint8_t  *ptr         = limit - 1;
-    int       num_bytes;
+    ptrdiff_t num_bytes;
     /* Write last byte first, which has no continue bit. */
     *ptr = value & 0x7f;
     value >>= 7;
@@ -371,7 +370,7 @@ lucy_NumUtil_encode_cu64(uint64_t value, char **out_buf) {
         value >>= 7;
     }
     num_bytes = limit - ptr;
-    memcpy(*out_buf, ptr, num_bytes);
+    memcpy(*out_buf, ptr, (size_t)num_bytes);
     *out_buf += num_bytes;
 }
 
@@ -438,39 +437,39 @@ lucy_NumUtil_skip_cint(const char **source_ptr) {
 }
 
 static CFISH_INLINE bool
-lucy_NumUtil_u1get(const void *array, uint32_t tick) {
+lucy_NumUtil_u1get(const void *array, size_t tick) {
     uint8_t *const u8bits      = (uint8_t*)array;
-    const uint32_t byte_offset = tick >> 3;
-    const uint8_t  mask        = 1 << (tick & 0x7);
+    const size_t   byte_offset = tick >> 3;
+    const unsigned mask        = 1 << (tick & 0x7);
     return !((u8bits[byte_offset] & mask) == 0);
 }
 
 static CFISH_INLINE void
-lucy_NumUtil_u1set(void *array, uint32_t tick) {
+lucy_NumUtil_u1set(void *array, size_t tick) {
     uint8_t *const u8bits      = (uint8_t*)array;
-    const uint32_t byte_offset = tick >> 3;
-    const uint8_t  mask        = 1 << (tick & 0x7);
+    const size_t   byte_offset = tick >> 3;
+    const unsigned mask        = 1 << (tick & 0x7);
     u8bits[byte_offset] |= mask;
 }
 
 static CFISH_INLINE void
-lucy_NumUtil_u1clear(void *array, uint32_t tick) {
+lucy_NumUtil_u1clear(void *array, size_t tick) {
     uint8_t *const u8bits      = (uint8_t*)array;
-    const uint32_t byte_offset = tick >> 3;
-    const uint8_t  mask        = 1 << (tick & 0x7);
+    const size_t   byte_offset = tick >> 3;
+    const unsigned mask        = 1 << (tick & 0x7);
     u8bits[byte_offset] &= ~mask;
 }
 
 static CFISH_INLINE void
-lucy_NumUtil_u1flip(void *array, uint32_t tick) {
+lucy_NumUtil_u1flip(void *array, size_t tick) {
     uint8_t *const u8bits      = (uint8_t*)array;
-    const uint32_t byte_offset = tick >> 3;
-    const uint8_t  mask        = 1 << (tick & 0x7);
+    const size_t   byte_offset = tick >> 3;
+    const unsigned mask        = 1 << (tick & 0x7);
     u8bits[byte_offset] ^= mask;
 }
 
 static CFISH_INLINE uint8_t
-lucy_NumUtil_u2get(const void *array, uint32_t tick) {
+lucy_NumUtil_u2get(const void *array, size_t tick) {
     uint8_t *ints  = (uint8_t*)array;
     uint8_t  byte  = ints[(tick >> 2)];
     int      shift = 2 * (tick & 0x3);
@@ -478,18 +477,18 @@ lucy_NumUtil_u2get(const void *array, uint32_t tick) {
 }
 
 static CFISH_INLINE void
-lucy_NumUtil_u2set(void *array, uint32_t tick, uint8_t value) {
+lucy_NumUtil_u2set(void *array, size_t tick, uint8_t value) {
     uint8_t *ints     = (uint8_t*)array;
-    int      shift    = 2 * (tick & 0x3);
-    uint8_t  mask     = 0x3 << shift;
+    unsigned shift    = 2 * (tick & 0x3);
+    unsigned mask     = (unsigned)0x3 << shift;
     uint8_t  new_val  = value & 0x3;
-    uint8_t  new_bits = new_val << shift;
+    uint8_t  new_bits = (uint8_t)(new_val << shift);
     ints[(tick >> 2)]  = (ints[(tick >> 2)] & ~mask) | new_bits;
 }
 
 
 static CFISH_INLINE uint8_t
-lucy_NumUtil_u4get(const void *array, uint32_t tick) {
+lucy_NumUtil_u4get(const void *array, size_t tick) {
     uint8_t *ints  = (uint8_t*)array;
     uint8_t  byte  = ints[(tick >> 1)];
     int      shift = 4 * (tick & 1);
@@ -497,12 +496,12 @@ lucy_NumUtil_u4get(const void *array, uint32_t tick) {
 }
 
 static CFISH_INLINE void
-lucy_NumUtil_u4set(void *array, uint32_t tick, uint8_t value) {
+lucy_NumUtil_u4set(void *array, size_t tick, uint8_t value) {
     uint8_t  *ints     = (uint8_t*)array;
-    int       shift    = 4 * (tick & 0x1);
-    uint8_t   mask     = 0xF << shift;
+    unsigned  shift    = 4 * (tick & 0x1);
+    unsigned  mask     = (unsigned)0xF << shift;
     uint8_t   new_val  = value & 0xF;
-    uint8_t   new_bits = new_val << shift;
+    uint8_t   new_bits = (uint8_t)(new_val << shift);
     ints[(tick >> 1)]  = (ints[(tick >> 1)] & ~mask) | new_bits;
 }
 

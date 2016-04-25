@@ -44,15 +44,14 @@ test_u1(TestBatchRunner *runner) {
         if (ints[i]) { NumUtil_u1set(bits, i); }
     }
     for (size_t i = 0; i < count; i++) {
-        TEST_INT_EQ(runner, NumUtil_u1get(bits, i), (long)ints[i],
-                    "u1 set/get");
+        TEST_UINT_EQ(runner, NumUtil_u1get(bits, i), ints[i], "u1 set/get");
     }
 
     for (size_t i = 0; i < count; i++) {
         NumUtil_u1flip(bits, i);
     }
     for (size_t i = 0; i < count; i++) {
-        TEST_INT_EQ(runner, NumUtil_u1get(bits, i), !ints[i], "u1 flip");
+        TEST_UINT_EQ(runner, NumUtil_u1get(bits, i), !ints[i], "u1 flip");
     }
 
     FREEMEM(bits);
@@ -69,7 +68,7 @@ test_u2(TestBatchRunner *runner) {
         NumUtil_u2set(bits, i, (uint8_t)ints[i]);
     }
     for (size_t i = 0; i < count; i++) {
-        TEST_INT_EQ(runner, NumUtil_u2get(bits, i), (long)ints[i], "u2");
+        TEST_UINT_EQ(runner, NumUtil_u2get(bits, i), ints[i], "u2");
     }
 
     FREEMEM(bits);
@@ -86,7 +85,7 @@ test_u4(TestBatchRunner *runner) {
         NumUtil_u4set(bits, i, (uint8_t)ints[i]);
     }
     for (size_t i = 0; i < count; i++) {
-        TEST_INT_EQ(runner, NumUtil_u4get(bits, i), (long)ints[i], "u4");
+        TEST_UINT_EQ(runner, NumUtil_u4get(bits, i), ints[i], "u4");
     }
 
     FREEMEM(bits);
