@@ -177,7 +177,7 @@ SortFieldWriter_Add_IMP(SortFieldWriter *self, int32_t doc_id, Obj *value) {
     Counter *counter   = ivars->counter;
     Counter_Add(counter, ivars->mem_per_entry);
     if (ivars->prim_id == FType_TEXT) {
-        int64_t size = Str_Get_Size((String*)value) + 1;
+        int64_t size = (int64_t)Str_Get_Size((String*)value) + 1;
         size = SI_increase_to_word_multiple(size);
         Counter_Add(counter, size);
     }

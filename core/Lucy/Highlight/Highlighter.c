@@ -475,7 +475,7 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, Vector *spans,
     StringIterator *temp            = Str_Top(raw_excerpt);
     CharBuf        *buf             = CB_new(Str_Get_Size(raw_excerpt) + 32);
     CharBuf        *encode_buf      = NULL;
-    int32_t         raw_excerpt_end = top + Str_Length(raw_excerpt);
+    int32_t         raw_excerpt_end = top + (int32_t)Str_Length(raw_excerpt);
 
     for (size_t i = 0, max = Vec_Get_Size(spans); i < max; i++) {
         Span *span = (Span*)Vec_Fetch(spans, i);
