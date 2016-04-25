@@ -64,7 +64,7 @@ RAMFH_do_open(RAMFileHandle *self, String *path, uint32_t flags,
     }
 
     ivars->contents = (ByteBuf*)INCREF(RAMFile_Get_Contents(ivars->ram_file));
-    ivars->len      = BB_Get_Size(ivars->contents);
+    ivars->len      = (int64_t)BB_Get_Size(ivars->contents);
 
     return self;
 }

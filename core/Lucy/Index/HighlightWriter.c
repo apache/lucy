@@ -199,7 +199,11 @@ HLWriter_TV_Buf_IMP(HighlightWriter *self, Inversion *inversion) {
         } while (--freq && (token = *++tokens));
 
         // Set new byte length.
-        BB_Set_Size(tv_buf, ptr - orig);
+        ptrdiff_t diff = ptr - orig;
+        if (diff < 0) { // sanity check
+            diff = 0;
+        }
+        BB_Set_Size(tv_buf, (size_t)diff);
     }
 
     // Go back and start the term vector string with the posting count.
