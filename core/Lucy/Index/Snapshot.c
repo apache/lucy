@@ -88,7 +88,7 @@ Snapshot_List_IMP(Snapshot *self) {
 uint32_t
 Snapshot_Num_Entries_IMP(Snapshot *self) {
     SnapshotIVARS *const ivars = Snapshot_IVARS(self);
-    return Hash_Get_Size(ivars->entries);
+    return (uint32_t)Hash_Get_Size(ivars->entries);
 }
 
 void

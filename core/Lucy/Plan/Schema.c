@@ -211,7 +211,7 @@ Schema_Fetch_Sim_IMP(Schema *self, String *field) {
 uint32_t
 Schema_Num_Fields_IMP(Schema *self) {
     SchemaIVARS *const ivars = Schema_IVARS(self);
-    return Hash_Get_Size(ivars->types);
+    return (uint32_t)Hash_Get_Size(ivars->types);
 }
 
 Architecture*
