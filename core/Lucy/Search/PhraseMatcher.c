@@ -46,7 +46,7 @@ PhraseMatcher_init(PhraseMatcher *self, Similarity *similarity, Vector *plists,
     ivars->more             = true;
 
     // Extract PostingLists out of Vector into local C array for quick access.
-    ivars->num_elements = Vec_Get_Size(plists);
+    ivars->num_elements = (uint32_t)Vec_Get_Size(plists);
     ivars->plists = (PostingList**)MALLOCATE(
                        ivars->num_elements * sizeof(PostingList*));
     for (size_t i = 0; i < ivars->num_elements; i++) {
