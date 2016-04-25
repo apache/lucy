@@ -59,7 +59,7 @@ RAMDH_Next_IMP(RAMDirHandle *self) {
         ivars->tick++;
         if (ivars->tick < (int32_t)Vec_Get_Size(ivars->elems)) {
             String *path = (String*)CERTIFY(
-                                Vec_Fetch(ivars->elems, ivars->tick), STRING);
+                                Vec_Fetch(ivars->elems, (size_t)ivars->tick), STRING);
             DECREF(ivars->entry);
             ivars->entry = (String*)INCREF(path);
             return true;
@@ -76,7 +76,7 @@ bool
 RAMDH_Entry_Is_Dir_IMP(RAMDirHandle *self) {
     RAMDirHandleIVARS *const ivars = RAMDH_IVARS(self);
     if (ivars->elems) {
-        String *name = (String*)Vec_Fetch(ivars->elems, ivars->tick);
+        String *name = (String*)Vec_Fetch(ivars->elems, (size_t)ivars->tick);
         if (name) {
             return RAMFolder_Local_Is_Directory(ivars->folder, name);
         }

@@ -157,20 +157,20 @@ test_clear_buffer(TestBatchRunner *runner) {
 static void
 S_test_sort(TestBatchRunner *runner, Vector *blobs, uint32_t mem_thresh,
             const char *test_name) {
-    int          size     = (int)Vec_Get_Size(blobs);
+    size_t       size     = Vec_Get_Size(blobs);
     BlobSortEx  *sortex   = BlobSortEx_new(mem_thresh, NULL);
     Blob       **shuffled = (Blob**)MALLOCATE(size * sizeof(Blob*));
 
-    for (int i = 0; i < size; ++i) {
+    for (size_t i = 0; i < size; ++i) {
         shuffled[i] = (Blob*)CERTIFY(Vec_Fetch(blobs, i), BLOB);
     }
-    for (int i = size - 1; i > 0; --i) {
+    for (int i = (int)size - 1; i > 0; --i) {
         int shuffle_pos = rand() % (i + 1);
         Blob *temp = shuffled[shuffle_pos];
         shuffled[shuffle_pos] = shuffled[i];
         shuffled[i] = temp;
     }
-    for (int i = 0; i < size; ++i) {
+    for (size_t i = 0; i < size; ++i) {
         BlobSortEx_Feed(sortex, INCREF(shuffled[i]));
     }
 

@@ -198,7 +198,7 @@ DefLexReader_Lexicon_IMP(DefaultLexiconReader *self, String *field,
                          Obj *term) {
     DefaultLexiconReaderIVARS *const ivars = DefLexReader_IVARS(self);
     int32_t     field_num = Seg_Field_Num(ivars->segment, field);
-    SegLexicon *orig      = (SegLexicon*)Vec_Fetch(ivars->lexicons, field_num);
+    SegLexicon *orig      = (SegLexicon*)Vec_Fetch(ivars->lexicons, (size_t)field_num);
     SegLexicon *lexicon   = NULL;
 
     if (orig) { // i.e. has data
@@ -216,7 +216,7 @@ S_find_tinfo(DefaultLexiconReader *self, String *field, Obj *target) {
     if (field != NULL && target != NULL) {
         int32_t field_num = Seg_Field_Num(ivars->segment, field);
         SegLexicon *lexicon
-            = (SegLexicon*)Vec_Fetch(ivars->lexicons, field_num);
+            = (SegLexicon*)Vec_Fetch(ivars->lexicons, (size_t)field_num);
 
         if (lexicon) {
             // Iterate until the result is ge the term.

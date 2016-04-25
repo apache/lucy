@@ -318,7 +318,7 @@ CFReaderDH_Next_IMP(CFReaderDirHandle *self) {
         ivars->tick++;
         if (ivars->tick < (int32_t)Vec_Get_Size(ivars->elems)) {
             String *path = (String*)CERTIFY(
-                                Vec_Fetch(ivars->elems, ivars->tick), STRING);
+                                Vec_Fetch(ivars->elems, (size_t)ivars->tick), STRING);
             DECREF(ivars->entry);
             ivars->entry = (String*)INCREF(path);
             return true;
@@ -335,7 +335,7 @@ bool
 CFReaderDH_Entry_Is_Dir_IMP(CFReaderDirHandle *self) {
     CFReaderDirHandleIVARS *const ivars = CFReaderDH_IVARS(self);
     if (ivars->elems) {
-        String *name = (String*)Vec_Fetch(ivars->elems, ivars->tick);
+        String *name = (String*)Vec_Fetch(ivars->elems, (size_t)ivars->tick);
         if (name) {
             return CFReader_Local_Is_Directory(ivars->cf_reader, name);
         }

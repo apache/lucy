@@ -247,7 +247,7 @@ String*
 Seg_Field_Name_IMP(Segment *self, int32_t field_num) {
     SegmentIVARS *const ivars = Seg_IVARS(self);
     return field_num
-           ? (String*)Vec_Fetch(ivars->by_num, field_num)
+           ? (String*)Vec_Fetch(ivars->by_num, (size_t)field_num)
            : NULL;
 }
 

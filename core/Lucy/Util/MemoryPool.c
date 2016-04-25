@@ -70,7 +70,7 @@ S_init_arena(MemoryPool *self, MemoryPoolIVARS *ivars, size_t amount) {
 
     if (ivars->tick < (int32_t)Vec_Get_Size(ivars->arenas)) {
         // In recycle mode, use previously acquired memory.
-        bb = (ByteBuf*)Vec_Fetch(ivars->arenas, ivars->tick);
+        bb = (ByteBuf*)Vec_Fetch(ivars->arenas, (size_t)ivars->tick);
         if (amount >= BB_Get_Size(bb)) {
             BB_Grow(bb, amount);
             BB_Set_Size(bb, amount);
@@ -89,7 +89,7 @@ S_init_arena(MemoryPool *self, MemoryPoolIVARS *ivars, size_t amount) {
     // Recalculate consumption to take into account blocked off space.
     ivars->consumed = 0;
     for (int32_t i = 0; i < ivars->tick; i++) {
-        ByteBuf *bb = (ByteBuf*)Vec_Fetch(ivars->arenas, i);
+        ByteBuf *bb = (ByteBuf*)Vec_Fetch(ivars->arenas, (size_t)i);
         ivars->consumed += BB_Get_Size(bb);
     }
 

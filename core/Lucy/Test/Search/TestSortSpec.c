@@ -324,7 +324,7 @@ S_add_random_objects(Indexer **indexer, Schema *schema, RAMFolder *folder,
 
     Vec_Sort(objects);
 
-    for (int i = 0; i < 100; ++i) {
+    for (size_t i = 0; i < 100; ++i) {
         Obj *obj = Vec_Fetch(objects, i);
         String *string = Obj_To_String(obj);
         Vec_Store(objects, i, (Obj*)string);

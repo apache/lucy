@@ -104,7 +104,7 @@ S_lazy_init(PostingListWriter *self) {
 static PostingPool*
 S_lazy_init_posting_pool(PostingListWriter *self, int32_t field_num) {
     PostingListWriterIVARS *const ivars = PListWriter_IVARS(self);
-    PostingPool *pool = (PostingPool*)Vec_Fetch(ivars->pools, field_num);
+    PostingPool *pool = (PostingPool*)Vec_Fetch(ivars->pools, (size_t)field_num);
     if (!pool && field_num != 0) {
         String *field = Seg_Field_Name(ivars->segment, field_num);
         pool = PostPool_new(ivars->schema, ivars->snapshot, ivars->segment,
