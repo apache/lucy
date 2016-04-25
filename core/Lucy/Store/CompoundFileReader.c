@@ -92,7 +92,7 @@ CFReader_do_open(CompoundFileReader *self, Folder *folder) {
         String *folder_name = IxFileNames_local_part(Folder_Get_Path(folder));
         size_t folder_name_len = Str_Length(folder_name);
 
-        for (uint32_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
+        for (size_t i = 0, max = Vec_Get_Size(files); i < max; i++) {
             String *orig = (String*)Vec_Fetch(files, i);
             if (Str_Starts_With(orig, folder_name)) {
                 Obj *record = Hash_Delete(ivars->records, orig);

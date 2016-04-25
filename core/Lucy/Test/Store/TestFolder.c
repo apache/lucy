@@ -244,7 +244,7 @@ test_List(TestBatchRunner *runner) {
 
     list = Folder_List(folder, NULL);
     Vec_Sort(list);
-    TEST_INT_EQ(runner, Vec_Get_Size(list), 3, "List");
+    TEST_UINT_EQ(runner, Vec_Get_Size(list), 3, "List");
     elem = (String*)DOWNCAST(Vec_Fetch(list, 0), STRING);
     TEST_TRUE(runner, elem && Str_Equals(elem, (Obj*)banana),
               "List first file");
@@ -256,7 +256,7 @@ test_List(TestBatchRunner *runner) {
     DECREF(list);
 
     list = Folder_List(folder, foo_bar);
-    TEST_INT_EQ(runner, Vec_Get_Size(list), 1, "List subdirectory contents");
+    TEST_UINT_EQ(runner, Vec_Get_Size(list), 1, "List subdirectory contents");
     elem = (String*)DOWNCAST(Vec_Fetch(list, 0), STRING);
     TEST_TRUE(runner, elem && Str_Equals(elem, (Obj*)baz),
               "Just the filename");

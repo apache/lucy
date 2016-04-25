@@ -114,7 +114,7 @@ uint32_t
 PolySearcher_Doc_Freq_IMP(PolySearcher *self, String *field, Obj *term) {
     PolySearcherIVARS *const ivars = PolySearcher_IVARS(self);
     uint32_t doc_freq = 0;
-    for (uint32_t i = 0, max = Vec_Get_Size(ivars->searchers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(ivars->searchers); i < max; i++) {
         Searcher *searcher = (Searcher*)Vec_Fetch(ivars->searchers, i);
         doc_freq += Searcher_Doc_Freq(searcher, field, term);
     }
@@ -123,7 +123,7 @@ PolySearcher_Doc_Freq_IMP(PolySearcher *self, String *field, Obj *term) {
 
 static void
 S_modify_doc_ids(Vector *match_docs, int32_t base) {
-    for (uint32_t i = 0, max = Vec_Get_Size(match_docs); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(match_docs); i < max; i++) {
         MatchDoc *match_doc = (MatchDoc*)Vec_Fetch(match_docs, i);
         int32_t  new_doc_id = MatchDoc_Get_Doc_ID(match_doc) + base;
         MatchDoc_Set_Doc_ID(match_doc, new_doc_id);
@@ -147,7 +147,7 @@ PolySearcher_Top_Docs_IMP(PolySearcher *self, Query *query,
                                                   Query_Get_Boost(query),
                                                   false);
 
-    for (uint32_t i = 0, max = Vec_Get_Size(searchers); i < max; i++) {
+    for (size_t i = 0, max = Vec_Get_Size(searchers); i < max; i++) {
         Searcher   *searcher   = (Searcher*)Vec_Fetch(searchers, i);
         int32_t     base       = I32Arr_Get(starts, i);
         TopDocs    *top_docs   = Searcher_Top_Docs(searcher, (Query*)compiler,
@@ -157,7 +157,7 @@ PolySearcher_Top_Docs_IMP(PolySearcher *self, Query *query,
         total_hits += TopDocs_Get_Total_Hits(top_docs);
 
         S_modify_doc_ids(sub_match_docs, base);
-        for (uint32_t j = 0, jmax = Vec_Get_Size(sub_match_docs); j < jmax; j++) {
+        for (size_t j = 0, jmax = Vec_Get_Size(sub_match_docs); j < jmax; j++) {
             MatchDoc *match_doc = (MatchDoc*)Vec_Fetch(sub_match_docs, j);
             if (!HitQ_Insert(hit_q, INCREF(match_doc))) { break; }
         }
