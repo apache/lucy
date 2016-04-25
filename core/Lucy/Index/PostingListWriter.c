@@ -111,7 +111,7 @@ S_lazy_init_posting_pool(PostingListWriter *self, int32_t field_num) {
                             ivars->polyreader, field, ivars->lex_writer,
                             ivars->mem_pool, ivars->lex_temp_out,
                             ivars->post_temp_out, ivars->skip_out);
-        Vec_Store(ivars->pools, field_num, (Obj*)pool);
+        Vec_Store(ivars->pools, (size_t)field_num, (Obj*)pool);
     }
     return pool;
 }
