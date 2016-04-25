@@ -182,7 +182,7 @@ SortFieldWriter_Add_IMP(SortFieldWriter *self, int32_t doc_id, Obj *value) {
         Counter_Add(counter, size);
     }
     else if (ivars->prim_id == FType_BLOB) {
-        int64_t size = Blob_Get_Size((Blob*)value) + 1;
+        int64_t size = (int64_t)Blob_Get_Size((Blob*)value) + 1;
         size = SI_increase_to_word_multiple(size);
         Counter_Add(counter, size);
     }

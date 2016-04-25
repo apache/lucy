@@ -259,7 +259,7 @@ test_sort_random_strings(TestBatchRunner *runner) {
         for (int i = 0; i < size; ++i) {
             buf[i] = rand();
         }
-        Blob *blob = Blob_new(buf, size);
+        Blob *blob = Blob_new(buf, (size_t)size);
         Vec_Push(blobs, (Obj*)blob);
     }
 
