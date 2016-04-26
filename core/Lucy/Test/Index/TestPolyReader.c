@@ -40,7 +40,7 @@ test_sub_tick(TestBatchRunner *runner) {
     for (i = 1; i < num_segs; i++) {
         if (PolyReader_sub_tick(offsets, i) != i - 1) { break; }
     }
-    TEST_INT_EQ(runner, i, num_segs, "got all sub_tick() calls right");
+    TEST_UINT_EQ(runner, i, num_segs, "got all sub_tick() calls right");
     DECREF(offsets);
     FREEMEM(ints);
 }
