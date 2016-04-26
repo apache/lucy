@@ -116,7 +116,7 @@ DefDelWriter_init(DefaultDeletionsWriter *self, Schema *schema,
         Vec_Store(ivars->bit_vecs, i, (Obj*)bit_vec);
         Hash_Store(ivars->name_to_tick,
                    SegReader_Get_Seg_Name(seg_reader),
-                   (Obj*)Int_new(i));
+                   (Obj*)Int_new((int64_t)i));
     }
 
     return self;
