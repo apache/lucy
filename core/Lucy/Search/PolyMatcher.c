@@ -30,7 +30,7 @@ PolyMatcher*
 PolyMatcher_init(PolyMatcher *self, Vector *children, Similarity *similarity) {
     Matcher_init((Matcher*)self);
     PolyMatcherIVARS *const ivars = PolyMatcher_IVARS(self);
-    ivars->num_kids = Vec_Get_Size(children);
+    ivars->num_kids = (uint32_t)Vec_Get_Size(children);
     ivars->sim      = (Similarity*)INCREF(similarity);
     ivars->children = (Vector*)INCREF(children);
     ivars->coord_factors = (float*)MALLOCATE((ivars->num_kids + 1) * sizeof(float));

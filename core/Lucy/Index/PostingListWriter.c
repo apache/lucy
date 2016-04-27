@@ -104,14 +104,14 @@ S_lazy_init(PostingListWriter *self) {
 static PostingPool*
 S_lazy_init_posting_pool(PostingListWriter *self, int32_t field_num) {
     PostingListWriterIVARS *const ivars = PListWriter_IVARS(self);
-    PostingPool *pool = (PostingPool*)Vec_Fetch(ivars->pools, field_num);
+    PostingPool *pool = (PostingPool*)Vec_Fetch(ivars->pools, (size_t)field_num);
     if (!pool && field_num != 0) {
         String *field = Seg_Field_Name(ivars->segment, field_num);
         pool = PostPool_new(ivars->schema, ivars->snapshot, ivars->segment,
                             ivars->polyreader, field, ivars->lex_writer,
                             ivars->mem_pool, ivars->lex_temp_out,
                             ivars->post_temp_out, ivars->skip_out);
-        Vec_Store(ivars->pools, field_num, (Obj*)pool);
+        Vec_Store(ivars->pools, (size_t)field_num, (Obj*)pool);
     }
     return pool;
 }

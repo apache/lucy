@@ -121,8 +121,16 @@ SnowStop_Load_IMP(SnowballStopFilter *self, Obj *dump) {
 Hash*
 SnowStop_gen_stoplist(String *language) {
     char lang[2];
-    lang[0] = tolower(Str_Code_Point_At(language, 0));
-    lang[1] = tolower(Str_Code_Point_At(language, 1));
+    int32_t first_letter  = Str_Code_Point_At(language, 0);
+    int32_t second_letter = Str_Code_Point_At(language, 1);
+    if (first_letter > 127 || first_letter < 0
+        || second_letter > 127 || second_letter < 0
+       ) {
+        first_letter = 0;
+        second_letter = 0;
+    }
+    lang[0] = (char)tolower((int)first_letter);
+    lang[1] = (char)tolower((int)second_letter);
     const uint8_t **words = NULL;
     if (memcmp(lang, "da", 2) == 0)      { words = SnowStop_snow_da; }
     else if (memcmp(lang, "de", 2) == 0) { words = SnowStop_snow_de; }

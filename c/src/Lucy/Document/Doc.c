@@ -55,7 +55,7 @@ Doc_Set_Fields_IMP(Doc *self, void *fields) {
 uint32_t
 Doc_Get_Size_IMP(Doc *self) {
     Hash *hash = (Hash*)Doc_IVARS(self)->fields;
-    return Hash_Get_Size(hash);
+    return (uint32_t)Hash_Get_Size(hash);
 }
 
 void

@@ -51,10 +51,10 @@ S_fetch_entry(InverterIVARS *ivars, String *field) {
     }
 
     InverterEntry *entry
-        = (InverterEntry*)Vec_Fetch(ivars->entry_pool, field_num);
+        = (InverterEntry*)Vec_Fetch(ivars->entry_pool, (size_t)field_num);
     if (!entry) {
         entry = InvEntry_new(schema, (String*)field, field_num);
-        Vec_Store(ivars->entry_pool, field_num, (Obj*)entry);
+        Vec_Store(ivars->entry_pool, (size_t)field_num, (Obj*)entry);
     }
     return entry;
 }

@@ -133,7 +133,7 @@ test_utf8proc_normalization(TestBatchRunner *runner) {
         // Normalize once.
         uint8_t *normalized;
         int32_t check = utf8proc_map((const uint8_t*)Str_Get_Ptr8(source),
-                                     Str_Get_Size(source),
+                                     (ssize_t)Str_Get_Size(source),
                                      &normalized,
                                      UTF8PROC_STABLE  |
                                      UTF8PROC_COMPOSE |

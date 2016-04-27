@@ -77,7 +77,7 @@ S_ormatcher_init2(ORMatcher *self, ORMatcherIVARS *ivars, Vector *children,
     ivars->size = 0;
 
     // Derive.
-    ivars->max_size = Vec_Get_Size(children);
+    ivars->max_size = (uint32_t)Vec_Get_Size(children);
 
     // Allocate.
     ivars->heap = (HeapedMatcherDoc**)CALLOCATE(ivars->max_size + 1, sizeof(HeapedMatcherDoc*));

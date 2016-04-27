@@ -93,7 +93,7 @@ S_lazy_init_field_writer(SortWriter *self, int32_t field_num) {
     SortWriterIVARS *const ivars = SortWriter_IVARS(self);
 
     SortFieldWriter *field_writer
-        = (SortFieldWriter*)Vec_Fetch(ivars->field_writers, field_num);
+        = (SortFieldWriter*)Vec_Fetch(ivars->field_writers, (size_t)field_num);
     if (!field_writer) {
 
         // Open temp files.
@@ -126,7 +126,7 @@ S_lazy_init_field_writer(SortWriter *self, int32_t field_num) {
                                   ivars->polyreader, field, ivars->counter,
                                   ivars->mem_thresh, ivars->temp_ord_out,
                                   ivars->temp_ix_out, ivars->temp_dat_out);
-        Vec_Store(ivars->field_writers, field_num, (Obj*)field_writer);
+        Vec_Store(ivars->field_writers, (size_t)field_num, (Obj*)field_writer);
     }
     return field_writer;
 }

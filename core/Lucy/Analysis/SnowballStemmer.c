@@ -39,8 +39,16 @@ SnowStemmer_init(SnowballStemmer *self, String *language) {
     ivars->language = Str_Clone(language);
 
     // Get a Snowball stemmer.  Be case-insensitive.
-    lang_buf[0] = tolower(Str_Code_Point_At(language, 0));
-    lang_buf[1] = tolower(Str_Code_Point_At(language, 1));
+    int32_t first_letter  = Str_Code_Point_At(language, 0);
+    int32_t second_letter = Str_Code_Point_At(language, 1);
+    if (first_letter > 127 || first_letter < 0
+        || second_letter > 127 || second_letter < 0
+       ) {
+        first_letter = 0;
+        second_letter = 0;
+    }
+    lang_buf[0] = (char)tolower((int)first_letter);
+    lang_buf[1] = (char)tolower((int)second_letter);
     lang_buf[2] = '\0';
     ivars->snowstemmer = sb_stemmer_new(lang_buf, "UTF_8");
     if (!ivars->snowstemmer) {

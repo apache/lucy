@@ -38,7 +38,7 @@ DataReader_init(DataReader *self, Schema *schema, Folder *folder,
                   seg_tick);
         }
         else {
-            Segment *segment = (Segment*)Vec_Fetch(segments, seg_tick);
+            Segment *segment = (Segment*)Vec_Fetch(segments, (size_t)seg_tick);
             if (!segment) {
                 THROW(ERR, "No segment at seg_tick %i32", seg_tick);
             }

@@ -230,7 +230,7 @@ S_find_starting_boundary(StringIterator *top, uint32_t max_skip,
 
         if (code_point == STR_OOB || code_point == '.') {
             // Skip remaining whitespace.
-            *num_skipped_ptr = StrIter_Skip_Whitespace(top);
+            *num_skipped_ptr = (uint32_t)StrIter_Skip_Whitespace(top);
             DECREF(iter);
             return true;
         }
@@ -300,7 +300,7 @@ S_find_ending_boundary(StringIterator *tail, uint32_t max_skip,
 
         if (code_point == STR_OOB) {
             // Skip remaining whitespace.
-            *num_skipped_ptr = StrIter_Skip_Whitespace_Back(tail);
+            *num_skipped_ptr = (uint32_t)StrIter_Skip_Whitespace_Back(tail);
             DECREF(iter);
             return true;
         }
@@ -340,7 +340,7 @@ S_find_ending_boundary(StringIterator *tail, uint32_t max_skip,
 
     if (word == NULL) {
         // Make space for ellipsis.
-        *num_skipped_ptr = StrIter_Recede(tail, 1);
+        *num_skipped_ptr = (uint32_t)StrIter_Recede(tail, 1);
     }
     else {
         // Use word boundary if no sentence boundary was found.
@@ -394,7 +394,7 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, String *field_val,
     else {
         start    = best_location - ivars->slop;
         max_skip = ivars->slop;
-        StrIter_Advance(top, start);
+        StrIter_Advance(top, (size_t)start);
     }
 
     uint32_t num_skipped;
@@ -413,7 +413,7 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, String *field_val,
     }
 
     bool found_ending_edge = true;
-    uint32_t excerpt_len = StrIter_Advance(tail, max_len);
+    uint32_t excerpt_len = (uint32_t)StrIter_Advance(tail, max_len);
 
     // Skip up to slop code points but keep at least max_len - slop.
     if (excerpt_len > max_len - ivars->slop) {
@@ -475,7 +475,7 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, Vector *spans,
     StringIterator *temp            = Str_Top(raw_excerpt);
     CharBuf        *buf             = CB_new(Str_Get_Size(raw_excerpt) + 32);
     CharBuf        *encode_buf      = NULL;
-    int32_t         raw_excerpt_end = top + Str_Length(raw_excerpt);
+    int32_t         raw_excerpt_end = top + (int32_t)Str_Length(raw_excerpt);
 
     for (size_t i = 0, max = Vec_Get_Size(spans); i < max; i++) {
         Span *span = (Span*)Vec_Fetch(spans, i);
@@ -500,7 +500,7 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, Vector *spans,
                     // Highlight previous section
                     int32_t highlighted_len = hl_end - hl_start;
                     StrIter_Assign(temp, iter);
-                    StrIter_Advance(iter, highlighted_len);
+                    StrIter_Advance(iter, (size_t)highlighted_len);
                     String *to_cat = StrIter_crop(temp, iter);
                     String *encoded = S_do_encode(self, to_cat, &encode_buf);
                     String *hl_frag = Highlighter_Highlight(self, encoded);
@@ -512,7 +512,7 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, Vector *spans,
 
                 int32_t non_highlighted_len = relative_start - hl_end;
                 StrIter_Assign(temp, iter);
-                StrIter_Advance(iter, non_highlighted_len);
+                StrIter_Advance(iter, (size_t)non_highlighted_len);
                 String *to_cat = StrIter_crop(temp, iter);
                 String *encoded = S_do_encode(self, to_cat, &encode_buf);
                 CB_Cat(buf, (String*)encoded);
@@ -529,7 +529,7 @@ Highlighter_Highlight_Excerpt_IMP(Highlighter *self, Vector *spans,
         // Highlight final section
         int32_t highlighted_len = hl_end - hl_start;
         StrIter_Assign(temp, iter);
-        StrIter_Advance(iter, highlighted_len);
+        StrIter_Advance(iter, (size_t)highlighted_len);
         String *to_cat = StrIter_crop(temp, iter);
         String *encoded = S_do_encode(self, to_cat, &encode_buf);
         String *hl_frag = Highlighter_Highlight(self, encoded);

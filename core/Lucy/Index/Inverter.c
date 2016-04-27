@@ -87,7 +87,8 @@ Inverter_Iterate_IMP(Inverter *self) {
 int32_t
 Inverter_Next_IMP(Inverter *self) {
     InverterIVARS *const ivars = Inverter_IVARS(self);
-    ivars->current = (InverterEntry*)Vec_Fetch(ivars->entries, ++ivars->tick);
+    ivars->tick += 1;
+    ivars->current = (InverterEntry*)Vec_Fetch(ivars->entries, (size_t)ivars->tick);
     if (!ivars->current) { ivars->current = ivars->blank; } // Exhausted.
     return InvEntry_IVARS(ivars->current)->field_num;
 }
