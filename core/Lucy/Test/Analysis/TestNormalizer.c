@@ -156,7 +156,7 @@ test_utf8proc_normalization(TestBatchRunner *runner) {
         // Normalize again.
         size_t normalized_len = strlen((char*)normalized);
         uint8_t *dupe;
-        int32_t dupe_check = utf8proc_map(normalized, normalized_len, &dupe,
+        int32_t dupe_check = utf8proc_map(normalized, (ssize_t)normalized_len, &dupe,
                                           UTF8PROC_STABLE  |
                                           UTF8PROC_COMPOSE |
                                           UTF8PROC_COMPAT  |

@@ -48,7 +48,7 @@ test_i8(TestBatchRunner *runner) {
     int i;
 
     for (i = -128; i < 128; i++) {
-        OutStream_Write_I8(outstream, i);
+        OutStream_Write_I8(outstream, (int8_t)i);
     }
     OutStream_Close(outstream);
 
@@ -72,7 +72,7 @@ test_u8(TestBatchRunner *runner) {
     int i;
 
     for (i = 0; i < 256; i++) {
-        OutStream_Write_U8(outstream, i);
+        OutStream_Write_U8(outstream, (uint8_t)i);
     }
     OutStream_Close(outstream);
 
@@ -398,7 +398,7 @@ test_cu64(TestBatchRunner *runner) {
     for (i = 0; i < 1000; i++) {
         char  buffer[10];
         const char *buf = buffer;
-        size_t size = InStream_Read_Raw_C64(raw_instream, buffer);
+        int size = InStream_Read_Raw_C64(raw_instream, buffer);
         uint64_t got = NumUtil_decode_cu64(&buf);
         UNUSED_VAR(size);
         if (got != ints[i]) {
