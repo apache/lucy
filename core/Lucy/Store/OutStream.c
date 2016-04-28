@@ -143,7 +143,7 @@ OutStream_Grow_IMP(OutStream *self, int64_t length) {
 int64_t
 OutStream_Tell_IMP(OutStream *self) {
     OutStreamIVARS *const ivars = OutStream_IVARS(self);
-    return ivars->buf_start + ivars->buf_pos;
+    return ivars->buf_start + (int64_t)ivars->buf_pos;
 }
 
 int64_t

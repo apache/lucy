@@ -267,15 +267,15 @@ FSFH_Release_Window_IMP(FSFileHandle *self, FileWindow *window) {
 bool
 FSFH_Read_IMP(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
     FSFileHandleIVARS *const ivars = FSFH_IVARS(self);
-    const int64_t end = offset + len;
+    const int64_t end = offset + (int64_t)len;
 
     if (ivars->flags & FH_WRITE_ONLY) {
         Err_set_error(Err_new(Str_newf("Can't read from write-only filehandle")));
         return false;
     }
-    if (offset < 0) {
-        Err_set_error(Err_new(Str_newf("Can't read from an offset less than 0 (%i64)",
-                                       offset)));
+    if (offset < 0 || end < offset) {
+        Err_set_error(Err_new(Str_newf("Invalid offset and len (%i64, %u64)",
+                                       offset, (uint64_t)len)));
         return false;
     }
     else if (end > ivars->len) {
@@ -381,7 +381,7 @@ SI_map(FSFileHandle *self, FSFileHandleIVARS *ivars, int64_t offset,
 
     if (len) {
         // Read-only memory mapping.
-        buf = mmap(NULL, len, PROT_READ, MAP_SHARED, ivars->fd, offset);
+        buf = mmap(NULL, (size_t)len, PROT_READ, MAP_SHARED, ivars->fd, offset);
         if (buf == (void*)(-1)) {
             Err_set_error(Err_new(Str_newf("mmap of offset %i64 and length %i64 (page size %i64) "
                                            "against '%o' failed: %s",
@@ -397,7 +397,7 @@ SI_map(FSFileHandle *self, FSFileHandleIVARS *ivars, int64_t offset,
 static CFISH_INLINE bool
 SI_unmap(FSFileHandle *self, char *buf, int64_t len) {
     if (buf != NULL) {
-        if (munmap(buf, len)) {
+        if (munmap(buf, (size_t)len)) {
             Err_set_error(Err_new(Str_newf("Failed to munmap '%o': %s",
                                            FSFH_IVARS(self)->path,
                                            strerror(errno))));
