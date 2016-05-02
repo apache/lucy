@@ -28,10 +28,10 @@
 #include "Lucy/Store/RAMFileHandle.h"
 #include "Lucy/Util/NumberUtils.h"
 
-// Inlined version of OutStream_Write_Bytes.
+// Inlined version of OutStream_Write_Bytes.  `len` must be between 0 and 2 GB.
 static CFISH_INLINE void
 SI_write_bytes(OutStream *self, OutStreamIVARS *ivars,
-               const void *bytes, size_t len);
+               const void *bytes, int64_t len);
 
 // Inlined version of OutStream_Write_CU32.
 static CFISH_INLINE void
@@ -123,10 +123,10 @@ OutStream_Absorb_IMP(OutStream *self, InStream *instream) {
     // not flushing too frequently and keeping code complexity under control.
     OutStream_Grow(self, OutStream_Tell(self) + bytes_left);
     while (bytes_left) {
-        const size_t bytes_this_iter = bytes_left < IO_STREAM_BUF_SIZE
-                                       ? (size_t)bytes_left
-                                       : IO_STREAM_BUF_SIZE;
-        InStream_Read_Bytes(instream, buf, bytes_this_iter);
+        const int64_t bytes_this_iter = bytes_left < IO_STREAM_BUF_SIZE
+                                        ? bytes_left
+                                        : IO_STREAM_BUF_SIZE;
+        InStream_Read_Bytes(instream, buf, (size_t)bytes_this_iter);
         SI_write_bytes(self, ivars, buf, bytes_this_iter);
         bytes_left -= bytes_this_iter;
     }
@@ -143,7 +143,7 @@ OutStream_Grow_IMP(OutStream *self, int64_t length) {
 int64_t
 OutStream_Tell_IMP(OutStream *self) {
     OutStreamIVARS *const ivars = OutStream_IVARS(self);
-    return ivars->buf_start + ivars->buf_pos;
+    return ivars->buf_start + (int64_t)ivars->buf_pos;
 }
 
 int64_t
@@ -180,30 +180,34 @@ OutStream_Length_IMP(OutStream *self) {
 
 void
 OutStream_Write_Bytes_IMP(OutStream *self, const void *bytes, size_t len) {
-    SI_write_bytes(self, OutStream_IVARS(self), bytes, len);
+    if (len >= INT32_MAX) {
+        THROW(ERR, "Can't write buffer longer than INT32_MAX: %u64",
+              (uint64_t)len);
+    }
+    SI_write_bytes(self, OutStream_IVARS(self), bytes, (int64_t)len);
 }
 
 static CFISH_INLINE void
 SI_write_bytes(OutStream *self, OutStreamIVARS *ivars,
-               const void *bytes, size_t len) {
+               const void *bytes, int64_t len) {
     // If this data is larger than the buffer size, flush and write.
     if (len >= IO_STREAM_BUF_SIZE) {
         S_flush(self, ivars);
-        if (!FH_Write(ivars->file_handle, bytes, len)) {
+        if (!FH_Write(ivars->file_handle, bytes, (size_t)len)) {
             RETHROW(INCREF(Err_get_error()));
         }
         ivars->buf_start += len;
     }
     // If there's not enough room in the buffer, flush then add.
-    else if (ivars->buf_pos + len >= IO_STREAM_BUF_SIZE) {
+    else if ((uint64_t)ivars->buf_pos + (uint64_t)len >= IO_STREAM_BUF_SIZE) {
         S_flush(self, ivars);
-        memcpy((ivars->buf + ivars->buf_pos), bytes, len);
-        ivars->buf_pos += len;
+        memcpy((ivars->buf + ivars->buf_pos), bytes, (size_t)len);
+        ivars->buf_pos += (size_t)len;
     }
     // If there's room, just add these bytes to the buffer.
     else {
-        memcpy((ivars->buf + ivars->buf_pos), bytes, len);
-        ivars->buf_pos += len;
+        memcpy((ivars->buf + ivars->buf_pos), bytes, (size_t)len);
+        ivars->buf_pos += (size_t)len;
     }
 }
 
@@ -314,7 +318,7 @@ SI_write_cu32(OutStream *self, OutStreamIVARS *ivars, uint32_t value) {
         value >>= 7;
     }
 
-    SI_write_bytes(self, ivars, ptr, (buf + sizeof(buf)) - ptr);
+    SI_write_bytes(self, ivars, ptr, (int64_t)((buf + sizeof(buf)) - ptr));
 }
 
 void
@@ -342,14 +346,18 @@ SI_write_cu64(OutStream *self, OutStreamIVARS *ivars, uint64_t value) {
         value >>= 7;
     }
 
-    SI_write_bytes(self, ivars, ptr, (buf + sizeof(buf)) - ptr);
+    SI_write_bytes(self, ivars, ptr, (int64_t)((buf + sizeof(buf)) - ptr));
 }
 
 void
 OutStream_Write_String_IMP(OutStream *self, const char *string, size_t len) {
     OutStreamIVARS *const ivars = OutStream_IVARS(self);
+    if (len >= INT32_MAX) {
+        THROW(ERR, "Can't write string longer than INT32_MAX: %u64",
+              (uint64_t)len);
+    }
     SI_write_cu32(self, ivars, (uint32_t)len);
-    SI_write_bytes(self, ivars, string, len);
+    SI_write_bytes(self, ivars, string, (int64_t)len);
 }
 
 void

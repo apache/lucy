@@ -41,7 +41,10 @@ BitVecDelDocs_init(BitVecDelDocs *self, Folder *folder,
     }
     // Cast away const-ness of buffer as we have no immutable BitVector.
     int64_t len    = InStream_Length(ivars->instream);
-    ivars->bits    = (uint8_t*)InStream_Buf(ivars->instream, len);
+    if (len >= (int64_t)(SIZE_MAX / 8)) {
+        THROW(ERR, "Unexpected deletions file length: %i64", len);
+    }
+    ivars->bits    = (uint8_t*)InStream_Buf(ivars->instream, (size_t)len);
     ivars->cap     = (size_t)(len * 8);
     return self;
 }

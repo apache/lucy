@@ -373,12 +373,12 @@ Folder_Slurp_File_IMP(Folder *self, String *path) {
         RETHROW(INCREF(Err_get_error()));
     }
     else {
-        uint64_t length = InStream_Length(instream);
+        int64_t length = InStream_Length(instream);
 
-        if (length >= SIZE_MAX) {
+        if (SIZE_MAX < INT64_MAX && length >= ((int64_t)SIZE_MAX)) {
             InStream_Close(instream);
             DECREF(instream);
-            THROW(ERR, "File %o is too big to slurp (%u64 bytes)", path,
+            THROW(ERR, "File %o is too big to slurp (%i64 bytes)", path,
                   length);
         }
         else {

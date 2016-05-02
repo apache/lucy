@@ -113,7 +113,7 @@ F64SortCache_Value_IMP(Float64SortCache *self, int32_t ord) {
         UNREACHABLE_RETURN(Obj*);
     }
     else {
-        InStream_Seek(ivars->dat_in, ord * sizeof(double));
+        InStream_Seek(ivars->dat_in, ord * (int64_t)sizeof(double));
         return (Obj*)Float_new(InStream_Read_F64(ivars->dat_in));
     }
 }
@@ -151,7 +151,7 @@ F32SortCache_Value_IMP(Float32SortCache *self, int32_t ord) {
         UNREACHABLE_RETURN(Obj*);
     }
     else {
-        InStream_Seek(ivars->dat_in, ord * sizeof(float));
+        InStream_Seek(ivars->dat_in, ord * (int64_t)sizeof(float));
         return (Obj*)Float_new(InStream_Read_F32(ivars->dat_in));
     }
 }
@@ -189,7 +189,7 @@ I32SortCache_Value_IMP(Int32SortCache *self, int32_t ord) {
         UNREACHABLE_RETURN(Obj*);
     }
     else {
-        InStream_Seek(ivars->dat_in, ord * sizeof(int32_t));
+        InStream_Seek(ivars->dat_in, ord * (int64_t)sizeof(int32_t));
         return (Obj*)Int_new(InStream_Read_I32(ivars->dat_in));
     }
 }
@@ -227,7 +227,7 @@ I64SortCache_Value_IMP(Int64SortCache *self, int32_t ord) {
         UNREACHABLE_RETURN(Obj*);
     }
     else {
-        InStream_Seek(ivars->dat_in, ord * sizeof(int64_t));
+        InStream_Seek(ivars->dat_in, ord * (int64_t)sizeof(int64_t));
         return (Obj*)Int_new(InStream_Read_I64(ivars->dat_in));
     }
 }

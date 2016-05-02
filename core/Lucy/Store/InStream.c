@@ -33,7 +33,7 @@ SI_tell(InStream *self);
 
 // Inlined version of InStream_Read_Bytes.
 static CFISH_INLINE void
-SI_read_bytes(InStream *self, char* buf, size_t len);
+SI_read_bytes(InStream *self, char* buf, int64_t len);
 
 // Inlined version of InStream_Read_U8.
 static CFISH_INLINE uint8_t
@@ -344,17 +344,20 @@ InStream_Advance_Buf_IMP(InStream *self, const char *buf) {
 
 void
 InStream_Read_Bytes_IMP(InStream *self, char* buf, size_t len) {
-    SI_read_bytes(self, buf, len);
+    if (len >= INT64_MAX) {
+        THROW(ERR, "Can't read %u64 bytes", (uint64_t)len);
+    }
+    SI_read_bytes(self, buf, (int64_t)len);
 }
 
 static CFISH_INLINE void
-SI_read_bytes(InStream *self, char* buf, size_t len) {
+SI_read_bytes(InStream *self, char* buf, int64_t len) {
     InStreamIVARS *const ivars = InStream_IVARS(self);
     const int64_t available
         = CHY_PTR_TO_I64(ivars->limit) - CHY_PTR_TO_I64(ivars->buf);
-    if (available >= (int64_t)len) {
+    if (available >= len) {
         // Request is entirely within buffer, so copy.
-        memcpy(buf, ivars->buf, len);
+        memcpy(buf, ivars->buf, (size_t)len);
         ivars->buf += len;
     }
     else {
@@ -362,21 +365,21 @@ SI_read_bytes(InStream *self, char* buf, size_t len) {
         if (available > 0) {
             memcpy(buf, ivars->buf, (size_t)available);
             buf += available;
-            len -= (size_t)available;
+            len -= available;
             ivars->buf += available;
         }
 
         if (len < IO_STREAM_BUF_SIZE) {
             // Ensure that we have enough mapped, then copy the rest.
             int64_t got = S_refill(self);
-            if (got < (int64_t)len) {
+            if (got < len) {
                 int64_t orig_pos = SI_tell(self) - available;
                 int64_t orig_len = len + available;
                 THROW(ERR,  "Read past EOF of %o (pos: %i64 len: %i64 "
                       "request: %i64)", ivars->filename, orig_pos,
                       ivars->len, orig_len);
             }
-            memcpy(buf, ivars->buf, len);
+            memcpy(buf, ivars->buf, (size_t)len);
             ivars->buf += len;
         }
         else {
@@ -385,7 +388,7 @@ SI_read_bytes(InStream *self, char* buf, size_t len) {
             const int64_t sub_file_pos  = SI_tell(self);
             const int64_t real_file_pos = sub_file_pos + ivars->offset;
             bool success
-                = FH_Read(ivars->file_handle, buf, real_file_pos, len);
+                = FH_Read(ivars->file_handle, buf, real_file_pos, (size_t)len);
             if (!success) {
                 RETHROW(INCREF(Err_get_error()));
             }
