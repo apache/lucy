@@ -44,7 +44,7 @@ DefDocReader_Fetch_Doc_IMP(DefaultDocReader *self, int32_t doc_id) {
     char     *field_name = (char*)MALLOCATE(field_name_cap + 1);
 
     // Get data file pointer from index, read number of fields.
-    InStream_Seek(ix_in, doc_id * 8);
+    InStream_Seek(ix_in, (int64_t)doc_id * 8);
     start = InStream_Read_I64(ix_in);
     InStream_Seek(dat_in, start);
     num_fields = InStream_Read_CU32(dat_in);
