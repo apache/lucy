@@ -104,7 +104,7 @@ test_Clone_and_Reopen(TestBatchRunner *runner) {
     InStream      *clone;
     InStream      *reopened;
 
-    for (uint32_t i = 0; i < 26; i++) {
+    for (uint8_t i = 0; i < 26; i++) {
         OutStream_Write_U8(outstream, 'a' + i);
     }
     OutStream_Close(outstream);

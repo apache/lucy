@@ -61,7 +61,7 @@ S_make_series_matcher(I32Array *doc_ids, I32Array *offsets, int32_t doc_max) {
 static I32Array*
 S_generate_match_list(int32_t first, int32_t max, int32_t doc_inc) {
     int32_t  count     = (max - first + doc_inc - 1) / doc_inc;
-    int32_t *doc_ids   = (int32_t*)MALLOCATE(count * sizeof(int32_t));
+    int32_t *doc_ids   = (int32_t*)MALLOCATE((size_t)count * sizeof(int32_t));
     int32_t  doc_id    = first;
     int32_t  i         = 0;
 

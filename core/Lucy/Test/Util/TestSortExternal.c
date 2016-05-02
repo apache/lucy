@@ -234,12 +234,12 @@ test_sort_packed_ints(TestBatchRunner *runner) {
     Vector *blobs    = Vec_new(num_ints);
 
     for (uint32_t i = 0; i < num_ints; ++i) {
-        char buf[4];
-        buf[0] = i >> 24;
-        buf[1] = i >> 16;
-        buf[2] = i >> 8;
-        buf[3] = i;
-        Blob *blob = Blob_new(buf, 4);
+        uint8_t buf[4];
+        buf[0] = (uint8_t)((i >> 24) & 0xFF);
+        buf[1] = (uint8_t)((i >> 16) & 0xFF);
+        buf[2] = (uint8_t)((i >> 8)  & 0xFF);
+        buf[3] = (uint8_t)(i & 0xFF);
+        Blob *blob = Blob_new((char*)buf, 4);
         Vec_Push(blobs, (Obj*)blob);
     }
 
@@ -254,12 +254,12 @@ test_sort_random_strings(TestBatchRunner *runner) {
     Vector *blobs       = Vec_new(num_strings);
 
     for (uint32_t i = 0; i < num_strings; ++i) {
-        char buf[1201];
+        uint8_t buf[1201];
         int size = rand() % 1200 + 1;
         for (int i = 0; i < size; ++i) {
-            buf[i] = rand();
+            buf[i] = (uint8_t)(rand() % 256);
         }
-        Blob *blob = Blob_new(buf, (size_t)size);
+        Blob *blob = Blob_new((char*)buf, (size_t)size);
         Vec_Push(blobs, (Obj*)blob);
     }
 
@@ -273,7 +273,7 @@ test_sort_random_strings(TestBatchRunner *runner) {
 static void
 test_run(TestBatchRunner *runner) {
     Vector *letters = Vec_new(26);
-    for (int i = 0; i < 26; ++i) {
+    for (char i = 0; i < 26; ++i) {
         char ch = 'a' + i;
         Blob *blob = Blob_new(&ch, 1);
         Vec_Push(letters, (Obj*)blob);

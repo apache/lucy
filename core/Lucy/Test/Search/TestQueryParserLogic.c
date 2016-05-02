@@ -477,7 +477,7 @@ logical_test_a_AND_b_AND_c_d(uint32_t boolop) {
     Query *left       = make_poly_query(BOOLOP_AND, a_query, b_query, c_query,
                                         NULL);
     Query *tree       = make_poly_query(boolop, left, d_query, NULL);
-    int32_t num_hits  = boolop == BOOLOP_AND ? 1 : 2;
+    uint32_t num_hits = boolop == BOOLOP_AND ? 1 : 2;
     return TestQP_new("a AND b AND c d", tree, NULL, num_hits);
 }
 
@@ -490,7 +490,7 @@ logical_test_a_AND_b_OR_c_d(uint32_t boolop) {
     Query *inner      = make_poly_query(BOOLOP_AND, a_query, b_query, NULL);
     Query *left       = make_poly_query(BOOLOP_OR, inner, c_query, NULL);
     Query *tree       = make_poly_query(boolop, left, d_query, NULL);
-    int32_t num_hits  = boolop == BOOLOP_AND ? 1 : 3;
+    uint32_t num_hits = boolop == BOOLOP_AND ? 1 : 3;
     return TestQP_new("a AND b OR c d", tree, NULL, num_hits);
 }
 
@@ -503,7 +503,7 @@ logical_test_a_OR_b_AND_c_d(uint32_t boolop) {
     Query *inner      = make_poly_query(BOOLOP_AND, b_query, c_query, NULL);
     Query *left       = make_poly_query(BOOLOP_OR, a_query, inner, NULL);
     Query *tree       = make_poly_query(boolop, left, d_query, NULL);
-    int32_t num_hits  = boolop == BOOLOP_AND ? 1 : 4;
+    uint32_t num_hits = boolop == BOOLOP_AND ? 1 : 4;
     return TestQP_new("a OR b AND c d", tree, NULL, num_hits);
 }
 
@@ -516,7 +516,7 @@ logical_test_a_OR_b_OR_c_d(uint32_t boolop) {
     Query *left       = make_poly_query(BOOLOP_OR, a_query, b_query, c_query,
                                         NULL);
     Query *tree       = make_poly_query(boolop, left, d_query, NULL);
-    int32_t num_hits  = boolop == BOOLOP_AND ? 1 : 4;
+    uint32_t num_hits = boolop == BOOLOP_AND ? 1 : 4;
     return TestQP_new("a OR b OR c d", tree, NULL, num_hits);
 }
 
@@ -529,7 +529,7 @@ logical_test_a_AND_b_c_AND_d(uint32_t boolop) {
     Query *left       = make_poly_query(BOOLOP_AND, a_query, b_query, NULL);
     Query *right      = make_poly_query(BOOLOP_AND, c_query, d_query, NULL);
     Query *tree       = make_poly_query(boolop, left, right, NULL);
-    int32_t num_hits  = boolop == BOOLOP_AND ? 1 : 3;
+    uint32_t num_hits = boolop == BOOLOP_AND ? 1 : 3;
     return TestQP_new("a AND b c AND d", tree, NULL, num_hits);
 }
 
@@ -542,7 +542,7 @@ logical_test_a_AND_b_c_OR_d(uint32_t boolop) {
     Query *left       = make_poly_query(BOOLOP_AND, a_query, b_query, NULL);
     Query *right      = make_poly_query(BOOLOP_OR, c_query, d_query, NULL);
     Query *tree       = make_poly_query(boolop, left, right, NULL);
-    int32_t num_hits  = boolop == BOOLOP_AND ? 2 : 3;
+    uint32_t num_hits = boolop == BOOLOP_AND ? 2 : 3;
     return TestQP_new("a AND b c OR d", tree, NULL, num_hits);
 }
 
@@ -555,7 +555,7 @@ logical_test_a_OR_b_c_AND_d(uint32_t boolop) {
     Query *left       = make_poly_query(BOOLOP_OR, a_query, b_query, NULL);
     Query *right      = make_poly_query(BOOLOP_AND, c_query, d_query, NULL);
     Query *tree       = make_poly_query(boolop, left, right, NULL);
-    int32_t num_hits  = boolop == BOOLOP_AND ? 1 : 4;
+    uint32_t num_hits = boolop == BOOLOP_AND ? 1 : 4;
     return TestQP_new("a OR b c AND d", tree, NULL, num_hits);
 }
 
@@ -568,7 +568,7 @@ logical_test_a_OR_b_c_OR_d(uint32_t boolop) {
     Query *left       = make_poly_query(BOOLOP_OR, a_query, b_query, NULL);
     Query *right      = make_poly_query(BOOLOP_OR, c_query, d_query, NULL);
     Query *tree       = make_poly_query(boolop, left, right, NULL);
-    int32_t num_hits  = boolop == BOOLOP_AND ? 2 : 4;
+    uint32_t num_hits = boolop == BOOLOP_AND ? 2 : 4;
     return TestQP_new("a OR b c OR d", tree, NULL, num_hits);
 }
 
@@ -581,7 +581,7 @@ logical_test_a_b_AND_c_AND_d(uint32_t boolop) {
     Query *right      = make_poly_query(BOOLOP_AND, b_query, c_query, d_query,
                                         NULL);
     Query *tree       = make_poly_query(boolop, a_query, right, NULL);
-    int32_t num_hits  = boolop == BOOLOP_AND ? 1 : 4;
+    uint32_t num_hits = boolop == BOOLOP_AND ? 1 : 4;
     return TestQP_new("a b AND c AND d", tree, NULL, num_hits);
 }
 
@@ -594,7 +594,7 @@ logical_test_a_b_AND_c_OR_d(uint32_t boolop) {
     Query *inner      = make_poly_query(BOOLOP_AND, b_query, c_query, NULL);
     Query *right      = make_poly_query(BOOLOP_OR, inner, d_query, NULL);
     Query *tree       = make_poly_query(boolop, a_query, right, NULL);
-    int32_t num_hits  = boolop == BOOLOP_AND ? 2 : 4;
+    uint32_t num_hits = boolop == BOOLOP_AND ? 2 : 4;
     return TestQP_new("a b AND c OR d", tree, NULL, num_hits);
 }
 
@@ -607,7 +607,7 @@ logical_test_a_b_OR_c_AND_d(uint32_t boolop) {
     Query *inner      = make_poly_query(BOOLOP_AND, c_query, d_query, NULL);
     Query *right      = make_poly_query(BOOLOP_OR, b_query, inner, NULL);
     Query *tree       = make_poly_query(boolop, a_query, right, NULL);
-    int32_t num_hits  = boolop == BOOLOP_AND ? 3 : 4;
+    uint32_t num_hits = boolop == BOOLOP_AND ? 3 : 4;
     return TestQP_new("a b OR c AND d", tree, NULL, num_hits);
 }
 
@@ -620,7 +620,7 @@ logical_test_a_b_OR_c_OR_d(uint32_t boolop) {
     Query *right      = make_poly_query(BOOLOP_OR, b_query, c_query, d_query,
                                         NULL);
     Query *tree       = make_poly_query(boolop, a_query, right, NULL);
-    int32_t num_hits  = boolop == BOOLOP_AND ? 3 : 4;
+    uint32_t num_hits = boolop == BOOLOP_AND ? 3 : 4;
     return TestQP_new("a b OR c OR d", tree, NULL, num_hits);
 }
 

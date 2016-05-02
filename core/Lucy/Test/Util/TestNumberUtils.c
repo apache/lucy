@@ -167,8 +167,8 @@ test_cu32(TestBatchRunner *runner) {
         decode = encoded;
         skip   = encoded;
         for (size_t i = 0; i < count; i++) {
-            TEST_INT_EQ(runner, NumUtil_decode_cu32(&decode), ints[i],
-                        "cu32 %lu", (long)ints[i]);
+            TEST_UINT_EQ(runner, NumUtil_decode_cu32(&decode), ints[i],
+                         "cu32 %lu", (unsigned long)ints[i]);
             NumUtil_skip_cint(&skip);
             if (decode > limit) { THROW(ERR, "overrun"); }
         }
@@ -185,8 +185,8 @@ test_cu32(TestBatchRunner *runner) {
         decode = encoded;
         skip   = encoded;
         for (size_t i = 0; i < count; i++) {
-            TEST_INT_EQ(runner, NumUtil_decode_cu32(&decode), ints[i],
-                        "padded cu32 %lu", (long)ints[i]);
+            TEST_UINT_EQ(runner, NumUtil_decode_cu32(&decode), ints[i],
+                         "padded cu32 %lu", (unsigned long)ints[i]);
             NumUtil_skip_cint(&skip);
             if (decode > limit) { THROW(ERR, "overrun"); }
         }
@@ -197,7 +197,7 @@ test_cu32(TestBatchRunner *runner) {
     target = encoded;
     NumUtil_encode_cu32(UINT32_MAX, &target);
     decode = encoded;
-    TEST_INT_EQ(runner, NumUtil_decode_cu32(&decode), UINT32_MAX, "cu32 UINT32_MAX");
+    TEST_UINT_EQ(runner, NumUtil_decode_cu32(&decode), UINT32_MAX, "cu32 UINT32_MAX");
 
     FREEMEM(encoded);
     FREEMEM(ints);
@@ -346,7 +346,7 @@ test_bigend_u32(TestBatchRunner *runner) {
     target = encoded;
     for (size_t i = 0; i < count; i++) {
         uint32_t got = NumUtil_decode_bigend_u32(target);
-        TEST_INT_EQ(runner, got, ints[i], "bigend u32");
+        TEST_UINT_EQ(runner, got, ints[i], "bigend u32");
         target += sizeof(uint32_t);
     }
 

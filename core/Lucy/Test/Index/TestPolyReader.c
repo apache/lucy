@@ -30,17 +30,17 @@ TestPolyReader_new() {
 
 static void
 test_sub_tick(TestBatchRunner *runner) {
-    size_t num_segs = 255;
+    uint32_t num_segs = 255;
     int32_t *ints = (int32_t*)MALLOCATE(num_segs * sizeof(int32_t));
-    size_t i;
+    uint32_t i;
     for (i = 0; i < num_segs; i++) {
-        ints[i] = i;
+        ints[i] = (int32_t)i;
     }
     I32Array *offsets = I32Arr_new(ints, num_segs);
     for (i = 1; i < num_segs; i++) {
-        if (PolyReader_sub_tick(offsets, i) != i - 1) { break; }
+        if (PolyReader_sub_tick(offsets, (int32_t)i) != i - 1) { break; }
     }
-    TEST_INT_EQ(runner, i, num_segs, "got all sub_tick() calls right");
+    TEST_UINT_EQ(runner, i, num_segs, "got all sub_tick() calls right");
     DECREF(offsets);
     FREEMEM(ints);
 }
