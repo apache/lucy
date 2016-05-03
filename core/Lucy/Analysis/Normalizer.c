@@ -81,7 +81,7 @@ Normalizer_Transform_IMP(Normalizer *self, Inversion *inversion) {
         TokenIVARS *const token_ivars = Token_IVARS(token);
         ssize_t len
             = utf8proc_decompose((uint8_t*)token_ivars->text,
-                                 token_ivars->len, buffer, bufsize,
+                                 (ssize_t)token_ivars->len, buffer, bufsize,
                                  ivars->options);
 
         if (len > bufsize) {
@@ -91,9 +91,13 @@ Normalizer_Transform_IMP(Normalizer *self, Inversion *inversion) {
             }
             // allocate additional INITIAL_BUFSIZE items
             bufsize = len + INITIAL_BUFSIZE;
-            buffer = (int32_t*)MALLOCATE((bufsize + 1) * sizeof(int32_t));
+            if ((size_t)bufsize >= SIZE_MAX / sizeof(int32_t) - sizeof(int32_t)) {
+                THROW(ERR, "Requested bufsize too large: %u64",
+                      (uint64_t)bufsize);
+            }
+            buffer = (int32_t*)MALLOCATE(((size_t)bufsize + 1) * sizeof(int32_t));
             len = utf8proc_decompose((uint8_t*)token_ivars->text,
-                                     token_ivars->len, buffer, bufsize,
+                                     (ssize_t)token_ivars->len, buffer, bufsize,
                                      ivars->options);
         }
         if (len < 0) {
@@ -104,11 +108,15 @@ Normalizer_Transform_IMP(Normalizer *self, Inversion *inversion) {
 
         if (len >= 0) {
             if (len > (ssize_t)token_ivars->len) {
+                if (len >= INT32_MAX - 1) {
+                    THROW(ERR, "Normalized result over 2 GB: %u64",
+                          (uint64_t)len);
+                }
                 FREEMEM(token_ivars->text);
-                token_ivars->text = (char*)MALLOCATE(len + 1);
+                token_ivars->text = (char*)MALLOCATE((size_t)len + 1);
             }
             memcpy(token_ivars->text, buffer, len + 1);
-            token_ivars->len = len;
+            token_ivars->len = (size_t)len;
         }
     }
 

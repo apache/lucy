@@ -566,7 +566,7 @@ S_parse_string(const char **json_ptr, const char *limit) {
     }
     else {
         // Optimize common case where there are no escapes.
-        size_t len = end - top;
+        size_t len = (size_t)(end - top);
         if (!StrHelp_utf8_valid(top, len)) {
             String *mess = MAKE_MESS("Bad UTF-8 in JSON");
             Err_set_error(Err_new(mess));
@@ -582,7 +582,7 @@ S_unescape_text(const char *top, const char *end) {
     // because only a \u escape can theoretically be too long and
     // StrHelp_encode_utf8_char guards against sequences over 4 bytes.
     // Therefore we can allocate once and not worry about reallocating.
-    size_t cap = end - top + 1;
+    size_t cap = (size_t)(end - top) + 1;
     char *target_buf = (char*)MALLOCATE(cap);
     size_t target_size = 0;
     for (const char *text = top; text < end; text++) {

@@ -156,9 +156,9 @@ HLWriter_TV_Buf_IMP(HighlightWriter *self, Inversion *inversion) {
     while ((tokens = Inversion_Next_Cluster(inversion, &freq)) != NULL) {
         Token *token = *tokens;
         char *const   token_text = Token_Get_Text(token);
-        const int32_t token_len  = Token_Get_Len(token);
+        const size_t  token_len  = Token_Get_Len(token);
 
-        int32_t overlap = StrHelp_overlap(last_text, token_text,
+        size_t overlap  = StrHelp_overlap(last_text, token_text,
                                           last_len, token_len);
         char *ptr;
         char *orig;
@@ -179,8 +179,8 @@ HLWriter_TV_Buf_IMP(HighlightWriter *self, Inversion *inversion) {
         num_postings += 1;
 
         // Append the string diff to the tv_buf.
-        NumUtil_encode_ci32(overlap, &ptr);
-        NumUtil_encode_ci32((token_len - overlap), &ptr);
+        NumUtil_encode_ci32((int32_t)overlap, &ptr);
+        NumUtil_encode_ci32((int32_t)(token_len - overlap), &ptr);
         memcpy(ptr, (token_text + overlap), (token_len - overlap));
         ptr += token_len - overlap;
 

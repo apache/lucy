@@ -126,7 +126,7 @@ MemPool_Grab_IMP(MemoryPool *self, size_t amount) {
 void
 MemPool_Resize_IMP(MemoryPool *self, void *ptr, size_t new_amount) {
     MemoryPoolIVARS *const ivars = MemPool_IVARS(self);
-    const size_t last_amount = ivars->buf - ivars->last_buf;
+    const size_t last_amount = (size_t)(ivars->buf - ivars->last_buf);
     INCREASE_TO_WORD_MULTIPLE(new_amount);
 
     if (ptr != ivars->last_buf) {
