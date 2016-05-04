@@ -278,7 +278,7 @@ word_break:
 
 static int
 S_wb_lookup(const char *ptr) {
-    uint8_t start = *(uint8_t*)ptr++;
+    unsigned start = *(uint8_t*)ptr++;
 
     if (start < 0x80) { return wb_ascii[start]; }
 
