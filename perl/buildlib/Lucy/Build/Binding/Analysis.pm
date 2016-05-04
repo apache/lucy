@@ -156,7 +156,8 @@ CODE:
     if (XSBind_sv_defined(aTHX_ text_sv)) {
         STRLEN len;
         char *text = SvPVutf8(text_sv, len);
-        starter_token = lucy_Token_new(text, len, 0, len, 1.0, 1);
+        STRLEN length = utf8_length((U8*)text, (U8*)text + len);
+        starter_token = lucy_Token_new(text, len, 0, length, 1.0, 1);
     }
 
     RETVAL = CFISH_OBJ_TO_SV_NOINC(lucy_Inversion_new(starter_token));
