@@ -129,13 +129,13 @@ TextTermStepper_Write_Delta_IMP(TextTermStepper *self, OutStream *outstream,
     }
 
     // Count how many bytes the strings share at the top.
-    const int32_t overlap = StrHelp_overlap(last_text, new_text,
-                                            last_size, new_size);
+    const size_t overlap = StrHelp_overlap(last_text, new_text,
+                                           last_size, new_size);
     const char *const diff_start_str = new_text + overlap;
     const size_t diff_len            = new_size - overlap;
 
     // Write number of common bytes and common bytes.
-    OutStream_Write_CI32(outstream, overlap);
+    OutStream_Write_CI32(outstream, (int32_t)overlap);
     OutStream_Write_String(outstream, diff_start_str, diff_len);
 
     // Update value.

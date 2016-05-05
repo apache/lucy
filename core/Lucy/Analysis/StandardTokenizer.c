@@ -147,9 +147,10 @@ S_parse_single(const char *text, size_t len, lucy_StringIter *iter,
     lucy_StringIter start = *iter;
     int wb = S_skip_extend_format(text, len, iter);
 
-    Token *token = Token_new(text + start.byte_pos,
-                             iter->byte_pos - start.byte_pos,
-                             start.char_pos, iter->char_pos, 1.0f, 1);
+    Token *token
+        = Token_new(text + start.byte_pos, iter->byte_pos - start.byte_pos,
+                    (uint32_t)start.char_pos, (uint32_t)iter->char_pos,
+                    1.0f, 1);
     Inversion_Append(inversion, token);
 
     return wb;
@@ -251,7 +252,8 @@ S_parse_word(const char *text, size_t len, lucy_StringIter *iter,
     Token *token;
 word_break:
     token = Token_new(text + start.byte_pos, end.byte_pos - start.byte_pos,
-                      start.char_pos, end.char_pos, 1.0f, 1);
+                      (uint32_t)start.char_pos, (uint32_t)end.char_pos,
+                      1.0f, 1);
     Inversion_Append(inversion, token);
 
     return wb;
@@ -278,7 +280,7 @@ word_break:
 
 static int
 S_wb_lookup(const char *ptr) {
-    uint8_t start = *(uint8_t*)ptr++;
+    unsigned start = *(uint8_t*)ptr++;
 
     if (start < 0x80) { return wb_ascii[start]; }
 

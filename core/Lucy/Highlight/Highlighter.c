@@ -389,10 +389,10 @@ Highlighter_Raw_Excerpt_IMP(Highlighter *self, String *field_val,
         // around the hottest point in the field, start the fragment at the
         // beginning.
         start    = 0;
-        max_skip = best_location;
+        max_skip = (uint32_t)best_location;
     }
     else {
-        start    = best_location - ivars->slop;
+        start    = best_location - (int32_t)ivars->slop;
         max_skip = ivars->slop;
         StrIter_Advance(top, (size_t)start);
     }

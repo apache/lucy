@@ -133,7 +133,7 @@ MatchPost_Add_Inversion_To_Pool_IMP(MatchPosting *self,
     Inversion_Reset(inversion);
     while ((tokens = Inversion_Next_Cluster(inversion, &freq)) != NULL) {
         TokenIVARS *const token_ivars = Token_IVARS(*tokens);
-        uint32_t raw_post_bytes
+        size_t raw_post_bytes
             = MAX_RAW_POSTING_LEN(base_size, token_ivars->len);
         RawPosting *raw_posting
             = RawPost_new(MemPool_Grab(mem_pool, raw_post_bytes), doc_id,

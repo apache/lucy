@@ -88,11 +88,13 @@ static void
 S_grow(Inversion *self, size_t size) {
     InversionIVARS *const ivars = Inversion_IVARS(self);
     if (size > ivars->cap) {
-        uint64_t amount = size * sizeof(Token*);
-        // Clip rather than wrap.
-        if (amount > SIZE_MAX || amount < size) { amount = SIZE_MAX; }
-        ivars->tokens = (Token**)REALLOCATE(ivars->tokens, (size_t)amount);
-        ivars->cap    = size;
+        if (size > SIZE_MAX / sizeof(Token*) || size > UINT32_MAX) {
+            THROW(ERR, "Can't grow Inversion to hold %u64 elements",
+                  (uint64_t)size);
+        }
+        size_t amount = size * sizeof(Token*);
+        ivars->tokens = (Token**)REALLOCATE(ivars->tokens, amount);
+        ivars->cap    = (uint32_t)size;
         memset(ivars->tokens + ivars->size, 0,
                (size - ivars->size) * sizeof(Token*));
     }

@@ -92,7 +92,7 @@ ScorePost_Add_Inversion_To_Pool_IMP(ScorePosting *self,
     Inversion_Reset(inversion);
     while ((tokens = Inversion_Next_Cluster(inversion, &freq)) != NULL) {
         TokenIVARS *const token_ivars = Token_IVARS(*tokens);
-        uint32_t raw_post_bytes
+        size_t raw_post_bytes
             = MAX_RAW_POSTING_LEN(base_size, token_ivars->len, freq);
         RawPosting *raw_posting
             = RawPost_new(MemPool_Grab(mem_pool, raw_post_bytes), doc_id,
@@ -115,8 +115,8 @@ ScorePost_Add_Inversion_To_Pool_IMP(ScorePosting *self,
         }
 
         // Resize raw posting memory allocation.
-        raw_post_ivars->aux_len = dest - start;
-        raw_post_bytes = dest - (char*)raw_posting;
+        raw_post_ivars->aux_len = (size_t)(dest - start);
+        raw_post_bytes = (size_t)(dest - (char*)raw_posting);
         MemPool_Resize(mem_pool, raw_posting, raw_post_bytes);
         PostPool_Feed(post_pool, (Obj*)raw_posting);
     }
@@ -204,8 +204,8 @@ ScorePost_Read_Raw_IMP(ScorePosting *self, InStream *instream,
     }
 
     // Resize raw posting memory allocation.
-    raw_post_ivars->aux_len = dest - start;
-    raw_post_bytes       = dest - (char*)raw_posting;
+    raw_post_ivars->aux_len = (size_t)(dest - start);
+    raw_post_bytes = (size_t)(dest - (char*)raw_posting);
     MemPool_Resize(mem_pool, raw_posting, raw_post_bytes);
 
     return raw_posting;

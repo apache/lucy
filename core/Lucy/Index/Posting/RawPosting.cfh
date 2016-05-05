@@ -40,8 +40,8 @@ class Lucy::Index::RawPosting nickname RawPost
     inherits Lucy::Index::Posting {
 
     uint32_t  freq;
-    uint32_t  content_len;
-    uint32_t  aux_len;
+    size_t    content_len;
+    size_t    aux_len;
     char[1]   blob; /* flexible array */
 
     /** Constructor.  Uses pre-allocated memory.

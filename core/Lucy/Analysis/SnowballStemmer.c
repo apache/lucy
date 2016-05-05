@@ -79,9 +79,16 @@ SnowStemmer_Transform_IMP(SnowballStemmer *self, Inversion *inversion) {
         TokenIVARS *const token_ivars = Token_IVARS(token);
         const sb_symbol *stemmed_text 
             = sb_stemmer_stem(snowstemmer, (sb_symbol*)token_ivars->text,
-                              token_ivars->len);
-        size_t len = sb_stemmer_length(snowstemmer);
+                              (int)token_ivars->len);
+        int length = sb_stemmer_length(snowstemmer);
+        if (length < 0) {
+            THROW(ERR, "Unexpected value for sb_stemmer_length: %d", length);
+        }
+        size_t len = (size_t)length;
         if (len > token_ivars->len) {
+            if (len >= INT32_MAX - 1) {
+                THROW(ERR, "String over 2Gb: %u64", (uint64_t)len);
+            }
             FREEMEM(token_ivars->text);
             token_ivars->text = (char*)MALLOCATE(len + 1);
         }

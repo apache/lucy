@@ -32,19 +32,18 @@ Token_init(Token *self, const char* text, size_t len, uint32_t start_offset,
            uint32_t end_offset, float boost, int32_t pos_inc) {
     TokenIVARS *const ivars = Token_IVARS(self);
 
-    // Allocate and assign.
+    if (len > INT32_MAX) {
+        THROW(ERR, "Token length greater than 2 GB: %u64", (uint64_t)len);
+    }
     ivars->text      = (char*)MALLOCATE(len + 1);
     ivars->text[len] = '\0';
     memcpy(ivars->text, text, len);
 
-    // Assign.
     ivars->len          = len;
     ivars->start_offset = start_offset;
     ivars->end_offset   = end_offset;
     ivars->boost        = boost;
     ivars->pos_inc      = pos_inc;
-
-    // Init.
     ivars->pos = -1;
 
     return self;
@@ -117,6 +116,9 @@ void
 Token_Set_Text_IMP(Token *self, char *text, size_t len) {
     TokenIVARS *const ivars = Token_IVARS(self);
     if (len > ivars->len) {
+        if (len > INT32_MAX) {
+            THROW(ERR, "Token length greater than 2 GB: %u64", (uint64_t)len);
+        }
         FREEMEM(ivars->text);
         ivars->text = (char*)MALLOCATE(len + 1);
     }
