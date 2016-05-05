@@ -50,12 +50,12 @@ DelWriter_init(DeletionsWriter *self, Schema *schema, Snapshot *snapshot,
 I32Array*
 DelWriter_Generate_Doc_Map_IMP(DeletionsWriter *self, Matcher *deletions,
                                int32_t doc_max, int32_t offset) {
-    int32_t *doc_map = (int32_t*)CALLOCATE(doc_max + 1, sizeof(int32_t));
-    int32_t  next_deletion = deletions ? Matcher_Next(deletions) : INT32_MAX;
     UNUSED_VAR(self);
     if (doc_max < 0) {
         THROW(ERR, "Negative doc_max is invalid: %i32", doc_max);
     }
+    int32_t *doc_map = (int32_t*)CALLOCATE((size_t)doc_max + 1, sizeof(int32_t));
+    int32_t  next_deletion = deletions ? Matcher_Next(deletions) : INT32_MAX;
 
     // 0 for a deleted doc, a new number otherwise
     for (int32_t i = 1, new_doc_id = 1; i <= doc_max; i++) {

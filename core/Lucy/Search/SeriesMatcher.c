@@ -68,10 +68,10 @@ SeriesMatcher_Advance_IMP(SeriesMatcher *self, int32_t target) {
         // Proceed to next matcher or bail.
         if (ivars->tick < ivars->num_matchers) {
             while (1) {
-                uint32_t next_offset
+                int32_t next_offset
                     = ivars->tick + 1 == ivars->num_matchers
                       ? INT32_MAX
-                      : (uint32_t)I32Arr_Get(ivars->offsets, (size_t)(ivars->tick + 1));
+                      : (int32_t)I32Arr_Get(ivars->offsets, (size_t)(ivars->tick + 1));
                 ivars->current_matcher = (Matcher*)Vec_Fetch(ivars->matchers,
                                                            ivars->tick);
                 ivars->current_offset = ivars->next_offset;

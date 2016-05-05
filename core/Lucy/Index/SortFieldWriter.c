@@ -349,7 +349,8 @@ S_lazy_init_sorted_ids(SortFieldWriter *self) {
     int32_t    run_max         = ivars->run_max;
 
     // Count.
-    int32_t *counts = (int32_t*)CALLOCATE(run_cardinality, sizeof(int32_t));
+    int32_t *counts
+        = (int32_t*)CALLOCATE((size_t)run_cardinality, sizeof(int32_t));
     for (int32_t doc_id = 0; doc_id <= run_max; ++doc_id) {
         int32_t ord = SortCache_Ordinal(sort_cache, doc_id);
         ++counts[ord];
@@ -364,7 +365,8 @@ S_lazy_init_sorted_ids(SortFieldWriter *self) {
     }
 
     // Distribute.
-    int32_t *sorted_ids = (int32_t*)MALLOCATE((run_max + 1) * sizeof(int32_t));
+    int32_t *sorted_ids
+        = (int32_t*)MALLOCATE(((size_t)run_max + 1) * sizeof(int32_t));
     for (int32_t doc_id = 0; doc_id <= run_max; ++doc_id) {
         int32_t ord = SortCache_Ordinal(sort_cache, doc_id);
         int32_t pos = counts[ord]++;
@@ -535,7 +537,7 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
     int8_t    prim_id   = ivars->prim_id;
     int32_t   doc_max   = (int32_t)Seg_Get_Count(ivars->segment);
     bool      has_nulls = ivars->count == doc_max ? false : true;
-    size_t    size      = (doc_max + 1) * sizeof(int32_t);
+    size_t    size      = ((size_t)doc_max + 1) * sizeof(int32_t);
     int32_t  *ords      = (int32_t*)MALLOCATE(size);
     int32_t   ord       = 0;
     int64_t   dat_start = OutStream_Tell(dat_out);
@@ -602,7 +604,7 @@ S_write_files(SortFieldWriter *self, OutStream *ord_out, OutStream *ix_out,
     int32_t ord_width   = ivars->ord_width;
 
     // Write ords.
-    size_t byte_count;
+    size_t byte_count = SIZE_MAX;
     switch (ord_width) {
         case 1:
             byte_count = (((size_t)doc_max + 1) + 7) / 8;
