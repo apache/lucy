@@ -237,8 +237,8 @@ IxManager_Make_Write_Lock_IMP(IndexManager *self) {
     String *write_lock_name = SSTR_WRAP_C("write");
     LockFactory *lock_factory = S_obtain_lock_factory(self);
     return LockFact_Make_Lock(lock_factory, write_lock_name,
-                              ivars->write_lock_timeout,
-                              ivars->write_lock_interval);
+                              (int32_t)ivars->write_lock_timeout,
+                              (int32_t)ivars->write_lock_interval);
 }
 
 Lock*
@@ -247,8 +247,8 @@ IxManager_Make_Deletion_Lock_IMP(IndexManager *self) {
     String *lock_name = SSTR_WRAP_C("deletion");
     LockFactory *lock_factory = S_obtain_lock_factory(self);
     return LockFact_Make_Lock(lock_factory, lock_name,
-                              ivars->deletion_lock_timeout,
-                              ivars->deletion_lock_interval);
+                              (int32_t)ivars->deletion_lock_timeout,
+                              (int32_t)ivars->deletion_lock_interval);
 }
 
 Lock*
@@ -257,8 +257,8 @@ IxManager_Make_Merge_Lock_IMP(IndexManager *self) {
     String *merge_lock_name = SSTR_WRAP_C("merge");
     LockFactory *lock_factory = S_obtain_lock_factory(self);
     return LockFact_Make_Lock(lock_factory, merge_lock_name,
-                              ivars->merge_lock_timeout,
-                              ivars->merge_lock_interval);
+                              (int32_t)ivars->merge_lock_timeout,
+                              (int32_t)ivars->merge_lock_interval);
 }
 
 void
@@ -372,33 +372,51 @@ IxManager_Get_Deletion_Lock_Interval_IMP(IndexManager *self) {
 
 void
 IxManager_Set_Write_Lock_Timeout_IMP(IndexManager *self, uint32_t timeout) {
+    if (timeout > INT32_MAX) {
+        THROW(ERR, "Timeout can't be greater than INT32_MAX: %u32", timeout);
+    }
     IxManager_IVARS(self)->write_lock_timeout = timeout;
 }
 
 void
 IxManager_Set_Write_Lock_Interval_IMP(IndexManager *self, uint32_t interval) {
+    if (interval > INT32_MAX) {
+        THROW(ERR, "Interval can't be greater than INT32_MAX: %u32", interval);
+    }
     IxManager_IVARS(self)->write_lock_interval = interval;
 }
 
 void
 IxManager_Set_Merge_Lock_Timeout_IMP(IndexManager *self, uint32_t timeout) {
+    if (timeout > INT32_MAX) {
+        THROW(ERR, "Timeout can't be greater than INT32_MAX: %u32", timeout);
+    }
     IxManager_IVARS(self)->merge_lock_timeout = timeout;
 }
 
 void
 IxManager_Set_Merge_Lock_Interval_IMP(IndexManager *self, uint32_t interval) {
+    if (interval > INT32_MAX) {
+        THROW(ERR, "Interval can't be greater than INT32_MAX: %u32", interval);
+    }
     IxManager_IVARS(self)->merge_lock_interval = interval;
 }
 
 void
 IxManager_Set_Deletion_Lock_Timeout_IMP(IndexManager *self,
                                         uint32_t timeout) {
+    if (timeout > INT32_MAX) {
+        THROW(ERR, "Timeout can't be greater than INT32_MAX: %u32", timeout);
+    }
     IxManager_IVARS(self)->deletion_lock_timeout = timeout;
 }
 
 void
 IxManager_Set_Deletion_Lock_Interval_IMP(IndexManager *self,
                                          uint32_t interval) {
+    if (interval > INT32_MAX) {
+        THROW(ERR, "Interval can't be greater than INT32_MAX: %u32", interval);
+    }
     IxManager_IVARS(self)->deletion_lock_interval = interval;
 }
 
