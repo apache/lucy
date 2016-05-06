@@ -60,7 +60,10 @@ Seg_init(Segment *self, int64_t number) {
 String*
 Seg_num_to_name(int64_t number) {
     char base36[StrHelp_MAX_BASE36_BYTES];
-    StrHelp_to_base36(number, &base36);
+    if (number < 0) {
+        THROW(ERR, "Arg can't be negative: %i64", number);
+    }
+    StrHelp_to_base36((uint64_t)number, &base36);
     return Str_newf("seg_%s", &base36);
 }
 

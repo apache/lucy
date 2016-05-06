@@ -73,7 +73,7 @@ SeriesMatcher_Advance_IMP(SeriesMatcher *self, int32_t target) {
                       ? INT32_MAX
                       : (int32_t)I32Arr_Get(ivars->offsets, (size_t)(ivars->tick + 1));
                 ivars->current_matcher = (Matcher*)Vec_Fetch(ivars->matchers,
-                                                           ivars->tick);
+                                                             (size_t)ivars->tick);
                 ivars->current_offset = ivars->next_offset;
                 ivars->next_offset = next_offset;
                 ivars->doc_id = next_offset - 1;

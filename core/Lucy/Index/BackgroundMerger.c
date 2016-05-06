@@ -314,7 +314,7 @@ S_merge_updated_deletions(BackgroundMerger *self) {
                                                new_segment, merge_polyreader);
         DeletionsWriter *del_writer = SegWriter_Get_Del_Writer(seg_writer);
         int64_t  merge_seg_num = Seg_Get_Number(ivars->segment);
-        uint32_t seg_tick      = INT32_MAX;
+        size_t   seg_tick      = INT32_MAX;
         int32_t  offset        = INT32_MAX;
 
         SegWriter_Prep_Seg_Dir(seg_writer);
