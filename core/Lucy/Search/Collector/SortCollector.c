@@ -191,7 +191,7 @@ S_derive_action(SortRule *rule, SortCache *cache) {
     }
     else if (rule_type == SortRule_FIELD) {
         if (cache) {
-            int8_t width = SortCache_Get_Ord_Width(cache);
+            int32_t width = SortCache_Get_Ord_Width(cache);
             switch (width) {
                 case 1:  return COMPARE_BY_ORD1  + reverse;
                 case 2:  return COMPARE_BY_ORD2  + reverse;
@@ -211,8 +211,10 @@ S_derive_action(SortRule *rule, SortCache *cache) {
                     else {
                         return COMPARE_BY_ORD32 + reverse;
                     }
-                default: THROW(ERR, "Unknown width: %i8", width);
+                default:
+                    ;
             }
+            THROW(ERR, "Unknown width: %i8", width);
         }
         else {
             return AUTO_TIE;
@@ -252,7 +254,7 @@ SortColl_Set_Reader_IMP(SortCollector *self, SegReader *reader) {
             else       { ivars->ord_arrays[i] = NULL; }
         }
     }
-    ivars->seg_doc_max = reader ? SegReader_Doc_Max(reader) : 0;
+    ivars->seg_doc_max = reader ? (uint32_t)SegReader_Doc_Max(reader) : 0;
     SortColl_Set_Reader_t super_set_reader
         = (SortColl_Set_Reader_t)SUPER_METHOD_PTR(SORTCOLLECTOR,
                                                   LUCY_SortColl_Set_Reader);
@@ -318,7 +320,7 @@ SortColl_Collect_IMP(SortCollector *self, int32_t doc_id) {
                  * acceptable.  Turn off AUTO_ACCEPT and start actually
                  * testing whether hits are competitive. */
                 ivars->bubble_score  = match_doc_ivars->score;
-                ivars->bubble_doc    = doc_id;
+                ivars->bubble_doc    = (uint32_t)doc_id;
                 ivars->actions       = ivars->derived_actions;
             }
 
@@ -344,7 +346,7 @@ SortColl_Collect_IMP(SortCollector *self, int32_t doc_id) {
 
 static CFISH_INLINE int32_t
 SI_compare_by_ord1(SortCollectorIVARS *ivars, uint32_t tick,
-                   int32_t a, int32_t b) {
+                   uint32_t a, uint32_t b) {
     const void *const ords = ivars->ord_arrays[tick];
     int32_t a_ord = NumUtil_u1get(ords, a);
     int32_t b_ord = NumUtil_u1get(ords, b);
@@ -352,7 +354,7 @@ SI_compare_by_ord1(SortCollectorIVARS *ivars, uint32_t tick,
 }
 static CFISH_INLINE int32_t
 SI_compare_by_ord2(SortCollectorIVARS *ivars, uint32_t tick,
-                   int32_t a, int32_t b) {
+                   uint32_t a, uint32_t b) {
     const void *const ords = ivars->ord_arrays[tick];
     int32_t a_ord = NumUtil_u2get(ords, a);
     int32_t b_ord = NumUtil_u2get(ords, b);
@@ -360,7 +362,7 @@ SI_compare_by_ord2(SortCollectorIVARS *ivars, uint32_t tick,
 }
 static CFISH_INLINE int32_t
 SI_compare_by_ord4(SortCollectorIVARS *ivars, uint32_t tick,
-                   int32_t a, int32_t b) {
+                   uint32_t a, uint32_t b) {
     const void *const ords = ivars->ord_arrays[tick];
     int32_t a_ord = NumUtil_u4get(ords, a);
     int32_t b_ord = NumUtil_u4get(ords, b);
@@ -368,7 +370,7 @@ SI_compare_by_ord4(SortCollectorIVARS *ivars, uint32_t tick,
 }
 static CFISH_INLINE int32_t
 SI_compare_by_ord8(SortCollectorIVARS *ivars, uint32_t tick,
-                   int32_t a, int32_t b) {
+                   uint32_t a, uint32_t b) {
     const uint8_t *ords = (const uint8_t*)ivars->ord_arrays[tick];
     int32_t a_ord = ords[a];
     int32_t b_ord = ords[b];
@@ -376,7 +378,7 @@ SI_compare_by_ord8(SortCollectorIVARS *ivars, uint32_t tick,
 }
 static CFISH_INLINE int32_t
 SI_compare_by_ord16(SortCollectorIVARS *ivars, uint32_t tick,
-                    int32_t a, int32_t b) {
+                    uint32_t a, uint32_t b) {
     const uint8_t *ord_bytes = (const uint8_t*)ivars->ord_arrays[tick];
     const uint8_t *address_a = ord_bytes + a * sizeof(uint16_t);
     const uint8_t *address_b = ord_bytes + b * sizeof(uint16_t);
@@ -386,17 +388,17 @@ SI_compare_by_ord16(SortCollectorIVARS *ivars, uint32_t tick,
 }
 static CFISH_INLINE int32_t
 SI_compare_by_ord32(SortCollectorIVARS *ivars, uint32_t tick,
-                    int32_t a, int32_t b) {
+                    uint32_t a, uint32_t b) {
     const uint8_t *ord_bytes = (const uint8_t*)ivars->ord_arrays[tick];
     const uint8_t *address_a = ord_bytes + a * sizeof(uint32_t);
     const uint8_t *address_b = ord_bytes + b * sizeof(uint32_t);
-    int32_t  ord_a = NumUtil_decode_bigend_u32(address_a);
-    int32_t  ord_b = NumUtil_decode_bigend_u32(address_b);
+    int32_t  ord_a = (int32_t)NumUtil_decode_bigend_u32(address_a);
+    int32_t  ord_b = (int32_t)NumUtil_decode_bigend_u32(address_b);
     return ord_a - ord_b;
 }
 static CFISH_INLINE int32_t
 SI_compare_by_native_ord16(SortCollectorIVARS *ivars, uint32_t tick,
-                           int32_t a, int32_t b) {
+                           uint32_t a, uint32_t b) {
     const uint16_t *ords = (const uint16_t*)ivars->ord_arrays[tick];
     int32_t a_ord = ords[a];
     int32_t b_ord = ords[b];
@@ -404,21 +406,21 @@ SI_compare_by_native_ord16(SortCollectorIVARS *ivars, uint32_t tick,
 }
 static CFISH_INLINE int32_t
 SI_compare_by_native_ord32(SortCollectorIVARS *ivars, uint32_t tick,
-                           int32_t a, int32_t b) {
+                           uint32_t a, uint32_t b) {
     const int32_t *ords = (const int32_t*)ivars->ord_arrays[tick];
     return ords[a] - ords[b];
 }
 
 // Bounds checking for doc id against the segment doc_max.  We assume that any
 // sort cache ord arrays can accomodate lookups up to this number.
-static CFISH_INLINE int32_t
+static CFISH_INLINE uint32_t
 SI_validate_doc_id(SortCollectorIVARS *ivars, int32_t doc_id) {
-    // Check as uint32_t since we're using these doc ids as array indexes.
-    if ((uint32_t)doc_id > (uint32_t)ivars->seg_doc_max) {
-        THROW(ERR, "Doc ID %i32 greater than doc max %i32", doc_id,
+    uint32_t converted = (uint32_t)doc_id;
+    if (converted > ivars->seg_doc_max) {
+        THROW(ERR, "Doc ID %i32 out of range (max %u32)", doc_id,
               ivars->seg_doc_max);
     }
-    return doc_id;
+    return converted;
 }
 
 static CFISH_INLINE bool
@@ -430,7 +432,6 @@ SI_competitive(SortCollectorIVARS *ivars, int32_t doc_id) {
      *
      *     uint8_t *const actions    = ivars->actions;
      *     const uint32_t num_rules  = ivars->num_rules;
-     *     const int32_t bubble_doc = ivars->bubble_doc;
      *
      * However, our major goal is to return as quickly as possible, and the
      * common case is that we'll have our answer before the first loop iter
@@ -482,12 +483,12 @@ SI_competitive(SortCollectorIVARS *ivars, int32_t doc_id) {
                 }
                 break;
             case COMPARE_BY_DOC_ID:
-                if (doc_id > ivars->bubble_doc)      { return false; }
-                else if (doc_id < ivars->bubble_doc) { return true; }
+                if ((int64_t)doc_id > (int64_t)ivars->bubble_doc)      { return false; }
+                else if ((int64_t)doc_id < (int64_t)ivars->bubble_doc) { return true; }
                 break;
             case COMPARE_BY_DOC_ID_REV:
-                if (doc_id > ivars->bubble_doc)      { return true; }
-                else if (doc_id < ivars->bubble_doc) { return false; }
+                if ((int64_t)doc_id > (int64_t)ivars->bubble_doc)      { return true; }
+                else if ((int64_t)doc_id < (int64_t)ivars->bubble_doc) { return false; }
                 break;
             case COMPARE_BY_ORD1: {
                     int32_t comparison
