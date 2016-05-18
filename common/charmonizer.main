@@ -318,10 +318,9 @@ lucy_MakeFile_new(chaz_CLI *cli) {
     }
 
     /* Lucy libraries. */
-    self->shared_lib = chaz_Lib_new("lucy", chaz_Lib_SHARED, lucy_version,
-                                    lucy_major_version);
-    self->static_lib = chaz_Lib_new("lucy", chaz_Lib_STATIC, lucy_version,
-                                    lucy_major_version);
+    self->shared_lib = chaz_Lib_new_shared("lucy", lucy_version,
+                                           lucy_major_version);
+    self->static_lib = chaz_Lib_new_static("lucy");
     self->shared_lib_filename = chaz_Lib_filename(self->shared_lib);
     self->static_lib_filename = chaz_Lib_filename(self->static_lib);
 

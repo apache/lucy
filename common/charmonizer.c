@@ -45,14 +45,12 @@
 
 typedef struct chaz_Lib chaz_Lib;
 
-typedef enum {
-    chaz_Lib_SHARED = 1,
-    chaz_Lib_STATIC = 2
-} chaz_LibType;
+chaz_Lib*
+chaz_Lib_new_shared(const char *name, const char *version,
+                    const char *major_version);
 
 chaz_Lib*
-chaz_Lib_new(const char *name, chaz_LibType type, const char *version,
-             const char *major_version);
+chaz_Lib_new_static(const char *name);
 
 void
 chaz_Lib_destroy(chaz_Lib *flags);
@@ -1710,7 +1708,6 @@ struct chaz_Lib {
     char *major_version;
     int   is_static;
     int   is_shared;
-    chaz_LibType lib_type;
 };
 
 static char*
@@ -1720,24 +1717,25 @@ static const char*
 S_get_prefix(void);
 
 chaz_Lib*
-chaz_Lib_new(const char *name, chaz_LibType lib_type, const char *version,
-             const char *major_version) {
+chaz_Lib_new_shared(const char *name, const char *version,
+                    const char *major_version) {
     chaz_Lib *lib = (chaz_Lib*)malloc(sizeof(chaz_Lib));
     lib->name          = chaz_Util_strdup(name);
     lib->version       = chaz_Util_strdup(version);
     lib->major_version = chaz_Util_strdup(major_version);
-    lib->lib_type      = lib_type;
-    if (lib_type == chaz_Lib_SHARED) {
-        lib->is_shared = 1;
-        lib->is_static = 0;
-    }
-    else if (lib_type == chaz_Lib_STATIC) {
-        lib->is_shared = 0;
-        lib->is_static = 1;
-    }
-    else {
-        chaz_Util_die("Invalid value for lib_type: %d", lib_type);
-    }
+    lib->is_shared = 1;
+    lib->is_static = 0;
+    return lib;
+}
+
+chaz_Lib*
+chaz_Lib_new_static(const char *name) {
+    chaz_Lib *lib = (chaz_Lib*)malloc(sizeof(chaz_Lib));
+    lib->name          = chaz_Util_strdup(name);
+    lib->version       = NULL;
+    lib->major_version = NULL;
+    lib->is_shared = 0;
+    lib->is_static = 1;
     return lib;
 }
 
@@ -1776,24 +1774,29 @@ chaz_Lib_is_static (chaz_Lib *lib) {
 
 char*
 chaz_Lib_filename(chaz_Lib *lib) {
-    const char *ext = lib->is_shared
-                      ? chaz_OS_shared_lib_ext()
-                      : chaz_OS_static_lib_ext();
-
-    if ((strcmp(ext, ".dll") == 0) || strcmp(ext, ".lib") == 0) {
-        return S_build_filename(lib, lib->major_version, ext);
+    if (lib->is_static) {
+        return chaz_Lib_no_version_filename(lib);
     }
     else {
-        return S_build_filename(lib, lib->version, ext);
+        const char *ext = chaz_OS_shared_lib_ext();
+        if (strcmp(ext, ".dll") == 0) {
+            return S_build_filename(lib, lib->major_version, ext);
+        }
+        else {
+            return S_build_filename(lib, lib->version, ext);
+        }
     }
 }
 
 char*
 chaz_Lib_major_version_filename(chaz_Lib *lib) {
-    const char *ext = lib->is_shared
-                      ? chaz_OS_shared_lib_ext()
-                      : chaz_OS_static_lib_ext();
-    return S_build_filename(lib, lib->major_version, ext);
+    if (lib->is_static) {
+        return chaz_Lib_no_version_filename(lib);
+    }
+    else {
+        const char *ext = chaz_OS_shared_lib_ext();
+        return S_build_filename(lib, lib->major_version, ext);
+    }
 }
 
 char*
@@ -2313,7 +2316,8 @@ S_chaz_CLI_rebuild_help(chaz_CLI *self) {
                 }
                 self->help[current_len++] = '=';
                 for (j = 0; opt->name[j]; j++) {
-                    self->help[current_len++] = toupper(opt->name[j]);
+                    unsigned char c = (unsigned char)opt->name[j];
+                    self->help[current_len++] = toupper(c);
                 }
                 if (opt->flags & CHAZ_CLI_ARG_OPTIONAL) {
                     self->help[current_len++] = ']';
@@ -2531,7 +2535,7 @@ chaz_CLI_parse(chaz_CLI *self, int argc, const char *argv[]) {
         /* Extract the name of the argument, look for a potential value. */
         while (1) {
             char c = arg[name_len + 2];
-            if (isalnum(c) || c == '-' || c == '_') {
+            if (isalnum((unsigned char)c) || c == '-' || c == '_') {
                 name_len++;
             }
             else if (c == '\0') {
@@ -3255,7 +3259,7 @@ chaz_ConfWriterC_vappend_conf(const char *fmt, va_list args) {
 
 static int
 chaz_ConfWriterC_sym_is_uppercase(const char *sym) {
-    return isupper(sym[0]);
+    return isupper((unsigned char)sym[0]);
 }
 
 static char*
@@ -3263,7 +3267,7 @@ chaz_ConfWriterC_uppercase_string(const char *src) {
     char *retval = chaz_Util_strdup(src);
     size_t i;
     for (i = 0; retval[i]; ++i) {
-        retval[i] = toupper(retval[i]);
+        retval[i] = toupper((unsigned char)retval[i]);
     }
     return retval;
 }
@@ -4808,33 +4812,6 @@ chaz_MakeFile_add_static_lib(chaz_MakeFile *makefile, chaz_Lib *lib,
     }
     chaz_MakeRule_add_rm_command(makefile->clean, filename);
 
-    /* Add symlinks. */
-    if (strcmp(shlib_ext, ".dll") != 0) {
-        char *major_v_name = chaz_Lib_major_version_filename(lib);
-        char *no_v_name    = chaz_Lib_no_version_filename(lib);
-
-        command = chaz_Util_join(" ", "ln -sf", filename, major_v_name, NULL);
-        chaz_MakeRule_add_command(rule, command);
-        free(command);
-
-        if (strcmp(shlib_ext, ".dylib") == 0) {
-            command = chaz_Util_join(" ", "ln -sf", filename, no_v_name,
-                                     NULL);
-        }
-        else {
-            command = chaz_Util_join(" ", "ln -sf", major_v_name, no_v_name,
-                                     NULL);
-        }
-        chaz_MakeRule_add_command(rule, command);
-        free(command);
-
-        chaz_MakeRule_add_rm_command(makefile->clean, major_v_name);
-        chaz_MakeRule_add_rm_command(makefile->clean, no_v_name);
-
-        free(major_v_name);
-        free(no_v_name);
-    }
-
     free(filename);
     return rule;
 }
@@ -5241,7 +5218,7 @@ chaz_Make_list_files(const char *dir, const char *ext,
 
         /* Strip whitespace from end of output. */
         for (prefix_len = output_len; prefix_len > 0; --prefix_len) {
-            if (!isspace(output[prefix_len-1])) { break; }
+            if (!isspace((unsigned char)output[prefix_len-1])) { break; }
         }
         prefix = (char*)malloc(prefix_len + 2);
         memcpy(prefix, output, prefix_len);
@@ -5331,8 +5308,8 @@ chaz_OS_init(void) {
         uname = chaz_OS_run_and_capture("uname", &uname_len);
         for (i = 0; i < CHAZ_OS_NAME_MAX && i < uname_len; i++) {
             char c = uname[i];
-            if (!c || isspace(c)) { break; }
-            chaz_OS.name[i] = tolower(c);
+            if (!c || isspace((unsigned char)c)) { break; }
+            chaz_OS.name[i] = tolower((unsigned char)c);
         }
         if (i > 0) { chaz_OS.name[i] = '\0'; }
         else       { strcpy(chaz_OS.name, "unknown_unix"); }
@@ -5789,7 +5766,7 @@ chaz_Probe_parse_cli_args(int argc, const char *argv[], chaz_CLI *cli) {
     chaz_CLI_register(cli, "enable-coverage", NULL, CHAZ_CLI_NO_ARG);
     chaz_CLI_register(cli, "cc", "compiler command", CHAZ_CLI_ARG_REQUIRED);
     chaz_CLI_register(cli, "cflags", NULL, CHAZ_CLI_ARG_OPTIONAL);
-    chaz_CLI_register(cli, "make", "make command", 0);
+    chaz_CLI_register(cli, "make", "make command", CHAZ_CLI_ARG_OPTIONAL);
 
     /* Parse options, exiting on failure. */
     if (!chaz_CLI_parse(cli, argc, argv)) {
@@ -5827,10 +5804,10 @@ chaz_Probe_parse_cli_args(int argc, const char *argv[], chaz_CLI *cli) {
         size_t r   = len;
         size_t trimmed_len;
 
-        while (isspace(arg[l])) {
+        while (isspace((unsigned char)arg[l])) {
             ++l;
         }
-        while (r > l && isspace(arg[r-1])) {
+        while (r > l && isspace((unsigned char)arg[r-1])) {
             --r;
         }
 
@@ -6575,8 +6552,8 @@ chaz_Headers_encode_affirmation(const char *header_name, char *buffer, size_t bu
             *buf = '\0';
             break;
         }
-        else if (isalnum(*header_name)) {
-            *buf = toupper(*header_name);
+        else if (isalnum((unsigned char)*header_name)) {
+            *buf = toupper((unsigned char)*header_name);
         }
         else {
             *buf = '_';
@@ -6722,6 +6699,15 @@ static const char chaz_Integers_sizes_code[] =
     CHAZ_QUOTE(      return 0;                             )
     CHAZ_QUOTE(  }                                         );
 
+static const char chaz_Integers_stdint_type_code[] =
+    CHAZ_QUOTE(  #include <stdint.h>                       )
+    CHAZ_QUOTE(  #include <stdio.h>                        )
+    CHAZ_QUOTE(  int main()                                )
+    CHAZ_QUOTE(  {                                         )
+    CHAZ_QUOTE(      printf("%%d", (int)sizeof(%s));       )
+    CHAZ_QUOTE(      return 0;                             )
+    CHAZ_QUOTE(  }                                         );
+
 static const char chaz_Integers_type64_code[] =
     CHAZ_QUOTE(  #include <stdio.h>                        )
     CHAZ_QUOTE(  int main()                                )
@@ -6769,6 +6755,7 @@ chaz_Integers_run(void) {
     int has_64            = false;
     int has_long_long     = false;
     int has___int64       = false;
+    int has_intptr_t      = false;
     int has_inttypes      = chaz_HeadCheck_check_header("inttypes.h");
     int has_stdint        = chaz_HeadCheck_check_header("stdint.h");
     char i32_t_type[10];
@@ -6777,6 +6764,8 @@ chaz_Integers_run(void) {
     char i64_t_type[10];
     char i64_t_postfix[10];
     char u64_t_postfix[10];
+    char printf_modifier_32[10];
+    char printf_modifier_64[10];
     char code_buf[1000];
     char scratch[50];
 
@@ -6829,6 +6818,15 @@ chaz_Integers_run(void) {
         free(output);
     }
 
+    /* Determine whether the intptr_t type is available (it's optional in
+     * C99). */
+    sprintf(code_buf, chaz_Integers_stdint_type_code, "intptr_t");
+    output = chaz_CC_capture_output(code_buf, &output_len);
+    if (output != NULL) {
+        has_intptr_t = true;
+        free(output);
+    }
+
     /* Figure out which integer types are available. */
     if (sizeof_char == 1) {
         has_8 = true;
@@ -6841,12 +6839,14 @@ chaz_Integers_run(void) {
         strcpy(i32_t_type, "int");
         strcpy(i32_t_postfix, "");
         strcpy(u32_t_postfix, "U");
+        strcpy(printf_modifier_32, "");
     }
     else if (sizeof_long == 4) {
         has_32 = true;
         strcpy(i32_t_type, "long");
         strcpy(i32_t_postfix, "L");
         strcpy(u32_t_postfix, "UL");
+        strcpy(printf_modifier_32, "l");
     }
     if (sizeof_long == 8) {
         has_64 = true;
@@ -6901,6 +6901,47 @@ chaz_Integers_run(void) {
                 chaz_Util_die("64-bit types, but no literal syntax found");
             }
         }
+    }
+
+    /* Probe for 64-bit printf format string modifier. */
+    if (has_64) {
+        int i;
+        const char *options[] = {
+            "ll",
+            "l",
+            "L",
+            "q",   /* Some *BSDs */
+            "I64", /* Microsoft */
+            NULL,
+        };
+
+        /* Buffer to hold the code, and its start and end. */
+        static const char format_64_code[] =
+            CHAZ_QUOTE(  #include <stdio.h>                            )
+            CHAZ_QUOTE(  int main() {                                  )
+            CHAZ_QUOTE(      printf("%%%su", 18446744073709551615%s);  )
+            CHAZ_QUOTE(      return 0;                                 )
+            CHAZ_QUOTE( }                                              );
+
+        for (i = 0; options[i] != NULL; i++) {
+            /* Try to print 2**64-1, and see if we get it back intact. */
+            int success;
+            sprintf(code_buf, format_64_code, options[i], u64_t_postfix);
+            output = chaz_CC_capture_output(code_buf, &output_len);
+            success = output != NULL
+                      && strcmp(output, "18446744073709551615") == 0;
+            free(output);
+
+            if (success) {
+                break;
+            }
+        }
+
+        if (options[i] == NULL) {
+            chaz_Util_die("64-bit types, but no printf modifier found");
+        }
+
+        strcpy(printf_modifier_64, options[i]);
     }
 
     /* Write out some conditional defines. */
@@ -7002,10 +7043,14 @@ chaz_Integers_run(void) {
          *   int16_t
          *   int32_t
          *   int64_t
+         *   intmax_t
+         *   intptr_t
          *   uint8_t
          *   uint16_t
          *   uint32_t
          *   uint64_t
+         *   uintmax_t
+         *   uintptr_t
          */
         if (has_8) {
             chaz_ConfWriter_add_global_typedef("signed char", "int8_t");
@@ -7025,6 +7070,30 @@ chaz_Integers_run(void) {
             sprintf(scratch, "unsigned %s", i64_t_type);
             chaz_ConfWriter_add_global_typedef(scratch, "uint64_t");
         }
+
+        if (has_64) {
+            chaz_ConfWriter_add_global_typedef(i64_t_type, "intmax_t");
+            sprintf(scratch, "unsigned %s", i64_t_type);
+            chaz_ConfWriter_add_global_typedef(scratch, "uintmax_t");
+        }
+        else if (has_32) {
+            chaz_ConfWriter_add_global_typedef(i32_t_type, "intmax_t");
+            sprintf(scratch, "unsigned %s", i32_t_type);
+            chaz_ConfWriter_add_global_typedef(scratch, "uintmax_t");
+        }
+    }
+
+    if (!has_intptr_t) {
+        if (sizeof_ptr == 4) {
+            chaz_ConfWriter_add_global_typedef(i32_t_type, "intptr_t");
+            sprintf(scratch, "unsigned %s", i32_t_type);
+            chaz_ConfWriter_add_global_typedef(scratch, "uintptr_t");
+        }
+        else if (sizeof_ptr == 8) {
+            chaz_ConfWriter_add_global_typedef(i64_t_type, "intptr_t");
+            sprintf(scratch, "unsigned %s", i64_t_type);
+            chaz_ConfWriter_add_global_typedef(scratch, "uintptr_t");
+        }
     }
 
     chaz_ConfWriter_end_module();
@@ -7042,14 +7111,20 @@ chaz_Integers_run(void) {
          *   INT16_MAX
          *   INT32_MAX
          *   INT64_MAX
+         *   INTMAX_MAX
+         *   INTPTR_MAX
          *   INT8_MIN
          *   INT16_MIN
          *   INT32_MIN
          *   INT64_MIN
+         *   INTMAX_MIN
+         *   INTPTR_MIN
          *   UINT8_MAX
          *   UINT16_MAX
          *   UINT32_MAX
          *   UINT64_MAX
+         *   UINTMAX_MAX
+         *   UINTPTR_MAX
          *   SIZE_MAX
          */
         if (has_8) {
@@ -7064,17 +7139,49 @@ chaz_Integers_run(void) {
         }
         if (has_32) {
             chaz_ConfWriter_add_global_def("INT32_MAX", "2147483647");
-            chaz_ConfWriter_add_global_def("INT32_MIN", "(-INT32_MAX-1)");
+            chaz_ConfWriter_add_global_def("INT32_MIN", "(-2147483647-1)");
             chaz_ConfWriter_add_global_def("UINT32_MAX", "4294967295U");
         }
         if (has_64) {
             sprintf(scratch, "9223372036854775807%s", i64_t_postfix);
             chaz_ConfWriter_add_global_def("INT64_MAX", scratch);
-            chaz_ConfWriter_add_global_def("INT64_MIN", "(-INT64_MAX-1)");
+            sprintf(scratch, "(-9223372036854775807%s-1)", i64_t_postfix);
+            chaz_ConfWriter_add_global_def("INT64_MIN", scratch);
             sprintf(scratch, "18446744073709551615%s", u64_t_postfix);
             chaz_ConfWriter_add_global_def("UINT64_MAX", scratch);
         }
+
+        if (has_64) {
+            sprintf(scratch, "9223372036854775807%s", i64_t_postfix);
+            chaz_ConfWriter_add_global_def("INTMAX_MAX", scratch);
+            sprintf(scratch, "(-9223372036854775807%s-1)", i64_t_postfix);
+            chaz_ConfWriter_add_global_def("INTMAX_MIN", scratch);
+            sprintf(scratch, "18446744073709551615%s", u64_t_postfix);
+            chaz_ConfWriter_add_global_def("UINTMAX_MAX", scratch);
+        }
+        else if (has_32) {
+            chaz_ConfWriter_add_global_def("INTMAX_MAX", "2147483647");
+            chaz_ConfWriter_add_global_def("INTMAX_MIN", "(-2147483647-1)");
+            chaz_ConfWriter_add_global_def("UINTMAX_MAX", "4294967295U");
+        }
+
         chaz_ConfWriter_add_global_def("SIZE_MAX", "((size_t)-1)");
+    }
+
+    if (!has_intptr_t) {
+        if (sizeof_ptr == 4) {
+            chaz_ConfWriter_add_global_def("INTPTR_MAX", "2147483647");
+            chaz_ConfWriter_add_global_def("INTPTR_MIN", "(-2147483647-1)");
+            chaz_ConfWriter_add_global_def("UINTPTR_MAX", "4294967295U");
+        }
+        else if (sizeof_ptr == 8) {
+            sprintf(scratch, "9223372036854775807%s", i64_t_postfix);
+            chaz_ConfWriter_add_global_def("INTPTR_MAX", scratch);
+            sprintf(scratch, "(-9223372036854775807%s-1)", i64_t_postfix);
+            chaz_ConfWriter_add_global_def("INTPTR_MIN", scratch);
+            sprintf(scratch, "18446744073709551615%s", u64_t_postfix);
+            chaz_ConfWriter_add_global_def("UINTPTR_MAX", scratch);
+        }
     }
 
     chaz_ConfWriter_end_module();
@@ -7090,8 +7197,10 @@ chaz_Integers_run(void) {
         /* We support only the following subset of stdint.h
          *   INT32_C
          *   INT64_C
+         *   INTMAX_C
          *   UINT32_C
          *   UINT64_C
+         *   UINTMAX_C
          */
         if (has_32) {
             if (strcmp(i32_t_postfix, "") == 0) {
@@ -7110,6 +7219,24 @@ chaz_Integers_run(void) {
             sprintf(scratch, "n##%s", u64_t_postfix);
             chaz_ConfWriter_add_global_def("UINT64_C(n)", scratch);
         }
+
+        if (has_64) {
+            sprintf(scratch, "n##%s", i64_t_postfix);
+            chaz_ConfWriter_add_global_def("INTMAX_C(n)", scratch);
+            sprintf(scratch, "n##%s", u64_t_postfix);
+            chaz_ConfWriter_add_global_def("UINTMAX_C(n)", scratch);
+        }
+        else if (has_32) {
+            if (strcmp(i32_t_postfix, "") == 0) {
+                chaz_ConfWriter_add_global_def("INTMAX_C(n)", "n");
+            }
+            else {
+                sprintf(scratch, "n##%s", i32_t_postfix);
+                chaz_ConfWriter_add_global_def("INTMAX_C(n)", scratch);
+            }
+            sprintf(scratch, "n##%s", u32_t_postfix);
+            chaz_ConfWriter_add_global_def("UINTMAX_C(n)", scratch);
+        }
     }
 
     chaz_ConfWriter_end_module();
@@ -7121,44 +7248,72 @@ chaz_Integers_run(void) {
     if (has_inttypes) {
         chaz_ConfWriter_add_sys_include("inttypes.h");
     }
-    else {
+
+    {
         /* We support only the following subset of inttypes.h
+         *   PRId32
+         *   PRIi32
+         *   PRIo32
+         *   PRIu32
+         *   PRIx32
+         *   PRIX32
          *   PRId64
+         *   PRIi64
+         *   PRIo64
          *   PRIu64
+         *   PRIx64
+         *   PRIX64
+         *   PRIdMAX
+         *   PRIiMAX
+         *   PRIoMAX
+         *   PRIuMAX
+         *   PRIxMAX
+         *   PRIXMAX
+         *   PRIdPTR
+         *   PRIiPTR
+         *   PRIoPTR
+         *   PRIuPTR
+         *   PRIxPTR
+         *   PRIXPTR
          */
-        if (has_64) {
-            int i;
-            const char *options[] = {
-                "ll",
-                "l",
-                "L",
-                "q",  /* Some *BSDs */
-                "I64", /* Microsoft */
-                NULL,
-            };
+        const char *ptr;
+        char macro_name_32[]  = "PRI.32";
+        char macro_name_64[]  = "PRI.64";
+        char macro_name_max[] = "PRI.MAX";
+        char macro_name_ptr[] = "PRI.PTR";
 
-            /* Buffer to hold the code, and its start and end. */
-            static const char format_64_code[] =
-                CHAZ_QUOTE(  #include <stdio.h>                            )
-                CHAZ_QUOTE(  int main() {                                  )
-                CHAZ_QUOTE(      printf("%%%su", 18446744073709551615%s);  )
-                CHAZ_QUOTE(      return 0;                                 )
-                CHAZ_QUOTE( }                                              );
+        for (ptr = "diouxX"; ptr[0] != '\0'; ptr++) {
+            int c = ptr[0];
 
-            for (i = 0; options[i] != NULL; i++) {
-                /* Try to print 2**64-1, and see if we get it back intact. */
-                sprintf(code_buf, format_64_code, options[i], u64_t_postfix);
-                output = chaz_CC_capture_output(code_buf, &output_len);
+            if (has_32) {
+                sprintf(scratch, "\"%s%c\"", printf_modifier_32, c);
 
-                if (output != NULL
-                    && strcmp(output, "18446744073709551615") == 0
-                   ) {
-                    sprintf(scratch, "\"%sd\"", options[i]);
-                    chaz_ConfWriter_add_global_def("PRId64", scratch);
-                    sprintf(scratch, "\"%su\"", options[i]);
-                    chaz_ConfWriter_add_global_def("PRIu64", scratch);
-                    free(output);
-                    break;
+                if (!has_inttypes) {
+                    macro_name_32[3] = c;
+                    chaz_ConfWriter_add_global_def(macro_name_32, scratch);
+                    if (!has_64) {
+                        macro_name_max[3] = c;
+                        chaz_ConfWriter_add_global_def(macro_name_max,
+                                                       scratch);
+                    }
+                }
+                if (!has_intptr_t && sizeof_ptr == 4) {
+                    macro_name_ptr[3] = c;
+                    chaz_ConfWriter_add_global_def(macro_name_ptr, scratch);
+                }
+            }
+            if (has_64) {
+                sprintf(scratch, "\"%s%c\"", printf_modifier_64, c);
+
+                if (!has_inttypes) {
+                    macro_name_64[3] = c;
+                    chaz_ConfWriter_add_global_def(macro_name_64, scratch);
+                    macro_name_max[3] = c;
+                    chaz_ConfWriter_add_global_def(macro_name_max, scratch);
+                }
+                if (!has_intptr_t && sizeof_ptr == 8) {
+                    macro_name_ptr[3] = c;
+                    chaz_ConfWriter_add_global_def(macro_name_ptr, scratch);
                 }
             }
         }
@@ -8213,10 +8368,9 @@ lucy_MakeFile_new(chaz_CLI *cli) {
     }
 
     /* Lucy libraries. */
-    self->shared_lib = chaz_Lib_new("lucy", chaz_Lib_SHARED, lucy_version,
-                                    lucy_major_version);
-    self->static_lib = chaz_Lib_new("lucy", chaz_Lib_STATIC, lucy_version,
-                                    lucy_major_version);
+    self->shared_lib = chaz_Lib_new_shared("lucy", lucy_version,
+                                           lucy_major_version);
+    self->static_lib = chaz_Lib_new_static("lucy");
     self->shared_lib_filename = chaz_Lib_filename(self->shared_lib);
     self->static_lib_filename = chaz_Lib_filename(self->static_lib);
 
