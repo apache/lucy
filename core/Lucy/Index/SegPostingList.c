@@ -177,15 +177,15 @@ int32_t
 SegPList_Advance_IMP(SegPostingList *self, int32_t target) {
     SegPostingListIVARS *const ivars = SegPList_IVARS(self);
     PostingIVARS *const posting_ivars = Post_IVARS(ivars->posting);
-    const uint32_t skip_interval = ivars->skip_interval;
+    const int32_t skip_interval = ivars->skip_interval;
 
-    if (ivars->doc_freq >= skip_interval) {
+    if ((int32_t)ivars->doc_freq >= skip_interval) {
         InStream *post_stream           = ivars->post_stream;
         InStream *skip_stream           = ivars->skip_stream;
         SkipStepper *const skip_stepper = ivars->skip_stepper;
         SkipStepperIVARS *const skip_stepper_ivars
             = SkipStepper_IVARS(skip_stepper);
-        uint32_t new_doc_id             = skip_stepper_ivars->doc_id;
+        int32_t new_doc_id              = skip_stepper_ivars->doc_id;
         int64_t new_filepos             = InStream_Tell(post_stream);
 
         /* Assuming the default skip_interval of 16...
@@ -195,7 +195,7 @@ SegPList_Advance_IMP(SegPostingList *self, int32_t target) {
          * yet, but we'll have already gone past 5 of the 16 skip docs --
          * ergo, the modulus in the following formula.
          */
-        int32_t num_skipped = 0 - (ivars->count % skip_interval);
+        int32_t num_skipped = 0 - ((int32_t)ivars->count % skip_interval);
         if (num_skipped == 0 && ivars->count != 0) {
             num_skipped = 0 - skip_interval;
         }
@@ -229,7 +229,7 @@ SegPList_Advance_IMP(SegPostingList *self, int32_t target) {
             posting_ivars->doc_id = new_doc_id;
 
             // Increase count by the number of docs we skipped over.
-            ivars->count += num_skipped;
+            ivars->count += (uint32_t)num_skipped;
         }
     }
 
@@ -286,7 +286,7 @@ S_seek_tinfo(SegPostingList *self, TermInfo *tinfo) {
     else {
         // Transfer doc_freq, seek main stream.
         int64_t post_filepos = TInfo_Get_Post_FilePos(tinfo);
-        ivars->doc_freq      = TInfo_Get_Doc_Freq(tinfo);
+        ivars->doc_freq      = (uint32_t)TInfo_Get_Doc_Freq(tinfo);
         InStream_Seek(ivars->post_stream, post_filepos);
 
         // Prepare posting.
@@ -294,7 +294,7 @@ S_seek_tinfo(SegPostingList *self, TermInfo *tinfo) {
 
         // Prepare to skip.
         ivars->skip_count = 0;
-        ivars->num_skips  = ivars->doc_freq / ivars->skip_interval;
+        ivars->num_skips  = ivars->doc_freq / (uint32_t)ivars->skip_interval;
         SkipStepper_Set_ID_And_Filepos(ivars->skip_stepper, 0, post_filepos);
         InStream_Seek(ivars->skip_stream, TInfo_Get_Skip_FilePos(tinfo));
     }

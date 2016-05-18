@@ -102,7 +102,7 @@ MatchPost_Read_Raw_IMP(MatchPosting *self, InStream *instream,
     const size_t      text_size = Str_Get_Size(term_text);
     const uint32_t    doc_code  = InStream_Read_CU32(instream);
     const uint32_t    delta_doc = doc_code >> 1;
-    const int32_t     doc_id    = last_doc_id + delta_doc;
+    const int32_t     doc_id    = last_doc_id + (int32_t)delta_doc;
     const uint32_t    freq      = (doc_code & 1)
                                   ? 1
                                   : InStream_Read_CU32(instream);
@@ -207,7 +207,7 @@ MatchPostWriter_Write_Posting_IMP(MatchPostingWriter *self, RawPosting *posting)
     RawPostingIVARS *const posting_ivars = RawPost_IVARS(posting);
     OutStream *const outstream   = ivars->outstream;
     const int32_t    doc_id      = posting_ivars->doc_id;
-    const uint32_t   delta_doc   = doc_id - ivars->last_doc_id;
+    const uint32_t   delta_doc   = (uint32_t)(doc_id - ivars->last_doc_id);
     char  *const     aux_content = posting_ivars->blob
                                    + posting_ivars->content_len;
     if (posting_ivars->freq == 1) {

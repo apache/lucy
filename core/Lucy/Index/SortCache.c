@@ -67,8 +67,8 @@ SortCache_Set_Native_Ords_IMP(SortCache *self, bool native_ords) {
 int32_t
 SortCache_Ordinal_IMP(SortCache *self, int32_t doc_id) {
     SortCacheIVARS *const ivars = SortCache_IVARS(self);
-    if ((uint32_t)doc_id > (uint32_t)ivars->doc_max) {
-        THROW(ERR, "Out of range: %i32 > %i32", doc_id, ivars->doc_max);
+    if (doc_id > ivars->doc_max || doc_id < 0) {
+        THROW(ERR, "Out of range: %i32 max: %i32", doc_id, ivars->doc_max);
     }
     switch (ivars->ord_width) {
         case 1: return NumUtil_u1get(ivars->ords, (uint32_t)doc_id);
@@ -85,18 +85,18 @@ SortCache_Ordinal_IMP(SortCache *self, int32_t doc_id) {
             }
             else {
                 uint8_t *bytes = (uint8_t*)ivars->ords;
-                bytes += doc_id * sizeof(uint16_t);
+                bytes += (size_t)doc_id * sizeof(uint16_t);
                 return NumUtil_decode_bigend_u16(bytes);
             }
         case 32:
             if (ivars->native_ords) {
-                uint32_t *ints = (uint32_t*)ivars->ords;
+                int32_t *ints = (int32_t*)ivars->ords;
                 return ints[doc_id];
             }
             else {
                 uint8_t *bytes = (uint8_t*)ivars->ords;
-                bytes += doc_id * sizeof(uint32_t);
-                return NumUtil_decode_bigend_u32(bytes);
+                bytes += (size_t)doc_id * sizeof(int32_t);
+                return (int32_t)NumUtil_decode_bigend_u32(bytes);
             }
         default: {
                 THROW(ERR, "Invalid ord width: %i32", ivars->ord_width);

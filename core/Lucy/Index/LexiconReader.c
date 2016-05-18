@@ -169,7 +169,7 @@ DefLexReader_init(DefaultLexiconReader *self, Schema *schema, Folder *folder,
     // Build an array of SegLexicon objects.
     ivars->lexicons = Vec_new(Schema_Num_Fields(schema));
     for (uint32_t i = 1, max = Schema_Num_Fields(schema) + 1; i < max; i++) {
-        String *field = Seg_Field_Name(segment, i);
+        String *field = Seg_Field_Name(segment, (int32_t)i);
         if (field && S_has_data(schema, folder, segment, field)) {
             SegLexicon *lexicon = SegLex_new(schema, folder, segment, field);
             Vec_Store(ivars->lexicons, i, (Obj*)lexicon);

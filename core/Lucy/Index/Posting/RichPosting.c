@@ -160,7 +160,7 @@ RichPost_Read_Raw_IMP(RichPosting *self, InStream *instream,
     const size_t      text_size = Str_Get_Size(term_text);
     const uint32_t    doc_code  = InStream_Read_CU32(instream);
     const uint32_t    delta_doc = doc_code >> 1;
-    const int32_t     doc_id    = last_doc_id + delta_doc;
+    const int32_t     doc_id    = last_doc_id + (int32_t)delta_doc;
     const uint32_t    freq      = (doc_code & 1)
                                   ? 1
                                   : InStream_Read_CU32(instream);

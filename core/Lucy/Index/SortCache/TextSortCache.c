@@ -100,7 +100,7 @@ TextSortCache_Value_IMP(TextSortCache *self, int32_t ord) {
         return NULL;
     }
     else {
-        uint32_t next_ord = ord + 1;
+        int32_t next_ord = ord + 1;
         int64_t next_offset;
         while (1) {
             InStream_Seek(ivars->ix_in, next_ord * (int64_t)sizeof(int64_t));

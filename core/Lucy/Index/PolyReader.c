@@ -277,7 +277,7 @@ S_try_open_elements(void *context) {
 
         // Create a Segment for each segmeta.
         if (Seg_valid_seg_name(entry)) {
-            int64_t seg_num = IxFileNames_extract_gen(entry);
+            int64_t seg_num = (int64_t)IxFileNames_extract_gen(entry);
             Segment *segment = Seg_new(seg_num);
 
             // Bail if reading the file fails (probably because it's been
@@ -308,7 +308,7 @@ S_try_open_elements(void *context) {
     seg_context.result   = NULL;
     args->seg_readers = Vec_new(num_segs);
     Err *error = NULL;
-    for (uint32_t seg_tick = 0; seg_tick < num_segs; seg_tick++) {
+    for (int32_t seg_tick = 0; seg_tick < (int32_t)num_segs; seg_tick++) {
         seg_context.seg_tick = seg_tick;
         error = Err_trap(S_try_open_segreader, &seg_context);
         if (error) {
@@ -584,7 +584,10 @@ PolyReader_sub_tick(I32Array *offsets, int32_t doc_id) {
         }
     }
 
-    return hi;
+    if (hi < 0) { // Paranoid, but easier than proving correctness.
+        THROW(ERR, "Internal error calculating sub-tick: %i32", hi);
+    }
+    return (uint32_t)hi;
 }
 
 

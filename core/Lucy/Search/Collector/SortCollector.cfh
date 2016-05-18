@@ -37,8 +37,8 @@ class Lucy::Search::Collector::SortCollector nickname SortColl
     uint32_t        num_rules;
     uint32_t        num_actions;
     float           bubble_score;
-    int32_t         bubble_doc;
-    int32_t         seg_doc_max;
+    uint32_t        bubble_doc;
+    uint32_t        seg_doc_max;
     bool            need_score;
     bool            need_values;
 
