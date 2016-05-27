@@ -57,7 +57,7 @@ S_SFWriterElem_create(Obj *value, int32_t doc_id);
 
 static int64_t
 SI_increase_to_word_multiple(int64_t amount) {
-    const int64_t remainder = amount % sizeof(void*);
+    const int64_t remainder = amount % (int64_t)sizeof(void*);
     if (remainder) {
         amount += sizeof(void*);
         amount -= remainder;
@@ -175,7 +175,7 @@ void
 SortFieldWriter_Add_IMP(SortFieldWriter *self, int32_t doc_id, Obj *value) {
     SortFieldWriterIVARS *const ivars = SortFieldWriter_IVARS(self);
     Counter *counter   = ivars->counter;
-    Counter_Add(counter, ivars->mem_per_entry);
+    Counter_Add(counter, (int64_t)ivars->mem_per_entry);
     if (ivars->prim_id == FType_TEXT) {
         int64_t size = (int64_t)Str_Get_Size((String*)value) + 1;
         size = SI_increase_to_word_multiple(size);
