@@ -144,7 +144,7 @@ HeatMap_Flatten_Spans_IMP(HeatMap *self, Vector *spans) {
         dest_tick = 0;
         for (size_t i = 0; i < num_raw_flattened; i++) {
             Span *span = (Span*)Vec_Fetch(flattened, i);
-            if (Span_Get_Weight(span)) {
+            if (Span_Get_Weight(span) != 0.0f) {
                 Vec_Store(flattened, dest_tick++, INCREF(span));
             }
         }
