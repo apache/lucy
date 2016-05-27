@@ -98,7 +98,7 @@ SortEx_Feed_IMP(SortExternal *self, Obj *item) {
     SortExternalIVARS *const ivars = SortEx_IVARS(self);
     if (ivars->buf_max == ivars->buf_cap) {
         size_t amount = Memory_oversize(ivars->buf_max + 1, sizeof(Obj*));
-        SortEx_Grow_Buffer(self, amount);
+        SortEx_Grow_Buffer(self, (uint32_t)amount);
     }
     ivars->buffer[ivars->buf_max] = item;
     ivars->buf_max++;
@@ -183,8 +183,8 @@ SortEx_Shrink_IMP(SortExternal *self) {
         }
         ivars->buffer   = (Obj**)REALLOCATE(ivars->buffer, size);
         ivars->buf_tick = 0;
-        ivars->buf_max  = buf_count;
-        ivars->buf_cap  = buf_count;
+        ivars->buf_max  = (uint32_t)buf_count;
+        ivars->buf_cap  = (uint32_t)buf_count;
     }
     else {
         FREEMEM(ivars->buffer);
@@ -293,7 +293,7 @@ S_absorb_slices(SortExternal *self, SortExternalIVARS *ivars,
 
     if (ivars->buf_cap < total_size) {
         size_t cap = Memory_oversize(total_size, sizeof(Obj*));
-        SortEx_Grow_Buffer(self, cap);
+        SortEx_Grow_Buffer(self, (uint32_t)cap);
     }
     ivars->buf_max = total_size;
 
@@ -393,8 +393,8 @@ SortEx_Grow_Buffer_IMP(SortExternal *self, uint32_t cap) {
 static uint32_t
 S_find_slice_size(SortExternal *self, SortExternalIVARS *ivars,
                   Obj **endpost) {
-    int32_t          lo      = ivars->buf_tick - 1;
-    int32_t          hi      = ivars->buf_max;
+    int32_t          lo      = (int32_t)ivars->buf_tick - 1;
+    int32_t          hi      = (int32_t)ivars->buf_max;
     Obj            **buffer  = ivars->buffer;
     SortEx_Compare_t compare
         = METHOD_PTR(SortEx_get_class(self), LUCY_SortEx_Compare);
@@ -408,9 +408,9 @@ S_find_slice_size(SortExternal *self, SortExternalIVARS *ivars,
     }
 
     // If lo is still -1, we didn't find anything.
-    return lo == -1
+    return lo < 0
            ? 0
-           : (lo - ivars->buf_tick) + 1;
+           : ((uint32_t)lo - ivars->buf_tick) + 1;
 }
 
 void

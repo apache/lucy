@@ -523,7 +523,7 @@ PostPool_Refill_IMP(PostingPool *self) {
         // Add to the run's buffer.
         if (num_elems >= ivars->buf_cap) {
             size_t new_cap = Memory_oversize(num_elems + 1, sizeof(Obj*));
-            PostPool_Grow_Buffer(self, new_cap);
+            PostPool_Grow_Buffer(self, (uint32_t)new_cap);
         }
         ivars->buffer[num_elems] = (Obj*)rawpost;
         num_elems++;
