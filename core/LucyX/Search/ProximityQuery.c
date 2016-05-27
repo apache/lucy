@@ -433,7 +433,7 @@ ProximityCompiler_Highlight_Spans_IMP(ProximityCompiler *self,
         I32Array *tv_end_positions   = TV_Get_Positions(last_tv);
         I32Array *tv_start_offsets   = TV_Get_Start_Offsets(first_tv);
         I32Array *tv_end_offsets     = TV_Get_End_Offsets(last_tv);
-        uint32_t  terms_max          = num_terms - 1;
+        int32_t   terms_max          = (int32_t)num_terms - 1;
         I32Array *valid_posits       = BitVec_To_Array(posit_vec);
         size_t    num_valid_posits   = I32Arr_Get_Size(valid_posits);
         size_t    j = 0;

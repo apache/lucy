@@ -170,7 +170,8 @@ HeatMap_Calc_Proximity_Boost_IMP(HeatMap *self, Span *span1, Span *span2) {
         return 0.0f;
     }
     else {
-        float factor = (ivars->window - distance) / (float)ivars->window;
+        float factor
+            = ((int32_t)ivars->window - distance) / (float)ivars->window;
         // Damp boost with greater distance.
         factor *= factor;
         return factor * (Span_Get_Weight(lower) + Span_Get_Weight(upper));

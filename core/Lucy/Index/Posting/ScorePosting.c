@@ -100,7 +100,7 @@ ScorePost_Add_Inversion_To_Pool_IMP(ScorePosting *self,
         RawPostingIVARS *const raw_post_ivars = RawPost_IVARS(raw_posting);
         char *const start  = raw_post_ivars->blob + token_ivars->len;
         char *dest         = start;
-        uint32_t last_prox = 0;
+        int32_t last_prox = 0;
 
         // Field_boost.
         *((uint8_t*)dest) = field_boost_byte;
@@ -109,8 +109,8 @@ ScorePost_Add_Inversion_To_Pool_IMP(ScorePosting *self,
         // Positions.
         for (uint32_t i = 0; i < freq; i++) {
             TokenIVARS *const t_ivars = Token_IVARS(tokens[i]);
-            const uint32_t prox_delta = t_ivars->pos - last_prox;
-            NumUtil_encode_cu32(prox_delta, &dest);
+            const int32_t prox_delta = t_ivars->pos - last_prox;
+            NumUtil_encode_ci32(prox_delta, &dest);
             last_prox = t_ivars->pos;
         }
 
