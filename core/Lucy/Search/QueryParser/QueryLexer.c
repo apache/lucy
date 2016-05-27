@@ -36,7 +36,7 @@
 
 static ParserElem*
 S_consume_keyword(StringIterator *iter, const char *keyword,
-                  size_t keyword_len, int type);
+                  size_t keyword_len, uint32_t type);
 
 static ParserElem*
 S_consume_field(StringIterator *iter);
@@ -162,7 +162,7 @@ QueryLexer_Tokenize_IMP(QueryLexer *self, String *query_string) {
 
 static ParserElem*
 S_consume_keyword(StringIterator *iter, const char *keyword,
-                  size_t keyword_len, int type) {
+                  size_t keyword_len, uint32_t type) {
     if (!StrIter_Starts_With_Utf8(iter, keyword, keyword_len)) {
         return NULL;
     }
