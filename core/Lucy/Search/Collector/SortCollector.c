@@ -61,7 +61,7 @@
 #define ACTIONS_MASK                 0x1F
 
 // Pick an action based on a SortRule and if needed, a SortCache.
-static int8_t
+static uint8_t
 S_derive_action(SortRule *rule, SortCache *sort_cache);
 
 // Decide whether a doc should be inserted into the HitQueue.
@@ -178,7 +178,7 @@ SortColl_Destroy_IMP(SortCollector *self) {
     SUPER_DESTROY(self, SORTCOLLECTOR);
 }
 
-static int8_t
+static uint8_t
 S_derive_action(SortRule *rule, SortCache *cache) {
     int32_t  rule_type = SortRule_Get_Type(rule);
     bool reverse   = !!SortRule_Get_Reverse(rule);
@@ -214,7 +214,7 @@ S_derive_action(SortRule *rule, SortCache *cache) {
                 default:
                     ;
             }
-            THROW(ERR, "Unknown width: %i8", width);
+            THROW(ERR, "Unknown width: %i32", width);
         }
         else {
             return AUTO_TIE;
@@ -223,7 +223,7 @@ S_derive_action(SortRule *rule, SortCache *cache) {
     else {
         THROW(ERR, "Unrecognized SortRule type %i32", rule_type);
     }
-    UNREACHABLE_RETURN(int8_t);
+    UNREACHABLE_RETURN(uint8_t);
 }
 
 void
