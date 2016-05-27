@@ -265,7 +265,7 @@ S_do_or_or_xor(BitVector *self, const BitVector *other, int operation) {
     uint8_t *bits_a, *bits_b;
     size_t max_cap, min_cap;
     uint8_t *limit;
-    double byte_size;
+    size_t byte_size;
 
     // Sort out what the minimum and maximum caps are.
     if (ivars->cap < ovars->cap) {
@@ -282,7 +282,7 @@ S_do_or_or_xor(BitVector *self, const BitVector *other, int operation) {
     bits_a        = ivars->bits;
     bits_b        = ovars->bits;
     byte_size     = SI_octet_size(min_cap);
-    limit         = ivars->bits + (size_t)byte_size;
+    limit         = ivars->bits + byte_size;
 
     // Perform union of common bits.
     if (operation == DO_OR) {
