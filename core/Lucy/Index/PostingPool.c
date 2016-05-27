@@ -155,7 +155,12 @@ PostPool_Compare_IMP(PostingPool *self, Obj **ptr_a, Obj **ptr_b) {
 
     if (comparison == 0) {
         // If a is a substring of b, it's less than b, so return a neg num.
-        comparison = a_len - b_len;
+        if (a_len < b_len) {
+            comparison = -1;
+        }
+        else if (a_len > b_len) {
+            comparison = 1;
+        }
 
         // Break ties by doc id.
         if (comparison == 0) {
