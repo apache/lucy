@@ -45,7 +45,7 @@ class Lucy::Index::PostingListWriter nickname PListWriter
 
     /** Test only. */
     inert void
-    set_default_mem_thresh(size_t mem_thresh);
+    set_default_mem_thresh(uint32_t mem_thresh);
 
     void
     Add_Inverted_Doc(PostingListWriter *self, Inverter *inverter,
