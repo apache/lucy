@@ -101,7 +101,7 @@ Lock_Obtain_IMP(Lock *self) {
     while (!locked) {
         time_left -= ivars->interval;
         if (time_left <= 0) { break; }
-        Sleep_millisleep(ivars->interval);
+        Sleep_millisleep((uint32_t)ivars->interval);
         locked = Lock_Request(self);
     }
 
