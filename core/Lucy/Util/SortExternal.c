@@ -365,7 +365,7 @@ S_merge(SortExternal *self,
         if (compare(self, left_ptr, right_ptr) <= 0) {
             *dest++ = *left_ptr++;
             if (left_ptr >= left_limit) {
-                right_size = right_limit - right_ptr;
+                right_size = (size_t)(right_limit - right_ptr);
                 memcpy(dest, right_ptr, right_size * sizeof(Obj*));
                 break;
             }
@@ -373,7 +373,7 @@ S_merge(SortExternal *self,
         else {
             *dest++ = *right_ptr++;
             if (right_ptr >= right_limit) {
-                left_size = left_limit - left_ptr;
+                left_size = (size_t)(left_limit - left_ptr);
                 memcpy(dest, left_ptr, left_size * sizeof(Obj*));
                 break;
             }

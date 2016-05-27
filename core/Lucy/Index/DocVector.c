@@ -144,7 +144,7 @@ S_extract_tv_cache(Blob *field_buf) {
             NumUtil_skip_cint(&tv_string);
             NumUtil_skip_cint(&tv_string);
         }
-        len = tv_string - bookmark_ptr;
+        len = (size_t)(tv_string - bookmark_ptr);
 
         // Store the $text => $posdata pair in the output hash.
         String *text = BB_Trusted_Utf8_To_String(text_buf);

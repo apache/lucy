@@ -245,7 +245,7 @@ MATCH:
 
 DONE:
     // Return number of anchors remaining.
-    return anchors_found - anchors_start;
+    return (uint32_t)(anchors_found - anchors_start);
 }
 
 float

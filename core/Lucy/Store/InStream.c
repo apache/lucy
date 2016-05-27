@@ -530,7 +530,7 @@ InStream_Read_Raw_C64_IMP(InStream *self, char *buf) {
     do {
         *dest = SI_read_u8(self, ivars);
     } while ((*dest++ & 0x80) != 0);
-    return dest - (uint8_t*)buf;
+    return (int)(dest - (uint8_t*)buf);
 }
 
 
