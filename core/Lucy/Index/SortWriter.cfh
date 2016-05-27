@@ -36,7 +36,7 @@ class Lucy::Index::SortWriter inherits Lucy::Index::DataWriter {
     OutStream  *temp_ix_out;
     OutStream  *temp_dat_out;
     Counter    *counter;
-    size_t      mem_thresh;
+    uint32_t    mem_thresh;
     bool        flush_at_finish;
 
     inert int32_t current_file_format;
@@ -51,7 +51,7 @@ class Lucy::Index::SortWriter inherits Lucy::Index::DataWriter {
 
     /* Test only. */
     inert void
-    set_default_mem_thresh(size_t mem_thresh);
+    set_default_mem_thresh(uint32_t mem_thresh);
 
     void
     Add_Inverted_Doc(SortWriter *self, Inverter *inverter, int32_t doc_id);

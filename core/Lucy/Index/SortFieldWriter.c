@@ -42,7 +42,7 @@
 
 // Prepare to read back a run.
 static void
-S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in,
+S_flip_run(SortFieldWriter *run, uint32_t sub_thresh, InStream *ord_in,
            InStream *ix_in, InStream *dat_in);
 
 // Write out a sort cache.  Returns the number of unique values in the sort
@@ -68,7 +68,7 @@ SI_increase_to_word_multiple(int64_t amount) {
 SortFieldWriter*
 SortFieldWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
                     PolyReader *polyreader, String *field,
-                    Counter *counter, size_t mem_thresh,
+                    Counter *counter, uint32_t mem_thresh,
                     OutStream *temp_ord_out, OutStream *temp_ix_out,
                     OutStream *temp_dat_out) {
     SortFieldWriter *self
@@ -82,7 +82,7 @@ SortFieldWriter*
 SortFieldWriter_init(SortFieldWriter *self, Schema *schema,
                      Snapshot *snapshot, Segment *segment,
                      PolyReader *polyreader, String *field,
-                     Counter *counter, size_t mem_thresh,
+                     Counter *counter, uint32_t mem_thresh,
                      OutStream *temp_ord_out, OutStream *temp_ix_out,
                      OutStream *temp_dat_out) {
     // Init.
@@ -518,7 +518,7 @@ SortFieldWriter_Flip_IMP(SortFieldWriter *self) {
         if (!ivars->dat_in) { RETHROW(INCREF(Err_get_error())); }
 
         // Assign streams and a slice of mem_thresh.
-        size_t sub_thresh = ivars->mem_thresh / num_runs;
+        uint32_t sub_thresh = ivars->mem_thresh / num_runs;
         if (sub_thresh < 65536) { sub_thresh = 65536; }
         for (size_t i = 0; i < num_runs; i++) {
             SortFieldWriter *run = (SortFieldWriter*)Vec_Fetch(ivars->runs, i);
@@ -682,7 +682,7 @@ SortFieldWriter_Finish_IMP(SortFieldWriter *self) {
 }
 
 static void
-S_flip_run(SortFieldWriter *run, size_t sub_thresh, InStream *ord_in,
+S_flip_run(SortFieldWriter *run, uint32_t sub_thresh, InStream *ord_in,
            InStream *ix_in, InStream *dat_in) {
     SortFieldWriterIVARS *const run_ivars = SortFieldWriter_IVARS(run);
 
