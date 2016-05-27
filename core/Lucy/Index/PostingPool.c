@@ -483,7 +483,7 @@ PostPool_Refill_IMP(PostingPool *self) {
         if (ivars->post_count == 0) {
             // Read a term.
             if (Lex_Next(lexicon)) {
-                ivars->post_count = Lex_Doc_Freq(lexicon);
+                ivars->post_count = (uint32_t)Lex_Doc_Freq(lexicon);
                 term_text = (String*)Lex_Get_Term(lexicon);
                 if (term_text && !Obj_is_a((Obj*)term_text, STRING)) {
                     THROW(ERR, "Only String terms are supported for now");

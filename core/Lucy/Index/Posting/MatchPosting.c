@@ -70,7 +70,7 @@ MatchPost_Destroy_IMP(MatchPosting *self) {
 
 int32_t
 MatchPost_Get_Freq_IMP(MatchPosting *self) {
-    return MatchPost_IVARS(self)->freq;
+    return (int32_t)MatchPost_IVARS(self)->freq;
 }
 
 void

@@ -242,9 +242,9 @@ ProximityCompiler_init(ProximityCompiler *self, ProximityQuery *parent,
     for (size_t i = 0, max = Vec_Get_Size(terms); i < max; i++) {
         Obj *term = Vec_Fetch(terms, i);
         int32_t doc_max  = Searcher_Doc_Max(searcher);
-        int32_t doc_freq
+        uint32_t doc_freq
             = Searcher_Doc_Freq(searcher, parent_ivars->field,term);
-        ivars->idf += Sim_IDF(sim, doc_freq, doc_max);
+        ivars->idf += Sim_IDF(sim, (int32_t)doc_freq, doc_max);
     }
 
     // Calculate raw weight.
