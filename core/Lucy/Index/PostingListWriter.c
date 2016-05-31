@@ -36,7 +36,7 @@
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Util/MemoryPool.h"
 
-static size_t default_mem_thresh = 0x1000000;
+static uint32_t default_mem_thresh = 0x1000000;
 
 int32_t PListWriter_current_file_format = 1;
 
@@ -129,7 +129,7 @@ PListWriter_Destroy_IMP(PostingListWriter *self) {
 }
 
 void
-PListWriter_set_default_mem_thresh(size_t mem_thresh) {
+PListWriter_set_default_mem_thresh(uint32_t mem_thresh) {
     default_mem_thresh = mem_thresh;
 }
 

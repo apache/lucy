@@ -307,7 +307,7 @@ InStream_Buf_IMP(InStream *self, size_t request) {
      * skip the following refill block. */
     if ((int64_t)request > bytes_in_buf) {
         const int64_t remaining_in_file = ivars->len - SI_tell(self);
-        int64_t amount = request;
+        int64_t amount = (int64_t)request;
 
         // Try to bump up small requests.
         if (amount < IO_STREAM_BUF_SIZE) { amount = IO_STREAM_BUF_SIZE; }
@@ -530,7 +530,7 @@ InStream_Read_Raw_C64_IMP(InStream *self, char *buf) {
     do {
         *dest = SI_read_u8(self, ivars);
     } while ((*dest++ & 0x80) != 0);
-    return dest - (uint8_t*)buf;
+    return (int)(dest - (uint8_t*)buf);
 }
 
 

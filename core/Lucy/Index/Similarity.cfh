@@ -111,7 +111,7 @@ public class Lucy::Index::Similarity nickname Sim inherits Clownfish::Obj {
      * range covered by the single-byte encoding is 7x10^9 to 2x10^-9.  The
      * accuracy is about one significant decimal digit.
      */
-    uint32_t
+    uint8_t
     Encode_Norm(Similarity *self, float f);
 
     /** See encode_norm.

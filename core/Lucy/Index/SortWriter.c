@@ -38,7 +38,7 @@
 
 int32_t SortWriter_current_file_format = 3;
 
-static size_t default_mem_thresh = 0x400000; // 4 MB
+static uint32_t default_mem_thresh = 0x400000; // 4 MB
 
 SortWriter*
 SortWriter_new(Schema *schema, Snapshot *snapshot, Segment *segment,
@@ -84,7 +84,7 @@ SortWriter_Destroy_IMP(SortWriter *self) {
 }
 
 void
-SortWriter_set_default_mem_thresh(size_t mem_thresh) {
+SortWriter_set_default_mem_thresh(uint32_t mem_thresh) {
     default_mem_thresh = mem_thresh;
 }
 

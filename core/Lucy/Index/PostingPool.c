@@ -155,7 +155,12 @@ PostPool_Compare_IMP(PostingPool *self, Obj **ptr_a, Obj **ptr_b) {
 
     if (comparison == 0) {
         // If a is a substring of b, it's less than b, so return a neg num.
-        comparison = a_len - b_len;
+        if (a_len < b_len) {
+            comparison = -1;
+        }
+        else if (a_len > b_len) {
+            comparison = 1;
+        }
 
         // Break ties by doc id.
         if (comparison == 0) {
@@ -483,7 +488,7 @@ PostPool_Refill_IMP(PostingPool *self) {
         if (ivars->post_count == 0) {
             // Read a term.
             if (Lex_Next(lexicon)) {
-                ivars->post_count = Lex_Doc_Freq(lexicon);
+                ivars->post_count = (uint32_t)Lex_Doc_Freq(lexicon);
                 term_text = (String*)Lex_Get_Term(lexicon);
                 if (term_text && !Obj_is_a((Obj*)term_text, STRING)) {
                     THROW(ERR, "Only String terms are supported for now");
@@ -523,7 +528,7 @@ PostPool_Refill_IMP(PostingPool *self) {
         // Add to the run's buffer.
         if (num_elems >= ivars->buf_cap) {
             size_t new_cap = Memory_oversize(num_elems + 1, sizeof(Obj*));
-            PostPool_Grow_Buffer(self, new_cap);
+            PostPool_Grow_Buffer(self, (uint32_t)new_cap);
         }
         ivars->buffer[num_elems] = (Obj*)rawpost;
         num_elems++;

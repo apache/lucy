@@ -115,12 +115,12 @@ TopDocs*
 IxSearcher_Top_Docs_IMP(IndexSearcher *self, Query *query, uint32_t num_wanted,
                         SortSpec *sort_spec) {
     Schema        *schema    = IxSearcher_Get_Schema(self);
-    uint32_t       doc_max   = IxSearcher_Doc_Max(self);
+    uint32_t       doc_max   = (uint32_t)IxSearcher_Doc_Max(self);
     uint32_t       wanted    = num_wanted > doc_max ? doc_max : num_wanted;
     SortCollector *collector = SortColl_new(schema, sort_spec, wanted);
     IxSearcher_Collect(self, query, (Collector*)collector);
     Vector  *match_docs = SortColl_Pop_Match_Docs(collector);
-    int32_t  total_hits = SortColl_Get_Total_Hits(collector);
+    uint32_t total_hits = SortColl_Get_Total_Hits(collector);
     TopDocs *retval     = TopDocs_new(match_docs, total_hits);
     DECREF(collector);
     DECREF(match_docs);

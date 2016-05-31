@@ -113,7 +113,7 @@ RAMFH_Release_Window_IMP(RAMFileHandle *self, FileWindow *window) {
 bool
 RAMFH_Read_IMP(RAMFileHandle *self, char *dest, int64_t offset, size_t len) {
     RAMFileHandleIVARS *const ivars = RAMFH_IVARS(self);
-    int64_t end = offset + len;
+    int64_t end = offset + (int64_t)len;
     if (!(ivars->flags & FH_READ_ONLY)) {
         Err_set_error(Err_new(Str_newf("Can't read from write-only handle")));
         return false;

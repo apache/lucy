@@ -660,7 +660,7 @@ MODULE = Lucy    PACKAGE = Lucy::Index::PostingListWriter
 
 void
 set_default_mem_thresh(mem_thresh)
-    size_t mem_thresh;
+    uint32_t mem_thresh;
 PPCODE:
     lucy_PListWriter_set_default_mem_thresh(mem_thresh);
 END_XS

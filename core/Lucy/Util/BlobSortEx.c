@@ -129,9 +129,8 @@ BlobSortEx_Refill_IMP(BlobSortEx *self) {
         }
 
         if (ivars->buf_max == ivars->buf_cap) {
-            BlobSortEx_Grow_Buffer(self,
-                                 Memory_oversize(ivars->buf_max + 1,
-                                                 sizeof(Obj*)));
+            size_t amount = Memory_oversize(ivars->buf_max + 1, sizeof(Obj*));
+            BlobSortEx_Grow_Buffer(self, (uint32_t)amount);
         }
         ivars->buffer[ivars->buf_max++] = INCREF(elem);
     }

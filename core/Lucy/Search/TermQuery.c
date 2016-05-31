@@ -166,10 +166,10 @@ TermCompiler_init(TermCompiler *self, Query *parent, Searcher *searcher,
     ivars->query_norm_factor = 0.0f;
 
     // Derive.
-    int32_t doc_max  = Searcher_Doc_Max(searcher);
-    int32_t doc_freq = Searcher_Doc_Freq(searcher, parent_ivars->field,
-                                         parent_ivars->term);
-    ivars->idf = Sim_IDF(sim, doc_freq, doc_max);
+    int32_t  doc_max  = Searcher_Doc_Max(searcher);
+    uint32_t doc_freq = Searcher_Doc_Freq(searcher, parent_ivars->field,
+                                          parent_ivars->term);
+    ivars->idf = Sim_IDF(sim, (int32_t)doc_freq, doc_max);
 
     /* The score of any document is approximately equal to:
      *

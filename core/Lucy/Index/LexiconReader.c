@@ -243,7 +243,7 @@ uint32_t
 DefLexReader_Doc_Freq_IMP(DefaultLexiconReader *self, String *field,
                           Obj *term) {
     TermInfo *tinfo = S_find_tinfo(self, field, term);
-    return tinfo ? TInfo_Get_Doc_Freq(tinfo) : 0;
+    return tinfo ? (uint32_t)TInfo_Get_Doc_Freq(tinfo) : 0;
 }
 
 

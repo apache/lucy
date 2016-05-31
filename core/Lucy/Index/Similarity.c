@@ -149,7 +149,7 @@ Sim_TF_IMP(Similarity *self, float freq) {
     return (float)sqrt(freq);
 }
 
-uint32_t
+uint8_t
 Sim_Encode_Norm_IMP(Similarity *self, float f) {
     uint32_t norm;
     UNUSED_VAR(self);
@@ -180,7 +180,7 @@ Sim_Encode_Norm_IMP(Similarity *self, float f) {
         }
     }
 
-    return norm;
+    return (uint8_t)norm;
 }
 
 float

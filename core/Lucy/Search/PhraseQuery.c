@@ -221,8 +221,8 @@ PhraseCompiler_init(PhraseCompiler *self, PhraseQuery *parent,
     for (size_t i = 0, max = Vec_Get_Size(terms); i < max; i++) {
         Obj     *term     = Vec_Fetch(terms, i);
         int32_t  doc_max  = Searcher_Doc_Max(searcher);
-        int32_t  doc_freq = Searcher_Doc_Freq(searcher, parent_ivars->field, term);
-        ivars->idf += Sim_IDF(sim, doc_freq, doc_max);
+        uint32_t doc_freq = Searcher_Doc_Freq(searcher, parent_ivars->field, term);
+        ivars->idf += Sim_IDF(sim, (int32_t)doc_freq, doc_max);
     }
 
     // Calculate raw weight.
@@ -404,7 +404,7 @@ PhraseCompiler_Highlight_Spans_IMP(PhraseCompiler *self, Searcher *searcher,
         I32Array *tv_end_positions   = TV_Get_Positions(last_tv);
         I32Array *tv_start_offsets   = TV_Get_Start_Offsets(first_tv);
         I32Array *tv_end_offsets     = TV_Get_End_Offsets(last_tv);
-        uint32_t  terms_max          = num_terms - 1;
+        int32_t   terms_max          = (int32_t)num_terms - 1;
         I32Array *valid_posits       = BitVec_To_Array(posit_vec);
         size_t    num_valid_posits   = I32Arr_Get_Size(valid_posits);
         size_t j = 0;
