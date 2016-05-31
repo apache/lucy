@@ -279,6 +279,10 @@ chaz_CLI_parse(chaz_CLI *self, int argc, const char *argv[]);
 /* #include "Charmonizer/Core/Defines.h" */
 /* #include "Charmonizer/Core/CFlags.h" */
 
+#define CHAZ_CC_BINFMT_ELF      1
+#define CHAZ_CC_BINFMT_MACHO    2
+#define CHAZ_CC_BINFMT_PE       3
+
 /* Attempt to compile and link an executable.  Return true if the executable
  * file exists after the attempt.
  */
@@ -312,6 +316,11 @@ chaz_CC_test_link(const char *source);
  */
 char*
 chaz_CC_capture_output(const char *source, size_t *output_len);
+
+/** Return true if macro is defined.
+ */
+int
+chaz_CC_has_macro(const char *macro);
 
 /** Initialize the compiler environment.
  */
@@ -348,6 +357,31 @@ chaz_CC_get_temp_cflags(void);
 chaz_CFlags*
 chaz_CC_new_cflags(void);
 
+/* Return the binary format.
+ */
+int
+chaz_CC_binary_format(void);
+
+/* Return the extension for an executable.
+ */
+const char*
+chaz_CC_exe_ext(void);
+
+/* Return the extension for a shared (dynamic) library.
+ */
+const char*
+chaz_CC_shared_lib_ext(void);
+
+/* Return the extension for a static library.
+ */
+const char*
+chaz_CC_static_lib_ext(void);
+
+/* Return the extension for an import library (Windows).
+ */
+const char*
+chaz_CC_import_lib_ext(void);
+
 /* Return the extension for a compiled object.
  */
 const char*
@@ -364,6 +398,9 @@ chaz_CC_msvc_version_num(void);
 
 int
 chaz_CC_sun_c_version_num(void);
+
+int
+chaz_CC_is_cygwin(void);
 
 const char*
 chaz_CC_link_command(void);
@@ -918,32 +955,6 @@ chaz_OS_mkdir(const char *filepath);
  */
 void
 chaz_OS_rmdir(const char *filepath);
-
-/* Return the operating system name.
- */
-const char*
-chaz_OS_name(void);
-
-int
-chaz_OS_is_darwin(void);
-
-int
-chaz_OS_is_cygwin(void);
-
-/* Return the extension for an executable on this system.
- */
-const char*
-chaz_OS_exe_ext(void);
-
-/* Return the extension for a shared object on this system.
- */
-const char*
-chaz_OS_shared_lib_ext(void);
-
-/* Return the extension for a static library on this system.
- */
-const char*
-chaz_OS_static_lib_ext(void);
 
 /* Return the equivalent of /dev/null on this system.
  */
@@ -1714,7 +1725,7 @@ static char*
 S_build_filename(chaz_Lib *lib, const char *version, const char *ext);
 
 static const char*
-S_get_prefix(void);
+S_get_prefix(chaz_Lib *lib);
 
 chaz_Lib*
 chaz_Lib_new_shared(const char *name, const char *version,
@@ -1778,8 +1789,8 @@ chaz_Lib_filename(chaz_Lib *lib) {
         return chaz_Lib_no_version_filename(lib);
     }
     else {
-        const char *ext = chaz_OS_shared_lib_ext();
-        if (strcmp(ext, ".dll") == 0) {
+        const char *ext = chaz_CC_shared_lib_ext();
+        if (chaz_CC_binary_format() == CHAZ_CC_BINFMT_PE) {
             return S_build_filename(lib, lib->major_version, ext);
         }
         else {
@@ -1794,23 +1805,24 @@ chaz_Lib_major_version_filename(chaz_Lib *lib) {
         return chaz_Lib_no_version_filename(lib);
     }
     else {
-        const char *ext = chaz_OS_shared_lib_ext();
+        const char *ext = chaz_CC_shared_lib_ext();
         return S_build_filename(lib, lib->major_version, ext);
     }
 }
 
 char*
 chaz_Lib_no_version_filename(chaz_Lib *lib) {
-    const char *prefix = S_get_prefix();
+    const char *prefix = S_get_prefix(lib);
     const char *ext = lib->is_shared
-                      ? chaz_OS_shared_lib_ext()
-                      : chaz_OS_static_lib_ext();
+                      ? chaz_CC_shared_lib_ext()
+                      : chaz_CC_static_lib_ext();
     return chaz_Util_join("", prefix, lib->name, ext, NULL);
 }
 
 char*
 chaz_Lib_implib_filename(chaz_Lib *lib) {
-    return S_build_filename(lib, lib->major_version, ".lib");
+    const char *ext = chaz_CC_import_lib_ext();
+    return S_build_filename(lib, lib->major_version, ext);
 }
 
 char*
@@ -1820,29 +1832,31 @@ chaz_Lib_export_filename(chaz_Lib *lib) {
 
 static char*
 S_build_filename(chaz_Lib *lib, const char *version, const char *ext) {
-    const char *prefix    = S_get_prefix();
-    const char *shlib_ext = chaz_OS_shared_lib_ext();
+    const char *prefix = S_get_prefix(lib);
+    int binary_format = chaz_CC_binary_format();
 
-    /* Use `shlib_ext` as a proxy for OS to determine behavior, but append
-     * the supplied `ext`. */
-    if (strcmp(shlib_ext, ".dll") == 0) {
+    if (binary_format == CHAZ_CC_BINFMT_PE) {
         return chaz_Util_join("", prefix, lib->name, "-", version, ext, NULL);
     }
-    else if (strcmp(shlib_ext, ".dylib") == 0) {
+    else if (binary_format == CHAZ_CC_BINFMT_MACHO) {
         return chaz_Util_join("", prefix, lib->name, ".", version, ext, NULL);
     }
-    else {
+    else if (binary_format == CHAZ_CC_BINFMT_ELF) {
         return chaz_Util_join("", prefix, lib->name, ext, ".", version, NULL);
+    }
+    else {
+        chaz_Util_die("Unsupported binary format");
+        return NULL;
     }
 }
 
 static const char*
-S_get_prefix() {
+S_get_prefix(chaz_Lib *lib) {
     if (chaz_CC_msvc_version_num()) {
         return "";
     }
-    else if (chaz_OS_is_cygwin()) {
-        return "cyg";
+    else if (chaz_CC_is_cygwin()) {
+        return lib->is_static ? "lib" : "cyg";
     }
     else {
         return "lib";
@@ -2047,19 +2061,15 @@ chaz_CFlags_compile_shared_library(chaz_CFlags *flags) {
         string = "/MD";
     }
     else if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
-        const char *shlib_ext = chaz_OS_shared_lib_ext();
-        if (strcmp(shlib_ext, ".dylib") == 0) {
+        int binary_format = chaz_CC_binary_format();
+        if (binary_format == CHAZ_CC_BINFMT_MACHO) {
             string = "-fno-common";
         }
-        else if (strcmp(shlib_ext, ".so") == 0) {
+        else if (binary_format == CHAZ_CC_BINFMT_ELF) {
             string = "-fPIC";
         }
-        else if (strcmp(shlib_ext, ".dll") == 0) {
-            /* MinGW */
-            return;
-        }
         else {
-            /* unknown */
+            /* MinGW. */
             return;
         }
     }
@@ -2075,7 +2085,7 @@ chaz_CFlags_compile_shared_library(chaz_CFlags *flags) {
 void
 chaz_CFlags_hide_symbols(chaz_CFlags *flags) {
     if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
-        if (strcmp(chaz_OS_shared_lib_ext(), ".dll") != 0) {
+        if (chaz_CC_binary_format() != CHAZ_CC_BINFMT_PE) {
             chaz_CFlags_append(flags, "-fvisibility=hidden");
         }
     }
@@ -2094,7 +2104,7 @@ chaz_CFlags_link_shared_library(chaz_CFlags *flags) {
         string = "/DLL";
     }
     else if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
-        if (strcmp(chaz_OS_shared_lib_ext(), ".dylib") == 0) {
+        if (chaz_CC_binary_format() == CHAZ_CC_BINFMT_MACHO) {
             string = "-dynamiclib";
         }
         else {
@@ -2114,16 +2124,16 @@ chaz_CFlags_link_shared_library(chaz_CFlags *flags) {
 void
 chaz_CFlags_set_shared_library_version(chaz_CFlags *flags, chaz_Lib *lib) {
     if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
-        const char *shlib_ext = chaz_OS_shared_lib_ext();
+        int binary_format = chaz_CC_binary_format();
 
-        if (strcmp(shlib_ext, ".dylib") == 0) {
+        if (binary_format == CHAZ_CC_BINFMT_MACHO) {
             const char *version = chaz_Lib_get_version(lib);
             char *string
                 = chaz_Util_join(" ", "-current_version", version, NULL);
             chaz_CFlags_append(flags, string);
             free(string);
         }
-        else if (strcmp(shlib_ext, ".so") == 0) {
+        else if (binary_format == CHAZ_CC_BINFMT_ELF) {
             char *soname = chaz_Lib_major_version_filename(lib);
             char *string = chaz_Util_join("", "-Wl,-soname,", soname, NULL);
             chaz_CFlags_append(flags, string);
@@ -2606,6 +2616,16 @@ chaz_CLI_parse(chaz_CLI *self, int argc, const char *argv[]) {
 /* #include "Charmonizer/Core/ConfWriter.h" */
 /* #include "Charmonizer/Core/OperatingSystem.h" */
 
+/* Detect binary format.
+ */
+static void
+chaz_CC_detect_binary_format(const char *filename);
+
+/** Return the numeric value of a macro or 0 if it isn't defined.
+ */
+static int
+chaz_CC_eval_macro(const char *macro);
+
 /* Detect macros which may help to identify some compilers.
  */
 static void
@@ -2621,8 +2641,13 @@ static struct {
     char     *cc_command;
     char     *cflags;
     char     *try_exe_name;
+    char      exe_ext[10];
+    char      shared_lib_ext[10];
+    char      static_lib_ext[10];
+    char      import_lib_ext[10];
     char      obj_ext[10];
     char      gcc_version_str[30];
+    int       binary_format;
     int       cflags_style;
     int       intval___GNUC__;
     int       intval___GNUC_MINOR__;
@@ -2630,12 +2655,13 @@ static struct {
     int       intval__MSC_VER;
     int       intval___clang__;
     int       intval___SUNPRO_C;
+    int       is_cygwin;
     chaz_CFlags *extra_cflags;
     chaz_CFlags *temp_cflags;
 } chaz_CC = {
     NULL, NULL, NULL,
-    "", "",
-    0, 0, 0, 0, 0, 0, 0,
+    "", "", "", "", "", "",
+    0, 0, 0, 0, 0, 0, 0, 0, 0,
     NULL, NULL
 };
 
@@ -2654,40 +2680,40 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     chaz_CC.temp_cflags  = NULL;
 
     /* Set names for the targets which we "try" to compile. */
+    strcpy(chaz_CC.exe_ext, ".exe");
     chaz_CC.try_exe_name
-        = chaz_Util_join("", CHAZ_CC_TRY_BASENAME, chaz_OS_exe_ext(), NULL);
+        = chaz_Util_join("", CHAZ_CC_TRY_BASENAME, chaz_CC.exe_ext, NULL);
 
     /* If we can't compile or execute anything, game over. */
     if (chaz_Util_verbosity) {
         printf("Trying to compile and execute a small test file...\n");
     }
-    if (!chaz_Util_remove_and_verify(chaz_CC.try_exe_name)) {
-        chaz_Util_die("Failed to delete file '%s'", chaz_CC.try_exe_name);
-    }
+
     /* Try MSVC argument style. */
-    strcpy(chaz_CC.obj_ext, ".obj");
-    chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_MSVC;
-    compile_succeeded = chaz_CC_compile_exe(CHAZ_CC_TRY_SOURCE_PATH,
-                                            CHAZ_CC_TRY_BASENAME, code);
     if (!compile_succeeded) {
-        /* Try POSIX argument style. */
-        strcpy(chaz_CC.obj_ext, ".o");
-        chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_POSIX;
+        chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_MSVC;
+        if (!chaz_Util_remove_and_verify(chaz_CC.try_exe_name)) {
+            chaz_Util_die("Failed to delete file '%s'", chaz_CC.try_exe_name);
+        }
         compile_succeeded = chaz_CC_compile_exe(CHAZ_CC_TRY_SOURCE_PATH,
                                                 CHAZ_CC_TRY_BASENAME, code);
     }
+
+    /* Try POSIX argument style. */
+    if (!compile_succeeded) {
+        chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_POSIX;
+        if (!chaz_Util_remove_and_verify(chaz_CC.try_exe_name)) {
+            chaz_Util_die("Failed to delete file '%s'", chaz_CC.try_exe_name);
+        }
+        compile_succeeded = chaz_CC_compile_exe(CHAZ_CC_TRY_SOURCE_PATH,
+                                                CHAZ_CC_TRY_BASENAME, code);
+    }
+
     if (!compile_succeeded) {
         chaz_Util_die("Failed to compile a small test file");
     }
-    retval = chaz_OS_run_local_redirected(chaz_CC.try_exe_name,
-                                          chaz_OS_dev_null());
+    chaz_CC_detect_binary_format(chaz_CC.try_exe_name);
     chaz_Util_remove_and_verify(chaz_CC.try_exe_name);
-    if (retval < 0) {
-        chaz_Util_die("Failed to execute test file: %s", strerror(errno));
-    }
-    if (retval > 0) {
-        chaz_Util_die("Unexpected exit code %d from test file", retval);
-    }
 
     chaz_CC_detect_known_compilers();
 
@@ -2705,9 +2731,104 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
     }
     chaz_CC.extra_cflags = chaz_CFlags_new(chaz_CC.cflags_style);
     chaz_CC.temp_cflags  = chaz_CFlags_new(chaz_CC.cflags_style);
+
+    /* File extensions. */
+    if (chaz_CC.binary_format == CHAZ_CC_BINFMT_ELF) {
+        if (chaz_Util_verbosity) {
+            printf("Detected binary format: ELF\n");
+        }
+        strcpy(chaz_CC.exe_ext, "");
+        strcpy(chaz_CC.shared_lib_ext, ".so");
+        strcpy(chaz_CC.static_lib_ext, ".a");
+        strcpy(chaz_CC.obj_ext, ".o");
+    }
+    else if (chaz_CC.binary_format == CHAZ_CC_BINFMT_MACHO) {
+        if (chaz_Util_verbosity) {
+            printf("Detected binary format: Mach-O\n");
+        }
+        strcpy(chaz_CC.exe_ext, "");
+        strcpy(chaz_CC.shared_lib_ext, ".dylib");
+        strcpy(chaz_CC.static_lib_ext, ".a");
+        strcpy(chaz_CC.obj_ext, ".o");
+    }
+    else if (chaz_CC.binary_format == CHAZ_CC_BINFMT_PE) {
+        if (chaz_Util_verbosity) {
+            printf("Detected binary format: Portable Executable\n");
+        }
+        strcpy(chaz_CC.exe_ext, ".exe");
+        strcpy(chaz_CC.shared_lib_ext, ".dll");
+        if (chaz_CC.intval___GNUC__) {
+            strcpy(chaz_CC.static_lib_ext, ".a");
+            strcpy(chaz_CC.import_lib_ext, ".dll.a");
+            strcpy(chaz_CC.obj_ext, ".o");
+        }
+        else {
+            strcpy(chaz_CC.static_lib_ext, ".lib");
+            strcpy(chaz_CC.import_lib_ext, ".lib");
+            strcpy(chaz_CC.obj_ext, ".obj");
+        }
+
+        if (chaz_CC_has_macro("__CYGWIN__")) {
+            chaz_CC.is_cygwin = 1;
+        }
+    }
+    else {
+        chaz_Util_die("Failed to detect binary format");
+    }
+
+    free(chaz_CC.try_exe_name);
+    chaz_CC.try_exe_name
+        = chaz_Util_join("", CHAZ_CC_TRY_BASENAME, chaz_CC.exe_ext, NULL);
 }
 
-static const char chaz_CC_detect_macro_code[] =
+static void
+chaz_CC_detect_binary_format(const char *filename) {
+    char *output;
+    size_t output_len;
+    int binary_format = 0;
+
+    output = chaz_Util_slurp_file(filename, &output_len);
+
+    /* ELF. */
+    if (binary_format == 0 && output_len >= 4
+        && memcmp(output, "\x7F" "ELF", 4) == 0
+       ) {
+        binary_format = CHAZ_CC_BINFMT_ELF;
+    }
+
+    /* Macho-O. */
+    if (binary_format == 0 && output_len >= 4
+        && (memcmp(output, "\xCA\xFE\xBA\xBE", 4) == 0      /* Fat binary. */
+            || memcmp(output, "\xFE\xED\xFA\xCE", 4) == 0   /* 32-bit BE. */
+            || memcmp(output, "\xFE\xED\xFA\xCF", 4) == 0   /* 64-bit BE. */
+            || memcmp(output, "\xCE\xFA\xED\xFE", 4) == 0   /* 32-bit LE. */
+            || memcmp(output, "\xCF\xFA\xED\xFE", 4) == 0)  /* 64-bit LE. */
+       ) {
+        binary_format = CHAZ_CC_BINFMT_MACHO;
+    }
+
+    /* Portable Executable. */
+    if (binary_format == 0 && output_len >= 0x40
+        && memcmp(output, "MZ", 2) == 0
+       ) {
+        size_t pe_header_off =
+            (unsigned char)output[0x3C]
+            | ((unsigned char)output[0x3D] << 8)
+            | ((unsigned char)output[0x3E] << 16)
+            | ((unsigned char)output[0x3F] << 24);
+
+        if (output_len >= pe_header_off + 4
+            && memcmp(output + pe_header_off, "PE\0\0", 4) == 0
+           ) {
+            binary_format = CHAZ_CC_BINFMT_PE;
+        }
+    }
+
+    chaz_CC.binary_format = binary_format;
+    free(output);
+}
+
+static const char chaz_CC_eval_macro_code[] =
     CHAZ_QUOTE(  #include <stdio.h>             )
     CHAZ_QUOTE(  int main() {                   )
     CHAZ_QUOTE(  #ifndef %s                     )
@@ -2718,15 +2839,15 @@ static const char chaz_CC_detect_macro_code[] =
     CHAZ_QUOTE(  }                              );
 
 static int
-chaz_CC_detect_macro(const char *macro) {
-    size_t size = sizeof(chaz_CC_detect_macro_code)
+chaz_CC_eval_macro(const char *macro) {
+    size_t size = sizeof(chaz_CC_eval_macro_code)
                   + (strlen(macro) * 2)
                   + 20;
     char *code = (char*)malloc(size);
     int retval = 0;
     char *output;
     size_t len;
-    sprintf(code, chaz_CC_detect_macro_code, macro, macro);
+    sprintf(code, chaz_CC_eval_macro_code, macro, macro);
     output = chaz_CC_capture_output(code, &len);
     if (output) {
         retval = atoi(output);
@@ -2736,21 +2857,34 @@ chaz_CC_detect_macro(const char *macro) {
     return retval;
 }
 
+int
+chaz_CC_has_macro(const char *macro) {
+    size_t size = sizeof(chaz_CC_eval_macro_code)
+                  + (strlen(macro) * 2)
+                  + 20;
+    char *code = (char*)malloc(size);
+    int retval = 0;
+    sprintf(code, chaz_CC_eval_macro_code, macro, macro);
+    retval = chaz_CC_test_compile(code);
+    free(code);
+    return retval;
+}
+
 static void
 chaz_CC_detect_known_compilers(void) {
-    chaz_CC.intval___GNUC__  = chaz_CC_detect_macro("__GNUC__");
+    chaz_CC.intval___GNUC__  = chaz_CC_eval_macro("__GNUC__");
     if (chaz_CC.intval___GNUC__) {
         chaz_CC.intval___GNUC_MINOR__
-            = chaz_CC_detect_macro("__GNUC_MINOR__");
+            = chaz_CC_eval_macro("__GNUC_MINOR__");
         chaz_CC.intval___GNUC_PATCHLEVEL__
-            = chaz_CC_detect_macro("__GNUC_PATCHLEVEL__");
+            = chaz_CC_eval_macro("__GNUC_PATCHLEVEL__");
         sprintf(chaz_CC.gcc_version_str, "%d.%d.%d", chaz_CC.intval___GNUC__,
                 chaz_CC.intval___GNUC_MINOR__,
                 chaz_CC.intval___GNUC_PATCHLEVEL__);
     }
-    chaz_CC.intval__MSC_VER   = chaz_CC_detect_macro("_MSC_VER");
-    chaz_CC.intval___clang__  = chaz_CC_detect_macro("__clang__");
-    chaz_CC.intval___SUNPRO_C = chaz_CC_detect_macro("__SUNPRO_C");
+    chaz_CC.intval__MSC_VER   = chaz_CC_eval_macro("_MSC_VER");
+    chaz_CC.intval___clang__  = chaz_CC_eval_macro("__clang__");
+    chaz_CC.intval___SUNPRO_C = chaz_CC_eval_macro("__SUNPRO_C");
 }
 
 void
@@ -2769,7 +2903,7 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
     const char *extra_cflags_string = "";
     const char *temp_cflags_string  = "";
     const char *local_cflags_string;
-    char *exe_file = chaz_Util_join("", exe_name, chaz_OS_exe_ext(), NULL);
+    char *exe_file = chaz_Util_join("", exe_name, chaz_CC.exe_ext, NULL);
     char *command;
     int result;
 
@@ -2953,6 +3087,31 @@ chaz_CC_new_cflags(void) {
     return chaz_CFlags_new(chaz_CC.cflags_style);
 }
 
+int
+chaz_CC_binary_format(void) {
+    return chaz_CC.binary_format;
+}
+
+const char*
+chaz_CC_exe_ext(void) {
+    return chaz_CC.exe_ext;
+}
+
+const char*
+chaz_CC_shared_lib_ext(void) {
+    return chaz_CC.shared_lib_ext;
+}
+
+const char*
+chaz_CC_static_lib_ext(void) {
+    return chaz_CC.static_lib_ext;
+}
+
+const char*
+chaz_CC_import_lib_ext(void) {
+    return chaz_CC.import_lib_ext;
+}
+
 const char*
 chaz_CC_obj_ext(void) {
     return chaz_CC.obj_ext;
@@ -2978,6 +3137,11 @@ chaz_CC_msvc_version_num(void) {
 int
 chaz_CC_sun_c_version_num(void) {
     return chaz_CC.intval___SUNPRO_C;
+}
+
+int
+chaz_CC_is_cygwin(void) {
+    return chaz_CC.is_cygwin;
 }
 
 const char*
@@ -4464,21 +4628,21 @@ S_write_rule(chaz_MakeRule *rule, FILE *out);
 
 void
 chaz_Make_init(const char *make_command) {
+    chaz_Make.shell_type = chaz_OS_shell_type();
+
     if (make_command) {
-        chaz_Make.make_command = chaz_Util_strdup(make_command);
+        if (!chaz_Make_detect(make_command, NULL)) {
+            chaz_Util_warn("Make utility '%s' doesn't appear to work");
+        }
     }
     else {
-        chaz_Make_detect("make", "gmake", "nmake", "dmake", "mingw32-make",
-                         "mingw64-make", NULL);
-    }
-
-    if (chaz_Make.make_command) {
-        if (strcmp(chaz_Make.make_command, "nmake") == 0) {
-            chaz_Make.shell_type = CHAZ_OS_CMD_EXE;
+        if (!chaz_Make_detect("make", "gmake", "nmake", "dmake",
+                              "mingw32-make", "mingw64-make", NULL)
+           ) {
+            chaz_Util_warn("No working make utility found");
         }
-        else {
-            /* TODO: Feature test which shell make uses on Windows. */
-            chaz_Make.shell_type = CHAZ_OS_POSIX;
+        else if (chaz_Util_verbosity) {
+            printf("Detected make utility '%s'\n", chaz_Make.make_command);
         }
     }
 }
@@ -4503,7 +4667,7 @@ chaz_Make_detect(const char *make1, ...) {
     va_list args;
     const char *candidate;
     int found = 0;
-    const char makefile_content[] = "foo:\n\techo \"foo!\"\n";
+    const char makefile_content[] = "foo:\n\techo foo\\^bar\n";
     chaz_Util_write_file("_charm_Makefile", makefile_content);
 
     /* Audition candidates. */
@@ -4529,8 +4693,15 @@ chaz_Make_audition(const char *make) {
     if (chaz_Util_can_open_file("_charm_foo")) {
         size_t len;
         char *content = chaz_Util_slurp_file("_charm_foo", &len);
-        if (NULL != strstr(content, "foo!")) {
-            succeeded = 1;
+        if (NULL != strstr(content, "foo\\bar")) {
+            if (chaz_Make.shell_type == CHAZ_OS_CMD_EXE) {
+                succeeded = 1;
+            }
+        }
+        else if (NULL != strstr(content, "foo^bar")) {
+            if (chaz_Make.shell_type == CHAZ_OS_POSIX) {
+                succeeded = 1;
+            }
         }
         free(content);
     }
@@ -4547,7 +4718,7 @@ chaz_Make_audition(const char *make) {
 chaz_MakeFile*
 chaz_MakeFile_new() {
     chaz_MakeFile *makefile = (chaz_MakeFile*)malloc(sizeof(chaz_MakeFile));
-    const char    *exe_ext  = chaz_OS_exe_ext();
+    const char    *exe_ext  = chaz_CC_exe_ext();
     const char    *obj_ext  = chaz_CC_obj_ext();
     char *generated;
 
@@ -4709,14 +4880,14 @@ chaz_MakeFile_add_compiled_exe(chaz_MakeFile *makefile, const char *exe,
 chaz_MakeRule*
 chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_Lib *lib,
                              const char *sources, chaz_CFlags *link_flags) {
-    chaz_CFlags   *local_flags  = chaz_CC_new_cflags();
-    const char    *link         = chaz_CC_link_command();
-    const char    *shlib_ext    = chaz_OS_shared_lib_ext();
-    const char    *link_flags_string = "";
-    const char    *local_flags_string;
+    chaz_CFlags *local_flags = chaz_CC_new_cflags();
+    const char *link = chaz_CC_link_command();
+    const char *link_flags_string = "";
+    const char *local_flags_string;
+    int binfmt = chaz_CC_binary_format();
     chaz_MakeRule *rule;
-    char          *filename;
-    char          *command;
+    char *filename;
+    char *command;
 
     filename = chaz_Lib_filename(lib);
     rule = chaz_MakeFile_add_rule(makefile, filename, sources);
@@ -4729,7 +4900,7 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_Lib *lib,
         chaz_CFlags_append(local_flags, "/nologo");
     }
     chaz_CFlags_link_shared_library(local_flags);
-    if (strcmp(shlib_ext, ".dylib") == 0) {
+    if (binfmt == CHAZ_CC_BINFMT_MACHO) {
         /* Set temporary install name with full path on Darwin. */
         const char *dir_sep = chaz_OS_dir_sep();
         char *major_v_name = chaz_Lib_major_version_filename(lib);
@@ -4751,7 +4922,7 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_Lib *lib,
     chaz_MakeRule_add_rm_command(makefile->clean, filename);
 
     /* Add symlinks. */
-    if (strcmp(shlib_ext, ".dll") != 0) {
+    if (binfmt == CHAZ_CC_BINFMT_ELF || binfmt == CHAZ_CC_BINFMT_MACHO) {
         char *major_v_name = chaz_Lib_major_version_filename(lib);
         char *no_v_name    = chaz_Lib_no_version_filename(lib);
 
@@ -4759,7 +4930,7 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_Lib *lib,
         chaz_MakeRule_add_command(rule, command);
         free(command);
 
-        if (strcmp(shlib_ext, ".dylib") == 0) {
+        if (binfmt == CHAZ_CC_BINFMT_MACHO) {
             command = chaz_Util_join(" ", "ln -sf", filename, no_v_name,
                                      NULL);
         }
@@ -4795,7 +4966,6 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *makefile, chaz_Lib *lib,
 chaz_MakeRule*
 chaz_MakeFile_add_static_lib(chaz_MakeFile *makefile, chaz_Lib *lib,
                              const char *objects) {
-    const char    *shlib_ext    = chaz_OS_shared_lib_ext();
     chaz_MakeRule *rule;
     char          *filename;
     char          *command;
@@ -4821,7 +4991,7 @@ chaz_MakeFile_add_lemon_exe(chaz_MakeFile *makefile, const char *dir) {
     chaz_CFlags   *cflags = chaz_CC_new_cflags();
     chaz_MakeRule *rule;
     const char *dir_sep = chaz_OS_dir_sep();
-    const char *exe_ext = chaz_OS_exe_ext();
+    const char *exe_ext = chaz_CC_exe_ext();
     char *lemon_exe = chaz_Util_join("", dir, dir_sep, "lemon", exe_ext, NULL);
     char *lemon_c   = chaz_Util_join(dir_sep, dir, "lemon.c", NULL);
 
@@ -5052,8 +5222,9 @@ chaz_MakeRule_add_command_with_libpath(chaz_MakeRule *rule,
     va_list args;
     char *path        = NULL;
     char *lib_command = NULL;
+    int binfmt = chaz_CC_binary_format();
 
-    if (strcmp(chaz_OS_shared_lib_ext(), ".so") == 0) {
+    if (binfmt == CHAZ_CC_BINFMT_ELF) {
         va_start(args, command);
         path = chaz_Util_vjoin(":", args);
         va_end(args);
@@ -5063,16 +5234,28 @@ chaz_MakeRule_add_command_with_libpath(chaz_MakeRule *rule,
 
         free(path);
     }
-    else if (strcmp(chaz_OS_shared_lib_ext(), ".dll") == 0) {
-        va_start(args, command);
-        path = chaz_Util_vjoin(";", args);
-        va_end(args);
+    else if (binfmt == CHAZ_CC_BINFMT_PE) {
+        if (chaz_Make.shell_type == CHAZ_OS_CMD_EXE) {
+            va_start(args, command);
+            path = chaz_Util_vjoin(";", args);
+            va_end(args);
 
-        /* It's important to not add a space before `&&`. Otherwise, the
-	 * space is added to the search path.
-	 */
-        lib_command = chaz_Util_join("", "path ", path, ";%path%&& ", command,
-                                     NULL);
+            /* It's important to not add a space before `&&`. Otherwise, the
+             * space is added to the search path.
+             */
+            lib_command = chaz_Util_join("", "path ", path, ";%path%&& ",
+                                         command, NULL);
+        }
+        else {
+            va_start(args, command);
+            path = chaz_Util_vjoin(":", args);
+            va_end(args);
+
+            lib_command = chaz_Util_join("", "PATH=", path, ":$$PATH ",
+                                         command, NULL);
+        }
+
+        free(path);
     }
     else {
         /* Assume that library paths are compiled into the executable on
@@ -5093,8 +5276,8 @@ chaz_MakeRule_add_rm_command(chaz_MakeRule *rule, const char *files) {
         command = chaz_Util_join(" ", "rm -f", files, NULL);
     }
     else if (chaz_Make.shell_type == CHAZ_OS_CMD_EXE) {
-        command = chaz_Util_join("", "for %i in (", files,
-                                 ") do @if exist %i del /f %i", NULL);
+        command = chaz_Util_join("", "for %%i in (", files,
+                                 ") do @if exist %%i del /f %%i", NULL);
     }
     else {
         chaz_Util_die("Unsupported shell type: %d", chaz_Make.shell_type);
@@ -5112,8 +5295,8 @@ chaz_MakeRule_add_recursive_rm_command(chaz_MakeRule *rule, const char *dirs) {
         command = chaz_Util_join(" ", "rm -rf", dirs, NULL);
     }
     else if (chaz_Make.shell_type == CHAZ_OS_CMD_EXE) {
-        command = chaz_Util_join("", "for %i in (", dirs,
-                                 ") do @if exist %i rmdir /s /q %i", NULL);
+        command = chaz_Util_join("", "for %%i in (", dirs,
+                                 ") do @if exist %%i rmdir /s /q %%i", NULL);
     }
     else {
         chaz_Util_die("Unsupported shell type: %d", chaz_Make.shell_type);
@@ -5267,107 +5450,81 @@ static struct {
     char name[CHAZ_OS_NAME_MAX+1];
     char dev_null[20];
     char dir_sep[2];
-    char exe_ext[5];
-    char static_lib_ext[5];
-    char shared_lib_ext[7];
     char local_command_start[3];
     int  shell_type;
-} chaz_OS = { "", "", "", "", "", "", "", 0 };
+    int  run_sh_via_cmd_exe;
+} chaz_OS = { "", "", "", "", 0, 0 };
+
+static int
+chaz_OS_run_sh_via_cmd_exe(const char *command);
 
 void
 chaz_OS_init(void) {
+    char *output;
+    size_t output_len;
+
     if (chaz_Util_verbosity) {
         printf("Initializing Charmonizer/Core/OperatingSystem...\n");
     }
 
-    if (chaz_Util_verbosity) {
-        printf("Trying to find a bit-bucket a la /dev/null...\n");
-    }
+    /* Detect shell based on escape character. */
 
-    /* Detect shell based on whether the bitbucket is "/dev/null" or "nul".
-     * Start with "nul" as some Windows boxes seem to have a "/dev/null".
-     */
-    if (chaz_Util_can_open_file("nul")) {
-        strcpy(chaz_OS.name, "windows");
-        strcpy(chaz_OS.dev_null, "nul");
-        strcpy(chaz_OS.dir_sep, "\\");
-        strcpy(chaz_OS.exe_ext, ".exe");
-        strcpy(chaz_OS.shared_lib_ext, ".dll");
-        strcpy(chaz_OS.static_lib_ext, ".lib");
-        strcpy(chaz_OS.local_command_start, ".\\");
-        chaz_OS.shell_type = CHAZ_OS_CMD_EXE;
-    }
-    else if (chaz_Util_can_open_file("/dev/null")) {
-        char   *uname;
-        size_t  uname_len;
-        size_t i;
+    /* Needed to make redirection work. */
+    chaz_OS.shell_type = CHAZ_OS_POSIX;
 
-        chaz_OS.shell_type = CHAZ_OS_POSIX;
+    output = chaz_OS_run_and_capture("echo foo\\^bar", &output_len);
 
-        /* Detect Unix name. */
-        uname = chaz_OS_run_and_capture("uname", &uname_len);
-        for (i = 0; i < CHAZ_OS_NAME_MAX && i < uname_len; i++) {
-            char c = uname[i];
-            if (!c || isspace((unsigned char)c)) { break; }
-            chaz_OS.name[i] = tolower((unsigned char)c);
+    if (output_len >= 7 && memcmp(output, "foo\\bar", 7) == 0) {
+        /* Escape character is caret. */
+        if (chaz_Util_verbosity) {
+            printf("Detected cmd.exe shell\n");
         }
-        if (i > 0) { chaz_OS.name[i] = '\0'; }
-        else       { strcpy(chaz_OS.name, "unknown_unix"); }
-        free(uname);
 
-        strcpy(chaz_OS.dev_null, "/dev/null");
-        strcpy(chaz_OS.dir_sep, "/");
-        strcpy(chaz_OS.exe_ext, "");
-        strcpy(chaz_OS.static_lib_ext, ".a");
-        if (memcmp(chaz_OS.name, "darwin", 6) == 0) {
-            strcpy(chaz_OS.shared_lib_ext, ".dylib");
-        }
-        else if (memcmp(chaz_OS.name, "cygwin", 6) == 0) {
-            strcpy(chaz_OS.shared_lib_ext, ".dll");
+        /* Try to see whether running commands via the `sh` command works.
+         * Run the `find` command to check whether we're in a somewhat POSIX
+         * compatible environment. */
+        free(output);
+        chaz_OS.run_sh_via_cmd_exe = 1;
+        output = chaz_OS_run_and_capture("find . -prune", &output_len);
+
+        if (output_len >= 2
+            && output[0] == '.'
+            && isspace((unsigned char)output[1])
+           ) {
+            if (chaz_Util_verbosity) {
+                printf("Detected POSIX shell via cmd.exe\n");
+            }
+            chaz_OS.shell_type = CHAZ_OS_POSIX;
         }
         else {
-            strcpy(chaz_OS.shared_lib_ext, ".so");
+            chaz_OS.shell_type = CHAZ_OS_CMD_EXE;
+            chaz_OS.run_sh_via_cmd_exe = 0;
         }
+    }
+    else if (output_len >= 7 && memcmp(output, "foo^bar", 7) == 0) {
+        /* Escape character is backslash. */
+        if (chaz_Util_verbosity) {
+            printf("Detected POSIX shell\n");
+        }
+        chaz_OS.shell_type = CHAZ_OS_POSIX;
+    }
+
+    if (chaz_OS.shell_type == CHAZ_OS_CMD_EXE) {
+        strcpy(chaz_OS.dir_sep, "\\");
+        strcpy(chaz_OS.dev_null, "nul");
+        /* Empty string should work, too. */
+        strcpy(chaz_OS.local_command_start, ".\\");
+    }
+    else if (chaz_OS.shell_type == CHAZ_OS_POSIX) {
+        strcpy(chaz_OS.dir_sep, "/");
+        strcpy(chaz_OS.dev_null, "/dev/null");
         strcpy(chaz_OS.local_command_start, "./");
     }
     else {
-        /* Bail out because we couldn't find anything like /dev/null. */
-        chaz_Util_die("Couldn't find anything like /dev/null");
+        chaz_Util_die("Couldn't identify shell");
     }
 
-    if (chaz_Util_verbosity) {
-        printf("Detected OS: %s\n", chaz_OS.name);
-    }
-}
-
-const char*
-chaz_OS_name(void) {
-    return chaz_OS.name;
-}
-
-int
-chaz_OS_is_darwin(void) {
-    return memcmp(chaz_OS.name, "darwin", 6) == 0;
-}
-
-int
-chaz_OS_is_cygwin(void) {
-    return memcmp(chaz_OS.name, "cygwin", 6) == 0;
-}
-
-const char*
-chaz_OS_exe_ext(void) {
-    return chaz_OS.exe_ext;
-}
-
-const char*
-chaz_OS_shared_lib_ext(void) {
-    return chaz_OS.shared_lib_ext;
-}
-
-const char*
-chaz_OS_static_lib_ext(void) {
-    return chaz_OS.static_lib_ext;
+    free(output);
 }
 
 const char*
@@ -5466,8 +5623,91 @@ chaz_OS_run_redirected(const char *command, const char *path) {
     else {
         chaz_Util_die("Don't know the shell type");
     }
-    retval = system(quiet_command);
+    if (chaz_OS.run_sh_via_cmd_exe) {
+        retval = chaz_OS_run_sh_via_cmd_exe(quiet_command);
+    }
+    else {
+        retval = system(quiet_command);
+    }
     free(quiet_command);
+    return retval;
+}
+
+static int
+chaz_OS_run_sh_via_cmd_exe(const char *command) {
+    size_t i;
+    size_t size;
+    char *sh_command;
+    char *p;
+    int retval;
+
+    /* Compute size. */
+
+    size = sizeof("sh -c \"\"");
+
+    for (i = 0; command[i] != '\0'; i++) {
+        char c = command[i];
+
+        switch (c) {
+            case '"':
+            case '\\':
+                size += 2;
+                break;
+
+            case '%':
+            case '!':
+                size += 3;
+                break;
+
+            default:
+                size += 1;
+                break;
+        }
+    }
+
+    /* Build sh command. */
+
+    sh_command = (char*)malloc(size);
+    p = sh_command;
+    memcpy(p, "sh -c \"", 7);
+    p += 7;
+
+    /* Escape special characters. */
+
+    for (i = 0; command[i] != '\0'; i++) {
+        char c = command[i];
+
+        switch (c) {
+            case '"':
+            case '\\':
+                /* Escape double quote and backslash. */
+                *p++ = '\\';
+                *p++ = c;
+                break;
+
+            case '%':
+            case '!':
+                /* Break out of double quotes for percent sign and
+                 * exclamation mark. This prevents variable expansion. */
+                *p++ = '"';
+                *p++ = c;
+                *p++ = '"';
+                break;
+
+            default:
+                *p++ = c;
+                break;
+        }
+    }
+
+    /* Finish and run sh command. */
+
+    *p++ = '"';
+    *p++ = '\0';
+
+    retval = system(sh_command);
+
+    free(sh_command);
     return retval;
 }
 
@@ -5548,7 +5788,7 @@ chaz_Util_write_file(const char *filename, const char *content) {
 
 char*
 chaz_Util_slurp_file(const char *file_path, size_t *len_ptr) {
-    FILE   *const file = fopen(file_path, "r");
+    FILE   *const file = fopen(file_path, "rb");
     char   *contents;
     size_t  len;
     long    check_val;
@@ -5721,7 +5961,7 @@ chaz_Util_can_open_file(const char *file_path) {
     FILE *garbage_fh;
 
     /* Use fopen as a portable test for the existence of a file. */
-    garbage_fh = fopen(file_path, "r");
+    garbage_fh = fopen(file_path, "rb");
     if (garbage_fh == NULL) {
         return 0;
     }
@@ -6133,7 +6373,6 @@ chaz_DirManip_try_rmdir(void) {
 
 void
 chaz_DirManip_run(void) {
-    const char *dir_sep = chaz_OS_dir_sep();
     int has_dirent_h = chaz_HeadCheck_check_header("dirent.h");
     int has_direct_h = chaz_HeadCheck_check_header("direct.h");
     int has_dirent_d_namlen = false;
@@ -6190,16 +6429,13 @@ chaz_DirManip_run(void) {
         chaz_ConfWriter_add_def("MAKEDIR_MODE_IGNORED", "1");
     }
 
-    if (strcmp(dir_sep, "\\") == 0) {
+    if (chaz_CC_has_macro("_WIN32") && !chaz_CC_is_cygwin()) {
         chaz_ConfWriter_add_def("DIR_SEP", "\"\\\\\"");
         chaz_ConfWriter_add_def("DIR_SEP_CHAR", "'\\\\'");
     }
     else {
-        char scratch[5];
-        sprintf(scratch, "\"%s\"", dir_sep);
-        chaz_ConfWriter_add_def("DIR_SEP", scratch);
-        sprintf(scratch, "'%s'", dir_sep);
-        chaz_ConfWriter_add_def("DIR_SEP_CHAR", scratch);
+        chaz_ConfWriter_add_def("DIR_SEP", "\"/\"");
+        chaz_ConfWriter_add_def("DIR_SEP_CHAR", "'/'");
     }
 
     /* See whether remove works on directories. */
@@ -7673,8 +7909,8 @@ chaz_Memory_probe_alloca(void) {
         CHAZ_QUOTE(      void *foo = %s(1);         )
         CHAZ_QUOTE(      return 0;                  )
         CHAZ_QUOTE(  }                              );
-    int has_alloca     = false;
-    int has_builtin_alloca    = false;
+    chaz_CFlags *temp_cflags = chaz_CC_get_temp_cflags();
+    int has_alloca = false;
     char code_buf[sizeof(alloca_code) + 100];
 
     {
@@ -7691,6 +7927,13 @@ chaz_Memory_probe_alloca(void) {
         }
     }
 
+    /* Under GCC, alloca is a builtin that works without including the
+     * correct header, generating only a warning. To avoid misdetection,
+     * disable the alloca builtin temporarily. */
+    if (chaz_CC_gcc_version_num()) {
+        chaz_CFlags_append(temp_cflags, "-fno-builtin-alloca");
+    }
+
     /* Unixen. */
     sprintf(code_buf, alloca_code, "alloca.h", "alloca");
     if (chaz_CC_test_link(code_buf)) {
@@ -7699,11 +7942,6 @@ chaz_Memory_probe_alloca(void) {
         chaz_ConfWriter_add_def("alloca", "alloca");
     }
     if (!has_alloca) {
-        /*
-         * FIXME: Under MinGW, alloca is defined in malloc.h. This probe
-         * produces compiler warnings but works regardless. These warnings
-         * are subsequently repeated during the build.
-         */
         sprintf(code_buf, alloca_code, "stdlib.h", "alloca");
         if (chaz_CC_test_link(code_buf)) {
             has_alloca = true;
@@ -7711,17 +7949,9 @@ chaz_Memory_probe_alloca(void) {
             chaz_ConfWriter_add_def("alloca", "alloca");
         }
     }
-    if (!has_alloca) {
-        sprintf(code_buf, alloca_code, "stdio.h", /* stdio.h is filler */
-                "__builtin_alloca");
-        if (chaz_CC_test_link(code_buf)) {
-            has_builtin_alloca = true;
-            chaz_ConfWriter_add_def("alloca", "__builtin_alloca");
-        }
-    }
 
     /* Windows. */
-    if (!(has_alloca || has_builtin_alloca)) {
+    if (!has_alloca) {
         sprintf(code_buf, alloca_code, "malloc.h", "alloca");
         if (chaz_CC_test_link(code_buf)) {
             has_alloca = true;
@@ -7729,13 +7959,15 @@ chaz_Memory_probe_alloca(void) {
             chaz_ConfWriter_add_def("alloca", "alloca");
         }
     }
-    if (!(has_alloca || has_builtin_alloca)) {
+    if (!has_alloca) {
         sprintf(code_buf, alloca_code, "malloc.h", "_alloca");
         if (chaz_CC_test_link(code_buf)) {
             chaz_ConfWriter_add_def("HAS_MALLOC_H", NULL);
             chaz_ConfWriter_add_def("alloca", "_alloca");
         }
     }
+
+    chaz_CFlags_clear(temp_cflags);
 }
 
 
@@ -8360,7 +8592,7 @@ lucy_MakeFile_new(chaz_CLI *cli) {
     else {
         self->cfish_lib_dir = NULL;
     }
-    if (strcmp(chaz_OS_shared_lib_ext(), ".dll") == 0) {
+    if (chaz_CC_binary_format() == CHAZ_CC_BINFMT_PE) {
         self->cfish_lib_name = "cfish-0.5";
     }
     else {
@@ -8597,7 +8829,7 @@ lucy_MakeFile_write_c_cfc_rules(lucy_MakeFile *self) {
 static void
 lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
     const char *dir_sep  = chaz_OS_dir_sep();
-    const char *exe_ext  = chaz_OS_exe_ext();
+    const char *exe_ext  = chaz_CC_exe_ext();
     const char *obj_ext  = chaz_CC_obj_ext();
 
     chaz_CFlags   *cflags;
