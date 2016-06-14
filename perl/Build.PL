@@ -75,6 +75,9 @@ my $builder = Lucy::Build->new(
     clownfish_params => {
         source => [
             $CORE_SOURCE_DIR,
+        ],
+        c_source => [
+            $CORE_SOURCE_DIR,
             $XS_SOURCE_DIR,
             $SNOWSTEM_SRC_DIR,
             $SNOWSTOP_SRC_DIR,
