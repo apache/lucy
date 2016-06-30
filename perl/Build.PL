@@ -76,12 +76,18 @@ my $builder = Lucy::Build->new(
         source => [
             $CORE_SOURCE_DIR,
         ],
-        c_source => [
-            $CORE_SOURCE_DIR,
-            $XS_SOURCE_DIR,
-            $SNOWSTEM_SRC_DIR,
-            $SNOWSTOP_SRC_DIR,
-            $UTF8PROC_SRC_DIR,
+        modules => [
+            {
+                name          => 'Lucy',
+                parcels       => [ 'Lucy', 'TestLucy' ],
+                c_source_dirs => [
+                    $CORE_SOURCE_DIR,
+                    $XS_SOURCE_DIR,
+                    $SNOWSTEM_SRC_DIR,
+                    $SNOWSTOP_SRC_DIR,
+                    $UTF8PROC_SRC_DIR,
+                ],
+            },
         ],
     },
     extra_linker_flags => [ @cf_linker_flags ],
