@@ -23,6 +23,9 @@ exit /b 1
 
 :test_c
 
+rem Needed to find DLL.
+path C:\install\bin;%path%
+
 if "%MSVC_VERSION%" == "10" goto msvc_10
 
 call "C:\Program Files (x86)\Microsoft Visual Studio %MSVC_VERSION%.0\VC\vcvarsall.bat" amd64

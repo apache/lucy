@@ -9131,16 +9131,13 @@ lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
         chaz_CFlags_add_library_path(link_flags, self->cfish_lib_dir);
     }
     chaz_CFlags_add_external_lib(link_flags, self->cfish_lib_name);
+    chaz_CFlags_add_rpath(link_flags, "\"$$PWD\"");
+    if (self->cfish_lib_dir) {
+        chaz_CFlags_add_rpath(link_flags, self->cfish_lib_dir);
+    }
 
     rule = chaz_MakeFile_add_rule(self->makefile, "test", "$(TEST_LUCY_EXE)");
-    if (self->cfish_lib_dir) {
-        chaz_MakeRule_add_command_with_libpath(rule, "$(TEST_LUCY_EXE)", ".",
-                                               self->cfish_lib_dir, NULL);
-    }
-    else {
-        chaz_MakeRule_add_command_with_libpath(rule, "$(TEST_LUCY_EXE)", ".",
-                                               NULL);
-    }
+    chaz_MakeRule_add_command(rule, "$(TEST_LUCY_EXE)");
 
     if (chaz_CLI_defined(self->cli, "enable-coverage")) {
         rule = chaz_MakeFile_add_rule(self->makefile, "coverage",
@@ -9149,15 +9146,7 @@ lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
                                   "lcov"
                                   " --zerocounters"
                                   " --directory $(BASE_DIR)");
-        if (self->cfish_lib_dir) {
-            chaz_MakeRule_add_command_with_libpath(rule, "$(TEST_LUCY_EXE)",
-                                                   ".", self->cfish_lib_dir,
-                                                   NULL);
-        }
-        else {
-            chaz_MakeRule_add_command_with_libpath(rule, "$(TEST_LUCY_EXE)",
-                                                   ".", NULL);
-        }
+        chaz_MakeRule_add_command(rule, "$(TEST_LUCY_EXE)");
         chaz_MakeRule_add_command(rule,
                                   "lcov"
                                   " --capture"
