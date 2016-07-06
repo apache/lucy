@@ -193,36 +193,33 @@ S_first_bit_in_nonzero_byte(uint8_t num) {
 int32_t
 BitVec_Next_Hit_IMP(BitVector *self, size_t tick) {
     BitVectorIVARS *const ivars = BitVec_IVARS(self);
+
+    if (ivars->cap > INT32_MAX) {
+        THROW(ERR, "Capacity too large for Next_Hit: %u64",
+              (uint64_t)ivars->cap);
+    }
+    if (tick >= ivars->cap) {
+        return -1;
+    }
+
     size_t byte_size = SI_octet_size(ivars->cap);
     uint8_t *const limit = ivars->bits + byte_size;
     uint8_t *ptr = ivars->bits + (tick >> 3);
 
-    if (ivars->cap > INT32_MAX / 8) {
-        THROW(ERR, "Capacity too large for Next_Hit: %u64",
-              (uint64_t)ivars->cap);
-    }
-
-    if (ptr >= limit) {
-        return -1;
-    }
-    else if (*ptr != 0) {
+    if (*ptr != 0) {
         // Special case the first byte.
-        const int32_t base = (ptr - ivars->bits) * 8;
-        const int32_t min_sub_tick = tick & 0x7;
-        unsigned int byte = *ptr >> min_sub_tick;
+        size_t min_sub_tick = tick & 0x7;
+        uint8_t byte = (uint8_t)(*ptr >> min_sub_tick);
         if (byte) {
-            const int32_t candidate 
-                = base + min_sub_tick + S_first_bit_in_nonzero_byte(byte);
-            return candidate < (int32_t)ivars->cap ? candidate : -1;
+            return (int32_t)tick + S_first_bit_in_nonzero_byte(byte);
         }
     }
 
     for (ptr++ ; ptr < limit; ptr++) {
         if (*ptr != 0) {
             // There's a non-zero bit in this byte.
-            const int32_t base = (ptr - ivars->bits) * 8;
-            const int32_t candidate = base + S_first_bit_in_nonzero_byte(*ptr);
-            return candidate < (int32_t)ivars->cap ? candidate : -1;
+            int32_t base = (int32_t)((ptr - ivars->bits) * 8);
+            return base + S_first_bit_in_nonzero_byte(*ptr);
         }
     }
 

@@ -329,7 +329,7 @@ test_Next_Hit(TestBatchRunner *runner) {
         BitVec_Set(bit_vec, (size_t)i);
         TEST_INT_EQ(runner, BitVec_Next_Hit(bit_vec, 0), i,
                     "Next_Hit for 0 is %d", i);
-        TEST_INT_EQ(runner, BitVec_Next_Hit(bit_vec, 0), i,
+        TEST_INT_EQ(runner, BitVec_Next_Hit(bit_vec, 1), i,
                     "Next_Hit for 1 is %d", i);
         for (int probe = 15; probe <= i; probe++) {
             TEST_INT_EQ(runner, BitVec_Next_Hit(bit_vec, (size_t)probe), i,
@@ -339,6 +339,8 @@ test_Next_Hit(TestBatchRunner *runner) {
             TEST_INT_EQ(runner, BitVec_Next_Hit(bit_vec, (size_t)probe), -1,
                         "no Next_Hit for %d when max is %d", probe, i);
         }
+        TEST_INT_EQ(runner, BitVec_Next_Hit(bit_vec, INT32_MAX), -1,
+                    "no Next_Hit for INT32_MAX when max is %d", i);
         DECREF(bit_vec);
     }
 }
@@ -429,7 +431,7 @@ test_off_by_one_error() {
 
 void
 TestBitVector_Run_IMP(TestBitVector *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 1029);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 1039);
     test_Set_and_Get(runner);
     test_Flip(runner);
     test_Flip_Block_ascending(runner);
