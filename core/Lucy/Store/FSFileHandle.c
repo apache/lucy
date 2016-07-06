@@ -444,6 +444,7 @@ FSFH_Read_IMP(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
 
 static CFISH_INLINE bool
 SI_init_read_only(FSFileHandle *self, FSFileHandleIVARS *ivars) {
+    UNUSED_VAR(self);
     char *filepath = Str_To_Utf8(ivars->path);
     SYSTEM_INFO sys_info;
 
@@ -500,6 +501,7 @@ SI_init_read_only(FSFileHandle *self, FSFileHandleIVARS *ivars) {
 static CFISH_INLINE void*
 SI_map(FSFileHandle *self, FSFileHandleIVARS *ivars, int64_t offset,
        int64_t len) {
+    UNUSED_VAR(self);
     void *buf = NULL;
 
     if (len) {
@@ -523,6 +525,7 @@ SI_map(FSFileHandle *self, FSFileHandleIVARS *ivars, int64_t offset,
 
 static CFISH_INLINE bool
 SI_unmap(FSFileHandle *self, char *buf, int64_t len) {
+    UNUSED_VAR(self);
     if (buf != NULL) {
         if (!UnmapViewOfFile(buf)) {
             char *win_error = Err_win_error();
