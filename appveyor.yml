@@ -18,10 +18,17 @@ environment:
     LUCY_DEBUG: 1
   matrix:
     - CLOWNFISH_HOST: c
+      BUILD_ENV: msys2
+      MSYSTEM: MINGW64
+    - CLOWNFISH_HOST: c
+      BUILD_ENV: mingw32
+    - CLOWNFISH_HOST: c
+      BUILD_ENV: msvc
       MSVC_VERSION: 10
     - CLOWNFISH_HOST: c
+      BUILD_ENV: msvc
       MSVC_VERSION: 12
-#    - CLOWNFISH_HOST: perl
+    - CLOWNFISH_HOST: perl
 
 build: off
 

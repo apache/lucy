@@ -21,7 +21,8 @@ set -e
 # Print all commands before executing.
 set -x
 
-install_dir="$TRAVIS_BUILD_DIR/install"
+build_dir="$(pwd)"
+install_dir="$build_dir/install_dir"
 
 # Fetch Clownfish.
 git clone -q --depth 1 https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git
@@ -32,6 +33,9 @@ test_c() {
     ./configure
     make -j
     ./install.sh --prefix "$install_dir"
+
+    # Needed to find DLL on Windows.
+    export PATH="$install_dir/bin:$PATH"
 
     cd ../../../c
     ./configure --clownfish-prefix "$install_dir"
@@ -59,9 +63,9 @@ test_perl() {
 test_go() {
     export GOPATH="$install_dir"
     mkdir -p "$install_dir/src/git-wip-us.apache.org/repos/asf"
-    ln -s "$TRAVIS_BUILD_DIR/lucy-clownfish" \
+    ln -s "$build_dir/lucy-clownfish" \
         "$install_dir/src/git-wip-us.apache.org/repos/asf/lucy-clownfish.git"
-    ln -s "$TRAVIS_BUILD_DIR" \
+    ln -s "$build_dir" \
         "$install_dir/src/git-wip-us.apache.org/repos/asf/lucy.git"
 
     # Install Clownfish.
