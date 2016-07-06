@@ -48,8 +48,7 @@ static const uint32_t BYTE_COUNTS[256] = {
 
 static CFISH_INLINE size_t
 SI_octet_size(size_t bit_size) {
-    if (bit_size == 0) { return 0; }
-    return (bit_size - 1) / 8 + 1;
+    return (bit_size + 7) / 8;
 }
 
 BitVector*
@@ -61,6 +60,10 @@ BitVec_new(size_t capacity) {
 BitVector*
 BitVec_init(BitVector *self, size_t capacity) {
     BitVectorIVARS *const ivars = BitVec_IVARS(self);
+
+    if (capacity > SIZE_MAX - 7) {
+        THROW(ERR, "BitVector capacity too large");
+    }
     const size_t byte_size = SI_octet_size(capacity);
 
     // Derive.
@@ -130,6 +133,9 @@ void
 BitVec_Grow_IMP(BitVector *self, size_t capacity) {
     BitVectorIVARS *const ivars = BitVec_IVARS(self);
     if (capacity > ivars->cap) {
+        if (capacity > SIZE_MAX - 7) {
+            THROW(ERR, "BitVector capacity overflow");
+        }
         const size_t old_byte_cap  = SI_octet_size(ivars->cap);
         const size_t new_byte_cap  = SI_octet_size(capacity);
         const size_t num_new_bytes = new_byte_cap - old_byte_cap;
