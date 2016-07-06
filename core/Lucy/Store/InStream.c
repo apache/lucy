@@ -344,9 +344,11 @@ InStream_Advance_Buf_IMP(InStream *self, const char *buf) {
 
 void
 InStream_Read_Bytes_IMP(InStream *self, char* buf, size_t len) {
+#if SIZE_MAX > INT64_MAX
     if (len >= INT64_MAX) {
         THROW(ERR, "Can't read %u64 bytes", (uint64_t)len);
     }
+#endif
     SI_read_bytes(self, buf, (int64_t)len);
 }
 
