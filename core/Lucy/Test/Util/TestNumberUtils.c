@@ -122,8 +122,7 @@ test_ci32(TestBatchRunner *runner) {
             NumUtil_skip_cint(&skip);
             if (decode > limit) { THROW(ERR, "overrun"); }
         }
-        TEST_TRUE(runner, skip == decode, "skip %" PRIu64 " == %" PRIu64,
-                  (uint64_t)skip, (uint64_t)decode);
+        TEST_TRUE(runner, skip == decode, "skip %p == %p", skip, decode);
     }
 
     target = encoded;
@@ -172,16 +171,14 @@ test_cu32(TestBatchRunner *runner) {
             NumUtil_skip_cint(&skip);
             if (decode > limit) { THROW(ERR, "overrun"); }
         }
-        TEST_TRUE(runner, skip == decode, "skip %lu == %lu",
-                  (unsigned long)skip, (unsigned long)decode);
+        TEST_TRUE(runner, skip == decode, "skip %p == %p", skip, decode);
 
         target = encoded;
         for (size_t i = 0; i < count; i++) {
             NumUtil_encode_padded_cu32((uint32_t)ints[i], &target);
         }
         TEST_TRUE(runner, target == limit,
-                  "padded cu32 uses 5 bytes (%lu == %lu)", (unsigned long)target,
-                  (unsigned long)limit);
+                  "padded cu32 uses 5 bytes (%p == %p)", target, limit);
         decode = encoded;
         skip   = encoded;
         for (size_t i = 0; i < count; i++) {
@@ -190,8 +187,8 @@ test_cu32(TestBatchRunner *runner) {
             NumUtil_skip_cint(&skip);
             if (decode > limit) { THROW(ERR, "overrun"); }
         }
-        TEST_TRUE(runner, skip == decode, "skip padded %lu == %lu",
-                  (unsigned long)skip, (unsigned long)decode);
+        TEST_TRUE(runner, skip == decode, "skip padded %p == %p", skip,
+                  decode);
     }
 
     target = encoded;
@@ -234,8 +231,7 @@ test_ci64(TestBatchRunner *runner) {
             if (decode > limit) { THROW(ERR, "overrun"); }
             NumUtil_skip_cint(&skip);
         }
-        TEST_TRUE(runner, skip == decode, "skip %lu == %lu",
-                  (unsigned long)skip, (unsigned long)decode);
+        TEST_TRUE(runner, skip == decode, "skip %p == %p", skip, decode);
     }
 
     target = encoded;
@@ -285,8 +281,7 @@ test_cu64(TestBatchRunner *runner) {
             if (decode > limit) { THROW(ERR, "overrun"); }
             NumUtil_skip_cint(&skip);
         }
-        TEST_TRUE(runner, skip == decode, "skip %lu == %lu",
-                  (unsigned long)skip, (unsigned long)decode);
+        TEST_TRUE(runner, skip == decode, "skip %p == %p", skip, decode);
     }
 
     target = encoded;
