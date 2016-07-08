@@ -8772,7 +8772,8 @@ static lucy_MakeFile*
 lucy_MakeFile_new(chaz_CLI *cli) {
     const char *dir_sep      = chaz_OS_dir_sep();
     const char *cfish_prefix = chaz_CLI_strval(cli, "clownfish-prefix");
-
+    char *cfcore_filename = chaz_Util_join(dir_sep, "cfcore", "Lucy.cfp",
+                                           NULL);
     lucy_MakeFile *self = malloc(sizeof(lucy_MakeFile));
 
     self->cli      = cli;
@@ -8781,9 +8782,16 @@ lucy_MakeFile_new(chaz_CLI *cli) {
     self->test_lib = NULL;
 
     /* Initialize directories. */
-    self->base_dir = "..";
-    self->core_dir = chaz_Util_join(dir_sep, self->base_dir, "core", NULL);
-    self->test_dir = chaz_Util_join(dir_sep, self->base_dir, "test", NULL);
+    if (chaz_Util_can_open_file(cfcore_filename)) {
+        self->base_dir = ".";
+        self->core_dir = chaz_Util_strdup("cfcore");
+        self->test_dir = chaz_Util_strdup("cftest");
+    }
+    else {
+        self->base_dir = "..";
+        self->core_dir = chaz_Util_join(dir_sep, self->base_dir, "core", NULL);
+        self->test_dir = chaz_Util_join(dir_sep, self->base_dir, "test", NULL);
+    }
     if (chaz_CLI_defined(cli, "enable-perl")) {
         self->host_src_dir = "xs";
     }

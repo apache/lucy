@@ -291,7 +291,8 @@ sub ACTION_dist {
     # bunch of stuff.  After the tarball is packaged up, we delete the copied
     # directories.
     my %to_copy = (
-        '../core'                          => 'core',
+        '../core'                          => 'cfcore',
+        '../test'                          => 'cftest',
         '../modules'                       => 'modules',
         '../devel'                         => 'devel',
         '../lemon'                         => 'lemon',

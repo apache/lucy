@@ -20,15 +20,26 @@ use lib 'buildlib';
 use File::Spec::Functions qw( catdir );
 use Lucy::Build;
 
-my @BASE_PATH        = Lucy::Build->cf_base_path;
-my $MODULES_DIR      = catdir( @BASE_PATH, 'modules' );
+my $IS_CPAN_DIST = -e 'cfcore';
+my @BASE_PATH    = Lucy::Build->cf_base_path;
+my $CORE_SOURCE_DIR;
+my $TEST_SOURCE_DIR;
+my $MODULES_DIR;
+if ($IS_CPAN_DIST) {
+    $CORE_SOURCE_DIR = 'cfcore';
+    $TEST_SOURCE_DIR = 'cftest';
+    $MODULES_DIR     = 'modules';
+}
+else {
+    $CORE_SOURCE_DIR = catdir( @BASE_PATH, 'core' );
+    $TEST_SOURCE_DIR = catdir( @BASE_PATH, 'test' );
+    $MODULES_DIR     = catdir( @BASE_PATH, 'modules' );
+}
 my $SNOWSTEM_SRC_DIR = catdir( $MODULES_DIR, qw( analysis snowstem source ) );
 my $SNOWSTEM_INC_DIR = catdir( $SNOWSTEM_SRC_DIR, 'include' );
 my $SNOWSTOP_SRC_DIR = catdir( $MODULES_DIR, qw( analysis snowstop source ) );
 my $UCD_INC_DIR      = catdir( $MODULES_DIR, qw( unicode ucd ) );
 my $UTF8PROC_SRC_DIR = catdir( $MODULES_DIR, qw( unicode utf8proc ) );
-my $CORE_SOURCE_DIR  = catdir( @BASE_PATH, 'core' );
-my $TEST_SOURCE_DIR  = catdir( @BASE_PATH, 'test' );
 my $XS_SOURCE_DIR    = 'xs';
 
 my @cf_linker_flags = Clownfish::CFC::Perl::Build->cf_linker_flags(
