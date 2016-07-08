@@ -4,6 +4,7 @@
 /Charmony.pm
 /MYMETA.json
 /MYMETA.yml
+/Makefile
 /_build/
 /autogen/
 /blib/
@@ -13,6 +14,8 @@
 /charmony.h
 /lib/Lucy.c
 /lib/Lucy.xs
+/lib/Lucy/Test.c
+/lib/Lucy/Test.xs
 /ppport.h
 /typemap
 

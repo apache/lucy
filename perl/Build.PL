@@ -17,34 +17,20 @@ use 5.008003;
 use strict;
 use warnings;
 use lib 'buildlib';
-use File::Spec::Functions qw( catdir );
+use File::Spec::Functions qw( catdir updir );
 use Lucy::Build;
 
 my $IS_CPAN_DIST = -e 'cfcore';
-my @BASE_PATH    = Lucy::Build->cf_base_path;
 my $CORE_SOURCE_DIR;
 my $TEST_SOURCE_DIR;
-my $MODULES_DIR;
 if ($IS_CPAN_DIST) {
     $CORE_SOURCE_DIR = 'cfcore';
     $TEST_SOURCE_DIR = 'cftest';
-    $MODULES_DIR     = 'modules';
 }
 else {
-    $CORE_SOURCE_DIR = catdir( @BASE_PATH, 'core' );
-    $TEST_SOURCE_DIR = catdir( @BASE_PATH, 'test' );
-    $MODULES_DIR     = catdir( @BASE_PATH, 'modules' );
+    $CORE_SOURCE_DIR = catdir( updir(), 'core' );
+    $TEST_SOURCE_DIR = catdir( updir(), 'test' );
 }
-my $SNOWSTEM_SRC_DIR = catdir( $MODULES_DIR, qw( analysis snowstem source ) );
-my $SNOWSTEM_INC_DIR = catdir( $SNOWSTEM_SRC_DIR, 'include' );
-my $SNOWSTOP_SRC_DIR = catdir( $MODULES_DIR, qw( analysis snowstop source ) );
-my $UCD_INC_DIR      = catdir( $MODULES_DIR, qw( unicode ucd ) );
-my $UTF8PROC_SRC_DIR = catdir( $MODULES_DIR, qw( unicode utf8proc ) );
-my $XS_SOURCE_DIR    = 'xs';
-
-my @cf_linker_flags = Clownfish::CFC::Perl::Build->cf_linker_flags(
-    'Clownfish',
-);
 
 my $builder = Lucy::Build->new(
     module_name => 'Lucy',
@@ -64,7 +50,7 @@ my $builder = Lucy::Build->new(
     build_requires     => {
         'Module::Build'      => 0.280801,
         'ExtUtils::CBuilder' => 0.21,
-        'ExtUtils::ParseXS'  => 2.18,
+        'ExtUtils::ParseXS'  => 3.00,
         'Devel::PPPort'      => 3.14,
         'Clownfish'          => 0.005000,
         'Clownfish::CFC'     => 0.005000,
@@ -77,31 +63,25 @@ my $builder = Lucy::Build->new(
             bugtracker => 'https://issues.apache.org/jira/browse/LUCY',
         },
     },
-    include_dirs => [
-        $CORE_SOURCE_DIR,
-        $XS_SOURCE_DIR,
-        $SNOWSTEM_INC_DIR,
-        $UCD_INC_DIR,
-        $UTF8PROC_SRC_DIR,
-    ],
+    include_dirs => [ $CORE_SOURCE_DIR ],
     clownfish_params => {
         source => [ $CORE_SOURCE_DIR, $TEST_SOURCE_DIR ],
         modules => [
             {
                 name          => 'Lucy',
-                parcels       => [ 'Lucy', 'TestLucy' ],
-                c_source_dirs => [
-                    $CORE_SOURCE_DIR,
-                    $TEST_SOURCE_DIR,
-                    $XS_SOURCE_DIR,
-                    $SNOWSTEM_SRC_DIR,
-                    $SNOWSTOP_SRC_DIR,
-                    $UTF8PROC_SRC_DIR,
-                ],
+                parcels       => [ 'Lucy' ],
+                make_target   => 'core_objects',
+                c_source_dirs => [ 'xs' ],
+                xs_prereqs    => [ 'Clownfish' ],
+            },
+            {
+                name        => 'Lucy::Test',
+                parcels     => [ 'TestLucy' ],
+                make_target => 'test_objects',
+                xs_prereqs  => [ 'Lucy', 'Clownfish' ],
             },
         ],
     },
-    extra_linker_flags => [ @cf_linker_flags ],
     add_to_cleanup => [
         qw(
             Lucy-*

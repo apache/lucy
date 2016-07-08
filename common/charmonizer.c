@@ -8771,6 +8771,7 @@ S_add_compiler_flags(struct chaz_CLI *cli) {
 static lucy_MakeFile*
 lucy_MakeFile_new(chaz_CLI *cli) {
     const char *dir_sep      = chaz_OS_dir_sep();
+    const char *host         = chaz_CLI_strval(cli, "host");
     const char *cfish_prefix = chaz_CLI_strval(cli, "clownfish-prefix");
     char *cfcore_filename = chaz_Util_join(dir_sep, "cfcore", "Lucy.cfp",
                                            NULL);
@@ -8792,14 +8793,14 @@ lucy_MakeFile_new(chaz_CLI *cli) {
         self->core_dir = chaz_Util_join(dir_sep, self->base_dir, "core", NULL);
         self->test_dir = chaz_Util_join(dir_sep, self->base_dir, "test", NULL);
     }
-    if (chaz_CLI_defined(cli, "enable-perl")) {
-        self->host_src_dir = "xs";
-    }
-    else if (chaz_CLI_defined(cli, "enable-go")) {
+    if (strcmp(host, "go") == 0) {
         self->host_src_dir = "cfext";
     }
-    else {
+    else if (strcmp(host, "c") == 0) {
         self->host_src_dir = "src";
+    }
+    else {
+        self->host_src_dir = NULL;
     }
     self->autogen_src_dir = chaz_Util_join(dir_sep, "autogen", "source", NULL);
     self->autogen_inc_dir
@@ -8973,7 +8974,9 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
         }
     }
 
-    chaz_MakeBinary_add_src_dir(self->lib, self->host_src_dir);
+    if (self->host_src_dir != NULL) {
+        chaz_MakeBinary_add_src_dir(self->lib, self->host_src_dir);
+    }
     chaz_MakeBinary_add_src_dir(self->lib, self->core_dir);
     chaz_MakeBinary_add_src_dir(self->lib, self->snowstem_dir);
     chaz_MakeBinary_add_src_dir(self->lib, self->snowstop_dir);
@@ -9057,6 +9060,23 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
     if (strcmp(host, "c") == 0) {
         lucy_MakeFile_write_c_cfc_rules(self);
         lucy_MakeFile_write_c_test_rules(self);
+    }
+
+    /* Targets to compile object files for Perl. */
+    if (strcmp(host, "perl") == 0) {
+        char *objects;
+
+        chaz_MakeFile_add_rule(self->makefile, "core_objects",
+                               "$(LUCY_SHARED_LIB_OBJS)");
+        objects = chaz_MakeBinary_obj_string(self->lib);
+        chaz_ConfWriter_add_def("CORE_OBJECTS", objects);
+        free(objects);
+
+        chaz_MakeFile_add_rule(self->makefile, "test_objects",
+                               "$(TESTLUCY_SHARED_LIB_OBJS)");
+        objects = chaz_MakeBinary_obj_string(self->test_lib);
+        chaz_ConfWriter_add_def("TEST_OBJECTS", objects);
+        free(objects);
     }
 
     chaz_MakeFile_write(self->makefile);
