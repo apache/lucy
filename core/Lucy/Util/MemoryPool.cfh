@@ -67,6 +67,11 @@ class Lucy::Util::MemoryPool nickname MemPool
 
     public void
     Destroy(MemoryPool *self);
+
+    /** Only for testing.
+     */
+    char*
+    Get_Buf(MemoryPool *self);
 }
 
 

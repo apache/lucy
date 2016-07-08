@@ -535,4 +535,19 @@ InStream_Read_Raw_C64_IMP(InStream *self, char *buf) {
     return (int)(dest - (uint8_t*)buf);
 }
 
+FileWindow*
+InStream_Get_Window_IMP(InStream *self) {
+    return InStream_IVARS(self)->window;
+}
+
+FileHandle*
+InStream_Get_Handle_IMP(InStream *self) {
+    return InStream_IVARS(self)->file_handle;
+}
+
+int64_t
+InStream_Bytes_In_Buf_IMP(InStream *self) {
+    InStreamIVARS *const ivars = InStream_IVARS(self);
+    return (int64_t)(ivars->limit - ivars->buf);
+}
 

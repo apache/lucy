@@ -41,8 +41,8 @@ test_refill(TestBatchRunner *runner) {
     RAMFile    *file      = RAMFile_new(NULL, false);
     OutStream  *outstream = OutStream_open((Obj*)file);
     InStream   *instream;
+    FileWindow *window;
     char        scratch[5];
-    InStreamIVARS *ivars;
 
     for (int32_t i = 0; i < 1023; i++) {
         OutStream_Write_U8(outstream, 'x');
@@ -52,41 +52,38 @@ test_refill(TestBatchRunner *runner) {
     OutStream_Close(outstream);
 
     instream = InStream_open((Obj*)file);
-    ivars = InStream_IVARS(instream);
     InStream_Refill(instream);
-    TEST_INT_EQ(runner, ivars->limit - ivars->buf, IO_STREAM_BUF_SIZE,
+    TEST_INT_EQ(runner, InStream_Bytes_In_Buf(instream), IO_STREAM_BUF_SIZE,
                 "Refill");
     TEST_INT_EQ(runner, (long)InStream_Tell(instream), 0,
                 "Correct file pos after standing-start Refill()");
     DECREF(instream);
 
     instream = InStream_open((Obj*)file);
-    ivars = InStream_IVARS(instream);
     InStream_Fill(instream, 30);
-    TEST_INT_EQ(runner, ivars->limit - ivars->buf, 30, "Fill()");
+    TEST_INT_EQ(runner, InStream_Bytes_In_Buf(instream), 30, "Fill()");
     TEST_INT_EQ(runner, (long)InStream_Tell(instream), 0,
                 "Correct file pos after standing-start Fill()");
     DECREF(instream);
 
     instream = InStream_open((Obj*)file);
-    ivars = InStream_IVARS(instream);
     InStream_Read_Bytes(instream, scratch, 5);
-    TEST_INT_EQ(runner, ivars->limit - ivars->buf,
+    TEST_INT_EQ(runner, InStream_Bytes_In_Buf(instream),
                 IO_STREAM_BUF_SIZE - 5, "small read triggers refill");
     DECREF(instream);
 
     instream = InStream_open((Obj*)file);
-    ivars = InStream_IVARS(instream);
     TEST_INT_EQ(runner, InStream_Read_U8(instream), 'x', "Read_U8");
     InStream_Seek(instream, 1023);
-    TEST_INT_EQ(runner, (long)FileWindow_IVARS(ivars->window)->offset, 0,
+    window = InStream_Get_Window(instream);
+    TEST_INT_EQ(runner, FileWindow_Get_Offset(window), 0,
                 "no unnecessary refill on Seek");
     TEST_INT_EQ(runner, (long)InStream_Tell(instream), 1023, "Seek/Tell");
     TEST_INT_EQ(runner, InStream_Read_U8(instream), 'y',
                 "correct data after in-buffer Seek()");
     TEST_INT_EQ(runner, InStream_Read_U8(instream), 'z', "automatic Refill");
-    TEST_TRUE(runner, (FileWindow_IVARS(ivars->window)->offset != 0),
-              "refilled");
+    window = InStream_Get_Window(instream);
+    TEST_TRUE(runner, FileWindow_Get_Offset(window) != 0, "refilled");
 
     DECREF(instream);
     DECREF(outstream);
@@ -149,7 +146,7 @@ test_Close(TestBatchRunner *runner) {
     RAMFile  *file     = RAMFile_new(NULL, false);
     InStream *instream = InStream_open((Obj*)file);
     InStream_Close(instream);
-    TEST_TRUE(runner, InStream_IVARS(instream)->file_handle == NULL,
+    TEST_TRUE(runner, InStream_Get_Handle(instream) == NULL,
               "Close decrements FileHandle's refcount");
     DECREF(instream);
     DECREF(file);
@@ -163,51 +160,53 @@ test_Seek_and_Tell(TestBatchRunner *runner) {
     int64_t     gb12     = gb1 * 12;
     FileHandle *fh       = (FileHandle*)MockFileHandle_new(NULL, gb12);
     InStream   *instream = InStream_open((Obj*)fh);
-    InStreamIVARS *const ivars = InStream_IVARS(instream);
+    FileWindow *window;
 
     InStream_Buf(instream, 10000);
-    TEST_TRUE(runner, ivars->limit == ((char*)NULL) + 10000,
-              "InStream_Buf sets limit");
+    TEST_INT_EQ(runner, InStream_Bytes_In_Buf(instream), 10000,
+                "InStream_Buf sets limit");
 
     InStream_Seek(instream, gb6);
-    TEST_TRUE(runner, InStream_Tell(instream) == gb6,
-              "Tell after seek forwards outside buffer");
-    TEST_TRUE(runner, ivars->buf == NULL,
+    TEST_INT_EQ(runner, InStream_Tell(instream), gb6,
+                "Tell after seek forwards outside buffer");
+    TEST_TRUE(runner, InStream_Buf(instream, 0) == NULL,
               "Seek forwards outside buffer sets buf to NULL");
-    TEST_TRUE(runner, ivars->limit == NULL,
-              "Seek forwards outside buffer sets limit to NULL");
-    TEST_TRUE(runner, FileWindow_IVARS(ivars->window)->offset == gb6,
-              "Seek forwards outside buffer tracks pos in window offset");
+    TEST_INT_EQ(runner, InStream_Bytes_In_Buf(instream), 0,
+                "Seek forwards outside buffer sets limit to NULL");
+    window = InStream_Get_Window(instream);
+    TEST_INT_EQ(runner, FileWindow_Get_Offset(window), gb6,
+                "Seek forwards outside buffer tracks pos in window offset");
 
     InStream_Buf(instream, (size_t)gb1);
-    TEST_TRUE(runner, ivars->limit == ((char*)NULL) + gb1,
-              "InStream_Buf sets limit");
+    TEST_INT_EQ(runner, InStream_Bytes_In_Buf(instream), gb1,
+                "InStream_Buf sets limit");
 
     InStream_Seek(instream, gb6 + 10);
-    TEST_TRUE(runner, InStream_Tell(instream) == gb6 + 10,
-              "Tell after seek forwards within buffer");
-    TEST_TRUE(runner, ivars->buf == ((char*)NULL) + 10,
+    TEST_INT_EQ(runner, InStream_Tell(instream), gb6 + 10,
+                "Tell after seek forwards within buffer");
+    TEST_TRUE(runner, InStream_Buf(instream, 0) == ((char*)NULL) + 10,
               "Seek within buffer sets buf");
-    TEST_TRUE(runner, ivars->limit == ((char*)NULL) + gb1,
-              "Seek within buffer leaves limit alone");
+    TEST_INT_EQ(runner, InStream_Bytes_In_Buf(instream), gb1 - 10,
+                "Seek within buffer leaves limit alone");
 
     InStream_Seek(instream, gb6 + 1);
-    TEST_TRUE(runner, InStream_Tell(instream) == gb6 + 1,
-              "Tell after seek backwards within buffer");
-    TEST_TRUE(runner, ivars->buf == ((char*)NULL) + 1,
+    TEST_INT_EQ(runner, InStream_Tell(instream), gb6 + 1,
+                "Tell after seek backwards within buffer");
+    TEST_TRUE(runner, InStream_Buf(instream, 0) == ((char*)NULL) + 1,
               "Seek backwards within buffer sets buf");
-    TEST_TRUE(runner, ivars->limit == ((char*)NULL) + gb1,
-              "Seek backwards within buffer leaves limit alone");
+    TEST_INT_EQ(runner, InStream_Bytes_In_Buf(instream), gb1 - 1,
+                "Seek backwards within buffer leaves limit alone");
 
     InStream_Seek(instream, gb3);
-    TEST_TRUE(runner, InStream_Tell(instream) == gb3,
-              "Tell after seek backwards outside buffer");
-    TEST_TRUE(runner, ivars->buf == NULL,
+    TEST_INT_EQ(runner, InStream_Tell(instream), gb3,
+                "Tell after seek backwards outside buffer");
+    TEST_TRUE(runner, InStream_Buf(instream, 0) == NULL,
               "Seek backwards outside buffer sets buf to NULL");
-    TEST_TRUE(runner, ivars->limit == NULL,
-              "Seek backwards outside buffer sets limit to NULL");
-    TEST_TRUE(runner, FileWindow_IVARS(ivars->window)->offset == gb3,
-              "Seek backwards outside buffer tracks pos in window offset");
+    TEST_INT_EQ(runner, InStream_Bytes_In_Buf(instream), 0,
+                "Seek backwards outside buffer sets limit to NULL");
+    window = InStream_Get_Window(instream);
+    TEST_INT_EQ(runner, FileWindow_Get_Offset(window), gb3,
+                "Seek backwards outside buffer tracks pos in window offset");
 
     DECREF(instream);
     DECREF(fh);

@@ -245,6 +245,14 @@ FSFH_Window_IMP(FSFileHandle *self, FileWindow *window, int64_t offset,
     }
 }
 
+int
+FSFH_Set_FD_IMP(FSFileHandle *self, int fd) {
+    FSFileHandleIVARS *const ivars = FSFH_IVARS(self);
+    int old_fd = ivars->fd;
+    ivars->fd = fd;
+    return old_fd;
+}
+
 /********************************* 64-bit *********************************/
 
 #if IS_64_BIT
