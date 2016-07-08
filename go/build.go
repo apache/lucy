@@ -540,6 +540,7 @@ func writeConfigGO() {
 			"// #cgo LDFLAGS: -L%s\n"+
 			"// #cgo LDFLAGS: -L%s\n"+
 			"// #cgo LDFLAGS: -L%s\n"+
+			"// #cgo LDFLAGS: -ltestlucy\n"+
 			"// #cgo LDFLAGS: -llucy\n"+
 			"// #cgo LDFLAGS: -lclownfish\n"+
 			"// #cgo LDFLAGS: -lm\n"+
