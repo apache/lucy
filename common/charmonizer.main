@@ -45,6 +45,7 @@ typedef struct lucy_MakeFile {
     /* Directories. */
     const char *base_dir;
     char       *core_dir;
+    char       *test_dir;
     const char *host_src_dir;
     char       *autogen_src_dir;
     char       *autogen_inc_dir;
@@ -233,6 +234,7 @@ lucy_MakeFile_new(chaz_CLI *cli) {
     /* Initialize directories. */
     self->base_dir = "..";
     self->core_dir = chaz_Util_join(dir_sep, self->base_dir, "core", NULL);
+    self->test_dir = chaz_Util_join(dir_sep, self->base_dir, "test", NULL);
     if (chaz_CLI_defined(cli, "enable-perl")) {
         self->host_src_dir = "xs";
     }
@@ -310,6 +312,7 @@ lucy_MakeFile_destroy(lucy_MakeFile *self) {
     chaz_MakeFile_destroy(self->makefile);
 
     free(self->core_dir);
+    free(self->test_dir);
     free(self->autogen_inc_dir);
     free(self->autogen_src_dir);
     free(self->lemon_dir);
@@ -430,6 +433,7 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
 
     chaz_MakeBinary_add_src_dir(self->lib, self->host_src_dir);
     chaz_MakeBinary_add_src_dir(self->lib, self->core_dir);
+    chaz_MakeBinary_add_src_dir(self->lib, self->test_dir);
     chaz_MakeBinary_add_src_dir(self->lib, self->snowstem_dir);
     chaz_MakeBinary_add_src_dir(self->lib, self->snowstop_dir);
     chaz_MakeBinary_add_src_dir(self->lib, self->utf8proc_dir);
@@ -484,21 +488,24 @@ lucy_MakeFile_write_c_cfc_rules(lucy_MakeFile *self) {
 
     sfc.var = chaz_MakeFile_add_var(self->makefile, "CLOWNFISH_HEADERS", NULL);
     chaz_Make_list_files(self->core_dir, "cfh", S_cfh_file_callback, &sfc);
+    chaz_Make_list_files(self->test_dir, "cfh", S_cfh_file_callback, &sfc);
 
     rule = chaz_MakeFile_add_rule(self->makefile, self->autogen_target, NULL);
     chaz_MakeRule_add_prereq(rule, "$(CLOWNFISH_HEADERS)");
     if (cfish_prefix == NULL) {
         cfc_command
             = chaz_Util_join("", "cfc --source=", self->core_dir,
+                             " --source=", self->test_dir,
                              " --dest=autogen --header=cfc_header", NULL);
     }
     else {
         cfc_command
             = chaz_Util_join("", cfish_prefix, dir_sep, "bin", dir_sep,
-                             "cfc --source=", self->core_dir, " --include=",
-                             cfish_prefix, dir_sep, "share", dir_sep,
-                             "clownfish", dir_sep, "include",
-                             " --dest=autogen --header=cfc_header", NULL);
+                             "cfc --source=", self->core_dir, " --source=",
+                             self->test_dir, " --include=", cfish_prefix,
+                             dir_sep, "share", dir_sep, "clownfish", dir_sep,
+                             "include --dest=autogen --header=cfc_header",
+                             NULL);
     }
     chaz_MakeRule_add_command(rule, cfc_command);
 
