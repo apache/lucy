@@ -810,15 +810,6 @@ chaz_MakeRule_add_prereq(chaz_MakeRule *self, const char *prereq);
 void
 chaz_MakeRule_add_command(chaz_MakeRule *self, const char *command);
 
-/** Add a command to be executed with a special runtime library path.
- *
- * @param command The additional command.
- * @param ... NULL-terminated list of library directories.
- */
-void
-chaz_MakeRule_add_command_with_libpath(chaz_MakeRule *self,
-                                       const char *command, ...);
-
 /** Add a command to remove one or more files.
  *
  * @param files The list of files.
@@ -5370,58 +5361,6 @@ chaz_MakeRule_add_command(chaz_MakeRule *self, const char *command) {
     }
 
     self->commands = commands;
-}
-
-void
-chaz_MakeRule_add_command_with_libpath(chaz_MakeRule *self,
-                                       const char *command, ...) {
-    va_list args;
-    char *path        = NULL;
-    char *lib_command = NULL;
-    int binfmt = chaz_CC_binary_format();
-
-    if (binfmt == CHAZ_CC_BINFMT_ELF) {
-        va_start(args, command);
-        path = chaz_Util_vjoin(":", args);
-        va_end(args);
-
-        lib_command = chaz_Util_join("", "LD_LIBRARY_PATH=", path,
-                                     ":$$LD_LIBRARY_PATH ", command, NULL);
-
-        free(path);
-    }
-    else if (binfmt == CHAZ_CC_BINFMT_PE) {
-        if (chaz_Make.shell_type == CHAZ_OS_CMD_EXE) {
-            va_start(args, command);
-            path = chaz_Util_vjoin(";", args);
-            va_end(args);
-
-            /* It's important to not add a space before `&&`. Otherwise, the
-             * space is added to the search path.
-             */
-            lib_command = chaz_Util_join("", "path ", path, ";%path%&& ",
-                                         command, NULL);
-        }
-        else {
-            va_start(args, command);
-            path = chaz_Util_vjoin(":", args);
-            va_end(args);
-
-            lib_command = chaz_Util_join("", "PATH=", path, ":$$PATH ",
-                                         command, NULL);
-        }
-
-        free(path);
-    }
-    else {
-        /* Assume that library paths are compiled into the executable on
-         * Darwin.
-         */
-        lib_command = chaz_Util_strdup(command);
-    }
-
-    chaz_MakeRule_add_command(self, lib_command);
-    free(lib_command);
 }
 
 void
