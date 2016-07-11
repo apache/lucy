@@ -92,6 +92,9 @@ lucy_MakeFile_write_c_cfc_rules(lucy_MakeFile *self);
 static void
 lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self);
 
+static int
+S_core_dir_filter(const char *dir, char *file, void *context);
+
 static void
 S_cfh_file_callback(const char *dir, char *file, void *context);
 
@@ -429,7 +432,8 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
     if (self->host_src_dir != NULL) {
         chaz_MakeBinary_add_src_dir(self->lib, self->host_src_dir);
     }
-    chaz_MakeBinary_add_src_dir(self->lib, self->core_dir);
+    chaz_MakeBinary_add_filtered_src_dir(self->lib, self->core_dir,
+                                         S_core_dir_filter, NULL);
     chaz_MakeBinary_add_src_dir(self->lib, self->snowstem_dir);
     chaz_MakeBinary_add_src_dir(self->lib, self->snowstop_dir);
     chaz_MakeBinary_add_src_dir(self->lib, self->utf8proc_dir);
@@ -646,6 +650,11 @@ lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
         chaz_MakeRule_add_rm_command(rule, "lucy.info");
         chaz_MakeRule_add_recursive_rm_command(rule, "coverage");
     }
+}
+
+static int
+S_core_dir_filter(const char *dir, char *file, void *context) {
+    return !S_ends_with(file, "JsonParser.c");
 }
 
 static void
