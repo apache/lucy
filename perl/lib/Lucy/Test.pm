@@ -18,6 +18,14 @@ use Lucy;
 our $VERSION = '0.005000';
 $VERSION = eval $VERSION;
 
+sub dl_load_flags { 1 }
+
+BEGIN {
+    require DynaLoader;
+    our @ISA = qw( DynaLoader );
+    bootstrap Lucy::Test '0.5.0';
+}
+
 # Set the default memory threshold for PostingListWriter to a low number so
 # that we simulate large indexes by performing a lot of PostingPool flushes.
 Lucy::Index::PostingListWriter::set_default_mem_thresh(0x1000);

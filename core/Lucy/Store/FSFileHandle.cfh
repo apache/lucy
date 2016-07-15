@@ -57,6 +57,11 @@ class Lucy::Store::FSFileHandle nickname FSFH
 
     bool
     Close(FSFileHandle *self);
+
+    /** Only for testing.
+     */
+    int
+    Set_FD(FSFileHandle *self, int fd);
 }
 
 

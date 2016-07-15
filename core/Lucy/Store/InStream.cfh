@@ -204,6 +204,21 @@ class Lucy::Store::InStream inherits Clownfish::Obj {
      */
     String*
     Get_Filename(InStream *self);
+
+    /** Only for testing.
+     */
+    FileWindow*
+    Get_Window(InStream *self);
+
+    /** Only for testing.
+     */
+    FileHandle*
+    Get_Handle(InStream *self);
+
+    /** Only for testing.
+     */
+    int64_t
+    Bytes_In_Buf(InStream *self);
 }
 
 

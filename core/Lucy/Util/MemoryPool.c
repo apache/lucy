@@ -157,3 +157,8 @@ MemPool_Release_All_IMP(MemoryPool *self) {
     ivars->consumed = 0;
 }
 
+char*
+MemPool_Get_Buf_IMP(MemoryPool *self) {
+    return MemPool_IVARS(self)->buf;
+}
+

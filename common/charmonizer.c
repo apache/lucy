@@ -650,8 +650,10 @@ typedef struct chaz_MakeVar chaz_MakeVar;
 typedef struct chaz_MakeRule chaz_MakeRule;
 typedef struct chaz_MakeBinary chaz_MakeBinary;
 
-typedef void (*chaz_Make_list_files_callback_t)(const char *dir, char *file,
-                                                void *context);
+typedef void
+(*chaz_Make_file_callback_t)(const char *dir, char *file, void *context);
+typedef int
+(*chaz_Make_file_filter_t)(const char *dir, char *file, void *context);
 
 /** Initialize the environment.
  *
@@ -685,7 +687,7 @@ chaz_Make_shell_type(void);
  */
 void
 chaz_Make_list_files(const char *dir, const char *ext,
-                     chaz_Make_list_files_callback_t callback, void *context);
+                     chaz_Make_file_callback_t callback, void *context);
 
 /** MakeFile constructor.
  */
@@ -810,15 +812,6 @@ chaz_MakeRule_add_prereq(chaz_MakeRule *self, const char *prereq);
 void
 chaz_MakeRule_add_command(chaz_MakeRule *self, const char *command);
 
-/** Add a command to be executed with a special runtime library path.
- *
- * @param command The additional command.
- * @param ... NULL-terminated list of library directories.
- */
-void
-chaz_MakeRule_add_command_with_libpath(chaz_MakeRule *self,
-                                       const char *command, ...);
-
 /** Add a command to remove one or more files.
  *
  * @param files The list of files.
@@ -857,6 +850,19 @@ chaz_MakeBinary_add_src_file(chaz_MakeBinary *self, const char *dir,
  */
 void
 chaz_MakeBinary_add_src_dir(chaz_MakeBinary *self, const char *path);
+
+/** Add .c files in a directory as sources for the binary if they match
+ * a filter.
+ *
+ * @param path The path to the directory.
+ * @param filter A callback that is invoked for every source file. The
+ * source file is only added if the callback returns true. May be NULL.
+ * @param context Context passed to filter.
+ */
+void
+chaz_MakeBinary_add_filtered_src_dir(chaz_MakeBinary *self, const char *path,
+                                     chaz_Make_file_filter_t filter,
+                                     void *context);
 
 /** Add a prerequisite to the make rule of the binary.
  *
@@ -4551,6 +4557,12 @@ struct chaz_MakeFile {
     size_t            num_binaries;
 };
 
+typedef struct {
+    chaz_MakeBinary         *binary;
+    chaz_Make_file_filter_t  filter;
+    void                    *filter_ctx;
+} chaz_MakeBinaryContext;
+
 /* Static vars. */
 static struct {
     char *make_command;
@@ -5373,58 +5385,6 @@ chaz_MakeRule_add_command(chaz_MakeRule *self, const char *command) {
 }
 
 void
-chaz_MakeRule_add_command_with_libpath(chaz_MakeRule *self,
-                                       const char *command, ...) {
-    va_list args;
-    char *path        = NULL;
-    char *lib_command = NULL;
-    int binfmt = chaz_CC_binary_format();
-
-    if (binfmt == CHAZ_CC_BINFMT_ELF) {
-        va_start(args, command);
-        path = chaz_Util_vjoin(":", args);
-        va_end(args);
-
-        lib_command = chaz_Util_join("", "LD_LIBRARY_PATH=", path,
-                                     ":$$LD_LIBRARY_PATH ", command, NULL);
-
-        free(path);
-    }
-    else if (binfmt == CHAZ_CC_BINFMT_PE) {
-        if (chaz_Make.shell_type == CHAZ_OS_CMD_EXE) {
-            va_start(args, command);
-            path = chaz_Util_vjoin(";", args);
-            va_end(args);
-
-            /* It's important to not add a space before `&&`. Otherwise, the
-             * space is added to the search path.
-             */
-            lib_command = chaz_Util_join("", "path ", path, ";%path%&& ",
-                                         command, NULL);
-        }
-        else {
-            va_start(args, command);
-            path = chaz_Util_vjoin(":", args);
-            va_end(args);
-
-            lib_command = chaz_Util_join("", "PATH=", path, ":$$PATH ",
-                                         command, NULL);
-        }
-
-        free(path);
-    }
-    else {
-        /* Assume that library paths are compiled into the executable on
-         * Darwin.
-         */
-        lib_command = chaz_Util_strdup(command);
-    }
-
-    chaz_MakeRule_add_command(self, lib_command);
-    free(lib_command);
-}
-
-void
 chaz_MakeRule_add_rm_command(chaz_MakeRule *self, const char *files) {
     char *command;
 
@@ -5552,6 +5512,14 @@ chaz_MakeBinary_add_src_file(chaz_MakeBinary *self, const char *dir,
 
 void
 chaz_MakeBinary_add_src_dir(chaz_MakeBinary *self, const char *path) {
+    chaz_MakeBinary_add_filtered_src_dir(self, path, NULL, NULL);
+}
+
+void
+chaz_MakeBinary_add_filtered_src_dir(chaz_MakeBinary *self, const char *path,
+                                     chaz_Make_file_filter_t filter,
+                                     void *filter_ctx) {
+    chaz_MakeBinaryContext context;
     size_t num_dirs = self->num_dirs;
     char **dirs = (char**)realloc(self->dirs, (num_dirs + 2) * sizeof(char*));
 
@@ -5560,18 +5528,27 @@ chaz_MakeBinary_add_src_dir(chaz_MakeBinary *self, const char *path) {
     self->dirs     = dirs;
     self->num_dirs = num_dirs + 1;
 
+    context.binary     = self;
+    context.filter     = filter;
+    context.filter_ctx = filter_ctx;
+
     chaz_Make_list_files(path, "c", S_chaz_MakeBinary_list_files_callback,
-                         self);
+                         &context);
 }
 
 static void
 S_chaz_MakeBinary_list_files_callback(const char *dir, char *file,
-                                      void *context) {
+                                      void *vcontext) {
+    chaz_MakeBinaryContext *context = (chaz_MakeBinaryContext*)vcontext;
     const char *dir_sep = chaz_OS_dir_sep();
-    char *path = chaz_Util_join(dir_sep, dir, file, NULL);
 
-    S_chaz_MakeBinary_do_add_src_file((chaz_MakeBinary*)context, path);
-    free(path);
+    if (context->filter == NULL
+        || context->filter(dir, file, context->filter_ctx) != 0
+       ) {
+        char *path = chaz_Util_join(dir_sep, dir, file, NULL);
+        S_chaz_MakeBinary_do_add_src_file(context->binary, path);
+        free(path);
+    }
 }
 
 static void
@@ -5661,7 +5638,7 @@ chaz_MakeBinary_get_link_flags(chaz_MakeBinary *self) {
 
 void
 chaz_Make_list_files(const char *dir, const char *ext,
-                     chaz_Make_list_files_callback_t callback, void *context) {
+                     chaz_Make_file_callback_t callback, void *context) {
     int         shell_type = chaz_OS_shell_type();
     const char *pattern;
     char       *command;
@@ -8650,10 +8627,12 @@ typedef struct lucy_MakeFile {
     chaz_CLI        *cli;
     chaz_MakeFile   *makefile;
     chaz_MakeBinary *lib;
+    chaz_MakeBinary *test_lib;
 
     /* Directories. */
     const char *base_dir;
     char       *core_dir;
+    char       *test_dir;
     const char *host_src_dir;
     char       *autogen_src_dir;
     char       *autogen_inc_dir;
@@ -8666,9 +8645,8 @@ typedef struct lucy_MakeFile {
     char       *utf8proc_dir;
     char       *json_dir;
 
-    /* Files. */
-    char        *autogen_target;
-    const char **autogen_src_files;
+    /* Targets. */
+    char *autogen_target;
 
     /* Clownfish library. */
     char       *cfish_lib_dir;
@@ -8699,6 +8677,9 @@ lucy_MakeFile_write_c_cfc_rules(lucy_MakeFile *self);
 
 static void
 lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self);
+
+static int
+S_core_dir_filter(const char *dir, char *file, void *context);
 
 static void
 S_cfh_file_callback(const char *dir, char *file, void *context);
@@ -8831,25 +8812,36 @@ S_add_compiler_flags(struct chaz_CLI *cli) {
 static lucy_MakeFile*
 lucy_MakeFile_new(chaz_CLI *cli) {
     const char *dir_sep      = chaz_OS_dir_sep();
+    const char *host         = chaz_CLI_strval(cli, "host");
     const char *cfish_prefix = chaz_CLI_strval(cli, "clownfish-prefix");
-
+    char *cfcore_filename = chaz_Util_join(dir_sep, "cfcore", "Lucy.cfp",
+                                           NULL);
     lucy_MakeFile *self = malloc(sizeof(lucy_MakeFile));
 
     self->cli      = cli;
     self->makefile = chaz_MakeFile_new();
     self->lib      = NULL;
+    self->test_lib = NULL;
 
     /* Initialize directories. */
-    self->base_dir = "..";
-    self->core_dir = chaz_Util_join(dir_sep, self->base_dir, "core", NULL);
-    if (chaz_CLI_defined(cli, "enable-perl")) {
-        self->host_src_dir = "xs";
+    if (chaz_Util_can_open_file(cfcore_filename)) {
+        self->base_dir = ".";
+        self->core_dir = chaz_Util_strdup("cfcore");
+        self->test_dir = chaz_Util_strdup("cftest");
     }
-	else if (chaz_CLI_defined(cli, "enable-go")) {
-        self->host_src_dir = "cfext";
-	}
     else {
+        self->base_dir = "..";
+        self->core_dir = chaz_Util_join(dir_sep, self->base_dir, "core", NULL);
+        self->test_dir = chaz_Util_join(dir_sep, self->base_dir, "test", NULL);
+    }
+    if (strcmp(host, "go") == 0) {
+        self->host_src_dir = "cfext";
+    }
+    else if (strcmp(host, "c") == 0) {
         self->host_src_dir = "src";
+    }
+    else {
+        self->host_src_dir = NULL;
     }
     self->autogen_src_dir = chaz_Util_join(dir_sep, "autogen", "source", NULL);
     self->autogen_inc_dir
@@ -8874,25 +8866,7 @@ lucy_MakeFile_new(chaz_CLI *cli) {
         = chaz_Util_join(dir_sep, self->core_dir, "Lucy", "Util", "Json",
                          NULL);
 
-    /* Initialize file names. */
-    if (chaz_CLI_defined(cli, "enable-perl")) {
-        static const char *perl_autogen_src_files[] = {
-            "boot.c",
-            "callbacks.c",
-            "lucy_parcel.c",
-            "testlucy_parcel.c",
-            NULL
-        };
-        self->autogen_src_files = perl_autogen_src_files;
-    }
-    else {
-        static const char *c_autogen_src_files[] = {
-            "lucy_parcel.c",
-            "testlucy_parcel.c",
-            NULL
-        };
-        self->autogen_src_files = c_autogen_src_files;
-    }
+    /* Initialize targets. */
     self->autogen_target
         = chaz_Util_join(dir_sep, "autogen", "hierarchy.json", NULL);
 
@@ -8919,6 +8893,7 @@ lucy_MakeFile_destroy(lucy_MakeFile *self) {
     chaz_MakeFile_destroy(self->makefile);
 
     free(self->core_dir);
+    free(self->test_dir);
     free(self->autogen_inc_dir);
     free(self->autogen_src_dir);
     free(self->lemon_dir);
@@ -8943,6 +8918,9 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
     const char *host     = chaz_CLI_strval(self->cli, "host");
     const char *math_lib = chaz_Floats_math_library();
 
+    const char *lib_objs      = NULL;
+    const char *test_lib_objs = NULL;
+
     chaz_MakeVar  *var;
     chaz_MakeRule *rule;
 
@@ -8952,7 +8930,6 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
     chaz_CFlags *link_flags;
 
     char *scratch;
-    int   i;
 
     printf("Creating Makefile...\n");
 
@@ -8987,25 +8964,20 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
 
     chaz_CFlags_destroy(makefile_cflags);
 
-    /* Binary. */
+    /* Core library. */
 
     if (strcmp(host, "c") == 0 || strcmp(host, "perl") == 0) {
+        /* Shared library for C and Perl. */
+
         chaz_MakeFile_add_rule(self->makefile, "all", "$(LUCY_SHARED_LIB)");
 
         self->lib
             = chaz_MakeFile_add_shared_lib(self->makefile, NULL, "lucy",
                                            lucy_version, lucy_major_version);
-        rule = chaz_MakeFile_add_rule(self->makefile,
-                                      "$(LUCY_SHARED_LIB_OBJS)",
-                                      self->autogen_target);
-        /*
-         * The dependency is actually on JsonParser.h, but make doesn't cope
-         * well with multiple output files.
-         */
-        scratch = chaz_Util_join(dir_sep, self->json_dir, "JsonParser.c",
-                                 NULL);
-        chaz_MakeRule_add_prereq(rule, scratch);
-        free(scratch);
+        lib_objs = "$(LUCY_SHARED_LIB_OBJS)";
+
+        compile_flags = chaz_MakeBinary_get_compile_flags(self->lib);
+        chaz_CFlags_add_define(compile_flags, "CFP_LUCY", NULL);
 
         link_flags = chaz_MakeBinary_get_link_flags(self->lib);
         chaz_CFlags_enable_debugging(link_flags);
@@ -9024,35 +8996,87 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
         }
     }
     else {
-        chaz_MakeFile_add_rule(self->makefile, "static", "$(LUCY_STATIC_LIB)");
+        /* Static library for Go and Python. */
+
+        chaz_MakeFile_add_rule(self->makefile, "static",
+                               "$(LUCY_STATIC_LIB) $(TESTLUCY_STATIC_LIB)");
 
         self->lib
             = chaz_MakeFile_add_static_lib(self->makefile, NULL, "lucy");
-        rule = chaz_MakeFile_add_rule(self->makefile,
-                                      "$(LUCY_STATIC_LIB_OBJS)",
-                                      self->autogen_target);
-        scratch = chaz_Util_join(dir_sep, self->json_dir, "JsonParser.c",
-                                 NULL);
-        chaz_MakeRule_add_prereq(rule, scratch);
-        free(scratch);
+        lib_objs = "$(LUCY_STATIC_LIB_OBJS)";
+
+        if (strcmp(host, "python") == 0) {
+            /* For Python, the static library is linked into a shared
+             * library.
+             */
+            compile_flags = chaz_MakeBinary_get_compile_flags(self->lib);
+            chaz_CFlags_compile_shared_library(compile_flags);
+            chaz_CFlags_add_define(compile_flags, "CFP_CFISH", NULL);
+        }
     }
 
-    chaz_MakeBinary_add_src_dir(self->lib, self->host_src_dir);
-    chaz_MakeBinary_add_src_dir(self->lib, self->core_dir);
+    if (self->host_src_dir != NULL) {
+        chaz_MakeBinary_add_src_dir(self->lib, self->host_src_dir);
+    }
+    chaz_MakeBinary_add_filtered_src_dir(self->lib, self->core_dir,
+                                         S_core_dir_filter, NULL);
     chaz_MakeBinary_add_src_dir(self->lib, self->snowstem_dir);
     chaz_MakeBinary_add_src_dir(self->lib, self->snowstop_dir);
     chaz_MakeBinary_add_src_dir(self->lib, self->utf8proc_dir);
-
     chaz_MakeBinary_add_src_file(self->lib, self->json_dir, "JsonParser.c");
+    chaz_MakeBinary_add_src_file(self->lib, self->autogen_src_dir,
+                                 "lucy_parcel.c");
 
-    for (i = 0; self->autogen_src_files[i] != NULL; ++i) {
-        chaz_MakeBinary_add_src_file(self->lib, self->autogen_src_dir,
-                                     self->autogen_src_files[i]);
+    /* Test library. */
+
+    if (strcmp(host, "c") == 0 || strcmp(host, "perl") == 0) {
+        /* Shared library for C and Perl. */
+
+        self->test_lib
+            = chaz_MakeFile_add_shared_lib(self->makefile, NULL, "testlucy",
+                                           lucy_version, lucy_major_version);
+        test_lib_objs = "$(TESTLUCY_SHARED_LIB_OBJS)";
+
+        compile_flags = chaz_MakeBinary_get_compile_flags(self->test_lib);
+        chaz_CFlags_add_define(compile_flags, "CFP_TESTLUCY", NULL);
+
+        link_flags = chaz_MakeBinary_get_link_flags(self->test_lib);
+        chaz_CFlags_enable_debugging(link_flags);
+        if (self->cfish_lib_dir) {
+            chaz_CFlags_add_library_path(link_flags, self->cfish_lib_dir);
+        }
+        chaz_CFlags_add_shared_lib(link_flags, NULL, "lucy",
+                                   lucy_major_version);
+        chaz_CFlags_add_external_lib(link_flags, self->cfish_lib_name);
+        if (math_lib) {
+            chaz_CFlags_add_external_lib(link_flags, math_lib);
+        }
+        if (chaz_CLI_defined(self->cli, "enable-coverage")) {
+            chaz_CFlags_enable_code_coverage(link_flags);
+        }
+
+        chaz_MakeBinary_add_prereq(self->test_lib, "$(LUCY_SHARED_LIB)");
+    }
+    else {
+        /* Static library for Go and Python. */
+
+        self->test_lib
+            = chaz_MakeFile_add_static_lib(self->makefile, NULL, "testlucy");
+        test_lib_objs = "$(TESTLUCY_STATIC_LIB_OBJS)";
+
+        if (strcmp(host, "python") == 0) {
+            /* For Python, the static library is linked into a shared
+             * library.
+             */
+            compile_flags = chaz_MakeBinary_get_compile_flags(self->test_lib);
+            chaz_CFlags_compile_shared_library(compile_flags);
+            chaz_CFlags_add_define(compile_flags, "CFP_TESTLUCY", NULL);
+        }
     }
 
-    compile_flags = chaz_MakeBinary_get_compile_flags(self->lib);
-    chaz_CFlags_add_define(compile_flags, "CFP_LUCY", NULL);
-    chaz_CFlags_add_define(compile_flags, "CFP_TESTLUCY", NULL);
+    chaz_MakeBinary_add_src_dir(self->test_lib, self->test_dir);
+    chaz_MakeBinary_add_src_file(self->test_lib, self->autogen_src_dir,
+                                 "testlucy_parcel.c");
 
     /* Additional rules. */
 
@@ -9061,28 +9085,53 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
     chaz_MakeFile_add_lemon_grammar(self->makefile, scratch);
     free(scratch);
 
+    /* Object files depend on autogenerated headers. */
+    rule = chaz_MakeFile_add_rule(self->makefile, lib_objs,
+                                  self->autogen_target);
+    /*
+     * The dependency is actually on JsonParser.h, but make doesn't cope
+     * well with multiple output files.
+     */
+    scratch = chaz_Util_join(dir_sep, self->json_dir, "JsonParser.c",
+                             NULL);
+    chaz_MakeRule_add_prereq(rule, scratch);
+    free(scratch);
+    chaz_MakeFile_add_rule(self->makefile, test_lib_objs,
+                           self->autogen_target);
+
     if (strcmp(host, "c") == 0) {
         lucy_MakeFile_write_c_cfc_rules(self);
         lucy_MakeFile_write_c_test_rules(self);
     }
 
-    /* Needed for parallel builds. */
-    for (i = 0; self->autogen_src_files[i] != NULL; ++i) {
-        char *path = chaz_Util_join("", self->autogen_src_dir, dir_sep,
-                                    self->autogen_src_files[i], NULL);
-        rule = chaz_MakeFile_add_rule(self->makefile, path,
-                                      self->autogen_target);
-        free(path);
-    }
+    /* Targets to compile object files for Perl. */
+    if (strcmp(host, "perl") == 0) {
+        char *objects;
 
-    rule = chaz_MakeFile_clean_rule(self->makefile);
-    chaz_MakeRule_add_recursive_rm_command(rule, "autogen");
+        chaz_MakeFile_add_rule(self->makefile, "core_objects",
+                               "$(LUCY_SHARED_LIB_OBJS)");
+        objects = chaz_MakeBinary_obj_string(self->lib);
+        chaz_ConfWriter_add_def("CORE_OBJECTS", objects);
+        free(objects);
+
+        chaz_MakeFile_add_rule(self->makefile, "test_objects",
+                               "$(TESTLUCY_SHARED_LIB_OBJS)");
+        objects = chaz_MakeBinary_obj_string(self->test_lib);
+        chaz_ConfWriter_add_def("TEST_OBJECTS", objects);
+        free(objects);
+    }
 
     chaz_MakeFile_write(self->makefile);
 }
 
 static void
 lucy_MakeFile_write_c_cfc_rules(lucy_MakeFile *self) {
+    static const char *const autogen_src_files[] = {
+        "lucy_parcel.c",
+        "testlucy_parcel.c",
+        NULL
+    };
+
     SourceFileContext sfc;
     chaz_MakeRule *rule;
 
@@ -9091,50 +9140,73 @@ lucy_MakeFile_write_c_cfc_rules(lucy_MakeFile *self) {
 
     char *cfc_command;
 
+    int i;
+
     sfc.var = chaz_MakeFile_add_var(self->makefile, "CLOWNFISH_HEADERS", NULL);
     chaz_Make_list_files(self->core_dir, "cfh", S_cfh_file_callback, &sfc);
+    chaz_Make_list_files(self->test_dir, "cfh", S_cfh_file_callback, &sfc);
 
     rule = chaz_MakeFile_add_rule(self->makefile, self->autogen_target, NULL);
     chaz_MakeRule_add_prereq(rule, "$(CLOWNFISH_HEADERS)");
     if (cfish_prefix == NULL) {
         cfc_command
             = chaz_Util_join("", "cfc --source=", self->core_dir,
+                             " --source=", self->test_dir,
                              " --dest=autogen --header=cfc_header", NULL);
     }
     else {
         cfc_command
             = chaz_Util_join("", cfish_prefix, dir_sep, "bin", dir_sep,
-                             "cfc --source=", self->core_dir, " --include=",
-                             cfish_prefix, dir_sep, "share", dir_sep,
-                             "clownfish", dir_sep, "include",
-                             " --dest=autogen --header=cfc_header", NULL);
+                             "cfc --source=", self->core_dir, " --source=",
+                             self->test_dir, " --include=", cfish_prefix,
+                             dir_sep, "share", dir_sep, "clownfish", dir_sep,
+                             "include --dest=autogen --header=cfc_header",
+                             NULL);
     }
     chaz_MakeRule_add_command(rule, cfc_command);
+
+    /* Tell make how autogenerated source files are built. */
+    for (i = 0; autogen_src_files[i] != NULL; ++i) {
+        char *path = chaz_Util_join("", self->autogen_src_dir, dir_sep,
+                                    autogen_src_files[i], NULL);
+        rule = chaz_MakeFile_add_rule(self->makefile, path,
+                                      self->autogen_target);
+        free(path);
+    }
+
+    rule = chaz_MakeFile_clean_rule(self->makefile);
+    chaz_MakeRule_add_recursive_rm_command(rule, "autogen");
 
     free(cfc_command);
 }
 
 static void
 lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
-    chaz_MakeBinary *test_exe;
+    chaz_MakeBinary *exe;
     chaz_CFlags     *link_flags;
     chaz_MakeRule   *rule;
 
-    test_exe = chaz_MakeFile_add_exe(self->makefile, "t", "test_lucy");
-    chaz_MakeBinary_add_src_file(test_exe, "t", "test_lucy.c");
-    chaz_MakeFile_add_rule(self->makefile, "$(TEST_LUCY_EXE_OBJS)",
-                           self->autogen_target);
-    link_flags = chaz_MakeBinary_get_link_flags(test_exe);
-    chaz_CFlags_add_shared_lib(link_flags, NULL, "lucy", lucy_major_version);
-    chaz_MakeBinary_add_prereq(test_exe, "$(LUCY_SHARED_LIB)");
+    exe = chaz_MakeFile_add_exe(self->makefile, "t", "test_lucy");
+    chaz_MakeBinary_add_src_file(exe, "t", "test_lucy.c");
+
+    link_flags = chaz_MakeBinary_get_link_flags(exe);
     if (self->cfish_lib_dir) {
         chaz_CFlags_add_library_path(link_flags, self->cfish_lib_dir);
     }
-    chaz_CFlags_add_external_lib(link_flags, self->cfish_lib_name);
     chaz_CFlags_add_rpath(link_flags, "\"$$PWD\"");
     if (self->cfish_lib_dir) {
         chaz_CFlags_add_rpath(link_flags, self->cfish_lib_dir);
     }
+    chaz_CFlags_add_shared_lib(link_flags, NULL, "testlucy",
+                               lucy_major_version);
+    chaz_CFlags_add_shared_lib(link_flags, NULL, "lucy", lucy_major_version);
+    chaz_CFlags_add_external_lib(link_flags, self->cfish_lib_name);
+
+    chaz_MakeBinary_add_prereq(exe, "$(TESTLUCY_SHARED_LIB)");
+    chaz_MakeBinary_add_prereq(exe, "$(LUCY_SHARED_LIB)");
+
+    chaz_MakeFile_add_rule(self->makefile, "$(TEST_LUCY_EXE_OBJS)",
+                           self->autogen_target);
 
     rule = chaz_MakeFile_add_rule(self->makefile, "test", "$(TEST_LUCY_EXE)");
     chaz_MakeRule_add_command(rule, "$(TEST_LUCY_EXE)");
@@ -9164,6 +9236,11 @@ lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
         chaz_MakeRule_add_rm_command(rule, "lucy.info");
         chaz_MakeRule_add_recursive_rm_command(rule, "coverage");
     }
+}
+
+static int
+S_core_dir_filter(const char *dir, char *file, void *context) {
+    return !S_ends_with(file, "JsonParser.c");
 }
 
 static void

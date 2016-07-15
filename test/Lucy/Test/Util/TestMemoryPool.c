@@ -34,7 +34,6 @@ TestMemPool_Run_IMP(TestMemoryPool *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 5);
 
     MemoryPool *mem_pool = MemPool_new(0);
-    MemoryPoolIVARS *const ivars = MemPool_IVARS(mem_pool);
     char *ptr_a, *ptr_b;
 
     ptr_a = (char*)MemPool_Grab(mem_pool, 10);
@@ -45,9 +44,10 @@ TestMemPool_Run_IMP(TestMemoryPool *self, TestBatchRunner *runner) {
     TEST_UINT_EQ(runner, MemPool_Get_Consumed(mem_pool), expected * 2,
                  "Accumulate consumed.");
 
-    ptr_a = ivars->buf;
+    ptr_a = MemPool_Get_Buf(mem_pool);
     MemPool_Resize(mem_pool, ptr_b, 6);
-    TEST_TRUE(runner, ivars->buf < ptr_a, "Resize adjusts next allocation");
+    TEST_TRUE(runner, MemPool_Get_Buf(mem_pool) < ptr_a,
+              "Resize adjusts next allocation");
     TEST_TRUE(runner, MemPool_Get_Consumed(mem_pool) < expected * 2,
                 "Resize() adjusts `consumed`");
 

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#define CFP_LUCY
 #define C_LUCY_DOC
 #include "XSBind.h"
 #include "Lucy/Document/Doc.h"

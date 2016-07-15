@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#define CFP_LUCY
 #define C_LUCY_DOCREADER
 #define C_LUCY_DEFAULTDOCREADER
 #include "XSBind.h"

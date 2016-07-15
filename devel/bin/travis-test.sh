@@ -49,10 +49,12 @@ test_perl() {
     export PERL5LIB="$install_dir/lib/perl5"
 
     # Install Clownfish.
-    cd lucy-clownfish/runtime/perl
+    cd lucy-clownfish/compiler/perl
+    cpanm --quiet --installdeps --notest .
     perl Build.PL
     ./Build install --install-base "$install_dir"
-    cd ../../compiler/perl
+    cd ../../runtime/perl
+    perl Build.PL
     ./Build install --install-base "$install_dir"
 
     cd ../../../perl

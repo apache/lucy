@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#define CFP_LUCY
 #define C_LUCY_INVERTER
 #define C_LUCY_INVERTERENTRY
 #include "XSBind.h"

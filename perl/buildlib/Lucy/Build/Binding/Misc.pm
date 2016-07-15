@@ -232,7 +232,7 @@ END_XS_CODE
 
 sub bind_test {
     my $xs_code = <<'END_XS_CODE';
-MODULE = Lucy   PACKAGE = Lucy::Test
+MODULE = Lucy::Test   PACKAGE = Lucy::Test
 
 #include "Clownfish/TestHarness/TestFormatter.h"
 #include "Clownfish/TestHarness/TestSuite.h"

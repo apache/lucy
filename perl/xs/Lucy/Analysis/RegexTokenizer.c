@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#define CFP_LUCY
 #define C_LUCY_REGEXTOKENIZER
 #define C_LUCY_TOKEN
 #include "XSBind.h"

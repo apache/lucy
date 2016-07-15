@@ -187,14 +187,13 @@ test_Close(TestBatchRunner *runner) {
 #ifdef _MSC_VER
     SKIP(runner, 2, "LUCY-155");
 #else
-    int saved_fd = FSFH_IVARS(fh)->fd;
-    FSFH_IVARS(fh)->fd = -1;
+    int saved_fd = FSFH_Set_FD(fh, -1);
     Err_set_error(NULL);
     bool result = FSFH_Close(fh);
     TEST_FALSE(runner, result, "Failed Close() returns false");
     TEST_TRUE(runner, Err_get_error() != NULL,
               "Failed Close() sets global error");
-    FSFH_IVARS(fh)->fd = saved_fd;
+    FSFH_Set_FD(fh, saved_fd);
 #endif /* _MSC_VER */
     DECREF(fh);
 
@@ -210,7 +209,6 @@ test_Window(TestBatchRunner *runner) {
     String *test_filename = SSTR_WRAP_C("_fstest");
     FSFileHandle *fh;
     FileWindow *window = FileWindow_new();
-    FileWindowIVARS *const window_ivars = FileWindow_IVARS(window);
     uint32_t i;
 
     S_remove(test_filename);
@@ -240,15 +238,20 @@ test_Window(TestBatchRunner *runner) {
 
     TEST_TRUE(runner, FSFH_Window(fh, window, 1021, 2),
               "Window() returns true");
+    const char *buf = FileWindow_Get_Buf(window);
+    int64_t offset = FileWindow_Get_Offset(window);
     TEST_TRUE(runner,
-              strncmp(window_ivars->buf - window_ivars->offset + 1021, "oo", 2) == 0,
+              strncmp(buf - offset + 1021, "oo", 2) == 0,
               "Window()");
 
     TEST_TRUE(runner, FSFH_Release_Window(fh, window),
               "Release_Window() returns true");
-    TEST_TRUE(runner, window_ivars->buf == NULL, "Release_Window() resets buf");
-    TEST_TRUE(runner, window_ivars->offset == 0, "Release_Window() resets offset");
-    TEST_TRUE(runner, window_ivars->len == 0, "Release_Window() resets len");
+    TEST_TRUE(runner, FileWindow_Get_Buf(window) == NULL,
+              "Release_Window() resets buf");
+    TEST_INT_EQ(runner, FileWindow_Get_Offset(window), 0,
+                "Release_Window() resets offset");
+    TEST_INT_EQ(runner, FileWindow_Get_Len(window), 0,
+                "Release_Window() resets len");
 
     DECREF(window);
     DECREF(fh);
