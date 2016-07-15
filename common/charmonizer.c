@@ -5080,13 +5080,6 @@ chaz_MakeBinary*
 chaz_MakeFile_add_lemon_exe(chaz_MakeFile *self, const char *dir) {
     chaz_MakeBinary *exe = chaz_MakeFile_add_exe(self, dir, "lemon");
     chaz_MakeBinary_add_src_file(exe, dir, "lemon.c");
-
-    if (chaz_CC_gcc_version_num()) {
-        chaz_CFlags *cflags = chaz_MakeBinary_get_compile_flags(exe);
-        chaz_CFlags_append(cflags, "-Wno-pedantic -Wno-sign-compare"
-                           " -Wno-unused-parameter");
-    }
-
     return exe;
 }
 
@@ -8957,7 +8950,7 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
     chaz_CFlags_add_include_dir(makefile_cflags, self->ucd_dir);
     chaz_CFlags_add_include_dir(makefile_cflags, self->utf8proc_dir);
 
-    var = chaz_MakeFile_add_var(self->makefile, "CFLAGS", NULL);
+    var = chaz_MakeFile_add_var(self->makefile, "LUCY_CFLAGS", NULL);
     chaz_MakeVar_append(var, chaz_CFlags_get_string(extra_cflags));
     chaz_MakeVar_append(var, chaz_CFlags_get_string(makefile_cflags));
     chaz_MakeVar_append(var, chaz_CC_get_cflags());
@@ -8977,6 +8970,7 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
         lib_objs = "$(LUCY_SHARED_LIB_OBJS)";
 
         compile_flags = chaz_MakeBinary_get_compile_flags(self->lib);
+        chaz_CFlags_append(compile_flags, "$(LUCY_CFLAGS)");
         chaz_CFlags_add_define(compile_flags, "CFP_LUCY", NULL);
 
         link_flags = chaz_MakeBinary_get_link_flags(self->lib);
@@ -9005,11 +8999,13 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
             = chaz_MakeFile_add_static_lib(self->makefile, NULL, "lucy");
         lib_objs = "$(LUCY_STATIC_LIB_OBJS)";
 
+        compile_flags = chaz_MakeBinary_get_compile_flags(self->lib);
+        chaz_CFlags_append(compile_flags, "$(LUCY_CFLAGS)");
+
         if (strcmp(host, "python") == 0) {
             /* For Python, the static library is linked into a shared
              * library.
              */
-            compile_flags = chaz_MakeBinary_get_compile_flags(self->lib);
             chaz_CFlags_compile_shared_library(compile_flags);
             chaz_CFlags_add_define(compile_flags, "CFP_CFISH", NULL);
         }
@@ -9038,6 +9034,7 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
         test_lib_objs = "$(TESTLUCY_SHARED_LIB_OBJS)";
 
         compile_flags = chaz_MakeBinary_get_compile_flags(self->test_lib);
+        chaz_CFlags_append(compile_flags, "$(LUCY_CFLAGS)");
         chaz_CFlags_add_define(compile_flags, "CFP_TESTLUCY", NULL);
 
         link_flags = chaz_MakeBinary_get_link_flags(self->test_lib);
@@ -9064,11 +9061,13 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
             = chaz_MakeFile_add_static_lib(self->makefile, NULL, "testlucy");
         test_lib_objs = "$(TESTLUCY_STATIC_LIB_OBJS)";
 
+        compile_flags = chaz_MakeBinary_get_compile_flags(self->test_lib);
+        chaz_CFlags_append(compile_flags, "$(LUCY_CFLAGS)");
+
         if (strcmp(host, "python") == 0) {
             /* For Python, the static library is linked into a shared
              * library.
              */
-            compile_flags = chaz_MakeBinary_get_compile_flags(self->test_lib);
             chaz_CFlags_compile_shared_library(compile_flags);
             chaz_CFlags_add_define(compile_flags, "CFP_TESTLUCY", NULL);
         }
@@ -9183,11 +9182,15 @@ lucy_MakeFile_write_c_cfc_rules(lucy_MakeFile *self) {
 static void
 lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
     chaz_MakeBinary *exe;
+    chaz_CFlags     *compile_flags;
     chaz_CFlags     *link_flags;
     chaz_MakeRule   *rule;
 
     exe = chaz_MakeFile_add_exe(self->makefile, "t", "test_lucy");
     chaz_MakeBinary_add_src_file(exe, "t", "test_lucy.c");
+
+    compile_flags = chaz_MakeBinary_get_compile_flags(exe);
+    chaz_CFlags_append(compile_flags, "$(LUCY_CFLAGS)");
 
     link_flags = chaz_MakeBinary_get_link_flags(exe);
     if (self->cfish_lib_dir) {
