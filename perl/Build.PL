@@ -72,13 +72,11 @@ my $builder = Lucy::Build->new(
                 parcels       => [ 'Lucy' ],
                 make_target   => 'core_objects',
                 c_source_dirs => [ 'xs' ],
-                xs_prereqs    => [ 'Clownfish' ],
             },
             {
                 name        => 'Lucy::Test',
                 parcels     => [ 'TestLucy' ],
                 make_target => 'test_objects',
-                xs_prereqs  => [ 'Lucy', 'Clownfish' ],
             },
         ],
     },

@@ -22,9 +22,6 @@ $VERSION = eval $VERSION;
 sub bind_all {
     my ($class, $hierarchy) = @_;
 
-    require Clownfish;
-    $hierarchy->inherit_metadata;
-
     $class->bind_lucy;
     $class->bind_simple;
     $class->bind_test;
