@@ -96,12 +96,13 @@ func (s *SimpleIMP) AddDoc(doc interface{}) error {
 	})
 }
 
-func (s *SimpleIMP) Search(query string, offset, numWanted int) (totalHits int, err error) {
+func (s *SimpleIMP) Search(query string, offset, numWanted int, sortSpec SortSpec) (totalHits int, err error) {
 	err = clownfish.TrapErr(func() {
 		self := (*C.lucy_Simple)(clownfish.Unwrap(s, "s"))
 		qStringC := (*C.cfish_String)(clownfish.GoToClownfish(query, unsafe.Pointer(C.CFISH_STRING), false))
 		defer C.cfish_decref(unsafe.Pointer(qStringC))
-		totalHits = int(C.LUCY_Simple_Search(self, qStringC, C.uint32_t(offset), C.uint32_t(numWanted)))
+		sortSpecC := (*C.lucy_SortSpec)(clownfish.UnwrapNullable(sortSpec))
+		totalHits = int(C.LUCY_Simple_Search(self, qStringC, C.uint32_t(offset), C.uint32_t(numWanted), sortSpecC))
 	})
 	return totalHits, err
 }
