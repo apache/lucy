@@ -43,7 +43,7 @@ func TestSimpleBasics(t *testing.T) {
 		t.Errorf("AddDoc with Doc: %v", err)
 	}
 
-	count, err := simple.Search("foo", 0, 10)
+	count, err := simple.Search("foo", 0, 10, nil)
 	if count != 3 || err != nil {
 		t.Errorf("Search: %d, %v", count, err)
 	}

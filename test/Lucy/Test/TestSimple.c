@@ -47,7 +47,7 @@ test_simple(TestBatchRunner *runner) {
         DECREF(doc);
 
         String *query = SSTR_WRAP_C("creamed");
-        uint32_t num_results = Simple_Search(lucy, query, 0, 10);
+        uint32_t num_results = Simple_Search(lucy, query, 0, 10, NULL);
         TEST_INT_EQ(runner, num_results, 1, "Search works right after add");
     }
 
@@ -59,7 +59,7 @@ test_simple(TestBatchRunner *runner) {
         DECREF(doc);
 
         String *query = SSTR_WRAP_C("creamed");
-        uint32_t num_results = Simple_Search(lucy, query, 0, 10);
+        uint32_t num_results = Simple_Search(lucy, query, 0, 10, NULL);
         TEST_INT_EQ(runner, num_results, 2, "Search returns total hits");
     }
 
@@ -74,7 +74,7 @@ test_simple(TestBatchRunner *runner) {
         lucy = Simple_new((Obj*)folder, language);
 
         String *query = SSTR_WRAP_C("cream");
-        uint32_t num_results = Simple_Search(lucy, query, 0, 10);
+        uint32_t num_results = Simple_Search(lucy, query, 0, 10, NULL);
         TEST_INT_EQ(runner, num_results, 3, "commit upon destroy");
 
         HitDoc *hit;
@@ -95,7 +95,7 @@ test_simple(TestBatchRunner *runner) {
         DECREF(doc);
 
         String *query = SSTR_WRAP_C("cream");
-        uint32_t num_results = Simple_Search(lucy, query, 0, 10);
+        uint32_t num_results = Simple_Search(lucy, query, 0, 10, NULL);
         TEST_INT_EQ(runner, num_results, 4,
                     "Search uses correct EasyAnalyzer");
     }

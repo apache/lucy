@@ -34,6 +34,7 @@
 #include "Lucy/Plan/Schema.h"
 #include "Lucy/Search/Hits.h"
 #include "Lucy/Search/IndexSearcher.h"
+#include "Lucy/Search/SortSpec.h"
 
 Simple*
 Simple_new(Obj *index, String *language) {
@@ -127,7 +128,7 @@ Simple_Add_Doc_IMP(Simple *self, Doc *doc) {
 
 uint32_t
 Simple_Search_IMP(Simple *self, String *query, uint32_t offset,
-                  uint32_t num_wanted) {
+                  uint32_t num_wanted, SortSpec *sort_spec) {
     SimpleIVARS *const ivars = Simple_IVARS(self);
 
     // Flush recent adds; lazily create searcher.
@@ -138,7 +139,7 @@ Simple_Search_IMP(Simple *self, String *query, uint32_t offset,
 
     DECREF(ivars->hits);
     ivars->hits = IxSearcher_Hits(ivars->searcher, (Obj*)query, offset,
-                                  num_wanted, NULL);
+                                  num_wanted, sort_spec);
 
     return Hits_Total_Hits(ivars->hits);
 }

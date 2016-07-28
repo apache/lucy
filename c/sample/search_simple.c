@@ -50,7 +50,7 @@ main(int argc, char *argv[]) {
     Simple *lucy     = Simple_new((Obj*)folder, language);
 
     String *query_str = Str_newf("%s", query_c);
-    Simple_Search(lucy, query_str, 0, 10);
+    Simple_Search(lucy, query_str, 0, 10, NULL);
 
     String *title_str = Str_newf("title");
     String *url_str   = Str_newf("url");

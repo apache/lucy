@@ -79,10 +79,12 @@ public class Lucy::Simple {
      * found.
      * @param num_wanted The number of hits you would like to see after
      * `offset` is taken into account.
+     * @param sort_spec A [](SortSpec), which will affect how results are
+     * ranked and returned.
      */
     public uint32_t
     Search(Simple *self, String *query, uint32_t offset = 0,
-           uint32_t num_wanted = 10);
+           uint32_t num_wanted = 10, SortSpec *sort_spec = NULL);
 
     /** Return the next hit, or [](cfish:@null) when the iterator is exhausted.
      */

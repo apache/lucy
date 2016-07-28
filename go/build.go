@@ -139,7 +139,7 @@ func runCFC() {
 func specClasses(parcel *cfc.Parcel) {
 	simpleBinding := cfc.NewGoClass(parcel, "Lucy::Simple")
 	simpleBinding.SpecMethod("Add_Doc", "AddDoc(doc interface{}) error")
-	simpleBinding.SpecMethod("Search", "Search(string, int, int) (int, error)")
+	simpleBinding.SpecMethod("Search", "Search(string, int, int, SortSpec) (int, error)")
 	simpleBinding.SpecMethod("Next", "Next(hit interface{}) bool")
 	simpleBinding.SpecMethod("", "Error() error")
 	simpleBinding.SetSuppressCtor(true)
