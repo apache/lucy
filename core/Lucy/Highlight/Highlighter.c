@@ -235,7 +235,7 @@ S_find_starting_boundary(StringIterator *top, uint32_t max_skip,
             return true;
         }
 
-        if (StrHelp_is_whitespace(code_point)) {
+        if (Str_is_whitespace(code_point)) {
             if (word == NULL) { word = StrIter_Clone(top); }
         }
         else {
@@ -260,7 +260,7 @@ S_find_starting_boundary(StringIterator *top, uint32_t max_skip,
             break;
         }
 
-        if (word == NULL && StrHelp_is_whitespace(code_point)) {
+        if (word == NULL && Str_is_whitespace(code_point)) {
             word = StrIter_Clone(iter);
             word_offset = i + 1;
         }
@@ -304,7 +304,7 @@ S_find_ending_boundary(StringIterator *tail, uint32_t max_skip,
             DECREF(iter);
             return true;
         }
-    } while (StrHelp_is_whitespace(code_point));
+    } while (Str_is_whitespace(code_point));
 
     // Keep track of the first word boundary.
     StringIterator *word = NULL;
@@ -325,7 +325,7 @@ S_find_ending_boundary(StringIterator *tail, uint32_t max_skip,
             return true;
         }
 
-        if (StrHelp_is_whitespace(code_point)) {
+        if (Str_is_whitespace(code_point)) {
             if (word == NULL) {
                 word = StrIter_Clone(iter);
                 word_offset = i + 1;
@@ -348,7 +348,7 @@ S_find_ending_boundary(StringIterator *tail, uint32_t max_skip,
 
         // Strip whitespace and punctuation that collides with an ellipsis.
         while (STR_OOB != (code_point = StrIter_Prev(tail))) {
-            if (!StrHelp_is_whitespace(code_point)
+            if (!Str_is_whitespace(code_point)
                 && code_point != '.'
                 && code_point != ','
                 && code_point != ';'

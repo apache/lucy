@@ -196,7 +196,7 @@ Freezer_deserialize_string(String *string, InStream *instream) {
     char *buf = (char*)MALLOCATE(size + 1);
     InStream_Read_Bytes(instream, buf, size);
     buf[size] = '\0';
-    if (!StrHelp_utf8_valid(buf, size)) {
+    if (!Str_utf8_valid(buf, size)) {
         THROW(ERR, "Attempt to deserialize invalid UTF-8");
     }
     return Str_init_steal_trusted_utf8(string, buf, size);

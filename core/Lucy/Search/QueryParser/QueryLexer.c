@@ -173,7 +173,7 @@ S_consume_keyword(StringIterator *iter, const char *keyword,
         DECREF(temp);
         return NULL;
     }
-    if (StrHelp_is_whitespace(lookahead)
+    if (Str_is_whitespace(lookahead)
         || lookahead == '"'
         || lookahead == '('
         || lookahead == ')'
@@ -257,7 +257,7 @@ S_consume_text(StringIterator *iter) {
         else if (code_point == STR_OOB) {
             break;
         }
-        else if (StrHelp_is_whitespace(code_point)
+        else if (Str_is_whitespace(code_point)
             || code_point == '"'
             || code_point == '('
             || code_point == ')'

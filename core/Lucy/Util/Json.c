@@ -567,7 +567,7 @@ S_parse_string(const char **json_ptr, const char *limit) {
     else {
         // Optimize common case where there are no escapes.
         size_t len = (size_t)(end - top);
-        if (!StrHelp_utf8_valid(top, len)) {
+        if (!Str_utf8_valid(top, len)) {
             String *mess = MAKE_MESS("Bad UTF-8 in JSON");
             Err_set_error(Err_new(mess));
             return NULL;
@@ -588,7 +588,7 @@ S_unescape_text(const char *top, const char *end) {
             text++;
         }
         else {
-            if (!StrHelp_utf8_valid(chunk, (size_t)(text - chunk))) {
+            if (!Str_utf8_valid(chunk, (size_t)(text - chunk))) {
                 DECREF(cb);
                 String *mess = MAKE_MESS("Bad UTF-8 in JSON");
                 Err_set_error(Err_new(mess));
@@ -661,7 +661,7 @@ S_unescape_text(const char *top, const char *end) {
         }
     }
 
-    if (!StrHelp_utf8_valid(chunk, (size_t)(text - chunk))) {
+    if (!Str_utf8_valid(chunk, (size_t)(text - chunk))) {
         DECREF(cb);
         String *mess = MAKE_MESS("Bad UTF-8 in JSON");
         Err_set_error(Err_new(mess));

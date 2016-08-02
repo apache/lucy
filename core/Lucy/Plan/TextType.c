@@ -160,7 +160,7 @@ TextTermStepper_Read_Key_Frame_IMP(TextTermStepper *self,
     // Set the value text.
     InStream_Read_Bytes(instream, ptr, text_len);
     BB_Set_Size(ivars->bytebuf, text_len);
-    if (!StrHelp_utf8_valid(ptr, text_len)) {
+    if (!Str_utf8_valid(ptr, text_len)) {
         THROW(ERR, "Invalid UTF-8 sequence in '%o' at byte %i64",
               InStream_Get_Filename(instream),
               InStream_Tell(instream) - text_len);
@@ -193,7 +193,7 @@ TextTermStepper_Read_Delta_IMP(TextTermStepper *self, InStream *instream) {
     // Set the value text.
     InStream_Read_Bytes(instream, ptr + text_overlap, finish_chars_len);
     BB_Set_Size(ivars->bytebuf, total_text_len);
-    if (!StrHelp_utf8_valid(ptr, total_text_len)) {
+    if (!Str_utf8_valid(ptr, total_text_len)) {
         THROW(ERR, "Invalid UTF-8 sequence in '%o' at byte %i64",
               InStream_Get_Filename(instream),
               InStream_Tell(instream) - finish_chars_len);
