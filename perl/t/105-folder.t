@@ -21,7 +21,7 @@ use Test::More tests => 25;
 use File::Spec::Functions qw( catfile );
 use Fcntl;
 use Lucy::Test::TestUtils qw( init_test_index_loc );
-use Clownfish::Util::StringHelper qw( to_base36 );
+use Lucy::Util::StringHelper qw( to_base36 );
 
 my $fs_index_loc = init_test_index_loc();
 my $fs_folder    = Lucy::Store::FSFolder->new( path => $fs_index_loc, );

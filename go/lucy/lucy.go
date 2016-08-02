@@ -41,7 +41,6 @@ package lucy
 #include "Clownfish/HashIterator.h"
 #include "Clownfish/Vector.h"
 #include "Clownfish/Err.h"
-#include "Clownfish/Util/StringHelper.h"
 #include "Lucy/Analysis/Analyzer.h"
 #include "Lucy/Analysis/Inversion.h"
 #include "Lucy/Analysis/Token.h"
@@ -55,6 +54,7 @@ package lucy
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Object/I32Array.h"
 #include "Lucy/Util/Freezer.h"
+#include "Lucy/Util/StringHelper.h"
 
 extern lucy_RegexTokenizer*
 GOLUCY_RegexTokenizer_init(lucy_RegexTokenizer *self, cfish_String *pattern);
@@ -154,7 +154,7 @@ S_count_code_points(const char *string, size_t len) {
     size_t i = 0;
 
     while (i < len) {
-        i += cfish_StrHelp_UTF8_COUNT[(uint8_t)(string[i])];
+        i += lucy_StrHelp_UTF8_COUNT[(uint8_t)(string[i])];
         ++num_code_points;
     }
 

@@ -20,7 +20,7 @@ package LucyX::Index::ZlibDocReader;
 use base qw( Lucy::Index::DocReader );
 our $VERSION = '0.005000';
 $VERSION = eval $VERSION;
-use Clownfish::Util::StringHelper qw( utf8_valid utf8_flag_on );
+use Lucy::Util::StringHelper qw( utf8_valid utf8_flag_on );
 use Compress::Zlib qw( uncompress );
 use Carp;
 

@@ -20,7 +20,6 @@
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Store/DirHandle.h"
 #include "Lucy/Store/Folder.h"
-#include "Clownfish/Util/StringHelper.h"
 
 String*
 IxFileNames_latest_snapshot(Folder *folder) {

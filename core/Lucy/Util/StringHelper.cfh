@@ -1,0 +1,59 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+parcel Lucy;
+
+inert class Lucy::Util::StringHelper nickname StrHelp {
+
+    /* A table where the values indicate the number of bytes in a UTF-8
+     * sequence implied by the leading utf8 byte.
+     */
+    inert const uint8_t[] UTF8_COUNT;
+
+    /** Return the number of bytes that two strings have in common.
+     */
+    inert size_t
+    overlap(const char *a, const char *b, size_t a_len,  size_t b_len);
+
+    /** Encode a NULL-terminated string representation of a value in base 36
+     * into `buffer`.
+     *
+     * @param value The number to be encoded.
+     * @param buffer A buffer at least MAX_BASE36_BYTES bytes long.
+     * @return the number of digits encoded (not including the terminating
+     * NULL).
+     */
+    inert size_t
+    to_base36(uint64_t value, void *buffer);
+
+    /** Return the first non-continuation byte before the supplied pointer.
+     * If backtracking progresses beyond the supplied start, return NULL.
+     */
+    inert nullable const char*
+    back_utf8_char(const char *utf8, const char *start);
+}
+
+__C__
+/** The maximum number of bytes encoded by to_base36(), including the
+ * terminating NULL.
+ */
+#define lucy_StrHelp_MAX_BASE36_BYTES 14
+#ifdef LUCY_USE_SHORT_NAMES
+  #define StrHelp_MAX_BASE36_BYTES lucy_StrHelp_MAX_BASE36_BYTES
+#endif
+__END_C__
+
+

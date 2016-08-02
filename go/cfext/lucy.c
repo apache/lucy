@@ -44,7 +44,6 @@
 #include "Clownfish/Vector.h"
 #include "Clownfish/Class.h"
 #include "Clownfish/Util/Memory.h"
-#include "Clownfish/Util/StringHelper.h"
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
 #include "Lucy/Document/HitDoc.h"

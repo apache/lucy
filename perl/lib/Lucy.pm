@@ -305,6 +305,23 @@ BEGIN {
     }
 }
 
+{
+    package Lucy::Util::StringHelper;
+    our $VERSION = '0.005000';
+    $VERSION = eval $VERSION;
+    BEGIN {
+        push our @ISA, 'Exporter';
+        our @EXPORT_OK = qw(
+            utf8_flag_on
+            utf8_flag_off
+            to_base36
+            utf8ify
+            utf8_valid
+            cat_bytes
+        );
+    }
+}
+
 1;
 
 __END__

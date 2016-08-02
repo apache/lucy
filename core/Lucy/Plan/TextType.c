@@ -21,8 +21,8 @@
 #include "Lucy/Plan/TextType.h"
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
+#include "Lucy/Util/StringHelper.h"
 #include "Clownfish/ByteBuf.h"
-#include "Clownfish/Util/StringHelper.h"
 
 TermStepper*
 TextType_Make_Term_Stepper_IMP(TextType *self) {
