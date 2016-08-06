@@ -23,7 +23,7 @@
 #include "Clownfish/Num.h"
 #include "Lucy/Store/Folder.h"
 #include "Lucy/Util/Json.h"
-#include "Clownfish/Util/StringHelper.h"
+#include "Lucy/Util/StringHelper.h"
 #include "Lucy/Util/IndexFileNames.h"
 
 Segment*

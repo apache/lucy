@@ -21,6 +21,7 @@
 #include "Lucy/Analysis/StandardTokenizer.h"
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
+#include "Lucy/Util/StringHelper.h"
 
 /*
  * We use a modified version of the Word_Break property defined in UAX #29.

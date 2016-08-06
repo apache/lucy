@@ -42,6 +42,7 @@
 #include "Lucy/Util/Freezer.h"
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/Json.h"
+#include "Lucy/Util/StringHelper.h"
 
 int32_t Indexer_CREATE   = 0x00000001;
 int32_t Indexer_TRUNCATE = 0x00000002;

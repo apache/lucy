@@ -18,7 +18,6 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Index/TermInfo.h"
-#include "Clownfish/Util/StringHelper.h"
 
 TermInfo*
 TInfo_new(int32_t doc_freq) {

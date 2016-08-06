@@ -29,7 +29,7 @@
 #include "Lucy/Store/LockFactory.h"
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/Json.h"
-#include "Clownfish/Util/StringHelper.h"
+#include "Lucy/Util/StringHelper.h"
 
 #include <stdlib.h>
 

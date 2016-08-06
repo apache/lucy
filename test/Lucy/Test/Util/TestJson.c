@@ -275,6 +275,7 @@ test_syntax_errors(TestBatchRunner *runner) {
     S_verify_bad_syntax(runner, "+1.0 ", "float with prepended plus");
     S_verify_bad_syntax(runner, "\"\\g\"", "invalid char escape");
     S_verify_bad_syntax(runner, "\"\\uAAAZ\"", "invalid \\u escape");
+    S_verify_bad_syntax(runner, "\"\\uAAA\"", "invalid \\u escape");
 }
 
 static void
@@ -342,7 +343,7 @@ void
 TestJson_Run_IMP(TestJson *self, TestBatchRunner *runner) {
     uint32_t num_tests = 105;
 #ifndef LUCY_VALGRIND
-    num_tests += 28; // FIXME: syntax errors leak memory.
+    num_tests += 30; // FIXME: syntax errors leak memory.
 #endif
     TestBatchRunner_Plan(runner, (TestBatch*)self, num_tests);
 

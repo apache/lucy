@@ -20,7 +20,7 @@ use base qw( Lucy::Index::DataWriter );
 use Carp;
 use Scalar::Util qw( blessed );
 use Compress::Zlib qw( compress );
-use Clownfish::Util::StringHelper qw( cat_bytes );
+use Lucy::Util::StringHelper qw( cat_bytes );
 use Clownfish;
 use bytes;
 no bytes;

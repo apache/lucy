@@ -19,7 +19,7 @@ use lib 'buildlib';
 
 use Test::More tests => 28;
 use Lucy::Test::TestUtils qw( utf8_test_strings );
-use Clownfish::Util::StringHelper qw( utf8ify utf8_flag_off );
+use Lucy::Util::StringHelper qw( utf8ify utf8_flag_off );
 use bytes;
 no bytes;
 

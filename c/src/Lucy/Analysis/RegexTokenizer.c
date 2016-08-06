@@ -26,9 +26,9 @@
 #include "Clownfish/String.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Util/Memory.h"
-#include "Clownfish/Util/StringHelper.h"
 #include "Lucy/Analysis/Token.h"
 #include "Lucy/Analysis/Inversion.h"
+#include "Lucy/Util/StringHelper.h"
 
 #if defined(CHY_HAS_PCRE_H)
 

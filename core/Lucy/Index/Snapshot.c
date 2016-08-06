@@ -21,7 +21,7 @@
 #include "Clownfish/Boolean.h"
 #include "Lucy/Index/Segment.h"
 #include "Lucy/Store/Folder.h"
-#include "Clownfish/Util/StringHelper.h"
+#include "Lucy/Util/StringHelper.h"
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/Json.h"
 

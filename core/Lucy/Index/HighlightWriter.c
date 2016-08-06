@@ -38,6 +38,7 @@
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Util/Freezer.h"
 #include "Lucy/Util/NumberUtils.h"
+#include "Lucy/Util/StringHelper.h"
 
 static OutStream*
 S_lazy_init(HighlightWriter *self);
