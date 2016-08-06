@@ -116,6 +116,6 @@ Description: Full-text search for dynamic languages
 Version: $version
 URL: http://lucy.apache.org/
 Requires: clownfish
-Libs: -L$prefix/lib -llucy -lcfish
+Libs: -L$prefix/lib -llucy -lclownfish
 EOF
 

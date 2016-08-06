@@ -27,7 +27,7 @@
  *         --dest=autogen
  *     c99 \
  *         getting_started.c \
- *         -I autogen/include -L $PREFIX/lib -l cfish -l lucy \
+ *         -I autogen/include -L $PREFIX/lib -l clownfish -l lucy \
  *         -o getting_started
  */
 

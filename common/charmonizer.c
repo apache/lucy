@@ -8872,10 +8872,10 @@ lucy_MakeFile_new(chaz_CLI *cli) {
         self->cfish_lib_dir = NULL;
     }
     if (chaz_CC_binary_format() == CHAZ_CC_BINFMT_PE) {
-        self->cfish_lib_name = "cfish-0.5";
+        self->cfish_lib_name = "clownfish-0.5";
     }
     else {
-        self->cfish_lib_name = "cfish";
+        self->cfish_lib_name = "clownfish";
     }
 
     return self;
