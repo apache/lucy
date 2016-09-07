@@ -22,6 +22,22 @@
 }
 
 {
+   <boot_Lucy>
+   Memcheck:Leak
+   ...
+   fun:boot_Lucy
+   ...
+}
+
+{
+   <boot_Lucy__Test>
+   Memcheck:Leak
+   ...
+   fun:boot_Lucy__Test
+   ...
+}
+
+{
    <XS_DynaLoader_dl_load_file>
    Memcheck:Leak
    ...
@@ -34,28 +50,6 @@
    Memcheck:Leak
    ...
    fun:cfish_Class_singleton
-   ...
-}
-{
-   <cfish_Class_bootstrap>
-   Memcheck:Leak
-   ...
-   fun:cfish_Class_bootstrap
-   ...
-}
-{
-   <cfish_Class_add_alias_to_registry>
-   Memcheck:Leak
-   ...
-   fun:cfish_Class_add_alias_to_registry
-   ...
-}
-
-{
-   <cfish_Lucy_bootstrap>
-   Memcheck:Leak
-   ...
-   fun:cfish_Lucy_bootstrap
    ...
 }
 
