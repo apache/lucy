@@ -23,6 +23,9 @@ MANIFEST
 # doc file does not require license.
 CONTRIBUTING
 
+# INSTALL.SKIP does not require license.
+INSTALL\.SKIP
+
 # The Lemon parser generator is in the public domain.  See LUCY-173.
 lemon\.c
 lempar\.c
