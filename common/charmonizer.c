@@ -5609,6 +5609,8 @@ chaz_MakeBinary_obj_string(chaz_MakeBinary *self) {
         tmp = chaz_Util_join("", retval, sep, obj_path, NULL);
         free(retval);
         retval = tmp;
+
+        free(obj_path);
     }
 
     return retval;
@@ -8878,6 +8880,7 @@ lucy_MakeFile_new(chaz_CLI *cli) {
         self->cfish_lib_name = "clownfish";
     }
 
+    free(cfcore_filename);
     return self;
 }
 
