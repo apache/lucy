@@ -1,5 +1,22 @@
 Revision history for Lucy
 
+0.6.0  XXXX-XX-XX
+
+  Tasks:
+
+    * [LUCY-301] - Change Read_C32/etc to explicitly signed
+                   Read_CI32/CU32/etc
+    * [LUCY-302] - Widen array index type and fix conversion warnings in
+                   NumberUtils.
+
+  Bugfixes:
+
+    * [LUCY-297] - Perl 5.10 build broken: "token_re is not a qr// entity"
+    * [LUCY-298] - Random numeric junk in tempfile name
+    * [LUCY-300] - Restrict max field length to 2 GB
+    * [LUCY-303] - "make test" broken on Cygwin
+    * [LUCY-307] - Lucy::Simple's `search` stopped supporting `sort_spec`
+
 0.5.1  2016-04-14
 
   Bugfixes:
