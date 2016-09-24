@@ -18,7 +18,7 @@ rem limitations under the License.
 if "%BUILD_ENV%" == "msys2" goto test_msys2
 
 rem Install Clownfish.
-git clone -q --depth 1 https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git
+git clone -q -b 0.6 --depth 1 https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git
 
 if "%CLOWNFISH_HOST%" == "c" goto test_c
 if "%CLOWNFISH_HOST%" == "perl" goto test_perl

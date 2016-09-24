@@ -25,7 +25,7 @@ build_dir="$(pwd)"
 install_dir="$build_dir/install_dir"
 
 # Fetch Clownfish.
-git clone -q --depth 1 https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git
+git clone -q -b 0.6 --depth 1 https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git
 
 test_c() {
     # Install Clownfish.
