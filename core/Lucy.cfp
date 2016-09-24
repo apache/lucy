@@ -1,8 +1,8 @@
 {
     "name": "Lucy",
-    "version": "v0.5.0",
-    "major_version": "v0.5.0",
+    "version": "v0.6.0",
+    "major_version": "v0.6.0",
     "prerequisites": {
-        "Clownfish": "v0.5.0"
+        "Clownfish": "v0.6.0"
     }
 }

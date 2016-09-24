@@ -16,7 +16,7 @@ package Lucy::Build::Binding::Plan;
 use strict;
 use warnings;
 
-our $VERSION = '0.005000';
+our $VERSION = '0.006000';
 $VERSION = eval $VERSION;
 
 sub bind_all {
