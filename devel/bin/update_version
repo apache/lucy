@@ -63,7 +63,7 @@ for my $path ('common/charmonizer.c', 'common/charmonizer.main') {
         or die "no match";
     $buf =~ s/(lucy_major_version\[\]\s+=\s+)"[\d.]+"/$1"$x.$y"/
         or die "no match";
-    $buf =~ s/(cfish_lib_name\s+=\s+)"cfish-[\d.]+"/$1"cfish-$x.$y"/
+    $buf =~ s/(cfish_lib_name\s+=\s+)"clownfish-[\d.]+"/$1"clownfish-$x.$y"/
         or die "no match";
     write_file($path, $buf);
 }
@@ -83,6 +83,14 @@ if ( $z == 0 && $dev == 0 ) {
         or die "no match";
 }
 write_file( 'perl/lib/Lucy.pm', $buf );
+
+# Update Lucy/Test.pm.
+$buf = read_file('perl/lib/Lucy/Test.pm');
+$buf =~ s/(our \$VERSION\ +=\ +)'.+?'/$1'$x_yyyzzz_version'/g
+    or die "no match";
+$buf =~ s/(bootstrap\s+Lucy::Test\s+)'[\d\._]+'/$1'$x_y_z_d_version'/
+    or die "no match";
+write_file( 'perl/lib/Lucy/Test.pm', $buf );
 
 # Update Lucy.pod.
 $buf = read_file('perl/lib/Lucy.pod');
@@ -121,13 +129,15 @@ $buf = read_file('core/Lucy.cfp');
 $buf =~ s/("version":\s+)"v\d+\.\d+\.\d+"/$1"v$x_y_z_version"/
     or die "no match";
 if ( $z == 0 && $dev == 0 ) {
+    $buf =~ s/("major_version":\s+)"v\d+\.\d+\.\d+"/$1"v$x_y_z_version"/
+        or die "no match";
     $buf =~ s/("Clownfish":\s+)"v\d+\.\d+\.\d+"/$1"v$x_y_z_version"/
         or die "no match";
 }
 write_file( 'core/Lucy.cfp', $buf );
 
 # Update TestLucy.cfp
-$buf = read_file('core/TestLucy.cfp');
+$buf = read_file('test/TestLucy.cfp');
 $buf =~ s/("version":\s+)"v\d+\.\d+\.\d+"/$1"v$x_y_z_version"/
     or die "no match";
 if ( $z == 0 && $dev == 0 ) {
@@ -136,7 +146,7 @@ if ( $z == 0 && $dev == 0 ) {
 }
 $buf =~ s/("Lucy":\s+)"v\d+\.\d+\.\d+"/$1"v$x_y_z_version"/
     or die "no match";
-write_file( 'core/TestLucy.cfp', $buf );
+write_file( 'test/TestLucy.cfp', $buf );
 
 # Update all other Perl modules.
 find sub {
