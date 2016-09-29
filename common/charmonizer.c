@@ -4567,9 +4567,10 @@ typedef struct {
 static struct {
     char *make_command;
     int   shell_type;
+    int   supports_pattern_rules;
 } chaz_Make = {
     NULL,
-    0
+    0, 0
 };
 
 /* Detect make command.
@@ -4695,7 +4696,12 @@ S_chaz_Make_detect(const char *make1, ...) {
     va_list args;
     const char *candidate;
     int found = 0;
-    const char makefile_content[] = "foo:\n\t@echo 643490c943525d19\n";
+    const char makefile_content[] =
+        "foo:\n"
+        "\t@echo 643490c943525d19\n"
+        "\n"
+        "%.ext:\n"
+        "\t@echo 8f4ef20576b070d5\n";
     chaz_Util_write_file("_charm_Makefile", makefile_content);
 
     /* Audition candidates. */
@@ -4727,12 +4733,28 @@ S_chaz_Make_audition(const char *make) {
         free(content);
     }
     chaz_Util_remove_and_verify("_charm_foo");
+    free(command);
 
     if (succeeded) {
         chaz_Make.make_command = chaz_Util_strdup(make);
+
+        command = chaz_Util_join(" ", make, "-f", "_charm_Makefile", "foo.ext",
+                                 NULL);
+        chaz_OS_run_redirected(command, "_charm_foo");
+        if (chaz_Util_can_open_file("_charm_foo")) {
+            size_t len;
+            char *content = chaz_Util_slurp_file("_charm_foo", &len);
+            if (content != NULL
+                && strstr(content, "8f4ef20576b070d5") != NULL
+               ) {
+                chaz_Make.supports_pattern_rules = 1;
+            }
+            free(content);
+        }
+        chaz_Util_remove_and_verify("_charm_foo");
+        free(command);
     }
 
-    free(command);
     return succeeded;
 }
 
@@ -5186,11 +5208,12 @@ S_chaz_MakeFile_write_binary_rules(chaz_MakeFile *self,
 
     /* Write rules to compile with custom flags. */
     if (cflags[0] != '\0') {
-        if (chaz_Make.shell_type == CHAZ_OS_CMD_EXE) {
-            /* Write a rule for each object file. This is needed for nmake
-             * which doesn't support pattern rules but also for mingw32-make
-             * which has problems with pattern rules and backslash directory
-             * separators.
+        if (!chaz_Make.supports_pattern_rules
+            || chaz_Make.shell_type == CHAZ_OS_CMD_EXE) {
+            /* Write a rule for each object file. This is needed for make
+             * utilities that don't support pattern rules but also for
+             * mingw32-make which has problems with pattern rules and
+             * backslash directory separators.
              */
             S_chaz_MakeFile_write_object_rules(binary->sources, cflags, out);
         }
