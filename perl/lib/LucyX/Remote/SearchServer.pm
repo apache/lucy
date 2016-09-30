@@ -67,6 +67,12 @@ sub serve {
         Reuse     => 1,
     );
     confess("No socket: $!") unless $main_sock;
+    $self->serve_sock($main_sock);
+}
+
+sub serve_sock {
+    my ( $self, $main_sock ) = @_;
+
     my $read_set = IO::Select->new($main_sock);
 
     while ( my @ready = $read_set->can_read ) {

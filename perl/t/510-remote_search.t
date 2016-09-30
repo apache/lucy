@@ -20,7 +20,9 @@ use Test::More;
 use Time::HiRes qw( sleep );
 use IO::Socket::INET;
 
-my $PORT_NUM = 7890;
+my $min_port = 7900;
+my $max_port = 7919;
+
 BEGIN {
     if ( $^O =~ /(mswin|cygwin)/i ) {
         plan( 'skip_all', "fork on Windows not supported by Lucy" );
@@ -50,13 +52,22 @@ use Lucy::Test;
 use LucyX::Remote::SearchServer;
 use LucyX::Remote::SearchClient;
 
-my $kid;
-$kid = fork;
-if ($kid) {
-    sleep .25;    # allow time for the server to set up the socket
-    die "Failed fork: $!" unless defined $kid;
+my ( $port, $sock );
+for ( $port = $min_port; $port <= $max_port; $port++ ) {
+    $sock = IO::Socket::INET->new(
+        LocalPort => $port,
+        Proto     => 'tcp',
+        Listen    => SOMAXCONN,
+        Reuse     => 1,
+    );
+    last if $sock;
 }
-else {
+die "No socket: $!" unless $sock;
+
+my $kid = fork;
+die "Failed fork: $!" unless defined $kid;
+
+if ( $kid == 0 ) {
     my $folder  = Lucy::Store::RAMFolder->new;
     my $indexer = Lucy::Index::Indexer->new(
         index  => $folder,
@@ -73,12 +84,14 @@ else {
     my $server = LucyX::Remote::SearchServer->new(
         searcher => $searcher,
     );
-    $server->serve( port => $PORT_NUM );
+    $server->serve_sock($sock);
     exit(0);
 }
 
+$sock->close;
+
 my $test_client_sock = IO::Socket::INET->new(
-    PeerAddr => "localhost:$PORT_NUM",
+    PeerAddr => "localhost:$port",
     Proto    => 'tcp',
 );
 if ($test_client_sock) {
@@ -91,7 +104,7 @@ else {
 
 my $searchclient = LucyX::Remote::SearchClient->new(
     schema       => SortSchema->new,
-    peer_address => "localhost:$PORT_NUM",
+    peer_address => "localhost:$port",
 );
 
 is( $searchclient->doc_freq( field => 'content', term => 'x' ),
