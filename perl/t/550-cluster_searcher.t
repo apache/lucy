@@ -20,7 +20,10 @@ use Test::More;
 use Time::HiRes qw( sleep );
 use IO::Socket::INET;
 
-my @ports = 7890 .. 7895;
+my $num_servers = 6;
+my $min_port = 7000;
+my $max_port = 7099;
+
 BEGIN {
     if ( $^O =~ /(mswin|cygwin)/i ) {
         plan( 'skip_all', "fork on Windows not supported by Lucy" );
@@ -55,15 +58,29 @@ use Lucy::Test;
 use LucyX::Remote::SearchServer;
 use LucyX::Remote::ClusterSearcher;
 
+my @ports;
+my $port = $min_port;
 my @kids;
 my $number = 7;
-for my $port (@ports) {
-    my $kid = fork;
-    if ($kid) {
-        die "Failed fork: $!" unless defined $kid;
-        push @kids, $kid;
+for ( my $i = 0; $i < $num_servers; $i++ ) {
+    my $sock;
+    while ( $port <= $max_port ) {
+        $sock = IO::Socket::INET->new(
+            LocalPort => $port,
+            Proto     => 'tcp',
+            Listen    => SOMAXCONN,
+            Reuse     => 1,
+        );
+        last if $sock;
+        $port++;
     }
-    else {
+    die "No socket: $!" unless $sock;
+    push @ports, $port;
+
+    my $kid = fork;
+    die "Failed fork: $!" unless defined $kid;
+
+    if ( $kid == 0 ) {
         my $folder  = Lucy::Store::RAMFolder->new;
         my $indexer = Lucy::Index::Indexer->new(
             index  => $folder,
@@ -85,13 +102,14 @@ for my $port (@ports) {
         my $server = LucyX::Remote::SearchServer->new(
             searcher => $searcher,
         );
-        $server->serve( port => $port );
+        $server->serve_sock($sock);
         exit(0);
     }
-}
 
-# Allow time for the servers to set up their sockets.
-sleep .5;
+    $sock->close;
+    push @kids, $kid;
+    $port++;
+}
 
 my $test_client_sock = IO::Socket::INET->new(
     PeerAddr => "localhost:$ports[0]",
@@ -130,7 +148,7 @@ my $cluster_searcher = LucyX::Remote::ClusterSearcher->new(
 );
 
 $hits = $cluster_searcher->hits( query => 'b' );
-is( $hits->total_hits, scalar @ports, "matched hits across multiple shards" );
+is( $hits->total_hits, $num_servers, "matched hits across multiple shards" );
 
 my $highlighter = Lucy::Highlight::Highlighter->new(
     searcher => $cluster_searcher,
