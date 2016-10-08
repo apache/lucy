@@ -40,6 +40,7 @@
 #endif
 
 #include "Clownfish/CharBuf.h"
+#include "Lucy/Store/ErrorMessage.h"
 #include "Lucy/Store/FSFolder.h"
 #include "Lucy/Store/CompoundFileReader.h"
 #include "Lucy/Store/CompoundFileWriter.h"
@@ -182,8 +183,8 @@ FSFolder_Rename_IMP(FSFolder *self, String* from, String *to) {
     char *to_path   = S_fullpath_ptr(self, to);
     bool  retval    = !rename(from_path, to_path);
     if (!retval) {
-        Err_set_error(Err_new(Str_newf("rename from '%s' to '%s' failed: %s",
-                                       from_path, to_path, strerror(errno))));
+        ErrMsg_set_with_errno("rename from '%s' to '%s' failed",
+                              from_path, to_path);
     }
     FREEMEM(from_path);
     FREEMEM(to_path);
@@ -339,8 +340,7 @@ S_create_dir(String *path) {
     bool retval = true;
     char *path_ptr = Str_To_Utf8(path);
     if (-1 == chy_makedir(path_ptr, 0777)) {
-        Err_set_error(Err_new(Str_newf("Couldn't create directory '%o': %s",
-                                       path, strerror(errno))));
+        ErrMsg_set_with_errno("Couldn't create directory '%o'", path);
         retval = false;
     }
     FREEMEM(path_ptr);
@@ -398,10 +398,9 @@ S_hard_link(char *from8, char *to8) {
         return true;
     }
     else {
-        char *win_error = Err_win_error();
-        Err_set_error(Err_new(Str_newf("CreateHardLink for new file '%s' from '%s' failed: %s",
-                                       to8, from8, win_error)));
-        FREEMEM(win_error);
+        ErrMsg_set_with_win_error("CreateHardLink for new file '%s' "
+                                  "from '%s' failed",
+                                  to8, from8);
         return false;
     }
 }
@@ -435,8 +434,8 @@ S_absolutify(String *path) {
 static bool
 S_hard_link(char *from8, char *to8) {
     if (-1 == link(from8, to8)) {
-        Err_set_error(Err_new(Str_newf("hard link for new file '%s' from '%s' failed: %s",
-                                       to8, from8, strerror(errno))));
+        ErrMsg_set_with_errno("hard link for new file '%s' from '%s' failed",
+                              to8, from8);
         return false;
     }
     else {

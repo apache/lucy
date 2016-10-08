@@ -17,7 +17,6 @@
 #define C_LUCY_LOCKFACTORY
 #include "Lucy/Util/ToolSet.h"
 
-#include <errno.h>
 #include <stdio.h>
 #include <ctype.h>
 

@@ -18,7 +18,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <errno.h>
 #include <sys/stat.h>
 
 #include "charmony.h"
@@ -26,6 +25,7 @@
 #include "Lucy/Util/ToolSet.h"
 #include "Clownfish/Err.h"
 #include "Clownfish/Vector.h"
+#include "Lucy/Store/ErrorMessage.h"
 #include "Lucy/Store/FSDirHandle.h"
 
 #ifdef CHY_HAS_SYS_TYPES_H
@@ -80,8 +80,7 @@ FSDH_do_open(FSDirHandle *self, String *dir) {
 
     if (dir_path_size >= MAX_PATH - 2) {
         // Deal with Windows ceiling on file path lengths.
-        Err_set_error(Err_new(Str_newf("Directory path is too long: %o",
-                                       dir)));
+        ErrMsg_set("Directory path is too long: %o", dir);
         CFISH_DECREF(self);
         return NULL;
     }
@@ -95,7 +94,7 @@ FSDH_do_open(FSDirHandle *self, String *dir) {
         = FindFirstFile(search_string, (WIN32_FIND_DATA*)ivars->sys_dir_entry);
     if (INVALID_HANDLE_VALUE == ivars->sys_dirhandle) {
         // Directory inaccessible or doesn't exist.
-        Err_set_error(Err_new(Str_newf("Failed to open dir '%o'", dir)));
+        ErrMsg_set_with_win_error("Failed to open dir '%o'", dir);
         CFISH_DECREF(self);
         return NULL;
     }
@@ -218,7 +217,7 @@ FSDH_do_open(FSDirHandle *self, String *dir) {
     ivars->sys_dirhandle = opendir(dir_path_ptr);
     FREEMEM(dir_path_ptr);
     if (!ivars->sys_dirhandle) {
-        Err_set_error(Err_new(Str_newf("Failed to opendir '%o'", dir)));
+        ErrMsg_set_with_errno("Failed to opendir '%o'", dir);
         DECREF(self);
         return NULL;
     }
@@ -315,8 +314,7 @@ FSDH_Close_IMP(FSDirHandle *self) {
         DIR *sys_dirhandle = (DIR*)ivars->sys_dirhandle;
         ivars->sys_dirhandle = NULL;
         if (closedir(sys_dirhandle) == -1) {
-            Err_set_error(Err_new(Str_newf("Error closing dirhandle: %s",
-                                           strerror(errno))));
+            ErrMsg_set_with_errno("Error closing dirhandle");
             return false;
         }
     }
