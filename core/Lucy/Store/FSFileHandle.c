@@ -19,7 +19,6 @@
 
 #include "charmony.h"
 
-#include <errno.h>
 #include <stdio.h>
 #include <fcntl.h> // open, POSIX flags
 
@@ -36,6 +35,7 @@
   #error "No support for memory mapped files"
 #endif
 
+#include "Lucy/Store/ErrorMessage.h"
 #include "Lucy/Store/FSFileHandle.h"
 #include "Lucy/Store/FileWindow.h"
 
@@ -95,7 +95,7 @@ FSFH_do_open(FSFileHandle *self, String *path, uint32_t flags) {
     FH_do_open((FileHandle*)self, path, flags);
     FSFileHandleIVARS *const ivars = FSFH_IVARS(self);
     if (!path || !Str_Get_Size(path)) {
-        Err_set_error(Err_new(Str_newf("Missing required param 'path'")));
+        ErrMsg_set("Missing required param 'path'");
         CFISH_DECREF(self);
         return NULL;
     }
@@ -107,8 +107,7 @@ FSFH_do_open(FSFileHandle *self, String *path, uint32_t flags) {
         FREEMEM(path_ptr);
         if (ivars->fd == -1) {
             ivars->fd = 0;
-            Err_set_error(Err_new(Str_newf("Attempt to open '%o' failed: %s",
-                                           path, strerror(errno))));
+            ErrMsg_set_with_errno("Attempt to open '%o' failed", path);
             CFISH_DECREF(self);
             return NULL;
         }
@@ -119,8 +118,7 @@ FSFH_do_open(FSFileHandle *self, String *path, uint32_t flags) {
             // Derive length.
             ivars->len = chy_lseek64(ivars->fd, INT64_C(0), SEEK_END);
             if (ivars->len == -1) {
-                Err_set_error(Err_new(Str_newf("lseek64 on %o failed: %s",
-                                               ivars->path, strerror(errno))));
+                ErrMsg_set_with_errno("lseek64 on %o failed", path);
                 CFISH_DECREF(self);
                 return NULL;
             }
@@ -128,8 +126,7 @@ FSFH_do_open(FSFileHandle *self, String *path, uint32_t flags) {
                 int64_t check_val
                     = chy_lseek64(ivars->fd, INT64_C(0), SEEK_SET);
                 if (check_val == -1) {
-                    Err_set_error(Err_new(Str_newf("lseek64 on %o failed: %s",
-                                                   ivars->path, strerror(errno))));
+                    ErrMsg_set_with_errno("lseek64 on %o failed", path);
                     CFISH_DECREF(self);
                     return NULL;
                 }
@@ -155,8 +152,8 @@ FSFH_do_open(FSFileHandle *self, String *path, uint32_t flags) {
         }
     }
     else {
-        Err_set_error(Err_new(Str_newf("Must specify FH_READ_ONLY or FH_WRITE_ONLY to open '%o'",
-                                       path)));
+        ErrMsg_set("Must specify FH_READ_ONLY or FH_WRITE_ONLY to open '%o'",
+                   path);
         CFISH_DECREF(self);
         return NULL;
     }
@@ -177,8 +174,7 @@ FSFH_Close_IMP(FSFileHandle *self) {
     // Close system-specific handles.
     if (ivars->fd) {
         if (close(ivars->fd)) {
-            Err_set_error(Err_new(Str_newf("Failed to close file: %s",
-                                           strerror(errno))));
+            ErrMsg_set_with_errno("Failed to close file");
             return false;
         }
         ivars->fd  = 0;
@@ -202,12 +198,12 @@ FSFH_Write_IMP(FSFileHandle *self, const void *data, size_t len) {
         ivars->len += check_val;
         if ((size_t)check_val != len) {
             if (check_val == -1) {
-                Err_set_error(Err_new(Str_newf("Error when writing %u64 bytes: %s",
-                                               (uint64_t)len, strerror(errno))));
+                ErrMsg_set_with_errno("Error when writing %u64 bytes",
+                                      (uint64_t)len);
             }
             else {
-                Err_set_error(Err_new(Str_newf("Attempted to write %u64 bytes, but wrote %i64",
-                                               (uint64_t)len, check_val)));
+                ErrMsg_set("Attempted to write %u64 bytes, but wrote %i64",
+                           (uint64_t)len, check_val);
             }
             return false;
         }
@@ -227,17 +223,17 @@ FSFH_Window_IMP(FSFileHandle *self, FileWindow *window, int64_t offset,
     FSFileHandleIVARS *const ivars = FSFH_IVARS(self);
     const int64_t end = offset + len;
     if (!(ivars->flags & FH_READ_ONLY)) {
-        Err_set_error(Err_new(Str_newf("Can't read from write-only handle")));
+        ErrMsg_set("Can't read from write-only handle");
         return false;
     }
     else if (offset < 0) {
-        Err_set_error(Err_new(Str_newf("Can't read from negative offset %i64",
-                                       offset)));
+        ErrMsg_set("Can't read from negative offset %i64", offset);
         return false;
     }
     else if (end > ivars->len) {
-        Err_set_error(Err_new(Str_newf("Tried to read past EOF: offset %i64 + request %i64 > len %i64",
-                                       offset, len, ivars->len)));
+        ErrMsg_set("Tried to read past EOF: "
+                   "offset %i64 + request %i64 > len %i64",
+                   offset, len, ivars->len);
         return false;
     }
     else {
@@ -278,17 +274,18 @@ FSFH_Read_IMP(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
     const int64_t end = offset + (int64_t)len;
 
     if (ivars->flags & FH_WRITE_ONLY) {
-        Err_set_error(Err_new(Str_newf("Can't read from write-only filehandle")));
+        ErrMsg_set("Can't read from write-only filehandle");
         return false;
     }
     if (offset < 0 || end < offset) {
-        Err_set_error(Err_new(Str_newf("Invalid offset and len (%i64, %u64)",
-                                       offset, (uint64_t)len)));
+        ErrMsg_set("Invalid offset and len (%i64, %u64)",
+                   offset, (uint64_t)len);
         return false;
     }
     else if (end > ivars->len) {
-        Err_set_error(Err_new(Str_newf("Tried to read past EOF: offset %i64 + request %u64 > len %i64",
-                                       offset, (uint64_t)len, ivars->len)));
+        ErrMsg_set("Tried to read past EOF: "
+                   "offset %i64 + request %u64 > len %i64",
+                   offset, (uint64_t)len, ivars->len);
         return false;
     }
     memcpy(dest, ivars->buf + offset, len);
@@ -348,23 +345,20 @@ SI_init_read_only(FSFileHandle *self, FSFileHandleIVARS *ivars) {
     FREEMEM(path_ptr);
     if (ivars->fd == -1) {
         ivars->fd = 0;
-        Err_set_error(Err_new(Str_newf("Can't open '%o': %s", ivars->path,
-                                       strerror(errno))));
+        ErrMsg_set_with_errno("Can't open '%o'", ivars->path);
         return false;
     }
 
     // Derive len.
     ivars->len = chy_lseek64(ivars->fd, INT64_C(0), SEEK_END);
     if (ivars->len == -1) {
-        Err_set_error(Err_new(Str_newf("lseek64 on %o failed: %s", ivars->path,
-                                       strerror(errno))));
+        ErrMsg_set_with_errno("lseek64 on %o failed", ivars->path);
         return false;
     }
     else {
         int64_t check_val = chy_lseek64(ivars->fd, INT64_C(0), SEEK_SET);
         if (check_val == -1) {
-            Err_set_error(Err_new(Str_newf("lseek64 on %o failed: %s",
-                                           ivars->path, strerror(errno))));
+            ErrMsg_set_with_errno("lseek64 on %o failed", ivars->path);
             return false;
         }
     }
@@ -391,10 +385,9 @@ SI_map(FSFileHandle *self, FSFileHandleIVARS *ivars, int64_t offset,
         // Read-only memory mapping.
         buf = mmap(NULL, (size_t)len, PROT_READ, MAP_SHARED, ivars->fd, offset);
         if (buf == (void*)(-1)) {
-            Err_set_error(Err_new(Str_newf("mmap of offset %i64 and length %i64 (page size %i64) "
-                                           "against '%o' failed: %s",
-                                           offset, len, ivars->page_size,
-                                           ivars->path, strerror(errno))));
+            ErrMsg_set_with_errno("mmap of offset %i64 and length %i64 "
+                                  "(page size %i64) against '%o' failed",
+                                  offset, len, ivars->page_size, ivars->path);
             return NULL;
         }
     }
@@ -406,9 +399,8 @@ static CFISH_INLINE bool
 SI_unmap(FSFileHandle *self, char *buf, int64_t len) {
     if (buf != NULL) {
         if (munmap(buf, (size_t)len)) {
-            Err_set_error(Err_new(Str_newf("Failed to munmap '%o': %s",
-                                           FSFH_IVARS(self)->path,
-                                           strerror(errno))));
+            ErrMsg_set_with_errno("Failed to munmap '%o'",
+                                  FSFH_IVARS(self)->path);
             return false;
         }
     }
@@ -423,8 +415,7 @@ FSFH_Read_IMP(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
 
     // Sanity check.
     if (offset < 0) {
-        Err_set_error(Err_new(Str_newf("Can't read from an offset less than 0 (%i64)",
-                                       offset)));
+        ErrMsg_set("Can't read from an offset less than 0 (%i64)", offset);
         return false;
     }
 
@@ -432,12 +423,12 @@ FSFH_Read_IMP(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
     check_val = chy_pread64(ivars->fd, dest, len, offset);
     if (check_val != (int64_t)len) {
         if (check_val == -1) {
-            Err_set_error(Err_new(Str_newf("Tried to read %u64 bytes, got %i64: %s",
-                                           (uint64_t)len, check_val, strerror(errno))));
+            ErrMsg_set_with_errno("Tried to read %u64 bytes, got %i64",
+                                  (uint64_t)len, check_val);
         }
         else {
-            Err_set_error(Err_new(Str_newf("Tried to read %u64 bytes, got %i64",
-                                           (uint64_t)len, check_val)));
+            ErrMsg_set("Tried to read %u64 bytes, got %i64",
+                       (uint64_t)len, check_val);
         }
         return false;
     }
@@ -472,10 +463,7 @@ SI_init_read_only(FSFileHandle *self, FSFileHandleIVARS *ivars) {
                         );
     FREEMEM(filepath);
     if (ivars->win_fhandle == INVALID_HANDLE_VALUE) {
-        char *win_error = Err_win_error();
-        Err_set_error(Err_new(Str_newf("CreateFile for %o failed: %s",
-                                       ivars->path, win_error)));
-        FREEMEM(win_error);
+        ErrMsg_set_with_win_error("CreateFile for %o failed", ivars->path);
         return false;
     }
 
@@ -483,8 +471,7 @@ SI_init_read_only(FSFileHandle *self, FSFileHandleIVARS *ivars) {
     DWORD file_size_hi;
     DWORD file_size_lo = GetFileSize(ivars->win_fhandle, &file_size_hi);
     if (file_size_lo == INVALID_FILE_SIZE && GetLastError() != NO_ERROR) {
-        Err_set_error(Err_new(Str_newf("GetFileSize for %o failed",
-                                       ivars->path)));
+        ErrMsg_set_with_win_error("GetFileSize for %o failed", ivars->path);
         return false;
     }
     ivars->len = ((uint64_t)file_size_hi << 32) | file_size_lo;
@@ -495,10 +482,8 @@ SI_init_read_only(FSFileHandle *self, FSFileHandleIVARS *ivars) {
         ivars->win_maphandle = CreateFileMapping(ivars->win_fhandle, NULL,
                                                  PAGE_READONLY, 0, 0, NULL);
         if (ivars->win_maphandle == NULL) {
-            char *win_error = Err_win_error();
-            Err_set_error(Err_new(Str_newf("CreateFileMapping for %o failed: %s",
-                                           ivars->path, win_error)));
-            FREEMEM(win_error);
+            ErrMsg_set_with_win_error("CreateFileMapping for %o failed",
+                                      ivars->path);
             return false;
         }
     }
@@ -521,10 +506,8 @@ SI_map(FSFileHandle *self, FSFileHandleIVARS *ivars, int64_t offset,
         buf = MapViewOfFile(ivars->win_maphandle, FILE_MAP_READ,
                             file_offset_hi, file_offset_lo, amount);
         if (buf == NULL) {
-            char *win_error = Err_win_error();
-            Err_set_error(Err_new(Str_newf("MapViewOfFile for %o failed: %s",
-                                           ivars->path, win_error)));
-            FREEMEM(win_error);
+            ErrMsg_set_with_win_error("MapViewOfFile for %o failed",
+                                      ivars->path);
         }
     }
 
@@ -536,11 +519,8 @@ SI_unmap(FSFileHandle *self, char *buf, int64_t len) {
     UNUSED_VAR(self);
     if (buf != NULL) {
         if (!UnmapViewOfFile(buf)) {
-            char *win_error = Err_win_error();
-            Err_set_error(Err_new(Str_newf("Failed to unmap '%o': %s",
-                                           FSFH_IVARS(self)->path,
-                                           win_error)));
-            FREEMEM(win_error);
+            ErrMsg_set_with_win_error("Failed to unmap '%o'",
+                                      FSFH_IVARS(self)->path);
             return false;
         }
     }
@@ -553,20 +533,14 @@ SI_close_win_handles(FSFileHandle *self) {
     // Close both standard handle and mapping handle.
     if (ivars->win_maphandle) {
         if (!CloseHandle(ivars->win_maphandle)) {
-            char *win_error = Err_win_error();
-            Err_set_error(Err_new(Str_newf("Failed to close file mapping handle: %s",
-                                           win_error)));
-            FREEMEM(win_error);
+            ErrMsg_set_with_win_error("Failed to close file mapping handle");
             return false;
         }
         ivars->win_maphandle = NULL;
     }
     if (ivars->win_fhandle) {
         if (!CloseHandle(ivars->win_fhandle)) {
-            char *win_error = Err_win_error();
-            Err_set_error(Err_new(Str_newf("Failed to close file handle: %s",
-                                           win_error)));
-            FREEMEM(win_error);
+            ErrMsg_set_with_win_error("Failed to close file handle");
             return false;
         }
         ivars->win_fhandle = NULL;
@@ -590,16 +564,14 @@ FSFH_Read_IMP(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
 
     // Sanity check.
     if (offset < 0) {
-        Err_set_error(Err_new(Str_newf("Can't read from an offset less than 0 (%i64)",
-                                       offset)));
+        ErrMsg_set("Can't read from an offset less than 0 (%i64)", offset);
         return false;
     }
 
     // ReadFile() takes a DWORD (unsigned 32-bit integer) as a length
     // argument, so throw a sensible error rather than wrap around.
     if (len > UINT32_MAX) {
-        Err_set_error(Err_new(Str_newf("Can't read more than 4 GB (%u64)",
-                                       (uint64_t)len)));
+        ErrMsg_set("Can't read more than 4 GB (%u64)", (uint64_t)len);
         return false;
     }
 
@@ -615,10 +587,7 @@ FSFH_Read_IMP(FSFileHandle *self, char *dest, int64_t offset, size_t len) {
 
     // Verify that the read has succeeded by now.
     if (!check_val) {
-        char *win_error = Err_win_error();
-        Err_set_error(Err_new(Str_newf("Failed to read %u64 bytes: %s",
-                                       (uint64_t)len, win_error)));
-        FREEMEM(win_error);
+        ErrMsg_set_with_win_error("Failed to read %u64 bytes", (uint64_t)len);
         return false;
     }
 
