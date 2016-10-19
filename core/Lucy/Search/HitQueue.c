@@ -108,13 +108,15 @@ HitQ_init(HitQueue *self, Schema *schema, SortSpec *sort_spec,
 void
 HitQ_Destroy_IMP(HitQueue *self) {
     HitQueueIVARS *const ivars = HitQ_IVARS(self);
-    FieldType **types = ivars->field_types;
-    FieldType **const limit = types + ivars->num_actions - 1;
-    for (; types < limit; types++) {
-        if (types) { DECREF(*types); }
+    if (ivars->field_types) {
+        FieldType **types = ivars->field_types;
+        FieldType **const limit = types + ivars->num_actions;
+        for (; types < limit; types++) {
+            DECREF(*types);
+        }
+        FREEMEM(ivars->field_types);
     }
     FREEMEM(ivars->actions);
-    FREEMEM(ivars->field_types);
     SUPER_DESTROY(self, HITQUEUE);
 }
 
