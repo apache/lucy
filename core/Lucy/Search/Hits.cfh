@@ -34,7 +34,8 @@ public class Lucy::Search::Hits inherits Clownfish::Obj {
     init(Hits *self, Searcher *searcher, TopDocs *top_docs,
          uint32_t offset = 0);
 
-    /** Return the next hit, or [](cfish:@null) when the iterator is exhausted.
+    /** Return the [](HitDoc) for the next hit, or [](@null) when the iterator
+     * is exhausted.
      */
     public incremented nullable HitDoc*
     Next(Hits *self);
