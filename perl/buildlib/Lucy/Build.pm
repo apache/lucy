@@ -216,20 +216,11 @@ limitations under the License.
 END_AUTOGEN
 }
 
-sub _check_module_build_for_dist {
-    eval "use Module::Build 0.38;";
-    die "./Build dist reqiures Module::Build 0.38 or higher--this is only "
-        . Module::Build->VERSION . $/ if $@;
-}
-
-sub ACTION_distdir {
-    _check_module_build_for_dist;
-    shift->SUPER::ACTION_distdir(@_);
-}
-
 sub ACTION_dist {
     my $self = shift;
-    _check_module_build_for_dist;
+
+    die("Module::Build 0.40_11 is required for ./Build dist")
+        if $Module::Build::VERSION < 0.40_11;
 
     # Create POD.
     $self->depends_on('pod');
@@ -263,10 +254,6 @@ sub ACTION_dist {
 
     move( "MANIFEST", "MANIFEST.bak" ) or die "move() failed: $!";
     $self->depends_on('manifest');
-    my $no_index = $self->_gen_pause_exclusion_list;
-    my $meta_add = $self->meta_add || {};
-    $meta_add->{no_index} = $no_index;
-    $self->meta_add( $meta_add );
     $self->SUPER::ACTION_dist;
 
     # Clean up.
@@ -275,63 +262,6 @@ sub ACTION_dist {
     unlink("META.yml");
     unlink("META.json");
     move( "MANIFEST.bak", "MANIFEST" ) or die "move() failed: $!";
-}
-
-sub ACTION_distmeta {
-    my $self = shift;
-    $self->SUPER::ACTION_distmeta(@_);
-    # Make sure everything has a version.
-    require CPAN::Meta;
-    my $v = version->new($self->dist_version);
-    my $meta = CPAN::Meta->load_file('META.json');
-    my $provides = $meta->provides;
-    while (my ($pkg, $data) = each %{ $provides }) {
-        die "$pkg, defined in $data->{file}, has no version\n"
-            unless $data->{version};
-        die "$pkg, defined in $data->{file}, is "
-            . version->new($data->{version})->normal
-            . " but should be " . $v->normal . "\n"
-            unless $data->{version} == $v;
-    }
-}
-
-# Generate a list of files for PAUSE, search.cpan.org, etc to ignore.
-sub _gen_pause_exclusion_list {
-    my $self = shift;
-
-    # Only exclude files that are actually on-board.
-    open( my $man_fh, '<', 'MANIFEST' ) or die "Can't open MANIFEST: $!";
-    my @manifest_entries = <$man_fh>;
-    chomp @manifest_entries;
-
-    my @excluded_files;
-    for my $entry (@manifest_entries) {
-        # Allow README and Changes.
-        next if $entry =~ m#^(README|Changes)#;
-
-        # Allow public modules.
-        if ( $entry =~ m#^(perl/)?lib\b.+\.(pm|pod)$# ) {
-            open( my $fh, '<', $entry ) or die "Can't open '$entry': $!";
-            my $content = do { local $/; <$fh> };
-            next if $content =~ /=head1\s*NAME/;
-        }
-
-        # Disallow everything else.
-        push @excluded_files, $entry;
-    }
-
-    # Exclude redacted modules.
-    if ( eval { require "buildlib/Lucy/Redacted.pm" } ) {
-        my @redacted = map {
-            my @parts = split( /\W+/, $_ );
-            catfile( $LIB_DIR, @parts ) . '.pm'
-        } Lucy::Redacted->redacted, Lucy::Redacted->hidden;
-        push @excluded_files, @redacted;
-    }
-
-    my %uniquifier;
-    @excluded_files = sort grep { !$uniquifier{$_}++ } @excluded_files;
-    return { file => \@excluded_files };
 }
 
 sub ACTION_semiclean {
