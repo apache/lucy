@@ -55,6 +55,10 @@ my $builder = Lucy::Build->new(
         'Clownfish'          => 0.006000,
         'Clownfish::CFC'     => 0.006000,
     },
+    no_index => {
+        directory => [qw( buildlib devel sample )],
+        package   => [qw( Lucy::Test )],
+    },
     meta_merge => { keywords => [qw( search lucy lucene )], },
     meta_add   => {
         resources => {
