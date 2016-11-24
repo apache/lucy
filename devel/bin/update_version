@@ -28,28 +28,33 @@ my $usage = "$0 version\n";
 my $version = shift(@ARGV) or die $usage;
 
 # standardize version strings
-my ( $x, $y, $z, $dev );
+my ( $x, $y, $z, $dev_sep, $dev );
 if ( $version =~ m/^(\d+)\.(\d+)\.(\d+)$/ ) {
     ( $x, $y, $z, $dev ) = ( $1, $2, $3, 0 );
 }
-elsif ( $version =~ m/^(\d+)\.(\d+)\.(\d+)_(\d+)$/ ) {
-    ( $x, $y, $z, $dev ) = ( $1, $2, $3, $4 );
+elsif ( $version =~ m/^(\d+)\.(\d+)\.(\d+)([._])(\d+)$/ ) {
+    ( $x, $y, $z, $dev_sep, $dev ) = ( $1, $2, $3, $4, $5 );
 }
 elsif ( $version =~ m/^(\d+)\.(\d\d\d)(\d\d\d)$/ ) {
     ( $x, $y, $z, $dev ) = ( int($1), int($2), int($3), 0 );
 }
-elsif ( $version =~ m/^(\d+)\.(\d\d\d)(\d\d\d)_(\d\d\d)$/ ) {
-    ( $x, $y, $z, $dev ) = ( int($1), int($2), int($3), int($4) );
+elsif ( $version =~ m/^(\d+)\.(\d\d\d)(\d\d\d)(_)?(\d\d\d)$/ ) {
+    ( $x, $y, $z, $dev_sep, $dev )
+        = ( int($1), int($2), int($3), defined($4) ? $4 : '.', int($5) );
 }
 else {
     die "Unknown version syntax. Try X.Y.Z or X.YYYZZZ\n";
 }
 my $x_y_z_version    = sprintf( "%d.%d.%d", $x, $y, $z );
 my $x_y_z_d_version  = $dev
-                       ? sprintf( "%d.%d.%d_%d", $x, $y, $z, $dev )
+                       ? $dev_sep eq '_'
+                         ? sprintf( "%d.%d.%d_%d", $x, $y, $z, $dev )
+                         : sprintf( "%d.%d.%d.%d", $x, $y, $z, $dev )
                        : sprintf( "%d.%d.%d", $x, $y, $z );
 my $x_yyyzzz_version = $dev
-                       ? sprintf( "%d.%03d%03d_%03d", $x, $y, $z, $dev )
+                       ? $dev_sep eq '_'
+                         ? sprintf( "%d.%03d%03d_%03d", $x, $y, $z, $dev )
+                         : sprintf( "%d.%03d%03d%03d", $x, $y, $z, $dev )
                        : sprintf( "%d.%03d%03d", $x, $y, $z );
 
 print "Using version: $x_y_z_version ( $x_yyyzzz_version )\n";
