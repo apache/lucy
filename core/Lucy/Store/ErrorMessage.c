@@ -785,11 +785,6 @@ ErrMsg_strerror(int my_errno) {
             msg = "Inappropriate file type or format";
             break;
 #endif
-#ifdef ELAST
-        case ELAST:
-            msg = "Must be equal largest errno";
-            break;
-#endif
 #ifdef ENEEDAUTH
         case ENEEDAUTH:
             msg = "Need authenticator";
