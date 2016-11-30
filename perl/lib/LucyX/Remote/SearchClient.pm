@@ -51,7 +51,12 @@ sub new {
 
 sub DESTROY {
     my $self = shift;
-    $self->close if defined $sock{$$self};
+    if ( defined $sock{$$self} ) {
+        # Ignore exceptions in destructor.
+        eval {
+            $self->close;
+        };
+    }
     delete $peer_address{$$self};
     delete $sock{$$self};
     $self->SUPER::DESTROY;
