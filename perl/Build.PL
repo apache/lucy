@@ -20,6 +20,16 @@ use lib 'buildlib';
 use File::Spec::Functions qw( catdir updir );
 use Lucy::Build;
 
+# Don't create FAIL reports from CPAN Testers that force parallel tests.
+# See LUCY-260.
+if ( $ENV{AUTOMATED_TESTING}
+     && $ENV{HARNESS_OPTIONS} =~ /(?:^|:)j(\d*)/
+     && ($1 || 9) > 1
+   ) {
+    print STDERR "Parallel testing is known to fail.\n";
+    exit;
+}
+
 my $IS_CPAN_DIST = -e 'cfcore';
 my $CORE_SOURCE_DIR;
 my $TEST_SOURCE_DIR;
