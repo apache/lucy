@@ -52,12 +52,23 @@ test_Choose_Sparse(TestBatchRunner *runner) {
         DECREF(doc_counts);
     }
 
+    {
+        size_t num_segs = 1000;
+        I32Array *doc_counts = I32Arr_new_blank(num_segs);
+        for (size_t j = 0; j < num_segs; j++) {
+            I32Arr_Set(doc_counts, j, 1);
+        }
+        uint32_t threshold = IxManager_Choose_Sparse(manager, doc_counts);
+        TEST_TRUE(runner, threshold > 500, "Many small segments");
+        DECREF(doc_counts);
+    }
+
     DECREF(manager);
 }
 
 void
 TestIxManager_Run_IMP(TestIndexManager *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 34);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 35);
     test_Choose_Sparse(runner);
 }
 
