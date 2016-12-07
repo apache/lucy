@@ -31,6 +31,56 @@
 #include "Lucy/Util/Json.h"
 #include "Clownfish/Util/StringHelper.h"
 
+static const int32_t S_fibonacci[47] = {
+    0,
+    1,
+    1,
+    2,
+    3,
+    5,
+    8,
+    13,
+    21,
+    34,
+    55,
+    89,
+    144,
+    233,
+    377,
+    610,
+    987,
+    1597,
+    2584,
+    4181,
+    6765,
+    10946,
+    17711,
+    28657,
+    46368,
+    75025,
+    121393,
+    196418,
+    317811,
+    514229,
+    832040,
+    1346269,
+    2178309,
+    3524578,
+    5702887,
+    9227465,
+    14930352,
+    24157817,
+    39088169,
+    63245986,
+    102334155,
+    165580141,
+    267914296,
+    433494437,
+    701408733,
+    1134903170,
+    1836311903
+};
+
 IndexManager*
 IxManager_new(String *host, LockFactory *lock_factory) {
     IndexManager *self = (IndexManager*)Class_Make_Obj(INDEXMANAGER);
@@ -122,21 +172,6 @@ S_check_cutoff(VArray *array, uint32_t tick, void *data) {
     return SegReader_Get_Seg_Num(seg_reader) > cutoff;
 }
 
-static uint32_t
-S_fibonacci(uint32_t n) {
-    uint32_t result = 0;
-    if (n > 46) {
-        THROW(ERR, "input %u32 too high", n);
-    }
-    else if (n < 2) {
-        result = n;
-    }
-    else {
-        result = S_fibonacci(n - 1) + S_fibonacci(n - 2);
-    }
-    return result;
-}
-
 VArray*
 IxManager_Recycle_IMP(IndexManager *self, PolyReader *reader,
                       DeletionsWriter *del_writer, int64_t cutoff,
@@ -198,7 +233,9 @@ IxManager_Choose_Sparse_IMP(IndexManager *self, I32Array *doc_counts) {
     for (uint32_t i = 0; i < num_candidates; i++) {
         uint32_t num_segs_when_done = num_candidates - threshold + 1;
         total_docs += I32Arr_Get(doc_counts, i);
-        if (total_docs < S_fibonacci(num_segs_when_done + 5)) {
+        uint32_t n = num_segs_when_done + 5;
+        if (n >= sizeof(S_fibonacci) / sizeof(S_fibonacci[0])
+            || total_docs < S_fibonacci[n]) {
             threshold = i + 1;
         }
     }
