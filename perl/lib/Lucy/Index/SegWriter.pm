@@ -15,7 +15,7 @@
 
 package Lucy::Index::SegWriter;
 use Lucy;
-our $VERSION = '0.006000';
+our $VERSION = '0.006001';
 $VERSION = eval $VERSION;
 
 1;

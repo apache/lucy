@@ -15,7 +15,7 @@
 
 package Lucy::Test;
 use Lucy;
-our $VERSION = '0.006000';
+our $VERSION = '0.006001';
 $VERSION = eval $VERSION;
 
 sub dl_load_flags { 1 }
@@ -23,7 +23,7 @@ sub dl_load_flags { 1 }
 BEGIN {
     require DynaLoader;
     our @ISA = qw( DynaLoader );
-    bootstrap Lucy::Test '0.6.0';
+    bootstrap Lucy::Test '0.6.1';
 }
 
 # Set the default memory threshold for PostingListWriter to a low number so
