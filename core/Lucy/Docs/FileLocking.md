@@ -21,7 +21,7 @@ same time, causing index corruption.  The search-time problem is more
 complex.
 
 Once an index file is no longer listed in the most recent snapshot, Indexer
-attempts to delete it as part of a post-[](lucy:Indexer.Commit) cleanup routine.  It is
+attempts to delete it as part of a post-[](lucy.Indexer.Commit) cleanup routine.  It is
 possible that at the moment an Indexer is deleting files which it believes
 no longer needed, a Searcher referencing an earlier snapshot is in fact
 using them.  The more often that an index is either updated or searched,
@@ -43,9 +43,9 @@ process will crash with a "Stale NFS filehandle" exception.
 
 Under normal circumstances, it is neither necessary nor desirable for
 IndexReaders to secure read locks against an index, but for NFS we have to
-make an exception.  LockFactory's [](lucy:LockFactory.Make_Shared_Lock) method exists for this
+make an exception.  LockFactory's [](lucy.LockFactory.Make_Shared_Lock) method exists for this
 reason; supplying an IndexManager instance to IndexReader's constructor
-activates an internal locking mechanism using [](lucy:LockFactory.Make_Shared_Lock) which
+activates an internal locking mechanism using [](lucy.LockFactory.Make_Shared_Lock) which
 prevents concurrent indexing processes from deleting files that are needed
 by active readers.
 
