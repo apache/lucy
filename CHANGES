@@ -5,10 +5,8 @@ Revision history for Lucy
   Bugfixes:
 
     * [LUCY-286] - Remote::SearchClient::DESTROY shouldn't throw exceptions
-    * [LUCY-309] - BSD make doesn't support pattern rules
     * [LUCY-310] - CPAN dist includes Lucy/Test.xs
     * [LUCY-311] - Non-ASCII error messages from strerror cause exceptions
-    * [LUCY-312] - Remote searcher tests fail if port is in use
     * [LUCY-315] - Memory leak in HitQueue with SortSpec
     * [LUCY-316] - Don't regenerate POD when building CPAN distro
     * [LUCY-317] - Compile failure on FreeBSD 10.1
