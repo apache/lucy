@@ -178,7 +178,9 @@ say qq|svnmucc -m "Publish Apache Lucy $x_y_z_version" |
     . qq|mv dev/lucy/apache-lucy-$full_rc_version/apache-lucy-$x_y_z_version.tar.gz.asc |
     . qq|release/lucy/apache-lucy-$x_y_z_version.tar.gz.asc |
     . qq|mv dev/lucy/apache-lucy-$full_rc_version/CHANGES-$x_y_z_version.txt |
-    . qq|release/lucy/CHANGES-$x_y_z_version.txt |
+    . qq|release/lucy/CHANGES-$x_y_z_version.txt|;
+say qq|svnmucc -m "Remove apache-lucy-$full_rc_version directory" |
+    . qq|-U https://dist.apache.org/repos/dist/ |
     . qq|rm dev/lucy/apache-lucy-$full_rc_version\n|;
 
 say qq|# Carefully remove the artifacts for any previous releases superseded|;
