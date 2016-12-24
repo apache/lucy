@@ -48,6 +48,11 @@ public class Lucy::Search::PolySearcher
     public void
     Destroy(PolySearcher *self);
 
+    /** Accessor for searchers.
+     */
+    public Vector*
+    Get_Searchers(PolySearcher *self);
+
     public int32_t
     Doc_Max(PolySearcher *self);
 

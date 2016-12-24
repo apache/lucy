@@ -17,7 +17,7 @@ use strict;
 use warnings;
 use lib 'buildlib';
 
-use Test::More tests => 8;
+use Test::More tests => 9;
 use Lucy::Test;
 use Lucy::Test::TestUtils qw( create_index );
 
@@ -31,6 +31,7 @@ my $poly_searcher = Lucy::Search::PolySearcher->new(
     searchers => [ $searcher_a, $searcher_b ],
 );
 
+is( scalar @{ $poly_searcher->get_searchers }, 2, 'get_searchers' );
 is( $poly_searcher->doc_freq( field => 'content', term => 'b' ),
     2, 'doc_freq' );
 is( $poly_searcher->doc_max,                 6,     'doc_max' );

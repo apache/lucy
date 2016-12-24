@@ -63,6 +63,9 @@ static void
 test_poly_searcher(TestBatchRunner *runner) {
     PolySearcher *poly_searcher = S_create_poly_searcher();
 
+    Vector *searchers = PolySearcher_Get_Searchers(poly_searcher);
+    TEST_UINT_EQ(runner, Vec_Get_Size(searchers), 2, "Get_Searchers");
+
     TEST_UINT_EQ(runner,
                  PolySearcher_Doc_Freq(poly_searcher, SSTR_WRAP_C("content"),
                                        (Obj*)SSTR_WRAP_C("b")),
@@ -121,6 +124,6 @@ test_poly_searcher(TestBatchRunner *runner) {
 
 void
 TestPolySearcher_Run_IMP(TestPolySearcher *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 10);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 11);
     test_poly_searcher(runner);
 }

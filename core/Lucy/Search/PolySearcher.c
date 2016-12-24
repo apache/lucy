@@ -83,6 +83,11 @@ PolySearcher_Destroy_IMP(PolySearcher *self) {
     SUPER_DESTROY(self, POLYSEARCHER);
 }
 
+Vector*
+PolySearcher_Get_Searchers_IMP(PolySearcher *self) {
+    return PolySearcher_IVARS(self)->searchers;
+}
+
 HitDoc*
 PolySearcher_Fetch_Doc_IMP(PolySearcher *self, int32_t doc_id) {
     PolySearcherIVARS *const ivars = PolySearcher_IVARS(self);
