@@ -21,11 +21,14 @@
 
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test.h"
+#include "Lucy/Test/TestSchema.h"
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Clownfish/TestHarness/TestUtils.h"
 #include "Lucy/Analysis/Analyzer.h"
 #include "Lucy/Analysis/Inversion.h"
 #include "Lucy/Analysis/Token.h"
+#include "Lucy/Document/Doc.h"
+#include "Lucy/Index/Indexer.h"
 #include "Lucy/Search/TermQuery.h"
 #include "Lucy/Search/PhraseQuery.h"
 #include "Lucy/Search/LeafQuery.h"
@@ -37,6 +40,7 @@
 #include "Lucy/Store/InStream.h"
 #include "Lucy/Store/OutStream.h"
 #include "Lucy/Store/RAMFile.h"
+#include "Lucy/Store/RAMFolder.h"
 #include "Lucy/Util/Freezer.h"
 
 Vector*
@@ -52,6 +56,47 @@ TestUtils_doc_set() {
     Vec_Push(docs, (Obj*)TestUtils_get_str("x foo a b c d"));
 
     return docs;
+}
+
+Folder*
+TestUtils_create_index(Vector *doc_set) {
+    Schema     *schema  = (Schema*)TestSchema_new(false);
+    RAMFolder  *folder  = RAMFolder_new(NULL);
+    Indexer    *indexer = Indexer_new(schema, (Obj*)folder, NULL, 0);
+
+    String *field = SSTR_WRAP_C("content");
+    for (size_t i = 0, max = Vec_Get_Size(doc_set); i < max; i++) {
+        Doc *doc = Doc_new(NULL, 0);
+        Doc_Store(doc, field, Vec_Fetch(doc_set, i));
+        Indexer_Add_Doc(indexer, doc, 1.0f);
+        DECREF(doc);
+    }
+
+    Indexer_Commit(indexer);
+
+    DECREF(indexer);
+    DECREF(schema);
+
+    return (Folder*)folder;
+}
+
+Folder*
+TestUtils_create_index_c(const char *first, ...) {
+    Vector *doc_set = Vec_new(1);
+    Vec_Push(doc_set, (Obj*)Str_new_from_utf8(first, strlen(first)));
+
+    va_list ap;
+    va_start(ap, first);
+    const char *next;
+    while ((next = va_arg(ap, const char*))) {
+        Vec_Push(doc_set, (Obj*)Str_new_from_utf8(next, strlen(next)));
+    }
+    va_end(ap);
+
+    Folder *folder = TestUtils_create_index(doc_set);
+
+    DECREF(doc_set);
+    return folder;
 }
 
 PolyQuery*

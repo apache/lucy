@@ -25,11 +25,8 @@
 #include "Lucy/Test.h"
 #include "Lucy/Test/Search/TestQueryParserLogic.h"
 #include "Lucy/Test/Search/TestQueryParser.h"
-#include "Lucy/Test/TestSchema.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Analysis/Analyzer.h"
-#include "Lucy/Document/Doc.h"
-#include "Lucy/Index/Indexer.h"
 #include "Lucy/Search/Hits.h"
 #include "Lucy/Search/IndexSearcher.h"
 #include "Lucy/Search/QueryParser.h"
@@ -42,7 +39,7 @@
 #include "Lucy/Search/NoMatchQuery.h"
 #include "Lucy/Search/ORQuery.h"
 #include "Lucy/Search/RequiredOptionalQuery.h"
-#include "Lucy/Store/RAMFolder.h"
+#include "Lucy/Store/Folder.h"
 
 #define make_leaf_query   (Query*)TestUtils_make_leaf_query
 #define make_not_query    (Query*)TestUtils_make_not_query
@@ -859,26 +856,11 @@ static LUCY_TestQPLogic_Prune_Test_t prune_test_funcs[] = {
 
 static Folder*
 S_create_index() {
-    Schema     *schema  = (Schema*)TestSchema_new(false);
-    RAMFolder  *folder  = RAMFolder_new(NULL);
-    Vector     *doc_set = TestUtils_doc_set();
-    Indexer    *indexer = Indexer_new(schema, (Obj*)folder, NULL, 0);
-
-    String *field = SSTR_WRAP_C("content");
-    for (size_t i = 0, max = Vec_Get_Size(doc_set); i < max; i++) {
-        Doc *doc = Doc_new(NULL, 0);
-        Doc_Store(doc, field, Vec_Fetch(doc_set, i));
-        Indexer_Add_Doc(indexer, doc, 1.0f);
-        DECREF(doc);
-    }
-
-    Indexer_Commit(indexer);
+    Vector *doc_set = TestUtils_doc_set();
+    Folder *folder  = TestUtils_create_index(doc_set);
 
     DECREF(doc_set);
-    DECREF(indexer);
-    DECREF(schema);
-
-    return (Folder*)folder;
+    return folder;
 }
 
 void

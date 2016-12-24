@@ -24,6 +24,17 @@ inert class Lucy::Test::TestUtils  {
     inert incremented Vector*
     doc_set();
 
+    /** Create an index using TestSchema with documents from `doc_set`.
+     */
+    inert incremented Folder*
+    create_index(Vector *doc_set);
+
+    /** Create an index using TestSchema with documents from a list
+     * of C strings terminated with NULL.
+     */
+    inert incremented Folder*
+    create_index_c(const char *first, ...);
+
     /** Testing-only TermQuery factory.
      */
     inert incremented TermQuery*
