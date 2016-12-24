@@ -29,7 +29,6 @@ our @EXPORT_OK = qw(
     uscon_dir
     create_index
     create_uscon_index
-    test_index_loc
     persistent_test_index_loc
     init_test_index_loc
     get_uscon_docs
@@ -44,6 +43,7 @@ use Lucy::Test;
 use File::Spec::Functions qw( catdir catfile curdir updir );
 use Encode qw( _utf8_off );
 use File::Path qw( rmtree );
+use File::Temp qw( tempdir );
 use Carp;
 
 my $working_dir = catfile( curdir(), 'lucy_test' );
@@ -64,28 +64,15 @@ sub remove_working_dir {
     return 1;
 }
 
-# Return a location for a test index to be used by a single test file.  If
-# the test file crashes it cannot clean up after itself, so we put the cleanup
-# routine in a single test file to be run at or near the end of the test
-# suite.
-sub test_index_loc {
-    return catdir( $working_dir, 'test_index' );
-}
-
 # Return a location for a test index intended to be shared by multiple test
 # files.  It will be cleaned as above.
 sub persistent_test_index_loc {
     return catdir( $working_dir, 'persistent_test_index' );
 }
 
-# Destroy anything left over in the test_index location, then create the
-# directory.  Finally, return the path.
+# Create a temporary test directory that will be removed at exit.
 sub init_test_index_loc {
-    my $dir = test_index_loc();
-    rmtree $dir;
-    die "Can't clean up '$dir'" if -e $dir;
-    mkdir $dir or die "Can't mkdir '$dir': $!";
-    return $dir;
+    return tempdir( DIR => 't', CLEANUP => 1 );
 }
 
 # Build a RAM index, using the supplied array of strings as source material.
