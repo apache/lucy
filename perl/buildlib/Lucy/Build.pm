@@ -45,16 +45,24 @@ else {
 sub new {
     my $self = shift->SUPER::new( recursive_test_files => 1, @_ );
 
+    # These compiler flags are only used to compile Perl-specific files
+    # with ExtUtils::CBuilder.
+    my $extra_cflags = $self->extra_compiler_flags;
+
     # Fix for MSVC: Although the generated XS should be C89-compliant, it
     # must be compiled in C++ mode like the rest of the code due to a
     # mismatch between the sizes of the C++ bool type and the emulated bool
     # type. (The XS code is compiled with Module::Build's extra compiler
     # flags, not the Clownfish cflags.)
     if ($Config{cc} =~ /^cl\b/) {
-        my $extra_cflags = $self->extra_compiler_flags;
         push @$extra_cflags, '/TP';
-        $self->extra_compiler_flags(@$extra_cflags);
     }
+
+    if ( $ENV{LUCY_DEBUG} ) {
+        push @$extra_cflags, '-DLUCY_DEBUG';
+    }
+
+    $self->extra_compiler_flags(@$extra_cflags);
 
     if ( $ENV{LUCY_VALGRIND} ) {
         my $optimize = $self->config('optimize') || '';
