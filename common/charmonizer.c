@@ -8793,10 +8793,6 @@ S_add_compiler_flags(struct chaz_CLI *cli) {
     }
 
     if (chaz_Probe_gcc_version_num()) {
-        if (getenv("LUCY_VALGRIND")) {
-            chaz_CFlags_append(extra_cflags,
-                "-DLUCY_VALGRIND -fno-inline-functions");
-        }
         chaz_CFlags_append(extra_cflags,
             "-pedantic -Wall -Wextra -Wno-variadic-macros");
         if (chaz_CLI_defined(cli, "enable-perl")) {

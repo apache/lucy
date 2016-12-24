@@ -129,13 +129,14 @@ test_num(TestBatchRunner *runner) {
     TEST_TRUE(runner, Int_Equals(i64, (Obj*)i64_thaw),
               "Integer freeze/thaw");
 
-#ifdef LUCY_VALGRIND
-    SKIP(runner, 1, "known leaks");
-#else
-    Boolean *true_thaw = (Boolean*)S_freeze_thaw((Obj*)CFISH_TRUE);
-    TEST_TRUE(runner, Bool_Equals(CFISH_TRUE, (Obj*)true_thaw),
-              "Boolean freeze/thaw");
-#endif
+    if (getenv("LUCY_VALGRIND")) {
+        SKIP(runner, 1, "known leaks");
+    }
+    else {
+        Boolean *true_thaw = (Boolean*)S_freeze_thaw((Obj*)CFISH_TRUE);
+        TEST_TRUE(runner, Bool_Equals(CFISH_TRUE, (Obj*)true_thaw),
+                  "Boolean freeze/thaw");
+    }
 
     DECREF(i64_thaw);
     DECREF(f64_thaw);

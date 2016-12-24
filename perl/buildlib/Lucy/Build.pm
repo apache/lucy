@@ -64,12 +64,6 @@ sub new {
 
     $self->extra_compiler_flags(@$extra_cflags);
 
-    if ( $ENV{LUCY_VALGRIND} ) {
-        my $optimize = $self->config('optimize') || '';
-        $optimize =~ s/\-O\d+/-O1/g;
-        $self->config( optimize => $optimize );
-    }
-
     $self->charmonizer_params( create_makefile => 1 );
     $self->charmonizer_params( charmonizer_c => $CHARMONIZER_C );
 
@@ -97,8 +91,7 @@ sub _valgrind_base_command {
 
 # Run the entire test suite under Valgrind.
 #
-# For this to work, Lucy must be compiled with the LUCY_VALGRIND environment
-# variable set to a true value, under a debugging Perl.
+# For this to work, the test suite must be run under a debugging Perl.
 #
 # A custom suppressions file will probably be needed -- use your judgment.
 # To pass in one or more local suppressions files, provide a comma separated
@@ -112,9 +105,6 @@ sub ACTION_test_valgrind {
     die "Must be run under a perl that was compiled with -DDEBUGGING"
         unless $self->config('ccflags') =~ /-D?DEBUGGING\b/
                || $^X =~ /\bdebugperl\b/;
-    if ( !$ENV{LUCY_VALGRIND} ) {
-        warn "\$ENV{LUCY_VALGRIND} not true -- possible false positives";
-    }
     $self->depends_on('code');
 
     # Unbuffer STDOUT, grab test file names.

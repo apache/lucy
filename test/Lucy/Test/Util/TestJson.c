@@ -342,9 +342,9 @@ test_max_depth(TestBatchRunner *runner) {
 void
 TestJson_Run_IMP(TestJson *self, TestBatchRunner *runner) {
     uint32_t num_tests = 105;
-#ifndef LUCY_VALGRIND
-    num_tests += 30; // FIXME: syntax errors leak memory.
-#endif
+    if (!getenv("LUCY_VALGRIND")) {
+        num_tests += 30; // FIXME: syntax errors leak memory.
+    }
     TestBatchRunner_Plan(runner, (TestBatch*)self, num_tests);
 
     // Test tolerance, then liberalize for testing.
@@ -359,8 +359,8 @@ TestJson_Run_IMP(TestJson *self, TestBatchRunner *runner) {
     test_floats(runner);
     test_max_depth(runner);
 
-#ifndef LUCY_VALGRIND
-    test_syntax_errors(runner);
-#endif
+    if (!getenv("LUCY_VALGRIND")) {
+        test_syntax_errors(runner);
+    }
 }
 

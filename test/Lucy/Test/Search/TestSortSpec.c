@@ -456,29 +456,30 @@ test_sort_spec(TestBatchRunner *runner) {
     TEST_TRUE(runner, Vec_Equals(results, (Obj*)wanted), "sort by one criteria");
     DECREF(results);
 
-#ifdef LUCY_VALGRIND
-    SKIP(runner, 2, "known leaks");
-#else
-    Err *error;
-    SortContext sort_ctx;
-    sort_ctx.searcher = searcher;
+    if (getenv("LUCY_VALGRIND")) {
+        SKIP(runner, 2, "known leaks");
+    }
+    else {
+        Err *error;
+        SortContext sort_ctx;
+        sort_ctx.searcher = searcher;
 
-    sort_ctx.sort_field = nope_str;
-    error = Err_trap(S_attempt_sorted_search, &sort_ctx);
-    TEST_TRUE(runner, error != NULL
-              && Err_is_a(error, ERR)
-              && Str_Contains_Utf8(Err_Get_Mess(error), "sortable", 8),
-              "sorting on a non-sortable field throws an error");
-    DECREF(error);
+        sort_ctx.sort_field = nope_str;
+        error = Err_trap(S_attempt_sorted_search, &sort_ctx);
+        TEST_TRUE(runner, error != NULL
+                  && Err_is_a(error, ERR)
+                  && Str_Contains_Utf8(Err_Get_Mess(error), "sortable", 8),
+                  "sorting on a non-sortable field throws an error");
+        DECREF(error);
 
-    sort_ctx.sort_field = unknown_str;
-    error = Err_trap(S_attempt_sorted_search, &sort_ctx);
-    TEST_TRUE(runner, error != NULL
-              && Err_is_a(error, ERR)
-              && Str_Contains_Utf8(Err_Get_Mess(error), "sortable", 8),
-              "sorting on an unknown field throws an error");
-    DECREF(error);
-#endif
+        sort_ctx.sort_field = unknown_str;
+        error = Err_trap(S_attempt_sorted_search, &sort_ctx);
+        TEST_TRUE(runner, error != NULL
+                  && Err_is_a(error, ERR)
+                  && Str_Contains_Utf8(Err_Get_Mess(error), "sortable", 8),
+                  "sorting on an unknown field throws an error");
+        DECREF(error);
+    }
 
     results = S_test_sorted_search(searcher, vehicle_str, 100,
                                    weight_str, false, NULL);
