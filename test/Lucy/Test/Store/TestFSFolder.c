@@ -154,7 +154,7 @@ test_protect_symlinks(TestBatchRunner *runner) {
 #endif // ENABLE_SYMLINK_TESTS
 }
 
-void
+static void
 test_disallow_updir(TestBatchRunner *runner) {
     FSFolder *outer_folder = (FSFolder*)S_set_up();
 

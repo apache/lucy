@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#define C_TESTLUCY_TESTTERMINFO
+#define C_TESTLUCY_TESTSPAN
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
@@ -28,7 +28,7 @@ TestSpan_new() {
     return (TestSpan*)Class_Make_Obj(TESTSPAN);
 }
 
-void 
+static void
 test_span_init_values(TestBatchRunner *runner) {
     Span* span = Span_new(2,3,7.0);
     TEST_INT_EQ(runner, Span_Get_Offset(span), 2, "get_offset" );
