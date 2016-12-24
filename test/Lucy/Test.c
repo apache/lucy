@@ -55,6 +55,7 @@
 #include "Lucy/Test/Search/TestNoMatchQuery.h"
 #include "Lucy/Test/Search/TestPhraseQuery.h"
 #include "Lucy/Test/Search/TestPolyQuery.h"
+#include "Lucy/Test/Search/TestPolySearcher.h"
 #include "Lucy/Test/Search/TestQueryParserLogic.h"
 #include "Lucy/Test/Search/TestQueryParserSyntax.h"
 #include "Lucy/Test/Search/TestRangeQuery.h"
@@ -144,6 +145,7 @@ Test_create_test_suite() {
     TestSuite_Add_Batch(suite, (TestBatch*)TestHeatMap_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestTermQuery_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestPhraseQuery_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestPolySearcher_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestSortSpec_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestRangeQuery_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestANDQuery_new());
