@@ -29,7 +29,6 @@ our @EXPORT_OK = qw(
     uscon_dir
     create_index
     create_uscon_index
-    persistent_test_index_loc
     init_test_index_loc
     get_uscon_docs
     utf8_test_strings
@@ -62,12 +61,6 @@ sub remove_working_dir {
     return unless -d $working_dir;
     rmtree $working_dir;
     return 1;
-}
-
-# Return a location for a test index intended to be shared by multiple test
-# files.  It will be cleaned as above.
-sub persistent_test_index_loc {
-    return catdir( $working_dir, 'persistent_test_index' );
 }
 
 # Create a temporary test directory that will be removed at exit.
@@ -157,8 +150,8 @@ sub _uscon_schema {
 }
 
 sub create_uscon_index {
-    my $folder
-        = Lucy::Store::FSFolder->new( path => persistent_test_index_loc() );
+    my $dir = tempdir( DIR => 't', CLEANUP => 1 );
+    my $folder = Lucy::Store::FSFolder->new( path => $dir );
     my $indexer = Lucy::Index::Indexer->new(
         schema   => _uscon_schema(),
         index    => $folder,
@@ -191,6 +184,8 @@ sub create_uscon_index {
     }
     $indexer->optimize;
     $indexer->commit;
+
+    return $dir;
 }
 
 # Return 3 strings useful for verifying UTF-8 integrity.

@@ -18,10 +18,10 @@ use warnings;
 use lib 'buildlib';
 
 use Test::More tests => 9;
-use Lucy::Test::TestUtils qw( persistent_test_index_loc );
+use Lucy::Test::TestUtils qw( create_uscon_index );
 
 my $searcher = Lucy::Search::IndexSearcher->new(
-    index => persistent_test_index_loc() );
+    index => create_uscon_index() );
 isa_ok( $searcher, 'Lucy::Search::IndexSearcher' );
 
 my %searches = (
