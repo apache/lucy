@@ -41,20 +41,22 @@ BEGIN {
     }
 }
 
-my $stderr_dumpfile = catfile( working_dir(), 'lucy_garbage' );
-unlink $stderr_dumpfile;
-sysopen( STDERR, $stderr_dumpfile, O_CREAT | O_WRONLY | O_EXCL )
-    or die "Failed to redirect STDERR";
-
-DEBUG_PRINT("Roach Motel");
-like( slurp_file($stderr_dumpfile), qr/Roach Motel/, "DEBUG_PRINT" );
+my $stderr_dumpfile;
 
 ASSERT(1);
 pass("ASSERT(true) didn't die");
 
 SKIP: {
-    skip( "Windows fork not supported by Lucy", 3 )
+    skip( "Windows redirect and fork not supported by Lucy", 6 )
         if $^O =~ /(mswin|cygwin)/i;
+
+    $stderr_dumpfile = catfile( working_dir(), 'lucy_garbage' );
+    unlink $stderr_dumpfile;
+    sysopen( STDERR, $stderr_dumpfile, O_CREAT | O_WRONLY | O_EXCL )
+        or die "Failed to redirect STDERR";
+
+    DEBUG_PRINT("Roach Motel");
+    like( slurp_file($stderr_dumpfile), qr/Roach Motel/, "DEBUG_PRINT" );
 
     my $stderr_out = capture_debug( 'Lucy.xs', 'Borax' );
     like( $stderr_out, qr/Borax/, "DEBUG - file name" );
@@ -78,14 +80,14 @@ SKIP: {
             "failing ASSERT"
         );
     }
+
+    set_env_cache("");
+    DEBUG("Slug and Snail Death");
+    unlike( slurp_file($stderr_dumpfile), qr/Slug/, "DEBUG disabled by default" );
+
+    # Clean up.
+    unlink $stderr_dumpfile;
 }
-
-set_env_cache("");
-DEBUG("Slug and Snail Death");
-unlike( slurp_file($stderr_dumpfile), qr/Slug/, "DEBUG disabled by default" );
-
-# Clean up.
-unlink $stderr_dumpfile;
 
 sub capture_debug {
     my ( $fake_env_var, $debug_string ) = @_;
