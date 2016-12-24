@@ -23,9 +23,6 @@ $VERSION = eval $VERSION;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
-    working_dir
-    create_working_dir
-    remove_working_dir
     uscon_dir
     create_index
     create_uscon_index
@@ -44,24 +41,6 @@ use Encode qw( _utf8_off );
 use File::Path qw( rmtree );
 use File::Temp qw( tempdir );
 use Carp;
-
-my $working_dir = catfile( curdir(), 'lucy_test' );
-
-# Return a directory within the system's temp directory where we will put all
-# testing scratch files.
-sub working_dir {$working_dir}
-
-sub create_working_dir {
-    mkdir( $working_dir, 0700 ) or die "Can't mkdir '$working_dir': $!";
-}
-
-# Verify that this user owns the working dir, then zap it.  Returns true upon
-# success.
-sub remove_working_dir {
-    return unless -d $working_dir;
-    rmtree $working_dir;
-    return 1;
-}
 
 # Create a temporary test directory that will be removed at exit.
 sub init_test_index_loc {
