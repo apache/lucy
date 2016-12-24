@@ -19,6 +19,7 @@ use lib 'buildlib';
 
 use Test::More;
 use File::Spec::Functions qw( catfile );
+use File::Temp qw( tempfile );
 use Fcntl;
 use Lucy::Util::Debug qw(
     DEBUG_ENABLED
@@ -27,7 +28,6 @@ use Lucy::Util::Debug qw(
     ASSERT
     set_env_cache
 );
-use Lucy::Test::TestUtils qw( working_dir );
 
 BEGIN {
     if ( !DEBUG_ENABLED() ) {
@@ -50,9 +50,9 @@ SKIP: {
     skip( "Windows redirect and fork not supported by Lucy", 6 )
         if $^O =~ /(mswin|cygwin)/i;
 
-    $stderr_dumpfile = catfile( working_dir(), 'lucy_garbage' );
-    unlink $stderr_dumpfile;
-    sysopen( STDERR, $stderr_dumpfile, O_CREAT | O_WRONLY | O_EXCL )
+    my $stderr_fh;
+    ( $stderr_fh, $stderr_dumpfile ) = tempfile( DIR => 't' );
+    open( STDERR, '>&', $stderr_fh )
         or die "Failed to redirect STDERR";
 
     DEBUG_PRINT("Roach Motel");
