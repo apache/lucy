@@ -47,9 +47,22 @@ Obj*
 Freezer_thaw(InStream *instream) {
     String *class_name = Freezer_read_string(instream);
     Class *klass = Class_singleton(class_name, NULL);
-    Obj *blank = Class_Make_Obj(klass);
     DECREF(class_name);
-    return Freezer_deserialize(blank, instream);
+    Obj *obj = NULL;
+
+    if (klass == BOOLEAN) {
+        // Booleans shouldn't be created with Make_Obj because only the
+        // TRUE and FALSE singletons are expected to exist and decref is
+        // a no-op.
+        bool value = InStream_Read_U8(instream);
+        obj = (Obj*)Bool_singleton(value);
+    }
+    else {
+        Obj *blank = Class_Make_Obj(klass);
+        obj = Freezer_deserialize(blank, instream);
+    }
+
+    return obj;
 }
 
 void
@@ -132,14 +145,6 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
     else if (Obj_is_a(obj, FLOAT)) {
         double value = InStream_Read_F64(instream);
         obj = (Obj*)Float_init((Float*)obj, value);
-    }
-    else if (Obj_is_a(obj, BOOLEAN)) {
-        bool value = !!InStream_Read_U8(instream);
-        Obj *result = value ? INCREF(CFISH_TRUE) : INCREF(CFISH_FALSE);
-        // FIXME: This DECREF is essentially a no-op causing a
-        // memory leak.
-        DECREF(obj);
-        obj = result;
     }
     else if (Obj_is_a(obj, QUERY)) {
         obj = (Obj*)Query_Deserialize((Query*)obj, instream);
