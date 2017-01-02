@@ -70,8 +70,8 @@ __C__
 
 /** Unconditionally print debug statement prepending file and line info.
  */
-#define LUCY_DEBUG_PRINT(args...)                                         \
-    lucy_Debug_print_mess(__FILE__, __LINE__, __func__, ##args)
+#define LUCY_DEBUG_PRINT(...)                                             \
+    lucy_Debug_print_mess(__FILE__, __LINE__, __func__, ##__VA_ARGS__)
 
 /** Conditionally execute code if debugging enabled via LUCY_DEBUG environment
  * variable.
@@ -93,34 +93,32 @@ __C__
 
 /** Conditionally print debug statement depending on LUCY_DEBUG env variable.
  */
-#define LUCY_DEBUG(args...)                                            \
-        LUCY_DEBUG_DO(LUCY_DEBUG_PRINT(args));
+#define LUCY_DEBUG(...)                                                     \
+        LUCY_DEBUG_DO(LUCY_DEBUG_PRINT(__VA_ARGS__));
 
 /** Abort on error if test fails.
  *
  * Note: unlike the system assert(), this [](cfish:.ASSERT) is #ifdef LUCY_DEBUG.
  */
-#define LUCY_ASSERT(test , args...)                                    \
-    do {                                                               \
-        if (!(test)) {                                                 \
-            LUCY_DEBUG_PRINT("ASSERT FAILED (" #test ")\n" args);      \
-            abort();                                                   \
-        }                                                              \
+#define LUCY_ASSERT(test, ...)                                              \
+    do {                                                                    \
+        if (!(test)) {                                                      \
+            LUCY_DEBUG_PRINT("ASSERT FAILED (" #test ")\n", ##__VA_ARGS__); \
+            abort();                                                        \
+        }                                                                   \
     } while (0)
 
-#elif defined(CFISH_HAS_GNUC_VARIADIC_MACROS) // not LUCY_DEBUG
+#elif defined(CFISH_HAS_ISO_VARIADIC_MACROS) // not LUCY_DEBUG
 
-#undef LUCY_DEBUG
 #define LUCY_DEBUG_ENABLED 0
 #define LUCY_DEBUG_DO(actions)
 #define LUCY_IFDEF_DEBUG(actions)
-#define LUCY_DEBUG_PRINT(args...)
-#define LUCY_DEBUG(args...)
-#define LUCY_ASSERT(test, args...)
+#define LUCY_DEBUG_PRINT(...)
+#define LUCY_DEBUG(...)
+#define LUCY_ASSERT(test, ...)
 
 #else  // also not LUCY_DEBUG
 
-#undef LUCY_DEBUG
 #define LUCY_DEBUG_ENABLED 0
 #define LUCY_DEBUG_DO(actions)
 #define LUCY_IFDEF_DEBUG(actions)
