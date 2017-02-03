@@ -7278,17 +7278,6 @@ static const char chaz_Integers_literal64_code[] =
     CHAZ_QUOTE(      return 0;                             )
     CHAZ_QUOTE(  }                                         );
 
-static const char chaz_Integers_u64_to_double_code[] =
-    CHAZ_QUOTE(  #include <stdio.h>                        )
-    CHAZ_QUOTE(  int main()                                )
-    CHAZ_QUOTE(  {                                         )
-    CHAZ_QUOTE(      unsigned %s int_num = 0;              )
-    CHAZ_QUOTE(      double float_num;                     )
-    CHAZ_QUOTE(      float_num = (double)int_num;          )
-    CHAZ_QUOTE(      printf("%%f\n", float_num);           )
-    CHAZ_QUOTE(      return 0;                             )
-    CHAZ_QUOTE(  }                                         );
-
 void
 chaz_Integers_run(void) {
     char *output;
@@ -7555,28 +7544,6 @@ chaz_Integers_run(void) {
         else {
             chaz_ConfWriter_add_def("PTR_TO_I64(ptr)",
                                     "((int64_t)(uint32_t)(ptr))");
-        }
-    }
-
-    /* Create macro for converting uint64_t to double. */
-    if (has_64) {
-        /*
-         * Determine whether unsigned 64-bit integers can be converted to
-         * double. Older MSVC versions don't support this conversion.
-         */
-        sprintf(code_buf, chaz_Integers_u64_to_double_code, i64_t_type);
-        output = chaz_CC_capture_output(code_buf, &output_len);
-        if (output != NULL) {
-            chaz_ConfWriter_add_def("U64_TO_DOUBLE(num)", "((double)(num))");
-            free(output);
-        }
-        else {
-            chaz_ConfWriter_add_def(
-                "U64_TO_DOUBLE(num)",
-                "((num) & UINT64_C(0x8000000000000000) ? "
-                "(double)(int64_t)((num) & UINT64_C(0x7FFFFFFFFFFFFFFF)) + "
-                "9223372036854775808.0 : "
-                "(double)(int64_t)(num))");
         }
     }
 
