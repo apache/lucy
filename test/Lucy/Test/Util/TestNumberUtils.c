@@ -305,7 +305,7 @@ test_bigend_u16(TestBatchRunner *runner) {
     char     *target    = encoded;
 
     for (size_t i = 0; i < count; i++) {
-        NumUtil_encode_bigend_u16((uint16_t)ints[i], &target);
+        NumUtil_encode_bigend_u16((uint16_t)ints[i], target);
         target += sizeof(uint16_t);
     }
     target = encoded;
@@ -316,7 +316,7 @@ test_bigend_u16(TestBatchRunner *runner) {
     }
 
     target = encoded;
-    NumUtil_encode_bigend_u16(1, &target);
+    NumUtil_encode_bigend_u16(1, target);
     TEST_INT_EQ(runner, encoded[0], 0, "Truly big-endian u16");
     TEST_INT_EQ(runner, encoded[1], 1, "Truly big-endian u16");
 
@@ -335,7 +335,7 @@ test_bigend_u32(TestBatchRunner *runner) {
 
     for (size_t i = 0; i < count; i++) {
         ints[i] = (uint32_t)ints[i];
-        NumUtil_encode_bigend_u32((uint32_t)ints[i], &target);
+        NumUtil_encode_bigend_u32((uint32_t)ints[i], target);
         target += sizeof(uint32_t);
     }
     target = encoded;
@@ -346,7 +346,7 @@ test_bigend_u32(TestBatchRunner *runner) {
     }
 
     target = encoded;
-    NumUtil_encode_bigend_u32(1, &target);
+    NumUtil_encode_bigend_u32(1, target);
     TEST_INT_EQ(runner, encoded[0], 0, "Truly big-endian u32");
     TEST_INT_EQ(runner, encoded[3], 1, "Truly big-endian u32");
 
@@ -364,7 +364,7 @@ test_bigend_u64(TestBatchRunner *runner) {
     char     *target    = encoded;
 
     for (size_t i = 0; i < count; i++) {
-        NumUtil_encode_bigend_u64(ints[i], &target);
+        NumUtil_encode_bigend_u64(ints[i], target);
         target += sizeof(uint64_t);
     }
     target = encoded;
@@ -375,7 +375,7 @@ test_bigend_u64(TestBatchRunner *runner) {
     }
 
     target = encoded;
-    NumUtil_encode_bigend_u64(1, &target);
+    NumUtil_encode_bigend_u64(1, target);
     TEST_INT_EQ(runner, encoded[0], 0, "Truly big-endian");
     TEST_INT_EQ(runner, encoded[7], 1, "Truly big-endian");
 
@@ -393,7 +393,7 @@ test_bigend_f32(TestBatchRunner *runner) {
     uint8_t *target    = encoded;
 
     for (size_t i = 0; i < count; i++) {
-        NumUtil_encode_bigend_f32(source[i], &target);
+        NumUtil_encode_bigend_f32(source[i], target);
         target += sizeof(float);
     }
     target = encoded;
@@ -404,7 +404,7 @@ test_bigend_f32(TestBatchRunner *runner) {
     }
 
     target = encoded;
-    NumUtil_encode_bigend_f32(-2.0f, &target);
+    NumUtil_encode_bigend_f32(-2.0f, target);
     TEST_INT_EQ(runner, (encoded[0] & 0x80), 0x80,
                 "Truly big-endian (IEEE 754 sign bit set for negative number)");
     TEST_INT_EQ(runner, encoded[0], 0xC0,
@@ -427,7 +427,7 @@ test_bigend_f64(TestBatchRunner *runner) {
     uint8_t *target    = encoded;
 
     for (size_t i = 0; i < count; i++) {
-        NumUtil_encode_bigend_f64(source[i], &target);
+        NumUtil_encode_bigend_f64(source[i], target);
         target += sizeof(double);
     }
     target = encoded;
@@ -438,7 +438,7 @@ test_bigend_f64(TestBatchRunner *runner) {
     }
 
     target = encoded;
-    NumUtil_encode_bigend_f64(-2.0, &target);
+    NumUtil_encode_bigend_f64(-2.0, target);
     TEST_INT_EQ(runner, (encoded[0] & 0x80), 0x80,
                 "Truly big-endian (IEEE 754 sign bit set for negative number)");
     TEST_INT_EQ(runner, encoded[0], 0xC0,

@@ -215,8 +215,7 @@ lucy_NumUtil_is_bigend() {
 }
 
 static CFISH_INLINE void
-lucy_NumUtil_encode_bigend_u16(uint16_t value, void *dest_ptr) {
-    uint8_t *dest = *(uint8_t**)dest_ptr;
+lucy_NumUtil_encode_bigend_u16(uint16_t value, void *dest) {
     if (!lucy_NumUtil_is_bigend()) {
         value = ((value & 0xFF00) >> 8) | ((value & 0x00FF) << 8);
     }
@@ -224,8 +223,7 @@ lucy_NumUtil_encode_bigend_u16(uint16_t value, void *dest_ptr) {
 }
 
 static CFISH_INLINE void
-lucy_NumUtil_encode_bigend_u32(uint32_t value, void *dest_ptr) {
-    uint8_t *dest = *(uint8_t**)dest_ptr;
+lucy_NumUtil_encode_bigend_u32(uint32_t value, void *dest) {
     if (!lucy_NumUtil_is_bigend()) {
         value =
             ((value & 0xFF000000) >> 24) |
@@ -237,8 +235,7 @@ lucy_NumUtil_encode_bigend_u32(uint32_t value, void *dest_ptr) {
 }
 
 static CFISH_INLINE void
-lucy_NumUtil_encode_bigend_u64(uint64_t value, void *dest_ptr) {
-    uint8_t *dest = *(uint8_t**)dest_ptr;
+lucy_NumUtil_encode_bigend_u64(uint64_t value, void *dest) {
     if (!lucy_NumUtil_is_bigend()) {
         value =
             ((value & 0xFF00000000000000) >> 56) |
@@ -285,28 +282,26 @@ lucy_NumUtil_decode_bigend_u64(const void *source) {
 }
 
 static CFISH_INLINE void
-lucy_NumUtil_encode_bigend_f32(float value, void *dest_ptr) {
-    uint8_t *dest = *(uint8_t**)dest_ptr;
+lucy_NumUtil_encode_bigend_f32(float value, void *dest) {
     if (lucy_NumUtil_is_bigend()) {
         memcpy(dest, &value, sizeof(float));
     }
     else {
         union { float f; uint32_t u32; } duo;
         duo.f = value;
-        lucy_NumUtil_encode_bigend_u32(duo.u32, &dest);
+        lucy_NumUtil_encode_bigend_u32(duo.u32, dest);
     }
 }
 
 static CFISH_INLINE void
-lucy_NumUtil_encode_bigend_f64(double value, void *dest_ptr) {
-    uint8_t *dest = *(uint8_t**)dest_ptr;
+lucy_NumUtil_encode_bigend_f64(double value, void *dest) {
     if (lucy_NumUtil_is_bigend()) {
         memcpy(dest, &value, sizeof(double));
     }
     else {
         union { double d; uint64_t u64; } duo;
         duo.d = value;
-        lucy_NumUtil_encode_bigend_u64(duo.u64, &dest);
+        lucy_NumUtil_encode_bigend_u64(duo.u64, dest);
     }
 }
 

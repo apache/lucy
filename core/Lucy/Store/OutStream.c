@@ -236,9 +236,8 @@ SI_write_u32(OutStream *self, OutStreamIVARS *ivars, uint32_t value) {
 #ifdef CHY_BIG_END
     SI_write_bytes(self, ivars, &value, 4);
 #else
-    char  buf[4];
-    char *buf_copy = buf;
-    NumUtil_encode_bigend_u32(value, &buf_copy);
+    char buf[4];
+    NumUtil_encode_bigend_u32(value, buf);
     SI_write_bytes(self, ivars, buf, 4);
 #endif
 }
@@ -258,9 +257,8 @@ SI_write_u64(OutStream *self, OutStreamIVARS *ivars, uint64_t value) {
 #ifdef CHY_BIG_END
     SI_write_bytes(self, ivars, &value, 8);
 #else
-    char  buf[sizeof(uint64_t)];
-    char *buf_copy = buf;
-    NumUtil_encode_bigend_u64(value, &buf_copy);
+    char buf[sizeof(uint64_t)];
+    NumUtil_encode_bigend_u64(value, buf);
     SI_write_bytes(self, ivars, buf, sizeof(uint64_t));
 #endif
 }
@@ -278,19 +276,17 @@ OutStream_Write_U64_IMP(OutStream *self, uint64_t value) {
 void
 OutStream_Write_F32_IMP(OutStream *self, float value) {
     OutStreamIVARS *const ivars = OutStream_IVARS(self);
-    char  buf[sizeof(float)];
-    char *buf_copy = buf;
-    NumUtil_encode_bigend_f32(value, &buf_copy);
-    SI_write_bytes(self, ivars, buf_copy, sizeof(float));
+    char buf[sizeof(float)];
+    NumUtil_encode_bigend_f32(value, buf);
+    SI_write_bytes(self, ivars, buf, sizeof(float));
 }
 
 void
 OutStream_Write_F64_IMP(OutStream *self, double value) {
     OutStreamIVARS *const ivars = OutStream_IVARS(self);
-    char  buf[sizeof(double)];
-    char *buf_copy = buf;
-    NumUtil_encode_bigend_f64(value, &buf_copy);
-    SI_write_bytes(self, ivars, buf_copy, sizeof(double));
+    char buf[sizeof(double)];
+    NumUtil_encode_bigend_f64(value, buf);
+    SI_write_bytes(self, ivars, buf, sizeof(double));
 }
 
 void

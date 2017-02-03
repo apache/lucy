@@ -240,13 +240,13 @@ S_write_ord(void *ords, int32_t width, int32_t doc_id, int32_t ord) {
         case 16: {
                 uint8_t *bytes = (uint8_t*)ords;
                 bytes += (size_t)doc_id * sizeof(uint16_t);
-                NumUtil_encode_bigend_u16((uint16_t)ord, &bytes);
+                NumUtil_encode_bigend_u16((uint16_t)ord, bytes);
             }
             break;
         case 32: {
                 uint8_t *bytes = (uint8_t*)ords;
                 bytes += (size_t)doc_id * sizeof(uint32_t);
-                NumUtil_encode_bigend_u32((uint32_t)ord, &bytes);
+                NumUtil_encode_bigend_u32((uint32_t)ord, bytes);
             }
             break;
         default:
