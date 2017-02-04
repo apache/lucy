@@ -268,6 +268,12 @@ chaz_CC_capture_output(const char *source, size_t *output_len);
 int
 chaz_CC_has_macro(const char *macro);
 
+/** Return true if preprocessor expression matches predicate. Predicate has
+ * the form "<op> value", e.g. ">= 0x1500".
+ */
+int
+chaz_CC_test_macro(const char *expression, const char *predicate);
+
 /** Initialize the compiler environment.
  */
 void
@@ -334,22 +340,28 @@ const char*
 chaz_CC_obj_ext(void);
 
 int
-chaz_CC_gcc_version_num(void);
-
-const char*
-chaz_CC_gcc_version(void);
+chaz_CC_is_gcc(void);
 
 int
-chaz_CC_msvc_version_num(void);
+chaz_CC_is_msvc(void);
 
 int
-chaz_CC_sun_c_version_num(void);
+chaz_CC_is_sun_c(void);
 
 int
 chaz_CC_is_cygwin(void);
 
 int
 chaz_CC_is_mingw(void);
+
+int
+chaz_CC_test_gcc_version(const char *predicate);
+
+int
+chaz_CC_test_msvc_version(const char *predicate);
+
+int
+chaz_CC_test_sun_c_version(const char *predicate);
 
 const char*
 chaz_CC_link_command(void);
@@ -629,6 +641,14 @@ chaz_HeadCheck_defines_symbol(const char *symbol, const char *includes);
 int
 chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
                                const char *includes);
+
+/*
+ * Return the size of the type or 0 if can't be determined. Only checks for
+ * sizes 1, 2, 4, 8. If hint != 0, try this size first to speed up the
+ * detection.
+ */
+int
+chaz_HeadCheck_size_of_type(const char *type, const char *includes, int hint);
 
 #endif /* H_CHAZ_HEAD_CHECK */
 
@@ -963,6 +983,13 @@ chaz_OS_dir_sep(void);
 int
 chaz_OS_shell_type(void);
 
+/* Return the file extension for executables on this system. This can be
+ * a different value than returned by chaz_CC_exe_ext() when
+ * cross-compiling.
+ */
+const char*
+chaz_OS_exe_ext(void);
+
 /* Initialize the Charmonizer/Core/OperatingSystem module.
  */
 void
@@ -1094,23 +1121,6 @@ chaz_Probe_init(struct chaz_CLI *cli);
  */
 void
 chaz_Probe_clean_up(void);
-
-/* Return an integer version of the GCC version number which is
- * (10000 * __GNU_C__ + 100 * __GNUC_MINOR__ + __GNUC_PATCHLEVEL__).
- */
-int
-chaz_Probe_gcc_version_num(void);
-
-/* If the compiler is GCC (or claims compatibility), return an X.Y.Z string
- * version of the GCC version; otherwise, return NULL.
- */
-const char*
-chaz_Probe_gcc_version(void);
-
-/* Return the integer version of MSVC defined by _MSC_VER
- */
-int
-chaz_Probe_msvc_version_num(void);
 
 #endif /* Include guard. */
 
@@ -1919,8 +1929,16 @@ chaz_CFlags_hide_symbols(chaz_CFlags *flags) {
         }
     }
     else if (flags->style == CHAZ_CFLAGS_STYLE_SUN_C) {
-        if (chaz_CC_sun_c_version_num() >= 0x550) {
-            /* Sun Studio 8. */
+        static int checked = 0;
+        static int version_ge_550;
+
+        if (!checked) {
+            /* Requires Sun Studio 8. */
+            version_ge_550 = chaz_CC_test_sun_c_version(">= 0x550");
+            checked = 1;
+        }
+
+        if (version_ge_550) {
             chaz_CFlags_append(flags, "-xldscope=hidden");
         }
     }
@@ -2463,11 +2481,6 @@ chaz_CLI_parse(chaz_CLI *self, int argc, const char *argv[]) {
 static void
 chaz_CC_detect_binary_format(const char *filename);
 
-/** Return the numeric value of a macro or 0 if it isn't defined.
- */
-static int
-chaz_CC_eval_macro(const char *macro);
-
 /* Detect macros which may help to identify some compilers.
  */
 static void
@@ -2498,12 +2511,10 @@ static struct {
     char      gcc_version_str[30];
     int       binary_format;
     int       cflags_style;
-    int       intval___GNUC__;
-    int       intval___GNUC_MINOR__;
-    int       intval___GNUC_PATCHLEVEL__;
-    int       intval__MSC_VER;
-    int       intval___clang__;
-    int       intval___SUNPRO_C;
+    int       is_gcc;
+    int       is_msvc;
+    int       is_clang;
+    int       is_sun_c;
     int       is_cygwin;
     int       is_mingw;
     chaz_CFlags *extra_cflags;
@@ -2511,7 +2522,7 @@ static struct {
 } chaz_CC = {
     NULL, NULL, NULL,
     "", "", "", "", "", "",
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
     NULL, NULL
 };
 
@@ -2546,6 +2557,9 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
         }
         compile_succeeded = chaz_CC_compile_exe(CHAZ_CC_TRY_SOURCE_PATH,
                                                 CHAZ_CC_TRY_BASENAME, code);
+        if (compile_succeeded) {
+            strcpy(chaz_CC.obj_ext, ".obj");
+        }
     }
 
     /* Try POSIX argument style. */
@@ -2556,6 +2570,9 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
         }
         compile_succeeded = chaz_CC_compile_exe(CHAZ_CC_TRY_SOURCE_PATH,
                                                 CHAZ_CC_TRY_BASENAME, code);
+        if (compile_succeeded) {
+            strcpy(chaz_CC.obj_ext, ".o");
+        }
     }
 
     if (!compile_succeeded) {
@@ -2566,13 +2583,13 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
 
     chaz_CC_detect_known_compilers();
 
-    if (chaz_CC.intval___GNUC__) {
+    if (chaz_CC_is_gcc()) {
         chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_GNU;
     }
-    else if (chaz_CC.intval__MSC_VER) {
+    else if (chaz_CC_is_msvc()) {
         chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_MSVC;
     }
-    else if (chaz_CC.intval___SUNPRO_C) {
+    else if (chaz_CC_is_sun_c()) {
         chaz_CC.cflags_style = CHAZ_CFLAGS_STYLE_SUN_C;
     }
     else {
@@ -2606,7 +2623,7 @@ chaz_CC_init(const char *compiler_command, const char *compiler_flags) {
         }
         strcpy(chaz_CC.exe_ext, ".exe");
         strcpy(chaz_CC.shared_lib_ext, ".dll");
-        if (chaz_CC.intval___GNUC__) {
+        if (chaz_CC_is_gcc()) {
             strcpy(chaz_CC.static_lib_ext, ".a");
             strcpy(chaz_CC.import_lib_ext, ".dll.a");
             strcpy(chaz_CC.obj_ext, ".o");
@@ -2680,43 +2697,40 @@ chaz_CC_detect_binary_format(const char *filename) {
     free(output);
 }
 
-static const char chaz_CC_eval_macro_code[] =
-    CHAZ_QUOTE(  #include <stdio.h>             )
-    CHAZ_QUOTE(  int main() {                   )
-    CHAZ_QUOTE(  #ifndef %s                     )
-    CHAZ_QUOTE(  #error "nope"                  )
-    CHAZ_QUOTE(  #endif                         )
-    CHAZ_QUOTE(      printf("%%d", %s);         )
-    CHAZ_QUOTE(      return 0;                  )
-    CHAZ_QUOTE(  }                              );
-
-static int
-chaz_CC_eval_macro(const char *macro) {
-    size_t size = sizeof(chaz_CC_eval_macro_code)
-                  + (strlen(macro) * 2)
+int
+chaz_CC_has_macro(const char *macro) {
+    static const char template[] =
+        CHAZ_QUOTE(  #ifdef %s             )
+        CHAZ_QUOTE(  int i;                )
+        CHAZ_QUOTE(  #else                 )
+        CHAZ_QUOTE(  #error "nope"         )
+        CHAZ_QUOTE(  #endif                );
+    size_t size = sizeof(template)
+                  + strlen(macro)
                   + 20;
     char *code = (char*)malloc(size);
     int retval = 0;
-    char *output;
-    size_t len;
-    sprintf(code, chaz_CC_eval_macro_code, macro, macro);
-    output = chaz_CC_capture_output(code, &len);
-    if (output) {
-        retval = atoi(output);
-        free(output);
-    }
+    sprintf(code, template, macro);
+    retval = chaz_CC_test_compile(code);
     free(code);
     return retval;
 }
 
 int
-chaz_CC_has_macro(const char *macro) {
-    size_t size = sizeof(chaz_CC_eval_macro_code)
-                  + (strlen(macro) * 2)
+chaz_CC_test_macro(const char *expression, const char *predicate) {
+    static const char template[] =
+        CHAZ_QUOTE(  #if (%s) %s           )
+        CHAZ_QUOTE(  int i;                )
+        CHAZ_QUOTE(  #else                 )
+        CHAZ_QUOTE(  #error "nope"         )
+        CHAZ_QUOTE(  #endif                );
+    size_t size = sizeof(template)
+                  + strlen(expression)
+                  + strlen(predicate)
                   + 20;
     char *code = (char*)malloc(size);
     int retval = 0;
-    sprintf(code, chaz_CC_eval_macro_code, macro, macro);
+    sprintf(code, template, expression, predicate);
     retval = chaz_CC_test_compile(code);
     free(code);
     return retval;
@@ -2724,19 +2738,10 @@ chaz_CC_has_macro(const char *macro) {
 
 static void
 chaz_CC_detect_known_compilers(void) {
-    chaz_CC.intval___GNUC__  = chaz_CC_eval_macro("__GNUC__");
-    if (chaz_CC.intval___GNUC__) {
-        chaz_CC.intval___GNUC_MINOR__
-            = chaz_CC_eval_macro("__GNUC_MINOR__");
-        chaz_CC.intval___GNUC_PATCHLEVEL__
-            = chaz_CC_eval_macro("__GNUC_PATCHLEVEL__");
-        sprintf(chaz_CC.gcc_version_str, "%d.%d.%d", chaz_CC.intval___GNUC__,
-                chaz_CC.intval___GNUC_MINOR__,
-                chaz_CC.intval___GNUC_PATCHLEVEL__);
-    }
-    chaz_CC.intval__MSC_VER   = chaz_CC_eval_macro("_MSC_VER");
-    chaz_CC.intval___clang__  = chaz_CC_eval_macro("__clang__");
-    chaz_CC.intval___SUNPRO_C = chaz_CC_eval_macro("__SUNPRO_C");
+    chaz_CC.is_gcc   = chaz_CC_has_macro("__GNUC__");
+    chaz_CC.is_msvc  = chaz_CC_has_macro("_MSC_VER");
+    chaz_CC.is_clang = chaz_CC_has_macro("__clang__");
+    chaz_CC.is_sun_c = chaz_CC_has_macro("__SUNPRO_C");
 }
 
 void
@@ -2782,7 +2787,7 @@ chaz_CC_compile_exe(const char *source_path, const char *exe_name,
         system(command);
     }
 
-    if (chaz_CC.intval__MSC_VER) {
+    if (chaz_CC_is_msvc()) {
         /* Zap MSVC junk. */
         size_t  junk_buf_size = strlen(exe_file) + 4;
         char   *junk          = (char*)malloc(junk_buf_size);
@@ -2970,25 +2975,18 @@ chaz_CC_obj_ext(void) {
 }
 
 int
-chaz_CC_gcc_version_num(void) {
-    return 10000 * chaz_CC.intval___GNUC__
-           + 100 * chaz_CC.intval___GNUC_MINOR__
-           + chaz_CC.intval___GNUC_PATCHLEVEL__;
-}
-
-const char*
-chaz_CC_gcc_version(void) {
-    return chaz_CC.intval___GNUC__ ? chaz_CC.gcc_version_str : NULL;
+chaz_CC_is_gcc(void) {
+    return chaz_CC.is_gcc;
 }
 
 int
-chaz_CC_msvc_version_num(void) {
-    return chaz_CC.intval__MSC_VER;
+chaz_CC_is_msvc(void) {
+    return chaz_CC.is_msvc;
 }
 
 int
-chaz_CC_sun_c_version_num(void) {
-    return chaz_CC.intval___SUNPRO_C;
+chaz_CC_is_sun_c(void) {
+    return chaz_CC.is_sun_c;
 }
 
 int
@@ -3001,9 +2999,26 @@ chaz_CC_is_mingw(void) {
     return chaz_CC.is_mingw;
 }
 
+int
+chaz_CC_test_gcc_version(const char *predicate) {
+    static const char version[] =
+        "10000 * __GNUC__ + 100 * __GNUC_MINOR__ + __GNUC_PATCHLEVEL__";
+    return chaz_CC_test_macro(version, predicate);
+}
+
+int
+chaz_CC_test_msvc_version(const char *predicate) {
+    return chaz_CC_test_macro("_MSC_VER", predicate);
+}
+
+int
+chaz_CC_test_sun_c_version(const char *predicate) {
+    return chaz_CC_test_macro("__SUNPRO_C", predicate);
+}
+
 const char*
 chaz_CC_link_command() {
-    if (chaz_CC.intval__MSC_VER) {
+    if (chaz_CC_is_msvc()) {
         return "link";
     }
     else {
@@ -3013,7 +3028,7 @@ chaz_CC_link_command() {
 
 char*
 chaz_CC_format_archiver_command(const char *target, const char *objects) {
-    if (chaz_CC.intval__MSC_VER) {
+    if (chaz_CC_is_msvc()) {
         /* TODO: Write `objects` to a temporary file in order to avoid
          * exceeding line length limits. */
         char *out = chaz_Util_join("", "/OUT:", target, NULL);
@@ -3029,7 +3044,7 @@ chaz_CC_format_archiver_command(const char *target, const char *objects) {
 
 char*
 chaz_CC_format_ranlib_command(const char *target) {
-    if (chaz_CC.intval__MSC_VER) {
+    if (chaz_CC_is_msvc()) {
         return NULL;
     }
     return chaz_Util_join(" ", "ranlib", target, NULL);
@@ -3039,7 +3054,7 @@ char*
 chaz_CC_shared_lib_filename(const char *dir, const char *basename,
                             const char *version) {
     /* Cygwin uses a "cyg" prefix for shared libraries. */
-    const char *prefix = chaz_CC_msvc_version_num()
+    const char *prefix = chaz_CC_is_msvc()
                          ? ""
                          : chaz_CC_is_cygwin() ? "cyg" : "lib";
     return chaz_CC_build_lib_filename(dir, prefix, basename, version,
@@ -3049,7 +3064,7 @@ chaz_CC_shared_lib_filename(const char *dir, const char *basename,
 char*
 chaz_CC_import_lib_filename(const char *dir, const char *basename,
                             const char *version) {
-    const char *prefix = chaz_CC_msvc_version_num() ? "" : "lib";
+    const char *prefix = chaz_CC_is_msvc() ? "" : "lib";
     return chaz_CC_build_lib_filename(dir, prefix, basename, version,
                                       chaz_CC.import_lib_ext);
 }
@@ -3104,7 +3119,7 @@ chaz_CC_build_lib_filename(const char *dir, const char *prefix,
 
 char*
 chaz_CC_static_lib_filename(const char *dir, const char *basename) {
-    const char *prefix = chaz_CC_msvc_version_num() ? "" : "lib";
+    const char *prefix = chaz_CC_is_msvc() ? "" : "lib";
 
     if (dir == NULL || strcmp(dir, ".") == 0) {
         return chaz_Util_join("", prefix, basename, chaz_CC.static_lib_ext,
@@ -4384,18 +4399,13 @@ chaz_HeadCheck_check_many_headers(const char **header_names) {
 
 int
 chaz_HeadCheck_defines_symbol(const char *symbol, const char *includes) {
-    /*
-     * Casting function pointers to object pointers like 'char*' is a C
-     * extension, so for a bullet-proof check, a separate test for functions
-     * might be necessary.
-     */
     static const char defines_code[] =
         CHAZ_QUOTE(  %s                                            )
         CHAZ_QUOTE(  int main() {                                  )
         CHAZ_QUOTE(  #ifdef %s                                     )
         CHAZ_QUOTE(      return 0;                                 )
         CHAZ_QUOTE(  #else                                         )
-        CHAZ_QUOTE(      return *(char*)&%s;                       )
+        CHAZ_QUOTE(      return (int)&%s;                          )
         CHAZ_QUOTE(  #endif                                        )
         CHAZ_QUOTE(  }                                             );
     long needed = sizeof(defines_code)
@@ -4426,6 +4436,44 @@ chaz_HeadCheck_contains_member(const char *struct_name, const char *member,
     int retval;
     sprintf(buf, contains_code, includes, struct_name, member);
     retval = chaz_CC_test_compile(buf);
+    free(buf);
+    return retval;
+}
+
+int
+chaz_HeadCheck_size_of_type(const char *type, const char *includes, int hint) {
+    static const char sizeof_code[] =
+        CHAZ_QUOTE(  #include <stddef.h>                           )
+        CHAZ_QUOTE(  %s                                            )
+        CHAZ_QUOTE(  int a[sizeof(%s)==%d?1:-1];                   );
+    size_t needed = sizeof(sizeof_code)
+                    + strlen(type)
+                    + strlen(includes)
+                    + 10;
+    char *buf = (char*)malloc(needed);
+    static const int sizes[] = { 4, 8, 2, 1 };
+    int retval = 0;
+    int i;
+
+    for (i = -1; i < (int)(sizeof(sizes) / sizeof(sizes[0])); i++) {
+        int size;
+
+        if (i < 0) {
+            if (hint != 0) { size = hint; }
+            else           { continue; }
+        }
+        else {
+            if (sizes[i] != hint) { size = sizes[i]; }
+            else                  { continue; }
+        }
+
+        sprintf(buf, sizeof_code, includes, type, size);
+        if (chaz_CC_test_compile(buf)) {
+            retval = size;
+            break;
+        }
+    }
+
     free(buf);
     return retval;
 }
@@ -4761,8 +4809,6 @@ S_chaz_Make_audition(const char *make) {
 chaz_MakeFile*
 chaz_MakeFile_new() {
     chaz_MakeFile *self = (chaz_MakeFile*)calloc(1, sizeof(chaz_MakeFile));
-    const char    *exe_ext  = chaz_CC_exe_ext();
-    const char    *obj_ext  = chaz_CC_obj_ext();
     char *generated;
 
     self->vars     = (chaz_MakeVar**)calloc(1, sizeof(chaz_MakeVar*));
@@ -4772,8 +4818,9 @@ chaz_MakeFile_new() {
     self->clean     = S_chaz_MakeRule_new("clean", NULL);
     self->distclean = S_chaz_MakeRule_new("distclean", "clean");
 
-    generated = chaz_Util_join("", "charmonizer", exe_ext, " charmonizer",
-                               obj_ext, " charmony.h Makefile", NULL);
+    /* MSVC leaves .obj files around when creating executables. */
+    generated = chaz_Util_join("", "charmonizer", chaz_OS_exe_ext(),
+                               " charmonizer.obj charmony.h Makefile", NULL);
     chaz_MakeRule_add_rm_command(self->distclean, generated);
 
     free(generated);
@@ -4882,7 +4929,6 @@ chaz_MakeFile_add_exe(chaz_MakeFile *self, const char *dir,
 
 void
 S_chaz_MakeFile_finish_exe(chaz_MakeFile *self, chaz_MakeBinary *binary) {
-    const char *link = chaz_CC_link_command();
     const char *link_flags_string;
     char *command;
 
@@ -4897,8 +4943,8 @@ S_chaz_MakeFile_finish_exe(chaz_MakeFile *self, chaz_MakeBinary *binary) {
     /* Objects in dollar var must come before flags since flags may
      * contain libraries.
      */
-    command = chaz_Util_join(" ", link, binary->dollar_var, link_flags_string,
-                             NULL);
+    command = chaz_Util_join(" ", "$(LINK)", binary->dollar_var,
+                             link_flags_string, NULL);
     chaz_MakeRule_add_command(binary->rule, command);
     free(command);
 }
@@ -4934,7 +4980,6 @@ chaz_MakeFile_add_shared_lib(chaz_MakeFile *self, const char *dir,
 void
 S_chaz_MakeFile_finish_shared_lib(chaz_MakeFile *self,
                                   chaz_MakeBinary *binary) {
-    const char *link = chaz_CC_link_command();
     const char *link_flags_string;
     int binfmt = chaz_CC_binary_format();
     char *no_v_name
@@ -4959,8 +5004,8 @@ S_chaz_MakeFile_finish_shared_lib(chaz_MakeFile *self,
     chaz_CFlags_set_link_output(binary->link_flags, "$@");
     link_flags_string = chaz_CFlags_get_string(binary->link_flags);
 
-    command = chaz_Util_join(" ", link, binary->dollar_var, link_flags_string,
-                             NULL);
+    command = chaz_Util_join(" ", "$(LINK)", binary->dollar_var,
+                             link_flags_string, NULL);
     chaz_MakeRule_add_command(binary->rule, command);
     free(command);
 
@@ -4995,7 +5040,7 @@ S_chaz_MakeFile_finish_shared_lib(chaz_MakeFile *self,
         free(filename);
     }
 
-    if (chaz_CC_msvc_version_num()) {
+    if (chaz_CC_is_msvc()) {
         /* Remove export file. */
         char *filename
             = chaz_CC_export_filename(binary->target_dir, binary->basename,
@@ -5144,6 +5189,9 @@ chaz_MakeFile_write(chaz_MakeFile *self) {
         fprintf(out, "SHELL = cmd\n");
     }
 
+    fprintf(out, "CC = %s\n", chaz_CC_get_cc());
+    fprintf(out, "LINK = %s\n", chaz_CC_link_command());
+
     for (i = 0; self->vars[i]; i++) {
         chaz_MakeVar *var = self->vars[i];
         fprintf(out, "%s = %s\n", var->name, var->value);
@@ -5162,7 +5210,7 @@ chaz_MakeFile_write(chaz_MakeFile *self) {
     S_chaz_MakeRule_write(self->distclean, out);
 
     /* Suffix rule for .c files. */
-    if (chaz_CC_msvc_version_num()) {
+    if (chaz_CC_is_msvc()) {
         fprintf(out, ".c.obj :\n");
         fprintf(out, "\t$(CC) /nologo $(CFLAGS) /c $< /Fo$@\n\n");
     }
@@ -5179,7 +5227,7 @@ S_chaz_MakeFile_write_binary_rules(chaz_MakeFile *self,
                                    chaz_MakeBinary *binary, FILE *out) {
     const char *cflags;
 
-    if (chaz_CC_msvc_version_num()) {
+    if (chaz_CC_is_msvc()) {
         chaz_CFlags_append(binary->compile_flags, "/nologo");
         chaz_CFlags_append(binary->link_flags, "/nologo");
     }
@@ -5859,6 +5907,15 @@ chaz_OS_shell_type(void) {
     return chaz_OS.shell_type;
 }
 
+const char*
+chaz_OS_exe_ext(void) {
+#ifdef _WIN32
+    return ".exe";
+#else
+    return "";
+#endif
+}
+
 int
 chaz_OS_remove(const char *name) {
     /*
@@ -6450,21 +6507,6 @@ chaz_Probe_clean_up(void) {
     if (chaz_Util_verbosity) { printf("Cleanup complete.\n"); }
 }
 
-int
-chaz_Probe_gcc_version_num(void) {
-    return chaz_CC_gcc_version_num();
-}
-
-const char*
-chaz_Probe_gcc_version(void) {
-    return chaz_CC_gcc_version_num() ? chaz_CC_gcc_version() : NULL;
-}
-
-int
-chaz_Probe_msvc_version_num(void) {
-    return chaz_CC_msvc_version_num();
-}
-
 /***************************************************************************/
 
 #line 17 "src/Charmonizer/Probe/AtomicOps.c"
@@ -6827,34 +6869,30 @@ chaz_Floats_run(void) {
 
 const char*
 chaz_Floats_math_library(void) {
+    /*
+     * The cast to a specific function pointer type is required because
+     * C++ overloads sqrt.
+     */
     static const char sqrt_code[] =
         CHAZ_QUOTE(  #include <math.h>                              )
-        CHAZ_QUOTE(  #include <stdio.h>                             )
         CHAZ_QUOTE(  typedef double (*sqrt_t)(double);              )
-        CHAZ_QUOTE(  int main(void) {                               )
-        CHAZ_QUOTE(      printf("%p\n", (sqrt_t)sqrt);              )
-        CHAZ_QUOTE(      return 0;                                  )
-        CHAZ_QUOTE(  }                                              );
+        CHAZ_QUOTE(  int main() { return (int)(sqrt_t)sqrt; }       );
     chaz_CFlags *temp_cflags = chaz_CC_get_temp_cflags();
-    char        *output = NULL;
-    size_t       output_len;
+    int success;
 
-    output = chaz_CC_capture_output(sqrt_code, &output_len);
-    if (output != NULL) {
+    if (chaz_CC_test_link(sqrt_code)) {
         /* Linking against libm not needed. */
-        free(output);
         return NULL;
     }
 
     chaz_CFlags_add_external_lib(temp_cflags, "m");
-    output = chaz_CC_capture_output(sqrt_code, &output_len);
+    success = chaz_CC_test_link(sqrt_code);
     chaz_CFlags_clear(temp_cflags);
 
-    if (output == NULL) {
+    if (!success) {
         chaz_Util_die("Don't know how to use math library.");
     }
 
-    free(output);
     return "m";
 }
 
@@ -6871,63 +6909,13 @@ chaz_Floats_math_library(void) {
 #include <stdio.h>
 #include <stdlib.h>
 
-/* Probe for ISO func macro. */
-static int
-chaz_FuncMacro_probe_iso() {
-    static const char iso_func_code[] =
-        CHAZ_QUOTE(  #include <stdio.h>                )
-        CHAZ_QUOTE(  int main() {                      )
-        CHAZ_QUOTE(      printf("%s", __func__);       )
-        CHAZ_QUOTE(      return 0;                     )
-        CHAZ_QUOTE(  }                                 );
-    size_t output_len;
-    char *output;
-    int success = false;
-
-    output = chaz_CC_capture_output(iso_func_code, &output_len);
-    if (output != NULL && strncmp(output, "main", 4) == 0) {
-        success = true;
-    }
-    free(output);
-
-    return success;
-}
-
-static int
-chaz_FuncMacro_probe_gnu() {
-    /* Code for verifying GNU func macro. */
-    static const char gnu_func_code[] =
-        CHAZ_QUOTE(  #include <stdio.h>                )
-        CHAZ_QUOTE(  int main() {                      )
-        CHAZ_QUOTE(      printf("%s", __FUNCTION__);   )
-        CHAZ_QUOTE(      return 0;                     )
-        CHAZ_QUOTE(  }                                 );
-    size_t output_len;
-    char *output;
-    int success = false;
-
-    output = chaz_CC_capture_output(gnu_func_code, &output_len);
-    if (output != NULL && strncmp(output, "main", 4) == 0) {
-        success = true;
-    }
-    free(output);
-
-    return success;
-}
-
 /* Attempt to verify inline keyword. */
-static char*
-chaz_FuncMacro_try_inline(const char *keyword, size_t *output_len) {
-    static const char inline_code[] =
-        CHAZ_QUOTE(  #include <stdio.h>                )
-        CHAZ_QUOTE(  static %s int foo() { return 1; } )
-        CHAZ_QUOTE(  int main() {                      )
-        CHAZ_QUOTE(      printf("%%d", foo());         )
-        CHAZ_QUOTE(      return 0;                     )
-        CHAZ_QUOTE(  }                                 );
+static int
+chaz_FuncMacro_try_inline(const char *keyword) {
+    static const char inline_code[] = "static %s int f() { return 1; }";
     char code[sizeof(inline_code) + 30];
     sprintf(code, inline_code, keyword);
-    return chaz_CC_capture_output(code, output_len);
+    return chaz_CC_test_compile(code);
 }
 
 static void
@@ -6943,12 +6931,9 @@ chaz_FuncMacro_probe_inline(void) {
 
     for (i = 0; i < num_inline_options; i++) {
         const char *inline_option = inline_options[i];
-        size_t output_len;
-        char *output = chaz_FuncMacro_try_inline(inline_option, &output_len);
-        if (output != NULL) {
+        if (chaz_FuncMacro_try_inline(inline_option)) {
             has_inline = true;
             chaz_ConfWriter_add_def("INLINE", inline_option);
-            free(output);
             break;
         }
     }
@@ -6966,11 +6951,11 @@ chaz_FuncMacro_run(void) {
     chaz_ConfWriter_start_module("FuncMacro");
 
     /* Check for func macros. */
-    if (chaz_FuncMacro_probe_iso()) {
+    if (chaz_CC_test_compile("const char *f() { return __func__; }")) {
         has_funcmac     = true;
         has_iso_funcmac = true;
     }
-    if (chaz_FuncMacro_probe_gnu()) {
+    if (chaz_CC_test_compile("const char *f() { return __FUNCTION__; }")) {
         has_funcmac      = true;
         has_gnuc_funcmac = true;
     }
@@ -7239,44 +7224,12 @@ chaz_Headers_probe_win(void) {
 static int
 chaz_Integers_machine_is_big_endian(void);
 
-static const char chaz_Integers_sizes_code[] =
-    CHAZ_QUOTE(  #include <stdio.h>                        )
-    CHAZ_QUOTE(  int main () {                             )
-    CHAZ_QUOTE(      printf("%d ", (int)sizeof(char));     )
-    CHAZ_QUOTE(      printf("%d ", (int)sizeof(short));    )
-    CHAZ_QUOTE(      printf("%d ", (int)sizeof(int));      )
-    CHAZ_QUOTE(      printf("%d ", (int)sizeof(long));     )
-    CHAZ_QUOTE(      printf("%d ", (int)sizeof(void*));    )
-    CHAZ_QUOTE(      printf("%d ", (int)sizeof(size_t));   )
-    CHAZ_QUOTE(      return 0;                             )
-    CHAZ_QUOTE(  }                                         );
-
 static const char chaz_Integers_stdint_type_code[] =
     CHAZ_QUOTE(  #include <stdint.h>                       )
-    CHAZ_QUOTE(  #include <stdio.h>                        )
-    CHAZ_QUOTE(  int main()                                )
-    CHAZ_QUOTE(  {                                         )
-    CHAZ_QUOTE(      printf("%%d", (int)sizeof(%s));       )
-    CHAZ_QUOTE(      return 0;                             )
-    CHAZ_QUOTE(  }                                         );
-
-static const char chaz_Integers_type64_code[] =
-    CHAZ_QUOTE(  #include <stdio.h>                        )
-    CHAZ_QUOTE(  int main()                                )
-    CHAZ_QUOTE(  {                                         )
-    CHAZ_QUOTE(      printf("%%d", (int)sizeof(%s));       )
-    CHAZ_QUOTE(      return 0;                             )
-    CHAZ_QUOTE(  }                                         );
+    CHAZ_QUOTE(  %s i;                                     );
 
 static const char chaz_Integers_literal64_code[] =
-    CHAZ_QUOTE(  #include <stdio.h>                        )
-    CHAZ_QUOTE(  #define big 9000000000000000000%s         )
-    CHAZ_QUOTE(  int main()                                )
-    CHAZ_QUOTE(  {                                         )
-    CHAZ_QUOTE(      int truncated = (int)big;             )
-    CHAZ_QUOTE(      printf("%%d\n", truncated);           )
-    CHAZ_QUOTE(      return 0;                             )
-    CHAZ_QUOTE(  }                                         );
+    CHAZ_QUOTE(  int f() { return (int)9000000000000000000%s; }  );
 
 void
 chaz_Integers_run(void) {
@@ -7321,51 +7274,31 @@ chaz_Integers_run(void) {
     }
 
     /* Record sizeof() for several common integer types. */
-    output = chaz_CC_capture_output(chaz_Integers_sizes_code, &output_len);
-    if (output != NULL) {
-        char *ptr     = output;
-        char *end_ptr = output;
-
-        sizeof_char   = strtol(ptr, &end_ptr, 10);
-        ptr           = end_ptr;
-        sizeof_short  = strtol(ptr, &end_ptr, 10);
-        ptr           = end_ptr;
-        sizeof_int    = strtol(ptr, &end_ptr, 10);
-        ptr           = end_ptr;
-        sizeof_long   = strtol(ptr, &end_ptr, 10);
-        ptr           = end_ptr;
-        sizeof_ptr    = strtol(ptr, &end_ptr, 10);
-        ptr           = end_ptr;
-        sizeof_size_t = strtol(ptr, &end_ptr, 10);
-
-        free(output);
-    }
+    sizeof_char   = chaz_HeadCheck_size_of_type("char",  "", 1);
+    sizeof_short  = chaz_HeadCheck_size_of_type("short", "", 2);
+    sizeof_int    = chaz_HeadCheck_size_of_type("int",   "", 4);
+    sizeof_long   = chaz_HeadCheck_size_of_type("long",  "", 4);
+    sizeof_ptr    = chaz_HeadCheck_size_of_type("void*", "", 4);
+    sizeof_size_t = chaz_HeadCheck_size_of_type("size_t",
+                                                "#include <stddef.h>", 4);
 
     /* Determine whether long longs are available. */
-    sprintf(code_buf, chaz_Integers_type64_code, "long long");
-    output = chaz_CC_capture_output(code_buf, &output_len);
-    if (output != NULL) {
+    if (chaz_CC_test_compile("long long l;")) {
         has_long_long    = true;
-        sizeof_long_long = strtol(output, NULL, 10);
-        free(output);
+        sizeof_long_long = chaz_HeadCheck_size_of_type("long long", "", 8);
     }
 
     /* Determine whether the __int64 type is available. */
-    sprintf(code_buf, chaz_Integers_type64_code, "__int64");
-    output = chaz_CC_capture_output(code_buf, &output_len);
-    if (output != NULL) {
+    if (chaz_CC_test_compile("__int64 i;")) {
         has___int64 = true;
-        sizeof___int64 = strtol(output, NULL, 10);
-        free(output);
+        sizeof___int64 = chaz_HeadCheck_size_of_type("__int64", "", 8);
     }
 
     /* Determine whether the intptr_t type is available (it's optional in
      * C99). */
     sprintf(code_buf, chaz_Integers_stdint_type_code, "intptr_t");
-    output = chaz_CC_capture_output(code_buf, &output_len);
-    if (output != NULL) {
+    if (chaz_CC_test_compile(code_buf)) {
         has_intptr_t = true;
-        free(output);
     }
 
     /* Figure out which integer types are available. */
@@ -7409,80 +7342,31 @@ chaz_Integers_run(void) {
     }
     else if (has_64) {
         sprintf(code_buf, chaz_Integers_literal64_code, "LL");
-        output = chaz_CC_capture_output(code_buf, &output_len);
-        if (output != NULL) {
+        if (chaz_CC_test_compile(code_buf)) {
             strcpy(i64_t_postfix, "LL");
-            free(output);
         }
         else {
             sprintf(code_buf, chaz_Integers_literal64_code, "i64");
-            output = chaz_CC_capture_output(code_buf, &output_len);
-            if (output != NULL) {
+            if (chaz_CC_test_compile(code_buf)) {
                 strcpy(i64_t_postfix, "i64");
-                free(output);
             }
             else {
                 chaz_Util_die("64-bit types, but no literal syntax found");
             }
         }
         sprintf(code_buf, chaz_Integers_literal64_code, "ULL");
-        output = chaz_CC_capture_output(code_buf, &output_len);
-        if (output != NULL) {
+        if (chaz_CC_test_compile(code_buf)) {
             strcpy(u64_t_postfix, "ULL");
-            free(output);
         }
         else {
             sprintf(code_buf, chaz_Integers_literal64_code, "Ui64");
-            output = chaz_CC_capture_output(code_buf, &output_len);
-            if (output != NULL) {
+            if (chaz_CC_test_compile(code_buf)) {
                 strcpy(u64_t_postfix, "Ui64");
-                free(output);
             }
             else {
                 chaz_Util_die("64-bit types, but no literal syntax found");
             }
         }
-    }
-
-    /* Probe for 64-bit printf format string modifier. */
-    if (has_64) {
-        int i;
-        const char *options[] = {
-            "ll",
-            "l",
-            "L",
-            "q",   /* Some *BSDs */
-            "I64", /* Microsoft */
-            NULL,
-        };
-
-        /* Buffer to hold the code, and its start and end. */
-        static const char format_64_code[] =
-            CHAZ_QUOTE(  #include <stdio.h>                            )
-            CHAZ_QUOTE(  int main() {                                  )
-            CHAZ_QUOTE(      printf("%%%su", 18446744073709551615%s);  )
-            CHAZ_QUOTE(      return 0;                                 )
-            CHAZ_QUOTE( }                                              );
-
-        for (i = 0; options[i] != NULL; i++) {
-            /* Try to print 2**64-1, and see if we get it back intact. */
-            int success;
-            sprintf(code_buf, format_64_code, options[i], u64_t_postfix);
-            output = chaz_CC_capture_output(code_buf, &output_len);
-            success = output != NULL
-                      && strcmp(output, "18446744073709551615") == 0;
-            free(output);
-
-            if (success) {
-                break;
-            }
-        }
-
-        if (options[i] == NULL) {
-            chaz_Util_die("64-bit types, but no printf modifier found");
-        }
-
-        strcpy(printf_modifier_64, options[i]);
     }
 
     /* Write out some conditional defines. */
@@ -7774,7 +7658,48 @@ chaz_Integers_run(void) {
         chaz_ConfWriter_add_sys_include("inttypes.h");
     }
 
-    {
+    /* Probe for 64-bit printf format string modifier. */
+    if (!has_inttypes && has_64) {
+        int i;
+        const char *options[] = {
+            "ll",
+            "l",
+            "L",
+            "q",   /* Some *BSDs */
+            "I64", /* Microsoft */
+            NULL,
+        };
+
+        /* Buffer to hold the code, and its start and end. */
+        static const char format_64_code[] =
+            CHAZ_QUOTE(  #include <stdio.h>                            )
+            CHAZ_QUOTE(  int main() {                                  )
+            CHAZ_QUOTE(      printf("%%%su", 18446744073709551615%s);  )
+            CHAZ_QUOTE(      return 0;                                 )
+            CHAZ_QUOTE( }                                              );
+
+        for (i = 0; options[i] != NULL; i++) {
+            /* Try to print 2**64-1, and see if we get it back intact. */
+            int success;
+            sprintf(code_buf, format_64_code, options[i], u64_t_postfix);
+            output = chaz_CC_capture_output(code_buf, &output_len);
+            success = output != NULL
+                      && strcmp(output, "18446744073709551615") == 0;
+            free(output);
+
+            if (success) {
+                break;
+            }
+        }
+
+        if (options[i] == NULL) {
+            chaz_Util_die("64-bit types, but no printf modifier found");
+        }
+
+        strcpy(printf_modifier_64, options[i]);
+    }
+
+    if (!has_inttypes || !has_intptr_t) {
         /* We support only the following subset of inttypes.h
          *   PRId32
          *   PRIi32
@@ -7811,10 +7736,9 @@ chaz_Integers_run(void) {
             int c = ptr[0];
 
             if (has_32) {
-                sprintf(scratch, "\"%s%c\"", printf_modifier_32, c);
-
+                macro_name_32[3] = c;
                 if (!has_inttypes) {
-                    macro_name_32[3] = c;
+                    sprintf(scratch, "\"%s%c\"", printf_modifier_32, c);
                     chaz_ConfWriter_add_global_def(macro_name_32, scratch);
                     if (!has_64) {
                         macro_name_max[3] = c;
@@ -7824,21 +7748,22 @@ chaz_Integers_run(void) {
                 }
                 if (!has_intptr_t && sizeof_ptr == 4) {
                     macro_name_ptr[3] = c;
-                    chaz_ConfWriter_add_global_def(macro_name_ptr, scratch);
+                    chaz_ConfWriter_add_global_def(macro_name_ptr,
+                                                   macro_name_32);
                 }
             }
             if (has_64) {
-                sprintf(scratch, "\"%s%c\"", printf_modifier_64, c);
-
+                macro_name_64[3] = c;
                 if (!has_inttypes) {
-                    macro_name_64[3] = c;
+                    sprintf(scratch, "\"%s%c\"", printf_modifier_64, c);
                     chaz_ConfWriter_add_global_def(macro_name_64, scratch);
                     macro_name_max[3] = c;
                     chaz_ConfWriter_add_global_def(macro_name_max, scratch);
                 }
                 if (!has_intptr_t && sizeof_ptr == 8) {
                     macro_name_ptr[3] = c;
-                    chaz_ConfWriter_add_global_def(macro_name_ptr, scratch);
+                    chaz_ConfWriter_add_global_def(macro_name_ptr,
+                                                   macro_name_64);
                 }
             }
         }
@@ -7962,12 +7887,7 @@ static int
 chaz_LargeFiles_probe_off64(void) {
     static const char off64_code[] =
         CHAZ_QUOTE(  %s                                        )
-        CHAZ_QUOTE(  #include <stdio.h>                        )
-        CHAZ_QUOTE(  int main()                                )
-        CHAZ_QUOTE(  {                                         )
-        CHAZ_QUOTE(      printf("%%d", (int)sizeof(%s));       )
-        CHAZ_QUOTE(      return 0;                             )
-        CHAZ_QUOTE(  }                                         );
+        CHAZ_QUOTE(  int a[sizeof(%s)==8?1:-1];                );
     char code_buf[sizeof(off64_code) + 100];
     int i;
     int success = false;
@@ -7981,8 +7901,6 @@ chaz_LargeFiles_probe_off64(void) {
 
     for (i = 0; i < num_off64_options; i++) {
         const char *candidate = off64_options[i];
-        char *output;
-        size_t output_len;
         int has_sys_types_h = chaz_HeadCheck_check_header("sys/types.h");
         const char *sys_types_include = has_sys_types_h
                                         ? "#include <sys/types.h>"
@@ -7990,15 +7908,10 @@ chaz_LargeFiles_probe_off64(void) {
 
         /* Execute the probe. */
         sprintf(code_buf, off64_code, sys_types_include, candidate);
-        output = chaz_CC_capture_output(code_buf, &output_len);
-        if (output != NULL) {
-            long sizeof_candidate = strtol(output, NULL, 10);
-            free(output);
-            if (sizeof_candidate == 8) {
-                strcpy(chaz_LargeFiles.off64_type, candidate);
-                success = true;
-                break;
-            }
+        if (chaz_CC_test_compile(code_buf)) {
+            strcpy(chaz_LargeFiles.off64_type, candidate);
+            success = true;
+            break;
         }
     }
     return success;
@@ -8009,20 +7922,13 @@ chaz_LargeFiles_try_stdio64(chaz_LargeFiles_stdio64_combo *combo) {
     static const char stdio64_code[] =
         CHAZ_QUOTE(  %s                                         )
         CHAZ_QUOTE(  #include <stdio.h>                         )
-        CHAZ_QUOTE(  int main() {                               )
-        CHAZ_QUOTE(      %s pos;                                )
-        CHAZ_QUOTE(      FILE *f;                               )
-        CHAZ_QUOTE(      f = %s("_charm_stdio64", "w");         )
-        CHAZ_QUOTE(      if (f == NULL) return -1;              )
-        CHAZ_QUOTE(      printf("%%d", (int)sizeof(%s));        )
-        CHAZ_QUOTE(      pos = %s(stdout);                      )
-        CHAZ_QUOTE(      %s(stdout, 0, SEEK_SET);               )
-        CHAZ_QUOTE(      return 0;                              )
+        CHAZ_QUOTE(  int a[sizeof(%s)==8?1:-1];                 )
+        CHAZ_QUOTE(  void f() {                                 )
+        CHAZ_QUOTE(      FILE *f = %s("_charm_stdio64", "w");   )
+        CHAZ_QUOTE(      %s pos = %s(f);                        )
+        CHAZ_QUOTE(      %s(f, 0, SEEK_SET);                    )
         CHAZ_QUOTE(  }                                          );
-    char *output = NULL;
-    size_t output_len;
     char code_buf[sizeof(stdio64_code) + 200];
-    int success = false;
 
     /* Prepare the source code. */
     sprintf(code_buf, stdio64_code, combo->includes,
@@ -8031,20 +7937,7 @@ chaz_LargeFiles_try_stdio64(chaz_LargeFiles_stdio64_combo *combo) {
             combo->fseek_command);
 
     /* Verify compilation and that the offset type has 8 bytes. */
-    output = chaz_CC_capture_output(code_buf, &output_len);
-    if (output != NULL) {
-        long size = strtol(output, NULL, 10);
-        if (size == 8) {
-            success = true;
-        }
-        free(output);
-    }
-
-    if (!chaz_Util_remove_and_verify("_charm_stdio64")) {
-        chaz_Util_die("Failed to remove '_charm_stdio64'");
-    }
-
-    return success;
+    return chaz_CC_test_compile(code_buf);
 }
 
 static void
@@ -8075,35 +7968,13 @@ chaz_LargeFiles_probe_stdio64(void) {
 static int
 chaz_LargeFiles_probe_lseek(chaz_LargeFiles_unbuff_combo *combo) {
     static const char lseek_code[] =
-        CHAZ_QUOTE( %s                                                       )
-        CHAZ_QUOTE( #include <stdio.h>                                       )
-        CHAZ_QUOTE( int main() {                                             )
-        CHAZ_QUOTE(     int fd;                                              )
-        CHAZ_QUOTE(     fd = open("_charm_lseek", O_WRONLY | O_CREAT, 0666); )
-        CHAZ_QUOTE(     if (fd == -1) { return -1; }                         )
-        CHAZ_QUOTE(     %s(fd, 0, SEEK_SET);                                 )
-        CHAZ_QUOTE(     printf("%%d", 1);                                    )
-        CHAZ_QUOTE(     if (close(fd)) { return -1; }                        )
-        CHAZ_QUOTE(     return 0;                                            )
-        CHAZ_QUOTE( }                                                        );
+        CHAZ_QUOTE( %s                                      )
+        CHAZ_QUOTE( void f() { %s(0, 0, SEEK_SET); }        );
     char code_buf[sizeof(lseek_code) + 100];
-    char *output = NULL;
-    size_t output_len;
-    int success = false;
 
     /* Verify compilation. */
     sprintf(code_buf, lseek_code, combo->includes, combo->lseek_command);
-    output = chaz_CC_capture_output(code_buf, &output_len);
-    if (output != NULL) {
-        success = true;
-        free(output);
-    }
-
-    if (!chaz_Util_remove_and_verify("_charm_lseek")) {
-        chaz_Util_die("Failed to remove '_charm_lseek'");
-    }
-
-    return success;
+    return chaz_CC_test_compile(code_buf);
 }
 
 static int
@@ -8112,28 +7983,15 @@ chaz_LargeFiles_probe_pread64(chaz_LargeFiles_unbuff_combo *combo) {
      * fine as long as it compiles. */
     static const char pread64_code[] =
         CHAZ_QUOTE(  %s                                     )
-        CHAZ_QUOTE(  #include <stdio.h>                     )
-        CHAZ_QUOTE(  int main() {                           )
-        CHAZ_QUOTE(      int fd = 20;                       )
+        CHAZ_QUOTE(  void f() {                             )
         CHAZ_QUOTE(      char buf[1];                       )
-        CHAZ_QUOTE(      printf("1");                       )
-        CHAZ_QUOTE(      %s(fd, buf, 1, 1);                 )
-        CHAZ_QUOTE(      return 0;                          )
+        CHAZ_QUOTE(      %s(0, buf, 1, 1);                  )
         CHAZ_QUOTE(  }                                      );
     char code_buf[sizeof(pread64_code) + 100];
-    char *output = NULL;
-    size_t output_len;
-    int success = false;
 
     /* Verify compilation. */
     sprintf(code_buf, pread64_code, combo->includes, combo->pread64_command);
-    output = chaz_CC_capture_output(code_buf, &output_len);
-    if (output != NULL) {
-        success = true;
-        free(output);
-    }
-
-    return success;
+    return chaz_CC_test_compile(code_buf);
 }
 
 static void
@@ -8141,7 +7999,7 @@ chaz_LargeFiles_probe_unbuff(void) {
     static chaz_LargeFiles_unbuff_combo unbuff_combos[] = {
         { "#include <unistd.h>\n#include <fcntl.h>\n", "lseek64",   "pread64" },
         { "#include <unistd.h>\n#include <fcntl.h>\n", "lseek",     "pread"      },
-        { "#include <io.h>\n#include <fcntl.h>\n",     "_lseeki64", "NO_PREAD64" },
+        { "#include <io.h>\n#include <stdio.h>\n",     "_lseeki64", "NO_PREAD64" },
         { NULL, NULL, NULL }
     };
     int i;
@@ -8219,7 +8077,7 @@ chaz_Memory_probe_alloca(void) {
     /* Under GCC, alloca is a builtin that works without including the
      * correct header, generating only a warning. To avoid misdetection,
      * disable the alloca builtin temporarily. */
-    if (chaz_CC_gcc_version_num()) {
+    if (chaz_CC_is_gcc()) {
         chaz_CFlags_append(temp_cflags, "-fno-builtin-alloca");
     }
 
@@ -8312,6 +8170,7 @@ chaz_RegularExpressions_run(void) {
 #line 17 "src/Charmonizer/Probe/Strings.c"
 /* #include "Charmonizer/Core/Compiler.h" */
 /* #include "Charmonizer/Core/ConfWriter.h" */
+/* #include "Charmonizer/Core/HeaderChecker.h" */
 /* #include "Charmonizer/Probe/Strings.h" */
 
 #include <stdlib.h>
@@ -8342,23 +8201,6 @@ chaz_Strings_probe_c99_snprintf(void) {
         CHAZ_QUOTE(      printf("%d", result);                      )
         CHAZ_QUOTE(      return 0;                                  )
         CHAZ_QUOTE(  }                                              );
-    static const char detect__scprintf_code[] =
-        CHAZ_QUOTE(  #include <stdio.h>                             )
-        CHAZ_QUOTE(  int main() {                                   )
-        CHAZ_QUOTE(      int  result;                               )
-        CHAZ_QUOTE(      result = _scprintf("%s", "12345");         )
-        CHAZ_QUOTE(      printf("%d", result);                      )
-        CHAZ_QUOTE(      return 0;                                  )
-        CHAZ_QUOTE(  }                                              );
-    static const char detect__snprintf_code[] =
-        CHAZ_QUOTE(  #include <stdio.h>                             )
-        CHAZ_QUOTE(  int main() {                                   )
-        CHAZ_QUOTE(      char buf[6];                               )
-        CHAZ_QUOTE(      int  result;                               )
-        CHAZ_QUOTE(      result = _snprintf(buf, 6, "%s", "12345"); )
-        CHAZ_QUOTE(      printf("%d", result);                      )
-        CHAZ_QUOTE(      return 0;                                  )
-        CHAZ_QUOTE(  }                                              );
     char   *output = NULL;
     size_t  output_len;
 
@@ -8377,15 +8219,11 @@ chaz_Strings_probe_c99_snprintf(void) {
 
     /* Test for _scprintf and _snprintf found in the MSVCRT.
      */
-    output = chaz_CC_capture_output(detect__scprintf_code, &output_len);
-    if (output != NULL) {
+    if (chaz_HeadCheck_defines_symbol("_scprintf", "#include <stdio.h>")) {
         chaz_ConfWriter_add_def("HAS__SCPRINTF", NULL);
-        free(output);
     }
-    output = chaz_CC_capture_output(detect__snprintf_code, &output_len);
-    if (output != NULL) {
+    if (chaz_HeadCheck_defines_symbol("_snprintf", "#include <stdio.h>")) {
         chaz_ConfWriter_add_def("HAS__SNPRINTF", NULL);
-        free(output);
     }
 }
 
@@ -8438,7 +8276,7 @@ chaz_SymbolVisibility_run(void) {
         if (chaz_CC_test_compile(code_buf)) {
             can_control_visibility = true;
             chaz_ConfWriter_add_def("EXPORT", export_win);
-            if (chaz_CC_gcc_version_num()) {
+            if (chaz_CC_is_gcc()) {
                 /*
                  * Under MinGW, symbols with dllimport storage class aren't
                  * constant. If a global variable is initialized to such a
@@ -8518,48 +8356,35 @@ chaz_UnusedVars_run(void) {
 /* Code for verifying ISO-style variadic macros. */
 static const char chaz_VariadicMacros_iso_code[] =
     CHAZ_QUOTE(  #include <stdio.h>                                    )
-    CHAZ_QUOTE(  #define ISO_TEST(fmt, ...) \\                         )
-    "                printf(fmt, __VA_ARGS__)                        \n"
-    CHAZ_QUOTE(  int main() {                                          )
-    CHAZ_QUOTE(      ISO_TEST("%d %d", 1, 1);                          )
-    CHAZ_QUOTE(      return 0;                                         )
-    CHAZ_QUOTE(  }                                                     );
+                "#define ISO_TEST(fmt, ...) printf(fmt, __VA_ARGS__)\n"
+    CHAZ_QUOTE(  void f() { ISO_TEST("%d %d", 1, 1); }                 );
 
 /* Code for verifying GNU-style variadic macros. */
 static const char chaz_VariadicMacros_gnuc_code[] =
     CHAZ_QUOTE(  #include <stdio.h>                                    )
     CHAZ_QUOTE(  #define GNU_TEST(fmt, args...) printf(fmt, ##args)    )
-    CHAZ_QUOTE(  int main() {                                          )
-    CHAZ_QUOTE(      GNU_TEST("%d %d", 1, 1);                          )
-    CHAZ_QUOTE(      return 0;                                         )
-    CHAZ_QUOTE(  }                                                     );
+    CHAZ_QUOTE(  void f() { GNU_TEST("%d %d", 1, 1); }                 );
 
 void
 chaz_VariadicMacros_run(void) {
-    char *output;
-    size_t output_len;
     int has_varmacros = false;
 
     chaz_ConfWriter_start_module("VariadicMacros");
 
     /* Test for ISO-style variadic macros. */
-    output = chaz_CC_capture_output(chaz_VariadicMacros_iso_code, &output_len);
-    if (output != NULL) {
+    if (chaz_CC_test_compile(chaz_VariadicMacros_iso_code)) {
         has_varmacros = true;
         chaz_ConfWriter_add_def("HAS_VARIADIC_MACROS", NULL);
         chaz_ConfWriter_add_def("HAS_ISO_VARIADIC_MACROS", NULL);
-        free(output);
     }
 
     /* Test for GNU-style variadic macros. */
-    output = chaz_CC_capture_output(chaz_VariadicMacros_gnuc_code, &output_len);
-    if (output != NULL) {
+    if (chaz_CC_test_compile(chaz_VariadicMacros_gnuc_code)) {
         if (has_varmacros == false) {
             has_varmacros = true;
             chaz_ConfWriter_add_def("HAS_VARIADIC_MACROS", NULL);
         }
         chaz_ConfWriter_add_def("HAS_GNUC_VARIADIC_MACROS", NULL);
-        free(output);
     }
 
     chaz_ConfWriter_end_module();
@@ -8703,12 +8528,14 @@ int main(int argc, const char **argv) {
     chaz_BuildEnv_run();
     chaz_DirManip_run();
     chaz_Headers_run();
+    chaz_FuncMacro_run();
     chaz_Booleans_run();
     chaz_Integers_run();
     chaz_Floats_run();
     chaz_LargeFiles_run();
     chaz_Memory_run();
     chaz_RegularExpressions_run();
+    chaz_SymbolVisibility_run();
     chaz_VariadicMacros_run();
 
     /* Write custom postamble. */
@@ -8759,7 +8586,7 @@ S_add_compiler_flags(struct chaz_CLI *cli) {
         chaz_CFlags_add_define(extra_cflags, "LUCY_DEBUG", NULL);
     }
 
-    if (chaz_Probe_gcc_version_num()) {
+    if (chaz_CC_is_gcc()) {
         chaz_CFlags_append(extra_cflags,
             "-pedantic -Wall -Wextra -Wno-variadic-macros");
         if (chaz_CLI_defined(cli, "enable-perl")) {
@@ -8770,8 +8597,8 @@ S_add_compiler_flags(struct chaz_CLI *cli) {
          * autogenerated files. */
         chaz_CFlags_append(extra_cflags, "-std=gnu99 -D_GNU_SOURCE");
     }
-    else if (chaz_Probe_msvc_version_num()) {
-        if (chaz_Probe_msvc_version_num() < 1800) {
+    else if (chaz_CC_is_msvc()) {
+        if (chaz_CC_test_msvc_version("< 1800")) {
             /* Compile as C++ under MSVC11 and below. */
             chaz_CFlags_append(extra_cflags, "/TP");
         }
@@ -8780,11 +8607,6 @@ S_add_compiler_flags(struct chaz_CLI *cli) {
         /* Thwart stupid warnings. */
         chaz_CFlags_append(extra_cflags,
 	    "/D_CRT_SECURE_NO_WARNINGS /D_SCL_SECURE_NO_WARNINGS /wd4996");
-
-        if (chaz_Probe_msvc_version_num() < 1300) {
-            /* Redefine 'for' to fix broken 'for' scoping under MSVC6. */
-            chaz_CFlags_append(extra_cflags, "/Dfor=\"if(0);else for\"");
-        }
     }
 
     chaz_CFlags_hide_symbols(extra_cflags);
@@ -8920,8 +8742,6 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
     chaz_MakeFile_add_var(self->makefile, "BASE_DIR", self->base_dir);
 
     /* C compiler */
-
-    chaz_MakeFile_add_var(self->makefile, "CC", chaz_CC_get_cc());
 
     makefile_cflags = chaz_CC_new_cflags();
 
@@ -9138,7 +8958,7 @@ lucy_MakeFile_write_c_cfc_rules(lucy_MakeFile *self) {
     chaz_MakeRule_add_prereq(rule, "$(CLOWNFISH_HEADERS)");
     if (cfish_prefix == NULL) {
         cfc_command
-            = chaz_Util_join("", "cfc --source=", self->core_dir,
+            = chaz_Util_join("", "cfc --charmonic --source=", self->core_dir,
                              " --source=", self->test_dir,
                              " --dest=autogen --header=cfc_header", NULL);
     }
@@ -9232,6 +9052,8 @@ lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
 
 static int
 S_core_dir_filter(const char *dir, char *file, void *context) {
+    (void)dir;
+    (void)context;
     return !S_ends_with(file, "JsonParser.c");
 }
 
