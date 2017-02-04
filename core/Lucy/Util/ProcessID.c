@@ -21,7 +21,7 @@
 /********************************* WINDOWS ********************************/
 #if (defined(CHY_HAS_WINDOWS_H) && defined(CHY_HAS_PROCESS_H) && !defined(__CYGWIN__))
 
-#include <Windows.h>
+#include <windows.h>
 #include <process.h>
 
 int
