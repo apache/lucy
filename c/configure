@@ -38,12 +38,17 @@ if [ -z "$CC" ]; then
     fi
 fi
 
-echo "Using C compiler '$CC'"
+if [ -z "$TARGET_CC" ]; then
+    echo "Using C compiler '$CC'"
+    TARGET_CC="$CC"
+else
+    echo "Using target compiler '$TARGET_CC' and host compiler '$CC'"
+fi
 
 command="$CC ../common/charmonizer.c -o charmonizer"
 echo $command
 $command || exit
 
 echo Running charmonizer
-./charmonizer --cc=$CC --host=c --enable-c --enable-makefile "$@"
+./charmonizer --cc="$TARGET_CC" --host=c --enable-c --enable-makefile "$@"
 
