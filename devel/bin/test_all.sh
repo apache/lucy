@@ -107,18 +107,20 @@ fi
 
 if [ -z "$1" -o "$1" = c ]; then
     cd "$cfish_dir/compiler/c"
-    ./configure
+    ./configure --prefix="$tmp_dir/c"
     make -j test
+    make install
 
     cd ../../runtime/c
-    ./configure
+    ./configure --prefix="$tmp_dir/c"
     make -j test
-    ./install.sh --prefix "$tmp_dir/c"
+    make install
     make distclean
 
     cd "$lucy_dir/c"
-    ./configure --clownfish-prefix "$tmp_dir/c"
+    ./configure --prefix="$tmp_dir/c" --clownfish-prefix "$tmp_dir/c"
     make -j test
+    make install
     make distclean
 
     cd "$root"

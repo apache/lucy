@@ -164,14 +164,6 @@ find sub {
     write_file($name, $buf);
 }, 'perl';
 
-# Update c/install.sh
-$buf = read_file('c/install.sh');
-$buf =~ s/\bversion=[\d.]+/version=$x_y_z_version/
-    or die "no match";
-$buf =~ s/\bmajor_version=[\d.]+/major_version=$x.$y/
-    or die "no match";
-write_file( 'c/install.sh', $buf );
-
 # utility functions
 sub read_file {
     my ($file) = @_;

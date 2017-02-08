@@ -92,6 +92,9 @@ lucy_MakeFile_write_c_cfc_rules(lucy_MakeFile *self);
 static void
 lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self);
 
+static void
+lucy_MakeFile_write_c_install_rules(lucy_MakeFile *self);
+
 static int
 S_core_dir_filter(const char *dir, char *file, void *context);
 
@@ -326,6 +329,8 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
     const char *host     = chaz_CLI_strval(self->cli, "host");
     const char *math_lib = chaz_Floats_math_library();
 
+    int is_c = strcmp(host, "c") == 0;
+
     const char *lib_objs      = NULL;
     const char *test_lib_objs = NULL;
 
@@ -372,14 +377,15 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
 
     /* Core library. */
 
-    if (strcmp(host, "c") == 0 || strcmp(host, "perl") == 0) {
+    if (is_c || strcmp(host, "perl") == 0) {
         /* Shared library for C and Perl. */
 
         chaz_MakeFile_add_rule(self->makefile, "all", "$(LUCY_SHARED_LIB)");
 
         self->lib
             = chaz_MakeFile_add_shared_lib(self->makefile, NULL, "lucy",
-                                           lucy_version, lucy_major_version);
+                                           lucy_version, lucy_major_version,
+                                           is_c);
         lib_objs = "$(LUCY_SHARED_LIB_OBJS)";
 
         compile_flags = chaz_MakeBinary_get_compile_flags(self->lib);
@@ -409,7 +415,7 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
                                "$(LUCY_STATIC_LIB) $(TESTLUCY_STATIC_LIB)");
 
         self->lib
-            = chaz_MakeFile_add_static_lib(self->makefile, NULL, "lucy");
+            = chaz_MakeFile_add_static_lib(self->makefile, NULL, "lucy", 0);
         lib_objs = "$(LUCY_STATIC_LIB_OBJS)";
 
         compile_flags = chaz_MakeBinary_get_compile_flags(self->lib);
@@ -438,12 +444,13 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
 
     /* Test library. */
 
-    if (strcmp(host, "c") == 0 || strcmp(host, "perl") == 0) {
+    if (is_c || strcmp(host, "perl") == 0) {
         /* Shared library for C and Perl. */
 
         self->test_lib
             = chaz_MakeFile_add_shared_lib(self->makefile, NULL, "testlucy",
-                                           lucy_version, lucy_major_version);
+                                           lucy_version, lucy_major_version,
+                                           0);
         test_lib_objs = "$(TESTLUCY_SHARED_LIB_OBJS)";
 
         compile_flags = chaz_MakeBinary_get_compile_flags(self->test_lib);
@@ -470,8 +477,8 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
     else {
         /* Static library for Go and Python. */
 
-        self->test_lib
-            = chaz_MakeFile_add_static_lib(self->makefile, NULL, "testlucy");
+        self->test_lib = chaz_MakeFile_add_static_lib(self->makefile, NULL,
+                                                      "testlucy", 0);
         test_lib_objs = "$(TESTLUCY_STATIC_LIB_OBJS)";
 
         compile_flags = chaz_MakeBinary_get_compile_flags(self->test_lib);
@@ -511,9 +518,10 @@ lucy_MakeFile_write(lucy_MakeFile *self) {
     chaz_MakeFile_add_rule(self->makefile, test_lib_objs,
                            self->autogen_target);
 
-    if (strcmp(host, "c") == 0) {
+    if (is_c) {
         lucy_MakeFile_write_c_cfc_rules(self);
         lucy_MakeFile_write_c_test_rules(self);
+        lucy_MakeFile_write_c_install_rules(self);
     }
 
     /* Targets to compile object files for Perl. */
@@ -599,7 +607,7 @@ lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
     chaz_CFlags     *link_flags;
     chaz_MakeRule   *rule;
 
-    exe = chaz_MakeFile_add_exe(self->makefile, "t", "test_lucy");
+    exe = chaz_MakeFile_add_exe(self->makefile, "t", "test_lucy", 0);
     chaz_MakeBinary_add_src_file(exe, "t", "test_lucy.c");
 
     compile_flags = chaz_MakeBinary_get_compile_flags(exe);
@@ -652,6 +660,29 @@ lucy_MakeFile_write_c_test_rules(lucy_MakeFile *self) {
         chaz_MakeRule_add_rm_command(rule, "lucy.info");
         chaz_MakeRule_add_recursive_rm_command(rule, "coverage");
     }
+}
+
+static void
+lucy_MakeFile_write_c_install_rules(lucy_MakeFile *self) {
+    const char *dir_sep = chaz_OS_dir_sep();
+    char *src;
+
+    src = chaz_Util_join(dir_sep, "autogen", "share", NULL);
+    chaz_MakeFile_install_dir(self->makefile, src, "$(DATADIR)", NULL);
+    free(src);
+
+    src = chaz_Util_join(dir_sep, "autogen", "man", NULL);
+    chaz_MakeFile_install_dir(self->makefile, src, "$(MANDIR)", NULL);
+    free(src);
+
+    chaz_MakeFile_install_pkgconfig(self->makefile, "lucy", lucy_version,
+        "Name: Apache Lucy\n"
+        "Description: Full-text search for dynamic languages\n"
+        "URL: http://lucy.apache.org/\n"
+        "Version: $${version}\n"
+        "Requires: clownfish\n"
+        "Libs: -L$${libdir} -llucy\n"
+    );
 }
 
 static int
