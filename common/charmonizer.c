@@ -6519,32 +6519,21 @@ chaz_Probe_clean_up(void) {
 #include <stdio.h>
 #include <stdlib.h>
 
-
-static int
-chaz_AtomicOps_osatomic_cas_ptr(void) {
-    static const char osatomic_casptr_code[] =
-        CHAZ_QUOTE(  #include <libkern/OSAtomic.h>                                  )
-        CHAZ_QUOTE(  #include <libkern/OSAtomic.h>                                  )
-        CHAZ_QUOTE(  int main() {                                                   )
-        CHAZ_QUOTE(      int  foo = 1;                                              )
-        CHAZ_QUOTE(      int *foo_ptr = &foo;                                       )
-        CHAZ_QUOTE(      int *target = NULL;                                        )
-        CHAZ_QUOTE(      OSAtomicCompareAndSwapPtr(NULL, foo_ptr, (void**)&target); )
-        CHAZ_QUOTE(      return 0;                                                  )
-        CHAZ_QUOTE(  }                                                              );
-     return chaz_CC_test_compile(osatomic_casptr_code);
-}
-
 void
 chaz_AtomicOps_run(void) {
     chaz_ConfWriter_start_module("AtomicOps");
 
+    if (chaz_HeadCheck_check_header("stdatomic.h")) {
+        chaz_ConfWriter_add_def("HAS_STDATOMIC_H", NULL);
+    }
     if (chaz_HeadCheck_check_header("libkern/OSAtomic.h")) {
         chaz_ConfWriter_add_def("HAS_LIBKERN_OSATOMIC_H", NULL);
 
         /* Check for OSAtomicCompareAndSwapPtr, introduced in later versions
          * of OSAtomic.h. */
-        if (chaz_AtomicOps_osatomic_cas_ptr()) {
+        if (chaz_HeadCheck_defines_symbol("OSAtomicCompareAndSwapPtr",
+                                          "#include <libkern/OSAtomic.h>")
+           ) {
             chaz_ConfWriter_add_def("HAS_OSATOMIC_CAS_PTR", NULL);
         }
     }
@@ -7923,10 +7912,11 @@ chaz_LargeFiles_try_stdio64(chaz_LargeFiles_stdio64_combo *combo) {
         CHAZ_QUOTE(  %s                                         )
         CHAZ_QUOTE(  #include <stdio.h>                         )
         CHAZ_QUOTE(  int a[sizeof(%s)==8?1:-1];                 )
-        CHAZ_QUOTE(  void f() {                                 )
+        CHAZ_QUOTE(  int main() {                               )
         CHAZ_QUOTE(      FILE *f = %s("_charm_stdio64", "w");   )
         CHAZ_QUOTE(      %s pos = %s(f);                        )
         CHAZ_QUOTE(      %s(f, 0, SEEK_SET);                    )
+        CHAZ_QUOTE(      return 0;                              )
         CHAZ_QUOTE(  }                                          );
     char code_buf[sizeof(stdio64_code) + 200];
 
@@ -7937,7 +7927,7 @@ chaz_LargeFiles_try_stdio64(chaz_LargeFiles_stdio64_combo *combo) {
             combo->fseek_command);
 
     /* Verify compilation and that the offset type has 8 bytes. */
-    return chaz_CC_test_compile(code_buf);
+    return chaz_CC_test_link(code_buf);
 }
 
 static void
@@ -7969,12 +7959,15 @@ static int
 chaz_LargeFiles_probe_lseek(chaz_LargeFiles_unbuff_combo *combo) {
     static const char lseek_code[] =
         CHAZ_QUOTE( %s                                      )
-        CHAZ_QUOTE( void f() { %s(0, 0, SEEK_SET); }        );
+        CHAZ_QUOTE( int main() {                            )
+        CHAZ_QUOTE(     %s(0, 0, SEEK_SET);                 )
+        CHAZ_QUOTE(     return 0;                           )
+        CHAZ_QUOTE( }                                       );
     char code_buf[sizeof(lseek_code) + 100];
 
     /* Verify compilation. */
     sprintf(code_buf, lseek_code, combo->includes, combo->lseek_command);
-    return chaz_CC_test_compile(code_buf);
+    return chaz_CC_test_link(code_buf);
 }
 
 static int
@@ -7983,15 +7976,16 @@ chaz_LargeFiles_probe_pread64(chaz_LargeFiles_unbuff_combo *combo) {
      * fine as long as it compiles. */
     static const char pread64_code[] =
         CHAZ_QUOTE(  %s                                     )
-        CHAZ_QUOTE(  void f() {                             )
+        CHAZ_QUOTE(  int main() {                           )
         CHAZ_QUOTE(      char buf[1];                       )
         CHAZ_QUOTE(      %s(0, buf, 1, 1);                  )
+        CHAZ_QUOTE(     return 0;                           )
         CHAZ_QUOTE(  }                                      );
     char code_buf[sizeof(pread64_code) + 100];
 
     /* Verify compilation. */
     sprintf(code_buf, pread64_code, combo->includes, combo->pread64_command);
-    return chaz_CC_test_compile(code_buf);
+    return chaz_CC_test_link(code_buf);
 }
 
 static void
