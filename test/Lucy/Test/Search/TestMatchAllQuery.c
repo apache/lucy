@@ -47,11 +47,17 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     DECREF(clone);
 }
 
+static void
+test_freeze_thaw_compiler(TestBatchRunner *runner) {
+    TestUtils_test_freeze_thaw(runner, (Obj*)MatchAllCompiler_new(38.0f),
+                               "compiler");
+}
 
 void
 TestMatchAllQuery_Run_IMP(TestMatchAllQuery *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 2);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 3);
     test_Dump_Load_and_Equals(runner);
+    test_freeze_thaw_compiler(runner);
 }
 
 

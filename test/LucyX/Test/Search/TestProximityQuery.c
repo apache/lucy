@@ -14,31 +14,38 @@
  * limitations under the License.
  */
 
-#define C_TESTLUCY_TESTPHRASEQUERY
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
-#include <math.h>
 
 #include "Clownfish/TestHarness/TestBatchRunner.h"
-#include "Lucy/Test.h"
-#include "Lucy/Test/TestUtils.h"
 #include "Lucy/Test/Search/MockSearcher.h"
-#include "Lucy/Test/Search/TestPhraseQuery.h"
-#include "Lucy/Search/PhraseQuery.h"
+#include "Lucy/Test/TestUtils.h"
 #include "Lucy/Util/Freezer.h"
+#include "LucyX/Search/ProximityQuery.h"
+#include "LucyX/Test/Search/TestProximityQuery.h"
 
-TestPhraseQuery*
-TestPhraseQuery_new() {
-    return (TestPhraseQuery*)Class_Make_Obj(TESTPHRASEQUERY);
+TestProximityQuery*
+TestProximityQuery_new() {
+    return (TestProximityQuery*)Class_Make_Obj(TESTPROXIMITYQUERY);
+}
+
+static ProximityQuery*
+S_make_proximity_query() {
+    Vector *terms = Vec_new(2);
+    Vec_Push(terms, (Obj*)Str_newf("a"));
+    Vec_Push(terms, (Obj*)Str_newf("b"));
+    ProximityQuery *query
+        = ProximityQuery_new(SSTR_WRAP_C("content"), terms, 4);
+    DECREF(terms);
+    return query;
 }
 
 static void
 test_Dump_And_Load(TestBatchRunner *runner) {
-    PhraseQuery *query
-        = TestUtils_make_phrase_query("content", "a", "b", "c", NULL);
-    Obj         *dump  = (Obj*)PhraseQuery_Dump(query);
-    PhraseQuery *twin = (PhraseQuery*)Freezer_load(dump);
-    TEST_TRUE(runner, PhraseQuery_Equals(query, (Obj*)twin),
+    ProximityQuery *query = S_make_proximity_query();
+    Obj *dump = (Obj*)ProximityQuery_Dump(query);
+    ProximityQuery *twin = (ProximityQuery*)Freezer_load(dump);
+    TEST_TRUE(runner, ProximityQuery_Equals(query, (Obj*)twin),
               "Dump => Load round trip");
     DECREF(query);
     DECREF(dump);
@@ -47,17 +54,17 @@ test_Dump_And_Load(TestBatchRunner *runner) {
 
 static void
 test_freeze_thaw_compiler(TestBatchRunner *runner) {
-    PhraseQuery *query
-        = TestUtils_make_phrase_query("content", "a", "b", "c", NULL);
+    ProximityQuery *query = S_make_proximity_query();
     Searcher *searcher = (Searcher*)MockSearcher_new();
-    PhraseCompiler *compiler = PhraseCompiler_new(query, searcher, 433.0f);
+    ProximityCompiler *compiler
+        = ProximityCompiler_new(query, searcher, 880.0f);
     TestUtils_test_freeze_thaw(runner, (Obj*)compiler, "compiler");
     DECREF(searcher);
     DECREF(query);
 }
 
 void
-TestPhraseQuery_Run_IMP(TestPhraseQuery *self, TestBatchRunner *runner) {
+TestProximityQuery_Run_IMP(TestProximityQuery *self, TestBatchRunner *runner) {
     TestBatchRunner_Plan(runner, (TestBatch*)self, 2);
     test_Dump_And_Load(runner);
     test_freeze_thaw_compiler(runner);

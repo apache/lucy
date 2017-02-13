@@ -22,9 +22,11 @@
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
+#include "Lucy/Test/Search/MockSearcher.h"
 #include "Lucy/Test/Search/TestReqOptQuery.h"
 #include "Lucy/Search/RequiredOptionalQuery.h"
 #include "Lucy/Search/LeafQuery.h"
+#include "Lucy/Search/TermQuery.h"
 #include "Lucy/Util/Freezer.h"
 
 TestReqOptQuery*
@@ -64,10 +66,27 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     DECREF(clone);
 }
 
+static void
+test_freeze_thaw_compiler(TestBatchRunner *runner) {
+    String *field = SSTR_WRAP_C("content");
+    TermQuery *req = TermQuery_new(field, (Obj*)SSTR_WRAP_C("a"));
+    TermQuery *opt = TermQuery_new(field, (Obj*)SSTR_WRAP_C("b"));
+    RequiredOptionalQuery *query = ReqOptQuery_new((Query*)req, (Query*)opt);
+    Searcher *searcher = (Searcher*)MockSearcher_new();
+    RequiredOptionalCompiler *compiler
+        = ReqOptCompiler_new(query, searcher, 921.0f);
+    TestUtils_test_freeze_thaw(runner, (Obj*)compiler, "compiler");
+    DECREF(searcher);
+    DECREF(query);
+    DECREF(opt);
+    DECREF(req);
+}
+
 void
 TestReqOptQuery_Run_IMP(TestReqOptQuery *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 5);
     test_Dump_Load_and_Equals(runner);
+    test_freeze_thaw_compiler(runner);
 }
 
 
