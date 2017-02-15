@@ -536,8 +536,9 @@ func TestFilePurgerMisc(t *testing.T) {
 
 	snapshot := NewSnapshot()
 	snapshot.WriteFile(folder, "")
-	purger := NewFilePurger(folder, snapshot, nil)
-	purger.purge()
+	purger := NewFilePurger(folder, nil)
+	purger.purgeSnapshots(snapshot)
+	purger.purgeAbortedMerge()
 	if folder.exists("foo") {
 		t.Errorf("Failed to purge file")
 	}

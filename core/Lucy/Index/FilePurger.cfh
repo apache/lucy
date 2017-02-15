@@ -22,22 +22,23 @@ parcel Lucy;
 class Lucy::Index::FilePurger inherits Clownfish::Obj {
 
     Folder       *folder;
-    Snapshot     *snapshot;
     IndexManager *manager;
-    Hash         *disallowed;
 
     inert incremented FilePurger*
-    new(Folder *folder, Snapshot *snapshot = NULL,
-        IndexManager *manager = NULL);
+    new(Folder *folder, IndexManager *manager = NULL);
 
     inert FilePurger*
-    init(FilePurger *self, Folder *folder, Snapshot *snapshot = NULL,
-         IndexManager *manager = NULL);
+    init(FilePurger *self, Folder *folder, IndexManager *manager = NULL);
 
     /** Purge obsolete files from the index.
      */
     void
-    Purge(FilePurger *self);
+    Purge_Snapshots(FilePurger *self, Snapshot *current);
+
+    /** Purge files left behind by an aborted background merge.
+     */
+    void
+    Purge_Aborted_Merge(FilePurger *self);
 
     public void
     Destroy(FilePurger *self);

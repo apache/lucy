@@ -161,13 +161,10 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
         }
     }
 
-    // Zap detritus from previous sessions.
-    // Note: we have to feed FilePurger with the most recent snapshot file
-    // now, but with the Indexer's snapshot later.
-    FilePurger *file_purger
-        = FilePurger_new(folder, latest_snapshot, ivars->manager);
-    FilePurger_Purge(file_purger);
-    DECREF(file_purger);
+    // Create new FilePurger and zap detritus from an aborted background
+    // merge.
+    ivars->file_purger = FilePurger_new(folder, ivars->manager);
+    FilePurger_Purge_Aborted_Merge(ivars->file_purger);
 
     // Create a new segment.
     int64_t new_seg_num
@@ -204,9 +201,7 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
 
     DECREF(merge_lock);
 
-    // Create new SegWriter and FilePurger.
-    ivars->file_purger
-        = FilePurger_new(folder, ivars->snapshot, ivars->manager);
+    // Create new SegWriter.
     ivars->seg_writer = SegWriter_new(ivars->schema, ivars->snapshot,
                                      ivars->segment, ivars->polyreader);
     SegWriter_Prep_Seg_Dir(ivars->seg_writer);
@@ -572,7 +567,7 @@ Indexer_Commit_IMP(Indexer *self) {
         if (!success) { RETHROW(INCREF(Err_get_error())); }
 
         // Purge obsolete files.
-        FilePurger_Purge(ivars->file_purger);
+        FilePurger_Purge_Snapshots(ivars->file_purger, ivars->snapshot);
     }
 
     // Release locks, invalidating the Indexer.
