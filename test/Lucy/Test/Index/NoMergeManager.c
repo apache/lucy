@@ -14,15 +14,29 @@
  * limitations under the License.
  */
 
-parcel TestLucy;
+#define TESTLUCY_USE_SHORT_NAMES
+#include "Lucy/Util/ToolSet.h"
 
-class Lucy::Test::Index::TestSortWriter
-    inherits Clownfish::TestHarness::TestBatch {
+#include "Lucy/Test/Index/NoMergeManager.h"
+#include "Lucy/Index/DeletionsWriter.h"
+#include "Lucy/Index/IndexManager.h"
+#include "Lucy/Index/PolyReader.h"
 
-    inert incremented TestSortWriter*
-    new();
+NoMergeManager*
+NoMergeManager_new() {
+    NoMergeManager *self = (NoMergeManager*)Class_Make_Obj(NOMERGEMANAGER);
+    return (NoMergeManager*)IxManager_init((IndexManager*)self, NULL, NULL);
+}
 
-    void
-    Run(TestSortWriter *self, TestBatchRunner *runner);
+Vector*
+NoMergeManager_Recycle_IMP(NoMergeManager *self, PolyReader *reader,
+                           DeletionsWriter *del_writer, int64_t cutoff,
+                           bool optimize) {
+    UNUSED_VAR(self);
+    UNUSED_VAR(reader);
+    UNUSED_VAR(del_writer);
+    UNUSED_VAR(cutoff);
+    UNUSED_VAR(optimize);
+    return Vec_new(0);
 }
 

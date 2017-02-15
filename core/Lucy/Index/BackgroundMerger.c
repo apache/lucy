@@ -109,8 +109,8 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager) {
     }
 
     // Create FilePurger. Zap detritus from previous sessions.
-    ivars->file_purger = FilePurger_new(folder, ivars->snapshot, ivars->manager);
-    FilePurger_Purge(ivars->file_purger);
+    ivars->file_purger = FilePurger_new(folder, ivars->manager);
+    FilePurger_Purge_Aborted_Merge(ivars->file_purger);
 
     // Open a PolyReader, passing in the IndexManager so we get a read lock on
     // the Snapshot's files -- so that Indexers don't zap our files while
@@ -518,7 +518,7 @@ BGMerger_Commit_IMP(BackgroundMerger *self) {
 
     if (ivars->needs_commit) {
         // Purge obsolete files.
-        FilePurger_Purge(ivars->file_purger);
+        FilePurger_Purge_Snapshots(ivars->file_purger, ivars->snapshot);
     }
 
     // Release the write lock.

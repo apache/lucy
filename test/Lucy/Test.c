@@ -32,6 +32,7 @@
 #include "Lucy/Test/Analysis/TestStandardTokenizer.h"
 #include "Lucy/Test/Highlight/TestHeatMap.h"
 #include "Lucy/Test/Highlight/TestHighlighter.h"
+#include "Lucy/Test/Index/TestBackgroundMerger.h"
 #include "Lucy/Test/Index/TestDocWriter.h"
 #include "Lucy/Test/Index/TestHighlightWriter.h"
 #include "Lucy/Test/Index/TestIndexManager.h"
@@ -138,6 +139,7 @@ Test_create_test_suite() {
     TestSuite_Add_Batch(suite, (TestBatch*)TestBlobType_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestNumericType_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestFType_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestBGMerger_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestSeg_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestHighlighter_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestSimple_new());
