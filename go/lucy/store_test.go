@@ -712,19 +712,6 @@ func TestLockFileLockAll(t *testing.T) {
 	lock.Release()
 }
 
-func TestLockFactoryAll(t *testing.T) {
-	folder := NewRAMFolder("")
-	factory := NewLockFactory(folder, "dev.example.com")
-	lock := factory.MakeLock("write", 10, 42)
-	if _, ok := lock.(Lock); !ok {
-		t.Errorf("MakeLock")
-	}
-	shlock := factory.MakeSharedLock("read", 10, 42)
-	if _, ok := shlock.(SharedLock); !ok {
-		t.Errorf("MakeSharedLock")
-	}
-}
-
 func TestCompoundFiles(t *testing.T) {
 	var err error
 	folder := NewRAMFolder("seg_6b")

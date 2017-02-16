@@ -31,7 +31,6 @@ public class Lucy::Index::IndexManager nickname IxManager
 
     Folder      *folder;
     String      *host;
-    LockFactory *lock_factory;
     uint32_t     write_lock_timeout;
     uint32_t     write_lock_interval;
     uint32_t     merge_lock_timeout;
@@ -42,19 +41,16 @@ public class Lucy::Index::IndexManager nickname IxManager
     /** Create a new IndexManager.
      *
      * @param host An identifier which should be unique per-machine.
-     * @param lock_factory A LockFactory.
      */
     public inert incremented IndexManager*
-    new(String *host = NULL, LockFactory *lock_factory = NULL);
+    new(String *host = NULL);
 
     /** Initialize an IndexManager.
      *
      * @param host An identifier which should be unique per-machine.
-     * @param lock_factory A LockFactory.
      */
     public inert IndexManager*
-    init(IndexManager *self, String *host = NULL,
-         LockFactory *lock_factory = NULL);
+    init(IndexManager *self, String *host = NULL);
 
     public void
     Destroy(IndexManager *self);
@@ -105,7 +101,7 @@ public class Lucy::Index::IndexManager nickname IxManager
     /** Create the Lock which controls access to modifying the logical content
      * of the index.
      */
-    public incremented Lock*
+    incremented Lock*
     Make_Write_Lock(IndexManager *self);
 
     /** Create the Lock which grants permission to delete obsolete snapshot

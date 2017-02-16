@@ -37,12 +37,9 @@ use Lucy::Test;
 
 my $folder = Lucy::Store::RAMFolder->new;
 
-my $lock_factory = Lucy::Store::LockFactory->new(
-    folder => $folder,
-    host   => 'me',
-);
-
-my $lock = $lock_factory->make_lock(
+my $lock = Lucy::Store::LockFileLock->new(
+    folder         => $folder,
+    host           => 'me',
     name           => 'angie',
     timeout        => 1000,
     exclusive_only => 0,

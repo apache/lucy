@@ -29,7 +29,7 @@ TestIxManager_new() {
 
 static void
 test_Choose_Sparse(TestBatchRunner *runner) {
-    IndexManager *manager = IxManager_new(NULL, NULL);
+    IndexManager *manager = IxManager_new(NULL);
 
     for (uint32_t num_segs = 2; num_segs < 20; num_segs++) {
         I32Array *doc_counts = I32Arr_new_blank(num_segs);

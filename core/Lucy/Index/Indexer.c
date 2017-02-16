@@ -92,7 +92,7 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
     ivars->folder       = folder;
     ivars->manager      = manager
                          ? (IndexManager*)INCREF(manager)
-                         : IxManager_new(NULL, NULL);
+                         : IxManager_new(NULL);
     IxManager_Set_Folder(ivars->manager, folder);
 
     // Get a write lock for this folder.
