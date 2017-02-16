@@ -47,27 +47,33 @@ for my $folder ( $fs_folder, $ram_folder ) {
     is( $slurped, $king, "slurp_file works" );
 
     my $lock = Lucy::Store::LockFileLock->new(
-        host    => '',
-        folder  => $folder,
-        name    => 'lock_robster',
-        timeout => 0,
+        host           => '',
+        folder         => $folder,
+        name           => 'lock_robster',
+        timeout        => 0,
+        exclusive_only => 1,
     );
     my $competing_lock = Lucy::Store::LockFileLock->new(
-        host    => '',
-        folder  => $folder,
-        name    => 'lock_robster',
-        timeout => 0,
+        host           => '',
+        folder         => $folder,
+        name           => 'lock_robster',
+        timeout        => 0,
+        exclusive_only => 1,
     );
 
-    $lock->obtain;
-    ok( $lock->is_locked,         "lock is locked" );
-    ok( !$competing_lock->obtain, "shouldn't get lock on existing resource" );
-    ok( $lock->is_locked, "lock still locked after competing attempt" );
+    $lock->obtain_exclusive();
+    ok( $lock->is_locked_exclusive(), "lock is locked" );
+    ok( !$competing_lock->obtain_exclusive(),
+        "shouldn't get lock on existing resource"
+    );
+    ok( $lock->is_locked_exclusive(),
+        "lock still locked after competing attempt"
+    );
 
     $lock->release;
-    ok( !$lock->is_locked, "release works" );
+    ok( !$lock->is_locked_exclusive(), "release works" );
 
-    $lock->obtain;
+    $lock->obtain_exclusive();
     $folder->rename( from => 'king_of_rock', to => 'king_of_lock' );
     $lock->release;
 

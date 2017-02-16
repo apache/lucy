@@ -453,8 +453,10 @@ func specClasses(parcel *cfc.Parcel) {
 	dhBinding.Register()
 
 	lockBinding := cfc.NewGoClass(parcel, "Lucy::Store::Lock")
-	lockBinding.SpecMethod("Request", "Request() error")
-	lockBinding.SpecMethod("Obtain", "Obtain() error")
+	lockBinding.SpecMethod("Request_Shared", "RequestShared() error")
+	lockBinding.SpecMethod("Request_Exclusive", "RequestExclusive() error")
+	lockBinding.SpecMethod("Obtain_Shared", "ObtainShared() error")
+	lockBinding.SpecMethod("Obtain_Exclusive", "ObtainExclusive() error")
 	lockBinding.SpecMethod("Release", "Release() error")
 	lockBinding.SpecMethod("Clear_Stale", "ClearStale() error")
 	lockBinding.Register()

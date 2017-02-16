@@ -43,41 +43,53 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
      * consist solely of characters matching [-_.A-Za-z0-9].
      * @param host A unique per-machine identifier.
      * @param timeout Time in milliseconds to keep retrying before abandoning
-     * the attempt to [](cfish:.Obtain) a lock.
+     * the attempt to obtain a lock.
      * @param interval Time in milliseconds between retries.
      */
     public inert Lock*
     init(Lock *self, Folder *folder, String *name,
          String *host, int32_t timeout = 0, int32_t interval = 100);
 
-    /** Returns true if the Lock is shared, false if the Lock is exclusive.
-     */
-    public abstract bool
-    Shared(Lock *self);
-
-    /** Call [](cfish:.Request) once per `interval` until [](cfish:.Request) returns
-     * success or the `timeout` has been reached.
+    /** Call [](.Request_Shared) once per `interval` until [](.Request_Shared)
+     * returns success or the `timeout` has been reached.
      *
      * @return true on success, false on failure (sets the global error object
      * returned by [](cfish:cfish.Err.get_error)).
      */
     public bool
-    Obtain(Lock *self);
+    Obtain_Shared(Lock *self);
 
-    /** Make one attempt to acquire the lock.
+    /** Call [](.Request_Exclusive) once per `interval` until
+     * [](.Request_Exclusive) returns success or the `timeout` has been
+     * reached.
      *
-     * The semantics of [](cfish:.Request) differ depending on whether [](cfish:.Shared) returns
-     * true.  If the Lock is [](cfish:.Shared), then [](cfish:.Request) should not fail if
-     * another lock is held against the resource identified by
-     * `name` (though it might fail for other reasons).  If it is
-     * not [](cfish:.Shared) -- i.e. it's an exclusive (write) lock -- then other locks
-     * should cause [](cfish:.Request) to fail.
+     * @return true on success, false on failure (sets the global error object
+     * returned by [](cfish:cfish.Err.get_error)).
+     */
+    public bool
+    Obtain_Exclusive(Lock *self);
+
+    /** Make one attempt to acquire a shared lock.
+     *
+     * [](.Request_Shared) should not fail if another shared lock is held
+     * against the resource identified by `name` (though it might fail for
+     * other reasons).
      *
      * @return true on success, false on failure (sets the global error object
      * returned by [](cfish:cfish.Err.get_error)).
      */
     public abstract bool
-    Request(Lock *self);
+    Request_Shared(Lock *self);
+
+    /** Make one attempt to acquire an exclusive lock.
+     *
+     * Other locks should cause [](.Request_Exclusive) to fail.
+     *
+     * @return true on success, false on failure (sets the global error object
+     * returned by [](cfish:cfish.Err.get_error)).
+     */
+    public abstract bool
+    Request_Exclusive(Lock *self);
 
     /** Release the lock.
      */
@@ -85,12 +97,20 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
     Release(Lock *self);
 
     /** Indicate whether the resource identified by this lock's name is
-     * currently locked.
+     * currently locked in shared or exclusive mode.
      *
      * @return true if the resource is locked, false otherwise.
      */
     public abstract bool
     Is_Locked(Lock *self);
+
+    /** Indicate whether the resource identified by this lock's name is
+     * currently locked in exclusive mode.
+     *
+     * @return true if the resource is locked, false otherwise.
+     */
+    public abstract bool
+    Is_Locked_Exclusive(Lock *self);
 
     /** Release all locks that meet the following three conditions: the lock
      * name matches, the host id matches, and the process id that the lock
@@ -105,9 +125,6 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
     String*
     Get_Host(Lock *self);
 
-    String*
-    Get_Lock_Path(Lock *self);
-
     public void
     Destroy(Lock *self);
 }
@@ -115,21 +132,23 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
 class Lucy::Store::LockFileLock nickname LFLock
     inherits Lucy::Store::Lock {
 
+    String *shared_lock_path;
     String *link_path;
+    bool    exclusive_only;
 
     inert incremented LockFileLock*
-    new(Folder *folder, String *name, String *host,
-        int32_t timeout = 0, int32_t interval = 100);
+    new(Folder *folder, String *name, String *host, int32_t timeout = 0,
+        int32_t interval = 100, bool exclusive_only);
 
     public inert LockFileLock*
-    init(LockFileLock *self, Folder *folder, String *name,
-         String *host, int32_t timeout = 0, int32_t interval = 100);
+    init(LockFileLock *self, Folder *folder, String *name, String *host,
+         int32_t timeout = 0, int32_t interval = 100, bool exclusive_only);
 
     public bool
-    Shared(LockFileLock *self);
+    Request_Shared(LockFileLock *self);
 
     public bool
-    Request(LockFileLock *self);
+    Request_Exclusive(LockFileLock *self);
 
     public void
     Release(LockFileLock *self);
@@ -137,21 +156,14 @@ class Lucy::Store::LockFileLock nickname LFLock
     public bool
     Is_Locked(LockFileLock *self);
 
+    public bool
+    Is_Locked_Exclusive(LockFileLock *self);
+
     public void
     Clear_Stale(LockFileLock *self);
 
-    /** Delete a given lock file which meets these conditions...
-     *
-     *    - lock name matches.
-     *    - host id matches.
-     *
-     * If delete_mine is false, don't delete a lock file which matches this
-     * process's pid.  If delete_other is false, don't delete lock files which
-     * don't match this process's pid.
-     */
-    bool
-    Maybe_Delete_File(LockFileLock *self, String *filepath,
-                      bool delete_mine, bool delete_other);
+    String*
+    Get_Lock_Path(LockFileLock *self);
 
     public void
     Destroy(LockFileLock *self);

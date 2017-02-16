@@ -43,9 +43,8 @@ process will crash with a "Stale NFS filehandle" exception.
 
 Under normal circumstances, it is neither necessary nor desirable for
 IndexReaders to secure read locks against an index, but for NFS we have to
-make an exception.  LockFactory's [](lucy.LockFactory.Make_Shared_Lock) method exists for this
-reason; supplying an IndexManager instance to IndexReader's constructor
-activates an internal locking mechanism using [](lucy.LockFactory.Make_Shared_Lock) which
+make an exception.  Supplying an IndexManager instance to IndexReader's
+constructor activates an internal locking mechanism using shared locks which
 prevents concurrent indexing processes from deleting files that are needed
 by active readers.
 

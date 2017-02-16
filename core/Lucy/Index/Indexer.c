@@ -98,7 +98,7 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
     // Get a write lock for this folder.
     Lock *write_lock = IxManager_Make_Write_Lock(ivars->manager);
     Lock_Clear_Stale(write_lock);
-    if (Lock_Obtain(write_lock)) {
+    if (Lock_Obtain_Exclusive(write_lock)) {
         // Only assign if successful, otherwise DESTROY unlocks -- bad!
         ivars->write_lock = write_lock;
     }
@@ -170,7 +170,7 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
     int64_t new_seg_num
         = IxManager_Highest_Seg_Num(ivars->manager, latest_snapshot) + 1;
     Lock *merge_lock = IxManager_Make_Merge_Lock(ivars->manager);
-    if (Lock_Is_Locked(merge_lock)) {
+    if (Lock_Is_Locked_Exclusive(merge_lock)) {
         // If there's a background merge process going on, stay out of its
         // way.
         Hash *merge_data = IxManager_Read_Merge_Data(ivars->manager);
@@ -398,7 +398,7 @@ S_maybe_merge(Indexer *self, Vector *seg_readers) {
     bool      merge_happened  = false;
     size_t    num_seg_readers = Vec_Get_Size(seg_readers);
     Lock     *merge_lock      = IxManager_Make_Merge_Lock(ivars->manager);
-    bool      got_merge_lock  = Lock_Obtain(merge_lock);
+    bool      got_merge_lock  = Lock_Obtain_Exclusive(merge_lock);
     int64_t   cutoff;
 
     if (got_merge_lock) {

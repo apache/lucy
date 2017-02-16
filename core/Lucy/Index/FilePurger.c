@@ -79,7 +79,7 @@ FilePurger_Purge_Snapshots_IMP(FilePurger *self, Snapshot *current) {
 
     // Obtain deletion lock, purge files, release deletion lock.
     Lock_Clear_Stale(deletion_lock);
-    if (Lock_Obtain(deletion_lock)) {
+    if (Lock_Obtain_Exclusive(deletion_lock)) {
         Folder *folder    = ivars->folder;
         Hash   *failures  = Hash_new(16);
         Hash   *spared    = Hash_new(32);
@@ -148,7 +148,7 @@ FilePurger_Purge_Aborted_Merge_IMP(FilePurger *self) {
     Lock         *merge_lock = IxManager_Make_Merge_Lock(manager);
 
     Lock_Clear_Stale(merge_lock);
-    if (!Lock_Is_Locked(merge_lock)) {
+    if (!Lock_Is_Locked_Exclusive(merge_lock)) {
         Hash *merge_data = IxManager_Read_Merge_Data(manager);
         Obj  *cutoff = merge_data
                        ? Hash_Fetch_Utf8(merge_data, "cutoff", 6)

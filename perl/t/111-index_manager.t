@@ -32,7 +32,7 @@ sub recycle {
 
 package main;
 
-use Test::More tests => 16;
+use Test::More tests => 13;
 use Lucy::Test;
 
 my $folder = Lucy::Store::RAMFolder->new;
@@ -43,20 +43,13 @@ my $lock_factory = Lucy::Store::LockFactory->new(
 );
 
 my $lock = $lock_factory->make_lock(
-    name    => 'angie',
-    timeout => 1000,
+    name           => 'angie',
+    timeout        => 1000,
+    exclusive_only => 0,
 );
 isa_ok( $lock, 'Lucy::Store::Lock', "make_lock" );
 is( $lock->get_name, "angie", "correct lock name" );
 is( $lock->get_host, "me",    "correct host" );
-
-$lock = $lock_factory->make_shared_lock(
-    name    => 'fred',
-    timeout => 0,
-);
-is( ref($lock),      'Lucy::Store::SharedLock', "make_shared_lock" );
-is( $lock->get_name, "fred",                    "correct lock name" );
-is( $lock->get_host, "me",                      "correct host" );
 
 my $schema = Lucy::Test::TestSchema->new;
 $folder = Lucy::Store::RAMFolder->new;

@@ -275,7 +275,8 @@ IxManager_Make_Write_Lock_IMP(IndexManager *self) {
     LockFactory *lock_factory = S_obtain_lock_factory(self);
     return LockFact_Make_Lock(lock_factory, write_lock_name,
                               (int32_t)ivars->write_lock_timeout,
-                              (int32_t)ivars->write_lock_interval);
+                              (int32_t)ivars->write_lock_interval,
+                              true);
 }
 
 Lock*
@@ -285,7 +286,8 @@ IxManager_Make_Deletion_Lock_IMP(IndexManager *self) {
     LockFactory *lock_factory = S_obtain_lock_factory(self);
     return LockFact_Make_Lock(lock_factory, lock_name,
                               (int32_t)ivars->deletion_lock_timeout,
-                              (int32_t)ivars->deletion_lock_interval);
+                              (int32_t)ivars->deletion_lock_interval,
+                              true);
 }
 
 Lock*
@@ -295,7 +297,8 @@ IxManager_Make_Merge_Lock_IMP(IndexManager *self) {
     LockFactory *lock_factory = S_obtain_lock_factory(self);
     return LockFact_Make_Lock(lock_factory, merge_lock_name,
                               (int32_t)ivars->merge_lock_timeout,
-                              (int32_t)ivars->merge_lock_interval);
+                              (int32_t)ivars->merge_lock_interval,
+                              true);
 }
 
 void
@@ -353,7 +356,7 @@ IxManager_Make_Snapshot_Read_Lock_IMP(IndexManager *self,
     size_t lock_name_len = Str_Length(filename) - (sizeof(".json") - 1);
     String *lock_name = Str_SubString(filename, 0, lock_name_len);
 
-    Lock *lock = LockFact_Make_Shared_Lock(lock_factory, lock_name, 1000, 100);
+    Lock *lock = LockFact_Make_Lock(lock_factory, lock_name, 1000, 100, false);
 
     DECREF(lock_name);
     return lock;
