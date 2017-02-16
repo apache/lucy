@@ -197,7 +197,7 @@ void indexing_process(Obj *index, Doc *doc) {
 
 void
 background_merge_process(Obj *index) {
-    IndexManager *manager = IxManager_new(NULL, NULL);
+    IndexManager *manager = IxManager_new(NULL);
     IxManager_Set_Write_Lock_Timeout(manager, 60000);
 
     BackgroundMerger bg_merger = BGMerger_new(index, manager);

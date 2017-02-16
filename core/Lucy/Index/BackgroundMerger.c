@@ -83,7 +83,7 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager) {
         ivars->manager = (IndexManager*)INCREF(manager);
     }
     else {
-        ivars->manager = IxManager_new(NULL, NULL);
+        ivars->manager = IxManager_new(NULL);
         IxManager_Set_Write_Lock_Timeout(ivars->manager, 10000);
     }
     IxManager_Set_Folder(ivars->manager, folder);

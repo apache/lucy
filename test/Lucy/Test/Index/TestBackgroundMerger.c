@@ -150,7 +150,7 @@ test_bg_merger(TestBatchRunner *runner) {
     {
         // Simulate failed background merge.
         DECREF(bg_merger);
-        IndexManager *manager = IxManager_new(NULL, NULL);
+        IndexManager *manager = IxManager_new(NULL);
         bg_merger = BGMerger_new((Obj*)folder, manager);
         BGMerger_Prepare_Commit(bg_merger);
         DECREF(bg_merger);

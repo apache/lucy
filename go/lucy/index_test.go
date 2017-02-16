@@ -148,7 +148,7 @@ func TestBackgroundMergerMisc(t *testing.T) {
 
 func TestIndexManagerAccessors(t *testing.T) {
 	host := "dev.example.com"
-	manager := NewIndexManager(host, nil)
+	manager := NewIndexManager(host)
 	if got := manager.GetHost(); got != host {
 		t.Errorf("GetHost: %v", got)
 	}
@@ -184,9 +184,9 @@ func TestIndexManagerAccessors(t *testing.T) {
 }
 
 func TestIndexManagerLocks(t *testing.T) {
-	manager := NewIndexManager("", nil)
+	manager := NewIndexManager("")
 	manager.SetFolder(NewRAMFolder(""))
-	if _, ok := manager.MakeWriteLock().(Lock); !ok {
+	if _, ok := manager.makeWriteLock().(Lock); !ok {
 		t.Errorf("MakeWriteLock")
 	}
 	if _, ok := manager.makeMergeLock().(Lock); !ok {
@@ -203,7 +203,7 @@ func TestIndexManagerLocks(t *testing.T) {
 
 func TestIndexManagerMergeData(t *testing.T) {
 	var err error
-	manager := NewIndexManager("", nil)
+	manager := NewIndexManager("")
 	manager.SetFolder(NewRAMFolder(""))
 	err = manager.WriteMergeData(42)
 	if err != nil {
@@ -223,7 +223,7 @@ func TestIndexManagerMergeData(t *testing.T) {
 }
 
 func TestIndexManagerMisc(t *testing.T) {
-	manager := NewIndexManager("", nil)
+	manager := NewIndexManager("")
 	manager.SetFolder(NewRAMFolder(""))
 	if got, err := manager.MakeSnapshotFilename(); !strings.Contains(got, "snapshot") || err != nil {
 		t.Errorf("MakeSnapshotFilename: %s, %v", got, err)
@@ -238,7 +238,7 @@ func TestIndexManagerMisc(t *testing.T) {
 
 func TestIndexManagerRecycle(t *testing.T) {
 	index := createTestIndex("foo", "bar", "baz")
-	manager := NewIndexManager("", nil)
+	manager := NewIndexManager("")
 	manager.SetFolder(index)
 	indexer, _ := OpenIndexer(&OpenIndexerArgs{Index: index})
 	searcher, _ := OpenIndexSearcher(index)
@@ -788,7 +788,7 @@ func TestIndexReaderOpen(t *testing.T) {
 	if got, err := OpenIndexReader(folder, snapshot, nil); got == nil || err != nil {
 		t.Errorf("With Snapshot: %v", err)
 	}
-	manager := NewIndexManager("", nil)
+	manager := NewIndexManager("")
 	manager.SetFolder(folder)
 	if got, err := OpenIndexReader(folder, nil, manager); got == nil || err != nil {
 		t.Errorf("With IndexManager: %v", err)
