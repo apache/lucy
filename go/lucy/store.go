@@ -766,13 +766,6 @@ func (lock *LockIMP) Release() error {
 }
 
 
-func (lock *LockIMP) ClearStale() error {
-	return clownfish.TrapErr(func() {
-		self := (*C.lucy_Lock)(clownfish.Unwrap(lock, "lock"))
-		C.LUCY_Lock_Clear_Stale(self)
-	})
-}
-
 func OpenCompoundFileReader(folder Folder) (reader CompoundFileReader, err error) {
 	err = clownfish.TrapErr(func() {
 		folderC := (*C.lucy_Folder)(clownfish.Unwrap(folder, "Folder"))

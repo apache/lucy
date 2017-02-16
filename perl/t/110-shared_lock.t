@@ -74,9 +74,8 @@ $lock->release;
 $another_lock->release;
 $ya_lock->release;
 
-ok( $lock->is_locked(), "failed to release a lock with a different pid" );
-$lock->clear_stale;
-ok( !$lock->is_locked(), "clear_stale" );
+ok( $lock->get_lock_path, "failed to release a lock with a different pid" );
+ok( !$lock->is_locked(), "is_locked clears stale locks" );
 
 ok( $lock->obtain_shared(), "got lock again" );
 ok( $lock->is_locked(), "it's locked" );

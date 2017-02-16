@@ -710,11 +710,6 @@ func TestLockFileLockAll(t *testing.T) {
 		t.Errorf("Obtain: %v", err)
 	}
 	lock.Release()
-
-	err = lock.ClearStale()
-	if err != nil {
-		t.Errorf("Nothing for ClearStale to do, but should still suceed: %v", err)
-	}
 }
 
 func TestLockFactoryAll(t *testing.T) {

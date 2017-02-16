@@ -78,7 +78,6 @@ FilePurger_Purge_Snapshots_IMP(FilePurger *self, Snapshot *current) {
     Lock *deletion_lock = IxManager_Make_Deletion_Lock(ivars->manager);
 
     // Obtain deletion lock, purge files, release deletion lock.
-    Lock_Clear_Stale(deletion_lock);
     if (Lock_Obtain_Exclusive(deletion_lock)) {
         Folder *folder    = ivars->folder;
         Hash   *failures  = Hash_new(16);
@@ -147,7 +146,6 @@ FilePurger_Purge_Aborted_Merge_IMP(FilePurger *self) {
     IndexManager *manager    = ivars->manager;
     Lock         *merge_lock = IxManager_Make_Merge_Lock(manager);
 
-    Lock_Clear_Stale(merge_lock);
     if (!Lock_Is_Locked_Exclusive(merge_lock)) {
         Hash *merge_data = IxManager_Read_Merge_Data(manager);
         Obj  *cutoff = merge_data
@@ -213,9 +211,6 @@ S_discover_unused(FilePurger *self, Snapshot *current, Hash *spared,
 
             // DON'T obtain the lock -- only see whether another
             // entity holds a lock on the snapshot file.
-            if (lock) {
-                Lock_Clear_Stale(lock);
-            }
             if (lock && Lock_Is_Locked(lock)) {
                 // The snapshot file is locked, which means someone's using
                 // that version of the index -- protect all of its entries.

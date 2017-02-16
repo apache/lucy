@@ -341,7 +341,8 @@ bool
 LFLock_Is_Locked_Exclusive_IMP(LockFileLock *self) {
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
 
-    return Folder_Exists(ivars->folder, ivars->lock_path);
+    return Folder_Exists(ivars->folder, ivars->lock_path)
+           && !S_maybe_delete_file(ivars, ivars->lock_path, false, true);
 }
 
 bool
@@ -349,7 +350,9 @@ LFLock_Is_Locked_IMP(LockFileLock *self) {
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
 
     // Check for exclusive lock.
-    if (Folder_Exists(ivars->folder, ivars->lock_path)) {
+    if (Folder_Exists(ivars->folder, ivars->lock_path)
+        && !S_maybe_delete_file(ivars, ivars->lock_path, false, true)
+       ) {
         return true;
     }
 
@@ -360,51 +363,24 @@ LFLock_Is_Locked_IMP(LockFileLock *self) {
         return false;
     }
 
+    bool locked = false;
     DirHandle *dh = Folder_Open_Dir(ivars->folder, lock_dir_name);
     if (!dh) { RETHROW(INCREF(Err_get_error())); }
 
     while (DH_Next(dh)) {
         String *entry = DH_Get_Entry(dh);
         if (S_is_shared_lock_file(ivars, entry)) {
-            DECREF(entry);
-            DECREF(dh);
-            return true;
+            String *candidate = Str_newf("%o/%o", lock_dir_name, entry);
+            if (!S_maybe_delete_file(ivars, candidate, false, true)) {
+                locked = true;
+            }
+            DECREF(candidate);
         }
         DECREF(entry);
     }
 
     DECREF(dh);
-    return false;
-}
-
-void
-LFLock_Clear_Stale_IMP(LockFileLock *self) {
-    LockFileLockIVARS *const ivars = LFLock_IVARS(self);
-
-    if (ivars->shared_lock_path) {
-        String *lock_dir_name = SSTR_WRAP_C("locks");
-        if (!Folder_Find_Folder(ivars->folder, lock_dir_name)) {
-            return;
-        }
-
-        DirHandle *dh = Folder_Open_Dir(ivars->folder, lock_dir_name);
-        if (!dh) { RETHROW(INCREF(Err_get_error())); }
-
-        while (DH_Next(dh)) {
-            String *entry = DH_Get_Entry(dh);
-            if (S_is_shared_lock_file(ivars, entry)) {
-                String *candidate = Str_newf("%o/%o", lock_dir_name, entry);
-                S_maybe_delete_file(ivars, candidate, false, true);
-                DECREF(candidate);
-            }
-            DECREF(entry);
-        }
-
-        DECREF(dh);
-    }
-    else {
-        S_maybe_delete_file(ivars, ivars->lock_path, false, true);
-    }
+    return locked;
 }
 
 static bool

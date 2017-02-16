@@ -457,7 +457,6 @@ func specClasses(parcel *cfc.Parcel) {
 	lockBinding.SpecMethod("Obtain_Shared", "ObtainShared() error")
 	lockBinding.SpecMethod("Obtain_Exclusive", "ObtainExclusive() error")
 	lockBinding.SpecMethod("Release", "Release() error")
-	lockBinding.SpecMethod("Clear_Stale", "ClearStale() error")
 	lockBinding.Register()
 
 	cfWriterBinding := cfc.NewGoClass(parcel, "Lucy::Store::CompoundFileWriter")

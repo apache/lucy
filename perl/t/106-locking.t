@@ -50,7 +50,6 @@ Dead_locks_are_removed: {
             exclusive_only => 1,
             @_
         );
-        $lock->clear_stale;
         $lock->obtain_exclusive() or die "no dice";
         return $lock;
     }
