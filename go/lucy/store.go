@@ -718,9 +718,9 @@ func OpenFSDirHandle(path string) (dh FSDirHandle, err error) {
 	return dh, err
 }
 
-func (lock *LockIMP) Request() error {
+func (lock *LockIMP) RequestShared() error {
 	self := (*C.lucy_Lock)(clownfish.Unwrap(lock, "lock"))
-	success := C.LUCY_Lock_Request(self)
+	success := C.LUCY_Lock_Request_Shared(self)
 	if !success {
 		cfErr := C.cfish_Err_get_error();
 		return clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error)
@@ -728,9 +728,29 @@ func (lock *LockIMP) Request() error {
 	return nil
 }
 
-func (lock *LockIMP) Obtain() error {
+func (lock *LockIMP) RequestExclusive() error {
 	self := (*C.lucy_Lock)(clownfish.Unwrap(lock, "lock"))
-	success := C.LUCY_Lock_Obtain(self)
+	success := C.LUCY_Lock_Request_Exclusive(self)
+	if !success {
+		cfErr := C.cfish_Err_get_error();
+		return clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error)
+	}
+	return nil
+}
+
+func (lock *LockIMP) ObtainShared() error {
+	self := (*C.lucy_Lock)(clownfish.Unwrap(lock, "lock"))
+	success := C.LUCY_Lock_Obtain_Shared(self)
+	if !success {
+		cfErr := C.cfish_Err_get_error();
+		return clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error)
+	}
+	return nil
+}
+
+func (lock *LockIMP) ObtainExclusive() error {
+	self := (*C.lucy_Lock)(clownfish.Unwrap(lock, "lock"))
+	success := C.LUCY_Lock_Obtain_Exclusive(self)
 	if !success {
 		cfErr := C.cfish_Err_get_error();
 		return clownfish.WRAPAny(unsafe.Pointer(C.cfish_incref(unsafe.Pointer(cfErr)))).(error)

@@ -195,7 +195,7 @@ func TestIndexManagerLocks(t *testing.T) {
 		t.Errorf("makeDeletionLock")
 	}
 	snapFile := "snapshot_4a.json"
-	if _, ok := manager.makeSnapshotReadLock(snapFile).(SharedLock); !ok {
+	if _, ok := manager.makeSnapshotReadLock(snapFile).(Lock); !ok {
 		t.Errorf("makeDeletionLock")
 	}
 }

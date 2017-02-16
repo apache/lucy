@@ -255,7 +255,7 @@ B<host> - A unique per-machine identifier.
 =item *
 
 B<timeout> - Time in milliseconds to keep retrying before abandoning
-the attempt to L<obtain()|/obtain> a lock.
+the attempt to obtain a lock.
 
 =item *
 

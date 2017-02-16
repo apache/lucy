@@ -527,7 +527,7 @@ S_obtain_write_lock(BackgroundMerger *self) {
     BackgroundMergerIVARS *const ivars = BGMerger_IVARS(self);
     Lock *write_lock = IxManager_Make_Write_Lock(ivars->manager);
     Lock_Clear_Stale(write_lock);
-    if (Lock_Obtain(write_lock)) {
+    if (Lock_Obtain_Exclusive(write_lock)) {
         // Only assign if successful, otherwise DESTROY unlocks -- bad!
         ivars->write_lock = write_lock;
     }
@@ -541,7 +541,7 @@ S_obtain_merge_lock(BackgroundMerger *self) {
     BackgroundMergerIVARS *const ivars = BGMerger_IVARS(self);
     Lock *merge_lock = IxManager_Make_Merge_Lock(ivars->manager);
     Lock_Clear_Stale(merge_lock);
-    if (Lock_Obtain(merge_lock)) {
+    if (Lock_Obtain_Exclusive(merge_lock)) {
         // Only assign if successful, same rationale as above.
         ivars->merge_lock = merge_lock;
     }

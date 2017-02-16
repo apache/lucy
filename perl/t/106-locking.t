@@ -44,13 +44,14 @@ Dead_locks_are_removed: {
 
     sub make_lock {
         my $lock = Lucy::Store::LockFileLock->new(
-            timeout => 0,
-            name    => 'foo',
-            host    => '',
+            timeout        => 0,
+            name           => 'foo',
+            host           => '',
+            exclusive_only => 1,
             @_
         );
         $lock->clear_stale;
-        $lock->obtain or die "no dice";
+        $lock->obtain_exclusive() or die "no dice";
         return $lock;
     }
 
