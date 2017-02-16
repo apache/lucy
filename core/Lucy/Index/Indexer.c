@@ -97,7 +97,6 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
 
     // Get a write lock for this folder.
     Lock *write_lock = IxManager_Make_Write_Lock(ivars->manager);
-    Lock_Clear_Stale(write_lock);
     if (Lock_Obtain_Exclusive(write_lock)) {
         // Only assign if successful, otherwise DESTROY unlocks -- bad!
         ivars->write_lock = write_lock;

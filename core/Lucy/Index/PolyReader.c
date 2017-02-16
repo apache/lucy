@@ -470,7 +470,6 @@ static bool
 S_obtain_deletion_lock(PolyReader *self) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
     ivars->deletion_lock = IxManager_Make_Deletion_Lock(ivars->manager);
-    Lock_Clear_Stale(ivars->deletion_lock);
     if (!Lock_Obtain_Exclusive(ivars->deletion_lock)) {
         DECREF(ivars->deletion_lock);
         ivars->deletion_lock = NULL;
@@ -485,7 +484,6 @@ S_obtain_read_lock(PolyReader *self, String *snapshot_file_name) {
     ivars->read_lock = IxManager_Make_Snapshot_Read_Lock(ivars->manager,
                                                          snapshot_file_name);
 
-    Lock_Clear_Stale(ivars->read_lock);
     if (!Lock_Obtain_Shared(ivars->read_lock)) {
         DECREF(ivars->read_lock);
         ivars->read_lock = NULL;

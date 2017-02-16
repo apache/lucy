@@ -112,13 +112,6 @@ public abstract class Lucy::Store::Lock inherits Clownfish::Obj {
     public abstract bool
     Is_Locked_Exclusive(Lock *self);
 
-    /** Release all locks that meet the following three conditions: the lock
-     * name matches, the host id matches, and the process id that the lock
-     * was created under no longer identifies an active process.
-     */
-    public abstract void
-    Clear_Stale(Lock *self);
-
     String*
     Get_Name(Lock *self);
 
@@ -158,9 +151,6 @@ class Lucy::Store::LockFileLock nickname LFLock
 
     public bool
     Is_Locked_Exclusive(LockFileLock *self);
-
-    public void
-    Clear_Stale(LockFileLock *self);
 
     String*
     Get_Lock_Path(LockFileLock *self);
