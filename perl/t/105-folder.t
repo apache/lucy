@@ -17,7 +17,7 @@ use strict;
 use warnings;
 use lib 'buildlib';
 
-use Test::More tests => 25;
+use Test::More tests => 17;
 use File::Spec::Functions qw( catfile );
 use Fcntl;
 use Lucy::Test::TestUtils qw( init_test_index_loc );
@@ -46,43 +46,13 @@ for my $folder ( $fs_folder, $ram_folder ) {
     my $slurped = $folder->slurp_file('king_of_rock');
     is( $slurped, $king, "slurp_file works" );
 
-    my $lock = Lucy::Store::LockFileLock->new(
-        host           => '',
-        folder         => $folder,
-        name           => 'lock_robster',
-        timeout        => 0,
-        exclusive_only => 1,
-    );
-    my $competing_lock = Lucy::Store::LockFileLock->new(
-        host           => '',
-        folder         => $folder,
-        name           => 'lock_robster',
-        timeout        => 0,
-        exclusive_only => 1,
-    );
-
-    $lock->obtain_exclusive();
-    my $lock_path = $lock->get_lock_path;
-    ok( $folder->exists($lock_path), "lock is locked" );
-    ok( !$competing_lock->obtain_exclusive(),
-        "shouldn't get lock on existing resource"
-    );
-    ok( $folder->exists($lock_path),
-        "lock still locked after competing attempt"
-    );
-
-    $lock->release;
-    ok( !$folder->exists($lock_path), "release works" );
-
-    $lock->obtain_exclusive();
     $folder->rename( from => 'king_of_rock', to => 'king_of_lock' );
-    $lock->release;
 
     ok( !$folder->exists('king_of_rock'),
-        "file successfully removed while locked"
+        "file successfully removed"
     );
     is( $folder->exists('king_of_lock'),
-        1, "file successfully moved while locked" );
+        1, "file successfully moved" );
 
     is( $folder->open_out("king_of_lock"),
         undef, "open_out returns undef when file exists" );

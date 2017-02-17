@@ -75,6 +75,7 @@
 #include "Lucy/Test/Store/TestIOChunks.h"
 #include "Lucy/Test/Store/TestIOPrimitives.h"
 #include "Lucy/Test/Store/TestInStream.h"
+#include "Lucy/Test/Store/TestLock.h"
 #include "Lucy/Test/Store/TestRAMDirHandle.h"
 #include "Lucy/Test/Store/TestRAMFileHandle.h"
 #include "Lucy/Test/Store/TestRAMFolder.h"
@@ -114,6 +115,7 @@ Test_create_test_suite() {
     TestSuite_Add_Batch(suite, (TestBatch*)TestFSFolder_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestRAMFolder_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestFolder_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestLFLock_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestIxManager_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestCFWriter_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestCFReader_new());

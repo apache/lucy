@@ -96,12 +96,6 @@ abstract class Lucy::Store::Lock inherits Clownfish::Obj {
     public abstract void
     Release(Lock *self);
 
-    String*
-    Get_Name(Lock *self);
-
-    String*
-    Get_Host(Lock *self);
-
     public void
     Destroy(Lock *self);
 }
@@ -130,9 +124,6 @@ class Lucy::Store::LockFileLock nickname LFLock
 
     public void
     Release(LockFileLock *self);
-
-    String*
-    Get_Lock_Path(LockFileLock *self);
 
     public void
     Destroy(LockFileLock *self);

@@ -77,16 +77,6 @@ Lock_Destroy_IMP(Lock *self) {
     SUPER_DESTROY(self, LOCK);
 }
 
-String*
-Lock_Get_Name_IMP(Lock *self) {
-    return Lock_IVARS(self)->name;
-}
-
-String*
-Lock_Get_Host_IMP(Lock *self) {
-    return Lock_IVARS(self)->host;
-}
-
 bool
 Lock_Obtain_Shared_IMP(Lock *self) {
     LockIVARS *const ivars = Lock_IVARS(self);
@@ -161,14 +151,6 @@ LFLock_init(LockFileLock *self, Folder *folder, String *name, String *host,
                                 (int64_t)pid);
     ivars->exclusive_only = exclusive_only;
     return self;
-}
-
-String*
-LFLock_Get_Lock_Path_IMP(LockFileLock *self) {
-    LockFileLockIVARS *const ivars = LFLock_IVARS(self);
-    return ivars->shared_lock_path
-           ? ivars->shared_lock_path
-           : ivars->lock_path;
 }
 
 struct lockfile_context {

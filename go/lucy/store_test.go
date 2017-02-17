@@ -652,20 +652,9 @@ func TestLockFileLockAll(t *testing.T) {
 	lock := NewLockFileLock(folder, "foo", "dev.example.com", 0, 1, false)
 	other := NewLockFileLock(folder, "foo", "dev.example.com", 0, 1, false)
 
-	if got := lock.getName(); got != "foo" {
-		t.Errorf("getName: %v", got)
-	}
-	if got := lock.getHost(); got != "dev.example.com" {
-		t.Errorf("getHost: %v", got)
-	}
-
 	err = lock.RequestShared()
 	if err != nil {
 		t.Errorf("Request: %v", err)
-	}
-	if got := lock.getLockPath(); len(got) == 0 {
-		// Lock path only valid when locked for shared locks.
-		t.Errorf("getLockPath should work")
 	}
 	err = other.RequestShared()
 	if err != nil {
@@ -685,10 +674,6 @@ func TestLockFileLockAll(t *testing.T) {
 	err = lock.RequestExclusive()
 	if err != nil {
 		t.Errorf("Request: %v", err)
-	}
-	if got := lock.getLockPath(); len(got) == 0 {
-		// Lock path only valid when locked for shared locks.
-		t.Errorf("getLockPath should work")
 	}
 	err = other.RequestExclusive()
 	if err == nil {
