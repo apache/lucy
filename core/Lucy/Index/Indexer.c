@@ -132,6 +132,7 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
                 schema_file = NULL;
             }
             else {
+                S_release_write_lock(self);
                 THROW(ERR, "Failed to parse %o", schema_file);
             }
         }
@@ -163,25 +164,25 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
     // Create new FilePurger and zap detritus from an aborted background
     // merge.
     ivars->file_purger = FilePurger_new(folder, ivars->manager);
-    FilePurger_Purge_Aborted_Merge(ivars->file_purger);
+    Lock *merge_lock = IxManager_Make_Merge_Lock(ivars->manager);
+    if (Lock_Request_Exclusive(merge_lock)) {
+        // No background merger is running.
+        ivars->merge_lock = merge_lock;
+        FilePurger_Purge_Aborted_Merge(ivars->file_purger);
+    }
+    else {
+        DECREF(merge_lock);
+    }
 
     // Create a new segment.
     int64_t new_seg_num
         = IxManager_Highest_Seg_Num(ivars->manager, latest_snapshot) + 1;
-    Lock *merge_lock = IxManager_Make_Merge_Lock(ivars->manager);
-    if (Lock_Is_Locked_Exclusive(merge_lock)) {
-        // If there's a background merge process going on, stay out of its
-        // way.
-        Hash *merge_data = IxManager_Read_Merge_Data(ivars->manager);
-        Obj *cutoff_obj = merge_data
-                          ? Hash_Fetch_Utf8(merge_data, "cutoff", 6)
-                          : NULL;
-        if (!cutoff_obj) {
-            DECREF(merge_lock);
-            DECREF(merge_data);
-            THROW(ERR, "Background merge detected, but can't read merge data");
-        }
-        else {
+    // If there's a background merge process going on, stay out of its
+    // way.
+    Hash *merge_data = IxManager_Read_Merge_Data(ivars->manager);
+    if (merge_data) {
+        Obj *cutoff_obj = Hash_Fetch_Utf8(merge_data, "cutoff", 6);
+        if (cutoff_obj) {
             int64_t cutoff = Json_obj_to_i64(cutoff_obj);
             if (cutoff >= new_seg_num) {
                 new_seg_num = cutoff + 1;
@@ -197,8 +198,6 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
         Seg_Add_Field(ivars->segment, (String*)Vec_Fetch(fields, i));
     }
     DECREF(fields);
-
-    DECREF(merge_lock);
 
     // Create new SegWriter.
     ivars->seg_writer = SegWriter_new(ivars->schema, ivars->snapshot,
@@ -396,12 +395,9 @@ S_maybe_merge(Indexer *self, Vector *seg_readers) {
     IndexerIVARS *const ivars = Indexer_IVARS(self);
     bool      merge_happened  = false;
     size_t    num_seg_readers = Vec_Get_Size(seg_readers);
-    Lock     *merge_lock      = IxManager_Make_Merge_Lock(ivars->manager);
-    bool      got_merge_lock  = Lock_Obtain_Exclusive(merge_lock);
     int64_t   cutoff;
 
-    if (got_merge_lock) {
-        ivars->merge_lock = merge_lock;
+    if (ivars->merge_lock) {
         cutoff = 0;
     }
     else {
@@ -420,7 +416,6 @@ S_maybe_merge(Indexer *self, Vector *seg_readers) {
         else {
             cutoff = INT64_MAX;
         }
-        DECREF(merge_lock);
     }
 
     // Get a list of segments to recycle.  Validate and confirm that there are

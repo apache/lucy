@@ -139,44 +139,37 @@ FilePurger_Purge_Snapshots_IMP(FilePurger *self, Snapshot *current) {
 void
 FilePurger_Purge_Aborted_Merge_IMP(FilePurger *self) {
     FilePurgerIVARS *const ivars = FilePurger_IVARS(self);
-    IndexManager *manager    = ivars->manager;
-    Lock         *merge_lock = IxManager_Make_Merge_Lock(manager);
+    IndexManager *manager = ivars->manager;
+    Hash *merge_data = IxManager_Read_Merge_Data(manager);
+    Obj  *cutoff = merge_data
+                   ? Hash_Fetch_Utf8(merge_data, "cutoff", 6)
+                   : NULL;
 
-    if (!Lock_Is_Locked_Exclusive(merge_lock)) {
-        Hash *merge_data = IxManager_Read_Merge_Data(manager);
-        Obj  *cutoff = merge_data
-                       ? Hash_Fetch_Utf8(merge_data, "cutoff", 6)
-                       : NULL;
+    if (cutoff) {
+        Folder *folder = ivars->folder;
 
-        if (cutoff) {
-            Folder *folder = ivars->folder;
-
-            String *cutoff_seg = Seg_num_to_name(Json_obj_to_i64(cutoff));
-            if (Folder_Local_Exists(folder, cutoff_seg)) {
-                if (!S_delete_entry(folder, cutoff_seg)) {
-                    if (Folder_Local_Exists(folder, cutoff_seg)) {
-                        WARN("Couldn't delete '%o' from aborted merge",
-                             cutoff_seg);
-                    }
-                }
-            }
-
-            String *merge_json = SSTR_WRAP_C("merge.json");
-            if (!Folder_Local_Delete(folder, merge_json)) {
-                if (Folder_Local_Exists(folder, merge_json)) {
+        String *cutoff_seg = Seg_num_to_name(Json_obj_to_i64(cutoff));
+        if (Folder_Local_Exists(folder, cutoff_seg)) {
+            if (!S_delete_entry(folder, cutoff_seg)) {
+                if (Folder_Local_Exists(folder, cutoff_seg)) {
                     WARN("Couldn't delete '%o' from aborted merge",
-                         merge_json);
+                         cutoff_seg);
                 }
             }
-
-            DECREF(cutoff_seg);
         }
 
-        DECREF(merge_data);
+        String *merge_json = SSTR_WRAP_C("merge.json");
+        if (!Folder_Local_Delete(folder, merge_json)) {
+            if (Folder_Local_Exists(folder, merge_json)) {
+                WARN("Couldn't delete '%o' from aborted merge",
+                     merge_json);
+            }
+        }
+
+        DECREF(cutoff_seg);
     }
 
-    DECREF(merge_lock);
-    return;
+    DECREF(merge_data);
 }
 
 static void
