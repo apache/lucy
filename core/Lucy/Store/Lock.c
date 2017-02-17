@@ -123,6 +123,10 @@ Lock_Obtain_Exclusive_IMP(Lock *self) {
 
 /***************************************************************************/
 
+#define LFLOCK_STATE_UNLOCKED          0
+#define LFLOCK_STATE_LOCKED_SHARED     1
+#define LFLOCK_STATE_LOCKED_EXCLUSIVE  2
+
 static bool
 S_request(LockFileLockIVARS *ivars, String *lock_path);
 
@@ -182,6 +186,10 @@ LFLock_Request_Shared_IMP(LockFileLock *self) {
         THROW(ERR, "Can't request shared lock if exclusive_only is set");
     }
 
+    if (ivars->state != LFLOCK_STATE_UNLOCKED) {
+        THROW(ERR, "Lock already acquired");
+    }
+
     // TODO: The is_locked test and subsequent file creation is prone to a
     // race condition. We could protect the whole process with an internal
     // exclusive lock.
@@ -192,16 +200,7 @@ LFLock_Request_Shared_IMP(LockFileLock *self) {
         return false;
     }
 
-    String *path = ivars->shared_lock_path;
-
-    // Null shared_lock_path indicates whether this particular instance is
-    // locked.
-    if (path && Folder_Exists(ivars->folder, path)) {
-        // Don't allow double obtain.
-        String *msg = Str_newf("Lock already obtained via '%o'", path);
-        Err_set_error((Err*)LockErr_new(msg));
-        return false;
-    }
+    String *path = NULL;
 
     uint32_t i = 0;
     do {
@@ -211,11 +210,11 @@ LFLock_Request_Shared_IMP(LockFileLock *self) {
 
     if (S_request(ivars, path)) {
         ivars->shared_lock_path = path;
+        ivars->state = LFLOCK_STATE_LOCKED_SHARED;
         return true;
     }
     else {
         DECREF(path);
-        ivars->shared_lock_path = NULL;
         return false;
     }
 }
@@ -223,6 +222,10 @@ LFLock_Request_Shared_IMP(LockFileLock *self) {
 bool
 LFLock_Request_Exclusive_IMP(LockFileLock *self) {
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
+
+    if (ivars->state != LFLOCK_STATE_UNLOCKED) {
+        THROW(ERR, "Lock already acquired");
+    }
 
     // TODO: The is_locked test and subsequent file creation is prone to a
     // race condition. We could protect the whole process with an internal
@@ -237,7 +240,13 @@ LFLock_Request_Exclusive_IMP(LockFileLock *self) {
         return false;
     }
 
-    return S_request(ivars, ivars->lock_path);
+    if (S_request(ivars, ivars->lock_path)) {
+        ivars->state = LFLOCK_STATE_LOCKED_EXCLUSIVE;
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 static bool
@@ -321,7 +330,16 @@ void
 LFLock_Release_IMP(LockFileLock *self) {
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
 
-    if (ivars->shared_lock_path) {
+    if (ivars->state == LFLOCK_STATE_UNLOCKED) {
+        THROW(ERR, "Lock not acquired");
+    }
+
+    if (ivars->state == LFLOCK_STATE_LOCKED_EXCLUSIVE) {
+        if (Folder_Exists(ivars->folder, ivars->lock_path)) {
+            S_maybe_delete_file(ivars, ivars->lock_path, true, false);
+        }
+    }
+    else { // Shared lock.
         if (Folder_Exists(ivars->folder, ivars->shared_lock_path)) {
             S_maybe_delete_file(ivars, ivars->shared_lock_path, true, false);
         }
@@ -330,11 +348,8 @@ LFLock_Release_IMP(LockFileLock *self) {
         DECREF(ivars->shared_lock_path);
         ivars->shared_lock_path = NULL;
     }
-    else {
-        if (Folder_Exists(ivars->folder, ivars->lock_path)) {
-            S_maybe_delete_file(ivars, ivars->lock_path, true, false);
-        }
-    }
+
+    ivars->state = LFLOCK_STATE_UNLOCKED;
 }
 
 bool

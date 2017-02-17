@@ -127,6 +127,7 @@ class Lucy::Store::LockFileLock nickname LFLock
 
     String *shared_lock_path;
     String *link_path;
+    int     state;
     bool    exclusive_only;
 
     inert incremented LockFileLock*
