@@ -263,16 +263,14 @@ S_request(LockFileLockIVARS *ivars, String *lock_path) {
     String *lock_dir_name = SSTR_WRAP_C("locks");
     if (!Folder_Exists(ivars->folder, lock_dir_name)) {
         if (!Folder_MkDir(ivars->folder, lock_dir_name)) {
-            Err *mkdir_err = (Err*)CERTIFY(Err_get_error(), ERR);
-            LockErr *err = LockErr_new(Str_newf("Can't create 'locks' directory: %o",
-                                                Err_Get_Mess(mkdir_err)));
+            Err *err = (Err*)INCREF(Err_get_error());
             // Maybe our attempt failed because another process succeeded.
             if (Folder_Find_Folder(ivars->folder, lock_dir_name)) {
                 DECREF(err);
             }
             else {
                 // Nope, everything failed, so bail out.
-                Err_set_error((Err*)err);
+                Err_set_error(err);
                 return false;
             }
         }
@@ -302,24 +300,22 @@ S_request(LockFileLockIVARS *ivars, String *lock_path) {
     context.outstream = outstream;
     context.json = json;
     Err *json_error = Err_trap(S_write_lockfile_json, &context);
-    bool wrote_json = !json_error;
     DECREF(outstream);
     DECREF(json);
-    if (wrote_json) {
+    if (json_error) {
+        Err_set_error(json_error);
+    }
+    else {
         success = Folder_Hard_Link(ivars->folder, ivars->link_path,
                                    lock_path);
         if (!success) {
+            // TODO: Only return a LockErr if errno == EEXIST, otherwise
+            // return a normal Err.
             Err *hard_link_err = (Err*)CERTIFY(Err_get_error(), ERR);
-            Err_set_error((Err*)LockErr_new(Str_newf("Failed to obtain lock at '%o': %o",
-                                                     lock_path,
-                                                     Err_Get_Mess(hard_link_err))));
+            String *msg = Str_newf("Failed to obtain lock at '%o': %o",
+                                   lock_path, Err_Get_Mess(hard_link_err));
+            Err_set_error((Err*)LockErr_new(msg));
         }
-    }
-    else {
-        Err_set_error((Err*)LockErr_new(Str_newf("Failed to obtain lock at '%o': %o",
-                                                 lock_path,
-                                                 Err_Get_Mess(json_error))));
-        DECREF(json_error);
     }
 
     // Verify that our temporary file got zapped.
