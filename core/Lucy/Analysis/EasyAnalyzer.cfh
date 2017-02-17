@@ -53,14 +53,14 @@ public class Lucy::Analysis::EasyAnalyzer inherits Lucy::Analysis::Analyzer {
      * @param language An ISO code from the list of supported languages.
      */
     public inert incremented EasyAnalyzer*
-    new(String *language = NULL);
+    new(String *language);
 
     /** Initialize an EasyAnalyzer.
      *
      * @param language An ISO code from the list of supported languages.
      */
     public inert EasyAnalyzer*
-    init(EasyAnalyzer *self, String *language = NULL);
+    init(EasyAnalyzer *self, String *language);
 
     public incremented Inversion*
     Transform(EasyAnalyzer *self, Inversion *inversion);
