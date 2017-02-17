@@ -96,22 +96,6 @@ abstract class Lucy::Store::Lock inherits Clownfish::Obj {
     public abstract void
     Release(Lock *self);
 
-    /** Indicate whether the resource identified by this lock's name is
-     * currently locked in shared or exclusive mode.
-     *
-     * @return true if the resource is locked, false otherwise.
-     */
-    public abstract bool
-    Is_Locked(Lock *self);
-
-    /** Indicate whether the resource identified by this lock's name is
-     * currently locked in exclusive mode.
-     *
-     * @return true if the resource is locked, false otherwise.
-     */
-    public abstract bool
-    Is_Locked_Exclusive(Lock *self);
-
     String*
     Get_Name(Lock *self);
 
@@ -146,12 +130,6 @@ class Lucy::Store::LockFileLock nickname LFLock
 
     public void
     Release(LockFileLock *self);
-
-    public bool
-    Is_Locked(LockFileLock *self);
-
-    public bool
-    Is_Locked_Exclusive(LockFileLock *self);
 
     String*
     Get_Lock_Path(LockFileLock *self);
