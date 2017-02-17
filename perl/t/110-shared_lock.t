@@ -20,8 +20,7 @@ use Test::More tests => 14;
 use Lucy::Test;
 
 my $folder = Lucy::Store::RAMFolder->new;
-
-my $lock = Lucy::Store::LockFileLock->new(
+my @args = (
     folder         => $folder,
     name           => 'ness',
     timeout        => 0,
@@ -29,32 +28,34 @@ my $lock = Lucy::Store::LockFileLock->new(
     exclusive_only => 0,
 );
 
-ok( !$lock->is_locked(), "not locked yet" );
+my $ex_lock = Lucy::Store::LockFileLock->new(@args);
+
+sub is_locked {
+    if ($ex_lock->request_exclusive) {
+        $ex_lock->release;
+        return 0;
+    }
+    else {
+        return 1;
+    }
+}
+
+my $lock = Lucy::Store::LockFileLock->new(@args);
+
+ok( !is_locked(), "not locked yet" );
 
 ok( $lock->obtain_shared(),               "obtain" );
-ok( $lock->is_locked(),                   "is_locked" );
+ok( is_locked(),                          "is_locked" );
 ok( $folder->exists('locks/ness-1.lock'), "lockfile exists" );
 
-my $another_lock = Lucy::Store::LockFileLock->new(
-    folder         => $folder,
-    name           => 'ness',
-    timeout        => 0,
-    host           => 'nessie',
-    exclusive_only => 0,
-);
+my $another_lock = Lucy::Store::LockFileLock->new(@args);
 ok( $another_lock->obtain_shared(), "got a second lock on the same resource" );
 
 $lock->release;
-ok( $lock->is_locked(),
+ok( is_locked(),
     "first lock released but still is_locked because of other lock" );
 
-my $ya_lock = Lucy::Store::LockFileLock->new(
-    folder         => $folder,
-    name           => 'ness',
-    timeout        => 0,
-    host           => 'nessie',
-    exclusive_only => 0,
-);
+my $ya_lock = Lucy::Store::LockFileLock->new(@args);
 ok( $ya_lock->obtain_shared(), "got yet another lock" );
 
 ok( $lock->obtain_shared(), "got first lock again" );
@@ -75,10 +76,10 @@ $another_lock->release;
 $ya_lock->release;
 
 ok( $lock->get_lock_path, "failed to release a lock with a different pid" );
-ok( !$lock->is_locked(), "is_locked clears stale locks" );
+ok( !is_locked(), "is_locked clears stale locks" );
 
 ok( $lock->obtain_shared(), "got lock again" );
-ok( $lock->is_locked(), "it's locked" );
+ok( is_locked(), "it's locked" );
 
 # Rewrite lock file to spec a different host.
 $content = $folder->slurp_file("locks/ness-1.lock");
@@ -89,4 +90,4 @@ $outstream->print($content);
 $outstream->close;
 
 $lock->release;
-ok( $lock->is_locked(), "don't delete lock belonging to another host" );
+ok( is_locked(), "don't delete lock belonging to another host" );

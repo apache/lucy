@@ -663,9 +663,6 @@ func TestLockFileLockAll(t *testing.T) {
 	if err != nil {
 		t.Errorf("Request: %v", err)
 	}
-	if !lock.IsLocked() {
-		t.Errorf("Lock should be locked, but IsLocked returned false")
-	}
 	if got := lock.getLockPath(); len(got) == 0 {
 		// Lock path only valid when locked for shared locks.
 		t.Errorf("getLockPath should work")
@@ -688,9 +685,6 @@ func TestLockFileLockAll(t *testing.T) {
 	err = lock.RequestExclusive()
 	if err != nil {
 		t.Errorf("Request: %v", err)
-	}
-	if !lock.IsLocked() {
-		t.Errorf("Lock should be locked, but IsLocked returned false")
 	}
 	if got := lock.getLockPath(); len(got) == 0 {
 		// Lock path only valid when locked for shared locks.

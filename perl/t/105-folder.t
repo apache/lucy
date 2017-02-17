@@ -62,16 +62,17 @@ for my $folder ( $fs_folder, $ram_folder ) {
     );
 
     $lock->obtain_exclusive();
-    ok( $lock->is_locked_exclusive(), "lock is locked" );
+    my $lock_path = $lock->get_lock_path;
+    ok( $folder->exists($lock_path), "lock is locked" );
     ok( !$competing_lock->obtain_exclusive(),
         "shouldn't get lock on existing resource"
     );
-    ok( $lock->is_locked_exclusive(),
+    ok( $folder->exists($lock_path),
         "lock still locked after competing attempt"
     );
 
     $lock->release;
-    ok( !$lock->is_locked_exclusive(), "release works" );
+    ok( !$folder->exists($lock_path), "release works" );
 
     $lock->obtain_exclusive();
     $folder->rename( from => 'king_of_rock', to => 'king_of_lock' );

@@ -131,6 +131,12 @@ static bool
 S_request(LockFileLockIVARS *ivars, String *lock_path);
 
 static bool
+S_is_locked_exclusive(LockFileLockIVARS *ivars);
+
+static bool
+S_is_locked(LockFileLockIVARS *ivars);
+
+static bool
 S_is_shared_lock_file(LockFileLockIVARS *ivars, String *entry);
 
 static bool
@@ -194,7 +200,7 @@ LFLock_Request_Shared_IMP(LockFileLock *self) {
     // race condition. We could protect the whole process with an internal
     // exclusive lock.
 
-    if (LFLock_Is_Locked_Exclusive(self)) {
+    if (S_is_locked_exclusive(ivars)) {
         String *msg = Str_newf("'%o.lock' is locked", ivars->name);
         Err_set_error((Err*)LockErr_new(msg));
         return false;
@@ -232,8 +238,8 @@ LFLock_Request_Exclusive_IMP(LockFileLock *self) {
     // exclusive lock.
 
     if (ivars->exclusive_only
-        ? LFLock_Is_Locked_Exclusive(self)
-        : LFLock_Is_Locked(self)
+        ? S_is_locked_exclusive(ivars)
+        : S_is_locked(ivars)
        ) {
         String *msg = Str_newf("'%o.lock' is locked", ivars->name);
         Err_set_error((Err*)LockErr_new(msg));
@@ -352,24 +358,15 @@ LFLock_Release_IMP(LockFileLock *self) {
     ivars->state = LFLOCK_STATE_UNLOCKED;
 }
 
-bool
-LFLock_Is_Locked_Exclusive_IMP(LockFileLock *self) {
-    LockFileLockIVARS *const ivars = LFLock_IVARS(self);
-
+static bool
+S_is_locked_exclusive(LockFileLockIVARS *ivars) {
     return Folder_Exists(ivars->folder, ivars->lock_path)
            && !S_maybe_delete_file(ivars, ivars->lock_path, false, true);
 }
 
-bool
-LFLock_Is_Locked_IMP(LockFileLock *self) {
-    LockFileLockIVARS *const ivars = LFLock_IVARS(self);
-
-    // Check for exclusive lock.
-    if (Folder_Exists(ivars->folder, ivars->lock_path)
-        && !S_maybe_delete_file(ivars, ivars->lock_path, false, true)
-       ) {
-        return true;
-    }
+static bool
+S_is_locked(LockFileLockIVARS *ivars) {
+    if (S_is_locked_exclusive(ivars)) { return true; }
 
     // Check for shared lock.
 
