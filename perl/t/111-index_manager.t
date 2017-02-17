@@ -32,24 +32,11 @@ sub recycle {
 
 package main;
 
-use Test::More tests => 11;
+use Test::More tests => 8;
 use Lucy::Test;
 
-my $folder = Lucy::Store::RAMFolder->new;
-
-my $lock = Lucy::Store::LockFileLock->new(
-    folder         => $folder,
-    host           => 'me',
-    name           => 'angie',
-    timeout        => 1000,
-    exclusive_only => 0,
-);
-isa_ok( $lock, 'Lucy::Store::Lock', "make_lock" );
-is( $lock->get_name, "angie", "correct lock name" );
-is( $lock->get_host, "me",    "correct host" );
-
 my $schema = Lucy::Test::TestSchema->new;
-$folder = Lucy::Store::RAMFolder->new;
+my $folder = Lucy::Store::RAMFolder->new;
 
 for ( 1 .. 20 ) {
     my $indexer = Lucy::Index::Indexer->new(
