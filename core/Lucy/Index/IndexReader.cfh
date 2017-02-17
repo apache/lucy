@@ -39,8 +39,7 @@ public class Lucy::Index::IndexReader nickname IxReader
 
     Hash            *components;
     IndexManager    *manager;
-    Lock            *read_lock;
-    Lock            *deletion_lock;
+    Lock            *snapshot_lock;
 
     /** Abstract initializer.
      */

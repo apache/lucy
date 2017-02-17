@@ -35,8 +35,6 @@ public class Lucy::Index::IndexManager nickname IxManager
     uint32_t     write_lock_interval;
     uint32_t     merge_lock_timeout;
     uint32_t     merge_lock_interval;
-    uint32_t     deletion_lock_timeout;
-    uint32_t     deletion_lock_interval;
 
     /** Create a new IndexManager.
      *
@@ -104,12 +102,6 @@ public class Lucy::Index::IndexManager nickname IxManager
     incremented Lock*
     Make_Write_Lock(IndexManager *self);
 
-    /** Create the Lock which grants permission to delete obsolete snapshot
-     * files or any file listed within an existing snapshot file.
-     */
-    incremented Lock*
-    Make_Deletion_Lock(IndexManager *self);
-
     incremented Lock*
     Make_Merge_Lock(IndexManager *self);
 
@@ -129,11 +121,11 @@ public class Lucy::Index::IndexManager nickname IxManager
     bool
     Remove_Merge_Data(IndexManager *self);
 
-    /** Create a shared lock on a snapshot file, which serves as a proxy for
+    /** Create a lock on a snapshot file, which serves as a proxy for
      * all the files it lists and indicates that they must not be deleted.
      */
     incremented Lock*
-    Make_Snapshot_Read_Lock(IndexManager *self, String *filename);
+    Make_Snapshot_Lock(IndexManager *self, String *filename);
 
     /** Return the highest number for a segment directory which contains a
      * segmeta file in the snapshot.
@@ -187,26 +179,6 @@ public class Lucy::Index::IndexManager nickname IxManager
      */
     uint32_t
     Get_Merge_Lock_Interval(IndexManager *self);
-
-    /** Setter for deletion lock timeout.  Default: 1000 milliseconds.
-     */
-    void
-    Set_Deletion_Lock_Timeout(IndexManager *self, uint32_t timeout);
-
-    /** Getter for deletion lock timeout.
-     */
-    uint32_t
-    Get_Deletion_Lock_Timeout(IndexManager *self);
-
-    /** Setter for deletion lock retry interval.  Default: 100 milliseconds.
-     */
-    void
-    Set_Deletion_Lock_Interval(IndexManager *self, uint32_t timeout);
-
-    /** Getter for deletion lock retry interval.
-     */
-    uint32_t
-    Get_Deletion_Lock_Interval(IndexManager *self);
 }
 
 

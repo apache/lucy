@@ -17,19 +17,10 @@ use strict;
 use warnings;
 use lib 'buildlib';
 
-use Test::More tests => 15;
-
-package FastIndexManager;
-use base qw( Lucy::Index::IndexManager );
-
-sub new {
-    my $self = shift->SUPER::new(@_);
-    $self->set_deletion_lock_timeout(100);
-    return $self;
-}
+use Test::More tests => 14;
 
 package NonMergingIndexManager;
-use base qw( FastIndexManager );
+use base qw( Lucy::Index::IndexManager );
 sub recycle { [] }
 
 package main;
@@ -43,49 +34,51 @@ my $schema  = Lucy::Test::TestSchema->new;
 my $indexer = Lucy::Index::Indexer->new(
     index   => $folder,
     schema  => $schema,
-    manager => FastIndexManager->new,
+    manager => Lucy::Index::IndexManager->new,
     create  => 1,
 );
 $indexer->delete_by_term( field => 'content', term => $_ ) for qw( a b c );
 $indexer->add_doc( { content => 'x' } );
 
-# Artificially create deletion lock.
-my $outstream = $folder->open_out('locks/deletion.lock')
+# Artificially create snapshot lock.
+my $outstream = $folder->open_out('locks/snapshot_1.lock')
     or die Clownfish->error;
 $outstream->print("{}");
 $outstream->close;
-{
-    my $captured;
-    local $SIG{__WARN__} = sub { $captured = shift; };
-    $indexer->commit;
-    like( $captured, qr/obsolete/,
-        "Indexer warns if it can't get a deletion lock" );
-}
 
-ok( $folder->exists('locks/deletion.lock'),
-    "Indexer doesn't delete deletion lock when it can't get it" );
+$indexer->commit;
+
+ok( $folder->exists('locks/snapshot_1.lock'),
+    "Indexer doesn't delete snapshot lock when it can't get it" );
 my $num_ds_files = grep {m/documents\.dat$/} @{ $folder->list_r };
 cmp_ok( $num_ds_files, '>', 1,
     "Indexer doesn't process deletions when it can't get deletion lock" );
 
-my $num_snap_files = grep {m/snapshot/} @{ $folder->list_r };
+my $num_snap_files = grep {m/snapshot.*\.json/} @{ $folder->list_r };
 is( $num_snap_files, 2, "didn't zap the old snap file" );
 
 my $reader;
 SKIP: {
     skip( "IndexReader opening failure leaks", 1 )
         if $ENV{LUCY_VALGRIND};
+    my $snapshot = Lucy::Index::Snapshot->new;
+    $snapshot->read_file(
+        folder => $folder,
+        path   => 'snapshot_1.json',
+    );
     eval {
         $reader = Lucy::Index::IndexReader->open(
-            index   => $folder,
-            manager => FastIndexManager->new( host => 'me' ),
+            index    => $folder,
+            snapshot => $snapshot,
+            manager  => Lucy::Index::IndexManager->new( host => 'me' ),
         );
     };
     ok( blessed($@) && $@->isa("Lucy::Store::LockErr"),
-        "IndexReader dies if it can't get deletion lock"
+        "IndexReader dies if it can't get snapshot lock"
     );
 }
-$folder->delete('locks/deletion.lock') or die "Can't delete 'deletion.lock'";
+$folder->delete('locks/snapshot_1.lock')
+    or die "Can't delete 'snapshot_1.lock'";
 
 Test_race_condition_1: {
     my $latest_snapshot_file = latest_snapshot($folder);
@@ -103,7 +96,7 @@ Test_race_condition_1: {
 
     $reader = Lucy::Index::IndexReader->open(
         index   => $folder,
-        manager => FastIndexManager->new( host => 'me' ),
+        manager => Lucy::Index::IndexManager->new( host => 'me' ),
     );
     is( $reader->doc_count, 1,
         "reader overcomes race condition of index update after read lock" );
@@ -149,7 +142,7 @@ $folder = create_index(qw( a b c x ));
 # Establish read lock.
 $reader = Lucy::Index::IndexReader->open(
     index   => $folder,
-    manager => FastIndexManager->new( host => 'me' ),
+    manager => Lucy::Index::IndexManager->new( host => 'me' ),
 );
 
 $indexer = Lucy::Index::Indexer->new(

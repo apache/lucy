@@ -173,14 +173,6 @@ func TestIndexManagerAccessors(t *testing.T) {
 	if got := manager.getMergeLockInterval(); got != 43 {
 		t.Errorf("set/getMergeLockInterval: %d", got)
 	}
-	manager.setDeletionLockTimeout(71)
-	if got := manager.getDeletionLockTimeout(); got != 71 {
-		t.Errorf("set/getDeletionLockTimeout: %d", got)
-	}
-	manager.setDeletionLockInterval(41)
-	if got := manager.getDeletionLockInterval(); got != 41 {
-		t.Errorf("set/getDeletionLockInterval: %d", got)
-	}
 }
 
 func TestIndexManagerLocks(t *testing.T) {
@@ -192,11 +184,8 @@ func TestIndexManagerLocks(t *testing.T) {
 	if _, ok := manager.makeMergeLock().(Lock); !ok {
 		t.Errorf("makeMergeLock")
 	}
-	if _, ok := manager.makeDeletionLock().(Lock); !ok {
-		t.Errorf("makeDeletionLock")
-	}
 	snapFile := "snapshot_4a.json"
-	if _, ok := manager.makeSnapshotReadLock(snapFile).(Lock); !ok {
+	if _, ok := manager.makeSnapshotLock(snapFile).(Lock); !ok {
 		t.Errorf("makeDeletionLock")
 	}
 }
