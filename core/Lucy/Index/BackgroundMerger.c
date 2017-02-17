@@ -88,14 +88,16 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager) {
     }
     IxManager_Set_Folder(ivars->manager, folder);
 
-    // Obtain write lock (which we'll only hold briefly), then merge lock.
-    S_obtain_write_lock(self);
-    if (!ivars->write_lock) {
+    // Obtain merge lock first so that a running background merger won't
+    // abort when failing to acquire the write lock during commit.
+    S_obtain_merge_lock(self);
+    if (!ivars->merge_lock) {
         DECREF(self);
         RETHROW(INCREF(Err_get_error()));
     }
-    S_obtain_merge_lock(self);
-    if (!ivars->merge_lock) {
+    // Obtain write lock (which we'll only hold briefly).
+    S_obtain_write_lock(self);
+    if (!ivars->write_lock) {
         DECREF(self);
         RETHROW(INCREF(Err_get_error()));
     }
@@ -509,8 +511,7 @@ BGMerger_Commit_IMP(BackgroundMerger *self) {
         DECREF(temp_snapfile);
     }
 
-    // Release the merge lock and remove the merge data file.
-    S_release_merge_lock(self);
+    // Remove the merge data file.
     IxManager_Remove_Merge_Data(ivars->manager);
 
     if (ivars->needs_commit) {
@@ -518,8 +519,9 @@ BGMerger_Commit_IMP(BackgroundMerger *self) {
         FilePurger_Purge_Snapshots(ivars->file_purger, ivars->snapshot);
     }
 
-    // Release the write lock.
+    // Release write and merge locks.
     S_release_write_lock(self);
+    S_release_merge_lock(self);
 }
 
 static void
