@@ -33,7 +33,7 @@
 // obsolete snapshots to snapshots array.
 static void
 S_discover_unused(FilePurger *self, Snapshot *current, Hash *spared,
-                  Hash *purged, Vector *snapshots);
+                  Hash *purged, Vector *snapshots, Vector *locks);
 
 // Add filepath entries referenced by a snapshot to a Hash. Note that
 // it's assumed that snapshots only list entries local to the index
@@ -75,69 +75,65 @@ FilePurger_Destroy_IMP(FilePurger *self) {
 void
 FilePurger_Purge_Snapshots_IMP(FilePurger *self, Snapshot *current) {
     FilePurgerIVARS *const ivars = FilePurger_IVARS(self);
-    Lock *deletion_lock = IxManager_Make_Deletion_Lock(ivars->manager);
 
-    // Obtain deletion lock, purge files, release deletion lock.
-    if (Lock_Obtain_Exclusive(deletion_lock)) {
-        Folder *folder    = ivars->folder;
-        Hash   *failures  = Hash_new(16);
-        Hash   *spared    = Hash_new(32);
-        Hash   *purged    = Hash_new(32);
-        Vector *snapshots = Vec_new(16);
+    Folder *folder    = ivars->folder;
+    Hash   *failures  = Hash_new(16);
+    Hash   *spared    = Hash_new(32);
+    Hash   *purged    = Hash_new(32);
+    Vector *snapshots = Vec_new(16);
+    Vector *locks     = Vec_new(16);
 
-        // Don't allow the locks directory to be zapped.
-        Hash_Store_Utf8(spared, "locks", 5, (Obj*)CFISH_TRUE);
+    // Don't allow the locks directory to be zapped.
+    Hash_Store_Utf8(spared, "locks", 5, (Obj*)CFISH_TRUE);
 
-        S_discover_unused(self, current, spared, purged, snapshots);
+    S_discover_unused(self, current, spared, purged, snapshots, locks);
 
-        // Attempt to delete entries -- if failure, no big deal, just try
-        // again later.
-        HashIterator *iter = HashIter_new(purged);
-        while (HashIter_Next(iter)) {
-            String *entry = HashIter_Get_Key(iter);
-            if (Hash_Fetch(spared, entry)) { continue; }
-            if (!S_delete_entry(folder, entry)) {
-                if (Folder_Exists(folder, entry)) {
-                    Hash_Store(failures, entry, (Obj*)CFISH_TRUE);
-                }
+    // Attempt to delete entries -- if failure, no big deal, just try
+    // again later.
+    HashIterator *iter = HashIter_new(purged);
+    while (HashIter_Next(iter)) {
+        String *entry = HashIter_Get_Key(iter);
+        if (Hash_Fetch(spared, entry)) { continue; }
+        if (!S_delete_entry(folder, entry)) {
+            if (Folder_Exists(folder, entry)) {
+                Hash_Store(failures, entry, (Obj*)CFISH_TRUE);
             }
         }
+    }
 
-        for (size_t i = 0, max = Vec_Get_Size(snapshots); i < max; i++) {
-            Snapshot *snapshot = (Snapshot*)Vec_Fetch(snapshots, i);
-            bool snapshot_has_failures = false;
-            if (Hash_Get_Size(failures)) {
-                // Only delete snapshot files if all of their entries were
-                // successfully deleted.
-                Vector *entries = Snapshot_List(snapshot);
-                for (size_t j = Vec_Get_Size(entries); j--;) {
-                    String *entry = (String*)Vec_Fetch(entries, j);
-                    if (Hash_Fetch(failures, entry)) {
-                        snapshot_has_failures = true;
-                        break;
-                    }
+    for (size_t i = 0, max = Vec_Get_Size(snapshots); i < max; i++) {
+        Snapshot *snapshot = (Snapshot*)Vec_Fetch(snapshots, i);
+        bool snapshot_has_failures = false;
+        if (Hash_Get_Size(failures)) {
+            // Only delete snapshot files if all of their entries were
+            // successfully deleted.
+            Vector *entries = Snapshot_List(snapshot);
+            for (size_t j = Vec_Get_Size(entries); j--;) {
+                String *entry = (String*)Vec_Fetch(entries, j);
+                if (Hash_Fetch(failures, entry)) {
+                    snapshot_has_failures = true;
+                    break;
                 }
-                DECREF(entries);
             }
-            if (!snapshot_has_failures) {
-                String *snapfile = Snapshot_Get_Path(snapshot);
-                Folder_Local_Delete(folder, snapfile);
-            }
+            DECREF(entries);
         }
-
-        DECREF(iter);
-        DECREF(failures);
-        DECREF(purged);
-        DECREF(spared);
-        DECREF(snapshots);
-        Lock_Release(deletion_lock);
-    }
-    else {
-        WARN("Can't obtain deletion lock, skipping deletion of "
-             "obsolete files");
+        if (!snapshot_has_failures) {
+            String *snapfile = Snapshot_Get_Path(snapshot);
+            Folder_Local_Delete(folder, snapfile);
+        }
     }
 
-    DECREF(deletion_lock);
+    // Release snapshot locks.
+    for (size_t i = 0, max = Vec_Get_Size(locks); i < max; i++) {
+        Lock_Release((Lock*)Vec_Fetch(locks, i));
+    }
+
+    DECREF(iter);
+    DECREF(failures);
+    DECREF(purged);
+    DECREF(spared);
+    DECREF(snapshots);
+    DECREF(locks);
 }
 
 void
@@ -185,7 +181,7 @@ FilePurger_Purge_Aborted_Merge_IMP(FilePurger *self) {
 
 static void
 S_discover_unused(FilePurger *self, Snapshot *current, Hash *spared,
-                  Hash *purged, Vector *snapshots) {
+                  Hash *purged, Vector *snapshots, Vector *locks) {
     FilePurgerIVARS *const ivars = FilePurger_IVARS(self);
     Folder      *folder       = ivars->folder;
     DirHandle   *dh           = Folder_Open_Dir(folder, NULL);
@@ -206,26 +202,23 @@ S_discover_unused(FilePurger *self, Snapshot *current, Hash *spared,
         ) {
             Snapshot *snapshot
                 = Snapshot_Read_File(Snapshot_new(), folder, entry);
-            Lock *lock
-                = IxManager_Make_Snapshot_Read_Lock(ivars->manager, entry);
+            Lock *lock = IxManager_Make_Snapshot_Lock(ivars->manager, entry);
 
-            // DON'T obtain the lock -- only see whether another
-            // entity holds a lock on the snapshot file.
-            if (lock && Lock_Is_Locked(lock)) {
+            if (Lock_Request_Exclusive(lock)) {
+                // No one's using this snapshot, so all of its entries are
+                // candidates for deletion.
+                Vec_Push(snapshots, (Obj*)snapshot);
+                Vec_Push(locks, (Obj*)lock);
+                S_find_all_referenced(snapshot, purged);
+            }
+            else {
                 // The snapshot file is locked, which means someone's using
                 // that version of the index -- protect all of its entries.
                 Hash_Store(spared, entry, (Obj*)CFISH_TRUE);
                 S_find_all_referenced(snapshot, spared);
+                DECREF(snapshot);
+                DECREF(lock);
             }
-            else {
-                // No one's using this snapshot, so all of its entries are
-                // candidates for deletion.
-                Vec_Push(snapshots, INCREF(snapshot));
-                S_find_all_referenced(snapshot, purged);
-            }
-
-            DECREF(snapshot);
-            DECREF(lock);
         }
         DECREF(entry);
     }

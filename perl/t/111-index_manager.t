@@ -32,7 +32,7 @@ sub recycle {
 
 package main;
 
-use Test::More tests => 13;
+use Test::More tests => 11;
 use Lucy::Test;
 
 my $folder = Lucy::Store::RAMFolder->new;
@@ -101,11 +101,6 @@ $manager->set_merge_lock_timeout(3);
 is( $manager->get_merge_lock_timeout, 3, "set/get merge lock timeout" );
 $manager->set_merge_lock_interval(4);
 is( $manager->get_merge_lock_interval, 4, "set/get merge lock interval" );
-$manager->set_deletion_lock_timeout(5);
-is( $manager->get_deletion_lock_timeout, 5, "set/get deletion lock timeout" );
-$manager->set_deletion_lock_interval(6);
-is( $manager->get_deletion_lock_interval,
-    6, "set/get deletion lock interval" );
 
 my $indexer = Lucy::Index::Indexer->new(
     index   => $folder,
