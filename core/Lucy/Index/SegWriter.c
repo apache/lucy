@@ -204,10 +204,8 @@ SegWriter_Finish_IMP(SegWriter *self) {
 
     // Write segment metadata and add the segment directory to the snapshot.
     Snapshot *snapshot = SegWriter_Get_Snapshot(self);
-    String *segmeta_filename = Str_newf("%o/segmeta.json", seg_name);
     Seg_Write_File(ivars->segment, ivars->folder);
     Snapshot_Add_Entry(snapshot, seg_name);
-    DECREF(segmeta_filename);
 
     // Collapse segment files into compound file.
     Folder_Consolidate(ivars->folder, seg_name);
