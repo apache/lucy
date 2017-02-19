@@ -454,7 +454,7 @@ S_maybe_delete_file(LockFileLockIVARS *ivars, String *path,
 void
 LFLock_Destroy_IMP(LockFileLock *self) {
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
-    DECREF(ivars->shared_lock_path);
+    if (ivars->state != LFLOCK_STATE_UNLOCKED) { LFLock_Release(self); }
     DECREF(ivars->link_path);
     SUPER_DESTROY(self, LOCKFILELOCK);
 }

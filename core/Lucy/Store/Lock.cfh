@@ -91,7 +91,7 @@ abstract class Lucy::Store::Lock inherits Clownfish::Obj {
     public abstract bool
     Request_Exclusive(Lock *self);
 
-    /** Release the lock.
+    /** Release the lock. Locks are always released by the destructor.
      */
     public abstract void
     Release(Lock *self);

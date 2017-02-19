@@ -482,7 +482,6 @@ static void
 S_release_snapshot_lock(PolyReader *self) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
     if (ivars->snapshot_lock) {
-        Lock_Release(ivars->snapshot_lock);
         DECREF(ivars->snapshot_lock);
         ivars->snapshot_lock = NULL;
     }

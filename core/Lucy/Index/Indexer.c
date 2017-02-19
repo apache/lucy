@@ -588,7 +588,6 @@ static void
 S_release_write_lock(Indexer *self) {
     IndexerIVARS *const ivars = Indexer_IVARS(self);
     if (ivars->write_lock) {
-        Lock_Release(ivars->write_lock);
         DECREF(ivars->write_lock);
         ivars->write_lock = NULL;
     }
@@ -598,7 +597,6 @@ static void
 S_release_merge_lock(Indexer *self) {
     IndexerIVARS *const ivars = Indexer_IVARS(self);
     if (ivars->merge_lock) {
-        Lock_Release(ivars->merge_lock);
         DECREF(ivars->merge_lock);
         ivars->merge_lock = NULL;
     }

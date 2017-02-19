@@ -71,9 +71,10 @@ test_exclusive_only(TestBatchRunner *runner, Lock *lock1, Lock *lock2,
               "Request_Exclusive (only) succeeds after Release %s", tag);
     TEST_FALSE(runner, Lock_Request_Exclusive(lock1),
                "Request_Exclusive (only) fails if lock2 is locked %s", tag);
-    Lock_Release(lock2);
-
     DECREF(lock2);
+
+    TEST_TRUE(runner, Lock_Request_Exclusive(lock1),
+              "Request_Exclusive (only) succeeds after Destroy %s", tag);
     DECREF(lock1);
 }
 
@@ -105,27 +106,12 @@ test_lock(TestBatchRunner *runner, Lock *lock1, Lock *lock2, Lock *lock3,
     TEST_TRUE(runner, CERTIFY(Err_get_error(), LOCKERR),
               "Request_Exclusive after Request_Exclusive sets LockErr %s",
               tag);
-    Lock_Release(lock1);
-
-    TEST_TRUE(runner, Lock_Request_Exclusive(lock3),
-              "Request_Exclusive succeeds after Release %s", tag);
-    Lock_Release(lock3);
-
-    DECREF(lock3);
-    DECREF(lock2);
     DECREF(lock1);
-}
 
-static void
-test_change_pid(TestBatchRunner *runner, Folder *folder, String *path,
-                const char *tag) {
-    Hash *hash = (Hash*)Json_slurp_json(folder, path);
-    TEST_TRUE(runner, CERTIFY(hash, HASH), "Lock file %s exists %s",
-              Str_Get_Ptr8(path), tag);
-    Hash_Store(hash, SSTR_WRAP_C("pid"), (Obj*)Str_newf("10000000"));
-    Folder_Delete(folder, path);
-    Json_spew_json((Obj*)hash, folder, path);
-    DECREF(hash);
+    TEST_TRUE(runner, Lock_Request_Shared(lock2),
+              "Request_Shared succeeds after Destroy %s", tag);
+    DECREF(lock2);
+    DECREF(lock3);
 }
 
 static void
@@ -136,11 +122,19 @@ test_stale(TestBatchRunner *runner, Folder *folder, const char *tag) {
     LockFileLock *lock1 = LFLock_new(folder, name, host1, 0, 100, false);
     LockFileLock *lock2 = LFLock_new(folder, name, host2, 0, 100, false);
     LockFileLock *tmp;
+    Hash *hash;
 
     tmp = LFLock_new(folder, name, host1, 0, 100, false);
     LFLock_Request_Exclusive(tmp);
+    String *ex_path = SSTR_WRAP_C("locks/test.lock");
+    hash = (Hash*)Json_slurp_json(folder, ex_path);
+    TEST_TRUE(runner, CERTIFY(hash, HASH), "Lock file %s exists %s",
+              Str_Get_Ptr8(ex_path), tag);
     DECREF(tmp);
-    test_change_pid(runner, folder, SSTR_WRAP_C("locks/test.lock"), tag);
+    // Write lock file with different pid.
+    Hash_Store(hash, SSTR_WRAP_C("pid"), (Obj*)Str_newf("10000000"));
+    Json_spew_json((Obj*)hash, folder, ex_path);
+    DECREF(hash);
     TEST_FALSE(runner, LFLock_Request_Exclusive(lock2),
                "Lock_Exclusive fails with other host's exclusive lock %s",
                tag);
@@ -150,8 +144,15 @@ test_stale(TestBatchRunner *runner, Folder *folder, const char *tag) {
 
     tmp = LFLock_new(folder, name, host1, 0, 100, false);
     LFLock_Request_Shared(tmp);
+    String *sh_path = SSTR_WRAP_C("locks/test-1.lock");
+    hash = (Hash*)Json_slurp_json(folder, sh_path);
+    TEST_TRUE(runner, CERTIFY(hash, HASH), "Lock file %s exists %s",
+              Str_Get_Ptr8(sh_path), tag);
     DECREF(tmp);
-    test_change_pid(runner, folder, SSTR_WRAP_C("locks/test-1.lock"), tag);
+    // Write lock file with different pid.
+    Hash_Store(hash, SSTR_WRAP_C("pid"), (Obj*)Str_newf("10000000"));
+    Json_spew_json((Obj*)hash, folder, SSTR_WRAP_C("locks/test-98765.lock"));
+    DECREF(hash);
     TEST_FALSE(runner, LFLock_Request_Exclusive(lock2),
                "Lock_Exclusive fails with other host's shared lock %s", tag);
     TEST_TRUE(runner, LFLock_Request_Exclusive(lock1),
@@ -175,8 +176,6 @@ test_Obtain(TestBatchRunner *runner, Lock *lock1, Lock *lock2,
               "Obtain_Exclusive succeeds %s", tag);
     TEST_FALSE(runner, Lock_Obtain_Shared(lock2),
                "Obtain_Shared after Obtain_Exclusive fails %s", tag);
-    Lock_Release(lock1);
-
     DECREF(lock2);
     DECREF(lock1);
 }
@@ -291,7 +290,7 @@ test_lf_lock(TestBatchRunner *runner) {
 
 void
 TestLFLock_Run_IMP(TestLockFileLock *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 80);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 82);
     test_lf_lock(runner);
 }
 

@@ -123,17 +123,12 @@ FilePurger_Purge_Snapshots_IMP(FilePurger *self, Snapshot *current) {
         }
     }
 
-    // Release snapshot locks.
-    for (size_t i = 0, max = Vec_Get_Size(locks); i < max; i++) {
-        Lock_Release((Lock*)Vec_Fetch(locks, i));
-    }
-
     DECREF(iter);
     DECREF(failures);
     DECREF(purged);
     DECREF(spared);
     DECREF(snapshots);
-    DECREF(locks);
+    DECREF(locks); // Will release locks.
 }
 
 void
