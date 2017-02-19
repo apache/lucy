@@ -30,7 +30,7 @@
 #include "Lucy/Test/Store/TestLock.h"
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Store/FSFolder.h"
-#include "Lucy/Store/Lock.h"
+#include "Lucy/Store/LockFileLock.h"
 #include "Lucy/Store/RAMFolder.h"
 #include "Lucy/Util/Json.h"
 

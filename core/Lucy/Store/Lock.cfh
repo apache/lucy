@@ -48,6 +48,9 @@ abstract class Lucy::Store::Lock inherits Clownfish::Obj {
     init(Lock *self, Folder *folder, String *name, int32_t timeout = 0,
          int32_t interval = 100);
 
+    inert bool
+    make_lock_dir(Folder *folder);
+
     /** Call [](.Request_Shared) once per `interval` until [](.Request_Shared)
      * returns success or the `timeout` has been reached.
      *
@@ -96,37 +99,6 @@ abstract class Lucy::Store::Lock inherits Clownfish::Obj {
 
     public void
     Destroy(Lock *self);
-}
-
-class Lucy::Store::LockFileLock nickname LFLock
-    inherits Lucy::Store::Lock {
-
-    String *host;
-    String *lock_path;
-    String *shared_lock_path;
-    String *link_path;
-    int     state;
-    bool    exclusive_only;
-
-    inert incremented LockFileLock*
-    new(Folder *folder, String *name, String *host, int32_t timeout = 0,
-        int32_t interval = 100, bool exclusive_only);
-
-    public inert LockFileLock*
-    init(LockFileLock *self, Folder *folder, String *name, String *host,
-         int32_t timeout = 0, int32_t interval = 100, bool exclusive_only);
-
-    public bool
-    Request_Shared(LockFileLock *self);
-
-    public bool
-    Request_Exclusive(LockFileLock *self);
-
-    public void
-    Release(LockFileLock *self);
-
-    public void
-    Destroy(LockFileLock *self);
 }
 
 /** Lock exception.

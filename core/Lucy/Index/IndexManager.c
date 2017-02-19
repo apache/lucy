@@ -25,7 +25,7 @@
 #include "Lucy/Index/Snapshot.h"
 #include "Lucy/Store/DirHandle.h"
 #include "Lucy/Store/Folder.h"
-#include "Lucy/Store/Lock.h"
+#include "Lucy/Store/LockFileLock.h"
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/Json.h"
 
