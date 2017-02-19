@@ -30,8 +30,8 @@
 #include "Lucy/Util/Sleep.h"
 
 Lock*
-Lock_init(Lock *self, Folder *folder, String *name,
-          String *host, int32_t timeout, int32_t interval) {
+Lock_init(Lock *self, Folder *folder, String *name, int32_t timeout,
+          int32_t interval) {
     LockIVARS *const ivars = Lock_IVARS(self);
 
     // Validate.
@@ -58,7 +58,6 @@ Lock_init(Lock *self, Folder *folder, String *name,
     ivars->folder       = (Folder*)INCREF(folder);
     ivars->timeout      = timeout;
     ivars->name         = Str_Clone(name);
-    ivars->host         = Str_Clone(host);
     ivars->interval     = interval;
 
     // Derive.
@@ -71,7 +70,6 @@ void
 Lock_Destroy_IMP(Lock *self) {
     LockIVARS *const ivars = Lock_IVARS(self);
     DECREF(ivars->folder);
-    DECREF(ivars->host);
     DECREF(ivars->name);
     DECREF(ivars->lock_path);
     SUPER_DESTROY(self, LOCK);
@@ -145,8 +143,9 @@ LockFileLock*
 LFLock_init(LockFileLock *self, Folder *folder, String *name, String *host,
             int32_t timeout, int32_t interval, bool exclusive_only) {
     int pid = PID_getpid();
-    Lock_init((Lock*)self, folder, name, host, timeout, interval);
+    Lock_init((Lock*)self, folder, name, timeout, interval);
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
+    ivars->host      = (String*)INCREF(host);
     ivars->link_path = Str_newf("%o.%o.%i64", ivars->lock_path, host,
                                 (int64_t)pid);
     ivars->exclusive_only = exclusive_only;
@@ -455,6 +454,7 @@ void
 LFLock_Destroy_IMP(LockFileLock *self) {
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
     if (ivars->state != LFLOCK_STATE_UNLOCKED) { LFLock_Release(self); }
+    DECREF(ivars->host);
     DECREF(ivars->link_path);
     SUPER_DESTROY(self, LOCKFILELOCK);
 }
