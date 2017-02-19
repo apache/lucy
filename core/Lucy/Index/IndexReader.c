@@ -81,7 +81,6 @@ IxReader_Close_IMP(IndexReader *self) {
         Hash_Clear(ivars->components);
     }
     if (ivars->snapshot_lock) {
-        Lock_Release(ivars->snapshot_lock);
         DECREF(ivars->snapshot_lock);
         ivars->snapshot_lock = NULL;
     }
@@ -91,10 +90,7 @@ void
 IxReader_Destroy_IMP(IndexReader *self) {
     IndexReaderIVARS *const ivars = IxReader_IVARS(self);
     DECREF(ivars->components);
-    if (ivars->snapshot_lock) {
-        Lock_Release(ivars->snapshot_lock);
-        DECREF(ivars->snapshot_lock);
-    }
+    DECREF(ivars->snapshot_lock);
     DECREF(ivars->manager);
     SUPER_DESTROY(self, INDEXREADER);
 }
