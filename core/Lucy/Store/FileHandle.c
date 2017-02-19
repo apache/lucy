@@ -18,17 +18,39 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Store/FileHandle.h"
+#include "Lucy/Store/ErrorMessage.h"
 
 int32_t FH_object_count = 0;
 
 FileHandle*
 FH_do_open(FileHandle *self, String *path, uint32_t flags) {
+    // Track number of live FileHandles released into the wild.
+    FH_object_count++;
+
+    // Check flags.
+    uint32_t rw_flags = flags & (FH_READ_ONLY | FH_WRITE_ONLY);
+    if (rw_flags == 0) {
+        ErrMsg_set("Must specify FH_READ_ONLY or FH_WRITE_ONLY to open '%o'",
+                   path);
+        DECREF(self);
+        return NULL;
+    }
+    else if (rw_flags == (FH_READ_ONLY | FH_WRITE_ONLY)) {
+        ErrMsg_set("Can't specify both FH_READ_ONLY and FH_WRITE_ONLY to"
+                   " open '%o'", path);
+        DECREF(self);
+        return NULL;
+    }
+    if ((flags & (FH_CREATE | FH_EXCLUSIVE)) == FH_EXCLUSIVE) {
+        ErrMsg_set("Can't specify FH_EXCLUSIVE without FH_CREATE to"
+                   " open '%o' ", path);
+        DECREF(self);
+        return NULL;
+    }
+
     FileHandleIVARS *const ivars = FH_IVARS(self);
     ivars->path    = path ? Str_Clone(path) : Str_new_from_trusted_utf8("", 0);
     ivars->flags   = flags;
-
-    // Track number of live FileHandles released into the wild.
-    FH_object_count++;
 
     ABSTRACT_CLASS_CHECK(self, FILEHANDLE);
     return self;

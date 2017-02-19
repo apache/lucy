@@ -46,7 +46,7 @@ S_new_filehandle() {
     }
     Class_Override(klass, S_no_op_method, LUCY_FH_Close_OFFSET);
     fh = (FileHandle*)Class_Make_Obj(klass);
-    return FH_do_open(fh, NULL, 0);
+    return FH_do_open(fh, NULL, FH_READ_ONLY);
 }
 
 void

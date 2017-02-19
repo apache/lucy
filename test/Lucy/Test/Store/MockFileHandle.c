@@ -31,7 +31,7 @@ MockFileHandle_new(String *path, int64_t length) {
 MockFileHandle*
 MockFileHandle_init(MockFileHandle *self, String *path,
                     int64_t length) {
-    FH_do_open((FileHandle*)self, path, 0);
+    if (!FH_do_open((FileHandle*)self, path, FH_READ_ONLY)) { return NULL; }
     MockFileHandleIVARS *const ivars = MockFileHandle_IVARS(self);
     ivars->len = length;
     return self;

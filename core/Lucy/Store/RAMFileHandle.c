@@ -30,15 +30,15 @@ RAMFH_open(String *path, uint32_t flags, RAMFile *file) {
 RAMFileHandle*
 RAMFH_do_open(RAMFileHandle *self, String *path, uint32_t flags,
               RAMFile *file) {
+    if (!FH_do_open((FileHandle*)self, path, flags)) { return NULL; }
+    RAMFileHandleIVARS *const ivars = RAMFH_IVARS(self);
+
     bool must_create
         = (flags & (FH_CREATE | FH_EXCLUSIVE)) == (FH_CREATE | FH_EXCLUSIVE)
           ? true : false;
     bool can_create
         = (flags & (FH_CREATE | FH_WRITE_ONLY)) == (FH_CREATE | FH_WRITE_ONLY)
           ? true : false;
-
-    FH_do_open((FileHandle*)self, path, flags);
-    RAMFileHandleIVARS *const ivars = RAMFH_IVARS(self);
 
     // Obtain a RAMFile.
     if (file) {

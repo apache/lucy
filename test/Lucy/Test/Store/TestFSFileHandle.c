@@ -22,11 +22,7 @@
 #define TESTLUCY_USE_SHORT_NAMES
 #include "Lucy/Util/ToolSet.h"
 
-#ifdef CHY_HAS_UNISTD_H
-  #include <unistd.h> // close
-#elif defined(CHY_HAS_IO_H)
-  #include <io.h> // close
-#endif
+#include "charmony.h"
 
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
@@ -159,6 +155,12 @@ test_Read_Write(TestBatchRunner *runner) {
               "Read() past EOF sets error");
 
     Err_set_error(NULL);
+    TEST_FALSE(runner, FSFH_Read(fh, buf, 4, 3),
+               "Read() across EOF returns false");
+    TEST_TRUE(runner, Err_get_error() != NULL,
+              "Read() across EOF sets error");
+
+    Err_set_error(NULL);
     TEST_FALSE(runner, FSFH_Write(fh, foo, 3),
                "Writing to a read-only handle returns false");
     TEST_TRUE(runner, Err_get_error() != NULL,
@@ -184,8 +186,8 @@ test_Close(TestBatchRunner *runner) {
     S_remove(test_filename);
     fh = FSFH_open(test_filename,
                    FH_CREATE | FH_WRITE_ONLY | FH_EXCLUSIVE);
-#ifdef _MSC_VER
-    SKIP(runner, 2, "LUCY-155");
+#if defined(CHY_HAS_WINDOWS_H) && !defined(CHY_HAS_SYS_MMAN_H)
+    SKIP(runner, 2, "Can't test invalid file handles on Windows");
 #else
     int saved_fd = FSFH_Set_FD(fh, -1);
     Err_set_error(NULL);
@@ -194,7 +196,7 @@ test_Close(TestBatchRunner *runner) {
     TEST_TRUE(runner, Err_get_error() != NULL,
               "Failed Close() sets global error");
     FSFH_Set_FD(fh, saved_fd);
-#endif /* _MSC_VER */
+#endif // Windows check.
     DECREF(fh);
 
     fh = FSFH_open(test_filename, FH_READ_ONLY);
@@ -260,7 +262,7 @@ test_Window(TestBatchRunner *runner) {
 
 void
 TestFSFH_Run_IMP(TestFSFileHandle *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 46);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 48);
     test_open(runner);
     test_Read_Write(runner);
     test_Close(runner);
