@@ -115,7 +115,8 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager) {
     // Open a PolyReader, passing in the IndexManager so we get a read lock on
     // the Snapshot's files -- so that Indexers don't zap our files while
     // we're operating in the background.
-    ivars->polyreader = PolyReader_open((Obj*)folder, NULL, ivars->manager);
+    ivars->polyreader
+        = PolyReader_open((Obj*)folder, ivars->snapshot, ivars->manager);
 
     // Clone the PolyReader's schema.
     Obj *dump = (Obj*)Schema_Dump(PolyReader_Get_Schema(ivars->polyreader));
@@ -249,12 +250,12 @@ S_maybe_merge(BackgroundMerger *self) {
 }
 
 static bool
-S_merge_updated_deletions(BackgroundMerger *self) {
+S_merge_updated_deletions(BackgroundMerger *self, Snapshot *latest_snapshot) {
     BackgroundMergerIVARS *const ivars = BGMerger_IVARS(self);
     Hash *updated_deletions = NULL;
 
     PolyReader *new_polyreader
-        = PolyReader_open((Obj*)ivars->folder, NULL, NULL);
+        = PolyReader_open((Obj*)ivars->folder, latest_snapshot, NULL);
     Vector *new_seg_readers
         = PolyReader_Get_Seg_Readers(new_polyreader);
     Vector *old_seg_readers
@@ -305,8 +306,6 @@ S_merge_updated_deletions(BackgroundMerger *self) {
             = PolyReader_open((Obj*)ivars->folder, ivars->snapshot, NULL);
         Vector *merge_seg_readers
             = PolyReader_Get_Seg_Readers(merge_polyreader);
-        Snapshot *latest_snapshot
-            = Snapshot_Read_File(Snapshot_new(), ivars->folder, NULL);
         int64_t new_seg_num
             = IxManager_Highest_Seg_Num(ivars->manager, latest_snapshot) + 1;
         Segment   *new_segment = Seg_new(new_seg_num);
@@ -360,7 +359,6 @@ S_merge_updated_deletions(BackgroundMerger *self) {
         SegWriter_Finish(seg_writer);
         DECREF(seg_writer);
         DECREF(new_segment);
-        DECREF(latest_snapshot);
         DECREF(merge_polyreader);
         DECREF(updated_deletions);
     }
@@ -411,33 +409,27 @@ BGMerger_Prepare_Commit_IMP(BackgroundMerger *self) {
             RETHROW(INCREF(Err_get_error()));
         }
 
-        // Write temporary snapshot file.
-        DECREF(ivars->snapfile);
-        String *snapfile = IxManager_Make_Snapshot_Filename(ivars->manager);
-        ivars->snapfile = Str_Cat_Trusted_Utf8(snapfile, ".temp", 5);
-        DECREF(snapfile);
-        Folder_Delete(folder, ivars->snapfile);
-        Snapshot_Write_File(snapshot, folder, ivars->snapfile);
-
         // Determine whether the index has been updated while this background
         // merge process was running.
 
         String *start_snapfile
             = Snapshot_Get_Path(PolyReader_Get_Snapshot(ivars->polyreader));
-        Snapshot *latest_snapshot
-            = Snapshot_Read_File(Snapshot_new(), ivars->folder, NULL);
-        String *latest_snapfile = Snapshot_Get_Path(latest_snapshot);
+        String *latest_snapfile = IxFileNames_latest_snapshot(ivars->folder);
         bool index_updated
             = !Str_Equals(start_snapfile, (Obj*)latest_snapfile);
 
         if (index_updated) {
+            Snapshot *latest_snapshot
+                = Snapshot_Read_File(Snapshot_new(), ivars->folder,
+                                     latest_snapfile);
+
             /* See if new deletions have been applied since this
              * background merge process started against any of the
              * segments we just merged away.  If that's true, we need to
              * write another segment which applies the deletions against
              * the new composite segment.
              */
-            S_merge_updated_deletions(self);
+            S_merge_updated_deletions(self, latest_snapshot);
 
             // Add the fresh content to our snapshot. (It's important to
             // run this AFTER S_merge_updated_deletions, because otherwise
@@ -452,16 +444,21 @@ BGMerger_Prepare_Commit_IMP(BackgroundMerger *self) {
                     }
                 }
             }
-            DECREF(files);
 
-            // Since the snapshot content has changed, we need to rewrite it.
-            Folder_Delete(folder, ivars->snapfile);
-            Snapshot_Write_File(snapshot, folder, ivars->snapfile);
+            DECREF(files);
+            DECREF(latest_snapshot);
         }
 
-        DECREF(latest_snapshot);
+        // Write temporary snapshot file.
+        DECREF(ivars->snapfile);
+        uint64_t gen = IxFileNames_extract_gen(latest_snapfile);
+        ivars->snapfile = IxFileNames_make_temp_snapshot(gen + 1);
+        Folder_Delete(folder, ivars->snapfile);
+        Snapshot_Write_File(snapshot, folder, ivars->snapfile);
 
         ivars->needs_commit = true;
+
+        DECREF(latest_snapfile);
     }
 
     // Close reader, so that we can delete its files if appropriate.

@@ -396,18 +396,6 @@ func (im *IndexManagerIMP) RemoveMergeData() error {
 	})
 }
 
-func (im *IndexManagerIMP) MakeSnapshotFilename() (retval string, err error) {
-	err = clownfish.TrapErr(func() {
-		self := (*C.lucy_IndexManager)(clownfish.Unwrap(im, "im"))
-		retvalC := C.LUCY_IxManager_Make_Snapshot_Filename(self)
-		if retvalC != nil {
-			defer C.cfish_decref(unsafe.Pointer(retvalC))
-			retval = clownfish.ToGo(unsafe.Pointer(retvalC)).(string)
-		}
-	})
-	return retval, err
-}
-
 func (im *IndexManagerIMP) Recycle(reader PolyReader, delWriter DeletionsWriter,
 	cutoff int64, optimize bool) (retval []SegReader, err error) {
 	err = clownfish.TrapErr(func() {

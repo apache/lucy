@@ -35,6 +35,12 @@ inert class Lucy::Util::IndexFileNames nickname IxFileNames {
     inert incremented nullable String*
     latest_snapshot(Folder *folder);
 
+    /** Return the name of a new temporary snapshot file, which shall contain
+     * a base-36 "generation" embedded inside it.
+     */
+    inert incremented String*
+    make_temp_snapshot(uint64_t gen);
+
     /** Split the `path` on '/' and return the last component.
      * Trailing slashes will be stripped.
      */

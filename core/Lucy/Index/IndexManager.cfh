@@ -145,13 +145,6 @@ public class Lucy::Index::IndexManager nickname IxManager
     int64_t
     Highest_Seg_Num(IndexManager *self, Snapshot *snapshot);
 
-    /** Return the name of a new snapshot file, which shall contain a base-36
-     * "generation" embedded inside it greater than the generation of any
-     * snapshot file currently in the index folder.
-     */
-    incremented String*
-    Make_Snapshot_Filename(IndexManager *self);
-
     /** Setter for write lock timeout.  Default: 1000 milliseconds.
      */
     public void

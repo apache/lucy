@@ -19,7 +19,6 @@ package lucy
 import "testing"
 import "os"
 import "reflect"
-import "strings"
 
 import "git-wip-us.apache.org/repos/asf/lucy-clownfish.git/runtime/go/clownfish"
 
@@ -224,10 +223,6 @@ func TestIndexManagerMergeData(t *testing.T) {
 
 func TestIndexManagerMisc(t *testing.T) {
 	manager := NewIndexManager("", nil)
-	manager.SetFolder(NewRAMFolder(""))
-	if got, err := manager.MakeSnapshotFilename(); !strings.Contains(got, "snapshot") || err != nil {
-		t.Errorf("MakeSnapshotFilename: %s, %v", got, err)
-	}
 	snapshot := NewSnapshot()
 	snapshot.AddEntry("seg_4")
 	snapshot.AddEntry("seg_5")

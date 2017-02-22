@@ -109,9 +109,9 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
     }
 
     // Find the latest snapshot or create a new one.
-    String *latest_snapfile = IxFileNames_latest_snapshot(folder);
-    if (latest_snapfile) {
-        Snapshot_Read_File(latest_snapshot, folder, latest_snapfile);
+    ivars->latest_snapfile = IxFileNames_latest_snapshot(folder);
+    if (ivars->latest_snapfile) {
+        Snapshot_Read_File(latest_snapshot, folder, ivars->latest_snapfile);
     }
 
     // Look for an existing Schema if one wasn't supplied.
@@ -119,7 +119,7 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
         ivars->schema = (Schema*)INCREF(schema);
     }
     else {
-        if (!latest_snapfile) {
+        if (!ivars->latest_snapfile) {
             S_release_write_lock(self);
             THROW(ERR, "No Schema supplied, and can't find one in the index");
         }
@@ -147,13 +147,13 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
         ivars->truncate = true;
     }
     else {
-        // TODO: clone most recent snapshot rather than read it twice.
         ivars->snapshot = (Snapshot*)INCREF(latest_snapshot);
-        ivars->polyreader = latest_snapfile
-                           ? PolyReader_open((Obj*)folder, NULL, NULL)
+        ivars->polyreader = ivars->latest_snapfile
+                           ? PolyReader_open((Obj*)folder, latest_snapshot,
+                                             NULL)
                            : PolyReader_new(schema, folder, NULL, NULL, NULL);
 
-        if (latest_snapfile) {
+        if (ivars->latest_snapfile) {
             // Make sure than any existing fields which may have been
             // dynamically added during past indexing sessions get added.
             Schema *old_schema = PolyReader_Get_Schema(ivars->polyreader);
@@ -215,7 +215,6 @@ Indexer_init(Indexer *self, Schema *schema, Obj *index,
     ivars->del_writer = (DeletionsWriter*)INCREF(
                            SegWriter_Get_Del_Writer(ivars->seg_writer));
 
-    DECREF(latest_snapfile);
     DECREF(latest_snapshot);
 
     return self;
@@ -231,6 +230,7 @@ Indexer_Destroy_IMP(Indexer *self) {
     DECREF(ivars->segment);
     DECREF(ivars->manager);
     DECREF(ivars->stock_doc);
+    DECREF(ivars->latest_snapfile);
     DECREF(ivars->polyreader);
     DECREF(ivars->del_writer);
     DECREF(ivars->snapshot);
@@ -509,9 +509,10 @@ Indexer_Prepare_Commit_IMP(Indexer *self) {
 
         // Derive snapshot and schema file names.
         DECREF(ivars->snapfile);
-        String *snapfile = IxManager_Make_Snapshot_Filename(ivars->manager);
-        ivars->snapfile = Str_Cat_Trusted_Utf8(snapfile, ".temp", 5);
-        DECREF(snapfile);
+        uint64_t gen = ivars->latest_snapfile
+                       ? IxFileNames_extract_gen(ivars->latest_snapfile)
+                       : 0;
+        ivars->snapfile = IxFileNames_make_temp_snapshot(gen + 1);
         uint64_t schema_gen = IxFileNames_extract_gen(ivars->snapfile);
         char base36[StrHelp_MAX_BASE36_BYTES];
         StrHelp_to_base36(schema_gen, &base36);

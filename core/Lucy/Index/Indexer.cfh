@@ -43,6 +43,7 @@ public class Lucy::Index::Indexer inherits Clownfish::Obj {
     Folder            *folder;
     Segment           *segment;
     IndexManager      *manager;
+    String            *latest_snapfile;
     PolyReader        *polyreader;
     Snapshot          *snapshot;
     SegWriter         *seg_writer;
