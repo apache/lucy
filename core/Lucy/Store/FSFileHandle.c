@@ -399,7 +399,8 @@ S_init(FSFileHandleIVARS *ivars, String *path, uint32_t flags) {
     char *path_ptr = Str_To_Utf8(path);
     HANDLE handle
         = CreateFileA(path_ptr, desired_access, share_mode, NULL,
-                      creation_disposition, FILE_ATTRIBUTE_NORMAL, NULL);
+                      creation_disposition, FILE_ATTRIBUTE_NOT_CONTENT_INDEXED,
+                      NULL);
     FREEMEM(path_ptr);
 
     if (handle == INVALID_HANDLE_VALUE) {
