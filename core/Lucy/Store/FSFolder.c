@@ -78,9 +78,17 @@ S_is_absolute(String *path);
 static String*
 S_absolutify(String *path);
 
+// Rename a directory or file.
+static bool
+S_rename(const char *from_path, const char *to_path);
+
 // Create a hard link.
 static bool
-S_hard_link(char *from_path, char *to_path);
+S_hard_link(const char *from_path, const char *to_path);
+
+// Delete a directory or file.
+static bool
+S_delete(const char *path);
 
 FSFolder*
 FSFolder_new(String *path) {
@@ -179,13 +187,10 @@ FSFolder_Local_Is_Directory_IMP(FSFolder *self, String *name) {
 
 bool
 FSFolder_Rename_IMP(FSFolder *self, String* from, String *to) {
+    // TODO: Update Folder entries.
     char *from_path = S_fullpath_ptr(self, from);
     char *to_path   = S_fullpath_ptr(self, to);
-    bool  retval    = !rename(from_path, to_path);
-    if (!retval) {
-        ErrMsg_set_with_errno("rename from '%s' to '%s' failed",
-                              from_path, to_path);
-    }
+    bool retval = S_rename(from_path, to_path);
     FREEMEM(from_path);
     FREEMEM(to_path);
     return retval;
@@ -194,27 +199,25 @@ FSFolder_Rename_IMP(FSFolder *self, String* from, String *to) {
 bool
 FSFolder_Hard_Link_IMP(FSFolder *self, String *from,
                        String *to) {
-    char *from_path_ptr = S_fullpath_ptr(self, from);
-    char *to_path_ptr   = S_fullpath_ptr(self, to);
-    bool  retval        = S_hard_link(from_path_ptr, to_path_ptr);
-    FREEMEM(from_path_ptr);
-    FREEMEM(to_path_ptr);
+    // TODO: Update Folder entries.
+    char *from_path = S_fullpath_ptr(self, from);
+    char *to_path   = S_fullpath_ptr(self, to);
+    bool  retval    = S_hard_link(from_path, to_path);
+    FREEMEM(from_path);
+    FREEMEM(to_path);
     return retval;
 }
 
 bool
 FSFolder_Local_Delete_IMP(FSFolder *self, String *name) {
+    // TODO: Delete should only delete files. We should add RmDir for
+    // directories.
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
-
-    char *path_ptr = S_fullpath_ptr(self, name);
-#ifdef CHY_REMOVE_ZAPS_DIRS
-    bool result = !remove(path_ptr);
-#else
-    bool result = !rmdir(path_ptr) || !remove(path_ptr);
-#endif
+    char *path   = S_fullpath_ptr(self, name);
+    bool  retval = S_delete(path);
     DECREF(Hash_Delete(ivars->entries, name));
-    FREEMEM(path_ptr);
-    return result;
+    FREEMEM(path);
+    return retval;
 }
 
 void
@@ -393,16 +396,61 @@ S_absolutify(String *path) {
 }
 
 static bool
-S_hard_link(char *from8, char *to8) {
-    if (CreateHardLink(to8, from8, NULL)) {
+S_rename(const char *from_path, const char *to_path) {
+    // TODO: We should consider using MoveFileEx with
+    // MOVEFILE_REPLACE_EXISTING to better match POSIX semantics. But unlike
+    // POSIX, this allows to replace a file with a directory, breaking the
+    // tests.
+    if (MoveFileA(from_path, to_path) != 0) {
+        return true;
+    }
+    else {
+        ErrMsg_set_with_win_error("rename from '%s' to '%s' failed",
+                                  from_path, to_path);
+        return false;
+    }
+}
+
+static bool
+S_hard_link(const char *from_path, const char *to_path) {
+    if (CreateHardLinkA(to_path, from_path, NULL) != 0) {
         return true;
     }
     else {
         ErrMsg_set_with_win_error("CreateHardLink for new file '%s' "
                                   "from '%s' failed",
-                                  to8, from8);
+                                  to_path, from_path);
         return false;
     }
+}
+
+static bool
+S_delete(const char *path) {
+    if (RemoveDirectoryA(path) != 0) {
+        return true;
+    }
+    if (GetLastError() != ERROR_DIRECTORY) {
+        ErrMsg_set_with_win_error("removing '%s' failed", path);
+        return false;
+    }
+
+    // Open file with FILE_FLAG_DELETE_ON_CLOSE and close it immediately.
+    // In contrast to DeleteFile, this allows files opened with
+    // FILE_SHARE_DELETE to be eventually deleted.
+    DWORD share_mode = FILE_SHARE_READ
+                       | FILE_SHARE_WRITE
+                       | FILE_SHARE_DELETE;
+    DWORD flags      = FILE_FLAG_DELETE_ON_CLOSE;
+    DWORD attrs      = FILE_ATTRIBUTE_NORMAL;
+    HANDLE handle = CreateFileA(path, DELETE, share_mode, NULL, OPEN_EXISTING,
+                                flags | attrs, NULL);
+    if (handle == INVALID_HANDLE_VALUE) {
+        ErrMsg_set_with_win_error("removing '%s' failed", path);
+        return false;
+    }
+
+    CloseHandle(handle);
+    return true;
 }
 
 #elif (defined(CHY_HAS_UNISTD_H))
@@ -432,15 +480,40 @@ S_absolutify(String *path) {
 }
 
 static bool
-S_hard_link(char *from8, char *to8) {
-    if (-1 == link(from8, to8)) {
-        ErrMsg_set_with_errno("hard link for new file '%s' from '%s' failed",
-                              to8, from8);
+S_rename(const char *from_path, const char *to_path) {
+    if (rename(from_path, to_path) != 0) {
+        ErrMsg_set_with_errno("rename from '%s' to '%s' failed",
+                              from_path, to_path);
         return false;
     }
     else {
         return true;
     }
+}
+
+static bool
+S_hard_link(const char *from_path, const char *to_path) {
+    if (link(from_path, to_path) != 0) {
+        ErrMsg_set_with_errno("hard link for new file '%s' from '%s' failed",
+                              to_path, from_path);
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+static bool
+S_delete(const char *path) {
+#ifdef CHY_REMOVE_ZAPS_DIRS
+    bool result = !remove(path);
+#else
+    bool result = !rmdir(path) || !remove(path);
+#endif
+    if (!result) {
+        ErrMsg_set_with_errno("removing '%s' failed", path);
+    }
+    return result;
 }
 
 #else
