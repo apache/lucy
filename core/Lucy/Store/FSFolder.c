@@ -19,26 +19,6 @@
 
 #include "charmony.h"
 
-#include <ctype.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <sys/stat.h>
-
-#ifdef CHY_HAS_SYS_TYPES_H
-  #include <sys/types.h>
-#endif
-
-// For rmdir, (hard) link.
-#ifdef CHY_HAS_UNISTD_H
-  #include <unistd.h>
-#endif
-
-// For mkdir, rmdir.
-#ifdef CHY_HAS_DIRECT_H
-  #include <direct.h>
-#endif
-
 #include "Clownfish/CharBuf.h"
 #include "Lucy/Store/ErrorMessage.h"
 #include "Lucy/Store/FSFolder.h"
@@ -65,6 +45,10 @@ S_dir_ok(String *path);
 // Create a directory, or set the global error object and return false.
 static bool
 S_create_dir(String *path);
+
+// Return true if the supplied path exists.
+static bool
+S_exists(const char *path);
 
 // Return true unless the supplied path contains a slash.
 static bool
@@ -157,12 +141,8 @@ FSFolder_Local_Exists_IMP(FSFolder *self, String *name) {
         return false;
     }
     else {
-        struct stat stat_buf;
         char *fullpath_ptr = S_fullpath_ptr(self, name);
-        bool retval = false;
-        if (stat(fullpath_ptr, &stat_buf) != -1) {
-            retval = true;
-        }
+        bool retval = S_exists(fullpath_ptr);
         FREEMEM(fullpath_ptr);
         return retval;
     }
@@ -327,30 +307,6 @@ S_fullpath_ptr(FSFolder *self, String *path) {
 }
 
 static bool
-S_dir_ok(String *path) {
-    bool retval = false;
-    char *path_ptr = Str_To_Utf8(path);
-    struct stat stat_buf;
-    if (stat(path_ptr, &stat_buf) != -1) {
-        if (stat_buf.st_mode & S_IFDIR) { retval = true; }
-    }
-    FREEMEM(path_ptr);
-    return retval;
-}
-
-static bool
-S_create_dir(String *path) {
-    bool retval = true;
-    char *path_ptr = Str_To_Utf8(path);
-    if (-1 == chy_makedir(path_ptr, 0777)) {
-        ErrMsg_set_with_errno("Couldn't create directory '%o'", path);
-        retval = false;
-    }
-    FREEMEM(path_ptr);
-    return retval;
-}
-
-static bool
 S_is_local_entry(String *path) {
     return !Str_Contains_Utf8(path, "/", 1);
 }
@@ -367,10 +323,39 @@ S_is_local_entry(String *path) {
 #include <windows.h>
 
 static bool
+S_dir_ok(String *path) {
+    char *path_ptr = Str_To_Utf8(path);
+    DWORD attrs = GetFileAttributesA(path_ptr);
+    bool retval = attrs != INVALID_FILE_ATTRIBUTES
+                  && (attrs & FILE_ATTRIBUTE_DIRECTORY);
+    FREEMEM(path_ptr);
+    return retval;
+}
+
+static bool
+S_create_dir(String *path) {
+    bool retval = true;
+    char *path_ptr = Str_To_Utf8(path);
+    if (CreateDirectoryA(path_ptr, NULL) == 0) {
+        ErrMsg_set_with_win_error("Couldn't create directory '%o'", path);
+        retval = false;
+    }
+    SetFileAttributes(path_ptr, FILE_ATTRIBUTE_NOT_CONTENT_INDEXED);
+    FREEMEM(path_ptr);
+    return retval;
+}
+
+static bool
+S_exists(const char *path) {
+    return GetFileAttributesA(path) != INVALID_FILE_ATTRIBUTES;
+}
+
+static bool
 S_is_absolute(String *path) {
     int32_t code_point = Str_Code_Point_At(path, 0);
 
-    if (isalpha(code_point)) {
+    if ((code_point >= 'A' && code_point <= 'Z')
+        || (code_point >= 'a' && code_point <= 'z')) {
         code_point = Str_Code_Point_At(path, 1);
         if (code_point != ':') { return false; }
         code_point = Str_Code_Point_At(path, 2);
@@ -383,9 +368,9 @@ static String*
 S_absolutify(String *path) {
     if (S_is_absolute(path)) { return Str_Clone(path); }
 
-    DWORD  cwd_len = GetCurrentDirectory(0, NULL);
+    DWORD  cwd_len = GetCurrentDirectoryA(0, NULL);
     char  *cwd     = (char*)MALLOCATE(cwd_len);
-    DWORD  res     = GetCurrentDirectory(cwd_len, cwd);
+    DWORD  res     = GetCurrentDirectoryA(cwd_len, cwd);
     if (res == 0 || res > cwd_len) {
         THROW(ERR, "GetCurrentDirectory failed");
     }
@@ -454,6 +439,41 @@ S_delete(const char *path) {
 }
 
 #elif (defined(CHY_HAS_UNISTD_H))
+
+#include <errno.h>
+#include <stdio.h>     // For rename, remove
+#include <sys/stat.h>  // For stat, mkdir
+#include <unistd.h>    // For getcwd, link, rmdir
+
+static bool
+S_dir_ok(String *path) {
+    bool retval = false;
+    char *path_ptr = Str_To_Utf8(path);
+    struct stat stat_buf;
+    if (stat(path_ptr, &stat_buf) != -1) {
+        if (stat_buf.st_mode & S_IFDIR) { retval = true; }
+    }
+    FREEMEM(path_ptr);
+    return retval;
+}
+
+static bool
+S_create_dir(String *path) {
+    bool retval = true;
+    char *path_ptr = Str_To_Utf8(path);
+    if (mkdir(path_ptr, 0777) != 0) {
+        ErrMsg_set_with_errno("Couldn't create directory '%o'", path);
+        retval = false;
+    }
+    FREEMEM(path_ptr);
+    return retval;
+}
+
+static bool
+S_exists(const char *path) {
+    struct stat stat_buf;
+    return stat(path, &stat_buf) == 0;
+}
 
 static bool
 S_is_absolute(String *path) {
