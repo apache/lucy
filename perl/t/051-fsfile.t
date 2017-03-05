@@ -97,6 +97,7 @@ undef $foo;
 $dupe->read( $foo, 4 );
 
 is( $foo, 'afoo', "reopened instream" );
+undef $instream;
 
 # Trigger destruction.
 undef $folder;
