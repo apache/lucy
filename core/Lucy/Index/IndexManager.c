@@ -25,8 +25,7 @@
 #include "Lucy/Index/Snapshot.h"
 #include "Lucy/Store/DirHandle.h"
 #include "Lucy/Store/Folder.h"
-#include "Lucy/Store/Lock.h"
-#include "Lucy/Store/LockFactory.h"
+#include "Lucy/Store/LockFileLock.h"
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/Json.h"
 
@@ -83,26 +82,22 @@ static const int32_t S_fibonacci[47] = {
 };
 
 IndexManager*
-IxManager_new(String *host, LockFactory *lock_factory) {
+IxManager_new(String *host) {
     IndexManager *self = (IndexManager*)Class_Make_Obj(INDEXMANAGER);
-    return IxManager_init(self, host, lock_factory);
+    return IxManager_init(self, host);
 }
 
 IndexManager*
-IxManager_init(IndexManager *self, String *host,
-               LockFactory *lock_factory) {
+IxManager_init(IndexManager *self, String *host) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     ivars->host                = host
                                 ? Str_Clone(host)
                                 : Str_new_from_trusted_utf8("", 0);
-    ivars->lock_factory        = (LockFactory*)INCREF(lock_factory);
     ivars->folder              = NULL;
     ivars->write_lock_timeout  = 1000;
     ivars->write_lock_interval = 100;
     ivars->merge_lock_timeout  = 0;
     ivars->merge_lock_interval = 1000;
-    ivars->deletion_lock_timeout  = 1000;
-    ivars->deletion_lock_interval = 100;
 
     return self;
 }
@@ -112,7 +107,6 @@ IxManager_Destroy_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     DECREF(ivars->host);
     DECREF(ivars->folder);
-    DECREF(ivars->lock_factory);
     SUPER_DESTROY(self, INDEXMANAGER);
 }
 
@@ -229,46 +223,24 @@ IxManager_Choose_Sparse_IMP(IndexManager *self, I32Array *doc_counts) {
     return threshold;
 }
 
-static LockFactory*
-S_obtain_lock_factory(IndexManager *self) {
-    IndexManagerIVARS *const ivars = IxManager_IVARS(self);
-    if (!ivars->lock_factory) {
-        if (!ivars->folder) {
-            THROW(ERR, "Can't create a LockFactory without a Folder");
-        }
-        ivars->lock_factory = LockFact_new(ivars->folder, ivars->host);
-    }
-    return ivars->lock_factory;
-}
-
 Lock*
 IxManager_Make_Write_Lock_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     String *write_lock_name = SSTR_WRAP_C("write");
-    LockFactory *lock_factory = S_obtain_lock_factory(self);
-    return LockFact_Make_Lock(lock_factory, write_lock_name,
-                              (int32_t)ivars->write_lock_timeout,
-                              (int32_t)ivars->write_lock_interval);
-}
-
-Lock*
-IxManager_Make_Deletion_Lock_IMP(IndexManager *self) {
-    IndexManagerIVARS *const ivars = IxManager_IVARS(self);
-    String *lock_name = SSTR_WRAP_C("deletion");
-    LockFactory *lock_factory = S_obtain_lock_factory(self);
-    return LockFact_Make_Lock(lock_factory, lock_name,
-                              (int32_t)ivars->deletion_lock_timeout,
-                              (int32_t)ivars->deletion_lock_interval);
+    return (Lock*)LFLock_new(ivars->folder, write_lock_name, ivars->host,
+                             (int32_t)ivars->write_lock_timeout,
+                             (int32_t)ivars->write_lock_interval,
+                             true);
 }
 
 Lock*
 IxManager_Make_Merge_Lock_IMP(IndexManager *self) {
     IndexManagerIVARS *const ivars = IxManager_IVARS(self);
     String *merge_lock_name = SSTR_WRAP_C("merge");
-    LockFactory *lock_factory = S_obtain_lock_factory(self);
-    return LockFact_Make_Lock(lock_factory, merge_lock_name,
-                              (int32_t)ivars->merge_lock_timeout,
-                              (int32_t)ivars->merge_lock_interval);
+    return (Lock*)LFLock_new(ivars->folder, merge_lock_name, ivars->host,
+                             (int32_t)ivars->merge_lock_timeout,
+                             (int32_t)ivars->merge_lock_interval,
+                             true);
 }
 
 void
@@ -312,9 +284,8 @@ IxManager_Remove_Merge_Data_IMP(IndexManager *self) {
 }
 
 Lock*
-IxManager_Make_Snapshot_Read_Lock_IMP(IndexManager *self,
-                                      String *filename) {
-    LockFactory *lock_factory = S_obtain_lock_factory(self);
+IxManager_Make_Snapshot_Lock_IMP(IndexManager *self, String *filename) {
+    IndexManagerIVARS *const ivars = IxManager_IVARS(self);
 
     if (!Str_Starts_With_Utf8(filename, "snapshot_", 9)
         || !Str_Ends_With_Utf8(filename, ".json", 5)
@@ -326,7 +297,8 @@ IxManager_Make_Snapshot_Read_Lock_IMP(IndexManager *self,
     size_t lock_name_len = Str_Length(filename) - (sizeof(".json") - 1);
     String *lock_name = Str_SubString(filename, 0, lock_name_len);
 
-    Lock *lock = LockFact_Make_Shared_Lock(lock_factory, lock_name, 1000, 100);
+    Lock *lock = (Lock*)LFLock_new(ivars->folder, lock_name, ivars->host,
+                                   1000, 100, false);
 
     DECREF(lock_name);
     return lock;
@@ -370,16 +342,6 @@ IxManager_Get_Merge_Lock_Interval_IMP(IndexManager *self) {
     return IxManager_IVARS(self)->merge_lock_interval;
 }
 
-uint32_t
-IxManager_Get_Deletion_Lock_Timeout_IMP(IndexManager *self) {
-    return IxManager_IVARS(self)->deletion_lock_timeout;
-}
-
-uint32_t
-IxManager_Get_Deletion_Lock_Interval_IMP(IndexManager *self) {
-    return IxManager_IVARS(self)->deletion_lock_interval;
-}
-
 void
 IxManager_Set_Write_Lock_Timeout_IMP(IndexManager *self, uint32_t timeout) {
     if (timeout > INT32_MAX) {
@@ -410,24 +372,6 @@ IxManager_Set_Merge_Lock_Interval_IMP(IndexManager *self, uint32_t interval) {
         THROW(ERR, "Interval can't be greater than INT32_MAX: %u32", interval);
     }
     IxManager_IVARS(self)->merge_lock_interval = interval;
-}
-
-void
-IxManager_Set_Deletion_Lock_Timeout_IMP(IndexManager *self,
-                                        uint32_t timeout) {
-    if (timeout > INT32_MAX) {
-        THROW(ERR, "Timeout can't be greater than INT32_MAX: %u32", timeout);
-    }
-    IxManager_IVARS(self)->deletion_lock_timeout = timeout;
-}
-
-void
-IxManager_Set_Deletion_Lock_Interval_IMP(IndexManager *self,
-                                         uint32_t interval) {
-    if (interval > INT32_MAX) {
-        THROW(ERR, "Interval can't be greater than INT32_MAX: %u32", interval);
-    }
-    IxManager_IVARS(self)->deletion_lock_interval = interval;
 }
 
 

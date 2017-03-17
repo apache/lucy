@@ -83,15 +83,18 @@ TestUtils_create_index(Vector *doc_set) {
 Folder*
 TestUtils_create_index_c(const char *first, ...) {
     Vector *doc_set = Vec_new(1);
-    Vec_Push(doc_set, (Obj*)Str_new_from_utf8(first, strlen(first)));
 
-    va_list ap;
-    va_start(ap, first);
-    const char *next;
-    while ((next = va_arg(ap, const char*))) {
-        Vec_Push(doc_set, (Obj*)Str_new_from_utf8(next, strlen(next)));
+    if (first != NULL) {
+        Vec_Push(doc_set, (Obj*)Str_new_from_utf8(first, strlen(first)));
+
+        va_list ap;
+        va_start(ap, first);
+        const char *next;
+        while ((next = va_arg(ap, const char*))) {
+            Vec_Push(doc_set, (Obj*)Str_new_from_utf8(next, strlen(next)));
+        }
+        va_end(ap);
     }
-    va_end(ap);
 
     Folder *folder = TestUtils_create_index(doc_set);
 

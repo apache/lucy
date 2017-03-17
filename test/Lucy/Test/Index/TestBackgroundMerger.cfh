@@ -16,13 +16,14 @@
 
 parcel TestLucy;
 
-class Lucy::Test::Index::TestSortWriter
+class Lucy::Test::Index::TestBackgroundMerger nickname TestBGMerger
     inherits Clownfish::TestHarness::TestBatch {
 
-    inert incremented TestSortWriter*
+    inert incremented TestBackgroundMerger*
     new();
 
     void
-    Run(TestSortWriter *self, TestBatchRunner *runner);
+    Run(TestBackgroundMerger *self, TestBatchRunner *runner);
 }
+
 

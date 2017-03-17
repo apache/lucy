@@ -14,15 +14,36 @@
  * limitations under the License.
  */
 
-parcel TestLucy;
+parcel Lucy;
 
-class Lucy::Test::Index::TestSortWriter
-    inherits Clownfish::TestHarness::TestBatch {
+class Lucy::Store::LockFileLock nickname LFLock
+    inherits Lucy::Store::Lock {
 
-    inert incremented TestSortWriter*
-    new();
+    String *host;
+    String *shared_lock_path;
+    String *link_path;
+    int     state;
+    bool    exclusive_only;
 
-    void
-    Run(TestSortWriter *self, TestBatchRunner *runner);
+    inert incremented LockFileLock*
+    new(Folder *folder, String *name, String *host, int32_t timeout = 0,
+        int32_t interval = 100, bool exclusive_only);
+
+    public inert LockFileLock*
+    init(LockFileLock *self, Folder *folder, String *name, String *host,
+         int32_t timeout = 0, int32_t interval = 100, bool exclusive_only);
+
+    public bool
+    Request_Shared(LockFileLock *self);
+
+    public bool
+    Request_Exclusive(LockFileLock *self);
+
+    public void
+    Release(LockFileLock *self);
+
+    public void
+    Destroy(LockFileLock *self);
 }
+
 

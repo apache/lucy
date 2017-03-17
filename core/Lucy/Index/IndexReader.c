@@ -55,8 +55,7 @@ IxReader_init(IndexReader *self, Schema *schema, Folder *folder,
     DECREF(snapshot);
     IndexReaderIVARS *const ivars = IxReader_IVARS(self);
     ivars->components     = Hash_new(0);
-    ivars->read_lock      = NULL;
-    ivars->deletion_lock  = NULL;
+    ivars->snapshot_lock  = NULL;
     if (manager) {
         ivars->manager = (IndexManager*)INCREF(manager);
         IxManager_Set_Folder(ivars->manager, ivars->folder);
@@ -81,10 +80,9 @@ IxReader_Close_IMP(IndexReader *self) {
         DECREF(iter);
         Hash_Clear(ivars->components);
     }
-    if (ivars->read_lock) {
-        Lock_Release(ivars->read_lock);
-        DECREF(ivars->read_lock);
-        ivars->read_lock = NULL;
+    if (ivars->snapshot_lock) {
+        DECREF(ivars->snapshot_lock);
+        ivars->snapshot_lock = NULL;
     }
 }
 
@@ -92,12 +90,8 @@ void
 IxReader_Destroy_IMP(IndexReader *self) {
     IndexReaderIVARS *const ivars = IxReader_IVARS(self);
     DECREF(ivars->components);
-    if (ivars->read_lock) {
-        Lock_Release(ivars->read_lock);
-        DECREF(ivars->read_lock);
-    }
+    DECREF(ivars->snapshot_lock);
     DECREF(ivars->manager);
-    DECREF(ivars->deletion_lock);
     SUPER_DESTROY(self, INDEXREADER);
 }
 

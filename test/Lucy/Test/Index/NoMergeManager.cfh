@@ -16,13 +16,15 @@
 
 parcel TestLucy;
 
-class Lucy::Test::Index::TestSortWriter
-    inherits Clownfish::TestHarness::TestBatch {
+class Lucy::Test::Index::NoMergeManager inherits Lucy::Index::IndexManager {
 
-    inert incremented TestSortWriter*
+    inert incremented NoMergeManager*
     new();
 
-    void
-    Run(TestSortWriter *self, TestBatchRunner *runner);
+    public incremented Vector*
+    Recycle(NoMergeManager *self, PolyReader *reader,
+            DeletionsWriter *del_writer, int64_t cutoff,
+            bool optimize = false);
 }
+
 

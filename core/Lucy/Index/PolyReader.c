@@ -34,15 +34,11 @@
 #include "Lucy/Util/Freezer.h"
 #include "Lucy/Util/IndexFileNames.h"
 
-// Obtain/release read locks and commit locks.
+// Request/release snapshot locks.
 static bool
-S_obtain_read_lock(PolyReader *self, String *snapshot_filename);
-static bool 
-S_obtain_deletion_lock(PolyReader *self);
+S_request_snapshot_lock(PolyReader *self, String *snapshot_filename);
 static void
-S_release_read_lock(PolyReader *self);
-static void
-S_release_deletion_lock(PolyReader *self);
+S_release_snapshot_lock(PolyReader *self);
 
 // Try to open all SegReaders.
 struct try_open_elements_context {
@@ -334,18 +330,12 @@ PolyReader*
 PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
                    IndexManager *manager) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
-    Folder   *folder   = S_derive_folder(index);
-    uint64_t  last_gen = 0;
+    Folder   *folder     = S_derive_folder(index);
+    Err      *last_error = NULL;
+    uint64_t  last_gen   = 0;
 
     PolyReader_init(self, NULL, folder, snapshot, manager, NULL);
     DECREF(folder);
-
-    if (manager) { 
-        if (!S_obtain_deletion_lock(self)) {
-            DECREF(self);
-            THROW(LOCKERR, "Couldn't get deletion lock");
-        }
-    }
 
     while (1) {
         String *target_snap_file;
@@ -372,12 +362,26 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
         // Derive "generation" of this snapshot file from its name.
         uint64_t gen = IxFileNames_extract_gen(target_snap_file);
 
+        if (gen <= last_gen) {
+            // If a snapshot was supplied, we couldn't read it. Otherwise,
+            // no new snapshot was found which should never happen. Throw
+            // error from previous attempt to read the snapshot.
+            DECREF(self);
+            RETHROW(last_error);
+        }
+
+        last_gen = gen;
+
         // Get a read lock on the most recent snapshot file if indicated.
+        // There's no need to retry. In the unlikely case that we fail to
+        // request a lock on the latest snapshot, there must be a
+        // FilePurger deleting the snapshot, which means that a newer
+        // snapshot just became available.
         if (manager) {
-            if (!S_obtain_read_lock(self, target_snap_file)) {
-                DECREF(self);
-                THROW(LOCKERR, "Couldn't get read lock for %o",
-                      target_snap_file);
+            if (!S_request_snapshot_lock(self, target_snap_file)) {
+                // Index updated, so try again.
+                last_error = (Err*)INCREF(Err_get_error());
+                continue;
             }
         }
 
@@ -399,20 +403,13 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
             context.snapshot = ivars->snapshot;
             context.folder   = folder;
             context.path     = target_snap_file;
-            Err *error = Err_trap(S_try_read_snapshot, &context);
+            last_error = Err_trap(S_try_read_snapshot, &context);
 
-            if (error) {
-                S_release_read_lock(self);
+            if (last_error) {
+                S_release_snapshot_lock(self);
                 DECREF(target_snap_file);
-                if (last_gen < gen) { // Index updated, so try again.
-                    DECREF(error);
-                    last_gen = gen;
-                    continue;
-                }
-                else { // Real error.
-                    if (manager) { S_release_deletion_lock(self); }
-                    RETHROW(error);
-                }
+                // Index updated, so try again.
+                continue;
             }
         }
 
@@ -425,18 +422,12 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
         struct try_open_elements_context context;
         context.self        = self;
         context.seg_readers = NULL;
-        Err *error = Err_trap(S_try_open_elements, &context);
-        if (error) {
-            S_release_read_lock(self);
+        last_error = Err_trap(S_try_open_elements, &context);
+        if (last_error) {
+            S_release_snapshot_lock(self);
             DECREF(target_snap_file);
-            if (last_gen < gen) { // Index updated, so try again.
-                DECREF(error);
-                last_gen = gen;
-            }
-            else { // Real error.
-                if (manager) { S_release_deletion_lock(self); }
-                RETHROW(error);
-            }
+            // Index updated, so try again.
+            continue;
         }
         else { // Succeeded.
             S_init_sub_readers(self, (Vector*)context.seg_readers);
@@ -445,8 +436,6 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
             break;
         }
     }
-
-    if (manager) { S_release_deletion_lock(self); }
 
     return self;
 }
@@ -466,51 +455,26 @@ S_derive_folder(Obj *index) {
     return folder;
 }
 
-static bool 
-S_obtain_deletion_lock(PolyReader *self) {
-    PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
-    ivars->deletion_lock = IxManager_Make_Deletion_Lock(ivars->manager);
-    Lock_Clear_Stale(ivars->deletion_lock);
-    if (!Lock_Obtain(ivars->deletion_lock)) {
-        DECREF(ivars->deletion_lock);
-        ivars->deletion_lock = NULL;
-        return false;
-    }
-    return true;
-}
-
 static bool
-S_obtain_read_lock(PolyReader *self, String *snapshot_file_name) {
+S_request_snapshot_lock(PolyReader *self, String *snapshot_file_name) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
-    ivars->read_lock = IxManager_Make_Snapshot_Read_Lock(ivars->manager,
-                                                         snapshot_file_name);
+    ivars->snapshot_lock = IxManager_Make_Snapshot_Lock(ivars->manager,
+                                                        snapshot_file_name);
 
-    Lock_Clear_Stale(ivars->read_lock);
-    if (!Lock_Obtain(ivars->read_lock)) {
-        DECREF(ivars->read_lock);
-        ivars->read_lock = NULL;
+    if (!Lock_Request_Shared(ivars->snapshot_lock)) {
+        DECREF(ivars->snapshot_lock);
+        ivars->snapshot_lock = NULL;
         return false;
     }
     return true;
 }
 
 static void
-S_release_read_lock(PolyReader *self) {
+S_release_snapshot_lock(PolyReader *self) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
-    if (ivars->read_lock) {
-        Lock_Release(ivars->read_lock);
-        DECREF(ivars->read_lock);
-        ivars->read_lock = NULL;
-    }
-}
-
-static void
-S_release_deletion_lock(PolyReader *self) {
-    PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
-    if (ivars->deletion_lock) {
-        Lock_Release(ivars->deletion_lock);
-        DECREF(ivars->deletion_lock);
-        ivars->deletion_lock = NULL;
+    if (ivars->snapshot_lock) {
+        DECREF(ivars->snapshot_lock);
+        ivars->snapshot_lock = NULL;
     }
 }
 

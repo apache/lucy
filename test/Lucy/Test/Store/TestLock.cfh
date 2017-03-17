@@ -16,13 +16,14 @@
 
 parcel TestLucy;
 
-class Lucy::Test::Index::TestSortWriter
+class Lucy::Test::Store::TestLockFileLock nickname TestLFLock
     inherits Clownfish::TestHarness::TestBatch {
 
-    inert incremented TestSortWriter*
+    inert incremented TestLockFileLock*
     new();
 
     void
-    Run(TestSortWriter *self, TestBatchRunner *runner);
+    Run(TestLockFileLock *self, TestBatchRunner *runner);
 }
+
 

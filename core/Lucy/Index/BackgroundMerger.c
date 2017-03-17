@@ -83,19 +83,21 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager) {
         ivars->manager = (IndexManager*)INCREF(manager);
     }
     else {
-        ivars->manager = IxManager_new(NULL, NULL);
+        ivars->manager = IxManager_new(NULL);
         IxManager_Set_Write_Lock_Timeout(ivars->manager, 10000);
     }
     IxManager_Set_Folder(ivars->manager, folder);
 
-    // Obtain write lock (which we'll only hold briefly), then merge lock.
-    S_obtain_write_lock(self);
-    if (!ivars->write_lock) {
+    // Obtain merge lock first so that a running background merger won't
+    // abort when failing to acquire the write lock during commit.
+    S_obtain_merge_lock(self);
+    if (!ivars->merge_lock) {
         DECREF(self);
         RETHROW(INCREF(Err_get_error()));
     }
-    S_obtain_merge_lock(self);
-    if (!ivars->merge_lock) {
+    // Obtain write lock (which we'll only hold briefly).
+    S_obtain_write_lock(self);
+    if (!ivars->write_lock) {
         DECREF(self);
         RETHROW(INCREF(Err_get_error()));
     }
@@ -109,8 +111,8 @@ BGMerger_init(BackgroundMerger *self, Obj *index, IndexManager *manager) {
     }
 
     // Create FilePurger. Zap detritus from previous sessions.
-    ivars->file_purger = FilePurger_new(folder, ivars->snapshot, ivars->manager);
-    FilePurger_Purge(ivars->file_purger);
+    ivars->file_purger = FilePurger_new(folder, ivars->manager);
+    FilePurger_Purge_Aborted_Merge(ivars->file_purger);
 
     // Open a PolyReader, passing in the IndexManager so we get a read lock on
     // the Snapshot's files -- so that Indexers don't zap our files while
@@ -509,25 +511,24 @@ BGMerger_Commit_IMP(BackgroundMerger *self) {
         DECREF(temp_snapfile);
     }
 
-    // Release the merge lock and remove the merge data file.
-    S_release_merge_lock(self);
+    // Remove the merge data file.
     IxManager_Remove_Merge_Data(ivars->manager);
 
     if (ivars->needs_commit) {
         // Purge obsolete files.
-        FilePurger_Purge(ivars->file_purger);
+        FilePurger_Purge_Snapshots(ivars->file_purger, ivars->snapshot);
     }
 
-    // Release the write lock.
+    // Release write and merge locks.
     S_release_write_lock(self);
+    S_release_merge_lock(self);
 }
 
 static void
 S_obtain_write_lock(BackgroundMerger *self) {
     BackgroundMergerIVARS *const ivars = BGMerger_IVARS(self);
     Lock *write_lock = IxManager_Make_Write_Lock(ivars->manager);
-    Lock_Clear_Stale(write_lock);
-    if (Lock_Obtain(write_lock)) {
+    if (Lock_Obtain_Exclusive(write_lock)) {
         // Only assign if successful, otherwise DESTROY unlocks -- bad!
         ivars->write_lock = write_lock;
     }
@@ -540,8 +541,7 @@ static void
 S_obtain_merge_lock(BackgroundMerger *self) {
     BackgroundMergerIVARS *const ivars = BGMerger_IVARS(self);
     Lock *merge_lock = IxManager_Make_Merge_Lock(ivars->manager);
-    Lock_Clear_Stale(merge_lock);
-    if (Lock_Obtain(merge_lock)) {
+    if (Lock_Obtain_Exclusive(merge_lock)) {
         // Only assign if successful, same rationale as above.
         ivars->merge_lock = merge_lock;
     }
@@ -556,7 +556,6 @@ static void
 S_release_write_lock(BackgroundMerger *self) {
     BackgroundMergerIVARS *const ivars = BGMerger_IVARS(self);
     if (ivars->write_lock) {
-        Lock_Release(ivars->write_lock);
         DECREF(ivars->write_lock);
         ivars->write_lock = NULL;
     }
@@ -566,7 +565,6 @@ static void
 S_release_merge_lock(BackgroundMerger *self) {
     BackgroundMergerIVARS *const ivars = BGMerger_IVARS(self);
     if (ivars->merge_lock) {
-        Lock_Release(ivars->merge_lock);
         DECREF(ivars->merge_lock);
         ivars->merge_lock = NULL;
     }

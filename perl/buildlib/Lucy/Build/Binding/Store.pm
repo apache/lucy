@@ -26,9 +26,7 @@ sub bind_all {
     $class->bind_filehandle;
     $class->bind_folder;
     $class->bind_instream;
-    $class->bind_lock;
     $class->bind_lockerr;
-    $class->bind_lockfactory;
     $class->bind_outstream;
     $class->bind_ramfilehandle;
     $class->bind_ramfolder;
@@ -213,68 +211,6 @@ END_XS_CODE
     Clownfish::CFC::Binding::Perl::Class->register($binding);
 }
 
-sub bind_lock {
-    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
-    my $synopsis = <<'END_SYNOPSIS';
-    my $lock = $lock_factory->make_lock(
-        name    => 'write',
-        timeout => 5000,
-    );
-    $lock->obtain or die "can't get lock for " . $lock->get_name;
-    do_stuff();
-    $lock->release;
-END_SYNOPSIS
-    my $constructor = <<'END_CONSTRUCTOR';
-=head2 new
-
-    my $lock = Lucy::Store::Lock->new(
-        name     => 'commit',     # required
-        folder   => $folder,      # required
-        host     => $hostname,    # required
-        timeout  => 5000,         # default: 0
-        interval => 1000,         # default: 100
-    );
-
-Abstract constructor.
-
-=over
-
-=item *
-
-B<folder> - A Folder.
-
-=item *
-
-B<name> - String identifying the resource to be locked, which must
-consist solely of characters matching [-_.A-Za-z0-9].
-
-=item *
-
-B<host> - A unique per-machine identifier.
-
-=item *
-
-B<timeout> - Time in milliseconds to keep retrying before abandoning
-the attempt to L<obtain()|/obtain> a lock.
-
-=item *
-
-B<interval> - Time in milliseconds between retries.
-
-=back
-END_CONSTRUCTOR
-    $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_constructor( alias => 'new', pod => $constructor, );
-
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Store::Lock",
-    );
-    $binding->set_pod_spec($pod_spec);
-
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
 sub bind_lockerr {
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
     my $synopsis = <<'END_SYNOPSIS';
@@ -297,42 +233,6 @@ END_SYNOPSIS
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Store::LockErr",
-    );
-    $binding->set_pod_spec($pod_spec);
-
-    Clownfish::CFC::Binding::Perl::Class->register($binding);
-}
-
-sub bind_lockfactory {
-    my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
-    my $synopsis = <<'END_SYNOPSIS';
-    use Sys::Hostname qw( hostname );
-    my $hostname = hostname() or die "Can't get unique hostname";
-    my $folder = Lucy::Store::FSFolder->new( 
-        path => '/path/to/index', 
-    );
-    my $lock_factory = Lucy::Store::LockFactory->new(
-        folder => $folder,
-        host   => $hostname,
-    );
-    my $write_lock = $lock_factory->make_lock(
-        name     => 'write',
-        timeout  => 5000,
-        interval => 100,
-    );
-END_SYNOPSIS
-    my $constructor = <<'END_CONSTRUCTOR';
-    my $lock_factory = Lucy::Store::LockFactory->new(
-        folder => $folder,      # required
-        host   => $hostname,    # required
-    );
-END_CONSTRUCTOR
-    $pod_spec->set_synopsis($synopsis);
-    $pod_spec->add_constructor( alias => 'new', sample => $constructor, );
-
-    my $binding = Clownfish::CFC::Binding::Perl::Class->new(
-        parcel     => "Lucy",
-        class_name => "Lucy::Store::LockFactory",
     );
     $binding->set_pod_spec($pod_spec);
 
