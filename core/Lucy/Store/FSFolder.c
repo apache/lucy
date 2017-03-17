@@ -19,26 +19,6 @@
 
 #include "charmony.h"
 
-#include <ctype.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <sys/stat.h>
-
-#ifdef CHY_HAS_SYS_TYPES_H
-  #include <sys/types.h>
-#endif
-
-// For rmdir, (hard) link.
-#ifdef CHY_HAS_UNISTD_H
-  #include <unistd.h>
-#endif
-
-// For mkdir, rmdir.
-#ifdef CHY_HAS_DIRECT_H
-  #include <direct.h>
-#endif
-
 #include "Clownfish/CharBuf.h"
 #include "Lucy/Store/ErrorMessage.h"
 #include "Lucy/Store/FSFolder.h"
@@ -66,6 +46,10 @@ S_dir_ok(String *path);
 static bool
 S_create_dir(String *path);
 
+// Return true if the supplied path exists.
+static bool
+S_exists(const char *path);
+
 // Return true unless the supplied path contains a slash.
 static bool
 S_is_local_entry(String *path);
@@ -78,9 +62,17 @@ S_is_absolute(String *path);
 static String*
 S_absolutify(String *path);
 
+// Rename a directory or file.
+static bool
+S_rename(const char *from_path, const char *to_path);
+
 // Create a hard link.
 static bool
-S_hard_link(char *from_path, char *to_path);
+S_hard_link(const char *from_path, const char *to_path);
+
+// Delete a directory or file.
+static bool
+S_delete(const char *path);
 
 FSFolder*
 FSFolder_new(String *path) {
@@ -149,12 +141,8 @@ FSFolder_Local_Exists_IMP(FSFolder *self, String *name) {
         return false;
     }
     else {
-        struct stat stat_buf;
         char *fullpath_ptr = S_fullpath_ptr(self, name);
-        bool retval = false;
-        if (stat(fullpath_ptr, &stat_buf) != -1) {
-            retval = true;
-        }
+        bool retval = S_exists(fullpath_ptr);
         FREEMEM(fullpath_ptr);
         return retval;
     }
@@ -179,13 +167,10 @@ FSFolder_Local_Is_Directory_IMP(FSFolder *self, String *name) {
 
 bool
 FSFolder_Rename_IMP(FSFolder *self, String* from, String *to) {
+    // TODO: Update Folder entries.
     char *from_path = S_fullpath_ptr(self, from);
     char *to_path   = S_fullpath_ptr(self, to);
-    bool  retval    = !rename(from_path, to_path);
-    if (!retval) {
-        ErrMsg_set_with_errno("rename from '%s' to '%s' failed",
-                              from_path, to_path);
-    }
+    bool retval = S_rename(from_path, to_path);
     FREEMEM(from_path);
     FREEMEM(to_path);
     return retval;
@@ -194,27 +179,25 @@ FSFolder_Rename_IMP(FSFolder *self, String* from, String *to) {
 bool
 FSFolder_Hard_Link_IMP(FSFolder *self, String *from,
                        String *to) {
-    char *from_path_ptr = S_fullpath_ptr(self, from);
-    char *to_path_ptr   = S_fullpath_ptr(self, to);
-    bool  retval        = S_hard_link(from_path_ptr, to_path_ptr);
-    FREEMEM(from_path_ptr);
-    FREEMEM(to_path_ptr);
+    // TODO: Update Folder entries.
+    char *from_path = S_fullpath_ptr(self, from);
+    char *to_path   = S_fullpath_ptr(self, to);
+    bool  retval    = S_hard_link(from_path, to_path);
+    FREEMEM(from_path);
+    FREEMEM(to_path);
     return retval;
 }
 
 bool
 FSFolder_Local_Delete_IMP(FSFolder *self, String *name) {
+    // TODO: Delete should only delete files. We should add RmDir for
+    // directories.
     FSFolderIVARS *const ivars = FSFolder_IVARS(self);
-
-    char *path_ptr = S_fullpath_ptr(self, name);
-#ifdef CHY_REMOVE_ZAPS_DIRS
-    bool result = !remove(path_ptr);
-#else
-    bool result = !rmdir(path_ptr) || !remove(path_ptr);
-#endif
+    char *path   = S_fullpath_ptr(self, name);
+    bool  retval = S_delete(path);
     DECREF(Hash_Delete(ivars->entries, name));
-    FREEMEM(path_ptr);
-    return result;
+    FREEMEM(path);
+    return retval;
 }
 
 void
@@ -324,30 +307,6 @@ S_fullpath_ptr(FSFolder *self, String *path) {
 }
 
 static bool
-S_dir_ok(String *path) {
-    bool retval = false;
-    char *path_ptr = Str_To_Utf8(path);
-    struct stat stat_buf;
-    if (stat(path_ptr, &stat_buf) != -1) {
-        if (stat_buf.st_mode & S_IFDIR) { retval = true; }
-    }
-    FREEMEM(path_ptr);
-    return retval;
-}
-
-static bool
-S_create_dir(String *path) {
-    bool retval = true;
-    char *path_ptr = Str_To_Utf8(path);
-    if (-1 == chy_makedir(path_ptr, 0777)) {
-        ErrMsg_set_with_errno("Couldn't create directory '%o'", path);
-        retval = false;
-    }
-    FREEMEM(path_ptr);
-    return retval;
-}
-
-static bool
 S_is_local_entry(String *path) {
     return !Str_Contains_Utf8(path, "/", 1);
 }
@@ -364,10 +323,39 @@ S_is_local_entry(String *path) {
 #include <windows.h>
 
 static bool
+S_dir_ok(String *path) {
+    char *path_ptr = Str_To_Utf8(path);
+    DWORD attrs = GetFileAttributesA(path_ptr);
+    bool retval = attrs != INVALID_FILE_ATTRIBUTES
+                  && (attrs & FILE_ATTRIBUTE_DIRECTORY);
+    FREEMEM(path_ptr);
+    return retval;
+}
+
+static bool
+S_create_dir(String *path) {
+    bool retval = true;
+    char *path_ptr = Str_To_Utf8(path);
+    if (CreateDirectoryA(path_ptr, NULL) == 0) {
+        ErrMsg_set_with_win_error("Couldn't create directory '%o'", path);
+        retval = false;
+    }
+    SetFileAttributes(path_ptr, FILE_ATTRIBUTE_NOT_CONTENT_INDEXED);
+    FREEMEM(path_ptr);
+    return retval;
+}
+
+static bool
+S_exists(const char *path) {
+    return GetFileAttributesA(path) != INVALID_FILE_ATTRIBUTES;
+}
+
+static bool
 S_is_absolute(String *path) {
     int32_t code_point = Str_Code_Point_At(path, 0);
 
-    if (isalpha(code_point)) {
+    if ((code_point >= 'A' && code_point <= 'Z')
+        || (code_point >= 'a' && code_point <= 'z')) {
         code_point = Str_Code_Point_At(path, 1);
         if (code_point != ':') { return false; }
         code_point = Str_Code_Point_At(path, 2);
@@ -380,9 +368,9 @@ static String*
 S_absolutify(String *path) {
     if (S_is_absolute(path)) { return Str_Clone(path); }
 
-    DWORD  cwd_len = GetCurrentDirectory(0, NULL);
+    DWORD  cwd_len = GetCurrentDirectoryA(0, NULL);
     char  *cwd     = (char*)MALLOCATE(cwd_len);
-    DWORD  res     = GetCurrentDirectory(cwd_len, cwd);
+    DWORD  res     = GetCurrentDirectoryA(cwd_len, cwd);
     if (res == 0 || res > cwd_len) {
         THROW(ERR, "GetCurrentDirectory failed");
     }
@@ -393,19 +381,99 @@ S_absolutify(String *path) {
 }
 
 static bool
-S_hard_link(char *from8, char *to8) {
-    if (CreateHardLink(to8, from8, NULL)) {
+S_rename(const char *from_path, const char *to_path) {
+    // TODO: We should consider using MoveFileEx with
+    // MOVEFILE_REPLACE_EXISTING to better match POSIX semantics. But unlike
+    // POSIX, this allows to replace a file with a directory, breaking the
+    // tests.
+    if (MoveFileA(from_path, to_path) != 0) {
+        return true;
+    }
+    else {
+        ErrMsg_set_with_win_error("rename from '%s' to '%s' failed",
+                                  from_path, to_path);
+        return false;
+    }
+}
+
+static bool
+S_hard_link(const char *from_path, const char *to_path) {
+    if (CreateHardLinkA(to_path, from_path, NULL) != 0) {
         return true;
     }
     else {
         ErrMsg_set_with_win_error("CreateHardLink for new file '%s' "
                                   "from '%s' failed",
-                                  to8, from8);
+                                  to_path, from_path);
         return false;
     }
 }
 
+static bool
+S_delete(const char *path) {
+    if (RemoveDirectoryA(path) != 0) {
+        return true;
+    }
+    if (GetLastError() != ERROR_DIRECTORY) {
+        ErrMsg_set_with_win_error("removing '%s' failed", path);
+        return false;
+    }
+
+    // Open file with FILE_FLAG_DELETE_ON_CLOSE and close it immediately.
+    // In contrast to DeleteFile, this allows files opened with
+    // FILE_SHARE_DELETE to be eventually deleted.
+    DWORD share_mode = FILE_SHARE_READ
+                       | FILE_SHARE_WRITE
+                       | FILE_SHARE_DELETE;
+    DWORD flags      = FILE_FLAG_DELETE_ON_CLOSE;
+    DWORD attrs      = FILE_ATTRIBUTE_NORMAL;
+    HANDLE handle = CreateFileA(path, DELETE, share_mode, NULL, OPEN_EXISTING,
+                                flags | attrs, NULL);
+    if (handle == INVALID_HANDLE_VALUE) {
+        ErrMsg_set_with_win_error("removing '%s' failed", path);
+        return false;
+    }
+
+    CloseHandle(handle);
+    return true;
+}
+
 #elif (defined(CHY_HAS_UNISTD_H))
+
+#include <errno.h>
+#include <stdio.h>     // For rename, remove
+#include <sys/stat.h>  // For stat, mkdir
+#include <unistd.h>    // For getcwd, link, rmdir
+
+static bool
+S_dir_ok(String *path) {
+    bool retval = false;
+    char *path_ptr = Str_To_Utf8(path);
+    struct stat stat_buf;
+    if (stat(path_ptr, &stat_buf) != -1) {
+        if (stat_buf.st_mode & S_IFDIR) { retval = true; }
+    }
+    FREEMEM(path_ptr);
+    return retval;
+}
+
+static bool
+S_create_dir(String *path) {
+    bool retval = true;
+    char *path_ptr = Str_To_Utf8(path);
+    if (mkdir(path_ptr, 0777) != 0) {
+        ErrMsg_set_with_errno("Couldn't create directory '%o'", path);
+        retval = false;
+    }
+    FREEMEM(path_ptr);
+    return retval;
+}
+
+static bool
+S_exists(const char *path) {
+    struct stat stat_buf;
+    return stat(path, &stat_buf) == 0;
+}
 
 static bool
 S_is_absolute(String *path) {
@@ -432,15 +500,40 @@ S_absolutify(String *path) {
 }
 
 static bool
-S_hard_link(char *from8, char *to8) {
-    if (-1 == link(from8, to8)) {
-        ErrMsg_set_with_errno("hard link for new file '%s' from '%s' failed",
-                              to8, from8);
+S_rename(const char *from_path, const char *to_path) {
+    if (rename(from_path, to_path) != 0) {
+        ErrMsg_set_with_errno("rename from '%s' to '%s' failed",
+                              from_path, to_path);
         return false;
     }
     else {
         return true;
     }
+}
+
+static bool
+S_hard_link(const char *from_path, const char *to_path) {
+    if (link(from_path, to_path) != 0) {
+        ErrMsg_set_with_errno("hard link for new file '%s' from '%s' failed",
+                              to_path, from_path);
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+static bool
+S_delete(const char *path) {
+#ifdef CHY_REMOVE_ZAPS_DIRS
+    bool result = !remove(path);
+#else
+    bool result = !rmdir(path) || !remove(path);
+#endif
+    if (!result) {
+        ErrMsg_set_with_errno("removing '%s' failed", path);
+    }
+    return result;
 }
 
 #else

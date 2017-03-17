@@ -388,16 +388,19 @@ S_init(FSFileHandleIVARS *ivars, String *path, uint32_t flags) {
     DWORD desired_access       = flags & FH_READ_ONLY
                                  ? GENERIC_READ
                                  : GENERIC_WRITE;
+    DWORD share_mode           = FILE_SHARE_READ;
     DWORD creation_disposition = flags & FH_CREATE
                                  ? flags & FH_EXCLUSIVE
                                    ? CREATE_NEW
                                    : OPEN_ALWAYS
                                  : OPEN_EXISTING;
 
+    share_mode |= FILE_SHARE_DELETE;
     char *path_ptr = Str_To_Utf8(path);
     HANDLE handle
-        = CreateFileA(path_ptr, desired_access, FILE_SHARE_READ, NULL,
-                      creation_disposition, FILE_ATTRIBUTE_NORMAL, NULL);
+        = CreateFileA(path_ptr, desired_access, share_mode, NULL,
+                      creation_disposition, FILE_ATTRIBUTE_NOT_CONTENT_INDEXED,
+                      NULL);
     FREEMEM(path_ptr);
 
     if (handle == INVALID_HANDLE_VALUE) {

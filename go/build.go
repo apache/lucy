@@ -259,7 +259,6 @@ func specClasses(parcel *cfc.Parcel) {
 	managerBinding.SpecMethod("Write_Merge_Data", "WriteMergeData(int64) error")
 	managerBinding.SpecMethod("Read_Merge_Data", "ReadMergeData() (map[string]interface{}, error)")
 	managerBinding.SpecMethod("Remove_Merge_Data", "RemoveMergeData() error")
-	managerBinding.SpecMethod("Make_Snapshot_Filename", "MakeSnapshotFilename() (string, error)")
 	managerBinding.SpecMethod("Recycle", "Recycle(PolyReader, DeletionsWriter, int64, bool) ([]SegReader, error)")
 	managerBinding.Register()
 

@@ -20,6 +20,7 @@
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Store/DirHandle.h"
 #include "Lucy/Store/Folder.h"
+#include "Lucy/Util/StringHelper.h"
 
 String*
 IxFileNames_latest_snapshot(Folder *folder) {
@@ -66,6 +67,13 @@ IxFileNames_extract_gen(String *name) {
     DECREF(num_string);
     DECREF(iter);
     return retval;
+}
+
+String*
+IxFileNames_make_temp_snapshot(uint64_t gen) {
+    char  base36[StrHelp_MAX_BASE36_BYTES];
+    StrHelp_to_base36(gen, &base36);
+    return Str_newf("snapshot_%s.json.temp", &base36);
 }
 
 String*

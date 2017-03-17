@@ -36,6 +36,63 @@ sub bind_all {
 
 sub bind_analyzer {
     my $pod_spec = Clownfish::CFC::Binding::Perl::Pod->new;
+    my $synopsis = <<'END_SYNOPSIS';
+    my $strings = $analyzer->split($text);
+
+    package SimpleAnalyzer;
+    use base qw( Lucy::Analysis::Analyzer );
+    sub new {
+        return shift->SUPER::new;
+    }
+    sub equals {
+        my ( $self, $other ) = @_;
+        return $other->isa(__PACKAGE__);
+    }
+    sub transform {
+        my ( $self, $inversion ) = @_;
+        while ( my $token = $inversion->next ) {
+            my $text = $token->get_text;
+            # Transform text...
+            $token->set_text($text);
+        }
+        $inversion->reset;
+        return $inversion;
+    }
+
+    package AnalyzerWithMemberVars;
+    use base qw( Lucy::Analysis::Analyzer );
+    our %foo;
+    sub new {
+        my $self = shift->SUPER::new;
+        return $self->init( { @_ } );
+    }
+    sub init {
+        my ( $self, $args ) = @_;
+        $foo{$$self} = $args->{foo};
+        return $self;
+    }
+    sub DESTROY {
+        my $self = shift;
+        delete $foo{$$self};
+        $self->SUPER::DESTROY;
+    }
+    sub equals {
+        my ( $self, $other ) = @_;
+        return $other->isa(__PACKAGE__)
+               && $foo{$$self} eq $foo{$$other};
+    }
+    sub dump {
+        my $self = shift;
+        my $dump = $self->SUPER::dump;
+        $dump->{foo} = $foo{$$self};
+        return $dump;
+    }
+    sub load {
+        my ( $self, $dump ) = @_;
+        my $loaded = $self->SUPER::load($dump);
+        return $loaded->init($dump);
+    }
+END_SYNOPSIS
     my $constructor = <<'END_CONSTRUCTOR';
 =head2 new
 
@@ -51,7 +108,7 @@ sub bind_analyzer {
 
 Abstract constructor.  Takes no arguments.
 END_CONSTRUCTOR
-    $pod_spec->set_synopsis("    # Abstract base class.\n");
+    $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( pod => $constructor );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(

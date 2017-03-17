@@ -28,7 +28,6 @@
 #include "Lucy/Store/LockFileLock.h"
 #include "Lucy/Util/IndexFileNames.h"
 #include "Lucy/Util/Json.h"
-#include "Lucy/Util/StringHelper.h"
 
 #include <stdlib.h>
 
@@ -125,32 +124,6 @@ IxManager_Highest_Seg_Num_IMP(IndexManager *self, Snapshot *snapshot) {
     }
     DECREF(files);
     return (int64_t)highest_seg_num;
-}
-
-String*
-IxManager_Make_Snapshot_Filename_IMP(IndexManager *self) {
-    IndexManagerIVARS *const ivars = IxManager_IVARS(self);
-    Folder *folder = (Folder*)CERTIFY(ivars->folder, FOLDER);
-    DirHandle *dh = Folder_Open_Dir(folder, NULL);
-    uint64_t max_gen = 0;
-
-    if (!dh) { RETHROW(INCREF(Err_get_error())); }
-    while (DH_Next(dh)) {
-        String *entry = DH_Get_Entry(dh);
-        if (Str_Starts_With_Utf8(entry, "snapshot_", 9)
-            && Str_Ends_With_Utf8(entry, ".json", 5)
-           ) {
-            uint64_t gen = IxFileNames_extract_gen(entry);
-            if (gen > max_gen) { max_gen = gen; }
-        }
-        DECREF(entry);
-    }
-    DECREF(dh);
-
-    uint64_t new_gen = max_gen + 1;
-    char  base36[StrHelp_MAX_BASE36_BYTES];
-    StrHelp_to_base36(new_gen, &base36);
-    return Str_newf("snapshot_%s.json", &base36);
 }
 
 static int
