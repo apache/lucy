@@ -56,16 +56,14 @@ class Lucy::Index::Posting::RichPosting nickname RichPost
                           float length_norm);
 
     incremented RichPostingMatcher*
-    Make_Matcher(RichPosting *self, Similarity *sim, PostingList *plist,
-                 float weight, bool need_score);
+    Make_Matcher(RichPosting *self, PostingList *plist, float weight);
 }
 
 class Lucy::Index::Posting::RichPostingMatcher nickname RichPostMatcher
     inherits Lucy::Index::Posting::ScorePostingMatcher {
 
     inert RichPostingMatcher*
-    init(RichPostingMatcher *self, Similarity *similarity,
-         PostingList *posting_list, float weight);
+    init(RichPostingMatcher *self, PostingList *posting_list, float weight);
 }
 
 

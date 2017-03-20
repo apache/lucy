@@ -65,7 +65,7 @@ public class Lucy::Index::PostingList nickname PList
     /** Invoke [](cfish:.Post_Make_Matcher) for this PostingList's posting.
      */
     abstract Matcher*
-    Make_Matcher(PostingList *self, float weight, bool need_score);
+    Make_Matcher(PostingList *self, float weight);
 
     /** Indexing helper function.
      */

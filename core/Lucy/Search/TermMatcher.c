@@ -24,13 +24,11 @@
 #include "Lucy/Search/Compiler.h"
 
 TermMatcher*
-TermMatcher_init(TermMatcher *self, Similarity *similarity, PostingList *plist,
-                 float weight) {
+TermMatcher_init(TermMatcher *self, PostingList *plist, float weight) {
     Matcher_init((Matcher*)self);
     TermMatcherIVARS *const ivars = TermMatcher_IVARS(self);
 
     // Assign.
-    ivars->sim           = (Similarity*)INCREF(similarity);
     ivars->plist         = (PostingList*)INCREF(plist);
     ivars->weight        = weight;
 
@@ -43,7 +41,6 @@ TermMatcher_init(TermMatcher *self, Similarity *similarity, PostingList *plist,
 void
 TermMatcher_Destroy_IMP(TermMatcher *self) {
     TermMatcherIVARS *const ivars = TermMatcher_IVARS(self);
-    DECREF(ivars->sim);
     DECREF(ivars->plist);
     SUPER_DESTROY(self, TERMMATCHER);
 }

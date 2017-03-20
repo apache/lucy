@@ -78,7 +78,7 @@ class Lucy::Index::SegPostingList nickname SegPList
     Seek_Lex(SegPostingList *self, Lexicon *lexicon);
 
     Matcher*
-    Make_Matcher(SegPostingList *self, float weight, bool need_score);
+    Make_Matcher(SegPostingList *self, float weight);
 
     RawPosting*
     Read_Raw(SegPostingList *self, int32_t last_doc_id, String *term_text,

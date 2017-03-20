@@ -62,8 +62,7 @@ class Lucy::Index::Posting nickname Post inherits Lucy::Util::Stepper {
     /** Factory method for creating a Matcher.
      */
     abstract incremented Matcher*
-    Make_Matcher(Posting *self, Similarity *sim, PostingList *plist,
-                 float weight, bool need_score);
+    Make_Matcher(Posting *self, PostingList *plist, float weight);
 }
 
 abstract class Lucy::Index::Posting::PostingWriter nickname PostWriter

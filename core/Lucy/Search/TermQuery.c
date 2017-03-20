@@ -258,6 +258,7 @@ TermCompiler_Get_Weight_IMP(TermCompiler *self) {
 Matcher*
 TermCompiler_Make_Matcher_IMP(TermCompiler *self, SegReader *reader,
                               bool need_score) {
+    UNUSED_VAR(need_score);
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
     TermQueryIVARS *const parent_ivars
         = TermQuery_IVARS((TermQuery*)ivars->parent);
@@ -276,7 +277,7 @@ TermCompiler_Make_Matcher_IMP(TermCompiler *self, SegReader *reader,
     }
     else {
         float weight = ivars->normalized_weight;
-        Matcher *retval = PList_Make_Matcher(plist, weight, need_score);
+        Matcher *retval = PList_Make_Matcher(plist, weight);
         DECREF(plist);
         return retval;
     }
