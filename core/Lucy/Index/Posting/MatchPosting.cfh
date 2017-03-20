@@ -59,7 +59,7 @@ class Lucy::Index::Posting::MatchPosting nickname MatchPost
 
     incremented MatchPostingMatcher*
     Make_Matcher(MatchPosting *self, Similarity *sim, PostingList *plist,
-                 Compiler *compiler, bool need_score);
+                 float weight, bool need_score);
 }
 
 class Lucy::Index::Posting::MatchPostingMatcher nickname MatchPostMatcher
@@ -67,7 +67,7 @@ class Lucy::Index::Posting::MatchPostingMatcher nickname MatchPostMatcher
 
     inert MatchPostingMatcher*
     init(MatchPostingMatcher *self, Similarity *similarity,
-         PostingList *posting_list, Compiler *compiler);
+         PostingList *posting_list, float weight);
 
     public float
     Score(MatchPostingMatcher *self);

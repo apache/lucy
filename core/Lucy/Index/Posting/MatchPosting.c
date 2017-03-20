@@ -144,21 +144,20 @@ MatchPost_Add_Inversion_To_Pool_IMP(MatchPosting *self,
 
 MatchPostingMatcher*
 MatchPost_Make_Matcher_IMP(MatchPosting *self, Similarity *sim,
-                           PostingList *plist, Compiler *compiler,
-                           bool need_score) {
+                           PostingList *plist, float weight, bool need_score) {
     MatchPostingMatcher *matcher
         = (MatchPostingMatcher*)Class_Make_Obj(MATCHPOSTINGMATCHER);
     UNUSED_VAR(self);
     UNUSED_VAR(need_score);
-    return MatchPostMatcher_init(matcher, sim, plist, compiler);
+    return MatchPostMatcher_init(matcher, sim, plist, weight);
 }
 
 /***************************************************************************/
 
 MatchPostingMatcher*
 MatchPostMatcher_init(MatchPostingMatcher *self, Similarity *sim,
-                      PostingList *plist, Compiler *compiler) {
-    TermMatcher_init((TermMatcher*)self, sim, plist, compiler);
+                      PostingList *plist, float weight) {
+    TermMatcher_init((TermMatcher*)self, sim, plist, weight);
     return self;
 }
 

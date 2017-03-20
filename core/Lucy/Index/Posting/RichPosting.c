@@ -192,20 +192,19 @@ RichPost_Read_Raw_IMP(RichPosting *self, InStream *instream,
 
 RichPostingMatcher*
 RichPost_Make_Matcher_IMP(RichPosting *self, Similarity *sim,
-                          PostingList *plist, Compiler *compiler,
-                          bool need_score) {
+                          PostingList *plist, float weight, bool need_score) {
     RichPostingMatcher* matcher
         = (RichPostingMatcher*)Class_Make_Obj(RICHPOSTINGMATCHER);
     UNUSED_VAR(self);
     UNUSED_VAR(need_score);
-    return RichPostMatcher_init(matcher, sim, plist, compiler);
+    return RichPostMatcher_init(matcher, sim, plist, weight);
 }
 
 RichPostingMatcher*
 RichPostMatcher_init(RichPostingMatcher *self, Similarity *sim,
-                     PostingList *plist, Compiler *compiler) {
+                     PostingList *plist, float weight) {
     return (RichPostingMatcher*)ScorePostMatcher_init((ScorePostingMatcher*)self,
-                                                      sim, plist, compiler);
+                                                      sim, plist, weight);
 }
 
 

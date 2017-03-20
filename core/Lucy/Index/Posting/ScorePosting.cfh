@@ -57,7 +57,7 @@ class Lucy::Index::Posting::ScorePosting nickname ScorePost
 
     incremented ScorePostingMatcher*
     Make_Matcher(ScorePosting *self, Similarity *sim, PostingList *plist,
-                 Compiler *compiler, bool need_score);
+                 float weight, bool need_score);
 
     nullable uint32_t*
     Get_Prox(ScorePosting *self);
@@ -70,7 +70,7 @@ class Lucy::Index::Posting::ScorePostingMatcher nickname ScorePostMatcher
 
     inert ScorePostingMatcher*
     init(ScorePostingMatcher *self, Similarity *sim, PostingList *plist,
-         Compiler *compiler);
+         float weight);
 
     public float
     Score(ScorePostingMatcher* self);

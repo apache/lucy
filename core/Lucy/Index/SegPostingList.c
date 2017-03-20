@@ -301,10 +301,10 @@ S_seek_tinfo(SegPostingList *self, TermInfo *tinfo) {
 }
 
 Matcher*
-SegPList_Make_Matcher_IMP(SegPostingList *self, Similarity *sim,
-                          Compiler *compiler, bool need_score) {
+SegPList_Make_Matcher_IMP(SegPostingList *self, Similarity *sim, float weight,
+                          bool need_score) {
     SegPostingListIVARS *const ivars = SegPList_IVARS(self);
-    return Post_Make_Matcher(ivars->posting, sim, (PostingList*)self, compiler,
+    return Post_Make_Matcher(ivars->posting, sim, (PostingList*)self, weight,
                              need_score);
 }
 

@@ -25,15 +25,14 @@
 
 TermMatcher*
 TermMatcher_init(TermMatcher *self, Similarity *similarity, PostingList *plist,
-                 Compiler *compiler) {
+                 float weight) {
     Matcher_init((Matcher*)self);
     TermMatcherIVARS *const ivars = TermMatcher_IVARS(self);
 
     // Assign.
     ivars->sim           = (Similarity*)INCREF(similarity);
     ivars->plist         = (PostingList*)INCREF(plist);
-    ivars->compiler      = (Compiler*)INCREF(compiler);
-    ivars->weight        = Compiler_Get_Weight(compiler);
+    ivars->weight        = weight;
 
     // Init.
     ivars->posting        = NULL;
@@ -46,7 +45,6 @@ TermMatcher_Destroy_IMP(TermMatcher *self) {
     TermMatcherIVARS *const ivars = TermMatcher_IVARS(self);
     DECREF(ivars->sim);
     DECREF(ivars->plist);
-    DECREF(ivars->compiler);
     SUPER_DESTROY(self, TERMMATCHER);
 }
 

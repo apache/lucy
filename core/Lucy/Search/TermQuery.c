@@ -275,8 +275,9 @@ TermCompiler_Make_Matcher_IMP(TermCompiler *self, SegReader *reader,
         return NULL;
     }
     else {
-        Matcher *retval = PList_Make_Matcher(plist, ivars->sim,
-                                             (Compiler*)self, need_score);
+        float weight = ivars->normalized_weight;
+        Matcher *retval = PList_Make_Matcher(plist, ivars->sim, weight,
+                                             need_score);
         DECREF(plist);
         return retval;
     }

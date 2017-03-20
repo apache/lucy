@@ -213,20 +213,19 @@ ScorePost_Read_Raw_IMP(ScorePosting *self, InStream *instream,
 
 ScorePostingMatcher*
 ScorePost_Make_Matcher_IMP(ScorePosting *self, Similarity *sim,
-                           PostingList *plist, Compiler *compiler,
-                           bool need_score) {
+                           PostingList *plist, float weight, bool need_score) {
     ScorePostingMatcher *matcher
         = (ScorePostingMatcher*)Class_Make_Obj(SCOREPOSTINGMATCHER);
     UNUSED_VAR(self);
     UNUSED_VAR(need_score);
-    return ScorePostMatcher_init(matcher, sim, plist, compiler);
+    return ScorePostMatcher_init(matcher, sim, plist, weight);
 }
 
 ScorePostingMatcher*
 ScorePostMatcher_init(ScorePostingMatcher *self, Similarity *sim,
-                      PostingList *plist, Compiler *compiler) {
+                      PostingList *plist, float weight) {
     // Init.
-    TermMatcher_init((TermMatcher*)self, sim, plist, compiler);
+    TermMatcher_init((TermMatcher*)self, sim, plist, weight);
     ScorePostingMatcherIVARS *const ivars = ScorePostMatcher_IVARS(self);
 
     // Fill score cache.

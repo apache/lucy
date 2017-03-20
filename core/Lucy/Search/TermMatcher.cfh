@@ -25,14 +25,13 @@ parcel Lucy;
 class Lucy::Search::TermMatcher inherits Lucy::Search::Matcher {
 
     float           weight;
-    Compiler       *compiler;
     Similarity     *sim;
     PostingList    *plist;
     Posting        *posting;
 
     inert TermMatcher*
     init(TermMatcher *self, Similarity *similarity, PostingList *posting_list,
-         Compiler *compiler);
+         float weight);
 
     public void
     Destroy(TermMatcher *self);

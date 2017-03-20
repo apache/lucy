@@ -57,7 +57,7 @@ class Lucy::Index::Posting::RichPosting nickname RichPost
 
     incremented RichPostingMatcher*
     Make_Matcher(RichPosting *self, Similarity *sim, PostingList *plist,
-                 Compiler *compiler, bool need_score);
+                 float weight, bool need_score);
 }
 
 class Lucy::Index::Posting::RichPostingMatcher nickname RichPostMatcher
@@ -65,7 +65,7 @@ class Lucy::Index::Posting::RichPostingMatcher nickname RichPostMatcher
 
     inert RichPostingMatcher*
     init(RichPostingMatcher *self, Similarity *similarity,
-         PostingList *posting_list, Compiler *compiler);
+         PostingList *posting_list, float weight);
 }
 
 
