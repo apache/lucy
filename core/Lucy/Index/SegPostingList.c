@@ -301,9 +301,10 @@ S_seek_tinfo(SegPostingList *self, TermInfo *tinfo) {
 }
 
 Matcher*
-SegPList_Make_Matcher_IMP(SegPostingList *self, Similarity *sim, float weight,
+SegPList_Make_Matcher_IMP(SegPostingList *self, float weight,
                           bool need_score) {
     SegPostingListIVARS *const ivars = SegPList_IVARS(self);
+    Similarity *sim = SegPList_Get_Similarity(self);
     return Post_Make_Matcher(ivars->posting, sim, (PostingList*)self, weight,
                              need_score);
 }
@@ -316,5 +317,13 @@ SegPList_Read_Raw_IMP(SegPostingList *self, int32_t last_doc_id,
                          last_doc_id, term_text, mem_pool);
 }
 
+Similarity*
+SegPList_Get_Similarity_IMP(SegPostingList *self) {
+    SegPostingListIVARS *const ivars = SegPList_IVARS(self);
+    Schema *schema = PListReader_Get_Schema(ivars->plist_reader);
+    Similarity *sim = Schema_Fetch_Sim(schema, ivars->field);
+    if (!sim) { sim = Schema_Get_Similarity(schema); }
+    return sim;
+}
 
 
