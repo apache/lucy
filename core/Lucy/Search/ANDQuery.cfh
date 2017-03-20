@@ -52,14 +52,17 @@ class Lucy::Search::ANDCompiler
     inherits Lucy::Search::PolyCompiler {
 
     inert incremented ANDCompiler*
-    new(ANDQuery *parent, Searcher *searcher, float boost);
+    new(ANDQuery *query, Searcher *searcher, float boost);
 
     inert ANDCompiler*
-    init(ANDCompiler *self, ANDQuery *parent, Searcher *searcher,
+    init(ANDCompiler *self, ANDQuery *query, Searcher *searcher,
          float boost);
 
     public incremented nullable Matcher*
     Make_Matcher(ANDCompiler *self, SegReader *reader, bool need_score);
+
+    public bool
+    Equals(ANDCompiler *self, Obj *other);
 }
 
 

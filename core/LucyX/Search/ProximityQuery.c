@@ -186,8 +186,7 @@ ProximityQuery_Make_Compiler_IMP(ProximityQuery *self, Searcher *searcher,
         return (Compiler*)term_compiler;
     }
     else {
-        return (Compiler*)ProximityCompiler_new(self, searcher, boost,
-                                                ivars->within);
+        return (Compiler*)ProximityCompiler_new(self, searcher, boost);
     }
 }
 
@@ -209,53 +208,60 @@ ProximityQuery_Get_Within_IMP(ProximityQuery  *self) {
 /*********************************************************************/
 
 ProximityCompiler*
-ProximityCompiler_new(ProximityQuery *parent, Searcher *searcher, float boost,
-                      uint32_t within) {
+ProximityCompiler_new(ProximityQuery *query, Searcher *searcher, float boost) {
     ProximityCompiler *self =
         (ProximityCompiler*)Class_Make_Obj(PROXIMITYCOMPILER);
-    return ProximityCompiler_init(self, parent, searcher, boost, within);
+    return ProximityCompiler_init(self, query, searcher, boost);
 }
 
 ProximityCompiler*
-ProximityCompiler_init(ProximityCompiler *self, ProximityQuery *parent,
-                       Searcher *searcher, float boost, uint32_t within) {
+ProximityCompiler_init(ProximityCompiler *self, ProximityQuery *query,
+                       Searcher *searcher, float boost) {
     ProximityCompilerIVARS *const ivars = ProximityCompiler_IVARS(self);
-    ProximityQueryIVARS *const parent_ivars = ProximityQuery_IVARS(parent);
+    ProximityQueryIVARS *const query_ivars = ProximityQuery_IVARS(query);
+    String     *field  = query_ivars->field;
+    Vector     *terms  = query_ivars->terms;
     Schema     *schema = Searcher_Get_Schema(searcher);
-    Similarity *sim    = Schema_Fetch_Sim(schema, parent_ivars->field);
-    Vector     *terms  = parent_ivars->terms;
-
-    ivars->within = within;
+    Similarity *sim    = Schema_Fetch_Sim(schema, ivars->field);
 
     // Try harder to find a Similarity if necessary.
     if (!sim) { sim = Schema_Get_Similarity(schema); }
 
     // Init.
-    Compiler_init((Compiler*)self, (Query*)parent, searcher, sim, boost);
+    Compiler_init((Compiler*)self);
+    ivars->field  = (String*)INCREF(field);
+    ivars->terms  = (Vector*)INCREF(terms);
+    ivars->within = query_ivars->within;
 
     // Store IDF for the phrase.
     ivars->idf = 0;
     for (size_t i = 0, max = Vec_Get_Size(terms); i < max; i++) {
         Obj *term = Vec_Fetch(terms, i);
         int32_t doc_max  = Searcher_Doc_Max(searcher);
-        uint32_t doc_freq
-            = Searcher_Doc_Freq(searcher, parent_ivars->field,term);
+        uint32_t doc_freq = Searcher_Doc_Freq(searcher, field, term);
         ivars->idf += Sim_IDF(sim, (int32_t)doc_freq, doc_max);
     }
 
     // Calculate raw weight.
-    ivars->raw_weight = ivars->idf * ivars->boost;
+    ivars->raw_weight = ivars->idf * boost;
 
     return self;
 }
 
 void
+ProximityCompiler_Destroy_IMP(ProximityCompiler *self) {
+    ProximityCompilerIVARS *const ivars = ProximityCompiler_IVARS(self);
+    DECREF(ivars->field);
+    DECREF(ivars->terms);
+    SUPER_DESTROY(self, PROXIMITYCOMPILER);
+}
+
+void
 ProximityCompiler_Serialize_IMP(ProximityCompiler *self,
                                 OutStream *outstream) {
-    ProximityCompiler_Serialize_t super_serialize
-            = SUPER_METHOD_PTR(PROXIMITYCOMPILER, LUCY_ProximityCompiler_Serialize);
-    super_serialize(self, outstream);
     ProximityCompilerIVARS *const ivars = ProximityCompiler_IVARS(self);
+    Freezer_serialize_string(ivars->field, outstream);
+    Freezer_serialize_varray(ivars->terms, outstream);
     OutStream_Write_F32(outstream, ivars->idf);
     OutStream_Write_F32(outstream, ivars->raw_weight);
     OutStream_Write_F32(outstream, ivars->query_norm_factor);
@@ -266,15 +272,20 @@ ProximityCompiler_Serialize_IMP(ProximityCompiler *self,
 ProximityCompiler*
 ProximityCompiler_Deserialize_IMP(ProximityCompiler *self,
                                   InStream *instream) {
-    ProximityCompiler_Deserialize_t super_deserialize
-            = SUPER_METHOD_PTR(PROXIMITYCOMPILER, LUCY_ProximityCompiler_Deserialize);
-    self = super_deserialize(self, instream);
     ProximityCompilerIVARS *const ivars = ProximityCompiler_IVARS(self);
+
+    ivars->field             = Freezer_read_string(instream);
+    ivars->terms             = Freezer_read_varray(instream);
     ivars->idf               = InStream_Read_F32(instream);
     ivars->raw_weight        = InStream_Read_F32(instream);
     ivars->query_norm_factor = InStream_Read_F32(instream);
     ivars->normalized_weight = InStream_Read_F32(instream);
     ivars->within            = InStream_Read_CU32(instream);
+
+    for (size_t i = 0, max = Vec_Get_Size(ivars->terms); i < max; i++) {
+        CERTIFY(Vec_Fetch(ivars->terms, i), OBJ);
+    }
+
     return self;
 }
 
@@ -282,24 +293,17 @@ bool
 ProximityCompiler_Equals_IMP(ProximityCompiler *self, Obj *other) {
     if ((ProximityCompiler*)other == self)        { return true; }
     if (!Obj_is_a(other, PROXIMITYCOMPILER))      { return false; }
-    ProximityCompiler_Equals_t super_equals
-        = (ProximityCompiler_Equals_t)SUPER_METHOD_PTR(PROXIMITYCOMPILER,
-                                                       LUCY_ProximityCompiler_Equals);
-    if (!super_equals(self, other)) { return false; }
     ProximityCompilerIVARS *const ivars = ProximityCompiler_IVARS(self);
     ProximityCompilerIVARS *const ovars
         = ProximityCompiler_IVARS((ProximityCompiler*)other);
+    if (!Str_Equals(ivars->field, (Obj*)ovars->field)) { return false; }
+    if (!Vec_Equals(ivars->terms, (Obj*)ovars->terms)) { return false; }
     if (ivars->idf != ovars->idf)                             { return false; }
     if (ivars->raw_weight != ovars->raw_weight)               { return false; }
     if (ivars->query_norm_factor != ovars->query_norm_factor) { return false; }
     if (ivars->normalized_weight != ovars->normalized_weight) { return false; }
     if (ivars->within            != ovars->within)            { return false; }
     return true;
-}
-
-float
-ProximityCompiler_Get_Weight_IMP(ProximityCompiler *self) {
-    return ProximityCompiler_IVARS(self)->normalized_weight;
 }
 
 float
@@ -321,22 +325,11 @@ ProximityCompiler_Make_Matcher_IMP(ProximityCompiler *self, SegReader *reader,
                                    bool need_score) {
     ProximityCompilerIVARS *const ivars = ProximityCompiler_IVARS(self);
     UNUSED_VAR(need_score);
-    ProximityQueryIVARS *const parent_ivars
-        = ProximityQuery_IVARS((ProximityQuery*)ivars->parent);
-    Vector *const      terms     = parent_ivars->terms;
+    Vector *const      terms     = ivars->terms;
     size_t             num_terms = Vec_Get_Size(terms);
 
     // Bail if there are no terms.
     if (!num_terms) { return NULL; }
-
-    // Bail unless field is valid and posting type supports positions.
-    Similarity *sim     = ProximityCompiler_Get_Similarity(self);
-    Posting    *posting = Sim_Make_Posting(sim);
-    if (posting == NULL || !Obj_is_a((Obj*)posting, SCOREPOSTING)) {
-        DECREF(posting);
-        return NULL;
-    }
-    DECREF(posting);
 
     // Bail if there's no PostingListReader for this segment.
     PostingListReader *const plist_reader
@@ -344,12 +337,24 @@ ProximityCompiler_Make_Matcher_IMP(ProximityCompiler *self, SegReader *reader,
               reader, Class_Get_Name(POSTINGLISTREADER));
     if (!plist_reader) { return NULL; }
 
+    Schema     *schema = PListReader_Get_Schema(plist_reader);
+    Similarity *sim    = Schema_Fetch_Sim(schema, ivars->field);
+    if (!sim) { sim = Schema_Get_Similarity(schema); }
+
+    // Bail unless field is valid and posting type supports positions.
+    Posting    *posting = Sim_Make_Posting(sim);
+    if (posting == NULL || !Obj_is_a((Obj*)posting, SCOREPOSTING)) {
+        DECREF(posting);
+        return NULL;
+    }
+    DECREF(posting);
+
     // Look up each term.
     Vector  *plists = Vec_new(num_terms);
     for (size_t i = 0; i < num_terms; i++) {
         Obj *term = Vec_Fetch(terms, i);
         PostingList *plist
-            = PListReader_Posting_List(plist_reader, parent_ivars->field, term);
+            = PListReader_Posting_List(plist_reader, ivars->field, term);
 
         // Bail if any one of the terms isn't in the index.
         if (!plist || !PList_Get_Doc_Freq(plist)) {
@@ -360,8 +365,9 @@ ProximityCompiler_Make_Matcher_IMP(ProximityCompiler *self, SegReader *reader,
         Vec_Push(plists, (Obj*)plist);
     }
 
+    float weight = ivars->normalized_weight;
     Matcher *retval
-        = (Matcher*)ProximityMatcher_new(sim, plists, (Compiler*)self, ivars->within);
+        = (Matcher*)ProximityMatcher_new(sim, plists, weight, ivars->within);
     DECREF(plists);
     return retval;
 }
@@ -371,16 +377,14 @@ ProximityCompiler_Highlight_Spans_IMP(ProximityCompiler *self,
                                       Searcher *searcher, DocVector *doc_vec,
                                       String *field) {
     ProximityCompilerIVARS *const ivars = ProximityCompiler_IVARS(self);
-    ProximityQueryIVARS *const parent_ivars
-        = ProximityQuery_IVARS((ProximityQuery*)ivars->parent);
-    Vector         *const terms  = parent_ivars->terms;
+    Vector         *const terms  = ivars->terms;
     Vector         *const spans  = Vec_new(0);
     const uint32_t  num_terms    = (uint32_t)Vec_Get_Size(terms);
     UNUSED_VAR(searcher);
 
     // Bail if no terms or field doesn't match.
     if (!num_terms) { return spans; }
-    if (!Str_Equals(field, (Obj*)parent_ivars->field)) { return spans; }
+    if (!Str_Equals(field, (Obj*)ivars->field)) { return spans; }
 
     Vector      *term_vectors    = Vec_new(num_terms);
     BitVector   *posit_vec       = BitVec_new(0);
@@ -433,7 +437,7 @@ ProximityCompiler_Highlight_Spans_IMP(ProximityCompiler *self,
         I32Array *valid_posits       = BitVec_To_Array(posit_vec);
         size_t    num_valid_posits   = I32Arr_Get_Size(valid_posits);
         size_t    j = 0;
-        float     weight = ProximityCompiler_Get_Weight(self);
+        float     weight = ivars->normalized_weight;
         size_t    i = 0;
 
         // Add only those starts/ends that belong to a valid position.

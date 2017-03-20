@@ -80,23 +80,22 @@ public class Lucy::Search::TermQuery inherits Lucy::Search::Query {
 }
 
 class Lucy::Search::TermCompiler inherits Lucy::Search::Compiler {
-    float idf;
-    float raw_weight;
-    float query_norm_factor;
-    float normalized_weight;
+    String *field;
+    Obj    *term;
+    float   idf;
+    float   raw_weight;
+    float   query_norm_factor;
+    float   normalized_weight;
 
     inert incremented TermCompiler*
-    new(Query *parent, Searcher *searcher, float boost);
+    new(TermQuery *query, Searcher *searcher, float boost);
 
     inert TermCompiler*
-    init(TermCompiler *self, Query *parent, Searcher *searcher,
+    init(TermCompiler *self, TermQuery *query, Searcher *searcher,
          float boost);
 
     public incremented nullable Matcher*
     Make_Matcher(TermCompiler *self, SegReader *reader, bool need_score);
-
-    public float
-    Get_Weight(TermCompiler *self);
 
     public float
     Sum_Of_Squared_Weights(TermCompiler *self);
@@ -116,6 +115,9 @@ class Lucy::Search::TermCompiler inherits Lucy::Search::Compiler {
 
     incremented TermCompiler*
     Deserialize(decremented TermCompiler *self, InStream *instream);
+
+    public void
+    Destroy(TermCompiler *self);
 }
 
 

@@ -15,6 +15,7 @@
  */
 
 #define C_LUCY_MATCHALLQUERY
+#define C_LUCY_MATCHALLCOMPILER
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Search/MatchAllQuery.h"
@@ -58,32 +59,54 @@ MatchAllQuery_To_String_IMP(MatchAllQuery *self) {
 Compiler*
 MatchAllQuery_Make_Compiler_IMP(MatchAllQuery *self, Searcher *searcher,
                                 float boost) {
-    return (Compiler*)MatchAllCompiler_new(self, searcher, boost);
+    UNUSED_VAR(self);
+    UNUSED_VAR(searcher);
+    return (Compiler*)MatchAllCompiler_new(boost);
 }
 
 /**********************************************************************/
 
 MatchAllCompiler*
-MatchAllCompiler_new(MatchAllQuery *parent, Searcher *searcher,
-                     float boost) {
+MatchAllCompiler_new(float boost) {
     MatchAllCompiler *self
         = (MatchAllCompiler*)Class_Make_Obj(MATCHALLCOMPILER);
-    return MatchAllCompiler_init(self, parent, searcher, boost);
+    return MatchAllCompiler_init(self, boost);
 }
 
 MatchAllCompiler*
-MatchAllCompiler_init(MatchAllCompiler *self, MatchAllQuery *parent,
-                      Searcher *searcher, float boost) {
-    return (MatchAllCompiler*)Compiler_init((Compiler*)self, (Query*)parent,
-                                            searcher, NULL, boost);
+MatchAllCompiler_init(MatchAllCompiler *self, float boost) {
+    MatchAllCompiler_IVARS(self)->boost = boost;
+    return (MatchAllCompiler*)Compiler_init((Compiler*)self);
+}
+
+bool
+MatchAllCompiler_Equals_IMP(MatchAllCompiler *self, Obj *other) {
+    if ((MatchAllCompiler*)other == self)   { return true; }
+    if (!Obj_is_a(other, MATCHALLCOMPILER)) { return false; }
+    MatchAllCompilerIVARS *const ivars = MatchAllCompiler_IVARS(self);
+    MatchAllCompilerIVARS *const ovars
+        = MatchAllCompiler_IVARS((MatchAllCompiler*)other);
+    if (ivars->boost != ovars->boost)       { return false; }
+    return true;
+}
+
+void
+MatchAllCompiler_Serialize_IMP(MatchAllCompiler *self, OutStream *outstream) {
+    OutStream_Write_F32(outstream, MatchAllCompiler_IVARS(self)->boost);
+}
+
+MatchAllCompiler*
+MatchAllCompiler_Deserialize_IMP(MatchAllCompiler *self, InStream *instream) {
+    MatchAllCompiler_IVARS(self)->boost  = InStream_Read_F32(instream);
+    return self;
 }
 
 Matcher*
 MatchAllCompiler_Make_Matcher_IMP(MatchAllCompiler *self, SegReader *reader,
                                   bool need_score) {
-    float weight = MatchAllCompiler_Get_Weight(self);
+    UNUSED_VAR(self);
     UNUSED_VAR(need_score);
+    float weight = MatchAllCompiler_IVARS(self)->boost;
     return (Matcher*)MatchAllMatcher_new(weight, SegReader_Doc_Max(reader));
 }
-
 

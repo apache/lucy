@@ -27,17 +27,17 @@
 
 
 ProximityMatcher*
-ProximityMatcher_new(Similarity *sim, Vector *plists, Compiler *compiler,
+ProximityMatcher_new(Similarity *sim, Vector *plists, float weight,
                      uint32_t within) {
     ProximityMatcher *self =
         (ProximityMatcher*)Class_Make_Obj(PROXIMITYMATCHER);
-    return ProximityMatcher_init(self, sim, plists, compiler, within);
+    return ProximityMatcher_init(self, sim, plists, weight, within);
 
 }
 
 ProximityMatcher*
 ProximityMatcher_init(ProximityMatcher *self, Similarity *similarity,
-                      Vector *plists, Compiler *compiler, uint32_t within) {
+                      Vector *plists, float weight, uint32_t within) {
     Matcher_init((Matcher*)self);
     ProximityMatcherIVARS *const ivars = ProximityMatcher_IVARS(self);
 
@@ -63,9 +63,8 @@ ProximityMatcher_init(ProximityMatcher *self, Similarity *similarity,
     }
 
     // Assign.
-    ivars->sim       = (Similarity*)INCREF(similarity);
-    ivars->compiler  = (Compiler*)INCREF(compiler);
-    ivars->weight    = Compiler_Get_Weight(compiler);
+    ivars->sim    = (Similarity*)INCREF(similarity);
+    ivars->weight = weight;
 
     return self;
 }
@@ -81,7 +80,6 @@ ProximityMatcher_Destroy_IMP(ProximityMatcher *self) {
     }
     DECREF(ivars->sim);
     DECREF(ivars->anchor_set);
-    DECREF(ivars->compiler);
     SUPER_DESTROY(self, PROXIMITYMATCHER);
 }
 

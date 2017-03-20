@@ -54,14 +54,17 @@ class Lucy::Search::ORCompiler
     inherits Lucy::Search::PolyCompiler {
 
     inert incremented ORCompiler*
-    new(ORQuery *parent, Searcher *searcher, float boost);
+    new(ORQuery *query, Searcher *searcher, float boost);
 
     inert ORCompiler*
-    init(ORCompiler *self, ORQuery *parent, Searcher *searcher,
+    init(ORCompiler *self, ORQuery *query, Searcher *searcher,
          float boost);
 
     public incremented nullable Matcher*
     Make_Matcher(ORCompiler *self, SegReader *reader, bool need_score);
+
+    public bool
+    Equals(ORCompiler *self, Obj *other);
 }
 
 

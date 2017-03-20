@@ -26,15 +26,15 @@
 #include "Lucy/Search/Compiler.h"
 
 PhraseMatcher*
-PhraseMatcher_new(Similarity *sim, Vector *plists, Compiler *compiler) {
+PhraseMatcher_new(Similarity *sim, Vector *plists, float weight) {
     PhraseMatcher *self = (PhraseMatcher*)Class_Make_Obj(PHRASEMATCHER);
-    return PhraseMatcher_init(self, sim, plists, compiler);
+    return PhraseMatcher_init(self, sim, plists, weight);
 
 }
 
 PhraseMatcher*
 PhraseMatcher_init(PhraseMatcher *self, Similarity *similarity, Vector *plists,
-                   Compiler *compiler) {
+                   float weight) {
     Matcher_init((Matcher*)self);
     PhraseMatcherIVARS *const ivars = PhraseMatcher_IVARS(self);
 
@@ -59,9 +59,8 @@ PhraseMatcher_init(PhraseMatcher *self, Similarity *similarity, Vector *plists,
     }
 
     // Assign.
-    ivars->sim       = (Similarity*)INCREF(similarity);
-    ivars->compiler  = (Compiler*)INCREF(compiler);
-    ivars->weight    = Compiler_Get_Weight(compiler);
+    ivars->sim    = (Similarity*)INCREF(similarity);
+    ivars->weight = weight;
 
     return self;
 }
@@ -77,7 +76,6 @@ PhraseMatcher_Destroy_IMP(PhraseMatcher *self) {
     }
     DECREF(ivars->sim);
     DECREF(ivars->anchor_set);
-    DECREF(ivars->compiler);
     SUPER_DESTROY(self, PHRASEMATCHER);
 }
 

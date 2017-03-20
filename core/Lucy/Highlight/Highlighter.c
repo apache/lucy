@@ -55,18 +55,19 @@ Highlighter*
 Highlighter_init(Highlighter *self, Searcher *searcher, Obj *query,
                  String *field, uint32_t excerpt_length) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
-    ivars->query          = Searcher_Glean_Query(searcher, query);
     ivars->searcher       = (Searcher*)INCREF(searcher);
     ivars->field          = Str_Clone(field);
     ivars->excerpt_length = excerpt_length;
     ivars->slop           = excerpt_length / 3;
     ivars->pre_tag        = Str_new_from_trusted_utf8("<strong>", 8);
     ivars->post_tag       = Str_new_from_trusted_utf8("</strong>", 9);
-    if (Query_is_a(ivars->query, COMPILER)) {
-        ivars->compiler = (Compiler*)INCREF(ivars->query);
+    if (Obj_is_a(query, COMPILER)) {
+        ivars->compiler = (Compiler*)INCREF(query);
     }
     else {
-        ivars->compiler = Query_Make_Root_Compiler(ivars->query, searcher);
+        Query *real_query = Searcher_Glean_Query(searcher, query);
+        ivars->compiler = Query_Make_Root_Compiler(real_query, searcher);
+        DECREF(real_query);
     }
     return self;
 }
@@ -75,7 +76,6 @@ void
 Highlighter_Destroy_IMP(Highlighter *self) {
     HighlighterIVARS *const ivars = Highlighter_IVARS(self);
     DECREF(ivars->searcher);
-    DECREF(ivars->query);
     DECREF(ivars->compiler);
     DECREF(ivars->field);
     DECREF(ivars->pre_tag);
@@ -127,11 +127,6 @@ Highlighter_Get_Post_Tag_IMP(Highlighter *self) {
 String*
 Highlighter_Get_Field_IMP(Highlighter *self) {
     return Highlighter_IVARS(self)->field;
-}
-
-Query*
-Highlighter_Get_Query_IMP(Highlighter *self) {
-    return Highlighter_IVARS(self)->query;
 }
 
 Searcher*

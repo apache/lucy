@@ -60,10 +60,10 @@ public class Lucy::Search::PolySearcher
     Doc_Freq(PolySearcher *self, String *field, Obj *term);
 
     public void
-    Collect(PolySearcher *self, Query *query, Collector *collector);
+    Collect(PolySearcher *self, Obj *query, Collector *collector);
 
     incremented TopDocs*
-    Top_Docs(PolySearcher *self, Query *query, uint32_t num_wanted,
+    Top_Docs(PolySearcher *self, Obj *query, uint32_t num_wanted,
              SortSpec *sort_spec = NULL);
 
     public incremented HitDoc*

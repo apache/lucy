@@ -55,7 +55,7 @@ Searcher_Hits_IMP(Searcher *self, Obj *query, uint32_t offset,
     uint32_t wanted     = offset + num_wanted > doc_max
                           ? doc_max
                           : offset + num_wanted;
-    TopDocs *top_docs   = Searcher_Top_Docs(self, real_query, wanted,
+    TopDocs *top_docs   = Searcher_Top_Docs(self, (Obj*)real_query, wanted,
                                             sort_spec);
     Hits    *hits       = Hits_new(self, top_docs, offset);
     DECREF(top_docs);

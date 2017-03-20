@@ -30,7 +30,7 @@ parcel Lucy;
  * However it is common for the Compiler to perform some calculations which
  * affect it's "weight" -- a floating point multiplier that the Matcher will
  * factor into each document's score.  If that is the case, then the Compiler
- * subclass may wish to override [](cfish:.Get_Weight), [](cfish:.Sum_Of_Squared_Weights), and
+ * subclass may wish to override [](cfish:.Sum_Of_Squared_Weights) and
  * [](cfish:.Apply_Norm_Factor).
  *
  * Compiling a Matcher is a two stage process.
@@ -57,23 +57,12 @@ parcel Lucy;
  * the Matchers's constructor, or whether [](cfish:.Make_Matcher) should return a
  * Matcher at all.
  */
-public class Lucy::Search::Compiler inherits Lucy::Search::Query {
-
-    Query        *parent;
-    Similarity   *sim;
+public class Lucy::Search::Compiler {
 
     /** Abstract initializer.
-     *
-     * @param parent The parent Query.
-     * @param searcher A Lucy::Search::Searcher, such as an
-     * IndexSearcher.
-     * @param similarity A Similarity.
-     * @param boost An arbitrary scoring multiplier.  Defaults to the boost of
-     * the parent Query.
      */
     public inert Compiler*
-    init(Compiler *self, Query *parent, Searcher *searcher,
-         Similarity *similarity = NULL, float boost);
+    init(Compiler *self);
 
     /** Factory method returning a Matcher.
      *
@@ -84,22 +73,6 @@ public class Lucy::Search::Compiler inherits Lucy::Search::Query {
      */
     public abstract incremented nullable Matcher*
     Make_Matcher(Compiler *self, SegReader *reader, bool need_score);
-
-    /** Return the Compiler's numerical weight, a scoring multiplier.  By
-     * default, returns the object's boost.
-     */
-    public float
-    Get_Weight(Compiler *self);
-
-    /** Accessor for the Compiler's Similarity object.
-     */
-    public nullable Similarity*
-    Get_Similarity(Compiler *self);
-
-    /** Accessor for the Compiler's parent Query object.
-     */
-    public Query*
-    Get_Parent(Compiler *self);
 
     /** Compute and return a raw weighting factor.  (This quantity is used by
      * [](cfish:.Normalize)).  By default, simply returns 1.0.
@@ -133,10 +106,10 @@ public class Lucy::Search::Compiler inherits Lucy::Search::Query {
      * implemented.
      */
     public void
-    Normalize(Compiler *self);
+    Normalize(Compiler *self, Similarity *sim);
 
     /** Return an array of Span objects, indicating where in the given field
-     * the text that matches the parent Query occurs and how well each snippet
+     * the text that matches the Query occurs and how well each snippet
      * matches.  The Span's offset and length are measured in Unicode code
      * points.
      *
@@ -150,20 +123,11 @@ public class Lucy::Search::Compiler inherits Lucy::Search::Query {
     Highlight_Spans(Compiler *self, Searcher *searcher,
                     DocVector *doc_vec, String *field);
 
-    void
+    abstract void
     Serialize(Compiler *self, OutStream *outstream);
 
-    incremented Compiler*
+    abstract incremented Compiler*
     Deserialize(decremented Compiler *self, InStream *instream);
-
-    public bool
-    Equals(Compiler *self, Obj *other);
-
-    public incremented String*
-    To_String(Compiler *self);
-
-    public void
-    Destroy(Compiler *self);
 }
 
 

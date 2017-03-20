@@ -73,10 +73,6 @@ func TestHighlighterAccessors(t *testing.T) {
 	if _, ok := hl.GetSearcher().(Searcher); !ok {
 		t.Errorf("GetSearcher")
 	}
-	barQuery := NewTermQuery("content", "bar")
-	if got := hl.GetQuery(); !barQuery.Equals(got) {
-		t.Errorf("GetQuery: %T %v", got, got)
-	}
 	if _, ok := hl.GetCompiler().(Compiler); !ok {
 		t.Errorf("GetCompiler")
 	}

@@ -69,14 +69,22 @@ class Lucy::Search::NoMatchCompiler
     inherits Lucy::Search::Compiler {
 
     inert incremented NoMatchCompiler*
-    new(NoMatchQuery *parent, Searcher *searcher, float boost);
+    new();
 
     inert NoMatchCompiler*
-    init(NoMatchCompiler *self, NoMatchQuery *parent,
-         Searcher *searcher, float boost);
+    init(NoMatchCompiler *self);
 
     public incremented nullable Matcher*
     Make_Matcher(NoMatchCompiler *self, SegReader *reader, bool need_score);
+
+    void
+    Serialize(NoMatchCompiler *self, OutStream *outstream);
+
+    incremented NoMatchCompiler*
+    Deserialize(decremented NoMatchCompiler *self, InStream *instream);
+
+    public bool
+    Equals(NoMatchCompiler *self, Obj *other);
 }
 
 

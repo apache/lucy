@@ -132,37 +132,40 @@ TermQuery_To_String_IMP(TermQuery *self) {
 
 Compiler*
 TermQuery_Make_Compiler_IMP(TermQuery *self, Searcher *searcher, float boost) {
-    return (Compiler*)TermCompiler_new((Query*)self, searcher, boost);
+    return (Compiler*)TermCompiler_new(self, searcher, boost);
 }
 
 /******************************************************************/
 
 TermCompiler*
-TermCompiler_new(Query *parent, Searcher *searcher, float boost) {
+TermCompiler_new(TermQuery *query, Searcher *searcher, float boost) {
     TermCompiler *self = (TermCompiler*)Class_Make_Obj(TERMCOMPILER);
-    return TermCompiler_init(self, parent, searcher, boost);
+    return TermCompiler_init(self, query, searcher, boost);
 }
 
 TermCompiler*
-TermCompiler_init(TermCompiler *self, Query *parent, Searcher *searcher,
+TermCompiler_init(TermCompiler *self, TermQuery *query, Searcher *searcher,
                   float boost) {
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
-    TermQueryIVARS *const parent_ivars = TermQuery_IVARS((TermQuery*)parent);
+    TermQueryIVARS *const query_ivars = TermQuery_IVARS(query);
+    String     *field   = query_ivars->field;
+    Obj        *term    = query_ivars->term;
     Schema     *schema  = Searcher_Get_Schema(searcher);
-    Similarity *sim     = Schema_Fetch_Sim(schema, parent_ivars->field);
+    Similarity *sim     = Schema_Fetch_Sim(schema, field);
 
     // Try harder to get a Similarity if necessary.
     if (!sim) { sim = Schema_Get_Similarity(schema); }
 
     // Init.
-    Compiler_init((Compiler*)self, parent, searcher, sim, boost);
+    Compiler_init((Compiler*)self);
+    ivars->field             = (String*)INCREF(field);
+    ivars->term              = INCREF(term);
     ivars->normalized_weight = 0.0f;
     ivars->query_norm_factor = 0.0f;
 
     // Derive.
     int32_t  doc_max  = Searcher_Doc_Max(searcher);
-    uint32_t doc_freq = Searcher_Doc_Freq(searcher, parent_ivars->field,
-                                          parent_ivars->term);
+    uint32_t doc_freq = Searcher_Doc_Freq(searcher, field, term);
     ivars->idf = Sim_IDF(sim, (int32_t)doc_freq, doc_max);
 
     /* The score of any document is approximately equal to:
@@ -176,20 +179,26 @@ TermCompiler_init(TermCompiler *self, Query *parent, Searcher *searcher,
      * tf_d and norm_d can only be added by the Matcher, since they are
      * per-document.
      */
-    ivars->raw_weight = ivars->idf * ivars->boost;
+    ivars->raw_weight = ivars->idf * boost;
 
     return self;
 }
 
+void
+TermCompiler_Destroy_IMP(TermCompiler *self) {
+    TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
+    DECREF(ivars->field);
+    DECREF(ivars->term);
+    SUPER_DESTROY(self, TERMCOMPILER);
+}
+
 bool
 TermCompiler_Equals_IMP(TermCompiler *self, Obj *other) {
-    TermCompiler_Equals_t super_equals
-        = (TermCompiler_Equals_t)SUPER_METHOD_PTR(TERMCOMPILER,
-                                                  LUCY_TermCompiler_Equals);
-    if (!super_equals(self, other))                           { return false; }
     if (!Obj_is_a(other, TERMCOMPILER))                       { return false; }
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
     TermCompilerIVARS *const ovars = TermCompiler_IVARS((TermCompiler*)other);
+    if (!Str_Equals(ivars->field, (Obj*)ovars->field))        { return false; }
+    if (!Obj_Equals(ivars->term, ovars->term))                { return false; }
     if (ivars->idf != ovars->idf)                             { return false; }
     if (ivars->raw_weight != ovars->raw_weight)               { return false; }
     if (ivars->query_norm_factor != ovars->query_norm_factor) { return false; }
@@ -200,9 +209,8 @@ TermCompiler_Equals_IMP(TermCompiler *self, Obj *other) {
 void
 TermCompiler_Serialize_IMP(TermCompiler *self, OutStream *outstream) {
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
-    TermCompiler_Serialize_t super_serialize
-        = SUPER_METHOD_PTR(TERMCOMPILER, LUCY_TermCompiler_Serialize);
-    super_serialize(self, outstream);
+    Freezer_serialize_string(ivars->field, outstream);
+    Freezer_freeze(ivars->term, outstream);
     OutStream_Write_F32(outstream, ivars->idf);
     OutStream_Write_F32(outstream, ivars->raw_weight);
     OutStream_Write_F32(outstream, ivars->query_norm_factor);
@@ -211,10 +219,9 @@ TermCompiler_Serialize_IMP(TermCompiler *self, OutStream *outstream) {
 
 TermCompiler*
 TermCompiler_Deserialize_IMP(TermCompiler *self, InStream *instream) {
-    TermCompiler_Deserialize_t super_deserialize
-        = SUPER_METHOD_PTR(TERMCOMPILER, LUCY_TermCompiler_Deserialize);
-    self = super_deserialize(self, instream);
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
+    ivars->field             = Freezer_read_string(instream);
+    ivars->term              = Freezer_thaw(instream);
     ivars->idf               = InStream_Read_F32(instream);
     ivars->raw_weight        = InStream_Read_F32(instream);
     ivars->query_norm_factor = InStream_Read_F32(instream);
@@ -244,25 +251,17 @@ TermCompiler_Apply_Norm_Factor_IMP(TermCompiler *self,
         = ivars->raw_weight * ivars->idf * query_norm_factor;
 }
 
-float
-TermCompiler_Get_Weight_IMP(TermCompiler *self) {
-    return TermCompiler_IVARS(self)->normalized_weight;
-}
-
 Matcher*
 TermCompiler_Make_Matcher_IMP(TermCompiler *self, SegReader *reader,
                               bool need_score) {
     UNUSED_VAR(need_score);
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
-    TermQueryIVARS *const parent_ivars
-        = TermQuery_IVARS((TermQuery*)ivars->parent);
     PostingListReader *plist_reader
         = (PostingListReader*)SegReader_Fetch(
               reader, Class_Get_Name(POSTINGLISTREADER));
     PostingList *plist = plist_reader
-                         ? PListReader_Posting_List(plist_reader,
-                                                    parent_ivars->field,
-                                                    parent_ivars->term)
+                         ? PListReader_Posting_List(plist_reader, ivars->field,
+                                                    ivars->term)
                          : NULL;
 
     if (plist == NULL || PList_Get_Doc_Freq(plist) == 0) {
@@ -282,18 +281,16 @@ TermCompiler_Highlight_Spans_IMP(TermCompiler *self, Searcher *searcher,
                                  DocVector *doc_vec, String *field) {
 
     TermCompilerIVARS *const ivars = TermCompiler_IVARS(self);
-    TermQueryIVARS *const parent_ivars
-        = TermQuery_IVARS((TermQuery*)ivars->parent);
     Vector *spans = Vec_new(0);
     TermVector *term_vector;
     I32Array *starts, *ends;
     UNUSED_VAR(searcher);
 
-    if (!Str_Equals(parent_ivars->field, (Obj*)field)) { return spans; }
+    if (!Str_Equals(ivars->field, (Obj*)field)) { return spans; }
 
     // Add all starts and ends.
     term_vector
-        = DocVec_Term_Vector(doc_vec, field, (String*)parent_ivars->term);
+        = DocVec_Term_Vector(doc_vec, field, (String*)ivars->term);
     if (!term_vector) { return spans; }
 
     starts = TV_Get_Start_Offsets(term_vector);
@@ -302,7 +299,7 @@ TermCompiler_Highlight_Spans_IMP(TermCompiler *self, Searcher *searcher,
         int32_t start  = I32Arr_Get(starts, i);
         int32_t length = I32Arr_Get(ends, i) - start;
         Vec_Push(spans,
-                (Obj*)Span_new(start, length, TermCompiler_Get_Weight(self)));
+                 (Obj*)Span_new(start, length, ivars->normalized_weight));
     }
 
     DECREF(term_vector);

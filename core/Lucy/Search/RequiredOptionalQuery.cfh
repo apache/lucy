@@ -74,15 +74,18 @@ class Lucy::Search::RequiredOptionalCompiler nickname ReqOptCompiler
     inherits Lucy::Search::PolyCompiler {
 
     inert incremented RequiredOptionalCompiler*
-    new(RequiredOptionalQuery *parent, Searcher *searcher, float boost);
+    new(RequiredOptionalQuery *query, Searcher *searcher, float boost);
 
     inert RequiredOptionalCompiler*
-    init(RequiredOptionalCompiler *self, RequiredOptionalQuery *parent,
+    init(RequiredOptionalCompiler *self, RequiredOptionalQuery *query,
          Searcher *searcher, float boost);
 
     public incremented nullable Matcher*
     Make_Matcher(RequiredOptionalCompiler *self, SegReader *reader,
                  bool need_score);
+
+    public bool
+    Equals(RequiredOptionalCompiler *self, Obj *other);
 }
 
 

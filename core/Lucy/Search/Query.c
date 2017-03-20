@@ -18,6 +18,8 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Search/Query.h"
+#include "Lucy/Index/Similarity.h"
+#include "Lucy/Plan/Schema.h"
 #include "Lucy/Search/Compiler.h"
 #include "Lucy/Search/Searcher.h"
 #include "Lucy/Store/InStream.h"
@@ -35,7 +37,11 @@ Compiler*
 Query_Make_Root_Compiler_IMP(Query *self, Searcher *searcher) {
     Compiler *compiler
         = Query_Make_Compiler(self, searcher, Query_Get_Boost(self));
-    Compiler_Normalize(compiler);
+
+    Schema     *schema = Searcher_Get_Schema(searcher);
+    Similarity *sim    = Schema_Get_Similarity(schema);
+    Compiler_Normalize(compiler, sim);
+
     return compiler;
 }
 

@@ -130,18 +130,19 @@ PolyQuery_Equals_IMP(PolyQuery *self, Obj *other) {
 
 
 PolyCompiler*
-PolyCompiler_init(PolyCompiler *self, PolyQuery *parent,
+PolyCompiler_init(PolyCompiler *self, PolyQuery *query,
                   Searcher *searcher, float boost) {
     PolyCompilerIVARS *const ivars = PolyCompiler_IVARS(self);
-    PolyQueryIVARS *const parent_ivars = PolyQuery_IVARS(parent);
-    const size_t num_kids = Vec_Get_Size(parent_ivars->children);
+    PolyQueryIVARS *const query_ivars = PolyQuery_IVARS(query);
+    const size_t num_kids = Vec_Get_Size(query_ivars->children);
 
-    Compiler_init((Compiler*)self, (Query*)parent, searcher, NULL, boost);
+    Compiler_init((Compiler*)self);
     ivars->children = Vec_new(num_kids);
+    ivars->boost    = boost;
 
     // Iterate over the children, creating a Compiler for each one.
     for (size_t i = 0; i < num_kids; i++) {
-        Query *child_query = (Query*)Vec_Fetch(parent_ivars->children, i);
+        Query *child_query = (Query*)Vec_Fetch(query_ivars->children, i);
         float sub_boost = boost * Query_Get_Boost(child_query);
         Compiler *child_compiler
             = Query_Make_Compiler(child_query, searcher, sub_boost);
@@ -162,7 +163,7 @@ float
 PolyCompiler_Sum_Of_Squared_Weights_IMP(PolyCompiler *self) {
     PolyCompilerIVARS *const ivars = PolyCompiler_IVARS(self);
     float sum      = 0;
-    float my_boost = PolyCompiler_Get_Boost(self);
+    float my_boost = ivars->boost;
 
     for (size_t i = 0, max = Vec_Get_Size(ivars->children); i < max; i++) {
         Compiler *child = (Compiler*)Vec_Fetch(ivars->children, i);
@@ -201,24 +202,35 @@ PolyCompiler_Highlight_Spans_IMP(PolyCompiler *self, Searcher *searcher,
     return spans;
 }
 
+bool
+PolyCompiler_Equals_IMP(PolyCompiler *self, Obj *other) {
+    if ((PolyCompiler*)other == self)                        { return true; }
+    if (!Obj_is_a(other, POLYCOMPILER))                      { return false; }
+    PolyCompilerIVARS *const ivars = PolyCompiler_IVARS(self);
+    PolyCompilerIVARS *const ovars = PolyCompiler_IVARS((PolyCompiler*)other);
+    if (ivars->boost != ovars->boost)                        { return false; }
+    if (!Vec_Equals(ovars->children, (Obj*)ivars->children)) { return false; }
+    return true;
+}
+
 void
 PolyCompiler_Serialize_IMP(PolyCompiler *self, OutStream *outstream) {
     PolyCompilerIVARS *const ivars = PolyCompiler_IVARS(self);
-    Freezer_serialize_string(PolyCompiler_get_class_name(self), outstream);
     Freezer_serialize_varray(ivars->children, outstream);
-    PolyCompiler_Serialize_t super_serialize
-        = SUPER_METHOD_PTR(POLYCOMPILER, LUCY_PolyCompiler_Serialize);
-    super_serialize(self, outstream);
+    OutStream_Write_F32(outstream, ivars->boost);
 }
 
 PolyCompiler*
 PolyCompiler_Deserialize_IMP(PolyCompiler *self, InStream *instream) {
     PolyCompilerIVARS *const ivars = PolyCompiler_IVARS(self);
-    String *class_name = Freezer_read_string(instream);
-    DECREF(class_name); // TODO Don't serialize class name.
+
     ivars->children = Freezer_read_varray(instream);
-    PolyCompiler_Deserialize_t super_deserialize
-        = SUPER_METHOD_PTR(POLYCOMPILER, LUCY_PolyCompiler_Deserialize);
-    return super_deserialize(self, instream);
+    ivars->boost    = InStream_Read_F32(instream);
+
+    for (size_t i = 0, max = Vec_Get_Size(ivars->children); i < max; i++) {
+        CERTIFY(Vec_Fetch(ivars->children, i), COMPILER);
+    }
+
+    return self;
 }
 

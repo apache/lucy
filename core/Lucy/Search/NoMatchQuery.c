@@ -62,7 +62,10 @@ NoMatchQuery_To_String_IMP(NoMatchQuery *self) {
 Compiler*
 NoMatchQuery_Make_Compiler_IMP(NoMatchQuery *self, Searcher *searcher,
                                float boost) {
-    return (Compiler*)NoMatchCompiler_new(self, searcher, boost);
+    UNUSED_VAR(self);
+    UNUSED_VAR(searcher);
+    UNUSED_VAR(boost);
+    return (Compiler*)NoMatchCompiler_new();
 }
 
 void
@@ -114,18 +117,35 @@ NoMatchQuery_Deserialize_IMP(NoMatchQuery *self, InStream *instream) {
 /**********************************************************************/
 
 NoMatchCompiler*
-NoMatchCompiler_new(NoMatchQuery *parent, Searcher *searcher,
-                    float boost) {
+NoMatchCompiler_new() {
     NoMatchCompiler *self
         = (NoMatchCompiler*)Class_Make_Obj(NOMATCHCOMPILER);
-    return NoMatchCompiler_init(self, parent, searcher, boost);
+    return NoMatchCompiler_init(self);
+}
+
+bool
+NoMatchCompiler_Equals_IMP(NoMatchCompiler *self, Obj *other) {
+    if ((NoMatchCompiler*)other == self)   { return true; }
+    if (!Obj_is_a(other, NOMATCHCOMPILER)) { return false; }
+    return true;
+}
+
+// Perl's Storable doesn't cope with empty strings.
+void
+NoMatchCompiler_Serialize_IMP(NoMatchCompiler *self, OutStream *outstream) {
+    UNUSED_VAR(self);
+    OutStream_Write_I8(outstream, 'x');
 }
 
 NoMatchCompiler*
-NoMatchCompiler_init(NoMatchCompiler *self, NoMatchQuery *parent,
-                     Searcher *searcher, float boost) {
-    return (NoMatchCompiler*)Compiler_init((Compiler*)self, (Query*)parent,
-                                           searcher, NULL, boost);
+NoMatchCompiler_Deserialize_IMP(NoMatchCompiler *self, InStream *instream) {
+    InStream_Read_I8(instream);
+    return self;
+}
+
+NoMatchCompiler*
+NoMatchCompiler_init(NoMatchCompiler *self) {
+    return (NoMatchCompiler*)Compiler_init((Compiler*)self);
 }
 
 Matcher*

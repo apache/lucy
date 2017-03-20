@@ -184,12 +184,17 @@ the parent Query.
 END_CONSTRUCTOR_POD
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', pod => $constructor, );
+    $pod_spec->add_method(
+        method => 'Normalize',
+        alias  => 'normalize',
+    );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Search::Compiler",
     );
     $binding->bind_constructor( alias => 'do_new' );
+    $binding->bind_method( alias => '_normalize', method => 'Normalize' );
     $binding->set_pod_spec($pod_spec);
 
     Clownfish::CFC::Binding::Perl::Class->register($binding);

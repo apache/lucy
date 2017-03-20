@@ -139,7 +139,7 @@ func (s *SearcherIMP) topDocs(query Query, numWanted uint32,
 	err = clownfish.TrapErr(func() {
 		self := (*C.lucy_Searcher)(clownfish.Unwrap(s, "s"))
 		sortSpecC := (*C.lucy_SortSpec)(clownfish.UnwrapNullable(sortSpec))
-		queryC := (*C.lucy_Query)(clownfish.Unwrap(query, "query"))
+		queryC := (*C.cfish_Obj)(clownfish.Unwrap(query, "query"))
 		topDocsC := C.LUCY_Searcher_Top_Docs(self, queryC,
 			C.uint32_t(numWanted), sortSpecC)
 		topDocs = WRAPTopDocs(unsafe.Pointer(topDocsC))

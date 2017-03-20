@@ -36,11 +36,11 @@
 
 // Determine the lowest ordinal that should match.
 static int32_t
-S_find_lower_bound(RangeCompiler *self, SortCache *sort_cache);
+S_find_lower_bound(RangeQueryIVARS *query_ivars, SortCache *sort_cache);
 
 // Determine the highest ordinal that should match.
 static int32_t
-S_find_upper_bound(RangeCompiler *self, SortCache *sort_cache);
+S_find_upper_bound(RangeQueryIVARS *query_ivars, SortCache *sort_cache);
 
 RangeQuery*
 RangeQuery_new(String *field, Obj *lower_term, Obj *upper_term,
@@ -215,30 +215,66 @@ RangeQuery_Load_IMP(RangeQuery *self, Obj *dump) {
 Compiler*
 RangeQuery_Make_Compiler_IMP(RangeQuery *self, Searcher *searcher,
                              float boost) {
-    return (Compiler*)RangeCompiler_new(self, searcher, boost);
+    UNUSED_VAR(searcher);
+    return (Compiler*)RangeCompiler_new(self, boost);
 }
 
 /**********************************************************************/
 
 RangeCompiler*
-RangeCompiler_new(RangeQuery *parent, Searcher *searcher, float boost) {
+RangeCompiler_new(RangeQuery *query, float boost) {
     RangeCompiler *self
         = (RangeCompiler*)Class_Make_Obj(RANGECOMPILER);
-    return RangeCompiler_init(self, parent, searcher, boost);
+    return RangeCompiler_init(self, query, boost);
 }
 
 RangeCompiler*
-RangeCompiler_init(RangeCompiler *self, RangeQuery *parent,
-                   Searcher *searcher, float boost) {
-    return (RangeCompiler*)Compiler_init((Compiler*)self, (Query*)parent,
-                                         searcher, NULL, boost);
+RangeCompiler_init(RangeCompiler *self, RangeQuery *query, float boost) {
+    RangeCompilerIVARS *const ivars = RangeCompiler_IVARS(self);
+    ivars->query = (RangeQuery*)INCREF(query);
+    ivars->boost = boost;
+    return (RangeCompiler*)Compiler_init((Compiler*)self);
+}
+
+void
+RangeCompiler_Destroy_IMP(RangeCompiler *self) {
+    DECREF(RangeCompiler_IVARS(self)->query);
+    SUPER_DESTROY(self, RANGECOMPILER);
+}
+
+bool
+RangeCompiler_Equals_IMP(RangeCompiler *self, Obj *other) {
+    if ((RangeCompiler*)other == self)                        { return true; }
+    if (!Obj_is_a(other, RANGECOMPILER))                      { return false; }
+    RangeCompilerIVARS *const ivars = RangeCompiler_IVARS(self);
+    RangeCompilerIVARS *const ovars
+        = RangeCompiler_IVARS((RangeCompiler*)other);
+    if (ivars->boost != ovars->boost)                         { return false; }
+    if (!RangeQuery_Equals(ivars->query, (Obj*)ovars->query)) { return false; }
+    return true;
+}
+
+void
+RangeCompiler_Serialize_IMP(RangeCompiler *self, OutStream *outstream) {
+    RangeCompilerIVARS *const ivars = RangeCompiler_IVARS(self);
+    FREEZE(ivars->query, outstream);
+    OutStream_Write_F32(outstream, ivars->boost);
+}
+
+RangeCompiler*
+RangeCompiler_Deserialize_IMP(RangeCompiler *self, InStream *instream) {
+    RangeCompilerIVARS *const ivars = RangeCompiler_IVARS(self);
+    ivars->query = (RangeQuery*)CERTIFY(THAW(instream), RANGEQUERY);
+    ivars->boost = InStream_Read_F32(instream);
+    return self;
 }
 
 Matcher*
 RangeCompiler_Make_Matcher_IMP(RangeCompiler *self, SegReader *reader,
                                bool need_score) {
-    RangeQuery *parent = (RangeQuery*)RangeCompiler_IVARS(self)->parent;
-    String *field = RangeQuery_IVARS(parent)->field;
+    RangeQuery *query = RangeCompiler_IVARS(self)->query;
+    RangeQueryIVARS *const query_ivars = RangeQuery_IVARS(query);
+    String *field = query_ivars->field;
     SortReader *sort_reader
         = (SortReader*)SegReader_Fetch(reader, Class_Get_Name(SORTREADER));
     SortCache *sort_cache = sort_reader
@@ -250,8 +286,8 @@ RangeCompiler_Make_Matcher_IMP(RangeCompiler *self, SegReader *reader,
         return NULL;
     }
     else {
-        int32_t lower = S_find_lower_bound(self, sort_cache);
-        int32_t upper = S_find_upper_bound(self, sort_cache);
+        int32_t lower = S_find_lower_bound(query_ivars, sort_cache);
+        int32_t upper = S_find_upper_bound(query_ivars, sort_cache);
         int32_t max_ord = SortCache_Get_Cardinality(sort_cache) + 1;
         if (lower > max_ord || upper < 0) {
             return NULL;
@@ -265,9 +301,8 @@ RangeCompiler_Make_Matcher_IMP(RangeCompiler *self, SegReader *reader,
 }
 
 static int32_t
-S_find_lower_bound(RangeCompiler *self, SortCache *sort_cache) {
-    RangeQuery *parent      = (RangeQuery*)RangeCompiler_IVARS(self)->parent;
-    Obj        *lower_term  = RangeQuery_IVARS(parent)->lower_term;
+S_find_lower_bound(RangeQueryIVARS *query_ivars, SortCache *sort_cache) {
+    Obj        *lower_term  = query_ivars->lower_term;
     int32_t     lower_bound = 0;
 
     if (lower_term) {
@@ -283,7 +318,7 @@ S_find_lower_bound(RangeCompiler *self, SortCache *sort_cache) {
                                  : Obj_Equals(lower_term, low_found);
 
             lower_bound = low_ord;
-            if (!exact_match || !RangeQuery_IVARS(parent)->include_lower) {
+            if (!exact_match || !query_ivars->include_lower) {
                 lower_bound++;
             }
             DECREF(low_found);
@@ -294,9 +329,8 @@ S_find_lower_bound(RangeCompiler *self, SortCache *sort_cache) {
 }
 
 static int32_t
-S_find_upper_bound(RangeCompiler *self, SortCache *sort_cache) {
-    RangeQuery *parent     = (RangeQuery*)RangeCompiler_IVARS(self)->parent;
-    Obj        *upper_term = RangeQuery_IVARS(parent)->upper_term;
+S_find_upper_bound(RangeQueryIVARS *query_ivars, SortCache *sort_cache) {
+    Obj        *upper_term = query_ivars->upper_term;
     int32_t     retval     = INT32_MAX;
 
     if (upper_term) {
@@ -312,7 +346,7 @@ S_find_upper_bound(RangeCompiler *self, SortCache *sort_cache) {
                                  : Obj_Equals(upper_term, (Obj*)hi_found);
 
             retval = hi_ord;
-            if (exact_match && !RangeQuery_IVARS(parent)->include_upper) {
+            if (exact_match && !query_ivars->include_upper) {
                 retval--;
             }
             DECREF(hi_found);

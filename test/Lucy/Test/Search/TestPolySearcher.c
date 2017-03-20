@@ -111,7 +111,7 @@ test_poly_searcher(TestBatchRunner *runner) {
     Collector *collector = (Collector*)BitColl_new(bit_vec);
     Query *query = PolySearcher_Glean_Query(poly_searcher,
                                             (Obj*)SSTR_WRAP_C("b"));
-    PolySearcher_Collect(poly_searcher, query, collector);
+    PolySearcher_Collect(poly_searcher, (Obj*)query, collector);
     TEST_INT_EQ(runner, BitVec_Next_Hit(bit_vec, 0),  2, "Collect doc 1");
     TEST_INT_EQ(runner, BitVec_Next_Hit(bit_vec, 3),  4, "Collect doc 2");
     TEST_INT_EQ(runner, BitVec_Next_Hit(bit_vec, 5), -1, "Collect end");

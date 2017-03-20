@@ -65,10 +65,10 @@ class Lucy::Search::NOTCompiler
     inherits Lucy::Search::PolyCompiler {
 
     inert incremented NOTCompiler*
-    new(NOTQuery *parent, Searcher *searcher, float boost);
+    new(NOTQuery *query, Searcher *searcher, float boost);
 
     inert NOTCompiler*
-    init(NOTCompiler *self, NOTQuery *parent, Searcher *searcher,
+    init(NOTCompiler *self, NOTQuery *query, Searcher *searcher,
          float boost);
 
     public incremented nullable Matcher*
@@ -80,6 +80,9 @@ class Lucy::Search::NOTCompiler
     incremented Vector*
     Highlight_Spans(NOTCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, String *field);
+
+    public bool
+    Equals(NOTCompiler *self, Obj *other);
 }
 
 

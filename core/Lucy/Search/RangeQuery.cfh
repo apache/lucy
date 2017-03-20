@@ -84,15 +84,29 @@ public class Lucy::Search::RangeQuery inherits Lucy::Search::Query {
 
 class Lucy::Search::RangeCompiler inherits Lucy::Search::Compiler {
 
+    RangeQuery *query;
+    float boost;
+
     inert incremented RangeCompiler*
-    new(RangeQuery *parent, Searcher *searcher, float boost);
+    new(RangeQuery *query, float boost);
 
     inert RangeCompiler*
-    init(RangeCompiler *self, RangeQuery *parent, Searcher *searcher,
-         float boost);
+    init(RangeCompiler *self, RangeQuery *query, float boost);
 
     public incremented nullable Matcher*
     Make_Matcher(RangeCompiler *self, SegReader *reader, bool need_score);
+
+    public bool
+    Equals(RangeCompiler *self, Obj *other);
+
+    public void
+    Destroy(RangeCompiler *self);
+
+    void
+    Serialize(RangeCompiler *self, OutStream *outstream);
+
+    incremented RangeCompiler*
+    Deserialize(decremented RangeCompiler *self, InStream *instream);
 }
 
 

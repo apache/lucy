@@ -55,7 +55,7 @@ sub highlight {
 
 package main;
 
-use Test::More tests => 6;
+use Test::More tests => 5;
 use Lucy::Test;
 
 binmode( STDOUT, ":utf8" );
@@ -115,8 +115,6 @@ $hl = Lucy::Highlight::Highlighter->new(
     query    => $compiler,
     field    => 'content',
 );
-is( $$compiler, ${ $hl->get_query },
-    "Highlighter accepts Compiler as Query" );
 is( $$compiler, ${ $hl->get_compiler },
     "Highlighter uses supplied Compiler" );
 
