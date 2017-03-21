@@ -23,8 +23,7 @@ package MyQuery;
 use base qw( Lucy::Search::Query );
 
 sub make_compiler {
-    my ( $self, %args ) = @_;
-    return MyCompiler->new( %args, parent => $self );
+    return MyCompiler->new;
 }
 
 package MyCompiler;

@@ -52,7 +52,7 @@ sub DESTROY {
 
 sub make_compiler {
     my ( $self, %args ) = @_;
-    return LucyX::Search::FilterCompiler->new( %args, parent => $self );
+    return LucyX::Search::FilterCompiler->new( query => $self );
 }
 
 sub serialize {
@@ -169,14 +169,15 @@ BEGIN { our @ISA = qw( Lucy::Search::Compiler ) }
 
 sub new {
     my ( $class, %args ) = @_;
-    $args{similarity} ||= $args{searcher}->get_schema->get_similarity;
-    return $class->SUPER::new(%args);
+    my $self = $class->SUPER::new;
+    $self->{query} = $args{query};
+    return $self;
 }
 
 sub make_matcher {
     my ( $self, %args ) = @_;
     my $seg_reader = $args{reader};
-    my $bits       = $self->get_parent->_bits($seg_reader);
+    my $bits       = $self->{query}->_bits($seg_reader);
     return LucyX::Search::FilterMatcher->new(
         bits    => $bits,
         doc_max => $seg_reader->doc_max,
