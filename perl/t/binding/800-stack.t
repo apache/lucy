@@ -24,10 +24,7 @@ use base qw( Lucy::Search::Query );
 
 sub make_compiler {
     my ( $self, %args ) = @_;
-    my $subordinate = delete $args{subordinate};
-    my $compiler = MyCompiler->new( %args, parent => $self );
-    $compiler->normalize unless $subordinate;
-    return $compiler;
+    return MyCompiler->new( %args, parent => $self );
 }
 
 package MyCompiler;
@@ -47,10 +44,7 @@ for ( 1 .. 50 ) {
     $q = Lucy::Search::ORQuery->new( children => \@kids );
 }
 my $searcher = MockSearcher->new( schema => Lucy::Plan::Schema->new );
-my $compiler = $q->make_compiler(
-    searcher => $searcher,
-    boost    => $q->get_boost,
-);
+my $compiler = $q->make_root_compiler($searcher);
 
 pass("Made it through deep recursion with multiple stack reallocations");
 

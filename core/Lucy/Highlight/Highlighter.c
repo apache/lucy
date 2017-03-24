@@ -66,9 +66,7 @@ Highlighter_init(Highlighter *self, Searcher *searcher, Obj *query,
         ivars->compiler = (Compiler*)INCREF(ivars->query);
     }
     else {
-        ivars->compiler = Query_Make_Compiler(ivars->query, searcher,
-                                              Query_Get_Boost(ivars->query),
-                                              false);
+        ivars->compiler = Query_Make_Root_Compiler(ivars->query, searcher);
     }
     return self;
 }

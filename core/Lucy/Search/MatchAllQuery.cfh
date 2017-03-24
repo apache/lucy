@@ -42,8 +42,7 @@ public class Lucy::Search::MatchAllQuery inherits Lucy::Search::Query {
     To_String(MatchAllQuery *self);
 
     public incremented Compiler*
-    Make_Compiler(MatchAllQuery *self, Searcher *searcher, float boost,
-                  bool subordinate = false);
+    Make_Compiler(MatchAllQuery *self, Searcher *searcher, float boost);
 }
 
 class Lucy::Search::MatchAllCompiler

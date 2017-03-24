@@ -56,10 +56,7 @@ ok( !$and_query->equals($different_children),
 my $one_child = Lucy::Search::ANDQuery->new( children => [$a_query] );
 ok( !$and_query->equals($one_child), '!equals (too few children)' );
 
-my $and_compiler = $and_query->make_compiler(
-    searcher => $searcher,
-    boost    => $and_query->get_boost,
-);
+my $and_compiler = $and_query->make_root_compiler($searcher);
 isa_ok( $and_compiler, "Lucy::Search::ANDCompiler", "make_compiler" );
 $frozen = freeze($and_compiler);
 $thawed = thaw($frozen);
@@ -71,9 +68,8 @@ my $and_matcher = $and_compiler->make_matcher(
 );
 isa_ok( $and_matcher, "Lucy::Search::ANDMatcher", "make_matcher" );
 
-my $term_matcher = $one_child->make_compiler(
-    searcher => $searcher,
-    boost    => $one_child->get_boost,
+my $term_matcher = $one_child->make_root_compiler(
+    $searcher,
 )->make_matcher( reader => $reader, need_score => 0 );
 isa_ok( $term_matcher, "Lucy::Search::TermMatcher",
     "make_matcher compiles to child's Matcher if there's only one child" );
@@ -83,9 +79,8 @@ my $hopeless_query = Lucy::Search::TermQuery->new(
     term  => 'nein',
 );
 $and_query->add_child($hopeless_query);
-my $nope = $and_query->make_compiler(
-    searcher => $searcher,
-    boost    => $and_query->get_boost,
+my $nope = $and_query->make_root_compiler(
+    $searcher,
 )->make_matcher( reader => $reader, need_score => 0 );
 ok( !defined $nope,
     "If matcher wouldn't return any docs, make_matcher returns undef" );

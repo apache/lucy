@@ -77,8 +77,7 @@ public class Lucy::Search::LeafQuery inherits Lucy::Search::Query {
     /** Throws an error.
      */
     public incremented Compiler*
-    Make_Compiler(LeafQuery *self, Searcher *searcher, float boost,
-                  bool subordinate = false);
+    Make_Compiler(LeafQuery *self, Searcher *searcher, float boost);
 
     public void
     Destroy(LeafQuery *self);

@@ -159,7 +159,7 @@ PhraseQuery_To_String_IMP(PhraseQuery *self) {
 
 Compiler*
 PhraseQuery_Make_Compiler_IMP(PhraseQuery *self, Searcher *searcher,
-                              float boost, bool subordinate) {
+                              float boost) {
     PhraseQueryIVARS *const ivars = PhraseQuery_IVARS(self);
     if (Vec_Get_Size(ivars->terms) == 1) {
         // Optimize for one-term "phrases".
@@ -169,17 +169,12 @@ PhraseQuery_Make_Compiler_IMP(PhraseQuery *self, Searcher *searcher,
         TermQuery_Set_Boost(term_query, ivars->boost);
         term_compiler
             = (TermCompiler*)TermQuery_Make_Compiler(term_query, searcher,
-                                                     boost, subordinate);
+                                                     boost);
         DECREF(term_query);
         return (Compiler*)term_compiler;
     }
     else {
-        PhraseCompiler *compiler
-            = PhraseCompiler_new(self, searcher, boost);
-        if (!subordinate) {
-            PhraseCompiler_Normalize(compiler);
-        }
-        return (Compiler*)compiler;
+        return (Compiler*)PhraseCompiler_new(self, searcher, boost);
     }
 }
 

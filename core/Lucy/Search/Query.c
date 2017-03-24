@@ -31,6 +31,43 @@ Query_init(Query *self, float boost) {
     return self;
 }
 
+Compiler*
+Query_Make_Root_Compiler_IMP(Query *self, Searcher *searcher) {
+    Compiler *compiler
+        = Query_Make_Compiler(self, searcher, Query_Get_Boost(self));
+    Compiler_Normalize(compiler);
+    return compiler;
+}
+
+// Default implementation for old Perl API.
+Compiler*
+Query_Make_Compiler_IMP(Query *self, Searcher *searcher, float boost) {
+    return Query_Make_Compiler_Compat(self, searcher, boost, true);
+}
+
+// For old Perl API.
+Compiler*
+Query_Make_Compiler_Compat_IMP(Query *self, Searcher *searcher, float boost,
+                               bool subordinate) {
+    Class *klass = Query_get_class(self);
+    LUCY_Query_Make_Compiler_t make_compiler
+        = METHOD_PTR(klass, LUCY_Query_Make_Compiler);
+    if (make_compiler == Query_Make_Compiler_IMP) {
+        // Detect infinite recursion.
+        THROW(ERR, "Method 'Make_Compiler' not defined by %o",
+              Class_Get_Name(klass));
+    }
+    Compiler *compiler = make_compiler(self, searcher, boost);
+
+    if (!subordinate) {
+        Schema     *schema = Searcher_Get_Schema(searcher);
+        Similarity *sim    = Schema_Get_Similarity(schema);
+        Compiler_Normalize(compiler, sim);
+    }
+
+    return compiler;
+}
+
 void
 Query_Set_Boost_IMP(Query *self, float boost) {
     Query_IVARS(self)->boost = boost;

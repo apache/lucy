@@ -131,14 +131,8 @@ TermQuery_To_String_IMP(TermQuery *self) {
 }
 
 Compiler*
-TermQuery_Make_Compiler_IMP(TermQuery *self, Searcher *searcher, float boost,
-                            bool subordinate) {
-    TermCompiler *compiler = TermCompiler_new((Query*)self, searcher, boost);
-    if (!subordinate) {
-        TermCompiler_Normalize(compiler);
-    }
-    return (Compiler*)compiler;
-
+TermQuery_Make_Compiler_IMP(TermQuery *self, Searcher *searcher, float boost) {
+    return (Compiler*)TermCompiler_new((Query*)self, searcher, boost);
 }
 
 /******************************************************************/

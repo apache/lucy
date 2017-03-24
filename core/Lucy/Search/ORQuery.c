@@ -40,13 +40,8 @@ ORQuery_init(ORQuery *self, Vector *children) {
 }
 
 Compiler*
-ORQuery_Make_Compiler_IMP(ORQuery *self, Searcher *searcher, float boost,
-                          bool subordinate) {
-    ORCompiler *compiler = ORCompiler_new(self, searcher, boost);
-    if (!subordinate) {
-        ORCompiler_Normalize(compiler);
-    }
-    return (Compiler*)compiler;
+ORQuery_Make_Compiler_IMP(ORQuery *self, Searcher *searcher, float boost) {
+    return (Compiler*)ORCompiler_new(self, searcher, boost);
 }
 
 bool

@@ -91,13 +91,8 @@ ReqOptQuery_Equals_IMP(RequiredOptionalQuery *self, Obj *other) {
 
 Compiler*
 ReqOptQuery_Make_Compiler_IMP(RequiredOptionalQuery *self, Searcher *searcher,
-                              float boost, bool subordinate) {
-    RequiredOptionalCompiler *compiler
-        = ReqOptCompiler_new(self, searcher, boost);
-    if (!subordinate) {
-        ReqOptCompiler_Normalize(compiler);
-    }
-    return (Compiler*)compiler;
+                              float boost) {
+    return (Compiler*)ReqOptCompiler_new(self, searcher, boost);
 }
 
 /**********************************************************************/

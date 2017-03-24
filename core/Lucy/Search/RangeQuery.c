@@ -214,12 +214,8 @@ RangeQuery_Load_IMP(RangeQuery *self, Obj *dump) {
 
 Compiler*
 RangeQuery_Make_Compiler_IMP(RangeQuery *self, Searcher *searcher,
-                             float boost, bool subordinate) {
-    RangeCompiler *compiler = RangeCompiler_new(self, searcher, boost);
-    if (!subordinate) {
-        RangeCompiler_Normalize(compiler);
-    }
-    return (Compiler*)compiler;
+                             float boost) {
+    return (Compiler*)RangeCompiler_new(self, searcher, boost);
 }
 
 /**********************************************************************/

@@ -148,9 +148,7 @@ PolySearcher_Top_Docs_IMP(PolySearcher *self, Query *query,
     uint32_t  total_hits  = 0;
     Compiler *compiler    = Query_is_a(query, COMPILER)
                             ? ((Compiler*)INCREF(query))
-                            : Query_Make_Compiler(query, (Searcher*)self,
-                                                  Query_Get_Boost(query),
-                                                  false);
+                            : Query_Make_Root_Compiler(query, (Searcher*)self);
 
     for (size_t i = 0, max = Vec_Get_Size(searchers); i < max; i++) {
         Searcher   *searcher   = (Searcher*)Vec_Fetch(searchers, i);

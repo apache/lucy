@@ -119,10 +119,7 @@ a subclass of [](cfish:lucy.Compiler).
 ~~~ perl
 sub make_compiler {
     my ( $self, %args ) = @_;
-    my $subordinate = delete $args{subordinate};
-    my $compiler = PrefixCompiler->new( %args, parent => $self );
-    $compiler->normalize unless $subordinate;
-    return $compiler;
+    return PrefixCompiler->new( %args, parent => $self );
 }
 ~~~
 

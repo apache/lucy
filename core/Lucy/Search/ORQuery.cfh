@@ -41,8 +41,7 @@ public class Lucy::Search::ORQuery inherits Lucy::Search::PolyQuery {
     init(ORQuery *self, Vector *children = NULL);
 
     public incremented Compiler*
-    Make_Compiler(ORQuery *self, Searcher *searcher, float boost,
-                  bool subordinate = false);
+    Make_Compiler(ORQuery *self, Searcher *searcher, float boost);
 
     public incremented String*
     To_String(ORQuery *self);

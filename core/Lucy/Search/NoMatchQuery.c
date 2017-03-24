@@ -61,12 +61,8 @@ NoMatchQuery_To_String_IMP(NoMatchQuery *self) {
 
 Compiler*
 NoMatchQuery_Make_Compiler_IMP(NoMatchQuery *self, Searcher *searcher,
-                               float boost, bool subordinate) {
-    NoMatchCompiler *compiler = NoMatchCompiler_new(self, searcher, boost);
-    if (!subordinate) {
-        NoMatchCompiler_Normalize(compiler);
-    }
-    return (Compiler*)compiler;
+                               float boost) {
+    return (Compiler*)NoMatchCompiler_new(self, searcher, boost);
 }
 
 void

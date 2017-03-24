@@ -79,13 +79,8 @@ ANDQuery_Equals_IMP(ANDQuery *self, Obj *other) {
 }
 
 Compiler*
-ANDQuery_Make_Compiler_IMP(ANDQuery *self, Searcher *searcher, float boost,
-                           bool subordinate) {
-    ANDCompiler *compiler = ANDCompiler_new(self, searcher, boost);
-    if (!subordinate) {
-        ANDCompiler_Normalize(compiler);
-    }
-    return (Compiler*)compiler;
+ANDQuery_Make_Compiler_IMP(ANDQuery *self, Searcher *searcher, float boost) {
+    return (Compiler*)ANDCompiler_new(self, searcher, boost);
 }
 
 /**********************************************************************/

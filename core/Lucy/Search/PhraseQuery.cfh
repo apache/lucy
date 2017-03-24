@@ -54,8 +54,7 @@ public class Lucy::Search::PhraseQuery inherits Lucy::Search::Query {
     Get_Terms(PhraseQuery *self);
 
     public incremented Compiler*
-    Make_Compiler(PhraseQuery *self, Searcher *searcher, float boost,
-                  bool subordinate = false);
+    Make_Compiler(PhraseQuery *self, Searcher *searcher, float boost);
 
     public bool
     Equals(PhraseQuery *self, Obj *other);

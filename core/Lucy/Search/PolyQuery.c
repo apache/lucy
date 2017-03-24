@@ -144,7 +144,7 @@ PolyCompiler_init(PolyCompiler *self, PolyQuery *parent,
         Query *child_query = (Query*)Vec_Fetch(parent_ivars->children, i);
         float sub_boost = boost * Query_Get_Boost(child_query);
         Compiler *child_compiler
-            = Query_Make_Compiler(child_query, searcher, sub_boost, true);
+            = Query_Make_Compiler(child_query, searcher, sub_boost);
         Vec_Push(ivars->children, (Obj*)child_compiler);
     }
 

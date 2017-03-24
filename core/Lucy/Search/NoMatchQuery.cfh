@@ -62,8 +62,7 @@ public class Lucy::Search::NoMatchQuery inherits Lucy::Search::Query {
     To_String(NoMatchQuery *self);
 
     public incremented Compiler*
-    Make_Compiler(NoMatchQuery *self, Searcher *searcher, float boost,
-                  bool subordinate = false);
+    Make_Compiler(NoMatchQuery *self, Searcher *searcher, float boost);
 }
 
 class Lucy::Search::NoMatchCompiler

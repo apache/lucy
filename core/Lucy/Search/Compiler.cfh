@@ -121,8 +121,7 @@ public class Lucy::Search::Compiler inherits Lucy::Search::Query {
     Apply_Norm_Factor(Compiler *self, float factor);
 
     /**  Take a newly minted Compiler object and apply query-specific
-     * normalization factors.  Should be invoked by Query subclasses during
-     * [](cfish:.Make_Compiler) for top-level nodes.
+     * normalization factors.
      *
      * For a TermQuery, the scoring formula is approximately:
      *

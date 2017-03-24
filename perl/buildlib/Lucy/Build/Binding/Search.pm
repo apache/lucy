@@ -574,10 +574,7 @@ sub bind_query {
     
     sub make_compiler {
         my ( $self, %args ) = @_;
-        my $subordinate = delete $args{subordinate};
-        my $compiler = MyCompiler->new( %args, parent => $self );
-        $compiler->normalize unless $subordinate;
-        return $compiler;
+        return MyCompiler->new;
     }
     
     package MyCompiler;
@@ -606,10 +603,19 @@ and MatchAllQuery default to 0.0 instead.
 END_CONSTRUCTOR_POD
     $pod_spec->set_synopsis($synopsis);
     $pod_spec->add_constructor( alias => 'new', pod => $constructor, );
+    $pod_spec->add_method(
+        alias  => 'make_compiler',
+        method => 'Make_Compiler',
+    );
 
     my $binding = Clownfish::CFC::Binding::Perl::Class->new(
         parcel     => "Lucy",
         class_name => "Lucy::Search::Query",
+    );
+    $binding->exclude_method('Make_Compiler');
+    $binding->bind_method(
+        alias  => 'make_compiler',
+        method => 'Make_Compiler_Compat',
     );
     $binding->set_pod_spec($pod_spec);
 

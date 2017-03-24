@@ -60,8 +60,7 @@ public class LucyX::Search::ProximityQuery inherits Lucy::Search::Query {
     Get_Within(ProximityQuery *self);
 
     public incremented Compiler*
-    Make_Compiler(ProximityQuery *self, Searcher *searcher, float boost,
-                  bool subordinate = false);
+    Make_Compiler(ProximityQuery *self, Searcher *searcher, float boost);
 
     public bool
     Equals(ProximityQuery *self, Obj *other);

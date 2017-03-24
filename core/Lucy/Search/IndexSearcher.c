@@ -135,8 +135,7 @@ IxSearcher_Collect_IMP(IndexSearcher *self, Query *query, Collector *collector) 
     bool      need_score        = Coll_Need_Score(collector);
     Compiler *compiler = Query_is_a(query, COMPILER)
                          ? (Compiler*)INCREF(query)
-                         : Query_Make_Compiler(query, (Searcher*)self,
-                                               Query_Get_Boost(query), false);
+                         : Query_Make_Root_Compiler(query, (Searcher*)self);
 
     // Accumulate hits into the Collector.
     for (size_t i = 0, max = Vec_Get_Size(seg_readers); i < max; i++) {

@@ -72,13 +72,8 @@ NOTQuery_Equals_IMP(NOTQuery *self, Obj *other) {
 }
 
 Compiler*
-NOTQuery_Make_Compiler_IMP(NOTQuery *self, Searcher *searcher, float boost,
-                           bool subordinate) {
-    NOTCompiler *compiler = NOTCompiler_new(self, searcher, boost);
-    if (!subordinate) {
-        NOTCompiler_Normalize(compiler);
-    }
-    return (Compiler*)compiler;
+NOTQuery_Make_Compiler_IMP(NOTQuery *self, Searcher *searcher, float boost) {
+    return (Compiler*)NOTCompiler_new(self, searcher, boost);
 }
 
 /**********************************************************************/

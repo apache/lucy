@@ -172,7 +172,7 @@ ProximityQuery_To_String_IMP(ProximityQuery *self) {
 
 Compiler*
 ProximityQuery_Make_Compiler_IMP(ProximityQuery *self, Searcher *searcher,
-                                 float boost, bool subordinate) {
+                                 float boost) {
     ProximityQueryIVARS *const ivars = ProximityQuery_IVARS(self);
     if (Vec_Get_Size(ivars->terms) == 1) {
         // Optimize for one-term "phrases".
@@ -181,17 +181,13 @@ ProximityQuery_Make_Compiler_IMP(ProximityQuery *self, Searcher *searcher,
         TermQuery_Set_Boost(term_query, ivars->boost);
         TermCompiler *term_compiler
             = (TermCompiler*)TermQuery_Make_Compiler(term_query, searcher,
-                                                     boost, subordinate);
+                                                     boost);
         DECREF(term_query);
         return (Compiler*)term_compiler;
     }
     else {
-        ProximityCompiler *compiler
-            = ProximityCompiler_new(self, searcher, boost, ivars->within);
-        if (!subordinate) {
-            ProximityCompiler_Normalize(compiler);
-        }
-        return (Compiler*)compiler;
+        return (Compiler*)ProximityCompiler_new(self, searcher, boost,
+                                                ivars->within);
     }
 }
 

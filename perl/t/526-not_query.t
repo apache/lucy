@@ -60,10 +60,7 @@ ok( !$not_b_query->equals($thawed), '!equals (boost)' );
 ok( !$not_b_query->equals($not_c_query),
     "!equals (different negated query)" );
 
-my $compiler = $not_b_query->make_compiler(
-    searcher => $searcher,
-    boost    => $not_b_query->get_boost,
-);
+my $compiler = $not_b_query->make_root_compiler($searcher);
 $frozen = freeze($compiler);
 $thawed = thaw($frozen);
 ok( $thawed->equals($compiler), 'freeze/thaw compiler' );

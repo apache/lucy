@@ -57,12 +57,8 @@ MatchAllQuery_To_String_IMP(MatchAllQuery *self) {
 
 Compiler*
 MatchAllQuery_Make_Compiler_IMP(MatchAllQuery *self, Searcher *searcher,
-                                float boost, bool subordinate) {
-    MatchAllCompiler *compiler = MatchAllCompiler_new(self, searcher, boost);
-    if (!subordinate) {
-        MatchAllCompiler_Normalize(compiler);
-    }
-    return (Compiler*)compiler;
+                                float boost) {
+    return (Compiler*)MatchAllCompiler_new(self, searcher, boost);
 }
 
 /**********************************************************************/

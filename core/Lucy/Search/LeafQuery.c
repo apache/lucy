@@ -142,12 +142,10 @@ LeafQuery_Load_IMP(LeafQuery *self, Obj *dump) {
 }
 
 Compiler*
-LeafQuery_Make_Compiler_IMP(LeafQuery *self, Searcher *searcher, float boost,
-                            bool subordinate) {
+LeafQuery_Make_Compiler_IMP(LeafQuery *self, Searcher *searcher, float boost) {
     UNUSED_VAR(self);
     UNUSED_VAR(searcher);
     UNUSED_VAR(boost);
-    UNUSED_VAR(subordinate);
     THROW(ERR, "Can't Make_Compiler() from LeafQuery");
     UNREACHABLE_RETURN(Compiler*);
 }

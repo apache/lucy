@@ -52,12 +52,12 @@ func checkQueryEquals(t *testing.T, query Query) {
 	}
 }
 
-func checkQueryMakeCompiler(t *testing.T, query Query) {
+func checkQueryMakeRootCompiler(t *testing.T, query Query) {
 	index := createTestIndex("foo", "bar", "baz")
 	searcher, _ := OpenIndexSearcher(index)
-	compiler, err := query.MakeCompiler(searcher, 1.0, false)
+	compiler, err := query.MakeRootCompiler(searcher)
 	if _, ok := compiler.(Compiler); !ok || err != nil {
-		t.Error("MakeCompiler for %v failed: %v", query, err)
+		t.Error("MakeRootCompiler for %v failed: %v", query, err)
 	}
 }
 
@@ -73,7 +73,7 @@ func TestTermQueryMisc(t *testing.T) {
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
 	checkQueryEquals(t, query)
-	checkQueryMakeCompiler(t, query)
+	checkQueryMakeRootCompiler(t, query)
 	checkQueryToStringHasFoo(t, query)
 }
 
@@ -118,7 +118,7 @@ func TestPhraseQueryMisc(t *testing.T) {
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
 	checkQueryEquals(t, query)
-	checkQueryMakeCompiler(t, query)
+	checkQueryMakeRootCompiler(t, query)
 	checkQueryToStringHasFoo(t, query)
 }
 
@@ -164,7 +164,7 @@ func TestANDQueryBasics(t *testing.T) {
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
 	checkQueryEquals(t, query)
-	checkQueryMakeCompiler(t, query)
+	checkQueryMakeRootCompiler(t, query)
 	checkQueryToStringHasFoo(t, query)
 }
 
@@ -177,7 +177,7 @@ func TestORQueryBasics(t *testing.T) {
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
 	checkQueryEquals(t, query)
-	checkQueryMakeCompiler(t, query)
+	checkQueryMakeRootCompiler(t, query)
 	checkQueryToStringHasFoo(t, query)
 }
 
@@ -188,7 +188,7 @@ func TestReqOptQueryBasics(t *testing.T) {
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
 	checkQueryEquals(t, query)
-	checkQueryMakeCompiler(t, query)
+	checkQueryMakeRootCompiler(t, query)
 	checkQueryToStringHasFoo(t, query)
 }
 
@@ -210,7 +210,7 @@ func TestNOTQueryBasics(t *testing.T) {
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
 	checkQueryEquals(t, query)
-	checkQueryMakeCompiler(t, query)
+	checkQueryMakeRootCompiler(t, query)
 	checkQueryToStringHasFoo(t, query)
 }
 
@@ -227,7 +227,7 @@ func TestMatchAllQueryBasics(t *testing.T) {
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
 	checkQueryEquals(t, query)
-	checkQueryMakeCompiler(t, query)
+	checkQueryMakeRootCompiler(t, query)
 }
 
 func TestNOMatchQueryBasics(t *testing.T) {
@@ -235,7 +235,7 @@ func TestNOMatchQueryBasics(t *testing.T) {
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
 	checkQueryEquals(t, query)
-	checkQueryMakeCompiler(t, query)
+	checkQueryMakeRootCompiler(t, query)
 }
 
 func TestRangeQueryBasics(t *testing.T) {
@@ -243,7 +243,7 @@ func TestRangeQueryBasics(t *testing.T) {
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
 	checkQueryEquals(t, query)
-	checkQueryMakeCompiler(t, query)
+	checkQueryMakeRootCompiler(t, query)
 	checkQueryToStringHasFoo(t, query)
 }
 
