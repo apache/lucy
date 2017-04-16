@@ -13,13 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package Lucy::Store::Lock;
-use Lucy;
-our $VERSION = '0.006000';
-$VERSION = eval $VERSION;
+use strict;
+use warnings;
 
-1;
+use Lucy::Test;
+my $success = Lucy::Test::run_tests("Lucy::Test::Index::TestBackgroundMerger");
 
-__END__
-
+exit($success ? 0 : 1);
 
