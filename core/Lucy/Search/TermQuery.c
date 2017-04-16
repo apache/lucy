@@ -235,6 +235,11 @@ TermCompiler_Sum_Of_Squared_Weights_IMP(TermCompiler *self) {
     return ivars->raw_weight * ivars->raw_weight;
 }
 
+float
+TermCompiler_Get_Weight_IMP(TermCompiler *self) {
+    return TermCompiler_IVARS(self)->normalized_weight;
+}
+
 void
 TermCompiler_Apply_Norm_Factor_IMP(TermCompiler *self,
                                    float query_norm_factor) {
