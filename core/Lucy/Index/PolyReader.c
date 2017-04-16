@@ -330,47 +330,51 @@ PolyReader*
 PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
                    IndexManager *manager) {
     PolyReaderIVARS *const ivars = PolyReader_IVARS(self);
-    Folder   *folder     = S_derive_folder(index);
-    Err      *last_error = NULL;
-    uint64_t  last_gen   = 0;
+    Folder   *folder          = S_derive_folder(index);
+    Err      *last_error      = NULL;
+    String   *last_snapfile   = NULL;
+    String   *target_snapfile = NULL;
 
     PolyReader_init(self, NULL, folder, snapshot, manager, NULL);
     DECREF(folder);
 
+    // If a Snapshot was supplied, use its file.
+    if (snapshot) {
+        target_snapfile = (String*)INCREF(Snapshot_Get_Path(snapshot));
+        if (!target_snapfile) {
+            THROW(ERR, "Supplied snapshot objects must not be empty");
+        }
+    }
+
     while (1) {
-        String *target_snap_file;
+        if (!snapshot) {
+            // If no Snapshot was supplied, pick the most recent snap file.
+            DECREF(target_snapfile);
+            target_snapfile = IxFileNames_latest_snapshot(folder);
 
-        // If a Snapshot was supplied, use its file.
-        if (snapshot) {
-            target_snap_file = Snapshot_Get_Path(snapshot);
-            if (!target_snap_file) {
-                THROW(ERR, "Supplied snapshot objects must not be empty");
-            }
-            else {
-                target_snap_file = (String*)INCREF(target_snap_file);
+            // No snap file?  Looks like the index is empty.  We can stop now.
+            if (!target_snapfile) {
+                DECREF(last_error);
+                last_error = NULL;
+                break;
             }
         }
-        else {
-            // Otherwise, pick the most recent snap file.
-            target_snap_file = IxFileNames_latest_snapshot(folder);
 
-            // No snap file?  Looks like the index is empty.  We can stop now
-            // and return NULL.
-            if (!target_snap_file) { break; }
-        }
-
-        // Derive "generation" of this snapshot file from its name.
-        uint64_t gen = IxFileNames_extract_gen(target_snap_file);
-
-        if (gen <= last_gen) {
+        if (last_snapfile
+            && Str_Equals(target_snapfile, (Obj*)last_snapfile)) {
+            // The target snapfile hasn't changed since the last iteration.
             // If a snapshot was supplied, we couldn't read it. Otherwise,
             // no new snapshot was found which should never happen. Throw
             // error from previous attempt to read the snapshot.
-            DECREF(self);
-            RETHROW(last_error);
+            break;
         }
 
-        last_gen = gen;
+        // This is either the first iteration, or we found a newer snapshot.
+        // Clear error and keep track of snapfile.
+        DECREF(last_error);
+        last_error = NULL;
+        DECREF(last_snapfile);
+        last_snapfile = (String*)INCREF(target_snapfile);
 
         // Get a read lock on the most recent snapshot file if indicated.
         // There's no need to retry. In the unlikely case that we fail to
@@ -378,7 +382,7 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
         // FilePurger deleting the snapshot, which means that a newer
         // snapshot just became available.
         if (manager) {
-            if (!S_request_snapshot_lock(self, target_snap_file)) {
+            if (!S_request_snapshot_lock(self, target_snapfile)) {
                 // Index updated, so try again.
                 last_error = (Err*)INCREF(Err_get_error());
                 continue;
@@ -402,12 +406,11 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
             struct try_read_snapshot_context context;
             context.snapshot = ivars->snapshot;
             context.folder   = folder;
-            context.path     = target_snap_file;
+            context.path     = target_snapfile;
             last_error = Err_trap(S_try_read_snapshot, &context);
 
             if (last_error) {
                 S_release_snapshot_lock(self);
-                DECREF(target_snap_file);
                 // Index updated, so try again.
                 continue;
             }
@@ -425,16 +428,22 @@ PolyReader_do_open(PolyReader *self, Obj *index, Snapshot *snapshot,
         last_error = Err_trap(S_try_open_elements, &context);
         if (last_error) {
             S_release_snapshot_lock(self);
-            DECREF(target_snap_file);
             // Index updated, so try again.
             continue;
         }
         else { // Succeeded.
             S_init_sub_readers(self, (Vector*)context.seg_readers);
             DECREF(context.seg_readers);
-            DECREF(target_snap_file);
             break;
         }
+    }
+
+    DECREF(target_snapfile);
+    DECREF(last_snapfile);
+
+    if (last_error) {
+        DECREF(self);
+        RETHROW(last_error);
     }
 
     return self;

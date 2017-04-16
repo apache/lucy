@@ -59,6 +59,7 @@ LFLock_init(LockFileLock *self, Folder *folder, String *name, String *host,
     Lock_init((Lock*)self, folder, name, timeout, interval);
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
     ivars->host      = (String*)INCREF(host);
+    ivars->lock_path = Str_newf("locks/%o.lock", name);
     ivars->link_path = Str_newf("%o.%o.%i64", ivars->lock_path, host,
                                 (int64_t)pid);
     ivars->exclusive_only = exclusive_only;
@@ -357,6 +358,7 @@ LFLock_Destroy_IMP(LockFileLock *self) {
     LockFileLockIVARS *const ivars = LFLock_IVARS(self);
     if (ivars->state != LFLOCK_STATE_UNLOCKED) { LFLock_Release(self); }
     DECREF(ivars->host);
+    DECREF(ivars->lock_path);
     DECREF(ivars->link_path);
     SUPER_DESTROY(self, LOCKFILELOCK);
 }

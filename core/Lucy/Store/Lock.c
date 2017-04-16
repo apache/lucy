@@ -54,9 +54,6 @@ Lock_init(Lock *self, Folder *folder, String *name, int32_t timeout,
     ivars->name         = Str_Clone(name);
     ivars->interval     = interval;
 
-    // Derive.
-    ivars->lock_path = Str_newf("locks/%o.lock", name);
-
     return self;
 }
 
@@ -65,7 +62,6 @@ Lock_Destroy_IMP(Lock *self) {
     LockIVARS *const ivars = Lock_IVARS(self);
     DECREF(ivars->folder);
     DECREF(ivars->name);
-    DECREF(ivars->lock_path);
     SUPER_DESTROY(self, LOCK);
 }
 

@@ -31,7 +31,6 @@ abstract class Lucy::Store::Lock inherits Clownfish::Obj {
 
     Folder      *folder;
     String      *name;
-    String      *lock_path;
     int32_t      timeout;
     int32_t      interval;
 

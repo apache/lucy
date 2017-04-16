@@ -234,7 +234,10 @@ S_delete_entry(Folder *folder, String *folder_entry) {
         Folder *inner = Folder_Local_Find_Folder(folder, folder_entry);
         if (inner == NULL) { return false; }
         if (Folder_is_a(inner, COMPOUNDFILEREADER)) {
-            inner = CFReader_Get_Real_Folder((CompoundFileReader*)inner);
+            CompoundFileReader *cf_reader = (CompoundFileReader*)inner;
+            inner = CFReader_Get_Real_Folder(cf_reader);
+            // Close cf.dat to allow speedy deletion on Windows.
+            CFReader_Close(cf_reader);
         }
 
         Vector *entries = Folder_List(inner, NULL);
