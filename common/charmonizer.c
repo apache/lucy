@@ -664,6 +664,7 @@ chaz_HeadCheck_size_of_type(const char *type, const char *includes, int hint);
 #define H_CHAZ_MAKE
 
 /* #include "Charmonizer/Core/CFlags.h" */
+/* #include "Charmonizer/Core/CLI.h" */
 
 typedef struct chaz_MakeFile chaz_MakeFile;
 typedef struct chaz_MakeVar chaz_MakeVar;
@@ -2107,7 +2108,15 @@ chaz_CFlags_add_rpath(chaz_CFlags *flags, const char *path) {
     if (chaz_CC_binary_format() != CHAZ_CC_BINFMT_ELF) { return; }
 
     if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
-        string = chaz_Util_join("", "-Wl,-rpath,", path, NULL);
+        /* If "new dtags" are enabled by default, DT_RUNPATH is set instead of
+         * DT_RPATH. Unfortunately, DT_RUNPATH is not applied transitively
+         * when searching for indirect dependencies. See
+         *
+         * https://bugs.launchpad.net/ubuntu/+source/eglibc/+bug/1253638
+         * https://sourceware.org/bugzilla/show_bug.cgi?id=13945
+         */
+        string = chaz_Util_join("", "-Wl,--disable-new-dtags -Wl,-rpath,",
+                                path, NULL);
     }
     else if (flags->style == CHAZ_CFLAGS_STYLE_SUN_C) {
         string = chaz_Util_join(" ", "-R", path, NULL);
@@ -3590,39 +3599,41 @@ chaz_ConfWriterC_end_module(void) {
     }
 
     /* Write out short names. */
-    fprintf(chaz_ConfWriterC.fh,
-        "\n#if defined(CHY_USE_SHORT_NAMES) "
-        "|| defined(CHAZ_USE_SHORT_NAMES)\n"
-    );
-    for (i = 0; i < chaz_ConfWriterC.def_count; i++) {
-        switch (defs[i].type) {
-            case CHAZ_CONFELEM_DEF:
-            case CHAZ_CONFELEM_TYPEDEF:
-                {
-                    const char *sym = defs[i].str1;
-                    const char *value = defs[i].str2;
-                    if (!value || strcmp(sym, value) != 0) {
-                        const char *prefix
-                            = chaz_ConfWriterC_sym_is_uppercase(sym)
-                              ? "CHY_" : "chy_";
-                        fprintf(chaz_ConfWriterC.fh, "  #define %s %s%s\n",
-                                sym, prefix, sym);
+    if (chaz_ConfWriterC.def_count > 0) {
+        fprintf(chaz_ConfWriterC.fh,
+            "\n#if defined(CHY_USE_SHORT_NAMES) "
+            "|| defined(CHAZ_USE_SHORT_NAMES)\n"
+        );
+        for (i = 0; i < chaz_ConfWriterC.def_count; i++) {
+            switch (defs[i].type) {
+                case CHAZ_CONFELEM_DEF:
+                case CHAZ_CONFELEM_TYPEDEF:
+                    {
+                        const char *sym = defs[i].str1;
+                        const char *value = defs[i].str2;
+                        if (!value || strcmp(sym, value) != 0) {
+                            const char *prefix
+                                = chaz_ConfWriterC_sym_is_uppercase(sym)
+                                  ? "CHY_" : "chy_";
+                            fprintf(chaz_ConfWriterC.fh, "  #define %s %s%s\n",
+                                    sym, prefix, sym);
+                        }
                     }
-                }
-                break;
-            case CHAZ_CONFELEM_GLOBAL_DEF:
-            case CHAZ_CONFELEM_GLOBAL_TYPEDEF:
-            case CHAZ_CONFELEM_SYS_INCLUDE:
-            case CHAZ_CONFELEM_LOCAL_INCLUDE:
-                /* no-op */
-                break;
-            default:
-                chaz_Util_die("Internal error: bad element type %d",
-                              (int)defs[i].type);
+                    break;
+                case CHAZ_CONFELEM_GLOBAL_DEF:
+                case CHAZ_CONFELEM_GLOBAL_TYPEDEF:
+                case CHAZ_CONFELEM_SYS_INCLUDE:
+                case CHAZ_CONFELEM_LOCAL_INCLUDE:
+                    /* no-op */
+                    break;
+                default:
+                    chaz_Util_die("Internal error: bad element type %d",
+                                  (int)defs[i].type);
+            }
         }
-    }
 
-    fprintf(chaz_ConfWriterC.fh, "#endif /* USE_SHORT_NAMES */\n");
+        fprintf(chaz_ConfWriterC.fh, "#endif /* USE_SHORT_NAMES */\n");
+    }
 
     /* Write out global definitions and system includes. */
     if (num_globals) {
