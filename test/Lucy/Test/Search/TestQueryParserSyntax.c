@@ -334,6 +334,14 @@ syntax_test_double_colon() {
     return TestQP_new("PHP::Interpreter", tree, NULL, 0);
 }
 
+static TestQueryParser*
+syntax_test_trailing_quote() {
+    Query *mies = make_leaf_query(NULL, "mies");
+    Query *quote = make_leaf_query(NULL, "\" ");
+    Query *tree = make_poly_query(BOOLOP_OR, mies, quote, NULL);
+    return TestQP_new("mies\" ", tree, NULL, 0);
+}
+
 /***************************************************************************/
 
 typedef TestQueryParser*
@@ -371,6 +379,7 @@ static LUCY_TestQPSyntax_Test_t syntax_test_funcs[] = {
     syntax_test_escaped_quotes_inside,
     syntax_test_identifier_field_name,
     syntax_test_double_colon,
+    syntax_test_trailing_quote,
     NULL
 };
 
@@ -445,7 +454,7 @@ test_query_parser_syntax(TestBatchRunner *runner) {
 
 void
 TestQPSyntax_Run_IMP(TestQueryParserSyntax *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 68);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 70);
     test_query_parser_syntax(runner);
 }
 
