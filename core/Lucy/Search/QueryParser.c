@@ -885,6 +885,11 @@ QParser_Expand_Leaf_IMP(QueryParser *self, Query *query) {
             StrIter_Recede(tail, 1);
         }
     }
+    if (StrIter_Compare_To(top, (Obj*)tail) > 0) {
+        DECREF(tail);
+        DECREF(top);
+        return NULL;
+    }
     String *source_text = StrIter_crop(top, tail);
 
     // Either use LeafQuery's field or default to Parser's list.
