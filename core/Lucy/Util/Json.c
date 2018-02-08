@@ -479,6 +479,12 @@ S_do_parse_json(void *json_parser, const char *json, size_t len) {
                 }
                 break;
         }
+        if (token_type < 0) {
+            // Clear out parser and return.
+            LucyParseJson(json_parser, 0, NULL, &state);
+            SET_ERROR("JSON syntax error", save, end);
+            return NULL;
+        }
         LucyParseJson(json_parser, token_type, value, &state);
         if (state.errors) {
             SET_ERROR("JSON syntax error", save, end);
