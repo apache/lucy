@@ -2039,7 +2039,15 @@ chaz_CFlags_add_rpath(chaz_CFlags *flags, const char *path) {
     if (chaz_CC_binary_format() != CHAZ_CC_BINFMT_ELF) { return; }
 
     if (flags->style == CHAZ_CFLAGS_STYLE_GNU) {
-        string = chaz_Util_join("", "-Wl,-rpath,", path, NULL);
+        /* If "new dtags" are enabled by default, DT_RUNPATH is set instead of
+         * DT_RPATH. Unfortunately, DT_RUNPATH is not applied transitively
+         * when searching for indirect dependencies. See
+         *
+         * https://bugs.launchpad.net/ubuntu/+source/eglibc/+bug/1253638
+         * https://sourceware.org/bugzilla/show_bug.cgi?id=13945
+         */
+        string = chaz_Util_join("", "-Wl,--disable-new-dtags -Wl,-rpath,",
+                                path, NULL);
     }
     else if (flags->style == CHAZ_CFLAGS_STYLE_SUN_C) {
         string = chaz_Util_join(" ", "-R", path, NULL);
