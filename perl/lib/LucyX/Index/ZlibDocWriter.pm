@@ -25,7 +25,7 @@ use Clownfish;
 use bytes;
 no bytes;
 
-our $VERSION = '0.006001';
+our $VERSION = '0.006002';
 $VERSION = eval $VERSION;
 
 # Inside-out member vars.

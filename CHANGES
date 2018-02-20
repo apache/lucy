@@ -1,5 +1,14 @@
 Revision history for Lucy
 
+0.6.2  2018-02-20
+
+  Bugfixes:
+
+    * Fix rpath issue with ELF linkers using new dtags
+    * Fix build issue with recent Go versions
+    * [LUCY-325] - QueryParser mishandles trailing double quote
+    * [LUCY-327] - t/core/035-json.t aborts when compiled with lemon 3.22.0
+
 0.6.1  2016-12-09
 
   Bugfixes:

@@ -47,23 +47,23 @@ my $builder = Lucy::Build->new(
     license     => 'apache',
     dist_author =>
         'The Apache Lucy Project <dev at lucy dot apache dot org>',
-    dist_version       => '0.6.1',
+    dist_version       => '0.6.2',
     requires           => {
         'perl'      => '5.8.3',
-        'Clownfish' => 0.006001,
+        'Clownfish' => 0.006002,
     },
     configure_requires => {
         'Module::Build'               => 0.280801,
-        'Clownfish'                   => 0.006001,
-        'Clownfish::CFC::Perl::Build' => 0.006001,
+        'Clownfish'                   => 0.006002,
+        'Clownfish::CFC::Perl::Build' => 0.006002,
     },
     build_requires     => {
         'Module::Build'      => 0.280801,
         'ExtUtils::CBuilder' => 0.21,
         'ExtUtils::ParseXS'  => 3.00,
         'Devel::PPPort'      => 3.14,
-        'Clownfish'          => 0.006001,
-        'Clownfish::CFC'     => 0.006001,
+        'Clownfish'          => 0.006002,
+        'Clownfish::CFC'     => 0.006002,
     },
     no_index => {
         directory => [qw( buildlib devel sample )],

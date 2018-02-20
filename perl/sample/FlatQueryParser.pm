@@ -24,7 +24,7 @@ use Lucy::Search::ORQuery;
 use PrefixQuery;
 use Carp;
 
-our $VERSION = '0.006001';
+our $VERSION = '0.006002';
 $VERSION = eval $VERSION;
 
 # Inherit new()
