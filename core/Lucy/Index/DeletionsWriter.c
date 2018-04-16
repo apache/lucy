@@ -280,8 +280,8 @@ DefDelWriter_Delete_By_Term_IMP(DefaultDeletionsWriter *self,
 void
 DefDelWriter_Delete_By_Query_IMP(DefaultDeletionsWriter *self, Query *query) {
     DefaultDeletionsWriterIVARS *const ivars = DefDelWriter_IVARS(self);
-    Compiler *compiler = Query_Make_Compiler(query, (Searcher*)ivars->searcher,
-                                             Query_Get_Boost(query), false);
+    Compiler *compiler
+        = Query_Make_Root_Compiler(query, (Searcher*)ivars->searcher);
 
     for (size_t i = 0, max = Vec_Get_Size(ivars->seg_readers); i < max; i++) {
         SegReader *seg_reader = (SegReader*)Vec_Fetch(ivars->seg_readers, i);

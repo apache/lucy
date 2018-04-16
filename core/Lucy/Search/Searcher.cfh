@@ -81,16 +81,16 @@ public class Lucy::Search::Searcher inherits Clownfish::Obj {
     /** Iterate over hits, feeding them into a
      * [](cfish:Collector).
      *
-     * @param query A Query.
+     * @param query A Query or a Compiler.
      * @param collector A Collector.
      */
     public abstract void
-    Collect(Searcher *self, Query *query, Collector *collector);
+    Collect(Searcher *self, Obj *query, Collector *collector);
 
     /** Return a TopDocs object with up to num_wanted hits.
      */
     abstract incremented TopDocs*
-    Top_Docs(Searcher *self, Query *query, uint32_t num_wanted,
+    Top_Docs(Searcher *self, Obj *query, uint32_t num_wanted,
              SortSpec *sort_spec = NULL);
 
     /** Retrieve a document.  Throws an error if the doc id is out of range.

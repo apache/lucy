@@ -89,6 +89,7 @@
 #include "Lucy/Test/Util/TestPriorityQueue.h"
 #include "Lucy/Test/Util/TestSortExternal.h"
 #include "Lucy/Test/Util/TestStringHelper.h"
+#include "LucyX/Test/Search/TestProximityQuery.h"
 
 TestSuite*
 Test_create_test_suite() {
@@ -160,6 +161,7 @@ Test_create_test_suite() {
     TestSuite_Add_Batch(suite, (TestBatch*)TestNoMatchQuery_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestSeriesMatcher_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestORQuery_new());
+    TestSuite_Add_Batch(suite, (TestBatch*)TestProximityQuery_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestQPLogic_new());
     TestSuite_Add_Batch(suite, (TestBatch*)TestQPSyntax_new());
 

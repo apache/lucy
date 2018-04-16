@@ -112,7 +112,7 @@ IxSearcher_Doc_Freq_IMP(IndexSearcher *self, String *field, Obj *term) {
 }
 
 TopDocs*
-IxSearcher_Top_Docs_IMP(IndexSearcher *self, Query *query, uint32_t num_wanted,
+IxSearcher_Top_Docs_IMP(IndexSearcher *self, Obj *query, uint32_t num_wanted,
                         SortSpec *sort_spec) {
     Schema        *schema    = IxSearcher_Get_Schema(self);
     uint32_t       doc_max   = (uint32_t)IxSearcher_Doc_Max(self);
@@ -128,15 +128,23 @@ IxSearcher_Top_Docs_IMP(IndexSearcher *self, Query *query, uint32_t num_wanted,
 }
 
 void
-IxSearcher_Collect_IMP(IndexSearcher *self, Query *query, Collector *collector) {
+IxSearcher_Collect_IMP(IndexSearcher *self, Obj *query, Collector *collector) {
     IndexSearcherIVARS *const ivars = IxSearcher_IVARS(self);
     Vector   *const seg_readers = ivars->seg_readers;
     I32Array *const seg_starts  = ivars->seg_starts;
     bool      need_score        = Coll_Need_Score(collector);
-    Compiler *compiler = Query_is_a(query, COMPILER)
-                         ? (Compiler*)INCREF(query)
-                         : Query_Make_Compiler(query, (Searcher*)self,
-                                               Query_Get_Boost(query), false);
+    Compiler *compiler;
+
+    if (Obj_is_a(query, QUERY)) {
+        compiler = Query_Make_Root_Compiler((Query*)query, (Searcher*)self);
+    }
+    else if (Obj_is_a(query, COMPILER)) {
+        compiler = (Compiler*)INCREF(query);
+    }
+    else {
+        THROW(ERR, "Invalid query type: %o", Obj_get_class_name(query));
+        return;
+    }
 
     // Accumulate hits into the Collector.
     for (size_t i = 0, max = Vec_Get_Size(seg_readers); i < max; i++) {

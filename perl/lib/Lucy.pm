@@ -162,18 +162,67 @@ BEGIN {
     package Lucy::Search::Compiler;
     our $VERSION = '0.006000';
     $VERSION = eval $VERSION;
+    use Lucy qw( STORABLE_freeze STORABLE_thaw );
+
+    # Backward compatibility.
+
     use Carp;
     use Scalar::Util qw( blessed );
 
+    my %warned;
+
     sub new {
         my ( $either, %args ) = @_;
-        if ( !defined $args{boost} ) {
-            confess("'parent' is not a Query")
-                unless ( blessed( $args{parent} )
-                and $args{parent}->isa("Lucy::Search::Query") );
-            $args{boost} = $args{parent}->get_boost;
+        my $self = $either->do_new;
+        if (%args) {
+            my $class = ref($either) || $either;
+            if ( !exists $warned{$class} ) {
+                warn <<"EOF";
+Warning: $class uses the deprecated
+Lucy::Search::Compiler API which will be removed in a
+future release. Please adapt to the new API.
+EOF
+                $warned{$class} = undef;
+            }
+            if ( !defined $args{boost} ) {
+                confess("'parent' is not a Query")
+                    unless ( blessed( $args{parent} )
+                    and $args{parent}->isa("Lucy::Search::Query") );
+                $args{boost} = $args{parent}->get_boost;
+            }
+            $self->{_cf_boost}  = $args{boost};
+            $self->{_cf_parent} = $args{parent};
+            $self->{_cf_sim}    = $args{similarity}
+                                  || $args{searcher}->get_schema
+                                                    ->get_similarity;
         }
-        return $either->do_new(%args);
+        return $self;
+    }
+
+    sub get_boost {
+        my $self = shift;
+        return $self->{_cf_boost};
+    }
+
+    sub get_weight {
+        my $self = shift;
+        return $self->{_cf_boost};
+    }
+
+    sub get_parent {
+        my $self = shift;
+        return $self->{_cf_parent};
+    }
+
+    sub get_similarity {
+        my $self = shift;
+        return $self->{_cf_sim};
+    }
+
+    sub normalize {
+        my ( $self, $sim ) = @_;
+        $sim ||= $self->{_cf_sim};
+        $self->_normalize($sim);
     }
 }
 

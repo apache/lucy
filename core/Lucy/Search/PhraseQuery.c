@@ -159,7 +159,7 @@ PhraseQuery_To_String_IMP(PhraseQuery *self) {
 
 Compiler*
 PhraseQuery_Make_Compiler_IMP(PhraseQuery *self, Searcher *searcher,
-                              float boost, bool subordinate) {
+                              float boost) {
     PhraseQueryIVARS *const ivars = PhraseQuery_IVARS(self);
     if (Vec_Get_Size(ivars->terms) == 1) {
         // Optimize for one-term "phrases".
@@ -169,17 +169,12 @@ PhraseQuery_Make_Compiler_IMP(PhraseQuery *self, Searcher *searcher,
         TermQuery_Set_Boost(term_query, ivars->boost);
         term_compiler
             = (TermCompiler*)TermQuery_Make_Compiler(term_query, searcher,
-                                                     boost, subordinate);
+                                                     boost);
         DECREF(term_query);
         return (Compiler*)term_compiler;
     }
     else {
-        PhraseCompiler *compiler
-            = PhraseCompiler_new(self, searcher, boost);
-        if (!subordinate) {
-            PhraseCompiler_Normalize(compiler);
-        }
-        return (Compiler*)compiler;
+        return (Compiler*)PhraseCompiler_new(self, searcher, boost);
     }
 }
 
@@ -196,48 +191,57 @@ PhraseQuery_Get_Terms_IMP(PhraseQuery *self) {
 /*********************************************************************/
 
 PhraseCompiler*
-PhraseCompiler_new(PhraseQuery *parent, Searcher *searcher, float boost) {
+PhraseCompiler_new(PhraseQuery *query, Searcher *searcher, float boost) {
     PhraseCompiler *self = (PhraseCompiler*)Class_Make_Obj(PHRASECOMPILER);
-    return PhraseCompiler_init(self, parent, searcher, boost);
+    return PhraseCompiler_init(self, query, searcher, boost);
 }
 
 PhraseCompiler*
-PhraseCompiler_init(PhraseCompiler *self, PhraseQuery *parent,
+PhraseCompiler_init(PhraseCompiler *self, PhraseQuery *query,
                     Searcher *searcher, float boost) {
     PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
-    PhraseQueryIVARS *const parent_ivars = PhraseQuery_IVARS(parent);
+    PhraseQueryIVARS *const query_ivars = PhraseQuery_IVARS(query);
+    String     *field  = query_ivars->field;
+    Vector     *terms  = query_ivars->terms;
     Schema     *schema = Searcher_Get_Schema(searcher);
-    Similarity *sim    = Schema_Fetch_Sim(schema, parent_ivars->field);
-    Vector     *terms  = parent_ivars->terms;
+    Similarity *sim    = Schema_Fetch_Sim(schema, field);
 
     // Try harder to find a Similarity if necessary.
     if (!sim) { sim = Schema_Get_Similarity(schema); }
 
     // Init.
-    Compiler_init((Compiler*)self, (Query*)parent, searcher, sim, boost);
+    Compiler_init((Compiler*)self);
+    ivars->field = (String*)INCREF(field);
+    ivars->terms = (Vector*)INCREF(terms);
 
     // Store IDF for the phrase.
     ivars->idf = 0;
     for (size_t i = 0, max = Vec_Get_Size(terms); i < max; i++) {
         Obj     *term     = Vec_Fetch(terms, i);
         int32_t  doc_max  = Searcher_Doc_Max(searcher);
-        uint32_t doc_freq = Searcher_Doc_Freq(searcher, parent_ivars->field, term);
+        uint32_t doc_freq = Searcher_Doc_Freq(searcher, field, term);
         ivars->idf += Sim_IDF(sim, (int32_t)doc_freq, doc_max);
     }
 
     // Calculate raw weight.
-    ivars->raw_weight = ivars->idf * ivars->boost;
+    ivars->raw_weight = ivars->idf * boost;
 
     return self;
 }
 
 void
+PhraseCompiler_Destroy_IMP(PhraseCompiler *self) {
+    PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
+    DECREF(ivars->field);
+    DECREF(ivars->terms);
+    SUPER_DESTROY(self, PHRASECOMPILER);
+}
+
+void
 PhraseCompiler_Serialize_IMP(PhraseCompiler *self, OutStream *outstream) {
     PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
-    PhraseCompiler_Serialize_t super_serialize
-        = (PhraseCompiler_Serialize_t)SUPER_METHOD_PTR(PHRASECOMPILER,
-                                                       LUCY_PhraseCompiler_Serialize);
-    super_serialize(self, outstream);
+    Freezer_serialize_string(ivars->field, outstream);
+    Freezer_serialize_varray(ivars->terms, outstream);
     OutStream_Write_F32(outstream, ivars->idf);
     OutStream_Write_F32(outstream, ivars->raw_weight);
     OutStream_Write_F32(outstream, ivars->query_norm_factor);
@@ -246,37 +250,35 @@ PhraseCompiler_Serialize_IMP(PhraseCompiler *self, OutStream *outstream) {
 
 PhraseCompiler*
 PhraseCompiler_Deserialize_IMP(PhraseCompiler *self, InStream *instream) {
-    PhraseCompiler_Deserialize_t super_deserialize
-        = SUPER_METHOD_PTR(PHRASECOMPILER, LUCY_PhraseCompiler_Deserialize);
-    self = super_deserialize(self, instream);
     PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
+
+    ivars->field             = Freezer_read_string(instream);
+    ivars->terms             = Freezer_read_varray(instream);
     ivars->idf               = InStream_Read_F32(instream);
     ivars->raw_weight        = InStream_Read_F32(instream);
     ivars->query_norm_factor = InStream_Read_F32(instream);
     ivars->normalized_weight = InStream_Read_F32(instream);
+
+    for (size_t i = 0, max = Vec_Get_Size(ivars->terms); i < max; i++) {
+        CERTIFY(Vec_Fetch(ivars->terms, i), OBJ);
+    }
+
     return self;
 }
 
 bool
 PhraseCompiler_Equals_IMP(PhraseCompiler *self, Obj *other) {
     if (!Obj_is_a(other, PHRASECOMPILER))                     { return false; }
-    PhraseCompiler_Equals_t super_equals
-        = (PhraseCompiler_Equals_t)SUPER_METHOD_PTR(PHRASECOMPILER,
-                                                    LUCY_PhraseCompiler_Equals);
-    if (!super_equals(self, other))                           { return false; }
     PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
     PhraseCompilerIVARS *const ovars
         = PhraseCompiler_IVARS((PhraseCompiler*)other);
+    if (!Str_Equals(ivars->field, (Obj*)ovars->field))        { return false; }
+    if (!Vec_Equals(ivars->terms, (Obj*)ovars->terms))        { return false; }
     if (ivars->idf != ovars->idf)                             { return false; }
     if (ivars->raw_weight != ovars->raw_weight)               { return false; }
     if (ivars->query_norm_factor != ovars->query_norm_factor) { return false; }
     if (ivars->normalized_weight != ovars->normalized_weight) { return false; }
     return true;
-}
-
-float
-PhraseCompiler_Get_Weight_IMP(PhraseCompiler *self) {
-    return PhraseCompiler_IVARS(self)->normalized_weight;
 }
 
 float
@@ -297,22 +299,11 @@ PhraseCompiler_Make_Matcher_IMP(PhraseCompiler *self, SegReader *reader,
                                 bool need_score) {
     UNUSED_VAR(need_score);
     PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
-    PhraseQueryIVARS *const parent_ivars
-        = PhraseQuery_IVARS((PhraseQuery*)ivars->parent);
-    Vector *const      terms     = parent_ivars->terms;
+    Vector *const      terms     = ivars->terms;
     size_t             num_terms = Vec_Get_Size(terms);
 
     // Bail if there are no terms.
     if (!num_terms) { return NULL; }
-
-    // Bail unless field is valid and posting type supports positions.
-    Similarity *sim     = PhraseCompiler_Get_Similarity(self);
-    Posting    *posting = Sim_Make_Posting(sim);
-    if (posting == NULL || !Obj_is_a((Obj*)posting, SCOREPOSTING)) {
-        DECREF(posting);
-        return NULL;
-    }
-    DECREF(posting);
 
     // Bail if there's no PostingListReader for this segment.
     PostingListReader *const plist_reader
@@ -320,12 +311,24 @@ PhraseCompiler_Make_Matcher_IMP(PhraseCompiler *self, SegReader *reader,
               reader, Class_Get_Name(POSTINGLISTREADER));
     if (!plist_reader) { return NULL; }
 
+    Schema     *schema = PListReader_Get_Schema(plist_reader);
+    Similarity *sim    = Schema_Fetch_Sim(schema, ivars->field);
+    if (!sim) { sim = Schema_Get_Similarity(schema); }
+
+    // Bail unless field is valid and posting type supports positions.
+    Posting *posting = Sim_Make_Posting(sim);
+    if (posting == NULL || !Obj_is_a((Obj*)posting, SCOREPOSTING)) {
+        DECREF(posting);
+        return NULL;
+    }
+    DECREF(posting);
+
     // Look up each term.
     Vector  *plists = Vec_new(num_terms);
     for (size_t i = 0; i < num_terms; i++) {
         Obj *term = Vec_Fetch(terms, i);
         PostingList *plist
-            = PListReader_Posting_List(plist_reader, parent_ivars->field, term);
+            = PListReader_Posting_List(plist_reader, ivars->field, term);
 
         // Bail if any one of the terms isn't in the index.
         if (!plist || !PList_Get_Doc_Freq(plist)) {
@@ -336,8 +339,8 @@ PhraseCompiler_Make_Matcher_IMP(PhraseCompiler *self, SegReader *reader,
         Vec_Push(plists, (Obj*)plist);
     }
 
-    Matcher *retval
-        = (Matcher*)PhraseMatcher_new(sim, plists, (Compiler*)self);
+    float weight = ivars->normalized_weight;
+    Matcher *retval = (Matcher*)PhraseMatcher_new(sim, plists, weight);
     DECREF(plists);
     return retval;
 }
@@ -346,16 +349,14 @@ Vector*
 PhraseCompiler_Highlight_Spans_IMP(PhraseCompiler *self, Searcher *searcher,
                                    DocVector *doc_vec, String *field) {
     PhraseCompilerIVARS *const ivars = PhraseCompiler_IVARS(self);
-    PhraseQueryIVARS *const parent_ivars
-        = PhraseQuery_IVARS((PhraseQuery*)ivars->parent);
-    Vector *const      terms     = parent_ivars->terms;
+    Vector *const      terms     = ivars->terms;
     Vector *const      spans     = Vec_new(0);
     const uint32_t     num_terms = (uint32_t)Vec_Get_Size(terms);
     UNUSED_VAR(searcher);
 
     // Bail if no terms or field doesn't match.
     if (!num_terms) { return spans; }
-    if (!Str_Equals(field, (Obj*)parent_ivars->field)) { return spans; }
+    if (!Str_Equals(field, (Obj*)ivars->field)) { return spans; }
 
     Vector *term_vectors    = Vec_new(num_terms);
     BitVector *posit_vec       = BitVec_new(0);
@@ -408,7 +409,7 @@ PhraseCompiler_Highlight_Spans_IMP(PhraseCompiler *self, Searcher *searcher,
         I32Array *valid_posits       = BitVec_To_Array(posit_vec);
         size_t    num_valid_posits   = I32Arr_Get_Size(valid_posits);
         size_t j = 0;
-        float weight = PhraseCompiler_Get_Weight(self);
+        float weight = ivars->normalized_weight;
         size_t i = 0;
 
         // Add only those starts/ends that belong to a valid position.

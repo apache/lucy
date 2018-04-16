@@ -59,10 +59,10 @@ public class Lucy::Search::IndexSearcher nickname IxSearcher
     Doc_Freq(IndexSearcher *self, String *field, Obj *term);
 
     public void
-    Collect(IndexSearcher *self, Query *query, Collector *collector);
+    Collect(IndexSearcher *self, Obj *query, Collector *collector);
 
     incremented TopDocs*
-    Top_Docs(IndexSearcher *self, Query *query, uint32_t num_wanted,
+    Top_Docs(IndexSearcher *self, Obj *query, uint32_t num_wanted,
              SortSpec *sort_spec = NULL);
 
     public incremented HitDoc*

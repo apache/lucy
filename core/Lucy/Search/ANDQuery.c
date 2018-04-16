@@ -79,29 +79,33 @@ ANDQuery_Equals_IMP(ANDQuery *self, Obj *other) {
 }
 
 Compiler*
-ANDQuery_Make_Compiler_IMP(ANDQuery *self, Searcher *searcher, float boost,
-                           bool subordinate) {
-    ANDCompiler *compiler = ANDCompiler_new(self, searcher, boost);
-    if (!subordinate) {
-        ANDCompiler_Normalize(compiler);
-    }
-    return (Compiler*)compiler;
+ANDQuery_Make_Compiler_IMP(ANDQuery *self, Searcher *searcher, float boost) {
+    return (Compiler*)ANDCompiler_new(self, searcher, boost);
 }
 
 /**********************************************************************/
 
 ANDCompiler*
-ANDCompiler_new(ANDQuery *parent, Searcher *searcher, float boost) {
+ANDCompiler_new(ANDQuery *query, Searcher *searcher, float boost) {
     ANDCompiler *self = (ANDCompiler*)Class_Make_Obj(ANDCOMPILER);
-    return ANDCompiler_init(self, parent, searcher, boost);
+    return ANDCompiler_init(self, query, searcher, boost);
 }
 
 ANDCompiler*
-ANDCompiler_init(ANDCompiler *self, ANDQuery *parent, Searcher *searcher,
+ANDCompiler_init(ANDCompiler *self, ANDQuery *query, Searcher *searcher,
                  float boost) {
-    PolyCompiler_init((PolyCompiler*)self, (PolyQuery*)parent, searcher,
-                      boost);
+    PolyCompiler_init((PolyCompiler*)self, (PolyQuery*)query, searcher, boost);
     return self;
+}
+
+bool
+ANDCompiler_Equals_IMP(ANDCompiler *self, Obj *other) {
+    if ((ANDCompiler*)other == self)   { return true;  }
+    if (!Obj_is_a(other, ANDCOMPILER)) { return false; }
+    ANDCompiler_Equals_t super_equals
+        = (ANDCompiler_Equals_t)SUPER_METHOD_PTR(ANDCOMPILER,
+                                                 LUCY_ANDCompiler_Equals);
+    return super_equals(self, other);
 }
 
 Matcher*
@@ -133,9 +137,9 @@ ANDCompiler_Make_Matcher_IMP(ANDCompiler *self, SegReader *reader,
             }
         }
 
-        Matcher *retval
-            = (Matcher*)ANDMatcher_new(child_matchers,
-                                       ANDCompiler_Get_Similarity(self));
+        Schema *schema = SegReader_Get_Schema(reader);
+        Similarity *sim = Schema_Get_Similarity(schema);
+        Matcher *retval = (Matcher*)ANDMatcher_new(child_matchers, sim);
         DECREF(child_matchers);
         return retval;
 

@@ -54,8 +54,7 @@ public class Lucy::Search::PhraseQuery inherits Lucy::Search::Query {
     Get_Terms(PhraseQuery *self);
 
     public incremented Compiler*
-    Make_Compiler(PhraseQuery *self, Searcher *searcher, float boost,
-                  bool subordinate = false);
+    Make_Compiler(PhraseQuery *self, Searcher *searcher, float boost);
 
     public bool
     Equals(PhraseQuery *self, Obj *other);
@@ -82,23 +81,22 @@ public class Lucy::Search::PhraseQuery inherits Lucy::Search::Query {
 class Lucy::Search::PhraseCompiler
     inherits Lucy::Search::Compiler {
 
-    float idf;
-    float raw_weight;
-    float query_norm_factor;
-    float normalized_weight;
+    String *field;
+    Vector *terms;
+    float   idf;
+    float   raw_weight;
+    float   query_norm_factor;
+    float   normalized_weight;
 
     inert incremented PhraseCompiler*
-    new(PhraseQuery *parent, Searcher *searcher, float boost);
+    new(PhraseQuery *query, Searcher *searcher, float boost);
 
     inert PhraseCompiler*
-    init(PhraseCompiler *self, PhraseQuery *parent, Searcher *searcher,
+    init(PhraseCompiler *self, PhraseQuery *query, Searcher *searcher,
          float boost);
 
     public incremented nullable Matcher*
     Make_Matcher(PhraseCompiler *self, SegReader *reader, bool need_score);
-
-    public float
-    Get_Weight(PhraseCompiler *self);
 
     public float
     Sum_Of_Squared_Weights(PhraseCompiler *self);
@@ -118,6 +116,9 @@ class Lucy::Search::PhraseCompiler
 
     incremented PhraseCompiler*
     Deserialize(decremented PhraseCompiler *self, InStream *instream);
+
+    public void
+    Destroy(PhraseCompiler *self);
 }
 
 

@@ -21,6 +21,7 @@
 
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
+#include "Lucy/Test/Search/MockSearcher.h"
 #include "Lucy/Test/Search/TestTermQuery.h"
 #include "Lucy/Test/TestUtils.h"
 #include "Lucy/Search/TermQuery.h"
@@ -57,10 +58,21 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     DECREF(clone);
 }
 
+static void
+test_freeze_thaw_compiler(TestBatchRunner *runner) {
+    TermQuery *query = TestUtils_make_term_query("content", "foo");
+    Searcher *searcher = (Searcher*)MockSearcher_new();
+    TermCompiler *compiler = TermCompiler_new(query, searcher, 433.0f);
+    TestUtils_test_freeze_thaw(runner, (Obj*)compiler, "compiler");
+    DECREF(searcher);
+    DECREF(query);
+}
+
 void
 TestTermQuery_Run_IMP(TestTermQuery *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 5);
     test_Dump_Load_and_Equals(runner);
+    test_freeze_thaw_compiler(runner);
 }
 
 

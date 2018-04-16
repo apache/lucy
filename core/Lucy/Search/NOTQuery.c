@@ -21,6 +21,8 @@
 #include "Lucy/Search/NOTQuery.h"
 #include "Lucy/Index/DocVector.h"
 #include "Lucy/Index/SegReader.h"
+#include "Lucy/Index/Similarity.h"
+#include "Lucy/Plan/Schema.h"
 #include "Lucy/Search/MatchAllMatcher.h"
 #include "Lucy/Search/NOTMatcher.h"
 #include "Lucy/Search/Searcher.h"
@@ -72,29 +74,34 @@ NOTQuery_Equals_IMP(NOTQuery *self, Obj *other) {
 }
 
 Compiler*
-NOTQuery_Make_Compiler_IMP(NOTQuery *self, Searcher *searcher, float boost,
-                           bool subordinate) {
-    NOTCompiler *compiler = NOTCompiler_new(self, searcher, boost);
-    if (!subordinate) {
-        NOTCompiler_Normalize(compiler);
-    }
-    return (Compiler*)compiler;
+NOTQuery_Make_Compiler_IMP(NOTQuery *self, Searcher *searcher, float boost) {
+    return (Compiler*)NOTCompiler_new(self, searcher, boost);
 }
 
 /**********************************************************************/
 
 NOTCompiler*
-NOTCompiler_new(NOTQuery *parent, Searcher *searcher, float boost) {
+NOTCompiler_new(NOTQuery *query, Searcher *searcher, float boost) {
     NOTCompiler *self = (NOTCompiler*)Class_Make_Obj(NOTCOMPILER);
-    return NOTCompiler_init(self, parent, searcher, boost);
+    return NOTCompiler_init(self, query, searcher, boost);
 }
 
 NOTCompiler*
-NOTCompiler_init(NOTCompiler *self, NOTQuery *parent, Searcher *searcher,
+NOTCompiler_init(NOTCompiler *self, NOTQuery *query, Searcher *searcher,
                  float boost) {
-    PolyCompiler_init((PolyCompiler*)self, (PolyQuery*)parent, searcher,
+    PolyCompiler_init((PolyCompiler*)self, (PolyQuery*)query, searcher,
                       boost);
     return self;
+}
+
+bool
+NOTCompiler_Equals_IMP(NOTCompiler *self, Obj *other) {
+    if ((NOTCompiler*)other == self)   { return true;  }
+    if (!Obj_is_a(other, NOTCOMPILER)) { return false; }
+    NOTCompiler_Equals_t super_equals
+        = (NOTCompiler_Equals_t)SUPER_METHOD_PTR(NOTCOMPILER,
+                                                 LUCY_NOTCompiler_Equals);
+    return super_equals(self, other);
 }
 
 float
@@ -124,7 +131,7 @@ NOTCompiler_Make_Matcher_IMP(NOTCompiler *self, SegReader *reader,
     UNUSED_VAR(need_score);
 
     if (negated_matcher == NULL) {
-        float weight = NOTCompiler_Get_Weight(self);
+        float weight = ivars->boost;
         int32_t doc_max = SegReader_Doc_Max(reader);
         return (Matcher*)MatchAllMatcher_new(weight, doc_max);
     }

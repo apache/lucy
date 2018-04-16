@@ -31,6 +31,7 @@
 #include "Lucy/Index/TermVector.h"
 #include "Lucy/Plan/FieldType.h"
 #include "Lucy/Plan/Schema.h"
+#include "Lucy/Search/Compiler.h"
 #include "Lucy/Search/Query.h"
 #include "Lucy/Search/SortRule.h"
 #include "Lucy/Search/SortSpec.h"
@@ -94,6 +95,9 @@ Freezer_serialize(Obj *obj, OutStream *outstream) {
     else if (Obj_is_a(obj, QUERY)) {
         Query_Serialize((Query*)obj, outstream);
     }
+    else if (Obj_is_a(obj, COMPILER)) {
+        Compiler_Serialize((Compiler*)obj, outstream);
+    }
     else if (Obj_is_a(obj, DOC)) {
         Doc_Serialize((Doc*)obj, outstream);
     }
@@ -148,6 +152,9 @@ Freezer_deserialize(Obj *obj, InStream *instream) {
     }
     else if (Obj_is_a(obj, QUERY)) {
         obj = (Obj*)Query_Deserialize((Query*)obj, instream);
+    }
+    else if (Obj_is_a(obj, COMPILER)) {
+        obj = (Obj*)Compiler_Deserialize((Compiler*)obj, instream);
     }
     else if (Obj_is_a(obj, DOC)) {
         obj = (Obj*)Doc_Deserialize((Doc*)obj, instream);

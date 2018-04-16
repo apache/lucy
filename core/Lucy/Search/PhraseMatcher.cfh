@@ -28,17 +28,16 @@ class Lucy::Search::PhraseMatcher inherits Lucy::Search::Matcher {
     ByteBuf        *anchor_set;
     float           phrase_freq;
     float           phrase_boost;
-    Compiler       *compiler;
     float           weight;
     bool            first_time;
     bool            more;
 
     inert incremented PhraseMatcher*
-    new(Similarity *similarity, Vector *posting_lists, Compiler *compiler);
+    new(Similarity *similarity, Vector *posting_lists, float weight);
 
     inert PhraseMatcher*
     init(PhraseMatcher *self, Similarity *similarity, Vector *posting_lists,
-         Compiler *compiler);
+         float weight);
 
     public void
     Destroy(PhraseMatcher *self);

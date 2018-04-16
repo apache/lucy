@@ -32,41 +32,9 @@
 #include "Lucy/Util/Freezer.h"
 
 Compiler*
-Compiler_init(Compiler *self, Query *parent, Searcher *searcher,
-              Similarity *sim, float boost) {
-    CompilerIVARS *const ivars = Compiler_IVARS(self);
-    Query_init((Query*)self, boost);
-    if (!sim) {
-        Schema *schema = Searcher_Get_Schema(searcher);
-        sim = Schema_Get_Similarity(schema);
-    }
-    ivars->parent  = (Query*)INCREF(parent);
-    ivars->sim     = (Similarity*)INCREF(sim);
+Compiler_init(Compiler *self) {
     ABSTRACT_CLASS_CHECK(self, COMPILER);
     return self;
-}
-
-void
-Compiler_Destroy_IMP(Compiler *self) {
-    CompilerIVARS *const ivars = Compiler_IVARS(self);
-    DECREF(ivars->parent);
-    DECREF(ivars->sim);
-    SUPER_DESTROY(self, COMPILER);
-}
-
-float
-Compiler_Get_Weight_IMP(Compiler *self) {
-    return Compiler_Get_Boost(self);
-}
-
-Similarity*
-Compiler_Get_Similarity_IMP(Compiler *self) {
-    return Compiler_IVARS(self)->sim;
-}
-
-Query*
-Compiler_Get_Parent_IMP(Compiler *self) {
-    return Compiler_IVARS(self)->parent;
 }
 
 float
@@ -82,14 +50,12 @@ Compiler_Apply_Norm_Factor_IMP(Compiler *self, float factor) {
 }
 
 void
-Compiler_Normalize_IMP(Compiler *self) {
-    CompilerIVARS *const ivars = Compiler_IVARS(self);
-
+Compiler_Normalize_IMP(Compiler *self, Similarity *sim) {
     // factor = (tf_q * idf_t)
     float factor = Compiler_Sum_Of_Squared_Weights(self);
 
     // factor /= norm_q
-    factor = Sim_Query_Norm(ivars->sim, factor);
+    factor = Sim_Query_Norm(sim, factor);
 
     // weight *= factor
     Compiler_Apply_Norm_Factor(self, factor);
@@ -104,49 +70,4 @@ Compiler_Highlight_Spans_IMP(Compiler *self, Searcher *searcher,
     UNUSED_VAR(field);
     return Vec_new(0);
 }
-
-String*
-Compiler_To_String_IMP(Compiler *self) {
-    CompilerIVARS *const ivars = Compiler_IVARS(self);
-    String *stringified_query = Query_To_String(ivars->parent);
-    CharBuf *buf = CB_new(0);
-    CB_Cat_Trusted_Utf8(buf, "compiler(", 9);
-    CB_Cat(buf, stringified_query);
-    CB_Cat_Trusted_Utf8(buf, ")", 1);
-    String *string = CB_Yield_String(buf);
-    DECREF(buf);
-    DECREF(stringified_query);
-    return string;
-}
-
-bool
-Compiler_Equals_IMP(Compiler *self, Obj *other) {
-    if ((Compiler*)other == self)                          { return true; }
-    if (!Obj_is_a(other, COMPILER))                        { return false; }
-    CompilerIVARS *const ivars = Compiler_IVARS(self);
-    CompilerIVARS *const ovars = Compiler_IVARS((Compiler*)other);
-    if (ivars->boost != ovars->boost)                      { return false; }
-    if (!Query_Equals(ivars->parent, (Obj*)ovars->parent)) { return false; }
-    if (!Sim_Equals(ivars->sim, (Obj*)ovars->sim))         { return false; }
-    return true;
-}
-
-void
-Compiler_Serialize_IMP(Compiler *self, OutStream *outstream) {
-    CompilerIVARS *const ivars = Compiler_IVARS(self);
-    ABSTRACT_CLASS_CHECK(self, COMPILER);
-    OutStream_Write_F32(outstream, ivars->boost);
-    FREEZE(ivars->parent, outstream);
-    FREEZE(ivars->sim, outstream);
-}
-
-Compiler*
-Compiler_Deserialize_IMP(Compiler *self, InStream *instream) {
-    CompilerIVARS *const ivars = Compiler_IVARS(self);
-    ivars->boost  = InStream_Read_F32(instream);
-    ivars->parent = (Query*)THAW(instream);
-    ivars->sim    = (Similarity*)THAW(instream);
-    return self;
-}
-
 

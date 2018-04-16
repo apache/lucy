@@ -23,6 +23,7 @@
 #include "Clownfish/CharBuf.h"
 #include "Lucy/Index/SegReader.h"
 #include "Lucy/Index/Similarity.h"
+#include "Lucy/Plan/Schema.h"
 #include "Lucy/Search/ORMatcher.h"
 #include "Lucy/Search/Searcher.h"
 #include "Lucy/Store/InStream.h"
@@ -40,13 +41,8 @@ ORQuery_init(ORQuery *self, Vector *children) {
 }
 
 Compiler*
-ORQuery_Make_Compiler_IMP(ORQuery *self, Searcher *searcher, float boost,
-                          bool subordinate) {
-    ORCompiler *compiler = ORCompiler_new(self, searcher, boost);
-    if (!subordinate) {
-        ORCompiler_Normalize(compiler);
-    }
-    return (Compiler*)compiler;
+ORQuery_Make_Compiler_IMP(ORQuery *self, Searcher *searcher, float boost) {
+    return (Compiler*)ORCompiler_new(self, searcher, boost);
 }
 
 bool
@@ -87,17 +83,26 @@ ORQuery_To_String_IMP(ORQuery *self) {
 /**********************************************************************/
 
 ORCompiler*
-ORCompiler_new(ORQuery *parent, Searcher *searcher, float boost) {
+ORCompiler_new(ORQuery *query, Searcher *searcher, float boost) {
     ORCompiler *self = (ORCompiler*)Class_Make_Obj(ORCOMPILER);
-    return ORCompiler_init(self, parent, searcher, boost);
+    return ORCompiler_init(self, query, searcher, boost);
 }
 
 ORCompiler*
-ORCompiler_init(ORCompiler *self, ORQuery *parent, Searcher *searcher,
+ORCompiler_init(ORCompiler *self, ORQuery *query, Searcher *searcher,
                 float boost) {
-    PolyCompiler_init((PolyCompiler*)self, (PolyQuery*)parent, searcher,
-                      boost);
+    PolyCompiler_init((PolyCompiler*)self, (PolyQuery*)query, searcher, boost);
     return self;
+}
+
+bool
+ORCompiler_Equals_IMP(ORCompiler *self, Obj *other) {
+    if ((ORCompiler*)other == self)   { return true;  }
+    if (!Obj_is_a(other, ORCOMPILER)) { return false; }
+    ORCompiler_Equals_t super_equals
+        = (ORCompiler_Equals_t)SUPER_METHOD_PTR(ORCOMPILER,
+                                                LUCY_ORCompiler_Equals);
+    return super_equals(self, other);
 }
 
 Matcher*
@@ -132,10 +137,11 @@ ORCompiler_Make_Matcher_IMP(ORCompiler *self, SegReader *reader,
             return NULL;
         }
         else {
-            Similarity *sim    = ORCompiler_Get_Similarity(self);
-            Matcher    *retval = need_score
-                                 ? (Matcher*)ORScorer_new(submatchers, sim)
-                                 : (Matcher*)ORMatcher_new(submatchers);
+            Schema *schema = SegReader_Get_Schema(reader);
+            Similarity *sim = Schema_Get_Similarity(schema);
+            Matcher *retval = need_score
+                              ? (Matcher*)ORScorer_new(submatchers, sim)
+                              : (Matcher*)ORMatcher_new(submatchers);
             DECREF(submatchers);
             return retval;
         }

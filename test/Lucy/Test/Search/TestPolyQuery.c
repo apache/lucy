@@ -22,11 +22,13 @@
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
+#include "Lucy/Test/Search/MockSearcher.h"
 #include "Lucy/Test/Search/TestPolyQuery.h"
 #include "Lucy/Search/ANDQuery.h"
 #include "Lucy/Search/ORQuery.h"
 #include "Lucy/Search/PolyQuery.h"
 #include "Lucy/Search/LeafQuery.h"
+#include "Lucy/Search/TermQuery.h"
 #include "Lucy/Util/Freezer.h"
 
 TestANDQuery*
@@ -78,16 +80,32 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner, uint32_t boolop) {
     DECREF(clone);
 }
 
+static void
+test_freeze_thaw_compiler(TestBatchRunner *runner, uint32_t boolop) {
+    String *field = SSTR_WRAP_C("content");
+    PolyQuery *query = TestUtils_make_poly_query(boolop,
+        TermQuery_new(field, (Obj*)SSTR_WRAP_C("a")),
+        TermQuery_new(field, (Obj*)SSTR_WRAP_C("b")),
+        NULL);
+    Searcher *searcher = (Searcher*)MockSearcher_new();
+    Compiler *compiler = PolyQuery_Make_Root_Compiler(query, searcher);
+    TestUtils_test_freeze_thaw(runner, (Obj*)compiler, "compiler");
+    DECREF(searcher);
+    DECREF(query);
+}
+
 void
 TestANDQuery_Run_IMP(TestANDQuery *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 5);
     test_Dump_Load_and_Equals(runner, BOOLOP_AND);
+    test_freeze_thaw_compiler(runner, BOOLOP_AND);
 }
 
 void
 TestORQuery_Run_IMP(TestORQuery *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 5);
     test_Dump_Load_and_Equals(runner, BOOLOP_OR);
+    test_freeze_thaw_compiler(runner, BOOLOP_OR);
 }
 
 

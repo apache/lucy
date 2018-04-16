@@ -42,23 +42,32 @@ public class Lucy::Search::MatchAllQuery inherits Lucy::Search::Query {
     To_String(MatchAllQuery *self);
 
     public incremented Compiler*
-    Make_Compiler(MatchAllQuery *self, Searcher *searcher, float boost,
-                  bool subordinate = false);
+    Make_Compiler(MatchAllQuery *self, Searcher *searcher, float boost);
 }
 
 class Lucy::Search::MatchAllCompiler
     inherits Lucy::Search::Compiler {
 
+    float boost;
+
     inert incremented MatchAllCompiler*
-    new(MatchAllQuery *parent, Searcher *searcher, float boost);
+    new(float boost);
 
     inert MatchAllCompiler*
-    init(MatchAllCompiler *self, MatchAllQuery *parent,
-         Searcher *searcher, float boost);
+    init(MatchAllCompiler *self, float boost);
 
     public incremented nullable Matcher*
     Make_Matcher(MatchAllCompiler *self, SegReader *reader,
                  bool need_score);
+
+    void
+    Serialize(MatchAllCompiler *self, OutStream *outstream);
+
+    incremented MatchAllCompiler*
+    Deserialize(decremented MatchAllCompiler *self, InStream *instream);
+
+    public bool
+    Equals(MatchAllCompiler *self, Obj *other);
 }
 
 

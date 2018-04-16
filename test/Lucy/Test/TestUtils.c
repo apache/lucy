@@ -229,3 +229,20 @@ TestUtils_modules_folder() {
     return NULL;
 }
 
+void
+TestUtils_test_freeze_thaw(TestBatchRunner *runner, Obj *obj,
+                           const char *msg) {
+    RAMFile *file = RAMFile_new(NULL, false);
+    OutStream *outstream = OutStream_open((Obj*)file);
+    Freezer_freeze(obj, outstream);
+    OutStream_Close(outstream);
+    InStream *instream = InStream_open((Obj*)file);
+    Obj *thawed = Freezer_thaw(instream);
+    TEST_TRUE(runner, Obj_Equals(obj, thawed), "freeze/thaw %s", msg);
+    DECREF(thawed);
+    DECREF(instream);
+    DECREF(outstream);
+    DECREF(file);
+    DECREF(obj);
+}
+

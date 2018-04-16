@@ -70,12 +70,13 @@ public abstract class Lucy::Search::PolyQuery inherits Lucy::Search::Query {
 abstract class Lucy::Search::PolyCompiler inherits Lucy::Search::Compiler {
 
     Vector *children;
+    float   boost;
 
     /** Initialize the Compiler, creating a Compiler child for each child
      * Query.  Normalization is left to the subclass.
      */
     inert PolyCompiler*
-    init(PolyCompiler *self, PolyQuery *parent, Searcher *searcher,
+    init(PolyCompiler *self, PolyQuery *query, Searcher *searcher,
          float boost);
 
     public float
@@ -87,6 +88,9 @@ abstract class Lucy::Search::PolyCompiler inherits Lucy::Search::Compiler {
     incremented Vector*
     Highlight_Spans(PolyCompiler *self, Searcher *searcher,
                     DocVector *doc_vec, String *field);
+
+    public bool
+    Equals(PolyCompiler *self, Obj *other);
 
     public void
     Destroy(PolyCompiler *self);

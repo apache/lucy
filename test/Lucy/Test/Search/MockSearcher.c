@@ -14,41 +14,37 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+#define TESTLUCY_USE_SHORT_NAMES
+#include "Lucy/Util/ToolSet.h"
 
-/**
- * Base class for TermMatchers.
- *
- * Each subclass of Posting is associated with a corresponding subclass of
- * TermMatcher.
- */
-class Lucy::Search::TermMatcher inherits Lucy::Search::Matcher {
+#include "Lucy/Test/Search/MockSearcher.h"
+#include "Lucy/Test/TestSchema.h"
 
-    float           weight;
-    PostingList    *plist;
-    Posting        *posting;
-
-    inert TermMatcher*
-    init(TermMatcher *self, PostingList *posting_list, float weight);
-
-    public void
-    Destroy(TermMatcher *self);
-
-    public int32_t
-    Next(TermMatcher* self);
-
-    public int32_t
-    Advance(TermMatcher* self, int32_t target);
-
-    public int32_t
-    Get_Doc_ID(TermMatcher* self);
+MockSearcher*
+MockSearcher_new() {
+    MockSearcher *self = (MockSearcher*)Class_Make_Obj(MOCKSEARCHER);
+    return MockSearcher_init(self);
 }
 
-__C__
-#define LUCY_TERMMATCHER_SCORE_CACHE_SIZE 32
-#ifdef LUCY_USE_SHORT_NAMES
-  #define TERMMATCHER_SCORE_CACHE_SIZE LUCY_TERMMATCHER_SCORE_CACHE_SIZE
-#endif
-__END_C__
+MockSearcher*
+MockSearcher_init(MockSearcher *self) {
+    Schema *schema = (Schema*)TestSchema_new(false);
+    Searcher_init((Searcher*)self, schema);
+    DECREF(schema);
+    return self;
+}
 
+int32_t
+MockSearcher_Doc_Max_IMP(MockSearcher *self) {
+    UNUSED_VAR(self);
+    return 2500;
+}
+
+uint32_t
+MockSearcher_Doc_Freq_IMP(MockSearcher *self, String *field, Obj *term) {
+    UNUSED_VAR(self);
+    UNUSED_VAR(field);
+    UNUSED_VAR(term);
+    return 10;
+}
 

@@ -288,10 +288,7 @@ sub test_range_search {
     my $thawed = thaw($frozen);
     ok( $query->equals($thawed), 'equals' );
 
-    my $compiler = $query->make_compiler(
-        searcher => $searcher,
-        boost    => $query->get_boost,
-    );
+    my $compiler = $query->make_root_compiler($searcher);
     $frozen = nfreeze($compiler);
     $thawed = thaw($frozen);
     ok( $compiler->equals($thawed), "freeze/thaw compiler" );

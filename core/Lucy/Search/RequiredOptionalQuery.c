@@ -91,33 +91,36 @@ ReqOptQuery_Equals_IMP(RequiredOptionalQuery *self, Obj *other) {
 
 Compiler*
 ReqOptQuery_Make_Compiler_IMP(RequiredOptionalQuery *self, Searcher *searcher,
-                              float boost, bool subordinate) {
-    RequiredOptionalCompiler *compiler
-        = ReqOptCompiler_new(self, searcher, boost);
-    if (!subordinate) {
-        ReqOptCompiler_Normalize(compiler);
-    }
-    return (Compiler*)compiler;
+                              float boost) {
+    return (Compiler*)ReqOptCompiler_new(self, searcher, boost);
 }
 
 /**********************************************************************/
 
 RequiredOptionalCompiler*
-ReqOptCompiler_new(RequiredOptionalQuery *parent, Searcher *searcher,
+ReqOptCompiler_new(RequiredOptionalQuery *query, Searcher *searcher,
                    float boost) {
     RequiredOptionalCompiler *self
         = (RequiredOptionalCompiler*)Class_Make_Obj(
               REQUIREDOPTIONALCOMPILER);
-    return ReqOptCompiler_init(self, parent, searcher, boost);
+    return ReqOptCompiler_init(self, query, searcher, boost);
 }
 
 RequiredOptionalCompiler*
 ReqOptCompiler_init(RequiredOptionalCompiler *self,
-                    RequiredOptionalQuery *parent,
+                    RequiredOptionalQuery *query,
                     Searcher *searcher, float boost) {
-    PolyCompiler_init((PolyCompiler*)self, (PolyQuery*)parent, searcher,
-                      boost);
+    PolyCompiler_init((PolyCompiler*)self, (PolyQuery*)query, searcher, boost);
     return self;
+}
+
+bool
+ReqOptCompiler_Equals_IMP(RequiredOptionalCompiler *self, Obj *other) {
+    if ((RequiredOptionalCompiler*)other == self)   { return true;  }
+    if (!Obj_is_a(other, REQUIREDOPTIONALCOMPILER)) { return false; }
+    ReqOptCompiler_Equals_t super_equals = (ReqOptCompiler_Equals_t)
+        SUPER_METHOD_PTR(REQUIREDOPTIONALCOMPILER, LUCY_ReqOptCompiler_Equals);
+    return super_equals(self, other);
 }
 
 Matcher*

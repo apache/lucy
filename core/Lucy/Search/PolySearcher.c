@@ -136,8 +136,8 @@ S_modify_doc_ids(Vector *match_docs, int32_t base) {
 }
 
 TopDocs*
-PolySearcher_Top_Docs_IMP(PolySearcher *self, Query *query,
-                          uint32_t num_wanted, SortSpec *sort_spec) {
+PolySearcher_Top_Docs_IMP(PolySearcher *self, Obj *query, uint32_t num_wanted,
+                          SortSpec *sort_spec) {
     PolySearcherIVARS *const ivars = PolySearcher_IVARS(self);
     Schema   *schema      = PolySearcher_Get_Schema(self);
     Vector   *searchers   = ivars->searchers;
@@ -146,16 +146,23 @@ PolySearcher_Top_Docs_IMP(PolySearcher *self, Query *query,
                             ? HitQ_new(schema, sort_spec, num_wanted)
                             : HitQ_new(NULL, NULL, num_wanted);
     uint32_t  total_hits  = 0;
-    Compiler *compiler    = Query_is_a(query, COMPILER)
-                            ? ((Compiler*)INCREF(query))
-                            : Query_Make_Compiler(query, (Searcher*)self,
-                                                  Query_Get_Boost(query),
-                                                  false);
+    Compiler *compiler;
+
+    if (Obj_is_a(query, QUERY)) {
+        compiler = Query_Make_Root_Compiler((Query*)query, (Searcher*)self);
+    }
+    else if (Obj_is_a(query, COMPILER)) {
+        compiler = (Compiler*)INCREF(query);
+    }
+    else {
+        THROW(ERR, "Invalid query type: %o", Obj_get_class_name(query));
+        UNREACHABLE_RETURN(TopDocs*);
+    }
 
     for (size_t i = 0, max = Vec_Get_Size(searchers); i < max; i++) {
         Searcher   *searcher   = (Searcher*)Vec_Fetch(searchers, i);
         int32_t     base       = I32Arr_Get(starts, i);
-        TopDocs    *top_docs   = Searcher_Top_Docs(searcher, (Query*)compiler,
+        TopDocs    *top_docs   = Searcher_Top_Docs(searcher, (Obj*)compiler,
                                                    num_wanted, sort_spec);
         Vector     *sub_match_docs = TopDocs_Get_Match_Docs(top_docs);
 
@@ -181,7 +188,7 @@ PolySearcher_Top_Docs_IMP(PolySearcher *self, Query *query,
 
 
 void
-PolySearcher_Collect_IMP(PolySearcher *self, Query *query,
+PolySearcher_Collect_IMP(PolySearcher *self, Obj *query,
                          Collector *collector) {
     PolySearcherIVARS *const ivars = PolySearcher_IVARS(self);
     Vector *const searchers = ivars->searchers;

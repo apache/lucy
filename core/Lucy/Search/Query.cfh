@@ -48,18 +48,24 @@ public class Lucy::Search::Query inherits Clownfish::Obj {
     public inert Query*
     init(Query *self, float boost = 1.0);
 
+    /** Derive a Compiler from the Query and normalize it.
+     */
+    public incremented Compiler*
+    Make_Root_Compiler(Query *self, Searcher *searcher);
+
     /** Abstract factory method returning a Compiler derived from this Query.
      *
      * @param searcher A Searcher.
      * @param boost A scoring multiplier.
-     * @param subordinate Indicates whether the Query is a subquery (as
-     * opposed to a top-level query).  If false, the implementation must
-     * invoke [](cfish:Compiler.Normalize) on the newly minted Compiler object before returning
-     * it.
      */
-    public abstract incremented Compiler*
-    Make_Compiler(Query *self, Searcher *searcher, float boost,
-                  bool subordinate = false);
+    public incremented Compiler*
+    Make_Compiler(Query *self, Searcher *searcher, float boost);
+
+    /** For backward compatibility with old API.
+     */
+    incremented Compiler*
+    Make_Compiler_Compat(Query *self, Searcher *searcher, float boost,
+                         bool subordinate = false);
 
     /** Set the Query's boost.
      */

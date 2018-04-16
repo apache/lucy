@@ -139,7 +139,7 @@ func (s *SearcherIMP) topDocs(query Query, numWanted uint32,
 	err = clownfish.TrapErr(func() {
 		self := (*C.lucy_Searcher)(clownfish.Unwrap(s, "s"))
 		sortSpecC := (*C.lucy_SortSpec)(clownfish.UnwrapNullable(sortSpec))
-		queryC := (*C.lucy_Query)(clownfish.Unwrap(query, "query"))
+		queryC := (*C.cfish_Obj)(clownfish.Unwrap(query, "query"))
 		topDocsC := C.LUCY_Searcher_Top_Docs(self, queryC,
 			C.uint32_t(numWanted), sortSpecC)
 		topDocs = WRAPTopDocs(unsafe.Pointer(topDocsC))
@@ -291,12 +291,11 @@ func (td *TopDocsIMP) GetMatchDocs() []MatchDoc {
 	return slice
 }
 
-func (q *QueryIMP) MakeCompiler(searcher Searcher, boost float32,
-	subordinate bool) (retval Compiler, err error) {
+func (q *QueryIMP) MakeRootCompiler(searcher Searcher) (retval Compiler, err error) {
 	err = clownfish.TrapErr(func() {
 		self := (*C.lucy_Query)(clownfish.Unwrap(q, "q"))
 		searcherCF := (*C.lucy_Searcher)(clownfish.Unwrap(searcher, "searcher"))
-		retvalCF := C.LUCY_Query_Make_Compiler(self, searcherCF, C.float(boost), C.bool(subordinate))
+		retvalCF := C.LUCY_Query_Make_Root_Compiler(self, searcherCF)
 		if retvalCF != nil {
 			retval = clownfish.WRAPAny(unsafe.Pointer(retvalCF)).(Compiler)
 		}

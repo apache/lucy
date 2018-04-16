@@ -14,41 +14,21 @@
  * limitations under the License.
  */
 
-parcel Lucy;
+parcel TestLucy;
 
-/**
- * Base class for TermMatchers.
- *
- * Each subclass of Posting is associated with a corresponding subclass of
- * TermMatcher.
- */
-class Lucy::Search::TermMatcher inherits Lucy::Search::Matcher {
+class Lucy::Test::Search::MockSearcher inherits Lucy::Search::Searcher {
 
-    float           weight;
-    PostingList    *plist;
-    Posting        *posting;
+    public inert incremented MockSearcher*
+    new();
 
-    inert TermMatcher*
-    init(TermMatcher *self, PostingList *posting_list, float weight);
-
-    public void
-    Destroy(TermMatcher *self);
+    public inert MockSearcher*
+    init(MockSearcher *self);
 
     public int32_t
-    Next(TermMatcher* self);
+    Doc_Max(MockSearcher *self);
 
-    public int32_t
-    Advance(TermMatcher* self, int32_t target);
-
-    public int32_t
-    Get_Doc_ID(TermMatcher* self);
+    public uint32_t
+    Doc_Freq(MockSearcher *self, String *field, Obj *term);
 }
-
-__C__
-#define LUCY_TERMMATCHER_SCORE_CACHE_SIZE 32
-#ifdef LUCY_USE_SHORT_NAMES
-  #define TERMMATCHER_SCORE_CACHE_SIZE LUCY_TERMMATCHER_SCORE_CACHE_SIZE
-#endif
-__END_C__
 
 

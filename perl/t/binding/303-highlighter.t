@@ -55,7 +55,7 @@ sub highlight {
 
 package main;
 
-use Test::More tests => 6;
+use Test::More tests => 5;
 use Lucy::Test;
 
 binmode( STDOUT, ":utf8" );
@@ -109,17 +109,12 @@ like(
 );
 
 $q = $searcher->glean_query("foo");
-my $compiler = $q->make_compiler(
-    searcher => $searcher,
-    boost    => $q->get_boost,
-);
+my $compiler = $q->make_root_compiler($searcher);
 $hl = Lucy::Highlight::Highlighter->new(
     searcher => $searcher,
     query    => $compiler,
     field    => 'content',
 );
-is( $$compiler, ${ $hl->get_query },
-    "Highlighter accepts Compiler as Query" );
 is( $$compiler, ${ $hl->get_compiler },
     "Highlighter uses supplied Compiler" );
 

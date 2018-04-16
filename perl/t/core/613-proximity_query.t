@@ -16,34 +16,8 @@
 use strict;
 use warnings;
 
-package MockSearcher;
-use base qw( Lucy::Search::Searcher );
+use Lucy::Test;
+my $success = Lucy::Test::run_tests("LucyX::Test::Search::TestProximityQuery");
 
-package MyQuery;
-use base qw( Lucy::Search::Query );
-
-sub make_compiler {
-    return MyCompiler->new;
-}
-
-package MyCompiler;
-use base qw( Lucy::Search::Compiler );
-
-sub apply_norm_factor {
-    my ( $self, $factor ) = @_;
-    $self->SUPER::apply_norm_factor($factor);
-}
-
-package main;
-use Test::More tests => 1;
-
-my $q = Lucy::Search::ORQuery->new;
-for ( 1 .. 50 ) {
-    my @kids = ( $q, ( MyQuery->new ) x 10 );
-    $q = Lucy::Search::ORQuery->new( children => \@kids );
-}
-my $searcher = MockSearcher->new( schema => Lucy::Plan::Schema->new );
-my $compiler = $q->make_root_compiler($searcher);
-
-pass("Made it through deep recursion with multiple stack reallocations");
+exit($success ? 0 : 1);
 

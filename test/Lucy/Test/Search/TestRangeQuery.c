@@ -65,11 +65,20 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     DECREF(clone);
 }
 
+static void
+test_freeze_thaw_compiler(TestBatchRunner *runner) {
+    RangeQuery *query
+        = TestUtils_make_range_query("content", "a", "b", true, true);
+    RangeCompiler *compiler = RangeCompiler_new(query, 672.0f);
+    TestUtils_test_freeze_thaw(runner, (Obj*)compiler, "compiler");
+    DECREF(query);
+}
 
 void
 TestRangeQuery_Run_IMP(TestRangeQuery *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 5);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 6);
     test_Dump_Load_and_Equals(runner);
+    test_freeze_thaw_compiler(runner);
 }
 
 

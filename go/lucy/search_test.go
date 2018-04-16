@@ -34,6 +34,19 @@ func checkQuerySerialize(t *testing.T, query Query) {
 	}
 }
 
+func checkCompilerSerialize(t *testing.T, compiler Compiler) {
+	folder := NewRAMFolder("")
+	outStream, _ := folder.OpenOut("foo")
+	compiler.serialize(outStream)
+	outStream.Close()
+	inStream, _ := folder.OpenIn("foo")
+	dupe := clownfish.GetClass(compiler).MakeObj().(Compiler).deserialize(inStream)
+	if !compiler.Equals(dupe) {
+		t.Errorf("Unsuccessful serialization round trip -- expected '%v', got '%v'",
+				 compiler.ToString(), dupe.ToString())
+	}
+}
+
 func checkQueryDumpLoad(t *testing.T, query Query) {
 	dupe := clownfish.GetClass(query).MakeObj().(Query)
 	dupe = dupe.Load(query.Dump()).(Query)
@@ -43,21 +56,21 @@ func checkQueryDumpLoad(t *testing.T, query Query) {
 	}
 }
 
-func checkQueryEquals(t *testing.T, query Query) {
-	if !query.Equals(query) {
+func checkObjEquals(t *testing.T, obj clownfish.Obj) {
+	if !obj.Equals(obj) {
 		t.Error("Equals self")
 	}
-	if query.Equals("blah") {
+	if obj.Equals("blah") {
 		t.Error("Equals against Go string")
 	}
 }
 
-func checkQueryMakeCompiler(t *testing.T, query Query) {
+func checkQueryMakeRootCompiler(t *testing.T, query Query) {
 	index := createTestIndex("foo", "bar", "baz")
 	searcher, _ := OpenIndexSearcher(index)
-	compiler, err := query.MakeCompiler(searcher, 1.0, false)
+	compiler, err := query.MakeRootCompiler(searcher)
 	if _, ok := compiler.(Compiler); !ok || err != nil {
-		t.Error("MakeCompiler for %v failed: %v", query, err)
+		t.Error("MakeRootCompiler for %v failed: %v", query, err)
 	}
 }
 
@@ -72,8 +85,8 @@ func TestTermQueryMisc(t *testing.T) {
 	query := NewTermQuery("content", "foo")
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
-	checkQueryEquals(t, query)
-	checkQueryMakeCompiler(t, query)
+	checkObjEquals(t, query)
+	checkQueryMakeRootCompiler(t, query)
 	checkQueryToStringHasFoo(t, query)
 }
 
@@ -92,9 +105,8 @@ func TestTermCompilerMisc(t *testing.T) {
 	searcher, _ := OpenIndexSearcher(folder)
 	query := NewTermQuery("content", "foo")
 	compiler := NewTermCompiler(query, searcher, 1.0)
-	checkQuerySerialize(t, compiler) 
-	checkQueryEquals(t, compiler)
-	checkQueryToStringHasFoo(t, compiler)
+	checkCompilerSerialize(t, compiler)
+	checkObjEquals(t, compiler)
 	segReaders := searcher.GetReader().SegReaders()
 	matcher, err := compiler.MakeMatcher(segReaders[0].(SegReader), false)
 	if matcher == nil || err != nil {
@@ -108,7 +120,6 @@ func TestTermCompilerWeighting(t *testing.T) {
 	query := NewTermQuery("content", "foo")
 	compiler := NewTermCompiler(query, searcher, 1.0)
 	_ = compiler.SumOfSquaredWeights()
-	_ = compiler.GetWeight()
 	compiler.ApplyNormFactor(10.0)
 }
 
@@ -117,8 +128,8 @@ func TestPhraseQueryMisc(t *testing.T) {
 	query := NewPhraseQuery("content", terms)
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
-	checkQueryEquals(t, query)
-	checkQueryMakeCompiler(t, query)
+	checkObjEquals(t, query)
+	checkQueryMakeRootCompiler(t, query)
 	checkQueryToStringHasFoo(t, query)
 }
 
@@ -139,9 +150,8 @@ func TestPhraseCompilerMisc(t *testing.T) {
 	terms := []interface{}{"foo", "bar"}
 	query := NewPhraseQuery("content", terms)
 	compiler := NewPhraseCompiler(query, searcher, 1.0)
-	checkQuerySerialize(t, compiler) 
-	checkQueryEquals(t, compiler)
-	checkQueryToStringHasFoo(t, compiler)
+	checkCompilerSerialize(t, compiler)
+	checkObjEquals(t, compiler)
 }
 
 func TestPhraseCompilerWeighting(t *testing.T) {
@@ -151,7 +161,6 @@ func TestPhraseCompilerWeighting(t *testing.T) {
 	query := NewPhraseQuery("content", terms)
 	compiler := NewPhraseCompiler(query, searcher, 1.0)
 	_ = compiler.SumOfSquaredWeights()
-	_ = compiler.GetWeight()
 	compiler.ApplyNormFactor(10.0)
 }
 
@@ -163,8 +172,8 @@ func TestANDQueryBasics(t *testing.T) {
 	query := NewANDQuery(children)
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
-	checkQueryEquals(t, query)
-	checkQueryMakeCompiler(t, query)
+	checkObjEquals(t, query)
+	checkQueryMakeRootCompiler(t, query)
 	checkQueryToStringHasFoo(t, query)
 }
 
@@ -176,8 +185,8 @@ func TestORQueryBasics(t *testing.T) {
 	query := NewORQuery(children)
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
-	checkQueryEquals(t, query)
-	checkQueryMakeCompiler(t, query)
+	checkObjEquals(t, query)
+	checkQueryMakeRootCompiler(t, query)
 	checkQueryToStringHasFoo(t, query)
 }
 
@@ -187,8 +196,8 @@ func TestReqOptQueryBasics(t *testing.T) {
 	query := NewRequiredOptionalQuery(req, opt)
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
-	checkQueryEquals(t, query)
-	checkQueryMakeCompiler(t, query)
+	checkObjEquals(t, query)
+	checkQueryMakeRootCompiler(t, query)
 	checkQueryToStringHasFoo(t, query)
 }
 
@@ -209,8 +218,8 @@ func TestNOTQueryBasics(t *testing.T) {
 	query := NewNOTQuery(negated)
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
-	checkQueryEquals(t, query)
-	checkQueryMakeCompiler(t, query)
+	checkObjEquals(t, query)
+	checkQueryMakeRootCompiler(t, query)
 	checkQueryToStringHasFoo(t, query)
 }
 
@@ -226,24 +235,24 @@ func TestMatchAllQueryBasics(t *testing.T) {
 	query := NewMatchAllQuery()
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
-	checkQueryEquals(t, query)
-	checkQueryMakeCompiler(t, query)
+	checkObjEquals(t, query)
+	checkQueryMakeRootCompiler(t, query)
 }
 
 func TestNOMatchQueryBasics(t *testing.T) {
 	query := NewNoMatchQuery()
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
-	checkQueryEquals(t, query)
-	checkQueryMakeCompiler(t, query)
+	checkObjEquals(t, query)
+	checkQueryMakeRootCompiler(t, query)
 }
 
 func TestRangeQueryBasics(t *testing.T) {
 	query := NewRangeQuery("content", "fab", "foo", true, true)
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
-	checkQueryEquals(t, query)
-	checkQueryMakeCompiler(t, query)
+	checkObjEquals(t, query)
+	checkQueryMakeRootCompiler(t, query)
 	checkQueryToStringHasFoo(t, query)
 }
 
@@ -251,7 +260,7 @@ func TestLeafQueryBasics(t *testing.T) {
 	query := NewLeafQuery("content", "foo")
 	checkQuerySerialize(t, query)
 	checkQueryDumpLoad(t, query)
-	checkQueryEquals(t, query)
+	checkObjEquals(t, query)
 	checkQueryToStringHasFoo(t, query)
 }
 

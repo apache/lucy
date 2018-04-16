@@ -26,7 +26,6 @@ parcel Lucy;
 public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
 
     Searcher   *searcher;
-    Query      *query;
     String     *field;
     uint32_t    excerpt_length;
     uint32_t    slop;
@@ -39,7 +38,7 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
      * @param searcher An object which inherits from
      * [](cfish:Searcher), such as an
      * [](cfish:IndexSearcher).
-     * @param query Query object or a query string.
+     * @param query Query object, Compiler object, or a query string.
      * @param field The name of the field from which to draw the excerpt.  The
      * field must marked as be `highlightable` (see
      * [](cfish:FieldType)).
@@ -54,7 +53,7 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
      * @param searcher An object which inherits from
      * [](cfish:Searcher), such as an
      * [](cfish:IndexSearcher).
-     * @param query Query object or a query string.
+     * @param query Query object, Compiler object, or a query string.
      * @param field The name of the field from which to draw the excerpt.  The
      * field must marked as be `highlightable` (see
      * [](cfish:FieldType)).
@@ -119,11 +118,6 @@ public class Lucy::Highlight::Highlighter inherits Clownfish::Obj {
      */
     public Searcher*
     Get_Searcher(Highlighter *self);
-
-    /** Accessor.
-     */
-    public Query*
-    Get_Query(Highlighter *self);
 
     /** Accessor for the Lucy::Search::Compiler object derived from
      * `query` and `searcher`.

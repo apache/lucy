@@ -212,22 +212,23 @@ ScorePost_Read_Raw_IMP(ScorePosting *self, InStream *instream,
 }
 
 ScorePostingMatcher*
-ScorePost_Make_Matcher_IMP(ScorePosting *self, Similarity *sim,
-                           PostingList *plist, Compiler *compiler,
-                           bool need_score) {
+ScorePost_Make_Matcher_IMP(ScorePosting *self, PostingList *plist,
+                           float weight) {
     ScorePostingMatcher *matcher
         = (ScorePostingMatcher*)Class_Make_Obj(SCOREPOSTINGMATCHER);
     UNUSED_VAR(self);
-    UNUSED_VAR(need_score);
-    return ScorePostMatcher_init(matcher, sim, plist, compiler);
+    return ScorePostMatcher_init(matcher, plist, weight);
 }
 
 ScorePostingMatcher*
-ScorePostMatcher_init(ScorePostingMatcher *self, Similarity *sim,
-                      PostingList *plist, Compiler *compiler) {
+ScorePostMatcher_init(ScorePostingMatcher *self, PostingList *plist,
+                      float weight) {
     // Init.
-    TermMatcher_init((TermMatcher*)self, sim, plist, compiler);
+    TermMatcher_init((TermMatcher*)self, (PostingList*)plist, weight);
     ScorePostingMatcherIVARS *const ivars = ScorePostMatcher_IVARS(self);
+
+    Similarity *sim = PList_Get_Similarity(plist);
+    ivars->sim = (Similarity*)INCREF(sim);
 
     // Fill score cache.
     ivars->score_cache = (float*)MALLOCATE(TERMMATCHER_SCORE_CACHE_SIZE * sizeof(float));
@@ -259,6 +260,7 @@ ScorePostMatcher_Score_IMP(ScorePostingMatcher* self) {
 void
 ScorePostMatcher_Destroy_IMP(ScorePostingMatcher *self) {
     ScorePostingMatcherIVARS *const ivars = ScorePostMatcher_IVARS(self);
+    DECREF(ivars->sim);
     FREEMEM(ivars->score_cache);
     SUPER_DESTROY(self, SCOREPOSTINGMATCHER);
 }

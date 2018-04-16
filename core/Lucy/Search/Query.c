@@ -18,6 +18,8 @@
 #include "Lucy/Util/ToolSet.h"
 
 #include "Lucy/Search/Query.h"
+#include "Lucy/Index/Similarity.h"
+#include "Lucy/Plan/Schema.h"
 #include "Lucy/Search/Compiler.h"
 #include "Lucy/Search/Searcher.h"
 #include "Lucy/Store/InStream.h"
@@ -29,6 +31,47 @@ Query_init(Query *self, float boost) {
     Query_IVARS(self)->boost = boost;
     ABSTRACT_CLASS_CHECK(self, QUERY);
     return self;
+}
+
+Compiler*
+Query_Make_Root_Compiler_IMP(Query *self, Searcher *searcher) {
+    Compiler *compiler
+        = Query_Make_Compiler(self, searcher, Query_Get_Boost(self));
+
+    Schema     *schema = Searcher_Get_Schema(searcher);
+    Similarity *sim    = Schema_Get_Similarity(schema);
+    Compiler_Normalize(compiler, sim);
+
+    return compiler;
+}
+
+// Default implementation for old Perl API.
+Compiler*
+Query_Make_Compiler_IMP(Query *self, Searcher *searcher, float boost) {
+    return Query_Make_Compiler_Compat(self, searcher, boost, true);
+}
+
+// For old Perl API.
+Compiler*
+Query_Make_Compiler_Compat_IMP(Query *self, Searcher *searcher, float boost,
+                               bool subordinate) {
+    Class *klass = Query_get_class(self);
+    LUCY_Query_Make_Compiler_t make_compiler
+        = METHOD_PTR(klass, LUCY_Query_Make_Compiler);
+    if (make_compiler == Query_Make_Compiler_IMP) {
+        // Detect infinite recursion.
+        THROW(ERR, "Method 'Make_Compiler' not defined by %o",
+              Class_Get_Name(klass));
+    }
+    Compiler *compiler = make_compiler(self, searcher, boost);
+
+    if (!subordinate) {
+        Schema     *schema = Searcher_Get_Schema(searcher);
+        Similarity *sim    = Schema_Get_Similarity(schema);
+        Compiler_Normalize(compiler, sim);
+    }
+
+    return compiler;
 }
 
 void

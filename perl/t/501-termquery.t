@@ -58,10 +58,7 @@ my $different_field = Lucy::Search::TermQuery->new(
 ok( !$term_query->equals($different_term),  "!equals (term)" );
 ok( !$term_query->equals($different_field), "!equals (field)" );
 
-my $term_compiler = $term_query->make_compiler(
-    searcher => $searcher,
-    boost    => $term_query->get_boost,
-);
+my $term_compiler = $term_query->make_root_compiler($searcher);
 $frozen = freeze($term_compiler);
 $thawed = thaw($frozen);
 ok( $term_compiler->equals($thawed), "freeze/thaw compiler" );

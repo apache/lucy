@@ -56,8 +56,7 @@ class Lucy::Index::Posting::ScorePosting nickname ScorePost
     Reset(ScorePosting *self);
 
     incremented ScorePostingMatcher*
-    Make_Matcher(ScorePosting *self, Similarity *sim, PostingList *plist,
-                 Compiler *compiler, bool need_score);
+    Make_Matcher(ScorePosting *self, PostingList *plist, float weight);
 
     nullable uint32_t*
     Get_Prox(ScorePosting *self);
@@ -66,11 +65,11 @@ class Lucy::Index::Posting::ScorePosting nickname ScorePost
 class Lucy::Index::Posting::ScorePostingMatcher nickname ScorePostMatcher
     inherits Lucy::Search::TermMatcher {
 
-    float *score_cache;
+    Similarity *sim;
+    float      *score_cache;
 
     inert ScorePostingMatcher*
-    init(ScorePostingMatcher *self, Similarity *sim, PostingList *plist,
-         Compiler *compiler);
+    init(ScorePostingMatcher *self, PostingList *plist, float weight);
 
     public float
     Score(ScorePostingMatcher* self);

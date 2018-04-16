@@ -82,6 +82,12 @@ inert class Lucy::Test::TestUtils  {
      */
     inert incremented nullable FSFolder*
     modules_folder();
+
+    /** Test whether a freeze/thaw round trip yields an equal object.
+     */
+    inert void
+    test_freeze_thaw(TestBatchRunner *runner, decremented Obj *obj,
+                     const char *msg);
 }
 
 __C__

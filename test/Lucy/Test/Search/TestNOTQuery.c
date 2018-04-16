@@ -22,9 +22,11 @@
 #include "Clownfish/TestHarness/TestBatchRunner.h"
 #include "Lucy/Test.h"
 #include "Lucy/Test/TestUtils.h"
+#include "Lucy/Test/Search/MockSearcher.h"
 #include "Lucy/Test/Search/TestNOTQuery.h"
 #include "Lucy/Search/NOTQuery.h"
 #include "Lucy/Search/LeafQuery.h"
+#include "Lucy/Search/TermQuery.h"
 #include "Lucy/Util/Freezer.h"
 
 TestNOTQuery*
@@ -61,10 +63,22 @@ test_Dump_Load_and_Equals(TestBatchRunner *runner) {
     DECREF(clone);
 }
 
+static void
+test_freeze_thaw_compiler(TestBatchRunner *runner) {
+    NOTQuery *query = TestUtils_make_not_query(
+        (Query*)TermQuery_new(SSTR_WRAP_C("content"), (Obj*)SSTR_WRAP_C("a")));
+    Searcher *searcher = (Searcher*)MockSearcher_new();
+    NOTCompiler *compiler = NOTCompiler_new(query, searcher, 921.0f);
+    TestUtils_test_freeze_thaw(runner, (Obj*)compiler, "compiler");
+    DECREF(searcher);
+    DECREF(query);
+}
+
 void
 TestNOTQuery_Run_IMP(TestNOTQuery *self, TestBatchRunner *runner) {
-    TestBatchRunner_Plan(runner, (TestBatch*)self, 4);
+    TestBatchRunner_Plan(runner, (TestBatch*)self, 5);
     test_Dump_Load_and_Equals(runner);
+    test_freeze_thaw_compiler(runner);
 }
 
 
